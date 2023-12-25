@@ -9,10 +9,10 @@ export class DebitVoucherRequestModel {
 }
 
 export class DebitVoucherDataRequestModel {
-  companyCode: number
+  //companyCode: number
   voucherNo: string
   transType: string
-  transDate: string
+  transDate: Date
   docType: string
   branch: string
   finYear: string
@@ -23,7 +23,7 @@ export class DebitVoucherDataRequestModel {
   partyState: string
   paymentState: string
   entryBy: string
-  entryDate: string
+  entryDate: Date
   panNo: string
   tdsSectionCode: string
   tdsSectionName: string

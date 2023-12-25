@@ -12,34 +12,25 @@ import Swal from 'sweetalert2';
   templateUrl: './vendor-bill-list.component.html'
 })
 export class VendorBillListComponent implements OnInit {
-  tableLoad = true; // flag , indicates if data is still lo or not , used to show loading animation
-  METADATA = {
-    checkBoxRequired: true,
-    noColumnSort: ["checkBoxRequired"],
-  };
+  tableLoad = true; // flag , indicates if data is still loaded or not , used to show loading animation
   tableData: any[]
   columnHeader = {
-    checkBoxRequired: {
-      Title: "Select",
+    srno: {
+      Title: "Sr. No.",
       class: "matcolumncenter",
-      Style: "min-width:8%",
+      Style: "min-width:5%",
     },
     vendor: {
       Title: "Vendor",
       class: "matcolumnleft",
       Style: "min-width:20%",
     },
-    billType: {
-      Title: "Bill Type",
-      class: "matcolumncenter",
-      Style: "min-width:12%",
-    },
     billNo: {
       Title: "Bill No",
       class: "matcolumncenter",
-      Style: "min-width:14%",
-      type: "Link",
-      functionName: "BalanceFunction"
+      Style: "min-width:17%",
+      // type: "Link",
+      // functionName: "BalanceFunction"
     },
     Date: {
       Title: "Date",
@@ -59,7 +50,7 @@ export class VendorBillListComponent implements OnInit {
     Status: {
       Title: "Status",
       class: "matcolumncenter",
-      Style: "min-width:10",
+      Style: "min-width:10%",
     },
 
     actionsItems: {
@@ -68,6 +59,10 @@ export class VendorBillListComponent implements OnInit {
       Style: "min-width:8%",
     }
   }
+  metaData = {
+    checkBoxRequired: true,
+    noColumnSort: Object.keys(this.columnHeader),
+  };
   dynamicControls = {
     add: false,
     edit: false,
@@ -78,7 +73,7 @@ export class VendorBillListComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  staticField = ['Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor']
+  staticField = ['billNo', 'Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor', 'srno']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   EventButton = {
@@ -88,7 +83,7 @@ export class VendorBillListComponent implements OnInit {
   };
   menuItems = [
     { label: 'Approve Bill' },
-    { label: 'Bill Payment' },
+    // { label: 'Bill Payment' },
     { label: 'Hold Payment' },
     { label: 'Unhold Payment' },
     { label: 'Cancel Bill' },
@@ -113,26 +108,43 @@ export class VendorBillListComponent implements OnInit {
   }
 
   functionCallHandler(event) {
-    console.log(event);
+    // console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {
       console.log("failed");
     }
   }
-  //#region to approve bill
+  //#region to handle actions
   async handleMenuItemClick(data) {
     const id = data.data._id;
-    if (data.label.label === 'Approve Bill') {
+    let updateData: any = {};
 
-      const updateData = {
-        bSTATNM: "Approved",
-        bSTAT: 2,
-        mODDT: new Date(),
-        mODBY: localStorage.getItem("UserName"),
-        mODLOC: localStorage.getItem("Branch")
-      };
-      let req = {
+    switch (data.label.label) {
+      case 'Approve Bill':
+        updateData = this.createUpdateData("Approved");
+        break;
+      case 'Modify':
+        this.route.navigateByUrl("/Finance/VendorPayment/BalancePayment");
+        break;
+      // case 'Bill Payment':
+      //   this.route.navigate(["/Finance/VendorPayment/VendorBillPaymentDetails"], {
+      //     state: { data: data.data },
+      //   });
+      //   break;
+      case 'Hold Payment':
+        updateData = this.createUpdateData("On Hold");
+        break;
+      case 'Unhold Payment':
+        updateData = this.createUpdateData("Generated");
+        break;
+      case 'Cancel Bill':
+        updateData = this.createUpdateData("Cancelled");
+        break;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      const req = {
         companyCode: this.companyCode,
         filter: { _id: id },
         collectionName: "vend_bill_summary",
@@ -145,23 +157,48 @@ export class VendorBillListComponent implements OnInit {
         Swal.fire({
           icon: "success",
           title: "Successful",
-          text: "Status is Approved",
+          text: `Status is ${updateData.bSTATNM}`,
           showConfirmButton: true,
         });
 
       }
-      this.getVendorBill();
+    }
 
+    this.getVendorBill();
+  }
+
+  private createUpdateData(status: string) {
+    let bSTAT: number;
+
+    switch (status) {
+      case "Approved":
+        bSTAT = 2;
+        break;
+      case "Hold Payment":
+        bSTAT = 4;
+        break;
+      case "Generated":
+        bSTAT = 1;
+        break;
+      case "Cancelled":
+        bSTAT = 6;
+        break;
+      default:
+        break;
+    }
+
+    return {
+      bSTATNM: status,
+      bSTAT: bSTAT,
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      mODLOC: localStorage.getItem("Branch")
     };
-
   }
-  //#endregion
-  //#region to call function on change of service selection
-  async selectCheckBox(event) {
-    console.log(event);
 
-  }
+
   //#endregion
+
   filterFunction() {
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
       data: { DefaultData: this.filterRequest },
@@ -197,7 +234,7 @@ export class VendorBillListComponent implements OnInit {
       // Call the vendor bill service to get the data
       let data = await this.objVendorBillService.getVendorBillList(this.filterRequest);
 
-      data.forEach(element => {
+      data.forEach((element, i) => {
         if (element.Status === 'Approved') {
           // Remove 'Approve Bill' from the actions array
           const index = element.actions.indexOf('Approve Bill');
@@ -205,9 +242,28 @@ export class VendorBillListComponent implements OnInit {
             element.actions.splice(index, 1);
           }
         }
+        if (element.Status === 'On Hold') {
+          // Remove 'Approve Bill' from the actions array
+          const index = element.actions.indexOf('Hold Payment');
+          if (index !== -1) {
+            element.actions.splice(index, 1);
+          }
+          // Add 'Unhold Payment' to the actions array
+          element.actions.push('Unhold Payment');
+         // console.log(element.actions);
+          
+        }
+        if (element.Status === 'Cancel Bill') {
+          // Remove all values from the actions array
+          element.actions = [];
+        }
       });
+      data = data.filter(x => x.Status != 'Approved');
       // Set the retrieved data to the tableData property
-      this.tableData = data;
+      this.tableData = data.map((x, index) => ({
+        ...x,
+        srno: index + 1
+      }))
 
       // Set tableLoad to false to indicate that the table has finished loading
       this.tableLoad = false;

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 @Component({
@@ -92,7 +93,8 @@ export class InvoiceManagementComponent implements OnInit {
   };
   constructor(
     private InvoiceService: InvoiceServiceService,
-    private DashboardFilterPage: FormBuilder
+    private DashboardFilterPage: FormBuilder,
+    private storage:StorageService
   ) {
     ;
     this.range = this.DashboardFilterPage.group({
@@ -117,18 +119,20 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   async get() {
+    debugger
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
     const requestData={
        startDate:this.range.controls.start.value,
        endDate :this.range.controls.end.value,
+       branch:this.storage.branch,
        customerName:[],
        locationNames:[]
 
     }
     const detail = await this.InvoiceService.getinvoiceDetailBill(requestData);
     // Format the start and end dates using DatePipe
-   this.tableData = detail;
+   this.tableData = detail.filter((item) => item.pendColAmt != 0 || item.penApAmt != 0);
     this.tableLoad = false;
   }
 

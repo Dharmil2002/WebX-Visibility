@@ -75,7 +75,7 @@ export class VendorBalancePaymentControl {
     ];
     this.VendorBalanceTaxationGSTArray = [
       {
-        name: "VendorGSTRegistered ",
+        name: "VendorGSTRegistered",
         label: "Vendor GST Registered",
         placeholder: "Vendor GST Registered",
         type: "toggle",

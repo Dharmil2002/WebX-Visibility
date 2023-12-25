@@ -58,6 +58,7 @@ export class ThcGenerationComponent implements OnInit {
 
   // End Code Of Harikesh
   //FormGrop
+  thcDetailGlobal: any;
   companyCode = localStorage.getItem("companyCode");
   thcTableForm: UntypedFormGroup;
   marketVehicleTableForm: UntypedFormGroup;
@@ -181,6 +182,7 @@ export class ThcGenerationComponent implements OnInit {
   balanceName: any;
   balanceStatus: any;
   isUpdate: boolean;
+  isArrivedInfo: boolean = false;
   thcDetail: any;
   locationData: any;
   prqlist: any;
@@ -192,6 +194,7 @@ export class ThcGenerationComponent implements OnInit {
   jsonControlBasicArray: any;
   jsonControlVehLoadArray: any;
   jsonControlDriverArray: any;
+  jsonControlArrivalArray: any;
   docketDetail: ShipmentDetail;
   //  unloadName: any;
   // unloadStatus: any;
@@ -255,6 +258,7 @@ export class ThcGenerationComponent implements OnInit {
           this.staticField.push('receiveBy', 'arrivalTime', 'remarks');
           this.isSubmit = true;
           this.isUpdate = true;
+          this.isArrivedInfo = true
           break;
         case 'addthc':
           this.addThc = true;
@@ -303,6 +307,8 @@ export class ThcGenerationComponent implements OnInit {
     this.jsonControlBasicArray = this.filterFormControls(thcFormControls, "Basic");
     this.jsonControlVehLoadArray = this.filterFormControls(thcFormControls, "vehLoad");
     this.jsonControlDriverArray = this.filterFormControls(thcFormControls, "driver");
+    this.jsonControlArrivalArray = this.filterFormControls(thcFormControls, "ArrivalInfo");
+
 
     if (this.addThc) {
       this.jsonControlDocketArray = this.filterFormControls(thcFormControls, "shipment_detail");
@@ -312,6 +318,7 @@ export class ThcGenerationComponent implements OnInit {
       ...this.jsonControlBasicArray,
       ...this.jsonControlVehLoadArray,
       ...this.jsonControlDriverArray,
+      ...this.jsonControlArrivalArray,
     ];
 
     if (this.addThc) {
@@ -406,6 +413,7 @@ export class ThcGenerationComponent implements OnInit {
     if (this.isUpdate || this.isView) {
       this.autoFillThc();
     } else {
+
       const vehiclesNo = await getVehicleStatusFromApi(this.companyCode, this.operationService);
       this.vehicleList = vehiclesNo.map(({ vehNo, driver, dMobNo, vMobNo, vendor, vendorType, capacity }) => ({
         name: vehNo,
@@ -699,7 +707,7 @@ export class ThcGenerationComponent implements OnInit {
       return;
     }
 
-    const docket = selectedDkt.map(({ dKTNO, remarks, pod, arrivalTime, receiveBy }) => ({ dKTNO, remarks, pod, arrivalTime, receiveBy }));
+    const docket = selectedDkt.map(({ docNo, remarks, pod, arrivalTime, receiveBy, aCTWT, pKGS }) => ({ docNo, remarks, pod, arrivalTime, receiveBy, aCTWT, pKGS }));
     const formControlNames = [
       "prqNo",
       "advPdAt",
@@ -745,11 +753,22 @@ export class ThcGenerationComponent implements OnInit {
       const podDetails = typeof (docket) == "object" ? docket : ""
       this.thcTableForm.removeControl("docket");
       this.thcTableForm.get("podDetail").setValue(podDetails);
+      const newARR = {
+        ...this.thcDetailGlobal.thcDetails.aRR,
+        "aCTDT": this.thcTableForm.get("ArrivalDate").value,
+        "sEALNO": this.thcTableForm.get("ArrivalSealNo").value,
+        "kM": this.thcTableForm.get("Arrivalendkm").value,
+        "aCRBY": this.thcTableForm.get("Arrivalremarks").value,
+        "aRBY": this.thcTableForm.get("ArrivalBy").value,
+      };
+
       const requestBody = {
         "oPSST": 2,
-        "oPSSTNM": "THC Update",
+        "oPSSTNM": "Delivered",
+        "aRR": newARR,
       };
-      const res = await showConfirmationDialogThc(requestBody, this.thcTableForm.get("tripId").value, this.operationService, podDetails);
+
+      const res = await showConfirmationDialogThc(requestBody, this.thcTableForm.get("tripId").value, this.operationService, podDetails, this.thcTableForm.get("vehicle").value);
       if (res) {
         Swal.fire({
           icon: "success",
@@ -938,6 +957,7 @@ export class ThcGenerationComponent implements OnInit {
   async autoFillThc() {
     const thcDetail = await this.thcService.getThcDetails(this.thcDetail.docNo);
     const thcNestedDetails = thcDetail.data;
+    this.thcDetailGlobal = thcNestedDetails;
     let propertiesToSet = [
 
       { Key: 'route', Name: 'rUTNM' },
@@ -954,7 +974,7 @@ export class ThcGenerationComponent implements OnInit {
       { Key: 'balAmtAt', Name: 'bLPAYAT' },
       { Key: 'status', Name: 'oPSST' },
       { Key: 'panNo', Name: 'vND.pAN' },
-      //{ Key: 'transMode', Name: 'tMODE' }
+      { Key: 'transMode', Name: 'tMODE' }
     ];
 
     propertiesToSet.forEach((property) => {
@@ -1058,16 +1078,16 @@ export class ThcGenerationComponent implements OnInit {
   GenerateTHCgenerationRequestBody() {
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
-
+    debugger
     const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
-    const schArrDate =  moment(deptDate).add(transitHours, 'hours').toDate();
+    const schArrDate = moment(deptDate).add(transitHours, 'hours').toDate();
     // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
-    
+
     //#region MainModel
     this.tHCGenerationModel.companyCode = this.storage.companyCode;
     this.tHCGenerationModel.branch = this.storage.branch;
     this.tHCGenerationModel.docType = "TH";
-    this.tHCGenerationModel.finYear = financialYear;    
+    this.tHCGenerationModel.finYear = financialYear;
     //#endregion
 
     //#region THC Summary
@@ -1086,7 +1106,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.Vendor_Name = this.thcTableForm.controls['vendorName'].value?.name || this.thcTableForm.controls['vendorName'].value;
     this.thcsummaryData.Vendor_pAN = this.thcTableForm.controls['panNo'].value || "";
     this.thcsummaryData.status = 1
-    this.thcsummaryData.statusName = "Generated";
+    this.thcsummaryData.statusName = "Intransit";
     this.thcsummaryData.financialStatus = 0;
     this.thcsummaryData.financialStatusName = "";
     this.thcsummaryData.contAmt = this.thcTableForm.controls['contAmt'].value || 0;
@@ -1102,7 +1122,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.Driver_mobile = this.thcTableForm.controls['driverMno'].value || "";
     this.thcsummaryData.Driver_lc = this.thcTableForm.controls['driverLno'].value || "";
     this.thcsummaryData.Driver_exd = this.thcTableForm.controls['driverLexd'].value || undefined;
-    this.thcsummaryData.Capacity_ActualWeight =  this.thcTableForm.controls['capacity'].value || 0;
+    this.thcsummaryData.Capacity_ActualWeight = this.thcTableForm.controls['capacity'].value || 0;
     this.thcsummaryData.Capacity_volume = 0;
     this.thcsummaryData.Capacity_volumetricWeight = 0;
     this.thcsummaryData.Utilization_ActualWeight = this.thcTableForm.controls['weightUtilization'].value;
@@ -1131,10 +1151,10 @@ export class ThcGenerationComponent implements OnInit {
     //this.thcsummaryData.mODDT = undefined;
     //this.thcsummaryData.mODLOC = undefined;
     //this.thcsummaryData.mODBY = undefined;
-    
+
     //New Added By Harikesh
-    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value?.value || "";
-    this.thcsummaryData.tMODENM = this.thcTableForm.controls['transMode']?.value?.name || "";
+    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value || "";
+    this.thcsummaryData.tMODENM = this.products.find(item => item.value == this.thcTableForm.controls['transMode']?.value)?.name || "";
     this.thcsummaryData.pRQNO = this.thcTableForm.controls['prqNo'].value || "";
     //#endregion
 
@@ -1218,7 +1238,7 @@ export class ThcGenerationComponent implements OnInit {
     this.mfheaderDetails.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
     this.mfheaderDetails.vOL = 0;
     this.mfheaderDetails.tHC = "";
-    this.mfheaderDetails.iSARR = true;
+    this.mfheaderDetails.iSARR = false;
     //this.mfheaderDetails.aRRDT = undefined;
     this.mfheaderDetails.eNTDT = new Date()
     this.mfheaderDetails.eNTLOC = this.storage.branch;
@@ -1241,7 +1261,7 @@ export class ThcGenerationComponent implements OnInit {
       mfdetailsList.pKGS = res.pKGS;
       mfdetailsList.wT = res.aCTWT;
       mfdetailsList.vOL = 0;
-      mfdetailsList.lDPKG = res.pKGS;      
+      mfdetailsList.lDPKG = res.pKGS;
       mfdetailsList.lDWT = res.aCTWT;
       mfdetailsList.lDVOL = 0;
       mfdetailsList.aRRPKG = 0;

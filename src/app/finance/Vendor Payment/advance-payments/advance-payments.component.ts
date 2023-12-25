@@ -31,6 +31,7 @@ import { VoucherServicesService } from "src/app/core/service/Finance/voucher-ser
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { StorageService } from "src/app/core/service/storage.service";
+import { VendorsVehicleDetailComponent } from "../Modal/vendors-vehicle-detail/vendors-vehicle-detail.component";
 @Component({
   selector: "app-advance-payments",
   templateUrl: "./advance-payments.component.html",
@@ -72,20 +73,25 @@ export class AdvancePaymentsComponent implements OnInit {
     VehicleNumber: {
       Title: "Vehicle No.",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
     THCamount: {
       Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
       type: "Link",
       functionName: "THCAmountFunction",
     },
     Advance: {
       Title: "Advance ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
+    // AdvancePending: {
+    //   Title: "Advance Pending ⟨₹⟩",
+    //   class: "matcolumncenter",
+    //   Style: "min-width:15%",
+    // },
   };
   EventButton = {
     functionName: "filterFunction",
@@ -173,7 +179,8 @@ export class AdvancePaymentsComponent implements OnInit {
     this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(
       this.PaymentData?.VendorInfo?.pAN
     );
-    this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0);
+    this.getVendorsVehicles(false);
+
   }
   async GetAdvancePaymentList() {
     this.isTableLode = false;
@@ -269,7 +276,7 @@ export class AdvancePaymentsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        if(result.success){
+        if (result.success) {
           this.GetAdvancePaymentList();
         }
       }
@@ -430,10 +437,10 @@ export class AdvancePaymentsComponent implements OnInit {
             this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name;
           this.debitVoucherRequestModel.finYear = financialYear;
 
-          this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+          // this.debitVoucherDataRequestModel.companyCode = this.companyCode;
           this.debitVoucherDataRequestModel.voucherNo = "";
           this.debitVoucherDataRequestModel.transType = "AdvancePayment";
-          this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
+          this.debitVoucherDataRequestModel.transDate = new Date();
           this.debitVoucherDataRequestModel.docType = "VR";
           this.debitVoucherDataRequestModel.branch =
             this.storage.branch;
@@ -442,22 +449,22 @@ export class AdvancePaymentsComponent implements OnInit {
           this.debitVoucherDataRequestModel.accLocation =
             this.storage.branch;
           this.debitVoucherDataRequestModel.preperedFor = "Vendor";
-          this.debitVoucherDataRequestModel.partyCode = this.PaymentData?.VendorInfo?.cD;
+          this.debitVoucherDataRequestModel.partyCode = `${this.PaymentData?.VendorInfo?.cD || ""}`;
           this.debitVoucherDataRequestModel.partyName = this.PaymentData?.VendorInfo?.nM;
           this.debitVoucherDataRequestModel.partyState =
             this.VendorDetails?.vendorState;
           this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-          this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
+          this.debitVoucherDataRequestModel.entryDate = new Date();
           this.debitVoucherDataRequestModel.panNo =
             this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
 
-          this.debitVoucherDataRequestModel.tdsSectionCode = "tdsSectionCode";
-          this.debitVoucherDataRequestModel.tdsSectionName = "tdsSectionName";
+          this.debitVoucherDataRequestModel.tdsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tdsSectionName = undefined
           this.debitVoucherDataRequestModel.tdsRate = 0;
           this.debitVoucherDataRequestModel.tdsAmount = 0;
           this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-          this.debitVoucherDataRequestModel.tcsSectionCode = "tcsSectionCode";
-          this.debitVoucherDataRequestModel.tcsSectionName = "tcsSectionName";
+          this.debitVoucherDataRequestModel.tcsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tcsSectionName = undefined
           this.debitVoucherDataRequestModel.tcsRate = 0;
           this.debitVoucherDataRequestModel.tcsAmount = 0;
 
@@ -469,7 +476,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
           this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
           this.debitVoucherDataRequestModel.netPayable = NetPayable;
-          this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount;
+          this.debitVoucherDataRequestModel.roundOff = 0;
           this.debitVoucherDataRequestModel.voucherCanceled = false;
 
           this.debitVoucherDataRequestModel.paymentMode =
@@ -636,5 +643,43 @@ export class AdvancePaymentsComponent implements OnInit {
   BalancePaymentlocationFieldChanged(event) {
     console.log(event)
     this.OnPaymentModeChange(event);
+  }
+  async getVendorsVehicles(OpenAble = false) {
+    try {
+      // Fetch beneficiary details from API
+      const VendorWiseVehicleData = await this.objVendorBillService.getVendorsWiseVehicleList(this.PaymentData?.VendorInfo
+        ?.nM);
+      this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(VendorWiseVehicleData.length);
+
+      // Check if beneficiary data is available
+      if (VendorWiseVehicleData.length > 0 && OpenAble) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: VendorWiseVehicleData,
+        };
+
+
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.matDialog.open(VendorsVehicleDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => {
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error('An error occurred:', error);
+    }
+  }
+  vehiclesregisteredview(event) {
+    debugger
+    this.getVendorsVehicles(true);
   }
 }

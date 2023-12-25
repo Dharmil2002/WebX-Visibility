@@ -21,12 +21,19 @@ import {
 } from "../VendorPaymentAPIUtitlity";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from "src/app/Models/Finance/Finance";
-import { Vendbilldetails, Vendbillpayment, VendorBillEntry } from "src/app/Models/Finance/VendorPayment";
+import {
+  DebitVoucherDataRequestModel,
+  DebitVoucherRequestModel,
+} from "src/app/Models/Finance/Finance";
+import {
+  Vendbilldetails,
+  Vendbillpayment,
+  VendorBillEntry,
+} from "src/app/Models/Finance/VendorPayment";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
-import { filter } from 'rxjs/operators';
+import { filter } from "rxjs/operators";
 import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BlancePaymentPopupComponent } from "../Modal/blance-payment-popup/blance-payment-popup.component";
@@ -191,12 +198,8 @@ export class BalancePaymentComponent implements OnInit {
         class: `color-Success-light`,
       },
     ];
-    this.GetVendorInformation();
   }
-  async GetVendorInformation() {
-    this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData?.VendorInfo?.cD)
-    console.log(this.VendorDetails)
-  }
+
   async GetABalancePaymentList() {
     this.isTableLode = false;
     const Filters = {
@@ -211,6 +214,7 @@ export class BalancePaymentComponent implements OnInit {
       Filters
     );
 
+    console.log("GetAdvancePaymentData", GetAdvancePaymentData);
 
     const Data = GetAdvancePaymentData.map((x, index) => {
       return {
@@ -226,7 +230,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     this.tableData = Data;
     this.isTableLode = true;
-    this.selectCheckBox()
+    this.selectCheckBox();
   }
 
   initializeFormControl(): void {
@@ -249,7 +253,8 @@ export class BalancePaymentComponent implements OnInit {
     // const GSTinputType = ['SGSTRate', 'UGSTRate', 'CGSTRate', 'IGSTRate'];
     this.AlljsonControlVendorBalanceTaxationGSTFilterArray =
       this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
-    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray;
+    this.jsonControlVendorBalanceTaxationGSTFilterArray =
+      this.AlljsonControlVendorBalanceTaxationGSTFilterArray;
     this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
     ]);
@@ -352,6 +357,39 @@ export class BalancePaymentComponent implements OnInit {
       this.VendorbillstateCode,
       this.VendorbillstateStatus
     );
+    this.GetVendorInformation();
+  }
+
+  async GetVendorInformation() {
+    const companyCode = localStorage.getItem("companyCode");
+    const filter = { vendorCode: this.PaymentData?.VendorInfo?.cD };
+    const req = { companyCode, collectionName: "vendor_detail", filter };
+    const res: any = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+
+    if (res.success && res.data.length != 0) {
+      this.VendorDetails = res.data[0];
+      console.log("this.VendorDetails", this.VendorDetails);
+
+      if (this.VendorDetails?.otherdetails) {
+        this.VendorBalanceTaxationGSTFilterForm.controls.VendorGSTRegistered.setValue(
+          true
+        );
+        this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.setValue(
+          this.VendorDetails?.otherdetails[0]?.gstNumber
+        );
+        console.log("this.StateList", this.StateList);
+        const getValue = this.StateList.find(
+          (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
+        );
+        console.log("getValue", getValue);
+        this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.setValue(
+          getValue || ""
+        );
+      }
+      console.log("VendorDetails", res);
+    }
   }
 
   async getTDSSectionDropdown() {
@@ -431,8 +469,6 @@ export class BalancePaymentComponent implements OnInit {
     }
   }
 
-
-
   BalanceUnbilledFunction(event) {
     const templateBody = {
       DocNo: event.data.THC,
@@ -460,7 +496,7 @@ export class BalancePaymentComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         if (result.success) {
-          this.GetABalancePaymentList()
+          this.GetABalancePaymentList();
         }
       }
     });
@@ -499,24 +535,11 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
     this.TDSSectionFieldChanged();
-    this.StateChange()
+    this.StateChange();
   }
 
   BeneficiarydetailsViewFunctions(event) {
     console.log("BeneficiarydetailsViewFunctions");
-  }
-  MakePayment() {
-    const dialogRef = this.matDialog.open(BlancePaymentPopupComponent, {
-      data: "",
-      width: "70%",
-      height: "60%",
-      disableClose: true,
-    });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result != undefined) {
-        this.PerformMakePaymentSection(result, true);
-      }
-    });
   }
 
 
@@ -527,47 +550,134 @@ export class BalancePaymentComponent implements OnInit {
     const SACcode = formValues.GSTSACcode;
 
     if (Billbookingstate && Vendorbillstate && SACcode) {
-      const IsStateTypeUT = this.AllStateList.find(item => item.stateName === Vendorbillstate.name).stateType === 'UT';
-      const GSTAmount = this.tableData.filter(item => item.isSelected).reduce((acc, curr) => acc + parseFloat(curr['BalancePending']), 0);
+      const IsStateTypeUT =
+        this.AllStateList.find(
+          (item) => item.stateName === Vendorbillstate.name
+        ).stateType === "UT";
+      const GSTAmount = this.tableData
+        .filter((item) => item.isSelected)
+        .reduce((acc, curr) => acc + parseFloat(curr["BalancePending"]), 0);
       const GSTdata = { GSTAmount, GSTRate: SACcode.GSTRT };
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
-        this.ShowOrHideBasedOnSameOrDifferentState('SAME', GSTdata);
+        this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTdata);
       } else if (IsStateTypeUT) {
-        this.ShowOrHideBasedOnSameOrDifferentState('UT', GSTdata);
-      } else if (!IsStateTypeUT && Billbookingstate.name != Vendorbillstate.name) {
-        this.ShowOrHideBasedOnSameOrDifferentState('DIFF', GSTdata);
+        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTdata);
+      } else if (
+        !IsStateTypeUT &&
+        Billbookingstate.name != Vendorbillstate.name
+      ) {
+        this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTdata);
       }
     }
   }
 
   ShowOrHideBasedOnSameOrDifferentState(Check, GSTdata) {
     const filterFunctions = {
-      'UT': x => x.name !== 'IGSTRate' && x.name !== 'SGSTRate',
-      'SAME': x => x.name !== 'IGSTRate' && x.name !== 'UGSTRate',
-      'DIFF': x => x.name !== 'SGSTRate' && x.name !== 'UGSTRate' && x.name !== 'CGSTRate'
+      UT: (x) => x.name !== "IGSTRate" && x.name !== "SGSTRate",
+      SAME: (x) => x.name !== "IGSTRate" && x.name !== "UGSTRate",
+      DIFF: (x) =>
+        x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate",
     };
 
-    const GSTinputType = ['SGSTRate', 'UGSTRate', 'CGSTRate', 'IGSTRate'];
+    const GSTinputType = ["SGSTRate", "UGSTRate", "CGSTRate", "IGSTRate"];
 
-    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter(filterFunctions[Check]);
+    this.jsonControlVendorBalanceTaxationGSTFilterArray =
+      this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter(
+        filterFunctions[Check]
+      );
 
     const GSTinput = this.jsonControlVendorBalanceTaxationGSTFilterArray
-      .filter(item => GSTinputType.includes(item.name))
-      .map(item => item.name);
+      .filter((item) => GSTinputType.includes(item.name))
+      .map((item) => item.name);
 
-    const GSTCalculateAmount = ((GSTdata.GSTAmount * GSTdata.GSTRate) / (100 * GSTinput.length)).toFixed(2);
+    const GSTCalculateAmount = (
+      (GSTdata.GSTAmount * GSTdata.GSTRate) /
+      (100 * GSTinput.length)
+    ).toFixed(2);
     const GSTCalculateRate = (GSTdata.GSTRate / GSTinput.length).toFixed(2);
 
     const calculateValues = (rateKey, amountKey) => {
-      this.VendorBalanceTaxationGSTFilterForm.get(rateKey).setValue(GSTCalculateRate);
-      this.VendorBalanceTaxationGSTFilterForm.get(amountKey).setValue(GSTCalculateAmount);
+      this.VendorBalanceTaxationGSTFilterForm.get(rateKey).setValue(
+        GSTCalculateRate
+      );
+      this.VendorBalanceTaxationGSTFilterForm.get(amountKey).setValue(
+        GSTCalculateAmount
+      );
     };
-    GSTinput.forEach(x => calculateValues(x, x.substring(0, 4) + 'Amount'));
+    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount"));
 
-    this.VendorBalanceTaxationGSTFilterForm.get('TotalGSTRate').setValue((+GSTCalculateRate * GSTinput.length).toFixed(2));
-    this.VendorBalanceTaxationGSTFilterForm.get('GSTAmount').setValue((+GSTCalculateAmount * GSTinput.length).toFixed(2));
+    this.VendorBalanceTaxationGSTFilterForm.get("TotalGSTRate").setValue(
+      (+GSTCalculateRate * GSTinput.length).toFixed(2)
+    );
+    this.VendorBalanceTaxationGSTFilterForm.get("GSTAmount").setValue(
+      (+GSTCalculateAmount * GSTinput.length).toFixed(2)
+    );
   }
+
+  RedirectToTHCPayment() {
+    this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
+  }
+
+  async getBeneficiaryData() {
+    try {
+      // Fetch beneficiary details from API
+      const beneficiaryModalData =
+        await this.objVendorBillService.getBeneficiaryDetailsFromApi(
+          this.PaymentData.Vendor
+        );
+
+      // Check if beneficiary data is available
+      if (beneficiaryModalData.length > 0) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: beneficiaryModalData,
+        };
+
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.matDialog.open(BeneficiaryDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => { });
+      } else {
+        // Display a warning if no beneficiary data is available
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Please Add Beneficiary Details To View",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error("An error occurred:", error);
+    }
+  }
+
+  //#region Full Booking With Payment
+
+  // Step 1  For Payment Details
+  MakePayment() {
+    const dialogRef = this.matDialog.open(BlancePaymentPopupComponent, {
+      data: "",
+      width: "70%",
+      height: "60%",
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+        this.BookVendorBill(result, true)
+      }
+    });
+  }
+  // Step 2 Create Vendor Bill in vend_bill_summary Collection 
   BookVendorBill(PaymenDetails, generateVoucher) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -577,7 +687,7 @@ export class BalancePaymentComponent implements OnInit {
           branch: this.storage.branch,
           finYear: financialYear,
           data: {
-            companyCode: this.companyCode,
+            //  companyCode: this.companyCode,
             cID: this.companyCode,
             docNo: "",
             bDT: new Date(),
@@ -591,16 +701,16 @@ export class BalancePaymentComponent implements OnInit {
             bALPBAMT: this.BalancePending,
             bSTAT: 1,
             bSTATNM: "Generated",
-            cNL: false,
-            cNLDT: undefined,
-            cNBY: "",
-            cNRES: "",
+            // cNL: false,
+            // cNLDT: undefined,
+            // cNBY: "",
+            // cNRES: "",
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName,
-            mODDT: undefined,
-            mODLOC: "",
-            mODBY: "",
+            // mODDT: undefined,
+            // mODLOC: "",
+            // mODBY: "",
             vND: {
               cD: this.VendorDetails?.vendorCode,
               nM: this.VendorDetails?.vendorName,
@@ -634,6 +744,8 @@ export class BalancePaymentComponent implements OnInit {
             },
           },
         };
+        console.log(this.VendorDetails)
+        console.log(vendorBillEntry)
         firstValueFrom(this.voucherServicesService
           .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
             this.SetVendorBillEntry(res?.data.ops[0].docNo, PaymenDetails, generateVoucher)
@@ -647,6 +759,7 @@ export class BalancePaymentComponent implements OnInit {
     }, "Balance Payment Generating..!");
 
   }
+  //Step 3 set Vendor bill details and store in vend_bill_det collection and update thc_summary collection billno and isbilled
   SetVendorBillEntry(BillNo, PaymenDetails, generateVoucher) {
     this.tableData.filter((x) => x.isSelected == true).forEach(async (item) => {
 
@@ -660,7 +773,7 @@ export class BalancePaymentComponent implements OnInit {
         bALAMT: item.BalancePending,
         tHCAMT: item.THCamount,
         eNTDT: new Date(),
-        eNTLOC: localStorage.getItem("CurrentBranchCode"),
+        eNTLOC: this.storage.branch,
         eNTBY: localStorage.getItem("UserName"),
       };
 
@@ -712,9 +825,7 @@ export class BalancePaymentComponent implements OnInit {
     }
 
   }
-  RedirectToTHCPayment() {
-    this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
-  }
+  //setep 4 Creating voucher_trans And voucher_trans_details And voucher_trans_document collection 
   SubmitVoucherData(PaymenDetails, BillNo) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -731,20 +842,19 @@ export class BalancePaymentComponent implements OnInit {
 
         this.debitVoucherRequestModel.companyCode = this.companyCode;
         this.debitVoucherRequestModel.docType = "VR";
-        this.debitVoucherRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.debitVoucherRequestModel.branch = this.storage.branch;
         this.debitVoucherRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.companyCode = this.companyCode;
         this.debitVoucherDataRequestModel.voucherNo = "";
-        this.debitVoucherDataRequestModel.transType = "DebitVoucher";
-        this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
+        this.debitVoucherDataRequestModel.transType = "BalancePayment";
+        this.debitVoucherDataRequestModel.transDate = new Date();
         this.debitVoucherDataRequestModel.docType = "VR";
         this.debitVoucherDataRequestModel.branch =
-          localStorage.getItem("CurrentBranchCode");
+          this.storage.branch;
         this.debitVoucherDataRequestModel.finYear = financialYear;
 
         this.debitVoucherDataRequestModel.accLocation =
-          localStorage.getItem("CurrentBranchCode");
+          this.storage.branch;
         this.debitVoucherDataRequestModel.preperedFor = "Vendor";
         this.debitVoucherDataRequestModel.partyCode =
           this.tableData[0].OthersData?.vendorCode;
@@ -754,7 +864,7 @@ export class BalancePaymentComponent implements OnInit {
           this.VendorDetails?.vendorState;
         this.debitVoucherDataRequestModel.entryBy =
           localStorage.getItem("UserName");
-        this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
+        this.debitVoucherDataRequestModel.entryDate = new Date();
         this.debitVoucherDataRequestModel.panNo =
           this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
         console.log(this.VendorBalanceTaxationTDSFilterForm.value)
@@ -763,8 +873,8 @@ export class BalancePaymentComponent implements OnInit {
         this.debitVoucherDataRequestModel.tdsRate = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0;
         this.debitVoucherDataRequestModel.tdsAmount = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0;
         this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-        this.debitVoucherDataRequestModel.tcsSectionCode = "tcsSectionCode";
-        this.debitVoucherDataRequestModel.tcsSectionName = "tcsSectionName";
+        this.debitVoucherDataRequestModel.tcsSectionCode = undefined;
+        this.debitVoucherDataRequestModel.tcsSectionName = undefined
         this.debitVoucherDataRequestModel.tcsRate = 0;
         this.debitVoucherDataRequestModel.tcsAmount = 0;
 
@@ -791,7 +901,7 @@ export class BalancePaymentComponent implements OnInit {
         this.debitVoucherDataRequestModel.paymentAmtount = NetPayable;
 
         const companyCode = this.companyCode;
-        const CurrentBranchCode = localStorage.getItem("CurrentBranchCode");
+        const CurrentBranchCode = this.storage.branch;
         console.log(this.tableData)
         var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
           return {
@@ -848,6 +958,7 @@ export class BalancePaymentComponent implements OnInit {
       }
     }, "Advance Payment Voucher Generating..!");
   }
+  // step 5 create vend_bill_payment collection
   vendbillpayment(BillNo, voucherno, PaymenDetails) {
     this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
 
@@ -856,7 +967,7 @@ export class BalancePaymentComponent implements OnInit {
         cID: this.companyCode,
         bILLNO: BillNo,
         vUCHNO: voucherno,
-        lOC: localStorage.getItem("CurrentBranchCode"),
+        lOC: this.storage.branch,
         dTM: PaymenDetails.Date.toUTCString(),
         bILLAMT: item.Advance,
         pAYAMT: item.BalancePending,
@@ -864,10 +975,10 @@ export class BalancePaymentComponent implements OnInit {
         mOD: PaymenDetails.PaymentMode,
         bANK: PaymenDetails?.Bank?.name || "",
         tRNO: PaymenDetails?.ChequeOrRefNo || "",
-        bY: localStorage.getItem("UserName"),
+        //bY: localStorage.getItem("UserName"),
         eNTDT: new Date(),
-        eNTLOC: localStorage.getItem("CurrentBranchCode"),
-        eNTBY: localStorage.getItem("UserName"),
+        eNTLOC: this.storage.branch,
+        eNTBY: this.storage.userName,
       };
 
       const RequestData = {
@@ -897,47 +1008,7 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
   }
-  PerformMakePaymentSection(PaymenDetails, generateVoucher) {
-    this.BookVendorBill(PaymenDetails, generateVoucher)
-  }
-  async getBeneficiaryData() {
-    try {
-      // Fetch beneficiary details from API
-      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(this.PaymentData.Vendor);
-
-      // Check if beneficiary data is available
-      if (beneficiaryModalData.length > 0) {
-        // Prepare request object for the dialog
-        const request = {
-          Details: beneficiaryModalData,
-        };
+  //#endregion
 
 
-        // Open the BeneficiaryDetailComponent dialog
-        const dialogRef = this.matDialog.open(BeneficiaryDetailComponent, {
-          data: request,
-          width: "100%",
-          disableClose: true,
-          position: {
-            top: "20px",
-          },
-        });
-
-        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
-        dialogRef.afterClosed().subscribe(() => {
-        });
-      } else {
-        // Display a warning if no beneficiary data is available
-        Swal.fire({
-          icon: "warning",
-          title: "Warning",
-          text: "Please Add Beneficiary Details To View",
-          showConfirmButton: true,
-        });
-      }
-    } catch (error) {
-      // Log any errors that occur during the process
-      console.error('An error occurred:', error);
-    }
-  }
 }

@@ -116,7 +116,7 @@ export class thcControl {
                     filterOptions: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view:prq ? prq : update,
+                    disable: view ? view : prq ? prq : update,
                     Validations: [
                         {
                             name: "required",
@@ -146,7 +146,7 @@ export class thcControl {
                     type: 'text',
                     value: '',
                     Validations: [],
-                    generatecontrol: true, disable: view ? view : prq ? prq : update,
+                    generatecontrol: true, disable: true,
                     additionalData: {
                         metaData: "Basic"
                     }
@@ -157,8 +157,8 @@ export class thcControl {
                     name: "vendorType",
                     label: "Vendor Type",
                     placeholder: "Vendor Type",
-                    type:'Staticdropdown',
-                    value:[],
+                    type: 'Staticdropdown',
+                    value: [],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -280,8 +280,11 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : update,                    
-                    Validations: [],
+                    disable: view ? view : prq ? prq : update,
+                    Validations: [{
+                        name: "required",
+                        message: "Transport Mode is required",
+                    }],
                     additionalData: {
                         showNameAndValue: false,
                         metaData: "Basic"
@@ -370,6 +373,86 @@ export class thcControl {
                         onOptionSelect: ''
                     },
                     disable: true
+                },
+                {
+                    name: "ArrivalDate",
+                    label: 'Arrival Date',
+                    placeholder: 'Arrival Date',
+                    type: "datetimerpicker",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Arrival Date is required",
+                        },
+                    ],
+                    additionalData: {
+                        metaData: "ArrivalInfo"
+                    },
+                },
+                {
+                    name: 'ArrivalSealNo',
+                    label: 'Arrival Seal No',
+                    placeholder: 'Arrival Seal No',
+                    type: 'number',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Arrival Seal No is required",
+                        },
+                    ],
+                    additionalData: {
+                        metaData: "ArrivalInfo"
+                    },
+                    generatecontrol: true, disable: false
+                },
+                {
+                    name: 'Arrivalendkm',
+                    label: 'Arrival End KM',
+                    placeholder: 'Arrival End KM',
+                    type: 'number',
+                    value: "",
+                    Validations: [{
+                        name: "required",
+                        message: "Arrival End KM is required",
+                    },],
+                    additionalData: {
+                        metaData: "ArrivalInfo"
+                    },
+                    generatecontrol: true, disable: false
+                },
+                {
+                    name: 'Arrivalremarks',
+                    label: 'Arrival Remarks',
+                    placeholder: 'Arrival Remarks',
+                    type: 'text',
+                    value: "",
+                    Validations: [{
+                        name: "required",
+                        message: "Arrival Remarks is required",
+                    },],
+                    additionalData: {
+                        metaData: "ArrivalInfo"
+                    },
+                    generatecontrol: true, disable: false
+                },
+                {
+                    name: 'ArrivalBy',
+                    label: 'Arrival By',
+                    placeholder: 'Arrival By',
+                    type: 'text',
+                    value: localStorage.getItem("UserName"),
+                    Validations: [],
+                    additionalData: {
+                        metaData: "ArrivalInfo"
+                    },
+                    generatecontrol: true, disable: true
                 },
                 {
                     name: 'capacity',
@@ -490,7 +573,7 @@ export class thcControl {
                         message: "Balance Paid At is required",
                     }],
                     generatecontrol: true,
-                    disable:  view ? view : update
+                    disable: view ? view : update
                 },
                 {
                     name: 'overload',

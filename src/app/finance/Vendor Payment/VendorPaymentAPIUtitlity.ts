@@ -7,7 +7,7 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
         branch: localStorage.getItem('Branch'),
         startdate: RequestBody.StartDate,
         enddate: RequestBody.EndDate,
-        vendorNames: RequestBody.vendorList,
+        vendorNames: RequestBody.vendorListWithKeys,
     }
 
     try {
@@ -54,6 +54,7 @@ export async function GetAdvancePaymentListFromApi(masterService, Filters) {
             VehicleNumber: x.vEHNO,
             THCamount: x.cONTAMT,
             Advance: x.aDVAMT,
+            AdvancePending: x.aDVPENAMT,
             OthersData: x
         })) ?? null;
         return result

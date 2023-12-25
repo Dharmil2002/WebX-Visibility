@@ -92,29 +92,31 @@ export class VehicleControls {
                     generatecontrol: true, disable: false
                 },
                 {
-                    name: "vendorType",
-                    label: "Vendor Type",
-                    placeholder: "VehicleType",
-                    type: 'Staticdropdown',
-                    value: [
-                        { value: 1, name: "Attached" },
-                        { value: 2, name: "Service Provider" },
-                        { value: 3, name: "Own" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: false,
+                    name: 'vendorType',
+                    label: 'Vendor Type',
+                    placeholder: 'Search Vendor Type',
+                    type: 'dropdown',
+                    value: isUpdate ? vehicleTable.vendorType : "",
                     Validations: [
                         {
                             name: "required",
-                            message: "Vendor Type  is required",
-                        }],
-                    functions: {
-                        onSelection: "vendorFieldChanged"
+                            message: "Vendor Type is required"
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "autocomplete",
+                        },
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
                     },
-                    additionalData: {}
+                    functions: {
+                        onOptionSelect: "vendorFieldChanged"
+                    },
+                    generatecontrol: true, disable: false
                 },
                 {
                     name: 'vendorName', label: "Vendor Name", placeholder: "Search and select Vendor Name", type: 'dropdown',
@@ -338,6 +340,18 @@ export class VehicleControls {
                 },
                 {
                     name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'vendorCode', label: '', placeholder: '', type: 'text', value: '', Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'vehicleTypeCode', label: '', placeholder: '', type: 'text', value: '', Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'vendorTypeCode', label: '', placeholder: '', type: 'text', value: '', Validations: [],
                     generatecontrol: false, disable: false
                 },
             ]

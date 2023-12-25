@@ -51,6 +51,16 @@
     </form>
     <!-- End -->
 
+    <!-- Mark Arrival Detail -->
+    <div *ngIf="isArrivedInfo">
+      <form [formGroup]="thcTableForm">
+        <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Mark Arrival Detail'"
+          [formData]="jsonControlArrivalArray" (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
+
     <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
       <!-- Bootstrap loader -->
       <div class="spinner-border text-primary" role="status">

@@ -51,6 +51,30 @@ export class SubmitionControl {
                 },
             },
             {
+                name: "mobile",
+                label: "Mobile No",
+                placeholder: "Mobile No",
+                type: "mobile-number",
+                value: "",
+                filterOptions: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Submission Date is required",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "Basic"
+                },
+                functions: {
+
+                },
+            },
+            {
                 name: 'Upload',
                 label: 'Submission Document',
                 placeholder: '',

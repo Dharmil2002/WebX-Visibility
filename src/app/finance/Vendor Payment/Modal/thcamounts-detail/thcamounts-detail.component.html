@@ -1,55 +1,20 @@
 <div mat-dialog-title style="display: flex;
-  justify-content: end;margin:0px;">
+  justify-content: end;margin-bottom:10px;">
     <button mat-icon-button (click)="Close()">
         <mat-icon>close</mat-icon>
     </button>
 </div>
 <div class="body" style="max-height: 420px;">
     <div class="col-12" style="padding: 0px;">
-        <div class="card" style="margin-bottom: 6px;margin-right: 3px;margin-left: 3px;padding: 0px;">
-            <div class="body" style="padding: 0px;">
-                <div class="task-list">
-
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6" style="margin-bottom: 0px;border-right: 2px solid gainsboro;">
-                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
-                                <div class="col-5">Vendor</div>
-                                <div class="col-5">{{PaymentData.Vendor}}</div>
-                            </div>
-                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
-                                <div class="col-5">Date</div>
-                                <div class="col-5">{{THCData.GenerationDate}}</div>
-
-                            </div>
-                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
-                                <div class="col-5">Contract</div>
-                                <div class="col-2 flex-center ">
-                                    <span class="hover p-1 px-3">View</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
-                                <div class="col-5">THC Number
-                                </div>
-                                <div class="col-5">{{THCData.THC}}
-                                </div>
-                            </div>
-                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
-                                <div class="col-5">Vehicle
-                                </div>
-                                <div class="col-5">{{THCData.VehicleNumber}}
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <form [formGroup]="THCAmountsDetailsForm">
+            <app-form-webxpress [form]="THCAmountsDetailsForm" [FormTitle]="'Vendor ' + PaymentData.Vendor"
+                [formData]="THCAmountsDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
     </div>
     <div class="row">
-
         <div class="col-6" *ngIf="isAddForm">
             <form [formGroup]=" THCAmountsADDForm">
                 <app-form-webxpress [form]="THCAmountsADDForm" [FormTitle]="'THC Amounts ADD (+)'"

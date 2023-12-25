@@ -129,10 +129,32 @@ export class UpdateShipmentsControl {
         generatecontrol: true,
         disable: true,
         Validations: [],
+      },
+      {
+        name: "gst",
+        label: "gst",
+        placeholder: "gst",
+        type: "text",
+        value: shipmentDetails?.extraData?.gSTAMT||0,
+        generatecontrol: false,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "gROAMT",
+        label: "gROAMT",
+        placeholder: "gROAMT",
+        type: "text",
+        value: shipmentDetails?.extraData?.gROAMT||0.00,
+        generatecontrol: false,
+        disable: true,
+        Validations: [],
       }
+      
     ];
     this.editDetail=[
       {
+        id: 1,
         name: "or",
         label: "Entered Value",
         placeholder:"Entered Value",
@@ -143,6 +165,7 @@ export class UpdateShipmentsControl {
         Validations: [],
       },
       {
+        id: 2,
         name: "or",
         label: "Edit Value",
         placeholder:"Edit Value",
@@ -153,6 +176,7 @@ export class UpdateShipmentsControl {
         Validations: [],
       },
         {
+            id: 3,
             name: "eNoOfPackage",
             label: "Number of packages",
             placeholder:"Number of packages",
@@ -163,6 +187,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
+            id: 4,
             name: "eDNoOfPackage",
             label: "Number of packages",
             placeholder: shipmentDetails?.extraData.pKGS||0,
@@ -174,6 +199,7 @@ export class UpdateShipmentsControl {
           },
        
           {
+            id: 5,
             name: "eWeight",
             label: "Weight(Kg)",
             placeholder:shipmentDetails?.extraData.cHRWT||0,
@@ -184,6 +210,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           } ,
           {
+            id: 6,
             name: "eDWeight",
             label: "Weight(Kg)",
             placeholder:shipmentDetails?.extraData.cHRWT||0,
@@ -195,6 +222,7 @@ export class UpdateShipmentsControl {
           } ,
           
           {
+            id: 7,
             name: "eFreightType",
             label: "Freight Rate Type",
             placeholder: "Freight Rate  Type",
@@ -205,6 +233,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
+            id: 8,
             name: "eDFreightType",
             label: "Freight Rate Type",
             placeholder: "Freight Rate  Type",
@@ -216,6 +245,7 @@ export class UpdateShipmentsControl {
           },
          
           {
+            id: 9,
             name: "eRate",
             label: "Freight Rate(₹)",
             placeholder:  "Freight Rate(₹)",
@@ -226,6 +256,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
+            id: 10,
             name: "eDRate",
             label: "Freight Rate(₹)",
             placeholder:  "Freight Rate(₹)",
@@ -240,6 +271,7 @@ export class UpdateShipmentsControl {
           },
          
           {
+            id:11,
             name: "eFreight",
             label: "Freight Amount(₹)",
             placeholder: shipmentDetails?.extraData.fRTAMT||"",
@@ -250,6 +282,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
+            id:12,
             name: "eDFreight",
             label: "Freight Amount(₹)",
             placeholder: "Freight Amount(₹)",
@@ -263,6 +296,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
+            id:13,
             name: "eInvoiceAmt",
             label: "Invoice Amount(₹)",
             placeholder: "Invoice Amount(₹)",
@@ -273,6 +307,7 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
+            id:14,
             name: "eDInvoiceAmt",
             label: "Invoice Amount(₹)",
             placeholder: "Invoice Amount(₹)",
@@ -283,21 +318,23 @@ export class UpdateShipmentsControl {
             Validations: [],
           },
           {
-            name: "Entered",
-            label: "Entered Total(₹)",
+            id:101,
+            name: "entered",
+            label: "Sub Total(₹)",
             placeholder: "Discount(₹)",
             type: "text",
-            value:parseFloat(shipmentDetails?.extraData.fRTAMT||0)+parseFloat(shipmentDetails?.extraData.fRTRT||0),
+            value:parseFloat(shipmentDetails?.extraData.fRTAMT||0),
             generatecontrol: true,
             disable: true,
             Validations: []
           },
           {
+            id:102,
             name: "edited",
-            label: "Edited Total(₹)",
+            label: "Sub Total(₹)",
             placeholder: "Edited Total(₹)",
             type: "text",
-            value:parseFloat(shipmentDetails?.extraData.fRTAMT||0)+parseFloat(shipmentDetails?.extraData.fRTRT||0),
+            value:parseFloat(shipmentDetails?.extraData.fRTAMT||0),
             generatecontrol: true,
             disable: true,
             Validations: []

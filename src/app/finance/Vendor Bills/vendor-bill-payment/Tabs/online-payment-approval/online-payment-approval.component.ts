@@ -1,5 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { VendorBillService } from '../../../vendor-bill.service';
+import Swal from 'sweetalert2';
+import { firstValueFrom } from 'rxjs';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-online-payment-approval',
@@ -70,8 +74,8 @@ export class OnlinePaymentApprovalComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Bill Payment' },
-    { label: 'Hold Payment' },
-    { label: 'Unhold Payment' },
+    // { label: 'Hold Payment' },
+    // { label: 'Unhold Payment' },
     { label: 'Cancel Bill' },
     { label: 'Modify' },
   ]
@@ -84,7 +88,9 @@ export class OnlinePaymentApprovalComponent implements OnInit {
   }
   @Input() tabName: string
   staticField = ['Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor', 'billNo']
-  constructor(private objVendorBillService: VendorBillService) {
+  constructor(private objVendorBillService: VendorBillService,
+    private masterService: MasterService,
+    private route: Router) {
     this.filterRequest.startdate.setDate(new Date().getDate() - 30);
     this.getVendorBill();
   }
@@ -102,7 +108,7 @@ export class OnlinePaymentApprovalComponent implements OnInit {
       const data = await this.objVendorBillService.getVendorBillList(this.filterRequest);
 
       // Set the retrieved data to the tableData property
-      this.tableData = data.filter(x => x.Status === 'Approved')
+      this.tableData = data.filter(x => x.Status === 'Approved' && x.status != 'Cancelled')
 
       // Set tableLoad to false to indicate that the table has finished loading
       this.tableLoad = false;
@@ -110,6 +116,80 @@ export class OnlinePaymentApprovalComponent implements OnInit {
       // Log the error to the console
       console.error('Error fetching vendor bill:', error);
     }
+  }
+  //#endregion
+
+  //#region to handle actions
+  async handleMenuItemClick(data) {
+    const id = data.data._id;
+    let updateData: any = {};
+
+    switch (data.label.label) {
+
+      case 'Modify':
+        this.route.navigateByUrl("/Finance/VendorPayment/BalancePayment");
+        break;
+      case 'Bill Payment':
+        this.route.navigate(["/Finance/VendorPayment/VendorBillPaymentDetails"], {
+          state: { data: data.data },
+        });
+        break;
+      case 'Cancel Bill':
+        updateData = this.createUpdateData("Cancel Bill");
+        break;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      const req = {
+        companyCode: this.companyCode,
+        filter: { _id: id },
+        collectionName: "vend_bill_summary",
+        update: updateData
+      }
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: `Status is ${updateData.bSTATNM}`,
+          showConfirmButton: true,
+        });
+
+      }
+    }
+
+    this.getVendorBill();
+  }
+
+  private createUpdateData(status: string) {
+    let bSTAT: number;
+
+    switch (status) {
+      case "Approved":
+        bSTAT = 2;
+        break;
+      case "Hold Payment":
+        bSTAT = 4;
+        break;
+      case "Generated":
+        bSTAT = 1;
+        break;
+      case "Cancel Bill":
+        bSTAT = 6;
+        break;
+      default:
+        break;
+    }
+
+    return {
+      bSTATNM: status,
+      bSTAT: bSTAT,
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      mODLOC: localStorage.getItem("Branch")
+    };
   }
   //#endregion
 }

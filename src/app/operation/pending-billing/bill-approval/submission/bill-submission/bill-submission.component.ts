@@ -63,10 +63,11 @@ export class BillSubmissionComponent implements OnInit {
       bSTS:3,
       bSTSNM:"Bill Submission",
       sUB:{
-        loc:this.storage.branch,
-        sDT:this.billSubmition.controls['submitDate'].value,
-        sBY:this.billSubmition.controls['submissionTo'].value,
-        sDoc:pod
+        lOC:this.storage.branch,
+        dTM:this.billSubmition.controls['submitDate'].value,
+        tO:this.billSubmition.controls['submissionTo'].value,
+        tOMOB:this.billSubmition.controls['mobile'].value,
+        dOC:pod
       }
     }
      await this.invoiceService.updateInvoiceStatus(filter,status);

@@ -209,6 +209,9 @@
                                         </div>
 
                                     </ng-container>
+                                    <ng-container *ngIf="columnHeader[tableData]?.type === 'Activetoggle'">
+                                        <mat-slide-toggle color="primary" [(ngModel)]="element[tableData]" (change)="functionHandle(columnHeader[tableData].functionName , element)"></mat-slide-toggle>
+                                    </ng-container>
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'iconClick'">
                                         <button mat-icon-button
                                             (click)="functionHandle(columnHeader[tableData].functionName , element)">

@@ -43,6 +43,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   height = '100vw';
   width = '100vw';
   maxWidth: '232vw'
+  backPath: string;
   dynamicControls = {
     add: false,
     edit: false,
@@ -102,6 +103,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     private filter: FilterUtils,
     private storage: StorageService
   ) {
+    this.backPath = "/dashboard/Index?tab=Billing​";
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
       this.status=this.router.getCurrentNavigation()?.extras?.state.data.title.status;

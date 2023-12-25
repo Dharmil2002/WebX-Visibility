@@ -227,6 +227,19 @@ export class ProductControls {
         generatecontrol: true,
         disable: false,
       },
+      {
+        name: "ChargesBehavior",
+        label: "",
+        placeholder: "",
+        type: "radiobutton",
+        value: [
+          { value: "+", name: "Add (+)", checked: true },
+          { value: "-", name: "Deduct (-)" },
+        ],
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
     ];
 
     this.ServicesControlsArray = [

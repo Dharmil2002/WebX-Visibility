@@ -40,6 +40,7 @@ export class vehicleModel {
   heightinFeet: any;
   id: any;
   controllBranch: any;
+  vendorTypeCode: number
   constructor(vehicleModel) {
     this.id = vehicleModel._id || this.getRandomID();
     this.vehicleType = vehicleModel.vehicleType || '';

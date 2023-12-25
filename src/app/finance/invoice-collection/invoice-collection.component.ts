@@ -46,6 +46,11 @@ export class InvoiceCollectionComponent implements OnInit {
   };
 
   InvoiceDetailscolumnHeader = {
+    checkBoxRequired: {
+      Title: "",
+      class: "matcolumncenter",
+      Style: "max-width:100px",
+    },
     bILLNO: {
       Title: "Invoice number",
       class: "matcolumnfirst",
@@ -97,7 +102,10 @@ export class InvoiceCollectionComponent implements OnInit {
     "pendingAmount",
   ];
   invoiceDetail: any;
-
+  metaData = {
+    checkBoxRequired: true,
+    noColumnSort: ["checkBoxRequired"],
+  };
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -105,7 +113,6 @@ export class InvoiceCollectionComponent implements OnInit {
     private generalService: GeneralService,
     private storage: StorageService
   ) {
-
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
 
       this.invoiceDetail = this.router.getCurrentNavigation()?.extras?.state.data.columnData;
@@ -172,5 +179,23 @@ export class InvoiceCollectionComponent implements OnInit {
       this.tab('Management​');
     }
   }
- 
+  getCalucationDetails(event){
+    const total = event.reduce((accumulator, eventItem) => {
+      if (eventItem.isSelected) {
+        return accumulator + eventItem.collectionAmount;
+      } else {
+        return 0;
+      }
+    }, 0);
+    this.CollectionSummaryTableForm.controls['collectionTotal'].setValue(Math.abs(total));
+
+  }
+  close(event){
+    this.tableData.map((x)=>{
+      if(x.bILLNO==event.billNO){
+        x.deductions = parseFloat(event?.netDeduction).toFixed(2) || "0.00";
+        x.collectionAmount = (parseFloat(x?.aMT || "0.00") - parseFloat(event?.netDeduction || "0.00")).toFixed(2);
+      }
+    })
+  }
 }

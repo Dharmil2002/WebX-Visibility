@@ -1,9 +1,14 @@
-<div class="paddingdiv">
-
+<div class="row ">
+    <div class="col d-flex justify-content-end">
+        <button mat-icon-button class="mb-2" (click)="Close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+<div class="body">
     <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [metaData]="metaData" [staticField]="staticField" [Link]="linkArray"
         (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)"
-        [menuItemFlag]="menuItemflag" [FormTitle]="'Vendor Bill List'" [EventButton]="EventButton"
-        [menuItems]="menuItems">
+        [menuItemFlag]="menuItemflag" [selectAllRequired]="false" [FormTitle]="'Vehicle List'" [menuItems]="menuItems">
     </app-generic-table-v2>
 </div>

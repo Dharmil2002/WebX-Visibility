@@ -7,9 +7,9 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { FormControls } from 'src/app/core/models/FormControl/formcontrol';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
-import { PackageInfo } from 'src/app/core/models/finance/update.shipmet';
 import { handleError, showSuccessMessage } from 'src/app/Utility/message/sweet-alert';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
+import { ConsigmentUtility } from 'src/app/Utility/module/operation/docket/consigment-utlity.module';
 @Component({
   selector: 'app-update-shipment-amount',
   templateUrl: './update-shipment-amount.component.html'
@@ -30,7 +30,8 @@ export class UpdateShipmentAmountComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
     private fb: UntypedFormBuilder,
-    private invoiceService: InvoiceServiceService
+    private invoiceService: InvoiceServiceService,
+    private consigmentUtility:ConsigmentUtility
   ) {
     
     this.shipmentDetails = this.data;
@@ -75,18 +76,9 @@ export class UpdateShipmentAmountComponent implements OnInit {
   }
   /*Below the function are mainly for the edit the shipment*/
   async updateShipment() {
-    const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight } = this.accountDetail.controls;
-    const { shipment } = this.shipmentTableForm.controls;
-      const bindBiillingData = {
-      pKGS:parseInt(eDNoOfPackage.value),
-      fRTRT: parseFloat(eDRate.value),
-      fRTAMT:parseFloat(eDFreight.value),
-      cHRWT: parseFloat(eDWeight.value),
-      tOTAMT: parseFloat(eDInvoiceAmt.value),
-      mODBY: this.storage.userName,
-      mODLOC: this.storage.branch,
-      mODDT: new Date()
-    }
+    debugger
+    const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight,edited } = this.accountDetail.controls;
+    const {shipment,gst} = this.shipmentTableForm.controls;
     let charges = [];
     this.extraCharges.forEach(element => {
       let chg={};
@@ -96,16 +88,32 @@ export class UpdateShipmentAmountComponent implements OnInit {
       charges.push(chg);
     });
     const sumOfOtherAmount = charges.reduce((a, b) => a + parseFloat(b.aMT), 0);
-    
-    const financeData ={
+    /*below file is for the bindBillingData for add dockets collection*/
+    const bindBiillingData = {
+       gROAMT:edited.value,
+       pKGS:parseInt(eDNoOfPackage.value),
+       fRTRT: parseFloat(eDRate.value),
+       fRTAMT:parseFloat(eDFreight.value),
+       cHRWT: parseFloat(eDWeight.value),
+       tOTAMT:parseFloat(edited.value)+parseFloat(gst.value),
+       mODBY: this.storage.userName,
+       mODLOC: this.storage.branch,
+       mODDT: new Date()
+     }
+     /*End*/
+     /*below file is for the financeData for add docket_fin_det collection*/
+      const financeData ={
       fRTAMT: parseFloat(eDFreight.value),
       oTHAMT: sumOfOtherAmount,
       cHG: charges,
-      tOTAMT: parseFloat(eDInvoiceAmt.value),
+      gROAMT:edited.value,
+      tOTAMT:parseFloat(edited.value)+parseFloat(gst.value),
       mODDT:new Date(),
       mODLOC:this.storage.branch,
       mODBY:this.storage.userName
     }
+    /*End*/
+    /*below file is for the bindBillingData for Update Api*/
     const reqData={
       dockets:bindBiillingData,
       finance:financeData,
@@ -120,14 +128,15 @@ export class UpdateShipmentAmountComponent implements OnInit {
     }
   }
   async getCharges() {
-
+    debugger
     const result = await this.invoiceService.getContractCharges({"cHTY":{"D$in":['C','B']}});
     if (result && result.length > 0) {
       const invoiceList: InvoiceModel[] = [];
 
-      result.forEach((element) => {
+      result.forEach((element,index) => {
         if (element) {
           const invoice: InvoiceModel = {
+            id:14+index,
             name: element.cHCD || '',
             label: `${element.cHNM}`,
             placeholder: element.cHNM || '',
@@ -159,21 +168,30 @@ export class UpdateShipmentAmountComponent implements OnInit {
       this.chargeDetails=[...invoiceList,...enable];
       const combinedArray = [...invoiceList, ...enable].sort((a,b)=>a.name.localeCompare(b.name));
       this.jsonControlsEdit.push(...combinedArray);
+      this.jsonControlsEdit= this.jsonControlsEdit.sort((a,b)=>a.id-b.id);
     }
     this.accountDetail = formGroupBuilder(this.fb, [this.jsonControlsEdit]);
     this.isChagesValid = true;
+    const getbillingDetail=await this.consigmentUtility.getBillingData({dKTNO:this.shipmentDetails.shipment});
+     if(getbillingDetail.length>0){
+      getbillingDetail[0].forEach(element => {
+        this.accountDetail.controls[element.cHGID].setValue(element.aMT);
+        this.accountDetail.controls[`${element.cHGID}Ed`].setValue(element.aMT);
+      });
+    let totAmt= getbillingDetail[0].reduce((total,amt)=>total+amt.aMT,0);
+    const frtAmt = parseFloat(this.accountDetail.controls['eDFreight']?.value || 0.0)
+    let total=frtAmt+totAmt
+    this.accountDetail.controls['edited'].setValue(total);
+    this.accountDetail.controls['entered'].setValue(total);
+     }
+    
 
   }
   /*End*/
   calucatedCharges(data){
     const fieldData=this.accountDetail.controls[data.field.name]?.value||"";
-    this.accountDetail.controls[data.field.name.split("Ed")[0]].setValue(fieldData); 
-    let enterAmt=this.accountDetail.controls['Entered'];
     let editedAmt=this.accountDetail.controls['edited'];
-    let invoiceAmt=this.accountDetail.controls['eInvoiceAmt']
-    enterAmt.setValue(parseFloat(fieldData)+parseFloat(enterAmt.value||0));
     editedAmt.setValue(parseFloat(fieldData)+parseFloat(editedAmt.value||0));
-    invoiceAmt.setValue(parseFloat(fieldData)+parseFloat(invoiceAmt.value||0));
   }
 
 }

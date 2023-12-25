@@ -30,7 +30,7 @@ export class InvoiceServiceService {
     return res.data;
   }
 
-  async filterShipment(shipments) {
+  async filterShipment(shipments,isShipment:boolean=false) {
     const filterShipmentList = [];
     const req = {
       companyCode: this.storage.companyCode,
@@ -50,11 +50,11 @@ export class InvoiceServiceService {
           state: locDetails.data[0].locState || "", // Assuming locState is the state you want to assign
           vehicleNo: element?.vEHNO || "",
           amount: element?.gROAMT || "",
-          gst: 0 || "",
+          gst: isShipment?element.gSTAMT:0.00,
           gstChrgAmt: element?.gSTCHAMT || "",
-          total: element.gROAMT,
-          noOfpkg: element?.pKGS || 0,
-          weight: element?.aCTWT || 0,
+          total:isShipment? element.gROAMT+element.gSTAMT:element.gROAMT,
+          noOfpkg: element?.pKGS || 0.00,
+          weight: element?.aCTWT || 0.00,
           isSelected: false,
           actions: ["Approve", "Hold", "Edit"],
           extraData: element,
@@ -153,23 +153,25 @@ export class InvoiceServiceService {
       "bSTSNM": "Generated",
       "bSTSDT": new Date(),
       "eXMT": data?.gstExempted || false,
-      "eXMTRES": data?.ExemptionReason || false,
+      "eXMTRES": data?.ExemptionReason || "",
       "gEN": {
         "lOC": this.storage.branch,
         "cT":data?.gstCt||"",
         "sT":data?.gstSt||"",
-        "gSTIN": data?.cGstin || false,
+        "gSTIN": data?.cGstin || "",
       },
-      // "sUB": {
-      //   "lOC": "",
-      //   "tO": "",
-      //   "tOMOB": "",
-      //   "dTM": ""
-      // },
-      // "cOL": {
-      //   "aMT": 0.00,
-      //   "bALAMT": 0.00
-      // },
+      "sUB": {
+        "lOC":data?.submissionOffice||"",
+        "tO": "",
+        "tOMOB": "",
+        "dTM": "",
+        "dOC":""
+      },
+      "cOL": {
+        "lOC":data?.collectionOffice||"",
+        "aMT": 0.00,
+        "bALAMT": 0.00
+      },
       "cUST": {
         "cD": customerCode,
         "nM": customerName,
@@ -282,7 +284,7 @@ export class InvoiceServiceService {
     const reqbody = {
       companyCode: this.storage.companyCode,
       collectionName: "dockets",
-      filter: { dKTNO: data.dktNo },
+      filter: { docNo: data.dktNo },
       update: data.dockets
     }
     await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqbody));

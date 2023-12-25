@@ -66,12 +66,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     srNo: {
       name: "#",
       key: "index",
-      style: "",
+     style: "",
     },
     INVNO: {
       name: "Invoice No.",
       key: "inputString",
-      style: "",
+      style: "min-width:150px",
     },
     INVDT: {
       name: "Invoice Date",
@@ -79,12 +79,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       additionalData: {
         minDate: new Date(),
       },
-      style: "",
+      style: "max-width:350px",
     },
     LENGTH: {
       name: "Length (CM)",
       key: "inputnumber",
-      style: "",
+      style: "min-width:150px",
       functions: {
         onChange: "calculateInvoiceTotal",
       },
@@ -92,7 +92,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     BREADTH: {
       name: "Breadth (CM)",
       key: "inputnumber",
-      style: "",
+     style: "min-width:150px",
       functions: {
         onChange: "calculateInvoiceTotal",
       },
@@ -103,7 +103,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       functions: {
         onChange: "calculateInvoiceTotal",
       },
-      style: "",
+     style: "min-width:150px",
     },
     DECLVAL: {
       name: "Declared Value",
@@ -111,7 +111,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       functions: {
         onChange: "calculateInvoiceTotal",
       },
-      style: "",
+     style: "min-width:150px",
     },
     NO_PKGS: {
       name: "No. of Pkgs.",
@@ -119,7 +119,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       functions: {
         onChange: "calculateInvoiceTotal",
       },
-      style: "",
+     style: "min-width:150px",
     },
     CUB_WT: {
       name: "Cubic Weight",
@@ -127,7 +127,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       functions: {
         onChange: "calculateInvoiceTotal",
       },
-      style: "",
+     style: "min-width:150px",
     },
     ACT_WT: {
       name: "Actual Weight (KG)",
@@ -135,22 +135,22 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       functions: {
         onChange: "calculateInvoiceTotal",
       },
-      style: "",
+     style: "min-width:150px",
     },
     Invoice_Product: {
       name: "Product",
       key: "inputString",
-      style: "",
+     style: "min-width:150px",
     },
     HSN_CODE: {
       name: "HSN Code",
       key: "inputString",
-      style: "",
+     style: "min-width:150px",
     },
     action: {
       name: "Action",
       key: "Action",
-      style: "",
+     style: "min-width:150px",
     },
   };
   /*below the varible for the

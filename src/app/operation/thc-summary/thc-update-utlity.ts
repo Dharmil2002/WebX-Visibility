@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-export async function showConfirmationDialogThc(data, tripId, operationService, podDetails) {
+export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -11,26 +11,60 @@ export async function showConfirmationDialogThc(data, tripId, operationService, 
     });
 
     if (confirmationResult.isConfirmed) {
-        const res = await updateThcStatus(data, tripId, operationService, podDetails);
+        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo);
         return res
     }
 
 }
-async function updateThcStatus(data, tripId, operationService, podDetails) {
+async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo) {
     const updatePromises = podDetails.map(async (element) => {
         const reqBody = {
             "companyCode": localStorage.getItem('companyCode'),
             "collectionName": "docket_ops_det",
             "filter": {
-                dKTNO: element.docketNumber, tId: tripId
+                dKTNO: element.docNo, tId: tripId
             },
             "update": {
+                "sTS": 2,
+                "sTSNM": "delivered",
                 "rMRK": element.remarks,
                 "pOD": element.pod,
                 "aRVTM": element.arrivalTime,
                 "rBY": element.receiveBy,
+                "aRRDT": data.aRR.aCTDT,
+                "aRRPKG": element.pKGS,
+                "aRRWT": element.aCTWT,
+                "vEHNO": vehicleNo,
+                "cLOC": localStorage.getItem('Branch'),
             }
         };
+        const reqBodyDocketEvent = {
+            "companyCode": localStorage.getItem('companyCode'),
+            "collectionName": "docket_events",
+            "data": {
+                "_id": `${localStorage.getItem('companyCode')}-${element.docNo}-0-EVN0004-${element.arrivalTime}`,
+                "cID": localStorage.getItem('companyCode'),
+                "dKTNO": element.docNo,
+                "sFX": 0,
+                "cNO": null,
+                "lOC": localStorage.getItem('Branch'),
+                "eVNID": "EVN0004",
+                "eVNDES": "Delivered",
+                "eVNDT": new Date(),
+                "eVNSRC": "Docket Delivered",
+                "nLOC": null,
+                "dOCTY": "",
+                "dOCNO": "",
+                "eTA": null,
+                "sTS": 4,
+                "sTSNM": "Delivered",
+                "oPSTS": "Docket Delivered - Delivered On " + localStorage.getItem('Branch'),
+                "eNTDT": new Date(),
+                "eNTLOC": localStorage.getItem('Branch'),
+                "eNTBY": localStorage.getItem('UserName'),
+            }
+        };
+        await operationService.operationMongoPost("generic/create", reqBodyDocketEvent).toPromise();
         return operationService.operationMongoPut("generic/update", reqBody).toPromise();
     });
     // Wait for all pod updates to complete

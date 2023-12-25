@@ -108,9 +108,7 @@
             Loading...
           </div> -->
           <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
-          <button class="msr-3" mat-raised-button color="primary" (click)="save()"
-            
-            >{{isUpdate?"Edit Docket":"Generate Docket"}} </button>
+          <button class="msr-3" mat-raised-button color="primary" [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" (click)="save()">{{isUpdate?"Edit Docket":"Generate Docket"}} </button>
           <button class="msr-3" mat-raised-button color="primary">Back</button>
         </div>
       </div>

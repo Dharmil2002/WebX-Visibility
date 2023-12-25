@@ -68,6 +68,7 @@ export class Vendbilldetails {
   tRIPNO?: string;
   tTYP?: string;
   aDVAMT?: number;
+  pENDBALAMT?: number;
   bALAMT?: number;
   tHCAMT?: number;
   eNTDT?: Date;

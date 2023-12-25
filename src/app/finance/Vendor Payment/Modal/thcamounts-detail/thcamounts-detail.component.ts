@@ -160,11 +160,11 @@ export class THCAmountsDetailComponent implements OnInit {
     // Helper function to filter and map charges based on the specified operator
     const filterCharges = (charges, operator) =>
       charges
-        .filter((x) => x.Add_Deduct === operator)
+        .filter((x) => x.cHBHV === operator)
         .map((x) => ({
-          name: x.SelectCharges.replaceAll(/\s/g, ""),
-          label: x.SelectCharges,
-          placeholder: x.SelectCharges,
+          name: x.cHNM.replaceAll(/\s/g, ""),
+          label: x.cHNM,
+          placeholder: x.cHNM,
           type: "number",
           value: 0.0,
           generatecontrol: true,
@@ -185,10 +185,9 @@ export class THCAmountsDetailComponent implements OnInit {
     // Request parameters to fetch charges from the server
     const req = {
       companyCode: this.companyCode,
-      collectionName: "product_charges_detail",
+      collectionName: "charges",
       filter: {
-        ProductName: this.THCData.OthersData.transMode,
-        ChargesType: "Charges",
+        cHTY:'V'
       },
     };
 
@@ -203,7 +202,6 @@ export class THCAmountsDetailComponent implements OnInit {
       // Filter and map charges based on the specified operator
       return filterCharges(res.data, operator);
     }
-
     // Return an empty array if no charges are found
     return [];
   }
@@ -265,16 +263,16 @@ export class THCAmountsDetailComponent implements OnInit {
   async submit() {
     const Charges = [];
     this.ChargesData.forEach((x) => {
-      const FieldName = x.SelectCharges.replaceAll(/\s/g, "");
+      const FieldName = x.cHNM.replaceAll(/\s/g, "");
       const Amount = parseInt(
-        x.Add_Deduct == "+"
+        x.cHBHV == "+"
           ? this.THCAmountsADDForm.value[FieldName]
           : this.THCAmountsLESSForm.value[FieldName]
       );
       Charges.push({
-        cRGCD: x.ChargesCode,
-        cRGNM: x.SelectCharges,
-        cRGTYP: x.Add_Deduct,
+        cRGCD: x.cHCD,
+        cRGNM: x.cHNM,
+        cRGTYP: x.cHBHV,
         cRGAMT: Amount,
       });
     });

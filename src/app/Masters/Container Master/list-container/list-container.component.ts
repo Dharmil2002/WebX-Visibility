@@ -5,6 +5,8 @@ import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
+import { ExpressRouteBulkUploadComponent } from "../../vendor-contract/vendorContractTabs/vendor-terdetail/express-route-bulk-upload/express-route-bulk-upload.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-list-container",
@@ -107,7 +109,8 @@ export class ListContainerComponent implements OnInit {
   constructor(
     private Route: Router,
     private masterService: MasterService,
-    private storage: StorageService
+    private storage: StorageService,
+    private dialog: MatDialog,
   ) {}
 
   async ngOnInit() {
@@ -171,5 +174,15 @@ export class ListContainerComponent implements OnInit {
         showConfirmButton: true,
       });
     }
+  }
+
+  upload() {
+    const dialogRef = this.dialog.open(ExpressRouteBulkUploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      // this.getXpressDetail();
+    });
   }
 }

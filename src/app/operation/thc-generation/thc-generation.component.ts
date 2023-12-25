@@ -307,7 +307,9 @@ export class ThcGenerationComponent implements OnInit {
     this.jsonControlBasicArray = this.filterFormControls(thcFormControls, "Basic");
     this.jsonControlVehLoadArray = this.filterFormControls(thcFormControls, "vehLoad");
     this.jsonControlDriverArray = this.filterFormControls(thcFormControls, "driver");
-    this.jsonControlArrivalArray = this.filterFormControls(thcFormControls, "ArrivalInfo");
+    if (this.isArrivedInfo) {
+      this.jsonControlArrivalArray = this.filterFormControls(thcFormControls, "ArrivalInfo");
+    }
 
 
     if (this.addThc) {
@@ -318,8 +320,9 @@ export class ThcGenerationComponent implements OnInit {
       ...this.jsonControlBasicArray,
       ...this.jsonControlVehLoadArray,
       ...this.jsonControlDriverArray,
-      ...this.jsonControlArrivalArray,
+      ...(this.isArrivedInfo ? this.jsonControlArrivalArray : []),
     ];
+
 
     if (this.addThc) {
       this.jsonControlArray.push(...this.jsonControlDocketArray);

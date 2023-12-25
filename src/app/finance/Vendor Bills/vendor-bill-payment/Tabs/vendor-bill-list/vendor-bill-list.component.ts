@@ -200,7 +200,6 @@ export class VendorBillListComponent implements OnInit {
   //#endregion
 
   filterFunction() {
-
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
       data: { DefaultData: this.filterRequest },
       width: "60%",

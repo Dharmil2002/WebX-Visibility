@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
   templateUrl: "./add-group.component.html",
 })
 export class AddGroupComponent implements OnInit {
+  backPath: string;
   UpdateData: any;
   isUpdate: boolean = false;
   FormTitle: string = "Add Account Group";
@@ -19,17 +20,13 @@ export class AddGroupComponent implements OnInit {
   GroupForm: any;
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
   FirstUpdate = false;
-  breadScrums = [
-    {
-      title: "Account Group Master",
-      items: ["Home"],
-      active: "Account",
-    },
-  ];
   AcGroupCatCode: any;
   AcGroupCatStatus: any;
   BalanceSheetCode: any;
   BalanceSheetStatus: any;
+  submit = 'Save';
+  action: string;
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -39,12 +36,39 @@ export class AddGroupComponent implements OnInit {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
-      this.FormTitle = "Edit Account Group";
+      this.submit = 'Modify';
+      this.action = 'edit'
+    } else {
+      this.action = 'Add'
+    }
+    if (this.action === 'edit') {
+      this.isUpdate = true;
+      this.breadScrums = [
+        {
+          title: "Modify Account Group Master",
+          items: ["Masters"],
+          active: "Modify Account Group Master",
+          generatecontrol: true,
+          toggle: this.UpdateData.activeFlag
+        },
+      ];
+
+    } else {
+      this.breadScrums = [
+        {
+          title: "Add Account Group Master",
+          items: ["Masters"],
+          active: "Add Account Group Master",
+          generatecontrol: true,
+          toggle: false
+        },
+      ];
     }
   }
   ngOnInit(): void {
     this.initializeFormControl();
     this.bindDropdown();
+    this.backPath = "/Masters/AccountMaster/ListAccountGroup";
   }
   initializeFormControl() {
     const GroupFormControls = new AccountGroupControls(
@@ -145,6 +169,10 @@ export class AddGroupComponent implements OnInit {
       BalanceSheetName: this.GroupForm.value.BalanceSheet.name,
       BalanceSheetCode: this.GroupForm.value.BalanceSheet.value,
       GroupName: this.GroupForm.value.GroupName,
+      activeFlag: this.GroupForm.value.activeFlag,
+      mODBY: localStorage.getItem("UserName"),
+      mODDT: new Date(),
+      mODLOC: localStorage.getItem("Branch"),
     };
     if (this.isUpdate) {
       const req = {
@@ -167,9 +195,11 @@ export class AddGroupComponent implements OnInit {
           tabledata.data.length === 0
             ? 1
             : tabledata.data[tabledata.data.length - 1].Groupcode + 1,
-        entryBy: localStorage.getItem("UserName"),
-        entryDate: new Date(),
-        companyCode: this.CompanyCode,
+        cID: this.CompanyCode,
+        activeFlag: this.GroupForm.value.activeFlag,
+        eNTBY: localStorage.getItem("UserName"),
+        eNTDT: new Date(),
+        eNTLOC: localStorage.getItem("Branch"),
         ...commonBody,
       };
       const req = {
@@ -208,5 +238,11 @@ export class AddGroupComponent implements OnInit {
     } catch (error) {
       console.log("failed");
     }
+  }
+
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.GroupForm.controls['activeFlag'].setValue(event);
+    //console.log("Toggle value :", event);
   }
 }

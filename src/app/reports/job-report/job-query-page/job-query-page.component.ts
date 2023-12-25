@@ -20,6 +20,7 @@ import Swal from 'sweetalert2';
   selector: 'app-job-query-page',
   templateUrl: './job-query-page.component.html'
 })
+
 export class JobQueryPageComponent implements OnInit {
   /*Above all are used for the Job table*/
   jobQueryTableForm: UntypedFormGroup;

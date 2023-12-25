@@ -1,8 +1,8 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="'/Masters/AccountMaster/ListAccountGroup'">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="GroupForm">
         <app-form-webxpress [form]="GroupForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
             [FormTitle]="FormTitle" (callFunction)="functionCallHandler($event)"
-            (functionCallEmitter)="functionCallHandler($event)">
+            (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

@@ -133,15 +133,15 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
     try {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {
-            ActiveFlag: true,
-            AccountCategoryName: AccountCategoryName,
-            AccountingLocations: AccountingLocations
+            iSSYS: 1,
+            cATNM: AccountCategoryName,
+            // AccountingLocations: AccountingLocations
         };
         const req = { companyCode, collectionName: 'account_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
         if (res && res.data) {
             return res.data.map(x => ({
-                name: x.AccountDescription, value: x.AccountCode, ...x
+                name: x.aCNM, value: x.aCCD, ...x
             }));
         }
     } catch (error) {

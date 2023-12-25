@@ -60,6 +60,7 @@ export class VendorBillEntry {
     // mODLOC?: string;
     // mODBY?: string;
   };
+  BillDetails?: Vendbilldetails[];
 }
 export class Vendbilldetails {
   _id: string;
@@ -88,6 +89,7 @@ export class Vendbillpayment {
   dTM?: Date;
   bILLAMT?: number;
   pAYAMT?: number;
+  pENDBALAMT?: number;
   aMT?: number;
   mOD?: string;
   bANK?: string;

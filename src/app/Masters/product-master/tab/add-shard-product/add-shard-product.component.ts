@@ -94,7 +94,7 @@ export class AddShardProductComponent implements OnInit {
   async save() {
     const length = this.tableData.length
     const index = length == 0? 1 : parseInt(this.tableData[length-1].pRCD.substring(3))+ 1
-    const ProductCode = `PRO${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
+    const ProductCode = `PRO${index <= 9 ? "00" : index >= 9 && index <= 99 ? "0" : ""}${index}`
     const Body = {
       _id: `${this.companyCode}-${ProductCode}`,
       pRNM: this.customerTableForm.value.ProductName,

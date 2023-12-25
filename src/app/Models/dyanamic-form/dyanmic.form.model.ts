@@ -1,4 +1,5 @@
 export class InvoiceModel {
+    id?:number;
     name: string;
     label: string;
     placeholder: string;

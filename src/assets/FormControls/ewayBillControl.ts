@@ -9,6 +9,7 @@ export class EwayBillControls {
   private contractControlArray: FormControls[];
   private totalSummaryControlArray: FormControls[];
   private ewayBillControlArray: FormControls[];
+  private EWayDetailControlArray: FormControls[];
   constructor() {
     this.docketFields = [
       {
@@ -205,7 +206,7 @@ export class EwayBillControls {
         name: "consignorTelephoneNo",
         label: "Consignor TelephoneNo",
         placeholder: "Consignor TelephoneNo",
-        type: "text",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -223,7 +224,7 @@ export class EwayBillControls {
         name: "consignorMobileNo",
         label: "Consignor MobileNo",
         placeholder: "Consignor MobileNo",
-        type: "text",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -291,7 +292,12 @@ export class EwayBillControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Consignor Name is required",
+          }
+        ],
       },
       {
         name: "consigneeCity",
@@ -343,7 +349,7 @@ export class EwayBillControls {
         name: "consigneeTelNo",
         label: "Consignee TelephoneNo",
         placeholder: "Consignee TelephoneNo",
-        type: "text",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -361,7 +367,7 @@ export class EwayBillControls {
         name: "consigneeMobNo",
         label: "Consignee MobileNo",
         placeholder: "Consignee MobileNo",
-        type: "text",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -1236,6 +1242,120 @@ export class EwayBillControls {
         Validations: [],
       },
     ];
+
+    this.EWayDetailControlArray = [
+      {
+        name: "INVNO",
+        label: "Invoice No",
+        placeholder: "Invoice No",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "INVDT",
+        label: "Invoice Date",
+        placeholder: "",
+        type: "date",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "LENGTH",
+        label: "Length (CM)",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "BREADTH",
+        label: "Breadth (CM)",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "HEIGHT",
+        label: "Height (CM)",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "DECLVAL",
+        label: "Declared Value",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "NO_PKGS",
+        label: "Pkgs",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "CUB_WT",
+        label: "Weight",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "ACT_WT",
+        label: "Actual Weight (KG)",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "Invoice_Product",
+        label: "Product",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "HSN_CODE",
+        label: "HSN Code",
+        placeholder: "",
+        type: "text",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+
+    ];
   }
 
   getDocketFieldControls() {
@@ -1252,6 +1372,9 @@ export class EwayBillControls {
   }
   getContainerFieldControls() {
     return this.containerControlArray;
+  }
+  getEwayBillFormControls() {
+    return this.EWayDetailControlArray;
   }
   getContractFieldControls() {
     return this.contractControlArray;

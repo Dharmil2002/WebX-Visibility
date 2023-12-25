@@ -47,7 +47,7 @@ dynamicControls = {
   async getShipmentDetails() {
     const shipments=this.shipments.dKTNO;
     let details=await this.invoiceServiceService.getInvoice(shipments,this.status);
-    let filterData=await this.invoiceServiceService.filterShipment(details);
+    let filterData=await this.invoiceServiceService.filterShipment(details,true);
     this.tableData=filterData;
     this.isLoad=false;
   }

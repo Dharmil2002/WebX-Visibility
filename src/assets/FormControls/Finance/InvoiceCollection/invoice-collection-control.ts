@@ -110,7 +110,7 @@ export class InvoiceCollectionControl {
         type: "text",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
       },
       {

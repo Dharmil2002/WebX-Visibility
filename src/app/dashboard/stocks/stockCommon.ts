@@ -57,7 +57,7 @@ export async function getDocketDetailsFromApi(
 
     // Filter docket details based on branch
     const docketDetails = res.data.filter(
-      (x: any) => x.orgLoc.toLowerCase() === branch.toLowerCase() || x.unloadloc.toLowerCase() === branch.toLowerCase()
+      (x: any) => x.orgLoc.toLowerCase() === branch.toLowerCase() || (x.unloadloc && x.unloadloc.toLowerCase() === branch.toLowerCase())
     );
 
     // Modify the data

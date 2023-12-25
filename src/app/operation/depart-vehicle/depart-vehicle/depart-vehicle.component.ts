@@ -386,8 +386,8 @@ export class DepartVehicleComponent implements OnInit {
 
   Close() {
 
-    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType'].value.value);
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle'].value.value);
+    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value||"");
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value||"");
     const loadingArray = [this.loadingSheetTableForm.value];
     const departArray = [this.departvehicleTableForm.value];
     const advancearray = [this.advanceTableForm.value];
@@ -403,8 +403,7 @@ export class DepartVehicleComponent implements OnInit {
     ];
     const mergedData = this.mergeArrays(mergedArray);
     delete mergedData.vehicleTypecontrolHandler;
-    mergedData['tripId'] = this.tripData.TripID;
-    mergedData['_id'] = this.tripData.TripID;
+    mergedData['_id'] = this.tripData.TripID+"-"+this.tripData.VehicleNo+"-"+this.tripData.RouteandSchedule.split(":")[1].split("-")[0];
     mergedData['lsno'] = this.lsDetails?.lsno || '';
     mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);
@@ -534,7 +533,7 @@ export class DepartVehicleComponent implements OnInit {
       );
     }
      // Update departure vehicle form controls with driver details
-     if (driverDetail[0]) {
+     if (driverDetail&&driverDetail[0]) {
       this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
       this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
       this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");

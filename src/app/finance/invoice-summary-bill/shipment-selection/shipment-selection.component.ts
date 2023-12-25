@@ -42,7 +42,6 @@ dynamicControls = {
   }
   getCalucationDetails($event){    
     const gstRate = parseFloat(this.data.gstRate.replace('%', '')) / 100;
-    
     $event.filter((x)=>x.isSelected==true);
     $event = $event.map((item) => {
       if(item.isSelected) {

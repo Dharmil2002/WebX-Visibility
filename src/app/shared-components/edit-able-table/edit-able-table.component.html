@@ -1,36 +1,9 @@
 <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
-        <div class="card" style="margin-bottom: 5px;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
             <div class="body">
-                <div class="task-list">
-                    <div class="row" *ngIf="FormTitle">
-                        <div class="col">
-                            <h4 style="margin-top:10px;margin-left:10px; color: #4165CF;font-weight: 500;"><mat-icon
-                                    style="padding-top:4px;">view_list</mat-icon>
-                                {{FormTitle}}
-                            </h4>
-                        </div>
-                        <div class="col d-flex justify-content-end">
-                            <button matTooltip="Add New Record" *ngIf="ActionObject.addRow" mat-stroked-button
-                                style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="AddRowData()"
-                                class="filter_btn">
-                                <mat-icon>add</mat-icon>
-                                Add New
-                            </button>
-                            <div *ngIf="showsubmit">
-                                <button matTooltip="Save Data" *ngIf="ActionObject.submit" mat-stroked-button
-                                    [disabled]="columnKey.includes('Check')?allComplete?!allComplete:!someComplete():false"
-                                    (click)="SubmitData()"
-                                    style="margin-top:10px;margin-bottom: 10px;margin-right:10px; " class="filter_btn"
-                                    color="success">
-                                    <mat-icon>save</mat-icon>
-                                    Submit
-                                </button>
-                            </div>
-                        </div>
-                        <hr>
-                    </div>
-                    <div class="materialTableHeader" *ngIf="showHeader">
+                <div class="responsive_table">
+                    <div class="materialTableHeader">
                         <div class="row">
                             <div class="col-8">
                                 <ul class="header-buttons-left ml-0">
@@ -62,186 +35,179 @@
 
                     </div>
                     <!-- Generic Table -->
-                    <div class="body overflow-auto">
-                        <div class="responsive_table" style="overflow-x: unset !important;">
-                            <mat-table [dataSource]="dataSource" class="col-12" matSort>
-                                <ng-container [matColumnDef]="item" *ngFor="let item of objKey(columnHeader)">
-                                    <mat-header-cell [class]="columnHeader[item].class"
-                                        [Style]="columnHeader[item].style" [ngStyle]="columnHeader[item]?.HeaderStyle"
-                                        *matHeaderCellDef>
-                                        <!-- Check if the column key is 'checkbox' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'checkbox'; else OtherHeader">
-                                            <mat-checkbox [(ngModel)]="allComplete" class="example-margin"
-                                                color="primary" [indeterminate]="someComplete()"
-                                                (change)="selectAll($event.checked)"></mat-checkbox>
-                                        </ng-container>
-                                        <!-- If the column key is not 'checkbox' -->
-                                        <ng-template #OtherHeader>{{columnHeader[item].name}}</ng-template>
-                                    </mat-header-cell>
-                                    <!-- Creating table cells -->
-                                    <mat-cell [class]="columnHeader[item].class" [Style]="columnHeader[item].style"
-                                        *matCellDef="let row; let i = index" style="padding-bottom: 2px;">
+                    <div>
+                        <table mat-table [dataSource]="dataSource" class="col-12" matSort>
+                            <ng-container [matColumnDef]="item" *ngFor="let item of objKey(columnHeader)">
+                                <th [Style]="columnHeader[item].style" class="color-plet padding-24 border-dark-gray "
+                                    [ngStyle]="columnHeader[item]?.HeaderStyle" mat-header-cell *matHeaderCellDef>
+                                    <!-- Check if the column key is 'checkbox' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'checkbox'; else OtherHeader">
+                                        <mat-checkbox [(ngModel)]="allComplete" class="example-margin" color="primary"
+                                            [indeterminate]="someComplete()"
+                                            (change)="selectAll($event.checked)"></mat-checkbox>
+                                    </ng-container>
+                                    <!-- If the column key is not 'checkbox' -->
+                                    <ng-template #OtherHeader>{{columnHeader[item].name}}</ng-template>
+                                </th>
+                                <!-- Creating table cells -->
+                                <td [Style]="columnHeader[item].style" class="padding-24 border-light-gray" mat-cell
+                                    *matCellDef="let row; let i = index">
 
-                                        <!-- Check if the column key is 'index' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'index'">{{i+1}}.
-                                        </ng-container>
+                                    <!-- Check if the column key is 'index' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'index'">{{i+1}}.
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'static' -->
-                                        <ng-container
-                                            *ngIf="columnHeader[item].key === 'static'"><label>{{row[item]}}</label></ng-container>
+                                    <!-- Check if the column key is 'static' -->
+                                    <ng-container
+                                        *ngIf="columnHeader[item].key === 'static'"><label>{{row[item]}}</label></ng-container>
 
-                                        <!-- Check if the column key is 'toggle' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'toggle'">
-                                            <mat-slide-toggle color="primary" class="example-margin"
-                                                [(ngModel)]="row[item]"
-                                                (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange })">
-                                            </mat-slide-toggle>
-                                        </ng-container>
+                                    <!-- Check if the column key is 'toggle' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'toggle'">
+                                        <mat-slide-toggle color="primary" class="example-margin" [(ngModel)]="row[item]"
+                                            (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange })">
+                                        </mat-slide-toggle>
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'checkbox' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'checkbox'">
-                                            <mat-checkbox class="example-margin" color="primary" [(ngModel)]="row[item]"
-                                                (change)="selectCheck()"></mat-checkbox>
-                                        </ng-container>
+                                    <!-- Check if the column key is 'checkbox' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'checkbox'">
+                                        <mat-checkbox class="example-margin" color="primary" [(ngModel)]="row[item]"
+                                            (change)="selectCheck()"></mat-checkbox>
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'togleCheckBox' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'togleCheckBox'">
-                                            <mat-checkbox class="example-margin" color="primary"
-                                                [(ngModel)]="row[item]"></mat-checkbox>
-                                        </ng-container>
+                                    <!-- Check if the column key is 'togleCheckBox' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'togleCheckBox'">
+                                        <mat-checkbox class="example-margin" color="primary"
+                                            [(ngModel)]="row[item]"></mat-checkbox>
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'disableCheckBox' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'DisebleCheckBox'">
-                                            <mat-checkbox class="example-margin" color="primary"
-                                                [disabled]="row.disable[item]" [(ngModel)]="row[item]"></mat-checkbox>
-                                        </ng-container>
+                                    <!-- Check if the column key is 'disableCheckBox' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'DisebleCheckBox'">
+                                        <mat-checkbox class="example-margin" color="primary"
+                                            [disabled]="row.disable[item]" [(ngModel)]="row[item]"></mat-checkbox>
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'multipleDropdown' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'multipleDropdown'">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <mat-select [(value)]="row[item]"
-                                                    placeholder={{columnHeader[item].name}} #multiple [multiple]="true">
-                                                    <mat-option>
-                                                        <ngx-mat-select-search
-                                                            placeholderLabel="Find {{columnHeader[item].name}}..."
-                                                            noEntriesFoundLabel="no matching {{columnHeader[item].name}} found"
-                                                            [formControl]="getFormControls(item)"></ngx-mat-select-search>
+                                    <!-- Check if the column key is 'multipleDropdown' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'multipleDropdown'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <mat-select [(value)]="row[item]" placeholder="From City" #multiple
+                                                [multiple]="true">
+                                                <mat-option>
+                                                    <ngx-mat-select-search placeholderLabel="Find From City..."
+                                                        noEntriesFoundLabel="'no matching From City found'"
+                                                        [formControl]="getFormControls(item)"></ngx-mat-select-search>
+                                                </mat-option>
+                                                <ng-container
+                                                    *ngFor="let Optionitem of ObservableControls[item] | async">
+                                                    <mat-option
+                                                        *ngIf="row.division != Optionitem.name && item === 'clubbingpartner';"
+                                                        [value]="Optionitem.value">
+                                                        {{Optionitem.name}}
                                                     </mat-option>
-                                                    <ng-container
-                                                        *ngFor="let Optionitem of ObservableControls[item] | async">
-                                                        <mat-option
-                                                            *ngIf="row.division != Optionitem.name && item === 'clubbingpartner';"
-                                                            [value]="Optionitem.value">
-                                                            {{Optionitem.name}}
-                                                        </mat-option>
-                                                        <mat-option *ngIf="item != 'clubbingpartner';"
-                                                            [value]="Optionitem.value">
-                                                            {{Optionitem.name}}
-                                                        </mat-option>
-                                                    </ng-container>
-                                                </mat-select>
-                                            </mat-form-field>
-                                        </ng-container>
-
-                                        <!-- Check if the column key is 'Dropdown' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'Dropdown'">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <mat-select [(value)]="row[item]"
-                                                    placeholder={{columnHeader[item].name}}
-                                                    (selectionChange)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onOptionSelect, eventArgs: $event})"
-                                                    #singleSelect [disabled]="columnHeader[item]?.readonly">
-                                                    <mat-option>
-                                                        <ngx-mat-select-search
-                                                            [placeholderLabel]="'Find ' + columnHeader[item].name"
-                                                            noEntriesFoundLabel="No matching {{ columnHeader[item].name }} found"
-                                                            [formControl]="getFormControls(item)"></ngx-mat-select-search>
+                                                    <mat-option *ngIf="item != 'clubbingpartner';"
+                                                        [value]="Optionitem.value">
+                                                        {{Optionitem.name}}
                                                     </mat-option>
-                                                    <mat-option *ngFor="let item of ObservableControls[item] | async"
-                                                        [value]="item.value">
-                                                        {{item.name}}
-                                                    </mat-option>
-                                                </mat-select>
-                                            </mat-form-field>
-                                        </ng-container>
+                                                </ng-container>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </ng-container>
 
-                                        <ng-container *ngIf="columnHeader[item].key === 'inputnumber'">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <input matInput type="number" [placeholder]="columnHeader[item].name"
-                                                    [value]="row[item]" [readonly]="columnHeader[item]?.readonly"
-                                                    [ngStyle]="columnHeader[item]?.style" [(ngModel)]="row[item]"
-                                                    (blur)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onblur })"
-                                                    (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange })"
-                                                    (click)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onClick })">
-                                            </mat-form-field>
-                                        </ng-container>
-                                        <!-- [min]="formItem.additionalData?.minDate"
+                                    <!-- Check if the column key is 'Dropdown' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'Dropdown'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <mat-select [(value)]="row[item]" placeholder={{columnHeader[item].name}}
+                                                (selectionChange)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onOptionSelect, eventArgs: $event})"
+                                                #singleSelect [disabled]="columnHeader[item]?.readonly">
+                                                <mat-option>
+                                                    <ngx-mat-select-search
+                                                        [placeholderLabel]="'Find ' + columnHeader[item].name"
+                                                        noEntriesFoundLabel="No matching {{ columnHeader[item].name }} found"
+                                                        [formControl]="getFormControls(item)"></ngx-mat-select-search>
+                                                </mat-option>
+                                                <mat-option *ngFor="let item of ObservableControls[item] | async"
+                                                    [value]="item.value">
+                                                    {{item.name}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="columnHeader[item].key === 'inputnumber'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <input matInput type="number" [placeholder]="columnHeader[item].name"
+                                                [value]="row[item]" [readonly]="columnHeader[item]?.readonly"
+                                                [ngStyle]="columnHeader[item]?.style" [(ngModel)]="row[item]"
+                                                (blur)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onblur })"
+                                                (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange })"
+                                                (click)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onClick })">
+                                        </mat-form-field>
+                                    </ng-container>
+                                    <!-- [min]="formItem.additionalData?.minDate"
                                             placeholder={{formItem.placeholder}}
                                             [max]="formItem.additionalData?.maxDate"
                                         (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
                                 , eventArgs: $event})" -->
-                                        <ng-container *ngIf="columnHeader[item].key==='date'">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <input matInput [matDatepicker]="picker"
-                                                    [min]="columnHeader[item].additionalData?.minDate"
-                                                    [max]="columnHeader[item].additionalData?.maxDate"
-                                                    [value]="row[item]" [(ngModel)]="row[item]">
-                                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                                <mat-datepicker #picker></mat-datepicker>
-                                            </mat-form-field>
-                                        </ng-container>
-                                        <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
-                                        <ng-container *ngIf="columnHeader[item].key==='time'">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <input matInput [owlDateTimeTrigger]="timepicker"
-                                                    [owlDateTime]="timepicker" [value]="row[item]"
-                                                    [(ngModel)]="row[item]">
-                                                <mat-icon matSuffix [owlDateTimeTrigger]="timepicker"
-                                                    class="date-icon">schedule</mat-icon>
-                                                <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
-                                            </mat-form-field>
-                                        </ng-container>
-                                        <!-- Check if the column key is 'input' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'input'">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <input matInput [placeholder]="columnHeader[item].name"
-                                                    appdecimalrangevalidator [MinValue]=0 [MaxValue]=15 [MaxAllowed]=3
-                                                    [value]="row[item]" [readonly]="columnHeader[item]?.readonly"
-                                                    [ngStyle]="columnHeader[item]?.style" [(ngModel)]="row[item]"
-                                                    (blur)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onblur})"
-                                                    (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange, eventArgs: $event})"
-                                                    (click)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onClick})">
-                                            </mat-form-field>
-                                        </ng-container>
+                                    <ng-container *ngIf="columnHeader[item].key==='date'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <input matInput [matDatepicker]="picker"
+                                                [min]="columnHeader[item].additionalData?.minDate"
+                                                [max]="columnHeader[item].additionalData?.maxDate" [value]="row[item]"
+                                                [(ngModel)]="row[item]">
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                        </mat-form-field>
+                                    </ng-container>
+                                    <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
+                                    <ng-container *ngIf="columnHeader[item].key==='time'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <input matInput [owlDateTimeTrigger]="timepicker" [owlDateTime]="timepicker"
+                                                [value]="row[item]" [(ngModel)]="row[item]">
+                                            <mat-icon matSuffix [owlDateTimeTrigger]="timepicker"
+                                                class="date-icon">schedule</mat-icon>
+                                            <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
+                                        </mat-form-field>
+                                    </ng-container>
+                                    <!-- Check if the column key is 'input' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'input'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <input matInput [placeholder]="columnHeader[item].name"
+                                                appdecimalrangevalidator [MinValue]=0 [MaxValue]=15 [MaxAllowed]=3
+                                                [value]="row[item]" [readonly]="columnHeader[item]?.readonly"
+                                                [ngStyle]="columnHeader[item]?.style" [(ngModel)]="row[item]"
+                                                (blur)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onblur})"
+                                                (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange, eventArgs: $event})"
+                                                (click)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onClick})">
+                                        </mat-form-field>
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'inputString' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'inputString' ">
-                                            <mat-form-field appearance="outline" floatLabel="never">
-                                                <input matInput [placeholder]="columnHeader[item].name"
-                                                    [value]="row[item]" [ngStyle]="columnHeader[item]?.style"
-                                                    [(ngModel)]="row[item]" [readonly]="columnHeader[item]?.readonly"
-                                                    (blur)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onblur })"
-                                                    (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange})"
-                                                    (click)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onClick})">
-                                            </mat-form-field>
-                                        </ng-container>
+                                    <!-- Check if the column key is 'inputString' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'inputString' ">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <input matInput [placeholder]="columnHeader[item].name" [value]="row[item]"
+                                                [ngStyle]="columnHeader[item]?.style" [(ngModel)]="row[item]"
+                                                [readonly]="columnHeader[item]?.readonly"
+                                                (blur)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onblur })"
+                                                (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange})"
+                                                (click)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onClick})">
+                                        </mat-form-field>
+                                    </ng-container>
 
-                                        <!-- Check if the column key is 'Action' -->
-                                        <ng-container *ngIf="columnHeader[item].key === 'Action'">
-                                            <button matTooltip="Delete" mat-icon-button
-                                                [disabled]="dataSource.data.length==1"
-                                                [ngStyle]="columnHeader[item].style" (click)="DeleteEvent(row)">
-                                                <mat-icon>delete</mat-icon>
-                                            </button>
-                                        </ng-container>
-                                    </mat-cell>
-                                </ng-container>
-                                <mat-header-row *matHeaderRowDef="objKey(columnHeader)"></mat-header-row>
-                                <mat-row *matRowDef="let row; columns: objKey(columnHeader);"></mat-row>
-                                <!-- <tr class="mat-row" *matNoDataRow>
+                                    <!-- Check if the column key is 'Action' -->
+                                    <ng-container *ngIf="columnHeader[item].key === 'Action'">
+                                        <button matTooltip="Delete" mat-icon-button
+                                            [disabled]="dataSource.data.length==1" [ngStyle]="columnHeader[item].style"
+                                            (click)="DeleteEvent(row)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </ng-container>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="objKey(columnHeader)"></tr>
+                            <tr mat-row *matRowDef="let row; columns: objKey(columnHeader);"></tr>
+                            <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
-                            </tr> -->
-                            </mat-table>
-                        </div>
+                            </tr>
+                        </table>
                     </div>
                     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"
                         aria-label="Select page of users"></mat-paginator>

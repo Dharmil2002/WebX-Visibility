@@ -73,6 +73,9 @@ export class DeducationControl {
         value: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+         onChange:"calucatedCharges"
+        },
         Validations: [],
       },
       {
@@ -83,6 +86,9 @@ export class DeducationControl {
         value: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onChange:"calucatedCharges"
+         },
         Validations: [],
       },
       {
@@ -93,6 +99,9 @@ export class DeducationControl {
         value: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onChange:"calucatedCharges"
+         },
         Validations: [],
       },
       {
@@ -103,24 +112,33 @@ export class DeducationControl {
         value: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onChange:"calucatedCharges"
+         },
         Validations: [],
       },
       {
         name: "additionalCharges",
-        label: "Additional Charges (-)",
-        placeholder: "Additional Charges (-)",
+        label: "Additional Charges (+)",
+        placeholder: "Additional Charges (+)",
         type: "text",
         value: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onChange:"calucatedCharges"
+         },
         Validations: [],
       },
       {
         name: "netDeduction",
-        label: "Net Deduction(+)",
-        placeholder: "Net Deduction(+)",
+        label: "Net Deduction",
+        placeholder: "Net Deduction",
         type: "text",
         value: "",
+        functions:{
+          onChange:"calucatedCharges"
+         },
         generatecontrol: true,
         disable: false,
         Validations: [],

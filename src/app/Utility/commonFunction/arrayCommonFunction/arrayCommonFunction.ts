@@ -104,3 +104,8 @@ export async function   total(round,field){
       control.value = data;
     }
   }
+  export function parseFloatWithFallback(value: any, fallback: number = 0.00): number {
+    const parsedValue = parseFloat(value);
+    return isNaN(parsedValue) ? fallback : parsedValue;
+  }
+

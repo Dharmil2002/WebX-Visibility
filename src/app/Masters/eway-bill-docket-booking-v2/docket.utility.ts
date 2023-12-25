@@ -1,3 +1,4 @@
+import { FormGroup } from "@angular/forms";
 import { WebxConvert } from "src/app/Utility/commonfunction";
 
 export async function getPincode(companyCode, masterService) {
@@ -8,7 +9,7 @@ export async function getPincode(companyCode, masterService) {
   };
 
   try {
-    const res: any = await masterService.masterMongoPost("generic/get",req).toPromise();
+    const res: any = await masterService.masterMongoPost("generic/get", req).toPromise();
     if (res && res.data) {
       const pincode = res.data
         .map((x) => ({ name: x.pincode, value: x.pincode }))
@@ -25,6 +26,7 @@ export async function getPincode(companyCode, masterService) {
 // invoiceUtils.ts
 
 export function calculateInvoiceTotalCommon(tableData, contractForm) {
+  debugger
   // Initialize accumulators for totals
   let totalChargedNoofPackages = 0;
   let totalChargedWeight = 0;
@@ -66,35 +68,123 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
 
 export async function addTracking(companyCode, operationService, data) {
   const dockData = {
-    _id:data?.docketNumber,
-    dktNo:data?.docketNumber||'',
-    vehNo:"",
-    route:"",
-    event:"Booked At"+" "+localStorage.getItem("Branch"),
-    orgn:data?.orgLoc||'',
-    loc:localStorage.getItem("Branch"),
-    dest:data.destination.split(":")[1].trim(),
-    lsno:"",
-    mfno:"",
-    dlSt:"",
-	  dlTm:"",
-    evnCd:"",
-    upBy:localStorage.getItem("UserName"),
-    upDt:new Date().toUTCString()
+    _id: data?.docketNumber,
+    dktNo: data?.docketNumber || '',
+    vehNo: "",
+    route: "",
+    event: "Booked At" + " " + localStorage.getItem("Branch"),
+    orgn: data?.orgLoc || '',
+    loc: localStorage.getItem("Branch"),
+    dest: data.destination.trim(),
+    lsno: "",
+    mfno: "",
+    dlSt: "",
+    dlTm: "",
+    evnCd: "",
+    upBy: localStorage.getItem("UserName"),
+    upDt: new Date()
   }
 
   const req = {
     companyCode: companyCode,
     collectionName: "cnote_tracking",
-    data:dockData
+    data: dockData
   };
 
   try {
     const res: any = await operationService.operationMongoPost("generic/create", req).toPromise();
-     return res;
+    return res;
   } catch (error) {
     console.error("Error update a docket Status:", error);
     return null;
   }
 }
 
+export const columnHeader = {
+  // srNo: {
+  //   Title: "#",
+  //   class: "matcolumncenter",
+  //   Style: "max-width:4%",
+  // },
+  INVNO: {
+    Title: "Invoice No.",
+    class: "matcolumncenter",
+    Style: "min-width:9%",
+  },
+  INVDT: {
+    Title: "Invoice Date",
+    class: "matcolumncenter",
+    Style: "min-width:10%",
+  },
+  // LENGTH: {
+  //   Title: "Len(CM)",
+  //   class: "matcolumncenter",
+  //   Style: "min-width:7%",
+  // },
+  // BREADTH: {
+  //   Title: "B(CM)",
+  //   class: "matcolumncenter",
+  //   Style: "min-width:7%",
+  // },
+  // HEIGHT: {
+  //   Title: "Ht(CM)",
+  //   class: "matcolumncenter",
+  //   Style: "min-width:7%",
+  // },
+  DECLVAL: {
+    Title: "Declared Value",
+    class: "matcolumncenter",
+    Style: "min-width:10%",
+  },
+  NO_PKGS: {
+    Title: "Pkgs",
+    class: "matcolumncenter",
+    Style: "min-width:7%",
+  },
+  CUB_WT: {
+    Title: "Weight",
+    class: "matcolumncenter",
+    Style: "min-width:7%",
+  },
+  ACT_WT: {
+    Title: "Actual Weight (KG)",
+    class: "matcolumncenter",
+    Style: "min-width:7%",
+  },
+  Invoice_Product: {
+    Title: "Product",
+    class: "matcolumncenter",
+    Style: "min-width:7%",
+  },
+  HSN_CODE: {
+    Title: "HSN Code",
+    class: "matcolumncenter",
+    Style: "min-width:7%",
+  },
+  actionsItems: {
+      Title: "Action",
+      class: "matcolumncenter",
+      Style: "min-width:7%",
+  }
+};
+
+export const staticField = ["srNo", "INVNO", "INVDT", "LENGTH", "BREADTH", "HEIGHT", "DECLVAL", "NO_PKGS", "CUB_WT", "ACT_WT", "Invoice_Product", "HSN_CODE"];
+
+/**
+ * Checks if all required fields in a given form group are filled.
+ * @param formGroup The form group to be checked.
+ * @returns A boolean indicating whether all required fields are filled (true) or not (false).
+ */
+export function checkRequiredFields(formGroup: FormGroup): boolean {
+  let isValid = true;
+  // Iterate through each control in the form group
+  Object.keys(formGroup.controls).forEach(key => {
+    const control = formGroup.get(key);
+    // Check if the control has errors and is a required field
+    if (control?.errors && control.errors.required) {
+      // If the control is required and empty, set the validity to false
+      isValid = isValid && !control.errors.required;
+    }
+  });
+  return isValid;
+}

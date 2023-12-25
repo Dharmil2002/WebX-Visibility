@@ -3,10 +3,13 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
+import { parseFloatWithFallback } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { GenericViewTableComponent } from 'src/app/shared-components/generic-view-table/generic-view-table.component';
 import { DeducationControl } from 'src/assets/FormControls/billing-invoice/deducation-controls';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-deduction-charges',
@@ -76,11 +79,9 @@ export class DeductionChargesComponent implements OnInit {
 
   }
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {
-      console.log("failed");
     }
   }
   autoFillCustDetail() {
@@ -94,5 +95,29 @@ export class DeductionChargesComponent implements OnInit {
         pendingAmt: custDetail.aMT ?? 0,
       });
     }
+    this.chargesTableForm.controls['tds'].setValue((parseFloat(custDetail.aMT)*5/100).toFixed(2));
+  }
+  calucatedCharges() {
+    debugger
+    const chargeFormGroup = this.chargesTableForm.controls;
+    const tds = parseFloatWithFallback(chargeFormGroup['tds'].value);
+    const ftDist = parseFloatWithFallback(chargeFormGroup['ftDist'].value);
+    const otherDeduction = parseFloatWithFallback(chargeFormGroup['otherDeduction'].value);
+    const claimsDeduction = parseFloatWithFallback(chargeFormGroup['claimsDeduction'].value, 0);
+    const additionalCharges = parseFloatWithFallback(chargeFormGroup['additionalCharges'].value);
+    const netDeduction = -tds - ftDist - otherDeduction - claimsDeduction + additionalCharges;
+    chargeFormGroup.netDeduction.setValue(Math.abs(netDeduction).toFixed(2));
+    
+    const billingAmount = parseFloat(this.deducationTableForm.controls['amt'].value);
+    if ( chargeFormGroup.netDeduction.value> billingAmount) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Deduction Error',
+        text: 'You cannot deduct more than the billing amount.',
+      });
+    }
+  }
+  save(){
+    this.dialogRef.close({...this.chargesTableForm.value,...this.deducationTableForm.value});
   }
 }

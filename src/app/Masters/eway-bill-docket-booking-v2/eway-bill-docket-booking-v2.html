@@ -61,7 +61,7 @@
                                         </generic-accordion-webxpress>
                                     </form>
                                     <app-table-boilerplate *ngIf="tableData" [tableData]="tableData"
-                                        [columnHeader]="displayedColumns1" title="Eway-Details"
+                                        [columnHeader]="displayedColumns1"[FormTitle]="Eway-Details"
                                         (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
                                         (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)"
                                         [showsubmit]="true" [ActionObject]="actionObject"></app-table-boilerplate>

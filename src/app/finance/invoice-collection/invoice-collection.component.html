@@ -7,7 +7,8 @@
   </form>
   <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="InvoiceDetailscolumnHeader"
   [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-  [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+  [menuItems]="menuItems" [staticField]="staticField" [selectAllRequired]="true"
+  (selectAllClicked)="getCalucationDetails($event)"(dialogClosed)="close($event)" (onFlagChange)="getCalucationDetails($event)" [Link]="linkArray" [height]="height" [width]="width"
   [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath">
   </app-generic-table-v2>
   <form [formGroup]="CollectionSummaryTableForm">

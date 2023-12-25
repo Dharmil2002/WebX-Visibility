@@ -25,6 +25,18 @@ export class ConsigmentUtility {
     return res;
   }
 
+  async getBillingData(filter={}){
+    const req={
+      companyCode: localStorage.getItem("companyCode"),
+      collectionName: "docket_fin_det",
+      filter:filter,
+    }
+    const res=await firstValueFrom(this.operationService.operationPost("generic/get",req));
+    const mappedValues = res.data.map((x) => x.cHG);
+    const resultArray = mappedValues[0] !== undefined ? mappedValues : [];
+    return resultArray;
+
+  }
   async containorConsigmentDetail() {
     const containerReq = {
       companyCode: localStorage.getItem("companyCode"),

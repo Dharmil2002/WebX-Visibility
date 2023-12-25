@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 @Component({
@@ -102,7 +103,7 @@ export class VehicletypeMasterListComponent implements OnInit {
             filter: { _id: id },
             update: det
         };
-        const res = await this.masterService.masterPut('generic/update', req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPut('generic/update', req));
         if (res) {
             // Display success message
             Swal.fire({

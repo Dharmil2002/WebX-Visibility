@@ -101,6 +101,7 @@ export class VendorBillListComponent implements OnInit {
     private objVendorBillService: VendorBillService,
     private masterService: MasterService) {
     this.filterRequest.startdate.setDate(new Date().getDate() - 30);
+    this.getVendorBill();
   }
 
   ngOnInit(): void {
@@ -136,7 +137,7 @@ export class VendorBillListComponent implements OnInit {
         updateData = this.createUpdateData("On Hold");
         break;
       case 'Unhold Payment':
-        updateData = this.createUpdateData("Generated");
+        updateData = this.createUpdateData("Awaiting Approval");
         break;
       case 'Cancel Bill':
         updateData = this.createUpdateData("Cancelled");
@@ -177,7 +178,7 @@ export class VendorBillListComponent implements OnInit {
       case "Hold Payment":
         bSTAT = 4;
         break;
-      case "Generated":
+      case "Awaiting Approval":
         bSTAT = 1;
         break;
       case "Cancelled":
@@ -219,7 +220,7 @@ export class VendorBillListComponent implements OnInit {
     });
   }
   BalanceFunction(event) {
-    console.log('BalanceFunction', event)
+    // console.log('BalanceFunction', event)
     this.route.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
       state: {
         data: event
@@ -233,7 +234,6 @@ export class VendorBillListComponent implements OnInit {
     try {
       // Call the vendor bill service to get the data
       let data = await this.objVendorBillService.getVendorBillList(this.filterRequest);
-
       data.forEach((element, i) => {
         if (element.Status === 'Approved') {
           // Remove 'Approve Bill' from the actions array
@@ -250,10 +250,10 @@ export class VendorBillListComponent implements OnInit {
           }
           // Add 'Unhold Payment' to the actions array
           element.actions.push('Unhold Payment');
-         // console.log(element.actions);
-          
+          // console.log(element.actions);
+
         }
-        if (element.Status === 'Cancel Bill') {
+        if (element.Status === 'Cancelled' || element.Status === 'Paid') {
           // Remove all values from the actions array
           element.actions = [];
         }

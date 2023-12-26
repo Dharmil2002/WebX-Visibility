@@ -342,7 +342,7 @@ export class PrqService {
     // Create an object with sorted PRQ data and all PRQ details
     const prqDetail = {
       tableData: sortedData,
-      allPrqDetail: res.data,
+      allPrqDetail: prqList,
     };
 
     return prqDetail;

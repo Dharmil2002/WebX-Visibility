@@ -14,7 +14,13 @@ import { Subject, take, takeUntil } from "rxjs";
   templateUrl: "./cluster-master-add.component.html",
 })
 export class ClusterMasterAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any; }[];
+  breadScrums: {
+    title: string;
+    items: string[];
+    active: string;
+    generatecontrol: boolean;
+    toggle: any;
+  }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   clusterTabledata: ClusterMaster;
   clusterTableForm: UntypedFormGroup;
@@ -28,7 +34,7 @@ export class ClusterMasterAddComponent implements OnInit {
   isUpdate = false;
   newClusterCode: string;
   data: any;
-  submit = 'Save';
+  submit = "Save";
   //#endregion
 
   ngOnInit() {
@@ -44,7 +50,7 @@ export class ClusterMasterAddComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
-      this.submit = 'Modify';
+      this.submit = "Modify";
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -58,7 +64,7 @@ export class ClusterMasterAddComponent implements OnInit {
           items: ["Home"],
           active: "Modify Cluster",
           generatecontrol: true,
-          toggle: this.data.activeFlag
+          toggle: this.data.activeFlag,
         },
       ];
     } else {
@@ -68,7 +74,7 @@ export class ClusterMasterAddComponent implements OnInit {
           items: ["Home"],
           active: "Add Cluster",
           generatecontrol: true,
-          toggle: false
+          toggle: false,
         },
       ];
       this.clusterTabledata = new ClusterMaster({});
@@ -108,7 +114,7 @@ export class ClusterMasterAddComponent implements OnInit {
           // Assuming the API response contains an array named 'pincodeList'
           const pincodeList = res.data.map((element) => ({
             name: element.PIN.toString(),
-            value:element.PIN.toString()
+            value: element.PIN.toString(),
           }));
           let filteredPincodeList = [];
           if (Array.isArray(pincodeValue)) {
@@ -129,13 +135,15 @@ export class ClusterMasterAddComponent implements OnInit {
             const pincode = this.clusterTabledata.pincode.split(",");
             pincode.forEach((item) => {
               pincodedata.push(
-                pincodeList.find((element) => element.name.trim() == item.trim())
+                pincodeList.find(
+                  (element) => element.name.trim() == item.trim()
+                )
               );
             });
             this.clusterTableForm.controls["pincodeDropdown"].patchValue(
               pincodedata
             );
-            console.log(pincodedata)
+            console.log(pincodedata);
           }
           const data =
             filteredPincodeList.length > 0 ? filteredPincodeList : pincodedata;
@@ -158,7 +166,7 @@ export class ClusterMasterAddComponent implements OnInit {
   //#endregion
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
-    this.clusterTableForm.controls['activeFlag'].setValue(event);
+    this.clusterTableForm.controls["activeFlag"].setValue(event);
     // console.log("Toggle value :", event);
   }
   //#region Save Function
@@ -170,7 +178,7 @@ export class ClusterMasterAddComponent implements OnInit {
             (item: any) => item.name
           );
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
-    this.clusterTableForm.removeControl("pincodeDropdown")
+    this.clusterTableForm.removeControl("pincodeDropdown");
 
     // Clear any errors in the form controls
     Object.values(this.clusterTableForm.controls).forEach((control) =>
@@ -211,28 +219,23 @@ export class ClusterMasterAddComponent implements OnInit {
       this.masterService.masterPost("generic/get", req).subscribe({
         next: (res: any) => {
           if (res) {
-            // Generate srno for each object in the array
-            const lastCode = res.data[res.data.length - 1];
-            const lastClusterCode = lastCode
-              ? parseInt(lastCode.clusterCode.substring(1))
-              : 0;
-            // Function to generate a new route code
-            function generateClusterCode(initialCode: number = 0) {
-              const nextClusterCode = initialCode + 1;
-              const clusterNumber = nextClusterCode.toString().padStart(4, "0");
-              const clusterCode = `C${clusterNumber}`;
-              return clusterCode;
-            }
-            this.newClusterCode = generateClusterCode(lastClusterCode);
-            this.clusterTableForm.controls["_id"].setValue(this.newClusterCode);
-            this.clusterTableForm.controls["clusterCode"].setValue(
-              this.newClusterCode
-            );
-            this.clusterTableForm.removeControl("pincodeDropdown");
+            const SortData = res.data.sort((a, b) => (+a.clusterCode.substring(1) < +b.clusterCode.substring(1) ? -1 : Number(+a.clusterCode.substring(1) > +b.clusterCode.substring(1))));
+            const lastElement = SortData[SortData.length - 1];
+            const index = +lastElement.clusterCode.substring(1)
+            this.newClusterCode = `C${(index + 1).toString().padStart(4,"0")}`
+            const body = {
+              clusterCode: this.newClusterCode,
+              clusterName: this.clusterTableForm.value.clusterName,
+              pincode: this.clusterTableForm.value.pincode,
+              activeFlag: this.clusterTableForm.value.activeFlag,
+              _id: this.newClusterCode,
+              entryDate: new Date(),
+              companyCode: this.companyCode,
+            };
             let req = {
               companyCode: this.companyCode,
               collectionName: "cluster_detail",
-              data: this.clusterTableForm.value,
+              data: body,
             };
             this.masterService.masterPost("generic/create", req).subscribe({
               next: (res: any) => {

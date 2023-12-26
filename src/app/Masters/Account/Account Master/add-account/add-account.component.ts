@@ -1,4 +1,4 @@
-import { filter } from 'rxjs/operators';
+import { filter } from "rxjs/operators";
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -11,7 +11,6 @@ import { AccountMasterControls } from "src/assets/FormControls/AccountMasterCont
 import { AccountGroupComponent } from "../../AccoutGroupMaster/account-group/account-group.component";
 import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
-import { Console } from "console";
 import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
@@ -54,7 +53,7 @@ export class AddAccountComponent implements OnInit {
   FormTitle = "Add Ledger";
   protected _onDestroy = new Subject<void>();
   FirstUpdate: boolean = false;
-  backPath:string;
+  backPath: string;
   jsonControlAccountCategoryArray: any;
   AccountCategoryForm: any;
   AccountLocationsCode: string;
@@ -69,6 +68,7 @@ export class AddAccountComponent implements OnInit {
   tdsCode: any;
   BalanceSheetStatus: any;
   BalanceSheetCode: any;
+  tdsData: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -79,7 +79,6 @@ export class AddAccountComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit Ledger";
       this.backPath = "/Masters/AccountMaster/AccountMasterList";
@@ -100,8 +99,9 @@ export class AddAccountComponent implements OnInit {
       collectionName: "account_detail",
       filter: {},
     };
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success) {
       this.TableData = res.data;
     }
@@ -126,9 +126,7 @@ export class AddAccountComponent implements OnInit {
       this.AccountForm.controls["AccountDescription"].setValue(
         this.UpdateData.aCNM
       );
-      this.AccountForm.controls["AccountCode"].setValue(
-        this.UpdateData.aCCD
-      );
+      this.AccountForm.controls["AccountCode"].setValue(this.UpdateData.aCCD);
       this.AccountForm.controls["ActiveFlag"].setValue(
         this.UpdateData.iSSYS == 0 ? false : true
       );
@@ -176,8 +174,9 @@ export class AddAccountComponent implements OnInit {
       collectionName: "General_master",
       filter: { codeType: "ACT", activeFlag: true },
     };
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success && res.data.length > 0) {
       const AccountCategoryData = res.data.map((x) => {
         return {
@@ -207,8 +206,9 @@ export class AddAccountComponent implements OnInit {
       collectionName: "General_master",
       filter: { codeType: "BLC", activeFlag: true },
     };
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success && res.data.length > 0) {
       const BalanceSheetcategory = res.data.map((x) => {
         return {
@@ -238,10 +238,10 @@ export class AddAccountComponent implements OnInit {
       collectionName: "General_master",
       filter: { codeType: "MCT", activeFlag: true },
     };
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success && res.data.length > 0) {
-      console.log("res acconut",res)
       const MainCategoryData = res.data.map((x) => {
         return {
           name: x.codeDesc,
@@ -273,8 +273,9 @@ export class AddAccountComponent implements OnInit {
       collectionName: "account_group_detail",
       filter: { cATNM: Value },
     };
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success && res.data.length > 0) {
       const GroupCodeData = res.data.map((x) => {
         return {
@@ -318,9 +319,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const bank = this.UpdateData.bankdetails;
-        const selectedData = BankData.filter((x) =>
-          bank.includes(x.value)
-        );
+        const selectedData = BankData.filter((x) => bank.includes(x.value));
         this.AccountForm.controls["bank"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -347,13 +346,12 @@ export class AddAccountComponent implements OnInit {
         TDSData.push({
           name: x.TDSsection,
           value: x.TDScode,
+          data: x,
         });
       });
       if (this.isUpdate) {
         const bank = this.UpdateData.TDSditals;
-        const selectedData = TDSData.filter((x) =>
-          bank.includes(x.value)
-        );
+        const selectedData = TDSData.filter((x) => bank.includes(x.value));
         this.AccountForm.controls["bank"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -372,8 +370,9 @@ export class AddAccountComponent implements OnInit {
       filter: { codeType: "PAR", activeFlag: true },
     };
 
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success && res.data.length > 0) {
       const PartySelectionData = res.data.map((x) => {
         return {
@@ -402,8 +401,9 @@ export class AddAccountComponent implements OnInit {
       collectionName: "account_detail",
       filter: {},
     };
-    const res = await  firstValueFrom(this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
     if (res.success && res.data.length > 0) {
       const FilterData = res.data.filter(
         (x) =>
@@ -413,10 +413,7 @@ export class AddAccountComponent implements OnInit {
       if (FilterData.length > 0) {
         if (!this.isUpdate) {
           this.AccountForm.controls["AccountDescription"].setValue("");
-        } else if (
-          this.AccountForm.value.aCNM.trim() !=
-          this.UpdateData.aCNM
-        ) {
+        } else if (this.AccountForm.value.aCNM.trim() != this.UpdateData.aCNM) {
           this.AccountForm.controls["AccountDescription"].setValue("");
         }
       }
@@ -448,14 +445,16 @@ export class AddAccountComponent implements OnInit {
     });
   }
 
-
   toggleTDSExempted(event) {
     const TDSExemptedValue = this.AccountForm.value.isTDSapplicable;
     if (TDSExemptedValue) {
-      const bankfiled=["bank"]
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(x=> !bankfiled.includes(x.name));
+      const bankfiled = ["bank"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !bankfiled.includes(x.name)
+      );
       this.getTdsDropdown();
-    } else {const bankfiled=["TDSsection","bank"]
+    } else {
+      const bankfiled = ["TDSsection", "bank"];
       this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
         (x) => !bankfiled.includes(x.name)
       );
@@ -463,33 +462,27 @@ export class AddAccountComponent implements OnInit {
   }
 
   HandlAccountCategory(event) {
-    if (
-      this.AccountForm.value.AccountCategory.name === "BANK"
-    ) {  const bankfiled=["TDSsection","isTDSapplicable"]
-          this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter((x) => !bankfiled.includes(x.name));
-          this.getBankDropdown();
-    }
-    else if (
-      this.AccountForm.value.AccountCategory.name === "TDS"
-    ) {  const bankfiled=["TDSsection","bank"]
-          this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter((x) => !bankfiled.includes(x.name));
-    }
-    else{
-      const tdfield=["bank","isTDSapplicable","TDSsection"]
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter((x) => !tdfield.includes(x.name));
+    if (this.AccountForm.value.AccountCategory.name === "BANK") {
+      const bankfiled = ["TDSsection", "isTDSapplicable"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !bankfiled.includes(x.name)
+      );
+      this.getBankDropdown();
+    } else if (this.AccountForm.value.AccountCategory.name === "TDS") {
+      const bankfiled = ["TDSsection", "bank"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !bankfiled.includes(x.name)
+      );
+    } else {
+      const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !tdfield.includes(x.name)
+      );
     }
   }
 
   async Save() {
-    const index =this.TableData.length === 0? 1: parseInt(
-            this.TableData[this.TableData.length - 1].aCCD.substring(3)) + 1;
-    const accountcode = `${this.AccountForm.value.GroupCode.name.substr(0, 3)}${
-      index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
-    }${index}`;
     const commonBody = {
-      _id: `${this.CompanyCode}-${accountcode}`,
-      cID: this.CompanyCode,
-      aCCD: accountcode,
       aCNM: this.AccountForm.value.AccountDescription,
       mATCD: this.AccountForm.value.MainCategory.value,
       mRPNM: this.AccountForm.value.MainCategory.name,
@@ -497,34 +490,61 @@ export class AddAccountComponent implements OnInit {
       gRPNM: this.AccountForm.value.GroupCode.name,
       cATCD: this.AccountForm.value.AccountCategory.value,
       cATNM: this.AccountForm.value.AccountCategory.name,
-      bCATCD:this.AccountForm.value.BalanceSheet.value.substr(0, 3),
-      bCATNM:this.AccountForm.value.BalanceSheet.name,
-      bANCD: this.AccountForm.value.bank.value||"",
-      bANM: this.AccountForm.value.bank.name||"",
-      isTDS:this.AccountForm.value.isTDSapplicable,
-      tSEC:this.AccountForm.value.isTDSapplicable?this.AccountForm.value.TDSsection.name:"",
+      bCATCD: this.AccountForm.value.BalanceSheet.value.substr(0, 3),
+      bCATNM: this.AccountForm.value.BalanceSheet.name,
+      bANCD: this.AccountForm.value.bank.value || "",
+      bANM: this.AccountForm.value.bank.name || "",
+      isTDS: this.AccountForm.value.isTDSapplicable,
+      tSEC: this.AccountForm.value.isTDSapplicable
+        ? this.AccountForm.value.TDSsection.name
+        : "",
       iSSYS: this.AccountForm.value.ActiveFlag,
-      pARTNM:this.AccountForm.value.PartySelection.name,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch,
-      eNTBY: this.storage.userName,
-      mODDT: new Date(),
-      mODLOC: this.storage.branch,
-      mODBY: this.storage.userName,
+      pARTNM: this.AccountForm.value.PartySelection.name,
+      rHUF: this.AccountForm.value.isTDSapplicable
+        ? this.AccountForm.value.TDSsection.data.RateForHUF
+        : "",
+      rOTHER: this.AccountForm.value.isTDSapplicable
+        ? this.AccountForm.value.TDSsection.data.RateForOthers
+        : "",
     };
+    if (!this.isUpdate) {
+      const index =
+        this.TableData.length === 0
+          ? 1
+          : parseInt(
+              this.TableData[this.TableData.length - 1].aCCD.substring(3)
+            ) + 1;
+      const accountcode = `${this.AccountForm.value.GroupCode.name.substr(
+        0,
+        3
+      )}${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`;
+
+      commonBody["_id"] = `${this.CompanyCode}-${accountcode}`;
+      commonBody["aCCD"] = accountcode;
+      commonBody["cID"] = this.CompanyCode;
+      commonBody["eNTDT"] = new Date();
+      commonBody["eNTLOC"] = this.storage.branch;
+      commonBody["eNTBY"] = this.storage.userName;
+    } else {
+      commonBody["mODDT"] = new Date();
+      commonBody["mODLOC"] = this.storage.branch;
+      commonBody["mODBY"] = this.storage.userName;
+    }
     const req = {
       companyCode: this.CompanyCode,
       collectionName: "account_detail",
-      filter: this.isUpdate
-        ? { aCCD: this.UpdateData.aCCD }
-        : undefined,
+      filter: this.isUpdate ? { aCCD: this.UpdateData.aCCD } : undefined,
       update: this.isUpdate ? commonBody : undefined,
       data: this.isUpdate ? undefined : commonBody,
     };
 
     const res = this.isUpdate
-      ? await  firstValueFrom(this.masterService.masterPut("generic/update", req))
-      : await  firstValueFrom(this.masterService.masterPost("generic/create", req));
+      ? await firstValueFrom(
+          this.masterService.masterPut("generic/update", req)
+        )
+      : await firstValueFrom(
+          this.masterService.masterPost("generic/create", req)
+        );
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");

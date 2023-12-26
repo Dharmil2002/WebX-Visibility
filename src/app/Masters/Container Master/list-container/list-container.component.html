@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
-    <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+  <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
     [tableData]="TableData" [EventButton]="EventButton" (functionCallEmitter)="functionCallHandler($event)"
-     [FormTitle]="'Container List'" [uploadComponent]= true  (uploadEvent)="upload()" [staticField]="staticField">
+    [FormTitle]="'Container List'" [staticField]="staticField">
   </app-generic-table-v2>
 </app-common-wrapper-webxpress>

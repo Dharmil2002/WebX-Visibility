@@ -108,7 +108,7 @@ export async function removeData(masterService, id, collectionName) {
     try {
         // Make an asynchronous request to remove data using the master service
         const res = await masterService.masterMongoRemove("generic/remove", req).toPromise();
-       // console.log(res);
+        // console.log(res);
         if (res.success) {
             // Display success message
             Swal.fire({
@@ -125,3 +125,47 @@ export async function removeData(masterService, id, collectionName) {
 }
 
 //#endregion 
+/**
+ * Checks for duplicates in an array of objects based on specified keys.
+ * If a duplicate is found, the error message is pushed to the "error" array.
+ * @param {Array} data - The array of objects to check for duplicates.
+ * @param {string} routeKey - The key representing the 'Route' property in each object.
+ * @param {string} capacityKey - The key representing the 'Capacity' property in each object.
+ */
+export async function checkForDuplicatesInBulkUpload(data, tableData, routeKey, capacityKey) {
+    // Set to store unique combinations of Route and Capacity
+
+    const uniqueEntries = new Set();
+
+    tableData.forEach(element => {
+        const key = `${element['rTNM']}-${element['cPCTNM']}`;
+        uniqueEntries.add(key);
+    });
+    // Filter out data with errors
+    const dataWithoutErrors = data.filter(entry => !entry.error);
+
+    // Iterate through each object in the array
+    dataWithoutErrors.forEach(entry => {
+        // Create a key based on the specified Route and Capacity keys
+        const key = `${entry[routeKey]}-${entry[capacityKey]}`;
+
+        // Check if the key is already in the set (duplicate entry)
+        if (uniqueEntries.has(key)) {
+            // Push an error message to the 'error' array
+            entry.error.push(`Duplicate entry for ${key}`);
+        } else {
+            // Add the key to the set if it's not a duplicate
+            uniqueEntries.add(key);
+        }
+    });
+
+    // Filter out objects with errors
+    const objectsWithErrors = data.filter(obj => obj.error !== null);
+
+    // Concatenate the two arrays, putting objects without errors first
+    const sortedValidatedData = [...dataWithoutErrors, ...objectsWithErrors];
+
+    console.log(sortedValidatedData);
+
+    return sortedValidatedData;
+}

@@ -250,7 +250,6 @@ export class VendorBillListComponent implements OnInit {
           }
           // Add 'Unhold Payment' to the actions array
           element.actions.push('Unhold Payment');
-          // console.log(element.actions);
 
         }
         if (element.Status === 'Cancelled' || element.Status === 'Paid') {

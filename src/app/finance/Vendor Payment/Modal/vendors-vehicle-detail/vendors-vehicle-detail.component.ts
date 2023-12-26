@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { BeneficiaryDetailComponent } from 'src/app/finance/Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component';
+import { BeneficiaryDetailComponent } from 'src/app/finance/Vendor Bills/beneficiary-detail/beneficiary-detail.component';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 
 @Component({

@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 
 @Component({

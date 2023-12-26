@@ -34,10 +34,10 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { filter } from "rxjs/operators";
-import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BlancePaymentPopupComponent } from "../Modal/blance-payment-popup/blance-payment-popup.component";
 import { StorageService } from "src/app/core/service/storage.service";
+import { BeneficiaryDetailComponent } from "../../Vendor Bills/beneficiary-detail/beneficiary-detail.component";
 
 @Component({
   selector: "app-balance-payment",

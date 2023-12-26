@@ -29,9 +29,9 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
-import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { StorageService } from "src/app/core/service/storage.service";
 import { VendorsVehicleDetailComponent } from "../Modal/vendors-vehicle-detail/vendors-vehicle-detail.component";
+import { BeneficiaryDetailComponent } from "../../Vendor Bills/beneficiary-detail/beneficiary-detail.component";
 @Component({
   selector: "app-advance-payments",
   templateUrl: "./advance-payments.component.html",

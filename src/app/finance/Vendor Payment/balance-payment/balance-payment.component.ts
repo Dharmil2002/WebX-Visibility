@@ -57,7 +57,6 @@ export class BalancePaymentComponent implements OnInit {
   ];
   linkArray = [];
   menuItems = [];
-  MakePaymentVisible: Boolean = false;
 
   dynamicControls = {
     add: false,
@@ -137,8 +136,6 @@ export class BalancePaymentComponent implements OnInit {
 
   AllStateList: any;
   StateList: any;
-  VendorBalanceSummaryFilterForm: UntypedFormGroup;
-  jsonControlVendorBalanceSummaryFilterArray: any;
 
   VendorBalancePaymentFilterForm: UntypedFormGroup;
   jsonControlVendorBalancePaymentFilterArray: any;
@@ -259,12 +256,6 @@ export class BalancePaymentComponent implements OnInit {
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
     ]);
 
-    this.jsonControlVendorBalanceSummaryFilterArray =
-      this.vendorBalancePaymentControl.getVendorBalanceSummaryArrayControls();
-    this.VendorBalanceSummaryFilterForm = formGroupBuilder(this.fb, [
-      this.jsonControlVendorBalanceSummaryFilterArray,
-    ]);
-
     this.jsonControlVendorBalancePaymentFilterArray =
       this.vendorBalancePaymentControl.getVendorBalanceTaxationPaymentDetailsArrayControls();
     this.VendorBalancePaymentFilterForm = formGroupBuilder(this.fb, [
@@ -337,8 +328,7 @@ export class BalancePaymentComponent implements OnInit {
     this.AllStateList = resState?.data;
     this.StateList = resState?.data
       .map((x) => ({
-        value: x.stateCode,
-        name: x.stateName,
+        value: x.ST, name: x.STNM
       }))
       .filter((x) => x != null)
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -379,7 +369,6 @@ export class BalancePaymentComponent implements OnInit {
         this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.setValue(
           this.VendorDetails?.otherdetails[0]?.gstNumber
         );
-        console.log("this.StateList", this.StateList);
         const getValue = this.StateList.find(
           (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
         );
@@ -458,7 +447,7 @@ export class BalancePaymentComponent implements OnInit {
           x.value ==
           this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
       );
-      const TDSrate = FindData.ACdetail.CorporateTDS.toFixed(2);
+      const TDSrate = FindData.rHUF.toFixed(2);
       const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
       this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
         TDSrate
@@ -552,8 +541,8 @@ export class BalancePaymentComponent implements OnInit {
     if (Billbookingstate && Vendorbillstate && SACcode) {
       const IsStateTypeUT =
         this.AllStateList.find(
-          (item) => item.stateName === Vendorbillstate.name
-        ).stateType === "UT";
+          (item) => item.STNM === Vendorbillstate.name
+        ).ISUT == true;
       const GSTAmount = this.tableData
         .filter((item) => item.isSelected)
         .reduce((acc, curr) => acc + parseFloat(curr["BalancePending"]), 0);
@@ -679,107 +668,113 @@ export class BalancePaymentComponent implements OnInit {
   }
   // Step 2 Create Vendor Bill in vend_bill_summary Collection And vend_bill_det collection and update thc_summary
   BookVendorBill(PaymenDetails, generateVoucher) {
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
-        const vendorBillEntry: VendorBillEntry = {
-          companyCode: this.companyCode,
-          docType: "VB",
-          branch: this.storage.branch,
-          finYear: financialYear,
-          data: {
-            cID: this.companyCode,
-            docNo: "",
-            bDT: new Date(),
-            lOC: this.VendorDetails?.vendorCity,
-            sT: this.VendorDetails?.vendorState,
-            gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
-            tHCAMT: this.THCamount,
-            aDVAMT: this.AdvanceTotal,
-            bALAMT: this.BalancePending,
-            rOUNOFFAMT: 0,
-            bALPBAMT: generateVoucher == true ? 0 : this.BalancePending,
-            bSTAT: generateVoucher == true ? 4 : 1,
-            bSTATNM: generateVoucher == true ? "Paid" : "Generated",
-            eNTDT: new Date(),
-            eNTLOC: this.storage.branch,
-            eNTBY: this.storage.userName,
-            vND: {
-              cD: this.PaymentData?.VendorInfo?.cD,
-              nM: this.PaymentData?.VendorInfo?.nM,
-              pAN: this.PaymentHeaderFilterForm.get("VendorPANNumber").value,
-              aDD: this.VendorDetails?.vendorAddress,
-              mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
-              eML: this.VendorDetails?.emailId,
-              gSTREG: this.VendorDetails?.otherdetails?.[0].gstNumber ? true : false,
-              sT: this.VendorDetails?.otherdetails?.[0].gstState,
-              gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
-            },
-            tDS: {
-              eXMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted,
-              sEC: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value : "",
-              sECD: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name : "",
-              rATE: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0,
-              aMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0,
-            },
-            gST: {
-              sAC: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value ? this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString() : "",
-              sACNM: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name ? this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name.toString() : "",
-              tYP: this.VendorBalanceTaxationGSTFilterForm.value.GSTType,
-              rATE: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.TotalGSTRate) || 0,
-              iGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTRate) || 0,
-              cGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTRate) || 0,
-              sGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTRate) || 0,
-              iGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0,
-              cGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
-              sGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
-              aMT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0,
-            },
-          }, BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
-            return {
+    if (this.tableData.filter(x => x.isSelected).length == 0) {
+      this.snackBarUtilityService.ShowCommonSwal(
+        "info",
+        "Please Select Atleast One THC"
+      );
+    } else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          const vendorBillEntry: VendorBillEntry = {
+            companyCode: this.companyCode,
+            docType: "VB",
+            branch: this.storage.branch,
+            finYear: financialYear,
+            data: {
               cID: this.companyCode,
-              bILLNO: "",
-              tRIPNO: x.THC,
-              tTYP: "THC",
-              aDVAMT: x.Advance,
-              bALAMT: x.BalancePending,
-              pENDBALAMT: generateVoucher == true ? 0 : x.BalancePending,
-              tHCAMT: x.THCamount,
+              docNo: "",
+              bDT: new Date(),
+              lOC: this.VendorDetails?.vendorCity,
+              sT: this.VendorDetails?.vendorState,
+              gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
+              tHCAMT: this.THCamount,
+              aDVAMT: this.AdvanceTotal,
+              bALAMT: this.BalancePending,
+              rOUNOFFAMT: 0,
+              bALPBAMT: generateVoucher == true ? 0 : this.BalancePending,
+              bSTAT: generateVoucher == true ? 4 : 1,
+              bSTATNM: generateVoucher == true ? "Paid" : "Generated",
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
-            }
-          })
-        };
+              vND: {
+                cD: this.PaymentData?.VendorInfo?.cD,
+                nM: this.PaymentData?.VendorInfo?.nM,
+                pAN: this.PaymentHeaderFilterForm.get("VendorPANNumber").value,
+                aDD: this.VendorDetails?.vendorAddress,
+                mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
+                eML: this.VendorDetails?.emailId,
+                gSTREG: this.VendorDetails?.otherdetails?.[0].gstNumber ? true : false,
+                sT: this.VendorDetails?.otherdetails?.[0].gstState,
+                gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
+              },
+              tDS: {
+                eXMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted,
+                sEC: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value : "",
+                sECD: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name : "",
+                rATE: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0,
+                aMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0,
+              },
+              gST: {
+                sAC: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value ? this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString() : "",
+                sACNM: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name ? this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name.toString() : "",
+                tYP: this.VendorBalanceTaxationGSTFilterForm.value.GSTType,
+                rATE: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.TotalGSTRate) || 0,
+                iGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTRate) || 0,
+                cGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTRate) || 0,
+                sGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTRate) || 0,
+                iGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0,
+                cGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
+                sGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
+                aMT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0,
+              },
+            }, BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
+              return {
+                cID: this.companyCode,
+                bILLNO: "",
+                tRIPNO: x.THC,
+                tTYP: "THC",
+                aDVAMT: x.Advance,
+                bALAMT: x.BalancePending,
+                pENDBALAMT: generateVoucher == true ? 0 : x.BalancePending,
+                tHCAMT: x.THCamount,
+                eNTDT: new Date(),
+                eNTLOC: this.storage.branch,
+                eNTBY: this.storage.userName,
+              }
+            })
+          };
 
-        firstValueFrom(this.voucherServicesService
-          .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
-            if (generateVoucher) {
-              this.SubmitVoucherData(PaymenDetails, res?.data.data.ops[0].docNo)
-            } else {
-              Swal.fire({
-                icon: "success",
-                title: "Bill Generated Successfully",
-                text: "Bill No: " + res?.data.data.ops[0].docNo,
-                showConfirmButton: true,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                    this.RedirectToTHCPayment()
-                  }, 2000);
-                }
-              });
-            }
-          }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-          .finally(() => {
+          firstValueFrom(this.voucherServicesService
+            .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
+              if (generateVoucher) {
+                this.SubmitVoucherData(PaymenDetails, res?.data.data.ops[0].docNo)
+              } else {
+                Swal.fire({
+                  icon: "success",
+                  title: "Bill Generated Successfully",
+                  text: "Bill No: " + res?.data.data.ops[0].docNo,
+                  showConfirmButton: true,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    Swal.hideLoading();
+                    setTimeout(() => {
+                      Swal.close();
+                      this.RedirectToTHCPayment()
+                    }, 1000);
+                  }
+                });
+              }
+            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+            .finally(() => {
 
-          });
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", error);
-      }
-    }, "Balance Payment Generating..!");
-
+            });
+        } catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal("error", error);
+        }
+      }, "Balance Payment Generating..!");
+    }
   }
 
   //setep 3 Creating voucher_trans And voucher_trans_details And voucher_trans_document collection 
@@ -898,7 +893,7 @@ export class BalancePaymentComponent implements OnInit {
               setTimeout(() => {
                 Swal.close();
                 this.RedirectToTHCPayment()
-              }, 2000);
+              }, 1000);
             }
           });
         }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
@@ -959,7 +954,7 @@ export class BalancePaymentComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
           this.RedirectToTHCPayment()
-        }, 2000);
+        }, 1000);
       }
     });
   }

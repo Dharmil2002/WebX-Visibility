@@ -122,7 +122,7 @@ export async function GetStateListFromAPI(masterService) {
     try {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {};
-        const req = { companyCode, collectionName: 'state_detail', filter };
+        const req = { companyCode, collectionName: 'state_master', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
 
         return res

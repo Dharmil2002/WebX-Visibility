@@ -26,7 +26,7 @@ export async function getPincode(companyCode, masterService) {
 // invoiceUtils.ts
 
 export function calculateInvoiceTotalCommon(tableData, contractForm) {
-  debugger
+  
   // Initialize accumulators for totals
   let totalChargedNoofPackages = 0;
   let totalChargedWeight = 0;

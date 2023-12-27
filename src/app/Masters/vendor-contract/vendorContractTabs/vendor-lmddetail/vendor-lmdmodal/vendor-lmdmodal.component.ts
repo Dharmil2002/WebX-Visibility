@@ -82,7 +82,7 @@ export class VendorLMDModalComponent implements OnInit {
   async save(event) {
     try {
       const collectionName = "vendor_contract_lmd_rt";
-
+      this.checkValueExists();
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
@@ -107,13 +107,11 @@ export class VendorLMDModalComponent implements OnInit {
         const existingData = await this.fetchExistingData(collectionName);
         let newId;
         // Find the contract with the specified cNID
-        const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+        const existingContract = existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID);
 
         if (existingContract) {
           // Sort existing data based on _id for consistency
-          const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
-
-          // Extract the last vendor code from the sorted data
+          const sortedData = existingContract.sort((a, b) => a._id.localeCompare(b._id));
           const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
 
           // Generate a new _id
@@ -305,17 +303,30 @@ export class VendorLMDModalComponent implements OnInit {
   //#region to check existing location 
   async checkValueExists() {
     try {
-      // Get the field value from the form controls
-      const fieldValue = this.TLMDForm.controls['location'].value.name;
+      // Set to store unique combinations of Route and Capacity from existRouteList
+      const uniqueEntries = new Set();
 
-      // Find the location in existing locations
-      const existingLocation = this.existingLocation.find(x => x.lOCNM === fieldValue);
+      // Extract values from existRouteList using provided keys and create unique key
+      this.existingLocation.forEach(tableEntry => {
+        const tablekey = `${tableEntry['lOCNM']}-${tableEntry['cPCTNM']}`;
+        uniqueEntries.add(tablekey);
+      });
+
+      // Get the field values from the form controls
+      const routeValue = this.TLMDForm.controls['location'].value.name;
+      const capacityValue = this.TLMDForm.controls['capacity'].value.name;
+
+      // Create a key for the current form input
+      const key = `${routeValue}-${capacityValue}`;
+
+      // Check if the input key already exists in the uniqueEntries set
+      const isDuplicate = uniqueEntries.has(key);
 
       // Check if data exists for the given filter criteria
-      if (existingLocation) {
+      if (isDuplicate) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          text: `Location: ${fieldValue} already exists in Last mile delivery! Please try with another!`,
+          text: `Location: ${routeValue} with Capacity: ${capacityValue} already exists in Last mile delivery! Please try with another!`,
           icon: "error",
           title: 'Error',
           showConfirmButton: true,
@@ -323,11 +334,15 @@ export class VendorLMDModalComponent implements OnInit {
 
         // Reset the input field
         this.TLMDForm.controls['location'].reset();
+        this.TLMDForm.controls['capacity'].reset();
+
+        // Refresh the route list
+        this.getDropDownData();
         this.getLocation();
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(`An error occurred while fetching 'location' details:`, error);
+      console.error(`An error occurred while checking for duplicate values:`, error);
     }
   }
   //#endregion

@@ -102,6 +102,7 @@ export class VendorTERModalComponent implements OnInit {
     try {
       const vendorContractCollection = "vendor_contract_xprs_rt";
 
+      this.checkValueExists();
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
@@ -126,13 +127,11 @@ export class VendorTERModalComponent implements OnInit {
         const existingData = await this.fetchExistingData(vendorContractCollection);
         let newId;
         // Find the contract with the specified cNID
-        const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+        const existingContract = existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID);
 
         if (existingContract) {
           // Sort existing data based on _id for consistency
-          const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
-
-          // Extract the last vendor code from the sorted data
+          const sortedData = existingContract.sort((a, b) => a._id.localeCompare(b._id));
           const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
 
           // Generate a new _id
@@ -285,17 +284,30 @@ export class VendorTERModalComponent implements OnInit {
   //#region to check existing location 
   async checkValueExists() {
     try {
-      // Get the field value from the form controls
-      const fieldValue = this.TERForm.controls['route'].value.name;
+      // Set to store unique combinations of Route and Capacity from existRouteList
+      const uniqueEntries = new Set();
 
-      // Find the route in existing routes
-      const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);
+      // Extract values from existRouteList using provided keys and create unique key
+      this.existRouteList.forEach(tableEntry => {
+        const tablekey = `${tableEntry['rTNM']}-${tableEntry['cPCTNM']}`;
+        uniqueEntries.add(tablekey);
+      });
+
+      // Get the field values from the form controls
+      const routeValue = this.TERForm.controls['route'].value.name;
+      const capacityValue = this.TERForm.controls['capacity'].value.name;
+
+      // Create a key for the current form input
+      const key = `${routeValue}-${capacityValue}`;
+
+      // Check if the input key already exists in the uniqueEntries set
+      const isDuplicate = uniqueEntries.has(key);
 
       // Check if data exists for the given filter criteria
-      if (existingRoute) {
+      if (isDuplicate) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          text: `Route: ${fieldValue} already exists in Express Route! Please try with another!`,
+          text: `Route: ${routeValue} with Capacity: ${capacityValue} already exists in Express Route! Please try another combination.`,
           icon: "error",
           title: 'Error',
           showConfirmButton: true,
@@ -303,11 +315,15 @@ export class VendorTERModalComponent implements OnInit {
 
         // Reset the input field
         this.TERForm.controls['route'].reset();
+        this.TERForm.controls['capacity'].reset();
+
+        // Refresh the route list
         this.getRouteList();
+        this.getDropDownData();
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(`An error occurred while fetching 'route' details:`, error);
+      console.error(`An error occurred while checking for duplicate values:`, error);
     }
   }
   //#endregion

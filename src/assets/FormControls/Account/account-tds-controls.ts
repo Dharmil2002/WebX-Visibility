@@ -17,11 +17,11 @@ export class AccountTdsControls {
             name: "required",
             message: "TDS Section is required",
           },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric length 4 to 100",
-            pattern: "^[a-zA-Z0-9]{4,100}$",
-          },
+          // {
+          //   name: "pattern",
+          //   message: "Please Enter alphanumeric length 2 to 100",
+          //   pattern: "^[a-zA-Z0-9 ]{2,100}$",
+          // },
         ],
         functions: {
           onChange:"CheckTDSSection"
@@ -57,7 +57,7 @@ export class AccountTdsControls {
           {
             name: "pattern",
             message: "Please Enter only numeric length 4 to 200",
-            pattern: "^[0-9]{4,100}$",
+            pattern: "^[0-9]{1,100}$",
           },
         ],
         functions: {
@@ -66,8 +66,8 @@ export class AccountTdsControls {
       },
       {
         name: "RateForHUF",
-        label: "Rate for HUF/ Individual",
-        placeholder: "Rate for HUF/ Individual",
+        label: "Rate for HUF/ Individual (%)",
+        placeholder: "Rate for HUF/ Individual (%)",
         type: "text",
         value: isUpdate?UpdateData.RateForHUF:"",
         generatecontrol: true,
@@ -79,8 +79,8 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter only numeric length 1 to 100",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric max 99",
+            pattern: "^[0-9]{1,2}$",
           },
         ],
         functions: {
@@ -88,8 +88,8 @@ export class AccountTdsControls {
       },
       {
         name: "RateForOthers",
-        label: "Rate for others",
-        placeholder: "Rate for others",
+        label: "Rate for others (%)",
+        placeholder: "Rate for others (%)",
         type: "text",
         value: isUpdate?UpdateData.RateForOthers:"",
         generatecontrol: true,
@@ -101,8 +101,8 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter only numeric length 1 to 100",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric max 99",
+            pattern: "^[0-9]{1,2}$",
           },
         ],
         functions: {

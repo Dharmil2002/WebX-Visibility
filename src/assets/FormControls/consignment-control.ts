@@ -19,7 +19,7 @@ export class ConsignmentControl {
     this.ConsignmentControlArray = [
       {
         name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
-        value: docketDetail.docketNumber, filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
+        value: docketDetail?.docketNumber|| 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
         additionalData: {
           metaData: "Basic"
         },

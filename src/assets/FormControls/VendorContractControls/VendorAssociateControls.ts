@@ -50,10 +50,10 @@ export class VendorAssociateControls {
             message: "please select values from list only",
           },
         ],
-        functions: {
-          // onModel: "getLocation",
-          onOptionSelect: "checkValueExists"
-        },
+        // functions: {
+        //   // onModel: "getLocation",
+        //   onOptionSelect: "checkValueExists"
+        // },
         additionalData: {
           showNameAndValue: false,
         },

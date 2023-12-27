@@ -23,7 +23,7 @@ export class QuickBookingControls {
         label: "C Note Date",
         placeholder: "C Note Date",
         type: "date",
-        value: "",
+        value: new Date(),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",

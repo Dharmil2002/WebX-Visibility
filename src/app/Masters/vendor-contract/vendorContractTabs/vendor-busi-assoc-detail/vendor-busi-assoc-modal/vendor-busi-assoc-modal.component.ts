@@ -69,7 +69,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
   async save(event) {
     try {
       const collectionName = "vendor_contract_ba";
-
+      this.checkValueExists();
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
@@ -95,13 +95,11 @@ export class VendorBusiAssocModalComponent implements OnInit {
         const existingData = await this.fetchExistingData(collectionName);
         let newId;
         // Find the contract with the specified cNID
-        const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+        const existingContract = existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID);
 
         if (existingContract) {
           // Sort existing data based on _id for consistency
-          const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
-
-          // Extract the last vendor code from the sorted data
+          const sortedData = existingContract.sort((a, b) => a._id.localeCompare(b._id));
           const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
 
           // Generate a new _id
@@ -333,17 +331,30 @@ export class VendorBusiAssocModalComponent implements OnInit {
   //#region to check existing location 
   async checkValueExists() {
     try {
-      // Get the field value from the form controls
-      const fieldValue = this.BusiAssocForm.controls['location'].value.name;
+      // Set to store unique combinations of Route and Capacity from existRouteList
+      const uniqueEntries = new Set();
 
-      // Find the city in existing citys
-      const existingcity = this.existCityList.find(x => x.lOCNM === fieldValue);
+      // Extract values from existRouteList using provided keys and create unique key
+      this.existCityList.forEach(tableEntry => {
+        const tablekey = `${tableEntry['lOCNM']}-${tableEntry['pBSNM']}`;
+        uniqueEntries.add(tablekey);
+      });
+
+      // Get the field value from the form controls
+      const locationValue = this.BusiAssocForm.controls['location'].value.name;
+      const paybasisValue = this.BusiAssocForm.controls['PayBasis'].value.name;
+
+      // Create a key for the current form input
+      const key = `${locationValue}-${paybasisValue}`;
+
+      // Check if the input key already exists in the uniqueEntries set
+      const isDuplicate = uniqueEntries.has(key);
 
       // Check if data exists for the given filter criteria
-      if (existingcity) {
+      if (isDuplicate) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          text: `Control Location: ${fieldValue} already exists in Business Associate! Please try with another!`,
+          text: `Control Location: ${locationValue} with PayBasis: ${paybasisValue} already exists in Business Associate! Please try with another!`,
           icon: "error",
           title: 'Error',
           showConfirmButton: true,
@@ -351,6 +362,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
 
         // Reset the input field
         this.BusiAssocForm.controls['location'].reset();
+        this.BusiAssocForm.controls['PayBasis'].reset();
         this.getDropDownData();
       }
     } catch (error) {

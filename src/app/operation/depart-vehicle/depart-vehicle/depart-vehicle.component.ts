@@ -403,7 +403,6 @@ export class DepartVehicleComponent implements OnInit {
     ];
     const mergedData = this.mergeArrays(mergedArray);
     delete mergedData.vehicleTypecontrolHandler;
-    mergedData['_id'] = this.tripData.TripID+"-"+this.tripData.VehicleNo+"-"+this.tripData.RouteandSchedule.split(":")[1].split("-")[0];
     mergedData['lsno'] = this.lsDetails?.lsno || '';
     mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);

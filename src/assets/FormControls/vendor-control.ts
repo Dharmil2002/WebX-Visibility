@@ -28,8 +28,8 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please Enter only text of length 3 to 25 characters",
-                        pattern: '^[a-zA-Z - a-zA-Z]{3,25}$',
+                        message: "Enter Vendor Name with 3 to 50 characters using only text",
+                        pattern: '^[a-zA-Z - a-zA-Z]{3,50}$',
                     }
                 ],
                 functions: {
@@ -94,8 +94,8 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please enter upto 200 characters.",
-                        pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,200}$",
+                        message: "Please Enter Vendor Address upto 350 characters.",
+                        pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,350}$",
                     },
                 ],
                 generatecontrol: true, disable: false
@@ -300,10 +300,10 @@ export class VendorControl {
                 type: 'text',
                 value: vendorMasterTable.msmeNumber,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "MSME Number is required"
-                    },
+                    // {
+                    //     name: "required",
+                    //     message: "MSME Number is required"
+                    // },
                     {
                         name: "pattern",
                         pattern: '^[A-Za-z0-9 ]{0,100}$',
@@ -319,10 +319,10 @@ export class VendorControl {
                 name: 'msmeScan', label: "MSME scan", placeholder: "select MSME scan", type: 'file', value: isUpdate ? vendorMasterTable.msmeScan : "",
                 generatecontrol: true, disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "MSME scan is required"
-                    },
+                    // {
+                    //     name: "required",
+                    //     message: "MSME scan is required"
+                    // },
                 ],
                 functions: {
                     onChange: 'selectMsmeScan',
@@ -375,12 +375,12 @@ export class VendorControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false
-            },            
+            },
             {
                 name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
                 generatecontrol: false, disable: false
             },
-           
+
         ];
         this.vendorOtherInfoArray = [
             {

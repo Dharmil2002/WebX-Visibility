@@ -24,7 +24,7 @@ export class ListContainerComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: false,
+    csv: true,
   };
   EventButton = {
     functionName: "AddNew",
@@ -106,6 +106,18 @@ export class ListContainerComponent implements OnInit {
     "Location",
   ];
   TableData: any;
+  csvFileName = "Container Master";
+  headerForCsv = {
+    "entryDate": "Created Date",
+    "cNTYPNM": "Container Type ",
+    "cNNO": "Container Number",
+    "vNTYP": "Vendor Type",
+    "vNNM": "Vendor Name",
+    "gRW": "Gross Weight ",
+    "tRW": "Tare Weight",
+    "nETW": "Net Weight",
+    "aCT": "Active Status",
+  }
   constructor(
     private Route: Router,
     private masterService: MasterService,
@@ -122,6 +134,7 @@ export class ListContainerComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
+    console.log('res' ,res)
     if (res.success) {
       this.TableData = res.data.map((x) => {
         return {

@@ -13,7 +13,7 @@
 
 <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
 <div class="search-bar-container">
-    <input type="text" placeholder="Scan..." [(ngModel)]="scanPackage"  class="search-bar-input">
+    <input type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()"  class="search-bar-input">
     <button class="search-bar-button"(click)="updatePackage()">Scan</button>
 </div>
 

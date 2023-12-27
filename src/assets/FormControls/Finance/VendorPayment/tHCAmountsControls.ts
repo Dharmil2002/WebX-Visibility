@@ -177,7 +177,7 @@ export class THCAmountsControl {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "balance" ? false : true,
         Validations: [
           {
             name: "required",
@@ -221,7 +221,7 @@ export class THCAmountsControl {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "balance" ? false : true,
         Validations: [
           {
             name: "required",
@@ -233,7 +233,7 @@ export class THCAmountsControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          },
+          }, 
         ],
         additionalData: {
           showNameAndValue: true,

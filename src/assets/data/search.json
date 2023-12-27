@@ -498,7 +498,7 @@
       "router": "Masters/CityLocationMapping/CityLocationIndex"
     },
     {
-      "title": "ContainerMaster/ContainerMasterTypeList",
+      "title": "ListContainerType",
       "tag": [
         "ContainerMaster",
         "ContainerMasterTypeList"
@@ -506,7 +506,7 @@
       "router": "Masters/ContainerMaster/ContainerMasterList"
     },
     {
-      "title": "ContainerMaster/AddContainerType",
+      "title": "AddContainerType",
       "tag": [
         "ContainerMaster",
         "AddContainerType"

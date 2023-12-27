@@ -119,7 +119,7 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   async get() {
-    debugger
+    
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
     const requestData={

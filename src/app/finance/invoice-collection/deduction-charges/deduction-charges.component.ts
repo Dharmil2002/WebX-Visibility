@@ -98,7 +98,7 @@ export class DeductionChargesComponent implements OnInit {
     this.chargesTableForm.controls['tds'].setValue((parseFloat(custDetail.aMT)*5/100).toFixed(2));
   }
   calucatedCharges() {
-    debugger
+    
     const chargeFormGroup = this.chargesTableForm.controls;
     const tds = parseFloatWithFallback(chargeFormGroup['tds'].value);
     const ftDist = parseFloatWithFallback(chargeFormGroup['ftDist'].value);
@@ -118,6 +118,7 @@ export class DeductionChargesComponent implements OnInit {
     }
   }
   save(){
+    
     this.dialogRef.close({...this.chargesTableForm.value,...this.deducationTableForm.value});
   }
 }

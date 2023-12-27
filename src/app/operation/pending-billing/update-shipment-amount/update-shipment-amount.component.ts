@@ -76,7 +76,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
   }
   /*Below the function are mainly for the edit the shipment*/
   async updateShipment() {
-    debugger
+    
     const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight,edited } = this.accountDetail.controls;
     const {shipment,gst} = this.shipmentTableForm.controls;
     let charges = [];
@@ -128,7 +128,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
     }
   }
   async getCharges() {
-    debugger
+    
     const result = await this.invoiceService.getContractCharges({"cHTY":{"D$in":['C','B']}});
     if (result && result.length > 0) {
       const invoiceList: InvoiceModel[] = [];

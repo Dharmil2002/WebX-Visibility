@@ -78,8 +78,10 @@ export async function getDocketDetailsFromApi(
             ? "Available for LS"
             : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo === ""
               ? "Available for manifest"
-              : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo
+              : item.isComplete === 1 && !item?.unloading &&!item?.depart && item?.lsNo && item?.mfNo
                 ? "Ready to Depart From " + localStorage.getItem("Branch")
+                :item.isComplete === 1 && !item?.unloading &&item?.depart&&item?.lsNo && item?.mfNo
+                ? "In Transit" +" "+ `${item?.orgLoc ?? ""} : ${item?.destination?.split(":")[1] ?? ""}`
                 : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo
                   ? "Going to Last Mile Delivery" + item.destination.split(":")[1]
                   :"Quick Completion";
@@ -94,6 +96,7 @@ export async function getDocketDetailsFromApi(
         chargedWeight: parseInt(item?.chrgwt ?? 0),
         actualWeight: parseInt(item?.actualwt ?? 0),
         status: status,
+        docketDate:item?.docketDate||new Date(),
         // Determine the Action based on the conditions
         Action: item?.isComplete === 1
           ? item?.lsNo === 0 ? "" : ""
@@ -103,6 +106,19 @@ export async function getDocketDetailsFromApi(
     });
 
     // Return the modified data
+    modifiedData.sort((a: any, b: any) => {
+      const dateA = a.docketDate ? new Date(a.docketDate) : null;
+      const dateB = b.docketDate ? new Date(b.docketDate) : null;
+      if (dateA && dateB) {
+        return dateB.getTime() - dateA.getTime();
+      } else if (dateA) {
+        return -1;
+      } else if (dateB) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
     return modifiedData;
   } catch (error) {
     throw new Error("Oops! Something went wrong. Please try again later.");

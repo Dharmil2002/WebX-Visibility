@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { DriversFromApi, GetAccountDetailFromApi, GetLocationDetailFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, GetsachsnFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
+import { DriversFromApi, GetAccountDetailFromApi, GetBankDetailFromApi, GetLocationDetailFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, GetsachsnFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
 import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
 import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
@@ -145,7 +145,7 @@ export class DebitVoucherComponent implements OnInit {
     const stateReqBody = {
       companyCode: this.companyCode,
       filter: {},
-      collectionName: "state_detail",
+      collectionName: "state_master",
     };
 
 
@@ -153,20 +153,12 @@ export class DebitVoucherComponent implements OnInit {
     this.AllStateList = resState?.data;
     this.StateList = resState?.data
       .map(x => ({
-        value: x.stateCode, name: x.stateName
+        value: x.ST, name: x.STNM
       }))
       .filter(x => x != null)
       .sort((a, b) => a.name.localeCompare(b.name));
 
 
-
-    // this.filter.Filter(
-    //   this.jsonControlDebitVoucherSummaryArray,
-    //   this.DebitVoucherSummaryForm,
-    //   this.StateList,
-    //   "Partystate",
-    //   true
-    // );
 
     this.AllLocationsList = await GetLocationDetailFromApi(this.masterService)
     this.filter.Filter(
@@ -185,14 +177,14 @@ export class DebitVoucherComponent implements OnInit {
       companyCode: this.companyCode,
       collectionName: "account_detail",
       filter: {
-        PartySelection: BindLedger,
+        pARTNM: BindLedger,
         // MainCategoryName: ["ASSET", "EXPENSE"],
-        AccountingLocations: this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+        //   AccountingLocations: this.DebitVoucherSummaryForm.value.Accountinglocation?.name
       },
     };
     const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
     this.AccountGroupList = resaccount_group?.data
-      .map(x => ({ value: x.AccountCode, name: x.AccountDescription, ...x }))
+      .map(x => ({ value: x.aCCD, name: x.aCNM, ...x }))
       .filter(x => x != null)
       .sort((a, b) => a.value.localeCompare(b.value));
   }
@@ -205,10 +197,12 @@ export class DebitVoucherComponent implements OnInit {
     }
   }
   StateChange(event) {
+    debugger
     const Partystate = this.DebitVoucherSummaryForm.value.Partystate;
     const Paymentstate = this.DebitVoucherSummaryForm.value.Paymentstate;
     if (Partystate && Paymentstate) {
-      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Paymentstate).stateType == "UT";
+      const IsStateTypeUT = this.AllStateList.find(item => item.STNM == Paymentstate).
+        ISUT == true;
       const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
         return accumulator + parseFloat(currentValue['GSTAmount']);
       }, 0);
@@ -376,7 +370,7 @@ export class DebitVoucherComponent implements OnInit {
     }
   }
   TDSSectionFieldChanged(event) {
-    this.DebitVoucherTaxationTDSForm.get("TDSRate").setValue(this.DebitVoucherTaxationTDSForm.value?.TDSSection?.ACdetail?.CorporateTDS)
+    this.DebitVoucherTaxationTDSForm.get("TDSRate").setValue(this.DebitVoucherTaxationTDSForm.value?.TDSSection?.rHUF)
     this.calculateTDSAndTotal('');
 
   }
@@ -546,7 +540,8 @@ export class DebitVoucherComponent implements OnInit {
     const Accountinglocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
     switch (PaymentMode) {
       case 'Cheque':
-        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        // const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
         this.filter.Filter(
           this.jsonControlDebitVoucherTaxationPaymentDetailsArray,
           this.DebitVoucherTaxationPaymentDetailsForm,

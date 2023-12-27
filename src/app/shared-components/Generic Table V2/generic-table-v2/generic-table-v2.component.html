@@ -88,8 +88,8 @@
                             </div>
                             <div class="col-auto ms-auto">
                                 <ul class="header-buttons">
-                                    <li>
-                                        <div *ngIf="csvHeaders" class="export-button m-l-10" matTooltip="CSV">
+                                    <li *ngIf="dynamicControls.csv">
+                                        <div  class="export-button m-l-10" matTooltip="CSV">
                                             <img src="assets/images/icons/csv.png" alt="" (click)="ExportToCsv()" />
                                         </div>
                                     </li>

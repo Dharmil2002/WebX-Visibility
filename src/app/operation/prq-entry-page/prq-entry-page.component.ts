@@ -389,14 +389,14 @@ export class PrqEntryPageComponent implements OnInit {
 
   async bilingChanged() {
     const billingParty =
-      this.prqEntryTableForm.controls["bPARTY"].value?.name || "";
+      this.prqEntryTableForm.controls["bPARTY"].value?.value || "";
 
     this.allPrqDetail = await this.prqService.getAllPrqDetailWithFilters(billingParty);
 
     let prqDetail = this.allPrqDetail.tableData
-      .filter(
-        (x) => x.bPARTY.toLowerCase() === billingParty.toLowerCase()
-      )
+      // .filter(
+      //   (x) => x.bPARTY.toLowerCase() === billingParty.toLowerCase()
+      // )
       .slice(0, 5);
     if (prqDetail.length > 0) {
       this.prqView(prqDetail);     
@@ -420,21 +420,21 @@ export class PrqEntryPageComponent implements OnInit {
     if (result) {
       setControlValue(
         this.prqEntryTableForm.get("cARTYP"),
-        result.carrierType
+        result.carrierTypeCode.toString()
       );
-      if (result.carrierType == "truck") {
+      if (result.carrierType?.toLowerCase() != "container" ) {
         setControlValue(
           this.prqEntryTableForm.get("vEHSIZE"),
-          result?.vehicleSize?.split("-")[0] ?? ""
+          result?.vehicleSizeCode ?? ""
         );
       }
       else {
         setControlValue(this.prqEntryTableForm.get("cNTSIZE"),
-          result?.size?.split("-")[0] ?? ""
+          result?.containerSize ?? ""
         );
         setControlValue(this.prqEntryTableForm.get("cNTYP"), {
-          name: result.typeContainerCode,
-          value: result.typeContainer,
+          name: result.typeContainer,
+          value: result.typeContainerCode,
         });
       }
       this.disableSize();
@@ -446,11 +446,9 @@ export class PrqEntryPageComponent implements OnInit {
         name: result.toCity,
         value: result.toCity,
       });
-      const billingParty = await this.customerService.getCustomerByCodeOrName(result.billingPartyCode, result.billingParty);
-
-      setControlValue(this.prqEntryTableForm.get("bPARTY"), billingParty);
+      setControlValue(this.prqEntryTableForm.get("bPARTY"), { name: result.billingParty, value: result.billingPartyCode });
       setControlValue(
-        this.prqEntryTableForm.get("contactNo"),
+        this.prqEntryTableForm.get("pHNO"),
         result.contactNo
       );
 

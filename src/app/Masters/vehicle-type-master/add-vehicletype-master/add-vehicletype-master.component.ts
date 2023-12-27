@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { calculateVolume } from "../../vehicle-master/vehicle-utility";
 import { HttpErrorResponse } from "@angular/common/http";
+import { firstValueFrom } from "rxjs";
 @Component({
   selector: 'app-add-vehicletype-master',
   templateUrl: './add-vehicletype-master.component.html',
@@ -102,7 +103,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
       "collectionName": "vehicleType_detail",
       "filter": {}
     };
-    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     const vehicleTypeExists = res.data.some((res) => res.vehicleTypeName === this.vehicleTypeTableForm.value.vehicleTypeName);
     if (vehicleTypeExists) {
       // Show the popup indicating that the state already exists
@@ -135,10 +136,17 @@ export class AddVehicletypeMasterComponent implements OnInit {
       "collectionName": "vehicleType_detail",
       "filter": {}
     }
-    const res = await this.masterService.masterPost("generic/get", req).toPromise()
-    if (res) {
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+    const sortedData = res.data.sort((a, b) => {
+      const dateA: Date | any = new Date(a.updatedDate);
+      const dateB: Date | any = new Date(b.updatedDate);
+      // Compare the date objects
+      return dateB - dateA; // Sort in descending order
+    });
+
+    if (sortedData) {
       // Generate srno for each object in the array
-      const lastUsedVehicleTypeCode = res.data[res.data.length - 1];
+      const lastUsedVehicleTypeCode = sortedData[0];
       const lastVehicleTypeCode = lastUsedVehicleTypeCode ? parseInt(lastUsedVehicleTypeCode.vehicleTypeCode.substring(3)) : 0;
       // Function to generate a new route code
       function generateVehicleCode(initialCode: number = 0) {
@@ -164,7 +172,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
           filter: { _id: id },
           update: this.vehicleTypeTableForm.value
         };
-        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -178,14 +186,14 @@ export class AddVehicletypeMasterComponent implements OnInit {
       }
       else {
         const data = this.vehicleTypeTableForm.value;
-        const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value };
+        const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value};
         const mergedObject = { ...data, ...id };
         let req = {
           companyCode: this.companyCode,
           collectionName: "vehicleType_detail",
           data: mergedObject
         };
-        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
           // Display success message
           Swal.fire({

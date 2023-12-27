@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
@@ -40,6 +40,14 @@ export class OperationService {
   operationMongoPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
+  operationMongoRemove(ApiURL,Request){
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const options = {
+      headers: headers,
+      body: Request
+    };
+      return this.http.delete<any>(`${environment.APIBaseURL}` + ApiURL,options);
+    }
   setShipmentStatus(data: string) {
     this.shipmentStatus = data
   }

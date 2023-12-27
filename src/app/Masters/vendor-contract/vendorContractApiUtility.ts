@@ -108,7 +108,7 @@ export async function removeData(masterService, id, collectionName) {
     try {
         // Make an asynchronous request to remove data using the master service
         const res = await masterService.masterMongoRemove("generic/remove", req).toPromise();
-       // console.log(res);
+        // console.log(res);
         if (res.success) {
             // Display success message
             Swal.fire({
@@ -125,3 +125,60 @@ export async function removeData(masterService, id, collectionName) {
 }
 
 //#endregion 
+//#region to check duplicates in bulk upload
+/**
+ * Checks for duplicates in an array of objects based on specified keys.
+ * If a duplicate is found, the error message is pushed to the "error" array.
+ * @param {Array} data - The array of objects to check for duplicates.
+ * @param {string} tableData - The array of objects containing reference data for comparison.
+ * @param {string} tblRouteKey - The key representing the 'Route' property in each object of tableData.
+ * @param {string} tblCapacityKey - The key representing the 'Capacity' property in each object of tableData.
+ * @param {string} flRouteKey - The key representing the 'Route' property in each object of data.
+ * @param {string} flCapacityKey - The key representing the 'Capacity' property in each object of data.
+ * @returns {Array} sortedValidatedData - The array of objects with duplicates flagged in the 'error' property.
+ */
+export async function checkForDuplicatesInBulkUpload(data, tableData, tblRouteKey, tblCapacityKey, flRouteKey, flCapacityKey) {
+    // Set to store unique combinations of Route and Capacity from tableData
+    const uniqueEntries = new Set();
+
+    // Extract values from tableData using provided keys and create unique key
+    tableData.forEach(tableEntry => {
+        const key = `${tableEntry[tblRouteKey]}-${tableEntry[tblCapacityKey]}`;
+        uniqueEntries.add(key);
+    });
+
+    // Filter out data with errors
+    const dataWithoutErrors = data.filter(entry => !entry.error);
+
+    // Iterate through each object in the array
+    dataWithoutErrors.forEach(entry => {
+        // Initialize entry.error as an array if it's null
+        entry.error = entry.error || [];
+
+        // Create a key based on the specified Route and Capacity keys
+        const key = `${entry[flRouteKey]}-${entry[flCapacityKey]}`;
+
+        // Check if the key is already in the set (duplicate entry)
+        if (uniqueEntries.has(key)) {
+            // Push an error message to the 'error' array
+            entry.error.push(`Duplicate entry for ${key}`);
+        } else {
+            // Add the key to the set if it's not a duplicate
+            uniqueEntries.add(key);
+        }
+    });
+
+    // Filter out objects with errors
+    const objectsWithErrors = data.filter(obj => obj.error.length !== 0);
+
+    // Filter out objects with no errors and set 'error' property to null
+    const objectsWithoutErrors = data
+        .filter(obj => obj.error.length === 0)
+        .map(obj => ({ ...obj, error: null }));
+
+    // Concatenate the two arrays, putting objects without errors first
+    const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
+
+    return sortedValidatedData;
+}
+//#endregion

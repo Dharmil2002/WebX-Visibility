@@ -26,7 +26,6 @@ export class ListAccountComponent implements OnInit {
     iconName: "add",
   };
   columnHeader = {
-    
     AcGroupName: {
       Title: "Account Group Name",
       class: "matcolumncenter",
@@ -63,15 +62,7 @@ export class ListAccountComponent implements OnInit {
     "AcLedger",
   ];
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
-  TableData: any = [
-    {
-      TDSsection: "TDS section",
-      PaymentType: "Payment Type",
-      RateForHUF: "Rate For HUF",
-      Thresholdlimit: "Threshold Limit",
-      RateForOthers: "Rate For Others",
-    },
-  ];
+  TableData: any = [];
   constructor(private Route: Router, private masterService: MasterService) {}
 
   async ngOnInit() {
@@ -83,8 +74,8 @@ export class ListAccountComponent implements OnInit {
     const res = await this.masterService.masterPost("generic/get", req).toPromise();
     if(res.success){
       this.TableData = res.data
-      this.isTableLode = true
     }
+    this.isTableLode = true
   }
 
   AddNew(){

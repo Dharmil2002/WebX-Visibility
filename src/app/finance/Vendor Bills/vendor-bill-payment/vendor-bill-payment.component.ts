@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-vendor-bill-payment',
@@ -30,7 +30,7 @@ export class VendorBillPaymentComponent implements OnInit {
   @ViewChild('myTabGroup') tabGroup!: MatTabGroup;
   constructor(private changeDetectorRef: ChangeDetectorRef,
     private activeRoute: ActivatedRoute,
-    ) { }
+  ) { }
 
   ngOnInit(): void {
   }
@@ -43,7 +43,7 @@ export class VendorBillPaymentComponent implements OnInit {
 
   GetSelectedIndex(event) {
     this.selectedTabIndex
-    
+
   }
   ngAfterViewInit(): void {
 

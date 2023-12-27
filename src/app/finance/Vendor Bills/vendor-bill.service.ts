@@ -17,10 +17,11 @@ export class VendorBillService {
 
       // Map each response object to the desired format
       const tableDataArray = responseArray.map((res, index) => ({
-       // srno: index + 1, // Add 1 to start the serial number from 1
+        // srno: index + 1, // Add 1 to start the serial number from 1
         vendor: (res && res.vND && res.vND.cD ? `${res.vND.cD} : ${res.vND.nM}` : ''),
         _id: res._id,
         vnCode: res.vND.cD,
+        vnName: res.vND.nM,
         billType: "Transaction Bill",
         billNo: res.docNo,
         Date: this.formatDate(res.bDT),
@@ -28,7 +29,7 @@ export class VendorBillService {
         pendingAmount: res.bALPBAMT,
         Status: res.bSTATNM,
         vPan: res.vND.pAN,
-         actions: [
+        actions: [
           'Approve Bill',
           'Bill Payment',
           'Hold Payment',

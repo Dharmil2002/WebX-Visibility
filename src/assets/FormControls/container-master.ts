@@ -103,7 +103,7 @@ export class ContainerControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: containerMasterTable?.activeFlag,
+                value: isUpdate?containerMasterTable?.activeFlag:false,
                 Validations: [],
                 generatecontrol: false, disable: false
             },

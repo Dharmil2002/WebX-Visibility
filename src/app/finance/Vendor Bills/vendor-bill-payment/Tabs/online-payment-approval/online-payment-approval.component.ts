@@ -135,7 +135,7 @@ export class OnlinePaymentApprovalComponent implements OnInit {
         });
         break;
       case 'Cancel Bill':
-        updateData = this.createUpdateData("Cancel Bill");
+        updateData = this.createUpdateData("Cancelled");
         break;
     }
 
@@ -167,15 +167,6 @@ export class OnlinePaymentApprovalComponent implements OnInit {
     let bSTAT: number;
 
     switch (status) {
-      case "Approved":
-        bSTAT = 2;
-        break;
-      case "Hold Payment":
-        bSTAT = 4;
-        break;
-      case "Generated":
-        bSTAT = 1;
-        break;
       case "Cancel Bill":
         bSTAT = 6;
         break;

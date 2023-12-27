@@ -105,31 +105,31 @@ export class AddTdsComponent implements OnInit {
       console.log("failed");
     }
   }
-  async hendelsave(body) {
-    const req = {
-      companyCode: this.CompanyCode,
-      collectionName: "tds_detail",
-      filter: this.isUpdate
-        ? { AccountCode: this.UpdateData.AccountCode }
-        : undefined,
-      update: this.isUpdate ? body : undefined,
-      data: this.isUpdate ? undefined : body,
-    };
+  // async hendelsave(body) {
+  //   const req = {
+  //     companyCode: this.CompanyCode,
+  //     collectionName: "tds_detail",
+  //     filter: this.isUpdate
+  //       ? { AccountCode: this.UpdateData.AccountCode }
+  //       : undefined,
+  //     update: this.isUpdate ? body : undefined,
+  //     data: this.isUpdate ? undefined : body,
+  //   };
 
-    const res = this.isUpdate
-      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
-      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
+  //   const res = this.isUpdate
+  //     ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
+  //     : await firstValueFrom (this.masterService.masterPost("generic/create", req))
 
-    if (res.success) {
-      this.Route.navigateByUrl("/Masters/AccountMaster/ListTds");
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: res.message,
-        showConfirmButton: true,
-      });
-    }
-  }
+  //   if (res.success) {
+  //     this.Route.navigateByUrl("/Masters/AccountMaster/ListTds");
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Successful",
+  //       text: res.message,
+  //       showConfirmButton: true,
+  //     });
+  //   }
+  // }
 
   async save() {
     const commonBody = {
@@ -154,11 +154,11 @@ export class AddTdsComponent implements OnInit {
           collectionName: "tds_detail",
           filter: {},
         }));
-        const index= parseInt(tabledata.data.length === 0 ? 0 : tabledata.data[tabledata.data.length-1].TDScode.substring(3))+1
-        const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
+        const index= parseInt(tabledata.data.length === 0 ? 0 : tabledata.data[tabledata.data.length-1].TDScode)+1
+        // const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
       const body = {
-        _id:`${this.CompanyCode}-${Tdscode}`,
-        TDScode:Tdscode,
+        _id:index,
+        TDScode:index,
         eNTBY: localStorage.getItem("UserName"),
         eNTDT: new Date(),
         companyCode: this.CompanyCode,

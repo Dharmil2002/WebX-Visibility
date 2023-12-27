@@ -11,6 +11,7 @@ import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsx
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import Swal from 'sweetalert2';
+import { checkForDuplicatesInBulkUpload } from '../../../vendorContractApiUtility';
 
 @Component({
   selector: 'app-business-associate-bulk-upload',
@@ -85,17 +86,12 @@ export class BusinessAssociateBulkUploadComponent implements OnInit {
         const validationRules = [{
           ItemsName: "ControlLocation",
           Validations: [{ Required: true },
-          { DuplicateFromList: true },
           {
             TakeFromList: this.locationList.map((x) => {
               return x.name;
             }),
-          },
-          {
-            Exists: this.existingData
-              .filter(item => item.cNID === this.CurrentContractDetails.cNID)
-              .map(item => item.lOCNM)
-          }],
+          }
+          ],
         },
         {
           ItemsName: "RateType",
@@ -163,8 +159,18 @@ export class BusinessAssociateBulkUploadComponent implements OnInit {
         ];
 
         var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
-        rPromise.then(response => {
-          this.OpenPreview(response);
+        rPromise.then(async response => {
+
+          // Specify the keys for Route and Capacity
+          const routeKey = "ControlLocation";
+          const capacityKey = "PayBasis";
+          const tableRouteKey = 'lOCNM'
+          const tableCapacitykey = 'pBSNM'
+          const tableData = this.existingData.filter(item => item.cNID === this.CurrentContractDetails.cNID)
+          // Call the function with the specified keys
+          const data = await checkForDuplicatesInBulkUpload(response, tableData, tableRouteKey, tableCapacitykey, routeKey, capacityKey);
+
+          this.OpenPreview(data);
         })
       });
     }

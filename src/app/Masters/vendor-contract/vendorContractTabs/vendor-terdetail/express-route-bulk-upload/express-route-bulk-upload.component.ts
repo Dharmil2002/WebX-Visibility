@@ -89,17 +89,11 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
         const validationRules = [{
           ItemsName: "Route",
           Validations: [{ Required: true },
-          //{ DuplicateFromList: true },
           {
             TakeFromList: this.routeList.map((x) => {
               return x.name;
             }),
-          },
-            // {
-            //   Exists: this.existingData
-            //     .filter(item => item.cNID === this.CurrentContractDetails.cNID)
-            //     .map(item => item.rTNM)
-            // }
+          }
           ],
         },
         {
@@ -151,16 +145,14 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
 
         var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
         rPromise.then(async response => {
-          console.log(response)
           // Specify the keys for Route and Capacity
           const routeKey = "Route";
           const capacityKey = "Capacity";
+          const tableRouteKey = 'rTNM';
+          const tableCapacity = 'cPCTNM';
           const tableData = this.existingData.filter(item => item.cNID === this.CurrentContractDetails.cNID)
-          console.log(tableData);
-          
           // Call the function with the specified keys
-          const data = await checkForDuplicatesInBulkUpload(response, tableData, routeKey, capacityKey);
-          console.log(data);
+          const data = await checkForDuplicatesInBulkUpload(response, tableData, tableRouteKey, tableCapacity, routeKey, capacityKey);
 
           this.OpenPreview(data);
         })

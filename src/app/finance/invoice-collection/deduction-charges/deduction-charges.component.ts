@@ -118,6 +118,7 @@ export class DeductionChargesComponent implements OnInit {
     }
   }
   save(){
+    debugger
     this.dialogRef.close({...this.chargesTableForm.value,...this.deducationTableForm.value});
   }
 }

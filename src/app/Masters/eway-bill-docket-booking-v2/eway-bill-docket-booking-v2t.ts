@@ -801,4 +801,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       console.error("Error getting pincode details:", error);
     }
   }
+  getDetail(){
+    debugger
+   console.log(this.tabForm.value)
+  }
 }

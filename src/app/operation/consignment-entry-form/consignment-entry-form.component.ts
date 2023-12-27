@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { Form, UntypedFormBuilder, UntypedFormGroup, Validators, } from "@angular/forms";
+import { Component, OnInit} from "@angular/core";
+import {UntypedFormBuilder, UntypedFormGroup, Validators, } from "@angular/forms";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { ConsignmentControl, FreightControl, } from "src/assets/FormControls/consignment-control";
@@ -23,7 +23,6 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
-import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { PrqService } from "../../Utility/module/operation/prq/prq.service";
 import { StorageService } from "src/app/core/service/storage.service";
@@ -112,10 +111,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   ) {
     super();
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
-
     this.model.docketDetail = new DocketDetail({});
     if (navigationState != null) {
-
+ 
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -178,9 +176,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /* End*/
   //#region initializeFormControl
   async initializeFormControl() {
+    const docketDetails=await this.docketService.docketObjectMapping(this.model.docketDetail)
     // Create LocationFormControls instance to get form controls for different sections
-    this.model.ConsignmentFormControls = new ConsignmentControl(this.model.docketDetail);
-    this.model.FreightFromControl = new FreightControl(this.model.docketDetail);
+    this.model.ConsignmentFormControls = new ConsignmentControl(docketDetails);
+    this.model.FreightFromControl = new FreightControl(docketDetails);
 
     // Get form controls for Driver Details section
     this.jsonControlArrayBasic =
@@ -314,7 +313,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
       //this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
     }
-    this.getLocBasedOnCity();
 
     if (this.model.prqData.carrierTypeCode == "3") {
       this.model.containerTableForm.controls["containerType"].setValue( { name:this.model.prqData?.typeContainer||"", value:this.model.prqData?.typeContainerCode||"" } );
@@ -394,6 +392,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
   /* below function was the call when */
   async getLocBasedOnCity() {
+    
     const destinationMapping = await this.locationService.locationFromApi({
       locCity: this.model.consignmentTableForm.get("toCity")?.value?.value.toUpperCase(),
     });
@@ -774,50 +773,52 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
-  autofillDropDown() {
+  async autofillDropDown() {
+    
+    const docketDetails=await this.docketService.docketObjectMapping(this.model.docketDetail);
+    this.model.docketDetail.invoiceDetails=await this.docketService.getDocketByDocNO(docketDetails.docketNumber,"docket_invoices");
+    this.model.docketDetail.containerDetail=await this.docketService.getDocketByDocNO(docketDetails.docketNumber,"docket_containers");
 
-    const { vendorType, vendorName, fromCity, toCity, destination, vehicleNo, billingParty, consignorName, consigneeName, prqNo, risk, payType, transMode, freightRatetype, packaging_type, weight_in, delivery_type, issuing_from } = this.model.docketDetail;
     const { controls } = this.model.consignmentTableForm;
 
     // Helper function to set form control values.
     const setControlValue = (controlName, value) => {
       controls[controlName].setValue(value);
     };
-
+    if(!docketDetails){
+       return false
+    }
     // Set vendor details.
-    const vendor = vendorType !== "Market" ? this.model.vendorDetail.find(v => v.name === vendorName) : vendorName;
-
-    setControlValue("vendorType", vendorType);
-
+    const vendor = docketDetails.vendorType != "4" ? {name:docketDetails.vendorName,value:docketDetails.vendorCode} : docketDetails.vendorName;
+    setControlValue("vendorType", docketDetails.vendorType.toString());
     // Trigger vendor field change actions.
     this.vendorFieldChanged();
-    setControlValue("vendorName", vendor);
+    setControlValue("vendorName",vendor);
     // Set city details.
-    setControlValue("fromCity", { name: fromCity, value: fromCity });
-    setControlValue("toCity", { name: toCity, value: toCity });
-    setControlValue("destination", { name: destination, value: destination });
-
+    setControlValue("fromCity", { name: docketDetails.fromCity, value: docketDetails.fromCity });
+    setControlValue("toCity", { name: docketDetails.toCity, value: docketDetails.toCity });
+    setControlValue("destination", { name: docketDetails.destination, value: docketDetails.destination });
     // Set vehicle number.
-    setControlValue("vehicleNo", { name: vehicleNo || "", value: vehicleNo || "" });
-
+    setControlValue("vehicleNo", { name: docketDetails.vehicleNo || "", value: docketDetails.vehicleNo || "" });
     // Find and set parties.
-    const findPartyByName = name => this.model.billingParty.find(x => x.name.toLowerCase() === name.toLowerCase());
-    setControlValue("billingParty", findPartyByName(billingParty));
-    setControlValue("consignorName", findPartyByName(consignorName));
-    setControlValue("consigneeName", findPartyByName(consigneeName));
-
+    const billingPartyObj={ name: docketDetails.billingPartyName, value: docketDetails.billingParty};
+    const consignorNameObj={ name: docketDetails.consignorName, value: docketDetails.consignorCode};
+    const consigneeNameObj={ name:docketDetails.consigneeName, value: docketDetails.consigneeCode};
+    setControlValue("billingParty",billingPartyObj);
+    setControlValue("consignorName",consignorNameObj);
+    setControlValue("consigneeName",consigneeNameObj);
     // Set various details.
-    setControlValue("risk", risk);
-    setControlValue("prqNo", { name: prqNo, value: prqNo });
-    setControlValue("payType", payType);
-    setControlValue("transMode", transMode);
-    setControlValue("packaging_type", packaging_type);
-    setControlValue("weight_in", weight_in);
-    setControlValue("delivery_type", delivery_type);
-    setControlValue("issuing_from", issuing_from);
+    setControlValue("risk", docketDetails.risk);
+    setControlValue("prqNo", { name: docketDetails.prqNo, value: docketDetails.prqNo });
+    setControlValue("payType", docketDetails.payType);
+    setControlValue("transMode", docketDetails.transMode);
+    setControlValue("packaging_type", docketDetails.packaging_type);
+    setControlValue("weight_in", docketDetails.weight_in);
+    setControlValue("delivery_type", docketDetails.delivery_type);
+    setControlValue("issuing_from",docketDetails. issuing_from);
 
     // Set Freight Table Form details.
-    this.model.FreightTableForm.controls["freightRatetype"].setValue(freightRatetype);
+    this.model.FreightTableForm.controls["freightRatetype"].setValue(docketDetails.freightRatetype);
 
     // Bind table data after form update.
     this.bindTableData();
@@ -825,21 +826,37 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
 
   bindTableData() {
+    
     if (this.model.docketDetail.invoiceDetails.length > 0) {
       this.tableLoadIn = true;
       this.loadIn = true;
       const invoiceDetail = this.model.docketDetail.invoiceDetails.map((x, index) => {
-        if (x) {
-          if (Object.values(x).every((value) => !value)) {
-            return null; // If all properties of x are empty, return null
-          }
-          // You can use 'x' and 'index' here
-          x.id = index + 1;
-          x.actions = ["Edit", "Remove"];
-          return x;
+        if (!x || Object.values(x).every((value) => value === null || value === undefined)) {
+          return null; // If x is null or all properties of x are null or undefined, return null
         }
-        return x; // Return the original element if no modification is needed
+
+        // You can use 'x' and 'index' here
+        x.id = index + 1;
+        x.ewayBillNo = `${x.eWBNO}`;
+        x.expiryDate = x.eXPDT  
+          ? formatDate(x.eXPDT, "dd-MM-yy HH:mm")
+          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm");
+        x.invoiceNo = x.iNVNO;
+        x.invoiceAmount = x.iNVAMT;
+        x.noofPkts = x.pKGS;
+        x.materialName = x.mTNM;
+        x.actualWeight = x.aCTWT;
+        x.chargedWeight = x.cHRWT;
+        x.invoice = true;
+        x.expiryDateO = x.eXPDT;
+        x.actions = ["Edit", "Remove"];
+
+        return x;
       });
+
+      this.model.invoiceData = invoiceDetail.filter((x) => x !== null);
+      this.tableLoadIn = this.model.invoiceData.length > 0;
+      this.loadIn = false;
       const allEmpty = invoiceDetail.every((x) => !x);
       if (!allEmpty) {
         this.model.invoiceData = invoiceDetail;
@@ -859,9 +876,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       fieldsToFromRemove
     );
 
-    if (containerDetail > 0) {
+    if (containerDetail.length > 0) {
+      this.contFlag = true;
       this.tableLoad = true;
       this.isLoad = true;
+      this.model.consignmentTableForm.controls["cd"].setValue(true);
       const containerDetail = this.model.docketDetail.containerDetail.map(
         (x, index) => {
           if (x) {
@@ -871,6 +890,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             // Modify 'x' if needed
             // For example, you can add the index to the element
             x.id = index + 1;
+            x.containerNumber=x.cNID;
+            x.containerCapacity=x.cNCPT;
+            x.containerType=x.cNTYPN;
+            x.isEmpty=x.isEMPT;
+            x.invoice = false;
             x.actions = ["Edit", "Remove"];
             return x;
           }
@@ -931,7 +955,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async save() {
-
+    
     this.isSubmit = true;
     // Remove all form errors
     const tabcontrols = this.model.consignmentTableForm;
@@ -1013,7 +1037,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     resetData.forEach((d) => {
       d.findIn.controls[d.name].setValue(d.value);
     })
-
+    
     if (!this.isUpdate) {
       let id = {
         isComplete: 1,
@@ -1084,8 +1108,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const CWt = invoiceDetails ? invoiceDetails.invoiceDetails.reduce((a, c) => a + (parseFloat(c.chargedWeight) || 0), 0) : 0;
 
       docketDetails["pKGS"] = Pkg;
-      docketDetails["aCTWT"] = Wt;
-      docketDetails["cHRWT"] = CWt;
+      const WtKg = Wt * 1000; // Convert Wt to kg (tons to kg)
+      const CWtKg = CWt * 1000; // Convert CWt to kg (tons to kg)
+      docketDetails["aCTWT"] = WtKg;
+      docketDetails["cHRWT"] = CWtKg;
       docketDetails["cFTWT"] = 0;
       docketDetails["vOL"] = 0;
       docketDetails["volume_in"] = 'FT';
@@ -1160,18 +1186,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         rCM: this.model.FreightTableForm.controls["rcm"].value,
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT: this.model.FreightTableForm.controls["gstChargedAmount"].value,
-        cHG: [
-          {
-            cHGID: "CH001",
-            cHGNM: "Insurance",
-            aMT: 10
-          },
-          {
-            cHGID: "CH002",
-            cHGNM: "Demurrage",
-            aMT: 10
-          }
-        ],
+        cHG:"",
         tOTAMT: this.model.FreightTableForm.controls['totalAmount'].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -1233,39 +1248,89 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           });
         });
     } else {
+      
+      vendorName
       let docketDetails = {
         ...this.model.consignmentTableForm.value,
         ...this.model.FreightTableForm.value,
         ...invoiceDetails,
-        ...containerDetail,
+        ...containerDetail
       };
-      let reqBody = {
-        companyCode: this.storage.companyCode,
-        collectionName: "docket_temp",
-        filter: {
-          docketNumber:
-            this.model.consignmentTableForm.controls["docketNumber"].value,
-        },
-        update: docketDetails,
-      };
-      const res = await this.operationService
-        .operationMongoPut("generic/update", reqBody)
-        .toPromise();
-      if (res) {
-        Swal.fire({
-          icon: "success",
-          title: "Docket Update Successfully",
-          text:
-            "DocketNo: " +
-            this.model.consignmentTableForm.controls["docketNumber"].value,
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Redirect to the desired page after the success message is confirmed.
-            this.navService.navigateTotab("docket", "dashboard/Index");
-          }
+      const jsonControl=[
+        ...this.jsonControlArrayBasic,
+        ...this.jsonControlArrayConsignor,
+        ...this.jsonControlArrayConsignee,
+        ... this.jsonControlArray,
+      ]
+      let invDet = [];
+      let contDet = [];
+      invoiceDetails.invoiceDetails.forEach(i => {
+        invDet.push({
+          _id: `${this.storage.companyCode}-${docketDetails.docketNumber}-${i.invoiceNo}`,
+          cID: this.storage.companyCode,
+          dKTNO:docketDetails.docketNumber,  //To be set from service
+          iNVNO: i.invoiceNo,
+          iNVAMT: i.invoiceAmount,
+          cURR: 'INR',
+          eWBNO: i.ewayBillNo,
+          eXPDT: i.expiryDateO,
+          pKGS: (parseInt(i.noofPkts) || 0),
+          mTNM: i.materialName,
+          aCTWT: (parseFloat(i.actualWeight) || 0),
+          cFTWT: 0,
+          cHRWT: (parseFloat(i.chargedWeight) || 0),
+          vOL: {
+            uNIT: "FT",
+            l: 0.000,
+            b: 0.000,
+            h: 0.000,
+            cU: 0.00
+          },
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch,
+          eNTBY: this.storage.userName
         });
-      }
+      });
+
+      containerDetail.containerDetail.forEach(i => {
+        let container = this.model.containerTypeList.find(f => f.name.trim() == i.containerType.trim());
+        contDet.push({
+          _id: `${this.storage.companyCode}-${docketDetails.docketNumber}-${i.containerNumber}`,
+          cID: this.storage.companyCode,
+          dKTNO:docketDetails.docketNumber,
+          cNID: i.containerNumber,
+          cNTYP: container?.value || i.containerType,
+          cNTYPN: container?.name || "",
+          cNCPT: parseInt(i.containerCapacity),
+          isEMPT: i.isEmpty,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch,
+          eNTBY: this.storage.userName
+        });
+      });
+     
+       const reverseDocketObjectMapping=await this.docketService.reverseDocketObjectMapping(docketDetails,jsonControl);
+       
+       const filter={"dKTNO":reverseDocketObjectMapping.docNo}
+      await Promise.all([
+        this.docketService.updateDocket(reverseDocketObjectMapping, reverseDocketObjectMapping.docNo),
+        this.docketService.updateManyDockets(invDet,filter, "docket_invoices"),
+        this.docketService.updateManyDockets(contDet,filter, "docket_containers"),
+        this.docketService.addEventData(docketDetails),
+        this.docketService.updateOperationData(docketDetails)
+      ]);
+
+      Swal.fire({
+        icon: "success",
+        title: "Docket Update Successfully",
+        text: "DocketNo: " + this.model.consignmentTableForm.controls["docketNumber"].value,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.navService.navigateTotab("docket", "dashboard/Index");
+        }
+      });
+     
     }
   }
   async addDocketNestedtDetail(dkt, invoiceDetails) {

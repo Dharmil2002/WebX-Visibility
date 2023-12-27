@@ -45,6 +45,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() extraData;
   triggered: boolean = false;
   objectKeys = Object.keys;
+  @Output() selectAllClicked = new EventEmitter<any>();
   // @Input() checkBoxRequired;
   // @Input() selectAllorRenderedData;
   @Input() metaData;
@@ -279,6 +280,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   //#endregion
   //#region  Function to select all rows on table by selecting checkbox
   selectAll(event: MatCheckboxChange) {
+   
     // Get the current page size and index from the paginator
     const pageSize = this.paginator.pageSize;
     const pageIndex = this.paginator.pageIndex;
@@ -302,6 +304,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
           obj['isSelected'] = true;
           return obj;
         });
+        this.selectAllClicked.emit(this.getSelecteditems());
       }
     } else {
       // Deselect all rows in the data source
@@ -309,6 +312,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
         obj['isSelected'] = false;
         return obj;
       });
+      this.selectAllClicked.emit(this.getSelecteditems());
     }
   }
 

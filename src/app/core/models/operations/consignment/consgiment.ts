@@ -135,6 +135,14 @@ export class InvoiceDetail {
     expiryDateO: string
     invoice: boolean=true
     actions: ['Edit', 'Remove']
+    iNVNO: string
+    eWBNO: string
+    eXPDT: any
+    iNVAMT: string
+    pKGS: string
+    mTNM: string
+    aCTWT: string
+    cHRWT: string
 }
 
 export class ContainerDetail {
@@ -144,5 +152,11 @@ export class ContainerDetail {
     containerCapacity: string
     invoice: boolean
     actions: ['Edit', 'Remove']
+  cNNO: string
+  cNCPT: string
+  cNTYPN: string
+  cNID: string
+  isEmpty: any
+  isEMPT: any
 }
 

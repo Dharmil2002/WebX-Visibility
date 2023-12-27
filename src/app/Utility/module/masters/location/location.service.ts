@@ -25,8 +25,8 @@ export class LocationService {
       // Map the response data to a more usable format
       const filterMap =
         res?.data?.map((x) => ({
-          value: x.locCode,
-          name: x.locCode,
+          value: `${x.locCode}`,
+          name: `${x.locCode}`,
           city: x.locCity,
           state: x.locState,
         })) ?? null;

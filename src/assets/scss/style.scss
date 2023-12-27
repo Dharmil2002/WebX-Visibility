@@ -628,10 +628,13 @@ a {
     width: 118%;
   }
 
-
   // .globehide{
   //   display:none!important;
   //   }
   
 }
+.blur-effect {
+  filter: blur(5px); /* Adjust the pixel value for more or less blur */
+}
+
 

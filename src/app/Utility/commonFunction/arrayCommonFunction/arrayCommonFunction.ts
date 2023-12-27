@@ -108,4 +108,14 @@ export async function   total(round,field){
     const parsedValue = parseFloat(value);
     return isNaN(parsedValue) ? fallback : parsedValue;
   }
+  export const getValueFromJsonControl = (jsonControl, name, value) => {
+    const item = jsonControl.find(x => x.name === name);
+    if (item) {
+        const foundValue = item.value.find(x => x.value === value);
+        if (foundValue) {
+            return foundValue.name;
+        }
+    }
+    return null;
+};
 

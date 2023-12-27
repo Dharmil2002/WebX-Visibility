@@ -29,9 +29,9 @@ export class VendorlastMileControl {
         additionalData: {
           showNameAndValue: false,
         },
-        functions: {
-          onOptionSelect: 'checkValueExists'
-        },
+        // functions: {
+        //   onOptionSelect: 'checkValueExists'
+        // },
       },
       {
         name: "rateType",

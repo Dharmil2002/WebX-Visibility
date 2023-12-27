@@ -28,9 +28,9 @@ export class TERCharges {
         additionalData: {
           showNameAndValue: false,
         },
-        functions: {
-          onOptionSelect: 'checkValueExists',
-        },
+        // functions: {
+        //   onOptionSelect: 'checkValueExists',
+        // },
       },
       {
         name: "rateType",

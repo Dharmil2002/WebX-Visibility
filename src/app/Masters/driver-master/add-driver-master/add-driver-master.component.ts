@@ -468,11 +468,14 @@ export class AddDriverMasterComponent implements OnInit {
 
   //#region
   async checkDriverNameExist() {
-    const drivernameExists = this.allData.driverData.some(
-      (res) =>
-        res._id === this.DriverTableForm.value._id ||
-        res.driverName.toUpperCase() === this.DriverTableForm.value.driverName.toUpperCase()
-    );
+    const FilterFunction = (x)=>{
+      if(this.isUpdate){
+        return x._id != this.DriverTable._id && x.driverName.toUpperCase() === this.DriverTableForm.value.driverName.toUpperCase()
+      }else{
+        return x.driverName.toUpperCase() === this.DriverTableForm.value.driverName.toUpperCase()
+      }
+    }
+    const drivernameExists = this.allData.driverData.some((x) => FilterFunction(x));
     if (drivernameExists) {
       // Show the popup indicating that the state already exists
       Swal.fire({

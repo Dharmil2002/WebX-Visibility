@@ -679,7 +679,7 @@ export class AdvancePaymentsComponent implements OnInit {
     }
   }
   vehiclesregisteredview(event) {
-    debugger
+    
     this.getVendorsVehicles(true);
   }
 }

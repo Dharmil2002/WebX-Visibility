@@ -17,7 +17,6 @@ import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunct
 import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
 import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail, updateTracking } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { StorageService } from "src/app/core/service/storage.service";
 
 
 @Component({
@@ -111,8 +110,7 @@ export class DepartVehicleComponent implements OnInit {
     private Route: Router,
     private dialog: MatDialog,
     private fb: UntypedFormBuilder,
-    private _operationService: OperationService,
-    private storage:StorageService
+    private _operationService: OperationService
   ) {
     // if (data) {
     //   this.tripData = data
@@ -387,7 +385,7 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
-   
+
     this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value||"");
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value||"");
     const loadingArray = [this.loadingSheetTableForm.value];
@@ -405,7 +403,6 @@ export class DepartVehicleComponent implements OnInit {
     ];
     const mergedData = this.mergeArrays(mergedArray);
     delete mergedData.vehicleTypecontrolHandler;
-    mergedData['_id'] = this.tripData.TripID+"-"+this.tripData.VehicleNo+"-"+this.storage.branch;
     mergedData['lsno'] = this.lsDetails?.lsno || '';
     mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);
@@ -414,7 +411,7 @@ export class DepartVehicleComponent implements OnInit {
 
 
   addDepartData(departData) {
-    
+
     const reqbody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_transaction_history",

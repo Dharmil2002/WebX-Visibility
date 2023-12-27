@@ -213,7 +213,7 @@ export async function updateTracking(companyCode, operationService, data) {
       dlTm: '',
       evnCd: '',
       upBy: localStorage.getItem('Username') || '',
-      upDt: new Date().toUTCString(),
+      upDt: new Date()
     };
 
     const req = {

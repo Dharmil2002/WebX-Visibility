@@ -78,8 +78,10 @@ export async function getDocketDetailsFromApi(
             ? "Available for LS"
             : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo === ""
               ? "Available for manifest"
-              : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo
+              : item.isComplete === 1 && !item?.unloading &&!item?.depart && item?.lsNo && item?.mfNo
                 ? "Ready to Depart From " + localStorage.getItem("Branch")
+                :item.isComplete === 1 && !item?.unloading &&item?.depart&&item?.lsNo && item?.mfNo
+                ? "In Transit" +" "+ `${item?.orgLoc ?? ""} : ${item?.destination?.split(":")[1] ?? ""}`
                 : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo
                   ? "Going to Last Mile Delivery" + item.destination.split(":")[1]
                   :"Quick Completion";

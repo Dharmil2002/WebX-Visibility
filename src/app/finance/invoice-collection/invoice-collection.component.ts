@@ -165,7 +165,7 @@ export class InvoiceCollectionComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   async save() {
-    debugger
+    
     const data=await this.invoiceService.getCollectionJson(this.CollectionSummaryTableForm.value,this.tableData);
     const res=this.invoiceService.saveCollection(data);
     if(res){
@@ -192,7 +192,7 @@ export class InvoiceCollectionComponent implements OnInit {
 
   }
   close(event){
-    debugger
+    
     this.tableData.map((x)=>{
       if(x.bILLNO==event.billNO){
         x.deductions = event?.netDeduction?parseFloat(event?.netDeduction).toFixed(2) : parseFloat(event?.tds).toFixed(2) || 0.00;

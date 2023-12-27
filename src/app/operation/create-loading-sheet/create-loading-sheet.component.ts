@@ -86,6 +86,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     // selectAllorRenderedData : false,
     noColumnSort: ["checkBoxRequired"],
   };
+  isSubmit:boolean=false;
   loadingData: any;
   shippingData: any;
   listDepartueDetail: any;
@@ -256,6 +257,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   IsActiveFuntion($event) {
+    
     // Assign the value of $event to the loadingData property
     this.loadingData = $event;
     if (!this.loadingSheetTableForm.value.vehicle.value) {
@@ -312,30 +314,27 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       });
   }
-
+  ngOnDestroy(): void {
+    this._cnoteService.setShipingData([]);
+    // Perform cleanup, unsubscribe from observables, etc.
+  }
+  
 
   loadingSheetGenerate() {
-
+    this.isSubmit=true;
+    const loadedData= this.tableData.filter((x)=>x.isSelected)
+    this.loadingData=loadedData;
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     } else {
-      if (this.loadingData) {
-        this.loadingData.forEach(obj => {
+      if (loadedData) {
+        loadedData.forEach(obj => {
           const randomNumber = "LS/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
           obj.LoadingSheet = randomNumber;
           obj.Action = "Print";
         });
         this.addTripData();
-        const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
-          this.dialog.open(LodingSheetGenerateSuccessComponent, {
-            width: "100%", // Set the desired width
-            data: this.loadingData, // Pass the data object
-          });
-
-        dialogRef.afterClosed().subscribe((result) => {
-          this.goBack('Departures');
-          // Handle the result after the dialog is closed
-        });
+       
       } else {
         SwalerrorMessage("error", "Please Select Any one Record", "", true);
       }
@@ -343,7 +342,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   updateLoadingData(event) {
-
+    
     let packages = event.shipping.reduce(
       (total, current) => total + current.Packages,
       0
@@ -361,10 +360,10 @@ export class CreateLoadingSheetComponent implements OnInit {
         x.leg.replace(" ", "").trim() ===
         (event.shipping[0].Origin + "-" + event.shipping[0].Destination).trim()
       ) {
-        (x.count = event.shipping.length),
-          (x.weightKg = totalWeightKg),
-          (x.volumeCFT = totalVolumeCFT),
-          (x.packages = packages);
+        x.count = isNaN(event.shipping.length) ? 0 : event.shipping.length;
+        x.weightKg = isNaN(totalWeightKg) ? 0 : totalWeightKg;
+        x.volumeCFT = isNaN(totalVolumeCFT) ? 0 : totalVolumeCFT;
+        x.packages = isNaN(packages) ? 0 : packages;
       }
     });
     //this.getshipmentData(event)
@@ -464,6 +463,19 @@ export class CreateLoadingSheetComponent implements OnInit {
         await Promise.all(updatePromises);
       }
     }
+    this.isSubmit=false;
+    // Add your message here
+    const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+          this.dialog.open(LodingSheetGenerateSuccessComponent, {
+            width: "100%", // Set the desired width
+            data: this.loadingData, // Pass the data object
+          });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          this.goBack('Departures');
+          this._cnoteService.setShipingData([]);
+          // Handle the result after the dialog is closed
+        });
   }
 
   async updateDocketDetails(docket, lsNo) {
@@ -480,8 +492,8 @@ export class CreateLoadingSheetComponent implements OnInit {
 
     try {
       await Promise.all([
-        updateTracking(this.companyCode, this._operationService, trackingDocket),
-        this.updateOperationService(docket, loadingSheetData)
+       await updateTracking(this.companyCode, this._operationService, trackingDocket),
+       await this.updateOperationService(docket, loadingSheetData)
       ]);
     } catch (error) {
       console.error('Error occurred during the API call:', error);
@@ -589,8 +601,11 @@ export class CreateLoadingSheetComponent implements OnInit {
       if (element?.isSelected) {
         // Check if the leg has been processed already
         if (!processedLegs.has(element?.leg)) {
-          loadAddedKg += parseInt(element?.weightKg || 0);
-          volAddedCft += parseInt(element?.volumeCFT || 0);
+          const weightKg = parseInt(element?.weightKg) || 0;
+          const volumeCFT = parseInt(element?.volumeCFT) || 0;
+
+          loadAddedKg += isNaN(weightKg) ? 0 : weightKg;
+          volAddedCft += isNaN(volumeCFT) ? 0 : volumeCFT;
 
           // Mark the leg as processed
           processedLegs.add(element?.leg);
@@ -601,17 +616,22 @@ export class CreateLoadingSheetComponent implements OnInit {
     // Calculate the total loaded values, including previously loaded values
     loadedKgInput += loadAddedKg;
     loadedCftInput += volAddedCft;
+
+    // Set NaN values to 0
+    loadedKgInput = isNaN(loadedKgInput) ? 0 : loadedKgInput;
+    loadedCftInput = isNaN(loadedCftInput) ? 0 : loadedCftInput;
+
     let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
     let loadedTons = loadedKgInput / 1000;
     let percentage = (loadedTons * 100) / capacityTons;
     // Update the form controls with the calculated values
-    this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(loadAddedKg);
-    this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(volAddedCft);
-    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(loadedCftInput);
-    this.loadingSheetTableForm.controls['LoadedKg'].setValue(loadedKgInput);
-    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(percentage.toFixed(2));
+    this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(isNaN(loadAddedKg) ? 0 : loadAddedKg);
+    this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(isNaN(volAddedCft) ? 0 : volAddedCft);
+    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(isNaN(loadedCftInput) ? 0 : loadedCftInput);
+    this.loadingSheetTableForm.controls['LoadedKg'].setValue(isNaN(loadedKgInput) ? 0 : loadedKgInput);
+    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(isNaN(percentage) ? 0 : percentage.toFixed(2));
     const volumeUtilization = loadedCftInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityVolumeCFT'].value);
-    this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(volumeUtilization.toFixed(2));
+    this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(isNaN(volumeUtilization) ? 0 : volumeUtilization.toFixed(2));
     if (percentage > 100 || volumeUtilization > 100) {
       let errorMessage = "Capacity has been exceeded.";
 

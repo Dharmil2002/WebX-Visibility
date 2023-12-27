@@ -39,7 +39,7 @@ export class DocketService {
     ) { }
 
     async updateDocket(data, filter) {
-        debugger
+        
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
@@ -258,7 +258,7 @@ export class DocketService {
     }
 
     async reverseDocketObjectMapping(docket, jsonControl) {
-        debugger
+        
         const pAYTYP = getValueFromJsonControl(jsonControl, "payType", docket.payType);
         const tRNMOD = getValueFromJsonControl(jsonControl, "transMode", docket.transMode);
         const vENDTY = getValueFromJsonControl(jsonControl, "vendorType", docket.vendorType);
@@ -347,7 +347,7 @@ export class DocketService {
         return res.data;
     }
     async updateManyDockets(data, filter, collectionName) {
-        debugger
+        
         try {
             const commonRequestData = {
                 companyCode: this.storage.companyCode,
@@ -383,7 +383,7 @@ export class DocketService {
     }
     
     async addEventData(data) {
-        debugger
+        
         const evnData = {
             "_id": `${this.storage.companyCode}-1-EVN0002` + new Date(),
             "cID": this.storage.companyCode,
@@ -415,7 +415,7 @@ export class DocketService {
         return res;
     }
     async updateOperationData(data) {
-        debugger
+        
         let opsData = {
             "tOTWT": data.invoiceDetails.reduce((totalWeight, invoiceDetail) => totalWeight + invoiceDetail.actualWeight, 0),
             "tOTPKG": data.invoiceDetails.reduce((tOTPKG, noofPkts) => tOTPKG + noofPkts.noofPkts, 0),

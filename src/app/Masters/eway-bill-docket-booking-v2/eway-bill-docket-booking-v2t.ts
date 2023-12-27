@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
-import { Subject } from "rxjs";
+import { Subject, firstValueFrom } from "rxjs";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { EwayBillControls } from "src/assets/FormControls/ewayBillControl";
@@ -662,56 +662,71 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       });
     }
   }
-  Addseries() {
-    const resultArray = this.generateArray(
-      this.companyCode,
-      this.tabForm.controls["docketNumber"].value,
-      this.contractForm.controls["totalChargedNoOfpkg"].value
-    );
-    let reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "docketScan",
-      data: resultArray,
-    };
-    this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
-      next: (res: any) => {
-        Swal.fire({
+  async Addseries() {
+    try {
+      // Generate the array with required data.
+      const resultArray = await this.generateArray(
+        this.companyCode,
+        this.tabForm.controls["docketNumber"].value,
+        this.contractForm.controls["totalChargedNoOfpkg"].value
+      );
+  
+      // Prepare the request body.
+      const reqBody = {
+        companyCode: this.companyCode,
+        collectionName: "docketScan",
+        data: resultArray,
+      };
+  
+      // Make the POST request and wait for the response.
+      const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
+  
+      // Check if response is successful.
+      if (res) {
+        // Display success message.
+        const result = await Swal.fire({
           icon: "success",
           title: "Booked Successfully",
           text: "DocketNo: " + this.tabForm.controls["docketNumber"].value,
           showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Redirect to the desired page after the success message is confirmed.
-            this._NavigationService.navigateTotab(
-              'DocketStock',
-              "dashboard/Index"
-            );
-          }
         });
-      },
-    });
+  
+        // Redirect after confirmation.
+        if (result.isConfirmed) {
+          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+        }
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Book",
+        text: "An error occurred: " + error.message,
+      });
+    }
   }
-  generateArray(companyCode, dockno, pkg) {
-    const array = Array.from({ length: pkg }, (_, index) => {
-      const serialNo = (index + 1).toString().padStart(3, "0");
-      const bcSerialNo = `${dockno}-${serialNo}`;
-      const entryDateTime = new Date().toISOString();
-      const bcDockSf = "0";
-      return {
-        _id: bcSerialNo,
-        companyCode: companyCode,
-        dockNo: dockno,
-        bcSerialNo: bcSerialNo,
-        entryDateTime: entryDateTime,
-        bcDockSf: bcDockSf,
-        loc: this.branch,
-        entryBy: this.userName,
-        entryDate: new Date().toISOString()
-      };
-    });
+  
+  async generateArray(companyCode, dockno, pkg) {
+    return new Promise((resolve, reject) => {
+      const array = Array.from({ length: pkg }, (_, index) => {
+        const serialNo = (index + 1).toString().padStart(3, "0");
+        const bcSerialNo = `${dockno}-${serialNo}`;
+        const entryDateTime = new Date().toISOString();
+        const bcDockSf = "0";
+        return {
+          _id: bcSerialNo,
+          companyCode: companyCode,
+          dockNo: dockno,
+          bcSerialNo: bcSerialNo,
+          entryDateTime: entryDateTime,
+          bcDockSf: bcDockSf,
+          loc: this.branch,
+          entryBy: this.userName,
+          entryDate: new Date().toISOString()
+        };
+      });
 
-    return array;
+      resolve(array);
+    });
   }
 
   async delete(event) {
@@ -802,7 +817,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     }
   }
   getDetail(){
-    debugger
+    
    console.log(this.tabForm.value)
   }
 }

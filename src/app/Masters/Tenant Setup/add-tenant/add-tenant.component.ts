@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -8,6 +9,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { TenantModel } from "src/app/core/models/Masters/Tenant Master/tenant-mater";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
+import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { TenantControl } from "src/assets/FormControls/tenantControl";
 import Swal from "sweetalert2";
 
@@ -69,7 +71,8 @@ export class AddTenantComponent implements OnInit {
     private filter: FilterUtils,
     private route: Router,
     private objImageHandling: ImageHandling,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private matDialog: MatDialog,
   ) {
     this.companyCode = this.sessionService.getCompanyCode();
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
@@ -111,8 +114,6 @@ export class AddTenantComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllMastersData();
-    // this.bindDropdown();
-    // this.getDropDownData();
     this.backPath = "/Masters/TenantMaster/TenantMasterList";
   }
 
@@ -144,54 +145,6 @@ export class AddTenantComponent implements OnInit {
       this.jsonControlTenantArray,
     ]);
   }
-
-  // bindDropdown() {
-  //   const propertyMappings = {
-  //     country: { property: "countryCode", statusProperty: "countryCodeStatus" }
-  //   };
-
-  //   this.jsonControlTenantArray.forEach((data) => {
-  //     const mapping = propertyMappings[data.name];
-  //     if (mapping) {
-  //       this[mapping.property] = data.name;
-  //       this[mapping.statusProperty] = data.additionalData.showNameAndValue;
-  //     }
-  //   });
-  // }
-
-  // getDropDownData() {
-  //   this.masterService.getJsonFileDetails("dropDownUrl").subscribe((res) => {
-  //     const { countryList } = res;
-  //     this.countryList = countryList;
-
-  //     if (this.isUpdate) {
-  //       this.updateCountry = this.findDropdownItemByName(
-  //         this.countryList,
-  //         this.TenantTab.cOUNTRY
-  //       );
-  //       this.tenantTableForm.controls.cOUNTRY.setValue(this.updateCountry);
-  //     }
-  //     const filterParams = [
-  //       [
-  //         this.jsonControlTenantArray,
-  //         this.countryList,
-  //         this.country,
-  //         this.countryStatus,
-  //       ],
-  //     ];
-  //     filterParams.forEach(
-  //       ([jsonControlArray, dropdownData, formControl, statusControl]) => {
-  //         this.filter.Filter(
-  //           jsonControlArray,
-  //           this.tenantTableForm,
-  //           dropdownData,
-  //           formControl,
-  //           statusControl
-  //         );
-  //       }
-  //     );
-  //   });
-  // }
 
   async getAllMastersData() {
     try {
@@ -369,6 +322,15 @@ export class AddTenantComponent implements OnInit {
       this.jsonControlTenantArray,
       allowedFormats
     );
+  }
+
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.matDialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
   }
 
   async checkValueExists(fieldName, errorMessage) {

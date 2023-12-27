@@ -79,6 +79,7 @@ export class AddAccountComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
+      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit Ledger";
       this.backPath = "/Masters/AccountMaster/AccountMasterList";
@@ -117,6 +118,22 @@ export class AddAccountComponent implements OnInit {
           x.name !== "TDSsection" &&
           x.name !== "isTDSapplicable"
       );
+    // if (this.isUpdate) {
+    //   if (this.UpdateData.cATNM == "TDS") {
+    //     this.jsonControlAccountArray =
+    //       AccountFormControls.getAccountAddArray().filter(
+    //         (x) => x.name !== "bank"
+    //       );
+    //       this.getTdsDropdown()
+    //   }
+    //   if (this.UpdateData.cATNM == "BANK") {
+    //     this.jsonControlAccountArray =
+    //       AccountFormControls.getAccountAddArray().filter(
+    //         (x) => x.name !== "isTDSapplicable"
+    //       );
+    //       // this.getBankDropdown()
+    //   }
+    // }
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.AccountForm = formGroupBuilder(this.fb, [
       this.AlljsonControlAccountArray,
@@ -197,6 +214,7 @@ export class AddAccountComponent implements OnInit {
         this.AccountCategoryCode,
         this.AccountCategoryStatus
       );
+      this.HandlAccountCategory()
     }
   }
 
@@ -419,6 +437,27 @@ export class AddAccountComponent implements OnInit {
       }
     }
   }
+
+  HandlAccountCategory() {
+    if (this.AccountForm.value.AccountCategory.name === "BANK") {
+      const bankfiled = ["TDSsection", "isTDSapplicable"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !bankfiled.includes(x.name)
+      );
+      this.getBankDropdown();
+    } else if (this.AccountForm.value.AccountCategory.name === "TDS") {
+      const bankfiled = ["TDSsection", "bank"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !bankfiled.includes(x.name)
+      );
+    } else {
+      const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
+      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+        (x) => !tdfield.includes(x.name)
+      );
+    }
+  }
+
   toggleSelectAll(argData: any) {
     let fieldName = argData.field.name;
     let autocompleteSupport = argData.field.additionalData.support;
@@ -457,26 +496,6 @@ export class AddAccountComponent implements OnInit {
       const bankfiled = ["TDSsection", "bank"];
       this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
         (x) => !bankfiled.includes(x.name)
-      );
-    }
-  }
-
-  HandlAccountCategory(event) {
-    if (this.AccountForm.value.AccountCategory.name === "BANK") {
-      const bankfiled = ["TDSsection", "isTDSapplicable"];
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => !bankfiled.includes(x.name)
-      );
-      this.getBankDropdown();
-    } else if (this.AccountForm.value.AccountCategory.name === "TDS") {
-      const bankfiled = ["TDSsection", "bank"];
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => !bankfiled.includes(x.name)
-      );
-    } else {
-      const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => !tdfield.includes(x.name)
       );
     }
   }

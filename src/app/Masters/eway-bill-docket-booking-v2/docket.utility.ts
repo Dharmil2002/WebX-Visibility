@@ -12,7 +12,7 @@ export async function getPincode(companyCode, masterService) {
     const res: any = await masterService.masterMongoPost("generic/get", req).toPromise();
     if (res && res.data) {
       const pincode = res.data
-        .map((x) => ({ name: x.pincode, value: x.pincode }))
+        .map((x) => ({ name: `${x.pincode}`, value: `${x.pincode}` }))
         .filter((x) => x.name !== undefined && x.value !== undefined);
       return pincode;
     } else {
@@ -68,7 +68,6 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
 
 export async function addTracking(companyCode, operationService, data) {
   const dockData = {
-    _id: data?.docketNumber,
     dktNo: data?.docketNumber || '',
     vehNo: "",
     route: "",

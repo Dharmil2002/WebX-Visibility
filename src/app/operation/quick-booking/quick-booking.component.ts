@@ -10,6 +10,7 @@ import { QuickBookingControls } from "src/assets/FormControls/quick-docket-booki
 import Swal from "sweetalert2";
 import { getCity } from "./quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { runningNumber } from "src/app/Utility/date/date-utils";
 
 @Component({
   selector: "app-quick-booking",
@@ -203,10 +204,8 @@ export class QuickBookingComponent implements OnInit {
     const controls = this.quickDocketTableForm;
     clearValidatorsAndValidate(controls);
     /*End*/
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-    const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-    let docketNo = `CN${dynamicValue}${paddedNumber}`;
+    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value    
+    let docketNo = `CN${dynamicValue}${runningNumber()}`;
     this.quickDocketTableForm.controls["docketNumber"].setValue(docketNo);
     this.quickDocketTableForm.controls["fromCity"].setValue(
       this.quickDocketTableForm.value.fromCity?.name || ""
@@ -237,7 +236,7 @@ export class QuickBookingComponent implements OnInit {
       next: (res: any) => {
         Swal.fire({
           icon: "success",
-          title: "Booked SuccesFully",
+          title: "Booked Successfully",
           text: "DocketNo: " + docketNo,
           showConfirmButton: true,
         }).then((result) => {

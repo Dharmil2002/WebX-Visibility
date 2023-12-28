@@ -1,4 +1,5 @@
 import { extractUniqueValues } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { runningNumber } from "src/app/Utility/date/date-utils";
 
 // This utility function groups shipments by leg
 export function groupShipmentsByLeg(shipingTableData) {
@@ -37,14 +38,12 @@ export function groupShipmentsByLeg(shipingTableData) {
 * @param {Object} data - The data containing docket information.
 * @returns {Promise<any>} - A Promise resolving to the API response.
 */
-export async function updateTracking(companyCode, operationService, dktNo) {
+export async function updateTracking(companyCode, operationService, dktNo,tripId) {
   try {
-    const docketDetails = await getDocketFromApiDetail(companyCode, operationService, dktNo);
-    const randomNumber = "UN/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+    const docketDetails = await getDocketFromApiDetail(companyCode, operationService, dktNo);    
     const lastArray = docketDetails.length - 1;
     const dockData = {
-      tripId: docketDetails[lastArray]?.tripId || '',
-      _id: randomNumber,
+      tripId:tripId || '',
       dktNo: docketDetails[lastArray]?.dktNo || '',
       vehNo: docketDetails[lastArray]?.vehNo || '',
       route: docketDetails[lastArray]?.route || '',

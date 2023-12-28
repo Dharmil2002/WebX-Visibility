@@ -68,53 +68,7 @@ export class BeneficiaryControl {
                 value: false,
                 Validations: [],
                 generatecontrol: false, disable: false
-            },
-            {
-                name: 'updateDate',
-                label: ' ',
-                placeholder: ' ',
-                type: 'date',
-                value: new Date(), // Set the value to the current date
-                filterOptions: '',
-                autocomplete: '',
-                displaywith: '',
-                Validations: [],
-                generatecontrol: false,
-                disable: false
-            },
-            {
-                name: "updateBy",
-                label: "",
-                placeholder: "",
-                type: "text",
-                value: localStorage.getItem("UserName"),
-                Validations: [],
-                generatecontrol: false,
-                disable: false,
-            },
-            // {
-            //     name: 'EntryDate',
-            //     label: ' ',
-            //     placeholder: ' ',
-            //     type: 'date',
-            //     value: new Date(), // Set the value to the current date
-            //     filterOptions: '',
-            //     autocomplete: '',
-            //     displaywith: '',
-            //     Validations: [],
-            //     generatecontrol: false,
-            //     disable: false
-            // },
-            // {
-            //     name: "EntryBy",
-            //     label: "",
-            //     placeholder: "",
-            //     type: "text",
-            //     value: localStorage.getItem("UserName"),
-            //     Validations: [],
-            //     generatecontrol: false,
-            //     disable: false,
-            // },
+            }                     
         ];
         this.beneficiaryDetailControlArray = [
             {

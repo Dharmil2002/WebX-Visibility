@@ -36,3 +36,8 @@ export const commonHours = String(commonCurrentDate.getHours()).padStart(2, '0')
 export const commonMinutes = String(commonCurrentDate.getMinutes()).padStart(2, '0');
 export const timeString=`${commonDay}${commonMonth}${commonYear}${commonHours}${commonMinutes}`
 /*End*/
+
+export function runningNumber(){
+  
+  return `${moment().format("YYMMDDHH")}${Math.floor(1000 + Math.random() * 9000)}`
+};        

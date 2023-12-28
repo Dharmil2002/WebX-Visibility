@@ -13,8 +13,7 @@ export async function updateTracking(companyCode, operationService,data,dktNo) {
     const docketDetails = await getDocketFromApiDetail(companyCode, operationService,dktNo);
     const lastArray=docketDetails.length-1;
     const dockData = {
-      tripId:docketDetails[lastArray]?.tripId || '',
-      _id:data?.mfNo,
+      tripId:docketDetails[lastArray]?.tripId || '',      
       dktNo:dktNo || '',
       vehNo: docketDetails[lastArray]?.vehNo || '',
       route: docketDetails[lastArray]?.route || '',

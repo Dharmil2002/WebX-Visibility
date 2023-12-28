@@ -17,9 +17,10 @@
             <div *ngIf="isTableLode">
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
                     [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
-                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField"
-                    (onFlagChange)="selectCheckBox($event)" [onFlagChangeGetAll]="true" [FormTitle]="'Bill List'"
-                    [TitleBoxData]="TotalAmountList">
+                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField" [FormTitle]="'Bill List'"
+                    (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
+                    [TitleBoxData]="TotalAmountList" [selectAllRequired]="true"
+                    (selectAllClicked)="selectCheckBox($event)">
                 </app-generic-table-v2>
             </div>
             <div *ngIf="isFormLode">

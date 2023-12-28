@@ -61,13 +61,13 @@ export class CustomerOutstandingReportComponent implements OnInit {
   }
 
   CSVHeader = {
-    "CustomerCode": "Customer Code",
-    "Customer": "Customer",
-    "Opening Balance": "Opening Balance",
-    "Bill Amount": "Bill Amount",
-    "Un Submitted Amount": "Un Submitted Amount",
-    "Submitted Amount": "Submitted Amount",
-    "Collection Amount": "Collection Amount",
+    "custCode": "Customer Code",
+    "cust": "Customer",
+    "openingBal": "Opening Balance",
+    "billAmt": "Bill Amount",
+    "unsubmittedAmt": "Un Submitted Amount",
+    "submittedAmt": "Submitted Amount",
+    "collectionAmt": "Collection Amount",
     "0-15": "0-15",
     "16-30": "16-30",
     "31-45": "31-45",
@@ -78,10 +78,10 @@ export class CustomerOutstandingReportComponent implements OnInit {
     "120-180": "120-180",
     "180-365": "180-365",
     "Above 365": "Above 365",
-    "Total Pending": "Total Pending",
-    "Manual Voucher Amount": "Manual Voucher Amount",
-    "On Account Balance": "On Account Balance",
-    "Ledger Balance": "Ledger Balance",
+    "TotalPending": "Total Pending",
+    "ManualVoucherAmount": "Manual Voucher Amount",
+    "OnAccountBalance": "On Account Balance",
+    "LedgerBalance": "Ledger Balance",
   }
 
   initializeFormControl() {

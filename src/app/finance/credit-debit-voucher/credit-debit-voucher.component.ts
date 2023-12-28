@@ -812,7 +812,7 @@ export class DebitVoucherComponent implements OnInit {
         this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
         this.debitVoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
         this.debitVoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
-        this.debitVoucherDataRequestModel.paymentAmtount = NetPayable
+        this.debitVoucherDataRequestModel.paymentAmount = NetPayable
 
 
         const companyCode = this.companyCode;

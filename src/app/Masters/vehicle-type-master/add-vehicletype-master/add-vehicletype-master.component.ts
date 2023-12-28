@@ -3,28 +3,25 @@ import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleTypeControl } from "src/assets/FormControls/vehicle-type-control";
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { VehicleTypeMaster } from "src/app/core/models/Masters/vehicle-type-master/vehicle-type-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { calculateVolume } from "../../vehicle-master/vehicle-utility";
-import { HttpErrorResponse } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: 'app-add-vehicletype-master',
   templateUrl: './add-vehicletype-master.component.html',
 })
 export class AddVehicletypeMasterComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean;}[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
   vehicleTypeTableData: VehicleTypeMaster;
   vehicleTypeTableForm: UntypedFormGroup;
   vehicleTypeControl: VehicleTypeControl;
-  backPath:string;
+  backPath: string;
   jsonControlVehicleTypeArray: any;
   vehicleCategory: any;
   vehicleCategoryStatus: any;
@@ -52,14 +49,13 @@ export class AddVehicletypeMasterComponent implements OnInit {
     public ObjSnackBarUtility: SnackBarUtilityService,
     private route: Router,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils,
+    private storage: StorageService,
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state;
     if (navigationState != null) {
       this.action = 'edit';
       this.submit = 'Modify';
       this.data = navigationState.data;
-      console.log(this.data);
 
       this.isUpdate = true;
       this.vehicleTypeTableData = this.data;
@@ -98,23 +94,17 @@ export class AddVehicletypeMasterComponent implements OnInit {
     this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
   }
   async checkVehicleTypeExist() {
-    let req = {
-      "companyCode": this.companyCode,
-      "collectionName": "vehicleType_detail",
-      "filter": {}
-    };
-    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-    const vehicleTypeExists = res.data.some((res) => res.vehicleTypeName === this.vehicleTypeTableForm.value.vehicleTypeName);
+    const res = await this.getVehicleTypeList();
+    const vehicleTypeNameToCheck = this.vehicleTypeTableForm.value.vehicleTypeName.toLowerCase();
+    const vehicleTypeExists = res.data.some((item) => item.vehicleTypeName.toLowerCase() === vehicleTypeNameToCheck
+    );
     if (vehicleTypeExists) {
       // Show the popup indicating that the state already exists
       Swal.fire({
-        title: 'Vehicle Type Name exists! Please try with another',
-        toast: true,
-        icon: "error",
-        showCloseButton: false,
-        showCancelButton: false,
+        icon: 'warning',
+        title: 'Warning',
         showConfirmButton: true,
-        confirmButtonText: "OK"
+        text: `Vehicle Type Name: ${this.vehicleTypeTableForm.value.vehicleTypeName} already exists! Please try with another`,
       });
       this.vehicleTypeTableForm.controls["vehicleTypeName"].reset();
     }
@@ -126,27 +116,10 @@ export class AddVehicletypeMasterComponent implements OnInit {
 
   }
   async save() {
-    // Remove field from the form controls
-    this.vehicleTypeTableForm.removeControl("companyCode");
-    this.vehicleTypeTableForm.removeControl("updateBy");
-    this.vehicleTypeTableForm.removeControl("isUpdate");
-
-    let req = {
-      "companyCode": this.companyCode,
-      "collectionName": "vehicleType_detail",
-      "filter": {}
-    }
-    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-    const sortedData = res.data.sort((a, b) => {
-      const dateA: Date | any = new Date(a.updatedDate);
-      const dateB: Date | any = new Date(b.updatedDate);
-      // Compare the date objects
-      return dateB - dateA; // Sort in descending order
-    });
-
+    let data = this.vehicleTypeTableForm.value
+    const sortedData = await this.getVehicleTypeList();
     if (sortedData) {
-      // Generate srno for each object in the array
-      const lastUsedVehicleTypeCode = sortedData[0];
+      const lastUsedVehicleTypeCode = sortedData[sortedData.length - 1];
       const lastVehicleTypeCode = lastUsedVehicleTypeCode ? parseInt(lastUsedVehicleTypeCode.vehicleTypeCode.substring(3)) : 0;
       // Function to generate a new route code
       function generateVehicleCode(initialCode: number = 0) {
@@ -166,11 +139,14 @@ export class AddVehicletypeMasterComponent implements OnInit {
         let id = this.vehicleTypeTableForm.value._id;
         // Remove the "_id" field from the form controls
         this.vehicleTypeTableForm.removeControl("_id");
+        data["mODDT"] = new Date();
+        data['mODLOC'] = this.storage.branch;
+        data['mODBY:'] = this.storage.userName;
         let req = {
           companyCode: this.companyCode,
           collectionName: "vehicleType_detail",
           filter: { _id: id },
-          update: this.vehicleTypeTableForm.value
+          update: data
         };
         const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
         if (res) {
@@ -185,8 +161,11 @@ export class AddVehicletypeMasterComponent implements OnInit {
         }
       }
       else {
-        const data = this.vehicleTypeTableForm.value;
-        const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value};
+        const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value };
+        data["eNTDT"] = new Date();
+        data['eNTLOC'] = this.storage.branch;
+        data['eNTBY:'] = this.storage.userName;
+        data.vehicleTypeCode = id._id;
         const mergedObject = { ...data, ...id };
         let req = {
           companyCode: this.companyCode,
@@ -210,6 +189,16 @@ export class AddVehicletypeMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.vehicleTypeTableForm.controls['isActive'].setValue(event);
-    console.log("Toggle value :", event);
+    // console.log("Toggle value :", event);
+  }
+  async getVehicleTypeList() {
+    let req = {
+      "companyCode": this.companyCode,
+      "collectionName": "vehicleType_detail",
+      "filter": {}
+    };
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+    return res.data.sort((a, b) => a._id.localeCompare(b._id));
+
   }
 }

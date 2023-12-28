@@ -174,7 +174,7 @@ export class AccountGroupComponent implements OnInit {
       if (data.name === "BalanceSheet") {
         this.BalanceSheetCode = data.name;
         this.BalanceSheetStatus = data.additionalData.showNameAndValue;
-        // this.getBalanceSheetcategoryDropdown();
+        this.getBalanceSheetcategoryDropdown();
       }
     });
   }

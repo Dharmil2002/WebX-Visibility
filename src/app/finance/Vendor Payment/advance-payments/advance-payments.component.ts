@@ -488,7 +488,7 @@ export class AdvancePaymentsComponent implements OnInit {
           this.debitVoucherDataRequestModel.date =
             this.PaymentSummaryFilterForm.value.Date;
           this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-          this.debitVoucherDataRequestModel.paymentAmtount = NetPayable;
+          this.debitVoucherDataRequestModel.paymentAmount = NetPayable;
 
           const companyCode = this.companyCode;
           const CurrentBranchCode = this.storage.branch;

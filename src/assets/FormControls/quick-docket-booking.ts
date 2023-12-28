@@ -230,8 +230,8 @@ export class QuickBookingControls {
       },
       {
         name: "actualwt",
-        label: "Actual Weight",
-        placeholder: "Actual Weight",
+        label: "Actual Weight (Kg)",
+        placeholder: "Actual Weight (Kg)",
         type: "number",
         value: "",
         filterOptions: "",
@@ -251,8 +251,8 @@ export class QuickBookingControls {
       },
       {
         name: "chrgwt",
-        label: "Charged Weight",
-        placeholder: "Charged Weight",
+        label: "Charged Weight (Kg)",
+        placeholder: "Charged Weight (Kg)",
         type: "number",
         value: "",
         filterOptions: "",

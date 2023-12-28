@@ -14,6 +14,7 @@ import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunct
 import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
 import { getDocketFromApiDetail, tripTransactionDetail, updateTracking } from './mark-arrival-utlity';
 import { extractUniqueValues } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -34,7 +35,8 @@ export class MarkArrivalComponent implements OnInit {
   latereasonlistStatus: any;
   sealdet: any;
   uploadedFiles: File[];
-
+  mfList: any[];
+  dktList: any[];
   constructor(
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
@@ -49,7 +51,7 @@ export class MarkArrivalComponent implements OnInit {
   }
   jsonControlArray: any;
   IntializeFormControl() {
-    
+
     const MarkArrivalFormControls = new MarkArrivalControl();
     this.jsonControlArray = MarkArrivalFormControls.getMarkArrivalsertFormControls();
     this.jsonControlArray.forEach(data => {
@@ -70,8 +72,27 @@ export class MarkArrivalComponent implements OnInit {
     this.MarkArrivalTableForm.controls.ETA.setValue(this.MarkArrivalTable.Expected)
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
     this.MarkArrivalTableForm.controls.TripID.setValue(this.MarkArrivalTable.TripID)
+
+    this.getManifestDetail().then(async (res) => {
+      this.mfList = res;
+      await this.getShipments();
+    });
   }
 
+  async getShipments() {
+    debugger
+    let mfs = this.mfList.map(mf => mf.mfNo);
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "collectionName": "docket",
+      "filter": { mfNo: { 'D$in': mfs } }
+    }
+    const res = await firstValueFrom(this._operationService.operationMongoPost("generic/get", reqBody));
+    this.dktList = res.data.map(dkt => {
+      dkt.destLoc = dkt.destination.split(':')[1].trim();
+      return dkt;
+    });
+  }
 
   functionCaller($event) {
     // console.log("fn handler called", $event);
@@ -94,14 +115,28 @@ export class MarkArrivalComponent implements OnInit {
     this.dialogRef.close("")
     Swal.fire({
       icon: "success",
-      title: "Successful",
-      text: `Vehicle Arrived Successfully`,//
+      title: "Arrival",
+      text: `Vehicle arrived successfully`,//
       showConfirmButton: true,
     })
   }
-
+  async getManifestDetail() {
+    debugger
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "menifest_detail",
+      filter: { tripId: this.MarkArrivalTable.TripID }
+    }
+    const res = await firstValueFrom(this._operationService.operationMongoPost("generic/get", req));
+    let mfData = res.data.map(mf => {
+      mf.orgn = mf.leg.split("-")[0];
+      mf.dest = mf.leg.split("-")[1];
+      return mf;
+    }).filter(mf => mf.dest == this.currentBranch);
+    return mfData;
+  }
   save() {
-    
+
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -110,7 +145,7 @@ export class MarkArrivalComponent implements OnInit {
 
     let tripDetailForm = this.MarkArrivalTableForm.value
     const tripId = this.MarkArrivalTableForm.value?.TripID || "";
-   
+
     delete tripDetailForm.Vehicle
     delete tripDetailForm.TripID
     delete tripDetailForm.Route
@@ -121,7 +156,7 @@ export class MarkArrivalComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_transaction_history",
-      "filter":{_id: tripId},
+      "filter": { _id: tripId },
       "update": {
         ...tripDetails.tripDetailForm,
       }
@@ -136,11 +171,11 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   updateTripData(tripId) {
+    let mfToScan = this.mfList.filter(mf => mf.dest == this.currentBranch);
+    const dktStatus = mfToScan.length > 0 ? "dktAvail" : "noDkt";
 
-    const dktStatus = this._operationService.getShipmentStatus();
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
     let tripStatus, tripDetails;
-
     if (dktStatus === "dktAvail") {
       tripStatus = "arrival";
       tripDetails = {
@@ -149,15 +184,16 @@ export class MarkArrivalComponent implements OnInit {
     } else if (dktStatus === "noDkt") {
       tripStatus = next ? "Update Trip" : "close";
       tripDetails = {
+        orgLoc: this.currentBranch,
         status: tripStatus,
-        nextUpComingLoc: "",
+        nextUpComingLoc: next || "",
         ...(next ? {} : { closeTime: new Date() })
       };
     }
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_detail",
-      "filter":{_id: this.MarkArrivalTable.id},
+      "filter": { _id: this.MarkArrivalTable.id },
       "update": {
         ...tripDetails
       }
@@ -165,10 +201,11 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
-          if (tripDetails.status==="close") {
-            this.getDocketTripWise(tripId);
+          if (tripDetails.status === "close") {
+            //this.getDocketTripWise(tripId);
+            await this.updateDocket();
             // Call the vehicleStatusUpdate function here
-            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode,this.MarkArrivalTable, this._operationService,true);
+            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
             Swal.fire({
               icon: "info",
               title: "Trip is close",
@@ -176,22 +213,56 @@ export class MarkArrivalComponent implements OnInit {
               showConfirmButton: true
             });
             this.getPreviousData();
-          }else{
-            this.getDocketTripWise(tripId);
+          } else {
+              await this.updateDocket();
+              this.getPreviousData();
+            //this.getDocketTripWise(tripId);
+           
           }
-         
-
         }
       }
     })
   }
+  async updateDocket(){   
+    const data=  this.dktList;
+    let trackingData = this.dktList    
+    .map(dkt => {
+      const dockData = {
+        tripId: dkt?.tripId || '',
+        dktNo: dkt?.docketNumber || '',
+        vehNo: this.MarkArrivalTable?.VehicleNo || '',
+        route: this.MarkArrivalTable.Route || '',
+        event: "Vehicle Arrival at " + " " + this.currentBranch,
+        orgn: dkt?.orgLoc || '',
+        loc: this.currentBranch || '',
+        dest: dkt?.destLoc || '',
+        lsno: dkt?.lsNo || '',
+        mfno: dkt?.mfNo || '',
+        unload: false,
+        dlSt: '',
+        dlTm: '',
+        evnCd: '',
+        upBy: localStorage.getItem('Username') || '',
+        upDt: new Date()
+      };
+      return dockData;
+    });
+
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: 'cnote_tracking',
+      data: trackingData
+    };
+    const res = await firstValueFrom(this._operationService.operationMongoPost('generic/create', req));
+  }
+
   /*here i write a code becuase of update docket states*/
   async getDocketTripWise(tripId) {
-    const detail = await getDocketFromApiDetail(this.companyCode, this._operationService,tripId.trim());
+    const detail = await getDocketFromApiDetail(this.companyCode, this._operationService, tripId.trim());
     const uniqueDktNumbers = extractUniqueValues(detail, 'dktNo');
     // Create an array of promises for updateTracking calls
     const updatePromises = uniqueDktNumbers.map(async element => {
-        await updateTracking(this.companyCode, this._operationService, element);
+      await updateTracking(this.companyCode, this._operationService, element);
     });
 
     // Wait for all updateTracking promises to resolve
@@ -199,7 +270,7 @@ export class MarkArrivalComponent implements OnInit {
 
     // Once all promises are resolved, call getPreviousData
     this.getPreviousData();
-}
+  }
 
   cancel() {
     this.goBack(2)
@@ -238,7 +309,7 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   async checkSealNumber() {
-    const tripDetail= await tripTransactionDetail(this.companyCode,this.MarkArrivalTable.TripID,this._operationService)
+    const tripDetail = await tripTransactionDetail(this.companyCode, this.MarkArrivalTable.TripID, this._operationService)
     const isMatchingSeal = this.MarkArrivalTableForm.value.Sealno == tripDetail[0].DepartureSeal;
 
     this.MarkArrivalTableForm.controls.SealStatus.setValue(isMatchingSeal ? 'Matching' : 'Not Matching');
@@ -296,6 +367,6 @@ export class MarkArrivalComponent implements OnInit {
     }
   }
 
- 
+
 
 }

@@ -74,10 +74,14 @@ export class DepartVehicleComponent implements OnInit {
   columnHeader = {
     leg: "Leg",
     manifest: "Manifest",
-    shipments_lb: "Shipments L/B",
-    packages_lb: "Packages L/B",
+    shipments_lb: "Shipments",
+    packages_lb: "Packages",
     weight_kg: "Weight Kg",
     volume_cft: "Volume CFT",
+  };
+  columnWidths = {
+    'leg': 'min-width: 10%',
+    'manifest': 'min-width:30%',
   };
   centerAlignedData = ["packages_lb", "weight_kg", "volume_cft"];
   //  #region declaring Csv File's Header as key and value Pair
@@ -293,9 +297,9 @@ export class DepartVehicleComponent implements OnInit {
         if (res) {
           // Filter menifestDetails based on mfNo and unloading=0
           const filteredMenifestDetails = res.data.filter((manifest) => {
-            const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo);
+            const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo&&item.unloading==0);
             matchedShipment && this.listDocket.push(matchedShipment.docketNumber);
-            return matchedShipment && matchedShipment.unloading === 0 && manifest.tripId === this.tripData.TripID
+            return matchedShipment && matchedShipment.unloading == 0 && manifest.tripId === this.tripData.TripID
           });
           let menifestList: any = [];
           filteredMenifestDetails.forEach((element) => {
@@ -431,8 +435,8 @@ export class DepartVehicleComponent implements OnInit {
     this.next = next;
     Swal.fire({
       icon: "info",
-      title: "Trip Departure",
-      text: "Your trip from " + next + " is about to depart.",
+      title: "Departure",
+      text: "Vehicle to " + next + " is about to depart.",
       confirmButtonText: "OK",
     });
 
@@ -613,7 +617,7 @@ export class DepartVehicleComponent implements OnInit {
     Swal.fire({
       icon: "success",
       title: "Successful",
-      text: `Vehicle depart Successfully`,//
+      text: `Vehicle is departed`,//
       showConfirmButton: true,
     })
       this.goBack('Departures');

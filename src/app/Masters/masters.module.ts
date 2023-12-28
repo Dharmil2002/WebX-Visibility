@@ -169,6 +169,7 @@ import { LastMileDeliveryBulkUploadComponent } from './vendor-contract/vendorCon
 import { BusinessAssociateBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/business-associate-bulk-upload/business-associate-bulk-upload.component';
 import { AddContainerComponent } from './Container Master/add-container/add-container.component';
 import { ListContainerComponent } from './Container Master/list-container/list-container.component';
+import { ViewPrintComponent } from './view-print/view-print.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -353,6 +354,7 @@ import { ListContainerComponent } from './Container Master/list-container/list-c
     BusinessAssociateBulkUploadComponent,
     AddContainerComponent,
     ListContainerComponent,
+    ViewPrintComponent,
   ],
 
   providers: [

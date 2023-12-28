@@ -179,3 +179,28 @@ const validateVendorBillEntry = (data: VendorBillEntry): void => {
 
 // Validate the example entry
 validateVendorBillEntry(vendorBillEntry);
+
+
+export class GenerateVendorBill {
+  companyCode: number;
+  VocuherNo: string;
+  paymentMode: string;
+  refNo: string;
+  accountName: string;
+  date: Date;
+  paymentAmount: number;
+  branch: string;
+  user: string;
+  BillList?: BillList[];
+}
+
+export class BillList {
+  billNo: string;
+  // TotalTHCAmount: number;
+  // AdvancePayedAmount: number;
+  // billAmount: number;
+  PaymentAmount: number;
+ // PendingAmount: number;
+  ispartial: boolean;
+
+}

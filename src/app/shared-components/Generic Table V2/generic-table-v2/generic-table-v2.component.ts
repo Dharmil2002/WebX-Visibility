@@ -39,6 +39,7 @@ export class GenericTableV2Component
   @Input() toggleArray;
   @Input() dynamicControls;
   @Input() menuItems: any;
+  @Input() HeaderMenuItems: any;
   @Input() menuItemFlag;
   @Input() boxData: any;
   @Input() TitleBoxData: any;
@@ -86,7 +87,7 @@ export class GenericTableV2Component
   selectedItems: any[] = [];
   AllChack = false
   @Input() centerAligned;
-  @Input()selectAllRequired;
+  @Input() selectAllRequired;
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
@@ -103,7 +104,7 @@ export class GenericTableV2Component
     public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router,
     public dialog: MatDialog,
-    private genericService:GenericService,
+    private genericService: GenericService,
   ) {
     super();
   }
@@ -253,19 +254,19 @@ export class GenericTableV2Component
   }
 
   //#region Funtion to send data for edit
-  drillDownData(item, tableData,title="") {
+  drillDownData(item, tableData, title = "") {
     let drillDownLink = this.Link.find((x) => x.Row == tableData);
     if (drillDownLink.Path) {
       this.router.navigate([drillDownLink.Path], {
         state: {
-          data: { columnData: item, extraData: this.extraData,title:drillDownLink?.title||""},
+          data: { columnData: item, extraData: this.extraData, title: drillDownLink?.title || "" },
         },
       });
     }
-    else if(!drillDownLink.Path && drillDownLink.componentDetails){
-      this.GeneralMultipleView(item,drillDownLink.componentDetails,drillDownLink.title);
+    else if (!drillDownLink.Path && drillDownLink.componentDetails) {
+      this.GeneralMultipleView(item, drillDownLink.componentDetails, drillDownLink.title);
     }
-     else {
+    else {
       if (this.menuItems) {
         let navigateToComponent;
         if (tableData === "Action") {
@@ -333,12 +334,12 @@ export class GenericTableV2Component
   getCheckData(data) {
     //this.onFlagChange.emit(data)
     this.AllChack = this.dataSource.filteredData.every((t) => t.isSelected)
-    if(this.onFlagChangeGetAll){
+    if (this.onFlagChangeGetAll) {
       this.onFlagChange.emit(this.dataSource.filteredData);
-    }else{
+    } else {
       this.onFlagChange.emit(this.getSelecteditems());
     }
-    
+
     this.selectAllClicked.emit(this.dataSource.filteredData);
     // console.log(this.getSelecteditems());
     //get data on single selection
@@ -352,9 +353,9 @@ export class GenericTableV2Component
       this[functionName](element, item.componentDetails);
     }
   }
-  GeneralMultipleView(item, viewComponent,title="") {
+  GeneralMultipleView(item, viewComponent, title = "") {
     //this.s
-    this.genericService.setSharedData({title:title});
+    this.genericService.setSharedData({ title: title });
     const dialogref = this.dialog.open(viewComponent, {
       width: this.width,
       height: this.height,

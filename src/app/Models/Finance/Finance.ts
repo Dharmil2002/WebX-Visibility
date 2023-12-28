@@ -9,7 +9,7 @@ export class DebitVoucherRequestModel {
 }
 
 export class DebitVoucherDataRequestModel {
-  companyCode: number
+  //companyCode: number
   voucherNo: string
   transType: string
   transDate: Date
@@ -48,7 +48,7 @@ export class DebitVoucherDataRequestModel {
   accountName: string
   date: string
   scanSupportingDocument: string
-  paymentAmtount: number
+  paymentAmount: number
 }
 
 export class DebitVoucherdetailsRequestModel {

@@ -15,6 +15,8 @@ import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
 import { getLoadingSheetDetail } from "../depart-vehicle/depart-vehicle/depart-common";
 import Swal from "sweetalert2";
+import { runningNumber } from "src/app/Utility/date/date-utils";
+import { aggregateData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -86,7 +88,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     // selectAllorRenderedData : false,
     noColumnSort: ["checkBoxRequired"],
   };
-  isSubmit:boolean=false;
+
+  isSubmit: boolean = false;
   loadingData: any;
   shippingData: any;
   listDepartueDetail: any;
@@ -257,7 +260,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   IsActiveFuntion($event) {
-    
+
     // Assign the value of $event to the loadingData property
     this.loadingData = $event;
     if (!this.loadingSheetTableForm.value.vehicle.value) {
@@ -283,28 +286,70 @@ export class CreateLoadingSheetComponent implements OnInit {
       );
       // Update route details if shipment is not being updated
     }
+    const [orgn, ...nextLocs] = this.tripData?.RouteandSchedule.split(":")[1].split("-");
     const req = {
       companyCode: this.companyCode,
       collectionName: "docket",
-      filter:{}
+      filter: {
+        orgLoc: this.orgBranch,
+        //destination: { 'D$in': nextLocs },        
+        'D$or': [{ lsNo: { $exists: false } }, { lsNo: "" }],
+      }
     };
     this._operationService
       .operationMongoPost("generic/get", req)
       .subscribe((res) => {
-        this.shipmentData = res.data.filter((x) => x.lsNo == "");
-        // Filter shipment data based on location and trip details
-        const filterData = filterDataByLocation(
-          this.shipmentData,
-          this.tripData,
-          this.orgBranch
-        );
+        this.shipmentData = res.data.filter((x) => x.lsNo == "")
+        .map((x) => {
+          x.totalChargedNoOfpkg = parseInt(x.totalChargedNoOfpkg || 0);
+          x.chrgwt = parseFloat(x.chrgwt || 0);
+          x.cft_tot = parseFloat(x.cft_tot || 0);
+          x.dktCount = 1;
+          x.destLoc = x.destination?.split(':')[1]?.trim();
+          return x;
+        })
+        .filter(f => nextLocs.includes(f.destLoc));
+
+        const gropuColumns = ['orgLoc', 'destLoc'];
+        const aggregationRules = [
+          { outputField: 'count', inputField: 'dktCount', operation: 'sum' },
+          { outputField: 'packages', inputField: 'totalChargedNoOfpkg', operation: 'sum' },
+          { outputField: 'weightKg', inputField: 'chrgwt', operation: 'sum' },
+          { outputField: 'volumeCFT', inputField: 'cft_tot', operation: 'sum' },
+        ];
+        const fixedColumn = [
+          { field: 'leg', calculate: item => { return `${item.orgLoc}-${item.destLoc}`} }
+        ];
+        let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn);
+        let dockets = [];
+        aggData = aggData.map((l: any) => {
+          let docs = this.shipmentData.filter(f => f.orgLoc == l.orgLoc && f.destLoc == l.destLoc);
+          //l.Dockets = docs;
+          dockets.push(...docs);
+          return l;
+        });
+        
         //Here i user cnoteDetails varible to used in updateDocketDetails() method
-        this._cnoteService.setShipingData(filterData.legWiseData);
-        this.alldocket = filterData.legWiseData
-        this.cnoteDetails = filterData.legWiseData;
-        const shipingfilterData = filterData.legWiseData;
+        this._cnoteService.setShipingData(dockets);
+        this.alldocket = dockets;
+        this.cnoteDetails = dockets;
+        const shipingfilterData = dockets;
         // Call the function to group shipments based on criteria
-        const groupedShipments = groupShipments(shipingfilterData);
+        const groupedShipments = aggData;
+
+        // const filterData = filterDataByLocation(
+        //   this.shipmentData,
+        //   this.tripData,
+        //   this.orgBranch
+        // );
+
+        // //Here i user cnoteDetails varible to used in updateDocketDetails() method
+        // this._cnoteService.setShipingData(filterData.legWiseData);
+        // this.alldocket = filterData.legWiseData
+        // this.cnoteDetails = filterData.legWiseData;
+        // const shipingfilterData = filterData.legWiseData;
+        // // Call the function to group shipments based on criteria
+        // const groupedShipments = groupShipments(shipingfilterData);
         if (groupedShipments.length > 0) {
           this.tableload = false;
         } else {
@@ -318,23 +363,23 @@ export class CreateLoadingSheetComponent implements OnInit {
     this._cnoteService.setShipingData([]);
     // Perform cleanup, unsubscribe from observables, etc.
   }
-  
+
 
   loadingSheetGenerate() {
-    this.isSubmit=true;
-    const loadedData= this.tableData.filter((x)=>x.isSelected)
-    this.loadingData=loadedData;
+    this.isSubmit = true;
+    const loadedData = this.tableData.filter((x) => x.isSelected)
+    this.loadingData = loadedData;
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     } else {
       if (loadedData) {
         loadedData.forEach(obj => {
-          const randomNumber = "LS/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+          let randomNumber = "LS/" + this.orgBranch + "/"+ runningNumber();
           obj.LoadingSheet = randomNumber;
           obj.Action = "Print";
         });
         this.addTripData();
-       
+
       } else {
         SwalerrorMessage("error", "Please Select Any one Record", "", true);
       }
@@ -342,7 +387,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   updateLoadingData(event) {
-    
+
     let packages = event.shipping.reduce(
       (total, current) => total + current.Packages,
       0
@@ -377,7 +422,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const vehRequest = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
-      filter:{}
+      filter: {}
     };
 
     // Fetch data from the JSON endpoint
@@ -410,9 +455,8 @@ export class CreateLoadingSheetComponent implements OnInit {
         "TH/" +
         this.orgBranch +
         "/" +
-        2223 +
-        "/" +
-        Math.floor(Math.random() * 100000);
+        runningNumber();
+       
       this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
       // Generate and set a random tripID if not already set
     }
@@ -427,7 +471,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "trip_detail",
-      filter: {_id:this.tripData.id},
+      filter: { _id: this.tripData.id },
       update: {
         ...tripDetails,
       },
@@ -463,19 +507,19 @@ export class CreateLoadingSheetComponent implements OnInit {
         await Promise.all(updatePromises);
       }
     }
-    this.isSubmit=false;
+    this.isSubmit = false;
     // Add your message here
     const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
-          this.dialog.open(LodingSheetGenerateSuccessComponent, {
-            width: "100%", // Set the desired width
-            data: this.loadingData, // Pass the data object
-          });
+      this.dialog.open(LodingSheetGenerateSuccessComponent, {
+        width: "100%", // Set the desired width
+        data: this.loadingData, // Pass the data object
+      });
 
-        dialogRef.afterClosed().subscribe((result) => {
-          this.goBack('Departures');
-          this._cnoteService.setShipingData([]);
-          // Handle the result after the dialog is closed
-        });
+    dialogRef.afterClosed().subscribe((result) => {
+      this.goBack('Departures');
+      this._cnoteService.setShipingData([]);
+      // Handle the result after the dialog is closed
+    });
   }
 
   async updateDocketDetails(docket, lsNo) {
@@ -492,8 +536,8 @@ export class CreateLoadingSheetComponent implements OnInit {
 
     try {
       await Promise.all([
-       await updateTracking(this.companyCode, this._operationService, trackingDocket),
-       await this.updateOperationService(docket, loadingSheetData)
+        await updateTracking(this.companyCode, this._operationService, trackingDocket),
+        await this.updateOperationService(docket, loadingSheetData)
       ]);
     } catch (error) {
       console.error('Error occurred during the API call:', error);
@@ -545,7 +589,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
-      filter:{_id:this.loadingSheetTableForm.value.vehicle.value},
+      filter: { _id: this.loadingSheetTableForm.value.vehicle.value },
       update: {
         ...vehicleDetails,
       },
@@ -661,13 +705,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   async departVehicle() {
     if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
-      const randomNumber =
-        "TH/" +
-        this.orgBranch +
-        "/" +
-        2223 +
-        "/" +
-        Math.floor(Math.random() * 100000);
+      let randomNumber ="TH/" +this.orgBranch +"/" +2223 +"/" +Math.floor(Math.random() * 100000) + runningNumber;
       this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
       // Generate and set a random tripID if not already set
     }
@@ -685,7 +723,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       const reqBody = {
         companyCode: this.companyCode,
         collectionName: "trip_detail",
-        filter:{_id:this.tripData.id},
+        filter: { _id: this.tripData.id },
         update: { ...tripDetails }
       }
 
@@ -695,8 +733,8 @@ export class CreateLoadingSheetComponent implements OnInit {
 
         Swal.fire({
           icon: "info",
-          title: "No Docket Added",
-          text: "Vehicle can depart as no docket is added for loading.",
+          title: "Departure",
+          text: "Vehicle is ready to depart",
           showConfirmButton: true,
         });
 
@@ -729,6 +767,6 @@ export class CreateLoadingSheetComponent implements OnInit {
       console.error('Error occurred during the API call:', error);
     }
   }
-  
-  
+
+
 }

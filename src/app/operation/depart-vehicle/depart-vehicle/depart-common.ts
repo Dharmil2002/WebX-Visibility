@@ -1,4 +1,5 @@
 import { FormGroup } from "@angular/forms";
+import { runningNumber } from "src/app/Utility/date/date-utils";
 
 /**
  * Retrieves loading sheet details for a specific trip and vehicle.
@@ -134,13 +135,11 @@ export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
 * @returns {Promise<any>} - A Promise resolving to the API response.
 */
 export async function updateTracking(companyCode, operationService, dktNo, next) {
-    try {
-        const randomNumber = "TR/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+    try {        
         const docketDetails = await getDocketFromApiDetail(companyCode, operationService, dktNo);
         const lastArray = docketDetails.length - 1;
         const dockData = {
             tripId: docketDetails[lastArray]?.tripId || '',
-            _id: randomNumber,
             dktNo: docketDetails[lastArray]?.dktNo || '',
             vehNo: docketDetails[lastArray]?.vehNo || '',
             route: docketDetails[lastArray]?.route || '',
@@ -154,8 +153,8 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
             dlSt: '',
             dlTm: '',
             evnCd: '',
-            upBy: localStorage.getItem('Username') || '',
-            upDt: new Date().toUTCString(),
+            upBy: localStorage.getItem('UserName') || '',
+            upDt: new Date(),
         };
 
         const req = {

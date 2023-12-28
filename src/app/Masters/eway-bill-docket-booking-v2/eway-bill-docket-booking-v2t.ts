@@ -13,6 +13,7 @@ import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { addTracking, calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
 import { getCity } from "src/app/operation/quick-booking/quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { runningNumber } from "src/app/Utility/date/date-utils";
 
 @Component({
   selector: "app-eway-example",
@@ -628,13 +629,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         },
       });
     } else {
-      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-      const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-      this.dockNo = `CN${dynamicValue}${paddedNumber}`;
+      const  newRunningNumber=await runningNumber();
+      this.dockNo = `CN${dynamicValue}${newRunningNumber}`;
       this.tabForm.controls["docketNumber"].setValue(this.dockNo);
 
       let id = {
-        id: this.dockNo,
+        _id: this.dockNo,
         isComplete: 1,
         unloading: 0,
         lsNo: "",

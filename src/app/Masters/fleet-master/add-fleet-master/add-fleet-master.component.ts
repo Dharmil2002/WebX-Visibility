@@ -54,7 +54,6 @@ export class AddFleetMasterComponent implements OnInit {
     this.companyCode = this.sessionService.getCompanyCode();
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.fleetTableData = route.getCurrentNavigation().extras.state.data;
-      // console.log(this.fleetTableData);
       this.isUpdate = true;
       this.imageData = {
         'fitnesscertificateScan': this.fleetTableData.fitnesscertificateScan,
@@ -222,35 +221,59 @@ export class AddFleetMasterComponent implements OnInit {
 
   //#region Function for save data
   async save() {
-    const controls = this.fleetTableForm;
-    clearValidatorsAndValidate(controls);
-    // Correct way to set values in form controls
-    this.fleetTableForm.get('vehicleNo').setValue(this.fleetTableForm.value.vehicleNo.value);
-    this.fleetTableForm.get('vehicleType').setValue(this.fleetTableForm.value.vehicleType.value);
+    const commonBody = {
+      vehicleNo: this.fleetTableForm.value.vehicleNo.value,
+      vehicleTypeNM: this.fleetTableForm.value.vehicleType.name,
+      vehicleType: this.fleetTableForm.value.vehicleType.value,
+      RCBookNo: this.fleetTableForm.value.RCBookNo,
+      registrationNo: this.fleetTableForm.value.registrationNo,
+      RegistrationDate: this.fleetTableForm.value.RegistrationDate,
+      vehicleInsurancePolicy: this.fleetTableForm.value.vehicleInsurancePolicy,
+      insuranceProvider: this.fleetTableForm.value.insuranceProvider,
+      insuranceExpiryDate: this.fleetTableForm.value.insuranceExpiryDate,
+      fitnessValidityDate: this.fleetTableForm.value.fitnessValidityDate,
+      chassisNo: this.fleetTableForm.value.chassisNo,
+      engineNo: this.fleetTableForm.value.engineNo,
+      activeFlag: this.fleetTableForm.value.activeFlag,
+      _id: this.fleetTableForm.value.vehicleNo.name,
+      cID: localStorage.getItem("companyCode"),
+      eNTBY: localStorage.getItem("UserName"),
+      eNTDT: new Date(),
+      eNTLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      mODLOC: localStorage.getItem("Branch"),
+    }
 
-    // Define an array of control names
+    // const controls = this.fleetTableForm;
+    // clearValidatorsAndValidate(controls);
+    // // Correct way to set values in form controls
+    // this.fleetTableForm.get('vehicleNo').setValue(this.fleetTableForm.value.vehicleNo.value);
+    // this.fleetTableForm.get('vehicleType').setValue(this.fleetTableForm.value.vehicleType.value);
+
+    // // Define an array of control names
     const imageControlNames = ['fitnesscertificateScan', 'insuranceScan', 'registrationScan'];
-    let data = { ...this.fleetTableForm.value };
+    // let data = { ...this.fleetTableForm.value };
 
     imageControlNames.forEach(controlName => {
       const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
 
       // Set the URL in the corresponding control name
-      data[controlName] = file;
+      commonBody[controlName] = file;
     });
 
     if (this.isUpdate) {
       let id = this.fleetTableData._id;
       // Remove the "id" field from the form controls
-      delete data._id;
-      delete data.eNTDT
-      delete data.eNTBY
-      delete data.eNTLOC
+      delete commonBody._id;
+      delete commonBody.eNTDT
+      delete commonBody.eNTBY
+      delete commonBody.eNTLOC
       let req = {
         companyCode: this.companyCode,
         collectionName: "fleet_master",
         filter: { _id: id },
-        update: data,
+        update: commonBody,
       };
 
       //API FOR UPDATE
@@ -267,17 +290,17 @@ export class AddFleetMasterComponent implements OnInit {
         });
         this.route.navigateByUrl("/Masters/FleetMaster/FleetMasterList");
       }
-    } else {
-      const randomNumber = this.fleetTableForm.value.vehicleNo;
-      data._id = randomNumber;
-      delete data.mODBY
-      delete data.mODDT
-      delete data.mODLOC
+    } else 
+    {
+      // commonBody._id = this.fleetTableForm.value.vehicleNo;
+      delete commonBody.mODBY
+      delete commonBody.mODDT
+      delete commonBody.mODLOC
       //API FOR ADD
       let req = {
         companyCode: this.companyCode,
         collectionName: "fleet_master",
-        data: data,
+        data: commonBody,
       };
       const res = await this.masterService
         .masterPost("generic/create", req)

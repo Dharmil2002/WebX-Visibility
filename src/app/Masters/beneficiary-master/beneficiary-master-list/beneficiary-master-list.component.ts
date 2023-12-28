@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
@@ -13,7 +15,7 @@ export class BeneficiaryMasterListComponent implements OnInit {
   linkArray = ['']
   csvFileName: string = '';
   columnHeader = {
-    'updateDate': 'Created Date',
+    'eNTDT': 'Created Date',
     'beneficiaryType': 'Code',
     'beneficiary': 'Name',
     "actions": "Actions"
@@ -32,7 +34,7 @@ export class BeneficiaryMasterListComponent implements OnInit {
   }
   TableStyle = "width:60%"
   headerForCsv = {
-    'updateDate': 'Created Date',
+    'eNTDT': 'Created Date',
     'beneficiaryType': 'Code',
     'beneficiary': 'Name',
   };
@@ -57,28 +59,25 @@ export class BeneficiaryMasterListComponent implements OnInit {
       };
 
       // Make the API call and await the response
-      const res = await this.masterService.masterPost('generic/get', req).toPromise();
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));;
 
       if (res) {
         // Enrich the data with beneficiary names
-        const data = await this.enrichTableData(res.data);
+        const enrichedData = await this.enrichTableData(res.data);
 
-        // Sort the data by the "updateDate" property in descending order
-        const sortedData = data.sort((a, b) => {
-          const dateA: Date | any = new Date(a.updateDate);
-          const dateB: Date | any = new Date(b.updateDate);
-
-          // Compare the date objects for sorting
-          return dateB - dateA; // Sort in descending order
-        });
+        // Sort the data by the "eNTDT" property in descending order
+        const formattedData = enrichedData.map(obj => ({
+          ...obj,
+          eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
+        })).sort((a, b) => b._id.localeCompare(a._id));
 
         // Update the tableData and indicate that the table is no longer loading
-        this.tableData = sortedData;
+        this.tableData = formattedData;
         this.tableLoad = false;
       }
     } catch (error) {
-      // Handle and log any errors that occur
-      console.error(error);
+      // Handle and log any errors that occur during the main process
+      console.error('Error fetching and processing beneficiary details:', error);
     }
   }
   //#endregion
@@ -152,7 +151,7 @@ export class BeneficiaryMasterListComponent implements OnInit {
       collectionName,
     };
     try {
-      const res = await this.masterService.masterPost('generic/get', req).toPromise();
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
       return res;
     } catch (error) {
       console.error(error);

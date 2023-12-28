@@ -125,9 +125,9 @@ Currently, all flows are working together without proper separation.
         Shipment: item.docketNumber,
         Origin: item.orgLoc,
         Destination: item.destination.split(':')[1].trim(),
-        Packages: parseInt(item.totalChargedNoOfpkg),
-        KgWeight: parseInt(item.chrgwt),
-        CftVolume: parseInt(item.cft_tot),
+        Packages: parseInt(item.totalChargedNoOfpkg||0),
+        KgWeight: parseInt(item.chrgwt||0),
+        CftVolume: parseInt(item.cft_tot||0),
       }));
       let originalArray = this._cnoteService.getShipingData()
      

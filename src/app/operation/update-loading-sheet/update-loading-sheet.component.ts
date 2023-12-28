@@ -328,7 +328,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   async UpdateDocketDetail(dkt) {
     if (dkt) {
-      await updateTracking(this.companyCode, this._operation, dkt);
+      await updateTracking(this.companyCode, this._operation, dkt,this.arrivalData?.TripID);
     }
     // const lsDetail = await loadingSheetDetails(this.companyCode, this._operation, this.arrivalData?.TripID);
     // lsDetail.forEach(async element => {

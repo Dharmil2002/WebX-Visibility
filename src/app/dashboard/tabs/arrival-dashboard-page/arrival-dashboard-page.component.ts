@@ -57,7 +57,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
 
   columnHeader = {
     "Route": "Route",
-    "VehicleNo": "Vehicle No",
+    "VehicleNo": "Veh No",
     "TripID": "Trip ID",
     "Location": "Location",
     "Scheduled": "STA",
@@ -72,6 +72,11 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     noColumnSort: ['checkBoxRequired']
   }
   //#endregion
+  columnWidths = {
+    'Route': 'min-width:20%',
+    'TripID': 'min-width:20%',
+    'Location': 'min-width:1%',
+  };
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "id": "Sr No",

@@ -81,7 +81,10 @@ export function filterDataByLocation(shipmentData: any, tripData: any, orgBranch
 
   let routeData = transform(tripData.RouteandSchedule, orgBranch);
   let currentLeg = routeData.split("-").splice(1);
-
+  // A-B-C-D
+  /*
+  [B,C,D]
+  */
   // Filter shipment data based on origin and current leg destinations
   let legWiseData = shipmentData.filter((x) => {
     return x.orgLoc.trim() === orgBranch.trim() && currentLeg.includes(x.destination?.split(':')[1]?.trim());
@@ -122,9 +125,9 @@ export function groupShipments(combinedData) {
     }
 
     result[leg].count++;
-    result[leg].packages += parseInt(item.totalChargedNoOfpkg);
-    result[leg].weightKg += parseInt(item.chrgwt);
-    result[leg].volumeCFT += parseFloat(item.cft_tot);
+    result[leg].packages += parseInt(item.totalChargedNoOfpkg||0);
+    result[leg].weightKg += parseInt(item.chrgwt||0);
+    result[leg].volumeCFT += parseFloat(item.cft_tot||0);
 
     return result;
   }, {});
@@ -197,8 +200,7 @@ export async function updateTracking(companyCode, operationService, data) {
     const docketDetails = await getDocketFromApiDetail(companyCode, operationService, data?.dktNo);
     const lastArray=docketDetails.length-1;
     const dockData = {
-      tripId: data?.tripId || '',
-      _id: data?.lsNo,
+      tripId: data?.tripId || '',      
       dktNo: data?.dktNo|| '',
       vehNo: data?.vehNo || '',
       route: data?.route || '',

@@ -21,7 +21,7 @@
     </div>
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="arrivalTableData" [width]="width"
         [height]="height" [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
-        [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"
+        [Link]="linkArray" [columnWidths]="columnWidths"  [toggleArray]="toggleArray" [menuItems]="menuItems"
         (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
         [dynamicControls]="dynamicControls" (dialogClosed)="updateDepartureData($event)" [height]="height"
         [width]="width" [maxWidth]="maxWidth">

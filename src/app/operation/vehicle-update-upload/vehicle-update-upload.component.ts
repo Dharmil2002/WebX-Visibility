@@ -343,7 +343,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     for (const element of this.loadingTableData) {
       let menifestDetails = result.find((x) => x.Leg === element.Leg);
-      await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber);
+      await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber, this.vehicelLoadData?.tripId);
 
       const jsonDetails = {
         "_id": menifestDetails?.MFNumber || "",
@@ -390,15 +390,16 @@ export class VehicleUpdateUploadComponent implements OnInit {
     });
   }
 
-  async updatedocketDetail(dktNo, mfNumber) {
+  async updatedocketDetail(dktNo, mfNumber, tripId) {
     let mfDetails = {
-      mfNo: mfNumber
+      mfNo: mfNumber,
+      tripId: tripId
     };
      await updateTracking(this.companyCode,this.operationService,mfDetails,dktNo)
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "docket",
-      filter:{_id: dktNo},
+      filter:{docketNumber: dktNo},/*here i added docketNumber this number */
       update: {
         ...mfDetails
       }

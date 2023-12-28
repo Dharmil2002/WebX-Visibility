@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import {UntypedFormGroup } from '@angular/forms';
 import { CnoteService } from '../../../core/service/Masters/CnoteService/cnote.service';
 import { ViewPrintComponent } from '../../view-print/view-print.component';
+import { runningNumber } from 'src/app/Utility/date/date-utils';
 @Component({
   selector: 'app-manifest-generated',
   templateUrl: './manifest-generated.component.html',
@@ -98,7 +99,7 @@ export class ManifestGeneratedComponent implements OnInit {
     let MeniFestDetails: any[] = [];
     groupedDataWithoutKey.forEach(element => {
 
-      const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+      let randomNumber = "MF/" + this.orgBranch + "/"+runningNumber();
       let meniFestjson = {
         MFNumber: randomNumber,
         Leg: element?.Leg || '',

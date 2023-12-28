@@ -9,7 +9,7 @@
   <generic-table-webxpress  class="blur-effect"[ngClass]="{'blur-effect': isSubmit}"*ngIf="!tableload && !isSubmit" [columnHeader]="columnHeader" [tableData]="tableData"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
     [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
-    [centerAligned]="centerAlignedData" [Link]="linkArray" [toggleArray]="toggleArray"
+    [centerAligned]="centerAlignedData" [columnWidths]="columnWidths" [Link]="linkArray" [toggleArray]="toggleArray"
     (dialogClosed)="updateLoadingData($event)" [extraData]="extraData" [maxWidth]="maxWidth" [width]="width"
     [height]="height" [menuItems]="menuItems" [selectAllRequired]="true" (menuItemClicked)="handleMenuItemClick($event)"
     [menuItemFlag]="menuItemflag"  (selectAllClicked)="IsActiveFuntion($event)" [dynamicControls]="dynamicControls">

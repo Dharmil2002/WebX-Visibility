@@ -53,7 +53,7 @@ export class StocksComponent
     no: {
       Title:"Cnote",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:15%",
     },
     date: {
       Title: "Date of Cnote",
@@ -61,9 +61,9 @@ export class StocksComponent
       Style: "min-width:80px",
     },
     paymentType: {
-      Title: "Payment Type",
+      Title: "Pay Type",
       class: "matcolumnleft",
-      Style: "min-width:2px",
+      Style: "max-width:70px",
     },
     contractParty: {
       Title:"Contract Party",
@@ -71,24 +71,24 @@ export class StocksComponent
       Style: "min-width:200px",
     },
     orgdest: {
-      Title:"Origin-Destination",
+      Title:"Org-Dest",
       class: "matcolumnleft",
       Style: "min-width:80px",
     },
     noofPackages: {
-      Title: "No of Packages",
+      Title: "Pkgs",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "max-width:70px",
     },
     actualWeight: {
-      Title: "Actual Weight",
+      Title: "Act Wt",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "max-width:70px",
     },
     chargedWeight: {
-      Title: "Charged Weight",
+      Title: "Chg Wt",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "max-width:70px",
     },
     status: {
       Title: "Status",

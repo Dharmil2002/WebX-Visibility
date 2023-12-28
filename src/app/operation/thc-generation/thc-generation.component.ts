@@ -941,8 +941,6 @@ export class ThcGenerationComponent implements OnInit {
     const fromTo = `${fromCity}-${toCity}`
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
-      console.log(this.allShipment)
-
       const filteredShipments = this.allShipment.filter((x) =>
         (x.fCT.toLowerCase() === fromCity.toLowerCase() &&
           x.tCT.toLowerCase() === toCity.toLowerCase()) || (x.vEHNO == this.thcTableForm.controls['vehicle'].value.value)
@@ -1081,7 +1079,7 @@ export class ThcGenerationComponent implements OnInit {
   GenerateTHCgenerationRequestBody() {
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
-    debugger
+    
     const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
     const schArrDate = moment(deptDate).add(transitHours, 'hours').toDate();
     // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");

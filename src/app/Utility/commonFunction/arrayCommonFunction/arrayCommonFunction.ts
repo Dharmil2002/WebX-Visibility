@@ -119,3 +119,50 @@ export async function   total(round,field){
     return null;
 };
 
+export function aggregateData(data, groupByColumns, aggregationRules, fixedColumns) {
+  const groups = {};
+
+  for (const item of data) {
+      const key = groupByColumns.map(column =>  item[column] ?? "" ).join('-');                
+      if (!groups[key]) {
+          groups[key] = { ...item };
+          fixedColumns.forEach(fixedColumn => {
+              groups[key][fixedColumn.field] = fixedColumn.calculate(item);
+          });
+      }
+
+      const group = groups[key];
+
+      aggregationRules.forEach(rule => {
+          const { inputField, outputField, operation, condition } = rule;
+          if(!group[outputField])
+              group[outputField]  = undefined;
+
+          if (!condition || condition(item)) {
+              if (operation === 'sum' ) {
+                  group[outputField] = (group[outputField] || 0) + (item[inputField] || 0);
+              } else if (operation === 'first' && group[outputField] === undefined) {
+                  group[outputField] = item[inputField];
+              }
+          }
+      });
+  }
+
+  const allowedFields = [
+      ...groupByColumns,
+      ...aggregationRules.map(rule => rule.outputField),
+      ...fixedColumns.map(column => column.field),
+  ];
+
+  for (const key in groups) {
+      if (groups.hasOwnProperty(key)) {
+          for (const field in groups[key]) {
+              if (!allowedFields.includes(field)) {
+                  delete groups[key][field];
+              }
+          }
+      }
+  }
+
+  return Object.values(groups);
+}

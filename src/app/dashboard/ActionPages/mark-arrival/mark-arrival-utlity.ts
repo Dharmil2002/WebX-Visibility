@@ -1,3 +1,4 @@
+import { runningNumber } from "src/app/Utility/date/date-utils";
 
 /**
  * Retrieves loading sheet details for a specific trip and vehicle.
@@ -33,10 +34,8 @@ export async function tripTransactionDetail(
 */
 export async function updateTracking(companyCode, operationService, docketDetails) {
     try {
-        const randomNumber = "MA/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
         const dockData = {
             tripId: docketDetails?.tripId || '',
-            _id: randomNumber,
             dktNo: docketDetails?.dktNo || '',
             vehNo: docketDetails?.vehNo || '',
             route: docketDetails?.route || '',
@@ -81,6 +80,7 @@ export async function getDocketFromApiDetail(companyCode, operationService, trip
         collectionName: 'cnote_tracking',
         filter: {
             tripId: tripId,
+            unload:false
         }
     };
 

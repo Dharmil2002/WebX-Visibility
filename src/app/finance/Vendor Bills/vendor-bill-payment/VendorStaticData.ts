@@ -13,7 +13,7 @@ export const VendorTableData = [
     },
     {
         vendor: 'V000005:ABC TRANSPORT COMPANY', billType: "PO Bill", billNo: "BEMUMB232400132", Date: '10/28/2023',
-        billAmount: 87650, pendingAmount: 87650, Status: "Approved",   
+        billAmount: 87650, pendingAmount: 87650, Status: "Approved",
         actions: [
             'Approve Bill',
             'Bill Payment',
@@ -25,7 +25,7 @@ export const VendorTableData = [
     },
     {
         vendor: 'V00001:AADARSH ROADWAYS', billType: "Transaction Bill", billNo: "BEMUMB232400133", Date: '10/26/2023',
-        billAmount: 65450, pendingAmount: 65450, Status: "Partial Paid", 
+        billAmount: 65450, pendingAmount: 65450, Status: "Partial Paid",
         actions: [
             'Approve Bill',
             'Bill Payment',
@@ -41,10 +41,13 @@ export const billType = [
     { value: "2", name: 'PO Bill' },
 ]
 export const status = [
-    { value: "1", name: 'Generated' },
+    { value: "1", name: 'Awaiting Approval' },
     { value: "2", name: 'Approved' },
-    { value: "3", name: 'Partial Paid' },
-    { value: "4", name: 'On Hold' },
+    { value: "3", name: 'Paid' },
+    { value: "4", name: 'Partially Paid' },
+    { value: "5", name: 'Payment On Hold' },
+    { value: "6", name: 'Payment Un Held' },
+    { value: "7", name: 'Cancelled' },
 ]
 export const VendorBillPayment = [
     {

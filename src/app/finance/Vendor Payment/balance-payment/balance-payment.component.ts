@@ -545,7 +545,7 @@ export class BalancePaymentComponent implements OnInit {
         ).ISUT == true;
       const GSTAmount = this.tableData
         .filter((item) => item.isSelected)
-        .reduce((acc, curr) => acc + parseFloat(curr["BalancePending"]), 0);
+        .reduce((acc, curr) => acc + parseFloat(curr["THCamount"]), 0);
       const GSTdata = { GSTAmount, GSTRate: SACcode.GSTRT };
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
@@ -693,8 +693,8 @@ export class BalancePaymentComponent implements OnInit {
               bALAMT: this.BalancePending,
               rOUNOFFAMT: 0,
               bALPBAMT: generateVoucher == true ? 0 : this.BalancePending,
-              bSTAT: generateVoucher == true ? 4 : 1,
-              bSTATNM: generateVoucher == true ? "Paid" : "Generated",
+              bSTAT: generateVoucher == true ? 3 : 1,
+              bSTATNM: generateVoucher == true ? "Paid" : "Awaiting Approval",
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
@@ -797,7 +797,7 @@ export class BalancePaymentComponent implements OnInit {
         this.debitVoucherRequestModel.branch = this.storage.branch;
         this.debitVoucherRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+        // this.debitVoucherDataRequestModel.companyCode = this.companyCode;
         this.debitVoucherDataRequestModel.voucherNo = "";
         this.debitVoucherDataRequestModel.transType = "BalancePayment";
         this.debitVoucherDataRequestModel.transDate = new Date();
@@ -849,7 +849,7 @@ export class BalancePaymentComponent implements OnInit {
         this.debitVoucherDataRequestModel.date =
           PaymenDetails.Date;
         this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-        this.debitVoucherDataRequestModel.paymentAmtount = NetPayable;
+        this.debitVoucherDataRequestModel.paymentAmount = NetPayable;
 
         const companyCode = this.companyCode;
         const CurrentBranchCode = this.storage.branch;

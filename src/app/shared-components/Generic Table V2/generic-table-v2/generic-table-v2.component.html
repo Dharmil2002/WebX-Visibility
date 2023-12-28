@@ -110,6 +110,19 @@
                                             </button>
                                         </div>
                                     </li>
+                                    <li *ngIf="HeaderMenuItems">
+                                        <button mat-stroked-button style="margin-left:10px; "
+                                            [matMenuTriggerFor]="matMenu" (click)="$event.stopPropagation()">
+                                            Actions
+                                        </button>
+
+                                        <mat-menu #matMenu="matMenu">
+                                            <button mat-menu-item *ngFor="let item of HeaderMenuItems"
+                                                (click)="handleMenuItemClick(item.label,item)">
+                                                {{ item.label }}
+                                            </button>
+                                        </mat-menu>
+                                    </li>
                                     <li *ngFor="let box of boxData" style="text-align: center;">
                                         <div class="msr-4 align-self-center">
                                             <h6 class="font-14 mb-1">{{box.title}}</h6>
@@ -210,7 +223,8 @@
 
                                     </ng-container>
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'Activetoggle'">
-                                        <mat-slide-toggle color="primary" [(ngModel)]="element[tableData]" (change)="functionHandle(columnHeader[tableData].functionName , element)"></mat-slide-toggle>
+                                        <mat-slide-toggle color="primary" [(ngModel)]="element[tableData]"
+                                            (change)="functionHandle(columnHeader[tableData].functionName , element)"></mat-slide-toggle>
                                     </ng-container>
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'iconClick'">
                                         <button mat-icon-button
@@ -247,7 +261,7 @@
                             <mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></mat-header-row>
                             <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></mat-row>
                         </mat-table>
-                        <div style="height: 70px;"[ngStyle]="{'display': showHeader ? 'block' : 'none'}">
+                        <div style="height: 70px;" [ngStyle]="{'display': showHeader ? 'block' : 'none'}">
                             <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0"
                                 [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
                             </mat-paginator>

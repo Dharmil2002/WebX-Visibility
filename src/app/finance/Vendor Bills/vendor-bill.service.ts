@@ -22,21 +22,26 @@ export class VendorBillService {
         _id: res._id,
         vnCode: res.vND.cD,
         vnName: res.vND.nM,
-        billType: "Transaction Bill",
+        billType: "Vendor Bill",
         billNo: res.docNo,
         Date: this.formatDate(res.bDT),
+        TotalTHCAmount: res.tHCAMT,
+        AdvancePayedAmount: res.aDVAMT,
         billAmount: res.bALAMT,
         pendingAmount: res.bALPBAMT,
+        paymentAmount: res.bALPBAMT,
         Status: res.bSTATNM,
+        StatusCode: res.bSTAT,
         vPan: res.vND.pAN,
-        actions: [
-          'Approve Bill',
-          'Bill Payment',
-          'Hold Payment',
-          // 'Unhold Payment',
-          'Cancel Bill',
-          'Modify'
-        ]
+        actions:
+          [
+            // 'Approve Bill',
+            // 'Bill Payment',
+            // 'Hold Payment',
+            // // 'Unhold Payment',
+            // 'Cancel Bill',
+            // 'Modify'
+          ]
       }));
 
       // console.log(tableDataArray);

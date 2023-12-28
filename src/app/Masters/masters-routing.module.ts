@@ -90,9 +90,11 @@ import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.compone
 import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
 import { ListContainerComponent } from './Container Master/list-container/list-container.component';
 import { AddContainerComponent } from './Container Master/add-container/add-container.component';
+import { ViewPrintComponent } from './view-print/view-print.component';
 
 
 const routes: Routes = [
+  { path: "ViewPrint", component: ViewPrintComponent },
   { path: "TenantMaster/TenantMasterList", component: TenantListComponent },
   { path: "TenantMaster/AddTenantMaster", component: AddTenantComponent },
   { path: "SAC-HSNMaster/SAC-HSNView", component: SacMasterListComponent },

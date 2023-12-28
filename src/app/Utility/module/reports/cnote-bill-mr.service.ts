@@ -16,7 +16,7 @@ export class CnoteBillMRService {
      async getCNoteBillMRReportDetail() {
           const reqBody = {
                companyCode: this.storage.companyCode,
-               collectionName: "cust_bill_headers",
+               collectionName: "Cust_bills_headers",
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
@@ -54,8 +54,8 @@ export class CnoteBillMRService {
                     "mANUALBILLNO": element?.docNo || '',
                     "bILLGENAT": element?.eNTLOC || '',
                     "bILLDT": formatDocketDate(element?.bGNDT || ''),
-                    "bILSUBAT": element.sUB.loc || '',
-                    "bILLSUBDT": formatDocketDate(element.sUB.sDT || ''),
+                    // "bILSUBAT": element.bLOC || '',
+                    // "bILLSUBDT": formatDocketDate(element.sUB.sDT || ''),
                     "bILLcOLLECTAT": element?.bALAMT || '',
                     "bILLCOLLECTDT": "",
                     "bILLAMT": element?.aMT || '',
@@ -64,7 +64,7 @@ export class CnoteBillMRService {
                     "bILLST": element?.bSTSNM || '',
                     "bILLNO": element?.bILLNO || "",
                     "mRNO": "",
-                    "mANUALMRNO": docDet.doc,
+                    "mANUALMRNO": docDet.docNo,
                     "mRDT": "",
                     "mRCLOSEDT": "",
                     "mRENTRYDT": "",

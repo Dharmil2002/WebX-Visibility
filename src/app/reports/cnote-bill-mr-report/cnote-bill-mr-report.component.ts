@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subject, take, takeUntil } from 'rxjs';
+import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -9,7 +9,9 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { CnoteBillMRService, convertToCSV } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 import { cNoteBillMRControl } from 'src/assets/FormControls/cnote-bill-mr-report/cnote-bill-mr-report';
 import Swal from 'sweetalert2';
@@ -180,15 +182,22 @@ export class CnoteBillMrReportComponent implements OnInit {
   cnoteStatus: any;
   billAtName: any;
   billAtStatus: any;
+  allData: {
+    cnoteData: any;
+  };
+  cnoteDetailList: any;
+  cnoteDet: any;
 
   constructor(
+    private storage: StorageService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
     private cnoteBillMRService: CnoteBillMRService,
     private generalService: GeneralService,
     private customerService: CustomerService,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private masterServices: MasterService,
   ) {
     this.initializeFormControl();
   }
@@ -273,20 +282,31 @@ export class CnoteBillMrReportComponent implements OnInit {
     const tranmode: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "tran_mode" }, "codeDesc", "codeId");
     const booking: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "DELTYP" }, "codeDesc", "codeId");
     const customer = await this.customerService.customerFromApi();
-    const cnote = await getShipment(this.operationService, false);
-    const shipmentDetail = cnote.map((x) => {
-      return { value: x.docketNumber, name: x.docketNumber };
-    });
-    // const paymentType: AutoComplateCommon[] = await this.generalService.getGeneralMaster('PAYTYP');
-    // const movemntType: AutoComplateCommon[] = await this.generalService.getGeneralMaster('MOVTYP');
-    // const tranmode: AutoComplateCommon[] = await this.generalService.getGeneralMaster('tran_mode');
-    this.filter.Filter(
-      this.jsoncnoteBillMRFormArray,
-      this.cnoteBillMRTableForm,
-      shipmentDetail,
-      this.cnoteName,
-      this.cnoteStatus
-    );
+    let cnoteReq = {
+      "companyCode": this.storage.companyCode,
+      "filter": {},
+      "collectionName": "dockets"
+    };
+    const cnoteRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", cnoteReq));
+    
+    const mergedData = {
+      cnoteData: cnoteRes?.data
+    };
+    this.allData = mergedData;
+    const cnoteDet = mergedData.cnoteData
+      .map(element => ({
+        name: element.docNo,
+        value: element.docNo,
+      }));
+      this.cnoteDetailList = cnoteDet;
+      this.cnoteDet = cnoteDet;
+      this.filter.Filter(
+        this.jsoncnoteBillMRFormArray,
+        this.cnoteBillMRTableForm,
+        cnoteDet,
+        this.cnoteName,
+        this.cnoteStatus
+      );
     this.filter.Filter(
       this.jsoncnoteBillMRFormArray,
       this.cnoteBillMRTableForm,

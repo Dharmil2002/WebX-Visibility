@@ -915,6 +915,13 @@
         "List Container"
       ],
       "router": "Masters/ContainerMaster/ListContainer"
+    },
+    {
+      "title": "CommonVP/ViewPrint",
+      "tag": [
+        "ViewPrint"
+      ],
+      "router": "Masters/ViewPrint"
     }
   ]
 }

@@ -9,7 +9,7 @@ import { vehicleModel } from "src/app/core/models/Masters/vehicle-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { calculateVolume } from "../vehicle-utility";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { RouteLocationService } from "src/app/Utility/module/masters/route-location/route-location.service";
 @Component({
@@ -208,8 +208,7 @@ export class AddVehicleMasterComponent implements OnInit {
   //#region
   async getDropDownData() {
     try {
-      const res = await this.masterService.getJsonFileDetails('dropDownUrl').toPromise();
-
+      const res: any = await firstValueFrom(this.masterService.getJsonFileDetails("dropDownUrl"));
       const {
         vendorTypeDropdown,
         divisionAccess
@@ -312,15 +311,12 @@ export class AddVehicleMasterComponent implements OnInit {
         "filter": {},
         "collectionName": "routeMasterLocWise"
       };
-      const routeRes = await this.masterService.masterPost('generic/get', routeReq).toPromise();
-      const venNameRes = await this.masterService.masterPost('generic/get', venNameReq).toPromise();
-      // const venTypeRes = await this.masterService.masterPost('generic/get', venTypeReq).toPromise();
-      const vehTypeRes = await this.masterService.masterPost('generic/get', vehTypeReq).toPromise();
-      const generalMasterResponse = await this.masterService.masterPost("generic/get", generalReqBody).toPromise();
+      const routeRes = await firstValueFrom(this.masterService.masterPost("generic/get", routeReq));
+      const venNameRes = await firstValueFrom(this.masterService.masterPost("generic/get", venNameReq));
+      const vehTypeRes = await firstValueFrom(this.masterService.masterPost("generic/get", vehTypeReq));
+      const generalMasterResponse = await firstValueFrom(this.masterService.masterPost("generic/get", generalReqBody));
       const mergedData = {
-        // vehicleData: vehicleRes?.data,
         vehTypeData: vehTypeRes?.data,
-        // venTypeData: venTypeRes?.data,
         venNameData: venNameRes?.data,
         routeData: routeRes?.data,
         fltType: generalMasterResponse.data
@@ -470,7 +466,7 @@ export class AddVehicleMasterComponent implements OnInit {
         "collectionName": collectionName,
         "filter": {}
       };
-      const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
+      const response = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
       const dataList = response.data.map(x => ({
         name: x[nameProperty],
         value: x[dataProperty]
@@ -505,7 +501,7 @@ export class AddVehicleMasterComponent implements OnInit {
       "collectionName": "vehicle_detail",
       "filter": {}
     };
-    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     const vehicleNoExists = res.data.some((res) => res._id === this.vehicleTableForm.value._id
       || res.vehicleNo === this.vehicleTableForm.value.vehicleNo);
     if (vehicleNoExists) {
@@ -574,9 +570,8 @@ export class AddVehicleMasterComponent implements OnInit {
         update: data,
       };
       //API FOR UPDATE
-      const res = await this.masterService
-        .masterPut("generic/update", req)
-        .toPromise();
+      const res = await firstValueFrom(this.masterService
+        .masterPost("generic/update", req));
       if (res) {
         // Display success message
         Swal.fire({
@@ -599,9 +594,7 @@ export class AddVehicleMasterComponent implements OnInit {
         data: data,
       };
       //API FOR ADD
-      const res = await this.masterService
-        .masterPost("generic/create", req)
-        .toPromise();
+      const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
       if (res) {
         Swal.fire({
           icon: "success",

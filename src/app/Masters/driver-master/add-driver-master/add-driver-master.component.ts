@@ -12,6 +12,7 @@ import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { firstValueFrom } from "rxjs";
 @Component({
   selector: "app-add-driver-master",
   templateUrl: "./add-driver-master.component.html",
@@ -166,18 +167,14 @@ export class AddDriverMasterComponent implements OnInit {
         filter: {},
         collectionName: "driver_detail",
       };
-      const locationRes = await this.masterService
-        .masterPost("generic/get", locationReq)
-        .toPromise();
-      const pincodeRes = await this.masterService
-        .masterPost("generic/get", pincodeReq)
-        .toPromise();
-      const vehicleRes = await this.masterService
-        .masterPost("generic/get", vehicleReq)
-        .toPromise();
-      const driverRes = await this.masterService
-        .masterPost("generic/get", driverReq)
-        .toPromise();
+      const locationRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", locationReq));
+      const pincodeRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", pincodeReq));
+      const vehicleRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", vehicleReq));
+      const driverRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", driverReq));
 
       const mergedData = {
         locationData: locationRes?.data,
@@ -243,24 +240,26 @@ export class AddDriverMasterComponent implements OnInit {
         (x) => x.name == this.DriverTable.vehicleNo
       );
       this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
-    }
-    // For setting image data, assuming you have imageData defined
-    Object.keys(this.imageData).forEach((controlName) => {
-      const url = this.imageData[controlName];
-      const fileName = this.objImageHandling.extractFileName(url);
-      // Set the form control value using the control name
-      this.DriverTableForm.controls[controlName].setValue(fileName);
 
-      //setting isFileSelected to true
-      const control = this.jsonControlDriverArray.find(x => x.name === controlName);
-      control.additionalData.isFileSelected = false
-    });
+      // For setting image data, assuming you have imageData defined
+      Object.keys(this.imageData).forEach((controlName) => {
+        const url = this.imageData[controlName];
+        const fileName = this.objImageHandling.extractFileName(url);
+        // Set the form control value using the control name
+        this.DriverTableForm.controls[controlName].setValue(fileName);
+
+        //setting isFileSelected to true
+        const control = this.jsonControlDriverArray.find(x => x.name === controlName);
+        control.additionalData.isFileSelected = false
+      });
+    }
   }
   //#endregion
 
   //#region
-  getDropDownData() {
-    this.masterService.getJsonFileDetails("dropDownUrl").subscribe((res) => {
+  async getDropDownData() {
+    try {
+      const res: any = await firstValueFrom(this.masterService.getJsonFileDetails("dropDownUrl"));
       this.countryList = res.countryList;
 
       if (this.isUpdate) {
@@ -289,7 +288,10 @@ export class AddDriverMasterComponent implements OnInit {
           );
         }
       );
-    });
+    } catch (error) {
+      // Handle errors here
+      console.error("Error fetching dropdown data:", error);
+    }
   }
   //#endregion
 
@@ -299,70 +301,40 @@ export class AddDriverMasterComponent implements OnInit {
   }
   //#endregion
 
-  //#region Driver Photo
-  async selectFileDriverPhoto(data) {
-    const allowedFormats = ["jpeg", "png", "jpg"];
-    // Call the uploadFile method from the service
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "driverPhoto", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
-  }
-  //#endregion
-
-  //#region License Scan
-  async selectedFileLicenseScan(data) {
-    const allowedFormats = ["jpeg", "png", "jpg"];
-    // Call the uploadFile method from the service
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "licenseScan", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
-  }
-  //#endregion
-
-  //#region DOB proof scan
-  async selectedFileDOBProofScan(data) {
-    const allowedFormats = ["jpeg", "png", "jpg"];
-    // Call the uploadFile method from the service
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "DOBProofScan", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
-  }
-  //#endregion
-
-  //#region Address Proof Scan
-  async selectedFileAddressProofScan(data) {
-    const allowedFormats = ["jpeg", "png", "jpg"];
-    // Call the uploadFile method from the service
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "addressProofScan", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
-  }
-  //#endregion
-
   //#region save
   async save() {
-    const controls = this.DriverTableForm;
-    clearValidatorsAndValidate(controls);
-    const formValue = this.DriverTableForm.value;
-    const controlNames = ["country", "pincode", "vehicleNo"];
-    controlNames.forEach((controlName) => {
-      const controlValue = formValue[controlName]?.name;
-      this.DriverTableForm.controls[controlName].setValue(controlValue);
-    });
+    const commonBody = {
+      manualDriverCode: this.DriverTableForm.value.manualDriverCode,
+      driverName: this.DriverTableForm.value.driverName,
+      licenseNo: this.DriverTableForm.value.licenseNo,
+      valdityDt: this.DriverTableForm.value.valdityDt,
+      country: this.DriverTableForm.value.country.name,
+      countryCD: this.DriverTableForm.value.country.value,
+      telno: this.DriverTableForm.value.telno,
+      address: this.DriverTableForm.value.address,
+      pincode: this.DriverTableForm.value.pincode.value,
+      city: this.DriverTableForm.value.city,
+      addressProofDocNo: this.DriverTableForm.value.addressProofDocNo,
+      vehicleNo: this.DriverTableForm.value.vehicleNo.value,
+      dDob: this.DriverTableForm.value.dDob,
+      DOBProofDocNo: this.DriverTableForm.value.DOBProofDocNo,
+      activeFlag: this.DriverTableForm.value.activeFlag,
+      _id: this.DriverTableForm.value.manualDriverCode,
+      cID: localStorage.getItem("companyCode"),
+      eNTBY: localStorage.getItem("UserName"),
+      eNTDT: new Date(),
+      eNTLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      mODLOC: localStorage.getItem("Branch"),
+    }
 
-    // Remove field from the form controls
-    this.DriverTableForm.removeControl("companyCode");
-    this.DriverTableForm.removeControl("updateBy");
-    this.DriverTableForm.removeControl("isUpdate");
-    //  let data = convertNumericalStringsToInteger(this.DriverTableForm.value)
-    this.DriverTableForm.controls["activeFlag"].setValue(
-      this.DriverTableForm.value.activeFlag === true ? true : false
-    );
     // Define an array of control names
     const imageControlNames = ['driverPhoto', 'licenseScan', 'addressProofScan', 'DOBProofScan'];
-    let data = { ...this.DriverTableForm.value };
 
     imageControlNames.forEach(controlName => {
       const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
-
-      // Set the URL in the corresponding control name
-      data[controlName] = file;
+      commonBody[controlName] = file;
     });
 
     let req = {
@@ -370,43 +342,40 @@ export class AddDriverMasterComponent implements OnInit {
       collectionName: "driver_detail",
       filter: {},
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", req));
     if (res) {
       // Generate srno for each object in the array
-      const lastUsedDriverCode = res.data[res.data.length - 1];
+      const sortedData = res.data.sort((a, b) => a._id.localeCompare(b._id));
+      const lastUsedDriverCode = sortedData[sortedData.length - 1];
       const lastDriverCode = lastUsedDriverCode
         ? parseInt(lastUsedDriverCode.manualDriverCode.substring(3))
         : 0;
-      // Function to generate a new route code
-      function generateDriverCode(initialCode: number = 0) {
+
+      const generateDriverCode = (initialCode: number = 0) => {
         const nextDriverCode = initialCode + 1;
-        const driverCodeNumber = nextDriverCode.toString().padStart(4, "0");
-        const driverCode = `DR${driverCodeNumber}`;
-        return driverCode;
-      }
-      if (this.isUpdate) {
-        this.newDriverCode = this.DriverTable._id;
-      } else {
-        this.newDriverCode = generateDriverCode(lastDriverCode);
-      }
+        return `DR${nextDriverCode.toString().padStart(4, "0")}`;
+      };
+
+      this.newDriverCode = this.isUpdate ? this.DriverTable._id : generateDriverCode(lastDriverCode);
       //generate unique manualDriverCode
-      data.manualDriverCode = this.newDriverCode
+      commonBody.manualDriverCode = this.newDriverCode
 
       if (this.isUpdate) {
         let id = this.DriverTableForm.value._id;
-        // Remove the "_id" field from the form controls
+        delete commonBody._id;
+        delete commonBody.eNTDT
+        delete commonBody.eNTBY
+        delete commonBody.eNTLOC
         this.DriverTableForm.removeControl("_id");
         let req = {
           companyCode: this.companyCode,
           collectionName: "driver_detail",
           filter: { _id: id },
-          update: data,
+          update: commonBody,
         };
-        const res = await this.masterService
-          .masterPut("generic/update", req)
-          .toPromise();
+        const res = await firstValueFrom(this.masterService
+          .masterPut("generic/update", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -418,22 +387,17 @@ export class AddDriverMasterComponent implements OnInit {
           this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
         }
       } else {
-        //const data = this.DriverTableForm.value;
+        delete commonBody.mODBY
+        delete commonBody.mODDT
+        delete commonBody.mODLOC
         this.DriverTableForm.removeControl("_id");
-        // Assign the generated _id directly
-        const id = { _id: this.newDriverCode };
-        // Merge the data and id objects
-        const mergedObject = { ...data, ...id };
-
+        commonBody["_id"] = this.newDriverCode
         let req = {
           companyCode: this.companyCode,
           collectionName: "driver_detail",
-          data: mergedObject,
+          data: commonBody,
         };
-
-        const res = await this.masterService
-          .masterPost("generic/create", req)
-          .toPromise();
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -468,10 +432,10 @@ export class AddDriverMasterComponent implements OnInit {
 
   //#region
   async checkDriverNameExist() {
-    const FilterFunction = (x)=>{
-      if(this.isUpdate){
+    const FilterFunction = (x) => {
+      if (this.isUpdate) {
         return x._id != this.DriverTable._id && x.driverName.toUpperCase() === this.DriverTableForm.value.driverName.toUpperCase()
-      }else{
+      } else {
         return x.driverName.toUpperCase() === this.DriverTableForm.value.driverName.toUpperCase()
       }
     }
@@ -538,6 +502,40 @@ export class AddDriverMasterComponent implements OnInit {
       width: '30%',
       height: '50%',
     });
+  }
+  //#endregion
+
+  //#region Driver Photo
+  async selectFileDriverPhoto(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "driverPhoto", this.DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
+  }
+  //#endregion
+
+  //#region License Scan
+  async selectedFileLicenseScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "licenseScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
+  }
+  //#endregion
+
+  //#region DOB proof scan
+  async selectedFileDOBProofScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "DOBProofScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
+  }
+  //#endregion
+
+  //#region Address Proof Scan
+  async selectedFileAddressProofScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "addressProofScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
   }
   //#endregion
 }

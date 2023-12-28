@@ -102,7 +102,7 @@ export class LocationMasterComponent implements OnInit {
             const ownership = ownershipObject ? ownershipObject.codeDesc : '';
 
             // Convert locCode and locName to uppercase
-            const locCode = obj.locCode.toUpperCase();
+            const locCode = obj.locCode;
             const locName = obj.locName.toUpperCase();
             const locCity = obj.locCity.toUpperCase();
             const locPincode = parseInt(obj.locPincode)

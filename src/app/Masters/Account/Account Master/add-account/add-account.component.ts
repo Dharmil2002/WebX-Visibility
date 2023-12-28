@@ -79,7 +79,6 @@ export class AddAccountComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit Ledger";
       this.backPath = "/Masters/AccountMaster/AccountMasterList";
@@ -331,13 +330,13 @@ export class AddAccountComponent implements OnInit {
       let BankData = [];
       res.data.forEach((x) => {
         BankData.push({
-          name: x.Accountnumber,
-          value: x.Bankname,
+          name: x.Bankname,
+          value: x.Accountnumber,
         });
       });
       if (this.isUpdate) {
-        const bank = this.UpdateData.bankdetails;
-        const selectedData = BankData.filter((x) => bank.includes(x.value));
+        const bank = this.UpdateData.bANCD;
+        const selectedData = BankData.find((x) => x.value==bank||x.name==bank);
         this.AccountForm.controls["bank"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -368,9 +367,9 @@ export class AddAccountComponent implements OnInit {
         });
       });
       if (this.isUpdate) {
-        const bank = this.UpdateData.TDSditals;
-        const selectedData = TDSData.filter((x) => bank.includes(x.value));
-        this.AccountForm.controls["bank"].setValue(selectedData);
+        const bank = this.UpdateData.tSEC;
+        const selectedData = TDSData.find((x) => x.value==bank || x.name==bank);
+        this.AccountForm.controls["TDSsection"].setValue(selectedData);
       }
       this.filter.Filter(
         this.jsonControlAccountArray,
@@ -450,6 +449,7 @@ export class AddAccountComponent implements OnInit {
       this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
         (x) => !bankfiled.includes(x.name)
       );
+      this.toggleTDSExempted();
     } else {
       const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
       this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
@@ -484,7 +484,7 @@ export class AddAccountComponent implements OnInit {
     });
   }
 
-  toggleTDSExempted(event) {
+  toggleTDSExempted() {
     const TDSExemptedValue = this.AccountForm.value.isTDSapplicable;
     if (TDSExemptedValue) {
       const bankfiled = ["bank"];
@@ -498,6 +498,7 @@ export class AddAccountComponent implements OnInit {
         (x) => !bankfiled.includes(x.name)
       );
     }
+
   }
 
   async Save() {

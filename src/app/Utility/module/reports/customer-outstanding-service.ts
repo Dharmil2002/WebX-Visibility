@@ -26,8 +26,17 @@ export class CustOutstandingService {
                let custoutData = {
                     "oloc": element.bLOC,
                     "obGNDT": element.bGNDT,
-                    "CustomerCode": element.cUST.cD || '',
-                    "Customer": element.cUST.nM || '',
+                    "custCode": element.cUST.cD || '',
+                    "cust": element.cUST.nM || '',
+                    "openingBal":element.aMT||'',
+                    "billAmt":element.aMT||'',
+                    // "unsubmittedAmt"
+                    // "submittedAmt"
+                    "collectionAmt":element.cOL.aMT,
+                    // "TotalPending"
+                    // "ManualVoucherAmount"
+                    // "OnAccountBalance"
+                    // "LedgerBalance"
                }
                custoutstandList.push(custoutData)
           })

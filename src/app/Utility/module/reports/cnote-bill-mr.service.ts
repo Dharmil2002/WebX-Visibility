@@ -27,7 +27,6 @@ export class CnoteBillMRService {
 
           let cnotebillList = [];
           res.data.map((element) => {
-               console.log("element", element);
 
                /*dockets collection*/
                // const docDet = resDocketTemp.data ? resDocketTemp.data.find((entry) => entry.docNo === element?.dKTNO) : null;

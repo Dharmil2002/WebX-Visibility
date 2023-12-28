@@ -92,12 +92,13 @@ export class VendorOutstandingReportComponent implements OnInit {
 
   CSVHeader = {
     "srNo": "#",
-    "Vendor": "Vendor",
-    "Opening Balance": "Opening Balance",
-    "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
-    "Paid Amount From 01 Apr 2023 To 11 Dec 2023": "Paid Amount From 01 Apr 2023 To 11 Dec 2023",
-    "Finalized": "Finalized",
-    "Un-Finalized": "Un-Finalized",
+    "vendorCD":"Vendor Code",
+    "vendor": "Vendor",
+    "openingBal": "Opening Balance",
+    "totalBillAmtFrom010423To111223": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
+    "paidAmtFrom010423To111223": "Paid Amount From 01 Apr 2023 To 11 Dec 2023",
+    "finalized": "Finalized",
+    "unFinalized": "Un-Finalized",
     "0-30": "0-30",
     "31-60": "31-60",
     "61-90": "61-90",
@@ -105,12 +106,12 @@ export class VendorOutstandingReportComponent implements OnInit {
     "121-150": "121-150",
     "151-180": "151-180",
     ">180": ">180",
-    "Total Payable": "Total Payable",
-    "On Account Amt": "On Account Amt",
-    "Manual Voucher": "Manual Voucher",
-    "JV Amount": "JV Amount",
-    "Paid Advance Amount": "Paid Advance Amount",
-    "Ledger Balance": "Ledger Balance"
+    "totalPayable": "Total Payable",
+    "onAccountAmt": "On Account Amt",
+    "manualVoucher": "Manual Voucher",
+    "jVAmt": "JV Amount",
+    "paidAdvanceAmount": "Paid Advance Amount",
+    "ledgerBalance": "Ledger Balance"
   }
 
   async getDropDownList() {

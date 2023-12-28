@@ -18,16 +18,32 @@ export class VendorWiseOutService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-        
+          reqBody.collectionName = "vend_bill_payment"
+          const resvoucher = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+
           let venoutList = [];
 
           res.data.map((element, index) => {
-               
+
+               const voucherDet = resvoucher.data ? resvoucher.data.find((entry) => entry.bILLNO === element?.docNo) : null;
+               let voucher = 0;
+               let accountAmt = 0;
+               if (voucherDet) {
+                    voucher = voucherDet.vUCHNO;
+                    accountAmt = voucherDet.bILLAMT;
+               }
+
                let venoutData = {
-                    "lOC":element.lOC,
-                    "obDT":element.bDT,
+                    "lOC": element.eNTLOC,
+                    "obDT": element.bDT,
                     "srNo": element.srNo = index + 1,
-                    "Vendor":element.vND.nM||''
+                    "vendorCD": element?.vND.cD || '',
+                    "vendor": element?.vND.nM || '',
+                    "openingBal": element?.tHCAMT || '',
+                    "manualVoucher": voucher,
+                    "paidAdvanceAmount": element?.aDVAMT || '',
+                    "totalPayable": element?.gST.aMT || '',
+                    "onAccountAmt": accountAmt
                }
                venoutList.push(venoutData)
           })

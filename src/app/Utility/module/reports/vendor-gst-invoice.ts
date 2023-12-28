@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { formatDocketDate } from "../../commonFunction/arrayCommonFunction/uniqArray";
 @Injectable({
      providedIn: "root",
 })
@@ -24,13 +25,23 @@ export class VendorGSTInvoiceService {
           res.data.map((element) => {
                
                let vengstinvData = {
-                    "SAC":element.gST.sACNM,
                     "oentrydt": element.eNTDT,
+                    "SAC":element.gST.sACNM,
                     "DocumentType": element?.docNo || '',
-                    "TCS_Amount":element?.tHCAMT||'',
                     "GSTRATE":element.gST.rATE||'',
                     "TDS_Rate":element.tDS.rATE||'',
                     "TDS_Amount":element.tDS.aMT||'',
+                    "BILLNO":element?.docNo||'',
+                    "BILLDT":formatDocketDate(element?.bDT||''),
+                    "BILLSTATUS":element?.bSTATNM||'',
+                    "BillBanch":element?.eNTLOC||'',  
+                    "BillGenState":element?.eNTLOC||'', 
+                    "Generation_GSTNO":element?.gST.iGST||'',
+                    "Bill_Sub_At":element?.eNTLOC||'',  
+                    "TCS_Rate":element?.tDS.rATE||'',
+                    "TCS_Amount":element?.tDS.aMT||'',
+                    "MANUALBILLNO":element?.docNo||''
+                   
                }
                vengstinvList.push(vengstinvData)
           })

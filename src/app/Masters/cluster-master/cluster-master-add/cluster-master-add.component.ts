@@ -7,7 +7,8 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ClusterControl } from "src/assets/FormControls/cluster-master";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import Swal from "sweetalert2";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-cluster-master-add",
@@ -45,7 +46,9 @@ export class ClusterMasterAddComponent implements OnInit {
     private Route: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private storage: StorageService,
+
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
@@ -100,7 +103,7 @@ export class ClusterMasterAddComponent implements OnInit {
     this.Route.navigateByUrl("/Masters/ClusterMaster/ClusterMasterList");
   }
   //#region Pincode Dropdown
-  getPincodeData() {
+  async getPincodeData() {
     const pincodeValue = this.clusterTableForm.controls["pincode"].value;
 
     if (pincodeValue !== null && pincodeValue !== "") {
@@ -109,54 +112,52 @@ export class ClusterMasterAddComponent implements OnInit {
         collectionName: "pincode_master",
         filter: {},
       };
-      this.masterService.masterPost("generic/get", req).subscribe({
-        next: (res: any) => {
-          // Assuming the API response contains an array named 'pincodeList'
-          const pincodeList = res.data.map((element) => ({
-            name: element.PIN.toString(),
-            value: element.PIN.toString(),
-          }));
-          let filteredPincodeList = [];
-          if (Array.isArray(pincodeValue)) {
-            filteredPincodeList = pincodeList.filter((item) =>
-              pincodeValue.toString().includes(item.name.toString())
-            );
-          } else if (
-            typeof pincodeValue === "string" &&
-            pincodeValue.length >= 2
-          ) {
-            filteredPincodeList = pincodeList.filter((item) =>
-              item.name.toString().includes(pincodeValue)
-            );
-          }
-          let pincodedata = [];
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req))
+      // Assuming the API response contains an array named 'pincodeList'
+      const pincodeList = res.data.map((element) => ({
+        name: element.PIN.toString(),
+        value: element.PIN.toString(),
+      }));
+      let filteredPincodeList = [];
+      if (Array.isArray(pincodeValue)) {
+        filteredPincodeList = pincodeList.filter((item) =>
+          pincodeValue.toString().includes(item.name.toString())
+        );
+      } else if (
+        typeof pincodeValue === "string" &&
+        pincodeValue.length >= 2
+      ) {
+        filteredPincodeList = pincodeList.filter((item) =>
+          item.name.toString().includes(pincodeValue)
+        );
+      }
+      let pincodedata = [];
 
-          if (this.isUpdate) {
-            const pincode = this.clusterTabledata.pincode.split(",");
-            pincode.forEach((item) => {
-              pincodedata.push(
-                pincodeList.find(
-                  (element) => element.name.trim() == item.trim()
-                )
-              );
-            });
-            this.clusterTableForm.controls["pincodeDropdown"].patchValue(
-              pincodedata
-            );
-            console.log(pincodedata);
-          }
-          const data =
-            filteredPincodeList.length > 0 ? filteredPincodeList : pincodedata;
-
-          this.filter.Filter(
-            this.jsonControlArray,
-            this.clusterTableForm,
-            data,
-            this.pincodeList,
-            this.pincodeStatus
+      if (this.isUpdate) {
+        const pincode = this.clusterTabledata.pincode.split(",");
+        pincode.forEach((item) => {
+          pincodedata.push(
+            pincodeList.find(
+              (element) => element.name.trim() == item.trim()
+            )
           );
-        },
-      });
+        });
+        this.clusterTableForm.controls["pincodeDropdown"].patchValue(
+          pincodedata
+        );
+        //console.log(pincodedata);
+      }
+      const data =
+        filteredPincodeList.length > 0 ? filteredPincodeList : pincodedata;
+
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.clusterTableForm,
+        data,
+        this.pincodeList,
+        this.pincodeStatus
+      );
+
     } else {
       // Handle case when pincodeValue is null or blank
       console.log("Pincode value is null or blank. API call skipped.");
@@ -170,13 +171,14 @@ export class ClusterMasterAddComponent implements OnInit {
     // console.log("Toggle value :", event);
   }
   //#region Save Function
-  save() {
+  async save() {
+
     const pincodeDropdown =
       this.clusterTableForm.value.pincodeDropdown == ""
         ? []
         : this.clusterTableForm.value.pincodeDropdown.map(
-            (item: any) => item.name
-          );
+          (item: any) => item.name
+        );
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
     this.clusterTableForm.removeControl("pincodeDropdown");
 
@@ -184,78 +186,82 @@ export class ClusterMasterAddComponent implements OnInit {
     Object.values(this.clusterTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
-
+    let data = this.clusterTableForm.value;
     if (this.isUpdate) {
       let id = this.clusterTableForm.value._id;
       this.clusterTableForm.removeControl("_id");
+      data["mODDT"] = new Date();
+      data['mODLOC'] = this.storage.branch;
+      data['mODBY:'] = this.storage.userName;
       let req = {
         companyCode: this.companyCode,
         collectionName: "cluster_detail",
         filter: { _id: id },
-        update: this.clusterTableForm.value,
+        update: data,
       };
-      this.masterService.masterPut("generic/update", req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl(
-              "/Masters/ClusterMaster/ClusterMasterList"
-            );
-          }
-        },
-      });
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.Route.navigateByUrl(
+          "/Masters/ClusterMaster/ClusterMasterList"
+        );
+      }
+
     } else {
-      let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        collectionName: "cluster_detail",
-        filter: {},
-      };
-      this.masterService.masterPost("generic/get", req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            const SortData = res.data.sort((a, b) => (+a.clusterCode.substring(1) < +b.clusterCode.substring(1) ? -1 : Number(+a.clusterCode.substring(1) > +b.clusterCode.substring(1))));
-            const lastElement = SortData[SortData.length - 1];
-            const index = +lastElement.clusterCode.substring(1)
-            this.newClusterCode = `C${(index + 1).toString().padStart(4,"0")}`
-            const body = {
-              clusterCode: this.newClusterCode,
-              clusterName: this.clusterTableForm.value.clusterName,
-              pincode: this.clusterTableForm.value.pincode,
-              activeFlag: this.clusterTableForm.value.activeFlag,
-              _id: this.newClusterCode,
-              entryDate: new Date(),
-              companyCode: this.companyCode,
-            };
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "cluster_detail",
-              data: body,
-            };
-            this.masterService.masterPost("generic/create", req).subscribe({
-              next: (res: any) => {
-                if (res) {
-                  // Display success message
-                  Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                  });
-                  this.Route.navigateByUrl(
-                    "/Masters/ClusterMaster/ClusterMasterList"
-                  );
-                }
-              },
-            });
-          }
-        },
-      });
+
+      const sortedClusters = await this.getClusterList();
+
+      if (sortedClusters && sortedClusters.length > 0) {
+        const lastUsedCluster = sortedClusters[sortedClusters.length - 1];
+        const lastClusterCodeNumber = lastUsedCluster ? parseInt(lastUsedCluster.clusterCode.substring(1)) : 0;
+
+        // Function to generate a new cluster code
+        const generateNewClusterCode = (lastCode: number = 0) => {
+          const nextClusterCodeNumber = lastCode + 1;
+          const paddedNumber = nextClusterCodeNumber.toString().padStart(4, '0');
+          return `C${paddedNumber}`;
+        };
+
+        // Use the generated code
+        this.newClusterCode = generateNewClusterCode(lastClusterCodeNumber);
+        const body = {
+          clusterCode: this.newClusterCode,
+          clusterName: this.clusterTableForm.value.clusterName,
+          pincode: this.clusterTableForm.value.pincode,
+          activeFlag: this.clusterTableForm.value.activeFlag,
+          _id: this.newClusterCode,
+          companyCode: this.companyCode,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch,
+          eNTBY: this.storage.userName
+        };
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "cluster_detail",
+          data: body,
+        };
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
+
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.Route.navigateByUrl(
+            "/Masters/ClusterMaster/ClusterMasterList"
+          );
+        }
+      }
     }
   }
   //#endregion
@@ -288,35 +294,34 @@ export class ClusterMasterAddComponent implements OnInit {
       });
   }
   //#endregion
-  checkClusterExists() {
+  async checkClusterExists() {
+    const res = await this.getClusterList()
+    if (res) {
+      const clusterNameToCheck = this.clusterTableForm.controls.clusterName.value.toLowerCase();
+      const count = res.some((item) =>
+        item.clusterName.toLowerCase() === clusterNameToCheck);
+      if (count) {
+        Swal.fire({
+          text: `Cluster Name :${this.clusterTableForm.controls.clusterName.value} already exists! Please try with another`,
+          icon: 'warning',
+          title: 'Warning',
+          showConfirmButton: true,
+          confirmButtonText: "OK",
+        });
+        this.clusterTableForm.controls["clusterName"].reset();
+      }
+    }
+  }
+
+  //#region to get cluster List
+  async getClusterList() {
     let req = {
       companyCode: this.companyCode,
       collectionName: "cluster_detail",
       filter: {},
     };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const count = res.data.filter(
-            (item) =>
-              item.clusterName ==
-              this.clusterTableForm.controls.clusterName.value
-          );
-          if (count.length > 0) {
-            Swal.fire({
-              title: "Cluster Name already exists! Please try with another",
-              toast: true,
-              icon: "error",
-              showCloseButton: false,
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "OK",
-            });
-            this.clusterTableForm.controls["clusterName"].reset();
-          }
-        }
-      },
-    });
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+    return res.data.sort((a, b) => a._id.localeCompare(b._id));
   }
+  //#endregion
 }

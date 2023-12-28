@@ -34,7 +34,7 @@ export class BeneficiaryModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initialize();
-    // console.log(this.objResult);
+    console.log(this.objResult);
   }
   //#region to initialize beneficiaryControl
   initialize() {
@@ -86,13 +86,12 @@ export class BeneficiaryModalComponent implements OnInit {
   //#region to set image at the change of accountCode
   OnAccountChange() {
     const accountCode = this.beneficiaryDetailForm.value.accountCode
-    const isDuplicate = this.objResult.beneficiaryList.some((item) => item.accountCode === accountCode);
+    const isDuplicate = this.objResult.beneficiaryList.some((item) => item.accountCode === parseInt(accountCode));
     if (isDuplicate) {
       this.beneficiaryDetailForm.controls['accountCode'].setValue('');
       // Show an error message using Swal (SweetAlert)
       Swal.fire({
         text: `Account Code:${accountCode} already exists! Please try with another.`,
-        toast: true,
         icon: 'warning',
         title: 'Warning',
         showConfirmButton: true,
@@ -107,7 +106,7 @@ export class BeneficiaryModalComponent implements OnInit {
   //#region to upload Kyc image
   async uploadKYC(data) {
     const allowedFormats = ["jpeg", "png", "jpg"];
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadKYC", this.beneficiaryDetailForm, this.imageData, "Beneficiary", 'Master', this.jsonDetailControl,allowedFormats);
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadKYC", this.beneficiaryDetailForm, this.imageData, "Beneficiary", 'Master', this.jsonDetailControl, allowedFormats);
   }
   //#endregion
   //#region to preview image
@@ -121,4 +120,7 @@ export class BeneficiaryModalComponent implements OnInit {
     });
   }
   //#endregion
+  cancel() {
+    this.dialogRef.close()
+  }
 }

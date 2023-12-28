@@ -8,9 +8,10 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { BeneficiaryControl } from 'src/assets/FormControls/BeneficiaryMaster';
 import Swal from 'sweetalert2';
-import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { MatDialog } from '@angular/material/dialog';
 import { BeneficiaryModalComponent } from './beneficiary-modal/beneficiary-modal.component';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-add-beneficiary-master',
@@ -124,6 +125,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private dialog: MatDialog,
+    private storage: StorageService,
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.beneficiaryTabledata = this.route.getCurrentNavigation().extras.state.data;
@@ -223,6 +225,9 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     let data = convertNumericalStringsToInteger(this.beneficiaryHeaderForm.value)
     if (this.isUpdate) {
       let id = this.beneficiaryTabledata._id;
+      data["mODDT"] = new Date();
+      data['mODLOC'] = this.storage.branch;
+      data['mODBY:'] = this.storage.userName;
       data.otherdetails = newData;
       // Remove the "id" field from the form controls
       delete data._id;
@@ -232,7 +237,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         filter: { _id: id },
         update: data
       };
-      const res = await this.masterService.masterPut("generic/update", req).toPromise()
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
       if (res) {
         // Display success message
         Swal.fire({
@@ -250,10 +255,10 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         collectionName: "beneficiary_detail",
         filter: {},
       }
-      const response = await this.masterService.masterPost("generic/get", req).toPromise()
+      const response = await firstValueFrom(this.masterService.masterPost("generic/get", req))
       if (response) {
-        // Generate srno for each object in the array
-        const lastCode = response.data[response.data.length - 1];
+        const sortedData = response.data.sort((a, b) => a._id.localeCompare(b._id));
+        const lastCode = sortedData[sortedData.length - 1];
         const last_id = lastCode ? parseInt(lastCode._id.substring(1)) : 0;
         // Function to generate a new route code
         function generateVendorCode(initialCode: number = 0) {
@@ -264,13 +269,16 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         }
         this.newVendorCode = generateVendorCode(last_id);
         data._id = this.newVendorCode;
-        // console.log(data);
+        data["eNTDT"] = new Date();
+        data['eNTLOC'] = this.storage.branch;
+        data['eNTBY:'] = this.storage.userName;
+
         let req = {
           companyCode: this.companyCode,
           collectionName: "beneficiary_detail",
           data: data
         };
-        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
         if (res) {
           // Display success message
           Swal.fire({
@@ -300,7 +308,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     };
 
     // Make an asynchronous call to retrieve data from the master service
-    const result = await this.masterService.masterPost("generic/get", request).toPromise();
+    const result = await firstValueFrom(this.masterService.masterPost("generic/get", request));
     // Initialize an array to hold the dropdown data
     let dropdownData = [];
 
@@ -355,79 +363,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       console.log("failed");
     }
   }
-  //#region to add data to form
-  // async addData() {
-  //   if (this.beneficiaryDetailForm.valid) {
-  //     this.tableLoad = true;
-  //     this.isLoad = true;
-  //     const tableData = this.tableData;
-  //     const accountCode = this.beneficiaryDetailForm.controls.accountCode.value;
-  //     if (tableData.length > 0) {
-  //       // Check if the gstNumber already exists in tableData
-  //       const isDuplicate = this.tableData.some((item) => item.accountCode === accountCode);
 
-  //       if (isDuplicate) {
-  //         this.beneficiaryDetailForm.controls['accountCode'].setValue('');
-  //         // Show an error message using Swal (SweetAlert)
-  //         Swal.fire({
-  //           text: 'Account Code already exists! Please try with another.',
-  //           toast: true,
-  //           icon: 'warning',
-  //           title: 'Warning',
-  //           showConfirmButton: true,
-  //         });
-  //         this.tableLoad = false;
-  //         this.isLoad = false;
-  //         return false
-  //       }
-  //     }
-  //     const delayDuration = 1000;
-  //     // Create a promise that resolves after the specified delay
-  //     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  //     // Use async/await to introduce the delay
-  //     await delay(delayDuration);
-  //     const id = this.isEditable ? this.editableData.id : tableData.length + 1;
-  //     // const json = {
-  //     //   id: id,
-  //     //   accountCode: result.accountCode,
-  //     //   IFSCcode: this.beneficiaryDetailForm.value.IFSCcode,
-  //     //   bankName: this.beneficiaryDetailForm.value.bankName,
-  //     //   branchName: this.beneficiaryDetailForm.value.branchName,
-  //     //   city: this.beneficiaryDetailForm.value.city,
-  //     //   UPIId: this.beneficiaryDetailForm.value.UPIId,
-  //     //   uploadKYC: "Done",
-  //     //   contactPerson: this.beneficiaryDetailForm.value.contactPerson,
-  //     //   mobileNo: this.beneficiaryDetailForm.value.mobileNo,
-  //     //   emailId: this.beneficiaryDetailForm.value.emailId,
-  //     //   actions: ['Edit', 'Remove']
-  //     // }
-  //     // this.tableData.push(json);
-  //     // const filedata = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
-  //     // if (Object.keys(this.imageData).length !== 0) {
-  //     //   this.urlList = {
-  //     //     ...this.urlList,  // Initialize as an empty object if urlList is undefined
-  //     //     [json.accountCode]: filedata
-  //     //   };
-  //     // }
-  //     //this.beneficiaryDetailForm.reset();
-  //     this.initialize('', false)
-
-  //     //setting isFileSelected  
-  //     const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
-  //     control.additionalData.isFileSelected = true;
-  //     this.isLoad = false;
-  //     this.tableLoad = false;
-  //   } else {
-  //     Swal.fire({
-  //       text: 'Please Fill Beneficiary Details',
-  //       icon: "warning",
-  //       title: 'Warning',
-  //       showConfirmButton: true,
-  //     });
-  //     return false
-  //   }
-  // }
-  //#endregion
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
     if (data.label.label === 'Remove') {
@@ -499,14 +435,13 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       };
 
       // Make the API call and await the response
-      const res = await this.masterService.masterPost('generic/get', req).toPromise();
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));;
       const newBeneficiary = this.beneficiaryHeaderForm.value.beneficiary.value;
       const isDuplicate = res.data.some((item) => item.beneficiary === newBeneficiary);
       if (isDuplicate) {
         // Show an error message using Swal
         Swal.fire({
-          text: `Beneficiary : ${this.beneficiaryHeaderForm.value.beneficiary.name} already exists! Please try with another.`,
-          toast: true,
+          text: `Beneficiary : ${newBeneficiary} already exists! Please try with another.`,
           icon: 'warning',
           title: 'Warning',
           showConfirmButton: true,

@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { firstValueFrom } from "rxjs";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 @Component({
@@ -16,7 +17,7 @@ export class VehicletypeMasterListComponent implements OnInit {
     // Define column headers for the table
     columnHeader =
         {
-            "updatedDate": "Created Date",
+            "eNTDT": "Created Date",
             "vehicleTypeCode": "Vehicle Type Code",
             "vehicleTypeName": "Vehicle Type Name",
             "isActive": "Active",
@@ -53,50 +54,47 @@ export class VehicletypeMasterListComponent implements OnInit {
         this.getVehicleTypeDetails();
         this.csvFileName = "Vehicle Type Details"  //setting csv file Name so file will be saved as per this name
     }
-    // async getVehicleTypeDetails() {
-    //     let req = {
-    //         companyCode: this.companyCode,
-    //         collectionName: "vehicleType_detail",
-    //         filter: {}
-    //     }
-    //     const res = await this.masterService.masterPost("generic/get", req).toPromise()
-    //     if (res) {
-    //         // Generate srno for each object in the array
-    //         const dataWithSrno = res.data.map((obj, index) => {
-    //             return {
-    //                 ...obj,
-    //                 srNo: index + 1
-    //             };
-    //         });
-    //         this.csv = dataWithSrno;
-    //         this.tableLoad = false;
-    //     }
-    // }
-    getVehicleTypeDetails() {
-        const req = {
-          "companyCode": this.companyCode,
-          "filter": {},
-          "collectionName": "vehicleType_detail"
-        };
-        this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
-          if (res && res.data) {
-            const data = res.data;
-            // Sort the data based on updatedDate in descending order
-            const dataWithDate = data.sort((a, b) => new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime());
-            // Extract the updatedDate from the first element (latest record)
-            const latestUpdatedDate = dataWithDate.length > 0 ? dataWithDate[0].updatedDate : null;
-            // Use latestUpdatedDate as needed
-            this.csv = dataWithDate;
-            this.tableData = dataWithDate;
-          }
-          this.tableLoad = false;
-        });
-      }
+
+    //#region to get Vehicle Type list
+    async getVehicleTypeDetails() {
+        try {
+            const req = {
+                companyCode: this.companyCode,
+                filter: {},
+                collectionName: "vehicleType_detail"
+            };
+
+            const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+
+            if (res && res.data) {
+                const data = res.data;
+
+                const dataWithFormattedDate = data.map(obj => ({
+                    ...obj,
+                    eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
+                })).sort((a, b) => b._id.localeCompare(a._id));
+
+                // Use latestUpdatedDate as needed
+                this.csv = dataWithFormattedDate;
+                this.tableData = dataWithFormattedDate;
+            }
+        } catch (error) {
+            // Handle errors if required
+            console.error('Error fetching vehicle type details:', error);
+        } finally {
+            this.tableLoad = false;
+        }
+    }
+    //#endregion
     async isActiveFuntion(det) {
         let id = det._id;
         // Remove the "id" field from the form controls
         delete det._id;
         delete det.activeflag;
+        delete det.eNTDT
+        det['mODDT'] = new Date()
+        det['mODBY'] = localStorage.getItem("UserName")
+        det['mODLOC'] = localStorage.getItem("Branch")
         let req = {
             companyCode: this.companyCode,
             collectionName: "vehicleType_detail",

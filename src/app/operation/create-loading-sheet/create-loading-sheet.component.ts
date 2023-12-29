@@ -292,6 +292,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       collectionName: "docket",
       filter: {
         orgLoc: this.orgBranch,
+        isComplete:1,
         //destination: { 'D$in': nextLocs },        
         'D$or': [{ lsNo: { $exists: false } }, { lsNo: "" }],
       }

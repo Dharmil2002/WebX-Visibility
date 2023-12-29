@@ -826,15 +826,17 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
 
   bindTableData() {
-    
+     
     if (this.model.docketDetail.invoiceDetails.length > 0) {
       this.tableLoadIn = true;
       this.loadIn = true;
       const invoiceDetail = this.model.docketDetail.invoiceDetails.map((x, index) => {
-        if (!x || Object.values(x).every((value) => value === null || value === undefined)) {
+        if (!x || Object.values(x).every((value) => value === null || value === undefined||value === undefined)) {
           return null; // If x is null or all properties of x are null or undefined, return null
         }
-
+        if(!x.iNVNO){
+          return null;
+        }
         // You can use 'x' and 'index' here
         x.id = index + 1;
         x.ewayBillNo = `${x.eWBNO}`;
@@ -886,6 +888,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           if (x) {
             if (Object.values(x).every((value) => !value)) {
               return null; // If all properties of x are empty, return null
+            }
+            if(!x.cNID){
+              return null;
             }
             // Modify 'x' if needed
             // For example, you can add the index to the element

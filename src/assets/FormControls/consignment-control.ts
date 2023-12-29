@@ -516,14 +516,14 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
+        name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number',type: 'mobile-number',
         value: docketDetail.cncontactNumber, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "consignee"
         }
       },
       {
-        name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
+        name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No',type: 'mobile-number',
         value: docketDetail.cnalternateContactNo, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "consignee"

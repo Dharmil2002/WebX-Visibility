@@ -1,12 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GenericViewTableComponent } from 'src/app/shared-components/generic-view-table/generic-view-table.component';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { SubmitionControl } from 'src/assets/FormControls/billing-invoice/bill-Submition';
 
 @Component({
@@ -16,6 +17,7 @@ import { SubmitionControl } from 'src/assets/FormControls/billing-invoice/bill-S
 export class BillSubmissionComponent implements OnInit {
   billSubmition: UntypedFormGroup;
   jsonControlArray: FormControls[];
+  uploadedFiles: File[];
   shipmentDetails: any;
   isChagesValid: boolean = false;
   imageData: any = {};
@@ -24,6 +26,7 @@ export class BillSubmissionComponent implements OnInit {
     private objImageHandling: ImageHandling, 
     private invoiceService: InvoiceServiceService,
     private storage: StorageService,
+    private dialog: MatDialog,
     public dialogRef: MatDialogRef<GenericViewTableComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
     ) { 
@@ -36,7 +39,7 @@ export class BillSubmissionComponent implements OnInit {
 
   functionCallHandler(event) {
     try {
-      this[event.functionName](event.data);
+      this[event.functionName](event);
     } catch (error) {
     }
   }
@@ -47,13 +50,21 @@ export class BillSubmissionComponent implements OnInit {
     this.billSubmition = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   
-  GetFileList(data) {
-    
-    this.imageData =  this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
-    billSubmition, this.imageData, "BillSubmit", 'Finance', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
-    console.log(this.imageData);
-
+  async GetFileList(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData =  await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+    billSubmition, this.imageData, "BillSubmit", 'Finance', this.jsonControlArray, allowedFormats);
   }
+    //#region to preview image
+    openImageDialog(control) {
+      const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+      this.dialog.open(ImagePreviewComponent, {
+        data: { imageUrl: file },
+        width: '30%',
+        height: '50%',
+      });
+    }
+    //#endregion
   async save(){
     const filter={
       bILLNO:this.shipmentDetails?.bILLNO

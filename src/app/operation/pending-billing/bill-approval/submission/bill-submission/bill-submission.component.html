@@ -1,6 +1,6 @@
 <form [formGroup]="billSubmition">
     <app-form-webxpress [form]="billSubmition" [FormTitle]="'Bill Submition'" [formData]="jsonControlArray"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+        (functionCallEmitter)="functionCallHandler($event)"  [uploadedFiles]="uploadedFiles" [showSaveAndCancelButton]="true"
         (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
 </form>

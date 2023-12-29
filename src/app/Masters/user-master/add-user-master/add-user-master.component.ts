@@ -361,7 +361,8 @@ export class AddUserMasterComponent implements OnInit {
       if (this.isUpdate) {
         data["mODDT"] = new Date();
         data['mODLOC'] = this.storage.branch;
-        data['mODBY:'] = this.storage.userName; let req = {
+        data['mODBY'] = this.storage.userName;
+        let req = {
           companyCode: this.companyCode,
           collectionName: "user_master",
           filter: {
@@ -384,7 +385,7 @@ export class AddUserMasterComponent implements OnInit {
       } else {
         data["eNTDT"] = new Date();
         data['eNTLOC'] = this.storage.branch;
-        data['eNTBY:'] = this.storage.userName;
+        data['eNTBY'] = this.storage.userName;
         const id = { _id: this.userTableForm.controls["userId"].value };
         const mergedObject = { ...data, ...id };
         let req = {

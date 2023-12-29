@@ -405,47 +405,6 @@ export class UserControl {
         generatecontrol: false,
         disable: false,
       },
-      {
-        name: "entryBy",
-        label: "Entry By",
-        placeholder: "Entry By",
-        type: "text",
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
-      {
-        name: "updateBy",
-        label: "Update By",
-        placeholder: "Update By",
-        type: "text",
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
-      {
-        name: "isUpdate",
-        label: "IsUpdate",
-        placeholder: "IsUpdate",
-        type: "text",
-        value: false,
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
-      {
-        name: "companyCode",
-        label: "Company Code",
-        placeholder: "Company Code",
-        type: "text",
-        value: parseInt(localStorage.getItem("companyCode")),
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
-
       //   ---------------Add support Controllers at last -----------------------
       {
         name: "userLocationscontrolHandler",
@@ -472,20 +431,7 @@ export class UserControl {
           },
         ],
 
-      },
-      {
-        name: "entryDate",
-        label: "Entry Date",
-        placeholder: "Select Entry Date",
-        type: "date",
-        value: new Date(), // Set the value to the current date
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
+      }      
     ];
   }
   getFormControlsUser() {

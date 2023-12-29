@@ -1,12 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { debug } from "console";
-import { ApiTracking } from "src/app/core/models/apitracking/api-tracking";
+import { firstValueFrom } from "rxjs";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
-import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
-import { geoDataServices } from "src/app/operation/error-handing/outbox-utility";
 import Swal from "sweetalert2";
-
 @Component({
     selector: 'app-user-master-list',
     templateUrl: './user-master-list.component.html'
@@ -19,8 +15,6 @@ export class UserMasterListComponent implements OnInit {
     csvFileName: string;
     toggleArray = ["isActive"];
     linkArray = [];
-    retryCount = 0;
-    maxRetries = 3;
     csv: any;
     dynamicControls = {
         add: true,
@@ -35,7 +29,7 @@ export class UserMasterListComponent implements OnInit {
         },
     ];
     columnHeader = {
-        "entryDate": "Created Date",
+        "eNTDT": "Created Date",
         "userId": "User Code",
         "name": "User Name",
         "multiLocation": "Locations",
@@ -59,7 +53,7 @@ export class UserMasterListComponent implements OnInit {
         "userType": 'UserType',
         "multiDivisionAccess": 'Multi Division Access',
         "entryBy": 'EntryBy',
-        "entryDate": 'Entry Date',
+        "eNTDT": 'Entry Date',
         "isActive": 'Activeflag'
     };
 
@@ -68,42 +62,34 @@ export class UserMasterListComponent implements OnInit {
         this.addAndEditPath = "/Masters/UserMaster/AddUser";
         this.getUserDetails();
     }
-    constructor(
-        private masterService: MasterService,
-    ) {
-    }
-
+    constructor(private masterService: MasterService,) { }
+    //#region to get user list
     async getUserDetails() {
-        let req = {
-            "companyCode": this.companyCode,
-            "collectionName": "user_master",
-            "filter": {}
-        };
         try {
-            const res = await this.masterService.masterPost("generic/get", req).toPromise()
-            if (res) {
-                // Generate srno for each object in the array
-                const dataWithSrno = res.data.map((obj, index) => {
-                    return {
-                        ...obj,
-                        //srNo: index + 1
-                    };
-                });
-                const sortedData = dataWithSrno.sort((a, b) => {
-                    const dateA: Date | any = new Date(a.entryDate);
-                    const dateB: Date | any = new Date(b.entryDate);
+            const req = {
+                companyCode: this.companyCode,
+                collectionName: "user_master",
+                filter: {}
+            };
 
-                    // Compare the date objects
-                    return dateB - dateA; // Sort in descending order
-                });
-                this.csv = sortedData;
+            const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+            if (res && res.data && Array.isArray(res.data)) {
+                const dataWithFormattedDate = res.data.map(obj => ({
+                    ...obj,
+                    eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
+                })).sort((a, b) => b._id.localeCompare(a._id));
+
+                this.csv = dataWithFormattedDate;
                 this.tableLoad = false;
+            } else {
+                console.error("No data found");
             }
-
         } catch (error) {
-
+            console.error("Error fetching user details:", error);
         }
     }
+    //#endregion
 
     functionCallHandler($event) {
         // console.log("fn handler called", $event);
@@ -122,16 +108,17 @@ export class UserMasterListComponent implements OnInit {
         let id = det._id;
         // Remove the "id" field from the form controls
         delete det._id;
-        delete det.srNo;
+        delete det.eNTDT
+        det['mODDT'] = new Date()
+        det['mODBY'] = localStorage.getItem("UserName")
+        det['mODLOC'] = localStorage.getItem("Branch")
         let req = {
             companyCode: parseInt(localStorage.getItem("companyCode")),
             collectionName: "user_master",
-            filter: {
-                _id: id,
-            },
+            filter: { _id: id, },
             update: det
         };
-        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
         if (res) {
             // Display success message
             Swal.fire({
@@ -143,7 +130,4 @@ export class UserMasterListComponent implements OnInit {
             this.getUserDetails();
         }
     }
-    // Function to make the API call as a promise with retry logic
-
-
 }

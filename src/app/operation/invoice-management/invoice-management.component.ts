@@ -96,13 +96,10 @@ export class InvoiceManagementComponent implements OnInit {
     private DashboardFilterPage: FormBuilder,
     private storage:StorageService
   ) {
-    ;
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
       end: new FormControl(),    // Create a form control for end date
     });
-    this.getKpiCount();
-
   }
 
   ngOnInit(): void {
@@ -119,7 +116,6 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   async get() {
-    
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
     const requestData={
@@ -134,6 +130,7 @@ export class InvoiceManagementComponent implements OnInit {
     // Format the start and end dates using DatePipe
    this.tableData = detail.filter((item) => item.pendColAmt != 0 || item.penApAmt != 0);
     this.tableLoad = false;
+    this.getKpiCount();
   }
 
   functionCallHandler(event) {
@@ -145,6 +142,7 @@ export class InvoiceManagementComponent implements OnInit {
     }
   }
    getKpiCount() {
+    const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
     const createShipDataObject = (
       count: number,
       title: string,
@@ -155,7 +153,7 @@ export class InvoiceManagementComponent implements OnInit {
       class: `info-box7 ${className} order-info-box7`,
     });
     const pendingBilling = [
-      createShipDataObject(3, "Invoice Generated", "bg-c-Bottle-light"),
+      createShipDataObject(invoiceGenerated, "Invoice Generated", "bg-c-Bottle-light"),
       createShipDataObject(1000, "Unbilled Amount", "bg-c-Grape-light"),
       createShipDataObject(1400, "Pending Approval", "bg-c-Daisy-light"),
       createShipDataObject(250, "Pending PODs", "bg-c-Grape-light"),

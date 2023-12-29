@@ -114,12 +114,26 @@ export class InvoiceCollectionComponent implements OnInit {
     private storage: StorageService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
-
+     
       this.invoiceDetail = this.router.getCurrentNavigation()?.extras?.state.data.columnData;
+      if(this.invoiceDetail.pendCol==0){
+        this.alertForTheZeroAmt()
+      }
     }
     this.backPath = "/dashboard/Index?tab=Management​";
 
     this.initializeFormControl();
+  }
+  alertForTheZeroAmt() {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Warning',
+      text: 'No invoice available for collection',
+      timer: 2000,
+      showCancelButton: false,
+      showConfirmButton: false
+    });
+    this.tab('Management​');
   }
 
   ngOnInit(): void {

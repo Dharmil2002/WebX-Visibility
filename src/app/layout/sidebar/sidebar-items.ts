@@ -81,23 +81,24 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
-              "path": "Masters/AccountMaster/ListAccount",
+              "path": "Masters/AccountMaster/AccountMasterList",
               "title": "Account Master",
               "moduleName": "Account Master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,
-              "submenu": []
+              "submenu": [
+              ]
             },
-            {
-              "path": "Masters/AccountMaster/ListAccountGroup",
-              "title": "Account Group Master",
-              "moduleName": "Account Group Master",
-              "icon": "",
-              "class": "ml-menu",
-              "groupTitle": false,
-              "submenu": []
-            },
+            // {
+            //   "path": "Masters/AccountMaster/ListAccountGroup",
+            //   "title": "Account Group Master",
+            //   "moduleName": "Account Group Master",
+            //   "icon": "",
+            //   "class": "ml-menu",
+            //   "groupTitle": false,
+            //   "submenu": []
+            // },
             {
               "path": "Masters/AccountMaster/BankAccountMasterList",
               "title": "Bank Account Master",
@@ -323,16 +324,6 @@ export const ROUTES: RouteInfo[] =
           "class": "ml-menu",
           "groupTitle": false,
           "submenu": [
-            {
-              "path": "Masters/AccountMaster/AccountMasterList",
-              "title": "Account Master",
-              "moduleName": "Account Master",
-              "icon": "",
-              "class": "ml-menu",
-              "groupTitle": false,
-              "submenu": [
-              ]
-            },
             {
               "path": "Masters/CustomerGroupMaster/CustomerGroupMasterList",
               "title": "Customer Group Master",

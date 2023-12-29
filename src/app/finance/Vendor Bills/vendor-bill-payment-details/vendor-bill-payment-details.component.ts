@@ -620,7 +620,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           // TotalTHCAmount: item.TotalTHCAmount,
           // AdvancePayedAmount: item.AdvancePayedAmount,
           // billAmount: item.billAmount,
-          PaymentAmount: item.pendingAmount - item.paymentAmount,
+          PaymentAmount: item.paymentAmount,
           // PendingAmount: item.pendingAmount - item.paymentAmount,
           ispartial: (item.pendingAmount - item.paymentAmount) == 0 ? false : true,
         }

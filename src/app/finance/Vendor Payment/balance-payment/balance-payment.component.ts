@@ -16,8 +16,10 @@ import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucher
 import { Router } from "@angular/router";
 import {
   GetAdvancePaymentListFromApi,
+  GetSingleVendorBillDetailsFromApi,
   GetSingleVendorDetailsFromApi,
   GetStateListFromAPI,
+  GetTHCListBasdedOnBillNumberFromApi,
 } from "../VendorPaymentAPIUtitlity";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
@@ -33,7 +35,7 @@ import {
 import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
-import { filter } from "rxjs/operators";
+import { filter, map } from "rxjs/operators";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BlancePaymentPopupComponent } from "../Modal/blance-payment-popup/blance-payment-popup.component";
 import { StorageService } from "src/app/core/service/storage.service";
@@ -150,13 +152,14 @@ export class BalancePaymentComponent implements OnInit {
   BillbookingstateStatus: any;
   VendorbillstateCode: any;
   VendorbillstateStatus: any;
-  PaymentData: any;
+  BillPaymentData: any;
   TDSdata: any;
   AdvanceTotal: number;
   BalancePending: number;
   THCamount: number;
   AlljsonControlVendorBalanceTaxationTDSFilterArray: any;
-
+  IsModifyAction = false;
+  GSTSACcodeData: any;
   constructor(
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -168,8 +171,38 @@ export class BalancePaymentComponent implements OnInit {
     private storage: StorageService,
     private route: Router // public dialog: MatDialog
   ) {
-    this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
-    if (this.PaymentData) {
+    // this.BillPaymentData = {
+    //   "vendor": "8888 : Krupesh",
+    //   "_id": "10065-VB/MUMB/2324/000015",
+    //   "vnCode": 8888,
+    //   "vnName": "Krupesh",
+    //   "billType": "Vendor Bill",
+    //   "billNo": "VB/MUMB/2324/000015",
+    //   "Date": "28/12/2023",
+    //   "TotalTHCAmount": 5000,
+    //   "AdvancePayedAmount": 1000,
+    //   "billAmount": 4000,
+    //   "pendingAmount": 4000,
+    //   "paymentAmount": 4000,
+    //   "Status": "Awaiting Approval",
+    //   "StatusCode": 1,
+    //   "vPan": "CASPJ2345J",
+    //   "actions": [
+    //     "Approve Bill",
+    //     "Hold Payment",
+    //     "Cancel Bill",
+    //     "Modify"
+    //   ],
+    //   "isSelected": false
+    // }
+    this.BillPaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
+    this.IsModifyAction = this.route.getCurrentNavigation()?.extras?.state?.Type == "Modify" ? true : false;
+
+    if (this.BillPaymentData) {
+      if (this.IsModifyAction) {
+        this.BillPaymentData.Vendor = this.BillPaymentData.vendor;
+      }
+
     } else {
       this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
     }
@@ -177,7 +210,8 @@ export class BalancePaymentComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFormControl();
-    this.GetABalancePaymentList();
+    this.GetBalancePaymentList();
+
     this.TotalAmountList = [
       {
         count: "0.00",
@@ -196,45 +230,21 @@ export class BalancePaymentComponent implements OnInit {
       },
     ];
   }
-
-  async GetABalancePaymentList() {
-    this.isTableLode = false;
-    const Filters = {
-      PaymentType: "Balance",
-      StartDate: this.PaymentData?.StartDate,
-      EndDate: this.PaymentData?.EndDate,
-      VendorInfo: this.PaymentData?.VendorInfo,
-    };
-
-    const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
-      this.masterService,
-      Filters
-    );
-
-    console.log("GetAdvancePaymentData", GetAdvancePaymentData);
-
-    const Data = GetAdvancePaymentData.map((x, index) => {
-      return {
-        GenerationDate: x.GenerationDate,
-        VehicleNumber: x.VehicleNumber,
-        Advance: x.Advance,
-        BalancePending: x.OthersData.bALAMT,
-        THC: x.THC,
-        THCamount: x.THCamount,
-        OthersData: x,
-        isSelected: false,
-      };
-    });
-    this.tableData = Data;
-    this.isTableLode = true;
-    this.selectCheckBox();
-  }
-
   initializeFormControl(): void {
-    let RequestObj = {
-      VendorPANNumber: this.PaymentData?.VendorInfo?.pAN || "",
-      Numberofvehiclesregistered: "0",
-    };
+    let RequestObj;
+    if (this.IsModifyAction) {
+      RequestObj = {
+        VendorPANNumber: this.BillPaymentData?.vPan || "",
+        Numberofvehiclesregistered: "0",
+      };
+    }
+    else {
+      RequestObj = {
+        VendorPANNumber: this.BillPaymentData?.VendorInfo?.pAN || "",
+        Numberofvehiclesregistered: "0",
+      };
+    }
+
     this.vendorBalancePaymentControl = new VendorBalancePaymentControl(
       RequestObj
     );
@@ -246,8 +256,6 @@ export class BalancePaymentComponent implements OnInit {
       this.jsonControlVendorBalanceTaxationTDSFilterArray,
     ]);
 
-    // this.jsonControlVendorBalanceTaxationGSTFilterArray =
-    // const GSTinputType = ['SGSTRate', 'UGSTRate', 'CGSTRate', 'IGSTRate'];
     this.AlljsonControlVendorBalanceTaxationGSTFilterArray =
       this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
     this.jsonControlVendorBalanceTaxationGSTFilterArray =
@@ -267,9 +275,9 @@ export class BalancePaymentComponent implements OnInit {
     this.PaymentHeaderFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlPaymentHeaderFilterArray,
     ]);
-    this.bindDropDwon();
+    this.BindDropDowns();
   }
-  bindDropDwon() {
+  BindDropDowns() {
     this.jsonControlVendorBalanceTaxationTDSFilterArray.forEach((data) => {
       if (data.name == "TDSSection") {
         this.TDSSectionCodeCode = data.name;
@@ -296,6 +304,112 @@ export class BalancePaymentComponent implements OnInit {
     });
   }
 
+  async GetBalancePaymentList() {
+    this.isTableLode = false;
+    let Filters
+
+    if (this.IsModifyAction) {
+      var StartDate = new Date();
+
+      // Subtract 30 days
+      StartDate.setDate(StartDate.getDate() - 30);
+      Filters = {
+        PaymentType: "Balance",
+        StartDate: StartDate,
+        EndDate: new Date(),
+        VendorInfo: {
+          cD: this.BillPaymentData?.vnCode,
+          nM: this.BillPaymentData?.vnName,
+        }
+      }
+    } else {
+      Filters = {
+        PaymentType: "Balance",
+        StartDate: this.BillPaymentData?.StartDate,
+        EndDate: this.BillPaymentData?.EndDate,
+        VendorInfo: this.BillPaymentData?.VendorInfo,
+      }
+    }
+
+    const GetAdvanceBillPaymentData = await GetAdvancePaymentListFromApi(
+      this.masterService,
+      Filters
+    );
+
+
+    const Data = GetAdvanceBillPaymentData.map((x, index) => {
+      return {
+        GenerationDate: x.GenerationDate,
+        VehicleNumber: x.VehicleNumber,
+        Advance: x.Advance,
+        BalancePending: x.OthersData.bALAMT,
+        THC: x.THC,
+        THCamount: x.THCamount,
+        OthersData: x,
+        isSelected: false,
+      };
+    });
+    if (this.IsModifyAction) {
+      const GetBillData = await GetTHCListBasdedOnBillNumberFromApi(
+        this.masterService,
+        this.BillPaymentData?.billNo
+      );
+      const MappedGetBillData = GetBillData.map((x, index) => {
+        return {
+          GenerationDate: x.GenerationDate,
+          VehicleNumber: x.VehicleNumber,
+          Advance: x.Advance,
+          BalancePending: x.OthersData.bALAMT,
+          THC: x.THC,
+          THCamount: x.THCamount,
+          OthersData: x,
+          isSelected: true,
+        }
+      });
+      this.tableData = [MappedGetBillData, Data].flat();
+    } else {
+      this.tableData = Data;
+    }
+
+    this.isTableLode = true;
+    this.selectCheckBox();
+    if (this.IsModifyAction) {
+      this.GetBillDetails();
+    }
+  }
+  async GetBillDetails() {
+
+    const BillDetails = await GetSingleVendorBillDetailsFromApi(
+      this.masterService,
+      this.BillPaymentData?.billNo
+    );
+    // Set TDS Sections
+    const FindData = this.TDSdata.find((x) => x.value == BillDetails?.tDS?.sEC);
+    this.VendorBalanceTaxationTDSFilterForm.get("TDSExempted").setValue(BillDetails?.tDS?.eXMT);
+    this.VendorBalanceTaxationTDSFilterForm.get("TDSSection").setValue(FindData);
+    this.VendorBalanceTaxationTDSFilterForm.get("TDSRate").setValue(BillDetails?.tDS?.rATE);
+    this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount").setValue(BillDetails?.tDS?.aMT);
+
+    // Set GST Sections
+    const SacCode = this.GSTSACcodeData.find((x) => x.value == BillDetails?.gST?.sAC);
+
+    this.VendorBalanceTaxationGSTFilterForm.get("VendorGSTRegistered").setValue(BillDetails?.vND?.gSTREG);
+    this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode").setValue(SacCode);
+    const BillBookingState = this.StateList.find((x) => x.value == BillDetails?.sT);
+    const VendorBillState = this.StateList.find((x) => x.value == BillDetails?.vND?.sT);
+
+    this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate").setValue(BillBookingState);
+    this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate").setValue(VendorBillState);
+    this.VendorBalanceTaxationGSTFilterForm.get("GSTType").setValue(BillDetails?.gST?.tYP);
+    this.VendorBalanceTaxationGSTFilterForm.get("GSTNumber").setValue(BillDetails?.vND?.gSTIN);
+    this.VendorBalanceTaxationGSTFilterForm.get("VGSTNumber").setValue(BillDetails?.gSTIN);
+
+
+    // Calculate And Set GST Data Based On State
+    this.StateChange();
+
+  }
+
   async getSACcodeDropdown() {
     let req = {
       companyCode: this.companyCode,
@@ -306,7 +420,7 @@ export class BalancePaymentComponent implements OnInit {
       this.masterService.masterPost("generic/get", req)
     );
     if (res.success) {
-      const GSTSACcodeData = res.data.map((x) => {
+      this.GSTSACcodeData = res.data.map((x) => {
         return {
           ...x,
           name: x.SNM,
@@ -316,7 +430,7 @@ export class BalancePaymentComponent implements OnInit {
       this.filter.Filter(
         this.jsonControlVendorBalanceTaxationGSTFilterArray,
         this.VendorBalanceTaxationGSTFilterForm,
-        GSTSACcodeData,
+        this.GSTSACcodeData,
         this.GSTSACcodeCode,
         this.GSTSACcodeStatus
       );
@@ -351,33 +465,35 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   async GetVendorInformation() {
-    const companyCode = this.storage.companyCode;
-    const filter = { vendorCode: this.PaymentData?.VendorInfo?.cD };
-    const req = { companyCode, collectionName: "vendor_detail", filter };
-    const res: any = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
+    if (!this.IsModifyAction) {
+      const companyCode = this.storage.companyCode;
+      const filter = { vendorCode: this.BillPaymentData?.VendorInfo?.cD };
+      const req = { companyCode, collectionName: "vendor_detail", filter };
+      const res: any = await firstValueFrom(
+        this.masterService.masterPost("generic/get", req)
+      );
 
-    if (res.success && res.data.length != 0) {
-      this.VendorDetails = res.data[0];
-      console.log("this.VendorDetails", this.VendorDetails);
+      if (res.success && res.data.length != 0) {
+        this.VendorDetails = res.data[0];
+        console.log("this.VendorDetails", this.VendorDetails);
 
-      if (this.VendorDetails?.otherdetails) {
-        this.VendorBalanceTaxationGSTFilterForm.controls.VendorGSTRegistered.setValue(
-          true
-        );
-        this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.setValue(
-          this.VendorDetails?.otherdetails[0]?.gstNumber
-        );
-        const getValue = this.StateList.find(
-          (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
-        );
-        console.log("getValue", getValue);
-        this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.setValue(
-          getValue || ""
-        );
+        if (this.VendorDetails?.otherdetails) {
+          this.VendorBalanceTaxationGSTFilterForm.controls.VendorGSTRegistered.setValue(
+            true
+          );
+          this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.setValue(
+            this.VendorDetails?.otherdetails[0]?.gstNumber
+          );
+          const getValue = this.StateList.find(
+            (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
+          );
+          console.log("getValue", getValue);
+          this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.setValue(
+            getValue || ""
+          );
+        }
+        console.log("VendorDetails", res);
       }
-      console.log("VendorDetails", res);
     }
   }
 
@@ -469,7 +585,7 @@ export class BalancePaymentComponent implements OnInit {
   }
   THCAmountFunction(event) {
     const RequestBody = {
-      PaymentData: this.PaymentData,
+      BillPaymentData: this.BillPaymentData,
       THCData: event?.data,
       Type: "balance",
     };
@@ -485,7 +601,7 @@ export class BalancePaymentComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         if (result.success) {
-          this.GetABalancePaymentList();
+          this.GetBalancePaymentList();
         }
       }
     });
@@ -550,13 +666,17 @@ export class BalancePaymentComponent implements OnInit {
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTdata);
+        this.VendorBalanceTaxationGSTFilterForm.get("GSTType").setValue("IGST");
+
       } else if (IsStateTypeUT) {
         this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTdata);
+        this.VendorBalanceTaxationGSTFilterForm.get("GSTType").setValue("IGST");
       } else if (
         !IsStateTypeUT &&
         Billbookingstate.name != Vendorbillstate.name
       ) {
         this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTdata);
+        this.VendorBalanceTaxationGSTFilterForm.get("GSTType").setValue("CGST/SGST");
       }
     }
   }
@@ -613,7 +733,7 @@ export class BalancePaymentComponent implements OnInit {
       // Fetch beneficiary details from API
       const beneficiaryModalData =
         await this.objVendorBillService.getBeneficiaryDetailsFromApi(
-          this.PaymentData.Vendor
+          this.BillPaymentData.Vendor
         );
 
       // Check if beneficiary data is available
@@ -686,28 +806,28 @@ export class BalancePaymentComponent implements OnInit {
               docNo: "",
               bDT: new Date(),
               lOC: this.VendorDetails?.vendorCity,
-              sT: this.VendorDetails?.vendorState,
-              gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
+              sT: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
+              gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.VGSTNumber.value,
               tHCAMT: this.THCamount,
               aDVAMT: this.AdvanceTotal,
               bALAMT: this.BalancePending,
               rOUNOFFAMT: 0,
               bALPBAMT: generateVoucher == true ? 0 : this.BalancePending,
-              bSTAT: generateVoucher == true ? 3 : 1,
+              bSTAT: generateVoucher == true ? 4 : 1,
               bSTATNM: generateVoucher == true ? "Paid" : "Awaiting Approval",
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
               vND: {
-                cD: this.PaymentData?.VendorInfo?.cD,
-                nM: this.PaymentData?.VendorInfo?.nM,
-                pAN: this.PaymentHeaderFilterForm.get("VendorPANNumber").value,
+                cD: this.BillPaymentData?.VendorInfo?.cD,
+                nM: this.BillPaymentData?.VendorInfo?.nM,
+                pAN: this.PaymentHeaderFilterForm.controls.VendorPANNumber?.value,
                 aDD: this.VendorDetails?.vendorAddress,
                 mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
                 eML: this.VendorDetails?.emailId,
-                gSTREG: this.VendorDetails?.otherdetails?.[0].gstNumber ? true : false,
-                sT: this.VendorDetails?.otherdetails?.[0].gstState,
-                gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
+                gSTREG: this.VendorBalanceTaxationGSTFilterForm.controls.VendorGSTRegistered.value,
+                sT: this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.value?.value,
+                gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.value,
               },
               tDS: {
                 eXMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted,
@@ -745,31 +865,31 @@ export class BalancePaymentComponent implements OnInit {
               }
             })
           };
+          await
+            firstValueFrom(this.voucherServicesService
+              .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
+                if (generateVoucher) {
+                  this.SubmitVoucherData(PaymenDetails, res?.data.data.ops[0].docNo)
+                } else {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Bill Generated Successfully",
+                    text: "Bill No: " + res?.data.data.ops[0].docNo,
+                    showConfirmButton: true,
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      Swal.hideLoading();
+                      setTimeout(() => {
+                        Swal.close();
+                        this.RedirectToTHCPayment()
+                      }, 1000);
+                    }
+                  });
+                }
+              }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+              .finally(() => {
 
-          firstValueFrom(this.voucherServicesService
-            .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
-              if (generateVoucher) {
-                this.SubmitVoucherData(PaymenDetails, res?.data.data.ops[0].docNo)
-              } else {
-                Swal.fire({
-                  icon: "success",
-                  title: "Bill Generated Successfully",
-                  text: "Bill No: " + res?.data.data.ops[0].docNo,
-                  showConfirmButton: true,
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    Swal.hideLoading();
-                    setTimeout(() => {
-                      Swal.close();
-                      this.RedirectToTHCPayment()
-                    }, 1000);
-                  }
-                });
-              }
-            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-            .finally(() => {
-
-            });
+              });
         } catch (error) {
           this.snackBarUtilityService.ShowCommonSwal("error", error);
         }

@@ -91,7 +91,7 @@ export class VendorBillListComponent implements OnInit {
     { label: 'Hold Payment' },
     { label: 'Unhold Payment' },
     { label: 'Cancel Bill' },
-    // { label: 'Modify' },
+    { label: 'Modify' },
   ]
   menuActionsItems = [
     // { label: 'Approve Bill', id: 1, type: 'Action' },
@@ -134,7 +134,7 @@ export class VendorBillListComponent implements OnInit {
             'Approve Bill',
             'Hold Payment',
             'Cancel Bill',
-            // 'Modify'
+            'Modify'
           ]
         }
         if (element.StatusCode === 2) {
@@ -235,7 +235,9 @@ export class VendorBillListComponent implements OnInit {
           updateData = this.createUpdateData("Approved");
           break;
         case 'Modify':
-          this.route.navigateByUrl("/Finance/VendorPayment/BalancePayment");
+          this.route.navigate(["/Finance/VendorPayment/BalancePayment"], {
+            state: { data: data.data, Type: "Modify", },
+          });
           break;
         case 'Bill Payment':
           this.route.navigate(["/Finance/VendorPayment/VendorBillPaymentDetails"], {

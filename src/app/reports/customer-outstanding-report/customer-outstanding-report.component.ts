@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -27,6 +27,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
   jsonCustOutFormArray: any
   CustOutTableForm: UntypedFormGroup
   custoutFormControl: custOutControl
+  protected _onDestroy = new Subject<void>();
   locName: any;
   locStatus: any;
   custName: any;
@@ -102,6 +103,22 @@ export class CustomerOutstandingReportComponent implements OnInit {
     this.CustOutTableForm = formGroupBuilder(this.fb, [this.jsonCustOutFormArray]);
   }
 
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonCustOutFormArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonCustOutFormArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.CustOutTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+
   async getDropDownList() {
     const locationList = await this.locationService.getLocationList();
     let custNameReq = {
@@ -169,7 +186,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
+    // Convert the selected data to a CSV string
     const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

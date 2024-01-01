@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -27,6 +27,7 @@ export class VendorOutstandingReportComponent implements OnInit {
   VendWiseOutTableForm: UntypedFormGroup
   jsonVendWiseOutFormArray: any
   vendoutFormControl: vendOutControl
+  protected _onDestroy = new Subject<void>();
   locName: any;
   locStatus: any;
   vendorName: any;
@@ -89,7 +90,21 @@ export class VendorOutstandingReportComponent implements OnInit {
     )?.additionalData.showNameAndValue;
     this.VendWiseOutTableForm = formGroupBuilder(this.fb, [this.jsonVendWiseOutFormArray]);
   }
-
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonVendWiseOutFormArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonVendWiseOutFormArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.VendWiseOutTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
   CSVHeader = {
     "srNo": "#",
     "vendorCD":"Vendor Code",
@@ -197,7 +212,7 @@ export class VendorOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
+    // Convert the selected data to a CSV string
     const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

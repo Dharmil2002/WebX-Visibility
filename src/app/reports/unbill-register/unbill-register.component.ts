@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Subject, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -23,6 +24,7 @@ export class UnbillRegisterComponent implements OnInit {
   unbillRegisTableForm: UntypedFormGroup
   jsonunBillRegisFormArray: any
   unBillFormControls: billRegControl
+  protected _onDestroy = new Subject<void>();
   locName: any;
   locStatus: any;
 
@@ -58,6 +60,22 @@ export class UnbillRegisterComponent implements OnInit {
       (data) => data.name === "loc"
     )?.additionalData.showNameAndValue;
     this.unbillRegisTableForm = formGroupBuilder(this.fb, [this.jsonunBillRegisFormArray]);
+  }
+
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonunBillRegisFormArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonunBillRegisFormArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.unbillRegisTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
   }
 
   async getDropDownList() {

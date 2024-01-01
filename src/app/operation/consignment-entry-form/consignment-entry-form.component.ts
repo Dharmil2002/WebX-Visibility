@@ -739,7 +739,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.model.vendorNameStatus
       );
       const vehFieldMap = this.model.vehicleList
-        .filter((x) => x.vendorTypeCode.toLowerCase() == vendorType.toLowerCase())
+        .filter((x) => x.vendorType == vendorType)
         .map((x) => {
           return { name: x.vehNo, value: x.vehNo };
         });

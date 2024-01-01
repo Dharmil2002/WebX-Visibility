@@ -87,7 +87,7 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
     try {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {
-            iSSYS: 1,
+            iSSYS: true,
             cATNM: AccountCategoryName,
             //AccountingLocations: AccountingLocations
         };

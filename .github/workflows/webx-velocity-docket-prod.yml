@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKER_REGISTRY: velocitycontainers.azurecr.io
-  IMAGE_NAME: tms-web
+  IMAGE_NAME: tms-web-prod
   TAG: ${{ github.sha }}
 
 jobs:

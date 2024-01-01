@@ -377,6 +377,15 @@ export class VendorControl {
                 disable: false
             },
             {
+                name: 'vendorTypeName',
+                label: 'Vendor Type',
+                placeholder: 'Search Vendor Type',
+                type: 'text',
+                value: "",
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
                 name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
                 generatecontrol: false, disable: false
             },

@@ -288,6 +288,7 @@ export class AddVendorMasterComponent implements OnInit {
       clearValidatorsAndValidate(this.otherDetailForm)
       clearValidatorsAndValidate(this.vendorTableForm)
       const formValue = this.vendorTableForm.value;
+      this.vendorTableForm.controls['vendorTypeName'].setValue(formValue.vendorType.name);
       const controlNames = [
         "vendorType",
         "vendorPinCode",

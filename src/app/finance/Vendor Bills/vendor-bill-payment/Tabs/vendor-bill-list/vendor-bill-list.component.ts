@@ -40,7 +40,7 @@ export class VendorBillListComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    billAmount: {
+    TotalTHCAmount: {
       Title: "Bill Amount(₹)",
       class: "matcolumncenter",
       Style: "min-width:9%",
@@ -76,7 +76,7 @@ export class VendorBillListComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  staticField = ['billNo', 'Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor']
+  staticField = ['billNo', 'Status', 'pendingAmount', 'TotalTHCAmount', 'Date', 'billType', 'vendor']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   FilterButton = {
@@ -272,11 +272,11 @@ export class VendorBillListComponent implements OnInit {
             text: `Status is ${updateData.bSTATNM}`,
             showConfirmButton: true,
           });
-
+          this.getVendorBill();
         }
       }
 
-      this.getVendorBill();
+
     }
   }
   async handleAction(id, updateType, successMessage) {

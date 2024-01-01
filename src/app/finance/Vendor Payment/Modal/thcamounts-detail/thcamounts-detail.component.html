@@ -7,7 +7,7 @@
 <div class="body" style="max-height: 420px;">
     <div class="col-12" style="padding: 0px;">
         <form [formGroup]="THCAmountsDetailsForm">
-            <app-form-webxpress [form]="THCAmountsDetailsForm" [FormTitle]="'Vendor ' + PaymentData.Vendor"
+            <app-form-webxpress [form]="THCAmountsDetailsForm" [FormTitle]="'Vendor ' + BillPaymentData.Vendor"
                 [formData]="THCAmountsDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
                 [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
                 [showSaveAndCancelButton]="false">
@@ -25,7 +25,7 @@
             </form>
         </div>
         <div class="col-6" *ngIf="isLessForm">
-            <form  [formGroup]="THCAmountsLESSForm">
+            <form [formGroup]="THCAmountsLESSForm">
                 <app-form-webxpress [form]="THCAmountsLESSForm" [formData]="THCAmountsLESSArray"
                     (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'THC Amounts LESS (-)'"
                     [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'"
@@ -42,9 +42,9 @@
         </app-form-webxpress>
     </form>
 
-    <div >
+    <div>
         <button style="margin: 10px 0px;" type="button" mat-raised-button color="primary" (click)="submit()">
             submit
-          </button>
+        </button>
     </div>
 </div>

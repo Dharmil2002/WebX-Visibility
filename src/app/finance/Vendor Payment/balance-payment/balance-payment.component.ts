@@ -197,7 +197,6 @@ export class BalancePaymentComponent implements OnInit {
     // }
     this.BillPaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.IsModifyAction = this.route.getCurrentNavigation()?.extras?.state?.Type == "Modify" ? true : false;
-
     if (this.BillPaymentData) {
       if (this.IsModifyAction) {
         this.BillPaymentData.Vendor = this.BillPaymentData.vendor;
@@ -733,7 +732,7 @@ export class BalancePaymentComponent implements OnInit {
       // Fetch beneficiary details from API
       const beneficiaryModalData =
         await this.objVendorBillService.getBeneficiaryDetailsFromApi(
-          this.BillPaymentData.Vendor
+          this.IsModifyAction ? this.BillPaymentData.vnCode : this.BillPaymentData.Vendor
         );
 
       // Check if beneficiary data is available
@@ -782,12 +781,12 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.BookVendorBill(result, true)
+        this.BookVendorBill(result, true, false)
       }
     });
   }
   // Step 2 Create Vendor Bill in vend_bill_summary Collection And vend_bill_det collection and update thc_summary
-  BookVendorBill(PaymenDetails, generateVoucher) {
+  BookVendorBill(PaymenDetails, generateVoucher, IsUpdate) {
     if (this.tableData.filter(x => x.isSelected).length == 0) {
       this.snackBarUtilityService.ShowCommonSwal(
         "info",
@@ -803,7 +802,7 @@ export class BalancePaymentComponent implements OnInit {
             finYear: financialYear,
             data: {
               cID: this.companyCode,
-              docNo: "",
+              docNo: IsUpdate ? this.BillPaymentData?.billNo : "",
               bDT: new Date(),
               lOC: this.VendorDetails?.vendorCity,
               sT: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
@@ -819,8 +818,8 @@ export class BalancePaymentComponent implements OnInit {
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
               vND: {
-                cD: this.BillPaymentData?.VendorInfo?.cD,
-                nM: this.BillPaymentData?.VendorInfo?.nM,
+                cD: IsUpdate ? this.BillPaymentData.vnCode : this.BillPaymentData?.VendorInfo?.cD,
+                nM: IsUpdate ? this.BillPaymentData.vnName : this.BillPaymentData?.VendorInfo?.nM,
                 pAN: this.PaymentHeaderFilterForm.controls.VendorPANNumber?.value,
                 aDD: this.VendorDetails?.vendorAddress,
                 mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
@@ -867,13 +866,13 @@ export class BalancePaymentComponent implements OnInit {
           };
           await
             firstValueFrom(this.voucherServicesService
-              .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
+              .FinancePost(`finance/bill/vendor/${IsUpdate ? 'update' : 'create'}`, vendorBillEntry)).then((res: any) => {
                 if (generateVoucher) {
                   this.SubmitVoucherData(PaymenDetails, res?.data.data.ops[0].docNo)
                 } else {
                   Swal.fire({
                     icon: "success",
-                    title: "Bill Generated Successfully",
+                    title: `Bill ${IsUpdate ? 'Updated' : 'Generated'} Successfully`,
                     text: "Bill No: " + res?.data.data.ops[0].docNo,
                     showConfirmButton: true,
                   }).then((result) => {

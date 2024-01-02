@@ -12,6 +12,8 @@ import { calculateVolume } from "../vehicle-utility";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { RouteLocationService } from "src/app/Utility/module/masters/route-location/route-location.service";
+import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 @Component({
   selector: 'app-add-vehicle-master',
   templateUrl: './add-vehicle-master.component.html',
@@ -88,7 +90,8 @@ export class AddVehicleMasterComponent implements OnInit {
     private route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private objRouteLocationService: RouteLocationService
+    private objRouteLocationService: RouteLocationService,
+    private generalService: GeneralService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
@@ -136,7 +139,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.getAllMastersData();
     this.backPath = "/Masters/VehicleMaster/VehicleMasterList";
     this.vendorFieldChanged();
-
+    this.getDropDownList();
   }
 
   initializeFormControl() {
@@ -409,6 +412,17 @@ export class AddVehicleMasterComponent implements OnInit {
     }
   }
   //#endregion
+
+  async getDropDownList() {
+    const vendorType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "VENDTYPE" }, "codeDesc", "codeId");
+    this.filter.Filter(
+      this.jsonControlVehicleArray,
+      this.vehicleTableForm,
+      vendorType,
+      this.vendorType,
+      this.vendorTypeStatus
+    );
+  }
 
   vendorFieldChanged() {
     const vendorType = this.vehicleTable.vendorTypeCode ? this.vehicleTable.vendorTypeCode : this.vehicleTableForm.value.vendorType.value;

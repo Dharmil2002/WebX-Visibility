@@ -15,9 +15,9 @@ export class ThcService {
     ) { }
 
     async getShipmentFiltered(branch, prqNo = null) {
-       
+
         let filter = { oRGN: branch, oSTS: 1 }
-        if( (prqNo && prqNo !== "")) {
+        if ((prqNo && prqNo !== "")) {
             filter["pRQNO"] = prqNo;
         }
         const reqBody = {
@@ -26,17 +26,19 @@ export class ThcService {
             filter: filter
         };
         // Perform an asynchronous operation to fetch data from the operation service
-        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get,reqBody));
-        const dockets=result.data.map((x)=>x.dKTNO);
+        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqBody));
+        const dockets = result.data.map((x) => x.dKTNO);
         const reqOpBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.docketOp,
-            filter: { dKTNO: { D$in: dockets },sFX:0, D$or: [
-                { tOTPKG: { D$gt: 0 } },
-                { tOTWT: { D$gt: 0 } }
-              ]}
+            filter: {
+                dKTNO: { D$in: dockets }, sFX: 0, D$or: [
+                    { tOTPKG: { D$gt: 0 } },
+                    { tOTWT: { D$gt: 0 } }
+                ]
+            }
         };
-        const dktDetail = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get,reqOpBody));
+        const dktDetail = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqOpBody));
         const createShipmentObject = (element, dkt) => {
             return {
                 bPARTYNM: element.bPARTYNM,
@@ -62,7 +64,7 @@ export class ThcService {
     }
 
     async getShipment(vehicle = false) {
-    
+
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
@@ -179,7 +181,7 @@ export class ThcService {
         }
     }
     async getThcDetails(tripId) {
-        
+
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.thcsummary,

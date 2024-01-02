@@ -58,7 +58,6 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       // we have to handle , if function not exists.
-      console.log("failed");
     }
   }
 
@@ -120,7 +119,6 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   async save() {
     const vehicleStatus= this.vehicleData;
     const form=this.vehicleStatusTableForm.value;
-    const vendorType=this.allVehDetail?.vendorTypeCode || "";
     let vehicleDetails = vehicleStatus.find(item => item.vehicleNo==form.vehNo.value)
     this.vehicleStatusTableForm.controls['capacity'].setValue(vehicleDetails.capacity != undefined ? vehicleDetails.capacity : '');
     this.vehicleStatusTableForm.controls['_id'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
@@ -131,8 +129,6 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     this.vehicleStatusTableForm.controls['vendorType'].setValue(vehicleDetails?.vendorType || "");
     this.vehicleStatusTableForm.controls['driver'].setValue(this.allVehDetail?.driverName || "");
     this.vehicleStatusTableForm.controls['dMobNo'].setValue(this.allVehDetail?.telno || "");
-    const detail = this.allVehDetail;
-    console.log(detail);
     try {
 
       const vehicleData = await addVehicleStatusData(this.companyCode, this._operationService, this.vehicleStatusTableForm.value);

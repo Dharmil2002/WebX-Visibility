@@ -99,6 +99,18 @@ export class VehicleStatusControls {
                 name: 'vendorTypeCode', label: 'vendorTypeCode', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
                 Validations: [],
             },
+            {
+                name: 'lcExpireDate', label: 'lcExpireDate', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'lcNo', label: 'lcNo', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: []
+            },
+            {
+                name: 'driverPan', label: 'driverPan', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: []
+            },
 
         ]
     }

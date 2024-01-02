@@ -260,7 +260,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
-
     let billingParty = { name: this.model.prqData?.billingParty, value: this.model.prqData?.billingPartyCode };
     //await this.customerService.getCustomerByCodeOrName(undefined, this.model.prqData?.billingParty);
 
@@ -268,8 +267,17 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.prqData.prqNo
     );
 
-    let vehType = this.vendorTypes.find(f => f.name == vehicleDetail?.vendorType);
-
+    /*below i can condition like this because there are few issue in Master so Managed 
+    Diffrent variaty of the data i did like this in future also removed this condition this is managed by it self 
+    issue Found in Vehicle and Vendor Master*/
+    let vehType;
+    if(vehicleDetail.vendorType=='Market'){
+      vehType = this.vendorTypes.find(f => f.name == vehicleDetail?.vendorType);
+    }
+    else{
+      vehType = this.vendorTypes.find(f => f.value == vehicleDetail?.vendorTypeCode);
+    }
+    /*End*/
     this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
     this.setFormValue(this.model.consignmentTableForm, "toCity", this.model.prqData, true, "toCity", "toCity");
     await this.getLocBasedOnCity();
@@ -306,7 +314,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     else {
       let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
       const vendor = vendors[0];
-      this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
+      this.setFormValue(this.model.consignmentTableForm,"vendorName", vendor);
       this.model.consignmentTableForm.controls['vehicleNo'].setValue({ name: this.model.prqData?.vEHNO || "", value: this.model.prqData?.vEHNO || "" });
 
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");

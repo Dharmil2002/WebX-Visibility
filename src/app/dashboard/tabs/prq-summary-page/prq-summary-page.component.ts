@@ -131,7 +131,7 @@ export class PrqSummaryPageComponent implements OnInit {
     const prqNo = data.prqNo
     const templateBody = {
       DocNo: prqNo,
-      templateName: 'prq'
+      templateName: 'PRQ View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');

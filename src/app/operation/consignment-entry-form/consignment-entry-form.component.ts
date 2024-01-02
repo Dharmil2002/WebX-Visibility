@@ -1611,5 +1611,18 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.tableData = this.model.tableData.filter((x) => x.id !== data.data.id);
   }
   /* End */
-
+  ngOnDestroy(): void {
+    // Destroy form values
+    this.model.invoiceTableForm.reset();
+    this.model.containerTableForm.reset();
+    this.model.ewayBillTableForm.reset();
+    this.model.containerTableForm.reset();
+    this.model.consignmentTableForm.reset();
+    this.model.containerTableForm.reset();
+    this.model.FreightTableForm.reset();
+    this.model.FreightTableForm.reset();
+    // Destroy variable values
+    this.model.invoiceData = [];
+    this.model.tableData = [];
+  }
 }

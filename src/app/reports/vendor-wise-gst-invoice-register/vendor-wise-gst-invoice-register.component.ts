@@ -24,9 +24,9 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
   };
   breadScrums = [
     {
-      title: "Vendor Wise GST Register Report",
+      title: "Vendor Wise GST Invoice Register Report",
       items: ["Home"],
-      active: "Vendor Wise GST Register Report",
+      active: "Vendor Wise GST Invoice Register Report",
     },
   ];
   vendorgstregisTableForm: UntypedFormGroup

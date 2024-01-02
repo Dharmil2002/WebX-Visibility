@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
      <form [formGroup]="CustGSTInvTableForm">
-          <app-form-webxpress [form]="CustGSTInvTableForm" [FormTitle]="'Customer Wise GST Invoice Register'" [formData]="jsonCustGSTInvFormArray"
+          <app-form-webxpress [form]="CustGSTInvTableForm" [FormTitle]="'Customer Wise GST Invoice Register Report'" [formData]="jsonCustGSTInvFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                [showSaveAndCancelButton]="true" [submit]="'Filter'">
           </app-form-webxpress>

@@ -20,9 +20,9 @@ import Swal from 'sweetalert2';
 export class CnwGstRegisterComponent implements OnInit {
   breadScrums = [
     {
-      title: "CNote wise GST Register Report",
+      title: "Consignment wise GST Register Report",
       items: ["Home"],
-      active: "CNote wise GST Register Report",
+      active: "Consignment wise GST Register Report",
     },
   ];
   cnoteTableForm: UntypedFormGroup;

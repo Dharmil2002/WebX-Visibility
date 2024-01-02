@@ -24,9 +24,9 @@ export class CnoteBillMrReportComponent implements OnInit {
 
   breadScrums = [
     {
-      title: "CNote Bill MR Report",
+      title: "Consignment Note Bill MR Register Report",
       items: ["Home"],
-      active: "CNote Bill MR Report",
+      active: "Consignment Note Bill MR Register Report",
     },
   ];
   cnoteBillMRTableForm: UntypedFormGroup;

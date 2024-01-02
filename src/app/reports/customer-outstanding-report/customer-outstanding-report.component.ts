@@ -19,9 +19,9 @@ import { log } from 'util';
 export class CustomerOutstandingReportComponent implements OnInit {
   breadScrums = [
     {
-      title: "Customer Outstanding Register Report ",
+      title: "Customer Outstanding Register Report",
       items: ["Home"],
-      active: "Customer Outstanding Register Report ",
+      active: "Customer Outstanding Register Report",
     },
   ];
   jsonCustOutFormArray: any

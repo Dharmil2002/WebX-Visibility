@@ -4,7 +4,7 @@ export class VendorMaster {
   vendorCity: string
   vendorState: string
   vendorCountry: string
-  vendorType: any
+  vendorType: string
   vendorSubType: any
   vendorAddress: any
   vendorLocation: any
@@ -36,6 +36,7 @@ export class VendorMaster {
       this.noPANRegistration = VendorMaster.noPANRegistration || false;
       this.isBlackListed = VendorMaster.isBlackListed || false;
       this.msmeRegistered = VendorMaster.msmeRegistered || false;
+      this.msmeScan = VendorMaster.msmeScan || '';
     }
   }
 }

@@ -444,7 +444,7 @@ export class ConsignmentControl {
         label: "Container Detail",
         placeholder: "",
         type: "toggle",
-        value: docketDetail.ccbp,
+        value: docketDetail.cd,
         generatecontrol: true,
         disable: false,
         functions: { onChange: "containerDetail" },

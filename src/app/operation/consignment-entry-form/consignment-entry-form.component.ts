@@ -1,5 +1,5 @@
-import { Component, OnInit} from "@angular/core";
-import {UntypedFormBuilder, UntypedFormGroup, Validators, } from "@angular/forms";
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup, Validators, } from "@angular/forms";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { ConsignmentControl, FreightControl, } from "src/assets/FormControls/consignment-control";
@@ -113,7 +113,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.model.docketDetail = new DocketDetail({});
     if (navigationState != null) {
- 
+
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -162,7 +162,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setGeneralMasterData(this.model.allformControl, this.wtUnits, "weight_in");
     this.setGeneralMasterData(this.model.allformControl, this.riskTypes, "risk");
     this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
-    this.setGeneralMasterData(this.jsonControlArray, this.rateTypes, "freightRatetype");
+    const rateType= this.rateTypes.filter((x) => x.value != "RTTYP-0007");
+    this.setGeneralMasterData(this.jsonControlArray,rateType, "freightRatetype");
 
   }
 
@@ -176,7 +177,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /* End*/
   //#region initializeFormControl
   async initializeFormControl() {
-    const docketDetails=await this.docketService.docketObjectMapping(this.model.docketDetail)
+    const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail)
     // Create LocationFormControls instance to get form controls for different sections
     this.model.ConsignmentFormControls = new ConsignmentControl(docketDetails);
     this.model.FreightFromControl = new FreightControl(docketDetails);
@@ -259,14 +260,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
-    
-    let billingParty = { name: this.model.prqData?.billingParty, value:  this.model.prqData?.billingPartyCode };
+
+    let billingParty = { name: this.model.prqData?.billingParty, value: this.model.prqData?.billingPartyCode };
     //await this.customerService.getCustomerByCodeOrName(undefined, this.model.prqData?.billingParty);
 
     let vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.model.prqData.prqNo
     );
-    
+
     let vehType = this.vendorTypes.find(f => f.name == vehicleDetail?.vendorType);
 
     this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
@@ -279,7 +280,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pAddress);
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);
-    
+
     this.setFormValue(this.model.consignmentTableForm, "vendorType", vehType.value, false, "", "");
 
     // Done By Harikesh 
@@ -297,26 +298,24 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     });
 
     await this.vendorFieldChanged()
-    
-    if (vehType.value == "4")
-    {
+
+    if (vehType.value == "4") {
       this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail.vendor);
       this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, false);
-    } 
-    else 
-    {
+    }
+    else {
       let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
       const vendor = vendors[0];
       this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
-      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vEHNO||"",value:this.model.prqData?.vEHNO||"" } );     
+      this.model.consignmentTableForm.controls['vehicleNo'].setValue({ name: this.model.prqData?.vEHNO || "", value: this.model.prqData?.vEHNO || "" });
 
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
       //this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
     }
 
     if (this.model.prqData.carrierTypeCode == "3") {
-      this.model.containerTableForm.controls["containerType"].setValue( { name:this.model.prqData?.typeContainer||"", value:this.model.prqData?.typeContainerCode||"" } );
-      this.model.containerTableForm.controls["containerCapacity"].setValue( this.model.prqData?.size || 0);
+      this.model.containerTableForm.controls["containerType"].setValue({ name: this.model.prqData?.typeContainer || "", value: this.model.prqData?.typeContainerCode || "" });
+      this.model.containerTableForm.controls["containerCapacity"].setValue(this.model.prqData?.size || 0);
     }
   }
 
@@ -374,7 +373,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async getPrqDetails() {
-    
+
     const prqNo = await this.prqService.getPrqForBooking(
       this.storage.branch,
       this.model.consignmentTableForm.value.billingParty.value,
@@ -392,7 +391,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
   /* below function was the call when */
   async getLocBasedOnCity() {
-    
+
     const destinationMapping = await this.locationService.locationFromApi({
       locCity: this.model.consignmentTableForm.get("toCity")?.value?.value.toUpperCase(),
     });
@@ -451,7 +450,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*below function is fire when vendor Name is select*/
   getVehicleFilter() {
-    
+
     const vehicleList = this.model.vehicleList.filter((x) => x.vendor == this.model.consignmentTableForm.value.vendorName.name).map((x) => {
       return { name: x.vehNo, value: x.vehNo };
     });
@@ -512,7 +511,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   prqSelection() {
-    
+
     this.model.prqData = this.model.prqNoDetail.find(
       (x) => x.prqNo == this.model.consignmentTableForm.controls["prqNo"].value.value
     );
@@ -739,7 +738,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.model.vendorNameStatus
       );
       const vehFieldMap = this.model.vehicleList
-        .filter((x) => x.vendorType == vendorType)
+        .filter((x) => x.vendorTypeCode == vendorType)
         .map((x) => {
           return { name: x.vehNo, value: x.vehNo };
         });
@@ -774,10 +773,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
   async autofillDropDown() {
-    
-    const docketDetails=await this.docketService.docketObjectMapping(this.model.docketDetail);
-    this.model.docketDetail.invoiceDetails=await this.docketService.getDocketByDocNO(docketDetails.docketNumber,"docket_invoices");
-    this.model.docketDetail.containerDetail=await this.docketService.getDocketByDocNO(docketDetails.docketNumber,"docket_containers");
+
+    const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail);
+    this.model.docketDetail.invoiceDetails = await this.docketService.getDocketByDocNO(docketDetails.docketNumber, "docket_invoices");
+    this.model.docketDetail.containerDetail = await this.docketService.getDocketByDocNO(docketDetails.docketNumber, "docket_containers");
 
     const { controls } = this.model.consignmentTableForm;
 
@@ -785,15 +784,15 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const setControlValue = (controlName, value) => {
       controls[controlName].setValue(value);
     };
-    if(!docketDetails){
-       return false
+    if (!docketDetails) {
+      return false
     }
     // Set vendor details.
-    const vendor = docketDetails.vendorType != "4" ? {name:docketDetails.vendorName,value:docketDetails.vendorCode} : docketDetails.vendorName;
+    const vendor = docketDetails.vendorType != "4" ? { name: docketDetails.vendorName, value: docketDetails.vendorCode } : docketDetails.vendorName;
     setControlValue("vendorType", docketDetails.vendorType.toString());
     // Trigger vendor field change actions.
     this.vendorFieldChanged();
-    setControlValue("vendorName",vendor);
+    setControlValue("vendorName", vendor);
     // Set city details.
     setControlValue("fromCity", { name: docketDetails.fromCity, value: docketDetails.fromCity });
     setControlValue("toCity", { name: docketDetails.toCity, value: docketDetails.toCity });
@@ -801,12 +800,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     // Set vehicle number.
     setControlValue("vehicleNo", { name: docketDetails.vehicleNo || "", value: docketDetails.vehicleNo || "" });
     // Find and set parties.
-    const billingPartyObj={ name: docketDetails.billingPartyName, value: docketDetails.billingParty};
-    const consignorNameObj={ name: docketDetails.consignorName, value: docketDetails.consignorCode};
-    const consigneeNameObj={ name:docketDetails.consigneeName, value: docketDetails.consigneeCode};
-    setControlValue("billingParty",billingPartyObj);
-    setControlValue("consignorName",consignorNameObj);
-    setControlValue("consigneeName",consigneeNameObj);
+    const billingPartyObj = { name: docketDetails.billingPartyName, value: docketDetails.billingParty };
+    const consignorNameObj = { name: docketDetails.consignorName, value: docketDetails.consignorCode };
+    const consigneeNameObj = { name: docketDetails.consigneeName, value: docketDetails.consigneeCode };
+    setControlValue("billingParty", billingPartyObj);
+    setControlValue("consignorName", consignorNameObj);
+    setControlValue("consigneeName", consigneeNameObj);
     // Set various details.
     setControlValue("risk", docketDetails.risk);
     setControlValue("prqNo", { name: docketDetails.prqNo, value: docketDetails.prqNo });
@@ -815,7 +814,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     setControlValue("packaging_type", docketDetails.packaging_type);
     setControlValue("weight_in", docketDetails.weight_in);
     setControlValue("delivery_type", docketDetails.delivery_type);
-    setControlValue("issuing_from",docketDetails. issuing_from);
+    setControlValue("issuing_from", docketDetails.issuing_from);
 
     // Set Freight Table Form details.
     this.model.FreightTableForm.controls["freightRatetype"].setValue(docketDetails.freightRatetype);
@@ -823,24 +822,22 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     // Bind table data after form update.
     this.bindTableData();
   }
-
-
   bindTableData() {
-     
+
     if (this.model.docketDetail.invoiceDetails.length > 0) {
       this.tableLoadIn = true;
       this.loadIn = true;
       const invoiceDetail = this.model.docketDetail.invoiceDetails.map((x, index) => {
-        if (!x || Object.values(x).every((value) => value === null || value === undefined||value === undefined)) {
+        if (!x || Object.values(x).every((value) => value === null || value === undefined || value === undefined)) {
           return null; // If x is null or all properties of x are null or undefined, return null
         }
-        if(!x.iNVNO){
+        if (!x.iNVNO) {
           return null;
         }
         // You can use 'x' and 'index' here
         x.id = index + 1;
         x.ewayBillNo = `${x.eWBNO}`;
-        x.expiryDate = x.eXPDT  
+        x.expiryDate = x.eXPDT
           ? formatDate(x.eXPDT, "dd-MM-yy HH:mm")
           : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm");
         x.invoiceNo = x.iNVNO;
@@ -889,16 +886,16 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             if (Object.values(x).every((value) => !value)) {
               return null; // If all properties of x are empty, return null
             }
-            if(!x.cNID){
+            if (!x.cNID) {
               return null;
             }
             // Modify 'x' if needed
             // For example, you can add the index to the element
             x.id = index + 1;
-            x.containerNumber=x.cNID;
-            x.containerCapacity=x.cNCPT;
-            x.containerType=x.cNTYPN;
-            x.isEmpty=x.isEMPT;
+            x.containerNumber = x.cNID;
+            x.containerCapacity = x.cNCPT;
+            x.containerType = x.cNTYPN;
+            x.isEmpty = x.isEMPT;
             x.invoice = false;
             x.actions = ["Edit", "Remove"];
             return x;
@@ -927,16 +924,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const cd = this.model.consignmentTableForm.controls["cd"].value;
     if (cd) {
       this.contFlag = true;
-      this.jsonControlArray = this.jsonControlArray.map((x) => {
-        if (x.name === "freightRatetype") {
-          x.value.push({
-            value: "C",
-            name: "Per Container",
-          });
-        }
-        return x;
-      });
-
+      this.setGeneralMasterData(this.jsonControlArray,this.rateTypes, "freightRatetype");
       this.filter.Filter(
         this.jsonContainerDetail,
         this.model.containerTableForm,
@@ -945,22 +933,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.model.containerTypeStatus
       );
     } else {
-      this.jsonControlArray = this.jsonControlArray.map((x) => {
-        if (x.name === "freightRatetype") {
-          // Use filter to remove the object with value: "C" and name: "Per Container"
-          x.value = x.value.filter(
-            (item) => !(item.value === "C" && item.name === "Per Container")
-          );
-        }
-        return x;
-      });
-
+      const rateType= this.rateTypes.filter((x) => x.value != "RTTYP-0007");
+      this.setGeneralMasterData(this.jsonControlArray,rateType, "freightRatetype");
       this.contFlag = false;
     }
   }
 
   async save() {
-    
+
     this.isSubmit = true;
     // Remove all form errors
     const tabcontrols = this.model.consignmentTableForm;
@@ -1042,7 +1022,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     resetData.forEach((d) => {
       d.findIn.controls[d.name].setValue(d.value);
     })
-    
+
     if (!this.isUpdate) {
       let id = {
         isComplete: 1,
@@ -1191,7 +1171,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         rCM: this.model.FreightTableForm.controls["rcm"].value,
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT: this.model.FreightTableForm.controls["gstChargedAmount"].value,
-        cHG:"",
+        cHG: "",
         tOTAMT: this.model.FreightTableForm.controls['totalAmount'].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -1253,7 +1233,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           });
         });
     } else {
-      
+
       vendorName
       let docketDetails = {
         ...this.model.consignmentTableForm.value,
@@ -1261,7 +1241,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         ...invoiceDetails,
         ...containerDetail
       };
-      const jsonControl=[
+      const jsonControl = [
         ...this.jsonControlArrayBasic,
         ...this.jsonControlArrayConsignor,
         ...this.jsonControlArrayConsignee,
@@ -1273,7 +1253,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         invDet.push({
           _id: `${this.storage.companyCode}-${docketDetails.docketNumber}-${i.invoiceNo}`,
           cID: this.storage.companyCode,
-          dKTNO:docketDetails.docketNumber,  //To be set from service
+          dKTNO: docketDetails.docketNumber,  //To be set from service
           iNVNO: i.invoiceNo,
           iNVAMT: i.invoiceAmount,
           cURR: 'INR',
@@ -1302,7 +1282,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         contDet.push({
           _id: `${this.storage.companyCode}-${docketDetails.docketNumber}-${i.containerNumber}`,
           cID: this.storage.companyCode,
-          dKTNO:docketDetails.docketNumber,
+          dKTNO: docketDetails.docketNumber,
           cNID: i.containerNumber,
           cNTYP: container?.value || i.containerType,
           cNTYPN: container?.name || "",
@@ -1313,14 +1293,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           eNTBY: this.storage.userName
         });
       });
-     
-       const reverseDocketObjectMapping=await this.docketService.reverseDocketObjectMapping(docketDetails,jsonControl);
-       
-       const filter={"dKTNO":reverseDocketObjectMapping.docNo}
+
+      const reverseDocketObjectMapping = await this.docketService.reverseDocketObjectMapping(docketDetails, jsonControl);
+
+      const filter = { "dKTNO": reverseDocketObjectMapping.docNo }
       await Promise.all([
         this.docketService.updateDocket(reverseDocketObjectMapping, reverseDocketObjectMapping.docNo),
-        this.docketService.updateManyDockets(invDet,filter, "docket_invoices"),
-        this.docketService.updateManyDockets(contDet,filter, "docket_containers"),
+        this.docketService.updateManyDockets(invDet, filter, "docket_invoices"),
+        this.docketService.updateManyDockets(contDet, filter, "docket_containers"),
         this.docketService.addEventData(docketDetails),
         this.docketService.updateOperationData(docketDetails)
       ]);
@@ -1335,7 +1315,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           this.navService.navigateTotab("docket", "dashboard/Index");
         }
       });
-     
+
     }
   }
   async addDocketNestedtDetail(dkt, invoiceDetails) {

@@ -299,7 +299,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.TotalDebitNote = this.TotalDebitNote + +element.debitNote;
       this.TotalPaidAmount = this.TotalPaidAmount + +element.AdvancePayedAmount;
       this.TotalPendingAmount = this.TotalPendingAmount + +element.pendingAmount;
-      this.TotalPaymentAmount = this.TotalPaymentAmount + +element.billAmount;
+      this.TotalPaymentAmount = this.TotalPaymentAmount + +element.paymentAmount //this.TotalPaymentAmount + +element.billAmount;
     });
 
     this.TotalAmountList.forEach((x) => {
@@ -620,7 +620,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           // TotalTHCAmount: item.TotalTHCAmount,
           // AdvancePayedAmount: item.AdvancePayedAmount,
           // billAmount: item.billAmount,
-          PaymentAmount: item.pendingAmount - item.paymentAmount,
+          PaymentAmount: item.paymentAmount,
           // PendingAmount: item.pendingAmount - item.paymentAmount,
           ispartial: (item.pendingAmount - item.paymentAmount) == 0 ? false : true,
         }
@@ -680,6 +680,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
           this.tableData.find(x => x.billNo == data.data.billNo).paymentAmount = paymentAmount;
           this.tableLoad = true;
+          this.selectCheckBox(false);
 
           Swal.fire('Success!', 'Payment Amount Entered Successfully!', 'success');
         }

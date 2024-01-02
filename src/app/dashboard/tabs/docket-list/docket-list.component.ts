@@ -163,7 +163,7 @@ export class DocketListComponent implements OnInit {
   OpenCnote(data){
     const templateBody = {
       DocNo:data.docNo,
-      templateName:'docket'
+      templateName:'Docket View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url,'','width=1000,height=800');

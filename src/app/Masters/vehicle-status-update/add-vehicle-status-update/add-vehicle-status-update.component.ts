@@ -58,7 +58,6 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       // we have to handle , if function not exists.
-      console.log("failed");
     }
   }
 
@@ -118,18 +117,22 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     }
   }
   async save() {
-    let capacity = this.vehicleData.find(item => item.vehicleNo == this.vehicleStatusTableForm.value.vehNo.value).capacity;
-
-    this.vehicleStatusTableForm.controls['capacity'].setValue(capacity != undefined ? capacity : '');
+    
+    const vehicleStatus= this.vehicleData;
+    const form=this.vehicleStatusTableForm.value;
+    let vehicleDetails = vehicleStatus.find(item => item.vehicleNo==form.vehNo.value)
+    this.vehicleStatusTableForm.controls['capacity'].setValue(vehicleDetails.capacity != undefined ? vehicleDetails.capacity : '');
     this.vehicleStatusTableForm.controls['_id'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     this.vehicleStatusTableForm.controls['vehNo'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     this.vehicleStatusTableForm.controls['vMobNo'].setValue(this.allVehDetail?.vendorPhoneNo || "");
     this.vehicleStatusTableForm.controls['vendor'].setValue(this.allVehDetail?.vendorName || "");
-    this.vehicleStatusTableForm.controls['vendorType'].setValue(this.allVehDetail?.vendorType || "");
+    this.vehicleStatusTableForm.controls['vendorTypeCode'].setValue(vehicleDetails?.vendorTypeCode || "");
+    this.vehicleStatusTableForm.controls['vendorType'].setValue(vehicleDetails?.vendorType || "");
     this.vehicleStatusTableForm.controls['driver'].setValue(this.allVehDetail?.driverName || "");
     this.vehicleStatusTableForm.controls['dMobNo'].setValue(this.allVehDetail?.telno || "");
-    const detail = this.allVehDetail;
-    console.log(detail);
+    this.vehicleStatusTableForm.controls['driverPan'].setValue(this.allVehDetail?.driverPan || "");
+    this.vehicleStatusTableForm.controls['lcExpireDate'].setValue(this.allVehDetail?.lcExpireDate || "");
+    this.vehicleStatusTableForm.controls['lcNo'].setValue(this.allVehDetail?.lcNo || "");
     try {
 
       const vehicleData = await addVehicleStatusData(this.companyCode, this._operationService, this.vehicleStatusTableForm.value);
@@ -166,7 +169,7 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     }
     else {
       this.allVehDetail = await this.vehicleStatusService.vehicleListFromMaster(vehNo);
-
+      
       if (!this.allVehDetail.driverName) {
         Swal.fire({
           icon: "info",

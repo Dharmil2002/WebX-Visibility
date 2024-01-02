@@ -6,6 +6,7 @@ import { BillSubmissionComponent } from './submission/bill-submission/bill-submi
 import { BillApproval } from 'src/app/Models/bill-approval/bill-approval';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/core/service/storage.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-bill-approval',
@@ -82,25 +83,43 @@ export class BillApprovalComponent implements OnInit {
       }
     }
     else if (data.label.label == "Cancel Bill") {
-      const filter = {
-        bILLNO: data?.data?.bILLNO
-      }
-      const status = {
-        cNL: true,
-        cNLDT:new Date(),
-        cNBY: this.storage.userName,
-        cNRES:""//required cancel reason in popup
-      }
-      const res = await this.invoiceService.updateInvoiceStatus(filter, status);
-      const filteDkt = {
-        cID: this.storage.companyCode,
-        bILLNO: data.data.bILLNO
-      }
-      await this.invoiceService.updateDocketStatus(filteDkt);
-      if (res) {
-        this.getApprovalData();
-        SwalerrorMessage("success", "Success", "The invoice has been successfully Cancelled.", true)
-      }
+      Swal.fire({
+        title: 'Reason For Cancel?',
+        html: '<input id="swal-input1" class="swal2-input">',
+        focusConfirm: false,
+        showCancelButton: true, // Add this line to show the cancel button
+        cancelButtonText: 'Cancel', // Optional: Customize the cancel button text
+        preConfirm: () => {
+          return (document.getElementById('swal-input1') as HTMLInputElement).value;
+        }
+      }).then(async (result) => {
+        debugger
+        if (result.isConfirmed) {
+          // Handle the input value if the user clicks the confirm button
+          const filter = {
+            bILLNO: data?.data?.bILLNO
+          }
+          const status = {
+            cNL: true,
+            cNLDT: new Date(),
+            cNBY: this.storage.userName,
+            cNRES:  result.value//required cancel reason in popup
+          }
+          const res = await this.invoiceService.updateInvoiceStatus(filter, status);
+          const filteDkt = {
+            cID: this.storage.companyCode,
+            bILLNO: data.data.bILLNO
+          }
+          await this.invoiceService.updateDocketStatus(filteDkt);
+          if (res) {
+            this.getApprovalData();
+            SwalerrorMessage("success", "Success", "The invoice has been successfully Cancelled.", true)
+          }
+          // Your code to handle the input value
+        } else if (result.isDismissed) {
+          this.getApprovalData();
+        }
+      });
     }
     else if (data.label.label === "Submission Bill") {
       const dialogref = this.dialog.open(BillSubmissionComponent, {

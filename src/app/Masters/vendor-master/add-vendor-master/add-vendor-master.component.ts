@@ -7,7 +7,6 @@ import { VendorMaster } from "src/app/core/models/Masters/vendor-master";
 import { VendorControl } from "src/assets/FormControls/vendor-control";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
@@ -15,7 +14,7 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
-
+import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
 @Component({
   selector: 'app-add-vendor-master',
   templateUrl: './add-vendor-master.component.html',
@@ -121,7 +120,7 @@ export class AddVendorMasterComponent implements OnInit {
       this.action = 'edit';
       this.isUpdate = true;
       this.imageData = {
-        'msmeScan': this.vendorTabledata.msmeScan,
+        'msmeScan': this.vendorTabledata.msmeScan === "" ? null : this.vendorTabledata.msmeScan,
         'panCardScan': this.vendorTabledata.panCardScan,
       };
       this.isLoad = true;
@@ -201,18 +200,19 @@ export class AddVendorMasterComponent implements OnInit {
       }
     });
   }
-  getDropDownData() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      const {
-        vendorTypeDropdown,
-      } = res;
-      this.vendorTypeData = vendorTypeDropdown;
-      if (this.isUpdate) {
-        this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vendorTabledata.vendorType);
-        this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
+  async getDropDownData() {
 
-        // For setting image data, assuming you have imageData defined
-        Object.keys(this.imageData).forEach((controlName) => {
+    this.vendorTypeData = await PayBasisdetailFromApi(this.masterService, 'VT')
+ 
+    if (this.isUpdate) {
+      this.vendorTypDetail = this.vendorTypeData.find(x => (x.name).toLowerCase() === this.vendorTabledata.vendorType.toLowerCase());
+      this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
+
+      // For setting image data, assuming you have imageData defined
+      Object.keys(this.imageData).forEach((controlName) => {
+
+        // Check if the value associated with the current controlName is null
+        if (this.imageData[controlName] !== null) {
           const url = this.imageData[controlName];
           const fileName = this.objImageHandling.extractFileName(url);
           // Set the form control value using the control name
@@ -221,20 +221,11 @@ export class AddVendorMasterComponent implements OnInit {
           // Set isFileSelected to true
           const control = this.jsonControlVendorArray.find(x => x.name === controlName);
           control.additionalData.isFileSelected = false;
-        });
-
-      }
-      const filterParams = [
-        [this.jsonControlVendorArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
-      ];
-
-      filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
-        this.filter.Filter(jsonControlArray, this.vendorTableForm, dropdownData, formControl, statusControl);
+        }
       });
-    });
-  }
-  findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find(item => item.name.toUpperCase() === name);
+
+    }
+    this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, this.vendorTypeData, this.vendorType, this.vendorTypeStatus);
   }
   /*get All Master Data*/
   async getAllMastersData() {
@@ -288,6 +279,7 @@ export class AddVendorMasterComponent implements OnInit {
       clearValidatorsAndValidate(this.otherDetailForm)
       clearValidatorsAndValidate(this.vendorTableForm)
       const formValue = this.vendorTableForm.value;
+      this.vendorTableForm.controls['vendorTypeName'].setValue(formValue.vendorType.name);
       const controlNames = [
         "vendorType",
         "vendorPinCode",
@@ -307,7 +299,7 @@ export class AddVendorMasterComponent implements OnInit {
         return rest;
       });
       this.vendorTableForm.value.otherdetails = newData;
-      let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
+      let data = this.vendorTableForm.value
       // Define an array of control names
       const imageControlNames = ['msmeScan', 'panCardScan'];
       imageControlNames.forEach(controlName => {
@@ -331,7 +323,7 @@ export class AddVendorMasterComponent implements OnInit {
           filter: { _id: id },
           update: data
         };
-        //console.log(data);
+        // console.log(data);
 
         const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
         if (res) {

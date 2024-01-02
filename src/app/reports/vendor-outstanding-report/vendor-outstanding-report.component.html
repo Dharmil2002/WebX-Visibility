@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
      <form [formGroup]="VendWiseOutTableForm">
-          <app-form-webxpress [form]="VendWiseOutTableForm" [FormTitle]="'Customer Outstanding Register'" [formData]="jsonVendWiseOutFormArray"
+          <app-form-webxpress [form]="VendWiseOutTableForm" [FormTitle]="'Vendor Wise Outstanding Report'" [formData]="jsonVendWiseOutFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                [showSaveAndCancelButton]="true" [submit]="'Filter'">
           </app-form-webxpress>

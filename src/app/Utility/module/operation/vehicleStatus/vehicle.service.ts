@@ -150,7 +150,14 @@ export class VehicleStatusService {
       vendorName,
       vendorType: vendorResult.data[0]?.vendorType || "",
       vendorPhoneNo: vendorResult.data[0]?.vendorPhoneNo || "",
+      /*below driverPan is Vendorpan here i 
+      get as driverPan because in vehicle so if changed in 
+      here vendorPan then might be issue occure in thc flow that's 
+      why i create key is driverPan*/
+      driverPan:vendorResult.data[0]?.panNo || "",
       driverName: driverResult.data[0]?.driverName || "",
+      lcExpireDate: driverResult.data[0]?.valdityDt || "",
+      lcNo: driverResult.data[0]?.licenseNo || "",
       telno: driverResult.data[0]?.telno || "",
     };
 

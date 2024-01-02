@@ -61,27 +61,27 @@ export class PrqSummaryPageComponent implements OnInit {
     }
     if (data.label) {
       if (data.label.route) {
-
         const inputDate = moment(data.data.pickUpDate, "DD-MM-YY HH:mm", true);
-        const onlyDate = inputDate.format("DD-MM-YY");
-
-        const today = moment().format("DD-MM-YY");
-
-        if (moment(onlyDate, "DD-MM-YY").isBefore(today, "day")) {
+      
+        // Use current date and time for 'today'
+        const today = moment();
+        // Check if 'inputDate' is before today (ignoring time)
+        if (inputDate.isBefore(today, "day")) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `This Pk-Up DateTime is for future Date hence not allowed .`,
+            text: "This Pick-Up DateTime is for a past date and hence not allowed.",
           });
           return null;
-        } else {
+        }
+        else {
           this.router.navigate([data.label.route], {
             state: {
               data: data.data
             },
           });
         }
-      } else {
+      }else {
         const { tabIndex, status } = data.label;
         await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this), tabIndex, status);
         this.tableLoad = true;
@@ -131,7 +131,7 @@ export class PrqSummaryPageComponent implements OnInit {
     const prqNo = data.prqNo
     const templateBody = {
       DocNo: prqNo,
-      templateName: 'prq'
+      templateName: 'PRQ View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');

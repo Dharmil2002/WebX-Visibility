@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Subject, take, takeUntil } from 'rxjs';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
@@ -32,6 +33,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
   originName: any;
   originStatus: any;
   desName: any;
+  protected _onDestroy = new Subject<void>();
   jsoncnoteBillMRFormArray: any;
   desStatus: any;
   payName: any;
@@ -124,7 +126,21 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     )?.additionalData.showNameAndValue;
     this.salesregisterTableForm = formGroupBuilder(this.fb, [this.jsonsalesregisterFormArray]);
   }
-
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonsalesregisterFormArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonsalesregisterFormArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.salesregisterTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
   CSVHeader = {
     "cNOTENO": "CNote No",
     "cNOTEDT": "CNote Date",
@@ -437,7 +453,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
+    // Convert the selected data to a CSV string
     const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

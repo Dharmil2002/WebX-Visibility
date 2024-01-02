@@ -87,7 +87,7 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
     try {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {
-            iSSYS: 1,
+            iSSYS: true,
             cATNM: AccountCategoryName,
             //AccountingLocations: AccountingLocations
         };
@@ -172,5 +172,46 @@ function mergeJsonLists(list1, list2) {
 
     return mergedList;
 }
+export async function GetTHCListBasdedOnBillNumberFromApi(masterService, BillNumber) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = { bILLNO: BillNumber };
+        const req = { companyCode, collectionName: 'thc_summary', filter };
+        const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
 
+        if (res && res.data && res.data[0]) {
+            const result = res.data.map((x, index) => ({
+                isSelected: false,
+                THC: x.docNo,
+                GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(), "dd-MM-yy"),
+                VehicleNumber: x.vEHNO,
+                THCamount: x.cONTAMT,
+                Advance: x.aDVAMT,
+                AdvancePending: x.aDVPENAMT,
+                OthersData: x
+            })) ?? null;
+            return result
+        }
+        return []
 
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return null;
+    }
+}
+
+export async function GetSingleVendorBillDetailsFromApi(masterService, bILLNO) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = { docNo: bILLNO };
+        const req = { companyCode, collectionName: 'vend_bill_summary', filter };
+        const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
+
+        if (res && res.data && res.data[0]) {
+            return res.data[0];
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}

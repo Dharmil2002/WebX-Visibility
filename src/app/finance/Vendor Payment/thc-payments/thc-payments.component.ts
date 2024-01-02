@@ -131,7 +131,8 @@ export class ThcPaymentsComponent implements OnInit {
             ...event.data,
             StartDate: this.RequestData.StartDate,
             EndDate: this.RequestData.EndDate,
-          }
+          },
+          Type: "Add",
         },
       });
     } else {

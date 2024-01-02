@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { VendorWiseOutService, convertToCSV } from 'src/app/Utility/module/reports/vendor-wise-outstanding';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { vendOutControl } from 'src/assets/FormControls/Vendor-Outstanding-report/vendor-outstanding-report';
 import Swal from 'sweetalert2';
+import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 
 @Component({
   selector: 'app-vendor-outstanding-report',
@@ -27,13 +29,14 @@ export class VendorOutstandingReportComponent implements OnInit {
   VendWiseOutTableForm: UntypedFormGroup
   jsonVendWiseOutFormArray: any
   vendoutFormControl: vendOutControl
+  protected _onDestroy = new Subject<void>();
   locName: any;
   locStatus: any;
   vendorName: any;
   vendorStatus: any;
   allData: {
     venNameData: any;
-    venTypeData: any;
+    // venTypeData: any;
   };
   vendorDetailList: any;
   venNameDet: any;
@@ -48,7 +51,8 @@ export class VendorOutstandingReportComponent implements OnInit {
     private filter: FilterUtils,
     private storage: StorageService,
     private masterServices: MasterService,
-    private vendorWiseOutService: VendorWiseOutService
+    private vendorWiseOutService: VendorWiseOutService,
+    private generalService: GeneralService,
   ) {
     this.initializeFormControl()
   }
@@ -89,7 +93,21 @@ export class VendorOutstandingReportComponent implements OnInit {
     )?.additionalData.showNameAndValue;
     this.VendWiseOutTableForm = formGroupBuilder(this.fb, [this.jsonVendWiseOutFormArray]);
   }
-
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonVendWiseOutFormArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonVendWiseOutFormArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.VendWiseOutTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
   CSVHeader = {
     "srNo": "#",
     "vendorCD":"Vendor Code",
@@ -116,6 +134,7 @@ export class VendorOutstandingReportComponent implements OnInit {
 
   async getDropDownList() {
     const locationList = await this.locationService.getLocationList();
+    const vendorType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "VT" }, "codeDesc", "codeId");
     let venNameReq = {
       "companyCode": this.storage.companyCode,
       "filter": {},
@@ -124,7 +143,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     const venNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", venNameReq));
     const mergedData = {
       venNameData: venNameRes?.data,
-      venTypeData: venNameRes?.data,
+      // venTypeData: venNameRes?.data,
     };
     this.allData = mergedData;
     const venNameDet = mergedData.venNameData
@@ -132,16 +151,16 @@ export class VendorOutstandingReportComponent implements OnInit {
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),
       }));
-    const venTypeDet = mergedData.venTypeData
-      .map(element => ({
-        name: element.vendorType,
-        value: element.vendorType,
-      }));
+    // const venTypeDet = mergedData.venTypeData
+    //   .map(element => ({
+    //     name: element.vendorType,
+    //     value: element.vendorType,
+    //   }));
 
     this.vendorDetailList = venNameDet;
-    this.vendTypeDetail = venTypeDet;
+    // this.vendTypeDetail = venTypeDet;
     this.venNameDet = venNameDet;
-    this.venTypeDet = venTypeDet
+    // this.venTypeDet = venTypeDet
     this.filter.Filter(
       this.jsonVendWiseOutFormArray,
       this.VendWiseOutTableForm,
@@ -152,7 +171,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     this.filter.Filter(
       this.jsonVendWiseOutFormArray,
       this.VendWiseOutTableForm,
-      venTypeDet,
+      vendorType,
       this.vendorTypeName,
       this.vendorTypeStatus
     );
@@ -197,7 +216,7 @@ export class VendorOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
+    // Convert the selected data to a CSV string
     const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

@@ -87,8 +87,9 @@ export class SubmitionControl {
                     },
                 ],
                 additionalData: {
-                    multiple: true
-                },
+                    multiple: true,
+                    isFileSelected: true
+                  },
                 functions: {
                     onChange: 'GetFileList',
                 },

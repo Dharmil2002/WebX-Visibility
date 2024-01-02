@@ -383,11 +383,10 @@ export class DocketService {
     }
     
     async addEventData(data) {
-        
         const evnData = {
-            "_id": `${this.storage.companyCode}-1-EVN0002` + new Date(),
+            "_id": `${this.storage.companyCode}${data.docketNumber}-1-EVN0002` + new Date(),
             "cID": this.storage.companyCode,
-            "dKTNO": data.docNo,
+            "dKTNO": data.docketNumber,
             "sFX": 1,
             "cNO": null,
             "lOC": this.storage.branch,

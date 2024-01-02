@@ -766,18 +766,11 @@
       "router": "Masters/CustomerContract/CustomerContractList"
     },
     {
-      "title": "AccountMasterList",
+      "title": "AccountMaster/AccountMasterList",
       "tag": [
         "AccountMasterList"
       ],
-      "router": "Masters/AccountMaster/ListAccount"
-    },
-    {
-      "title": "AccountMasterAdd",
-      "tag": [
-        "AccountMasterAdd"
-      ],
-      "router": "Masters/AccountMaster/AddAccount"
+      "router": "Masters/AccountMaster/AccountMasterList"
     },
     {
       "title": "BankMasterList",
@@ -806,20 +799,6 @@
         "TdsMasterAdd"
       ],
       "router": "Masters/AccountMaster/AddTds"
-    },
-    {
-      "title": "AccountGroupList",
-      "tag": [
-        "AccountGroupList"
-      ],
-      "router": "Masters/AccountMaster/ListAccount"
-    },
-    {
-      "title": "AAccountGroupAdd",
-      "tag": [
-        "AccountGroupAdd"
-      ],
-      "router": "Masters/AccountMaster/ListAccountGroup"
     },
     {
       "title": "Reports/Job-Register Report",

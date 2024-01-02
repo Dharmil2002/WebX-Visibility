@@ -3,6 +3,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -97,7 +98,7 @@ export class VendorMasterListComponent implements OnInit {
       // Generate srno for each object in the array
       const dataWithSrno = res.data
         .map((obj) => {
-          const vendorType = vendorTypeData.find(x => parseInt(x.value) === obj.vendorType);
+          const vendorType = vendorTypeData.find(x => x.value === obj.vendorType);
           return {
             ...obj,
             // srNo: index + 1,
@@ -114,7 +115,7 @@ export class VendorMasterListComponent implements OnInit {
 
   }
   async fetchData() {
-    const { vendorTypeDropdown }: any = await this.masterService.getJsonFileDetails('dropDownUrl').toPromise();
+    const vendorTypeDropdown = await PayBasisdetailFromApi(this.masterService, 'VT');
     // Use vendorTypeDropdown here or return it
     return vendorTypeDropdown;
   }
@@ -128,7 +129,7 @@ export class VendorMasterListComponent implements OnInit {
     delete det._id;
     delete det.srNo;
     delete det.eNTDT
-    det["vendorType"] = parseInt(vendorType.value)
+    det["vendorType"] = vendorType.value
     det['mODDT'] = new Date()
     det['mODBY'] = localStorage.getItem("UserName")
     det['mODLOC'] = localStorage.getItem("Branch")

@@ -94,7 +94,7 @@ export class PendingBillingComponent implements OnInit {
     private matDialog: MatDialog,
     private genericService:GenericService
   ) {
-    this.getKpiCount();
+  
     this.getFilterData();
   
   }
@@ -131,10 +131,12 @@ export class PendingBillingComponent implements OnInit {
   async get(data) {
     this.tableLoad = true; 
     const unBillingData = await this.invoiceService.getPendingDetails(data.start, data.end, data.customer);
-    this.tableData = unBillingData.map(function(item) {
-      return { ...item, action: "Generate Invoice" };
+    this.tableData = unBillingData.map(item => {
+      item.action = item.dockets != 0 ? "Generate Invoice" : "";
+      return item;
     });
     this.tableLoad = false;
+    this.getKpiCount();
   }
 
 
@@ -160,14 +162,19 @@ export class PendingBillingComponent implements OnInit {
   }
   reloadData(result) {
     if (result != undefined) {
+      this.getKpiCount();
       this.get(result);
     }
     else{
+      this.getKpiCount();
       this.getFilterData() 
       this.genericService.clearSharedData();
     }
   }
   getKpiCount() {
+    const totalShipment= this.tableData.map((item) => item.dKTNO).length;
+    const totolApproved = this.tableData.map((item) => item.dockets).length;
+    const unBillamt = this.tableData.reduce((acc, item) => acc + item.sum, 0);
     const createShipDataObject = (
       count: number,
       title: string,
@@ -178,10 +185,10 @@ export class PendingBillingComponent implements OnInit {
       class: `info-box7 ${className} order-info-box7`,
     });
     const pendingBilling = [
-      createShipDataObject(3, "Unbilled Shipments", "bg-c-Bottle-light"),
-      createShipDataObject(1000, "Unbilled Amount", "bg-c-Grape-light"),
-      createShipDataObject(1400, "Approved for Billing ", "bg-c-Daisy-light"),
-      createShipDataObject(250, "Pending PODs", "bg-c-Grape-light"),
+      createShipDataObject(totalShipment, "Unbilled Shipments", "bg-c-Bottle-light"),
+      createShipDataObject(unBillamt, "Unbilled Amount", "bg-c-Grape-light"),
+      createShipDataObject(totolApproved, "Approved for Billing ", "bg-c-Daisy-light"),
+      createShipDataObject(totolApproved, "Pending PODs", "bg-c-Grape-light"),
     ];
     this.boxData = pendingBilling
   }

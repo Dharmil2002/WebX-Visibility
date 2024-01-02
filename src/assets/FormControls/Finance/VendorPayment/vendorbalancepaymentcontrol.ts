@@ -348,6 +348,16 @@ export class VendorBalancePaymentControl {
         disable: true,
         Validations: [],
       },
+      {
+        name: "GSTType",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: [],
+      },
     ];
     this.VendorBalanceSummaryArray = [
       {

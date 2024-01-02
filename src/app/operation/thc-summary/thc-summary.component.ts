@@ -169,7 +169,7 @@ export class ThcSummaryComponent implements OnInit {
   openExternalWindow(data) {
     const templateBody = {
       DocNo: data.docNo,
-      templateName: 'thc'
+      templateName: 'THC View-Print'
     }
     console.log('templateBody', templateBody)
     console.log('data', data)

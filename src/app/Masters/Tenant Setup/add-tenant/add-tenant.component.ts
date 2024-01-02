@@ -64,6 +64,7 @@ export class AddTenantComponent implements OnInit {
   cURRENCYStatus: any;
   currencyDet: any;
   currencyData: any;
+  FileData: any;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -252,8 +253,8 @@ export class AddTenantComponent implements OnInit {
       this.tenantTableForm.controls[controlName].setValue(controlValue);
     });
 
-    let data = this.tenantTableForm.value;
-    console.log("data", data);
+    const file = this.objImageHandling.getFileByKey("lOGO", this.imageData);
+    let data = {...this.tenantTableForm.value , lOGO:file};
 
     if (this.isUpdate) {
       let id = this.TenantTab._id;
@@ -325,7 +326,9 @@ export class AddTenantComponent implements OnInit {
   }
 
   openImageDialog(control) {
+    console.log('control' , control)
     const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    console.log('file' ,file)
     this.matDialog.open(ImagePreviewComponent, {
       data: { imageUrl: file },
       width: '30%',

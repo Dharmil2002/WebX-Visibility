@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -7,7 +7,8 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { UserMaster } from "src/app/core/models/Masters/User Master/user-master";
 import { UserControl } from "src/assets/FormControls/userMaster";
 import Swal from "sweetalert2";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-add-user-master",
@@ -29,7 +30,6 @@ export class AddUserMasterComponent implements OnInit {
   location: any;
   divisionStatus: any;
   locationName: any;
-  branchCode: any;
   userLocationStatus: any;
   userRoleStatus: any;
   userRole: any;
@@ -39,30 +39,19 @@ export class AddUserMasterComponent implements OnInit {
   userTypeStatus: any;
   locationStatus: any;
   UserFormControls: UserControl;
-  locationData: any;
-  countryData: any;
-  updateCountry: any;
   divisionAccess: any;
-  multiLoc: any;
   locationList: any;
   userList: any;
   roleId: any;
   countryList: any;
-  updateLocation: any;
-  updateUser: any;
-  updateRoleId: any;
   userData: any;
-  roleIdData: any;
   divisionList: any;
   division: any;
   data: any;
   confirmpassword: any;
-  userCodeCounter: number = 0;
-  previousUserCode: string = "";
   newUserCode: any;
-  jsonControlArray: any[];
   submit = 'Save';
-  backPath:string;
+  backPath: string;
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
@@ -74,14 +63,16 @@ export class AddUserMasterComponent implements OnInit {
     private filter: FilterUtils,
     private route: Router,
     private fb: UntypedFormBuilder,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService,
+
   ) {
     const extrasState = this.route.getCurrentNavigation()?.extras?.state;
     this.isUpdate = false;
     this.action = extrasState ? "edit" : "add";
     if (this.action === "edit") {
       this.userTable = extrasState.data;
-      console.log(this.userTable);
+      // console.log(this.userTable);
 
       this.isUpdate = true;
       this.submit = 'Modify';
@@ -145,7 +136,6 @@ export class AddUserMasterComponent implements OnInit {
   }
 
   initializeFormControl() {
-    //throw new Error("Method not implemented.");
     this.UserFormControls = new UserControl(this.userTable, this.isUpdate);
     // Get form controls for Driver Details section
     this.jsonControlUserArray = this.UserFormControls.getFormControlsUser();
@@ -161,11 +151,11 @@ export class AddUserMasterComponent implements OnInit {
       this.countryList = countryList;
 
       if (this.isUpdate) {
-        this.updateCountry = this.findDropdownItemByName(
+        const updateCountry = this.findDropdownItemByName(
           this.countryList,
           this.userTable.country
         );
-        this.userTableForm.controls.country.setValue(this.updateCountry);
+        this.userTableForm.controls.country.setValue(updateCountry);
 
         // Patches the Div control value of UserTableForm with filter
         this.userTableForm.controls["division"].patchValue(
@@ -203,7 +193,7 @@ export class AddUserMasterComponent implements OnInit {
   }
 
   findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find((item) => item.value === name);
+    return dropdownData.find((item) => parseInt(item.value) === name);
   }
 
   toggleSelectAll(argData: any) {
@@ -235,37 +225,12 @@ export class AddUserMasterComponent implements OnInit {
         collectionName: "General_master",
         filter: {},
       };
-      const userReqBody = {
-        companyCode: this.companyCode,
-        collectionName: "user_master",
-        filter: {},
-      };
-      const locationsResponse = await this.masterService
-        .masterPost("generic/get", locationReq)
-        .toPromise();
-      const userStatusResponse = await this.masterService
-        .masterPost("generic/get", generalReqBody)
-        .toPromise();
-      const managerResponse = await this.masterService
-        .masterPost("generic/get", userReqBody)
-        .toPromise();
+
+      const locationsResponse = await firstValueFrom(this.masterService.masterPost("generic/get", locationReq));
+      const userStatusResponse = await firstValueFrom(this.masterService.masterPost("generic/get", generalReqBody));
       const locations = locationsResponse.data.map((element) => ({
         name: String(element.locCode),
         value: String(element.locCode),
-      }));
-
-      //Code Type = 'EMPST'
-      // const userStatusList = userStatusResponse.data
-      //   .filter((item) => item.codeType === "EMPST" && item.activeFlag)
-      //   .map((x) => {
-      //     {
-      //       return { name: x.codeDesc, value: x.codeId };
-      //     }
-      //   });
-
-      const managerList = managerResponse.data.map((element) => ({
-        name: String(element.name),
-        value: String(element.userId),
       }));
 
       //Code Type = 'usertyp'
@@ -292,11 +257,6 @@ export class AddUserMasterComponent implements OnInit {
         );
         this.userTableForm.controls["branchCode"].setValue(userLocation);
 
-        // const userStatus = userStatusList.find(
-        //   (x) => x.name === this.userTable.userStatus
-        // );
-        // this.userTableForm.controls["userStatus"].setValue(userStatus);
-
         const userType = userTypeList.find(
           (x) => x.name === this.userTable.userType
         );
@@ -307,10 +267,6 @@ export class AddUserMasterComponent implements OnInit {
         );
         this.userTableForm.controls["role"].setValue(userRole);
 
-        // const managerId = managerList.find(
-        //   (x) => x.name === this.userTable.managerId
-        // );
-        // this.userTableForm.controls["managerId"].setValue(managerId);
         this.userTableForm.controls["userLocationscontrolHandler"].patchValue(
           locations.filter((element) =>
             this.userTable.multiLocation.includes(element.value)
@@ -352,15 +308,9 @@ export class AddUserMasterComponent implements OnInit {
 
   async save() {
     this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
-    this.userTableForm.controls["userType"].setValue(
-      this.userTableForm.value.userType.name
-    );
-    this.userTableForm.controls["country"].setValue(
-      this.userTableForm.value.country.value
-    );
-    this.userTableForm.controls["role"].setValue(
-      this.userTableForm.value.role.name
-    );
+    this.userTableForm.value.userType ? this.userTableForm.controls["userType"].setValue(this.userTableForm.value.userType.name) : '';
+    this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
+    this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
     //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
     const division = this.userTableForm.value.division.map(
       (item: any) => item.name
@@ -372,9 +322,6 @@ export class AddUserMasterComponent implements OnInit {
     );
     this.userTableForm.controls["multiLocation"].setValue(multiLoc);
 
-    // this.userTableForm.controls["isActive"].setValue(
-    //   this.userTableForm.value.isActive === true ? true : false
-    // );
     //remove unwanted controlName
     const controlsToRemove = [
       "confirmpassword",
@@ -387,88 +334,79 @@ export class AddUserMasterComponent implements OnInit {
     controlsToRemove.forEach((controlName) => {
       this.userTableForm.removeControl(controlName);
     });
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      collectionName: "user_master",
-      filter: {},
-    };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: async (res: any) => {
+    const sortedData = await this.getUserList();
+    if (sortedData) {
+      // Generate srno for each object in the array
+      const lastUserId = sortedData[sortedData.length - 1];
+      const lastUserCode = lastUserId ? parseInt(lastUserId.userId.substring(3)) : 0;
+      // Function to generate a new route code
+      function generateUserCode(initialCode: number = 0) {
+        const nextUserCode = initialCode + 1;
+        const userNumber = nextUserCode.toString().padStart(4, "0");
+        const userCode = `USR${userNumber}`;
+        return userCode;
+      }
+      if (this.isUpdate) {
+        this.newUserCode = this.userTable._id;
+      } else {
+        this.newUserCode = generateUserCode(lastUserCode);
+      }
+      //generate unique userId
+      this.userTableForm.controls["userId"].setValue(this.newUserCode);
+      // Clear any errors in the form controls
+      Object.values(this.userTableForm.controls).forEach((control) =>
+        control.setErrors(null)
+      );
+      let data = this.userTableForm.value;
+      if (this.isUpdate) {
+        data["mODDT"] = new Date();
+        data['mODLOC'] = this.storage.branch;
+        data['mODBY'] = this.storage.userName;
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "user_master",
+          filter: {
+            _id: this.userTable._id,
+          },
+          update: data,
+        };
+
+        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
         if (res) {
-          // Generate srno for each object in the array
-          const lastUserId = res.data[res.data.length - 1];
-          const lastUserCode = lastUserId
-            ? parseInt(lastUserId.userId.substring(3))
-            : 0;
-          // Function to generate a new route code
-          function generateUserCode(initialCode: number = 0) {
-            const nextUserCode = initialCode + 1;
-            const userNumber = nextUserCode.toString().padStart(4, "0");
-            const userCode = `USR${userNumber}`;
-            return userCode;
-          }
-          if (this.isUpdate) {
-            this.newUserCode = this.userTable._id;
-          } else {
-            this.newUserCode = generateUserCode(lastUserCode);
-          }
-          //generate unique userId
-          this.userTableForm.controls["userId"].setValue(this.newUserCode);
-          // Clear any errors in the form controls
-          Object.values(this.userTableForm.controls).forEach((control) =>
-            control.setErrors(null)
-          );
-          if (this.isUpdate) {
-            // Remove the "id" field from the form controls
-            this.userTableForm.removeControl('isUpdate')
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "user_master",
-              filter: {
-                _id: this.userTable._id,
-              },
-              update: this.userTableForm.value,
-            };
-            const res = await this.masterService
-              .masterPut("generic/update", req)
-              .toPromise();
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Record updated Successfully",
-                showConfirmButton: true,
-              });
-              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            }
-          } else {
-            const data = this.userTableForm.value;
-            const id = { _id: this.userTableForm.controls["userId"].value };
-            const mergedObject = { ...data, ...id };
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "user_master",
-              data: mergedObject,
-            };
-            const res = await this.masterService
-              .masterPost("generic/create", req)
-              .toPromise();
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Record added Successfully",
-                showConfirmButton: true,
-              });
-              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            }
-          }
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: "Record updated Successfully",
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
         }
-      },
-      complete() { },
-    });
+      } else {
+        data["eNTDT"] = new Date();
+        data['eNTLOC'] = this.storage.branch;
+        data['eNTBY'] = this.storage.userName;
+        const id = { _id: this.userTableForm.controls["userId"].value };
+        const mergedObject = { ...data, ...id };
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "user_master",
+          data: mergedObject,
+        };
+
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: "Record added Successfully",
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+        }
+      }
+    }
   }
 
   cancel() {
@@ -504,13 +442,10 @@ export class AddUserMasterComponent implements OnInit {
     this.confirmpassword = this.userTableForm.get("confirmpassword").value;
     if (this.password != this.confirmpassword) {
       Swal.fire({
-        title: "Password and confirm password did not match",
-        toast: true,
-        icon: "error",
-        showCloseButton: false,
-        showCancelButton: false,
-        showConfirmButton: true,
-        confirmButtonText: "OK",
+        text: "Password and confirm password did not match",
+        icon: 'warning',
+        title: 'Warning',
+        showConfirmButton: true
       });
       this.userTableForm.controls["confirmpassword"].reset();
     }
@@ -519,29 +454,22 @@ export class AddUserMasterComponent implements OnInit {
   async checkValueExists(fieldName, errorMessage) {
     try {
       // Get the field value from the form controls
-      const fieldValue = this.userTableForm.controls[fieldName].value;
+      const fieldValue = this.userTableForm.controls[fieldName].value.toLowerCase();
 
-      // Create a request object with the filter criteria
-      const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        collectionName: "user_master",
-        filter: { [fieldName]: fieldValue },
-      };
-
-      // Send the request to fetch user data
-      const userlist = await this.masterService.masterPost("generic/get", req).toPromise();
+      // Fetch user data
+      const userList = await this.getUserList();
 
       // Check if data exists for the given filter criteria
-      if (userlist.data.length > 0) {
+      const isValueExist = userList.some(item => item[fieldName].toLowerCase() === fieldValue);
+
+      // Check if data exists for the given filter criteria
+      if (isValueExist) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          title: `${errorMessage} already exists! Please try with another !`,
-          toast: true,
-          icon: "error",
-          showCloseButton: false,
-          showCancelButton: false,
-          showConfirmButton: true,
-          confirmButtonText: "OK"
+          text: `${errorMessage}: ${this.userTableForm.controls[fieldName].value} already exists! Please try with another !`,
+          icon: 'warning',
+          title: 'Warning',
+          showConfirmButton: true
         });
 
         // Reset the input field
@@ -569,4 +497,17 @@ export class AddUserMasterComponent implements OnInit {
     this.userTableForm.controls['isActive'].setValue(event);
     // console.log("Toggle value :", event);
   }
+  //#region to get user List
+  async getUserList() {
+    try {
+      const req = { companyCode: this.companyCode, collectionName: "user_master", filter: {} };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+      return response ? response.data.sort((a, b) => a._id.localeCompare(b._id)) : [];
+    } catch (error) {
+      console.error("Error fetching user list:", error);
+      throw error;
+    }
+  }
+  //#endregion
 }

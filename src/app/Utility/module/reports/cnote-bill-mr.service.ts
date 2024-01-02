@@ -16,7 +16,7 @@ export class CnoteBillMRService {
      async getCNoteBillMRReportDetail() {
           const reqBody = {
                companyCode: this.storage.companyCode,
-               collectionName: "Cust_bills_headers",
+               collectionName: "cust_bill_headers",
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));

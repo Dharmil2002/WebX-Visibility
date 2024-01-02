@@ -96,7 +96,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   async checkVehicleTypeExist() {
     const res = await this.getVehicleTypeList();
     const vehicleTypeNameToCheck = this.vehicleTypeTableForm.value.vehicleTypeName.toLowerCase();
-    const vehicleTypeExists = res.data.some((item) => item.vehicleTypeName.toLowerCase() === vehicleTypeNameToCheck
+    const vehicleTypeExists = res.some((item) => item.vehicleTypeName.toLowerCase() === vehicleTypeNameToCheck
     );
     if (vehicleTypeExists) {
       // Show the popup indicating that the state already exists
@@ -192,13 +192,18 @@ export class AddVehicletypeMasterComponent implements OnInit {
     // console.log("Toggle value :", event);
   }
   async getVehicleTypeList() {
-    let req = {
-      "companyCode": this.companyCode,
-      "collectionName": "vehicleType_detail",
-      "filter": {}
-    };
-    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-    return res.data.sort((a, b) => a._id.localeCompare(b._id));
+    try {
+      let req = {
+        "companyCode": this.companyCode,
+        "collectionName": "vehicleType_detail",
+        "filter": {}
+      };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/get", req));
 
+      return response ? response.data.sort((a, b) => a._id.localeCompare(b._id)) : [];
+    } catch (error) {
+      console.error("Error fetching user list:", error);
+      throw error;
+    }
   }
 }

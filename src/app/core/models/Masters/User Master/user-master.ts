@@ -51,7 +51,7 @@ export class UserMaster {
   userTypeValue: any;
   userStatusData: any;
   userpassword: any;
-  erpId:any;
+  erpId: any;
   branchCode: any;
 
   constructor(UserMaster) {
@@ -75,6 +75,9 @@ export class UserMaster {
       this.updateBy = UserMaster.updateBy || "";
       this.status = UserMaster.status || 200;
       this.divId = UserMaster.divId || '';
+      this.residentialAddress = UserMaster.residentialAddress || '';
+      this.dateOfJoining = UserMaster.dateOfJoining || '';
+      this.dateOfBirth = UserMaster.dateOfBirth || '';
     }
   }
   public getRandomID(): string {

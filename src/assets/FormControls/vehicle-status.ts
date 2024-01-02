@@ -56,7 +56,7 @@ export class VehicleStatusControls {
                 Validations: [],
             },
             {
-                name: 'updateBy', label: 'updateBy', placeholder: '', type: '', value: localStorage.getItem("Username"), generatecontrol: false, disable: false,
+                name: 'updateBy', label: 'updateBy', placeholder: '', type: '', value: localStorage.getItem("UserName"), generatecontrol: false, disable: false,
                 Validations: [],
             },
             {
@@ -94,7 +94,23 @@ export class VehicleStatusControls {
             {
                 name: 'ToCity', label: 'ToCity', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
                 Validations: [],
-            }
+            },
+            {
+                name: 'vendorTypeCode', label: 'vendorTypeCode', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'lcExpireDate', label: 'lcExpireDate', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'lcNo', label: 'lcNo', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: []
+            },
+            {
+                name: 'driverPan', label: 'driverPan', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: []
+            },
 
         ]
     }

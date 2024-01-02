@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -24,14 +24,15 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
   };
   breadScrums = [
     {
-      title: "Vendor Wise GST Register Report",
+      title: "Vendor Wise GST Invoice Register Report",
       items: ["Home"],
-      active: "Vendor Wise GST Register Report",
+      active: "Vendor Wise GST Invoice Register Report",
     },
   ];
   vendorgstregisTableForm: UntypedFormGroup
   jsonvendgstregisFormArray: any
   vengstFormControls: vendorWiseGSTControl
+  protected _onDestroy = new Subject<void>();
   vendorDetail: any;
   vendorDetailList: any;
   venNameDet: any;
@@ -128,6 +129,22 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     this.vendorgstregisTableForm = formGroupBuilder(this.fb, [this.jsonvendgstregisFormArray]);
   }
 
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonvendgstregisFormArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonvendgstregisFormArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.vendorgstregisTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+
   async getDropDownList() {
     let venNameReq = {
       "companyCode": this.storage.companyCode,
@@ -210,7 +227,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
+    // Convert the selected data to a CSV string
     const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

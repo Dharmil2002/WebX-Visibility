@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKER_REGISTRY: velocitycontainers.azurecr.io
-  IMAGE_NAME: tms-web
+  IMAGE_NAME: tms-web-prod
   TAG: ${{ github.sha }}
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
         password: ${{ secrets.ACR_PASSWORD }}
 
     - name: Build Docker image
-      run: docker build . -f Dockerfiles/Dockerfile.beta -t ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+      run: docker build . -f Dockerfiles/Dockerfile.prod -t ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
     #- name: Push Docker image to Azure Container Registry
     #  run: docker push ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}

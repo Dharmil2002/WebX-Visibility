@@ -34,6 +34,8 @@ export class JobSummaryPageComponent implements OnInit {
       Title: "Job No",
       class: "matcolumnleft",
       Style: "min-width:250px",
+      type: 'windowLink',
+      functionName: 'OpenJob'
     },
     jobDate: {
       Title: "Job Date",
@@ -84,7 +86,6 @@ export class JobSummaryPageComponent implements OnInit {
   //#endregion
   staticField = [
     "createdOn",
-    "jobNo",
     "jobDate",
     "jobType",
     "billingParty",
@@ -109,5 +110,22 @@ export class JobSummaryPageComponent implements OnInit {
     let data = await getJobDetailFromApi(this._masterService);
     this.tableData = data;
     this.tableLoad = false;
+  }
+
+  functionCallHandler(event) {
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+
+  OpenJob(data) {
+    const templateBody = {
+      DocNo: data.jobNo,
+      templateName: 'Job View-Print'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
   }
 }

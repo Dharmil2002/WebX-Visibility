@@ -26,7 +26,7 @@ export class THCAmountsDetailComponent implements OnInit {
 
   THCAmountsArray: any;
   THCAmountsForm: UntypedFormGroup;
-  PaymentData;
+  BillPaymentData;
   THCData;
   Type: any;
   isLessForm = false;
@@ -49,7 +49,7 @@ export class THCAmountsDetailComponent implements OnInit {
 
   ngOnInit() {
     console.log("objResult", this.objResult);
-    this.PaymentData = this.objResult?.PaymentData;
+    this.BillPaymentData = this.objResult?.BillPaymentData;
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
     this.getTHCsummary();
@@ -187,7 +187,7 @@ export class THCAmountsDetailComponent implements OnInit {
       companyCode: this.companyCode,
       collectionName: "charges",
       filter: {
-        cHTY:'V'
+        cHTY: 'V'
       },
     };
 

@@ -25,14 +25,6 @@ export class ViewPrintComponent implements OnInit {
   viewName: any;
   viewStatus: any;
   viewTable: any;
-  json = [
-    { "module": "View-Print-0001", "collectionName": "prq_summary", "branch": "bRCD", "templateName": 'prq' },
-    { "module": "View-Print-0002", "collectionName": "thc_summary", "branch": "cLOC", "templateName": 'thc' },
-    { "module": "View-Print-0003", "collectionName": "dockets", "branch": "oRGN", "templateName": 'docket' },
-    { "module": "View-Print-0004", "collectionName": "voucher_trans", "branch": "bRC", "templateName": 'voucher' },
-    { "module": "View-Print-0005", "collectionName": "job_detail", "templateName": 'job' }
-  ]
-
   constructor(
     private fb: UntypedFormBuilder,
     private generalService: GeneralService,
@@ -59,32 +51,6 @@ export class ViewPrintComponent implements OnInit {
     this.viewTableForm = formGroupBuilder(this.fb, [this.jsonControlViewArray]);
   }
 
-  /*fetches and filters dropdown data based on the values of
-  'dOCNO' and 'vIEWTYPE' from the viewTableForm.*/
-  // async getDropdownData() {
-  // Extracting values from the viewTableForm
-  //   const { dOCNO, vIEWTYPE } = this.viewTableForm.value;
-  // Finding the type from the json array based on the selected 'vIEWTYPE' value  
-  // const type = this.json.find(x => x.module === vIEWTYPE.value);
-  // Constructing the request object for fetching data from the MongoDB collection
-  //   const req = {
-  //     "companyCode": this.storage.companyCode,
-  //     "collectionName": type.collectionName,
-  //     filter: { "docNo": { "D$regex": `${dOCNO}`, "D$options": "i" }, [type['branch']]: this.storage.branch }
-  //   };
-  // Fetching data from the MongoDB collection using masterServices
-  //   const Res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", req));
-  // Filtering and updating the viewTableForm based on the fetched data
-  //   this.filter.Filter(
-  //     this.jsonControlViewArray,
-  //     this.viewTableForm,
-  // Mapping the fetched data to a format suitable for the dropdown
-  //     Res.data.map((x) => { return { name: x.docNo, value: x.docNo } }),
-  //     'dOCNO',
-  //     false
-  //   );
-  // }
-
   /*Bind dropdown of view type from general master*/
   async getDropDownList() {
     // Resetting the value of the 'dOCNO' control to an empty string
@@ -102,13 +68,9 @@ export class ViewPrintComponent implements OnInit {
   }
 
   async save() {
-    const { vIEWTYPE } = this.viewTableForm.value;
-    const type = this.json.find((x) => x.module === vIEWTYPE.value);
-    // const docNo = { dOCNO: this.viewTableForm.value.dOCNO };
-    const docNo = this.viewTableForm.value.dOCNO;
     const req = {
-      templateName: type.templateName,
-      DocNo: docNo,
+      templateName: this.viewTableForm.value.vIEWTYPE.name,
+      DocNo: this.viewTableForm.value.dOCNO,
     };
     console.log("req", req);
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;

@@ -7,6 +7,7 @@ import { ManageRunsheetComponent } from "./tabs/manage-runsheet/manage-runsheet.
 import { StocksComponent } from "./stocks/stocks.component";
 import { UpdateStockComponent } from "./ActionPages/update-stock/update-stock.component";
 import { JobTrackerComponent } from "./tabs/job-tracker/job-tracker.component";
+import { AddDeliveryMrGenerationComponent } from "./tabs/Delivery MR Generation/add-delivery-mr-generation/add-delivery-mr-generation.component";
 const routes: Routes = [
   {
     path: "",
@@ -40,6 +41,10 @@ const routes: Routes = [
   {
     path:"JobTracker",
     component:JobTrackerComponent
+  },
+  {
+    path:"AddDeliveryMrGeneration",
+    component:AddDeliveryMrGenerationComponent
   },
 
 ];

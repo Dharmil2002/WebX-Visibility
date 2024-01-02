@@ -476,54 +476,7 @@ export class LocationControl {
         value: '',
         Validations: [],
         generatecontrol: false, disable: false
-      },
-      {
-        name: '_id',
-        label: '',
-        placeholder: '',
-        type: 'text',
-        value: LocationTable._id,
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
-
-      },
-      {
-        name: 'updateDate',
-        label: ' ',
-        placeholder: ' ',
-        type: 'date',
-        value: new Date(), // Set the value to the current date
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
-      },
-      {
-        name: "updateBy",
-        label: "Update By",
-        placeholder: "Update By",
-        type: "text",
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
-      {
-        name: "EntryBy",
-        label: "",
-        placeholder: "Update By",
-        type: "text",
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
+      }
     ])
   }
   getFormControlsLocation() {

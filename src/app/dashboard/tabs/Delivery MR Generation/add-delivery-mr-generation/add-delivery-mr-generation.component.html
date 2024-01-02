@@ -1,0 +1,15 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+
+    <form [formGroup]="deliveryMrTableForm">
+        <app-form-webxpress [form]="deliveryMrTableForm" [FormTitle]="'Delivery MR Generation '"
+            [formData]="jsonControlDeliveryMrGenArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+    <app-generic-table-v2 *ngIf="tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [FormTitle]="'Delivery MR Generation List'" [tableData]="tableData" [menuItems]="menuItems"
+        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag"
+        (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" [DisplayAddNewButton]=true
+        (AddNewButtonEvent)="addDetails()">
+    </app-generic-table-v2>
+</app-common-wrapper-webxpress>

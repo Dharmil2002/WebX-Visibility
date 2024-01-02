@@ -53,6 +53,9 @@ import { ThcSummaryComponent } from "../operation/thc-summary/thc-summary.compon
 import { ThcUpdateComponent } from './tabs/thc-update/thc-update.component';
 import { DocketListComponent } from './tabs/docket-list/docket-list.component';
 import { InvoiceDashboardComponent } from "../finance/invoice-summary-bill/invoice-dashboard/invoice-dashboard.component";
+import { DeliveryMrGenerationListComponent } from './tabs/Delivery MR Generation/delivery-mr-generation-list/delivery-mr-generation-list.component';
+import { AddDeliveryMrGenerationComponent } from './tabs/Delivery MR Generation/add-delivery-mr-generation/add-delivery-mr-generation.component';
+import { DeliveryMrGenerationModalComponent } from './tabs/Delivery MR Generation/delivery-mr-generation-modal/delivery-mr-generation-modal.component';
 @NgModule({
   declarations: [
     DocketDashboardComponent,
@@ -80,10 +83,10 @@ import { InvoiceDashboardComponent } from "../finance/invoice-summary-bill/invoi
     ThcSummaryComponent,
     ThcUpdateComponent,
     DocketListComponent,
-    InvoiceDashboardComponent
-
-
-
+    InvoiceDashboardComponent,
+    DeliveryMrGenerationListComponent,
+    AddDeliveryMrGenerationComponent,
+    DeliveryMrGenerationModalComponent,
   ],
   imports: [
     CommonModule,

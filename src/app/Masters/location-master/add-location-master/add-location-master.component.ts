@@ -10,11 +10,11 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { processProperties } from "../../processUtility";
 import { take, takeUntil } from "rxjs/operators";
-import { ReplaySubject, Subject } from "rxjs";
+import { Subject, firstValueFrom } from "rxjs";
 import { MapRender } from "src/app/Utility/Location Map/Maprendering";
-import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: "app-add-location-master",
   templateUrl: "./add-location-master.component.html",
@@ -79,7 +79,8 @@ export class AddLocationMasterComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private objPinCodeService: PinCodeService,
-    private objState: StateService
+    private objState: StateService,
+    private storage: StorageService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
@@ -205,19 +206,20 @@ export class AddLocationMasterComponent implements OnInit {
     );
 
     if (this.isUpdate) {
-      const id = this.locationTableForm.value._id;
-      this.locationTableForm.removeControl("_id");
-      this.locationTableForm.removeControl("EntryBy");
+      const id = this.locationTable._id;
       this.locationTableForm.removeControl("mappedPincode");
       this.locationTableForm.removeControl("pincodeHandler");
-
+      let data = this.locationTableForm.value;
+      data["mODDT"] = new Date();
+      data['mODLOC'] = this.storage.branch;
+      data['mODBY'] = this.storage.userName;
       const req = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
         filter: { _id: id },
-        update: this.locationTableForm.value,
+        update: data,
       };
-      const res = this.masterService.masterPut("generic/update", req).toPromise()
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
       if (res) {
         // Display success message
         Swal.fire({
@@ -244,20 +246,20 @@ export class AddLocationMasterComponent implements OnInit {
         });
         return;
       }
-      this.locationTableForm.removeControl("updateBy");
       this.locationTableForm.removeControl("mappedPincode");
-
+      let data = this.locationTableForm.value;
+      data["eNTDT"] = new Date();
+      data['eNTLOC'] = this.storage.branch;
+      data['eNTBY'] = this.storage.userName;
       // Create a new record
-      this.locationTableForm.controls["_id"].setValue(
-        this.locationTableForm.controls["locCode"].value
-      );
+      data["_id"] = this.locationTableForm.controls["locCode"].value;
 
       const createReq = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
-        data: this.locationTableForm.value,
+        data: data,
       };
-      const res = this.masterService.masterPost("generic/create", createReq).toPromise()
+      const res = await firstValueFrom(this.masterService.masterPost("generic/create", createReq))
       if (res) {
         // Display success message
         Swal.fire({
@@ -318,11 +320,6 @@ export class AddLocationMasterComponent implements OnInit {
   /*get all Master Details*/
   async getAllMastersData() {
     try {
-      const locationReqBody = {
-        companyCode: this.companyCode,
-        filter: {},
-        collectionName: "location_detail",
-      };
       const pincodeReqBody = {
         companyCode: this.companyCode,
         filter: {},
@@ -338,16 +335,10 @@ export class AddLocationMasterComponent implements OnInit {
         "collectionName": "state_master",
       };
 
-      this.StateList = await this.masterService.masterPost('generic/get', request).toPromise();
-      this.locationResponse = await this.masterService
-        .masterPost("generic/get", locationReqBody)
-        .toPromise();
-      this.pincodeResponse = await this.masterService
-        .masterPost("generic/get", pincodeReqBody)
-        .toPromise();
-      const generalResponse = await this.masterService
-        .masterPost("generic/get", generalReqBody)
-        .toPromise();
+      this.StateList = await firstValueFrom(this.masterService.masterPost('generic/get', request));
+      this.locationResponse = await this.getLocationList();
+      this.pincodeResponse = await firstValueFrom(this.masterService.masterPost("generic/get", pincodeReqBody));
+      const generalResponse = await firstValueFrom(this.masterService.masterPost("generic/get", generalReqBody));
       this.locLevelList = generalResponse.data
         .filter((item) => item.codeType === "HRCHY" && item.activeFlag)
         .map((x) => {
@@ -401,10 +392,7 @@ export class AddLocationMasterComponent implements OnInit {
           (x) => x.name == this.locationTable.ownership
         );
         this.locationTableForm.controls.ownership.setValue(ownership);
-
-        const pincodeDet = this.pincodeDet.find(
-          (x) => x.value == this.locationTable.locPincode
-        );
+        const pincodeDet = this.pincodeDet.find((x) => x.value == (this.locationTable.locPincode).toString());
         this.locationTableForm.controls.locPincode.setValue(pincodeDet);
       }
       this.filter.Filter(
@@ -447,9 +435,7 @@ export class AddLocationMasterComponent implements OnInit {
         (x) => x.value == this.locationTable.reportLevel
       );
       this.locationTableForm.controls.reportLevel.setValue(reportLevel);
-      this.setReportLocData(
-        this.isUpdate ? this.locationTable.reportLevel : event
-      );
+      this.setReportLocData(this.isUpdate ? this.locationTable.reportLevel : event);
     }
     this.filter.Filter(
       this.jsonControlLocationArray,
@@ -466,7 +452,7 @@ export class AddLocationMasterComponent implements OnInit {
         !event.hasOwnProperty("value")
         ? event
         : event.eventArgs.option.value.value;
-    const filter = this.locationResponse.data.filter(
+    const filter = this.locationResponse.filter(
       (x) => parseInt(x.locLevel) === parseInt(locHierachy)
     );
     const reportLoc = filter
@@ -496,18 +482,13 @@ export class AddLocationMasterComponent implements OnInit {
       // Get the field value from the form controls
       let fieldValue = this.locationTableForm.controls[fieldName].value;
       fieldValue = fieldValue.toUpperCase();
-      // Create a request object with the filter criteria
-      const req = {
-        companyCode: this.companyCode,
-        collectionName: "location_detail",
-        filter: { [fieldName]: fieldValue },
-      };
-
-      // Send the request to fetch user data
-      const locationlist = await this.masterService.masterPost("generic/get", req).toPromise();
+      const locationList = await this.getLocationList();
 
       // Check if data exists for the given filter criteria
-      if (locationlist.data.length > 0) {
+      const isValueExist = locationList.some(item => item[fieldName].toLowerCase() === fieldValue);
+
+      // Check if data exists for the given filter criteria
+      if (isValueExist) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
           icon: "error",
@@ -708,6 +689,20 @@ export class AddLocationMasterComponent implements OnInit {
       this.checkGstNo();
     } catch (error) {
       console.error('An error occurred while setting the GST state:', error);
+    }
+  }
+  //#endregion
+
+  //#region to get location List
+  async getLocationList() {
+    try {
+      const req = { companyCode: this.companyCode, collectionName: "location_detail", filter: {} };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+      return response ? response.data.sort((a, b) => a._id.localeCompare(b._id)) : [];
+    } catch (error) {
+      console.error("Error fetching location list:", error);
+      throw error;
     }
   }
   //#endregion

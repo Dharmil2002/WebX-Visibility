@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 
@@ -13,7 +15,7 @@ export class LocationMasterComponent implements OnInit {
   linkArray = []
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   columnHeader = {
-    'updateDate': 'Created Date',
+    'eNTDT': 'Created Date',
     'locCode': 'Code',
     'locName': 'Name',
     'ownership': 'Ownership',
@@ -24,7 +26,7 @@ export class LocationMasterComponent implements OnInit {
     "actions": "Actions"
   };
   columnWidths = {
-    'updateDate': 'max-width: 50%',
+    'eNTDT': 'max-width: 50%',
     'locCode': 'max-width:10%',
     'locName': 'max-width:13%',
     'ownership': 'max-width:12%',
@@ -73,9 +75,7 @@ export class LocationMasterComponent implements OnInit {
       collectionName: "General_master",
     };
 
-    const generalResponse = await this.masterService
-      .masterPost("generic/get", generalReqBody)
-      .toPromise();
+    const generalResponse = await firstValueFrom(this.masterService.masterPost("generic/get", generalReqBody));
     return generalResponse.data
   }
   //#region to get location Details
@@ -85,46 +85,45 @@ export class LocationMasterComponent implements OnInit {
       "filter": {},
       "collectionName": "location_detail"
     }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: async (res: any) => {
-        if (res) {
-          // Get the ownership descriptions using the getOwnership() function
-          const ownershipDescriptions = await this.getOwnership();
+    const res = await firstValueFrom(this.masterService.masterPost('generic/get', req))
+    if (res && Array.isArray(res.data)) {
+      try {
+        // Get the ownership descriptions using the getOwnership() function
+        const ownershipDescriptions = await this.getOwnership();
 
-          // Modify each object in res.data
-          const modifiedData = res.data.map(obj => {
-            // Find the matching ownership description
-            const ownershipObject = ownershipDescriptions.find(
-              (x) => x.codeId === obj.ownership
-            );
+        // Modify each object in res.data
+        const modifiedData = res.data.map(obj => {
+          // Find the matching ownership description
+          const ownershipObject = ownershipDescriptions.find(x => x.codeId === obj.ownership);
 
-            // Set the ownership property to the codeDesc if found, or an empty string if not found
-            const ownership = ownershipObject ? ownershipObject.codeDesc : '';
+          // Set the ownership property to the codeDesc if found, or an empty string if not found
+          const ownership = ownershipObject ? ownershipObject.codeDesc : '';
 
-            // Convert locCode and locName to uppercase
-            const locCode = obj.locCode;
-            const locName = obj.locName.toUpperCase();
-            const locCity = obj.locCity.toUpperCase();
-            const locPincode = parseInt(obj.locPincode)
-            // Create a modified object
-            return { ...obj, ownership, locCode, locName, locCity, locPincode };
-          });
+          // Convert locCode and locName to uppercase
+          const locCode = obj.locCode;
+          const locName = obj.locName.toUpperCase();
+          const locCity = obj.locCity.toUpperCase();
+          const locPincode = parseInt(obj.locPincode, 10); // Specify the radix for parseInt
 
-          // Sort the modified data by updateDate in descending order
-          const sortedData = modifiedData.sort((a, b) => {
-            const dateA: Date | any = new Date(a.updateDate);
-            const dateB: Date | any = new Date(b.updateDate);
+          // Create a modified object
+          return {
+            ...obj,
+            ownership,
+            locCode,
+            locName,
+            locCity,
+            locPincode,
+            eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
+          };
+        }).sort((a, b) => b._id.localeCompare(a._id));
 
-            // Compare the date objects
-            return dateB - dateA; // Sort in descending order
-          });
-
-          // Assign the modified and sorted data back to this.csv
-          this.csv = sortedData;
-          this.tableLoad = false;
-        }
+        // Assign the modified and sorted data back to this.csv
+        this.csv = modifiedData;
+        this.tableLoad = false;
+      } catch (error) {
+        console.error("Error processing user data:", error);
       }
-    });
+    }
   }
   //#endregion
 
@@ -132,8 +131,10 @@ export class LocationMasterComponent implements OnInit {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
-    delete det.srNo;
-
+    delete det.eNTDT
+    det['mODDT'] = new Date()
+    det['mODBY'] = localStorage.getItem("UserName")
+    det['mODLOC'] = localStorage.getItem("Branch")
     const ownershipDescriptions = await this.getOwnership();
     const ownershipObject = ownershipDescriptions.find(
       (x) => x.codeDesc === det.ownership
@@ -147,20 +148,16 @@ export class LocationMasterComponent implements OnInit {
       filter: { _id: id },
       update: det
     };
-    this.masterService.masterPut('generic/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.getLocationDetails();
-        }
-      }
-    });
+    const res = await firstValueFrom(this.masterService.masterPut('generic/update', req))
+    if (res) {
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+      this.getLocationDetails();
+    }
   }
-
 }

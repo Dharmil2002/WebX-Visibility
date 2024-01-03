@@ -134,7 +134,7 @@ export class VendorOutstandingReportComponent implements OnInit {
 
   async getDropDownList() {
     const locationList = await this.locationService.getLocationList();
-    const vendorType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "VT" }, "codeDesc", "codeId");
+    const vendorType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "VENDTYPE" }, "codeDesc", "codeId");
     let venNameReq = {
       "companyCode": this.storage.companyCode,
       "filter": {},

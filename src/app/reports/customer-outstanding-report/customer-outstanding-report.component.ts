@@ -133,8 +133,8 @@ export class CustomerOutstandingReportComponent implements OnInit {
     this.allData = mergedData;
     const custNameDet = mergedData.custNameData
       .map(element => ({
-        name: element.customerCode.toString(),
-        value: element.customerName.toString(),
+        name: element.customerName.toString(),
+        value: element.customerCode.toString(),
       }));
     this.customerDetailList = custNameDet;
     this.custNameDet = custNameDet;
@@ -159,12 +159,12 @@ export class CustomerOutstandingReportComponent implements OnInit {
     const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
       ? this.CustOutTableForm.value.locHandler.map(x => x.value)
       : [];
-      const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
-      ? this.CustOutTableForm.value.custnmcdHandler.map(x => x.value)
+    const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
+      ? this.CustOutTableForm.value.custnmcdHandler.map(x => x.name)
       : [];
     const filteredRecords = data.filter(record => {
       const locDet = loct.length === 0 || loct.includes(record.oloc);
-      const custDet = cust.length === 0 || cust.includes(record.Customer);
+      const custDet = cust.length === 0 || cust.includes(record.cust);
       const startValue = new Date(this.CustOutTableForm.controls.start.value);
       const endValue = new Date(this.CustOutTableForm.controls.end.value);
       const entryTime = new Date(record.obGNDT);

@@ -69,7 +69,7 @@ export class UserMasterListComponent implements OnInit {
             const req = {
                 companyCode: this.companyCode,
                 collectionName: "user_master",
-                filter: {}
+                filter: { companyCode: this.companyCode}
             };
 
             const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));

@@ -93,17 +93,15 @@ export class VendorMasterListComponent implements OnInit {
       "filter": {}
     }
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-    const vendorTypeData = await this.fetchData();
     if (res) {
       // Generate srno for each object in the array
       const dataWithSrno = res.data
         .map((obj) => {
-          const vendorType = vendorTypeData.find(x => x.value === obj.vendorType);
           return {
             ...obj,
             // srNo: index + 1,
             vendorName: obj.vendorName.toUpperCase(),
-            vendorType: vendorType ? vendorType.name.toUpperCase() : '',
+            vendorType: obj.vendorTypeName ? obj.vendorTypeName.toUpperCase() : '',
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
         })
@@ -114,22 +112,15 @@ export class VendorMasterListComponent implements OnInit {
     }
 
   }
-  async fetchData() {
-    const vendorTypeDropdown = await PayBasisdetailFromApi(this.masterService, 'VT');
-    // Use vendorTypeDropdown here or return it
-    return vendorTypeDropdown;
-  }
   //#endregion
 
   async isActiveFuntion(det) {
     let id = det._id;
-    const vendorTypeData = await this.fetchData();
-    const vendorType = vendorTypeData.find(x => (x.name).toLowerCase() === det.vendorType.toLowerCase());
     // Remove the "_id" field from the form controls
     delete det._id;
     delete det.srNo;
-    delete det.eNTDT
-    det["vendorType"] = vendorType.value
+    delete det.eNTDT;
+    delete det.vendorType;
     det['mODDT'] = new Date()
     det['mODBY'] = localStorage.getItem("UserName")
     det['mODLOC'] = localStorage.getItem("Branch")

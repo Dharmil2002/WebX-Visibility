@@ -202,7 +202,7 @@ export class AddVendorMasterComponent implements OnInit {
   }
   async getDropDownData() {
 
-    this.vendorTypeData = await PayBasisdetailFromApi(this.masterService, 'VT')
+    this.vendorTypeData = await PayBasisdetailFromApi(this.masterService, 'VENDTYPE')
  
     if (this.isUpdate) {
       this.vendorTypDetail = this.vendorTypeData.find(x => (x.name).toLowerCase() === this.vendorTabledata.vendorType.toLowerCase());

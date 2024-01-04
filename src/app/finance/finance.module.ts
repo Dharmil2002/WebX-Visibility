@@ -62,6 +62,8 @@ import { BlancePaymentPopupComponent } from './Vendor Payment/Modal/blance-payme
 import { VendorsVehicleDetailComponent } from './Vendor Payment/Modal/vendors-vehicle-detail/vendors-vehicle-detail.component';
 import { VendorBillPaymentDetailsComponent } from './Vendor Bills/vendor-bill-payment-details/vendor-bill-payment-details.component';
 import { BeneficiaryDetailComponent } from './Vendor Bills/beneficiary-detail/beneficiary-detail.component';
+import { JournalVoucherCreationComponent } from './VoucherEntry/Journal Voucher/journal-voucher-creation/journal-voucher-creation.component';
+import { JournalVoucherCreationModalComponent } from './VoucherEntry/Journal Voucher/Modals/journal-voucher-creation-modal/journal-voucher-creation-modal.component';
 
 @NgModule({
     declarations: [
@@ -89,7 +91,9 @@ import { BeneficiaryDetailComponent } from './Vendor Bills/beneficiary-detail/be
         BeneficiaryDetailComponent,
         DeductionChargesComponent,
         ShipmentSelectionComponent,
-        VendorsVehicleDetailComponent
+        VendorsVehicleDetailComponent,
+        JournalVoucherCreationComponent,
+        JournalVoucherCreationModalComponent
     ],
     imports: [
         CommonModule,

@@ -12,11 +12,12 @@ import { BalancePaymentComponent } from './Vendor Payment/balance-payment/balanc
 import { VendorBillPaymentComponent } from './Vendor Bills/vendor-bill-payment/vendor-bill-payment.component';
 import { BillApprovalComponent } from '../operation/pending-billing/bill-approval/bill-approval.component';
 import { VendorBillPaymentDetailsComponent } from './Vendor Bills/vendor-bill-payment-details/vendor-bill-payment-details.component';
+import { JournalVoucherCreationComponent } from './VoucherEntry/Journal Voucher/journal-voucher-creation/journal-voucher-creation.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
   { path: 'AddManualVouchar', component: AddManualVoucherComponent },
-  { path: 'DebitVoucher', component: DebitVoucherComponent },
+  { path: 'VoucherEntry/DebitVoucher', component: DebitVoucherComponent },
   { path: 'VendorPayment/Dashboard', component: DashboardComponent },
   { path: 'VendorPayment/THC-Payment', component: ThcPaymentsComponent },
   { path: 'VendorPayment/AdvancePayment', component: AdvancePaymentsComponent },
@@ -25,7 +26,8 @@ const routes: Routes = [
   { path: 'VendorPayment/VendorBillPaymentDetails', component: VendorBillPaymentDetailsComponent },
   { path: 'InvoiceCollection', component: InvoiceCollectionComponent },
   { path: 'Deductions', component: DeductionsComponent },
-  { path: "bill-approval", component: BillApprovalComponent }
+  { path: "bill-approval", component: BillApprovalComponent },
+  { path: 'VoucherEntry/JournalVoucher', component: JournalVoucherCreationComponent },
 ];
 
 @NgModule({

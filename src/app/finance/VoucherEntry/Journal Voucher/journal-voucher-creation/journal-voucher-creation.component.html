@@ -1,0 +1,12 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+
+    <form [formGroup]="JournalVoucherSummaryForm">
+        <app-form-webxpress [form]="JournalVoucherSummaryForm" [FormTitle]="'Journal Voucher'"
+            [formData]="jsonControlJournalVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'">
+        </app-form-webxpress>
+    </form>
+
+
+</app-common-wrapper-webxpress>

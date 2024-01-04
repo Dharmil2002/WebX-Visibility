@@ -744,11 +744,18 @@
       "router": "Masters/BeneficiaryMaster/AddBeneficiaryMaster"
     },
     {
-      "title": "DebitVoucher",
+      "title": "Finance/VoucherEntry/DebitVoucher",
       "tag": [
-        "DebitVoucher"
+        "Finance/VoucherEntry/DebitVoucher"
       ],
-      "router": "Finance/DebitVoucher"
+      "router": "Finance/VoucherEntry/DebitVoucher"
+    },
+    {
+      "title": "Finance/VoucherEntry/JournalVoucher",
+      "tag": [
+        "Finance/VoucherEntry/JournalVoucher"
+      ],
+      "router": "Finance/VoucherEntry/JournalVoucher"
     },
     {
       "title": "VendorPaymentDashboard",
@@ -880,7 +887,6 @@
       ],
       "router": "Reports/vendor-wise-outstanding-report"
     },
-
     {
       "title": "AddContainerMaster",
       "tag": [

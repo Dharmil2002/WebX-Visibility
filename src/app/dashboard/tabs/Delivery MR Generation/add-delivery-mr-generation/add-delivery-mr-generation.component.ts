@@ -1,10 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { DeliveryMrGeneration } from 'src/assets/FormControls/DeliveryMr';
 import { deliveryStaticData } from '../deliveryData';
 import { MatDialog } from '@angular/material/dialog';
 import { DeliveryMrGenerationModalComponent } from '../delivery-mr-generation-modal/delivery-mr-generation-modal.component';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
+import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
+import { GetAccountDetailFromApi } from 'src/app/finance/credit-debit-voucher/debitvoucherAPIUtitlity';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -44,57 +52,57 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       // Style: "min-width:80px",
     },
     subTotal: {
-      Title: "Sub Total Amount ",
+      Title: "Sub Total Amount(₹)",
       class: "matcolumnleft",
       //Style: "max-width:70px",
     },
     newSubTotal: {
-      Title: "New Sub Total Amount ",
+      Title: "New Sub Total Amount(₹)",
       class: "matcolumnleft",
       //Style: "min-width:200px",
     },
     rateDifference: {
-      Title: "Rate Difference ",
+      Title: "Rate Difference(₹)",
       class: "matcolumnleft",
       //Style: "min-width:80px",
     },
     doorDelivery: {
-      Title: "Door Delivery",
+      Title: "Door Delivery(₹)",
       class: "matcolumncenter",
       //Style: "max-width:70px",
     },
     demmurage: {
-      Title: "Demmurage",
+      Title: "Demmurage(₹)",
       class: "matcolumncenter",
       //Style: "max-width:70px",
     },
     loadingCharge: {
-      Title: "Loading Charge",
+      Title: "Loading Charge(₹)",
       class: "matcolumncenter",
       //Style: "max-width:70px",
     },
     unLoadingCharge: {
-      Title: "UnLoading Charge",
+      Title: "UnLoading Charge(₹)",
       class: "matcolumnleft",
       //Style: "min-width:100px",
     },
     forclipCharge: {
-      Title: "Forclip Charge",
+      Title: "Forclip Charge(₹)",
       class: "matcolumnleft",
       //Style: "min-width:100px",
     },
     gatepassCharge: {
-      Title: "Gatepass Charge",
+      Title: "Gatepass Charge(₹)",
       class: "matcolumnleft",
       //Style: "min-width:100px",
     },
     otherCharge: {
-      Title: "Other Charge",
+      Title: "Other Charge(₹)",
       class: "matcolumnleft",
       //Style: "min-width:100px",
     },
     totalAmount: {
-      Title: "Total Amount",
+      Title: "Total Amount(₹)",
       class: "matcolumnleft",
       //Style: "min-width:100px",
     },
@@ -123,16 +131,29 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   ];
   menuItems = [
     { label: 'Edit' },
-    //{ label: 'Remove' }
   ]
+  isChagesValid: boolean;
+  jsonControlPaymentArray: any;
+  PaymentSummaryFilterForm: UntypedFormGroup;
+  AlljsonControlPaymentSummaryFilterArray: any;
+  jsonControlBillingArray: any;
+  billingForm: UntypedFormGroup;
 
   constructor(private fb: UntypedFormBuilder,
-    private dialog: MatDialog) { }
+    private router: Router,
+    private dialog: MatDialog,
+    private filter: FilterUtils,
+    private masterService: MasterService) {
+    if (this.router.getCurrentNavigation()?.extras?.state != null) {
+      const data = this.router.getCurrentNavigation()?.extras?.state.data;
+      console.log(data);
+
+    }
+  }
 
   ngOnInit(): void {
     this.initializeDeliveryMrFormControls();
-    console.log(this.tableData);
-    
+    this.getTDSData();
   }
 
   functionCallHandler($event) {
@@ -153,41 +174,64 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     // Retrieve the generated form controls array from the DeliveryMrGeneration instance.
     this.jsonControlDeliveryMrGenArray = deliveryMrControlsGenerator.getDeliveryMrControls();
+    this.jsonControlPaymentArray = deliveryMrControlsGenerator.getDeliveryMrPaymentControls();
+    this.jsonControlBillingArray = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
+    this.AlljsonControlPaymentSummaryFilterArray = this.jsonControlPaymentArray;
+    this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentArray])
 
     // Build the form group using the FormBuilder and the obtained form controls array.
     this.deliveryMrTableForm = formGroupBuilder(this.fb, [this.jsonControlDeliveryMrGenArray]);
+    this.billingForm = formGroupBuilder(this.fb, [this.jsonControlBillingArray]);
+    this.jsonControlPaymentArray = this.jsonControlPaymentArray.slice(0, 1);
+    this.deliveryMrTableForm.controls['Deliveredto'].setValue("Receiver");
+    this.deliveryMrTableForm.controls['NoofDocket'].setValue("Single");
   }
   //#endregion
 
   save() {
+    this.addDetails(this.deliveryMrTableForm.value);
+    // if (this.deliveryMrTableForm.valid) {
+    //   const consignmentNoteNumber = this.deliveryMrTableForm.value.ConsignmentNoteNumber ? this.deliveryMrTableForm.value.ConsignmentNoteNumbersplit(',').map(i => i.trim()) : [];
+
+    //   console.log(consignmentNoteNumber);
+    //   this.addDetails(this.deliveryMrTableForm.value);
+    // } else {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Warning",
+    //     text: 'Please Fill Delivery MR Generation details',
+    //     showConfirmButton: true,
+    //   });
+    // }
     console.log(this.deliveryMrTableForm.value);
   }
+
   hideControl() {
     // Get the value of the 'Deliveredto' control from the form
     const deliveredToValue = this.deliveryMrTableForm.value.Deliveredto;
 
-    // Check if the control value is 'Consignee'
-    if (deliveredToValue === 'Consignee') {
-      // Find the control named 'NameofReceiver' in the jsonControlDeliveryMrGenArray
-      let disableControl = this.jsonControlDeliveryMrGenArray.find(control => control.name === 'NameofReceiver');
+    // Check if the control value is 'Consignee' or 'Receiver'
+    if (deliveredToValue === 'Consignee' || deliveredToValue === 'Receiver') {
+      // Determine the control properties based on the 'deliveredToValue'
+      const controlName = (deliveredToValue === 'Consignee') ? 'NameofReceiver' : 'NameofConsignee';
+      const label = (deliveredToValue === 'Consignee') ? 'Name of Consignee' : 'Name of Receiver';
+      const placeholder = (deliveredToValue === 'Consignee') ? 'Name of Consignee' : 'Name of Receiver';
+      const validationMessage = (deliveredToValue === 'Consignee') ? 'Name of Consignee is required' : 'Name of Receiver is required';
 
-      // Modify the properties of disableControl
-      disableControl.name = 'NameofConsignee';
-      disableControl.label = 'Name of Consignee';
-      disableControl.placeholder = 'Name of Consignee';
-      disableControl.value = '';
-    }
-    // Check if the control value is 'Consignee'
-    if (deliveredToValue === 'Receiver') {
+      // Find the control in the jsonControlDeliveryMrGenArray
+      const disableControl = this.jsonControlDeliveryMrGenArray.find(control => control.name === controlName);
 
-      // Find the control named 'NameofConsignee' in the jsonControlDeliveryMrGenArray
-      let disableControl = this.jsonControlDeliveryMrGenArray.find(control => control.name === 'NameofConsignee');
-
-      // Modify the properties of disableControl
-      disableControl.name = 'NameofReceiver';
-      disableControl.label = 'Name of Receiver';
-      disableControl.placeholder = 'Name of Receiver';
-      disableControl.value = '';
+      // Modify the properties of disableControl if found
+      if (disableControl) {
+        disableControl.name = controlName;
+        disableControl.label = label;
+        disableControl.placeholder = placeholder;
+        disableControl.value = '';
+        disableControl.Validations = [{
+          name: 'required',
+          message: validationMessage,
+        }];
+      }
     }
   }
   //#region to Add a new item to the table or edit
@@ -205,11 +249,160 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         top: "20px",
       },
     });
-    dialogRef.afterClosed().subscribe(() => {
+    dialogRef.afterClosed().subscribe((data) => {
+      console.log(data);
+      const mrTable = {
+        nWSUBTTL: parseFloat(data.newSubTotal),
+        //rTDFRNC:parseFloat(data.
+        dORDLVRY: parseFloat(data.doorDelivery),
+        dMRG: parseFloat(data.Demurrage),
+        lODNGCHRG: parseFloat(data.Loading),
+        uNLODNGCHRG: parseFloat(data.Unloading),
+        fRCLPCHRGE: parseFloat(data.forclip),
+        gTPSCHRG: parseFloat(data.Gatepass),
+        oTHRCHRG: parseFloat(data.Other)
+      }
       //this.getTableDetail();
       this.tableload = true;
+      console.log(mrTable);
     });
   }
   //#endregion
-  handleMenuItemClick(e) { }
+
+  //#region  to fill or remove data form table to controls
+  handleMenuItemClick(data) {
+    console.log(data);
+
+    // const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
+    // data.label.label === 'Remove' ? this.removeTableData(terDetails._id) :
+    this.addDetails(data)
+  }
+  //#endregion 
+
+  validateConsig() {
+    // Get the value of the 'Deliveredto' control from the form
+    const NoofDocketValue = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
+    console.log(NoofDocketValue);
+    const consignmentNoteNumber = this.deliveryMrTableForm.value.ConsignmentNoteNumber ? this.deliveryMrTableForm.value.ConsignmentNoteNumbersplit(',').map(i => i.trim()) : [];
+
+    console.log(consignmentNoteNumber);
+
+  }
+  // Payment Modes Changes
+  async OnPaymentModeChange(event) {
+    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+    let filterFunction;
+
+    switch (PaymentMode) {
+      case "Cheque":
+        filterFunction = (x) => x.name !== "CashAccount";
+
+        break;
+      case "Cash":
+        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank"
+          && x.name !== 'depositedIntoBank' && x.name !== 'issuedFromBank' && x.name !== 'OnAccount';
+        break;
+      case "RTGS/UTR":
+        filterFunction = (x) => x.name !== "CashAccount";
+        break;
+    }
+
+    this.jsonControlPaymentArray =
+      this.AlljsonControlPaymentSummaryFilterArray.filter(filterFunction);
+
+    switch (PaymentMode) {
+      case "Cheque":
+        const responseFromAPIBank = await GetAccountDetailFromApi(
+          this.masterService,
+          "BANK",
+          ''
+        );
+        this.filter.Filter(
+          this.jsonControlPaymentArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPIBank,
+          "Bank",
+          false
+        );
+        this.filter.Filter(
+          this.jsonControlPaymentArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPIBank,
+          "depositedIntoBank",
+          true
+        );
+        const Bank = this.PaymentSummaryFilterForm.get("Bank");
+        Bank.setValidators([
+          Validators.required,
+          autocompleteObjectValidator(),
+        ]);
+        Bank.updateValueAndValidity();
+
+        const depositedIntoBank = this.PaymentSummaryFilterForm.get("depositedIntoBank");
+        depositedIntoBank.setValidators([
+          Validators.required,
+          autocompleteObjectValidator(),
+        ]);
+        depositedIntoBank.updateValueAndValidity();
+
+        const ChequeOrRefNo =
+          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        ChequeOrRefNo.setValidators([Validators.required]);
+        ChequeOrRefNo.updateValueAndValidity();
+
+        const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount");
+        CashAccount.setValue("");
+        CashAccount.clearValidators();
+        CashAccount.updateValueAndValidity();
+
+        break;
+      case "Cash":
+        const responseFromAPICash = await GetAccountDetailFromApi(
+          this.masterService,
+          "CASH", '');
+        this.filter.Filter(
+          this.jsonControlPaymentArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPICash,
+          "CashAccount",
+          false
+        );
+
+        const CashAccountS = this.PaymentSummaryFilterForm.get("CashAccount");
+        CashAccountS.setValidators([
+          Validators.required,
+          autocompleteObjectValidator(),
+        ]);
+        CashAccountS.updateValueAndValidity();
+
+        const BankS = this.PaymentSummaryFilterForm.get("Bank");
+        BankS.setValue("");
+        BankS.clearValidators();
+        BankS.updateValueAndValidity();
+
+        const ChequeOrRefNoS =
+          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        ChequeOrRefNoS.setValue("");
+        ChequeOrRefNoS.clearValidators();
+        ChequeOrRefNoS.updateValueAndValidity();
+
+        break;
+      case "RTGS/UTR":
+        break;
+    }
+  }
+  async getTDSData() {
+    const responseFromAPIBank = await GetAccountDetailFromApi(
+      this.masterService,
+      "TDS",
+      ''
+    );
+    this.filter.Filter(
+      this.jsonControlBillingArray,
+      this.billingForm,
+      responseFromAPIBank,
+      "TDSSection",
+      false
+    );
+  }
 }

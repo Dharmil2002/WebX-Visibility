@@ -43,7 +43,7 @@ const routes: Routes = [
     component:JobTrackerComponent
   },
   {
-    path:"AddDeliveryMrGeneration",
+    path:"DeliveryMrGeneration",
     component:AddDeliveryMrGenerationComponent
   },
 

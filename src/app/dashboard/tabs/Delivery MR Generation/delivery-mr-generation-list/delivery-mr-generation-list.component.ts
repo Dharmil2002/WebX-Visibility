@@ -23,7 +23,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     csv: false,
   };
  
-  linkArray = [{ Row: "Action", Path: "Masters/Docket/EwayBillDocketBookingV2" }];
+  linkArray = [{ Row: "Action", Path: "dashboard/DeliveryMrGeneration" }];
 
   toggleArray = [];
  

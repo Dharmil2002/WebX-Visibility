@@ -2,6 +2,7 @@ import { FormControls } from 'src/app/core/models/FormControl/formcontrol';
 
 export class JournalVoucherControl {
   JournalVoucherSummaryArray: FormControls[];
+  JournalVoucherDetailsArray: FormControls[];
 
   constructor(FormValues) {
     this.JournalVoucherSummaryArray = [
@@ -179,10 +180,114 @@ export class JournalVoucherControl {
       },
 
     ];
+    this.JournalVoucherDetailsArray = [
+      {
+        name: "Ledger",
+        label: "Ledger",
+        placeholder: "Ledger",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Ledger is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+
+
+      {
+        name: "DebitAmount",
+        label: "Debit Amount ₹",
+        placeholder: "Debit Amount ₹",
+        type: "number",
+        value: FormValues?.DebitAmount,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Debit Amount is required!",
+          },
+          {
+            name: "pattern",
+            message: "Please Enter Valid Debit Amount",
+            pattern: '^[^-]+$'
+          },
+        ],
+
+      },
+      {
+        name: "CreditAmount",
+        label: "Credit Amount ₹",
+        placeholder: "Credit Amount ₹",
+        type: "number",
+        value: FormValues?.CreditAmount,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Debit Amount is required!",
+          },
+          {
+            name: "pattern",
+            message: "Please Enter Valid Debit Amount",
+            pattern: '^[^-]+$'
+          },
+        ],
+
+      },
+
+      {
+        name: "Narration",
+        label: "Narration",
+        placeholder: "Narration",
+        type: "text",
+        value: FormValues?.Narration,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Narration is required!",
+          },
+        ]
+      },
+
+      {
+        name: "LedgerHdn",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
+
+    ]
   }
 
   getJournalVoucherSummaryArrayControls() {
     return this.JournalVoucherSummaryArray;
   }
-
+  getJournalVoucherDetailsArrayControls() {
+    return this.JournalVoucherDetailsArray;
+  }
 }

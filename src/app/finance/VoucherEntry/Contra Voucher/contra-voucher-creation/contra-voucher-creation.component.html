@@ -1,0 +1,31 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+
+    <form [formGroup]="ContraVoucherSummaryForm">
+        <app-form-webxpress [form]="ContraVoucherSummaryForm" [FormTitle]="'Contra Voucher'"
+            [formData]="jsonControlContraVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'">
+        </app-form-webxpress>
+    </form>
+
+    <form [formGroup]="ContraVoucherPaymentForm">
+        <app-form-webxpress [form]="ContraVoucherPaymentForm" [FormTitle]="'Contra Payment'"
+            [formData]="jsonControlContraVoucherPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            [className]="'col-xl-2 col-lg-2 col-md-2 col-sm-2 mb-2'">
+        </app-form-webxpress>
+    </form>
+
+
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button [disabled]="!ContraVoucherPaymentForm.valid " class="msr-3" mat-raised-button color="primary"
+                    (click)="Submit()">Submit</button>
+                <button mat-button (click)="cancel('Billing​')">Back</button>
+            </div>
+        </div>
+    </div>
+
+</app-common-wrapper-webxpress>

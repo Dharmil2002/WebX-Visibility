@@ -65,6 +65,7 @@ import { BeneficiaryDetailComponent } from './Vendor Bills/beneficiary-detail/be
 import { JournalVoucherCreationComponent } from './VoucherEntry/Journal Voucher/journal-voucher-creation/journal-voucher-creation.component';
 import { JournalVoucherCreationModalComponent } from './VoucherEntry/Journal Voucher/Modals/journal-voucher-creation-modal/journal-voucher-creation-modal.component';
 import { OpeningBalanceLedgerComponent } from './opening-balance-ledger/opening-balance-ledger.component';
+import { ContraVoucherCreationComponent } from './VoucherEntry/Contra Voucher/contra-voucher-creation/contra-voucher-creation.component';
 
 @NgModule({
     declarations: [
@@ -95,7 +96,8 @@ import { OpeningBalanceLedgerComponent } from './opening-balance-ledger/opening-
         VendorsVehicleDetailComponent,
         JournalVoucherCreationComponent,
         JournalVoucherCreationModalComponent,
-        OpeningBalanceLedgerComponent
+        OpeningBalanceLedgerComponent,
+        ContraVoucherCreationComponent
     ],
     imports: [
         CommonModule,

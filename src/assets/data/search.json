@@ -758,6 +758,13 @@
       "router": "Finance/VoucherEntry/JournalVoucher"
     },
     {
+      "title": "Finance/VoucherEntry/ContraVoucher",
+      "tag": [
+        "Finance/VoucherEntry/ContraVoucher"
+      ],
+      "router": "Finance/VoucherEntry/ContraVoucher"
+    },
+    {
       "title": "VendorPaymentDashboard",
       "tag": [
         "VendorPaymentDashboard"

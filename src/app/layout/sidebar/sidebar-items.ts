@@ -567,6 +567,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Finance/VoucherEntry/ContraVoucher",
+              "title": "Contra Voucher",
+              "moduleName": "Contra Voucher",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
           ]
         },
 

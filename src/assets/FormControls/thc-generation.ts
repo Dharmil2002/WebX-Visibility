@@ -291,6 +291,23 @@ export class thcControl {
                     },
                 },
                 {
+                    name: 'containerwise',
+                    label: 'Container Wise',
+                    placeholder: '',
+                    type: 'toggle',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: true,
+                    disable: false,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onChange: 'onchangecontainerwise'
+                    },
+                },
+                {
                     name: 'driverName',
                     label: 'Driver Name',
                     placeholder: '',

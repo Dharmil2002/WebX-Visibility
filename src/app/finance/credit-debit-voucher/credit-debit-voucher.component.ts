@@ -197,7 +197,7 @@ export class DebitVoucherComponent implements OnInit {
     }
   }
   StateChange(event) {
-    debugger
+
     const Partystate = this.DebitVoucherSummaryForm.value.Partystate;
     const Paymentstate = this.DebitVoucherSummaryForm.value.Paymentstate;
     if (Partystate && Paymentstate) {
@@ -375,7 +375,7 @@ export class DebitVoucherComponent implements OnInit {
 
   }
   TCSSectionFieldChanged(event) {
-    this.DebitVoucherTaxationTCSForm.get("TCSRate").setValue(this.DebitVoucherTaxationTCSForm.value?.TCSSection?.ACdetail?.CorporateTCS)
+    this.DebitVoucherTaxationTCSForm.get("TCSRate").setValue(this.DebitVoucherTaxationTCSForm.value?.TCSSection?.rHUF)
     this.calculateTCSAndTotal('');
 
   }
@@ -420,7 +420,7 @@ export class DebitVoucherComponent implements OnInit {
       });
       TDSAmount = TDSWithLineitems;
     }
-    debugger
+
     var parsedTDSAmount = parseFloat(TDSAmount) || 0;
     var parsedTCSAmount = parseFloat(TCSAmount) || 0;
 

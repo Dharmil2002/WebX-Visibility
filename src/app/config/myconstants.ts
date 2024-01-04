@@ -7,7 +7,8 @@ export const Collections = {
     PrqDetails: 'prq_summary',
     ThcDetails: 'thc_detail',
     docketOp: 'docket_ops_det',
-    thcsummary: 'thc_summary'
+    thcsummary: 'thc_summary',
+    thc_movement: 'thc_movement',
 };
 
 export const GenericActions = {

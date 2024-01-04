@@ -22,7 +22,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
             "companyCode": localStorage.getItem('companyCode'),
             "collectionName": "docket_ops_det",
             "filter": {
-                dKTNO: element.docNo, tId: tripId
+                dKTNO: element.docNo, tHC: tripId
             },
             "update": {
                 "sTS": 2,
@@ -46,7 +46,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "cID": localStorage.getItem('companyCode'),
                 "dKTNO": element.docNo,
                 "sFX": 0,
-                "cNO": null,
+                "cNO": element?.cNO || "",
                 "lOC": localStorage.getItem('Branch'),
                 "eVNID": "EVN0004",
                 "eVNDES": "Delivered",

@@ -1,5 +1,6 @@
 export class THCGenerationModel {
   companyCode: number
+  ContainerWise: boolean
   data: thcsummaryData
   thcmovementDetails: ThcmovementDetails
   mfheaderDetails: MfheaderDetails

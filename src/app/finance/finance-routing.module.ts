@@ -13,6 +13,7 @@ import { VendorBillPaymentComponent } from './Vendor Bills/vendor-bill-payment/v
 import { BillApprovalComponent } from '../operation/pending-billing/bill-approval/bill-approval.component';
 import { VendorBillPaymentDetailsComponent } from './Vendor Bills/vendor-bill-payment-details/vendor-bill-payment-details.component';
 import { JournalVoucherCreationComponent } from './VoucherEntry/Journal Voucher/journal-voucher-creation/journal-voucher-creation.component';
+import { OpeningBalanceLedgerComponent } from './opening-balance-ledger/opening-balance-ledger.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: 'Deductions', component: DeductionsComponent },
   { path: "bill-approval", component: BillApprovalComponent },
   { path: 'VoucherEntry/JournalVoucher', component: JournalVoucherCreationComponent },
+  { path: "opening-balance", component: OpeningBalanceLedgerComponent }
 ];
 
 @NgModule({

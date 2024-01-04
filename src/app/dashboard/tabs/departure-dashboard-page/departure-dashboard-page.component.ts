@@ -87,6 +87,8 @@ export class DepartureDashboardPageComponent
       Title: "Trip ID",
       class: "matcolumnleft",
       Style: "min-width:200px",
+      type:'windowLink',
+      functionName:'OpenManifest'
     },
     Scheduled: {
       Title: "Scheduled",
@@ -117,7 +119,6 @@ export class DepartureDashboardPageComponent
   staticField = [
     "RouteandSchedule",
     "VehicleNo",
-    "TripID",
     "Scheduled",
     "Expected",
     "Hrs"
@@ -201,5 +202,27 @@ export class DepartureDashboardPageComponent
         this.tableload = false;
       },
     });
+  }
+
+  functionCallHandler(event) {
+    console.log(event);
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+
+
+  OpenManifest(data){
+    console.log('data' ,data.TripID)
+
+    const TripID = data.TripID
+    const templateBody = {
+      DocNo: TripID,
+      templateName: 'Manifest View-Print'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
   }
 }

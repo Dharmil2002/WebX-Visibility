@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+      <form [formGroup]="openingbalanceForm">
+        <app-form-webxpress [form]="openingbalanceForm" [formData]="jsonControlopeningbalanceArray" [submit]="'Filter'" [showSaveAndCancelButton]="true"
+            [FormTitle]="'opening balance Form'" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)" >
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

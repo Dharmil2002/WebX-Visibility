@@ -20,6 +20,7 @@ import { searchbilling } from "src/app/dashboard/docket-dashboard/dashboard-utli
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { MatDialog } from "@angular/material/dialog";
 import { VirtualLoginComponent } from "../virtual-login/virtual-login.component";
+import { StorageService } from "src/app/core/service/storage.service";
 const document: any = window.document;
 
 @Component({
@@ -50,6 +51,7 @@ export class HeaderComponent
   // Replace this with your actual data source or API call
   allOptions: any;
   searchData: any;
+  logo: string;
 
   constructor(
     private dialogModel: MatDialog,
@@ -61,6 +63,7 @@ export class HeaderComponent
     private configService: ConfigService,
     private authService: AuthService,
     private router: Router,
+    private storage:StorageService,
     public languageService: LanguageService,
     private breakpointObserver: BreakpointObserver
   ) {
@@ -97,7 +100,7 @@ export class HeaderComponent
   }
   ngOnInit() {
     this.config = this.configService.configData;
-
+    this.logo = this.storage.companyLogo;
     this.Mode = localStorage.getItem("Import");
     this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
     this.getCurrentFinancialYear();

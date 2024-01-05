@@ -23,6 +23,7 @@ export class SigninComponent
   CompanyLogo;
   hide = true;
   Menulist: any;
+  logingLogo: string;
   constructor(
     private formBuilder: UntypedFormBuilder,
     private router: Router,
@@ -33,6 +34,7 @@ export class SigninComponent
     super();
   }
   ngOnInit() {
+    this.logingLogo="https://webxblob.blob.core.windows.net/newtms/logo/webxpress-logo.png";
     this.loginForm = this.formBuilder.group({
       username: [
         "",
@@ -67,12 +69,14 @@ export class SigninComponent
     } else {
      
       this.subs.sink = this.authService.login(this.loginForm.value).subscribe(
-        (res) => {
+        async (res) => {
           if (res) {
             const token = this.authService.currentUserValue.tokens.access.token;
             if (token) {
-              this.Islogin = true;
-              this.router.navigate(["/dashboard/Index"]);
+            this.Islogin = true;
+            const companyDetail=await this.authService.getCompanyDetail();
+            this.storageService.setItem("companyLogo",companyDetail.company_Image);
+            this.router.navigate(["/dashboard/Index"]);
             }
             else{
               this.Islogin = false;

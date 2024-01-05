@@ -26,6 +26,10 @@ export class StorageService {
   get mode(): string {
     return this.getItem("Mode");
   }
+  get companyLogo(): string {
+    return this.getItem("companyLogo");
+  }
+
 
   setItem(key: string, value: any, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;

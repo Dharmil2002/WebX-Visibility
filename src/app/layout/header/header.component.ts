@@ -52,6 +52,7 @@ export class HeaderComponent
   allOptions: any;
   searchData: any;
   logo: string;
+  companyCd: string;
 
   constructor(
     private dialogModel: MatDialog,
@@ -101,6 +102,7 @@ export class HeaderComponent
   ngOnInit() {
     this.config = this.configService.configData;
     this.logo = this.storage.companyLogo;
+    this.companyCd=this.storage.companyCd;
     this.Mode = localStorage.getItem("Import");
     this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
     this.getCurrentFinancialYear();

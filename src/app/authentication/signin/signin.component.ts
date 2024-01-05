@@ -76,6 +76,7 @@ export class SigninComponent
             this.Islogin = true;
             const companyDetail=await this.authService.getCompanyDetail();
             this.storageService.setItem("companyLogo",companyDetail.company_Image);
+            this.storageService.setItem("company_Code",companyDetail.company_Code);
             this.router.navigate(["/dashboard/Index"]);
             }
             else{

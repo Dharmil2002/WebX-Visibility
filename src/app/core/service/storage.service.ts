@@ -14,6 +14,9 @@ export class StorageService {
   get companyCode(): number {
     return this.getItemObject<number>("companyCode");
   }
+  get companyCd(): string {
+    return this.getItem("company_Code");
+  }
 
   get branch(): string {
     return this.getItem("Branch");

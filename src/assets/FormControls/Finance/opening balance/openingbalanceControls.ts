@@ -15,6 +15,10 @@ export class openingbalanceControls {
                 disable: false,
                 Validations: [
                   {
+                    name: "required",
+                    message: "BranchCode is required",
+                  },
+                  {
                     name: "autocomplete",
                   },
                   {
@@ -26,7 +30,6 @@ export class openingbalanceControls {
                   showNameAndValue: false,
                 },
                 functions: {
-                  onOptionSelect: "getGroupCodeDropdown",
                 },
               },
               {
@@ -39,6 +42,10 @@ export class openingbalanceControls {
                 disable: false,
                 Validations: [
                   {
+                    name: "required",
+                    message: "AccountCategory is required",
+                  },
+                  {
                     name: "autocomplete",
                   },
                   {
@@ -50,7 +57,7 @@ export class openingbalanceControls {
                   showNameAndValue: false,
                 },
                 functions: {
-                  onOptionSelect: "getGroupCodeDropdown",
+                  onOptionSelect: "getAccountCodeDropdown",
                 },
               },
               {
@@ -63,6 +70,10 @@ export class openingbalanceControls {
                 disable: false,
                 Validations: [
                   {
+                    name: "required",
+                    message: "AccountCode is required",
+                  },
+                  {
                     name: "autocomplete",
                   },
                   {
@@ -71,10 +82,10 @@ export class openingbalanceControls {
                   },
                 ],
                 additionalData: {
-                  showNameAndValue: false,
+                  showNameAndValue: true,
                 },
                 functions: {
-                  onOptionSelect: "getGroupCodeDropdown",
+                  onOptionSelect: "getAccountDescription",
                 },
               },
               {
@@ -91,21 +102,31 @@ export class openingbalanceControls {
                 name: "DebitAmount",
                 label: "Debit Amount",
                 placeholder: "Please Enter Debit Amount",
-                type: "text",
-                value: "",
+                type: "number",
+                value: 0,
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "DebitAmount is required",
+                  },
+                ],
               },
               {
                 name: "CreditAmount",
                 label: "Credit Amount",
                 placeholder: "Please Enter Credit Amount",
-                type: "text",
-                value: "",
+                type: "number",
+                value: 0,
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "CreditAmount is required",
+                  },
+                ],
               },
         ]
     }

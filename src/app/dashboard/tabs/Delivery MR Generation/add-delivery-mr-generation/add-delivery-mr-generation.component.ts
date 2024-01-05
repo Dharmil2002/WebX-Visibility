@@ -6,12 +6,12 @@ import { deliveryStaticData } from '../deliveryData';
 import { MatDialog } from '@angular/material/dialog';
 import { DeliveryMrGenerationModalComponent } from '../delivery-mr-generation-modal/delivery-mr-generation-modal.component';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
-import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
 import { GetAccountDetailFromApi } from 'src/app/finance/credit-debit-voucher/debitvoucherAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { firstValueFrom } from 'rxjs';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -29,7 +29,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       active: "Delivery MR Generation",
     },
   ];
-  tableData = deliveryStaticData;
+  // tableData = deliveryStaticData;
+  tableData: any = [];
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   companyCode: number = parseInt(localStorage.getItem("companyCode"));
   menuItemflag: boolean = true;
@@ -132,7 +133,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   menuItems = [
     { label: 'Edit' },
   ]
-  isChagesValid: boolean;
   jsonControlPaymentArray: any;
   PaymentSummaryFilterForm: UntypedFormGroup;
   AlljsonControlPaymentSummaryFilterArray: any;
@@ -154,6 +154,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.initializeDeliveryMrFormControls();
     this.getTDSData();
+    this.getDocketList();
   }
 
   functionCallHandler($event) {
@@ -187,25 +188,44 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.deliveryMrTableForm.controls['NoofDocket'].setValue("Single");
   }
   //#endregion
+  //#region to add data in table
+  async save() {
+    this.tableload = true;
+    const tableData = this.tableData;
+    const DocketDat = await this.getDocketList()
+    const cnote = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
+    const paybs = DocketDat.find(x => x.docketNumber === cnote);
 
-  save() {
-    this.addDetails(this.deliveryMrTableForm.value);
-    // if (this.deliveryMrTableForm.valid) {
-    //   const consignmentNoteNumber = this.deliveryMrTableForm.value.ConsignmentNoteNumber ? this.deliveryMrTableForm.value.ConsignmentNoteNumbersplit(',').map(i => i.trim()) : [];
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
 
-    //   console.log(consignmentNoteNumber);
-    //   this.addDetails(this.deliveryMrTableForm.value);
-    // } else {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Warning",
-    //     text: 'Please Fill Delivery MR Generation details',
-    //     showConfirmButton: true,
-    //   });
-    // }
-    console.log(this.deliveryMrTableForm.value);
+    const json = {
+      id: this.tableData.length + 1,
+      consignmentNoteNumber: cnote,
+      totalAmount: 0,
+      otherCharge: 0,
+      gatepassCharge: 0,
+      forclipCharge: 0,
+      unLoadingCharge: 0,
+      loadingCharge: 0,
+      demmurage: 0,
+      doorDelivery: 0,
+      rateDifference: 0,
+      newSubTotal: 0,
+      subTotal: 0,
+      payBasis: paybs.payType,
+      actions: ['Edit']
+    };
+
+    this.tableData.push(json);
+
+    this.tableload = false;
   }
-
+  //#endregion
+  //#region to change control
   hideControl() {
     // Get the value of the 'Deliveredto' control from the form
     const deliveredToValue = this.deliveryMrTableForm.value.Deliveredto;
@@ -234,6 +254,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
     }
   }
+  //#endregion
   //#region to Add a new item to the table or edit
   addDetails(event) {
     const request = {
@@ -268,27 +289,45 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     });
   }
   //#endregion
-
-  //#region  to fill or remove data form table to controls
+  //#region to fill or remove data form table to controls
   handleMenuItemClick(data) {
     console.log(data);
-
-    // const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
-    // data.label.label === 'Remove' ? this.removeTableData(terDetails._id) :
     this.addDetails(data)
   }
   //#endregion 
-
-  validateConsig() {
-    // Get the value of the 'Deliveredto' control from the form
+  //#region to validate docket number
+  async validateConsig() {
+    // Get the value of the 'ConsignmentNoteNumber' control from the form
     const NoofDocketValue = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
-    console.log(NoofDocketValue);
-    const consignmentNoteNumber = this.deliveryMrTableForm.value.ConsignmentNoteNumber ? this.deliveryMrTableForm.value.ConsignmentNoteNumbersplit(',').map(i => i.trim()) : [];
 
-    console.log(consignmentNoteNumber);
+    // Check if NoofDocketValue contains a comma before splitting
+    const consignmentNoteNumbers = NoofDocketValue.includes(',') ? NoofDocketValue.split(',').map(i => i.trim()) : [NoofDocketValue];
 
+    try {
+      // Fetch data from the 'docket' collection  
+      const docketData = await this.getDocketList();
+
+      // Check if there's a match in the fetched data for any of the consignment note numbers
+      const foundMatch = docketData.find(x => consignmentNoteNumbers.includes(x.docketNumber));
+      if (!foundMatch) {
+        // If the branches don't match, display an informative message using SweetAlert
+        Swal.fire({
+          icon: "info",
+          title: `This Consignment No: ${NoofDocketValue} is not valid`,
+          showConfirmButton: true,
+        });
+
+        // Return from the function to prevent further execution
+        return;
+      }
+
+    } catch (error) {
+      // Handle any errors that may occur during the API request
+      console.error("Error fetching data:", error);
+    }
   }
-  // Payment Modes Changes
+  //#endregion
+  //#region Payment Modes Changes
   async OnPaymentModeChange(event) {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     let filterFunction;
@@ -391,6 +430,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         break;
     }
   }
+  //#endregion
   async getTDSData() {
     const responseFromAPIBank = await GetAccountDetailFromApi(
       this.masterService,
@@ -404,5 +444,20 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       "TDSSection",
       false
     );
+  }
+  setBankName() {
+    const bnknm = this.PaymentSummaryFilterForm.value.Bank;
+    bnknm ? this.PaymentSummaryFilterForm.controls['depositedIntoBank'].setValue(bnknm) : '';
+  }
+  async getDocketList() {
+    const req = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "docket"
+    };
+
+    // Fetch data from the 'docket' collection using the masterService
+    const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+    return res.data;
   }
 }

@@ -440,6 +440,9 @@ export class DeliveryMrGeneration {
                     showNameAndValue: true,
                     metaData: "Basic"
                 },
+                functions: {
+                    onOptionSelect: "setBankName"
+                },
             },
 
             {
@@ -631,31 +634,6 @@ export class DeliveryMrGeneration {
                 Validations: []
             },
             {
-                name: "TDSRate",
-                label: "TDS Rate",
-                placeholder: "TDS Rate",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                        {
-                        name: "required",
-                        message: "TDS Rate is required"
-                    },
-                ]
-            },
-            {
-                name: "TDSAmount",
-                label: "TDS Amount",
-                placeholder: "TDS Amount",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: [ ]
-            },
-            {
                 name: "TDSSection",
                 label: "TDS Section",
                 placeholder: "TDS Section",
@@ -685,6 +663,31 @@ export class DeliveryMrGeneration {
 
             },
             {
+                name: "TDSRate",
+                label: "TDS Rate",
+                placeholder: "TDS Rate",
+                type: "text",
+                value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "TDS Rate is required"
+                    },
+                ]
+            },
+            {
+                name: "TDSAmount",
+                label: "TDS Amount",
+                placeholder: "TDS Amount",
+                type: "text",
+                value: '',
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
                 name: "GSTCharged",
                 label: "GST Charged",
                 placeholder: "GST Charged",
@@ -692,7 +695,7 @@ export class DeliveryMrGeneration {
                 value: '',
                 generatecontrol: true,
                 disable: true,
-                Validations: [ ]
+                Validations: []
             },
             {
                 name: "DeliveryMRNetAmount",
@@ -702,7 +705,7 @@ export class DeliveryMrGeneration {
                 value: '',
                 generatecontrol: true,
                 disable: true,
-                Validations: [ ]
+                Validations: []
             },
             {
                 name: "CollectionAmount",

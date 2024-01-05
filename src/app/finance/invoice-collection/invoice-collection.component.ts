@@ -179,19 +179,21 @@ export class InvoiceCollectionComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   async save() {
-    
     const data=await this.invoiceService.getCollectionJson(this.CollectionSummaryTableForm.value,this.tableData);
-    const res=this.invoiceService.saveCollection(data);
+    const res=await this.invoiceService.saveCollection(data);
     if(res){
+      const MRNo = res.ops[0].mRNO; // Add this line to get MRNo
       Swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'Invoice collection saved successfully',
+        text: `Invoice collection saved successfully. MRNo: ${MRNo}`,
         timer: 2000,
         showCancelButton: false,
-        showConfirmButton: false
+        showConfirmButton: true, // Add this line to show the "OK" button
+        confirmButtonText: 'OK' // Add this line to set the text of the "OK" button
+      }).then(() => {
+        this.tab('Management​');
       });
-      this.tab('Management​');
     }
   }
   getCalucationDetails(event){

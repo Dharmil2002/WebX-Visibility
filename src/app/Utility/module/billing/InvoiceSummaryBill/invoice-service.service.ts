@@ -579,7 +579,7 @@ export class InvoiceServiceService {
   
 /*End*/
 /*Save CollectionData*/
-saveCollection(data){
+  async saveCollection(data){
   
   const req={
     companyCode:this.storage.companyCode,
@@ -589,7 +589,7 @@ saveCollection(data){
     branch: this.storage.branch,
     finYear: financialYear
   }
-  const res=firstValueFrom(this.operationService.operationMongoPost("finance/bill/cust/addCustomerCollection",req));
+  const res=await firstValueFrom(this.operationService.operationMongoPost("finance/bill/cust/addCustomerCollection",req));
   return res;
 }
 /*End*/

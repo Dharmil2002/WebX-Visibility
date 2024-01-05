@@ -1,5 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import {
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { LocationMaster } from "src/app/core/models/Masters/LocationMaster";
@@ -15,6 +19,8 @@ import { MapRender } from "src/app/Utility/Location Map/Maprendering";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { es } from "date-fns/locale";
+import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 @Component({
   selector: "app-add-location-master",
   templateUrl: "./add-location-master.component.html",
@@ -27,12 +33,18 @@ export class AddLocationMasterComponent implements OnInit {
   mappedPincode: string;
   mappedPincodeStatus: boolean;
   columnHeader = {
-    'PinCode': 'Pin Code',
-    'City': 'City',
-    'State': 'State',
+    PinCode: "Pin Code",
+    City: "City",
+    State: "State",
   };
-  StaticField
-  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
+  StaticField;
+  breadScrums: {
+    title: string;
+    items: string[];
+    active: string;
+    generatecontrol: boolean;
+    toggle: any;
+  }[];
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -69,7 +81,7 @@ export class AddLocationMasterComponent implements OnInit {
   locationData: any;
   StateList: any;
   isChecked = false;
-  submit = 'Save';
+  submit = "Save";
   //#endregion
 
   constructor(
@@ -86,13 +98,19 @@ export class AddLocationMasterComponent implements OnInit {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
       this.locationTable = {
         ...this.locationTable,
-        mappedPinCode: this.locationTable?.mappedPinCode ? this.locationTable.mappedPinCode.join(', ') : '',
-        mappedCity: this.locationTable?.mappedCity ? this.locationTable.mappedCity.join(', ') : '',
-        mappedState: this.locationTable?.mappedState ? this.locationTable.mappedState.join(', ') : '',
+        mappedPinCode: this.locationTable?.mappedPinCode
+          ? this.locationTable.mappedPinCode.join(", ")
+          : "",
+        mappedCity: this.locationTable?.mappedCity
+          ? this.locationTable.mappedCity.join(", ")
+          : "",
+        mappedState: this.locationTable?.mappedState
+          ? this.locationTable.mappedState.join(", ")
+          : "",
       };
 
       this.isUpdate = true;
-      this.submit = 'Modify';
+      this.submit = "Modify";
       this.action = "edit";
     } else {
       this.action = "Add";
@@ -104,7 +122,7 @@ export class AddLocationMasterComponent implements OnInit {
           items: ["Masters"],
           active: "Modify Location",
           generatecontrol: true,
-          toggle: this.locationTable.activeFlag
+          toggle: this.locationTable.activeFlag,
         },
       ];
     } else {
@@ -114,7 +132,7 @@ export class AddLocationMasterComponent implements OnInit {
           items: ["Masters"],
           active: "Add Location",
           generatecontrol: true,
-          toggle: false
+          toggle: false,
         },
       ];
       this.locationTable = new LocationMaster({});
@@ -124,10 +142,20 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
-    this.locationFormControls = new LocationControl(this.locationTable, this.isUpdate, this.isChecked);
-    this.jsonControlLocationArray = this.locationFormControls.getFormControlsLocation();
+    this.locationFormControls = new LocationControl(
+      this.locationTable,
+      this.isUpdate,
+      this.isChecked
+    );
+    this.jsonControlLocationArray =
+      this.locationFormControls.getFormControlsLocation();
     // Build the accordion data with section names as keys and corresponding form controls as values
-    this.locationTableForm = formGroupBuilder(this.fb, [this.jsonControlLocationArray]);
+    this.locationTableForm = formGroupBuilder(this.fb, [
+      this.jsonControlLocationArray,
+    ]);
+    if (this.isUpdate) {
+      this.CheckHQTR(this.locationTable.locCode);
+    }
   }
   //#endregion
   ngOnInit(): void {
@@ -142,7 +170,10 @@ export class AddLocationMasterComponent implements OnInit {
       locPincode: { variable: "pincode", status: "pincodeStatus" },
       reportLoc: { variable: "report", status: "reportStatus" },
       ownership: { variable: "locOwnership", status: "locOwnershipStatus" },
-      mappedPincode: { variable: "mappedPincode", status: "mappedPincodeStatus" }
+      mappedPincode: {
+        variable: "mappedPincode",
+        status: "mappedPincodeStatus",
+      },
     };
     processProperties.call(
       this,
@@ -153,13 +184,20 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region Pincode Dropdown
   getPincodeData() {
-    this.objPinCodeService.validateAndFilterPincode(this.locationTableForm, "", this.jsonControlLocationArray, 'locPincode', this.pincodeStatus);
+    this.objPinCodeService.validateAndFilterPincode(
+      this.locationTableForm,
+      "",
+      this.jsonControlLocationArray,
+      "locPincode",
+      this.pincodeStatus
+    );
   }
   //#endregion
 
   //#region Save function
   async save() {
-    const { mappedPinCode, mappedCity, mappedState } = this.locationTableForm.value;
+    const { mappedPinCode, mappedCity, mappedState } =
+      this.locationTableForm.value;
 
     if (
       (mappedPinCode.length === 0 || mappedPinCode === "") &&
@@ -167,9 +205,9 @@ export class AddLocationMasterComponent implements OnInit {
       (mappedState.length === 0 || mappedState === "")
     ) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Warning',
-        text: 'Please fill at least one mapped area pincode/city/state',
+        icon: "warning",
+        title: "Warning",
+        text: "Please fill at least one mapped area pincode/city/state",
         showConfirmButton: true,
       });
       return;
@@ -186,9 +224,15 @@ export class AddLocationMasterComponent implements OnInit {
       "ownership",
     ];
     const extractControlValue = (controlName) => formValue[controlName]?.value;
-    const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode ? this.locationTableForm.value.mappedPinCode.split(',') : [];
-    const resultArraycityList = this.locationTableForm.value.mappedCity ? this.locationTableForm.value.mappedCity.split(',') : [];
-    const resultArraystateList = this.locationTableForm.value.mappedState ? this.locationTableForm.value.mappedState.split(',') : [];
+    const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode
+      ? this.locationTableForm.value.mappedPinCode.split(",")
+      : [];
+    const resultArraycityList = this.locationTableForm.value.mappedCity
+      ? this.locationTableForm.value.mappedCity.split(",")
+      : [];
+    const resultArraystateList = this.locationTableForm.value.mappedState
+      ? this.locationTableForm.value.mappedState.split(",")
+      : [];
 
     controlNames.forEach((controlName) => {
       const controlValue = extractControlValue(controlName);
@@ -198,9 +242,13 @@ export class AddLocationMasterComponent implements OnInit {
     const latLng = this.locationTableForm.value.Latitude.split(",");
     this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
     this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
-    this.locationTableForm.controls["mappedPinCode"].setValue(resultArraypinCodeList)
-    this.locationTableForm.controls["mappedCity"].setValue(resultArraycityList)
-    this.locationTableForm.controls["mappedState"].setValue(resultArraystateList)
+    this.locationTableForm.controls["mappedPinCode"].setValue(
+      resultArraypinCodeList
+    );
+    this.locationTableForm.controls["mappedCity"].setValue(resultArraycityList);
+    this.locationTableForm.controls["mappedState"].setValue(
+      resultArraystateList
+    );
     Object.values(this.locationTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
@@ -211,15 +259,17 @@ export class AddLocationMasterComponent implements OnInit {
       this.locationTableForm.removeControl("pincodeHandler");
       let data = this.locationTableForm.value;
       data["mODDT"] = new Date();
-      data['mODLOC'] = this.storage.branch;
-      data['mODBY'] = this.storage.userName;
+      data["mODLOC"] = this.storage.branch;
+      data["mODBY"] = this.storage.userName;
       const req = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
         filter: { _id: id },
         update: data,
       };
-      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      const res = await firstValueFrom(
+        this.masterService.masterPut("generic/update", req)
+      );
       if (res) {
         // Display success message
         Swal.fire({
@@ -232,16 +282,19 @@ export class AddLocationMasterComponent implements OnInit {
       }
     } else {
       this.locationTableForm.removeControl("pincodeHandler");
-      if (locLevel.name === 'Head Office' && reportLevel.name === 'Head Office') {
+      if (
+        locLevel.name === "Head Office" &&
+        reportLevel.name === "Head Office"
+      ) {
         // Reset form controls and show an error message
         this.locationTableForm.patchValue({
-          locLevel: '',
-          reportLevel: '',
+          locLevel: "",
+          reportLevel: "",
         });
         Swal.fire({
-          icon: 'warning',
-          title: 'Warning',
-          text: 'You cannot add Multiple Location as Head Office. Please try with another location.',
+          icon: "warning",
+          title: "Warning",
+          text: "You cannot add Multiple Location as Head Office. Please try with another location.",
           showConfirmButton: true,
         });
         return;
@@ -249,17 +302,22 @@ export class AddLocationMasterComponent implements OnInit {
       this.locationTableForm.removeControl("mappedPincode");
       let data = this.locationTableForm.value;
       data["eNTDT"] = new Date();
-      data['eNTLOC'] = this.storage.branch;
-      data['eNTBY'] = this.storage.userName;
+      data["eNTLOC"] = this.storage.branch;
+      data["eNTBY"] = this.storage.userName;
       // Create a new record
       data["_id"] = this.locationTableForm.controls["locCode"].value;
-
+      if(this.locationTableForm.value.locCode=="HQTR"){
+        data["reportLevel"] = "";
+        data["reportLoc"] = "";
+      }
       const createReq = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
         data: data,
       };
-      const res = await firstValueFrom(this.masterService.masterPost("generic/create", createReq))
+      const res = await firstValueFrom(
+        this.masterService.masterPost("generic/create", createReq)
+      );
       if (res) {
         // Display success message
         Swal.fire({
@@ -295,7 +353,10 @@ export class AddLocationMasterComponent implements OnInit {
     const stateName = this.locationTableForm.value.locState;
 
     // Fetch state details by state name
-    const stateDetails = await this.objState.fetchStateByFilterId(stateName, 'STNM');
+    const stateDetails = await this.objState.fetchStateByFilterId(
+      stateName,
+      "STNM"
+    );
 
     // Check if state details were found
     if (stateDetails.length > 0) {
@@ -307,10 +368,12 @@ export class AddLocationMasterComponent implements OnInit {
       // Fetch the list of countries from a JSON file
       this.masterService.getJsonFileDetails("countryList").subscribe((res) => {
         // Find the country name that matches the state's country code
-        const countryName = res.find(x => x.Code === CNTR);
+        const countryName = res.find((x) => x.Code === CNTR);
         if (countryName) {
           // Set the country value in the form if found
-          this.locationTableForm.controls["locCountry"].setValue(countryName.Country);
+          this.locationTableForm.controls["locCountry"].setValue(
+            countryName.Country
+          );
         }
       });
     }
@@ -331,14 +394,20 @@ export class AddLocationMasterComponent implements OnInit {
         collectionName: "General_master",
       };
       const request = {
-        "companyCode": this.companyCode,
-        "collectionName": "state_master",
+        companyCode: this.companyCode,
+        collectionName: "state_master",
       };
 
-      this.StateList = await firstValueFrom(this.masterService.masterPost('generic/get', request));
+      this.StateList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", request)
+      );
       this.locationResponse = await this.getLocationList();
-      this.pincodeResponse = await firstValueFrom(this.masterService.masterPost("generic/get", pincodeReqBody));
-      const generalResponse = await firstValueFrom(this.masterService.masterPost("generic/get", generalReqBody));
+      this.pincodeResponse = await firstValueFrom(
+        this.masterService.masterPost("generic/get", pincodeReqBody)
+      );
+      const generalResponse = await firstValueFrom(
+        this.masterService.masterPost("generic/get", generalReqBody)
+      );
       this.locLevelList = generalResponse.data
         .filter((item) => item.codeType === "HRCHY" && item.activeFlag)
         .map((x) => {
@@ -368,19 +437,22 @@ export class AddLocationMasterComponent implements OnInit {
         var mergedItem = Object.assign({}, this.pincodeResponse.data[i]);
         for (var j = 0; j < this.StateList.data.length; j++) {
           if (this.pincodeResponse.data[i].ST === this.StateList.data[j].ST) {
-            mergedItem = Object.assign({}, this.pincodeResponse.data[i], this.StateList.data[j]);
+            mergedItem = Object.assign(
+              {},
+              this.pincodeResponse.data[i],
+              this.StateList.data[j]
+            );
             break; // Break the inner loop when a match is found
           }
         }
         mergedArray.push(mergedItem);
       }
 
-      this.pincodeDet = this.pincodeResponse.data
-        .map((element) => ({
-          name: element.PIN.toString(),
-          value: element.PIN.toString(),
-        }));
-      this.pincodeResponse.data = mergedArray
+      this.pincodeDet = this.pincodeResponse.data.map((element) => ({
+        name: element.PIN.toString(),
+        value: element.PIN.toString(),
+      }));
+      this.pincodeResponse.data = mergedArray;
       // Handle the response from the server
       if (this.isUpdate) {
         const locLevel = this.locLevelList.find(
@@ -392,7 +464,9 @@ export class AddLocationMasterComponent implements OnInit {
           (x) => x.name == this.locationTable.ownership
         );
         this.locationTableForm.controls.ownership.setValue(ownership);
-        const pincodeDet = this.pincodeDet.find((x) => x.value == (this.locationTable.locPincode).toString());
+        const pincodeDet = this.pincodeDet.find(
+          (x) => x.value == this.locationTable.locPincode.toString()
+        );
         this.locationTableForm.controls.locPincode.setValue(pincodeDet);
       }
       this.filter.Filter(
@@ -420,10 +494,13 @@ export class AddLocationMasterComponent implements OnInit {
       (item) =>
         item.PIN == this.locationTableForm.controls.locPincode.value.value
     );
-    fetchData.ST = parseInt(fetchData.ST)
+    fetchData.ST = parseInt(fetchData.ST);
     // Fetch and set the state name based on the state code
-    const stateName = await this.objState.fetchStateByFilterId(fetchData.ST, 'ST');
-    this.locationTableForm.controls.locState.setValue(stateName[0].STNM)
+    const stateName = await this.objState.fetchStateByFilterId(
+      fetchData.ST,
+      "ST"
+    );
+    this.locationTableForm.controls.locState.setValue(stateName[0].STNM);
     this.locationTableForm.controls.locCity.setValue(fetchData.CT);
     this.getStateDetails();
   }
@@ -435,7 +512,9 @@ export class AddLocationMasterComponent implements OnInit {
         (x) => x.value == this.locationTable.reportLevel
       );
       this.locationTableForm.controls.reportLevel.setValue(reportLevel);
-      this.setReportLocData(this.isUpdate ? this.locationTable.reportLevel : event);
+      this.setReportLocData(
+        this.isUpdate ? this.locationTable.reportLevel : event
+      );
     }
     this.filter.Filter(
       this.jsonControlLocationArray,
@@ -448,8 +527,8 @@ export class AddLocationMasterComponent implements OnInit {
   setReportLocData(event) {
     const locHierachy =
       this.isUpdate &&
-        typeof event !== "object" &&
-        !event.hasOwnProperty("value")
+      typeof event !== "object" &&
+      !event.hasOwnProperty("value")
         ? event
         : event.eventArgs.option.value.value;
     const filter = this.locationResponse.filter(
@@ -485,14 +564,16 @@ export class AddLocationMasterComponent implements OnInit {
       const locationList = await this.getLocationList();
 
       // Check if data exists for the given filter criteria
-      const isValueExist = locationList.some(item => item[fieldName].toLowerCase() === fieldValue);
+      const isValueExist = locationList.some(
+        (item) => item[fieldName].toLowerCase() === fieldValue
+      );
 
       // Check if data exists for the given filter criteria
       if (isValueExist) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
           icon: "error",
-          title: 'error',
+          title: "error",
           text: `${errorMessage} already exists! Please try with another !`,
           showConfirmButton: true,
         });
@@ -500,14 +581,35 @@ export class AddLocationMasterComponent implements OnInit {
         // Reset the input field
         this.locationTableForm.controls[fieldName].reset();
       }
-    }
-    catch (error) {
+    } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+      console.error(
+        `An error occurred while fetching ${fieldName} details:`,
+        error
+      );
     }
   }
-  async checkLocCode() {
-    await this.checkValueExists("locCode", "Location Code");
+  async checkLocCode(event) {
+    console.log("event", event);
+    // const res = await this.checkValueExists("locCode", "Location Code");
+    const Body = {
+      companyCode: this.companyCode,
+      collectionName: "location_detail",
+      filter: { locCode: this.locationTableForm.value.locCode.toUpperCase() },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
+    if (res.success && res.data.length != 0) {
+      Swal.fire({
+        icon: "error",
+        title: "error",
+        text: `Location Code already exists! Please try with another !`,
+        showConfirmButton: true,
+      });
+      this.locationTableForm.controls.locCode.setValue("");
+    }
+    this.CheckHQTR(this.locationTableForm.value.locCode.toUpperCase());
   }
   async checkLocName() {
     await this.checkValueExists("locName", "Location Name");
@@ -517,11 +619,52 @@ export class AddLocationMasterComponent implements OnInit {
   }
   //#endregion
 
+  CheckHQTR(value) {
+    if (value == "HQTR") {
+      this.jsonControlLocationArray.forEach((x) => {
+        if (x.name == "reportLevel" || x.name == "reportLoc") {
+          x.disable = true;
+        }
+      });
+      this.locationTableForm.get("reportLevel").clearValidators();
+      this.locationTableForm.get("reportLevel").updateValueAndValidity();
+      this.locationTableForm.get("reportLoc").clearValidators();
+      this.locationTableForm.get("reportLoc").updateValueAndValidity();
+      this.locationTableForm.get("locLevel").clearValidators();
+      this.locationTableForm
+        .get("locLevel")
+        .setValidators(autocompleteObjectValidator());
+      this.locationTableForm.get("locLevel").updateValueAndValidity();
+    } else {
+      this.jsonControlLocationArray.forEach((x) => {
+        if (x.name == "reportLevel" || x.name == "reportLoc") {
+          if (this.isUpdate) {
+            x.disable = true;
+          } else {
+            x.disable = false;
+          }
+        }
+      });
+      this.locationTableForm
+        .get("reportLevel")
+        .setValidators([Validators.required, autocompleteObjectValidator()]);
+      this.locationTableForm.get("reportLevel").updateValueAndValidity();
+      this.locationTableForm
+        .get("reportLoc")
+        .setValidators([Validators.required, autocompleteObjectValidator()]);
+      this.locationTableForm.get("reportLoc").updateValueAndValidity();
+      this.locationTableForm
+        .get("locLevel")
+        .setValidators([Validators.required, autocompleteObjectValidator()]);
+      this.locationTableForm.get("locLevel").updateValueAndValidity();
+    }
+  }
+
   //#region get Latitude & Longitude from map
   showMap() {
     let dialogRef = this.dialog.open(MapRender, {
       data: {
-        Modulename: "LocationMaster"
+        Modulename: "LocationMaster",
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
@@ -535,7 +678,7 @@ export class AddLocationMasterComponent implements OnInit {
     // Get the search keyword
     let search = this.locationTableForm.controls.mappedPincode.value;
     let data = [];
-    let dataSTNM = []
+    let dataSTNM = [];
     // Check if search length is less than 3 characters
     if (search.length >= 3) {
       // If the minimum search length is met
@@ -559,7 +702,7 @@ export class AddLocationMasterComponent implements OnInit {
             return false;
           })
           .map((element) => ({
-            name: element.CT.toString(),// + " - CT",
+            name: element.CT.toString(), // + " - CT",
             value: "CT",
           }));
         let uniqueSTNMs = new Set();
@@ -573,10 +716,10 @@ export class AddLocationMasterComponent implements OnInit {
             return false;
           })
           .map((element) => ({
-            name: element.STNM.toString(),// + " - ST",
+            name: element.STNM.toString(), // + " - ST",
             value: "ST",
           }));
-        data = [...data, ...dataSTNM]
+        data = [...data, ...dataSTNM];
       }
       this.filter.Filter(
         this.jsonControlLocationArray,
@@ -585,13 +728,12 @@ export class AddLocationMasterComponent implements OnInit {
         this.mappedPincode,
         this.mappedPincodeStatus
       );
-
     }
   }
   //#endregion
   async resetPinCode(event) {
-    await this.locationTableForm.controls.mappedPincode.patchValue([])
-    await this.locationTableForm.controls.pincodeHandler.patchValue([])
+    await this.locationTableForm.controls.mappedPincode.patchValue([]);
+    await this.locationTableForm.controls.pincodeHandler.patchValue([]);
     // this.jsonControlLocationArray[14].additionalData.isChecked = false
     // this.filter.Filter(
     //   this.jsonControlLocationArray,
@@ -613,44 +755,64 @@ export class AddLocationMasterComponent implements OnInit {
     this.jsonControlLocationArray[index].filterOptions
       .pipe(take(1), takeUntil(this._onDestroy))
       .subscribe((val) => {
-        const uniqueValuesSet = new Set(val.map(item => item.value));
-        Array.from(uniqueValuesSet).forEach(item => {
-          if (item == 'CT') {
-            let mappedCity = val.filter(items => items.value == 'CT')
-            this.locationTableForm.controls.mappedCity.patchValue(isSelectAll ? mappedCity.map(item => item.name).toString() : [])
-          } if (item == 'ST') {
-            let mappedState = val.filter(items => items.value == 'ST')
-            this.locationTableForm.controls.mappedState.patchValue(isSelectAll ? mappedState.map(item => item.name).toString() : [])
-
-          } if (item == 'PIN') {
-            let mappedPinCode = val.filter(items => items.value == 'PIN')
-            this.locationTableForm.controls.mappedPinCode.patchValue(isSelectAll ? mappedPinCode.map(item => item.name).toString() : [])
-
+        const uniqueValuesSet = new Set(val.map((item) => item.value));
+        Array.from(uniqueValuesSet).forEach((item) => {
+          if (item == "CT") {
+            let mappedCity = val.filter((items) => items.value == "CT");
+            this.locationTableForm.controls.mappedCity.patchValue(
+              isSelectAll ? mappedCity.map((item) => item.name).toString() : []
+            );
           }
-        })
+          if (item == "ST") {
+            let mappedState = val.filter((items) => items.value == "ST");
+            this.locationTableForm.controls.mappedState.patchValue(
+              isSelectAll ? mappedState.map((item) => item.name).toString() : []
+            );
+          }
+          if (item == "PIN") {
+            let mappedPinCode = val.filter((items) => items.value == "PIN");
+            this.locationTableForm.controls.mappedPinCode.patchValue(
+              isSelectAll
+                ? mappedPinCode.map((item) => item.name).toString()
+                : []
+            );
+          }
+        });
         this.locationTableForm.controls[autocompleteSupport].patchValue(
           isSelectAll ? val : []
         );
       });
-
   }
   setSelectedPincodeData(event) {
-
-    const uniqueValuesSet = new Set(event.eventArgs.value.map(item => item.value));
-    Array.from(uniqueValuesSet).forEach(item => {
-      if (item == 'CT') {
-        let mappedCity = event.eventArgs.value.filter(items => items.value == 'CT')
-        this.locationTableForm.controls.mappedCity.patchValue(mappedCity.map(item => item.name).toString())
-      } if (item == 'ST') {
-        let mappedState = event.eventArgs.value.filter(items => items.value == 'ST')
-        this.locationTableForm.controls.mappedState.patchValue(mappedState.map(item => item.name).toString())
-
-      } if (item == 'PIN') {
-        let mappedPinCode = event.eventArgs.value.filter(items => items.value == 'PIN')
-        this.locationTableForm.controls.mappedPinCode.patchValue(mappedPinCode.map(item => item.name).toString())
-
+    const uniqueValuesSet = new Set(
+      event.eventArgs.value.map((item) => item.value)
+    );
+    Array.from(uniqueValuesSet).forEach((item) => {
+      if (item == "CT") {
+        let mappedCity = event.eventArgs.value.filter(
+          (items) => items.value == "CT"
+        );
+        this.locationTableForm.controls.mappedCity.patchValue(
+          mappedCity.map((item) => item.name).toString()
+        );
       }
-    })
+      if (item == "ST") {
+        let mappedState = event.eventArgs.value.filter(
+          (items) => items.value == "ST"
+        );
+        this.locationTableForm.controls.mappedState.patchValue(
+          mappedState.map((item) => item.name).toString()
+        );
+      }
+      if (item == "PIN") {
+        let mappedPinCode = event.eventArgs.value.filter(
+          (items) => items.value == "PIN"
+        );
+        this.locationTableForm.controls.mappedPinCode.patchValue(
+          mappedPinCode.map((item) => item.name).toString()
+        );
+      }
+    });
   }
   //#endregion
   //set value empty
@@ -660,7 +822,7 @@ export class AddLocationMasterComponent implements OnInit {
   //#region to set flag value
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
-    this.locationTableForm.controls['activeFlag'].setValue(event);
+    this.locationTableForm.controls["activeFlag"].setValue(event);
     //console.log("Toggle value :", event);
   }
   //#endregion
@@ -672,23 +834,26 @@ export class AddLocationMasterComponent implements OnInit {
       let filterId = gstNumber.substring(0, 2);
       filterId = parseInt(filterId);
       // Fetch the GST state name based on the state code
-      const stateName = await this.objState.fetchStateByFilterId(filterId, 'ST');
+      const stateName = await this.objState.fetchStateByFilterId(
+        filterId,
+        "ST"
+      );
       const locState = stateName[0].STNM;
       const gstState = this.locationTableForm.value.locState;
 
       if (locState !== gstState) {
         Swal.fire({
-          icon: 'warning',
-          title: 'Warning',
+          icon: "warning",
+          title: "Warning",
           text: `This GST '${gstNumber}' belongs to '${locState}' not '${gstState}' Please correct the state code`,
           showConfirmButton: true,
         });
-        this.locationTableForm.controls['gstNumber'].setValue("");
+        this.locationTableForm.controls["gstNumber"].setValue("");
         return;
       }
       this.checkGstNo();
     } catch (error) {
-      console.error('An error occurred while setting the GST state:', error);
+      console.error("An error occurred while setting the GST state:", error);
     }
   }
   //#endregion
@@ -696,10 +861,18 @@ export class AddLocationMasterComponent implements OnInit {
   //#region to get location List
   async getLocationList() {
     try {
-      const req = { companyCode: this.companyCode, collectionName: "location_detail", filter: {} };
-      const response = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      const req = {
+        companyCode: this.companyCode,
+        collectionName: "location_detail",
+        filter: {},
+      };
+      const response = await firstValueFrom(
+        this.masterService.masterPost("generic/get", req)
+      );
 
-      return response ? response.data.sort((a, b) => a._id.localeCompare(b._id)) : [];
+      return response
+        ? response.data.sort((a, b) => a._id.localeCompare(b._id))
+        : [];
     } catch (error) {
       console.error("Error fetching location list:", error);
       throw error;

@@ -64,7 +64,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "autocomplete",
@@ -95,7 +95,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "autocomplete",
@@ -127,7 +127,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "autocomplete",

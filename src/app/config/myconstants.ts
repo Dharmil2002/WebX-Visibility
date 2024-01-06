@@ -7,8 +7,10 @@ export const Collections = {
     PrqDetails: 'prq_summary',
     ThcDetails: 'thc_detail',
     docketOp: 'docket_ops_det',
-    thcsummary: 'thc_summary',
     thc_movement: 'thc_movement',
+    thcsummary: 'thc_summary',
+    chaHeaders: 'cha_headers',
+    chaDetails: 'cha_details',
 };
 
 export const GenericActions = {
@@ -19,5 +21,6 @@ export const GenericActions = {
 
 export const OperationActions = {
     CreateThc: "operation/thc/create",
-    getThc: "operation/thc/get"
+    getThc: "operation/thc/get",
+    createCha:"operation/cha/create"
 }

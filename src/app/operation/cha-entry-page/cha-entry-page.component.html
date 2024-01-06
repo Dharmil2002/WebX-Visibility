@@ -1,14 +1,25 @@
 <div *ngIf="!RakeEntry">
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" [loadTable]="tableLoad">
     <form [formGroup]="chaEntryTableForm">
         <app-form-webxpress [form]="chaEntryTableForm" [formData]="chaEntryControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+            (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'CHA Entry'" [showSaveAndCancelButton]="false"
+            (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
-    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns1"
-    (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
-   (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
-   [ActionObject]="actionObject"></app-table-boilerplate>
+    <form [formGroup]="chaEntryTableForm">
+        <app-form-webxpress [form]="chaFormTableForm" [formData]="chaTableFormControl"
+            (functionCallEmitter)="functionCallHandler($event)"  (callFunction)="functionCallHandler($event)" [FormTitle]="'Document Details'" 
+            [EventButton]="buttons">
+        </app-form-webxpress>
+        <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="model.dynamicControls" [columnHeader]="model.columnHeader"
+        [tableData]="chaTableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="model.menuItems"
+        [staticField]="model.staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+        [addFlag]="addFlag" (addEmitter)="addPopUp($event)" [showHeader]=false>
+      </app-generic-table-v2>
+    </form>
+    
    <div class="row">
        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
            <div class="example-button-row  d-flex justify-content-end">
@@ -19,31 +30,5 @@
            </div>
        </div>  
    </div>
-    
 </app-common-wrapper-webxpress>
 </div>
-<!-- <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <form [formGroup]="chaEntryTableForm">
-        <app-form-webxpress [form]="chaEntryTableForm" [formData]="chaEntryControlArray"
-            (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <app-table-boilerplate *ngIf="tableView" [tableData]="tableData" [columnHeader]="chaDisplayFields"
-        title="CHA Deatils" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
-        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
-        [ActionObject]="actionObject"></app-table-boilerplate>
-    <ng-container>
-        <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-                <div class="example-button-row">
-                    <button type="button" [disabled]="!chaEntryTableForm.valid" mat-raised-button color="primary"
-                        (click)="save()">
-                        Save
-                    </button>
-                    <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </ng-container>
-</app-common-wrapper-webxpress> -->

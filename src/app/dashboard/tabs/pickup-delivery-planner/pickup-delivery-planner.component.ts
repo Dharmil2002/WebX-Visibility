@@ -10,8 +10,6 @@ export class PickupDeliveryPlannerComponent implements OnInit {
     this.myTabGroup.selectedIndex = Index;
   }
   ngOnInit() {
-    setTimeout(() => {
       this.GetSelectedIndex(1)
-    }, 0);
   }
 }

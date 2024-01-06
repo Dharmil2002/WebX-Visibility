@@ -108,6 +108,10 @@ export async function   total(round,field){
     const parsedValue = parseFloat(value);
     return isNaN(parsedValue) ? fallback : parsedValue;
   }
+  
+  export function assignDetail(detail: any[], formValue: any): any {
+    return detail.length > 0 ? detail : formValue;
+  }
   export const getValueFromJsonControl = (jsonControl, name, value) => {
     const item = jsonControl.find(x => x.name === name);
     if (item) {
@@ -166,3 +170,5 @@ export function aggregateData(data, groupByColumns, aggregationRules, fixedColum
 
   return Object.values(groups);
 }
+
+

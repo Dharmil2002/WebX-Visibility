@@ -3,28 +3,28 @@
         <div class="col-lg-12 col-md-12">
             <div class="card">
                 <mat-tab-group (selectedIndexChange)="GetSelectedIndex($event)" #myTabGroup>
-                    <mat-tab>
+                    <!-- <mat-tab>
                         <ng-template mat-tab-label>
-                            <!-- <mat-icon class="example-tab-icon msr-2">home</mat-icon> -->
+                            <mat-icon class="example-tab-icon msr-2">home</mat-icon>
                             Pickup and Delivery Planner
                         </ng-template>
                         <app-pickup-del-page *ngIf="myTabGroup.selectedIndex== 0"
                             (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-del-page>
-                    </mat-tab>
-                    <mat-tab>
+                    </mat-tab> -->
+                    <!-- <mat-tab>
                         <ng-template mat-tab-label>
-                            <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                            <mat-icon class="example-tab-icon msr-2">create</mat-icon>
                             Manage Run Sheets
                         </ng-template>
                         <app-manage-runsheet *ngIf="myTabGroup.selectedIndex== 1"
                             (CurrentIndex)="GetSelectedIndex($event)"></app-manage-runsheet>
-                    </mat-tab>
+                    </mat-tab> -->
                     <mat-tab>
                         <ng-template mat-tab-label>
                             <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                             Delivery MR Generation 
                         </ng-template>
-                        <app-delivery-mr-generation-list *ngIf="myTabGroup.selectedIndex== 2"
+                        <app-delivery-mr-generation-list
                             (CurrentIndex)="GetSelectedIndex($event)"></app-delivery-mr-generation-list>
                     </mat-tab>
                 </mat-tab-group>

@@ -1,3 +1,5 @@
+import { UntypedFormGroup } from "@angular/forms";
+
 // filter-utils.ts
 export function filterAndUnique<T>(
   data: T[],
@@ -15,3 +17,12 @@ export function filterAndUnique<T>(
     })
     .map(mapFunction);
 }
+/*Below function is for check the form group is empty or not*/
+export function isEmptyForm(Form: UntypedFormGroup): boolean {
+  return Object.keys(Form.value).every(key => {
+    // Check if the property is empty. This can be adjusted based on how you define "empty" (e.g., consider whitespace, null, undefined)
+    let value = Form.value[key];
+    return value == null || value === '';
+  });
+}
+/*End*/

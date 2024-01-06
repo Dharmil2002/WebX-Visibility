@@ -9,13 +9,13 @@
         <div class="card" *ngIf="this.menuDetail">
             <mat-tab-group (selectedTabChange)="onTabChange($event)" (selectedIndexChange)="GetSelectedIndex($event)"
                 #myTabGroup>
-                <mat-tab *ngIf="hasPermission('dashboardcount')" label="dashboardcount">
+                <!-- <mat-tab *ngIf="hasPermission('dashboardcount')" label="dashboardcount">
                     <ng-template mat-tab-label>
                         Dashboard
                     </ng-template>
                     <app-dashboard-count-page [selectedIndex]="0"
                         (CurrentIndex)="GetSelectedIndex($event)"></app-dashboard-count-page>
-                </mat-tab>
+                </mat-tab> -->
                 <mat-tab *ngIf="hasPermission('DocketStock')" label="DocketStock">
                     <ng-template mat-tab-label>
                         Docket Stock
@@ -49,13 +49,13 @@
                                   DEPS
                               </ng-template>
                           </mat-tab> -->
-                <mat-tab *ngIf=" hasPermission('POD')" label="POD">
+                <!-- <mat-tab *ngIf=" hasPermission('POD')" label="POD">
                     <ng-template mat-tab-label>
                         POD/COD
                     </ng-template>
                     <app-pod-cod-dashboard-page (CurrentIndex)="GetSelectedIndex($event)"
                         [selectedIndex]="5"></app-pod-cod-dashboard-page>
-                </mat-tab>
+                </mat-tab> -->
                 <mat-tab *ngIf="hasPermission('PRQ')" label="PRQ">
                     <ng-template mat-tab-label>
                         PRQ Summary
@@ -119,7 +119,7 @@
                     <app-invoice-management (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Management​'"
                         [selectedIndex]="14"></app-invoice-management>
                 </mat-tab>
-                <mat-tab *ngIf=" hasPermission('invoiceBilling')" label="Contracts">
+                <!-- <mat-tab *ngIf=" hasPermission('invoiceBilling')" label="Contracts">
                     <ng-template mat-tab-label>
                         Customer Contracts
                     </ng-template>
@@ -132,7 +132,7 @@
                     </ng-template>
                     <app-invoice-management (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Masters'"
                         [selectedIndex]="16"></app-invoice-management>
-                </mat-tab>
+                </mat-tab> -->
                 <mat-tab *ngIf="hasPermission('Voucher')" label="Voucher">
                     <ng-template mat-tab-label>
                         Manual Voucher

@@ -62,11 +62,12 @@ export class JobControl {
                     }
                 ],
                 functions: {
+                    onModel: "getCustomer",
                     onOptionSelect: "getDocketBasedOnCity"
                 },
                 additionalData: {
                     metaData: "jobControls",
-                    showNameAndValue: false
+                    showNameAndValue: true
                 }
             },
             //  {
@@ -169,10 +170,7 @@ export class JobControl {
                 label: "Job Type",
                 placeholder: 'Job Type',
                 type: "Staticdropdown",
-                value: [
-                    { value: 'I', name: 'Import' },
-                    { value: 'E', name: 'Export' }
-                ],
+                value: [],
                 Validations: [
                     {
                         name: "required",
@@ -211,10 +209,7 @@ export class JobControl {
                 label: "Transported By",
                 placeholder: 'Transported By',
                 type: "Staticdropdown",
-                value: [
-                    { value: 'T', name: 'Third Party' },
-                    { value: 'O', name: 'Own' }
-                ],
+                value: [],
                 Validations: [
                 ],
                 functions: {
@@ -241,25 +236,6 @@ export class JobControl {
                 ]
             },
             {
-                name: "vendorName",
-                label: "Vendor Name",
-                placeholder: "Enter Vendor Name",
-                type: "dropdown",//dropdown
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Vendor Name is required"
-                    }
-                ],
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "jobControls"
-                }
-            },
-            {
                 name: 'jobLocation', label: "Job Location", placeholder: "Select Job Location", type: 'text',
                 value: localStorage.getItem('Branch'), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [],
@@ -270,12 +246,7 @@ export class JobControl {
             },
             {
                 name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'Staticdropdown',
-                value: [
-                    { value: 'Air', name: 'Air' },
-                    { value: 'Road', name: 'Road' },
-                    { value: 'Rail', name: 'Rail' }
-
-                ], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: [], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
                     onSelection: "tranPortChanged"
@@ -301,7 +272,7 @@ export class JobControl {
             },
             {
                 name: 'exportType', label: "Export Type", placeholder: "Export Type", type: 'Staticdropdown',
-                value: [{ name: "Container", value: "container" }],
+                value: [],
                 filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 additionalData: {
                     showNameAndValue: false,
@@ -486,7 +457,7 @@ export class JobControl {
                 ]
                 ,
                 functions: {
-                    onChange: "getDocketDetail",
+                    onModel: "getShipment",
                     onOptionSelect: 'fillDocketDetail'
                 }
             },

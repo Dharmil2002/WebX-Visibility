@@ -38,7 +38,7 @@ export class LocationControl {
         type: "text",
         value: LocationTable.locName,
         generatecontrol: true,
-        disable: isUpdate ? true : false,
+        disable: false,
         Validations: [
           {
             name: "required",

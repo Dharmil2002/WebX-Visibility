@@ -20,9 +20,9 @@ import Swal from 'sweetalert2';
 export class CnwGstRegisterComponent implements OnInit {
   breadScrums = [
     {
-      title: "Consignment wise GST Register Report",
+      title: "Consignment Note GST Register Report",
       items: ["Home"],
-      active: "Consignment wise GST Register Report",
+      active: "Consignment Note GST Register Report",
     },
   ];
   cnoteTableForm: UntypedFormGroup;
@@ -335,7 +335,7 @@ export class CnwGstRegisterComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
+    // Convert the selected data to a CSV string
     const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

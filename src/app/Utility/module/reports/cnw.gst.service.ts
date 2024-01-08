@@ -83,7 +83,6 @@ export class CnwGstService {
      //      })
      //      return cnotegstList
      // }
-
      async getCNoteGSTregisterReportDetail() {
           const reqBody = {
                companyCode: this.storage.companyCode,
@@ -91,40 +90,68 @@ export class CnwGstService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "job_details"
+          const resjob = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "cha_headers"
+          const rescha = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "cha_details"
+          const reschaDet = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           let cnotegstList = [];
           res.data.map((element) => {
+
+               const jobDet = resjob.data ? resjob.data.find((entry) => entry.jID === element?.jOBNO) : null;
+               const chaDet = rescha.data ? rescha.data.find((entry) => entry.jID === element?.jOBNO) : null;
+               const chaDetail = reschaDet.data ? reschaDet.data.find((entry) => entry.cHAID === chaDet?.cHAID) : null;
+               let jobid = 0;
+               let jobDate = 0;
+               let cHAID = 0;
+               let chanum = 0;
+               let chadate = 0;
+               let chaAmt = 0;
+               if (jobDet) {
+                    jobid = jobDet.jID;
+                    jobDate = jobDet.jDT;
+               }
+               if (chaDet) {
+                    cHAID = chaDet.cHAID;
+               }
+               if (chaDetail) {
+                    chanum = chaDetail.cHAID;
+                    chadate = chaDetail.eNTDT;
+                    chaAmt = chaDetail.tOTAMT;
+               }
+
                let jobgstData = {
                     "docketNumber": element?.docNo || "",
                     "odocketDate": element.dKTDT,
-                    // "docketDate": formatDocketDate(element?.dKTDT || ""),
                     "docketDate": element?.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
                     "time": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
                     "edd": "",
-                    "bbrnch": element?.eNTLOC||'',
-                    "dbranch": element?.dEST||'',
+                    "bbrnch": element?.eNTLOC || '',
+                    "dbranch": element?.dEST || '',
                     "payty": element?.pAYTYPNM || '',
                     "busity": "",
                     "prod": "",
                     "contID": "",
-                    "conpar": element?.bPARTY||'',
+                    "conpar": element?.bPARTY || '',
                     "sertp": 'FTL',
                     "vehno": element?.vEHNO || "",
-                    "billparnm": element?.bPARTY||'',
+                    "billparnm": element?.bPARTY || '',
                     "bacode": "",
-                    "lastmodby": element?.eNTBY||'',
-                    "cnotemoddt": formatDocketDate(element?.eNTDT||''),
+                    "lastmodby": element?.eNTBY || '',
+                    "cnotemoddt": formatDocketDate(element?.eNTDT || ''),
                     "cusrefno": "",
                     "movty": element?.mODNM || '',
                     "tranmode": element?.tRNMODNM || '',
-                    "status": element?.oSTSN||'',
-                    "loadty": element?.loadty||'',
-                    "subtot": element?.tOTAMT||'',
-                    "doctot": element?.tOTAMT||'',
+                    "status": element?.oSTSN || '',
+                    "loadty": element?.loadty || '',
+                    "subtot": element?.tOTAMT || '',
+                    "doctot": element?.tOTAMT || '',
                     "gstrt": "",
                     "gstamt": element?.gSTAMT || "",
                     "frtrt": element?.fRTRT || '',
-                    "frttp": element?.fRTRTY||'',
-                    "frichar": element?.fRTAMT||'',
+                    "frttp": element?.fRTRTYN || '',
+                    "frichar": element?.fRTAMT || '',
                     "otherchar": "",
                     "greentax": "",
                     "dropchar": "",
@@ -145,16 +172,18 @@ export class CnwGstService {
                     "dphamt": "",
                     "disrt": "",
                     "discamt": "",
-                    "jobno": "",
-                    "jobdt": "",
-                    "chano": "",
-                    "chadt": "",
-                    "chaamt": "",
+                    "jobno": jobid,
+                    // "jobdt": jobDate,
+                    "jobdt": formatDocketDate(jobDate || ''),
+                    "chano": chanum,
+                    // "chadt": chadate,
+                    "chadt": formatDocketDate(chadate || ''),
+                    "chaamt": chaAmt,
                     "tCT": element?.tCT || '',
                     "fCT": element?.fCT || "",
                     "oRGN": element?.oRGN || '',
                     "dEST": element?.dEST || '',
-                    "cSGNNM":element?.cSGNNM,
+                    "cSGNNM": element?.cSGNNM,
                }
                cnotegstList.push(jobgstData)
           })

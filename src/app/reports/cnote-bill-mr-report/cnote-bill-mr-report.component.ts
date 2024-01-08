@@ -387,6 +387,9 @@ export class CnoteBillMrReportComponent implements OnInit {
     const movetype = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
       ? this.cnoteBillMRTableForm.value.movTypeHandler.map(x => x.name)
       : [];
+    const customer = Array.isArray(this.cnoteBillMRTableForm.value.custHandler)
+      ? this.cnoteBillMRTableForm.value.custHandler.map(x => x.name)
+      : [];
     // Filter records based on form values
     const filteredRecords = data.filter(record => {
       const origin = fromloc.length === 0 || fromloc.includes(record.oRGN);
@@ -395,6 +398,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       const des = toloc.length === 0 || toloc.includes(record.dEST);
       const booktpDet = bookingtype.length === 0 || bookingtype.includes(record.bOOKINGTPE);
       const tranmodeDet = transitmode.length === 0 || transitmode.includes(record.tRANMODE);
+      const customerDet = customer.length === 0 || customer.includes(record.bILLPAR);
       const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
       const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
       const entryTime = new Date(record.oeNTDT);

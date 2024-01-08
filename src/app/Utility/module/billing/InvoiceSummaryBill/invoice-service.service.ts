@@ -132,8 +132,8 @@ export class InvoiceServiceService {
         cGSTRT:gstType.includes(data?.gstType)?parseFloat(data.gstRate) / 2:0,
         iGST:data?.gstType == "IGST" ? element.gstCharged:0,
         iGSTRT: data?.gstType == "IGST"?data.gstRate:0,
-        eNTDT: new Date(),
-        eNTLOC:element.extraData?.oRGN || "",
+        eNTDT:new Date(),
+        eNTLOC:this.storage.branch || "",
         eNTBY:this.storage?.userName|| "",
       }
       jsonBillingList.push(jsonBilling);

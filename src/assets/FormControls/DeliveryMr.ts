@@ -39,33 +39,6 @@ export class DeliveryMrGeneration {
                     message: "Name of Receiver is required",
                 },]
             },
-            // {
-            //     name: 'NameofConsignee',
-            //     label: 'Name of Consignee',
-            //     placeholder: 'Name of Consignee',
-            //     type: 'text',
-            //     value: "",
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: []
-            // },
-            {
-                name: 'NoofDocket',
-                label: 'No of Docket ',
-                placeholder: 'No of Docket ',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Single", name: "Single" },
-                    { value: "Multiple", name: "Multiple" },
-                ],
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                    name: "required",
-                    message: "No of Docket is required",
-                },],
-
-            },
             {
                 name: 'ContactNumber',
                 label: 'Contact Number ',
@@ -555,9 +528,9 @@ export class DeliveryMrGeneration {
                 Validations: []
             },
             {
-                name: "StateofSupply",
-                label: "State of Supply",
-                placeholder: "State of Supply",
+                name: "Stateofbooking",
+                label: "State of Booking",
+                placeholder: "State of Booking",
                 type: "text",
                 value: '',
                 generatecontrol: true,
@@ -565,9 +538,9 @@ export class DeliveryMrGeneration {
                 Validations: []
             },
             {
-                name: "PlaceofSupply",
-                label: "Place of Supply",
-                placeholder: "Place of Supply",
+                name: "StateofSupply",
+                label: "State of Supply",
+                placeholder: "State of Supply",
                 type: "dropdown",
                 value: "",
                 filterOptions: "",
@@ -597,17 +570,33 @@ export class DeliveryMrGeneration {
                 name: "SACCode",
                 label: "SAC Code",
                 placeholder: "SAC Code",
-                type: "text",
-                value: '',
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                displaywith: "",
                 generatecontrol: true,
-                disable: true,
+                disable: false,
                 Validations: [
-                    //     {
-                    //     name: "required",
-                    //     message: "Billing Party is required"
-                    // },
-                ]
-            },
+                  {
+                    name: "required",
+                    message: "SAC Code is required"
+                  },
+                  {
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                  },
+                  {
+                    name: "autocomplete",
+                  },
+                ],
+                additionalData: {
+                  showNameAndValue: true,
+                  metaData: "Basic"
+                },
+                functions: {
+                  onOptionSelect: "SACCodeFieldChanged"
+                },
+              },
             {
                 name: "GSTRate",
                 label: "GST Rate",
@@ -660,11 +649,13 @@ export class DeliveryMrGeneration {
                     showNameAndValue: false,
                     //metaData: "Basic"
                 },
-
+                functions: {
+                    onOptionSelect: "TDSSectionFieldChanged"
+                },
             },
             {
                 name: "TDSRate",
-                label: "TDS Rate",
+                label: 'TDS Rate %',
                 placeholder: "TDS Rate",
                 type: "text",
                 value: '',
@@ -675,7 +666,10 @@ export class DeliveryMrGeneration {
                         name: "required",
                         message: "TDS Rate is required"
                     },
-                ]
+                ],
+                functions: {
+                    onChange: "calculateTDSAndTotal"
+                },
             },
             {
                 name: "TDSAmount",

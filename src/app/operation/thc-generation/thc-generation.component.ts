@@ -37,6 +37,7 @@ import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommon
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
 import moment from "moment";
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: "app-thc-generation",
@@ -105,6 +106,11 @@ export class ThcGenerationComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:150px",
     },
+    cNO: {
+      Title: "Container Id",
+      class: "matcolumnleft",
+      Style: "min-width:150px",
+    },
     fCT: {
       Title: "From City",
       class: "matcolumncenter",
@@ -157,6 +163,7 @@ export class ThcGenerationComponent implements OnInit {
   staticField = [
     "bPARTYNM",
     "pKGS",
+    // "cNO",
     "docNo",
     "fCT",
     "tCT",
@@ -213,6 +220,7 @@ export class ThcGenerationComponent implements OnInit {
   vendorTypes: AutoComplete[];
   products: AutoComplete[];
   directPrq: boolean;
+  DocketsContainersWise: boolean = false;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -248,14 +256,14 @@ export class ThcGenerationComponent implements OnInit {
         case 'view':
           this.disbleCheckbox = true;
           this.thcDetail = navigationState.data;
-          this.staticField.push('receiveBy', 'arrivalTime', 'remarks');
+          this.staticField.push('cNO', 'receiveBy', 'arrivalTime', 'remarks');
           this.isView = true;
           this.isSubmit = true;
           delete this.columnHeader.actionsItems;
           break;
         case 'update':
           this.thcDetail = navigationState.data;
-          this.staticField.push('receiveBy', 'arrivalTime', 'remarks');
+          this.staticField.push('cNO', 'receiveBy', 'arrivalTime', 'remarks');
           this.isSubmit = true;
           this.isUpdate = true;
           this.isArrivedInfo = true
@@ -284,6 +292,7 @@ export class ThcGenerationComponent implements OnInit {
       delete this.columnHeader.receiveBy;
       delete this.columnHeader.arrivalTime;
       delete this.columnHeader.remarks;
+      delete this.columnHeader.actionsItems;
       this.menuItems[0].label = "Edit"
       this.getShipmentDetail();
     }
@@ -341,6 +350,13 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*End*/
 
+  onchangecontainerwise(event) {
+    this.DocketsContainersWise = event?.eventArgs?.checked;
+    if (this.DocketsContainersWise) {
+      this.staticField.push('cNO');
+    }
+    this.getLocBasedOnCity()
+  }
   /*here the function of the filterFormControls which is retive the additionData*/
   filterFormControls(formControls, metaData) {
     return formControls.filter((x) => x.additionalData && x.additionalData.metaData === metaData);
@@ -357,15 +373,16 @@ export class ThcGenerationComponent implements OnInit {
   /*here the function which is getting a docket from the Api for the create THC*/
   async getShipmentDetail() {
 
-    if (!this.isUpdate && !this.isView) {
-      let prqNo = this.prqDetail?.prqNo || "";
-      const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
-      this.allShipment = shipmentList;
-      if (this.addThc) {
-        this.tableData = shipmentList
-        this.tableLoad = false;
-      }
-    }
+    // if (!this.isUpdate && !this.isView) {
+    //   let prqNo = this.prqDetail?.prqNo || "";
+    //   debugger
+    //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
+    //   this.allShipment = shipmentList;
+    //   if (this.addThc) {
+    //     this.tableData = shipmentList
+    //     this.tableLoad = false;
+    //   }
+    // }
   }
   /*End*/
 
@@ -639,6 +656,17 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   selectCheckBox(event) {
+    if (this.DocketsContainersWise) {
+      if (event.length > 1) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Information',
+          text: 'You can select only one Container Wise Docket',
+          showConfirmButton: true,
+        });
+        return false;
+      }
+    }
     // Assuming event is an array of objects
     // Sum all the calculated actualWeights
     const totalActualWeight = event.reduce((acc, weight) => acc + weight.aCTWT, 0);
@@ -690,6 +718,18 @@ export class ThcGenerationComponent implements OnInit {
   }
   async createThc() {
 
+    if (this.DocketsContainersWise) {
+
+      if (this.tableData.filter(x => x.isSelected).length > 1) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Information',
+          text: 'You can select only one Container Wise Docket',
+          showConfirmButton: true,
+        });
+        return false;
+      }
+    }
     const selectedDkt = this.isUpdate ? this.tableData : this.selectedData ? this.selectedData : [];
     if (selectedDkt.length === 0 && !this.isUpdate) {
       Swal.fire({
@@ -710,7 +750,7 @@ export class ThcGenerationComponent implements OnInit {
       return;
     }
 
-    const docket = selectedDkt.map(({ docNo, remarks, pod, arrivalTime, receiveBy, aCTWT, pKGS }) => ({ docNo, remarks, pod, arrivalTime, receiveBy, aCTWT, pKGS }));
+    const docket = selectedDkt.map(({ docNo, cNO, remarks, pod, arrivalTime, receiveBy, aCTWT, pKGS }) => ({ docNo, cNO, remarks, pod, arrivalTime, receiveBy, aCTWT, pKGS }));
     const formControlNames = [
       "prqNo",
       "advPdAt",
@@ -941,8 +981,8 @@ export class ThcGenerationComponent implements OnInit {
     const fromTo = `${fromCity}-${toCity}`
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
-      const filteredShipments = this.allShipment.filter((x) => ((x.fCT.toLowerCase() === fromCity.toLowerCase() && x.tCT.toLowerCase() === toCity.toLowerCase()))//|| (x.vEHNO == this.thcTableForm.controls['vehicle'].value.value)
-      );
+      this.allShipment = await this.thcService.getShipmentFiltered(this.orgBranch, "", fromCity.toUpperCase(), toCity.toUpperCase(), this.DocketsContainersWise);
+      const filteredShipments = this.allShipment; //this.allShipment.filter((x) => ((x.fCT.toLowerCase() === fromCity.toLowerCase() && x.tCT.toLowerCase() === toCity.toLowerCase()))//|| (x.vEHNO == this.thcTableForm.controls['vehicle'].value.value));
       const addEditAction = (shipments) => {
         return shipments.map((shipment) => {
           return { ...shipment, actions: ["Edit"] };
@@ -955,6 +995,7 @@ export class ThcGenerationComponent implements OnInit {
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
     const thcDetail = await this.thcService.getThcDetails(this.thcDetail.docNo);
+    const thcMovemnetDetails = await this.thcService.getThcMovemnetDetails(this.thcDetail.docNo);
     const thcNestedDetails = thcDetail.data;
     this.thcDetailGlobal = thcNestedDetails;
     let propertiesToSet = [
@@ -963,8 +1004,7 @@ export class ThcGenerationComponent implements OnInit {
       { Key: 'tripDate', Name: 'eNTDT' },
       { Key: 'tripId', Name: 'docNo' },
       { Key: 'capacity', Name: 'cAP.wT' },
-      { Key: 'loadedKg', Name: 'cAP.vWT' },
-      { Key: 'weightUtilization', Name: 'cAP.vWT' },
+      { Key: 'weightUtilization', Name: 'uTI.wT' },
       { Key: 'driverName', Name: 'dRV.nM' },
       { Key: 'driverMno', Name: 'dRV.mNO' },
       { Key: 'driverLno', Name: 'dRV.lNO' },
@@ -985,6 +1025,8 @@ export class ThcGenerationComponent implements OnInit {
         nestedValues || ""
       );
     });
+
+    this.thcTableForm.controls.loadedKg.setValue(thcMovemnetDetails.data?.[0]?.lOAD?.wT || "");
 
     if (thcNestedDetails.thcDetails.pRQNO) {
       const prqNo = {
@@ -1008,8 +1050,8 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["vehicle"].setValue({ name: thcNestedDetails?.thcDetails.vEHNO, value: thcNestedDetails?.thcDetails.vEHNO });
     this.thcTableForm.controls["vendorName"].setValue({ name: thcNestedDetails?.thcDetails.vND?.nM, value: thcNestedDetails?.thcDetails.vND?.nM });
     this.thcTableForm.controls["driverLexd"].disable();
-    this.thcTableForm.controls["vendorType"].setValue(`${thcNestedDetails?.thcDetails.vND?.tY
-      }`);
+    this.thcTableForm.controls["vendorType"].setValue(`${thcNestedDetails?.thcDetails.vND?.tY}`);
+    this.thcTableForm.controls["containerwise"].setValue(thcNestedDetails.shipment?.[0].cNO ? true : false);
     if (this.addThc) {
       this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);
@@ -1083,6 +1125,7 @@ export class ThcGenerationComponent implements OnInit {
     // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
 
     //#region MainModel
+    this.tHCGenerationModel.ContainerWise = this.DocketsContainersWise;
     this.tHCGenerationModel.companyCode = this.storage.companyCode;
     this.tHCGenerationModel.branch = this.storage.branch;
     this.tHCGenerationModel.docType = "TH";

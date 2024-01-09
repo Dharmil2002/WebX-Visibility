@@ -41,7 +41,7 @@ export class LocationMaster {
       this.mappedCity = LocationMaster.mappedCity || '';
       this.mappedState = LocationMaster.mappedState || '';
       this.mappedPinCode = LocationMaster.mappedPinCode || '';
-
+      this.gstNumber = LocationMaster.gstNumber || '';
     }
 
   }

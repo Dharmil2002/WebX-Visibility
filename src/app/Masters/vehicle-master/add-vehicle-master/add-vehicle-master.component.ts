@@ -585,7 +585,7 @@ export class AddVehicleMasterComponent implements OnInit {
       };
       //API FOR UPDATE
       const res = await firstValueFrom(this.masterService
-        .masterPost("generic/update", req));
+        .masterMongoPut("generic/update", req));
       if (res) {
         // Display success message
         Swal.fire({

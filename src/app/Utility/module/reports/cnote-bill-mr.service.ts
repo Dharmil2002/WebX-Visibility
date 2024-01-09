@@ -16,10 +16,14 @@ export class CnoteBillMRService {
      async getCNoteBillMRReportDetail() {
           const reqBody = {
                companyCode: this.storage.companyCode,
-               collectionName: "cust_bill_headers",
+               collectionName: "cust_bill_details",
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "cust_bill_headers"
+          const rescustBillHeaders = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "cust_bill_collection"
+          const rescustbillcoll = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "dockets"
           const resDocketTemp = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "docket_invoices"
@@ -28,43 +32,108 @@ export class CnoteBillMRService {
           let cnotebillList = [];
           res.data.map((element) => {
 
-               /*dockets collection*/
-               // const docDet = resDocketTemp.data ? resDocketTemp.data.find((entry) => entry.docNo === element?.dKTNO) : null;
-               const docDet = resDocketTemp.data.find((entry) => entry.docNo = 'CNDELBDTD2324000005');
-               // console.log("docDet", docDet);
-               // let pAYBAS = 0;
-               // if (docDet) {
-               //      pAYBAS = docDet.map(num => num.pAYTYP);
-               // }
-
-               /*invoiceDetail collection*/
-               // const invDet = resdocinv.data ? resdocinv.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
-               const invDet = resdocinv.data.find((entry) => entry.docNo = 'CNDELBDTD2324000005');
-               //let inv = 0;
-               // if (invDet) {
-               //      inv = invDet.map(num => num.iNVNO);
-               // }
+               const custBillHeaderDet = rescustBillHeaders.data ? rescustBillHeaders.data.find((entry) => entry.bILLNO === element?.bILLNO) : null;
+               const custbillcollDet = rescustbillcoll.data ? rescustbillcoll.data.find((entry) => entry.bILLNO === element?.bILLNO) : null;
+               const docDet = resDocketTemp.data ? resDocketTemp.data.find((entry) => entry.docNo === element?.dKTNO) : null;
+               const docinvDet = resdocinv.data ? resdocinv.data.find((entry) => entry.dKTNO === docDet?.docNo) : null;
+               let pAYBAS = 0;
+               let billGenDt = 0;
+               let subLoc = 0;
+               let subDt = 0;
+               let billColAt = 0;
+               let billAmt = 0;
+               let billcollDt = 0;
+               let billParty = 0;
+               let billStatus = 0;
+               let mrNo = 0;
+               let deliveryType = 0;
+               let businessType = 0;
+               let vehNo = 0;
+               let billPartyNM = 0;
+               let docketeditDt = 0;
+               let moveType = 0;
+               let TransMode = 0;
+               let DocketDt = 0;
+               let toCity = 0;
+               let fromCity = 0;
+               let actualWeight = 0;
+               let packs = 0;
+               let chargedWeight = 0;
+               let cubicWeight = 0;
+               let invNo = 0;
+               let invDt = 0;
+               let len = 0;
+               let breadth = 0;
+               let height = 0;
+               let riskType = 0;
+               let gstAmt = 0;
+               let FRTRt = 0;
+               let FRTRtType = 0;
+               let otherChar = 0;
+               let freigthAmt = 0;
+               if (custBillHeaderDet) {
+                    billGenDt = custBillHeaderDet.bGNDT;
+                    subLoc = custBillHeaderDet.sUB.lOC;
+                    subDt = custBillHeaderDet.sUB.dTM;
+                    billParty = custBillHeaderDet.cUST.nM
+                    billStatus = custBillHeaderDet.bSTSNM
+                    businessType = custBillHeaderDet.bUSVRT
+               }
+               if (custbillcollDet) {
+                    billAmt = custbillcollDet.aMT
+                    billcollDt = custbillcollDet.dTM
+                    billColAt = custbillcollDet.lOC;
+                    mrNo = custbillcollDet.mRNO
+               }
+               if (docDet) {
+                    deliveryType = docDet.dELTYN
+                    pAYBAS = docDet.pAYTYPNM
+                    vehNo = docDet.vEHNO
+                    billPartyNM = docDet.bPARTYNM
+                    docketeditDt = docDet.eNTDT
+                    moveType = docDet.mODNM
+                    TransMode = docDet.tRNMODNM
+                    DocketDt = docDet.dKTDT
+                    fromCity = docDet.fCT
+                    toCity = docDet.tCT
+                    actualWeight = docDet.aCTWT
+                    packs = docDet.pKGS
+                    chargedWeight = docDet.cHRWT
+                    cubicWeight = docDet.cFTWT
+                    riskType = docDet.rSKTYN
+                    gstAmt = docDet.gSTAMT
+                    FRTRt = docDet.fRTRT
+                    FRTRtType = docDet.fRTRTY
+                    otherChar = docDet.oTHAMT
+                    freigthAmt = docDet.fRTAMT
+               }
+               if (docinvDet) {
+                    invNo = docinvDet.iNVNO
+                    invDt = docinvDet.eNTDT
+                    len = docinvDet.vOL.l
+                    breadth = docinvDet.vOL.b
+                    height = docinvDet.vOL.h
+               }
 
                let cnotebillData = {
                     "oeNTDT": element?.eNTDT,
-                    "bOOKINGTPE": docDet.dELTYN,
+                    "bOOKINGTPE": deliveryType,
                     "dEST": element?.dEST,
                     "oRGN": element?.oRGN,
-                    "mANUALBILLNO": element?.docNo || '',
+                    "mANUALBILLNO": element?.bILLNO || '',
                     "bILLGENAT": element?.eNTLOC || '',
-                    "bILLDT": formatDocketDate(element?.bGNDT || ''),
-                    // "bILSUBAT": element.bLOC || '',
-                    // "bILLSUBDT": formatDocketDate(element.sUB.sDT || ''),
-                    "bILLcOLLECTAT": element?.bALAMT || '',
-                    "bILLCOLLECTDT": "",
-                    "bILLAMT": element?.aMT || '',
-                    "bILLPENAMT": element?.bALAMT || '',
-                    "bILLPAR": element.cUST.nM || '',
-                    "bILLST": element?.bSTSNM || '',
-                    "bILLNO": element?.bILLNO || "",
-                    "mRNO": "",
-                    "mANUALMRNO": docDet.docNo,
-                    "mRDT": "",
+                    "bILLDT": formatDocketDate(billGenDt || ''),
+                    "bILSUBAT": subLoc,
+                    "bILLSUBDT": formatDocketDate(subDt || ''),
+                    "bILLcOLLECTAT": billColAt,
+                    "bILLCOLLECTDT": formatDocketDate(billcollDt || ''),
+                    "bILLAMT": billAmt,
+                    "bILLPAR": billParty,
+                    "bILLST": billStatus,
+                    "bILLNO": element?.bILLNO || '',
+                    "mRNO": mrNo,
+                    "mANUALMRNO": mrNo,
+                    "mRDT": formatDocketDate(billcollDt || ''),
                     "mRCLOSEDT": "",
                     "mRENTRYDT": "",
                     "mRGENAT": "",
@@ -72,54 +141,55 @@ export class CnoteBillMRService {
                     "mRNETAMT": "",
                     "mRSTAT": "",
                     "dEMCHAR": "",
-                    "cNOTENO": docDet?.docNo || "",
+                    "cNOTENO": element?.dKTNO || "",
                     // "cNOTEDT": formatDocketDate(element?.dKTDT || ""),
-                    "cNOTEDT": docDet?.dKTDT ? new Date(docDet.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
-                    "tIME": docDet.dKTDT ? new Date(docDet.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
+                    "cNOTEDT": DocketDt ? new Date(DocketDt).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
+                    "tIME": DocketDt ? new Date(DocketDt).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
                     "eDD": "",
-                    "bOOKBRANCH": "",
-                    "dELIBRANCH": "",
-                    "pAYTYPE": docDet.pAYTYPNM,
-                    "bUSTYPE": "",
-                    "pROD": "",
+                    "bOOKBRANCH": element?.oRGN || "",
+                    "dELIBRANCH": element?.dEST || "",
+                    "pAYTYPE": pAYBAS,
+                    "bUSTYPE": businessType,
+                    "pROD": "Road",
                     "cONID": "",
                     "cONTPARTY": "",
                     "sERTYPE": "FTL",
-                    "vEHNO": docDet?.vEHNO || '',
-                    "bILLPARTYNM": docDet.bPARTYNM || '',
+                    "vEHNO": vehNo,
+                    "bILLPARTYNM": billPartyNM,
                     "bACODE": "",
                     "eEDD": "",
-                    "lASTEDITBY": element?.mODBY || '',
-                    "cNOTEEDITDT": formatDocketDate(element?.mODDT || ''),
+                    "lASTEDITBY": element?.eNTBY || '',
+                    "cNOTEEDITDT": formatDocketDate(docketeditDt || ''),
                     "cUSTREFNO": "",
-                    "mOVTYPE": docDet.mODNM || '',
-                    "tRANMODE": docDet.tRNMODNM || '',
-                    "sTAT": element?.bSTSNM || '',
+                    "mOVTYPE": moveType,
+                    "tRANMODE": TransMode,
+                    // "sTAT": element?.bSTSNM || '',
+                    "sTAT": "Stock avaiable @ " + element?.dEST,
                     "lOADTPE": "FTL",
                     "rEM": "",
-                    "bILLAT": "",
+                    "bILLAT": element?.eNTLOC || '',
                     "pINCODE": "",
                     "lOCALCNOTE": "",
                     "fROMZN": "",
                     "tOZN": "",
                     "oDA": "",
-                    "fROMCITY": docDet?.fCT || '',
-                    "tOCITY": docDet?.tCT || '',
-                    "dRIVNM": "",
-                    "pKGS": docDet?.pKGS || '',
-                    "aCTWT": docDet?.aCTWT || '',
-                    "cHARWT": docDet?.cHRWT || '',
+                    "fROMCITY": fromCity,
+                    "tOCITY": toCity,
+                    // "dRIVNM": "",
+                    "pKGS": packs,
+                    "aCTWT": actualWeight,
+                    "cHARWT": chargedWeight,
                     "sPEINSTRUCT": "",
-                    "pKGTPE": "",
-                    "cUBICWT": "",
+                    "pKGTPE": "Carton Box",
+                    "cUBICWT": cubicWeight,
                     "cHRPKG": "",
                     "cHARGKM": "",
-                    "iNVNO": invDet.iNVNO || '',
-                    "iNVDT": "",
+                    "iNVNO": invNo,
+                    "iNVDT": formatDocketDate(invDt || ''),
                     "dELVALUE": "",
-                    "lEN": invDet.vOL.l || '',
-                    "bRTH": invDet.vOL.b || '',
-                    "hGT": invDet.vOL.h || '',
+                    "lEN": len,
+                    "bRTH": breadth,
+                    "hGT": height,
                     "cONTENT": "",
                     "bATCHNO": "",
                     "pARTNO": "",
@@ -134,7 +204,7 @@ export class CnoteBillMRService {
                     "fOV": "",
                     "mULDELIV": "",
                     "mULPICKUP": "",
-                    "rISKTPE": docDet?.rSKTYN || '',
+                    "rISKTPE": riskType,
                     "cOD/DOD": "",
                     "dACC": "",
                     "dEF": "",
@@ -144,13 +214,13 @@ export class CnoteBillMRService {
                     "dEFAULTCARDRT": "",
                     "fUELPERRT": "",
                     "CONID": "",
-                    "sUBTOT": docDet?.tOTAMT || '',
-                    "dOCTOT": docDet?.tOTAMT || '',
-                    "gSTAMT": docDet?.gSTAMT || '',
-                    "fRTRT": docDet?.fRTRT || '',
-                    "fRTTPE": docDet?.fRTRTYNM || '',
-                    "fRIGHTCHAR": "",
-                    "oTHERCHAR": "",
+                    "sUBTOT": element?.sUBTOT || '',
+                    "dOCTOT": element?.dKTTOT || '',
+                    "gSTAMT": gstAmt,
+                    "fRTRT": FRTRt,
+                    "fRTTPE": FRTRtType,
+                    "fRIGHTCHAR": freigthAmt,
+                    "oTHERCHAR": otherChar,
                     "gREENTAX": "",
                     "dROPCHAR": "",
                     "dOCCHAR": "",
@@ -166,7 +236,7 @@ export class CnoteBillMRService {
                     "uNLOADCHAR": "",
                     "mULTIDELCHAR": "",
                     "lOADCHAR": "",
-                    "gSTRT": docDet?.gSTAMT || '',
+                    "gSTRT": element?.gSTRT || '',
                     "gSTCHAR": "",
                     "vATRT": "",
                     "vATAMT": "",

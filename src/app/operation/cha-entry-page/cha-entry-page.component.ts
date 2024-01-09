@@ -8,6 +8,14 @@ import { processProperties } from "src/app/Masters/processUtility";
 import Swal from "sweetalert2";
 import { ChaEntryControl } from "src/assets/FormControls/cha-entry";
 import { chaJobDetail, updateJobStatus } from "./cha-utility";
+import { ChaEntryModel } from "src/app/Models/Cha-entry/cha-entry";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { isEmptyForm } from "src/app/Utility/Form Utilities/filter-utils";
+import { ChaService } from "src/app/Utility/module/operation/cha-entry/cha-entry-service";
 
 @Component({
   selector: 'app-cha-entry-page',
@@ -31,6 +39,7 @@ export class ChaEntryPageComponent implements OnInit {
   toCityStatus: any;
   chaEntryFormControls: ChaEntryControl;
   isUpdate: boolean;
+  backPath: string;
   actionObject = {
     addRow: true,
     submit: false,
@@ -38,28 +47,11 @@ export class ChaEntryPageComponent implements OnInit {
   };
   chaEntryControlArray: any;
   chaEntryTableForm: UntypedFormGroup;
+  chaFormTableForm: UntypedFormGroup;
   cityData: any;
+  chaTableData: any[];
+  menuItemflag: boolean = true;
   tableLoad = true;
-  columnHeader =
-    {
-      "srNo": "Sr No.",
-      "customerClearance": "Customer Clearance",
-      "clearanceCharge": "Clearance Charge",
-      "gstRate ": "GST Rate ",
-      "gstAmount": "GST Amount",
-      "totalAmount ": "Total Amount ",
-      "actions": "Actions",
-    }
-  //#region declaring Csv File's Header as key and value Pair
-  headerForCsv = {
-    "srNo": "Sr No.",
-    "customerClearance": "Customer Clearance",
-    "clearanceCharge": "Clearance Charge",
-    "gstRate ": "GST Rate ",
-    "gstAmount": "GST Amount",
-    "totalAmount ": "Total Amount ",
-    "actions": "Actions",
-  }
   //#endregion 
   breadScrums = [
     {
@@ -68,73 +60,29 @@ export class ChaEntryPageComponent implements OnInit {
       active: "CHA Entry",
     },
   ];
+  buttons = {
+    functionName: 'addDocumentData',
+    name: "Add Data",
+    iconName: 'add'
+  }
   jobDetail: any;
-  displayedColumns1 = {
-    srNo: {
-      name: "Sl No",
-      key: "index",
-      Style: "",
-      HeaderStyle: { 'min-width': '80px' },
-      class: "matcolumncenter"
-    },
-    docName: {
-      name: "Name of Document",
-      key: "Dropdown",
-      option: [
-        { name: "Incoming Invoice", value: "Incoming Invoice" },
-        { name: "Goods Movement", value: "Goods Movement" },
-        { name: "CFS Charges", value: "CFS Charges" }
-      ],
-      Style: "",
-      HeaderStyle: { 'text-align': 'center' },
-    },
-    clrChrg: {
-      name: "Clearance Charge (₹)",
-      key: "inputnumber",
-      Style: "",
-      HeaderStyle: { 'text-align': 'center' },
-      functions: {
-        onChange: "calculateTotaAmount",
-      },
-    },
-    gstRate: {
-      name: "GST Rate",
-      key: "inputnumber",
-      Style: "",
-      HeaderStyle: { 'text-align': 'center' },
-      functions: {
-        onChange: "calculateTotaAmount",
-      },
-    },
-    gstAmt: {
-      name: "GST Amount (₹)",
-      key: "inputnumber",
-      Style: "",
-      HeaderStyle: { 'text-align': 'center' },
-      readonly: true
-    },
-    totalAmt: {
-      name: "Total Amount (₹)",
-      key: "inputnumber",
-      Style: "",
-      HeaderStyle: { 'text-align': 'center' },
-      readonly: true
-    },
-    action: {
-      name: "Action",
-      key: "Action",
-      Style: "",
-      HeaderStyle: { 'text-align': 'center' },
-    }
-  };
   RakeEntry: boolean;
+  chaTableFormControl: FormControls[];
+  docType: AutoComplete[];
+  jobType: AutoComplete[];
+  eximDoc: AutoComplete[];
+  tableLoadIn: boolean;
+  loadIn: boolean;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
-    private masterService: MasterService,
-    private filter: FilterUtils
-    ) {
+    private chaService:ChaService,
+    private generalService: GeneralService,
+    private customerService: CustomerService,
+    private model: ChaEntryModel
+  ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+      
       this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
       if (this.jobDetail.Action == "Rake Entry") {
         this.Route.navigate(['/Operation/RakeEntry'], {
@@ -146,19 +94,24 @@ export class ChaEntryPageComponent implements OnInit {
         this.RakeEntry = true;
 
       }
-      else {
+      else if(this.jobDetail.Action=="Update"){
+        this.Route.navigate(['/Operation/JobEntry'], {
+          state: {
+            data: this.jobDetail
+          },
+        });
+
       }
       this.initializeFormControl();
-
     }
     else { this.initializeFormControl(); }
+    this.chaTableData = [];
   }
 
   ngOnInit(): void {
     this.bindDropdown();
-    this.getCityList();
-    this.getCustomerDetails();
-    this.loadTempData();
+    this.getGeneralmasterData();
+    this.backPath = "/dashboard/Index?tab=Job";
   }
 
   bindDropdown() {
@@ -177,64 +130,27 @@ export class ChaEntryPageComponent implements OnInit {
     this.chaEntryFormControls = new ChaEntryControl();
     // Get form controls for job Entry form section
     this.chaEntryControlArray = this.chaEntryFormControls.getChaEntryFormControls();
+    this.chaTableFormControl = this.chaEntryFormControls.getChaTableFormControls();
     // Build the form group using formGroupBuilder function
     this.chaEntryTableForm = formGroupBuilder(this.fb, [this.chaEntryControlArray]);
+    this.chaFormTableForm = formGroupBuilder(this.fb, [this.chaTableFormControl]);
     this.autoBillData();
   }
 
-  getCustomerDetails() {
-    this.masterService.getJsonFileDetails("customer").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.chaEntryControlArray,
-            this.chaEntryTableForm,
-            res,
-            this.billingParty,
-            this.billingPartyStatus
-          ); // Filter the docket control array based on customer details
-        }
-      },
-    });
+  async getCustomer(event) {
+    await this.customerService.getCustomerForAutoComplete(this.chaEntryTableForm, this.chaEntryControlArray, event.field.name, this.billingPartyStatus);
   }
 
-  getCityList() {
-    let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "city_detail"
-    };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        const cityList = res.data.map(element => ({
-          name: element.cityName,
-          value: element.id
-        }));
-        this.filter.Filter(
-          this.chaEntryControlArray,
-          this.chaEntryTableForm,
-          cityList,
-          this.fromCity,
-          this.fromCityStatus
-        );
-
-        this.filter.Filter(
-          this.chaEntryControlArray,
-          this.chaEntryTableForm,
-          cityList,
-          this.toCity,
-          this.toCityStatus
-        );
-      }
-    });
-  }
   autoBillData() {
+    
     if (this.jobDetail) {
-      this.chaEntryTableForm.controls['documentType'].setValue('jobNo')
-      this.chaEntryTableForm.controls['jobType'].setValue(this.jobDetail.jobType === "Export" ? "E" : this.jobDetail.jobType === "Import" ? "I" : "");
+      this.chaEntryTableForm.controls['documentType'].setValue('EDT01');
+      this.chaEntryTableForm.controls['documentType'].disable();
+      this.chaEntryTableForm.controls['jobType'].setValue(this.jobDetail.jTYP);
+      this.chaEntryTableForm.controls['jobType'].disable();
       const billingParty = {
-        name: this.jobDetail?.billingParty || "",
-        value: this.jobDetail?.billingParty || ""
+        name: this.jobDetail?.bPARTYNM || "",
+        value: this.jobDetail?.bPARTY || ""
       }
 
       this.chaEntryTableForm.controls['billingParty'].setValue(billingParty);
@@ -244,41 +160,51 @@ export class ChaEntryPageComponent implements OnInit {
 
   }
   async save() {
-    // Create a new array without the 'srNo' property
-    let modifiedTableData = this.tableData.map(({ srNo, ...rest }) => rest);
-    // Assign the modified array back to 'this.tableData'
-    this.tableData = modifiedTableData;
-    this.chaEntryTableForm.controls["billingParty"].setValue(this.chaEntryTableForm.value.billingParty.value);
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-    const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-    let jeNo = `CHA${dynamicValue}${paddedNumber}`;
-    this.chaEntryTableForm.controls["chaId"].setValue(jeNo);
-    this.chaEntryTableForm.controls["_id"].setValue(jeNo);
-    let docDetail = {
-      containorDetail: this.tableData,
-    };
-    let jobDetail = {
-      ...this.chaEntryTableForm.value,
-      ...docDetail,
-    };
-    const res = await chaJobDetail(jobDetail, this.masterService);
-    const resUpdate = await updateJobStatus(this.jobDetail, this.masterService)
-    if (res) {
-      Swal.fire({
-        icon: "success",
-        title: "Generated SuccesFully",
-        text: "CHA No: " + jeNo,
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.goBack("Job")
+    
+    let modifiedTableData = this.chaTableData;
+    // Define a variable for the condition
+    let condition = modifiedTableData.length <= 0 ? 'emptyTable' : 'nonEmptyTable';
+    // Use switch for handling different cases
+    switch (condition) {
+      case 'emptyTable':
+        if (isEmptyForm(this.chaFormTableForm)) {
+          Swal.fire({
+            icon: "warning",
+            title: "Please add at least one document",
+            showConfirmButton: true,
+          });
+          return;
+        } else {
+          const docData = this.eximDoc.find(x => x.value == this.chaFormTableForm.value.docName);
+          let formData = this.chaFormTableForm.getRawValue();
+          formData['docCode'] = docData.value;
+          formData['docName'] = docData.name;
+          modifiedTableData = [formData];
         }
-      });
+        break;
+      case 'nonEmptyTable':
+        modifiedTableData = modifiedTableData.map(({ Action, ...rest }) => rest);
+        break;
     }
-
+    let formData = this.chaEntryTableForm.getRawValue();
+    formData['jobTypeName']= this.jobType.find((x)=>x.value==formData.jobType)?.name || "";
+    formData['documentTypeName']= this.docType.find((x)=>x.value==formData.documentType)?.name || "";
+    let jobDetail = {
+      ...formData,
+      modifiedTableData
+    };
+   const res=await this.chaService.addChaEntry(jobDetail);
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Cha Generated",
+          text: `Cha no: ${res.data}`,
+          showConfirmButton: true,
+        });
+        this.goBack("Job");
+      }
   }
-
+  
   cancel() {
     this.goBack("Job")
   }
@@ -288,101 +214,117 @@ export class ChaEntryPageComponent implements OnInit {
     try {
       this[functionName]($event);
     } catch (error) {
-      console.log("failed");
     }
   }
-  loadTempData() {
-    this.tableData = [
-      {
-        srNo: 0, // Serial number
-        docName: "",
-        clrChrg: "0.00",
-        gstRate: "0.00",
-        gstAmt: "0.00",
-        totalAmt: "0.00"
-      }
-    ]
+
+  async getGeneralmasterData() {
+    this.docType = await this.generalService.getGeneralMasterData("EXIMDOCTYPE");
+    this.jobType = await this.generalService.getGeneralMasterData("JOBTYP");
+    this.eximDoc = await this.generalService.getGeneralMasterData("EXIMDOC");
+    setGeneralMasterData(this.chaEntryControlArray, this.docType, "documentType");
+    setGeneralMasterData(this.chaEntryControlArray, this.jobType, "jobType");
+    setGeneralMasterData(this.chaTableFormControl, this.eximDoc, "docName");
   }
   // Add a new item to the table
-  addItem() {
-    const AddObj = {
-      srNo: 0, // Serial number
-      docName: "",
-      clrChrg: "0.00",
-      gstRate: "0.00",
-      gstAmt: "0.00",
-      totalAmt: "0.00"
-    };
-    this.tableData.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
-  }
-  async delete(event) {
-    const index = event.index;
-    const row = event.element;
-
-    const swalWithBootstrapButtons = await Swal.mixin({
-      customClass: {
-        confirmButton: "btn btn-success msr-2",
-        cancelButton: "btn btn-danger",
-      },
-      buttonsStyling: false,
-    });
-
-    swalWithBootstrapButtons
-      .fire({
-        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
-        // color: "#03a9f3",
-        showCancelButton: true,
-        cancelButtonColor: "#d33",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        showLoaderOnConfirm: true,
-        preConfirm: (Remarks) => {
-          var Request = {
-            CompanyCode: localStorage.getItem("CompanyCode"),
-            ID: row.id,
-          };
-          if (row.id == 0) {
-            return {
-              isSuccess: true,
-              message: "City has been deleted !",
-            };
-          } else {
-            console.log("Request", Request);
-            //return this.VendorContractService.updateMileStoneRequest(Request);
-          }
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          this.tableData.splice(index, 1);
-          this.tableData = this.tableData;
-          swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
-          event.callback(true);
-        } else if (result.isConfirmed) {
-          swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
-          event.callback(false);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire(
-            "Cancelled",
-            "Your item is safe :)",
-            "error"
-          );
-          event.callback(false);
-        }
-      });
-
-    return true;
-  }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
-  calculateTotaAmount(event) {
-    let gstamount = parseFloat(event.row.clrChrg) * parseFloat(event.row.gstRate) / 100
-    event.row.gstAmt = gstamount.toFixed(2);
-    let total = parseFloat(event.row.clrChrg) + gstamount;
-    event.row.totalAmt = total.toFixed(2);
+  calculateTotalAmount() {
+    // Helper function to parse the float and return 0 if it's NaN
+    const parseOrZero = (value) => {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? 0 : parsed;
+    };
+    // Parse values safely
+    let clrChrg = parseOrZero(this.chaFormTableForm.value.clrChrg);
+    let gstRate = parseOrZero(this.chaFormTableForm.value.gstRate);
+    // Calculate GST amount
+    let gstAmount = clrChrg * gstRate / 100;
+    this.chaFormTableForm.controls['gstAmt'].setValue(gstAmount.toFixed(2));
+    // Calculate total amount
+    let total = clrChrg + gstAmount;
+    this.chaFormTableForm.controls['totalAmt'].setValue(total.toFixed(2));
+  }
+
+  /*below function call when the document Details added*/
+
+  async addDocumentData() {
+    const chaDetail = this.chaTableData;
+    this.tableLoadIn = true;
+    this.loadIn = true;
+    const delayDuration = 1000;
+    const docNM = this.eximDoc.find((x) => x.value == this.chaFormTableForm.value.docName)?.name || "";
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const json = {
+      id: chaDetail.length + 1,
+      docName: docNM,
+      clrChrg: parseFloat(this.chaFormTableForm.value.clrChrg).toFixed(2),
+      gstRate: parseFloat(this.chaFormTableForm.value.gstRate).toFixed(2),
+      gstAmt: parseFloat(this.chaFormTableForm.value.gstAmt).toFixed(2),
+      totalAmt: parseFloat(this.chaFormTableForm.value.totalAmt).toFixed(2),
+      docCode: this.chaFormTableForm.value.docName,
+      actions: ["Edit", "Remove"],
+    };
+    this.chaTableData.push(json);
+    this.chaFormTableForm.reset();
+    this.tableLoadIn = false;
+    this.loadIn = false;
 
   }
-  
+  handleMenuItemClick(data) {
+    this.fillDocument(data);
+  }
+  fillDocument(data: any) {
+    if (data.label.label === "Remove") {
+      this.chaTableData = this.chaTableData.filter((x) => x.id !== data.data.id);
+    } else {
+      const atLeastOneValuePresent = Object.keys(this.chaFormTableForm.controls)
+        .some(key => {
+          const control = this.chaFormTableForm.get(key);
+          return control && (control.value !== null && control.value !== undefined && control.value !== '');
+        });
+
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, proceed!',
+          cancelButtonText: 'No, cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.fillDocumentDetails(data)
+          }
+        });
+      }
+      else {
+        this.fillDocumentDetails(data)
+      }
+    }
+  }
+  /*AutoFiill Invoice data*/
+  fillDocumentDetails(data) {
+    // Define a mapping of form control names to their respective keys in the incoming data
+    const formFields = {
+      clrChrg: "clrChrg",
+      gstRate: "gstRate",
+      gstAmt: "gstAmt",
+      totalAmt: "totalAmt"
+    };
+    this.chaFormTableForm.controls['docName'].setValue(data.data?.docCode || "");
+    // Loop through the defined form fields and set their values from the incoming data
+    Object.keys(formFields).forEach(field => {
+      // Set form control value to the data property if available, otherwise set it to an empty string
+      this.chaFormTableForm.controls[field].setValue(data.data?.[formFields[field]] || "");
+    });
+    // Filter the invoiceData to exclude the entry with the provided data ID
+    this.chaTableData = this.chaTableData.filter(x => x.id !== data.data.id);
+  }
+  /*End*/
 }

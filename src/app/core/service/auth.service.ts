@@ -2,6 +2,7 @@ import {
   BehaviorSubject,
   Observable,
   ReplaySubject,
+  firstValueFrom,
   of,
   throwError,
   timer,
@@ -51,9 +52,13 @@ export class AuthService {
   public get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
-  GetCompany(CompanyCode) {
-
-    return this.http.post<any>(`${environment.APIBaseURL}Master/Company`, CompanyCode)
+  async getCompany() {
+    const req={
+      companyCode: this.storageService.companyCode,
+      collectionName:"company_master",
+      filter:{companyCode:this.storageService.companyCode}
+    }
+    return await firstValueFrom(this.http.post<any>(`${environment.APIBaseURL}/generic/get`, req));
   }
   GetDmsMenu(companyDetails) {
 
@@ -66,7 +71,6 @@ export class AuthService {
       .pipe(
         map(async (user: any) => {
           if (user.tokens) {
-
             let userdetails = this._jwt.decodeToken(user.tokens.access.token);
             this.storageService.setItem("currentUser", JSON.stringify(user));
             this.storageService.setItem("UserName", user.usr.name);
@@ -110,7 +114,10 @@ export class AuthService {
         })
       );
   }
-
+ async getCompanyDetail(){
+    let companyDetails = await this.getCompany();
+    return companyDetails.data[0];
+  }
 
 
 

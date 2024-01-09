@@ -622,15 +622,15 @@
     "vendorTypeDropdown": [
         {
             "name": "Attached",
-            "value": "1"
-        },
-        {
-            "name": "Service Provider",
             "value": "2"
         },
         {
-            "name": "Own",
+            "name": "Service Provider",
             "value": "3"
+        },
+        {
+            "name": "Own",
+            "value": "1"
         }
     ],
     "vendorNameDropdown": [

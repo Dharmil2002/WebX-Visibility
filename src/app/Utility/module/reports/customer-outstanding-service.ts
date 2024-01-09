@@ -18,21 +18,29 @@ export class CustOutstandingService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "cust_bill_collection"
+          const rescustBill = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
 
           let custoutstandList = [];
 
           res.data.map((element) => {
+
+               const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.bILLNO === element?.bILLNO) : null;
+               let Amount = 0;
+               if (custBillDet) {
+                    Amount = custBillDet.aMT;
+               }
 
                let custoutData = {
                     "oloc": element.bLOC,
                     "obGNDT": element.bGNDT,
                     "custCode": element.cUST.cD || '',
                     "cust": element.cUST.nM || '',
-                    "openingBal":element.aMT||'',
-                    "billAmt":element.aMT||'',
-                    // "unsubmittedAmt"
-                    // "submittedAmt"
-                    "collectionAmt":element.cOL.aMT,
+                    "openingBal": element.aMT || '',
+                    "billAmt": element.aMT || '',
+                    "unsubmittedAmt":element.aMT || '',
+                    "submittedAmt":element.aMT || '',
+                    "collectionAmt": Amount,
                     // "TotalPending"
                     // "ManualVoucherAmount"
                     // "OnAccountBalance"

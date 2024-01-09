@@ -15,6 +15,7 @@ import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
 import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 @Component({
   selector: 'app-add-vendor-master',
   templateUrl: './add-vendor-master.component.html',
@@ -36,6 +37,7 @@ export class AddVendorMasterComponent implements OnInit {
   vLocation: any;
   vLocationStatus: any;
   vendorCity: any;
+  isSubmit: boolean = false;
   vendorCityStatus: any;
   vendorTypDetail: any;
   vendorTypeData: any;
@@ -112,9 +114,11 @@ export class AddVendorMasterComponent implements OnInit {
     private objState: StateService,
     private objImageHandling: ImageHandling,
     private dialog: MatDialog,
+    private locationService: LocationService
 
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
+      
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
 
       this.action = 'edit';
@@ -126,13 +130,15 @@ export class AddVendorMasterComponent implements OnInit {
       this.isLoad = true;
       this.tableLoad = true;
       // setting data in table at update time
-      this.vendorTabledata.otherdetails.forEach((item, index) => {
-        item.id = index + 1;
-        item.actions = ['Edit', 'Remove'];
+      if (this.vendorTabledata.otherdetails) {
+        this.vendorTabledata.otherdetails.forEach((item, index) => {
+          item.id = index + 1;
+          item.actions = ['Edit', 'Remove'];
 
-        // Push the modified object into this.tableData
-        this.tableData.push(item);
-      });
+          // Push the modified object into this.tableData
+          this.tableData.push(item);
+        });
+      }
       this.isLoad = false;
       this.tableLoad = false;
     } else {
@@ -156,7 +162,7 @@ export class AddVendorMasterComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getDropDownData();
-    this.getAllMastersData();
+    //this.getAllMastersData();
     this.backPath = "/Masters/VendorMaster/VendorMasterList";
   }
   // Function to handle function calls
@@ -201,131 +207,171 @@ export class AddVendorMasterComponent implements OnInit {
     });
   }
   async getDropDownData() {
-
-    this.vendorTypeData = await PayBasisdetailFromApi(this.masterService, 'VT')
- 
+    this.vendorTypeData = await PayBasisdetailFromApi(this.masterService, 'VENDTYPE')
     if (this.isUpdate) {
-      this.vendorTypDetail = this.vendorTypeData.find(x => (x.name).toLowerCase() === this.vendorTabledata.vendorType.toLowerCase());
-      this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
-
+      const vendType= this.vendorTabledata.vendorType;
+      if(vendType){
+      let foundObject = this.vendorTypeData.find(x =>
+        x.name.toLowerCase() === vendType.toLowerCase() ||
+        x.value.toLowerCase() === vendType.toLowerCase()
+      );
+      if (foundObject) {
+        this.vendorTableForm.controls.vendorType.setValue(foundObject);
+      }
+      const vendorLoc = this.vendorTabledata.vendorLocation.map((x) => { return { name: x, value: x } })
+      this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(vendorLoc);
+      this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, vendorLoc, this.vLocation, this.vLocationStatus);
+      const pincode = this.vendorTabledata.vendorPinCode ? { name: this.vendorTabledata.vendorPinCode, value: this.vendorTabledata.vendorPinCode } : "";
+      this.vendorTableForm.controls.vendorPinCode.setValue(pincode);
+    }
+    this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, this.vendorTypeData, this.vendorType, this.vendorTypeStatus);
       // For setting image data, assuming you have imageData defined
-      Object.keys(this.imageData).forEach((controlName) => {
-
-        // Check if the value associated with the current controlName is null
-        if (this.imageData[controlName] !== null) {
-          const url = this.imageData[controlName];
-          const fileName = this.objImageHandling.extractFileName(url);
-          // Set the form control value using the control name
-          this.vendorTableForm.controls[controlName].setValue(fileName);
-
-          // Set isFileSelected to true
-          const control = this.jsonControlVendorArray.find(x => x.name === controlName);
-          control.additionalData.isFileSelected = false;
-        }
-      });
-
+      if (this.imageData) {
+        Object.keys(this.imageData).forEach((controlName) => {
+          // Check if the value associated with the current controlName is null
+          if (this.imageData[controlName] !== null) {
+            const url = this.imageData[controlName];
+            const fileName = this.objImageHandling.extractFileName(url);
+            // Set the form control value using the control name
+            this.vendorTableForm.controls[controlName].setValue(fileName);
+            // Set isFileSelected to true
+            const control = this.jsonControlVendorArray.find(x => x.name === controlName);
+            control.additionalData.isFileSelected = false;
+          }
+        });
+      }
     }
     this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, this.vendorTypeData, this.vendorType, this.vendorTypeStatus);
   }
-  /*get All Master Data*/
-  async getAllMastersData() {
-    try {
-      const reqBody = {
-        "companyCode": this.companyCode,
-        "collectionName": "location_detail",
-        "filter": {}
-      }
-      const pincodeBody = {
-        "companyCode": this.companyCode,
-        "collectionName": "pincode_master",
-        "filter": {}
-      }
-      const locationBranchResponse = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
-      this.pincodeResponse = await firstValueFrom(this.masterService.masterPost("generic/get", pincodeBody));
-      const locationBranchList = locationBranchResponse.data.map((x) => { { return { name: x.locName, value: x.locCode } } })
-      this.pincodeData = this.pincodeResponse.data
-        .map((element) => ({
-          name: element.PIN.toString(),
-          value: element.PIN.toString(),
-        }));
-      // Handle the response from the server
-      if (this.isUpdate) {
-        this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(locationBranchList.filter((element) =>
-          this.vendorTabledata.vendorLocation.includes(element.value)
-        ));
-        const updatedData = this.pincodeData.find((x) => x.name == this.vendorTabledata.vendorPinCode);
-        this.vendorTableForm.controls.vendorPinCode.setValue(updatedData);
-      }
-      this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, locationBranchList, this.vLocation, this.vLocationStatus);
-    } catch (error) {
-      // Handle any errors that occurred during the request
-      console.error('Error:', error);
+  /*  Below the function for the Getting a Location */
+  async getVendorLocation() {
+    let vendLocation = this.vendorTableForm.value.vendorLocationDropdown.length > 0 ? this.vendorTableForm.value.vendorLocationDropdown.map((x) => x.value) : "";
+    let destinationMapping = await this.locationService.locationFromApi({ locCode: { 'D$regex': `^${this.vendorTableForm.controls.vendorLocation.value}`, 'D$options': 'i' } })
+    if (vendLocation) {
+      destinationMapping = destinationMapping.filter((x) => !vendLocation.includes(x.value));
+      destinationMapping.push(...this.vendorTableForm.value.vendorLocationDropdown);
     }
+    this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, destinationMapping, this.vLocation, this.vLocationStatus);
   }
-  //#region to call pincode
-  getPincode() {
-    this.objPinCodeService.validateAndFilterPincode(this.vendorTableForm, "", this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
-  }
-  async getGstPincode() {
-    const stateName = this.otherDetailForm.value.gstState;
-    const stateDataByName = await this.objState.fetchStateByFilterId(stateName, 'STNM'); // for filter by STNM
-    this.objPinCodeService.validateAndFilterPincode(this.otherDetailForm, stateDataByName[0].ST, this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus);
-  }
-  //#endregion
-
+  /*End*/
   async save() {
-    if (this.tableData.length > 0) {
-
-      clearValidatorsAndValidate(this.otherDetailForm)
-      clearValidatorsAndValidate(this.vendorTableForm)
-      const formValue = this.vendorTableForm.value;
-      this.vendorTableForm.controls['vendorTypeName'].setValue(formValue.vendorType.name);
-      const controlNames = [
-        "vendorType",
-        "vendorPinCode",
-      ];
-      controlNames.forEach(controlName => {
-        const controlValue = formValue[controlName]?.value;
-        this.vendorTableForm.controls[controlName].setValue(controlValue);
+    if (this.otherDetailForm.valid) {
+      Swal.fire({
+        icon: "warning",
+        title: "Pending Data",
+        text: "There is pending data for the GST. Are you sure you want to continue?",
+        showCancelButton: true,
+        confirmButtonText: "Continue",
+        cancelButtonText: "Cancel",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await this.saveVendorDetails();
+        } else {
+          return false;
+        }
       });
-      const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
-      this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
-      this.vendorTableForm.removeControl('vendorLocationDropdown');
-      this.vendorTableForm.removeControl('');
-      Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
+    } 
+    else{
+     await this.saveVendorDetails()
+    }
+ 
+  }
+  async saveVendorDetails(){
+    this.isSubmit = true;
+    clearValidatorsAndValidate(this.otherDetailForm)
+    clearValidatorsAndValidate(this.vendorTableForm)
+    const formValue = this.vendorTableForm.value;
+    this.vendorTableForm.controls['vendorTypeName'].setValue(formValue.vendorType.name);
+    const controlNames = [
+      "vendorType",
+      "vendorPinCode",
+    ];
+    controlNames.forEach(controlName => {
+      const controlValue = formValue[controlName]?.value;
+      this.vendorTableForm.controls[controlName].setValue(controlValue);
+    });
+    const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
+    this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
+    this.vendorTableForm.removeControl('vendorLocationDropdown');
+    this.vendorTableForm.removeControl('');
+    Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
+    this.vendorTableForm.value.otherdetails = this.tableData.length > 0
+      ? this.tableData.map(({ actions, id, ...rest }) => rest)
+      : [];
+    let data = this.vendorTableForm.value
+    // Define an array of control names
+    const imageControlNames = ['msmeScan', 'panCardScan'];
+    imageControlNames.forEach(controlName => {
+      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+      // Set the URL in the corresponding control name
+      data[controlName] = file;
+    });
 
-      const newData = this.tableData.map(x => {
-        const { actions, id, ...rest } = x;
-        return rest;
-      });
-      this.vendorTableForm.value.otherdetails = newData;
-      let data = this.vendorTableForm.value
-      // Define an array of control names
-      const imageControlNames = ['msmeScan', 'panCardScan'];
-      imageControlNames.forEach(controlName => {
-        const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
-        // Set the URL in the corresponding control name
-        data[controlName] = file;
-      });
+    if (this.isUpdate) {
+      let vendorCode = data.vendorCode;
+      delete data._id;
+      data['mODDT'] = new Date()
+      data['mODBY'] = this.vendorTableForm.value.eNTBY
+      delete data.eNTBY;
+      delete data.eNTLOC;
+      delete data.eNTDT;
+      data['mODLOC'] = localStorage.getItem("Branch")
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "vendor_detail",
+        filter: { vendorCode: vendorCode },
+        update: data
+      };
+      // console.log(data);
 
-      if (this.isUpdate) {
-        let id = data._id;
-        delete data._id;
-        data['mODDT'] = new Date()
-        data['mODBY'] = this.vendorTableForm.value.eNTBY
-        delete data.eNTBY;
-        delete data.eNTLOC;
-        delete data.eNTDT;
-        data['mODLOC'] = localStorage.getItem("Branch")
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+      }
+    }
+    else {
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "vendor_detail",
+        filter: {},
+        sorting: { vendorCode: -1 }
+      }
+      const resVendor = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
+      if (resVendor) {
+        // Generate srno for each object in the array
+        const lastCode = resVendor.data;
+        const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
+        // Function to generate a new route code
+        function generateVendorCode(initialCode: number = 0) {
+          const nextVendorCode = initialCode + 1;
+          const vendorNumber = nextVendorCode.toString().padStart(4, '0');
+          const vendorCode = `V${vendorNumber}`;
+          return vendorCode;
+        }
+        this.newVendorCode = generateVendorCode(lastVendorCode);
+        data.vendorCode = this.newVendorCode;
+        data._id =`${this.companyCode}-${this.newVendorCode}`;
+        data['eNTDT'] = new Date()
+        data['eNTLOC'] = localStorage.getItem("Branch")
+        const newData = this.tableData.map(x => {
+          const { actions, id, ...rest } = x;
+          return rest;
+        });
+
+        data.otherdetails = newData;
         let req = {
           companyCode: this.companyCode,
           collectionName: "vendor_detail",
-          filter: { _id: id },
-          update: data
+          data: data
         };
-        // console.log(data);
-
-        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
         if (res) {
           // Display success message
           Swal.fire({
@@ -337,77 +383,25 @@ export class AddVendorMasterComponent implements OnInit {
           this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
         }
       }
-      else {
-        let req = {
-          companyCode: this.companyCode,
-          collectionName: "vendor_detail",
-          filter: {},
-        }
-        const resVendor = await firstValueFrom(this.masterService.masterPost("generic/get", req))
-        if (resVendor) {
-          // Generate srno for each object in the array
-          const lastCode = resVendor.data[resVendor.data.length - 1];
-          const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
-          // Function to generate a new route code
-          function generateVendorCode(initialCode: number = 0) {
-            const nextVendorCode = initialCode + 1;
-            const vendorNumber = nextVendorCode.toString().padStart(4, '0');
-            const vendorCode = `V${vendorNumber}`;
-            return vendorCode;
-          }
-          this.newVendorCode = generateVendorCode(lastVendorCode);
-          data.vendorCode = this.newVendorCode;
-          data._id = this.newVendorCode;
-          data['eNTDT'] = new Date()
-          data['eNTLOC'] = localStorage.getItem("Branch")
-          const newData = this.tableData.map(x => {
-            const { actions, id, ...rest } = x;
-            return rest;
-          });
-
-          data.otherdetails = newData;
-          let req = {
-            companyCode: this.companyCode,
-            collectionName: "vendor_detail",
-            data: data
-          };
-          const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-          }
-        }
-      }
-    } else {
-      Swal.fire({
-        text: 'Please Fill Vendor Other Details',
-        icon: "warning",
-        title: 'Warning',
-        showConfirmButton: true,
-      });
-      return false
     }
   }
   cancel() {
     this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
   }
+  async getGstPincode() {
+    const stateName = this.otherDetailForm.value.gstState;
+    const stateDataByName = await this.objState.fetchStateByFilterId(stateName, 'STNM'); // for filter by STNM
+    this.objPinCodeService.getPincodes(this.otherDetailForm,this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus,'', stateDataByName[0].ST);
+  }
   //#region to Set the vendor's city and state based on the provided PIN code
   async setStateCityData() {
+    
+    const{allData}=this.vendorTableForm.controls.vendorPinCode.value
     try {
-      let fetchData = this.pincodeResponse.data.find(item =>
-        item.PIN == this.vendorTableForm.controls.vendorPinCode.value.value);
-
       // Set the vendor's city
-      this.vendorTableForm.controls.vendorCity.setValue(fetchData.CT);
-      fetchData.ST = parseInt(fetchData.ST)
-      // Fetch and set the state name based on the state code
-      const stateName = await this.objState.fetchStateByFilterId(fetchData.ST, 'ST');
+      this.vendorTableForm.controls.vendorCity.setValue(allData.CT);
+      allData.ST = parseInt(allData.ST)
+      const stateName = await this.objState.fetchStateByFilterId(allData.ST, 'ST');
       this.vendorTableForm.controls.vendorState.setValue(stateName[0].STNM);
 
       // Fetch and set the vendor's country based on the state's country code
@@ -421,6 +415,9 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
 
+  getPincode() {
+    this.objPinCodeService.getPincodes(this.vendorTableForm,this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
+  }
   // Set the GST state based on the provided GST number
   async setState() {
     try {
@@ -438,11 +435,10 @@ export class AddVendorMasterComponent implements OnInit {
   // Set the GST city based on the provided GST pincode
   setGSTCity() {
     try {
-      const fetchData = this.pincodeResponse.data.find(item =>
-        item.PIN == this.otherDetailForm.controls.gstPincode.value.value);
+      const {allData} = this.otherDetailForm.controls.gstPincode.value
 
       // Set the GST city
-      this.otherDetailForm.controls.gstCity.setValue(fetchData.CT);
+      this.otherDetailForm.controls.gstCity.setValue(allData.CT);
     } catch (error) {
       console.error('An error occurred while setting the GST city:', error);
     }
@@ -585,8 +581,7 @@ export class AddVendorMasterComponent implements OnInit {
       this.otherDetailForm.controls['gstNumber'].setValue(data.data?.gstNumber || "");
       this.otherDetailForm.controls['gstState'].setValue(data.data?.gstState || "");
       this.otherDetailForm.controls['gstAddress'].setValue(data.data?.gstAddress || "");
-      const updatedData = this.pincodeData.find((x) => x.name == data.data.gstPincode);
-      this.otherDetailForm.controls.gstPincode.setValue(updatedData);
+      this.otherDetailForm.controls.gstPincode.setValue({name:data.data.gstPincode,value: data.data.gstPincode});
       this.otherDetailForm.controls['gstCity'].setValue(data.data?.gstCity || "");
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }

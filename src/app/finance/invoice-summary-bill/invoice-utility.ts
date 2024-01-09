@@ -90,7 +90,7 @@ export async function getApiCompanyDetail(masterService) {
     const req = {
         companyCode: companyCode,
         collectionName: "company_master",
-        filter: {}
+        filter: {companyCode:companyCode}
     };
     try {
         const resCompany = await masterService.masterPost("generic/get", req).toPromise();

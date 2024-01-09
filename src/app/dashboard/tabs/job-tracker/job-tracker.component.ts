@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getJobDetailFromApi } from '../job-summary-page/job-summary-utlity';
 import { jobtrackingDetail } from './job-tracker-utility';
+import { JobEntryService } from 'src/app/Utility/module/operation/job-entry/job-entry-service';
 @Component({
   selector: 'app-job-tracker',
   templateUrl: './job-tracker.component.html'
 })
 export class JobTrackerComponent implements OnInit {
-
   tableLoad:boolean=true;
   tableData: any;
   boxData:any;
@@ -59,11 +59,6 @@ export class JobTrackerComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width: 60px",
     },
-    vehicleSize: {
-      Title: "Size",
-      class: "matcolumncenter",
-      Style: "max-width: 70px",
-    },
     totalChaAmt: {
       Title: "CHA Amount Rs.",
       class: "matcolumncenter",
@@ -85,7 +80,6 @@ export class JobTrackerComponent implements OnInit {
     "fromToCity",
     "jobLocation",
     "pkgs",
-    "vehicleSize",
     "totalChaAmt",
     "chaDate"
   ];
@@ -95,7 +89,10 @@ export class JobTrackerComponent implements OnInit {
     // { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
     // { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
   ]
-  constructor(private masterService: MasterService) { 
+  constructor(
+    private masterService: MasterService,
+    private jobService:JobEntryService
+    ) { 
     this.allColumnFilter=this.columnHeader
    }
 
@@ -107,7 +104,7 @@ export class JobTrackerComponent implements OnInit {
    
   }
   async getRakeDetail(){
-    let data = await getJobDetailFromApi(this.masterService);
+    let data = await this.jobService.getJobDetails();
     this.tableData = data;
     this.tableLoad=false;
     const boxData = [

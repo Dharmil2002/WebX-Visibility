@@ -538,24 +538,57 @@ export const ROUTES: RouteInfo[] =
       icon: "book",
       class: "menu-toggle",
       groupTitle: false,
-      submenu: [{
-        path: "Finance/DebitVoucher",
-        title: "Debit Voucher",
-        moduleName: "Debit Voucher",
-        icon: "star",
-        class: "",
-        groupTitle: false,
-        submenu: []
-      },
-      {
-        path: "Finance/VendorPayment/Dashboard",
-        title: "Vendor Payment",
-        moduleName: "Vendor Payment",
-        icon: "star",
-        class: "",
-        groupTitle: false,
-        submenu: []
-      }
+      submenu: [
+        {
+          "path": "",
+          "title": "Voucher Entry",
+          "moduleName": "Voucher Entry",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Finance/VoucherEntry/DebitVoucher",
+              "title": "Debit Voucher",
+              "moduleName": "Debit Voucher",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Finance/VoucherEntry/JournalVoucher",
+              "title": "Journal Voucher",
+              "moduleName": "Journal Voucher",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Finance/VoucherEntry/ContraVoucher",
+              "title": "Contra Voucher",
+              "moduleName": "Contra Voucher",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+          ]
+        },
+
+        {
+          path: "Finance/VendorPayment/Dashboard",
+          title: "Vendor Payment",
+          moduleName: "Vendor Payment",
+          icon: "star",
+          class: "",
+          groupTitle: false,
+          submenu: []
+        }
       ],
     },
   ]

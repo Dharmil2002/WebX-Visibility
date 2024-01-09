@@ -1,0 +1,30 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+
+    <form [formGroup]="JournalVoucherSummaryForm">
+        <app-form-webxpress [form]="JournalVoucherSummaryForm" [FormTitle]="'Journal Voucher'"
+            [formData]="jsonControlJournalVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'">
+        </app-form-webxpress>
+    </form>
+
+    <app-generic-table-v2 *ngIf="LoadVoucherDetails" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+        [TitleBoxData]="this.TotalAmountList" [FormTitle]="'Details'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag"
+        [showHeader]="false" (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true
+        (AddNewButtonEvent)="AddNewJournals()" (functionCallEmitter)="functionCallHandler($event)"
+        (callFunction)="functionCallHandler($event)">
+    </app-generic-table-v2>
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button [disabled]="!JournalVoucherSummaryForm.valid || 
+                    tableData.length==0 " class="msr-3" mat-raised-button color="primary"
+                    (click)="Submit()">Submit</button>
+                <button mat-button (click)="cancel('Billing​')">Back</button>
+            </div>
+        </div>
+    </div>
+
+</app-common-wrapper-webxpress>

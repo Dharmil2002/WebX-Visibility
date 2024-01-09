@@ -38,7 +38,7 @@ export class LocationControl {
         type: "text",
         value: LocationTable.locName,
         generatecontrol: true,
-        disable: isUpdate ? true : false,
+        disable: false,
         Validations: [
           {
             name: "required",
@@ -64,7 +64,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "autocomplete",
@@ -95,7 +95,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "autocomplete",
@@ -113,7 +113,6 @@ export class LocationControl {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect: "setReportLocData",
           onModel: "setReporting"
         },
       },
@@ -127,7 +126,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "autocomplete",
@@ -145,7 +144,7 @@ export class LocationControl {
           showNameAndValue: false,
         },
         functions: {
-          onModelChange: "getLocationDetails",
+          onModel: "getReportLocation",
         },
       },
 
@@ -353,6 +352,7 @@ export class LocationControl {
         }],
         functions: {
           onClick: "showMap",
+          onModel:"latLongValidator"
         },
       },
       {
@@ -478,52 +478,15 @@ export class LocationControl {
         generatecontrol: false, disable: false
       },
       {
-        name: '_id',
-        label: '',
-        placeholder: '',
-        type: 'text',
-        value: LocationTable._id,
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
-
-      },
-      {
-        name: 'updateDate',
-        label: ' ',
-        placeholder: ' ',
-        type: 'date',
-        value: new Date(), // Set the value to the current date
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
-      },
-      {
-        name: "updateBy",
-        label: "Update By",
-        placeholder: "Update By",
+        name: "companyCode",
+        label: "Company Code",
+        placeholder: "Company Code",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: parseInt(localStorage.getItem("companyCode")),
         Validations: [],
         generatecontrol: false,
         disable: false,
-      },
-      {
-        name: "EntryBy",
-        label: "",
-        placeholder: "Update By",
-        type: "text",
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
+    }
     ])
   }
   getFormControlsLocation() {

@@ -55,7 +55,7 @@ export class DebitVoucherdetailsRequestModel {
   companyCode: number
   voucherNo: string
   transType: string
-  transDate: string
+  transDate: Date
   finYear: string
   branch: string
   accCode: string

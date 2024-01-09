@@ -117,7 +117,7 @@ export class custOutControl {
                     ],
                     additionalData: {
                          support: "custnmcdHandler",
-                         showNameAndValue: true,
+                         showNameAndValue: false,
                     },
                     functions: {
                          onToggleAll: "toggleSelectAll",

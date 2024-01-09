@@ -1,6 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ChaEntryControl {
     chaEntryControlArray: FormControls[];
+    chaTableFormControlArray: FormControls[];
     constructor() {
         this.chaEntryControlArray = [
             {
@@ -13,16 +14,13 @@ export class ChaEntryControl {
                 disable: true,
                 Validations: [
                 ]
-            }, 
+            },
             {
                 name: "documentType",
                 label: " Document Type",
                 placeholder: 'Document Type',
                 type: "Staticdropdown",
-                value: [
-                    { value: 'jobNo', name: 'Job No' },
-                    { value: 'cnNo', name: 'CN No' }
-                ],
+                value: [],
                 Validations: [
                 ],
                 generatecontrol: true,
@@ -32,13 +30,27 @@ export class ChaEntryControl {
                 name: 'billingParty', label: "Billing Party", placeholder: "Select Billing Party", type: 'dropdown',
                 value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Billing Party is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    }
                 ],
+                functions: {
+                    onModel: "getCustomer"
+                },
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 }
-            }, 
+            },
             {
-                name: 'jobNo', label: "Job No/CN No", placeholder: "", type: 'text', value:"",
+                name: 'jobNo', label: "Job No/CN No", placeholder: "", type: 'text', value: "",
                 generatecontrol: true, disable: true,
                 Validations: [],
                 functions: {
@@ -50,10 +62,7 @@ export class ChaEntryControl {
                 label: "Job Type",
                 placeholder: 'Job Type',
                 type: "Staticdropdown",
-                value: [
-                    { value: 'I', name: 'Import' },
-                    { value: 'E', name: 'Export' }
-                ],
+                value: [],
                 Validations: [
                 ],
                 generatecontrol: true,
@@ -64,7 +73,7 @@ export class ChaEntryControl {
                 label: "Transported By",
                 placeholder: 'Transported By',
                 type: "text",
-                value:'',
+                value: '',
                 Validations: [
                 ],
                 generatecontrol: true,
@@ -88,7 +97,7 @@ export class ChaEntryControl {
                 Validations: [],
                 generatecontrol: false, disable: false
             },
-              {
+            {
                 name: 'entryBy',
                 label: 'entryBy',
                 placeholder: 'entryBy',
@@ -108,8 +117,74 @@ export class ChaEntryControl {
             },
 
         ];
+        this.chaTableFormControlArray = [
+            {
+                name: "docName",
+                label: "Name of Document",
+                placeholder: "Name of Document",
+                type: "Staticdropdown",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "clrChrg",
+                label: "Clearance Charge (₹)",
+                placeholder: "Clearance Charge (₹)",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                functions:{
+                    onChange: 'calculateTotalAmount'
+                },
+                Validations: [
+                ]
+            },
+            {
+                name: "gstRate",
+                label: "GST Rate",
+                placeholder: "GST Rate",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                functions:{
+                    onChange: 'calculateTotalAmount'
+                },
+                Validations: [
+                ]
+            },
+            {
+                name: "gstAmt",
+                label: "GST Amount (₹)",
+                placeholder: "GST Amount (₹)",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [
+                ]
+            },
+            {
+                name: "totalAmt",
+                label: "Total Amount (₹)",
+                placeholder: "Total Amount (₹)",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [
+                ]
+            },
+        ]
     }
     getChaEntryFormControls() {
         return this.chaEntryControlArray;
+    }
+    getChaTableFormControls() {
+        return this.chaTableFormControlArray
     }
 }

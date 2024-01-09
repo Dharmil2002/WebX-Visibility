@@ -1,0 +1,7 @@
+<div class="paddingdiv">
+    <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
+        [Link]="linkArray"[refreshbtn]=true (functionCallEmitter)="functionCallHandler($event)">
+    </app-generic-table-v2>
+</div>

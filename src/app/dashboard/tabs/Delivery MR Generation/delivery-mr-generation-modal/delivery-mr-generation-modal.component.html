@@ -1,0 +1,15 @@
+<div class="row ">
+    <div class="col d-flex justify-content-end">
+        <button mat-icon-button class="mb-2" (click)="Close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+<div class="body">
+    <form [formGroup]="MrGenerationForm">
+        <app-form-webxpress [form]="MrGenerationForm" [formData]="allJson"
+            [FormTitle]="'Delivery MR Delivery Charges'" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)" [submit]="submit">
+        </app-form-webxpress>
+    </form>
+</div>

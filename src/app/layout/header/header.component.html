@@ -7,7 +7,7 @@
       <a href="#" onClick="return false;" class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
       <a class="navbar-brand pointer">
         <img src="assets/images/banner/DMS.jpg"  height="30px" width="30px" alt="" (click)="navigateToPage()"/>
-        <span class="logo-name" style="color: #03a9f3;">Globe</span>
+        <span class="logo-name" style="color: #03a9f3;">{{companyCd}}</span>
       </a>
     </div>
     <div class="collapse navbar-collapse" [ngbCollapse]="isNavbarCollapsed">
@@ -20,7 +20,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-left globehide">
         <li style="position:fixed;margin-left: 29px;">
-          <img src="assets/images/globe.png" class="pointer" height="50px" width="150px" alt="Company Logo"  (click)="navigateToPage()">
+          <img [src]="logo" class="pointer" height="50px" width="150px" alt="Company Logo"  (click)="navigateToPage()">
         </li>
       </ul>
       <!-- Search bar to the right of the logo -->

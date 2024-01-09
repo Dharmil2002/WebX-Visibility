@@ -72,7 +72,6 @@ export class ViewPrintComponent implements OnInit {
       templateName: this.viewTableForm.value.vIEWTYPE.name,
       DocNo: this.viewTableForm.value.dOCNO,
     };
-    console.log("req", req);
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, '', 'width=1000,height=800');
   }

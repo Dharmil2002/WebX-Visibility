@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -77,7 +78,10 @@ export class VendorMasterListComponent implements OnInit {
   linkArray = []
   addAndEditPath: string;
   viewComponent: any;
-  constructor(private masterService: MasterService) {
+  constructor(
+    private masterService: MasterService,
+    private storage:StorageService
+    ) {
     this.addAndEditPath = "/Masters/VendorMaster/AddVendorMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -90,53 +94,44 @@ export class VendorMasterListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vendor_detail",
-      "filter": {}
+      "filter": {companyCode:this.storage.companyCode}
     }
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-    const vendorTypeData = await this.fetchData();
     if (res) {
       // Generate srno for each object in the array
       const dataWithSrno = res.data
         .map((obj) => {
-          const vendorType = vendorTypeData.find(x => x.value === obj.vendorType);
           return {
             ...obj,
             // srNo: index + 1,
             vendorName: obj.vendorName.toUpperCase(),
-            vendorType: vendorType ? vendorType.name.toUpperCase() : '',
+            vendorType: obj.vendorTypeName ? obj.vendorTypeName.toUpperCase() : '',
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
         })
-        .sort((a, b) => b._id.localeCompare(a._id));
+        .sort((a, b) => b.vendorCode.localeCompare(a.vendorCode));
 
       this.csv = dataWithSrno;
       this.tableLoad = false;
     }
 
   }
-  async fetchData() {
-    const vendorTypeDropdown = await PayBasisdetailFromApi(this.masterService, 'VT');
-    // Use vendorTypeDropdown here or return it
-    return vendorTypeDropdown;
-  }
   //#endregion
 
   async isActiveFuntion(det) {
-    let id = det._id;
-    const vendorTypeData = await this.fetchData();
-    const vendorType = vendorTypeData.find(x => (x.name).toLowerCase() === det.vendorType.toLowerCase());
+    let vendorCode = det.vendorCode;
     // Remove the "_id" field from the form controls
     delete det._id;
     delete det.srNo;
-    delete det.eNTDT
-    det["vendorType"] = vendorType.value
+    delete det.eNTDT;
+    delete det.vendorType;
     det['mODDT'] = new Date()
     det['mODBY'] = localStorage.getItem("UserName")
     det['mODLOC'] = localStorage.getItem("Branch")
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "vendor_detail",
-      filter: { _id: id },
+      filter: { vendorCode: vendorCode },
       update: det
     };
     const res = await this.masterService.masterPut("generic/update", req).toPromise()

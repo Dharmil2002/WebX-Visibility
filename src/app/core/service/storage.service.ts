@@ -14,6 +14,9 @@ export class StorageService {
   get companyCode(): number {
     return this.getItemObject<number>("companyCode");
   }
+  get companyCd(): string {
+    return this.getItem("company_Code");
+  }
 
   get branch(): string {
     return this.getItem("Branch");
@@ -26,6 +29,10 @@ export class StorageService {
   get mode(): string {
     return this.getItem("Mode");
   }
+  get companyLogo(): string {
+    return this.getItem("companyLogo");
+  }
+
 
   setItem(key: string, value: any, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;

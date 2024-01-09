@@ -14,12 +14,20 @@ export class ThcService {
         private storage: StorageService
     ) { }
 
-    async getShipmentFiltered(branch, prqNo = null) {
+    async getShipmentFiltered(branch, prqNo = null, fromCity = null, toCity = null, DocketsContainersWise = false) {
 
         let filter = { oRGN: branch, oSTS: 1 }
         if ((prqNo && prqNo !== "")) {
             filter["pRQNO"] = prqNo;
         }
+        if ((fromCity && fromCity !== "")) {
+            filter["fCT"] = fromCity;
+        }
+        if ((toCity && toCity !== "")) {
+            filter["tCT"] = toCity;
+        }
+        filter["iSCONT"] = DocketsContainersWise;
+
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
@@ -32,7 +40,8 @@ export class ThcService {
             companyCode: this.storage.companyCode,
             collectionName: Collections.docketOp,
             filter: {
-                dKTNO: { D$in: dockets }, sFX: 0, D$or: [
+                sTS: 1,
+                dKTNO: { D$in: dockets }, D$or: [
                     { tOTPKG: { D$gt: 0 } },
                     { tOTWT: { D$gt: 0 } }
                 ]
@@ -56,10 +65,35 @@ export class ThcService {
                 transitHours: element?.tRNHR || 0,
             };
         };
-        const docketList = result.data.map((element) => {
-            const dkt = dktDetail.data.find((x) => x.dKTNO === element.dKTNO);
-            return createShipmentObject(element, dkt);
-        });
+        const createShipmentObjectContainerWise = (ops, dkt) => {
+            return {
+                bPARTYNM: dkt.bPARTYNM,
+                docNo: dkt.dKTNO,
+                sFX: ops?.sFX || 0,
+                cNO: ops?.cNO || "",
+                fCT: dkt.fCT,
+                tCT: dkt.tCT,
+                aCTWT: ops?.tOTWT || 0,
+                pKGS: ops?.tOTPKG || 0,
+                pod: dkt?.pOD || "",
+                receiveBy: dkt?.rCVBY || "",
+                arrivalTime: dkt?.aRRTM || "",
+                remarks: dkt?.rEMARKS || "",
+                transitHours: dkt?.tRNHR || 0,
+            };
+        };
+        let docketList;
+        if (DocketsContainersWise) {
+            docketList = dktDetail.data.map((element) => { //ops Data 
+                const dkt = result.data.find((x) => x.dKTNO === element.dKTNO);  // Dockets Data
+                return createShipmentObjectContainerWise(element, dkt);
+            });
+        } else {
+            docketList = result.data.map((element) => {// Dockets Data
+                const dkt = dktDetail.data.find((x) => x.dKTNO === element.dKTNO); //ops Data 
+                return createShipmentObject(element, dkt);
+            });
+        }
         return docketList;
     }
 
@@ -188,6 +222,16 @@ export class ThcService {
             filter: { docNo: tripId }
         };
         let nestedDetail = await firstValueFrom(this.operationService.operationPost(OperationActions.getThc, reqBody));
+        return nestedDetail;
+    }
+    async getThcMovemnetDetails(tripId) {
+
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.thc_movement,
+            filter: { docNo: tripId }
+        };
+        let nestedDetail = await firstValueFrom(this.operationService.operationPost(GenericActions.Get, reqBody));
         return nestedDetail;
     }
     async newsthcGeneration(request) {

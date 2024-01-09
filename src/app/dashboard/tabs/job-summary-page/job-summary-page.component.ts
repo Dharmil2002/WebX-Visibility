@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { getJobDetailFromApi } from './job-summary-utlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getGeneric } from 'src/app/operation/rake-update/rake-update-utility';
+import { JobEntryService } from 'src/app/Utility/module/operation/job-entry/job-entry-service';
 
 @Component({
   selector: 'app-job-summary-page',
@@ -67,11 +68,11 @@ export class JobSummaryPageComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-    vehicleSize: {
-      Title: "Size(MT)",
-      class: "matcolumncenter",
-      Style:  "max-width:90px",
-    },
+    // vehicleSize: {
+    //   Title: "Size(MT)",
+    //   class: "matcolumncenter",
+    //   Style:  "max-width:90px",
+    // },
     status: {
       Title: "Status",
       class: "matcolumnleft",
@@ -92,12 +93,13 @@ export class JobSummaryPageComponent implements OnInit {
     "fromToCity",
     "jobLocation",
     "pkgs",
-    "vehicleSize",
     "status"
   ];
   addAndEditPath: string;
   linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
-  constructor(private _masterService: MasterService) {
+  constructor(
+    private jobservice:JobEntryService
+    ) {
     this.addAndEditPath = "Operation/JobEntry";
     this.allColumnFilter=this.columnHeader
   }
@@ -107,7 +109,7 @@ export class JobSummaryPageComponent implements OnInit {
   }
 
   async getJobDetails() {
-    let data = await getJobDetailFromApi(this._masterService);
+    let data = await this.jobservice.getJobDetails();
     this.tableData = data;
     this.tableLoad = false;
   }

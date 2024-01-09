@@ -12,6 +12,9 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -28,10 +31,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       active: "Delivery MR Generation",
     },
   ];
-  // tableData = deliveryStaticData;
   tableData: any = [];
-  tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  tableload: boolean; // flag , indicates if data is still lodaing or not , used to show loading animation
   menuItemflag: boolean = true;
   dynamicControls = {
     add: false,
@@ -127,7 +128,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       //Style: "min-width:100px",
     },
   };
-  branch = localStorage.getItem("Branch");
 
   staticField = [
     "totalAmount",
@@ -156,14 +156,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   jsonControlBillingArray: any;
   billingForm: UntypedFormGroup;
   filteredDocket = []
-  isLoad: boolean;
   SACCodeList: any;
+  TotalAmountList: { count: string; title: string; class: string; }[];
+  headerDetails: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private objLocationService: LocationService) {
+    private objLocationService: LocationService,
+    private objStorageService: StorageService,
+    private operation: OperationService,) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
       console.log(data);
@@ -174,9 +177,15 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.initializeDeliveryMrFormControls();
     this.getTDSData();
-    this.getDocketList('');
+    this.TotalAmountList = [
+      {
+        count: "0.00",
+        title: "Total MR Amount",
+        class: `color-Success-light`,
+      }
+    ];
   }
-
+  //#region to call handler function
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch
@@ -187,7 +196,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       console.log("failed");
     }
   }
-
+  //#endregion
   //#region to initializes the form controls for the Delivery MR table.
   initializeDeliveryMrFormControls() {
     // Create an instance of the DeliveryMrGeneration class to generate form controls.
@@ -210,7 +219,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#region to add data in table
   async save() {
     this.tableload = true;
-
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -240,16 +248,14 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.tableData.push(json);
     });
     this.tableload = false;
-    this.isLoad = true;
 
     if (this.deliveryMrTableForm.value.Deliveredto === 'Receiver') {
       this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].billingParty);
     } else {
       this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].consigneeName);
     }
-    console.log();
-
-
+    this.headerDetails = this.deliveryMrTableForm.value;
+    this.deliveryMrTableForm.reset();
   }
   //#endregion
   //#region to change control
@@ -289,7 +295,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       Details: event,
     }
     this.tableload = true;
-    this.isLoad = true;
     const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
       data: request,
       width: "100%",
@@ -336,15 +341,19 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.tableData = this.tableData.filter(item => item.id !== data.id);
       this.tableData.unshift(json);
       this.tableload = false;
-      this.isLoad = false;
 
-
+      let totalMr = 0;
+      this.tableData.forEach(item => {
+        totalMr += item.totalAmount;
+      });
+      const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
+      totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
     });
   }
   //#endregion
   //#region to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    console.log(data);
+    //console.log(data);
     this.addDetails(data)
   }
   //#endregion 
@@ -371,13 +380,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           index === self.findIndex((d) => d.docketNumber === data.docketNumber)
       );
 
-      // const foundMatch = docketData.find(x => consignmentNoteNumbers.includes(x.docketNumber));
       if (this.filteredDocket.length === 0) {
         Swal.fire({
           icon: "info",
           title: `This Consignment No: ${NoofDocketValue} is not valid`,
           showConfirmButton: true,
         });
+        this.deliveryMrTableForm.controls.ConsignmentNoteNumber.reset();
         return;
       }
 
@@ -504,11 +513,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
   }
   //#endregion
+  //#region to get dropdown's data
   async getTDSData() {
     const filter = { locCode: localStorage.getItem('Branch') }
     const stateList = await this.objLocationService.locationFromApi(filter);
-    this.billingForm.get("Stateofbooking").setValue(stateList[0].state);
-
+    this.billingForm.get("Stateofbooking").setValue(stateList?.[0]?.state);
     let Accountinglocation = this.billingForm.value.Stateofbooking
     let responseFromAPITDS = await GetAccountDetailFromApi(this.masterService, "TDS", Accountinglocation)
     this.filter.Filter(
@@ -527,13 +536,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       false
     );
     const stateReqBody = {
-      companyCode: this.companyCode,
+      companyCode: this.objStorageService.companyCode,
       filter: {},
       collectionName: "state_master",
     };
 
     const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
-    const StateList = resState?.data
+    const StateLists = resState?.data
       .map(x => ({
         value: x.ST, name: x.STNM
       }))
@@ -543,19 +552,22 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.filter.Filter(
       this.jsonControlBillingArray,
       this.billingForm,
-      stateList,
+      StateLists,
       "StateofSupply",
       false
     );
   }
-
+  //#endregion
+  //#region to set bank name
   setBankName() {
     const bnknm = this.PaymentSummaryFilterForm.value.Bank;
     bnknm ? this.PaymentSummaryFilterForm.controls['depositedIntoBank'].setValue(bnknm) : '';
   }
+  //#endregion
+  //#region to get Docket list
   async getDocketList(data = {}) {
     const req = {
-      companyCode: this.companyCode,
+      companyCode: this.objStorageService.companyCode,
       filter: data,
       collectionName: "docket",
     };
@@ -564,26 +576,161 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
     return res.data;
   }
+  //#endregion
+  //#region to calculate TDS related amount
   TDSSectionFieldChanged(event) {
-    this.billingForm.get("TDSRate").setValue(this.billingForm.value?.TDSSection?.rHUF)
-    this.calculateTDSAndTotal('');
+    // Get the value of TDSSection from the form
+    const TDSFormValue = this.billingForm.value.TDSSection;
+
+    // Get the TDS rate from the TDSSection value
+    const TDSRate = TDSFormValue?.rHUF || 0;
+
+    // Set the TDS rate in the form
+    this.billingForm.get("TDSRate").setValue(TDSRate);
+
+    // Get the total amount count from TotalAmountList or default to 0 if undefined
+    const totalAmountCount = parseFloat(this.TotalAmountList[0]?.count) || 0;
+
+    // Calculate TDS amount based on the TDS rate and total amount
+    const TDSAmount = totalAmountCount * TDSRate / 100;
+
+    // Calculate the remaining amount after deducting TDS
+    const totalTDSamt = totalAmountCount - TDSAmount;
+
+    // Set the TDS amount in the form
+    this.billingForm.get("TDSAmount").setValue(totalTDSamt);
+
+    // Get the GSTAmount from the form or default to 0 if undefined
+    const totalGSTamt = this.billingForm.value.GSTAmount || 0;
+
+    // Calculate the DeliveryMRNetAmount by adding TDS and GST amounts
+    const deliveryMramt = totalTDSamt + totalGSTamt;
+
+    // Set the DeliveryMRNetAmount in the form
+    this.billingForm.get("DeliveryMRNetAmount").setValue(deliveryMramt);
 
   }
+  //#endregion
+  //#region to calculate GST related amount
   SACCodeFieldChanged() {
-    const GSTRate = this.SACCodeList.filter(x => x.name === this.billingForm.value.SACCode?.name)
-    this.billingForm.get("GSTRate").setValue(GSTRate[0].GSTRT)
+    // Get the selected SAC code from the form
+    const selectedSACCode = this.billingForm.value.SACCode?.name;
+
+    // Find the corresponding SAC code object from SACCodeList
+    const selectedSACCodeObject = this.SACCodeList.find(x => x.name === selectedSACCode);
+
+    // Set GSTRate in the form
+    this.billingForm.get("GSTRate").setValue(selectedSACCodeObject?.GSTRT || 0);
+
+    // Get the total amount count from TotalAmountList or default to 0 if undefined
+    const totalAmountCount = parseFloat(this.TotalAmountList[0]?.count) || 0;
+
+    // Calculate and set GSTAmount in the form
+    const GSTAmount = totalAmountCount * (selectedSACCodeObject?.GSTRT || 0) / 100;
+    const totalGSTamt = totalAmountCount + GSTAmount;
+
+    // Set GSTAmount in the form
+    this.billingForm.get("GSTAmount").setValue(totalGSTamt);
+
+    // Enable GSTCharged based on the presence of GSTRate
+    this.billingForm.get("GSTCharged").setValue(!!this.billingForm.value.GSTRate);
   }
-  calculateTDSAndTotal(event) {
-    // const TDSRate = Number(this.billingForm.value['TDSRate']);
-    // const DebitAmount = this.tableData.filter(item => item.TDSApplicable == "Yes").reduce((accumulator, currentValue) => {
-    //   return accumulator + parseFloat(currentValue['DebitAmount']);
-    // }, 0);
-    // if (!isNaN(DebitAmount) && !isNaN(TDSRate)) {
-    //   const TDSAmount = (DebitAmount * TDSRate) / 100;
-    //   this.billingForm.controls.TDSDeduction.setValue(TDSAmount.toFixed(2));
-    //   //this.CalculatePaymentAmount();
-    // } else {
-    //   console.error('Invalid input values for DebitAmount or GSTRate');
-    // }
+  //#endregion
+  //#region to save data to collection delivery_mr_header and delivery_mr_details
+  async submit() {
+    const headerRequest = {
+      // _id
+      cID: this.objStorageService.companyCode,
+      // dLMRNO:
+      dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
+      dLVRT: this.headerDetails.Deliveredto,
+      cNTCTNO: this.headerDetails.ContactNumber,
+      rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
+      CONSGNM: this.headerDetails.NameofConsignee ? this.headerDetails.NameofConsignee : '',
+      mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
+      bNK: this.PaymentSummaryFilterForm.value.Bank.name,
+      cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo,
+      cHQDT: this.PaymentSummaryFilterForm.value.Date,
+      iSUBNK: this.PaymentSummaryFilterForm.value.issuedFromBank,
+      oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
+      dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
+      dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
+      bILNGPRT: this.billingForm.value.BillingParty,
+      bKNGST: this.billingForm.value.Stateofbooking,
+      sPLYSTNM: this.billingForm.value.StateofSupply.name,
+      sPLYSTCD: this.billingForm.value.StateofSupply.value,
+      sACCDNM: this.billingForm.value.SACCode.name,
+      sACCd: this.billingForm.value.SACCode.value,
+      gSTRT: this.billingForm.value.GSTRate,
+      gSTAMT: this.billingForm.value.GSTAmount,
+      tDSSCTCD: this.billingForm.value.TDSSection.value,
+      tDSSCTNM: this.billingForm.value.TDSSection.name,
+      tDSRT: this.billingForm.value.TDSRate,
+      tDSAmt: this.billingForm.value.TDSAmount,
+      gSTCHRGD: this.billingForm.value.GSTCharged,
+      dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
+      cLLCTAMT: this.billingForm.value.CollectionAmount,
+      pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
+      rNDOF: this.billingForm.value.RoundOff,
+      eNTDT: new Date(),
+      eNTLOC: this.objStorageService.branch,
+      eNTBY: this.objStorageService.userName 
+    }
+    // Prepare the request body with company code, collection name, and job detail data.
+    let reqBody = {
+      companyCode: this.objStorageService.companyCode,
+      collectionName: "delivery_mr_header",
+      docType: "MR",
+      branch: this.objStorageService.branch,
+      finYear: financialYear,
+      data: headerRequest
+    };
+    console.log(reqBody);
+
+    // Send a POST request to create the job detail in the MongoDB collection.
+    const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
+    this.tableData.forEach(element => {
+      const detailRequest = {
+        // _id
+        cID: this.objStorageService.companyCode,
+        // dMRNO:
+        docType: "MR",
+        branch: this.objStorageService.branch,
+        finYear: financialYear,
+        //dMRNO:
+        dOCNO: element.consignmentNoteNumber,
+        mLTPNTDLRY: element.Multipointdelivery,
+        dOC: element.Document,
+        iNSURNC: element.Insurance,
+        gRNTX: element.GreenTax,
+        dMRG: element.Demurrage,
+        dISCNT: element.Discount,
+        gST: element.GST,
+        uNLODNG: element.Unloading,
+        fRGHT: element.Freight,
+        lODNG: element.Loading,
+        //cNSGTNO:
+        pYBASIS: element.payBasis,
+        sUBTTL: element.subTotal,
+        nWSUBTTL: element.newSubTotal,
+        rTDFRNC: element.rateDifference,
+        //dORDLVRY:
+        // fRCLPCHRGE:
+        //   gTPSCHRG:
+        // oTHRCHRG:
+        tOTL: element.totalAmount,
+        eNTDT: new Date(),
+        eNTLOC: this.objStorageService.branch,
+        eNTBY: this.objStorageService.userName
+
+      }
+    });
+
+    // const requestBody = {
+    //   companyCode: this.objStorageService.companyCode,
+    //   filter: {},
+    //   collectionName: "state_master",
+    // };
   }
+  //#endregion
 }

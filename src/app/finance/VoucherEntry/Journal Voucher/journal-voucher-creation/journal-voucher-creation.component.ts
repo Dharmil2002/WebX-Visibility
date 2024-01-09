@@ -12,6 +12,14 @@ import { GetLedgercolumnHeader } from '../jornalvoucherCommonUtitlity';
 import { MatDialog } from '@angular/material/dialog';
 import { JournalVoucherCreationModalComponent } from '../Modals/journal-voucher-creation-modal/journal-voucher-creation-modal.component';
 import { Router } from '@angular/router';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { firstValueFrom } from 'rxjs';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import Swal from 'sweetalert2';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 @Component({
   selector: 'app-journal-voucher-creation',
   templateUrl: './journal-voucher-creation.component.html',
@@ -28,7 +36,7 @@ export class JournalVoucherCreationComponent implements OnInit {
 
   JournalVoucherSummaryForm: UntypedFormGroup;
   jsonControlJournalVoucherSummaryArray: any;
-
+  TotalAmountList: { count: any; title: string; class: string }[];
   LoadVoucherDetails = true;
   dynamicControls = {
     add: false,
@@ -44,19 +52,49 @@ export class JournalVoucherCreationComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-
+  debitVoucherRequestModel = new DebitVoucherRequestModel();
+  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  totalDebit: number;
+  totalCredit: number;
   staticField = ['Ledger', 'DebitAmount', 'CreditAmount', 'Narration']
   columnHeader = GetLedgercolumnHeader()
   tableData: any = [];
   AccountGroupList: any;
   constructor(private fb: UntypedFormBuilder,
+    private storage: StorageService,
     private masterService: MasterService,
     private router: Router,
+    private navigationService: NavigationService,
+    private voucherServicesService: VoucherServicesService,
+    public snackBarUtilityService: SnackBarUtilityService,
     private matDialog: MatDialog,
     private filter: FilterUtils,) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
+    this.SetTotalAmountList()
+  }
+  SetTotalAmountList() {
+    this.totalDebit = this.tableData.reduce((accumulator, currentValue) => {
+      const drValue = parseFloat(currentValue['DebitAmount']);
+      return isNaN(drValue) ? accumulator : accumulator + drValue;
+    }, 0);
+    this.totalCredit = this.tableData.reduce((accumulator, currentValue) => {
+      const drValue = parseFloat(currentValue['CreditAmount']);
+      return isNaN(drValue) ? accumulator : accumulator + drValue;
+    }, 0);
+    this.TotalAmountList = [
+      {
+        count: this.totalDebit.toFixed(2),
+        title: "Total Debit Amount",
+        class: `color-Ocean-danger`,
+      },
+      {
+        count: this.totalCredit.toFixed(2),
+        title: "Total Credit Amount",
+        class: `color-Success-light`,
+      }
+    ]
   }
   initializeFormControl() {
     this.JournalVoucherControl = new JournalVoucherControl("");
@@ -152,6 +190,7 @@ export class JournalVoucherCreationComponent implements OnInit {
   handleMenuItemClick(data) {
     if (data.label.label === 'Remove') {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      this.SetTotalAmountList()
     }
     else {
 
@@ -208,15 +247,144 @@ export class JournalVoucherCreationComponent implements OnInit {
           Narration: result?.Narration,
           actions: ['Edit', 'Remove']
         }
-        this.tableData.push(json);
+        this.tableData.unshift(json);
         this.LoadVoucherDetails = true;
       }
       this.LoadVoucherDetails = true;
+      this.SetTotalAmountList()
     });
+
   }
   Submit() {
     console.log(this.JournalVoucherSummaryForm.value);
     console.log(this.tableData);
+
+    if (this.tableData.length == 0) {
+      this.snackBarUtilityService.ShowCommonSwal(
+        "info",
+        "Please Add Atleast One Journal Voucher Details "
+      );
+    }
+    else if (this.totalCredit != this.totalDebit) {
+      this.snackBarUtilityService.ShowCommonSwal(
+        "info",
+        "Total Debit Amount and Total Credit Amount Should be Equal"
+      );
+    } else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+
+
+
+          this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
+          this.debitVoucherRequestModel.docType = "VR";
+          this.debitVoucherRequestModel.branch = this.storage.branch;
+          this.debitVoucherRequestModel.finYear = financialYear;
+
+          this.debitVoucherDataRequestModel.voucherNo = "";
+          this.debitVoucherDataRequestModel.transType = "Journal Voucher";
+          this.debitVoucherDataRequestModel.transDate = new Date();
+          this.debitVoucherDataRequestModel.docType = "VR";
+          this.debitVoucherDataRequestModel.branch = this.storage.branch;
+          this.debitVoucherDataRequestModel.finYear = financialYear;
+
+          this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
+          this.debitVoucherDataRequestModel.preperedFor = this.JournalVoucherSummaryForm.value.Preparedfor;
+          this.debitVoucherDataRequestModel.partyCode = this.JournalVoucherSummaryForm.value.PartyName?.value;
+          this.debitVoucherDataRequestModel.partyName = this.JournalVoucherSummaryForm.value.PartyName?.name;
+          this.debitVoucherDataRequestModel.partyState = ""
+          this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
+          this.debitVoucherDataRequestModel.entryDate = new Date();
+          this.debitVoucherDataRequestModel.panNo = this.JournalVoucherSummaryForm.get("PANnumber").value;
+
+          this.debitVoucherDataRequestModel.tdsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tdsSectionName = undefined
+          this.debitVoucherDataRequestModel.tdsRate = 0;
+          this.debitVoucherDataRequestModel.tdsAmount = 0;
+          this.debitVoucherDataRequestModel.tdsAtlineitem = false;
+          this.debitVoucherDataRequestModel.tcsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tcsSectionName = undefined
+          this.debitVoucherDataRequestModel.tcsRate = 0;
+          this.debitVoucherDataRequestModel.tcsAmount = 0;
+
+          this.debitVoucherDataRequestModel.IGST = 0;
+          this.debitVoucherDataRequestModel.SGST = 0;
+          this.debitVoucherDataRequestModel.CGST = 0;
+          this.debitVoucherDataRequestModel.UGST = 0;
+          this.debitVoucherDataRequestModel.GSTTotal = 0;
+
+          this.debitVoucherDataRequestModel.paymentAmt = this.totalCredit;
+          this.debitVoucherDataRequestModel.netPayable = this.totalCredit;
+          this.debitVoucherDataRequestModel.roundOff = 0;
+          this.debitVoucherDataRequestModel.voucherCanceled = false;
+
+          this.debitVoucherDataRequestModel.paymentMode = undefined;
+          this.debitVoucherDataRequestModel.refNo = undefined;
+          this.debitVoucherDataRequestModel.accountName = undefined;
+          this.debitVoucherDataRequestModel.date = undefined;
+          this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+          this.debitVoucherDataRequestModel.paymentAmount = this.totalCredit;
+
+          const companyCode = this.storage.companyCode;
+          const CurrentBranchCode = this.storage.branch;
+          var VoucherlineitemList = this.tableData.map(function (item) {
+            return {
+              companyCode: companyCode,
+              voucherNo: "",
+              transType: "Journal Voucher",
+              transDate: new Date(),
+              finYear: financialYear,
+              branch: CurrentBranchCode,
+              accCode: item.LedgerHdn,
+              accName: item.Ledger,
+              sacCode: "",
+              sacName: "",
+              debit: parseFloat(item.DebitAmount).toFixed(2),
+              credit: parseFloat(item.CreditAmount).toFixed(2),
+              GSTRate: 0,
+              GSTAmount: 0,
+              Total: parseFloat(item.DebitAmount).toFixed(2),
+              TDSApplicable: false,
+              narration: item.Narration ?? ""
+            };
+          });
+
+
+          this.debitVoucherRequestModel.details = VoucherlineitemList;
+          this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+          this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+
+          firstValueFrom(this.voucherServicesService
+            .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+              if (res.success) {
+                Swal.fire({
+                  icon: "success",
+                  title: "Jornal Voucher Created Successfully",
+                  text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+                  showConfirmButton: true,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    Swal.hideLoading();
+                    setTimeout(() => {
+                      Swal.close();
+                    }, 2000);
+                    this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                  }
+                });
+              }
+            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+            .finally(() => {
+
+            });
+
+        } catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            error.message
+          );
+        }
+      }, "Jornal Voucher Generating..!");
+    }
 
   }
   cancel(tabIndex: string): void {

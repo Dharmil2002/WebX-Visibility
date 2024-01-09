@@ -155,8 +155,8 @@ export class ContraVoucherControl {
         type: "Staticdropdown",
         value: [
           {
-            value: "Cheque",
-            name: "Cheque",
+            value: "Bank",
+            name: "Bank",
           },
           {
             value: "Cash",
@@ -287,8 +287,8 @@ export class ContraVoucherControl {
         type: "Staticdropdown",
         value: [
           {
-            value: "Cheque",
-            name: "Cheque",
+            value: "Bank",
+            name: "Bank",
           },
           {
             value: "Cash",

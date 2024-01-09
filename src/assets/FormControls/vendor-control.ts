@@ -28,8 +28,8 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Enter Vendor Name with 3 to 50 characters using only text",
-                        pattern: '^[a-zA-Z - a-zA-Z]{3,50}$',
+                        message: "Enter Vendor Name with 3 to 150 characters using only text",
+                        pattern: '^[a-zA-Z0-9 -/]{3,150}$',
                     }
                 ],
                 functions: {
@@ -46,10 +46,6 @@ export class VendorControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "Vendor Manager is required"
-                    },
                     {
                         name: "pattern",
                         message: "Please Enter only text of length 3 to 25 characters",
@@ -91,12 +87,12 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "Vendor Address is required"
-                    },
-                    {
-                        name: "pattern",
-                        message: "Please Enter Vendor Address upto 350 characters.",
-                        pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,350}$",
-                    },
+                    }
+                    // {
+                    //     name: "pattern",
+                    //     message: "Please Enter Vendor Address upto 500 characters.",
+                    //     pattern: "^[a-zA-Z 0-9 ,.'()#/\\-]{1,500}$"
+                    // },
                 ],
                 generatecontrol: true, disable: false
             },
@@ -116,6 +112,7 @@ export class VendorControl {
                     }]
                 },
                 functions: {
+                    onModel:"getVendorLocation",
                     onToggleAll: 'toggleSelectAll'
                 },
                 generatecontrol: true, disable: false
@@ -208,10 +205,7 @@ export class VendorControl {
                 placeholder: 'Enter Vendor E-mails',
                 type: 'text', value: vendorMasterTable.emailId,
                 Validations: [
-                    {
-                        name: "required",
-                        message: " Email ID is required",
-                    },
+                  
                 ],
                 functions: {
                     onChange: "onChangeEmail",
@@ -253,10 +247,6 @@ export class VendorControl {
                 name: 'panCardScan', label: "PAN card scan", placeholder: "select PAN card to scan", type: 'file', value: isUpdate ? vendorMasterTable.panCardScan : "",
                 generatecontrol: true, disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "PAN card scan is required"
-                    },
                 ],
                 functions: {
                     onChange: 'selectPanCardScan',
@@ -436,11 +426,11 @@ export class VendorControl {
                     name: "required",
                     message: "GST Address is required"
                 },
-                {
-                    name: "pattern",
-                    message: "Please enter upto 200 characters.",
-                    pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,200}$",
-                },
+                // {
+                //     name: "pattern",
+                //     message: "Please enter upto 200 characters.",
+                //     pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,200}$",
+                // },
                 ],
                 generatecontrol: true, disable: false
             },

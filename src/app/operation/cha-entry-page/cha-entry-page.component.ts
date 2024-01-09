@@ -82,7 +82,7 @@ export class ChaEntryPageComponent implements OnInit {
     private model: ChaEntryModel
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      debugger
+      
       this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
       if (this.jobDetail.Action == "Rake Entry") {
         this.Route.navigate(['/Operation/RakeEntry'], {
@@ -142,7 +142,7 @@ export class ChaEntryPageComponent implements OnInit {
   }
 
   autoBillData() {
-    debugger
+    
     if (this.jobDetail) {
       this.chaEntryTableForm.controls['documentType'].setValue('EDT01');
       this.chaEntryTableForm.controls['documentType'].disable();
@@ -160,7 +160,7 @@ export class ChaEntryPageComponent implements OnInit {
 
   }
   async save() {
-    debugger
+    
     let modifiedTableData = this.chaTableData;
     // Define a variable for the condition
     let condition = modifiedTableData.length <= 0 ? 'emptyTable' : 'nonEmptyTable';

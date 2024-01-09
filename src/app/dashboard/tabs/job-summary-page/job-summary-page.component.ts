@@ -109,7 +109,6 @@ export class JobSummaryPageComponent implements OnInit {
   }
 
   async getJobDetails() {
-    debugger
     let data = await this.jobservice.getJobDetails();
     this.tableData = data;
     this.tableLoad = false;

@@ -113,7 +113,6 @@ export class LocationControl {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect: "setReportLocData",
           onModel: "setReporting"
         },
       },
@@ -145,7 +144,7 @@ export class LocationControl {
           showNameAndValue: false,
         },
         functions: {
-          onModelChange: "getLocationDetails",
+          onModel: "getReportLocation",
         },
       },
 
@@ -353,6 +352,7 @@ export class LocationControl {
         }],
         functions: {
           onClick: "showMap",
+          onModel:"latLongValidator"
         },
       },
       {
@@ -476,7 +476,17 @@ export class LocationControl {
         value: '',
         Validations: [],
         generatecontrol: false, disable: false
-      }
+      },
+      {
+        name: "companyCode",
+        label: "Company Code",
+        placeholder: "Company Code",
+        type: "text",
+        value: parseInt(localStorage.getItem("companyCode")),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+    }
     ])
   }
   getFormControlsLocation() {

@@ -93,7 +93,6 @@ export class BillApprovalComponent implements OnInit {
           return (document.getElementById('swal-input1') as HTMLInputElement).value;
         }
       }).then(async (result) => {
-        debugger
         if (result.isConfirmed) {
           // Handle the input value if the user clicks the confirm button
           const filter = {

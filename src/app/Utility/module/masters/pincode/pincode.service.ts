@@ -148,7 +148,7 @@ export class PinCodeService {
     }
   }
 
-  async getPincodes(form, jsondata, controlName, codeStatus, city, stateCode) {
+  async getPincodes(form, jsondata, controlName, codeStatus, city='', stateCode='') {
     try {
       const cValue = form.controls[controlName].value;
       
@@ -171,14 +171,11 @@ export class PinCodeService {
 
         // Fetch pincode data from the masterService asynchronously
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
-        
          // Extract data from the response
-        const codeData = cResponse.data.map((x) => { return { name: x.PIN, value: x.PIN } });
-        
+        const codeData = cResponse.data.map((x) => { return { name: `${x.PIN}`, value: `${x.PIN}`,allData:x} });
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode
-          console.log(`No data found for City ${cValue}`);
           // Swal.fire({
           //   icon: "info",
           //   title: "No Data Found",
@@ -198,7 +195,73 @@ export class PinCodeService {
       }
     } catch (error) {
       // Handle any errors that may occur during the asynchronous operation
-      console.error("Error fetching data:", error);
     }
   }
+  async getPincodeNestedData(filter,value) {
+    try {
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (value.length >= 3) {
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: localStorage.getItem("companyCode"), 
+          collectionName: "pincode_master",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+         // Extract data from the response
+        const codeData = cResponse.data.map((x) => { return { name: `${x.PIN}`, value: `${x.PIN}`,allData:x} });
+        // Filter cityCodeData for partial matches
+        if (codeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for City ${cValue}`,
+          //   showConfirmButton: true,
+          // });
+        } else {
+          // Call the filter function with the filtered data
+          return codeData
+        }
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+    }
+  }
+  async getStateNestedData(filter,value) {
+    try {
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (value.length >= 3) {
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: localStorage.getItem("companyCode"), 
+          collectionName: "state_master",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+         // Extract data from the response
+        const codeData = cResponse.data.map((x) => { return { name: `${x.STNM}`, value: `${x.STSN}`,allData:x} });
+        // Filter cityCodeData for partial matches
+        if (codeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for City ${cValue}`,
+          //   showConfirmButton: true,
+          // });
+        } else {
+          // Call the filter function with the filtered data
+          return codeData
+        }
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+    }
+  }
+  
 }

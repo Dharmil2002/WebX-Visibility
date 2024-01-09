@@ -25,7 +25,7 @@
         [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"[addFlag]="addFlag"[FormTitle]="'GST Details'"  [DisplayAddNewButton]=true (AddNewButtonEvent)="addData()" >
     </app-generic-table-v2>
   
-    <button type="button" [disabled]="!vendorTableForm.valid" mat-raised-button color="primary" (click)="save()">
+    <button type="button" [disabled]="!vendorTableForm.valid || isSubmit" mat-raised-button color="primary" (click)="save()">
         <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
         <ng-template #saveButton>Save</ng-template>
     </button>&nbsp;&nbsp;

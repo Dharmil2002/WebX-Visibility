@@ -119,7 +119,7 @@ export class JobEntryPageComponent implements OnInit {
     private customerService: CustomerService,
     private generalService: GeneralService,
   ) {
-    debugger
+    
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data || "";
     if (navigationState) {
       this.jobDetails = navigationState;
@@ -773,7 +773,6 @@ export class JobEntryPageComponent implements OnInit {
   }
 
   getDocketBasedOnCity() {
-     debugger
     if (this.jobEntryTableForm.value.transportedBy == "T" && this.jobEntryTableForm.value.transportMode == "Road") {
       const toCity = this.jobEntryTableForm.value.toCity;
       const billingPartyName = this.jobEntryTableForm.value.billingParty.name.toLowerCase();

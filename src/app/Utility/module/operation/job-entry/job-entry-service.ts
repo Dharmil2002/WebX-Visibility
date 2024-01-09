@@ -75,7 +75,7 @@ export class JobEntryService {
     return res;
   }
   async getjobDetailsByJob(jobId) {
-    debugger
+    
     // Function to create request object
     const createRequest = (collectionName) => ({
       companyCode:this.storage.companyCode,

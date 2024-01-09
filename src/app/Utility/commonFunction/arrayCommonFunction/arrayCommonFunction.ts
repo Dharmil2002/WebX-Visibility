@@ -1,3 +1,4 @@
+import { UntypedFormGroup } from "@angular/forms";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
 /**
@@ -110,7 +111,7 @@ export async function   total(round,field){
   }
   
   export function assignDetail(detail: any[], formValue: any): any {
-    return detail.length > 0 ? detail : formValue;
+    return detail.length > 0 ? detail : [formValue];
   }
   export const getValueFromJsonControl = (jsonControl, name, value) => {
     const item = jsonControl.find(x => x.name === name);
@@ -172,3 +173,16 @@ export function aggregateData(data, groupByColumns, aggregationRules, fixedColum
 }
 
 
+export function latLongValidator(data) {
+  const value =data.split(',').map(v => parseFloat(v.trim()));
+  const latitude = value[0];
+  const longitude = value[1];
+
+  const isValidLatitude = !isNaN(latitude) && latitude >= -90 && latitude <= 90;
+  const isValidLongitude = !isNaN(longitude) && longitude >= -180 && longitude <= 180;
+
+  if (!isValidLatitude || !isValidLongitude) {
+      return { 'latLongInvalid': true };
+  }
+  return null;
+}

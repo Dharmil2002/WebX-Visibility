@@ -433,23 +433,24 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPut('generic/update', req));
         return res;
     }
-    async getDocketsForAutoComplete(form, jsondata, controlName, codeStatus,billingParty) {
-       debugger
+    async getDocketsForAutoComplete(form, jsondata, controlName, codeStatus,billingParty="") {
+       
         try {
           const dValue = form.controls[controlName].value;
     
           // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
           if (dValue.length >= 3) {
-            const filter = {
+            let filter = {
                 docNo: { 'D$regex': `^${dValue}`, 'D$options': 'i' },
                 jOBNO: "",
-                bPARTY: billingParty,
                 'D$or': [
                     { oRGN: this.storage.branch },
                     { dEST: this.storage.branch }
                 ]
             };
-            
+            if (billingParty) {
+                filter['bPARTY'] = billingParty;
+            }
             // Prepare the pincodeBody with the companyCode and the determined filter
             const cityBody = {
                 companyCode: localStorage.getItem("companyCode"),

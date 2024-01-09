@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -77,7 +78,10 @@ export class VendorMasterListComponent implements OnInit {
   linkArray = []
   addAndEditPath: string;
   viewComponent: any;
-  constructor(private masterService: MasterService) {
+  constructor(
+    private masterService: MasterService,
+    private storage:StorageService
+    ) {
     this.addAndEditPath = "/Masters/VendorMaster/AddVendorMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -90,7 +94,7 @@ export class VendorMasterListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vendor_detail",
-      "filter": {}
+      "filter": {companyCode:this.storage.companyCode}
     }
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res) {
@@ -105,7 +109,7 @@ export class VendorMasterListComponent implements OnInit {
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
         })
-        .sort((a, b) => b._id.localeCompare(a._id));
+        .sort((a, b) => b.vendorCode.localeCompare(a.vendorCode));
 
       this.csv = dataWithSrno;
       this.tableLoad = false;
@@ -115,7 +119,7 @@ export class VendorMasterListComponent implements OnInit {
   //#endregion
 
   async isActiveFuntion(det) {
-    let id = det._id;
+    let vendorCode = det.vendorCode;
     // Remove the "_id" field from the form controls
     delete det._id;
     delete det.srNo;
@@ -127,7 +131,7 @@ export class VendorMasterListComponent implements OnInit {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "vendor_detail",
-      filter: { _id: id },
+      filter: { vendorCode: vendorCode },
       update: det
     };
     const res = await this.masterService.masterPut("generic/update", req).toPromise()

@@ -1,0 +1,9 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums"
+ (toggleChange)="onToggleChange($event)">
+  <form [formGroup]="AcknowledgeTableForm">
+    <app-form-webxpress [form]="AcknowledgeTableForm" [formData]="jsonControlAdviceAcknowledgeArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+      (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'Advice Acknowledge'">
+    </app-form-webxpress>
+  </form>
+</app-common-wrapper-webxpress>

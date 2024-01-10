@@ -431,7 +431,17 @@ export class UserControl {
           },
         ],
 
-      }      
+      },
+      {
+        name: "companyCode",
+        label: "companyCode",
+        placeholder: "",
+        type: "",
+        value:localStorage.getItem("companyCode"),
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      }, 
     ];
   }
   getFormControlsUser() {

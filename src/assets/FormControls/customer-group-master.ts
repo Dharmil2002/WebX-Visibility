@@ -7,24 +7,12 @@ export class CustomerGroupControl {
     this.customerGroupControlArray = [
       {
         name: 'groupCode', label: "Group Code",
-        placeholder: "Enter Group Code",
+        placeholder: "",
         type: 'text',
-        value: customerGroupTable.groupCode,
-        generatecontrol: true, disable: isUpdate ? true : false,
-        Validations: [
-          {
-            name: "required",
-            message: "Group Code is required"
-          },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric Group Code of length 4 to 10",
-            pattern: '^[a-zA-Z0-9]{4,10}$',
-          }
-        ],
-        functions: {
-          onChange: "checkGroupCodeExists",
-        },
+        value: isUpdate?customerGroupTable.groupCode:"System Generated",
+        generatecontrol: true, disable: true,
+        Validations: [],
+        functions: {},
       },
 
 

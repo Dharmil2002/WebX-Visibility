@@ -6,6 +6,7 @@ import { CustomerGroupMaster } from "src/app/core/models/Masters/customer-group-
 import { CustomerGroupControl } from "src/assets/FormControls/customer-group-master";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: 'app-customer-group-add',
@@ -72,7 +73,7 @@ export class CustomerGroupAddComponent implements OnInit {
     this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
   }
   //#region Save Function
-  save() {
+  async save() {
     if (this.isUpdate) {
       let id = this.groupTableForm.value._id;
       // Remove the "id" field from the form controls
@@ -98,7 +99,17 @@ export class CustomerGroupAddComponent implements OnInit {
         }
       });
     } else {
-      this.groupTableForm.controls["_id"].setValue(this.groupTableForm.controls.groupCode.value);
+      const tableReq ={
+        companyCode: this.companyCode,
+        collectionName: "customerGroup_detail",
+        filter:{}
+      }
+      const tableRes = await firstValueFrom(this.masterService.masterPost('generic/get', tableReq))
+      const tableData = tableRes.data
+      const index =tableData.length==0?0:parseInt(tableData[tableData.length-1].groupCode.substring(4));
+      const code = `CUGR${(index+1).toString().padStart(4, '0')}`
+      this.groupTableForm.controls["_id"].setValue(`${this.companyCode}-${code}`);
+      this.groupTableForm.controls["groupCode"].setValue(code);
       let req = {
         companyCode: this.companyCode,
         collectionName: "customerGroup_detail",

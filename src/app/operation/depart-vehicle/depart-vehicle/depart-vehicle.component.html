@@ -6,8 +6,8 @@
 </form>
 Load Details
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="menifestTableData"
-        [csvFileName]="csvFileName"   [columnWidths]="columnWidths" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [csvFileName]="csvFileName" [hyperlinkControls]="hyperlinkControls"   [columnWidths]="columnWidths" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+        [toggleArray]="toggleArray" [menuItems]="menuItems" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">
     </generic-table-webxpress>
 Vendor Detail

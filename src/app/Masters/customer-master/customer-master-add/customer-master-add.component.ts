@@ -714,7 +714,7 @@ export class CustomerMasterAddComponent implements OnInit {
       customerGroup: this.customerTableForm.value.customerGroup.name,
       activeFlag: this.customerTableForm.value.activeFlag,
       BlackListed: this.customerTableForm.value.BlackListed,
-      _id: `${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
+      _id: `${this.companyCode}-${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
         }-${this.customerTableForm.value.customerName.replaceAll(/ /g, "").substring(
           0,
           4

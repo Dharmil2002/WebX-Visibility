@@ -78,9 +78,9 @@ export class UserControl {
           {
             name: "pattern",
             message:
-              "Please enter password with 6-15 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
+              "Please enter password with 8-24 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
             pattern:
-              "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{6,15}$",
+              "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,24}$",
           },
         ],
         additionalData: {
@@ -290,7 +290,7 @@ export class UserControl {
           },
         ],
         functions: {
-          onChange: "GetEmailDetails",
+          onChange: "CheckEmailId",
         },
       },
       {

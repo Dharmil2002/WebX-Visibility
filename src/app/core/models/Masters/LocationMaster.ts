@@ -6,6 +6,7 @@ export class LocationMaster {
   locName: string;
   locPincode: string;
   locState: string;
+  locStateId: number;
   locRegion: string;
   locAddr: string;
   locCity: string;
@@ -32,6 +33,7 @@ export class LocationMaster {
       this.locPincode = LocationMaster.locPincode || '';
       this.locAddr = LocationMaster.locAddr || '';
       this.locState = LocationMaster.locState || '';
+      this.locStateId = LocationMaster.locStateId || 0;
       this.locCity = LocationMaster.locCity || '';
       this.ownership = LocationMaster.ownership || '';
       this.locZone = LocationMaster.locZone || '';

@@ -29,8 +29,8 @@ export class CustomerGroupControl {
           },
           {
             name: "pattern",
-            message: "Please Enter only text of length 3 to 20 characters",
-            pattern: '^[a-zA-Z ]{3,20}$',
+            message: "Please Enter only text of length 3 to 100 characters",
+            pattern: '^[a-zA-Z 0-9]{3,100}$',
           }
 
 

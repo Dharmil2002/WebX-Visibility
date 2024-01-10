@@ -451,7 +451,7 @@ export class AddLocationMasterComponent implements OnInit {
     
   }
   async getReportLocation() {
-    const data= await this.locationService.locationFromApi({locCode: {'D$regex' : `^${this.locationTableForm.controls.reportLoc.value}`,'D$options' : 'i'} ,locLevel: this.locationTableForm.controls.locLevel.value.value})
+    const data= await this.locationService.locationFromApi({locCode: {'D$regex' : `^${this.locationTableForm.controls.reportLoc.value}`,'D$options' : 'i'} ,locLevel: this.locationTableForm.controls.reportLoc.value.value})
     this.filter.Filter(
       this.jsonControlLocationArray,
       this.locationTableForm,

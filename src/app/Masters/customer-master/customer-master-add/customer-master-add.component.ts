@@ -700,102 +700,120 @@ export class CustomerMasterAddComponent implements OnInit {
 
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
   async save() {
-    const controlDetail = this.customerTableForm.value.customerLocationsDrop;
-    const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.value) : "";
-    this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
-    this.customerTableForm.removeControl('customerLocationsDrop')
-    const Body = {
-      ...this.customerTableForm.value,
-      customerName: this.customerTableForm.value.customerName.toUpperCase(), // Convert to uppercase
-      CustomerCategory: this.customerTableForm.value.CustomerCategory.name,
-      customerLocations: customerLocationsDrop,
-      // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
-      PinCode: this.customerTableForm.value.PinCode.name,
-      customerGroup: this.customerTableForm.value.customerGroup.name,
-      activeFlag: this.customerTableForm.value.activeFlag,
-      BlackListed: this.customerTableForm.value.BlackListed,
-      _id: `${this.companyCode}-${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
-        }-${this.customerTableForm.value.customerName.replaceAll(/ /g, "").substring(
-          0,
-          4
-        )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
-      customerCode: this.isUpdate
-        ? this.customerTable.customerCode
-        : `${this.customerTableForm.value.customerGroup.value.trim().replaceAll(/ /g, "").substring(0, 4) + this.customerTableForm.value.customerName.toUpperCase().trim().replaceAll(/ /g, "").substring(0, 4) + this.customerIndex}`,
-      companyCode: localStorage.getItem("companyCode"),
-      updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
-      GSTdetails: this.tableData.map((x) => {
-        return {
-          gstAddres: x.gstAddres,
-          gstCity: x.gstCity,
-          gstNo: x.gstNo,
-          gstPinCode: x.gstPinCode,
-          gstState: x.gstState,
-        };
-      }),
-    };
-    const imageControlNames = ['uplodPANcard', 'MSMEscan'];
-    imageControlNames.forEach(controlName => {
-      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+    let customerCode;
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "customer_detail",
+      filter: {},
+      sorting: {
+        customerCode: -1
+      }
+    }
+    const rescustomer = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
+    if (rescustomer) {
 
-      // Set the URL in the corresponding control name
-      Body[controlName] = file;
-    });
+      const lastCode = rescustomer.data;
+      const lastcustomerCode = lastCode ? parseInt(lastCode.customerCode.substring(4)) : 0;
+      // Function to generate a new route code
+      function generatecustomerCode(initialCode: number = 0) {
+        const nextcustomerCode = initialCode + 1;
+        const customerNumber = nextcustomerCode.toString().padStart(5, '0');
+        const customerCode = `CUST${customerNumber}`;
+        return customerCode;
+      }
+      customerCode = generatecustomerCode(lastcustomerCode);
 
-    if (this.isUpdate) {
-      delete Body._id;
-      delete Body.customerCode;
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "customer_detail",
-        filter: { _id: this.customerTable._id },
-        update: Body,
+      const controlDetail = this.customerTableForm.value.customerLocationsDrop;
+      const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.value) : "";
+      this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
+      this.customerTableForm.removeControl('customerLocationsDrop')
+      const Body = {
+        ...this.customerTableForm.value,
+        customerName: this.customerTableForm.value.customerName.toUpperCase(), // Convert to uppercase
+        CustomerCategory: this.customerTableForm.value.CustomerCategory.name,
+        customerLocations: customerLocationsDrop,
+        // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
+        PinCode: this.customerTableForm.value.PinCode.name,
+        customerGroup: this.customerTableForm.value.customerGroup.name,
+        activeFlag: this.customerTableForm.value.activeFlag,
+        BlackListed: this.customerTableForm.value.BlackListed,
+        _id: `${this.companyCode}-${customerCode}`,
+        customerCode: this.isUpdate ? this.customerTable.customerCode : `${customerCode}`,
+        companyCode: localStorage.getItem("companyCode"),
+        updatedDate: new Date(),
+        updatedBy: localStorage.getItem("UserName"),
+        GSTdetails: this.tableData.map((x) => {
+          return {
+            gstAddres: x.gstAddres,
+            gstCity: x.gstCity,
+            gstNo: x.gstNo,
+            gstPinCode: x.gstPinCode,
+            gstState: x.gstState,
+          };
+        }),
       };
-      //API FOR UPDATE
-      this.masterService.masterPut("generic/update", req).subscribe({
-        next: (res) => {
-          this.Route.navigateByUrl(
-            "/Masters/CustomerMaster/CustomerMasterList"
-          );
-          if (res.success) {
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-          }
-          //
-        },
-        error: (err) => {
-          console.log(err);
-        },
+      const imageControlNames = ['uplodPANcard', 'MSMEscan'];
+      imageControlNames.forEach(controlName => {
+        const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+
+        // Set the URL in the corresponding control name
+        Body[controlName] = file;
       });
-    } else {
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "customer_detail",
-        data: Body,
-      };
-      await this.masterService.masterPost("generic/create", req).subscribe({
-        next: (res) => {
-          if (res.success) {
+
+      if (this.isUpdate) {
+        delete Body._id;
+        delete Body.customerCode;
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "customer_detail",
+          filter: { _id: this.customerTable._id },
+          update: Body,
+        };
+        //API FOR UPDATE
+        this.masterService.masterPut("generic/update", req).subscribe({
+          next: (res) => {
             this.Route.navigateByUrl(
               "/Masters/CustomerMaster/CustomerMasterList"
             );
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-          }
-        },
-        error: (err) => {
-          console.log("err", err);
-        },
-      });
+            if (res.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+              });
+            }
+            //
+          },
+          error: (err) => {
+            console.log(err);
+          },
+        });
+      } else {
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "customer_detail",
+          data: Body,
+        };
+        await this.masterService.masterPost("generic/create", req).subscribe({
+          next: (res) => {
+            if (res.success) {
+              this.Route.navigateByUrl(
+                "/Masters/CustomerMaster/CustomerMasterList"
+              );
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+              });
+            }
+          },
+          error: (err) => {
+            console.log("err", err);
+          },
+        });
+      }
     }
   }
 

@@ -25,7 +25,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
   };
 
   linkArray = [];
- 
+
   toggleArray = [];
 
   columnHeader = {
@@ -159,8 +159,13 @@ export class DeliveryMrGenerationListComponent implements OnInit {
 
     // Check if the branch is defined and matches the extracted destination
     if (this.branch && this.branch.trim() === result) {
+
       // If the branches match, navigate to the DeliveryMrGeneration page
-      this.router.navigateByUrl("/dashboard/DeliveryMrGeneration");
+      this.router.navigate(["/dashboard/DeliveryMrGeneration"], {
+        state: {
+          data: event
+        },
+      });
     } else {
       // If the branches don't match, display an informative message using SweetAlert
       Swal.fire({

@@ -5,6 +5,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { DeliveryMrGeneration } from 'src/assets/FormControls/DeliveryMr';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 
 @Component({
   selector: 'app-delivery-mr-generation-modal',
@@ -59,6 +60,7 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     data["consignmentNoteNumber"] = this.objResult.Details.data.consignmentNoteNumber
     data["payBasis"] = this.objResult.Details.data.payBasis
     data["subTotal"] = this.objResult.Details.data.subTotal
+    clearValidatorsAndValidate(this.MrGenerationForm)
     this.dialogRef.close(data)
   }
 

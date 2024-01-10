@@ -6,9 +6,16 @@
             (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true" submit='Submit'>
         </app-form-webxpress>
     </form>
+    <div *ngIf="tableload" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [FormTitle]="'Delivery MR Generation List'" [tableData]="tableData" [menuItems]="menuItems"
-        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag"
+        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" [TitleBoxData]="TotalAmountList"
         (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag">
     </app-generic-table-v2>
     <div class="row">
@@ -24,10 +31,9 @@
         <div class="col-6">
             <form [formGroup]="billingForm">
                 <app-form-webxpress [form]="billingForm" [FormTitle]="'Bill Summary'"
-                    [formData]="jsonControlBillingArray"
-                    (functionCallEmitter)="functionCallHandler($event)"
-                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '"
-                    (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    [formData]="jsonControlBillingArray" (functionCallEmitter)="functionCallHandler($event)"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>
@@ -40,7 +46,7 @@
                     tableData.length==0" class="msr-3" mat-raised-button color="primary"
                     (click)="Submit()">Submit</button>
                 <button mat-button (click)="RedirectToTHCPayment()">Back</button> -->
-                <button mat-button mat-raised-button color="primary">Submit</button>
+                <button mat-button mat-raised-button color="primary" (click)="submit()">Submit</button>
             </div>
         </div>
     </div>

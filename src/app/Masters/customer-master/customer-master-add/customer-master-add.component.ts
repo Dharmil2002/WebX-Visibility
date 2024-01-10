@@ -9,7 +9,7 @@ import { Router } from "@angular/router";
 import { customerModel } from "src/app/core/models/Masters/customerMaster";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
@@ -211,9 +211,12 @@ export class CustomerMasterAddComponent implements OnInit {
   //#endregion
 
   ngOnInit(): void {
+
+    if (this.isUpdate) {
+      this.setcustomerGroup(this.customerTable?.customerGroup);
+    }
     this.bindDropdown();
     this.bindGSTDropdown();
-    this.getCustomerGroupDropdown();
     this.getCustomerCategoryDropdown();
     this.getPinCode();
     this.getDataAndPopulateForm();
@@ -221,6 +224,7 @@ export class CustomerMasterAddComponent implements OnInit {
     this.backPath = "/Masters/CustomerMaster/CustomerMasterList";
     // this.getImage();
   }
+
 
   bindGSTDropdown() {
     this.jsonControlGSTArray.forEach((data) => {
@@ -710,7 +714,7 @@ export class CustomerMasterAddComponent implements OnInit {
       customerGroup: this.customerTableForm.value.customerGroup.name,
       activeFlag: this.customerTableForm.value.activeFlag,
       BlackListed: this.customerTableForm.value.BlackListed,
-      _id: `${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
+      _id: `${this.companyCode}-${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
         }-${this.customerTableForm.value.customerName.replaceAll(/ /g, "").substring(
           0,
           4
@@ -948,14 +952,14 @@ export class CustomerMasterAddComponent implements OnInit {
 
   // Uplod PAN card
   async selectedFilePanCardScan(data) {
- const allowedFormats = ["jpeg", "png", "jpg"];
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray,allowedFormats);
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray, allowedFormats);
   }
 
   // MSME Scan
   async selectedFileMSMEScan(data) {
-     const allowedFormats = ["jpeg", "png", "jpg"];
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray,allowedFormats);
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray, allowedFormats);
   }
 
   //#region to preview image
@@ -968,4 +972,79 @@ export class CustomerMasterAddComponent implements OnInit {
     });
   }
   //#endregion
+
+  async getcustomerGroup() {
+
+    const cValue = this.customerTableForm.controls["customerGroup"].value;
+    // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+    if (cValue.length >= 3) {
+      const filter = { groupName: { 'D$regex': `^${cValue}`, 'D$options': 'i' } }
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "customerGroup_detail",
+        filter: filter,
+      };
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req))
+      if (res && res.success) {
+        const dropdownData = res.data.map((x) => {
+          return {
+            name: x.groupName,
+            value: x.groupCode,
+          };
+        });
+        this.filter.Filter(
+          this.jsonControlCustomerArray,
+          this.customerTableForm,
+          dropdownData,
+          this.customerGroup,
+          this.customerGroupStatus
+        );
+      }
+    }
+  }
+  async setcustomerGroup(value) {
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "customerGroup_detail",
+      filter: { groupName: value },
+    };
+
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req))
+    if (res && res.success) {
+      const dropdownData = res.data.map((x) => {
+        return {
+          name: x.groupName,
+          value: x.groupCode,
+        };
+      });
+      res.data.forEach((x) => {
+        if (x.groupName == this.customerTable.customerGroup) {
+          this.customerTableForm.controls["customerGroup"].setValue({
+            name: x.groupName,
+            value: x.groupCode,
+          });
+        }
+      });
+
+
+      this.filter.Filter(
+        this.jsonControlCustomerArray,
+        this.customerTableForm,
+        dropdownData,
+        this.customerGroup,
+        this.customerGroupStatus
+      );
+    }
+    // For setting image data, assuming you have imageData defined
+    Object.keys(this.imageData).forEach((controlName) => {
+      const url = this.imageData[controlName];
+      const fileName = this.objImageHandling.extractFileName(url);
+      // Set the form control value using the control name
+      this.customerTableForm.controls[controlName].setValue(fileName);
+
+      //setting isFileSelected to true
+      const control = this.jsonControlCustomerArray.find(x => x.name === controlName);
+      control.additionalData.isFileSelected = false
+    });
+  }
 }

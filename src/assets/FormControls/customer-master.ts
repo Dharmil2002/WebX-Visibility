@@ -28,6 +28,9 @@ export class customerControl {
         additionalData: {
           showNameAndValue: true,
         },
+        functions: {
+          onModel: "getcustomerGroup",
+        },
       },
 
       {
@@ -353,7 +356,7 @@ export class customerControl {
         Validations: [],
         additionalData: {
           isFileSelected: true
-      },
+        },
         functions: {
           onChange: "selectedFileMSMEScan",
         },

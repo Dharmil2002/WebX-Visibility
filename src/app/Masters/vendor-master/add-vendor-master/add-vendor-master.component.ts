@@ -118,7 +118,7 @@ export class AddVendorMasterComponent implements OnInit {
 
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      
+
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
 
       this.action = 'edit';
@@ -209,22 +209,22 @@ export class AddVendorMasterComponent implements OnInit {
   async getDropDownData() {
     this.vendorTypeData = await PayBasisdetailFromApi(this.masterService, 'VENDTYPE')
     if (this.isUpdate) {
-      const vendType= this.vendorTabledata.vendorType;
-      if(vendType){
-      let foundObject = this.vendorTypeData.find(x =>
-        x.name.toLowerCase() === vendType.toLowerCase() ||
-        x.value.toLowerCase() === vendType.toLowerCase()
-      );
-      if (foundObject) {
-        this.vendorTableForm.controls.vendorType.setValue(foundObject);
+      const vendType = this.vendorTabledata.vendorType;
+      if (vendType) {
+        let foundObject = this.vendorTypeData.find(x =>
+          x.name.toLowerCase() === vendType.toLowerCase() ||
+          x.value.toLowerCase() === vendType.toLowerCase()
+        );
+        if (foundObject) {
+          this.vendorTableForm.controls.vendorType.setValue(foundObject);
+        }
+        const vendorLoc = this.vendorTabledata.vendorLocation.map((x) => { return { name: x, value: x } })
+        this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(vendorLoc);
+        this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, vendorLoc, this.vLocation, this.vLocationStatus);
+        const pincode = this.vendorTabledata.vendorPinCode ? { name: this.vendorTabledata.vendorPinCode, value: this.vendorTabledata.vendorPinCode } : "";
+        this.vendorTableForm.controls.vendorPinCode.setValue(pincode);
       }
-      const vendorLoc = this.vendorTabledata.vendorLocation.map((x) => { return { name: x, value: x } })
-      this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(vendorLoc);
-      this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, vendorLoc, this.vLocation, this.vLocationStatus);
-      const pincode = this.vendorTabledata.vendorPinCode ? { name: this.vendorTabledata.vendorPinCode, value: this.vendorTabledata.vendorPinCode } : "";
-      this.vendorTableForm.controls.vendorPinCode.setValue(pincode);
-    }
-    this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, this.vendorTypeData, this.vendorType, this.vendorTypeStatus);
+      this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, this.vendorTypeData, this.vendorType, this.vendorTypeStatus);
       // For setting image data, assuming you have imageData defined
       if (this.imageData) {
         Object.keys(this.imageData).forEach((controlName) => {
@@ -270,13 +270,13 @@ export class AddVendorMasterComponent implements OnInit {
           return false;
         }
       });
-    } 
-    else{
-     await this.saveVendorDetails()
     }
- 
+    else {
+      await this.saveVendorDetails()
+    }
+
   }
-  async saveVendorDetails(){
+  async saveVendorDetails() {
     this.isSubmit = true;
     clearValidatorsAndValidate(this.otherDetailForm)
     clearValidatorsAndValidate(this.vendorTableForm)
@@ -351,13 +351,13 @@ export class AddVendorMasterComponent implements OnInit {
         // Function to generate a new route code
         function generateVendorCode(initialCode: number = 0) {
           const nextVendorCode = initialCode + 1;
-          const vendorNumber = nextVendorCode.toString().padStart(4, '0');
+          const vendorNumber = nextVendorCode.toString().padStart(5, '0');
           const vendorCode = `V${vendorNumber}`;
           return vendorCode;
         }
         this.newVendorCode = generateVendorCode(lastVendorCode);
         data.vendorCode = this.newVendorCode;
-        data._id =`${this.companyCode}-${this.newVendorCode}`;
+        data._id = `${this.companyCode}-${this.newVendorCode}`;
         data['eNTDT'] = new Date()
         data['eNTLOC'] = localStorage.getItem("Branch")
         const newData = this.tableData.map(x => {
@@ -391,12 +391,12 @@ export class AddVendorMasterComponent implements OnInit {
   async getGstPincode() {
     const stateName = this.otherDetailForm.value.gstState;
     const stateDataByName = await this.objState.fetchStateByFilterId(stateName, 'STNM'); // for filter by STNM
-    this.objPinCodeService.getPincodes(this.otherDetailForm,this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus,'', stateDataByName[0].ST);
+    this.objPinCodeService.getPincodes(this.otherDetailForm, this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus, '', stateDataByName[0].ST);
   }
   //#region to Set the vendor's city and state based on the provided PIN code
   async setStateCityData() {
-    
-    const{allData}=this.vendorTableForm.controls.vendorPinCode.value
+
+    const { allData } = this.vendorTableForm.controls.vendorPinCode.value
     try {
       // Set the vendor's city
       this.vendorTableForm.controls.vendorCity.setValue(allData.CT);
@@ -416,7 +416,7 @@ export class AddVendorMasterComponent implements OnInit {
   }
 
   getPincode() {
-    this.objPinCodeService.getPincodes(this.vendorTableForm,this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
+    this.objPinCodeService.getPincodes(this.vendorTableForm, this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
   }
   // Set the GST state based on the provided GST number
   async setState() {
@@ -435,7 +435,7 @@ export class AddVendorMasterComponent implements OnInit {
   // Set the GST city based on the provided GST pincode
   setGSTCity() {
     try {
-      const {allData} = this.otherDetailForm.controls.gstPincode.value
+      const { allData } = this.otherDetailForm.controls.gstPincode.value
 
       // Set the GST city
       this.otherDetailForm.controls.gstCity.setValue(allData.CT);
@@ -581,7 +581,7 @@ export class AddVendorMasterComponent implements OnInit {
       this.otherDetailForm.controls['gstNumber'].setValue(data.data?.gstNumber || "");
       this.otherDetailForm.controls['gstState'].setValue(data.data?.gstState || "");
       this.otherDetailForm.controls['gstAddress'].setValue(data.data?.gstAddress || "");
-      this.otherDetailForm.controls.gstPincode.setValue({name:data.data.gstPincode,value: data.data.gstPincode});
+      this.otherDetailForm.controls.gstPincode.setValue({ name: data.data.gstPincode, value: data.data.gstPincode });
       this.otherDetailForm.controls['gstCity'].setValue(data.data?.gstCity || "");
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }

@@ -68,7 +68,7 @@ export class UserMaster {
       this.internalId = UserMaster.empId || "";
       this.userRole = UserMaster.userRole || "";
       this.userType = UserMaster.userType || "";
-      this.isActive = UserMaster.isActive || false;
+      this.isActive = UserMaster.isActive || true;
       this.address = UserMaster.address || "";
       this.department = UserMaster.department || "";
       this.entryBy = UserMaster.entryBy || "";

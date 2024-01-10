@@ -35,6 +35,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() Link;
   @Input() toggleArray;
   @Input() dynamicControls;
+  @Input() hyperlinkControls;
   @Input() menuItems: any;
   @Input() menuItemFlag;
   @Output() menuItemClicked = new EventEmitter<any>();
@@ -61,6 +62,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   selectedItems: any[] = [];
   @Input() centerAligned;
   @Input() columnWidths: { [key: string]: string };
+  @Output() functionCallEmitter = new EventEmitter();
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
@@ -360,5 +362,8 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       return 'matcolumncenter';
     }
     return 'matcolumnleft';
+  }
+  hyperlinkFunction(functionName,data){
+    this.functionCallEmitter.emit({ functionName, data })
   }
 }

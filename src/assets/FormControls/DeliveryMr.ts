@@ -50,6 +50,11 @@ export class DeliveryMrGeneration {
                 Validations: [{
                     name: "required",
                     message: "Contact Number is required",
+                },
+                {
+                    name: "pattern",
+                    message: "Please enter 10 digit Contact number",
+                    pattern: "^[0-9]{10,12}$",
                 },]
             },
             {
@@ -70,93 +75,6 @@ export class DeliveryMrGeneration {
             }
         ]
         this.deliveryMrDetailsControlArray = [
-            // {
-            //     name: 'consignmentNoteNumber',
-            //     label: 'Consignment Note Number',
-            //     placeholder: 'Consignment Note Number',
-            //     type: 'government-id',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [
-            //         {
-            //             name: "required",
-            //             message: "Consignment Note Number is required",
-            //         },
-            //         // {
-            //         //     name: "pattern",
-            //         //     message: "Please Enter only positive numbers with up to two decimal places",
-            //         //     pattern: '^\\d+(\\.\\d{1,2})?$'
-            //         // }
-            //     ]
-            // },
-            // // {
-            // //     name: "PayBasis",
-            // //     label: "PayBasis",
-            // //     placeholder: "PayBasis",
-            // //     type: "dropdown",
-            // //     value: "",
-            // //     filterOptions: "",
-            // //     displaywith: "",
-            // //     generatecontrol: true,
-            // //     disable: false,
-            // //     Validations: [
-            // //         {
-            // //             name: "required",
-            // //             message: "PayBasis is required"
-            // //         },
-            // //         {
-            // //             name: "invalidAutocompleteObject",
-            // //             message: "Choose proper value",
-            // //         },
-            // //         {
-            // //             name: "autocomplete",
-            // //         },
-            // //     ],
-            // //     additionalData: {
-            // //         showNameAndValue: false,
-            // //         //metaData: "Basic"
-            // //     },
-            // //     functions: {
-            // //         onOptionSelect: "PayBasisFieldChanged"
-            // //     },
-            // // },
-            // {
-            //     name: 'payBasis',
-            //     label: 'PayBasis',
-            //     placeholder: 'PayBasis',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [
-            //     //     {
-            //     //     name: "pattern",
-            //     //     message: "Please Enter only positive numbers with up to two decimal places",
-            //     //     pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     // }
-            // ]
-            // },
-            // {
-            //     name: 'subTotal',
-            //     label: 'SubTotal(₹)',
-            //     placeholder: 'SubTotal',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [
-            //         {
-            //             name: "required",
-            //             message: "SubTotal is required",
-            //         },
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter only positive numbers with up to two decimal places",
-            //             pattern: '^\\d+(\\.\\d{1,2})?$'
-            //         }
-            //     ]
-            // },
             {
                 name: 'newSubTotal',
                 label: 'NewSubTotal(₹)',
@@ -176,160 +94,7 @@ export class DeliveryMrGeneration {
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }
                 ]
-            },
-            // {
-            //     name: 'rateDifference',
-            //     label: 'Rate Difference(₹)',
-            //     placeholder: 'Rate Difference',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Rate Difference is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'doorDelivery',
-            //     label: 'Door Delivery(₹)',
-            //     placeholder: 'Door Delivery',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Door Delivery is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'demmurage',
-            //     label: 'Demmurage(₹)',
-            //     placeholder: 'Demmurage',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Demmurage is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'loadingCharge',
-            //     label: 'Loading Charge(₹)',
-            //     placeholder: 'Loading Charge',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Loading Charge is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'unLoadingCharge',
-            //     label: 'UnLoading Charge(₹)',
-            //     placeholder: 'UnLoading Charge',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Unloading charge is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'forclipCharge',
-            //     label: 'Forclip Charge(₹)',
-            //     placeholder: 'Forclip Charge',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "ForClip Charge is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'gatepassCharge',
-            //     label: 'Gatepass Charge(₹)',
-            //     placeholder: 'Gatepass Charge',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Gatepass Charge is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
-            // {
-            //     name: 'otherCharge',
-            //     label: 'Other Charge(₹)',
-            //     placeholder: 'Other Charge',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "required",
-            //         message: "Other Charge is required",
-            //     }, {
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }],
-            //     functions: {
-            //         onChange: "getTotal"
-            //     },
-            // },
-            // {
-            //     name: 'totalAmount',
-            //     label: 'TotalAmount(₹)',
-            //     placeholder: 'TotalAmount',
-            //     type: 'text',
-            //     value: '',
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [{
-            //         name: "pattern",
-            //         message: "Please Enter only positive numbers with up to two decimal places",
-            //         pattern: '^\\d+(\\.\\d{1,2})?$'
-            //     }]
-            // },
+            }
         ]
         this.deliveryMrPaymentModeArray = [
             {
@@ -478,7 +243,7 @@ export class DeliveryMrGeneration {
                 label: "On Account",
                 placeholder: "On Account",
                 type: "checkbox",
-                value: '',
+                value: false,
                 generatecontrol: true,
                 disable: false,
                 Validations: []
@@ -577,26 +342,26 @@ export class DeliveryMrGeneration {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                  {
-                    name: "required",
-                    message: "SAC Code is required"
-                  },
-                  {
-                    name: "invalidAutocompleteObject",
-                    message: "Choose proper value",
-                  },
-                  {
-                    name: "autocomplete",
-                  },
+                    {
+                        name: "required",
+                        message: "SAC Code is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
                 ],
                 additionalData: {
-                  showNameAndValue: true,
-                  metaData: "Basic"
+                    showNameAndValue: true,
+                    metaData: "Basic"
                 },
                 functions: {
-                  onOptionSelect: "SACCodeFieldChanged"
+                    onOptionSelect: "SACCodeFieldChanged"
                 },
-              },
+            },
             {
                 name: "GSTRate",
                 label: "GST Rate",
@@ -605,12 +370,7 @@ export class DeliveryMrGeneration {
                 value: '',
                 generatecontrol: true,
                 disable: true,
-                Validations: [
-                    //     {
-                    //     name: "required",
-                    //     message: "Billing Party is required"
-                    // },
-                ]
+                Validations: []
             },
             {
                 name: "GSTAmount",
@@ -682,16 +442,6 @@ export class DeliveryMrGeneration {
                 Validations: []
             },
             {
-                name: "GSTCharged",
-                label: "GST Charged",
-                placeholder: "GST Charged",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
                 name: "DeliveryMRNetAmount",
                 label: "Delivery MR Net Amount",
                 placeholder: "Delivery MR Net Amount",
@@ -710,20 +460,30 @@ export class DeliveryMrGeneration {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    //     {
-                    //     name: "required",
-                    //     message: "Billing Party is required"
-                    // },
+                    {
+                        name: "required",
+                        message: "Collection Amount is required"
+                    },
                 ]
+            },
+            {
+                name: "GSTCharged",
+                label: "GST Charged",
+                placeholder: "GST Charged",
+                type: "checkbox",
+                value: false,
+                generatecontrol: true,
+                disable: true,
+                Validations: []
             },
             {
                 name: "PartiallyCollected ",
                 label: "Partially Collected ",
                 placeholder: "Partially Collected ",
                 type: "checkbox",
-                value: '',
+                value: false,
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: []
             },
             {
@@ -731,9 +491,9 @@ export class DeliveryMrGeneration {
                 label: "Round Off",
                 placeholder: "Round Off",
                 type: "checkbox",
-                value: '',
+                value: false,
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: []
             },
         ]

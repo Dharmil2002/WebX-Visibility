@@ -64,7 +64,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: isUpdate?true:false,
+        disable: false,
         Validations: [
           {
             name: "autocomplete",
@@ -95,7 +95,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: isUpdate?true:false,
+        disable:false,
         Validations: [
           {
             name: "autocomplete",
@@ -126,7 +126,7 @@ export class LocationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: isUpdate?true:false,
+        disable:false,
         Validations: [
           {
             name: "autocomplete",
@@ -257,7 +257,7 @@ export class LocationControl {
         functions: {
           onOptionSelect: "getStateDetails",
         },
-      },
+      },      
       {
         name: "locAddr",
         label: "Address",
@@ -486,7 +486,20 @@ export class LocationControl {
         Validations: [],
         generatecontrol: false,
         disable: false,
-    }
+      },
+      {
+        name: "locStateId",
+        label: "State",
+        placeholder: "Select State",
+        type: "text",
+        value: LocationTable.locStateId,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: []
+      },
     ])
   }
   getFormControlsLocation() {

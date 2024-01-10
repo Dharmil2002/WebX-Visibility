@@ -43,6 +43,11 @@ export class DepartVehicleComponent implements OnInit {
     //csv: true
   };
   linkArray = [{ Row: "Shipments", Path: "Operation/LoadingSheetView" }];
+
+  hyperlinkControls={
+    value:"manifest",
+    functionName:"viewMenifest"
+  }
   //declaring breadscrum
   breadscrums = [
     {
@@ -73,7 +78,7 @@ export class DepartVehicleComponent implements OnInit {
   menifestTableData: any[];
   columnHeader = {
     leg: "Leg",
-    manifest: "Manifest",
+    hyperlink: "Manifest",
     shipments_lb: "Shipments",
     packages_lb: "Packages",
     weight_kg: "Weight Kg",
@@ -617,7 +622,7 @@ export class DepartVehicleComponent implements OnInit {
     Swal.fire({
       icon: "success",
       title: "Successful",
-      text: `Vehicle is departed`,//
+      text: `Vehicle is departed`,
       showConfirmButton: true,
     })
       this.goBack('Departures');
@@ -634,4 +639,12 @@ export class DepartVehicleComponent implements OnInit {
   // await Promise.all(updatePromises);
 
   // }
+  viewMenifest(event){
+    const req = {
+      templateName: "Manifest View-Print",
+      DocNo: event.data?.manifest,
+    };
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, '', 'width=1000,height=800');
+  }
 }

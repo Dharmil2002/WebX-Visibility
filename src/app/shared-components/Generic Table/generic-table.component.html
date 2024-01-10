@@ -124,6 +124,10 @@
                                         class="tbl-action-btn">
                                         <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
                                     </button>
+                                    <!-- <a ></a> -->
+                                    <div *ngIf="tableData=='hyperlink'">
+                                        <div style="color: #36cbe9; font-weight: bolder; text-decoration: underline;" class="pointer" (click)="hyperlinkFunction(hyperlinkControls.functionName,element)">{{element[hyperlinkControls.value]}}</div>
+                                    </div>
                                 </mat-cell>
                             </ng-container>
 

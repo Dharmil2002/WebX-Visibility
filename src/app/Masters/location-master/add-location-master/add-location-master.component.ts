@@ -148,6 +148,7 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
+    
     this.locationFormControls = new LocationControl(
       this.locationTable,
       this.isUpdate,
@@ -160,7 +161,7 @@ export class AddLocationMasterComponent implements OnInit {
       this.jsonControlLocationArray,
     ]);
     if (this.isUpdate) {
-      this.CheckHQTR(this.locationTable.locCode);
+      this.CheckHQTR(this.locationTable.locLevel);
     }
   }
   //#endregion
@@ -284,13 +285,10 @@ export class AddLocationMasterComponent implements OnInit {
       }
     } else {
       this.locationTableForm.removeControl("pincodeHandler");
-      if (
-        locLevel.name === "Head Office" &&
-        reportLevel.name === "Head Office"
-      ) {
+      if ( locLevel.value === 1 ) {
         // Reset form controls and show an error message
         this.locationTableForm.patchValue({
-          locLevel: "",
+          locLevel: 1,
           reportLevel: "",
         });
         Swal.fire({
@@ -306,9 +304,10 @@ export class AddLocationMasterComponent implements OnInit {
       data["eNTDT"] = new Date();
       data["eNTLOC"] = this.storage.branch;
       data["eNTBY"] = this.storage.userName;
+
       // Create a new record
-      data["_id"] = this.companyCode+this.locationTableForm.controls["locCode"].value;
-      if(this.locationTableForm.value.locCode=="HQTR"){
+      data["_id"] = `${this.companyCode}-${data["locCode"]}`;
+      if(data["locLevel"] == 1 ){
         data["reportLevel"] = "";
         data["reportLoc"] = "";
       }
@@ -426,13 +425,15 @@ export class AddLocationMasterComponent implements OnInit {
       "ST"
     );
     this.locationTableForm.controls.locState.setValue(stateName[0].STNM);
+    this.locationTableForm.controls.locStateId.setValue(stateName[0].ST);
     this.locationTableForm.controls.locCity.setValue(allData.CT);
+    this.locationTableForm.controls['gstNumber'].setValue("");
     this.getStateDetails();
   }
   //#endregion
 
   setReportLevelData(event) {
-    
+      
     if (this.isUpdate) {
       const reportLevel = this.hierachy.find(
         (x) => x.value == this.locationTable.reportLevel
@@ -441,6 +442,25 @@ export class AddLocationMasterComponent implements OnInit {
       const reportLoc=this.locationTable.reportLoc?{name:this.locationTable.reportLoc,value:this.locationTable.reportLoc}:"";
       this.locationTableForm.controls.reportLoc.setValue(reportLoc);
     }
+    if(this.locationTableForm.controls.locLevel.value.value == 1 && parseInt(this.locationTable.locLevel) != 1) {
+      this.locationService.locationFromApi({ locLevel: this.locationTableForm.controls.locLevel.value.value })
+      .then((data)=>{
+        const isValueExist = data.length > 0;
+        if (isValueExist) {
+          Swal.fire({
+            icon: "error",
+            title: "error",
+            text: `${this.locationTableForm.controls.locLevel.value.name} already exists!`,
+            showConfirmButton: true,
+          });
+    
+          // Reset the input field
+          this.locationTableForm.controls["locLevel"].setValue(0);
+          this.CheckHQTR(this.locationTableForm.value.locLevel.value);
+        }
+      });
+    }
+
     this.filter.Filter(
       this.jsonControlLocationArray,
       this.locationTableForm,
@@ -448,10 +468,11 @@ export class AddLocationMasterComponent implements OnInit {
       this.reportLoc,
       this.reportLocStatus
     );
-    
+
+    this.CheckHQTR(this.locationTableForm.value.locLevel.value);
   }
   async getReportLocation() {
-    const data= await this.locationService.locationFromApi({locCode: {'D$regex' : `^${this.locationTableForm.controls.reportLoc.value}`,'D$options' : 'i'} ,reportLevel: this.locationTableForm.controls.reportLevel.value.value})
+    const data= await this.locationService.locationFromApi({locCode: {'D$regex' : `^${this.locationTableForm.controls.reportLoc.value}`,'D$options' : 'i'} ,locLevel: parseInt(this.locationTableForm.controls.reportLevel.value.value)})
     this.filter.Filter(
       this.jsonControlLocationArray,
       this.locationTableForm,
@@ -545,8 +566,7 @@ export class AddLocationMasterComponent implements OnInit {
         showConfirmButton: true,
       });
       this.locationTableForm.controls.locCode.setValue("");
-    }
-    this.CheckHQTR(this.locationTableForm.value.locCode.toUpperCase());
+    }    
   }
   async checkLocName() {
     await this.checkValueExists("locName", "Location Name");
@@ -557,7 +577,7 @@ export class AddLocationMasterComponent implements OnInit {
   //#endregion
 
   CheckHQTR(value) {
-    if (value == "HQTR") {
+    if (value == 1) {
       this.jsonControlLocationArray.forEach((x) => {
         if (x.name == "reportLevel" || x.name == "reportLoc") {
           x.disable = true;
@@ -573,15 +593,15 @@ export class AddLocationMasterComponent implements OnInit {
         .setValidators(autocompleteObjectValidator());
       this.locationTableForm.get("locLevel").updateValueAndValidity();
     } else {
-      this.jsonControlLocationArray.forEach((x) => {
-        if (x.name == "reportLevel" || x.name == "reportLoc") {
-          if (this.isUpdate) {
-            x.disable = true;
-          } else {
-            x.disable = false;
-          }
-        }
-      });
+      // this.jsonControlLocationArray.forEach((x) => {
+      //   if (x.name == "reportLevel" || x.name == "reportLoc") {
+      //     if (this.isUpdate) {
+      //       x.disable = true;
+      //     } else {
+      //       x.disable = false;
+      //     }
+      //   }
+      // });
       this.locationTableForm
         .get("reportLevel")
         .setValidators([Validators.required, autocompleteObjectValidator()]);
@@ -780,16 +800,9 @@ export class AddLocationMasterComponent implements OnInit {
   async validateState() {
     try {
       const gstNumber = this.locationTableForm.value.gstNumber;
-      let filterId = gstNumber.substring(0, 2);
-      filterId = parseInt(filterId);
-      // Fetch the GST state name based on the state code
-      const stateName = await this.objState.fetchStateByFilterId(
-        filterId,
-        "ST"
-      );
-      const locState = stateName[0].STNM;
-      const gstState = this.locationTableForm.value.locState;
-
+      let gstState = gstNumber.substring(0, 2);
+      gstState = parseInt(gstState);
+      const locState = this.locationTableForm.value.locStateId;
       if (locState !== gstState) {
         Swal.fire({
           icon: "warning",

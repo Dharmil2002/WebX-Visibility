@@ -121,22 +121,6 @@
       "router": "Masters/StateMaster/AddState"
     },
     {
-      "title": "CityMaster/CityMasterView",
-      "tag": [
-        "CityMaster",
-        "CityMasterView"
-      ],
-      "router": "Masters/CityMaster/CityMasterView"
-    },
-    {
-      "title": "CityMaster/AddCity",
-      "tag": [
-        "CityMaster",
-        "AddCity"
-      ],
-      "router": "Masters/CityMaster/AddCity"
-    },
-    {
       "title": "DriverMaster/DriverMasterList",
       "tag": [
         "DriverMaster",

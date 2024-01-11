@@ -91,6 +91,7 @@ import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.comp
 import { ListContainerComponent } from './Container Master/list-container/list-container.component';
 import { AddContainerComponent } from './Container Master/add-container/add-container.component';
 import { ViewPrintComponent } from './view-print/view-print.component';
+import { ProductListComponent } from './shard-product/product-list/product-list.component';
 
 
 const routes: Routes = [
@@ -174,7 +175,7 @@ const routes: Routes = [
 
   //Product Master Router
   { path: "ProductMaster/ListProduct", component: ListProductComponent },
-  { path: "ProductMaster/shardProductList", component: ShardProductComponent },
+  // { path: "ProductMaster/shardProductList", component: ShardProductComponent },
 
   //Account Master Router
   { path: "AccountMaster/AccountMasterList", component: AccountMasterComponent },
@@ -202,6 +203,7 @@ const routes: Routes = [
   { path: "ContainerMaster/ListContainer", component: ListContainerComponent },
 
 
+  { path: "shardProduct/shardProductList", component: ProductListComponent },
 ];
 
 @NgModule({

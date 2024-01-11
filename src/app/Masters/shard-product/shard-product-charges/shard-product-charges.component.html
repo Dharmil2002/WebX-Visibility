@@ -1,0 +1,62 @@
+<div>
+    <ul class="m-0" style="padding-left: 10px; display: flex; justify-content: space-between;">
+        <li style=" font-weight: 700; font-size: 1.5rem; list-style: none;">
+            {{chargesTypeTitle}}
+        </li>
+        <li style="margin-bottom: 5px; border-radius: 50px; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center; margin-right: 10px; cursor: pointer; background-color: rgba(0,0,0,0.1);"
+            (click)="close()">
+            <mat-icon fontIcon="close"></mat-icon>
+        </li>
+    </ul>
+    <div class="row mx-auto"
+        style="background: linear-gradient(to right, rgba(0, 0, 0,0.1) , white); width: 100%; border-bottom: 1px solid rgba(0, 0, 0, 0.1);border-top: 1px solid rgba(0, 0, 0, 0.1);">
+        <div class="col-8 my-auto">
+            <div class="m-0 p-0" style="display: flex;">
+                <p class="m-0 p-0"> Product ID: </p>
+                <p class="m-0 p-0 px-1"> <b>{{ProductId}}</b></p>
+            </div>
+            <div class="m-0 p-0" style="display: flex;">
+                <p class="m-0 p-0"> Product Name: </p>
+                <p class="m-0 p-0 px-1"><b> {{ProductName}} </b></p>
+            </div>
+        </div>
+    </div>
+    <div class="table">
+        <div *ngIf="!TableLoad" class="d-flex justify-content-center align-items-center">
+            <!-- Bootstrap loader -->
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="listTable" *ngIf="!Tabletab && TableLoad">
+            <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+                [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)"
+                (DeleteFunction)="DeleteFunction($event)" [EventButton]="EventButton" [metaData]="metaData"
+                [staticField]="staticField">
+            </app-generic-table-v2>
+        </div>
+        <div class="addTab" *ngIf="Tabletab">
+            <div class="title" style="font-size: 18px; font-weight: 700; margin: 10px 0px 0px 10px ;">
+                {{addTitle}}
+            </div>
+            <div>
+                <div>
+                    <form [formGroup]="TableForm">
+                        <app-form-webxpress [form]="TableForm" [formData]="jsonControlArray"
+                            [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'" [showSaveAndCancelButton]="false"
+                            (callFunction)="functionCallHandler($event)"
+                            (functionCallEmitter)="functionCallHandler($event)">
+                        </app-form-webxpress>
+                    </form>
+                </div>
+                <div style="display: flex;">
+                    <button type="button" style="margin-right: 20px;" [disabled]="!TableForm.valid" mat-raised-button color="primary"
+                        (click)="save()">
+                        Submit
+                    </button>
+                    <button type="button" mat-raised-button mat-button (click)="Cancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

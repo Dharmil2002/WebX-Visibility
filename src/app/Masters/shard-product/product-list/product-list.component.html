@@ -1,0 +1,14 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <div *ngIf="!isTableLode" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <div *ngIf="isTableLode">
+    <app-generic-table-v2  [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+      [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData" [menuItems]="menuItems"
+      [Link]="linkArray" [EventButton]="EventButton" [staticField]="staticField" >
+    </app-generic-table-v2>
+  </div>
+</app-common-wrapper-webxpress>

@@ -836,7 +836,7 @@
         "shard-Product",
         "shard-Product"
       ],
-      "router": "Masters/ProductMaster/shardProductList"
+      "router": "Masters/shardProduct/shardProductList"
     },
     {
       "title": "Reports/Vendor-Wise-GST-Invoice-Register-Report",

@@ -9,7 +9,6 @@ import { UserControl } from "src/assets/FormControls/userMaster";
 import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
-import { fi } from "date-fns/locale";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 
 @Component({
@@ -237,7 +236,6 @@ export class AddUserMasterComponent implements OnInit {
             return { name: x.codeDesc, value: x.codeId };
           }
         });
-
       //Code Type = 'usertyp'
       const userRoleList = userStatusResponse.data
         .filter((item) => item.codeType === "USERROLE" && item.activeFlag)
@@ -246,7 +244,6 @@ export class AddUserMasterComponent implements OnInit {
             return { name: x.codeDesc, value: x.codeId };
           }
         });
-
       //Code Type = 'DIVIS'
       this.divisionList = userStatusResponse.data
         .filter((item) => item.codeType === "DIVIS" && item.activeFlag)
@@ -256,36 +253,6 @@ export class AddUserMasterComponent implements OnInit {
           }
         });
 
-      if (this.isUpdate) {
-        const userLocation = locations.find(
-          (x) => x.value === this.userTable.branchCode
-        );
-        this.userTableForm.controls["branchCode"].setValue(userLocation);
-
-        const userType = userTypeList.find(
-          (x) => x.name === this.userTable.userType
-        );
-        this.userTableForm.controls["userType"].setValue(userType);
-
-        // Patches the Div control value of UserTableForm with filter
-        this.userTableForm.controls["division"].patchValue(
-          this.divisionList.filter((element) =>
-            this.userTable.multiDivisionAccess.includes(element.name)
-          )
-        );
-
-        const userRole = userRoleList.find(
-          (x) => x.name === this.userTable.role
-        );
-        this.userTableForm.controls["role"].setValue(userRole);
-
-        this.userTableForm.controls["userLocationscontrolHandler"].patchValue(
-          locations.filter((element) =>
-            this.userTable.multiLocation.includes(element.value)
-          )
-        );
-      }
-      
       this.filter.Filter(
         this.jsonControlUserArray,
         this.userTableForm,
@@ -322,7 +289,37 @@ export class AddUserMasterComponent implements OnInit {
         this.division,
         this.divisionStatus
       );
+      if (this.isUpdate) {
+        const userLocation = locations.find(
+          (x) => x.value === this.userTable.branchCode
+        );
+        this.userTableForm.controls["branchCode"].setValue(userLocation);
 
+        const userType = userTypeList.find(
+          (x) => x.name === this.userTable.userType
+        );
+        this.userTableForm.controls["userType"].setValue(userType);
+
+        // Patches the Div control value of UserTableForm with filter
+        if( this.userTable.multiDivisionAccess.length>0){
+        this.userTableForm.controls["division"].patchValue(
+          this.divisionList.filter((element) =>
+            this.userTable.multiDivisionAccess.includes(element.name)
+          )
+        );
+        }
+        const userRole = userRoleList.find(
+          (x) => x.name === this.userTable.role
+        );
+        this.userTableForm.controls["role"].setValue(userRole);
+        if( this.userTable.multiLocation.length>0){
+        this.userTableForm.controls["userLocationscontrolHandler"].patchValue(
+          locations.filter((element) =>
+            this.userTable.multiLocation.includes(element.value)
+          )
+        );
+        }
+      }
     } catch (error) {
       console.error("Error:", error);
     }
@@ -379,7 +376,7 @@ export class AddUserMasterComponent implements OnInit {
         companyCode: this.companyCode,
         collectionName: "user_master",
         filter: {
-          _id: this.userTable.emailId,
+          emailId: this.userTable.emailId,
         },
         update: data,
       };

@@ -18,15 +18,15 @@ export class DocketService {
             status: "",
             actions: [""],
         },
-        "0": {
+        "1": {
             status: "Booked",
             actions: ["Edit Docket"],
         },
-        "1": {
+        "2": {
             status: "Thc Generated",
             actions: [""],
         },
-        "2": {
+        "3": {
             status: "Delivered",
             actions: [""],
         }
@@ -87,7 +87,7 @@ export class DocketService {
             if (x.oRGN === orgBranch || (x.dEST == orgBranch && x.status == "2")) {
 
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
-                const statusInfo = this.statusMapping[x.fSTS] || this.statusMapping.default;
+                const statusInfo = this.statusMapping[x.oSTS] || this.statusMapping.default;
                 x.ftCity = `${x.fCT}-${x.tCT}`;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions;

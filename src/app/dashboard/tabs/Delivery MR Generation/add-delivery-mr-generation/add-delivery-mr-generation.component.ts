@@ -15,6 +15,7 @@ import { LocationService } from 'src/app/Utility/module/masters/location/locatio
 import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -159,6 +160,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   SACCodeList: any;
   TotalAmountList: { count: string; title: string; class: string; }[];
   headerDetails: any;
+  docketNo: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -166,11 +168,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private masterService: MasterService,
     private objLocationService: LocationService,
     private objStorageService: StorageService,
-    private operation: OperationService,) {
+    private operation: OperationService,
+    public snackBarUtilityService: SnackBarUtilityService,
+  ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
-      console.log(data);
-
+      //console.log(data.data.no);
+      this.docketNo = data.data.no;
     }
   }
 
@@ -214,6 +218,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.billingForm = formGroupBuilder(this.fb, [this.jsonControlBillingArray]);
     this.jsonControlPaymentArray = this.jsonControlPaymentArray.slice(0, 1);
     this.deliveryMrTableForm.controls['Deliveredto'].setValue("Receiver");
+    this.deliveryMrTableForm.controls['ConsignmentNoteNumber'].setValue(this.docketNo);
+    this.docketNo ? this.validateConsig() : null;
   }
   //#endregion
   //#region to add data in table
@@ -638,99 +644,109 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to save data to collection delivery_mr_header and delivery_mr_details
   async submit() {
-    const headerRequest = {
-      // _id
-      cID: this.objStorageService.companyCode,
-      // dLMRNO:
-      dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
-      dLVRT: this.headerDetails.Deliveredto,
-      cNTCTNO: this.headerDetails.ContactNumber,
-      rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
-      CONSGNM: this.headerDetails.NameofConsignee ? this.headerDetails.NameofConsignee : '',
-      mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
-      bNK: this.PaymentSummaryFilterForm.value.Bank.name,
-      cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo,
-      cHQDT: this.PaymentSummaryFilterForm.value.Date,
-      iSUBNK: this.PaymentSummaryFilterForm.value.issuedFromBank,
-      oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
-      dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
-      dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
-      bILNGPRT: this.billingForm.value.BillingParty,
-      bKNGST: this.billingForm.value.Stateofbooking,
-      sPLYSTNM: this.billingForm.value.StateofSupply.name,
-      sPLYSTCD: this.billingForm.value.StateofSupply.value,
-      sACCDNM: this.billingForm.value.SACCode.name,
-      sACCd: this.billingForm.value.SACCode.value,
-      gSTRT: this.billingForm.value.GSTRate,
-      gSTAMT: this.billingForm.value.GSTAmount,
-      tDSSCTCD: this.billingForm.value.TDSSection.value,
-      tDSSCTNM: this.billingForm.value.TDSSection.name,
-      tDSRT: this.billingForm.value.TDSRate,
-      tDSAmt: this.billingForm.value.TDSAmount,
-      gSTCHRGD: this.billingForm.value.GSTCharged,
-      dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
-      cLLCTAMT: this.billingForm.value.CollectionAmount,
-      pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
-      rNDOF: this.billingForm.value.RoundOff,
-      eNTDT: new Date(),
-      eNTLOC: this.objStorageService.branch,
-      eNTBY: this.objStorageService.userName 
-    }
-    // Prepare the request body with company code, collection name, and job detail data.
-    let reqBody = {
-      companyCode: this.objStorageService.companyCode,
-      collectionName: "delivery_mr_header",
-      docType: "MR",
-      branch: this.objStorageService.branch,
-      finYear: financialYear,
-      data: headerRequest
-    };
-    console.log(reqBody);
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const headerRequest = {
+          cID: this.objStorageService.companyCode,
+          dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
+          dLVRT: this.headerDetails.Deliveredto,
+          cNTCTNO: this.headerDetails.ContactNumber,
+          rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
+          CONSGNM: this.headerDetails.NameofConsignee ? this.headerDetails.NameofConsignee : '',
+          mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
+          bNK: this.PaymentSummaryFilterForm.value.Bank.name,
+          cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo,
+          cHQDT: this.PaymentSummaryFilterForm.value.Date,
+          iSUBNK: this.PaymentSummaryFilterForm.value.issuedFromBank,
+          oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
+          dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
+          dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
+          bILNGPRT: this.billingForm.value.BillingParty,
+          bKNGST: this.billingForm.value.Stateofbooking,
+          sPLYSTNM: this.billingForm.value.StateofSupply.name,
+          sPLYSTCD: this.billingForm.value.StateofSupply.value,
+          sACCDNM: this.billingForm.value.SACCode.name,
+          sACCd: this.billingForm.value.SACCode.value,
+          gSTRT: this.billingForm.value.GSTRate,
+          gSTAMT: this.billingForm.value.GSTAmount,
+          tDSSCTCD: this.billingForm.value.TDSSection.value,
+          tDSSCTNM: this.billingForm.value.TDSSection.name,
+          tDSRT: this.billingForm.value.TDSRate,
+          tDSAmt: this.billingForm.value.TDSAmount,
+          gSTCHRGD: this.billingForm.value.GSTCharged,
+          dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
+          cLLCTAMT: this.billingForm.value.CollectionAmount,
+          pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
+          rNDOF: this.billingForm.value.RoundOff,
+          eNTDT: new Date(),
+          eNTLOC: this.objStorageService.branch,
+          eNTBY: this.objStorageService.userName
+        }
+        const detailRequests = this.tableData.map(element => {
+          return {
+            cID: this.objStorageService.companyCode,
+            dOCNO: element.consignmentNoteNumber,
+            mLTPNTDLRY: element.Multipointdelivery,
+            dOC: element.Document,
+            iNSURNC: element.Insurance,
+            gRNTX: element.GreenTax,
+            dMRG: element.Demurrage,
+            dISCNT: element.Discount,
+            gST: element.GST,
+            uNLODNG: element.Unloading,
+            fRGHT: element.Freight,
+            lODNG: element.Loading,
+            //cNSGTNO:
+            pYBASIS: element.payBasis,
+            sUBTTL: element.subTotal,
+            nWSUBTTL: element.newSubTotal,
+            rTDFRNC: element.rateDifference,
+            //dORDLVRY:
+            // fRCLPCHRGE:
+            //   gTPSCHRG:
+            // oTHRCHRG:
+            tOTL: element.totalAmount,
+            eNTDT: new Date(),
+            eNTLOC: this.objStorageService.branch,
+            eNTBY: this.objStorageService.userName
 
-    // Send a POST request to create the job detail in the MongoDB collection.
-    const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
-    this.tableData.forEach(element => {
-      const detailRequest = {
-        // _id
-        cID: this.objStorageService.companyCode,
-        // dMRNO:
-        docType: "MR",
-        branch: this.objStorageService.branch,
-        finYear: financialYear,
-        //dMRNO:
-        dOCNO: element.consignmentNoteNumber,
-        mLTPNTDLRY: element.Multipointdelivery,
-        dOC: element.Document,
-        iNSURNC: element.Insurance,
-        gRNTX: element.GreenTax,
-        dMRG: element.Demurrage,
-        dISCNT: element.Discount,
-        gST: element.GST,
-        uNLODNG: element.Unloading,
-        fRGHT: element.Freight,
-        lODNG: element.Loading,
-        //cNSGTNO:
-        pYBASIS: element.payBasis,
-        sUBTTL: element.subTotal,
-        nWSUBTTL: element.newSubTotal,
-        rTDFRNC: element.rateDifference,
-        //dORDLVRY:
-        // fRCLPCHRGE:
-        //   gTPSCHRG:
-        // oTHRCHRG:
-        tOTL: element.totalAmount,
-        eNTDT: new Date(),
-        eNTLOC: this.objStorageService.branch,
-        eNTBY: this.objStorageService.userName
+          }
+        });
 
+        let data = {
+          chargeDetails: detailRequests,
+          ...headerRequest
+        };
+
+        // Prepare the request body with company code, collection name, and job detail data.
+        let reqBody = {
+          companyCode: this.objStorageService.companyCode,
+          //collectionName: "delivery_mr_header",
+          docType: "MR",
+          branch: this.objStorageService.branch,
+          finYear: financialYear,
+          data: data
+        };
+        console.log(reqBody);
+
+        // Send a POST request to create the job detail in the MongoDB collection.
+        const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Delivery MR Created Successfully",
+            text: "Delivery MR No: " + res?.data?.chargeDetails?.ops[0].dLMRNO,
+            showConfirmButton: true,
+          })
+        }
       }
-    });
-
-    // const requestBody = {
-    //   companyCode: this.objStorageService.companyCode,
-    //   filter: {},
-    //   collectionName: "state_master",
-    // };
+      catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          "Fail To Submit Data..!"
+        );
+      }
+    }, "Delivery MR Generating..!");
   }
   //#endregion
 }

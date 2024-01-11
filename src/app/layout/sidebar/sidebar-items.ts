@@ -167,16 +167,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
-            {
-              "path": "Masters/CityMaster/CityMasterView",
-              "title": "City master",
-              "moduleName": "City master",
-              "icon": "",
-              "class": "ml-menu",
-              "groupTitle": false,
-              "submenu": [
-              ]
-            },
+            // {
+            //   "path": "Masters/CityMaster/CityMasterView",
+            //   "title": "City master",
+            //   "moduleName": "City master",
+            //   "icon": "",
+            //   "class": "ml-menu",
+            //   "groupTitle": false,
+            //   "submenu": [
+            //   ]
+            // },
             {
               "path": "Masters/ClusterMaster/ClusterMasterList",
               "title": "Cluster Master",

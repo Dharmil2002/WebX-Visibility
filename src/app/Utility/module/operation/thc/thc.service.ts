@@ -97,12 +97,12 @@ export class ThcService {
         return docketList;
     }
 
-    async getShipment(vehicle = false) {
+    async getShipment(vehicle = false,filter = {}) {
 
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
-            filter: { oSTS: 1 }
+            filter:filter
         };
 
         // Perform an asynchronous operation to fetch data from the operation service

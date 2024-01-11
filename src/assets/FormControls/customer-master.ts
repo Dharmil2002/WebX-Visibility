@@ -148,10 +148,10 @@ export class customerControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "ERP code is required",
-          },
+          // {
+          //   name: "required",
+          //   message: "ERP code is required",
+          // },
           {
             name: "pattern",
             message: "Please Enter alphanumeric ERP code of length 4 to 100",
@@ -161,6 +161,26 @@ export class customerControl {
         functions: {
           onChange: "onChangeERPcode",
         },
+      },
+      {
+        name: "TANNumber",
+        label: "TAN Number",
+        placeholder: "TAN Number",
+        type: "text",
+        value: isUpdate ? customerTable.TANNumber : "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "TAN Number is required",
+          },
+          // {
+          //   name: "pattern",
+          //   message: "Please Enter alphanumeric ERP code of length 4 to 100",
+          //   pattern: "^[a-zA-Z0-9]{4,100}$",
+          // },
+        ],
       },
 
       {
@@ -237,12 +257,12 @@ export class customerControl {
             name: "required",
             message: "Registered Address is required",
           },
-          {
-            name: "pattern",
-            message:
-              "Please Enter alphanumeric Registered Address of length 4 to 100",
-            pattern: "^[a-zA-Z0-9,-/ ]{4,200}$",
-          },
+          // {
+          //   name: "pattern",
+          //   message:
+          //     "Please Enter alphanumeric Registered Address of length 4 to 500",
+          //   pattern: "^[a-zA-Z0-9,-/ ]{4,500}$",
+          // },
         ],
         functions: {},
       },
@@ -332,10 +352,10 @@ export class customerControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "MSME Number is required",
-          },
+          // {
+          //   name: "required",
+          //   message: "MSME Number is required",
+          // },
           {
             name: "pattern",
             message: "Please Enter alphanumeric MSME Number of length 4 to 100",

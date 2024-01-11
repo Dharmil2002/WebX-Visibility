@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { firstValueFrom } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 
 @Component({
   selector: "app-product-charges",
@@ -35,20 +36,25 @@ export class ProductChargesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    SelectCharges: {
+    sELCHA: {
       Title: "Select Charges",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
-    Add_Deduct: {
+    aDD_DEDU: {
       Title: "Add/Deduct",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
-    ChargesBehaviour: {
+    cHACAT: {
+      Title: "Charges Cat.",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    cHABEH: {
       Title: "Charges Behaviour",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
     VariabilityType: {
       Title: "Variability",
@@ -72,13 +78,7 @@ export class ProductChargesComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
 
-  staticField = [
-    "SrNo",
-    "VariabilityType",
-    "ChargesBehaviour",
-    "Add_Deduct",
-    "SelectCharges",
-  ];
+  staticField = ["SrNo", "VariabilityType", "cHABEH", "aDD_DEDU", "sELCHA" , "cHACAT"];
   tableData = [];
   ProductId: any;
   ProductName: any;
@@ -123,10 +123,10 @@ export class ProductChargesComponent implements OnInit {
     if (this.isUpdate) {
       // this.customerTableForm.controls.Add_Deduct.set
       this.customerTableForm.controls["Add_Deduct"].setValue(
-        this.UpdatedData.Add_Deduct
+        this.UpdatedData.aDD_DEDU
       );
       this.customerTableForm.controls["Variability"].setValue(
-        this.UpdatedData.Variability
+        this.UpdatedData.vAR
       );
     }
   }
@@ -147,7 +147,7 @@ export class ProductChargesComponent implements OnInit {
   async ChargesListDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: { pRCD: this.ProductId },
       collectionName: "charges",
     };
     const Res = await this.masterService
@@ -156,6 +156,7 @@ export class ProductChargesComponent implements OnInit {
     if (Res.success && Res.data.length > 0) {
       this.ChargesList = Res.data.map((x) => {
         return {
+          ...x,
           name: x.cHNM,
           value: x.cHCD,
         };
@@ -172,7 +173,7 @@ export class ProductChargesComponent implements OnInit {
 
       if (this.isUpdate) {
         const element = this.ChargesList.find(
-          (x) => x.name == this.UpdatedData.SelectCharges
+          (x) => x.name == this.UpdatedData.sELCHA
         );
         this.ChargesData.push(element);
         this.customerTableForm.controls["SelectCharges"].setValue(element);
@@ -204,7 +205,7 @@ export class ProductChargesComponent implements OnInit {
       });
       if (this.isUpdate) {
         const element = this.ChargesBehaviourList.find(
-          (x) => x.name == this.UpdatedData.ChargesBehaviour
+          (x) => x.name == this.UpdatedData.cHABEH
         );
         console.log("element", element);
         this.customerTableForm.controls["ChargesBehaviour"].setValue(element);
@@ -223,20 +224,20 @@ export class ProductChargesComponent implements OnInit {
     this.TableLoad = false;
     let req = {
       companyCode: this.companyCode,
-      filter: { ProductId: this.ProductId, ChargesType: this.selectedValue },
+      filter: { pRCD: this.ProductId, cHATY: this.selectedValue },
       collectionName: "product_charges_detail",
     };
 
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-    console.log("Res", Res);
+    console.log("product_charges_detail", Res);
     if (Res?.success) {
       this.tableData = Res?.data.map((x, index) => {
         return {
           ...x,
           SrNo: index + 1,
-          VariabilityType: x.Variability == "Y" ? "Define variability" : "",
+          VariabilityType: x.vAR == "Y" ? "Define variability" : "",
         };
       });
       this.TableLoad = true;
@@ -248,6 +249,7 @@ export class ProductChargesComponent implements OnInit {
   async save() {
     const Body = {
       sELCHA: this.customerTableForm.value.SelectCharges.name,
+      cHACAT:this.customerTableForm.value.SelectCharges.cHTY,
       cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
       vAR: this.customerTableForm.value.Variability,
       aDD_DEDU: this.customerTableForm.value.Add_Deduct,
@@ -262,27 +264,22 @@ export class ProductChargesComponent implements OnInit {
     if (!this.isUpdate) {
       let Tablereq = {
         companyCode: this.companyCode,
-        filter: {},
         collectionName: "product_charges_detail",
+        filter: {},
+        sorting: { cHACD: -1 },
       };
-
-      const tableRes = await this.masterService
-        .masterPost("generic/get", Tablereq)
-        .toPromise();
-      const length = tableRes.data.length;
-      const index =
-        length == 0
-          ? 1
-          : parseInt(tableRes.data[length - 1].ChargesCode.substring(3)) + 1;
-      const padding = index < 9 ? "00" : index < 99 ? "0" : "";
-      Body["ChargesCode"] = `CHA${padding}${index}`;
-      Body[
-        "_id"
-      ] = `${this.companyCode}-${this.ProductId}-CHA${padding}${index}`;
-      Body["companyCode"] = this.companyCode;
-      Body["ProductName"] = this.ProductName;
-      Body["ProductId"] = this.ProductId;
+      const resVendor = await firstValueFrom(
+        this.masterService.masterPost("generic/findLastOne", Tablereq)
+      );
+      const LastCode = resVendor.data?.cHACD || "PR0000";
+      const code = nextKeyCode(LastCode);
+      Body["cHACD"] = code;
+      Body["_id"] = `${this.companyCode}-${this.ProductId}-${code}`;
+      Body["cID"] = this.companyCode;
+      Body["pRNM"] = this.ProductName;
+      Body["pRCD"] = this.ProductId;
     }
+    console.log("Body", Body);
     const req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",

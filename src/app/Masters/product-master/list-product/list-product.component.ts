@@ -75,35 +75,43 @@ export class ListProductComponent implements OnInit {
   productNameList: any = [];
   tableData: any;
   isTableLode = false;
-  isCompany: any = true;
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
     private masterService: MasterService
-  ) {
-    // this.route.queryParams.subscribe((params) => {
-      // const encryptedData = params["isCompany"]; // Retrieve the encrypted data from the URL
-      // if (this.isCompany == undefined || this.isCompany == null) {
-      //   console.log("encryptedData", encryptedData);
-      //   if (encryptedData != undefined) {
-      //     this.isCompany = encryptedData == "true" ? true : false;
-      //     if (!this.isCompany) {
-      //       delete this.columnHeader.Charges;
-      //       delete this.columnHeader.Services;
-      //     }
-      //   } else {
-      //     window.history.back();
-      //   }
-      // } else {
-      //   window.location.reload();
-      // }
-    // });
-  }
+  ) {}
   ngOnInit() {
     this.getProductDetails();
-    if (this.isCompany) {
-      this.getProductNameList();
+  }
+
+  async getProductDetails() {
+    this.isTableLode = false;
+    let req = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "product_detail",
+    };
+
+    const Res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
+    if (Res?.success) {
+      this.tableData = Res?.data.map((x, index) => {
+        return {
+          ...x,
+          SrNo: index + 1,
+          Charges: "Charges",
+          Services: "Services",
+        };
+      });
+      this.isTableLode = true;
+    } else {
+      this.tableData = [];
+      this.isTableLode = true;
     }
+  }
+  AddNew(){
+    this.getProductNameList()
   }
 
   async getProductNameList() {
@@ -116,127 +124,61 @@ export class ListProductComponent implements OnInit {
       .masterPost("generic/get", req)
       .toPromise();
     if (Res.success && Res.data.length > 0) {
-      this.productNameList = Res.data;
-    }
-  }
-
-  async getProductDetails() {
-    this.isTableLode = false;
-    if (this.isCompany) {
-      let req = {
-        companyCode: this.companyCode,
-        filter: {},
-        collectionName: "product_detail",
-      };
-
-      const Res = await this.masterService
-        .masterPost("generic/get", req)
-        .toPromise();
-      if (Res?.success) {
-        this.tableData = Res?.data.map((x, index) => {
-          return {
-            ...x,
-            SrNo: index + 1,
-            Charges: "Charges",
-            Services: "Services",
-          };
-        });
-        this.isTableLode = true;
-      } else {
-        this.tableData = [];
-        this.isTableLode = true;
-      }
-    } else {
-      let req = {
-        companyCode: this.companyCode,
-        filter: {},
-        collectionName: "products",
-      };
-      const Res = await this.masterService
-        .masterPost("generic/get", req)
-        .toPromise();
-      console.log("Res", Res);
-      if (Res?.success) {
-        this.tableData = Res?.data.map((x, index) => {
-          return {
-            ProductName: x.product_name,
-            ProductID: x.product_id,
-            SrNo: index + 1,
-            Charges: "Charges",
-            Services: "Services",
-          };
-        });
-        this.isTableLode = true;
-      } else {
-        this.tableData = [];
-        this.isTableLode = true;
-      }
-    }
-  }
-  AddNew() {
-    if (this.isCompany) {
-      if (this.productNameList.length != this.tableData.length) {
-        const dialogref = this.dialog.open(AddProductComponent, {
-          width: "600px",
-          height: "280px",
-          data: { isCompany: this.isCompany },
-        });
-        dialogref.afterClosed().subscribe((result) => {
-          if (result?.isSuccess) {
-            this.getProductDetails();
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: "!Product add Successful",
-              showConfirmButton: true,
-            });
-          }
-        });
-      } else {
+      let isAddList = []
+      const ProductNameList = this.tableData.map((x)=>{
+        return x.ProductName;
+      })
+      Res.data.forEach((x)=>{
+        if(!ProductNameList.includes(x.product_name)){
+          isAddList.push(x)
+        }
+      })
+      if(isAddList.length != 0){
+        this.AddNewPopUp()
+      }else{
         Swal.fire({
           icon: "info",
           title: "info",
-          text: "All Product add Successful",
+          text: "All Product add Successful!!",
           showConfirmButton: true,
         });
       }
-    } else {
-      const dialogref = this.dialog.open(AddProductComponent, {
-        width: "600px",
-        height: "280px",
-        data: { isCompany: this.isCompany },
-      });
-      dialogref.afterClosed().subscribe((result) => {
-        if (result?.isSuccess) {
-          this.getProductDetails();
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: "!Product add Successful",
-            showConfirmButton: true,
-          });
-        }
-      });
     }
+  }
+  AddNewPopUp() {
+    const dialogref = this.dialog.open(AddProductComponent, {
+      width: "600px",
+      height: "280px",
+      data: {},
+    });
+    dialogref.afterClosed().subscribe((result) => {
+      if (result?.isSuccess) {
+        this.getProductDetails();
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "!Product add Successful",
+          showConfirmButton: true,
+        });
+      }
+    });
   }
   addCharges(event) {
     console.log("event", event);
     const dialogref = this.dialog.open(ProductChargesComponent, {
       width: "80%",
       height: "80%",
-      data: { isCompany: this.isCompany, element: event },
+      data: { element: event },
     });
-    dialogref.afterClosed().subscribe((result) => {
-    });
+    dialogref.afterClosed().subscribe((result) => {});
   }
   addServices(event) {
     const dialogref = this.dialog.open(ProductServicesComponent, {
       width: "70%",
       height: "80%",
-      data: { isCompany: this.isCompany , element: event },
+      data: { element: event },
     });
-    dialogref.afterClosed().subscribe((result) => {
-    });
+    dialogref.afterClosed().subscribe((result) => {});
   }
 
   functionCallHandler(event) {

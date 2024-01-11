@@ -16,6 +16,7 @@ import { ImagePreviewComponent } from "src/app/shared-components/image-preview/i
 import { MatDialog } from "@angular/material/dialog";
 import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 @Component({
   selector: 'app-add-vendor-master',
   templateUrl: './add-vendor-master.component.html',
@@ -343,19 +344,13 @@ export class AddVendorMasterComponent implements OnInit {
         filter: {},
         sorting: { vendorCode: -1 }
       }
-      const resVendor = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
-      if (resVendor) {
-        // Generate srno for each object in the array
-        const lastCode = resVendor.data;
-        const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
-        // Function to generate a new route code
-        function generateVendorCode(initialCode: number = 0) {
-          const nextVendorCode = initialCode + 1;
-          const vendorNumber = nextVendorCode.toString().padStart(5, '0');
-          const vendorCode = `V${vendorNumber}`;
-          return vendorCode;
-        }
-        this.newVendorCode = generateVendorCode(lastVendorCode);
+      const Vendor = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
+      const resVendor = Vendor?.data;
+      const lastVendorCode = resVendor.vendorCode || "V00000";
+      this.newVendorCode = nextKeyCode(lastVendorCode);
+
+      if (this.newVendorCode) {
+
         data.vendorCode = this.newVendorCode;
         data._id = `${this.companyCode}-${this.newVendorCode}`;
         data['eNTDT'] = new Date()

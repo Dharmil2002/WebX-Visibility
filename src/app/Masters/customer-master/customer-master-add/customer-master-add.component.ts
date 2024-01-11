@@ -17,6 +17,7 @@ import { columnHeader, staticField } from "../customer-master-list/customer-utli
 import { MatDialog } from "@angular/material/dialog";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 
 @Component({
   selector: "app-customer-master-add",
@@ -700,7 +701,7 @@ export class CustomerMasterAddComponent implements OnInit {
 
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
   async save() {
-    let customerCode;
+
     let req = {
       companyCode: this.companyCode,
       collectionName: "customer_detail",
@@ -709,19 +710,12 @@ export class CustomerMasterAddComponent implements OnInit {
         customerCode: -1
       }
     }
-    const rescustomer = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
-    if (rescustomer) {
+    const customer = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
+    const rescustomer = customer?.data;
+    const lastcustomerCode = rescustomer.customerCode || "CUST00000";
+    let customerCode = nextKeyCode(lastcustomerCode);
 
-      const lastCode = rescustomer.data;
-      const lastcustomerCode = lastCode ? parseInt(lastCode.customerCode.substring(4)) : 0;
-      // Function to generate a new route code
-      function generatecustomerCode(initialCode: number = 0) {
-        const nextcustomerCode = initialCode + 1;
-        const customerNumber = nextcustomerCode.toString().padStart(5, '0');
-        const customerCode = `CUST${customerNumber}`;
-        return customerCode;
-      }
-      customerCode = generatecustomerCode(lastcustomerCode);
+    if (customerCode) {
 
       const controlDetail = this.customerTableForm.value.customerLocationsDrop;
       const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.value) : "";

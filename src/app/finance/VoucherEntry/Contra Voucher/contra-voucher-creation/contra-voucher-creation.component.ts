@@ -137,8 +137,6 @@ export class ContraVoucherCreationComponent implements OnInit {
 
 
   Submit() {
-    console.log(this.ContraVoucherSummaryForm.value);
-    console.log(this.ContraVoucherPaymentForm.value);
 
     const FromDebitAmount = this.ContraVoucherPaymentForm.get("FromDebitAmount").value;
     const FromCreditAmount = this.ContraVoucherPaymentForm.get("FromCreditAmount").value;
@@ -207,6 +205,10 @@ export class ContraVoucherCreationComponent implements OnInit {
           this.debitVoucherDataRequestModel.scanSupportingDocument = "";
           this.debitVoucherDataRequestModel.paymentAmount = parseFloat(totalPaymentAmount.toFixed(2));
 
+          this.debitVoucherDataRequestModel.mANNUM = this.ContraVoucherSummaryForm.get("ManualNumber").value;
+          this.debitVoucherDataRequestModel.mREFNUM = this.ContraVoucherSummaryForm.get("ReferenceNumber").value;
+          this.debitVoucherDataRequestModel.nAR = this.ContraVoucherSummaryForm.get("Narration").value;
+
           const companyCode = this.storage.companyCode;
           const CurrentBranchCode = this.storage.branch;
           var VoucherlineitemList =
@@ -227,7 +229,8 @@ export class ContraVoucherCreationComponent implements OnInit {
               GSTAmount: 0,
               Total: parseFloat(FromDebitAmount).toFixed(2),
               TDSApplicable: false,
-              narration: ""
+              narration: "",
+              PaymentMode: this.ContraVoucherPaymentForm.value.FromPaymentMode
             }, {
               companyCode: companyCode,
               voucherNo: "",
@@ -245,7 +248,8 @@ export class ContraVoucherCreationComponent implements OnInit {
               GSTAmount: 0,
               Total: ToDebitAmount,
               TDSApplicable: false,
-              narration: ""
+              narration: "",
+              PaymentMode: this.ContraVoucherPaymentForm.value.ToPaymentMode
             }];
 
 

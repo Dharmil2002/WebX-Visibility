@@ -49,6 +49,9 @@ export class DebitVoucherDataRequestModel {
   date: string
   scanSupportingDocument: string
   paymentAmount: number
+  mANNUM: string
+  mREFNUM: string
+  nAR: string;
 }
 
 export class DebitVoucherdetailsRequestModel {
@@ -68,7 +71,8 @@ export class DebitVoucherdetailsRequestModel {
   GSTAmount: number
   Total: number
   TDSApplicable: boolean
-  narration: string
+  narration: string;
+  PaymentMode?: string
 }
 export class DebitAgainstDocumentList {
   companyCode: number

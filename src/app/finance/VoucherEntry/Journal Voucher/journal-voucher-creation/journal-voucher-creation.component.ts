@@ -325,6 +325,9 @@ export class JournalVoucherCreationComponent implements OnInit {
           this.debitVoucherDataRequestModel.scanSupportingDocument = "";
           this.debitVoucherDataRequestModel.paymentAmount = this.totalCredit;
 
+          this.debitVoucherDataRequestModel.mANNUM = this.JournalVoucherSummaryForm.get("ManualNumber").value;
+          this.debitVoucherDataRequestModel.mREFNUM = this.JournalVoucherSummaryForm.get("ReferenceNumber").value;
+
           const companyCode = this.storage.companyCode;
           const CurrentBranchCode = this.storage.branch;
           var VoucherlineitemList = this.tableData.map(function (item) {

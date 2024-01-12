@@ -1,0 +1,9 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
+
+    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
+        [Link]="linkArray" [FormTitle]="'Result'" [showHeader]='false'
+        (functionCallEmitter)="functionCallHandler($event)">
+    </app-generic-table-v2>
+    <h4>Quick link :<a href="/dashboard/DeliveryMrGeneration">Click here for generate more delivery</a> </h4>
+</app-common-wrapper-webxpress>

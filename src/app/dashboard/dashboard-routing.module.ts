@@ -8,6 +8,7 @@ import { StocksComponent } from "./stocks/stocks.component";
 import { UpdateStockComponent } from "./ActionPages/update-stock/update-stock.component";
 import { JobTrackerComponent } from "./tabs/job-tracker/job-tracker.component";
 import { AddDeliveryMrGenerationComponent } from "./tabs/Delivery MR Generation/add-delivery-mr-generation/add-delivery-mr-generation.component";
+import { DeliveryMrResponseModalComponent } from "./tabs/Delivery MR Generation/delivery-mr-response-modal/delivery-mr-response-modal.component";
 const routes: Routes = [
   {
     path: "",
@@ -45,6 +46,10 @@ const routes: Routes = [
   {
     path:"DeliveryMrGeneration",
     component:AddDeliveryMrGenerationComponent
+  },
+  {
+    path:"DeliveryMrGeneration/Result",
+    component:DeliveryMrResponseModalComponent
   },
 
 ];

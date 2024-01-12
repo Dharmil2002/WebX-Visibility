@@ -62,7 +62,7 @@ export async function getDocketDetailsFromApi(
 
     // Modify the data
     const modifiedData = docketDetails.map((item: any) => {
-    
+
       let formattedDate = "";
 
       if (item.docketDate) {
@@ -95,7 +95,7 @@ export async function getDocketDetailsFromApi(
         noofPackages: parseInt(item?.totalChargedNoOfpkg ?? 0),
         chargedWeight: parseInt(item?.chrgwt ?? 0),
         actualWeight: parseInt(item?.actualwt ?? 0),
-        status: status,
+        status: item.dSTAT && item.dSTAT === 1 ? item.dSTATNM : status,
         docketDate:item?.docketDate||new Date(),
         // Determine the Action based on the conditions
         Action: item?.isComplete === 1

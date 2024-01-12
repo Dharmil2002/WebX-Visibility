@@ -40,7 +40,6 @@ import moment from "moment";
 
 /*Please organize the code in order of priority, with the code that is used first placed at the top.*/
 export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-
   breadscrums = [
     {
       title: "Eway Bill",
@@ -48,10 +47,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       active: "ConsignmentForm",
     },
   ];
-
   expanded = false
   backPath: string;
-
   isSubmit: boolean = false;
   isUpdate: boolean;
   loadIn: boolean;
@@ -66,7 +63,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   addFlag: boolean = true;
   ewayBill: boolean = true;
   prqFlag: boolean;
-
   jsonControlArray: any;
   jsonInvoiceDetail: any;
   jsonControlArrayConsignor: any;
@@ -74,7 +70,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   jsonEwayBill: any;
   jsonControlArrayBasic: any;
   jsonContainerDetail: any;
-
   packagingTypes: AutoComplete[];
   paymentBases: AutoComplete[];
   movementTypes: AutoComplete[];
@@ -164,6 +159,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
     const rateType= this.rateTypes.filter((x) => x.value != "RTTYP-0007");
     this.setGeneralMasterData(this.jsonControlArray,rateType, "freightRatetype");
+    const prodCode= this.products.find((x)=>x.name=="Road")?.value||"";
+    this.model.consignmentTableForm.controls["transMode"].setValue(prodCode);
 
   }
 
@@ -219,7 +216,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.ewayBillTableForm = formGroupBuilder(this.fb, [this.jsonEwayBill]);
     this.commonDropDownMapping();
     this.model.consignmentTableForm.controls["payType"].setValue("P02");
-    this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    //this.model.consignmentTableForm.controls["transMode"].setValue("P1");
 
     const filteredMode = this.model.movementType.find(item => item.name == this.storage.mode).value
     this.model.consignmentTableForm.controls["movementType"].setValue(filteredMode);
@@ -284,7 +281,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.model.consignmentTableForm, "billingParty", billingParty);
     this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payTypeCode);
     this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pickupDate);
-    this.setFormValue(this.model.consignmentTableForm, "transMode", "P1");
     this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pAddress);
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);
@@ -325,6 +321,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.containerTableForm.controls["containerType"].setValue({ name: this.model.prqData?.typeContainer || "", value: this.model.prqData?.typeContainerCode || "" });
       this.model.containerTableForm.controls["containerCapacity"].setValue(this.model.prqData?.size || 0);
     }
+    const prodCode= this.products.find((x)=>x.name=="Road")?.value||"";
+    this.setFormValue(this.model.consignmentTableForm, "transMode",prodCode);
   }
 
   setFormValue(
@@ -348,7 +346,24 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async bindDataFromDropdown() {
-
+    debugger
+    const locDetails = await this.locationService.locationFromApi({ locCode: this.storage.branch });
+    if (!locDetails.length || locDetails[0].locLevel == 1){
+      Swal.fire({
+        icon: 'info', // Change the icon to 'info' for an informational message
+        title: 'Information', // Update the title to reflect the nature of the message
+        text: 'Creating consignment is not allowed in ' + this.storage.branch + ' branch.', // Modify the text for clarity and proper spacing
+        timer: 2000, // You can adjust the timer duration if needed
+        showCancelButton: false, // Keep this as false if you don't need a cancel button
+        showConfirmButton: true, // Set to true to show a confirm button
+        confirmButtonText: 'OK' // You can customize the text of the confirm button
+    });
+        this.navService.navigateTotab(
+          "docket",
+          "dashboard/Index"
+        );
+       return false;
+     }
     const vehicleList = await getVehicleStatusFromApi(
       this.storage.companyCode,
       this.operationService
@@ -405,7 +420,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     });
     this.filter.Filter(this.model.allformControl, this.model.consignmentTableForm, destinationMapping, this.model.destination, this.model.destinationStatus);
   }
-
   cancel() {
     this.navService.navigateTotab("docket", "dashboard/Index");
   }

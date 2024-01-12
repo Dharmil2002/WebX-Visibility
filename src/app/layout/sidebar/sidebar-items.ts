@@ -157,16 +157,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
-            // {
-            //   "path": "Masters/StateMaster/StateMasterView",
-            //   "title": "State master",
-            //   "moduleName": "State master",
-            //   "icon": "",
-            //   "class": "ml-menu",
-            //   "groupTitle": false,
-            //   "submenu": [
-            //   ]
-            // },
+            {
+              "path": "Masters/StateMaster/StateMasterView",
+              "title": "State master",
+              "moduleName": "State master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
             // {
             //   "path": "Masters/CityMaster/CityMasterView",
             //   "title": "City master",
@@ -255,15 +255,15 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
-            // {
-            //   "path": "Masters/PinCodeMaster/PinCodeMasterList",
-            //   "title": "Pin code Master",
-            //   "moduleName": "Masters",
-            //   "icon": "",
-            //   "class": "",
-            //   "groupTitle": false,
-            //   "submenu": []
-            // },
+            {
+              "path": "Masters/PinCodeMaster/PinCodeMasterList",
+              "title": "Pin code Master",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
             {
               "path": "Masters/VehicleMaster/VehicleMasterList",
               "title": "Vehicle Master",

@@ -8,7 +8,7 @@ import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.s
 import { cNoteGSTControl } from 'src/assets/FormControls/CNote-GST-Wise-Register-report/cnote-gst-wise-register';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
-import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
+import { CnwGstService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/cnw.gst.service';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import Swal from 'sweetalert2';
@@ -42,53 +42,6 @@ export class CnwGstRegisterComponent implements OnInit {
   payStatus: any;
   tranModeName: any;
   transModeStatus: any;
-
-  // CSVHeader = {
-  //   "docketNumber": "Consignment Note No",
-  //   "docketDate": "Consignment Note Date",
-  //   "billingParty": "Billing Party",
-  //   "movementType": "Movement Type",
-  //   "payType": "Payment Mode",
-  //   "origin": "Origin",
-  //   "fromCity": "From City",
-  //   "toCity": "To City",
-  //   "destination": "Destination",
-  //   "prqNo": "PRQ No",
-  //   "transMode": "Transport Mode",
-  //   "vendorType": "Vendor Type",
-  //   "vendorName": "Vendor Name",
-  //   "pAddress": "Pickup Address",
-  //   "dAddress": "Delivery Address",
-  //   "prLrNo": "PR LR No",
-  //   "pck_type": "Packaging Type",
-  //   "wt_in": "Weight In",
-  //   "gpChDel": "GP/CH/Del",
-  //   "risk": "Risk",
-  //   "deltype": "Delivery Type",
-  //   "issuingFrom": "Issuing From",
-  //   "vehicleNo": " Lorry No",
-  //   "consignorName": " Consignor Name",
-  //   "consignorCntNo": " Consignor Contact Number",
-  //   "consigneeName": "Consignee Name",
-  //   "consigneeCntNo": "Consignee Contact Number",
-  //   "ewayBill": "EWay Bill",
-  //   "expDt": "Expiry Date",
-  //   "invoiceNo": "Invoice Number",
-  //   "invoiceAmt": "Invoice Amount (₹)",
-  //   "NoofPck": "No of Package",
-  //   "materialNm": " Material Number",
-  //   "actualWt": "Actual Weight",
-  //   "charWt": "Charged Wight",
-  //   "freightRt": "Freight Rate",
-  //   "freightRtTp": "Freight Rate Type",
-  //   "freightAmt": "Freight Amount (₹)",
-  //   "otherAmt": "Other Amount (₹)",
-  //   "grossAmt": "Gross Amount (₹)",
-  //   "rcm": "RCM",
-  //   "gstAmt": "GST Amount (₹)",
-  //   "gstcharAmt": "GST Charged Amount (₹)",
-  //   "TotAmt": "Total Amount (₹)"
-  // }
 
   CSVHeader = {
     "docketNumber": "Consignment Note No",
@@ -335,22 +288,11 @@ export class CnwGstRegisterComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Cnote_GST_Wise_Register_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { odocketDate, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);
   }
 
   toggleSelectAll(argData: any) {

@@ -1,51 +1,23 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
-
+import * as XLSX from 'xlsx';
 export async function getJobregisterReportDetail(masterServices) {
-    // Prepare the request body with company code and collection name
-    // filter needs to be added
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "job_detail",
         filter: {}
     }
-    // Fetch job details from the API for "job_detail" collection
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
-    // Update collection name for additional data
     reqBody.collectionName = "cha_detail"
-    // Fetch data for "cha_detail" collection
     const resChaEntry = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
-    // Update collection name for another set of data
-    // reqBody.collectionName = "docket_temp"
-    // // Fetch data for "docket_temp" collection
-    // const resDocketTemp = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
-    // Initialize an array to store modified job data
     let jobList = [];
-    // Process each element in the response data
     res.data.map((element, index) => {
 
-        // Find corresponding entry in "cha_detail" using job ID
         const chaDet = resChaEntry.data ? resChaEntry.data.find((entry) => entry.jobNo === element?.jobId) : null;
-
-        // Find corresponding entry in "docket_temp" using job ID
-        // const docDet = resDocketTemp.data ? resDocketTemp.data.find((entry) => entry.jobNo === element?.jobId) : null;
-
-        // Initialize variables for calculations and data extraction
         let totalCHAamt = 0;
-        // let containerNo = 0;
-
-        // Calculate total amount from "cha_detail" if available
         if (chaDet) {
             totalCHAamt = chaDet.containorDetail.reduce((total, amt) => total + parseFloat(amt.totalAmt), 0);
         }
-
-        // // Extract container details from "docket_temp" if available
-        // if (docDet) {
-        //     containerNo = docDet.containerDetail.map((num) => parseFloat(num.containerNumber), 0);
-        // }
-
-        // Create a modified job data object
         let jobData = {
-            // "srNo": element.srNo = index + 1,
             "jobNo": element?.jobId || '',
             "ojobDate": element.jobDate,
             "jobDate": formatDocketDate(element?.jobDate || new Date()),
@@ -87,13 +59,13 @@ export async function getJobregisterReportDetail(masterServices) {
             "totalNoofcontainer": element.blChallan ? element.blChallan.length : 0,
             "jobType": element?.jobType == "I" ? "Import" : element?.jobType == "E" ? "Export" : "",
             "chargWt": element?.weight || "",
-            // "DespatchQty":
-            //"despatchWt":
+            "DespatchQty":'0.00',
+            "despatchWt":'0.00',
             "poNumber": element?.poNumber || "",
-            "totalChaAmt": totalCHAamt,
-            //"voucherAmt":
-            //"vendorBillAmt"
-            //"customerBillAmt"
+            "totalChaAmt": totalCHAamt || '0.00',
+            "voucherAmt":'',
+            "vendorBillAmt":'',
+            "customerBillAmt":'',
             "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
             "jobLocation": element?.jobLocation || "",
         }
@@ -142,4 +114,33 @@ export function convertToCSV(data: any[], excludedColumns: string[] = [], header
     });
 
     return header + rows.join('');
+}
+
+export function exportAsExcelFile(json: any[], excelFileName: string, customHeaders: Record<string, string>): void {
+    // Convert the JSON data to an Excel worksheet using XLSX.utils.json_to_sheet.
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(json);
+    // Get the keys (headers) from the first row of the JSON data.
+    const headerKeys = Object.keys(json[0]);
+    // Iterate through the header keys and replace the default headers with custom headers.
+    for (let i = 0; i < headerKeys.length; i++) {
+        const headerKey = headerKeys[i];
+        if (headerKey && customHeaders[headerKey]) {
+            worksheet[XLSX.utils.encode_col(i) + '1'] = { t: 's', v: customHeaders[headerKey] };
+        }
+    }
+    // Format the headers in the worksheet.
+    for (const key in worksheet) {
+        if (Object.prototype.hasOwnProperty.call(worksheet, key)) {
+            // Check if the key corresponds to a header cell (e.g., A1, B1, etc.).
+            const reg = /^[A-Z]+1$/;
+            if (reg.test(key)) {
+                // Set the format of the header cells to '0.00'.
+                worksheet[key].z = '0.00';
+            }
+        }
+    }
+    // Create a workbook containing the worksheet.
+    const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+    // Write the workbook to an Excel file with the specified filename.
+    XLSX.writeFile(workbook, `${excelFileName}.xlsx`);
 }

@@ -6,7 +6,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
-import { convertToCSV, getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
+import { convertToCSV, exportAsExcelFile, getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
@@ -686,29 +686,11 @@ export class JobQueryPageComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, ['ojobDate', 'jobLocation'], this.CSVHeader);
-
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv' });
-
-    // Create a link element
-    const a = document.createElement('a');
-
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-
-    // Set the download attribute with the desired file name
-    a.download = `Job-Summary-Report-${timeString}.csv`;
-
-    // Append the link to the body
-    document.body.appendChild(a);
-
-    // Trigger a click on the link to start the download
-    a.click();
-
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { ojobDate,jobLocation, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Job-Summary-Report-${timeString}`, this.CSVHeader);
   }
 
   cancel() {

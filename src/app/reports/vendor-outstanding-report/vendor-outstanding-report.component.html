@@ -2,7 +2,7 @@
      <form [formGroup]="VendWiseOutTableForm">
           <app-form-webxpress [form]="VendWiseOutTableForm" [FormTitle]="'Vendor Wise Outstanding Report'" [formData]="jsonVendWiseOutFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-               [showSaveAndCancelButton]="true" [submit]="'Filter'">
+               [showSaveButton]="true" [submit]="'Download'">
           </app-form-webxpress>
      </form>
 </app-common-wrapper-webxpress>

@@ -10,7 +10,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { convertToCSV, SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
+import { convertToCSV, exportAsExcelFile, SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
 import { salesRegisterControl } from 'src/assets/FormControls/sales-register/sales-register-advance';
 import Swal from 'sweetalert2';
 
@@ -22,9 +22,9 @@ export class SalesRegisterAdvancedComponent implements OnInit {
 
   breadScrums = [
     {
-      title: "Sales Register Report",
+      title: "Sales Register Advanced Report",
       items: ["Home"],
-      active: "Sales Register Report",
+      active: "Sales Register Advanced Report",
     },
   ];
   salesregisterTableForm: UntypedFormGroup
@@ -453,22 +453,11 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Sales_Register_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { ocNOTEDT, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Sales_Register_Advance_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

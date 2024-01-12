@@ -16,6 +16,8 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -41,6 +43,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     csv: false,
   };
   linkArray = [];
+
+  debitVoucherRequestModel = new DebitVoucherRequestModel();
+  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
 
   columnHeader = {
     consignmentNoteNumber: {
@@ -167,8 +172,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private objLocationService: LocationService,
-    private objStorageService: StorageService,
     private operation: OperationService,
+    private storage: StorageService,
+    private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
@@ -541,7 +547,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       false
     );
     const stateReqBody = {
-      companyCode: this.objStorageService.companyCode,
+      companyCode: this.storage.companyCode,
       filter: {},
       collectionName: "state_master",
     };
@@ -572,7 +578,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#region to get Docket list
   async getDocketList(data = {}) {
     const req = {
-      companyCode: this.objStorageService.companyCode,
+      companyCode: this.storage.companyCode,
       filter: data,
       collectionName: "docket",
     };
@@ -655,7 +661,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.snackBarUtilityService.commonToast(async () => {
         try {
           const headerRequest = {
-            cID: this.objStorageService.companyCode,
+            cID: this.storage.companyCode,
             dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
             dLVRT: this.headerDetails.Deliveredto,
             cNTCTNO: this.headerDetails.ContactNumber,
@@ -687,12 +693,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
             pRTLYRMGAMT: (this.billingForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
             eNTDT: new Date(),
-            eNTLOC: this.objStorageService.branch,
-            eNTBY: this.objStorageService.userName
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName
           }
           const detailRequests = this.tableData.map(element => {
             return {
-              cID: this.objStorageService.companyCode,
+              cID: this.storage.companyCode,
               dOCNO: element.consignmentNoteNumber,
               mLTPNTDLRY: element.Multipointdelivery,
               dOC: element.Document,
@@ -715,8 +721,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
               // oTHRCHRG:
               tOTL: element.totalAmount,
               eNTDT: new Date(),
-              eNTLOC: this.objStorageService.branch,
-              eNTBY: this.objStorageService.userName
+              eNTLOC: this.storage.branch,
+              eNTBY: this.storage.userName
 
             }
           });
@@ -727,10 +733,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           };
           // Prepare the request body with company code, collection name, and job detail data.
           let reqBody = {
-            companyCode: this.objStorageService.companyCode,
+            companyCode: this.storage.companyCode,
             //collectionName: "delivery_mr_header",
             docType: "MR",
-            branch: this.objStorageService.branch,
+            branch: this.storage.branch,
             finYear: financialYear,
             data: data
           };
@@ -815,4 +821,121 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
   }
   //#endregion
+
+  GenerateVoucher() {
+
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+
+        this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
+        this.debitVoucherRequestModel.docType = "VR";
+        this.debitVoucherRequestModel.branch = this.storage.branch;
+        this.debitVoucherRequestModel.finYear = financialYear;
+
+        this.debitVoucherDataRequestModel.voucherNo = "";
+        this.debitVoucherDataRequestModel.transType = "Delivery MR Voucher";
+        this.debitVoucherDataRequestModel.transDate = new Date();
+        this.debitVoucherDataRequestModel.docType = "VR";
+        this.debitVoucherDataRequestModel.branch = this.storage.branch;
+        this.debitVoucherDataRequestModel.finYear = financialYear;
+
+        this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
+        this.debitVoucherDataRequestModel.preperedFor = ""
+        this.debitVoucherDataRequestModel.partyCode = ""
+        this.debitVoucherDataRequestModel.partyName = ""
+        this.debitVoucherDataRequestModel.partyState = ""
+        this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
+        this.debitVoucherDataRequestModel.entryDate = new Date();
+        this.debitVoucherDataRequestModel.panNo = ""
+
+        this.debitVoucherDataRequestModel.tdsSectionCode = undefined
+        this.debitVoucherDataRequestModel.tdsSectionName = undefined
+        this.debitVoucherDataRequestModel.tdsRate = 0;
+        this.debitVoucherDataRequestModel.tdsAmount = 0;
+        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
+        this.debitVoucherDataRequestModel.tcsSectionCode = undefined
+        this.debitVoucherDataRequestModel.tcsSectionName = undefined
+        this.debitVoucherDataRequestModel.tcsRate = 0;
+        this.debitVoucherDataRequestModel.tcsAmount = 0;
+
+        this.debitVoucherDataRequestModel.IGST = 0;
+        this.debitVoucherDataRequestModel.SGST = 0;
+        this.debitVoucherDataRequestModel.CGST = 0;
+        this.debitVoucherDataRequestModel.UGST = 0;
+        this.debitVoucherDataRequestModel.GSTTotal = 0;
+
+        this.debitVoucherDataRequestModel.paymentAmt = 0
+        this.debitVoucherDataRequestModel.netPayable = 0
+        this.debitVoucherDataRequestModel.roundOff = 0;
+        this.debitVoucherDataRequestModel.voucherCanceled = false;
+
+        this.debitVoucherDataRequestModel.paymentMode = undefined;
+        this.debitVoucherDataRequestModel.refNo = undefined;
+        this.debitVoucherDataRequestModel.accountName = undefined;
+        this.debitVoucherDataRequestModel.date = undefined;
+        this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+        this.debitVoucherDataRequestModel.paymentAmount = 0
+
+
+        const companyCode = this.storage.companyCode;
+        const CurrentBranchCode = this.storage.branch;
+        var VoucherlineitemList = this.tableData.map(function (item) {
+          return {
+            companyCode: companyCode,
+            voucherNo: "",
+            transType: "Delivery MR Voucher",
+            transDate: new Date(),
+            finYear: financialYear,
+            branch: CurrentBranchCode,
+            accCode: item.LedgerHdn,
+            accName: item.Ledger,
+            sacCode: "",
+            sacName: "",
+            debit: parseFloat(item.DebitAmount).toFixed(2),
+            credit: parseFloat(item.CreditAmount).toFixed(2),
+            GSTRate: 0,
+            GSTAmount: 0,
+            Total: parseFloat(item.DebitAmount).toFixed(2),
+            TDSApplicable: false,
+            narration: item.Narration ?? ""
+          };
+        });
+
+
+        this.debitVoucherRequestModel.details = VoucherlineitemList;
+        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+
+        firstValueFrom(this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+            if (res.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Delivery MR Created Successfully",
+                text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+                showConfirmButton: true,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.hideLoading();
+                  setTimeout(() => {
+                    Swal.close();
+                  }, 2000);
+                }
+              });
+            }
+          }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+          .finally(() => {
+
+          });
+
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          error.message
+        );
+      }
+    }, "Delivery MR Voucher Generating..!");
+
+  }
+
 }

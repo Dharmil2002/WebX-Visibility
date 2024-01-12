@@ -648,7 +648,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   //#region to save data to collection delivery_mr_header and delivery_mr_details
-  async submit() {
+  async GenerateMR(VoucherNo) {
     if (this.tableData.length === 0 || !this.billingForm.valid) {
       Swal.fire({
         text: 'Please fill the required details above',
@@ -690,8 +690,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             gSTCHRGD: this.billingForm.value.GSTCharged,
             dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
             cLLCTAMT: this.billingForm.value.CollectionAmount,
+            rNDOFF: this.billingForm.value.roundOffAmt || 0,
             pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
             pRTLYRMGAMT: (this.billingForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
+            vNO: VoucherNo,
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName
@@ -715,6 +717,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
               sUBTTL: element.subTotal,
               nWSUBTTL: element.newSubTotal,
               rTDFRNC: element.rateDifference,
+              vNO: VoucherNo,
               //dORDLVRY:
               // fRCLPCHRGE:
               //   gTPSCHRG:
@@ -777,8 +780,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       // Round off the value to the nearest integer
       const roundedValue = value ? Math.round(value) : 0;
 
+      // Calculate the decimal part
+      const decimalPart = (value - roundedValue).toFixed(2);
+      //console.log(decimalPart);
+
       // Set the rounded value back to the form control
       deliveryMRNetAmountControl.setValue(roundedValue);
+      this.billingForm.get("roundOffAmt").setValue(decimalPart);
     } else {
       // No rounding required, set the original value
       deliveryMRNetAmountControl.setValue(value);
@@ -840,18 +848,18 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.debitVoucherDataRequestModel.finYear = financialYear;
 
         this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
-        this.debitVoucherDataRequestModel.preperedFor = ""
+        this.debitVoucherDataRequestModel.preperedFor = "Customer"
         this.debitVoucherDataRequestModel.partyCode = ""
-        this.debitVoucherDataRequestModel.partyName = ""
-        this.debitVoucherDataRequestModel.partyState = ""
+        this.debitVoucherDataRequestModel.partyName = this.filteredDocket[0]?.billingParty;
+        this.debitVoucherDataRequestModel.partyState = this.billingForm.value.StateofSupply.name
         this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
         this.debitVoucherDataRequestModel.entryDate = new Date();
         this.debitVoucherDataRequestModel.panNo = ""
 
-        this.debitVoucherDataRequestModel.tdsSectionCode = undefined
-        this.debitVoucherDataRequestModel.tdsSectionName = undefined
-        this.debitVoucherDataRequestModel.tdsRate = 0;
-        this.debitVoucherDataRequestModel.tdsAmount = 0;
+        this.debitVoucherDataRequestModel.tdsSectionCode = this.billingForm.value.SACCode.value;
+        this.debitVoucherDataRequestModel.tdsSectionName = this.billingForm.value.SACCode.name;
+        this.debitVoucherDataRequestModel.tdsRate = this.billingForm.value.TDSRate;
+        this.debitVoucherDataRequestModel.tdsAmount = this.billingForm.value.TDSAmount;
         this.debitVoucherDataRequestModel.tdsAtlineitem = false;
         this.debitVoucherDataRequestModel.tcsSectionCode = undefined
         this.debitVoucherDataRequestModel.tcsSectionName = undefined
@@ -862,66 +870,62 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.debitVoucherDataRequestModel.SGST = 0;
         this.debitVoucherDataRequestModel.CGST = 0;
         this.debitVoucherDataRequestModel.UGST = 0;
-        this.debitVoucherDataRequestModel.GSTTotal = 0;
+        this.debitVoucherDataRequestModel.GSTTotal = this.billingForm.value.GSTAmount;
 
-        this.debitVoucherDataRequestModel.paymentAmt = 0
-        this.debitVoucherDataRequestModel.netPayable = 0
-        this.debitVoucherDataRequestModel.roundOff = 0;
+        this.debitVoucherDataRequestModel.paymentAmt = this.billingForm.value.DeliveryMRNetAmount
+        this.debitVoucherDataRequestModel.netPayable = this.billingForm.value.CollectionAmount
+        this.debitVoucherDataRequestModel.roundOff = this.billingForm.value.roundOffAmt || 0;
         this.debitVoucherDataRequestModel.voucherCanceled = false;
 
-        this.debitVoucherDataRequestModel.paymentMode = undefined;
-        this.debitVoucherDataRequestModel.refNo = undefined;
-        this.debitVoucherDataRequestModel.accountName = undefined;
-        this.debitVoucherDataRequestModel.date = undefined;
+        this.debitVoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
+        this.debitVoucherDataRequestModel.refNo = this.PaymentSummaryFilterForm.value?.ChequeOrRefNo;
+        this.debitVoucherDataRequestModel.accountName = this.PaymentSummaryFilterForm.value?.Bank.name;
+        this.debitVoucherDataRequestModel.date = this.PaymentSummaryFilterForm.value?.Date;
         this.debitVoucherDataRequestModel.scanSupportingDocument = "";
-        this.debitVoucherDataRequestModel.paymentAmount = 0
 
 
         const companyCode = this.storage.companyCode;
         const CurrentBranchCode = this.storage.branch;
-        var VoucherlineitemList = this.tableData.map(function (item) {
-          return {
+
+        let voucherLineItemList = [];
+
+        this.tableData.forEach(item => {
+          console.log(this.billingForm.value);
+
+          const voucherLineItem = {
             companyCode: companyCode,
             voucherNo: "",
             transType: "Delivery MR Voucher",
             transDate: new Date(),
             finYear: financialYear,
             branch: CurrentBranchCode,
-            accCode: item.LedgerHdn,
-            accName: item.Ledger,
+            accCode: '',
+            accName: '',
             sacCode: "",
             sacName: "",
-            debit: parseFloat(item.DebitAmount).toFixed(2),
-            credit: parseFloat(item.CreditAmount).toFixed(2),
-            GSTRate: 0,
-            GSTAmount: 0,
-            Total: parseFloat(item.DebitAmount).toFixed(2),
+            debit: parseFloat(item.totalAmount).toFixed(2),
+            credit: 0,
+            GSTRate: this.billingForm.value?.GSTRate,
+            GSTAmount: item.GST,
+            Total: parseFloat(item.totalAmount).toFixed(2),
             TDSApplicable: false,
-            narration: item.Narration ?? ""
+            narration: ""
           };
+
+          voucherLineItemList.push(voucherLineItem);
         });
 
-
-        this.debitVoucherRequestModel.details = VoucherlineitemList;
+        this.debitVoucherRequestModel.details = voucherLineItemList;
         this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
         this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+        console.log(this.debitVoucherRequestModel);
 
         firstValueFrom(this.voucherServicesService
           .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
             if (res.success) {
-              Swal.fire({
-                icon: "success",
-                title: "Delivery MR Created Successfully",
-                text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-                showConfirmButton: true,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                  }, 2000);
-                }
-              });
+              Swal.hideLoading();
+              Swal.close();
+              this.GenerateMR(res?.data?.mainData?.ops[0].vNO)
             }
           }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
           .finally(() => {

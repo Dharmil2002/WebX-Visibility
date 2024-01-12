@@ -512,6 +512,16 @@ export class DeliveryMrGeneration {
                 disable: true,
                 Validations: []
             },
+            {
+                name: "roundOffAmt",
+                label: "Round Off",
+                placeholder: "Round Off",
+                type: "text",
+                value: 0,
+                generatecontrol: false,
+                disable: true,
+                Validations: []
+            },
         ]
     }
     getDeliveryMrControls() {

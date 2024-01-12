@@ -132,10 +132,9 @@ export class JobEntryPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.bindDropdown();
-    this.getDockeContainorDetail();
-    this.tranPortChanged();
     this.getGeneralmasterData().then((x) => {
       this.getDropDownDetail();
+      this.getDockeContainorDetail();
     });
     this.backPath = "/dashboard/Index?tab=6";
   }
@@ -267,7 +266,6 @@ export class JobEntryPageComponent implements OnInit {
 
 
   tranPortChanged() {
-
     const transportedBy = this.jobEntryTableForm.value.transportedBy;
     const transportMode = this.jobEntryTableForm.value.transportMode;
     const jobType = this.jobEntryTableForm.controls['jobType'].value;
@@ -334,6 +332,7 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*End*/
   async getDockeContainorDetail() {
+    debugger
     const resContainerType = await this.consigmentUtility.containorConsigmentDetail();
     this.containerTypeList = resContainerType;
     this.filter.Filter(
@@ -343,6 +342,7 @@ export class JobEntryPageComponent implements OnInit {
       this.containerTypeBL,
       this.containerTypeBLStatus
     );
+    this.tranPortChanged();
     //const docketDetail=this.dock
   }
   /*below the function called when user select docket no*/

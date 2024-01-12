@@ -54,7 +54,9 @@
       [showSaveAndCancelButton]="false">
     </app-form-webxpress>
   </form>
-  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 83%;top: -277px;display: flex;position: relative;" (click)="addDetail('cnote')"
+  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 83%;
+          top: -204px;
+          position: relative;" (click)="addDetail('cnote')"
     [disabled]="!this.containorTableForm.controls['cnoteNo'].value && !this.containorTableForm.value.contNo">
     <mat-icon>add</mat-icon>
     Add New

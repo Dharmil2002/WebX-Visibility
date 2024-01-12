@@ -1,13 +1,61 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums">
-  <form [formGroup]="AddCompanyFormsValue">
-    <generic-accordion-webxpress 
-    [AccordionForm]="AddCompanyFormsValue" 
-    [accordionGroup]="accordionData"
-    (functionCallEmitter)="functionCallHandler($event)" 
-    [Icondata]="Icondata" 
-    [fafIconData]="fafIcondata"
-    [showSaveAndCancelButton]="true" 
-    >
-    </generic-accordion-webxpress>
-  </form>
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" (toggleChange)="onToggleChange($event)">
+  <div>
+    <form [formGroup]="AddCompanyFormsValue">
+      <app-form-webxpress [form]="AddCompanyFormsValue" [formData]="jsonControlCompanyArray"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [FormTitle]="'Company Setup'"
+        (functionCallEmitter)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+    <div>
+      <form [formGroup]="FinancialTableForm">
+        <app-form-webxpress [form]="FinancialTableForm" [FormTitle]="'Financial Details'" [formData]="jsonControlFinancialArray"
+          [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+          (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
+      <div>
+        <div>
+          <form [formGroup]="GSTTableForm">
+            <app-form-webxpress [form]="GSTTableForm" [FormTitle]="'GST Details'" [formData]="jsonControlGSTArray"
+              [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+              (functionCallEmitter)="functionCallHandler($event)">
+            </app-form-webxpress>
+          </form>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: end;">
+          <button matTooltip="Add New Record" [disabled]="!GSTTableForm.valid" mat-stroked-button (click)="AddRowData()"
+            class="filter_btn" style="margin-right: 30px;">
+            <mat-icon>add</mat-icon>
+            Add New
+          </button>
+        </div>
+        <div class="row">
+          <div *ngIf="!tableLode" class="d-flex justify-content-center align-items-center">
+            <!-- Bootstrap loader -->
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <app-generic-table-v2 *ngIf="tableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+            [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+            [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+            [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+            [menuItemFlag]="menuItemflag">
+          </app-generic-table-v2>
+        </div>
+      </div>
+    <div class="row" style="margin-top: 30px; margin-left: 10px;">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+        <div class="example-button-row">
+          <button type="button" [disabled]="!AddCompanyFormsValue.valid" mat-raised-button color="primary"
+            (click)="save()">
+            <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
+            <ng-template #saveButton>Save</ng-template>
+          </button>
+          <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </app-common-wrapper-webxpress>

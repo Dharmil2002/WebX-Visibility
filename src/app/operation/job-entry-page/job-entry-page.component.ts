@@ -21,6 +21,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { StorageService } from "src/app/core/service/storage.service";
 
 
 @Component({
@@ -118,8 +119,9 @@ export class JobEntryPageComponent implements OnInit {
     private route: Router,
     private customerService: CustomerService,
     private generalService: GeneralService,
+    private storage: StorageService
   ) {
-    
+
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data || "";
     if (navigationState) {
       this.jobDetails = navigationState;
@@ -133,7 +135,7 @@ export class JobEntryPageComponent implements OnInit {
     this.getDockeContainorDetail();
     this.tranPortChanged();
     this.getGeneralmasterData().then((x) => {
-     this.getDropDownDetail();
+      this.getDropDownDetail();
     });
     this.backPath = "/dashboard/Index?tab=6";
   }
@@ -189,76 +191,75 @@ export class JobEntryPageComponent implements OnInit {
     this.blTableForm = formGroupBuilder(this.fb, [this.jsonFormBlControls]);
     this.jobEntryTableForm.controls['transportedBy'].setValue('T01');
     this.jobEntryTableForm.controls['jobType'].setValue('J02');
-    this.jobEntryTableForm.controls['transportMode'].setValue('P1');
 
   }
 
   async autoFillJobDetails() {
     this.jobTableLoad = true
-    const {jobHeader,jobChallan} = await this.jobEntryService.getjobDetailsByJob(this.jobDetails.jobNo);
+    const { jobHeader, jobChallan } = await this.jobEntryService.getjobDetailsByJob(this.jobDetails.jobNo);
     if (jobHeader) {
       const fields = {
-          jobId: 'jID',
-          jobDate: 'jDT',
-          weight: 'wT',
-          mobileNo: 'mOBNO',
-          DestCountry: 'dESTCN',
-          fromCity: 'fCT',
-          toCity: 'tCT',
-          jobType: 'jTYP',
-          noOfPkg: 'pKGS',
-          transportedBy: 'tBY',
-          nOOFCONT: 'cNTS',
-          jobLocation: 'lOC',
-          transportMode: 'tMODE',
-          poNumber: 'pONO',
-          exportType: 'eTYP',
-          billingParty: null, // special case
+        jobId: 'jID',
+        jobDate: 'jDT',
+        weight: 'wT',
+        mobileNo: 'mOBNO',
+        DestCountry: 'dESTCN',
+        fromCity: 'fCT',
+        toCity: 'tCT',
+        jobType: 'jTYP',
+        noOfPkg: 'pKGS',
+        transportedBy: 'tBY',
+        nOOFCONT: 'cNTS',
+        jobLocation: 'lOC',
+        transportMode: 'tMODE',
+        poNumber: 'pONO',
+        exportType: 'eTYP',
+        billingParty: null, // special case
       };
-  
+
       Object.entries(fields).forEach(([formControlName, jobHeaderProperty]) => {
-          if (jobHeaderProperty) {
-              this.jobEntryTableForm.controls[formControlName].setValue(jobHeader[jobHeaderProperty] || '');
-          } else if (formControlName === 'billingParty') {
-              this.jobEntryTableForm.controls[formControlName].setValue({ 
-                  name: jobHeader.bPARTYNM, 
-                  value: jobHeader.bPARTY 
-              });
-          }
-      });
-  }
-  if(jobChallan.length>0){
-    let challan=[];
-    jobChallan.forEach((element, index) => {
-      const formattedInvDate = element.iNVDT ? formatDate(element.iNVDT, 'dd-MM-yy HH:mm') : "";
-      const formattedSbDt = element.sBDT ? formatDate(element.sBDT, 'dd-MM-yy HH:mm') : "";
-      const formattedblDate = element.bLDT ? formatDate(element.bLDT, 'dd-MM-yy HH:mm') : "";
-      const formattedbeDT = element.bEDT ? formatDate(element.bEDT, 'dd-MM-yy HH:mm') : "";
-      const jsonChallan={
-        id:index + 1,
-        invoice: true,
-        invNum:element?.iNVNO,
-        oinvDate:element?.iNVDT,
-        invDate:formattedInvDate,
-        sbNum:element?.sBNO,
-        sbDt:formattedSbDt,
-        sbD:element?.sBDT,
-        cod:element?.cOD,
-        pod:element?.pOD,
-        containerType:element?.cNTYP,
-        containerNum:element?.cNNO,
-        blNum:element?.bLNO,
-        blDate:formattedblDate,
-        beNum:element?.bENO,
-        beDT:formattedbeDT,
-        actions:["Edit", "Remove"]
+        if (jobHeaderProperty) {
+          this.jobEntryTableForm.controls[formControlName].setValue(jobHeader[jobHeaderProperty] || '');
+        } else if (formControlName === 'billingParty') {
+          this.jobEntryTableForm.controls[formControlName].setValue({
+            name: jobHeader.bPARTYNM,
+            value: jobHeader.bPARTY
+          });
         }
-      challan.push(jsonChallan);
-    });
-    this.TblChallan=challan
-    this.isBlLoad = false;
-    this.jobTableLoad = false;
-  }
+      });
+    }
+    if (jobChallan.length > 0) {
+      let challan = [];
+      jobChallan.forEach((element, index) => {
+        const formattedInvDate = element.iNVDT ? formatDate(element.iNVDT, 'dd-MM-yy HH:mm') : "";
+        const formattedSbDt = element.sBDT ? formatDate(element.sBDT, 'dd-MM-yy HH:mm') : "";
+        const formattedblDate = element.bLDT ? formatDate(element.bLDT, 'dd-MM-yy HH:mm') : "";
+        const formattedbeDT = element.bEDT ? formatDate(element.bEDT, 'dd-MM-yy HH:mm') : "";
+        const jsonChallan = {
+          id: index + 1,
+          invoice: true,
+          invNum: element?.iNVNO,
+          oinvDate: element?.iNVDT,
+          invDate: formattedInvDate,
+          sbNum: element?.sBNO,
+          sbDt: formattedSbDt,
+          sbD: element?.sBDT,
+          cod: element?.cOD,
+          pod: element?.pOD,
+          containerType: element?.cNTYP,
+          containerNum: element?.cNNO,
+          blNum: element?.bLNO,
+          blDate: formattedblDate,
+          beNum: element?.bENO,
+          beDT: formattedbeDT,
+          actions: ["Edit", "Remove"]
+        }
+        challan.push(jsonChallan);
+      });
+      this.TblChallan = challan
+      this.isBlLoad = false;
+      this.jobTableLoad = false;
+    }
   }
   async getDropDownDetail() {
     if (this.isUpdate) { this.autoFillJobDetails() }
@@ -266,7 +267,7 @@ export class JobEntryPageComponent implements OnInit {
 
 
   tranPortChanged() {
-    
+
     const transportedBy = this.jobEntryTableForm.value.transportedBy;
     const transportMode = this.jobEntryTableForm.value.transportMode;
     const jobType = this.jobEntryTableForm.controls['jobType'].value;
@@ -292,7 +293,7 @@ export class JobEntryPageComponent implements OnInit {
         break;
       case "T01":
         this.jobEntryTableForm.controls['transportMode'].enable();
-        if (transportMode == "P1") {
+        if (transportMode.name == "Road") {
           this.columnJobDetail = this.definition.columnCnoteDetail;
           // Define the filter criteria as an object
           const filterCriteria = {
@@ -309,7 +310,7 @@ export class JobEntryPageComponent implements OnInit {
           }
           this.jsonJobFormControls = this.jsonAllJobControls
         }
-        if (transportMode == "P3") {
+        if (transportMode.name == "Rail") {
           this.columnJobDetail = this.definition.columnContainorDetail;
           const filterCriteria = {
             excludeNames: ["cnoteNo", "cnoteDate"]
@@ -637,7 +638,7 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*Below the code Which fill */
   async save() {
-    
+
     this.jobEntryTableForm.controls['transportMode'].enable();
     let fieldsToFromRemove = [];
     const tabcontrols = this.jobEntryTableForm;
@@ -708,7 +709,7 @@ export class JobEntryPageComponent implements OnInit {
     const chalanDetails = { blChallan: modifiedTblChallan };
 
     let jobDetail = {
-      formData:this.jobEntryTableForm.value,
+      formData: this.jobEntryTableForm.value,
       ...jobDetails,
       ...chalanDetails
     };
@@ -716,7 +717,7 @@ export class JobEntryPageComponent implements OnInit {
     jobDetail.formData.transportedByName = this.tranBy.find(x => x.value === this.jobEntryTableForm.value.transportedBy)?.name || '';
     jobDetail.formData.transportModeName = this.tranMode.find(x => x.value === this.jobEntryTableForm.value.transportMode)?.name || '';
     jobDetail.formData.exportTypeName = this.exportType.find(x => x.value === this.jobEntryTableForm.value.exportType)?.name || '';
-    let fieldMapping=this.jobEntryService.jobFieldMapping(jobDetail,this.containerTypeList);
+    let fieldMapping = this.jobEntryService.jobFieldMapping(jobDetail, this.containerTypeList);
     if (this.isUpdate) {
       const jobEntryNo = this.jobDetails.jobNo;
       const res = await this.jobEntryService.updateJobDetails(jobDetail, jobEntryNo);
@@ -731,7 +732,7 @@ export class JobEntryPageComponent implements OnInit {
       }
     }
     else {
-       const res=await this.jobEntryService.addJobDetail(fieldMapping,financialYear);
+      const res = await this.jobEntryService.addJobDetail(fieldMapping, financialYear);
       //await addJobDetail(jobDetail, this.masterService, financialYear);
       if (res) {
         //const jobEntryNo = res.toUpperCase();
@@ -825,7 +826,7 @@ export class JobEntryPageComponent implements OnInit {
         );
       }
     }
-    else{
+    else {
       this.filter.Filter(
         this.allformControl,
         this.jobEntryTableForm,
@@ -834,7 +835,7 @@ export class JobEntryPageComponent implements OnInit {
         this.cnoteNoStatus
       );
     }
-    
+
   }
 
   selectedFile(event) {
@@ -1022,7 +1023,7 @@ export class JobEntryPageComponent implements OnInit {
   /* End */
   /*on JOB details Changed*/
   onJobChanged() {
-    
+
     this.TblChallan = [];
     const jobType = this.jobEntryTableForm.controls['jobType'].value;
     const transportedBy = this.jobEntryTableForm.controls['transportedBy'].value;
@@ -1036,7 +1037,7 @@ export class JobEntryPageComponent implements OnInit {
         "containerNum"
       ]
       this.jsonFormBlControls = this.allBlControls.filter(x => !controls.includes(x.name));
-      const exportType=this.exportType.filter((x)=>x.value!="E01");
+      const exportType = this.exportType.filter((x) => x.value != "E01");
       this.isImport = true;
       this.jsonJobFormControls = this.jsonJobFormControls.map((x) => {
         if (x.name === "exportType") {
@@ -1057,7 +1058,7 @@ export class JobEntryPageComponent implements OnInit {
       ]
       this.isImport = false;
       this.jsonFormBlControls = this.allBlControls.filter(x => !controls.includes(x.name));
-      const exportType=this.exportType.filter((x)=>x.value=="E01");
+      const exportType = this.exportType.filter((x) => x.value == "E01");
       this.jsonJobFormControls = this.jsonJobFormControls.map((x) => {
         if (x.name === "exportType") {
           return { ...x, value: exportType };
@@ -1209,23 +1210,35 @@ export class JobEntryPageComponent implements OnInit {
     /*Below the Code which is For get a data From General Master Collection*/
     this.jobType = await this.generalService.getGeneralMasterData("JOBTYP");
     this.tranBy = await this.generalService.getGeneralMasterData("TRANBY");
-    this.tranMode = await this.generalService.getGeneralMasterData("tran_mode");
+    this.tranMode = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
     this.exportType = await this.generalService.getGeneralMasterData("EXPTYP");
+
+
     /*Below the Code is to Set a Dropdown Value For Static Dropdown 
     ``setGeneralMasterData`` is a Common Function*/
-    setGeneralMasterData(this.jsonAllJobControls,this.jobType,"jobType");
-    setGeneralMasterData(this.jsonAllJobControls,this.tranBy,"transportedBy");
-    setGeneralMasterData(this.jsonAllJobControls,this.tranMode,"transportMode");
-    setGeneralMasterData(this.jsonAllJobControls,this.exportType,"exportType");
+    this.filter.Filter(
+      this.jsonAllJobControls,
+      this.jobEntryTableForm,
+      this.tranMode,
+      'transportMode',
+      false
+    );
+    setGeneralMasterData(this.jsonAllJobControls, this.jobType, "jobType");
+    setGeneralMasterData(this.jsonAllJobControls, this.tranBy, "transportedBy");
+    //  setGeneralMasterData(this.jsonAllJobControls,this.tranMode,"transportMode");
+    setGeneralMasterData(this.jsonAllJobControls, this.exportType, "exportType");
     this.onJobChanged();
+    const tranMode= this.tranMode.find((x)=>x.name=="Road")
+    this.jobEntryTableForm.controls['transportMode'].setValue(tranMode);
+  
     /*End*/
 
   }
   /*Below is Docket Function Which is For AutoComplate*/
   async getShipment(event) {
-    let billingParty=this.jobEntryTableForm.value.billingParty.value;
-    if (typeof (event.eventArgs)=="string") {
-     await this.docketService.getDocketsForAutoComplete(this.containorTableForm, this.jsonFormTableControls, event.field.name, this.cnoteNoStatus,billingParty);
+    let billingParty = this.jobEntryTableForm.value.billingParty.value;
+    if (typeof (event.eventArgs) == "string") {
+      await this.docketService.getDocketsForAutoComplete(this.containorTableForm, this.jsonFormTableControls, event.field.name, this.cnoteNoStatus, billingParty);
     }
   }
   /*End*/

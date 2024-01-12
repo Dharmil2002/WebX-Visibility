@@ -464,7 +464,10 @@ export class DeliveryMrGeneration {
                         name: "required",
                         message: "Collection Amount is required"
                     },
-                ]
+                ],
+                functions: {
+                    onChange: "setPartiallyCollected"
+                },
             },
             {
                 name: "GSTCharged",
@@ -477,7 +480,7 @@ export class DeliveryMrGeneration {
                 Validations: []
             },
             {
-                name: "PartiallyCollected ",
+                name: "PartiallyCollected",
                 label: "Partially Collected ",
                 placeholder: "Partially Collected ",
                 type: "checkbox",
@@ -487,12 +490,25 @@ export class DeliveryMrGeneration {
                 Validations: []
             },
             {
-                name: "RoundOff ",
+                name: "RoundOff",
                 label: "Round Off",
                 placeholder: "Round Off",
                 type: "checkbox",
                 value: false,
                 generatecontrol: true,
+                disable: true,
+                Validations: [],
+                functions: {
+                    onChange: "applyRoundOffIfChecked"
+                }
+            },
+            {
+                name: "PartiallyCollectedAmt",
+                label: "Round Off",
+                placeholder: "Round Off",
+                type: "number",
+                value: 0,
+                generatecontrol: false,
                 disable: true,
                 Validations: []
             },

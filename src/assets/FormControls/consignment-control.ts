@@ -209,7 +209,13 @@ export class ConsignmentControl {
           {
             name: "required",
             message: "Destination is required",
-          }
+          }, {
+            name: "autocomplete",
+        },
+        {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+        }
         ],
         additionalData: {
           showNameAndValue: false,

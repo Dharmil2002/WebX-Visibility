@@ -91,6 +91,7 @@ import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.comp
 import { ListContainerComponent } from './Container Master/list-container/list-container.component';
 import { AddContainerComponent } from './Container Master/add-container/add-container.component';
 import { ViewPrintComponent } from './view-print/view-print.component';
+import { ProductListComponent } from './shard-product/product-list/product-list.component';
 
 
 const routes: Routes = [
@@ -110,8 +111,8 @@ const routes: Routes = [
   { path: 'Docket/ManifestGeneration', component: ManifestGenerationComponent },
   { path: 'CompanyGSTMaster/CompanyGSTMasterList', component: CompanygstmasterListComponent },
   { path: 'CompanyGSTMaster/AddCompanyGSTMaster', component: CompanygstmasterAddComponent },
-  { path: "StateMaster/StateMasterView", component: StateMasterListComponent },
-  { path: "StateMaster/AddState", component: AddStateMasterComponent },
+  { path: "StateMasterView", component: StateMasterListComponent },
+  { path: "AddState", component: AddStateMasterComponent },
   { path: "CityMasterView", component: CityMasterListComponent },
   { path: "AddCity", component: AddCityMasterComponent },
   { path: "DriverMaster/DriverMasterList", component: DriverMasterComponent },
@@ -129,8 +130,8 @@ const routes: Routes = [
   { path: "DocumentControlRegister/SplitDCR", component: SplitDcrComponent },
   { path: "VehicleTypeMaster/VehicleTypeMasterList", component: VehicletypeMasterListComponent },
   { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },
-  { path: "PinCodeMaster/PinCodeMasterList", component: PincodeMasterListComponent },
-  { path: "PinCodeMaster/AddPinCodeMaster", component: AddPinCodeMasterComponent },
+  { path: "PinCodeMasterList", component: PincodeMasterListComponent },
+  { path: "AddPinCodeMaster", component: AddPinCodeMasterComponent },
   { path: "VehicleMaster/VehicleMasterList", component: VehicleMasterListComponent },
   { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },
   { path: "RouteLocationWise/RouteList", component: RouteMasterLocationWiseComponent },
@@ -174,7 +175,7 @@ const routes: Routes = [
 
   //Product Master Router
   { path: "ProductMaster/ListProduct", component: ListProductComponent },
-  { path: "ProductMaster/shardProductList", component: ShardProductComponent },
+  // { path: "ProductMaster/shardProductList", component: ShardProductComponent },
 
   //Account Master Router
   { path: "AccountMaster/AccountMasterList", component: AccountMasterComponent },
@@ -202,6 +203,7 @@ const routes: Routes = [
   { path: "ContainerMaster/ListContainer", component: ListContainerComponent },
 
 
+  { path: "shardProduct/shardProductList", component: ProductListComponent },
 ];
 
 @NgModule({

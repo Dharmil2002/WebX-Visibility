@@ -40,7 +40,6 @@ export class AddProductComponent implements OnInit {
   companyCode = parseInt(localStorage.getItem("companyCode"));
   tableData: any[];
   ProductNameData: any[];
-  isCompany: boolean;
   constructor(
     public dialogRef: MatDialogRef<AddProductComponent>,
     private fb: UntypedFormBuilder,
@@ -49,18 +48,13 @@ export class AddProductComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     console.log("data", data);
-    this.isCompany = data.isCompany;
   }
 
   ngOnInit(): void {
     this.initializeFormControl();
-    if (this.isCompany) {
-      this.bindDropdown();
-      this.getList();
-      this.GetTableData();
-    } else {
-      this.getShardProduct();
-    }
+    this.bindDropdown();
+    this.getList();
+    this.GetTableData();
   }
 
   async getList() {
@@ -78,9 +72,7 @@ export class AddProductComponent implements OnInit {
 
   initializeFormControl() {
     const customerFormControls = new ProductControls();
-    this.jsonControlArray = customerFormControls.getProductControlsArray(
-      this.isCompany
-    );
+    this.jsonControlArray = customerFormControls.getProductControlsArray(true);
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
@@ -142,58 +134,23 @@ export class AddProductComponent implements OnInit {
     }
   }
 
-  async getShardProduct() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "products",
-    };
-    const Res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-    if (Res?.success) {
-      this.tableData = Res?.data;
-      this.customerTableForm.controls.ProductID.setValue(
-        `${parseInt(this.tableData[this.tableData.length - 1]._id) + 1}`
-      );
-    }
-  }
+  
 
   async save() {
     let req;
-    if (this.isCompany) {
-      const Body = {
-        ProductName: this.customerTableForm.value.ProductName.name,
-        ProductID: this.customerTableForm.value.ProductID,
-        companyCode: this.companyCode,
-        updatedDate: new Date(),
-        updatedBy: localStorage.getItem("UserName"),
-      };
-      req = {
-        companyCode: this.companyCode,
-        collectionName: "product_detail",
-        data: Body,
-      };
-    } else {
-      const Body = {
-        product_name: this.customerTableForm.value.ProductName,
-        product_id: this.customerTableForm.value.ProductID,
-        _id: `${
-          this.customerTableForm.value.ProductID
-        } - ${this.customerTableForm.value.ProductName.toUpperCase().substring(
-          0,
-          3
-        )}`,
-        updatedDate: new Date(),
-        updatedBy: localStorage.getItem("UserName"),
-        active: true,
-      };
-      req = {
-        companyCode: this.companyCode,
-        collectionName: "products",
-        data: Body,
-      };
-    }
+    const Body = {
+      _id:`${this.companyCode}-${this.customerTableForm.value.ProductID}`,
+      ProductName: this.customerTableForm.value.ProductName.name,
+      ProductID: this.customerTableForm.value.ProductID,
+      companyCode: this.companyCode,
+      updatedDate: new Date(),
+      updatedBy: localStorage.getItem("UserName"),
+    };
+    req = {
+      companyCode: this.companyCode,
+      collectionName: "product_detail",
+      data: Body,
+    };
     const res = await this.masterService
       .masterPost("generic/create", req)
       .toPromise();
@@ -223,30 +180,34 @@ export class AddProductComponent implements OnInit {
 
   handleProductId() {
     this.customerTableForm.controls.ProductID.setValue(
-      "P" + this.customerTableForm.value.ProductName.value
+      this.customerTableForm.value.ProductName.value
     );
   }
 
-  async handleProductName() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "products",
-    };
-    const Res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-    if (Res?.success && Res.data.length > 0) {
-      const FilterData = Res.data.filter((x)=> x.product_name.toLowerCase() == this.customerTableForm.value.ProductName.toLowerCase())
-      if(FilterData.length != 0){
-        this.customerTableForm.controls.ProductName.setValue("");
-        Swal.fire({
-          icon: "info",
-          title: "info",
-          text: "Product name exist!",
-          showConfirmButton: true,
-        });
-      }
-    }
-  }
+  // async handleProductName() {
+  //   let req = {
+  //     companyCode: this.companyCode,
+  //     filter: {},
+  //     collectionName: "products",
+  //   };
+  //   const Res = await this.masterService
+  //     .masterPost("generic/get", req)
+  //     .toPromise();
+  //   if (Res?.success && Res.data.length > 0) {
+  //     const FilterData = Res.data.filter(
+  //       (x) =>
+  //         x.product_name.toLowerCase() ==
+  //         this.customerTableForm.value.ProductName.toLowerCase()
+  //     );
+  //     if (FilterData.length != 0) {
+  //       this.customerTableForm.controls.ProductName.setValue("");
+  //       Swal.fire({
+  //         icon: "info",
+  //         title: "info",
+  //         text: "Product name exist!",
+  //         showConfirmButton: true,
+  //       });
+  //     }
+  //   }
+  // }
 }

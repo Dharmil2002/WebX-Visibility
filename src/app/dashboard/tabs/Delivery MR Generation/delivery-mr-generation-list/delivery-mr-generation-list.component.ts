@@ -11,7 +11,6 @@ import { Router } from '@angular/router';
 export class DeliveryMrGenerationListComponent implements OnInit {
   tableData: [] | any;
   tableload = true; // flag , indicates if data is still loading or not , used to show loading animation
-  drillDownPath: string;
   companyCode: number = parseInt(localStorage.getItem("companyCode"));
   menuItemflag: boolean = false;
   METADATA = {
@@ -119,7 +118,8 @@ export class DeliveryMrGenerationListComponent implements OnInit {
 
       // Update tableData property with the modified data
       this.tableData = modifiedData.map(x => ({
-        ...x, Actions: "Delivery MR Generation"
+        ...x,
+        Actions: x.status === 'Delivery MR Generated' ? '' : 'Delivery MR Generation'
       }));
 
       // Set tableload to false to indicate that the table loading is complete

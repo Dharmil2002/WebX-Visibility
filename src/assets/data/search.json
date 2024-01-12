@@ -105,22 +105,6 @@
       "router": "Masters/CompanyGSTMaster/AddCompanyGSTMaster"
     },
     {
-      "title": "StateMaster/StateMasterView",
-      "tag": [
-        "StateMaster",
-        "StateMasterView"
-      ],
-      "router": "Masters/StateMaster/StateMasterView"
-    },
-    {
-      "title": "StateMaster/AddState",
-      "tag": [
-        "StateMaster",
-        "AddState"
-      ],
-      "router": "Masters/StateMaster/AddState"
-    },
-    {
       "title": "DriverMaster/DriverMasterList",
       "tag": [
         "DriverMaster",
@@ -247,22 +231,6 @@
         "AddVehicleTypeMaster"
       ],
       "router": "Masters/VehicleTypeMaster/AddVehicleTypeMaster"
-    },
-    {
-      "title": "PinCodeMaster/PinCodeMasterList",
-      "tag": [
-        "PinCodeMaster",
-        "PinCodeMasterList"
-      ],
-      "router": "Masters/PinCodeMaster/PinCodeMasterList"
-    },
-    {
-      "title": "PinCodeMaster/AddPinCodeMaster",
-      "tag": [
-        "PinCodeMaster",
-        "AddPinCodeMaster"
-      ],
-      "router": "Masters/PinCodeMaster/AddPinCodeMaster"
     },
     {
       "title": "VehicleMaster/VehicleMasterList",
@@ -836,7 +804,7 @@
         "shard-Product",
         "shard-Product"
       ],
-      "router": "Masters/ProductMaster/shardProductList"
+      "router": "Masters/shardProduct/shardProductList"
     },
     {
       "title": "Reports/Vendor-Wise-GST-Invoice-Register-Report",

@@ -1,22 +1,25 @@
 import { Component, OnInit } from "@angular/core";
-import { AddProductComponent } from "../add-product/add-product.component";
-import { ProductChargesComponent } from "../product-charges/product-charges.component";
-import { ProductServicesComponent } from "../product-services/product-services.component";
-import Swal from "sweetalert2";
 import { MatDialog } from "@angular/material/dialog";
+import { ActivatedRoute } from "@angular/router";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { ActivatedRoute, Router } from "@angular/router";
+import Swal from "sweetalert2";
+import { ProductChargesComponent } from "../../product-master/product-charges/product-charges.component";
+import { ProductServicesComponent } from "../../product-master/product-services/product-services.component";
+import { ShardProductAddComponent } from "../shard-product-add/shard-product-add.component";
+import { ShardProductChargesComponent } from "../shard-product-charges/shard-product-charges.component";
+import { ShardProductServicesComponent } from "../shard-product-services/shard-product-services.component";
+// import { AddShardProductComponent } from '../add-shard-product/add-shard-product.component';
 
 @Component({
-  selector: "app-list-product",
-  templateUrl: "./list-product.component.html",
+  selector: "app-product-list",
+  templateUrl: "./product-list.component.html",
 })
-export class ListProductComponent implements OnInit {
+export class ProductListComponent implements OnInit {
   breadScrums = [
     {
-      title: "Product List",
+      title: "Shard Product List",
       items: ["Home"],
-      active: "Product Master",
+      active: "Shard Product Master",
     },
   ];
   linkArray = [];
@@ -75,6 +78,7 @@ export class ListProductComponent implements OnInit {
   productNameList: any = [];
   tableData: any;
   isTableLode = false;
+  isCompany: any = true;
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
@@ -89,66 +93,29 @@ export class ListProductComponent implements OnInit {
     let req = {
       companyCode: this.companyCode,
       filter: {},
-      collectionName: "product_detail",
+      collectionName: "products",
     };
-
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
     if (Res?.success) {
       this.tableData = Res?.data.map((x, index) => {
         return {
-          ...x,
+          ProductName: x.product_name,
+          ProductID: x.product_id,
           SrNo: index + 1,
           Charges: "Charges",
           Services: "Services",
         };
       });
       this.isTableLode = true;
-    } else {
-      this.tableData = [];
-      this.isTableLode = true;
     }
   }
-  AddNew(){
-    this.getProductNameList()
-  }
-
-  async getProductNameList() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "products",
-    };
-    const Res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-    if (Res.success && Res.data.length > 0) {
-      let isAddList = []
-      const ProductNameList = this.tableData.map((x)=>{
-        return x.ProductName;
-      })
-      Res.data.forEach((x)=>{
-        if(!ProductNameList.includes(x.product_name)){
-          isAddList.push(x)
-        }
-      })
-      if(isAddList.length != 0){
-        this.AddNewPopUp()
-      }else{
-        Swal.fire({
-          icon: "info",
-          title: "info",
-          text: "All Product add Successful!!",
-          showConfirmButton: true,
-        });
-      }
-    }
-  }
-  AddNewPopUp() {
-    const dialogref = this.dialog.open(AddProductComponent, {
+  AddNew() {
+    const dialogref = this.dialog.open(ShardProductAddComponent, {
       width: "600px",
-      height: "280px",
+      height: "300px",
+      disableClose:true,
       data: {},
     });
     dialogref.afterClosed().subscribe((result) => {
@@ -164,8 +131,7 @@ export class ListProductComponent implements OnInit {
     });
   }
   addCharges(event) {
-    console.log("event", event);
-    const dialogref = this.dialog.open(ProductChargesComponent, {
+    const dialogref = this.dialog.open(ShardProductChargesComponent, {
       width: "80%",
       height: "80%",
       data: { element: event },
@@ -173,16 +139,14 @@ export class ListProductComponent implements OnInit {
     dialogref.afterClosed().subscribe((result) => {});
   }
   addServices(event) {
-    const dialogref = this.dialog.open(ProductServicesComponent, {
+    const dialogref = this.dialog.open(ShardProductServicesComponent, {
       width: "70%",
       height: "80%",
       data: { element: event },
     });
     dialogref.afterClosed().subscribe((result) => {});
   }
-
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {

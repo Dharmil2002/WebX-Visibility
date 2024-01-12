@@ -1,0 +1,22 @@
+<!-- <p>add-product works!</p> -->
+<div style="width: 100%;">
+    <ul class="m-0" style="padding-left: 10px; display: flex; justify-content: space-between;">
+        <li style=" font-weight: 700; font-size: 1.5rem; list-style: none;">
+            Shard Product Add
+        </li>
+        <li style="margin-bottom: 5px; border-radius: 50px; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center; margin-right: 10px; cursor: pointer; background-color: rgba(0,0,0,0.1);"
+            (click)="close()">
+            <mat-icon fontIcon="close"></mat-icon>
+        </li>
+    </ul>
+    <div>
+        <div>
+            <form [formGroup]="ProductShardTableForm">
+                <app-form-webxpress [form]="ProductShardTableForm" [formData]="jsonControlArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'" [showSaveAndCancelButton]="true"
+                    (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+</div>

@@ -320,34 +320,33 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       const json = {
         id: data.id,
         consignmentNoteNumber: data.consignmentNoteNumber,
-        Multipointdelivery: parseFloat(data["Multi-point delivery"]),
-        Document: parseFloat(data.Document),
-        Insurance: parseFloat(data.Insurance),
-        GreenTax: parseFloat(data["Green Tax"]),
-        Demurrage: parseFloat(data.Demurrage),
-        Discount: parseFloat(data.Discount),
-        GST: parseFloat(data.GST),
-        Unloading: parseFloat(data.Unloading),
-        Freight: parseFloat(data.Freight),
-        Loading: parseFloat(data.Loading),
-        newSubTotal: parseFloat(data.newSubTotal),
-        subTotal: data.subTotal,
+        Multipointdelivery: parseFloat(data["Multi-point delivery"]) || 0,
+        Document: parseFloat(data.Document) || 0,
+        Insurance: parseFloat(data.Insurance) || 0,
+        GreenTax: parseFloat(data["Green Tax"]) || 0,
+        Demurrage: parseFloat(data.Demurrage) || 0,
+        Discount: parseFloat(data.Discount) || 0,
+        GST: parseFloat(data.GST) || 0,
+        Unloading: parseFloat(data.Unloading) || 0,
+        Freight: parseFloat(data.Freight) || 0,
+        Loading: parseFloat(data.Loading) || 0,
+        newSubTotal: parseFloat(data.newSubTotal) || 0,
+        subTotal: data.subTotal || 0,
         rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
-        totalAmount: (parseFloat(data.Document) +
-          + parseFloat(data.Insurance)
-          + parseFloat(data["Green Tax"])
-          + parseFloat(data.Demurrage)
-          + parseFloat(data.GST)
-          + parseFloat(data.Unloading)
-          + parseFloat(data.Freight)
-          + parseFloat(data.Loading)) - parseFloat(data.Discount),
+        totalAmount: (parseFloat(data.Document || 0) +
+          + parseFloat(data.Insurance || 0)
+          + parseFloat(data["Green Tax"] || 0)
+          + parseFloat(data.Demurrage || 0)
+          + parseFloat(data.GST || 0)
+          + parseFloat(data.Unloading || 0)
+          + parseFloat(data.Freight || 0)
+          + parseFloat(data.Loading || 0)) - parseFloat(data.Discount || 0),
         payBasis: data.payBasis,
         actions: ['Edit']
       };
       this.tableData = this.tableData.filter(item => item.id !== data.id);
       this.tableData.unshift(json);
       this.tableload = false;
-
       let totalMr = 0;
       this.tableData.forEach(item => {
         totalMr += item.totalAmount;
@@ -610,7 +609,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const totalGSTamt = this.billingForm.value.GSTAmount || 0;
 
     // Calculate the DeliveryMRNetAmount by adding TDS and GST amounts
-    const deliveryMramt = totalTDSamt + totalGSTamt;
+    const deliveryMramt = parseFloat(totalTDSamt + totalGSTamt).toFixed(2);
 
     // Set the DeliveryMRNetAmount in the form
     this.billingForm.get("DeliveryMRNetAmount").setValue(deliveryMramt);
@@ -644,109 +643,176 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to save data to collection delivery_mr_header and delivery_mr_details
   async submit() {
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
-        const headerRequest = {
-          cID: this.objStorageService.companyCode,
-          dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
-          dLVRT: this.headerDetails.Deliveredto,
-          cNTCTNO: this.headerDetails.ContactNumber,
-          rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
-          CONSGNM: this.headerDetails.NameofConsignee ? this.headerDetails.NameofConsignee : '',
-          mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
-          bNK: this.PaymentSummaryFilterForm.value.Bank.name,
-          cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo,
-          cHQDT: this.PaymentSummaryFilterForm.value.Date,
-          iSUBNK: this.PaymentSummaryFilterForm.value.issuedFromBank,
-          oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
-          dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
-          dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
-          bILNGPRT: this.billingForm.value.BillingParty,
-          bKNGST: this.billingForm.value.Stateofbooking,
-          sPLYSTNM: this.billingForm.value.StateofSupply.name,
-          sPLYSTCD: this.billingForm.value.StateofSupply.value,
-          sACCDNM: this.billingForm.value.SACCode.name,
-          sACCd: this.billingForm.value.SACCode.value,
-          gSTRT: this.billingForm.value.GSTRate,
-          gSTAMT: this.billingForm.value.GSTAmount,
-          tDSSCTCD: this.billingForm.value.TDSSection.value,
-          tDSSCTNM: this.billingForm.value.TDSSection.name,
-          tDSRT: this.billingForm.value.TDSRate,
-          tDSAmt: this.billingForm.value.TDSAmount,
-          gSTCHRGD: this.billingForm.value.GSTCharged,
-          dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
-          cLLCTAMT: this.billingForm.value.CollectionAmount,
-          pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
-          rNDOF: this.billingForm.value.RoundOff,
-          eNTDT: new Date(),
-          eNTLOC: this.objStorageService.branch,
-          eNTBY: this.objStorageService.userName
-        }
-        const detailRequests = this.tableData.map(element => {
-          return {
+    if (this.tableData.length === 0 || !this.billingForm.valid) {
+      Swal.fire({
+        text: 'Please fill the required details above',
+        icon: "warning",
+        title: 'Warning',
+        showConfirmButton: true,
+      });
+      return false
+    } else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          const headerRequest = {
             cID: this.objStorageService.companyCode,
-            dOCNO: element.consignmentNoteNumber,
-            mLTPNTDLRY: element.Multipointdelivery,
-            dOC: element.Document,
-            iNSURNC: element.Insurance,
-            gRNTX: element.GreenTax,
-            dMRG: element.Demurrage,
-            dISCNT: element.Discount,
-            gST: element.GST,
-            uNLODNG: element.Unloading,
-            fRGHT: element.Freight,
-            lODNG: element.Loading,
-            //cNSGTNO:
-            pYBASIS: element.payBasis,
-            sUBTTL: element.subTotal,
-            nWSUBTTL: element.newSubTotal,
-            rTDFRNC: element.rateDifference,
-            //dORDLVRY:
-            // fRCLPCHRGE:
-            //   gTPSCHRG:
-            // oTHRCHRG:
-            tOTL: element.totalAmount,
+            dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
+            dLVRT: this.headerDetails.Deliveredto,
+            cNTCTNO: this.headerDetails.ContactNumber,
+            rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
+            CONSGNM: this.headerDetails.NameofConsignee ? this.headerDetails.NameofConsignee : '',
+            mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
+            bNK: this.PaymentSummaryFilterForm.value.Bank.name,
+            cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo,
+            cHQDT: this.PaymentSummaryFilterForm.value.Date,
+            iSUBNK: this.PaymentSummaryFilterForm.value.issuedFromBank,
+            oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
+            dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
+            dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
+            bILNGPRT: this.billingForm.value.BillingParty,
+            bKNGST: this.billingForm.value.Stateofbooking,
+            sPLYSTNM: this.billingForm.value.StateofSupply.name,
+            sPLYSTCD: this.billingForm.value.StateofSupply.value,
+            sACCDNM: this.billingForm.value.SACCode.name,
+            sACCd: this.billingForm.value.SACCode.value,
+            gSTRT: this.billingForm.value.GSTRate,
+            gSTAMT: this.billingForm.value.GSTAmount,
+            tDSSCTCD: this.billingForm.value.TDSSection.value,
+            tDSSCTNM: this.billingForm.value.TDSSection.name,
+            tDSRT: this.billingForm.value.TDSRate,
+            tDSAmt: this.billingForm.value.TDSAmount,
+            gSTCHRGD: this.billingForm.value.GSTCharged,
+            dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
+            cLLCTAMT: this.billingForm.value.CollectionAmount,
+            pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
+            pRTLYRMGAMT: (this.billingForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
             eNTDT: new Date(),
             eNTLOC: this.objStorageService.branch,
             eNTBY: this.objStorageService.userName
-
           }
-        });
+          const detailRequests = this.tableData.map(element => {
+            return {
+              cID: this.objStorageService.companyCode,
+              dOCNO: element.consignmentNoteNumber,
+              mLTPNTDLRY: element.Multipointdelivery,
+              dOC: element.Document,
+              iNSURNC: element.Insurance,
+              gRNTX: element.GreenTax,
+              dMRG: element.Demurrage,
+              dISCNT: element.Discount,
+              gST: element.GST,
+              uNLODNG: element.Unloading,
+              fRGHT: element.Freight,
+              lODNG: element.Loading,
+              //cNSGTNO:
+              pYBASIS: element.payBasis,
+              sUBTTL: element.subTotal,
+              nWSUBTTL: element.newSubTotal,
+              rTDFRNC: element.rateDifference,
+              //dORDLVRY:
+              // fRCLPCHRGE:
+              //   gTPSCHRG:
+              // oTHRCHRG:
+              tOTL: element.totalAmount,
+              eNTDT: new Date(),
+              eNTLOC: this.objStorageService.branch,
+              eNTBY: this.objStorageService.userName
 
-        let data = {
-          chargeDetails: detailRequests,
-          ...headerRequest
-        };
+            }
+          });
 
-        // Prepare the request body with company code, collection name, and job detail data.
-        let reqBody = {
-          companyCode: this.objStorageService.companyCode,
-          //collectionName: "delivery_mr_header",
-          docType: "MR",
-          branch: this.objStorageService.branch,
-          finYear: financialYear,
-          data: data
-        };
-        console.log(reqBody);
+          let data = {
+            chargeDetails: detailRequests,
+            ...headerRequest
+          };
+          // Prepare the request body with company code, collection name, and job detail data.
+          let reqBody = {
+            companyCode: this.objStorageService.companyCode,
+            //collectionName: "delivery_mr_header",
+            docType: "MR",
+            branch: this.objStorageService.branch,
+            finYear: financialYear,
+            data: data
+          };
 
-        // Send a POST request to create the job detail in the MongoDB collection.
-        const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
-        if (res) {
-          Swal.fire({
-            icon: "success",
-            title: "Delivery MR Created Successfully",
-            text: "Delivery MR No: " + res?.data?.chargeDetails?.ops[0].dLMRNO,
-            showConfirmButton: true,
-          })
+          //Send a POST request to create the job detail in the MongoDB collection.
+          const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
+          if (res) {
+            Swal.hideLoading();
+            setTimeout(() => {
+              Swal.close();
+            }, 2000);
+            // If the branches match, navigate to the DeliveryMrGeneration page
+            this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
+              state: {
+                data: res.data.chargeDetails
+              },
+            });
+          }
         }
-      }
-      catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal(
-          "error",
-          "Fail To Submit Data..!"
-        );
-      }
-    }, "Delivery MR Generating..!");
+        catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+        }
+      }, "Delivery MR Generating..!");
+    }
+
+  }
+  //#endregion
+  //#region to roundoff delivery Amount
+  applyRoundOffIfChecked() {
+    const isChecked = this.billingForm.value.RoundOff;
+    const deliveryMRNetAmountControl = this.billingForm.get("DeliveryMRNetAmount");
+    let value = deliveryMRNetAmountControl.value;
+
+    if (isChecked) {
+      // Round off the value to the nearest integer
+      const roundedValue = value ? Math.round(value) : 0;
+
+      // Set the rounded value back to the form control
+      deliveryMRNetAmountControl.setValue(roundedValue);
+    } else {
+      // No rounding required, set the original value
+      deliveryMRNetAmountControl.setValue(value);
+    }
+  }
+  //#endregion
+  //#region to set Partially Collected checkbox value
+  setPartiallyCollected() {
+    // Reset values
+    this.billingForm.get("PartiallyCollectedAmt").setValue(0);
+    this.billingForm.get("PartiallyCollected").setValue(false);
+
+    // Get values from the form
+    const collectedAMT = this.billingForm.value.CollectionAmount;
+    const mrNetAMT = this.billingForm.value.DeliveryMRNetAmount;
+
+    // Check conditions
+    if (collectedAMT < mrNetAMT) {
+      const PartiallyCollectedAmt = mrNetAMT - collectedAMT;
+
+      // Set values and log
+      this.billingForm.get("PartiallyCollected").setValue(true);
+      this.billingForm.get("PartiallyCollectedAmt").setValue(PartiallyCollectedAmt);
+      //console.log("Partially Collected Amount:", PartiallyCollectedAmt);
+    } else if ((collectedAMT > mrNetAMT)) {
+
+      Swal.fire({
+        icon: "info",
+        title: `Delivery MR Net Amount should be less than CollectionAmount`,
+        showConfirmButton: true,
+      });
+      this.billingForm.controls.CollectionAmount.reset();
+      // No partial collection
+      this.billingForm.get("PartiallyCollected").setValue(false);
+      return;
+    }
+    else {
+      // No partial collection
+      this.billingForm.get("PartiallyCollected").setValue(false);
+    }
   }
   //#endregion
 }

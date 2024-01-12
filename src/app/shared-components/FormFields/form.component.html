@@ -293,7 +293,7 @@
                   <!--Checkbox-->
                   <ng-container *ngIf="formItem.type === 'checkbox'">
                     <ng-container *ngIf="formItem.generatecontrol">
-                      <mat-checkbox class="example-full-width" [formControlName]="formItem.name"
+                      <mat-checkbox class="example-full-width" [formControlName]="formItem.name"  (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
                         style=" margin: auto 5px; margin-top: 15px;">
                         {{formItem.label}}
                       </mat-checkbox>

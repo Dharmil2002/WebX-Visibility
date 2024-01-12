@@ -245,9 +245,15 @@ export class JobControl {
                 }
             },
             {
-                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'Staticdropdown',
+                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'dropdown',
                 value: [], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [],
+                Validations: [ {
+                    name: "autocomplete",
+                },
+                {
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                }],
                 functions: {
                     onSelection: "tranPortChanged"
                 },

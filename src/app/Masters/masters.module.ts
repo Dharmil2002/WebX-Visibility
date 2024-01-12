@@ -170,6 +170,10 @@ import { BusinessAssociateBulkUploadComponent } from './vendor-contract/vendorCo
 import { AddContainerComponent } from './Container Master/add-container/add-container.component';
 import { ListContainerComponent } from './Container Master/list-container/list-container.component';
 import { ViewPrintComponent } from './view-print/view-print.component';
+import { ProductListComponent } from './shard-product/product-list/product-list.component';
+import { ShardProductChargesComponent } from './shard-product/shard-product-charges/shard-product-charges.component';
+import { ShardProductServicesComponent } from './shard-product/shard-product-services/shard-product-services.component';
+import { ShardProductAddComponent } from './shard-product/shard-product-add/shard-product-add.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -355,6 +359,10 @@ import { ViewPrintComponent } from './view-print/view-print.component';
     AddContainerComponent,
     ListContainerComponent,
     ViewPrintComponent,
+    ProductListComponent,
+    ShardProductChargesComponent,
+    ShardProductServicesComponent,
+    ShardProductAddComponent,
   ],
 
   providers: [

@@ -78,7 +78,14 @@ export class ProductChargesComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
 
-  staticField = ["SrNo", "VariabilityType", "cHABEH", "aDD_DEDU", "sELCHA" , "cHACAT"];
+  staticField = [
+    "SrNo",
+    "VariabilityType",
+    "cHABEH",
+    "aDD_DEDU",
+    "sELCHA",
+    "cHACAT",
+  ];
   tableData = [];
   ProductId: any;
   ProductName: any;
@@ -106,7 +113,6 @@ export class ProductChargesComponent implements OnInit {
 
   ngOnInit(): void {
     this.GetTableData();
-    // this.HendelFormFunction()
   }
   HendelFormFunction() {
     this.initializeFormControl();
@@ -115,8 +121,8 @@ export class ProductChargesComponent implements OnInit {
     this.ChargesListDropdown();
   }
   initializeFormControl() {
-    const customerFormControls = new ProductControls();
-    this.jsonControlArray = customerFormControls.getChargesControlsArray();
+    const customerFormControls = new ProductControls(this.isUpdate);
+    this.jsonControlArray = customerFormControls.getChargesControlsArray(this.isUpdate);
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
 
@@ -127,6 +133,9 @@ export class ProductChargesComponent implements OnInit {
       );
       this.customerTableForm.controls["Variability"].setValue(
         this.UpdatedData.vAR
+      );
+      this.customerTableForm.controls["ChargesCode"].setValue(
+        this.UpdatedData.cHACD
       );
     }
   }
@@ -161,15 +170,6 @@ export class ProductChargesComponent implements OnInit {
           value: x.cHCD,
         };
       });
-      this.ChargesData = [];
-      this.ChargesList.forEach((x) => {
-        const FilterData = this.tableData.filter(
-          (t) => t.SelectCharges == x.name
-        );
-        if (FilterData.length == 0) {
-          this.ChargesData.push(x);
-        }
-      });
 
       if (this.isUpdate) {
         const element = this.ChargesList.find(
@@ -178,10 +178,11 @@ export class ProductChargesComponent implements OnInit {
         this.ChargesData.push(element);
         this.customerTableForm.controls["SelectCharges"].setValue(element);
       }
+
       this.filter.Filter(
         this.jsonControlArray,
         this.customerTableForm,
-        this.ChargesData,
+        this.ChargesList,
         this.SelectChargesCode,
         this.SelectChargesStatus
       );
@@ -207,7 +208,6 @@ export class ProductChargesComponent implements OnInit {
         const element = this.ChargesBehaviourList.find(
           (x) => x.name == this.UpdatedData.cHABEH
         );
-        console.log("element", element);
         this.customerTableForm.controls["ChargesBehaviour"].setValue(element);
       }
       this.filter.Filter(
@@ -231,7 +231,6 @@ export class ProductChargesComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-    console.log("product_charges_detail", Res);
     if (Res?.success) {
       this.tableData = Res?.data.map((x, index) => {
         return {
@@ -249,11 +248,10 @@ export class ProductChargesComponent implements OnInit {
   async save() {
     const Body = {
       sELCHA: this.customerTableForm.value.SelectCharges.name,
-      cHACAT:this.customerTableForm.value.SelectCharges.cHTY,
+      cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
       cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
       vAR: this.customerTableForm.value.Variability,
       aDD_DEDU: this.customerTableForm.value.Add_Deduct,
-      cHATY: this.selectedValue,
       eNTDT: new Date(),
       eNTLOC: this.storage.branch,
       eNTBY: this.storage.userName,
@@ -262,30 +260,19 @@ export class ProductChargesComponent implements OnInit {
       mODBY: this.storage.userName,
     };
     if (!this.isUpdate) {
-      let Tablereq = {
-        companyCode: this.companyCode,
-        collectionName: "product_charges_detail",
-        filter: {},
-        sorting: { cHACD: -1 },
-      };
-      const resVendor = await firstValueFrom(
-        this.masterService.masterPost("generic/findLastOne", Tablereq)
-      );
-      const LastCode = resVendor.data?.cHACD || "PR0000";
-      const code = nextKeyCode(LastCode);
-      Body["cHACD"] = code;
-      Body["_id"] = `${this.companyCode}-${this.ProductId}-${code}`;
+      Body["cHACD"] = this.customerTableForm.value.ChargesCode;
+      Body[
+        "_id"
+      ] = `${this.companyCode}-${this.ProductId}-${this.customerTableForm.value.ChargesCode}`;
       Body["cID"] = this.companyCode;
       Body["pRNM"] = this.ProductName;
       Body["pRCD"] = this.ProductId;
+      Body["cHATY"] = this.selectedValue;
     }
-    console.log("Body", Body);
     const req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
-      filter: this.isUpdate
-        ? { ChargesCode: this.UpdatedData.ChargesCode }
-        : undefined,
+      filter: this.isUpdate ? { cHACD: this.UpdatedData.cHACD } : undefined,
       update: this.isUpdate ? Body : undefined,
       data: this.isUpdate ? undefined : Body,
     };
@@ -347,5 +334,62 @@ export class ProductChargesComponent implements OnInit {
     this.isUpdate = true;
     this.Tabletab = !this.Tabletab;
     this.HendelFormFunction();
+  }
+
+  Cancel() {
+    this.UpdatedData = "";
+    this.isUpdate = false;
+    this.Tabletab = !this.Tabletab;
+  }
+
+  async handleChargesCode(event) {
+    if (this.isUpdate) {
+      if (this.customerTableForm.value.ChargesCode == this.UpdatedData.cHACD) {
+        return;
+      }
+    }
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "product_charges_detail",
+      filter: { cHACD: this.customerTableForm.value.ChargesCode },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data.length != 0) {
+      this.customerTableForm.controls.ChargesCode.setValue("");
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Charges Code exist",
+        showConfirmButton: true,
+      });
+    }
+  }
+
+  async handleSelectCharges() {
+    if (this.isUpdate) {
+      if (this.customerTableForm.value.SelectCharges.name == this.UpdatedData.sELCHA) {
+        return;
+      }
+    }
+
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "product_charges_detail",
+      filter: { sELCHA: this.customerTableForm.value.SelectCharges.name , cHATY:this.selectedValue ,pRCD:this.ProductId },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data.length != 0) {
+      this.customerTableForm.controls.SelectCharges.setValue("");
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Select Charges exist",
+        showConfirmButton: true,
+      });
+    }
   }
 }

@@ -147,8 +147,17 @@ export class ShardProductChargesComponent implements OnInit {
     };
 
     if (!this.isUpdate) {
-      const length = this.tableData.length;
-      const LastCode = length == 0 ? "CHA0000" : this.tableData[length - 1].cHCD;
+
+      let Tablereq = {
+        companyCode: this.companyCode,
+        collectionName: "charges",
+        filter: {},
+        sorting: { cHCD: -1 },
+      };
+      const resVendor = await firstValueFrom(
+        this.masterService.masterPost("generic/findLastOne", Tablereq)
+      );
+      const LastCode = resVendor.data?.cHCD || "CHA0000";
       const ChargeCode = nextKeyCode(LastCode);
       Body["_id"] = ChargeCode;
       Body["cHCD"] = ChargeCode;
@@ -164,31 +173,31 @@ export class ShardProductChargesComponent implements OnInit {
       data: this.isUpdate ? undefined : Body,
     };
 
-    const res = this.isUpdate
-      ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
-      : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+    // const res = this.isUpdate
+    //   ? await firstValueFrom(
+    //       this.masterService.masterPut("generic/update", req)
+    //     )
+    //   : await firstValueFrom(
+    //       this.masterService.masterPost("generic/create", req)
+    //     );
 
-    if (res?.success) {
-      Swal.fire({
-        icon: "success",
-        title: "Data inserted Successful",
-        text: res.message,
-        showConfirmButton: true,
-      });
-      this.GetTableData();
-      this.Tabletab = !this.Tabletab;
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Data not inserted",
-        text: res.message,
-        showConfirmButton: true,
-      });
-    }
+    // if (res?.success) {
+    //   Swal.fire({
+    //     icon: "success",
+    //     title: "Data inserted Successful",
+    //     text: res.message,
+    //     showConfirmButton: true,
+    //   });
+    //   this.GetTableData();
+    //   this.Tabletab = !this.Tabletab;
+    // } else {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Data not inserted",
+    //     text: res.message,
+    //     showConfirmButton: true,
+    //   });
+    // }
   }
   close() {
     this.dialogRef.close({ isSuccess: false });

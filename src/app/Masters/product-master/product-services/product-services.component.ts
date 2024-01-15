@@ -1,12 +1,13 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { UntypedFormBuilder} from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ProductControls } from "src/assets/FormControls/ProductControls";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 
 @Component({
   selector: "app-product-services",
@@ -43,8 +44,8 @@ export class ProductServicesComponent implements OnInit {
   ProductId: any;
   ProductName: any;
   tableTab = false;
-  ServicesNameList:any;
-  ServicesTypeList:any;
+  ServicesNameList: any;
+  ServicesTypeList: any;
   jsonControlArray: any[];
   customerTableForm: any;
   companyCode = parseInt(localStorage.getItem("companyCode"));
@@ -66,7 +67,6 @@ export class ProductServicesComponent implements OnInit {
     private masterService: MasterService,
     public dialogRef: MatDialogRef<ProductServicesComponent>
   ) {
-    console.log('data' ,data)
     this.ProductId = data.element.ProductID;
     this.ProductName = data.element.ProductName;
   }
@@ -80,7 +80,7 @@ export class ProductServicesComponent implements OnInit {
     this.ServicesTypeDropdown();
   }
   initializeFormControl() {
-    const customerFormControls = new ProductControls();
+    const customerFormControls = new ProductControls(true);
     this.jsonControlArray = customerFormControls.getServicesControlsArray();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -118,7 +118,7 @@ export class ProductServicesComponent implements OnInit {
   async ServicesNameDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: { pRCD: this.ProductId },
       collectionName: "services",
     };
     const Res = await this.masterService
@@ -127,21 +127,14 @@ export class ProductServicesComponent implements OnInit {
     if (Res?.success && Res.data.length > 0) {
       this.ServicesNameList = Res.data.map((x) => {
         return {
-          name: x.service_name,
-          value: x.service_id,
+          name: x.sERNM,
+          value: x.sERCD,
         };
-      });
-      this.ServicesNameData = [];
-      this.ServicesNameList.forEach((x) => {
-        const FilterData = this.tableData.filter((t) => t.ServicesName == x.name);
-        if (FilterData.length == 0) {
-          this.ServicesNameData.push(x);
-        }
       });
       this.filter.Filter(
         this.jsonControlArray,
         this.customerTableForm,
-        this.ServicesNameData,
+        this.ServicesNameList,
         this.ServicesNameCode,
         this.ServicesNameStatus
       );
@@ -195,17 +188,21 @@ export class ProductServicesComponent implements OnInit {
         });
         this.isTable = true;
       } else {
-        this.tableData = []
+        this.tableData = [];
         this.isTableEmt = true;
       }
     }
   }
   async save() {
     const Body = {
+      _id: `${this.companyCode}-${this.customerTableForm.value.ServicesCode}`,
       ProductName: this.ProductName,
       ProductId: this.ProductId,
-      ServicesType: this.customerTableForm.value.ServicesType.map((x)=> {return x.name}).join(','),
+      ServicesType: this.customerTableForm.value.ServicesType.map((x) => {
+        return x.name;
+      }).join(","),
       ServicesName: this.customerTableForm.value.ServicesName.name,
+      ServicesCode: this.customerTableForm.value.ServicesCode,
       companyCode: this.companyCode,
       updatedDate: new Date(),
       updatedBy: localStorage.getItem("UserName"),
@@ -247,15 +244,55 @@ export class ProductServicesComponent implements OnInit {
     this.HendelFormFunction();
     this.tableTab = !this.tableTab;
   }
-  Delete(event){
-    console.log(event)
-  }
   functionCallHandler($event) {
     let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
       console.log("failed");
+    }
+  }
+
+  async handleServicesCode(event) {
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "product_Services_detail",
+      filter: { ServicesCode: this.customerTableForm.value.ServicesCode },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data.length != 0) {
+      this.customerTableForm.controls.ServicesCode.setValue("");
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Services Code exist",
+        showConfirmButton: true,
+      });
+    }
+  }
+
+  async handleServicesName() {
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "product_Services_detail",
+      filter: {
+        ServicesName: this.customerTableForm.value.ServicesName.name,
+        ProductId: this.ProductId,
+      },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data.length != 0) {
+      this.customerTableForm.controls.ServicesName.setValue("");
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Services Name exist",
+        showConfirmButton: true,
+      });
     }
   }
 }

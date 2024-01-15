@@ -306,7 +306,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     "AsBilling Party": "As Billing Party",
     "ConsignorId": "Consignor Id",
     "ConsignorName": "Consignor Name",
-    "ConsignorAddress Code": "Consignor Address Code",
+    "ConsignorAddressCode": "Consignor Address Code",
     "ConsignorAddress": "Consignor Address",
     "ConsignorCity-Pincode": "Consignor City-Pincode",
     "ConsignorE-Mail": "Consignor E-Mail",
@@ -454,7 +454,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { ocNOTEDT, ...rest } = record;
+      const { ocNOTEDT,destin,origin,booktp, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Sales_Register_Advance_Report-${timeString}`, this.CSVHeader);

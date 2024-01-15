@@ -33,18 +33,6 @@ export class CnoteBillMRService {
           const resdocfin = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "cust_contract"
           const rescuscontract = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          // let docketCharges = []
-          // resdocfin.data.forEach(element => {
-          //      if (element.cHG.length > 0) {
-          //           element.cHG.forEach(chg => {
-          //                const docketCharge = {
-          //                     dKTNO: element?.dKTNO || "",
-          //                     [chg.cHGNM]: chg?.aMT || 0.00
-          //                }
-          //                docketCharges.push(docketCharge);
-          //           });
-          //      }
-          // });
           let docketCharges = [];
           resdocfin.data.forEach(element => {
                if (element.cHG.length > 0) {

@@ -5,7 +5,7 @@ import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { CustOutstandingService, convertToCSV } from 'src/app/Utility/module/reports/customer-outstanding-service';
+import { CustOutstandingService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-outstanding-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { custOutControl } from 'src/assets/FormControls/Customer-Outstanding-report/customer-outstanding-report';
@@ -186,22 +186,11 @@ export class CustomerOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Customer_Outstanding_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { obGNDT,oloc, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

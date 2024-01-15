@@ -5,7 +5,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { VendorService } from 'src/app/Utility/module/masters/vendor-master/vendor.service';
-import { VendorGSTInvoiceService, convertToCSV } from 'src/app/Utility/module/reports/vendor-gst-invoice';
+import { VendorGSTInvoiceService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { VendorDetail } from 'src/app/core/models/Masters/vendor-master/vendor-master';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -227,22 +227,11 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Vendor_Wise_GST_Invoice_Register_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { oentrydt, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

@@ -40,6 +40,8 @@ export class SalesRegisterService {
           const resdockops = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "thc_summary"
           const resthcsummary = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          reqBody.collectionName = "customer_detail"
+          const rescustomerdet = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           let docketCharges = [];
           resdocfin.data.forEach(element => {
                if (element.cHG.length > 0) {
@@ -59,11 +61,19 @@ export class SalesRegisterService {
                const chadetailsDet = reschadetails.data ? reschadetails.data.find((entry) => entry.cUSTID === element?.bPARTY) : null;
                const jobdetailsDet = resjobdetails.data ? resjobdetails.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
                const jobheaderdet = resjobheaderdetails.data ? resjobheaderdetails.data.find((entry) => entry.jID === jobdetailsDet?.jID) : null;
-               const custbilldet = rescustbilldetails.data ? rescustbilldetails.data.find((entry) => entry.dKTNO === element?.eNTLOC) : null;
-               const docketinvdet = resdocketinvdet.data ? resdocketinvdet.data.find((entry) => entry.dKTNO === element?.eNTLOC) : null;
+               const custbilldet = rescustbilldetails.data ? rescustbilldetails.data.find((entry) => entry.dKTNO === element?.docNo) : null;
+               const docketinvdet = resdocketinvdet.data ? resdocketinvdet.data.find((entry) => entry.dKTNO === element?.docNo) : null;
                const custbillheaderdet = rescustbillheader.data ? rescustbillheader.data.find((entry) => entry.bILLNO === custbilldet?.bILLNO) : null;
                const dockopsdet = resdockops.data ? resdockops.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
                const thcsummarydet = resthcsummary.data ? resthcsummary.data.find((entry) => entry.docNo === dockopsdet?.tHC) : null;
+               const ConsignorToFind = element?.cSGNNM;
+               const customerdet = rescustomerdet.data && ConsignorToFind
+                    ? rescustomerdet.data.find((entry) => entry.customerName === ConsignorToFind)
+                    : null;
+               const ConsigneeToFind = element?.cSGNNM;
+               const customerConsigneedet = rescustomerdet.data && ConsigneeToFind
+                    ? rescustomerdet.data.find((entry) => entry.customerName === ConsigneeToFind)
+                    : null;
                let contID = 0;
                let constParty = 0;
                let cHAID = 0;
@@ -71,12 +81,27 @@ export class SalesRegisterService {
                let seriveType = 0;
                let container = 0;
                let transportedBy = 0;
-               let billAt = 0;
+               // let billAt = 0;
                let invNo = 0;
                let invDt = 0;
                let gstRate = 0;
                let tripsheetNo = 0;
                let thcDt = 0;
+               let custEmail = 0;
+               let custAdd = 0;
+               let pincode = 0;
+               let city = 0;
+               let Consigneecity = 0;
+               let Consigneepincode = 0;
+               let email = 0;
+               let Consigneeemail = 0;
+               let tele = 0;
+               let RegisteredAddress = 0;
+               let Consigneegst = 0;
+               let gst = 0;
+               let jDT = 0;
+               let jobtype = 0;
+               let portofDis = 0;
                if (custcontractDet) {
                     contID = custcontractDet.cONID
                     constParty = custcontractDet.cUSTNM
@@ -89,20 +114,38 @@ export class SalesRegisterService {
                     seriveType = jobheaderdet.eTYPNM
                     container = jobheaderdet.cNTS
                     transportedBy = jobheaderdet.tBYNM
+                    jDT = jobheaderdet.jDT
+                    jobtype = jobheaderdet.jTYPNM
                }
-               if (custbilldet) {
-                    billAt = custbilldet.eNTLOC
-               }
+               // if (custbilldet) {
+               //      billAt = custbilldet.eNTLOC
+               // }
                if (docketinvdet) {
                     invNo = docketinvdet.iNVNO
                     invDt = docketinvdet.eNTDT
                }
                if (custbillheaderdet) {
                     gstRate = custbillheaderdet.gST.rATE
+                    custEmail = custbillheaderdet.cUST.eML
+                    custAdd = custbillheaderdet.cUST.aDD
+                    tele = custbillheaderdet.tEL
                }
                if (thcsummarydet) {
                     tripsheetNo = thcsummarydet.docNo
                     thcDt = thcsummarydet.eNTDT
+               }
+               if (customerdet) {
+                    pincode = customerdet.PinCode
+                    city = customerdet.city
+                    email = customerdet.Customer_Emails
+                    gst = customerdet.GSTdetails[0].gstNo
+               }
+               if (customerConsigneedet) {
+                    Consigneepincode = customerConsigneedet.PinCode
+                    Consigneecity = customerConsigneedet.city
+                    Consigneeemail = customerConsigneedet.Customer_Emails
+                    RegisteredAddress = customerConsigneedet.RegisteredAddress
+                    Consigneegst = customerConsigneedet.GSTdetails[0].gstNo
                }
                let salesData = {
                     "ocNOTEDT": element?.dKTDT,
@@ -131,8 +174,8 @@ export class SalesRegisterService {
                     "eEDDREASON": "",
                     "cUSTREFNO": '',
                     "rEMA": '',
-                    "bILLAT": billAt || '',
-                    "pINCODE": '',
+                    "bILLAT": element?.eNTLOC || '',
+                    "pINCODE": pincode || '',
                     "pINCODECAT": '',
                     "pINCODEAREA": '',
                     "fROMZONE": '',
@@ -166,7 +209,7 @@ export class SalesRegisterService {
                     "ChargedPkgsNo": '0',
                     "ChargedkM": '0',
                     "InvoiceNo": invNo || '',
-                    "InvoiceDate": invDt || '',
+                    "InvoiceDate": formatDocketDate(invDt || ''),
                     "Declared Value": '0.00',
                     "Length": '0.00',
                     "Breadth": '0.00',
@@ -219,18 +262,18 @@ export class SalesRegisterService {
                     "TripSheetNo": tripsheetNo || '',
                     "TripSheetStartDate": '',
                     "TripSheetEndDate": '',
-                    "ThcDate": thcDt || '',
-                    "AsBillingParty": element?.bPARTYNM,
-                    "ConsignorE-Mail": '',
-                    "ConsignorAddress Code": '',
-                    "ConsignorAddress": '',
-                    "ConsignorCity-Pincode": '',
+                    "ThcDate": formatDocketDate(thcDt || ''),
+                    "AsBillingParty": element?.bPARTYNM || '',
+                    "ConsignorE-Mail": custEmail || '',
+                    "ConsignorAddressCode": custAdd || '',
+                    "ConsignorAddress": custAdd || '',
+                    "ConsignorCity-Pincode": `${city || ''} - ${pincode || ''}`,
                     "ICNo": '',
                     "RackNo": '',
                     "GroupNonGroup": '',
                     "AppointmentID": '',
                     "Industry": '',
-                    "GSTCharge": '',
+                    "GSTCharge": element?.gSTAMT || 0.00,
                     "VATRate": '',
                     "VATAmount": '',
                     "DocketTotal": '',
@@ -259,7 +302,7 @@ export class SalesRegisterService {
                     "Multidelivery": '',
                     "Multipickup": '',
                     "SealNo": '',
-                    "JobNo": '',
+                    "JobNo": element?.jOBNO || '',
                     "ContainerNo": '',
                     "ContainerCapacity": '',
                     "ContainerType": '',
@@ -289,22 +332,22 @@ export class SalesRegisterService {
                     "NoofPkts": element?.pKGS || '',
                     "CurrentLocation": element?.oRGN || '',
                     "BillingParty": element?.bPARTY || '',
-                    "ConsignorTelephoneNo": "",
-                    "ConsignorGST": "",
-                    "ConsigneeAddressCode": "",
-                    "ConsigneeAddress": "",
-                    "ConsigneeCity-Pincode": "",
-                    "ConsigneeE-Mail": "",
-                    "ConsigneeTelephoneNo": "",
-                    "ConsigneeGST": "",
-                    "JobDate ": "",
-                    "JobType ": "",
-                    "PortofDischarge": "",
+                    "ConsignorTelephoneNo": element?.cSGNPH || '',
+                    "ConsignorGST": gst || '',
+                    "ConsigneeAddressCode": RegisteredAddress || '',
+                    "ConsigneeAddress": RegisteredAddress || '',
+                    "ConsigneeCity-Pincode": `${Consigneecity || ''} - ${Consigneepincode || ''}`,
+                    "ConsigneeE-Mail": Consigneeemail,
+                    "ConsigneeTelephoneNo": element?.cSGEPH || '',
+                    "ConsigneeGST": Consigneegst || '',
+                    "JobDate ": formatDocketDate(jDT || ''),
+                    "JobType ": jobtype || '',
+                    "PortofDischarge": '',
                     "DestinationCountry": "",
                     "VehicleSize": "",
-                    "TransportedBy": transportedBy,
+                    "TransportedBy": transportedBy || '',
                     "NoofContainer": container || '0',
-                    "ExportType ": seriveType,
+                    "ExportType ": seriveType || '',
                     "CHANumber": cHAID || '',
                     "CHAAmount": chaAmt || "0.00",
                }

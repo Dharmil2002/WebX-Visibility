@@ -6,7 +6,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { VendorWiseOutService, convertToCSV } from 'src/app/Utility/module/reports/vendor-wise-outstanding';
+import { VendorWiseOutService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-wise-outstanding';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { vendOutControl } from 'src/assets/FormControls/Vendor-Outstanding-report/vendor-outstanding-report';
@@ -109,7 +109,7 @@ export class VendorOutstandingReportComponent implements OnInit {
       });
   }
   CSVHeader = {
-    "srNo": "#",
+    "srNo": "Sr No",
     "vendorCD":"Vendor Code",
     "vendor": "Vendor",
     "openingBal": "Opening Balance",
@@ -216,22 +216,11 @@ export class VendorOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Vendor_Wise_Outstanding_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { obDT,lOC, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Vendor_Wise_Outstanding_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

@@ -289,7 +289,7 @@ export class CnwGstRegisterComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { odocketDate, ...rest } = record;
+      const { odocketDate, tCT, fCT, oRGN, dEST, cSGNNM, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);

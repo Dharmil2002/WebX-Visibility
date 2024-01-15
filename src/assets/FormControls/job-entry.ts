@@ -452,8 +452,11 @@ export class JobControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
+                    },
+                    {
+                        name: "required",
+                        message: "Cnote Number is required"
                     }
-
                 ]
                 ,
                 functions: {
@@ -473,6 +476,10 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Cnote Date is required"
+                    }
                 ]
             },
             {
@@ -487,6 +494,10 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "No of Package is required"
+                    }
                 ]
             },
             {
@@ -501,6 +512,10 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Loaded Weight is required"
+                    }
                 ]
             },
             {

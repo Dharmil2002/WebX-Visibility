@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component,OnInit } from "@angular/core";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -7,7 +7,6 @@ import { Router } from "@angular/router";
 import { processProperties } from "src/app/Masters/processUtility";
 import Swal from "sweetalert2";
 import { ChaEntryControl } from "src/assets/FormControls/cha-entry";
-import { chaJobDetail, updateJobStatus } from "./cha-utility";
 import { ChaEntryModel } from "src/app/Models/Cha-entry/cha-entry";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";

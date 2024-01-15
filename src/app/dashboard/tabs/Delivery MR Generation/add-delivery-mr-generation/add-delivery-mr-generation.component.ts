@@ -166,6 +166,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   TotalAmountList: { count: string; title: string; class: string; }[];
   headerDetails: any;
   docketNo: any;
+  AlljsonControlMRArray: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -217,13 +218,23 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.jsonControlPaymentArray = deliveryMrControlsGenerator.getDeliveryMrPaymentControls();
     this.jsonControlBillingArray = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
     this.AlljsonControlPaymentSummaryFilterArray = this.jsonControlPaymentArray;
+    this.AlljsonControlMRArray = this.jsonControlDeliveryMrGenArray;
     this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentArray])
 
     // Build the form group using the FormBuilder and the obtained form controls array.
     this.deliveryMrTableForm = formGroupBuilder(this.fb, [this.jsonControlDeliveryMrGenArray]);
     this.billingForm = formGroupBuilder(this.fb, [this.jsonControlBillingArray]);
     this.jsonControlPaymentArray = this.jsonControlPaymentArray.slice(0, 1);
+
     this.deliveryMrTableForm.controls['Deliveredto'].setValue("Receiver");
+    const filterFunction = (x) => x.name !== "NameofConsignee";
+    this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+
+    // Clear validation for NameofReceiver control
+    const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
+    NameofConsignee.clearValidators();
+    NameofConsignee.updateValueAndValidity();
+
     this.deliveryMrTableForm.controls['ConsignmentNoteNumber'].setValue(this.docketNo);
     this.docketNo ? this.validateConsig() : null;
   }
@@ -271,32 +282,43 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   //#region to change control
-  hideControl() {
-    // Get the value of the 'Deliveredto' control from the form
+  async hideControl() {
     const deliveredToValue = this.deliveryMrTableForm.value.Deliveredto;
 
-    // Check if the control value is 'Consignee' or 'Receiver'
-    if (deliveredToValue === 'Consignee' || deliveredToValue === 'Receiver') {
-      // Determine the control properties based on the 'deliveredToValue'
-      const controlName = (deliveredToValue === 'Consignee') ? 'NameofReceiver' : 'NameofConsignee';
-      const label = (deliveredToValue === 'Consignee') ? 'Name of Consignee' : 'Name of Receiver';
-      const placeholder = (deliveredToValue === 'Consignee') ? 'Name of Consignee' : 'Name of Receiver';
-      const validationMessage = (deliveredToValue === 'Consignee') ? 'Name of Consignee is required' : 'Name of Receiver is required';
+    const filter = { "docketNumber": this.docketNo };
+    const consigneeName = await this.getDocketList(filter);
+    const cgnm = consigneeName[0]?.consigneeName;
 
-      // Find the control in the jsonControlDeliveryMrGenArray
-      const disableControl = this.jsonControlDeliveryMrGenArray.find(control => control.name === controlName);
+    const NameofReceiver = this.deliveryMrTableForm.get('NameofReceiver');
+    const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
 
-      // Modify the properties of disableControl if found
-      if (disableControl) {
-        disableControl.name = controlName;
-        disableControl.label = label;
-        disableControl.placeholder = placeholder;
-        disableControl.value = '';
-        disableControl.Validations = [{
-          name: 'required',
-          message: validationMessage,
-        }];
-      }
+    if (deliveredToValue === 'Receiver') {
+      const filterFunction = (x) => x.name !== "NameofConsignee";
+      this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+
+      // Reset values and clear validators
+      NameofConsignee.setValue('');
+      NameofConsignee.clearValidators();
+      NameofConsignee.updateValueAndValidity();
+
+      // Apply required validator for NameofReceiver control
+      NameofReceiver.setValidators([Validators.required]);
+      NameofReceiver.updateValueAndValidity();
+    }
+
+    if (deliveredToValue === 'Consignee') {
+      const filterFunction = (x) => x.name !== "NameofReceiver";
+      this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+
+      // Reset values and clear validators
+      NameofReceiver.setValue('');
+      NameofReceiver.clearValidators();
+      NameofReceiver.updateValueAndValidity();
+
+      // Apply required validator for NameofConsignee control      
+      NameofConsignee.setValue(cgnm);
+      NameofConsignee.setValidators([Validators.required]);
+      NameofConsignee.updateValueAndValidity();
     }
   }
   //#endregion
@@ -390,6 +412,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           data !== null &&
           index === self.findIndex((d) => d.docketNumber === data.docketNumber)
       );
+
+      // const consigneeName = this.filteredDocket[0]?.consigneeName;
+      // this.deliveryMrTableForm.controls['Consignee'].setValue(consigneeName);
 
       if (this.filteredDocket.length === 0) {
         Swal.fire({
@@ -609,7 +634,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const totalTDSamt = totalAmountCount - TDSAmount;
 
     // Set the TDS amount in the form
-    this.billingForm.get("TDSAmount").setValue(totalTDSamt);
+    this.billingForm.get("TDSAmount").setValue(TDSAmount);
 
     // Get the GSTAmount from the form or default to 0 if undefined
     const totalGSTamt = this.billingForm.value.GSTAmount || 0;
@@ -638,10 +663,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     // Calculate and set GSTAmount in the form
     const GSTAmount = totalAmountCount * (selectedSACCodeObject?.GSTRT || 0) / 100;
-    const totalGSTamt = totalAmountCount + GSTAmount;
+    //const totalGSTamt = totalAmountCount + GSTAmount;
 
     // Set GSTAmount in the form
-    this.billingForm.get("GSTAmount").setValue(totalGSTamt);
+    this.billingForm.get("GSTAmount").setValue(GSTAmount);
 
     // Enable GSTCharged based on the presence of GSTRate
     this.billingForm.get("GSTCharged").setValue(!!this.billingForm.value.GSTRate);

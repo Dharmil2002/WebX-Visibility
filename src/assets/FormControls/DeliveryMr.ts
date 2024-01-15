@@ -40,6 +40,19 @@ export class DeliveryMrGeneration {
                 },]
             },
             {
+                name: 'NameofConsignee',
+                label: 'Name of Consignee',
+                placeholder: 'Name of Consignee',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [{
+                    name: "required",
+                    message: "Name of Consignee is required",
+                },]
+            },
+            {
                 name: 'ContactNumber',
                 label: 'Contact Number ',
                 placeholder: 'Contact Number ',

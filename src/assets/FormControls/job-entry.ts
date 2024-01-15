@@ -195,9 +195,9 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [{
-                    name: "pattern",
-                    message: "Please Enter Proper Packages(1-6 Digit)",
-                    pattern: '[0-9]{1,6}'
+                    // name: "pattern",
+                    // message: "Please Enter Proper Packages(1-6 Digit)",
+                    // pattern: '[0-9]{1,6}'
                 }
                 ],
                 additionalData: {
@@ -245,7 +245,7 @@ export class JobControl {
                 }
             },
             {
-                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'Staticdropdown',
+                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'dropdown',
                 value: [], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {

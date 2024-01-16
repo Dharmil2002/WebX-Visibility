@@ -149,7 +149,7 @@ export class LocationMasterComponent implements OnInit {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "location_detail",
-      filter: { locCode: locCode },
+      filter: { companyCode:this.companyCode,locCode: locCode },
       update: det
     };
     const res = await firstValueFrom(this.masterService.masterPut('generic/update', req))

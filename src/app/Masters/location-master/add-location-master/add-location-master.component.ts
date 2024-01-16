@@ -592,15 +592,11 @@ export class AddLocationMasterComponent implements OnInit {
         .setValidators(autocompleteObjectValidator());
       this.locationTableForm.get("locLevel").updateValueAndValidity();
     } else {
-      // this.jsonControlLocationArray.forEach((x) => {
-      //   if (x.name == "reportLevel" || x.name == "reportLoc") {
-      //     if (this.isUpdate) {
-      //       x.disable = true;
-      //     } else {
-      //       x.disable = false;
-      //     }
-      //   }
-      // });
+      this.jsonControlLocationArray.forEach((x) => {
+        if (x.name == "reportLevel" || x.name == "reportLoc") {
+            x.disable = false;
+        }
+      });
       this.locationTableForm
         .get("reportLevel")
         .setValidators([Validators.required, autocompleteObjectValidator()]);

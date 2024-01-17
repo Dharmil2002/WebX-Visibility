@@ -163,12 +163,12 @@ export class RakeEntryModel implements IFieldDefinition {
         { Row: 'contCnt', Path: '', componentDetails: GenericViewTableComponent },
     ]
     public jsonColumn = {
-        containerNumber: {
+        cNID: {
             Title: "Container No",
             class: "matcolumnleft",
             Style: "min-width:250px",
         },
-        containerType: {
+        cNTYP: {
             Title: "Container Type",
             class: "matcolumnleft",
             Style: "min-width:250px",

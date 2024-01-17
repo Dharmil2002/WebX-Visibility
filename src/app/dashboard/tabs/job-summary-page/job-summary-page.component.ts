@@ -1,7 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { getJobDetailFromApi } from './job-summary-utlity';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { getGeneric } from 'src/app/operation/rake-update/rake-update-utility';
 import { JobEntryService } from 'src/app/Utility/module/operation/job-entry/job-entry-service';
 
 @Component({

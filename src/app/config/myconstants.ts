@@ -11,6 +11,7 @@ export const Collections = {
     thcsummary: 'thc_summary',
     chaHeaders: 'cha_headers',
     chaDetails: 'cha_details',
+    rake_headers: 'rake_headers'
 };
 
 export const GenericActions = {
@@ -22,5 +23,6 @@ export const GenericActions = {
 export const OperationActions = {
     CreateThc: "operation/thc/create",
     getThc: "operation/thc/get",
-    createCha:"operation/cha/create"
+    createCha:"operation/cha/create",
+    createRake:"operation/rake/create"
 }

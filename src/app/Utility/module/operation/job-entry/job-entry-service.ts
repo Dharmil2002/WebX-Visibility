@@ -18,6 +18,7 @@ export class JobEntryService {
     "1_false": "Update job",
     "1_true": "Awaiting CHA Entry",
     "2": "Awaiting Rake Entry",
+    "3": "Rake Generated",
     "default": ""
   };
   actionMapping = {
@@ -334,6 +335,8 @@ export class JobEntryService {
           jobLocation: element?.lOC || "",
           fCT: element?.fCT || "",
           tCT: element?.tCT || "",
+          tBY: element?.tBY || "",
+          tBYNM: element?.tBYNM || "",
           pkgs: element?.pKGS || 0,
           eNTDT: element?.eNTDT || new Date(),
           totalChaAmt:chaDetail?chaDetail.tOTAMT:"",

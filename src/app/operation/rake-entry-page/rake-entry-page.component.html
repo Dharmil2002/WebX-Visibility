@@ -1,6 +1,6 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
   <form [formGroup]="rakeEntryTableForm">
-    <app-form-webxpress [form]="rakeEntryTableForm" [formData]="jsonControlArray"
+    <app-form-webxpress [form]="rakeEntryTableForm" [FormTitle]="'Basic Details'" [formData]="jsonControlArray"
       (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
       [showSaveAndCancelButton]="false">
     </app-form-webxpress>

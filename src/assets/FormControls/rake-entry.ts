@@ -37,7 +37,11 @@ export class RakeEntryControl {
                 functions:{
                     onModel:"getDestLocation"
                 },
-                Validations: [{
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Destination is required",
+                    },{
                     name: "autocomplete",
                 },
                 {
@@ -55,6 +59,10 @@ export class RakeEntryControl {
                     onSelection: "vendorFieldChanged"
                 },
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Vendor Type is required",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -93,6 +101,10 @@ export class RakeEntryControl {
                 {
                     name: "invalidAutocompleteObject",
                     message: "Choose proper value",
+                },
+                {
+                    name: "required",
+                    message: "From City is required",
                 }
                 ],
                 functions: {
@@ -113,6 +125,10 @@ export class RakeEntryControl {
                 {
                     name: "invalidAutocompleteObject",
                     message: "Choose proper value",
+                },
+                {
+                    name: "required",
+                    message: "To City is required",
                 }
                 ],
                 functions: {
@@ -374,7 +390,10 @@ export class RakeEntryControl {
                 value: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [ {
+                    name: "required",
+                    message: "CNNO is required",
+                }],
                 functions: {
                     onModel: "getShipment",
                     onOptionSelect: "getCnoteDetails"
@@ -517,11 +536,18 @@ export class RakeEntryControl {
             generatecontrol: true,
             disable: false,
             Validations: [
+                {
+                    name: "required",
+                    message: "RR No is required",
+                }
             ]
         },
         {
             name: 'rrDate', label: 'RR Date', placeholder: 'RR Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
-            generatecontrol: true, disable: false, Validations: [],
+            generatecontrol: true, disable: false, Validations: [  {
+                name: "required",
+                message: "RR Date is required",
+            }],
             additionalData: {
             }
         }],
@@ -534,11 +560,18 @@ export class RakeEntryControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Enter Inv No is required"
+                    }
                 ]
             },
             {
                 name: 'invDate', label: 'Inv Date', placeholder: 'Inv Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
-                generatecontrol: true, disable: false, Validations: [],
+                generatecontrol: true, disable: false, Validations: [   {
+                    name: "required",
+                    message: "Enter Inv Date is required",
+                }],
                 additionalData: {
                 }
             },
@@ -551,6 +584,10 @@ export class RakeEntryControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Enter Inv Amount is required",
+                    }
                 ]
             },
         ]

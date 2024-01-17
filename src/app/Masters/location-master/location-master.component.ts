@@ -62,8 +62,8 @@ export class LocationMasterComponent implements OnInit {
   centerAlignedData: string[];
   constructor(
     private masterService: MasterService,
-    private storage:StorageService
-    ) {
+    private storage: StorageService
+  ) {
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
     this.csvFileName = "Location Details";
     this.centerAlignedData = ["locPincode"]
@@ -86,7 +86,7 @@ export class LocationMasterComponent implements OnInit {
   async getLocationDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "filter": {companyCode:this.storage.companyCode},
+      "filter": { companyCode: this.storage.companyCode },
       "collectionName": "location_detail"
     }
     const res = await firstValueFrom(this.masterService.masterPost('generic/get', req))
@@ -119,7 +119,14 @@ export class LocationMasterComponent implements OnInit {
             locPincode,
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
-        }).sort((a, b) => b._id.localeCompare(a._id));
+        }).sort((a, b) => {
+          const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
+          const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
+          if (!isNaN(dateA) && !isNaN(dateB)) {
+            return dateB - dateA;
+          }
+          return 0; // Handle invalid dates or NaN values
+        });
 
         // Assign the modified and sorted data back to this.csv
         this.csv = modifiedData;
@@ -149,7 +156,7 @@ export class LocationMasterComponent implements OnInit {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "location_detail",
-      filter: { companyCode:this.companyCode,locCode: locCode },
+      filter: { companyCode: this.companyCode, locCode: locCode },
       update: det
     };
     const res = await firstValueFrom(this.masterService.masterPut('generic/update', req))

@@ -94,9 +94,10 @@ export class LocationMasterComponent implements OnInit {
       try {
         // Get the ownership descriptions using the getOwnership() function
         const ownershipDescriptions = await this.getOwnership();
+        const sortedData = res.data.sort((a, b) => new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime());
 
         // Modify each object in res.data
-        const modifiedData = res.data.map(obj => {
+        const modifiedData = sortedData.map(obj => {
           // Find the matching ownership description
           const ownershipObject = ownershipDescriptions.find(x => x.codeId === obj.ownership);
 
@@ -119,13 +120,6 @@ export class LocationMasterComponent implements OnInit {
             locPincode,
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
-        }).sort((a, b) => {
-          const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
-          const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
-          if (!isNaN(dateA) && !isNaN(dateB)) {
-            return dateB - dateA;
-          }
-          return 0; // Handle invalid dates or NaN values
         });
 
         // Assign the modified and sorted data back to this.csv

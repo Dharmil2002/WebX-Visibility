@@ -579,7 +579,37 @@ export const ROUTES: RouteInfo[] =
             },
           ]
         },
+        {
+          "path": "",
+          "title": "Fund Transfer",
+          "moduleName": "Fund Transfer",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Finance/FundTransfer/AdviceGeneration",
+              "title": "Advice Generation",
+              "moduleName": "Advice Generation",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Finance/FundTransfer/AdviceAcknowledge",
+              "title": "Advice Acknowledge",
+              "moduleName": "Advice Acknowledge",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
 
+          ]
+        },
         {
           path: "Finance/VendorPayment/Dashboard",
           title: "Vendor Payment",

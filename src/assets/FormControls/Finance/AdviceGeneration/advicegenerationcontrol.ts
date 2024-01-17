@@ -2,11 +2,12 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class AdviceGenerationControl {
   AdviceGenerationArray: FormControls[];
-  constructor() {
+  AdviceGenerationPaymentArray: FormControls[];
+  constructor(FormValues: any) {
     this.AdviceGenerationArray = [
       {
-        name: 'brand', label: '', placeholder: '', type: 'radiobutton',
-        value: [{ value: 'DA', name: 'Debit Advice', "checked": true }, { value: 'CA', name: 'Credit Advice' }],
+        name: 'AdviceType', label: '', placeholder: '', type: 'radiobutton',
+        value: [{ value: 'D', name: 'Debit Advice', "checked": true }, { value: 'C', name: 'Credit Advice' }],
         Validations: [],
         generatecontrol: true, disable: false
       },
@@ -66,10 +67,10 @@ export class AdviceGenerationControl {
       },
       {
         name: "applicableAmount",
-        label: "Applicable Amount ",
+        label: "Applicable Amount (₹)",
         placeholder: "Enter Applicable Amount ",
-        type: "text",
-        value:"",
+        type: "number",
+        value: FormValues?.applicableAmount,
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -84,7 +85,6 @@ export class AdviceGenerationControl {
           // },
         ],
         functions: {
-          //onChange: "CheckUserName",
         },
       },
       {
@@ -92,138 +92,159 @@ export class AdviceGenerationControl {
         label: "Advice Generation Location",
         placeholder: "Advice Generation Location",
         type: "text",
-        value:"",
+        value: localStorage.getItem("Branch"),
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "Advice Generation Location is required",
-          },
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter only text!",
-          //   pattern: "^[a-zA-Z ]{0,100}$",
-          // },
         ],
         functions: {
-          //onChange: "CheckUserName",
         },
       },
+
+
+    ];
+    this.AdviceGenerationPaymentArray = [
+
       {
-        name: "paymentMode",
+        name: "PaymentMode",
         label: "Payment Mode",
-        placeholder: "Select Payment Mode",
-        type: "dropdown",
-        value: "",
+        placeholder: "Payment Mode",
+        type: "Staticdropdown",
+        value: [
+          {
+            value: "Cheque",
+            name: "Cheque",
+          },
+          {
+            value: "Cash",
+            name: "Cash",
+          },
+          {
+            value: "RTGS/UTR",
+            name: "RTGS/UTR",
+          },
+
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
             name: "required",
-            message: "Payment Mode is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
+            message: "Payment Mode is required",
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
+        },
+        functions: {
+          onSelection: "OnPaymentModeChange"
         },
       },
+
       {
-        name: "cashbankAccount",
-        label: "Cash/Bank Account",
-        placeholder: "Cash/Bank Account",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Cash/Bank Account is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-      {
-        name: "bankName",
-        label: "Bank Name",
-        placeholder: "Bank Name",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Bank Name is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-      {
-        name: "chequeNumber",
-        label: "Cheque Number",
-        placeholder: "Enter Cheque Number",
+        name: "ChequeOrRefNo",
+        label: "Cheque/Ref No.",
+        placeholder: "Cheque/Ref No.",
         type: "text",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter alphanumeric 250 digit!",
-          //   pattern: "^[a-zA-Z 0-9 , ]{0,250}$",
-          // },
-        ],
+          {
+            name: "required",
+            message: "Cheque/Ref No is required"
+          },],
       },
       {
-        name: "chequeDate",
-        label: "Cheque Date",
-        placeholder: "select Cheque Date",
-        type: "date",
+        name: "Bank",
+        label: "Select Bank",
+        placeholder: "Select Bank",
+        type: "dropdown",
         value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Bank is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+
+      {
+        name: "CashAccount",
+        label: "Cash Account",
+        placeholder: "Cash Account",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Account is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      // {
+      //   name: "ReceivedFromBank",
+      //   label: "Received From Bank",
+      //   placeholder: "Received From Bank",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
+      {
+        name: "Date",
+        label: "Date",
+        placeholder: "Date",
+        type: "date",
+        value: new Date(),
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          minDate: new Date(),
+        },
       },
-      {
-        name: "isActive",
-        label: "Active Flag",
-        placeholder: "",
-        type: "toggle",
-        value: "",
-        generatecontrol: false,
-        disable: false,
-        Validations: [],
-      },
+
     ];
   }
   getFormControls() {
     return this.AdviceGenerationArray;
+  }
+  getPaymentFormControls() {
+    return this.AdviceGenerationPaymentArray;
   }
 }

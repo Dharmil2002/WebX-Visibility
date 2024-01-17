@@ -703,6 +703,20 @@
       "router": "Finance/VoucherEntry/DebitVoucher"
     },
     {
+      "title": "Finance/FundTransfer/AdviceGeneration",
+      "tag": [
+        "Finance/FundTransfer/AdviceGeneration"
+      ],
+      "router": "Finance/FundTransfer/AdviceGeneration"
+    },
+    {
+      "title": "Finance/FundTransfer/AdviceAcknowledge",
+      "tag": [
+        "Finance/FundTransfer/AdviceAcknowledge"
+      ],
+      "router": "Finance/FundTransfer/AdviceAcknowledge"
+    },
+    {
       "title": "Finance/VoucherEntry/JournalVoucher",
       "tag": [
         "Finance/VoucherEntry/JournalVoucher"

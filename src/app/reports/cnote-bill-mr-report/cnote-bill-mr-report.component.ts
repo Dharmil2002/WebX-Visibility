@@ -12,7 +12,6 @@ import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 import { cNoteBillMRControl } from 'src/assets/FormControls/cnote-bill-mr-report/cnote-bill-mr-report';
 import Swal from 'sweetalert2';
 
@@ -83,7 +82,7 @@ export class CnoteBillMrReportComponent implements OnInit {
     "sTAT": "Status",
     "lOADTPE": "Load Type",
     "rEM": "Remark",
-    // "bILLAT": "Billed At",
+    "bILLAT": "Billed At",
     "pINCODE": "Pincode",
     "lOCALCNOTE": "Local C Note",
     "fROMZN": "From Zone",
@@ -154,10 +153,10 @@ export class CnoteBillMrReportComponent implements OnInit {
     "lOADCHAR": "Loading Charges",
     "gSTRT": "GST Rate",
     "gSTCHAR": "GST Charge",
-    // "vATRT": "VAT Rate",
-    // "vATAMT": "VAT Amount",
-    // "cALAMITYRT": "Calamity Cess Rate",
-    // "cALAMITYAMT": "Calamity Cess Amount",
+    "vATRT": "VAT Rate",
+    "vATAMT": "VAT Amount",
+    "cALAMITYRT": "Calamity Cess Rate",
+    "cALAMITYAMT": "Calamity Cess Amount",
     "aDVAMT": "Advance Amount",
     "aDVREMARK": "Advance Remark",
     "dPHRT": "DPH Rate",
@@ -405,7 +404,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid && paytpDet && booktpDet && tranmodeDet && des && origin && movtype && customerDet;
+      return isDateRangeValid && des && origin && movtype && paytpDet && booktpDet && tranmodeDet && customerDet;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
     // const selectedData = filteredRecords;
@@ -422,7 +421,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { oRGN,dEST,oeNTDT, bOOKINGTPE, ...rest } = record;
+      const { oRGN,dEST, bOOKINGTPE,oeNTDT,  ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_Bill_MR_Report-${timeString}`,this.CSVHeader);

@@ -144,6 +144,7 @@ export class CnwGstService {
                if (custcontractDet) {
                     contID = custcontractDet.cONID
                }
+               const gstrt = (element?.gSTAMT || 0) / (element?.fRTRT || 1) + '%';
                let jobgstData = {
                     "docketNumber": element?.docNo || "",
                     "odocketDate": element.dKTDT,
@@ -163,7 +164,7 @@ export class CnwGstService {
                     "conpar": element?.bPARTYNM || '',
                     "sertp": 'FTL',
                     "vehno": element?.vEHNO || "",
-                    "billparnm": element?.bPARTY || '',
+                    "billparnm": element?.bPARTYNM || '',
                     "bacode": "",
                     "lastmodby": element?.eNTBY || '',
                     "cnotemoddt": formatDocketDate(element?.eNTDT || ''),
@@ -174,7 +175,7 @@ export class CnwGstService {
                     "loadty": 'FTL' || '',
                     "subtot": element?.tOTAMT || '',
                     "doctot": element?.tOTAMT || '',
-                    "gstrt": "0.00", //  filter
+                    "gstrt": gstrt, //  filter
                     "gstamt": element?.gSTAMT || "",
                     "frtrt": element?.fRTRT || '',
                     "frttp": element?.fRTRTYN || '',

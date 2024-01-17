@@ -9,13 +9,20 @@ export async function getJobregisterReportDetail(masterServices) {
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
     reqBody.collectionName = "cha_detail"
     const resChaEntry = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
+    reqBody.collectionName = "cust_bill_headers"
+    const rescustBill = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
     let jobList = [];
-    res.data.map((element, index) => {
+    res.data.map((element) => {
 
         const chaDet = resChaEntry.data ? resChaEntry.data.find((entry) => entry.jobNo === element?.jobId) : null;
+        const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.cUST.nM === element?.billingParty) : null;
         let totalCHAamt = 0;
+        let custBillAmt = 0;
         if (chaDet) {
             totalCHAamt = chaDet.containorDetail.reduce((total, amt) => total + parseFloat(amt.totalAmt), 0);
+        }
+        if (custBillDet) {
+            custBillAmt = custBillDet.aMT;
         }
         let jobData = {
             "jobNo": element?.jobId || '',
@@ -59,13 +66,13 @@ export async function getJobregisterReportDetail(masterServices) {
             "totalNoofcontainer": element.blChallan ? element.blChallan.length : 0,
             "jobType": element?.jobType == "I" ? "Import" : element?.jobType == "E" ? "Export" : "",
             "chargWt": element?.weight || "",
-            "DespatchQty":'0.00',
-            "despatchWt":'0.00',
+            "DespatchQty": '0',
+            "despatchWt": '0',
             "poNumber": element?.poNumber || "",
             "totalChaAmt": totalCHAamt || '0.00',
-            "voucherAmt":'',
-            "vendorBillAmt":'',
-            "customerBillAmt":'',
+            "voucherAmt": '',
+            "vendorBillAmt": '',
+            "customerBillAmt": custBillAmt || '0.00',
             "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
             "jobLocation": element?.jobLocation || "",
         }

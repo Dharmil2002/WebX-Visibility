@@ -1,20 +1,25 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { processProperties } from "src/app/Masters/processUtility";
 import { RakeEntryControl } from "src/assets/FormControls/rake-entry";
-import { getCity } from "../quick-booking/quick-utility";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { Router } from "@angular/router";
-import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
 import Swal from "sweetalert2";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { areAllFieldsEmpty, removeFields, removeFieldsFromArray, updateProperty } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import {assignDetail, getTypeName, setGeneralMasterData} from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { RakeEntryService } from "src/app/Utility/module/operation/rake-entry/rake-entry-service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { getVendorsForAutoComplete } from "../job-entry-page/job-entry-utility";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -46,16 +51,16 @@ export class RakeEntryPageComponent implements OnInit {
     rakeEntryTableForm: UntypedFormGroup;
     rakeContainerTableForm: UntypedFormGroup;
     rakeDetailsTableForm: UntypedFormGroup;
-    invDetailsTableForm:UntypedFormGroup;
+    invDetailsTableForm: UntypedFormGroup;
     tableData: any = [];
     tableData1: any = [];
     tableRakeData: any = [];
-    tableInvData:any=[];
+    tableInvData: any = [];
     TableStyle = "width:20%"
     type: any;
     show = false;
     apiShow = false;
-    rrLoad:boolean =true;
+    rrLoad: boolean = true;
     companyCode = parseInt(localStorage.getItem("companyCode"));
     fromCity: string; //it's used in getCity() for the binding a fromCity
     fromCityStatus: boolean; //it's used in getCity() for binding fromCity
@@ -94,16 +99,18 @@ export class RakeEntryPageComponent implements OnInit {
     width: '800px'
     height: '500px'
     jsonInvoiceDetails: FormControls[];
-    invLoad: boolean=true;
+    invLoad: boolean = true;
     isInvLoad: boolean;
     shipments: { name: any; value: any; extraData: any; }[];
+    vendorTypes: AutoComplete[];
+    loadType: AutoComplete[];
+    movementType: AutoComplete[];
+    docType: AutoComplete[];
+    tranMode: AutoComplete[];
+    backPath: string;
     ngOnInit(): void {
         this.initializeFormControl();
         this.bindDropDown();
-        this.getCity();
-        this.vendorDetail();
-        this.getLocation();
-        this.getDocketDetail()
     }
 
     constructor(
@@ -112,13 +119,17 @@ export class RakeEntryPageComponent implements OnInit {
         private masterService: MasterService,
         private filter: FilterUtils,
         private definition: RakeEntryModel,
-        private docketService: DocketService
+        private docketService: DocketService,
+        private rakeService: RakeEntryService,
+        private locationService:LocationService,
+        private generalService: GeneralService,
+        private pinCodeService:PinCodeService,
+        private storage:StorageService
     ) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
+            this.backPath = "/dashboard/Index?tab=7";
         }
-
-
     }
 
     bindDropDown() {
@@ -149,7 +160,7 @@ export class RakeEntryPageComponent implements OnInit {
         this.jsonControlArray = this.rakeEntryFormControl.getRakeEntryFormControls();
         this.containerJsonArray = this.rakeEntryFormControl.getRakeContainerDetail();
         this.jsonRakeDetails = this.rakeEntryFormControl.getrakeDetailsControls();
-        this.jsonInvoiceDetails=this.rakeEntryFormControl.getInvoiceDetails() ;
+        this.jsonInvoiceDetails = this.rakeEntryFormControl.getInvoiceDetails();
         this.allContainer = this.containerJsonArray;
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -160,6 +171,7 @@ export class RakeEntryPageComponent implements OnInit {
         this.rakeEntryTableForm.controls['documentType'].setValue('CN');
         this.definition.columnHeader = this.definition.columnHeader;
         //this.loadTempData(jobDetail);
+        this.getGeneralMasterData();
 
     }
 
@@ -174,56 +186,8 @@ export class RakeEntryPageComponent implements OnInit {
         }
     }
 
-    async getCity() {
-        try {
-            const cityDetail = await getCity(this.companyCode, this.masterService);
-
-            if (cityDetail) {
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.rakeEntryTableForm,
-                    cityDetail,
-                    this.fromCity,
-                    this.fromCityStatus
-                ); // Filter the docket control array based on fromCity details
-
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.rakeEntryTableForm,
-                    cityDetail,
-                    this.toCity,
-                    this.toCityStatus
-                );
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.rakeEntryTableForm,
-                    cityDetail,
-                    this.via,
-                    this.viaStatus
-                ); // Filter the docket control array based on toCity details
-            }
-        } catch (error) {
-            console.error("Error getting city details:", error);
-        }
-    }
-
-    async getDocketDetail() {
-        const docketDetail = await this.docketService.getDocket();
-        const docketFilter = await filterDocketDetail(docketDetail);
-        const cnValues = docketFilter.map((x) => { return { name: x.cnNo, value: x.cnNo, extraData: x } });
-        this.filter.Filter(
-            this.containerJsonArray,
-            this.rakeContainerTableForm,
-            cnValues,
-            this.cnNo,
-            this.cnNoStatus
-        );
-        this.shipments=cnValues;
-        this.allCn = docketFilter;
-        this.cnDetail = docketFilter
-
-    }
-
+ 
+    
     cancel() {
         this.goBack('Job')
     }
@@ -232,114 +196,86 @@ export class RakeEntryPageComponent implements OnInit {
         this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
     }
 
-    async vendorDetail() {
-        const resDetail = await vendorDetailFromApi(this.masterService);
-        const vendorData = resDetail.map((x) => { return { value: x.vendorCode, name: x.vendorName, type: x.vendorType } });
-        this.vendorData = vendorData;
-        this.filter.Filter(
-            this.jsonControlArray,
-            this.rakeEntryTableForm,
-            vendorData,
-            this.vendor,
-            this.vendorStatus
-        );
+    /*Below is Docket Function Which is For AutoComplate*/
+    async getShipment(event) {
+        if (typeof (event.eventArgs) == "string") {
+            await this.docketService.getDocketsForAutoComplete(this.rakeContainerTableForm,this.containerJsonArray, event.field.name, this.cnNoStatus);
+        }
     }
-
-    async save() {
-        let fieldsToFromRemove = [];
-        let containorDetail = {};
-        let invoiceDetail={};
-        let rakeDetails={};
-        let jobs = []
-        let cnote = []
-        if (this.tableData.length > 0) {
-            if (Array.isArray(this.tableData)) {
-                this.tableData.forEach((item) => {
-                 if (item.hasOwnProperty('cnNo') && item.cnDate) {
-                        item.cnDate = item.cnDateUtc;
-                        fieldsToFromRemove = ["id", "actions","jsonColumn","tableData","fieldsToFromRemove",],
-                            cnote.push(item.cnNo);
-                    }
+    /*End*/
+    /*Below is the Function for Get City Details*/
+    async getCityDetail(event) {
+        const { additionalData, type, name } = event.field;
+        const cityMapping = additionalData.showNameAndValue;
+    
+        if (type === 'multiselect') {
+            const selectedValues = this.rakeEntryTableForm.controls[name].value;
+    
+            if (selectedValues.length >= 3) {
+                const viaControlHandler = this.rakeEntryTableForm.controls['viaControlHandler'].value;
+                const regexPattern = `^${selectedValues}`;
+                const cityDetails = await this.pinCodeService.getCityDetails({
+                    CT: { 'D$regex': regexPattern, 'D$options': 'i' }
                 });
+    
+                let updatedCities = cityDetails;
+                if (viaControlHandler) {
+                    const viaControlHandlerValues = viaControlHandler.map(x => x.value);
+                    updatedCities = updatedCities.filter(city => !viaControlHandlerValues.includes(city.value));
+                    updatedCities.push(...this.rakeEntryTableForm.value.viaControlHandler);
+                }
+    
+                this.rakeEntryTableForm.controls['viaControlHandler'].setValue(viaControlHandler);
+                this.filter.Filter(this.jsonControlArray, this.rakeEntryTableForm, updatedCities, name, cityMapping);
             }
-
+        } else {
+            this.pinCodeService.getCity(this.rakeEntryTableForm, this.jsonControlArray, name, cityMapping);
         }
-        else if (this.rakeEntryTableForm.value.cnNo) {
-            const cnDetail = {
-                cnNo: this.rakeEntryTableForm.value.cnNo.value,
-                cnDate: this.rakeEntryTableForm.value?.cnDateUtc || new Date(),
-                noOfPkg: this.rakeEntryTableForm.value.noOfPkg,
-                weight: this.rakeEntryTableForm.value.weight
-            }
-            this.tableData.push(cnDetail);
-            cnote = this.tableData.map((x) => x.cnNo);
-        }
-        containorDetail = this.tableData
-        invoiceDetail = this.tableInvData.length>0?this.tableInvData:[this.invDetailsTableForm.value];
-        rakeDetails = this.tableRakeData.length>0?this.tableRakeData:[this.rakeDetailsTableForm.value];
-        // Create a new array without the 'srNo' property
-        // Assign the modified array back to 'this.tableData'
-        const thisYear = new Date().getFullYear();
-        const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-        const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-        const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-        const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-        let rake = `Rake/${dynamicValue}/${financialYear}/${paddedNumber}`;
-        this.rakeEntryTableForm.controls['_id'].setValue(rake);
-        this.rakeEntryTableForm.controls['rakeId'].setValue(rake);
-        this.rakeEntryTableForm.controls['vendorName'].setValue(this.rakeEntryTableForm.controls['vendorName']?.value.name || "");
-        this.rakeEntryTableForm.controls['fromCity'].setValue(this.rakeEntryTableForm.controls['fromCity']?.value.name || "");
-        this.rakeEntryTableForm.controls['toCity'].setValue(this.rakeEntryTableForm.controls['toCity']?.value.name || "");
-        this.rakeEntryTableForm.controls['destination'].setValue(this.rakeEntryTableForm.controls['destination']?.value.value);
+    }
+    
+     /*End*/
+    async save() {
+        debugger
+        const containerDetail = this.tableData;
+        const rakeDetail = this.tableRakeData;
+        const invoiceDetail = this.tableInvData;
+        let bindData = {
+            containerDetail: assignDetail(containerDetail, this.rakeContainerTableForm.value),
+            rakeDetail: assignDetail(rakeDetail, this.rakeDetailsTableForm.value),
+            invoiceDetail: assignDetail(invoiceDetail, this.invDetailsTableForm.value)
+        };
         const viaCity = this.rakeEntryTableForm.controls['viaControlHandler'].value;
         const cityMap = viaCity ? viaCity.map((x) => x.name) : [];
         this.rakeEntryTableForm.controls['via'].setValue(cityMap);
         this.rakeEntryTableForm.removeControl('viaControlHandler');
-        const containorList =  removeFields(containorDetail, fieldsToFromRemove);
-        const updatedinvoiceList = updateProperty(invoiceDetail,'invDate','oinvDate');
-        const invoiceList =  removeFields(updatedinvoiceList,['actions','oinvDate']);
-        const updatedRakeDetails = updateProperty(rakeDetails,'rrDate','orrDate');
-        const rakeDetailsData =  removeFields(updatedRakeDetails,['actions','orrDate']);
-        
-        let docDetail = {
-            containorDetail: containorList,
-            invoiceDetails:invoiceList,
-            rakeDetails:rakeDetailsData
-            
-        };
-        let jobDetail = {
-            ...this.rakeEntryTableForm.value,
-            ...docDetail,
-        };
-        for (const element of cnote) {
-            await this.docketService.updateDocket(element, { "rakeId": rake});
-          }
-        const res = await addRakeEntry(jobDetail, this.masterService)
-        if (res) {
-          
-            Swal.fire({
-                icon: "success",
-                title: "Generated Successfully",
-                text: "Rake No: " + rake,
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.goBack('Rake');
-                }
-            });
+        let dataEntry = this.rakeEntryTableForm.value;
+        dataEntry['vendorTypeName'] = await getTypeName(dataEntry.vendorType, this.vendorTypes);
+        dataEntry['loadTypeName'] =await getTypeName(dataEntry.loadType, this.loadType);
+        dataEntry['movementType'] = dataEntry.movementType;
+        dataEntry['movementTypeName'] = await getTypeName(dataEntry.movementType, this.movementType);
+        dataEntry['documentType'] = await getTypeName(dataEntry.documentType, this.docType,true);
+        dataEntry['documentTypeName'] = dataEntry.documentType;
+        dataEntry['transportMode'] = await getTypeName(dataEntry.transportMode, this.tranMode,true);
+        dataEntry['transportModeName'] = dataEntry.transportMode;
+        dataEntry['jobNo'] = this.jobDetail?.jobNo||"";
+        const allData = {
+            ...dataEntry,
+            ...bindData,
         }
+        let mappedData = await this.rakeService.fieldMapping(allData);
+        let res = await this.rakeService.addRakeDetails(mappedData);
+        if (res) {
+            Swal.fire({
+              icon: "success",
+              title: "RAKE Generated",
+              text: `RAKE No: ${res.data}`,
+              showConfirmButton: true,
+            });
+            this.goBack("Job");
+          }
+
     }
-    async getLocation() {
-        const location = await genericGet(this.masterService, "location_detail");
-        const locList = location.map((x) => { return { name: x.locCode, value: x.locCode } });
-        this.filter.Filter(
-            this.jsonControlArray,
-            this.rakeEntryTableForm,
-            locList,
-            this.destination,
-            this.destinationStatus
-        );
-    }
+
 
     vendorFieldChanged() {
 
@@ -347,18 +283,10 @@ export class RakeEntryPageComponent implements OnInit {
         const vendorType = this.rakeEntryTableForm.value.vendorType;
         this.jsonControlArray.forEach((x) => {
             if (x.name === "vendorName") {
-                x.type = vendorType === "Market" ? "text" : "dropdown";
+                x.type = vendorType == "4" ? "text" : "dropdown";
             }
         });
-        if (vendorType !== 'Market') {
-            const vendorDetail = this.vendorData.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.rakeEntryTableForm,
-                vendorDetail,
-                this.vendor,
-                this.vendorStatus
-            );
+        if (vendorType != "4") {
             rakeControl.setValidators([Validators.required, autocompleteObjectValidator()]);
             rakeControl.updateValueAndValidity();
         }
@@ -370,17 +298,18 @@ export class RakeEntryPageComponent implements OnInit {
 
     }
     /*below the function for Cnote details*/
-    getCnoteDetails() {
-        const dktDetail = this.rakeContainerTableForm.controls['cnNo'].value;
-        const containerDetails=areAllFieldsEmpty(dktDetail.extraData?.containerDetail);
-        this.rakeContainerTableForm.controls['cnDate'].setValue(dktDetail.extraData.docketDate);
-        this.rakeContainerTableForm.controls['noOfContainer'].setValue(containerDetails?0:dktDetail.extraData?.containerDetail.length);
-        this.rakeContainerTableForm.controls['noOfPkg'].setValue(dktDetail.extraData.noOfPkg);
-        this.rakeContainerTableForm.controls['weight'].setValue(dktDetail.extraData.weight);
-        this.rakeContainerTableForm.controls['fCity'].setValue(dktDetail.extraData.fCity);
-        this.rakeContainerTableForm.controls['tCity'].setValue(dktDetail.extraData.tCity);
-        this.rakeContainerTableForm.controls['contDtl'].setValue(containerDetails?['']:dktDetail.extraData?.containerDetail);
-        this.rakeContainerTableForm.controls['billingParty'].setValue(dktDetail.extraData.billingParty);
+    async getCnoteDetails() {
+       const containerDetails= await this.docketService.getDocketDetails({dKTNO:this.rakeContainerTableForm.controls['cnNo'].value.value});
+        const {docketData} = this.rakeContainerTableForm.controls['cnNo'].value;
+        this.rakeContainerTableForm.controls['cnDate'].setValue(docketData?.dKTDT);
+        this.rakeContainerTableForm.controls['noOfContainer'].setValue(containerDetails?.data.length||0);
+        this.rakeContainerTableForm.controls['noOfPkg'].setValue(docketData?.pKGS||0);
+        this.rakeContainerTableForm.controls['weight'].setValue(docketData?.aCTWT||0);
+        this.rakeContainerTableForm.controls['fCity'].setValue(docketData?.fCT||"");
+        this.rakeContainerTableForm.controls['tCity'].setValue(docketData?.tCT||"");
+        this.rakeContainerTableForm.controls['billingParty'].setValue(docketData?.bPARTYNM||"");
+        this.rakeContainerTableForm.controls['billingPartyCode'].setValue(docketData?.bPARTY||"");
+        this.rakeContainerTableForm.controls['contDtl'].setValue(containerDetails?.data||[]);
     }
     /*THC*/
     async addContainor() {
@@ -413,16 +342,17 @@ export class RakeEntryPageComponent implements OnInit {
         const json = {
             cnNo: this.rakeContainerTableForm.controls['cnNo'].value?.value,
             cnDate: formatDate(this.rakeContainerTableForm.controls['cnDate'].value, "dd-MM-yy HH:mm"),
-            contCnt: this.rakeContainerTableForm.controls['noOfContainer']?.value||0,
+            contCnt: this.rakeContainerTableForm.controls['noOfContainer']?.value || 0,
             noOfPkg: this.rakeContainerTableForm.controls['noOfPkg'].value,
             weight: this.rakeContainerTableForm.controls['weight'].value,
             fCity: this.rakeContainerTableForm.controls['fCity'].value,
             tCity: this.rakeContainerTableForm.controls['tCity'].value,
             billingParty: this.rakeContainerTableForm.controls['billingParty'].value,
+            billingPartyCode: this.rakeContainerTableForm.controls['billingPartyCode'].value,
             cnDateDateUtc: this.rakeContainerTableForm.controls['cnDate'].value,
             type: 'cn',
-            jsonColumn:this.definition.jsonColumn,
-            staticField:['containerNumber','containerType'],
+            jsonColumn: this.definition.jsonColumn,
+            staticField: ['cNID', 'cNTYP'],
             tableData: this.rakeContainerTableForm.controls['contDtl']?.value,
             actions: ["Edit", "Remove"]
         };
@@ -446,13 +376,13 @@ export class RakeEntryPageComponent implements OnInit {
     }
     /*End*/
     handleMenuItemClick(data) {
-        if(data.data.rrNo){
-         this.fillRakeDetails(data);
+        if (data.data.rrNo) {
+            this.fillRakeDetails(data);
         }
-        else if(data.data.invNum){
+        else if (data.data.invNum) {
             this.fillInvoiceDetails(data);
         }
-        else{
+        else {
             this.fillContainersDetails(data)
         }
     }
@@ -488,8 +418,8 @@ export class RakeEntryPageComponent implements OnInit {
         }
     }
 
-    fillRakeDetails(data){
-        this.rrLoad=true;
+    fillRakeDetails(data) {
+        this.rrLoad = true;
         if (data.label.label === "Remove") {
             this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);
         } else {
@@ -497,9 +427,9 @@ export class RakeEntryPageComponent implements OnInit {
             this.rakeDetailsTableForm.controls['rrDate'].setValue(
                 data.data?.orrDate || new Date()
             );
-           
+
             this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);;
-            this.rrLoad=false;
+            this.rrLoad = false;
         }
     }
     async addRakeData() {
@@ -587,11 +517,11 @@ export class RakeEntryPageComponent implements OnInit {
         this.invDetailsTableForm.reset();
 
     }
-    fillInvoiceDetails(data){
-        this.isInvLoad=true;
+    fillInvoiceDetails(data) {
+        this.isInvLoad = true;
         if (data.label.label === "Remove") {
             this.tableInvData = this.tableInvData.filter(x => x.invNum !== data.data.invNum);
-            this.isInvLoad=false;
+            this.isInvLoad = false;
         } else {
             this.invDetailsTableForm.controls['invNum'].setValue(data.data.invNum);
             this.invDetailsTableForm.controls['invAmt'].setValue(data.data.invAmt);
@@ -599,7 +529,41 @@ export class RakeEntryPageComponent implements OnInit {
                 data.data?.orrDate || new Date()
             );
             this.tableInvData = this.tableInvData.filter(x => x.invNum !== data.data.invNum);
-            this.isInvLoad=false;
+            this.isInvLoad = false;
         }
     }
+    /*here i wanna create a Function for the destination*/
+    async getDestLocation(){
+    const destinationMapping = await this.locationService.locationFromApi({
+         locCode: { 'D$regex': `^${this.rakeEntryTableForm.controls.destination.value}`, 'D$options': 'i' } ,
+      });
+      this.filter.Filter(this.jsonControlArray, this.rakeEntryTableForm, destinationMapping,this.destination,this.destinationStatus);
+    }
+      /*End*/
+   /*vendorType Changes*/
+   async getVendors(event) {
+    const formData = this.rakeEntryTableForm.value;
+    if (event.eventArgs.length >= 3) {
+      const vendorType = this.rakeEntryTableForm.controls["vendorType"].value;
+      if (vendorType && vendorType !== "") {
+        let vendors = await getVendorsForAutoComplete(this.masterService, event.eventArgs, parseInt(vendorType));
+        this.filter.Filter(this.jsonControlArray,this.rakeEntryTableForm,vendors,this.vendor,this.vendorStatus);
+      }
+    }
+  }
+
+   /*End*/
+   /*Below is function for get data from General Master*/
+    async getGeneralMasterData() {
+        this.vendorTypes = await this.generalService.getGeneralMasterData("VENDTYPE");
+        setGeneralMasterData(this.jsonControlArray, this.vendorTypes, "vendorType");
+        this.loadType = await this.generalService.getGeneralMasterData("LOADTYPE");
+        setGeneralMasterData(this.jsonControlArray, this.loadType, "loadType");
+        this.movementType = await this.generalService.getGeneralMasterData("MOVTYP");
+        this.docType = await this.generalService.getGeneralMasterData("RAKEDOCTYPE");
+        setGeneralMasterData(this.jsonControlArray, this.movementType, "movementType");
+        this.tranMode = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+        
+    }
+   /*End*/
 }

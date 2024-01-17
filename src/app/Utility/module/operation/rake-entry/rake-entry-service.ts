@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { Collections, OperationActions } from "src/app/config/myconstants";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
-import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utlity";
 
 @Injectable({
   providedIn: "root",
@@ -37,8 +38,21 @@ export class RakeEntryService {
     const res = this.operations.operationPost('generic/create', reqBody).toPromise();
     return res;
   }
+  async addRakeDetails(data) {
+    const thisYear = new Date().getFullYear();
+    const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: Collections.rake_headers,
+      docType: "RAKE",
+      branch: this.storage.branch,
+      finYear: financialYear,
+      data: data
+    }
+    const res = await firstValueFrom(this.operations.operationPost(OperationActions.createRake, req));
+    return res
+  }
   async fieldMapping(data) {
-    debugger
     const rake = {
       _id: "",
       docNo: "",
@@ -46,21 +60,21 @@ export class RakeEntryService {
       jID: data?.jobNo || "",
       tMODE: data?.transportMode || "",
       tMODENM: data?.transportModeName || "",
-      dEST: data?.destination || "",
+      dEST: data?.destination.value || "",
       vENDTYP: data?.vendorType || "",
       vENDTYPNM: data?.vendorTypeName || "",
-      vNDCD: data?.vendorTypeCode || "",
-      vNDNM: data?.vendorTypeName || "",
+      vNDCD: data?.vendorName.value || "",
+      vNDNM: data?.vendorName.name || "",
       fCT: data?.fromCity.value || "",
       tCT: data?.toCity.value || "",
       vIA: data?.via || "",
+      nFC: data?.NFC || "",
       dOCTYP: data?.documentType || "",
       dOCTYPNM: data?.documentTypeName || "",
       lTYP: data?.loadType || "",
       lTYPNM: data?.loadTypeName || "",
       mTYPNM: data?.movementTypeName || "",
-      mTYP: data?.mTYP || "",
-      nFC: data?.NFC || "",
+      mTYP: data?.movementType || "",
       fNRNO: data?.fnrNo || "",
       lOC: this.storage?.branch || "",
       aCTIVE: data?.isActive || false,
@@ -72,34 +86,33 @@ export class RakeEntryService {
       cID: this.storage.companyCode
     }
     let container = [];
-    if(data.container.length>0){
-    data.container.forEach(element => {
-      let rakeContainer = {
-        _id: "",
-        dKTNO: element?.cnNo || "",
-        dktDT: element?.cnDate || "",
-        cNTS: element?.contCnt || "",
-        rAKEID: "",
-        pKGS: element?.noOfPkg || "",
-        wT: element?.weight || "",
-        fCT: element?.fCity || "",
-        tCT: element?.tCity || "",
-        bPARTY: element?.billingParty?.value || "",
-        bPARTYNM: element?.billingParty?.name || "",
-        eNTLOC: this.storage.branch,
-        eNTBY: this.storage.companyCode,
-        eNTDT: new Date(),
-        mODDT: new Date(),
-        mODLOC: this.storage.branch,
-        mODBY: this.storage.userName
-      }
-      container.push(rakeContainer);
-    });
-  }
+    if (data.containerDetail.length > 0) {
+      data.containerDetail.forEach(element => {
+        let rakeContainer = {
+          _id: "",
+          cID: this.storage.companyCode,
+          dKTNO: element?.cnNo || "",
+          dktDT: element?.cnDateDateUtc || "",
+          cNTS: element?.contCnt || "",
+          rAKEID: "",
+          pKGS: element?.noOfPkg || "",
+          wT: element?.weight || "",
+          fCT: element?.fCity || "",
+          tCT: element?.tCity || "",
+          bPARTY: element?.billingPartyCode || "",
+          bPARTYNM: element?.billingParty || "",
+          eNTLOC: this.storage.branch,
+          eNTBY: this.storage.companyCode,
+          eNTDT: new Date(),
+        }
+        container.push(rakeContainer);
+      });
+    }
     let rakeInvoiceList = [];
-    data.rakeInvoice.forEach(element => {
+    data.invoiceDetail.forEach(element => {
       let rakeInvoice = {
         _id: "",
+        cID: this.storage.companyCode,
         rAKEID: "",
         iNVNO: element?.invNum || "",
         iNVDT: element?.oinvDate || "",
@@ -111,23 +124,84 @@ export class RakeEntryService {
       rakeInvoiceList.push(rakeInvoice);
     });
     let rakeDetails = [];
-    data.rakeDetails.forEach(element => {
+    data.rakeDetail.forEach(element => {
       let rakeData = {
         _id: "",
+        cID: this.storage.companyCode,
         rAKEID: "",
-        rRNo:element?.rrNo||"",
-        rRDate:element?.orrDate||new Date(),
-        eNTBY:this.storage.userName,
-        eNTDT:new Date(),
-        eNTLOC:this.storage.branch
+        rRNo: element?.rrNo || "",
+        rRDate: element?.orrDate || new Date(),
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch
       }
-     rakeDetails.push(rakeData);
+      rakeDetails.push(rakeData);
     });
-    const reqData={
-      rakeHeaders:rake,
-      rakeInvoices:rakeInvoiceList,
-      rakeDetails:rakeDetails,
+    const reqData = {
+      rakeHeaders: rake,
+      rakeContainers: container,
+      rakeInvoices: rakeInvoiceList,
+      rakeDetails: rakeDetails,
     }
     return reqData;
+  }
+
+  async fetchData(collection, filter) {
+    debugger
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: collection,
+      filter: filter
+    };
+    return await firstValueFrom(this.operations.operationPost('generic/get', req));
+  }
+  async getRakeDetail() {
+    // Fetch rake headers
+    const rakeHeadersRes = await this.fetchData(Collections.rake_headers, { lOC: this.storage.branch });
+    const rakeNo = rakeHeadersRes.data.map(x => x.rAKEID);
+    // Define a common filter for subsequent requests
+    const rakeFilter = { rAKEID: { D$in: rakeNo } };
+    // Fetch rake details, invoices, and details using the common function
+    const resRd = await this.fetchData('rake_details', rakeFilter);
+   // const resInvs = await this.fetchData('rake_invoices', rakeFilter);
+    const resContainers = await this.fetchData('rake_containers', rakeFilter); // Note: This seems redundant, as it's the same as resInvs
+    let RakeDetails = [];
+    rakeHeadersRes.data.forEach(element => {
+      // Ensure resContainers and resRd are arrays before proceeding
+      const containersData = Array.isArray(resContainers?.data) ? resContainers.data : [];
+      const rrData = Array.isArray(resRd?.data) ? resRd.data : [];
+    
+      const filteredContainers = containersData.filter(item => item.rAKEID === element?.rAKEID);
+      const rrDetails = rrData.filter(x => x.rAKEID === element?.rAKEID);
+    
+      const rrContainers = filteredContainers.reduce((sum, item) => sum + (item.cNTS ?? 0), 0);
+      const weight = filteredContainers.reduce((sum, item) => sum + (item.wT ?? 0), 0);
+    
+      const uniqueBillingParties = new Set();
+      const uniquecnNos = new Set();
+    
+      filteredContainers.forEach(item => {
+        if (item.bPARTY) uniqueBillingParties.add(item.bPARTY);
+        if (item.dKTNO) uniquecnNos.add(item.dKTNO);
+      });
+    
+      const jsonRake = {
+        RakeNo: element?.rAKEID ?? '',
+        RakeEntryDate: formatDocketDate(element?.eNTDT ?? ''),
+        RRNo: rrDetails.length,
+        ContainerNo: rrContainers,
+        FromToCity: `${element?.fCT ?? ''}-${element?.tCT ?? ''}`,
+        Weight: weight,
+        BillingParty: uniqueBillingParties.size,
+        BillingPartyList: Array.from(uniqueBillingParties),
+        CurrentStatus: "At " + localStorage.getItem("Branch"),
+        CNNo: uniquecnNos.size,
+        CNNoList: Array.from(uniquecnNos),
+        actions: "Updated"
+      }
+    
+      RakeDetails.push(jsonRake);
+    });
+     return RakeDetails;
   }
 }

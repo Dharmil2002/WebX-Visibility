@@ -186,3 +186,7 @@ export function latLongValidator(data) {
   }
   return null;
 }
+export function getTypeName(dataEntryProperty, typesArray, isValue = false) {
+  const foundObject = typesArray.find(x => x.value === dataEntryProperty || x.name === dataEntryProperty);
+  return isValue ? foundObject?.value ?? '' : foundObject?.name ?? '';
+}

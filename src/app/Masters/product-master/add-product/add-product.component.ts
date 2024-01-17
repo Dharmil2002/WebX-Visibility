@@ -46,33 +46,17 @@ export class AddProductComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
-    console.log("data", data);
-  }
+  ) {}
 
   ngOnInit(): void {
     this.initializeFormControl();
     this.bindDropdown();
-    this.getList();
     this.GetTableData();
   }
 
-  async getList() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "products",
-    };
-    const Res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-    if (Res?.success) {
-    }
-  }
-
   initializeFormControl() {
-    const customerFormControls = new ProductControls();
-    this.jsonControlArray = customerFormControls.getProductControlsArray(true);
+    const customerFormControls = new ProductControls(true);
+    this.jsonControlArray = customerFormControls.getisCompanyProductControlsArray();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
@@ -133,9 +117,6 @@ export class AddProductComponent implements OnInit {
       this.getProductNameDropdown();
     }
   }
-
-  
-
   async save() {
     let req;
     const Body = {
@@ -178,36 +159,23 @@ export class AddProductComponent implements OnInit {
     }
   }
 
-  handleProductId() {
-    this.customerTableForm.controls.ProductID.setValue(
-      this.customerTableForm.value.ProductName.value
-    );
+  async handleProductId() {
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "product_detail",
+      filter:{ProductID:this.customerTableForm.value.ProductID}
+    };
+    const res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
+      if(res.success && res.data.length != 0){
+        this.customerTableForm.controls.ProductID.setValue("");
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Product Id exist",
+          showConfirmButton: true,
+        });
+      }
   }
-
-  // async handleProductName() {
-  //   let req = {
-  //     companyCode: this.companyCode,
-  //     filter: {},
-  //     collectionName: "products",
-  //   };
-  //   const Res = await this.masterService
-  //     .masterPost("generic/get", req)
-  //     .toPromise();
-  //   if (Res?.success && Res.data.length > 0) {
-  //     const FilterData = Res.data.filter(
-  //       (x) =>
-  //         x.product_name.toLowerCase() ==
-  //         this.customerTableForm.value.ProductName.toLowerCase()
-  //     );
-  //     if (FilterData.length != 0) {
-  //       this.customerTableForm.controls.ProductName.setValue("");
-  //       Swal.fire({
-  //         icon: "info",
-  //         title: "info",
-  //         text: "Product name exist!",
-  //         showConfirmButton: true,
-  //       });
-  //     }
-  //   }
-  // }
 }

@@ -22,6 +22,7 @@ import { CustomerService } from "src/app/Utility/module/masters/customer/custome
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { StorageService } from "src/app/core/service/storage.service";
+import { isEmptyForm } from "src/app/Utility/Form Utilities/filter-utils";
 
 
 @Component({
@@ -132,10 +133,9 @@ export class JobEntryPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.bindDropdown();
-    this.getDockeContainorDetail();
-    this.tranPortChanged();
     this.getGeneralmasterData().then((x) => {
       this.getDropDownDetail();
+      this.getDockeContainorDetail();
     });
     this.backPath = "/dashboard/Index?tab=6";
   }
@@ -197,6 +197,7 @@ export class JobEntryPageComponent implements OnInit {
   async autoFillJobDetails() {
     this.jobTableLoad = true
     const { jobHeader, jobChallan } = await this.jobEntryService.getjobDetailsByJob(this.jobDetails.jobNo);
+    //transportMode: 'tMODE',
     if (jobHeader) {
       const fields = {
         jobId: 'jID',
@@ -211,7 +212,6 @@ export class JobEntryPageComponent implements OnInit {
         transportedBy: 'tBY',
         nOOFCONT: 'cNTS',
         jobLocation: 'lOC',
-        transportMode: 'tMODE',
         poNumber: 'pONO',
         exportType: 'eTYP',
         billingParty: null, // special case
@@ -228,6 +228,7 @@ export class JobEntryPageComponent implements OnInit {
         }
       });
     }
+    this.jobEntryTableForm.controls['tMODE'].setValue({name:jobHeader?.tMODENM||"",value:jobHeader?.tMODE||""});
     if (jobChallan.length > 0) {
       let challan = [];
       jobChallan.forEach((element, index) => {
@@ -290,6 +291,7 @@ export class JobEntryPageComponent implements OnInit {
         this.jobEntryTableForm.controls['transportMode'].disable();
         const remove = ['exportType'];
         this.jsonJobFormControls = this.jsonAllJobControls.filter((x) => !remove.includes(x.name));
+        console.log(this.jsonFormBlControls + "First Case");
         break;
       case "T01":
         this.jobEntryTableForm.controls['transportMode'].enable();
@@ -308,7 +310,10 @@ export class JobEntryPageComponent implements OnInit {
           else {
             this.isImport = true;
           }
+          this.containorTableForm.reset();
+          this.tableData = [];
           this.jsonJobFormControls = this.jsonAllJobControls
+
         }
         if (transportMode.name == "Rail") {
           this.columnJobDetail = this.definition.columnContainorDetail;
@@ -329,7 +334,6 @@ export class JobEntryPageComponent implements OnInit {
         break;
       default:
         this.jobEntryTableForm.controls['transportMode'].enable();
-      // Handle other cases if needed
     }
   }
   /*End*/
@@ -343,6 +347,7 @@ export class JobEntryPageComponent implements OnInit {
       this.containerTypeBL,
       this.containerTypeBLStatus
     );
+    this.tranPortChanged();
     //const docketDetail=this.dock
   }
   /*below the function called when user select docket no*/
@@ -479,6 +484,7 @@ export class JobEntryPageComponent implements OnInit {
     this.containorTableForm.controls["cnoteDate"].setValue("");
     this.containorTableForm.controls["noOfpkg"].setValue("");
     this.containorTableForm.controls["loadedWeight"].setValue("");
+    this.getPkg();
     // Remove all validation
 
     this.isLoad = false;
@@ -509,6 +515,7 @@ export class JobEntryPageComponent implements OnInit {
   fillDocket(data: any) {
     if (data.label.label === "Remove") {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      this.getPkg();
     } else {
       const excludedKeys = [
         "Company_file",
@@ -638,62 +645,57 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*Below the code Which fill */
   async save() {
-
     this.jobEntryTableForm.controls['transportMode'].enable();
     let fieldsToFromRemove = [];
     const tabcontrols = this.jobEntryTableForm;
     let containorDetail = []
     let challlanDetails = []
     let docket = []
-    if (this.tableData.length > 0) {
-      if (this.tableData.hasOwnProperty('cnoteNo')) {
-        if (Array.isArray(this.tableData)) {
-          this.tableData.forEach((item) => {
-            if (item.hasOwnProperty('cnoteNo') && item.cnoteDate) {
-              item.cnoteDate = item.dktDt;
-            }
-          });
-          fieldsToFromRemove = ["id", "actions", "cnote", "dktDt"]
+    let condition = this.tableData.length > 0 ? "dataExists"
+      : isEmptyForm(this.containorTableForm) ? "formEmpty"
+        : "formValue";
+    switch (condition) {
+      case "dataExists":
+        this.tableData.forEach((item) => {
+          if (item.hasOwnProperty('cnoteNo') && item.cnoteDate) {
+            item.cnoteDate = item?.dktDt || '';
+          }
+        });
+        break;
+      case "formValue":
+        const docketDetail = {
+          cnoteNo: this.containorTableForm.value.cnoteNo.value,
+          cnoteDate: this.containorTableForm.value?.cnoteDate || new Date(),
+          noOfpkg: this.containorTableForm.value.noOfpkg,
+          loadedWeight: this.containorTableForm.value.loadedWeight,
         }
+        this.tableData.push(docketDetail);
         docket = this.tableData.map((x) => x.docketNumber);
-      }
-      else {
-        fieldsToFromRemove = ["id", "actions", "cnote"]
-      }
-
-    }
-    else if (this.containorTableForm.value.cnoteNo) {
-      const docketDetail = {
-        cnoteNo: this.containorTableForm.value.cnoteNo.value,
-        cnoteDate: this.containorTableForm.value?.cnoteDate || new Date(),
-        noOfpkg: this.containorTableForm.value.noOfpkg,
-        loadedWeight: this.containorTableForm.value.loadedWeight,
-      }
-      this.tableData.push(docketDetail);
-      docket = this.tableData.map((x) => x.docketNumber);
-    }
-    else if (this.containorTableForm.value.contNo) {
-      const containerDetail = {
-        contNo: this.containorTableForm.value.contNo,
-        contType: this.containorTableForm.value?.containerType.value,
-        noOfpkg: this.containorTableForm.value.noOfpkg,
-        loadedWeight: this.containorTableForm.value.loadedWeight,
-      }
-      this.tableData.push(containerDetail);
+        break;
     }
     containorDetail = this.tableData;
-    if (this.TblChallan.length > 0) {
-      this.TblChallan = this.TblChallan.map(element => {
-        // Check if the properties are not undefined or null before assigning
-        element.invDate = element.oinvDate !== undefined && element.oinvDate !== null ? element.oinvDate : "";
-        element.blDate = element.oblDate !== undefined && element.oblDate !== null ? element.oblDate : "";
-        element.sbDt = element.sbDt !== undefined && element.sbDt !== null ? element.osbDt : "";
-        element.beDT = element.obeDT !== undefined && element.obeDT !== null ? element.obeDT : "";
-        return element;
-      });
-
+    let tblCondition = this.TblChallan.length > 0 ? "hasData"
+      : isEmptyForm(this.blTableForm) ? "emptyForm"
+        : "formValue";
+    switch (tblCondition) {
+      case "hasData":
+        this.TblChallan = this.TblChallan.map(element => {
+          element.invDate = element.oinvDate ?? "";
+          element.blDate = element.oblDate ?? "";
+          element.sbDt = element.sbDt ?? "";
+          element.beDT = element.obeDT ?? "";
+          return element;
+        });
+        challlanDetails = this.TblChallan;
+        break;
+      case "formValue":
+        challlanDetails = [this.blTableForm.value];
+        break;
+      default:
+        challlanDetails = [];
+        break;
     }
-    challlanDetails = this.TblChallan.length > 0 ? this.TblChallan : [this.blTableForm.value]
+
     clearValidatorsAndValidate(tabcontrols);
     // Create a new array without the 'srNo' property
     let modifiedTableData = this.tableData.map(({ srNo, ...rest }) => rest);
@@ -701,12 +703,9 @@ export class JobEntryPageComponent implements OnInit {
     this.tableData = modifiedTableData;
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-    const containorList = removeFields(containorDetail, fieldsToFromRemove);
-    const removeField = ['actions', 'osb', 'oinvDate', 'oblDate', 'osbDt', 'invoice', 'id'];
-    const modifiedTblChallan = removeFields(challlanDetails, removeField);
     /*below code is for  Data pass  in array Because for the store array in db*/
-    const jobDetails = { jobDetails: containorList };
-    const chalanDetails = { blChallan: modifiedTblChallan };
+    const jobDetails = { jobDetails: containorDetail };
+    const chalanDetails = { blChallan: challlanDetails };
 
     let jobDetail = {
       formData: this.jobEntryTableForm.value,
@@ -715,12 +714,28 @@ export class JobEntryPageComponent implements OnInit {
     };
     jobDetail.formData.jobTypeName = this.jobType.find(x => x.value === this.jobEntryTableForm.value.jobType)?.name || '';
     jobDetail.formData.transportedByName = this.tranBy.find(x => x.value === this.jobEntryTableForm.value.transportedBy)?.name || '';
-    jobDetail.formData.transportModeName = this.tranMode.find(x => x.value === this.jobEntryTableForm.value.transportMode)?.name || '';
     jobDetail.formData.exportTypeName = this.exportType.find(x => x.value === this.jobEntryTableForm.value.exportType)?.name || '';
     let fieldMapping = this.jobEntryService.jobFieldMapping(jobDetail, this.containerTypeList);
     if (this.isUpdate) {
       const jobEntryNo = this.jobDetails.jobNo;
-      const res = await this.jobEntryService.updateJobDetails(jobDetail, jobEntryNo);
+      let jobData = fieldMapping.jobData;
+      jobData._id = `${this.storage.companyCode}-${jobEntryNo}`;
+      jobData.docNo = jobEntryNo;
+      jobData.jID = jobEntryNo;
+      fieldMapping.jobDetails.forEach(element => {
+        element._id = `${this.storage.companyCode}-${jobEntryNo}-${element.dKTNO}`
+        element.jID = jobEntryNo
+      });
+      fieldMapping.blChallan.forEach(element => {
+        element._id = `${this.storage.companyCode}-${jobEntryNo}-${element.iNVNO}`
+        element.jID = jobEntryNo
+      });
+      const res = await this.jobEntryService.updateJobDetails(jobData, { cID: this.storage.companyCode, jID: jobEntryNo }, 'job_header');
+      if (fieldMapping.jobDetails.length > 0) {
+        await this.jobEntryService.addDeleteJobDetails(fieldMapping.jobDetails, { cID: this.storage.companyCode, jID: jobEntryNo }, 'job_details');
+      } if (fieldMapping.blChallan.length > 0) {
+        await this.jobEntryService.addDeleteJobDetails(fieldMapping.blChallan, { cID: this.storage.companyCode, jID: jobEntryNo }, 'job_challans');
+      }
       if (res) {
         if (docket.length <= 0) {
           this.showSuccessMessage(jobEntryNo, "Job Updated Successfully");
@@ -943,6 +958,7 @@ export class JobEntryPageComponent implements OnInit {
       this.columnJobDetail = this.definition.columnContainorDetail;
       this.tableLoad = false;
       this.isLoad = false;
+
     }
   }
 
@@ -1023,10 +1039,12 @@ export class JobEntryPageComponent implements OnInit {
   /* End */
   /*on JOB details Changed*/
   onJobChanged() {
-
+    Object.keys(this.blTableForm.controls).forEach(key => {
+      this.blTableForm.get(key).clearValidators();
+      this.blTableForm.get(key).updateValueAndValidity();
+    });
     this.TblChallan = [];
     const jobType = this.jobEntryTableForm.controls['jobType'].value;
-    const transportedBy = this.jobEntryTableForm.controls['transportedBy'].value;
     if (jobType == "J01") {
       const controls = [
         "invNum",
@@ -1037,8 +1055,16 @@ export class JobEntryPageComponent implements OnInit {
         "containerNum"
       ]
       this.jsonFormBlControls = this.allBlControls.filter(x => !controls.includes(x.name));
+      this.jsonFormBlControls.forEach((x) => {
+        const control = this.blTableForm.controls[x.name];
+        control.setValue("");
+        control.setValidators(Validators.required);
+        control.updateValueAndValidity();
+      });
       const exportType = this.exportType.filter((x) => x.value != "E01");
       this.isImport = true;
+      this.containorTableForm.reset();
+      this.tableData = [];
       this.jsonJobFormControls = this.jsonJobFormControls.map((x) => {
         if (x.name === "exportType") {
           return { ...x, value: exportType };
@@ -1066,7 +1092,14 @@ export class JobEntryPageComponent implements OnInit {
           return x;
         }
       });
+
       this.columnChallan = this.definition.columnExport;
+      this.jsonFormBlControls.forEach((x) => {
+        const control = this.blTableForm.controls[x.name];
+        control.setValue("");
+        control.setValidators(Validators.required);
+        control.updateValueAndValidity();
+      });
     }
   }
   /*End*/
@@ -1143,6 +1176,7 @@ export class JobEntryPageComponent implements OnInit {
       data.data?.loadedWeight || ""
     );
     this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    this.getPkg();
   }
 
   fillInvoiceDetails(data) {
@@ -1227,10 +1261,11 @@ export class JobEntryPageComponent implements OnInit {
     setGeneralMasterData(this.jsonAllJobControls, this.tranBy, "transportedBy");
     //  setGeneralMasterData(this.jsonAllJobControls,this.tranMode,"transportMode");
     setGeneralMasterData(this.jsonAllJobControls, this.exportType, "exportType");
-    this.onJobChanged();
-    const tranMode= this.tranMode.find((x)=>x.name=="Road")
+    const tranMode = this.tranMode.find((x) => x.name == "Road")
     this.jobEntryTableForm.controls['transportMode'].setValue(tranMode);
-  
+    this.onJobChanged();
+
+
     /*End*/
 
   }
@@ -1243,4 +1278,9 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*End*/
   /*End*/
+  /*here the function which i getting noOfPkg*/
+  getPkg() {
+    const noOfpkg = this.tableData.reduce((x, y) => x + y.noOfpkg, 0)
+    this.jobEntryTableForm.controls['noOfPkg'].setValue(noOfpkg);
+  }
 }

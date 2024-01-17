@@ -16,6 +16,8 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -41,6 +43,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     csv: false,
   };
   linkArray = [];
+
+  debitVoucherRequestModel = new DebitVoucherRequestModel();
+  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
 
   columnHeader = {
     consignmentNoteNumber: {
@@ -161,14 +166,16 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   TotalAmountList: { count: string; title: string; class: string; }[];
   headerDetails: any;
   docketNo: any;
+  AlljsonControlMRArray: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
     private filter: FilterUtils,
     private masterService: MasterService,
     private objLocationService: LocationService,
-    private objStorageService: StorageService,
     private operation: OperationService,
+    private storage: StorageService,
+    private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
@@ -211,13 +218,23 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.jsonControlPaymentArray = deliveryMrControlsGenerator.getDeliveryMrPaymentControls();
     this.jsonControlBillingArray = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
     this.AlljsonControlPaymentSummaryFilterArray = this.jsonControlPaymentArray;
+    this.AlljsonControlMRArray = this.jsonControlDeliveryMrGenArray;
     this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentArray])
 
     // Build the form group using the FormBuilder and the obtained form controls array.
     this.deliveryMrTableForm = formGroupBuilder(this.fb, [this.jsonControlDeliveryMrGenArray]);
     this.billingForm = formGroupBuilder(this.fb, [this.jsonControlBillingArray]);
     this.jsonControlPaymentArray = this.jsonControlPaymentArray.slice(0, 1);
+
     this.deliveryMrTableForm.controls['Deliveredto'].setValue("Receiver");
+    const filterFunction = (x) => x.name !== "NameofConsignee";
+    this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+
+    // Clear validation for NameofReceiver control
+    const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
+    NameofConsignee.clearValidators();
+    NameofConsignee.updateValueAndValidity();
+
     this.deliveryMrTableForm.controls['ConsignmentNoteNumber'].setValue(this.docketNo);
     this.docketNo ? this.validateConsig() : null;
   }
@@ -265,32 +282,43 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   //#region to change control
-  hideControl() {
-    // Get the value of the 'Deliveredto' control from the form
+  async hideControl() {
     const deliveredToValue = this.deliveryMrTableForm.value.Deliveredto;
 
-    // Check if the control value is 'Consignee' or 'Receiver'
-    if (deliveredToValue === 'Consignee' || deliveredToValue === 'Receiver') {
-      // Determine the control properties based on the 'deliveredToValue'
-      const controlName = (deliveredToValue === 'Consignee') ? 'NameofReceiver' : 'NameofConsignee';
-      const label = (deliveredToValue === 'Consignee') ? 'Name of Consignee' : 'Name of Receiver';
-      const placeholder = (deliveredToValue === 'Consignee') ? 'Name of Consignee' : 'Name of Receiver';
-      const validationMessage = (deliveredToValue === 'Consignee') ? 'Name of Consignee is required' : 'Name of Receiver is required';
+    const filter = { "docketNumber": this.docketNo };
+    const consigneeName = await this.getDocketList(filter);
+    const cgnm = consigneeName[0]?.consigneeName;
 
-      // Find the control in the jsonControlDeliveryMrGenArray
-      const disableControl = this.jsonControlDeliveryMrGenArray.find(control => control.name === controlName);
+    const NameofReceiver = this.deliveryMrTableForm.get('NameofReceiver');
+    const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
 
-      // Modify the properties of disableControl if found
-      if (disableControl) {
-        disableControl.name = controlName;
-        disableControl.label = label;
-        disableControl.placeholder = placeholder;
-        disableControl.value = '';
-        disableControl.Validations = [{
-          name: 'required',
-          message: validationMessage,
-        }];
-      }
+    if (deliveredToValue === 'Receiver') {
+      const filterFunction = (x) => x.name !== "NameofConsignee";
+      this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+
+      // Reset values and clear validators
+      NameofConsignee.setValue('');
+      NameofConsignee.clearValidators();
+      NameofConsignee.updateValueAndValidity();
+
+      // Apply required validator for NameofReceiver control
+      NameofReceiver.setValidators([Validators.required]);
+      NameofReceiver.updateValueAndValidity();
+    }
+
+    if (deliveredToValue === 'Consignee') {
+      const filterFunction = (x) => x.name !== "NameofReceiver";
+      this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+
+      // Reset values and clear validators
+      NameofReceiver.setValue('');
+      NameofReceiver.clearValidators();
+      NameofReceiver.updateValueAndValidity();
+
+      // Apply required validator for NameofConsignee control      
+      NameofConsignee.setValue(cgnm);
+      NameofConsignee.setValidators([Validators.required]);
+      NameofConsignee.updateValueAndValidity();
     }
   }
   //#endregion
@@ -384,6 +412,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           data !== null &&
           index === self.findIndex((d) => d.docketNumber === data.docketNumber)
       );
+
+      // const consigneeName = this.filteredDocket[0]?.consigneeName;
+      // this.deliveryMrTableForm.controls['Consignee'].setValue(consigneeName);
 
       if (this.filteredDocket.length === 0) {
         Swal.fire({
@@ -541,7 +572,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       false
     );
     const stateReqBody = {
-      companyCode: this.objStorageService.companyCode,
+      companyCode: this.storage.companyCode,
       filter: {},
       collectionName: "state_master",
     };
@@ -572,7 +603,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#region to get Docket list
   async getDocketList(data = {}) {
     const req = {
-      companyCode: this.objStorageService.companyCode,
+      companyCode: this.storage.companyCode,
       filter: data,
       collectionName: "docket",
     };
@@ -603,7 +634,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const totalTDSamt = totalAmountCount - TDSAmount;
 
     // Set the TDS amount in the form
-    this.billingForm.get("TDSAmount").setValue(totalTDSamt);
+    this.billingForm.get("TDSAmount").setValue(TDSAmount);
 
     // Get the GSTAmount from the form or default to 0 if undefined
     const totalGSTamt = this.billingForm.value.GSTAmount || 0;
@@ -632,17 +663,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     // Calculate and set GSTAmount in the form
     const GSTAmount = totalAmountCount * (selectedSACCodeObject?.GSTRT || 0) / 100;
-    const totalGSTamt = totalAmountCount + GSTAmount;
+    //const totalGSTamt = totalAmountCount + GSTAmount;
 
     // Set GSTAmount in the form
-    this.billingForm.get("GSTAmount").setValue(totalGSTamt);
+    this.billingForm.get("GSTAmount").setValue(GSTAmount);
 
     // Enable GSTCharged based on the presence of GSTRate
     this.billingForm.get("GSTCharged").setValue(!!this.billingForm.value.GSTRate);
   }
   //#endregion
   //#region to save data to collection delivery_mr_header and delivery_mr_details
-  async submit() {
+  async GenerateMR(VoucherNo) {
     if (this.tableData.length === 0 || !this.billingForm.valid) {
       Swal.fire({
         text: 'Please fill the required details above',
@@ -655,7 +686,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.snackBarUtilityService.commonToast(async () => {
         try {
           const headerRequest = {
-            cID: this.objStorageService.companyCode,
+            cID: this.storage.companyCode,
             dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
             dLVRT: this.headerDetails.Deliveredto,
             cNTCTNO: this.headerDetails.ContactNumber,
@@ -684,15 +715,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             gSTCHRGD: this.billingForm.value.GSTCharged,
             dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
             cLLCTAMT: this.billingForm.value.CollectionAmount,
+            rNDOFF: this.billingForm.value.roundOffAmt || 0,
             pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
             pRTLYRMGAMT: (this.billingForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
+            vNO: VoucherNo,
             eNTDT: new Date(),
-            eNTLOC: this.objStorageService.branch,
-            eNTBY: this.objStorageService.userName
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName
           }
           const detailRequests = this.tableData.map(element => {
             return {
-              cID: this.objStorageService.companyCode,
+              cID: this.storage.companyCode,
               dOCNO: element.consignmentNoteNumber,
               mLTPNTDLRY: element.Multipointdelivery,
               dOC: element.Document,
@@ -709,14 +742,15 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
               sUBTTL: element.subTotal,
               nWSUBTTL: element.newSubTotal,
               rTDFRNC: element.rateDifference,
+              vNO: VoucherNo,
               //dORDLVRY:
               // fRCLPCHRGE:
               //   gTPSCHRG:
               // oTHRCHRG:
               tOTL: element.totalAmount,
               eNTDT: new Date(),
-              eNTLOC: this.objStorageService.branch,
-              eNTBY: this.objStorageService.userName
+              eNTLOC: this.storage.branch,
+              eNTBY: this.storage.userName
 
             }
           });
@@ -727,10 +761,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           };
           // Prepare the request body with company code, collection name, and job detail data.
           let reqBody = {
-            companyCode: this.objStorageService.companyCode,
+            companyCode: this.storage.companyCode,
             //collectionName: "delivery_mr_header",
             docType: "MR",
-            branch: this.objStorageService.branch,
+            branch: this.storage.branch,
             finYear: financialYear,
             data: data
           };
@@ -771,8 +805,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       // Round off the value to the nearest integer
       const roundedValue = value ? Math.round(value) : 0;
 
+      // Calculate the decimal part
+      const decimalPart = (value - roundedValue).toFixed(2);
+      //console.log(decimalPart);
+
       // Set the rounded value back to the form control
       deliveryMRNetAmountControl.setValue(roundedValue);
+      this.billingForm.get("roundOffAmt").setValue(decimalPart);
     } else {
       // No rounding required, set the original value
       deliveryMRNetAmountControl.setValue(value);
@@ -815,4 +854,117 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
   }
   //#endregion
+
+  GenerateVoucher() {
+
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+
+        this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
+        this.debitVoucherRequestModel.docType = "VR";
+        this.debitVoucherRequestModel.branch = this.storage.branch;
+        this.debitVoucherRequestModel.finYear = financialYear;
+
+        this.debitVoucherDataRequestModel.voucherNo = "";
+        this.debitVoucherDataRequestModel.transType = "Delivery MR Voucher";
+        this.debitVoucherDataRequestModel.transDate = new Date();
+        this.debitVoucherDataRequestModel.docType = "VR";
+        this.debitVoucherDataRequestModel.branch = this.storage.branch;
+        this.debitVoucherDataRequestModel.finYear = financialYear;
+
+        this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
+        this.debitVoucherDataRequestModel.preperedFor = "Customer"
+        this.debitVoucherDataRequestModel.partyCode = ""
+        this.debitVoucherDataRequestModel.partyName = this.filteredDocket[0]?.billingParty;
+        this.debitVoucherDataRequestModel.partyState = this.billingForm.value.StateofSupply.name
+        this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
+        this.debitVoucherDataRequestModel.entryDate = new Date();
+        this.debitVoucherDataRequestModel.panNo = ""
+
+        this.debitVoucherDataRequestModel.tdsSectionCode = this.billingForm.value.SACCode.value;
+        this.debitVoucherDataRequestModel.tdsSectionName = this.billingForm.value.SACCode.name;
+        this.debitVoucherDataRequestModel.tdsRate = this.billingForm.value.TDSRate;
+        this.debitVoucherDataRequestModel.tdsAmount = this.billingForm.value.TDSAmount;
+        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
+        this.debitVoucherDataRequestModel.tcsSectionCode = undefined
+        this.debitVoucherDataRequestModel.tcsSectionName = undefined
+        this.debitVoucherDataRequestModel.tcsRate = 0;
+        this.debitVoucherDataRequestModel.tcsAmount = 0;
+
+        this.debitVoucherDataRequestModel.IGST = 0;
+        this.debitVoucherDataRequestModel.SGST = 0;
+        this.debitVoucherDataRequestModel.CGST = 0;
+        this.debitVoucherDataRequestModel.UGST = 0;
+        this.debitVoucherDataRequestModel.GSTTotal = this.billingForm.value.GSTAmount;
+
+        this.debitVoucherDataRequestModel.paymentAmt = this.billingForm.value.DeliveryMRNetAmount
+        this.debitVoucherDataRequestModel.netPayable = this.billingForm.value.CollectionAmount
+        this.debitVoucherDataRequestModel.roundOff = this.billingForm.value.roundOffAmt || 0;
+        this.debitVoucherDataRequestModel.voucherCanceled = false;
+
+        this.debitVoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
+        this.debitVoucherDataRequestModel.refNo = this.PaymentSummaryFilterForm.value?.ChequeOrRefNo;
+        this.debitVoucherDataRequestModel.accountName = this.PaymentSummaryFilterForm.value?.Bank.name;
+        this.debitVoucherDataRequestModel.date = this.PaymentSummaryFilterForm.value?.Date;
+        this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+
+
+        const companyCode = this.storage.companyCode;
+        const CurrentBranchCode = this.storage.branch;
+
+        let voucherLineItemList = [];
+
+        this.tableData.forEach(item => {
+          console.log(this.billingForm.value);
+
+          const voucherLineItem = {
+            companyCode: companyCode,
+            voucherNo: "",
+            transType: "Delivery MR Voucher",
+            transDate: new Date(),
+            finYear: financialYear,
+            branch: CurrentBranchCode,
+            accCode: '',
+            accName: '',
+            sacCode: "",
+            sacName: "",
+            debit: parseFloat(item.totalAmount).toFixed(2),
+            credit: 0,
+            GSTRate: this.billingForm.value?.GSTRate,
+            GSTAmount: item.GST,
+            Total: parseFloat(item.totalAmount).toFixed(2),
+            TDSApplicable: false,
+            narration: ""
+          };
+
+          voucherLineItemList.push(voucherLineItem);
+        });
+
+        this.debitVoucherRequestModel.details = voucherLineItemList;
+        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+        console.log(this.debitVoucherRequestModel);
+
+        firstValueFrom(this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+            if (res.success) {
+              Swal.hideLoading();
+              Swal.close();
+              this.GenerateMR(res?.data?.mainData?.ops[0].vNO)
+            }
+          }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+          .finally(() => {
+
+          });
+
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          error.message
+        );
+      }
+    }, "Delivery MR Voucher Generating..!");
+
+  }
+
 }

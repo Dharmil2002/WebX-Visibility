@@ -2,7 +2,7 @@
     <form [formGroup]="jobQueryTableForm">
         <app-form-webxpress [form]="jobQueryTableForm" [FormTitle]="'Job Register Report'" [formData]="jsonFormArray"
             (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="true" [submit]="'Filter'">
+            [showSaveButton]="true" [submit]="'Download'">
         </app-form-webxpress>
     </form>
     <app-generic-table-v2 *ngIf="!tableLoad" [csvHeaders]="headerForCsv" [dynamicControls]="dynamicControls"

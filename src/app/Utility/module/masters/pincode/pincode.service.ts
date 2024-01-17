@@ -100,27 +100,27 @@ export class PinCodeService {
   async getCity(form, jsondata, controlName, codeStatus) {
     try {
       const cValue = form.controls[controlName].value;
-      
+
       // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
-      if (cValue.length >= 3) {        
-        const filter = { CT: {'D$regex' : `^${cValue}`, 'D$options' : 'i'} }
+      if (cValue.length >= 3) {
+        const filter = { CT: { 'D$regex': `^${cValue}`, 'D$options': 'i' } }
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"), 
+          companyCode: localStorage.getItem("companyCode"),
           collectionName: "pincode_master",
           filter,
         };
 
         // Fetch pincode data from the masterService asynchronously
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
-        
-         // Extract data from the response
+
+        // Extract data from the response
         const codeData = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
-                              .map((ct: string) => {
-                                return { name: ct, value: ct }
-                              });
-      
+          .map((ct: string) => {
+            return { name: ct, value: ct }
+          });
+
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode
@@ -147,32 +147,45 @@ export class PinCodeService {
       console.error("Error fetching data:", error);
     }
   }
-
-  async getPincodes(form, jsondata, controlName, codeStatus, city='', stateCode='') {
+  async getCityDetails(filter = {}) {
+    const cityBody = {
+      companyCode: localStorage.getItem("companyCode"),
+      collectionName: "pincode_master",
+      filter:filter,
+    };
+    const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+    // Extract data from the response
+    const codeData = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
+      .map((ct: string) => {
+        return { name: ct, value: ct }
+      });
+    return codeData
+  }
+  async getPincodes(form, jsondata, controlName, codeStatus, city = '', stateCode = '') {
     try {
       const cValue = form.controls[controlName].value;
-      
+
       // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
       if (cValue.length >= 3) {
         let gte = parseInt(`${cValue}00000`.slice(0, 6));
         let lte = parseInt(`${cValue}99999`.slice(0, 6));
-        const filter = { PIN: {'D$gte' : gte, 'D$lte' : lte} }
-        if(city)
+        const filter = { PIN: { 'D$gte': gte, 'D$lte': lte } }
+        if (city)
           filter["CT"] = city;
-        if(stateCode)
+        if (stateCode)
           filter["ST"] = stateCode;
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"), 
+          companyCode: localStorage.getItem("companyCode"),
           collectionName: "pincode_master",
           filter,
         };
 
         // Fetch pincode data from the masterService asynchronously
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
-         // Extract data from the response
-        const codeData = cResponse.data.map((x) => { return { name: `${x.PIN}`, value: `${x.PIN}`,allData:x} });
+        // Extract data from the response
+        const codeData = cResponse.data.map((x) => { return { name: `${x.PIN}`, value: `${x.PIN}`, allData: x } });
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode
@@ -197,21 +210,21 @@ export class PinCodeService {
       // Handle any errors that may occur during the asynchronous operation
     }
   }
-  async getPincodeNestedData(filter,value) {
+  async getPincodeNestedData(filter, value) {
     try {
       // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
       if (value.length >= 3) {
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"), 
+          companyCode: localStorage.getItem("companyCode"),
           collectionName: "pincode_master",
           filter,
         };
 
         // Fetch pincode data from the masterService asynchronously
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
-         // Extract data from the response
-        const codeData = cResponse.data.map((x) => { return { name: `${x.PIN}`, value: `${x.PIN}`,allData:x} });
+        // Extract data from the response
+        const codeData = cResponse.data.map((x) => { return { name: `${x.PIN}`, value: `${x.PIN}`, allData: x } });
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode
@@ -230,21 +243,21 @@ export class PinCodeService {
       // Handle any errors that may occur during the asynchronous operation
     }
   }
-  async getStateNestedData(filter,value) {
+  async getStateNestedData(filter, value) {
     try {
       // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
       if (value.length >= 3) {
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"), 
+          companyCode: localStorage.getItem("companyCode"),
           collectionName: "state_master",
           filter,
         };
 
         // Fetch pincode data from the masterService asynchronously
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
-         // Extract data from the response
-        const codeData = cResponse.data.map((x) => { return { name: `${x.STNM}`, value: `${x.STSN}`,allData:x} });
+        // Extract data from the response
+        const codeData = cResponse.data.map((x) => { return { name: `${x.STNM}`, value: `${x.STSN}`, allData: x } });
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode
@@ -263,5 +276,5 @@ export class PinCodeService {
       // Handle any errors that may occur during the asynchronous operation
     }
   }
-  
+
 }

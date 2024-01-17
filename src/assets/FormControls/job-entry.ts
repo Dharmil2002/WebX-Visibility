@@ -195,9 +195,9 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [{
-                    name: "pattern",
-                    message: "Please Enter Proper Packages(1-6 Digit)",
-                    pattern: '[0-9]{1,6}'
+                    // name: "pattern",
+                    // message: "Please Enter Proper Packages(1-6 Digit)",
+                    // pattern: '[0-9]{1,6}'
                 }
                 ],
                 additionalData: {
@@ -247,13 +247,7 @@ export class JobControl {
             {
                 name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'dropdown',
                 value: [], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [ {
-                    name: "autocomplete",
-                },
-                {
-                    name: "invalidAutocompleteObject",
-                    message: "Choose proper value",
-                }],
+                Validations: [],
                 functions: {
                     onSelection: "tranPortChanged"
                 },
@@ -458,8 +452,11 @@ export class JobControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
+                    },
+                    {
+                        name: "required",
+                        message: "Cnote Number is required"
                     }
-
                 ]
                 ,
                 functions: {
@@ -479,6 +476,10 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Cnote Date is required"
+                    }
                 ]
             },
             {
@@ -493,6 +494,10 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "No of Package is required"
+                    }
                 ]
             },
             {
@@ -507,6 +512,10 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Loaded Weight is required"
+                    }
                 ]
             },
             {
@@ -721,7 +730,7 @@ export class JobControl {
                 name: "containerNum",
                 label: "Container Num",
                 placeholder: "Container Num",
-                type: "number",
+                type: "text",
                 value: "",
                 additionalData: {
                     metaData: ""

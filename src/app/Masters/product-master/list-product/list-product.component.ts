@@ -164,7 +164,6 @@ export class ListProductComponent implements OnInit {
     });
   }
   addCharges(event) {
-    console.log("event", event);
     const dialogref = this.dialog.open(ProductChargesComponent, {
       width: "80%",
       height: "80%",
@@ -182,7 +181,6 @@ export class ListProductComponent implements OnInit {
   }
 
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {

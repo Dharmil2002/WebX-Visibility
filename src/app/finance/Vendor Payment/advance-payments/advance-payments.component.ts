@@ -253,15 +253,16 @@ export class AdvancePaymentsComponent implements OnInit {
     console.log("BalanceUnbilledFunction", event);
     const templateBody = {
       DocNo: event.data.THC,
-      templateName: "thc",
+      templateName: "THC View-Print",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, "", "width=1500,height=800");
   }
+
   THCAmountFunction(event) {
     const RequestBody = {
-      PaymentData: this.PaymentData,
+      BillPaymentData: this.PaymentData,
       THCData: event?.data,
       Type: "Advance",
     };
@@ -679,7 +680,7 @@ export class AdvancePaymentsComponent implements OnInit {
     }
   }
   vehiclesregisteredview(event) {
-    
+
     this.getVendorsVehicles(true);
   }
 }

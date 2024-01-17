@@ -40,6 +40,19 @@ export class DeliveryMrGeneration {
                 },]
             },
             {
+                name: 'NameofConsignee',
+                label: 'Name of Consignee',
+                placeholder: 'Name of Consignee',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [{
+                    name: "required",
+                    message: "Name of Consignee is required",
+                },]
+            },
+            {
                 name: 'ContactNumber',
                 label: 'Contact Number ',
                 placeholder: 'Contact Number ',
@@ -507,6 +520,16 @@ export class DeliveryMrGeneration {
                 label: "Round Off",
                 placeholder: "Round Off",
                 type: "number",
+                value: 0,
+                generatecontrol: false,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: "roundOffAmt",
+                label: "Round Off",
+                placeholder: "Round Off",
+                type: "text",
                 value: 0,
                 generatecontrol: false,
                 disable: true,

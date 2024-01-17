@@ -495,4 +495,18 @@ export class DocketService {
           console.error("Error fetching data:", error);
         }
       }
+      async getDocketDetails(filter={}) {
+        try {
+            // Prepare the pincodeBody with the companyCode and the determined filter
+            const cityBody = {
+                companyCode: localStorage.getItem("companyCode"),
+                collectionName: "docket_containers",
+                filter:filter
+            };
+            // Fetch pincode data from the masterService asynchronously
+            const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
+            return dResponse
+        } catch (error) {
+        }
+      }
 }

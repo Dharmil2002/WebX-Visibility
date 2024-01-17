@@ -28,7 +28,7 @@ export class ChaEntryControl {
             },
             {
                 name: 'billingParty', label: "Billing Party", placeholder: "Select Billing Party", type: 'dropdown',
-                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true,disable: true,
                 Validations: [
                     {
                         name: "required",
@@ -72,12 +72,15 @@ export class ChaEntryControl {
                 name: "transportedBy",
                 label: "Transported By",
                 placeholder: 'Transported By',
-                type: "text",
-                value: '',
+                type: "Staticdropdown",
+                value: [],
                 Validations: [
                 ],
+                functions: {
+                    onSelection: ""
+                },
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'isUpdate',

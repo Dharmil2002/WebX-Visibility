@@ -4,7 +4,7 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { CustGSTInvoiceService, convertToCSV } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
+import { CustGSTInvoiceService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { customerWiseGSTInvControl } from 'src/assets/FormControls/Customer-Wise-GST-Invoice/customer-wise-gst-invoice';
@@ -193,14 +193,19 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
 
   async save() {
     let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail();
+    const customerName = Array.isArray(this.CustGSTInvTableForm.value.custnmcdHandler)
+      ? this.CustGSTInvTableForm.value.custnmcdHandler.map(x => x.value)
+      : [];
+    console.log("customerName", customerName)
     const filteredRecords = data.filter(record => {
+      const custNm = customerName.length === 0 || customerName.includes(record.ocustName);
       const startValue = new Date(this.CustGSTInvTableForm.controls.start.value);
       const endValue = new Date(this.CustGSTInvTableForm.controls.end.value);
       const entryTime = new Date(record.obGNDT);
       endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid;
+      return isDateRangeValid && custNm;
     });
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {
@@ -215,22 +220,11 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { obGNDT, ocustName, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

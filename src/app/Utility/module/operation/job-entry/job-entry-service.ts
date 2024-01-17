@@ -18,6 +18,7 @@ export class JobEntryService {
     "1_false": "Update job",
     "1_true": "Awaiting CHA Entry",
     "2": "Awaiting Rake Entry",
+    "3": "Rake Generated",
     "default": ""
   };
   actionMapping = {
@@ -134,20 +135,59 @@ export class JobEntryService {
   getExportType(exportType) {
     return this.exportType[exportType]
   }
-  async updateJobDetails(data, jobId) {
+  async updateJobDetails(data,filter,collectionName) {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
-      collectionName: "job_header",
-      filter: {
-        jobId: jobId // Use the current PRQ ID in the filter
-      },
+      collectionName:collectionName,
+      filter: filter,
       update: data
     };
-    const res = await this.operation.operationPut("generic/update", reqBody).toPromise();
+    const res = await firstValueFrom(this.operation.operationPut("generic/update", reqBody));
     return res;
   }
-  jobFieldMapping(data, containerType) {
+  async addDeleteJobDetails(data, filter, collectionName) {
+    // Use destructuring for better readability
+    const companyCode = localStorage.getItem("companyCode");
 
+    // Consolidate repeated code into a single object
+    const commonRequest = {
+      companyCode,
+      collectionName,
+    };
+
+    // Delete job details
+    const reqDelete = {
+      ...commonRequest,
+      filter,
+    };
+
+    try {
+      let resDelete=0;
+      const resGet= await firstValueFrom(this.operation.operationMongoPost("generic/get", reqDelete));
+      if(resGet.data.length>0){
+       resDelete = await firstValueFrom(this.operation.operationMongoRemove("generic/removeAll", reqDelete));
+      }
+      else{
+        resDelete=1;
+      }
+      // Check if the delete operation was successful before adding new details
+      if (resDelete) {
+        // Add job details
+        const reqBody = {
+          ...commonRequest,
+          data,
+        };
+        const resAdd = await firstValueFrom(this.operation.operationMongoPost("generic/create", reqBody));
+        return resAdd;
+      }
+    } catch (error) {
+      // Error handling for the entire operation
+      throw error; // Re-throw the error if you need to handle it further up the call stack
+    }
+
+  }
+  jobFieldMapping(data, containerType) {
+      debugger
     const jobMapping = {
       _id: "",
       cID: this.storage.companyCode,
@@ -168,8 +208,8 @@ export class JobEntryService {
       tBYNM: data.formData.transportedByName || "",
       pKGS: data.jobDetails.reduce((acc, pkg) => acc + pkg.noOfpkg, 0),
       cNTS: data.jobDetails.length,
-      tMODE: data.formData.transportMode || "",
-      tMODENM: data.formData.transportModeName || "",
+      tMODE: data.formData.transportMode?.value || "",
+      tMODENM: data.formData.transportMode?.name || "",
       pONO: data.formData.poNumber || "",
       eTYP: data.formData.exportType || "",
       eTYPNM: data.formData.exportTypeName || "",
@@ -184,6 +224,7 @@ export class JobEntryService {
       eNTBY: this.storage.userName,
     }
     let jobDetails = [];
+    if(data.jobDetails.length>0){
     data.jobDetails.forEach(element => {
       const containerCode = containerType.find((x) => x.name == element?.containerType)?.value || "";
       let jobDetail = {
@@ -204,7 +245,10 @@ export class JobEntryService {
       }
       jobDetails.push(jobDetail);
     });
+  }
     let blChallan = [];
+    if(data.blChallan.length>0){
+      
     data.blChallan.forEach(element => {
       const containerCode = containerType.find((x) => x.name == element?.containerType)?.value || "";
       let Challan = {
@@ -217,13 +261,13 @@ export class JobEntryService {
         iNVNO: element?.invNum || "",
         iNVDT: element?.invDate || "",
         sBNO: element?.sbNum || "",
-        sBDT: element?.sbDt || "",
+        sBDT: element?.osb || "",
         pOD: element?.pod || "",
         cOD: element?.cod || "",
         bLNO:element?.blNum || "",
-        bLDT:element?.blDate || "",
+        bLDT:element?.oblDate || "",
         bENO:element?.beNum || "",
-        bEDT:element?.beDT || "",
+        bEDT:element?.obeDate || "",
         cNTYP: containerCode || "",
         cNTYPNM: element?.containerType || "",
         cNNO: element?.containerNum || "",
@@ -234,6 +278,7 @@ export class JobEntryService {
       }
       blChallan.push(Challan);
     });
+  }
     const req = {
       jobData: jobMapping,
       jobDetails: jobDetails,
@@ -291,6 +336,8 @@ export class JobEntryService {
           jobLocation: element?.lOC || "",
           fCT: element?.fCT || "",
           tCT: element?.tCT || "",
+          tBY: element?.tBY || "",
+          tBYNM: element?.tBYNM || "",
           pkgs: element?.pKGS || 0,
           eNTDT: element?.eNTDT || new Date(),
           totalChaAmt:chaDetail?chaDetail.tOTAMT:"",

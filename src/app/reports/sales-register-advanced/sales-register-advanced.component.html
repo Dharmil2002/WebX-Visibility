@@ -1,8 +1,8 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
      <form [formGroup]="salesregisterTableForm">
-          <app-form-webxpress [form]="salesregisterTableForm" [FormTitle]="'Sales Register Report'" [formData]="jsonsalesregisterFormArray"
+          <app-form-webxpress [form]="salesregisterTableForm" [FormTitle]="'Sales Register Advanced  Report'" [formData]="jsonsalesregisterFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-               [showSaveAndCancelButton]="true" [submit]="'Filter'">
+               [showSaveButton]="true" [submit]="'Download'">
           </app-form-webxpress>
      </form>
 </app-common-wrapper-webxpress>

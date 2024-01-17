@@ -18,27 +18,23 @@
         [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" [TitleBoxData]="TotalAmountList"
         (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag">
     </app-generic-table-v2>
-    <div class="row">
-        <div class="col-6">
-            <form [formGroup]="PaymentSummaryFilterForm">
-                <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
-                    [formData]="jsonControlPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
-                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '" (callFunction)="functionCallHandler($event)"
-                    [showSaveAndCancelButton]="false">
-                </app-form-webxpress>
-            </form>
-        </div>
-        <div class="col-6">
-            <form [formGroup]="billingForm">
-                <app-form-webxpress [form]="billingForm" [FormTitle]="'Bill Summary'"
-                    [formData]="jsonControlBillingArray" (functionCallEmitter)="functionCallHandler($event)"
-                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '" (callFunction)="functionCallHandler($event)"
-                    [showSaveAndCancelButton]="false">
-                </app-form-webxpress>
-            </form>
-        </div>
 
-    </div>
+    <form [formGroup]="billingForm">
+        <app-form-webxpress [form]="billingForm" [FormTitle]="'Bill Summary'" [formData]="jsonControlBillingArray"
+            (functionCallEmitter)="functionCallHandler($event)" [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 '"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <form [formGroup]="PaymentSummaryFilterForm">
+        <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
+            [formData]="jsonControlPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
+            [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 '" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+
+
+
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
@@ -46,7 +42,7 @@
                     tableData.length==0" class="msr-3" mat-raised-button color="primary"
                     (click)="Submit()">Submit</button>
                 <button mat-button (click)="RedirectToTHCPayment()">Back</button> -->
-                <button mat-button mat-raised-button color="primary" (click)="submit()">Submit</button>
+                <button mat-button mat-raised-button color="primary" (click)="GenerateVoucher()">Submit</button>
             </div>
         </div>
     </div>

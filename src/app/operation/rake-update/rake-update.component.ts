@@ -3,6 +3,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getGeneric, rakeFieldMapping } from './rake-update-utility';
 import { RakeDetailComponent } from '../rake-detail/rake-detail.component';
 import { Router } from '@angular/router';
+import { RakeEntryService } from 'src/app/Utility/module/operation/rake-entry/rake-entry-service';
 
 @Component({
   selector: 'app-rake-update',
@@ -27,7 +28,7 @@ export class RakeUpdateComponent implements OnInit {
     RakeNo: {
       Title: "Rake No",
       class: "matcolumnleft",
-      Style: "min-width:170px",
+      Style: "min-width:250px",
     },
     RakeEntryDate: {
       Title: "Rake Entry Date",
@@ -37,12 +38,12 @@ export class RakeUpdateComponent implements OnInit {
     RRNo: {
       Title: "RRNo",
       class: "matcolumnleft",
-      Style: "min-width:120px",
+      Style: "max-width:70px",
     },
     ContainerNo: {
-      Title: "Container No",
+      Title: "Cont No",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "max-width:70px",
     },
     FromToCity: {
       Title: "From-To City",
@@ -62,13 +63,13 @@ export class RakeUpdateComponent implements OnInit {
     CNNo: {
       Title: "CN No",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "max-width:70px",
     },
-    JobNo: {
-      Title: "Job No",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
+    // JobNo: {
+    //   Title: "Job No",
+    //   class: "matcolumncenter",
+    //   Style: "min-width:2px",
+    // },
     CurrentStatus: {
       Title: "Current Status",
       class: "matcolumnleft",
@@ -105,6 +106,7 @@ export class RakeUpdateComponent implements OnInit {
 
   constructor(
     private masterService: MasterService,
+    private rakeService:RakeEntryService,
     private router: Router
     ) { 
        this.allColumnFilter=this.columnHeader;
@@ -141,8 +143,8 @@ export class RakeUpdateComponent implements OnInit {
     ];
   }
   async getRakeDetail() {
-    const detail = await getGeneric(this.masterService, "rake_detail");
-    const rakeDetail = await rakeFieldMapping(detail);
+    debugger;
+    const rakeDetail = await this.rakeService.getRakeDetail();
     this.tableData = rakeDetail;
     this.tableLoad = false;
   }

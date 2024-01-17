@@ -6,7 +6,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
-import { convertToCSV, getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
+import { convertToCSV, exportAsExcelFile, getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
@@ -607,42 +607,6 @@ export class JobQueryPageComponent implements OnInit {
       });
   }
 
-  // // Asynchronous method to filter and save job data based on user input
-  // async save() {
-  //   // Fetch job data from the API
-  //   let data = await getJobregisterReportDetail(this.masterService);
-  //   // Extract selected values from form controls
-  //   const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
-  //     ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
-  //     : [];
-  //   const jobNo = Array.isArray(this.jobQueryTableForm.value.jobNoHandler)
-  //     ? this.jobQueryTableForm.value.jobNoHandler.map(x => x.name)
-  //     : [];
-  //   const cNoteNum = Array.isArray(this.jobQueryTableForm.value.cnoteHandler)
-  //     ? this.jobQueryTableForm.value.cnoteHandler.map(x => x.name)
-  //     : [];
-  //   // Filter records based on user-selected criteria
-  //   const filteredRecords = data.filter(record => {
-  //     // Check if job number is empty or matches the record's job number
-  //     const jobDet = jobNo.length === 0 || jobNo.includes(record.jobNo);
-  //     // Check if location is empty or matches the record's job location
-  //     const locDet = Location.length === 0 || Location.includes(record.jobLocation);
-  //     // Check if CNote number is empty or matches the record's CNote number
-  //     const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
-  //     // Convert and check if the record's entry time is within the specified date range
-  //     const startDate = this.datePipe.transform(this.jobQueryTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-  //     const endDate = this.datePipe.transform(this.jobQueryTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-  //     const entryTime = record.ojobDate;
-  //     const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
-  //     // Return true if all conditions are met, indicating the record should be included in the result
-  //     return jobDet && locDet && cnoteno && isDateRangeValid;
-  //   });
-  //   // Update the component's tableData with the filtered records
-  //   this.tableData = filteredRecords;
-  //   // Set the tableLoad flag to false to indicate that the data has been loaded
-  //   this.tableLoad = false;
-  // }
-
   async save() {
     let data = await getJobregisterReportDetail(this.masterService);
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
@@ -660,10 +624,7 @@ export class JobQueryPageComponent implements OnInit {
       const jobDet = jobNo.length === 0 || jobNo.includes(record.jobNo);
       // Check if location is empty or matches the record's job location
       const locDet = Location.length === 0 || Location.includes(record.jobLocation);
-      // Check if CNote number is empty or matches the record's CNote number
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
-
-      // Convert and check if the record's entry time is within the specified date range
       const startValue = new Date(this.jobQueryTableForm.controls.start.value);
       const endValue = new Date(this.jobQueryTableForm.controls.end.value);
       const entryTime = new Date(record.ojobDate);
@@ -686,29 +647,11 @@ export class JobQueryPageComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string
-    const csvString = convertToCSV(filteredRecords, ['ojobDate', 'jobLocation'], this.CSVHeader);
-
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv' });
-
-    // Create a link element
-    const a = document.createElement('a');
-
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-
-    // Set the download attribute with the desired file name
-    a.download = `Job-Summary-Report-${timeString}.csv`;
-
-    // Append the link to the body
-    document.body.appendChild(a);
-
-    // Trigger a click on the link to start the download
-    a.click();
-
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { ojobDate,jobLocation, ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Job-Summary-Report-${timeString}`, this.CSVHeader);
   }
 
   cancel() {

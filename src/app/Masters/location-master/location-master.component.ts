@@ -62,8 +62,8 @@ export class LocationMasterComponent implements OnInit {
   centerAlignedData: string[];
   constructor(
     private masterService: MasterService,
-    private storage:StorageService
-    ) {
+    private storage: StorageService
+  ) {
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
     this.csvFileName = "Location Details";
     this.centerAlignedData = ["locPincode"]
@@ -86,7 +86,7 @@ export class LocationMasterComponent implements OnInit {
   async getLocationDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "filter": {companyCode:this.storage.companyCode},
+      "filter": { companyCode: this.storage.companyCode },
       "collectionName": "location_detail"
     }
     const res = await firstValueFrom(this.masterService.masterPost('generic/get', req))
@@ -94,9 +94,10 @@ export class LocationMasterComponent implements OnInit {
       try {
         // Get the ownership descriptions using the getOwnership() function
         const ownershipDescriptions = await this.getOwnership();
+        const sortedData = res.data.sort((a, b) => new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime());
 
         // Modify each object in res.data
-        const modifiedData = res.data.map(obj => {
+        const modifiedData = sortedData.map(obj => {
           // Find the matching ownership description
           const ownershipObject = ownershipDescriptions.find(x => x.codeId === obj.ownership);
 
@@ -119,7 +120,7 @@ export class LocationMasterComponent implements OnInit {
             locPincode,
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
-        }).sort((a, b) => b._id.localeCompare(a._id));
+        });
 
         // Assign the modified and sorted data back to this.csv
         this.csv = modifiedData;
@@ -149,7 +150,7 @@ export class LocationMasterComponent implements OnInit {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "location_detail",
-      filter: { locCode: locCode },
+      filter: { companyCode: this.companyCode, locCode: locCode },
       update: det
     };
     const res = await firstValueFrom(this.masterService.masterPut('generic/update', req))

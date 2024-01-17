@@ -257,7 +257,6 @@ export class AddLocationMasterComponent implements OnInit {
 
     if (this.isUpdate) {
       const locCode=this.locationTableForm.controls["locCode"].value;
-      const id = this.locationTable._id;
       this.locationTableForm.removeControl("mappedPincode");
       this.locationTableForm.removeControl("pincodeHandler");
       let data = this.locationTableForm.value;
@@ -267,7 +266,7 @@ export class AddLocationMasterComponent implements OnInit {
       const req = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
-        filter: { locCode: locCode },
+        filter: {companyCode:this.companyCode,locCode: locCode },
         update: data,
       };
       const res = await firstValueFrom(
@@ -593,15 +592,11 @@ export class AddLocationMasterComponent implements OnInit {
         .setValidators(autocompleteObjectValidator());
       this.locationTableForm.get("locLevel").updateValueAndValidity();
     } else {
-      // this.jsonControlLocationArray.forEach((x) => {
-      //   if (x.name == "reportLevel" || x.name == "reportLoc") {
-      //     if (this.isUpdate) {
-      //       x.disable = true;
-      //     } else {
-      //       x.disable = false;
-      //     }
-      //   }
-      // });
+      this.jsonControlLocationArray.forEach((x) => {
+        if (x.name == "reportLevel" || x.name == "reportLoc") {
+            x.disable = false;
+        }
+      });
       this.locationTableForm
         .get("reportLevel")
         .setValidators([Validators.required, autocompleteObjectValidator()]);

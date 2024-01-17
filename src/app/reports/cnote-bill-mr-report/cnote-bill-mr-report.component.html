@@ -2,7 +2,7 @@
      <form [formGroup]="cnoteBillMRTableForm">
           <app-form-webxpress [form]="cnoteBillMRTableForm" [FormTitle]="'Consignment Note Bill MR Register Report'" [formData]="jsoncnoteBillMRFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-               [showSaveAndCancelButton]="true" [submit]="'Filter'">
+               [showSaveButton]="true" [submit]="'Download'">
           </app-form-webxpress>
      </form>
 </app-common-wrapper-webxpress>

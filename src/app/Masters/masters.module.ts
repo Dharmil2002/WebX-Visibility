@@ -124,10 +124,6 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 import { EncryptionService } from "../core/service/encryptionService.service";
 import { CustomerContractNonFreightChargesComponent } from "./Customer Contract/CustomerContractTabs/customer-contract-non-freight-charges/customer-contract-non-freight-charges.component";
 import { MatSidenavModule } from "@angular/material/sidenav";
-import { ShardProductComponent } from "./product-master/shard-product/shard-product.component";
-import { AddShardProductComponent } from "./product-master/tab/add-shard-product/add-shard-product.component";
-import { AddShardChargesComponent } from "./product-master/tab/add-shard-charges/add-shard-charges.component";
-import { AddShardServicesComponent } from "./product-master/tab/add-shard-services/add-shard-services.component";
 import { AccountMasterComponent } from "./Account/Account Master/account-master/account-master.component";
 import { AccountListFilterComponent } from './Account/Account Master/account-list-filter/account-list-filter.component';
 import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
@@ -315,10 +311,6 @@ import { ShardProductAddComponent } from './shard-product/shard-product-add/shar
     AddProductComponent,
     ProductChargesComponent,
     ProductServicesComponent,
-    ShardProductComponent,
-    AddShardProductComponent,
-    AddShardChargesComponent,
-    AddShardServicesComponent,
     AccountMasterComponent,
     AccountListFilterComponent,
     AddAccountComponent,

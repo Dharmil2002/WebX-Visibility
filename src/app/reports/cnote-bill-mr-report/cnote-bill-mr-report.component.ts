@@ -7,12 +7,11 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { CnoteBillMRService, convertToCSV } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
+import { CnoteBillMRService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 import { cNoteBillMRControl } from 'src/assets/FormControls/cnote-bill-mr-report/cnote-bill-mr-report';
 import Swal from 'sweetalert2';
 
@@ -288,7 +287,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       "collectionName": "dockets"
     };
     const cnoteRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", cnoteReq));
-    
+
     const mergedData = {
       cnoteData: cnoteRes?.data
     };
@@ -298,15 +297,15 @@ export class CnoteBillMrReportComponent implements OnInit {
         name: element.docNo,
         value: element.docNo,
       }));
-      this.cnoteDetailList = cnoteDet;
-      this.cnoteDet = cnoteDet;
-      this.filter.Filter(
-        this.jsoncnoteBillMRFormArray,
-        this.cnoteBillMRTableForm,
-        cnoteDet,
-        this.cnoteName,
-        this.cnoteStatus
-      );
+    this.cnoteDetailList = cnoteDet;
+    this.cnoteDet = cnoteDet;
+    this.filter.Filter(
+      this.jsoncnoteBillMRFormArray,
+      this.cnoteBillMRTableForm,
+      cnoteDet,
+      this.cnoteName,
+      this.cnoteStatus
+    );
     this.filter.Filter(
       this.jsoncnoteBillMRFormArray,
       this.cnoteBillMRTableForm,
@@ -405,7 +404,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid && paytpDet && booktpDet && tranmodeDet && des && origin && movtype;
+      return isDateRangeValid && des && origin && movtype && paytpDet && booktpDet && tranmodeDet && customerDet;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
     // const selectedData = filteredRecords;
@@ -421,22 +420,11 @@ export class CnoteBillMrReportComponent implements OnInit {
       }
       return;
     }
-    // Convert the selected data to a CSV string 
-    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
-    // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    // Create a link element
-    const a = document.createElement('a');
-    // Set the href attribute of the link to the Blob URL
-    a.href = URL.createObjectURL(blob);
-    // Set the download attribute with the desired file name
-    a.download = `Cnote_Bill_MR_Report-${timeString}.csv`;
-    // Append the link to the body
-    document.body.appendChild(a);
-    // Trigger a click on the link to start the download
-    a.click();
-    // Remove the link from the body
-    document.body.removeChild(a);
+    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+      const { oRGN,dEST, bOOKINGTPE,oeNTDT,  ...rest } = record;
+      return rest;
+    });
+    exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_Bill_MR_Report-${timeString}`,this.CSVHeader);
   }
 
   toggleSelectAll(argData: any) {

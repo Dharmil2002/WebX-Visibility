@@ -346,7 +346,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async bindDataFromDropdown() {
-    debugger
+    
     const locDetails = await this.locationService.locationFromApi({ locCode: this.storage.branch });
     if (!locDetails.length || locDetails[0].locLevel == 1){
       Swal.fire({

@@ -57,7 +57,7 @@
   <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 83%;
           top: -204px;
           position: relative;" (click)="addDetail('cnote')"
-    [disabled]="!this.containorTableForm.controls['cnoteNo'].value && !this.containorTableForm.value.contNo">
+    [disabled]="!this.containorTableForm.valid">
     <mat-icon>add</mat-icon>
     Add New
   </button>

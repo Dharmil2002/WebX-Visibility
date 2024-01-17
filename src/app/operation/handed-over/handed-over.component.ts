@@ -24,26 +24,26 @@ export class HandedOverComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:200px",
     },
-    containerNumber: {
+    cNID: {
       Title: "Container No",
       class: "matcolumncenter",
       Style: "min-width:200px",
     },
-    containerType: {
+    cNTYPN: {
       Title: "Container Type",
       class: "matcolumncenter",
       Style: "min-width:200px",
     },
-    isEmpty: {
+    isEMPT: {
       Title: "Is Empty",
       class: "matcolumncenter",
       Style: "min-width:200px",
     }
   }
   staticField = [
-    "containerNumber",
-    "containerType",
-    "isEmpty"
+    "cNID",
+    "cNTYPN",
+    "isEMPT"
   ]
   breadScrums = [
     {
@@ -69,7 +69,7 @@ export class HandedOverComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private thcService: ThcService,
     private storage:StorageService,
-    private rakeEntryService:RakeEntryService
+    private rakeEntryService:RakeEntryService,
   ) {
     
     const navigationState = this.router.getCurrentNavigation()?.extras?.state;
@@ -115,36 +115,27 @@ export class HandedOverComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
   async getShipmentDetails() {
-    
-    const docket = this.data?.containorDetail.map((x) => x.cnNo);
-    const docketList = await this.thcService.getShipment(false);
+     debugger
+    const dktFilter = { dKTNO: { D$in: this.data?.CNNoList } };
+    const docketList = await this.rakeEntryService.fetchData('docket_containers',{cID:this.storage.companyCode,...dktFilter});
+    this.tableData = docketList.data;
     // Function to get containerDetail based on cnNo
-    const getContainerDetailByCnNo = (objectArray, cnNo) => {
-      const containerDetailArray = [];
+    // const getContainerDetailByCnNo = (objectArray, cnNo) => {
+    //   const containerDetailArray = [];
 
-      // Iterate through the objectArray
-      objectArray.forEach((obj) => {
-        // Check if the docketNumber matches any cnNo in the cnNoArray
-        if (cnNo.includes(obj.docketNumber)) {
-          // If there are container details, add them to the containerDetailArray
-          if (obj.containerDetail && obj.containerDetail.length > 0) {
-            containerDetailArray.push({
-              docketNumber: obj.docketNumber,
-              containerDetail: obj.containerDetail,
-            });
-          }
-        }
-      });
+    //   // Iterate through the objectArray
+    //   docketList.forEach((obj) => {
+    //         containerDetailArray.push({
+    //           docketNumber: obj.docketNumber,
+    //           containerDetail: obj.containerDetail,
+    //         });
+    //   });
 
-      return containerDetailArray;
-    };
+    //   return containerDetailArray;
+    // };
 
     // Get containerDetail for the given cnNoArray
-    const resultContainerDetail = getContainerDetailByCnNo(docketList, docket);
-    const containersArray = resultContainerDetail.flatMap(container => container.containerDetail);
-    console.log(containersArray);
-    this.tableData = containersArray;
-
+    //const resultContainerDetail = getContainerDetailByCnNo(docketList, docket)
 
   }
 
@@ -157,10 +148,10 @@ export class HandedOverComponent implements OnInit {
       .filter((x) => x.isSelected)
       .map((container) => ({
           cID:this.storage.companyCode,
-          cONTNO: container?.containerNumber||"",
-          cONTYP: container?.containerType||"",
+          cONTNO: container?.cNID||"",
+          cONTYP: container?.cNTYPN||"",
           cONCPY:container?.containerCapacity||0,
-          iSEMPTY:container?.isEmpty||"",
+          iSEMPTY:container?.isEMPT||"",
           rAKENO:this.data.RakeNo,
           cONTFOR: this.handTableForm.value.containerFor,
           cONTLOC:this.handTableForm.controls['locationCode'].value,

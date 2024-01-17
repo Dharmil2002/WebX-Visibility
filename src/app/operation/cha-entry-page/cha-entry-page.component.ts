@@ -1,13 +1,11 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component,OnInit } from "@angular/core";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
-import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { Router } from "@angular/router";
 import { processProperties } from "src/app/Masters/processUtility";
 import Swal from "sweetalert2";
 import { ChaEntryControl } from "src/assets/FormControls/cha-entry";
-import { chaJobDetail, updateJobStatus } from "./cha-utility";
 import { ChaEntryModel } from "src/app/Models/Cha-entry/cha-entry";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
@@ -73,6 +71,7 @@ export class ChaEntryPageComponent implements OnInit {
   eximDoc: AutoComplete[];
   tableLoadIn: boolean;
   loadIn: boolean;
+  tranBy: AutoComplete[];
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -142,7 +141,7 @@ export class ChaEntryPageComponent implements OnInit {
   }
 
   autoBillData() {
-    
+    debugger;
     if (this.jobDetail) {
       this.chaEntryTableForm.controls['documentType'].setValue('EDT01');
       this.chaEntryTableForm.controls['documentType'].disable();
@@ -152,10 +151,9 @@ export class ChaEntryPageComponent implements OnInit {
         name: this.jobDetail?.bPARTYNM || "",
         value: this.jobDetail?.bPARTY || ""
       }
-
       this.chaEntryTableForm.controls['billingParty'].setValue(billingParty);
       this.chaEntryTableForm.controls['jobNo'].setValue(this.jobDetail.jobNo);
-      this.chaEntryTableForm.controls['transportedBy'].setValue(this.jobDetail?.transportedBy === "I" ? "Third Party" : this.jobDetail?.transportedBy === "E" ? "Own" : "");
+      this.chaEntryTableForm.controls['transportedBy'].setValue(this.jobDetail?.tBY||"");
     }
 
   }
@@ -197,8 +195,8 @@ export class ChaEntryPageComponent implements OnInit {
       if (res) {
         Swal.fire({
           icon: "success",
-          title: "Cha Generated",
-          text: `Cha no: ${res.data}`,
+          title: "CHA Generated",
+          text: `CHA No: ${res.data}`,
           showConfirmButton: true,
         });
         this.goBack("Job");
@@ -221,7 +219,9 @@ export class ChaEntryPageComponent implements OnInit {
     this.docType = await this.generalService.getGeneralMasterData("EXIMDOCTYPE");
     this.jobType = await this.generalService.getGeneralMasterData("JOBTYP");
     this.eximDoc = await this.generalService.getGeneralMasterData("EXIMDOC");
+    this.tranBy = await this.generalService.getGeneralMasterData("TRANBY");
     setGeneralMasterData(this.chaEntryControlArray, this.docType, "documentType");
+    setGeneralMasterData(this.chaEntryControlArray, this.tranBy, "transportedBy");
     setGeneralMasterData(this.chaEntryControlArray, this.jobType, "jobType");
     setGeneralMasterData(this.chaTableFormControl, this.eximDoc, "docName");
   }
@@ -261,10 +261,10 @@ export class ChaEntryPageComponent implements OnInit {
     const json = {
       id: chaDetail.length + 1,
       docName: docNM,
-      clrChrg: parseFloat(this.chaFormTableForm.value.clrChrg).toFixed(2),
-      gstRate: parseFloat(this.chaFormTableForm.value.gstRate).toFixed(2),
-      gstAmt: parseFloat(this.chaFormTableForm.value.gstAmt).toFixed(2),
-      totalAmt: parseFloat(this.chaFormTableForm.value.totalAmt).toFixed(2),
+      clrChrg: parseFloat(this.chaFormTableForm.value?.clrChrg||0.00).toFixed(2),
+      gstRate: parseFloat(this.chaFormTableForm.value?.gstRate||0.00).toFixed(2),
+      gstAmt: parseFloat(this.chaFormTableForm.value?.gstAmt||0.00).toFixed(2),
+      totalAmt: parseFloat(this.chaFormTableForm.value?.totalAmt||0.00).toFixed(2),
       docCode: this.chaFormTableForm.value.docName,
       actions: ["Edit", "Remove"],
     };

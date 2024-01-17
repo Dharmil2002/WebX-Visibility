@@ -185,13 +185,9 @@ export class RakeEntryPageComponent implements OnInit {
             console.log("failed");
         }
     }
-
- 
-    
     cancel() {
         this.goBack('Job')
     }
-
     goBack(tabIndex: string): void {
         this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
     }
@@ -391,7 +387,10 @@ export class RakeEntryPageComponent implements OnInit {
             this.tableData = this.tableData.filter(x => x.cnNo !== data.data.cnNo);
         } else {
             const cnNoToFind = data?.data?.cnNo;
-            const dktDetails = cnNoToFind ? this.shipments.find(x => x.value === cnNoToFind) : '';
+            const dktDetails = {
+                name:cnNoToFind,
+                value:cnNoToFind
+            };
             this.rakeContainerTableForm.controls['cnNo'].setValue(
                 dktDetails || ""
             );

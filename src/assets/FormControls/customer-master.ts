@@ -257,12 +257,12 @@ export class customerControl {
             name: "required",
             message: "Registered Address is required",
           },
-          // {
-          //   name: "pattern",
-          //   message:
-          //     "Please Enter alphanumeric Registered Address of length 4 to 500",
-          //   pattern: "^[a-zA-Z0-9,-/ ]{4,500}$",
-          // },
+          {
+            name: "pattern",
+            message:
+              "Please Enter alphanumeric Registered Address of length 4 to 500",
+            pattern: "^.{4,500}$",
+          },
         ],
         functions: {},
       },

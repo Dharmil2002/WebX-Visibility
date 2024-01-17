@@ -1273,7 +1273,7 @@ export class JobEntryPageComponent implements OnInit {
   async getShipment(event) {
     let billingParty = this.jobEntryTableForm.value.billingParty.value;
     if (typeof (event.eventArgs) == "string") {
-      await this.docketService.getDocketsForAutoComplete(this.containorTableForm, this.jsonFormTableControls, event.field.name, this.cnoteNoStatus, billingParty);
+      await this.docketService.getDocketsForAutoComplete(this.containorTableForm, this.jsonFormTableControls, event.field.name, this.cnoteNoStatus, billingParty,true);
     }
   }
   /*End*/

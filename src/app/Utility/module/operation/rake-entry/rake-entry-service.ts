@@ -68,6 +68,7 @@ export class RakeEntryService {
       fCT: data?.fromCity.value || "",
       tCT: data?.toCity.value || "",
       vIA: data?.via || "",
+      nFC: data?.NFC || "",
       dOCTYP: data?.documentType || "",
       dOCTYPNM: data?.documentTypeName || "",
       lTYP: data?.loadType || "",

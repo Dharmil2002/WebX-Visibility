@@ -187,7 +187,7 @@ export class JobEntryService {
 
   }
   jobFieldMapping(data, containerType) {
-
+      debugger
     const jobMapping = {
       _id: "",
       cID: this.storage.companyCode,
@@ -248,6 +248,7 @@ export class JobEntryService {
   }
     let blChallan = [];
     if(data.blChallan.length>0){
+      
     data.blChallan.forEach(element => {
       const containerCode = containerType.find((x) => x.name == element?.containerType)?.value || "";
       let Challan = {
@@ -260,13 +261,13 @@ export class JobEntryService {
         iNVNO: element?.invNum || "",
         iNVDT: element?.invDate || "",
         sBNO: element?.sbNum || "",
-        sBDT: element?.sbDt || "",
+        sBDT: element?.osb || "",
         pOD: element?.pod || "",
         cOD: element?.cod || "",
         bLNO:element?.blNum || "",
-        bLDT:element?.blDate || "",
+        bLDT:element?.oblDate || "",
         bENO:element?.beNum || "",
-        bEDT:element?.beDT || "",
+        bEDT:element?.obeDate || "",
         cNTYP: containerCode || "",
         cNTYPNM: element?.containerType || "",
         cNNO: element?.containerNum || "",

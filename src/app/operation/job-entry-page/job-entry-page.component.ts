@@ -703,12 +703,9 @@ export class JobEntryPageComponent implements OnInit {
     this.tableData = modifiedTableData;
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-    const containorList = removeFields(containorDetail, fieldsToFromRemove);
-    const removeField = ['actions', 'osb', 'oinvDate', 'oblDate', 'osbDt', 'invoice', 'id'];
-    const modifiedTblChallan = removeFields(challlanDetails, removeField);
     /*below code is for  Data pass  in array Because for the store array in db*/
-    const jobDetails = { jobDetails: containorList };
-    const chalanDetails = { blChallan: modifiedTblChallan };
+    const jobDetails = { jobDetails: containorDetail };
+    const chalanDetails = { blChallan: challlanDetails };
 
     let jobDetail = {
       formData: this.jobEntryTableForm.value,

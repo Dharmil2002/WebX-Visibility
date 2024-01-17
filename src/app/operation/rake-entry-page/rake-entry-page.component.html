@@ -94,7 +94,7 @@
       <div class="example-button-row  d-flex justify-content-end">
 
         <button mat-button (click)="cancel()">Back</button>
-        <button class="msr-3" mat-raised-button color="primary" (click)="save()">Save</button>
+        <button class="msr-3" mat-raised-button color="primary" [disabled]="!this.rakeEntryTableForm.valid"(click)="save()">Save</button>
       </div>
     </div>
   </div>

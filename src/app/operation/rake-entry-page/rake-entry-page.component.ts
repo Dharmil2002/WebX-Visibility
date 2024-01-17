@@ -235,7 +235,7 @@ export class RakeEntryPageComponent implements OnInit {
     
      /*End*/
     async save() {
-        debugger
+        
         const containerDetail = this.tableData;
         const rakeDetail = this.tableRakeData;
         const invoiceDetail = this.tableInvData;

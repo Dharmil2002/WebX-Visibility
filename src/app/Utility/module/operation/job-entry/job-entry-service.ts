@@ -187,7 +187,6 @@ export class JobEntryService {
 
   }
   jobFieldMapping(data, containerType) {
-      debugger
     const jobMapping = {
       _id: "",
       cID: this.storage.companyCode,

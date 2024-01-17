@@ -115,7 +115,6 @@ export class HandedOverComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
   async getShipmentDetails() {
-     debugger
     const dktFilter = { dKTNO: { D$in: this.data?.CNNoList } };
     const docketList = await this.rakeEntryService.fetchData('docket_containers',{cID:this.storage.companyCode,...dktFilter});
     this.tableData = docketList.data;

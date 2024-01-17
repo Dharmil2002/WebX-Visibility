@@ -141,7 +141,6 @@ export class ChaEntryPageComponent implements OnInit {
   }
 
   autoBillData() {
-    debugger;
     if (this.jobDetail) {
       this.chaEntryTableForm.controls['documentType'].setValue('EDT01');
       this.chaEntryTableForm.controls['documentType'].disable();

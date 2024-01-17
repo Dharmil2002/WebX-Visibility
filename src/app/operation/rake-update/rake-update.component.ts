@@ -143,7 +143,6 @@ export class RakeUpdateComponent implements OnInit {
     ];
   }
   async getRakeDetail() {
-    debugger;
     const rakeDetail = await this.rakeService.getRakeDetail();
     this.tableData = rakeDetail;
     this.tableLoad = false;

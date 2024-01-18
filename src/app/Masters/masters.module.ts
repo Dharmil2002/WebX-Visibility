@@ -170,6 +170,7 @@ import { ProductListComponent } from './shard-product/product-list/product-list.
 import { ShardProductChargesComponent } from './shard-product/shard-product-charges/shard-product-charges.component';
 import { ShardProductServicesComponent } from './shard-product/shard-product-services/shard-product-services.component';
 import { ShardProductAddComponent } from './shard-product/shard-product-add/shard-product-add.component';
+import { UploadLocationComponent } from './location-master/upload-location/upload-location.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -355,6 +356,7 @@ import { ShardProductAddComponent } from './shard-product/shard-product-add/shar
     ShardProductChargesComponent,
     ShardProductServicesComponent,
     ShardProductAddComponent,
+    UploadLocationComponent,
   ],
 
   providers: [

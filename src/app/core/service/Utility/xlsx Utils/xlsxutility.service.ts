@@ -37,9 +37,15 @@ export class xlsxutilityService {
           if ("MaxValue" in validation && !isNaN(parseFloat(value)) && parseFloat(value) > validation.MaxValue) {
             errors.push(`${rule.ItemsName} must be at least ${validation.MaxValue}.`);
           }
-          if ("Pattern" in validation && validation.Pattern instanceof RegExp && !validation.Pattern.test(value)) {
-            errors.push(`${rule.ItemsName} does not match the required pattern.`);
+          if ("Pattern" in validation && typeof validation.Pattern === "string") {
+            const regexPattern = new RegExp(validation.Pattern);
+            if (!regexPattern.test(value)) {
+              errors.push(`${rule.ItemsName} does not match the pattern.`);
+            }
           }
+          // if ("Pattern" in validation && validation.Pattern instanceof RegExp && !validation.Pattern.test(value)) {
+          //   errors.push(`${rule.ItemsName} does not match the required pattern.`);
+          // }
           if ("Exists" in validation && validation.Exists.find(listItem =>
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} already exists. Please enter another ${rule.ItemsName}.`);

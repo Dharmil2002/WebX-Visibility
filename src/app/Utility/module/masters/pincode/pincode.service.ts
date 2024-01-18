@@ -18,7 +18,7 @@ export class PinCodeService {
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
-      collectionName: "pincode_detail",
+      collectionName: "pincode_master",
       filter: {},
     };
     try {

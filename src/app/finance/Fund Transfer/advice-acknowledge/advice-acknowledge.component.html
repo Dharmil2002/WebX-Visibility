@@ -1,1 +1,14 @@
-<p>advice-acknowledge works!</p>
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <div *ngIf="!tableData" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div *ngIf="tableData">
+        <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData"
+            [FormTitle]="'Advice Acknowledge'" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+            [menuItems]="menuItems" [Link]="linkArray" [EventButton]="EventButton" [staticField]="staticField">
+        </app-generic-table-v2>
+    </div>
+</app-common-wrapper-webxpress>

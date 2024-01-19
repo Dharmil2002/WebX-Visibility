@@ -417,6 +417,8 @@ export class AddLocationMasterComponent implements OnInit {
   //#region to set state and city according to pincode
   async setStateCityData() {
     const {allData}=this.locationTableForm.controls.locPincode.value;
+    console.log(allData);
+    
     allData.ST = parseInt(allData.ST);
     // Fetch and set the state name based on the state code
     const stateName = await this.objState.fetchStateByFilterId(

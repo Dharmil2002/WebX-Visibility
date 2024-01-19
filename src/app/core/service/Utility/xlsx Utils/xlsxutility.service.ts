@@ -43,9 +43,6 @@ export class xlsxutilityService {
               errors.push(`${rule.ItemsName} does not match the pattern.`);
             }
           }
-          // if ("Pattern" in validation && validation.Pattern instanceof RegExp && !validation.Pattern.test(value)) {
-          //   errors.push(`${rule.ItemsName} does not match the required pattern.`);
-          // }
           if ("Exists" in validation && validation.Exists.find(listItem =>
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} already exists. Please enter another ${rule.ItemsName}.`);
@@ -72,6 +69,9 @@ export class xlsxutilityService {
             );
             validationObservables.push(validationObservable);
           }
+        }
+        if (errors.length > 0) {
+          break; // Exit the loop if errors are found
         }
       }
 

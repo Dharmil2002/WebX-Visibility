@@ -14,12 +14,12 @@ export class PinCodeService {
     private filter: FilterUtils) {
 
   }
-  async pinCodeDetail() {
+  async pinCodeDetail(filter = {}) {
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "pincode_master",
-      filter: {},
+      filter: filter,
     };
     try {
       // Make an asynchronous request to the API using masterMongoPost method
@@ -151,7 +151,7 @@ export class PinCodeService {
     const cityBody = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "pincode_master",
-      filter:filter,
+      filter: filter,
     };
     const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
     // Extract data from the response

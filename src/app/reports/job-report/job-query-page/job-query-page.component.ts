@@ -2,13 +2,14 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, take, takeUntil } from 'rxjs';
+import { Subject, take, firstValueFrom, takeUntil } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
-import { convertToCSV, exportAsExcelFile, getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
+import { JobRegisterService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/job-register.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
 import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
@@ -454,7 +455,7 @@ export class JobQueryPageComponent implements OnInit {
     "toCity": "Destination",
     "pkgs": "Pkgs",
     "weight": "Gross Weight",
-    "transportMode": "Job Mode",
+    "jobMode": "Job Mode",
     "jobType": "Job Type",
     "chargWt": "Charged Weight",
     "DespatchQty": "Despatch Qty",
@@ -498,7 +499,8 @@ export class JobQueryPageComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private operationService: OperationService,
-    private datePipe: DatePipe
+    private storage: StorageService,
+    private jobRegisterService: JobRegisterService
   ) {
     this.initializeFormControl();
     this.allColumnFilter = this.columnHeader;
@@ -527,7 +529,16 @@ export class JobQueryPageComponent implements OnInit {
     // Fetch location data from the API
     const locationList = await getLocationApiDetail(this.masterService);
     // Fetch job data from the API
-    let dataJob = await getJobregisterReportDetail(this.masterService);
+    // let dataJob = await getJobregisterReportDetail(this.masterService);
+    let jobReq = {
+      "companyCode": this.storage.companyCode,
+      "filter": {},
+      "collectionName": "job_details"
+    };
+    const jobRes = await firstValueFrom(this.masterService.masterMongoPost("generic/get", jobReq));
+    const mergedData = {
+      jobData: jobRes?.data
+    };
     // Fetch shipment data from the API
     const shipmentList = await getShipment(this.operationService, false);
     // Map location data to a format suitable for dropdowns
@@ -535,9 +546,13 @@ export class JobQueryPageComponent implements OnInit {
       return { value: x.locCode, name: x.locName };
     });
     // Map job data to a format suitable for dropdowns
-    const jobDetail = dataJob.map((x) => {
-      return { value: x.jobNo, name: x.jobNo };
-    });
+    const jobDetail = mergedData.jobData.map(element => ({
+      name: element.jID,
+      value: element.jID,
+    }));
+    // const jobDetail = dataJob.map((x) => {
+    //   return { value: x.jobNo, name: x.jobNo };
+    // });
     // Map shipment data to a format suitable for dropdowns
     const shipmentDetail = shipmentList.map((x) => {
       return { value: x.docketNumber, name: x.docketNumber };
@@ -608,7 +623,7 @@ export class JobQueryPageComponent implements OnInit {
   }
 
   async save() {
-    let data = await getJobregisterReportDetail(this.masterService);
+    let data = await this.jobRegisterService.getJobregisterReportDetail();
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
       ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
       : [];
@@ -620,9 +635,7 @@ export class JobQueryPageComponent implements OnInit {
       : [];
     // Filter records based on user-selected criteria
     const filteredRecords = data.filter(record => {
-      // Check if job number is empty or matches the record's job number
       const jobDet = jobNo.length === 0 || jobNo.includes(record.jobNo);
-      // Check if location is empty or matches the record's job location
       const locDet = Location.length === 0 || Location.includes(record.jobLocation);
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
       const startValue = new Date(this.jobQueryTableForm.controls.start.value);
@@ -648,7 +661,7 @@ export class JobQueryPageComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { ojobDate,jobLocation, ...rest } = record;
+      const { ojobDate, jobLocation, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Job-Summary-Report-${timeString}`, this.CSVHeader);

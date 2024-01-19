@@ -87,12 +87,12 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "Vendor Address is required"
-                    }
-                    // {
-                    //     name: "pattern",
-                    //     message: "Please Enter Vendor Address upto 500 characters.",
-                    //     pattern: "^[a-zA-Z 0-9 ,.'()#/\\-]{1,500}$"
-                    // },
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please Enter Vendor Address upto 500 characters.",
+                        pattern: "^.{1,500}$"
+                    },
                 ],
                 generatecontrol: true, disable: false
             },
@@ -205,7 +205,7 @@ export class VendorControl {
                 placeholder: 'Enter Vendor E-mails',
                 type: 'text', value: vendorMasterTable.emailId,
                 Validations: [
-                  
+
                 ],
                 functions: {
                     onChange: "onChangeEmail",
@@ -321,10 +321,12 @@ export class VendorControl {
                     isFileSelected: true
                 },
             },
+
             {
                 name: 'isBlackListed', label: 'Black Listed', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isBlackListed, Validations: [],
                 generatecontrol: true, disable: false
             },
+
             {
                 name: 'vendorLocationDropdown',
                 label: 'Vendor Location',
@@ -388,10 +390,7 @@ export class VendorControl {
                 placeholder: 'Enter GST Number',
                 type: 'government-id',
                 value: vendorMasterTable.gstNumber,
-                Validations: [{
-                    name: "required",
-                    message: "GST Number is required"
-                },
+                Validations: [
                 {
                     name: "pattern",
                     pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
@@ -409,10 +408,7 @@ export class VendorControl {
                 placeholder: 'GST State',
                 type: 'text',
                 value: vendorMasterTable.gstState,
-                Validations: [{
-                    name: "required",
-                    message: "GST state is required"
-                },],
+                Validations: [],
 
                 generatecontrol: true, disable: true
             },
@@ -422,16 +418,7 @@ export class VendorControl {
                 placeholder: 'GST Address',
                 type: 'text',
                 value: vendorMasterTable.gstState,
-                Validations: [{
-                    name: "required",
-                    message: "GST Address is required"
-                },
-                // {
-                //     name: "pattern",
-                //     message: "Please enter upto 200 characters.",
-                //     pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,200}$",
-                // },
-                ],
+                Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -441,10 +428,6 @@ export class VendorControl {
                 type: 'dropdown',
                 value: vendorMasterTable.gstPincode,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "Vendor Pincode is required"
-                    },
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
@@ -468,10 +451,7 @@ export class VendorControl {
                 placeholder: 'GST City',
                 type: 'text',
                 value: vendorMasterTable.gstCity,
-                Validations: [{
-                    name: "required",
-                    message: "GST City is required"
-                },],
+                Validations: [],
 
                 generatecontrol: true, disable: true
             },

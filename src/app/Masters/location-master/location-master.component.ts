@@ -4,6 +4,8 @@ import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunc
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { UploadLocationComponent } from './upload-location/upload-location.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-location-master',
@@ -60,9 +62,11 @@ export class LocationMasterComponent implements OnInit {
   addAndEditPath: string;
   csvFileName: string;
   centerAlignedData: string[];
+  uploadComponent = UploadLocationComponent;
   constructor(
     private masterService: MasterService,
-    private storage: StorageService
+    private storage: StorageService,
+    private dialog: MatDialog,
   ) {
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
     this.csvFileName = "Location Details";
@@ -165,4 +169,15 @@ export class LocationMasterComponent implements OnInit {
       this.getLocationDetails();
     }
   }
+   //#region to call upload function
+   upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getLocationDetails();
+    });
+  }
+  //#endregion
 }

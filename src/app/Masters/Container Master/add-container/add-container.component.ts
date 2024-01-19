@@ -34,7 +34,7 @@ export class AddContainerComponent implements OnInit {
   VendorNameStatus: any;
   CompanyCode = localStorage.getItem("companyCode");
   UpdateData: any;
-  FormTitle: string ='Add Container';
+  FormTitle: string = "Add Container";
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -46,7 +46,6 @@ export class AddContainerComponent implements OnInit {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
       this.FormTitle = "Edit Account";
-
     }
   }
 
@@ -120,7 +119,7 @@ export class AddContainerComponent implements OnInit {
     const req = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
-      filter: { codeType: "VENDTYPE" },
+      filter: { codeType: "VENDTYPE", codeDesc: "Own" },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
@@ -132,13 +131,9 @@ export class AddContainerComponent implements OnInit {
           value: x._id,
         };
       });
-      if (this.isUpdate) {
-        const element = VendorTypeData.find(
-          (x) => x.name == this.UpdateData.vNTYP
-        );
-        this.containerTableForm.controls["VendorType"].setValue(element);
-        // this.getAcGroupDropdown();
-      }
+      this.containerTableForm.controls["VendorType"].setValue(
+        VendorTypeData[0]
+      );
       this.filter.Filter(
         this.jsonControlArray,
         this.containerTableForm,
@@ -152,7 +147,7 @@ export class AddContainerComponent implements OnInit {
     const req = {
       companyCode: this.CompanyCode,
       collectionName: "vendor_detail",
-      filter: {},
+      filter: { vendorTypeName: "Own" },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
@@ -185,8 +180,8 @@ export class AddContainerComponent implements OnInit {
     const TareWeight = +this.containerTableForm.value.TareWeight;
     console.log({
       GrossWeight,
-      TareWeight
-    })
+      TareWeight,
+    });
     if (GrossWeight >= TareWeight) {
       const NetWeight = GrossWeight - TareWeight;
       this.containerTableForm.controls["NetWeight"].setValue(+NetWeight);
@@ -214,10 +209,9 @@ export class AddContainerComponent implements OnInit {
       gRW: +this.containerTableForm.value.GrossWeight,
       tRW: +this.containerTableForm.value.TareWeight,
       nETW: +this.containerTableForm.value.NetWeight,
-      aCT:this.containerTableForm.value.isActive,
-      
+      aCT: this.containerTableForm.value.isActive,
     };
-    if(!this.isUpdate){
+    if (!this.isUpdate) {
       const tableReq = {
         companyCode: this.CompanyCode,
         collectionName: "container_detail_master",
@@ -229,17 +223,21 @@ export class AddContainerComponent implements OnInit {
       const index =
         TableData.data.length === 0
           ? 1
-          : parseInt(TableData.data[TableData.data.length - 1].cNCD.substring(4)) + 1;
-      const containercode = `CON-${index <= 9 ? "00" : index >= 9 && index <= 99 ? "0" : ""}${index}`;
-      body["_id"]=`${this.CompanyCode}-${containercode}`
-      body["cNCD"]= containercode
-      body["eNTDT"]= new Date()
-      body["eNTLOC"]= this.storage.branch
-      body["eNTBY"]= this.storage.userName
-    }else{
-      body["mODDT"]= new Date()
-      body["mODLOC"]= this.storage.branch
-      body["mODBY"]= this.storage.userName
+          : parseInt(
+              TableData.data[TableData.data.length - 1].cNCD.substring(4)
+            ) + 1;
+      const containercode = `CON-${
+        index <= 9 ? "00" : index >= 9 && index <= 99 ? "0" : ""
+      }${index}`;
+      body["_id"] = `${this.CompanyCode}-${containercode}`;
+      body["cNCD"] = containercode;
+      body["eNTDT"] = new Date();
+      body["eNTLOC"] = this.storage.branch;
+      body["eNTBY"] = this.storage.userName;
+    } else {
+      body["mODDT"] = new Date();
+      body["mODLOC"] = this.storage.branch;
+      body["mODBY"] = this.storage.userName;
     }
     const req = {
       companyCode: this.CompanyCode,
@@ -248,7 +246,7 @@ export class AddContainerComponent implements OnInit {
       update: this.isUpdate ? body : undefined,
       data: this.isUpdate ? undefined : body,
     };
-    console.log('body' ,body)
+    console.log("body", body);
     const res = this.isUpdate
       ? await firstValueFrom(
           this.masterService.masterPut("generic/update", req)
@@ -277,7 +275,7 @@ export class AddContainerComponent implements OnInit {
     }
   }
 
-  cancel(){
+  cancel() {
     this.Route.navigateByUrl("/Masters/ContainerMaster/ListContainer");
   }
 }

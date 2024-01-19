@@ -21,8 +21,8 @@ export class UploadLocationComponent implements OnInit {
   rateTypeDropDown: any;
   mergedCapacity: any[];
   existingData: any;
-  hierachy: import("d:/docket/velocity-docket/src/app/Models/drop-down/dropdown").AutoComplete[];
-  locOwnerShipList: import("d:/docket/velocity-docket/src/app/Models/drop-down/dropdown").AutoComplete[];
+  hierachy: any[];
+  locOwnerShipList: any[];
   pincodeList: any[];
   cityList: any;
   stateList: any[];
@@ -200,24 +200,18 @@ export class UploadLocationComponent implements OnInit {
             ],
           }
         ];
+        const response = await firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        console.log('response = ', response);
+        this.OpenPreview(response);
 
-        var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
-        rPromise.then(async response => {
-          console.log('response =  ');
-          console.log(response);
+        // var rPromise = await firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        // console.log(rPromise);
 
-          this.OpenPreview(response)
-          // Specify the keys for Route and Capacity
-          // const routeKey = "Route";
-          // const capacityKey = "Capacity";
-          // const tableRouteKey = 'rTNM';
-          // const tableCapacity = 'cPCTNM';
-          // const tableData = this.existingData.filter(item => item.cNID === this.CurrentContractDetails.cNID)
-          // Call the function with the specified keys
-          //const data = await checkForDuplicatesInBulkUpload(response, tableData, tableRouteKey, tableCapacity, routeKey, capacityKey);
-
-          //this.OpenPreview(data);
-        })
+        // rPromise.then(async response => {
+        //   console.log('response =  ');
+        //   console.log(response);
+        //   this.OpenPreview(response)        
+        // })
       });
     }
   }

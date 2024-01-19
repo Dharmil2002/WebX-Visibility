@@ -16,6 +16,8 @@ import { GetLocationDetailFromApi, GetBankDetailFromApi, GetAccountDetailFromApi
 import { AdviceGeneration } from "src/app/Models/Finance/Advice";
 import { AdviceAcknowledgeControl } from '../../../../assets/FormControls/Finance/AdviceAcknowledge/adviceacknowledgecontrol';
 import { MatDialog } from '@angular/material/dialog';
+import { formatDate } from "src/app/Utility/date/date-utils";
+
 import { AdviceAcknowledgeFiltersComponent } from '../Models/advice-acknowledge-filters/advice-acknowledge-filters.component';
 @Component({
   selector: 'app-advice-acknowledge',
@@ -36,7 +38,12 @@ export class AdviceAcknowledgeComponent implements OnInit {
     EndDate: new Date()
   }
   linkArray = [];
-  menuItems = [];
+  menuItemflag = true;
+  menuItems = [
+    { label: 'Modify' },
+    { label: 'Acknowledge' },
+    { label: 'View' },
+  ]
 
   dynamicControls = {
     add: false,
@@ -49,36 +56,41 @@ export class AdviceAcknowledgeComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    Vendor: {
+    eNTDT: {
       Title: "Created on ⟨Date⟩",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    THCamount: {
+    docNo: {
       Title: "Advice No",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    AdvancePending: {
+    rBRANCH: {
       Title: "Advice Branch",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
-    AdvancePendings: {
+    eNTLOC: {
       Title: "Raised on Branch ",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
-    BalanceUnbilled: {
+    aMT: {
       Title: "Amount ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
-    Status: {
+    sTNM: {
       Title: "Status ",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "min-width:10%",
+    }
   };
   EventButton = {
     functionName: "filterFunction",
@@ -90,82 +102,104 @@ export class AdviceAcknowledgeComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "Vendor", "THCamount"];
+  staticField = ["SrNo", "docNo", "eNTDT", "rBRANCH", "eNTLOC", "aMT", "sTNM"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   isTableLode = true;
-  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) {
+  constructor(private matDialog: MatDialog,
+    public StorageService: StorageService, private router: Router, private masterService: MasterService,) {
     this.RequestData.StartDate.setDate(new Date().getDate() - 30);
   }
 
   ngOnInit(): void {
-    this.GetTHCData()
+    this.GetAdviceData()
   }
-  async GetTHCData() {
-    // const GetTHCData = await GetTHCListFromApi(this.masterService, this.RequestData)
-    this.tableData = []
-  }
-
-  AdvancePendingFunction(event) {
-    // Check if TotaladvAmt is greater than 0
-    const isTotaladvAmtValid = event?.data?.AdvancePending > 0;
-
-    if (isTotaladvAmtValid) {
-      this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
-        state: {
-          data: {
-            ...event.data,
-            StartDate: this.RequestData.StartDate,
-            EndDate: this.RequestData.EndDate,
-          }
-        },
-      });
-    } else {
-      Swal.fire({
-        icon: "info",
-        title: "Data Does Not exist for Advance Payment on current branch",
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.close();
-        }
-      });
-    }
-
-  }
-
-  BalanceUnbilledFunction(event) {
-    // Check if TotaladvAmt is greater than 0
-    const isTotaladvAmtValid = event?.data?.BalanceUnbilled > 0;
-    // Check if there is any entry with balAmtAt equal to "Branch"
-    if (isTotaladvAmtValid) {
-      this.router.navigate(['/Finance/VendorPayment/BalancePayment'], {
-        state: {
-          data: {
-            ...event.data,
-            StartDate: this.RequestData.StartDate,
-            EndDate: this.RequestData.EndDate,
+  async GetAdviceData() {
+    const RequestBody = {
+      "companyCode": localStorage.getItem('companyCode'),
+      "collectionName": "advice_details",
+      "filter": {
+        "D$and": [
+          {
+            "eNTDT": {
+              "D$gte": this.RequestData.StartDate
+            }
           },
-          Type: "Add",
-        },
-      });
-    } else {
-      Swal.fire({
-        icon: "info",
-        title: "Data Does Not exist for Balance Payment on current branch",
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.close();
-        }
-      });
+          {
+            "eNTDT": {
+              "D$lte": this.RequestData.EndDate
+            }
+          }
+        ]
+      }
     }
 
-    //BalanceUnbilled
+    try {
+      const APIResult: any = await firstValueFrom(this.masterService.masterMongoPost("generic/get", RequestBody));
+      if (APIResult.data) {
+        const result = APIResult.data.sort((a, b) => {
+          const aValue = a.docNo;
+          const bValue = b.docNo;
 
+          return bValue.localeCompare(aValue);
+        });
 
+        this.tableData = result.map((x, index) => ({
+          SrNo: index + 1,
+          docNo: x.docNo,
+          eNTDT: formatDate(x.eNTDT, "dd MMM yyyy"),
+          rBRANCH: x.rBRANCH,
+          eNTLOC: x.eNTLOC,
+          aMT: x.aMT,
+          sTNM: x.sTNM,
+          actions: x.sTCD == 1 ? ['Modify', 'Acknowledge', 'View'] : ['View'],
+          OthersData: x
+        })) ?? null;
+      }
 
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return null;
+    }
   }
 
+  //#region to handle actions
+  async handleMenuItemClick(data) {
+    let RequestData = data.data?.OthersData;
+
+    switch (data.label.label) {
+      case 'Acknowledge':
+        // RequestData.sTCD = 2;
+        // RequestData.sTNM = "Acknowledge";
+        // RequestData.mODDT = new Date();
+        // RequestData.mODBY = this.StorageService.userName;
+        // RequestData.mODLOC = this.StorageService.branch;
+        // const req = {
+        //   companyCode: this.companyCode,
+        //   filter: { _id: RequestData._id },
+        //   collectionName: "advice_details",
+        //   update: RequestData
+        // }
+
+        // const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+        // if (res) {
+        //   Swal.fire({
+        //     icon: "success",
+        //     title: "Successful",
+        //     text: `Status is ${RequestData.sTNM}`,
+        //     showConfirmButton: true,
+        //   });
+        // }
+        this.router.navigate(["/Finance/FundTransfer/AdviceGeneration"], {
+          state: { data: RequestData, Type: "Acknowledge", },
+        });
+        break;
+      case 'Modify':
+        this.router.navigate(["/Finance/FundTransfer/AdviceGeneration"], {
+          state: { data: RequestData, Type: "Modify", },
+        });
+        break;
+    }
+  }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
@@ -189,7 +223,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
       if (result != undefined) {
         this.RequestData.StartDate = result.StartDate;
         this.RequestData.EndDate = result.EndDate;
-        this.GetTHCData()
+        this.GetAdviceData()
       }
     });
   }

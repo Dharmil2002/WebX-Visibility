@@ -30,26 +30,34 @@ export class AdviceGenerationComponent implements OnInit {
   AlljsonControlAdvicePaymentGenerationArray: any;
   submit = "Save";
   AdviceFormControls: AdviceGenerationControl;
-  action: string;
   breadScrums = [{}];
   isUpdate = false;
-  updateData: any;
   AllLocationsList: any;
+  NavigationStateRequest: any;
   constructor(private fb: UntypedFormBuilder, private router: Router,
     private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService, private storage: StorageService, private filter: FilterUtils, private route: Router, private masterService: MasterService,) {
-    const extrasState = this.route.getCurrentNavigation()?.extras?.state;
-    this.updateData = this.route.getCurrentNavigation()?.extras?.state?.data;
-    this.isUpdate = false;
-    this.action = extrasState ? "edit" : "add";
-    if (this.action === "edit") {
+    this.NavigationStateRequest = this.route.getCurrentNavigation()?.extras?.state;
+
+    if (this.NavigationStateRequest?.Type === "Modify") {
       this.isUpdate = true;
       this.submit = "Modify";
       this.breadScrums = [
         {
-          title: "Modify AdviceGeneration",
+          title: "Advice Modify",
           items: ["Finance"],
-          active: "Modify AdviceGeneration",
+          active: "Advice Modify",
+        },
+      ];
+    }
+    else if (this.NavigationStateRequest?.Type === "Acknowledge") {
+      this.isUpdate = true;
+      this.submit = "Acknowledge";
+      this.breadScrums = [
+        {
+          title: "Advice Acknowledge",
+          items: ["Finance"],
+          active: "Advice Acknowledge",
         },
       ];
     } else {
@@ -70,13 +78,26 @@ export class AdviceGenerationComponent implements OnInit {
   }
 
   initializeFormControl() {
-    this.AdviceFormControls = new AdviceGenerationControl("");
+    this.AdviceFormControls = new AdviceGenerationControl(this.NavigationStateRequest?.data, this.NavigationStateRequest?.Type);
     this.jsonControlAdviceGenerationArray = this.AdviceFormControls.getFormControls();
     this.AdviceTableForm = formGroupBuilder(this.fb, [this.jsonControlAdviceGenerationArray,]);
 
     this.jsonControlAdvicePaymentGenerationArray = this.AdviceFormControls.getPaymentFormControls();
+    if (this.NavigationStateRequest?.Type != "Acknowledge") {
+      this.jsonControlAdvicePaymentGenerationArray = this.jsonControlAdvicePaymentGenerationArray.filter(x => x.name != "Depositedin");
+    }
     this.AlljsonControlAdvicePaymentGenerationArray = this.jsonControlAdvicePaymentGenerationArray
     this.AdvicePaymentForm = formGroupBuilder(this.fb, [this.jsonControlAdvicePaymentGenerationArray,]);
+    if (this.NavigationStateRequest?.Type == "Modify" || this.NavigationStateRequest?.Type == "Acknowledge") {
+      this.SetModifyData();
+    }
+
+  }
+  SetModifyData() {
+    this.AdviceTableForm.get('AdviceType').setValue(this.NavigationStateRequest?.data?.aDTYP);
+    if (this.NavigationStateRequest?.Type == "Acknowledge") {
+      this.AdviceTableForm.get('AdviceType').disable();
+    }
 
   }
   async BindDataFromAPI() {
@@ -89,11 +110,26 @@ export class AdviceGenerationComponent implements OnInit {
       "raisedonBranch",
       false
     );
+    this.filter.Filter(
+      this.jsonControlAdvicePaymentGenerationArray,
+      this.AdvicePaymentForm,
+      PaymentMode,
+      "PaymentMode",
+      true
+    );
+    if (this.NavigationStateRequest?.Type == "Modify" || this.NavigationStateRequest?.Type == "Acknowledge") {
+      const raisedonBranch = this.AllLocationsList.find(x => x.name == this.NavigationStateRequest?.data?.rBRANCH)
+      this.AdviceTableForm.get('raisedonBranch').setValue(raisedonBranch);
+      const PaymentModedata = PaymentMode.find(x => x.name == this.NavigationStateRequest?.data?.pMODE)
+      this.AdvicePaymentForm.get('PaymentMode').setValue(PaymentModedata);
+      this.OnPaymentModeChange(true);
+    }
+
   }
   // Payment Modes Changes 
   async OnPaymentModeChange(event) {
 
-    const PaymentMode = this.AdvicePaymentForm.get("PaymentMode").value;
+    const PaymentMode = this.AdvicePaymentForm.get("PaymentMode").value?.name;
     let filterFunction;
     switch (PaymentMode) {
       case 'Cheque':
@@ -123,11 +159,22 @@ export class AdviceGenerationComponent implements OnInit {
         Bank.setValidators([Validators.required, autocompleteObjectValidator()]);
         Bank.updateValueAndValidity();
 
+        if (event == true) {
+          const SelectedBank = responseFromAPIBank.find(x => x.value == this.NavigationStateRequest?.data?.aCNM)
+          Bank.setValue(SelectedBank);
+          if (this.NavigationStateRequest?.Type == "Acknowledge") {
+            this.filter.Filter(
+              this.jsonControlAdvicePaymentGenerationArray,
+              this.AdvicePaymentForm,
+              responseFromAPIBank,
+              "Depositedin",
+              false
+            );
+          }
+        }
         const ChequeOrRefNo = this.AdvicePaymentForm.get('ChequeOrRefNo');
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
-
-
 
         const CashAccount = this.AdvicePaymentForm.get('CashAccount');
         CashAccount.setValue("");
@@ -148,7 +195,19 @@ export class AdviceGenerationComponent implements OnInit {
         const CashAccountS = this.AdvicePaymentForm.get('CashAccount');
         CashAccountS.setValidators([Validators.required, autocompleteObjectValidator()]);
         CashAccountS.updateValueAndValidity();
-
+        if (event == true) {
+          const SelectedCash = responseFromAPICash.find(x => x.value == this.NavigationStateRequest?.data?.aCNM)
+          CashAccountS.setValue(SelectedCash);
+          if (this.NavigationStateRequest?.Type == "Acknowledge") {
+            this.filter.Filter(
+              this.jsonControlAdvicePaymentGenerationArray,
+              this.AdvicePaymentForm,
+              responseFromAPICash,
+              "Depositedin",
+              false
+            );
+          }
+        }
         const BankS = this.AdvicePaymentForm.get('Bank');
         BankS.setValue("");
         BankS.clearValidators();
@@ -181,69 +240,124 @@ export class AdviceGenerationComponent implements OnInit {
     }
   }
 
-  GenerateAdvice() {
+  async GenerateAdvice() {
+    if (this.NavigationStateRequest?.Type == "Acknowledge") {
 
-
-
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
-        const AccountDetails = this.AdvicePaymentForm.value.PaymentMode == "Cash" ? this.AdvicePaymentForm.value.CashAccount : this.AdvicePaymentForm.value.Bank;
-        const AdviceGeneration: AdviceGeneration = {
-          companyCode: this.storage.companyCode,
-          docType: "ADVICE",
-          branch: this.storage.branch,
-          finYear: financialYear,
-          data: {
-            docNo: this.isUpdate ? this.updateData?.docNo : "",
-            aDTYP: this.AdviceTableForm.value.AdviceType,
-            aDDT: this.AdviceTableForm.value.adviceDate,
-            rBRANCH: this.AdviceTableForm.value.raisedonBranch?.name,
-            rEASION: this.AdviceTableForm.value.reasonforAdvice,
-            aMT: this.AdviceTableForm.value.applicableAmount,
-            pMODE: this.AdvicePaymentForm.value.PaymentMode,
-            cHEQREF: this.AdvicePaymentForm.value.ChequeOrRefNo,
-            aCCD: AccountDetails?.name,
-            aCNM: AccountDetails?.value,
-            aDT: this.AdvicePaymentForm.value.Date,
-            sTCD: this.isUpdate == true ? 2 : 1,
-            sTNM: this.isUpdate == true ? "Acknowledge" : "Generated",
-            dACCD: "",
-            dACNM: "",
-            eNTDT: new Date(),
-            eNTLOC: this.storage.branch,
-            eNTBY: this.storage.userName
-          }
-        }
-        await
-          firstValueFrom(this.voucherServicesService
-            .FinancePost(`finance/bill/Advice/create`, AdviceGeneration)).then((res: any) => {
-              if (res.success) {
-
-                Swal.fire({
-                  icon: "success",
-                  title: `Advice ${this.isUpdate ? 'Updated' : 'Generated'} Successfully`,
-                  text: "Advice No: " + res?.data.ops[0].docNo,
-                  showConfirmButton: true,
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    Swal.hideLoading();
-                    setTimeout(() => {
-                      Swal.close();
-                      this.router.navigate(['/dashboard/Index'], { queryParams: { tab: 0 }, state: [] });
-                    }, 1000);
-                  }
-                });
-
-              } else {
-                this.snackBarUtilityService.ShowCommonSwal("error", res?.message);
-              }
-            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-            .finally(() => {
-
-            });
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", error);
+      let RequestData = this.NavigationStateRequest?.data;
+      RequestData.sTCD = 2;
+      RequestData.sTNM = "Acknowledge";
+      RequestData.dACCD = this.AdvicePaymentForm.value?.Depositedin?.value;
+      RequestData.dACNM = this.AdvicePaymentForm.value?.Depositedin?.name;
+      RequestData.dDT = this.AdvicePaymentForm.value?.Depositedon;
+      RequestData.mODDT = new Date();
+      RequestData.mODBY = this.storage.userName;
+      RequestData.mODLOC = this.storage.branch;
+      const req = {
+        companyCode: this.storage.companyCode,
+        filter: { _id: RequestData._id },
+        collectionName: "advice_details",
+        update: RequestData
       }
-    }, "Advice Generating..!");
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: `Advice Acknowledge Successfully`,
+          text: "Advice No: " + RequestData.docNo,
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.hideLoading();
+            setTimeout(() => {
+              Swal.close();
+              this.router.navigate(['/Finance/FundTransfer/AdviceAcknowledge']);
+            }, 1000);
+          }
+        });
+      }
+
+    } else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          const AccountDetails = this.AdvicePaymentForm.value.PaymentMode?.value == "Cash" ? this.AdvicePaymentForm.value.CashAccount : this.AdvicePaymentForm.value.Bank;
+          const AdviceGeneration: AdviceGeneration = {
+            companyCode: this.storage.companyCode,
+            docType: "ADVICE",
+            branch: this.storage.branch,
+            finYear: financialYear,
+            data: {
+              docNo: this.isUpdate ? this.NavigationStateRequest?.data?.docNo : "",
+              aDTYP: this.AdviceTableForm.value.AdviceType,
+              aDDT: this.AdviceTableForm.value.adviceDate,
+              rBRANCH: this.AdviceTableForm.value.raisedonBranch?.name,
+              rEASION: this.AdviceTableForm.value.reasonforAdvice,
+              aMT: this.AdviceTableForm.value.applicableAmount,
+              pMODE: this.AdvicePaymentForm.value.PaymentMode?.value,
+              cHEQREF: this.AdvicePaymentForm.value.ChequeOrRefNo,
+              aCCD: AccountDetails?.name,
+              aCNM: AccountDetails?.value,
+              aDT: this.AdvicePaymentForm.value.Date,
+              sTCD: 1,
+              sTNM: "Generated",
+              dACCD: "",
+              dACNM: "",
+              eNTDT: new Date(),
+              eNTLOC: this.storage.branch,
+              eNTBY: this.storage.userName,
+            }
+          }
+          if (this.isUpdate) {
+            AdviceGeneration.data.mODDT = new Date();
+            AdviceGeneration.data.mODBY = this.storage.userName;
+            AdviceGeneration.data.mODLOC = this.storage.branch;
+          }
+          await
+            firstValueFrom(this.voucherServicesService
+              .FinancePost(`finance/bill/Advice/create`, AdviceGeneration)).then((res: any) => {
+                if (res.success) {
+
+                  Swal.fire({
+                    icon: "success",
+                    title: `Advice ${this.isUpdate ? 'Updated' : 'Generated'} Successfully`,
+                    text: `Advice No: ${this.isUpdate ? AdviceGeneration.data.docNo : res?.data.ops[0].docNo}`,
+                    showConfirmButton: true,
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      Swal.hideLoading();
+                      setTimeout(() => {
+                        Swal.close();
+                        this.router.navigate(['/Finance/FundTransfer/AdviceAcknowledge']);
+                      }, 1000);
+                    }
+                  });
+
+                } else {
+                  this.snackBarUtilityService.ShowCommonSwal("error", res?.message);
+                }
+              }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+              .finally(() => {
+
+              });
+        } catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal("error", error);
+        }
+      }, "Advice Generating..!");
+    }
   }
 }
+const PaymentMode = [
+  {
+    value: "Cheque",
+    name: "Cheque",
+  },
+  {
+    value: "Cash",
+    name: "Cash",
+  },
+  {
+    value: "RTGS/UTR",
+    name: "RTGS/UTR",
+  },
+
+]

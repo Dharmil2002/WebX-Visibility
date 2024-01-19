@@ -25,8 +25,8 @@ export class AdviceGeneration {
     eNTDT?: Date;
     eNTLOC?: string;
     eNTBY?: string;
-    // mODDT?: Date;
-    // mODLOC?: string;
-    // mODBY?: string;
+    mODDT?: Date;
+    mODLOC?: string;
+    mODBY?: string;
   };
 }

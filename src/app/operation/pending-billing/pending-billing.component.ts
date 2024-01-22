@@ -112,7 +112,6 @@ export class PendingBillingComponent implements OnInit {
     this.get(data);
   }
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {

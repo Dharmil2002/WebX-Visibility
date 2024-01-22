@@ -98,7 +98,6 @@ export class HandedOverUploadComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        debugger
         this.dialogRef.close(result)
         //this.model.previewResult = result;
         //this.containorCsvDetail();

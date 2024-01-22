@@ -89,8 +89,8 @@ export class FilterBillingComponent implements OnInit {
     const stateDetail = await stateFromApi(this.masterService);
     const customerDetail = await customerFromApi(this.masterService);
     this.stateDetail=stateDetail;
-    this.locationDetail=locDetail;
-    this.filter.Filter(this.jsonFilterArray, this.filterTableForm, locDetail, this.locationName, this.userLocationStatus);
+    this.locationDetail=locDetail.map((x)=>{return{name:x.value,value:x.value}});
+    this.filter.Filter(this.jsonFilterArray, this.filterTableForm,this.locationDetail, this.locationName, this.userLocationStatus);
     this.filter.Filter(this.jsonFilterArray, this.filterTableForm, stateDetail, this.stateName, this.stateStatus);
     this.filter.Filter(this.jsonFilterArray, this.filterTableForm, customerDetail, this.customerName, this.customerStatus);
   }

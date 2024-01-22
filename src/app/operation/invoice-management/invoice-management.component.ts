@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { GenericService } from 'src/app/core/service/generic-services/generic-services';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import { FilterBillingComponent } from '../pending-billing/filter-billing/filter-billing.component';
 @Component({
   selector: 'app-invoice-management',
   templateUrl: './invoice-management.component.html'
@@ -94,7 +97,9 @@ export class InvoiceManagementComponent implements OnInit {
   constructor(
     private InvoiceService: InvoiceServiceService,
     private DashboardFilterPage: FormBuilder,
-    private storage:StorageService
+    private storage:StorageService,
+    private matDialog: MatDialog,
+    private genericService:GenericService
   ) {
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
@@ -112,18 +117,18 @@ export class InvoiceManagementComponent implements OnInit {
     // Set default start and end dates when the component initializes
     this.range.controls["start"].setValue(lastweek);
     this.range.controls["end"].setValue(now);
-    this.get();
+    this.get(event);
   }
 
-  async get() {
+  async get(event) {
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
     const requestData={
-       startDate:this.range.controls.start.value,
-       endDate :this.range.controls.end.value,
+       startDate:event?event.start:this.range.controls.start.value,
+       endDate :event?event.end:this.range.controls.end.value,
        branch:this.storage.branch,
-       customerName:[],
-       locationNames:[]
+       customerName:event?event.customer:[],
+       locationNames:event?event.bookLoc:[]
 
     }
     const detail = await this.InvoiceService.getinvoiceDetailBill(requestData);
@@ -132,7 +137,25 @@ export class InvoiceManagementComponent implements OnInit {
     this.tableLoad = false;
     this.getKpiCount();
   }
-
+  openFilterDialog() {
+    const dialogRef = this.matDialog.open(FilterBillingComponent, {
+      width: "60%",
+      position: {
+        top: "20px",
+      },
+      disableClose: true,
+      data: "",
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      
+      if (result != undefined) {
+        this.get(result);
+      }
+      else{
+        this.genericService.clearSharedData();
+      }
+    });
+  }
   functionCallHandler(event) {
     console.log(event);
     try {

@@ -93,4 +93,8 @@ export class DeliveryMrResponseModalComponent implements OnInit {
     }));
     this.tableload = false;
   }
+  generateDelivery(): void {
+    // Use Router to navigate to the generated URL
+    this.router.navigate(["/dashboard/Index"])
+  }
 }

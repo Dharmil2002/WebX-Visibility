@@ -60,7 +60,7 @@ export class ContraVoucherCreationComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService,
     private filter: FilterUtils
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -171,6 +171,29 @@ export class ContraVoucherCreationComponent implements OnInit {
       }
     }
   }
+  onChangeAmount(event) {
+    const fieldName = event?.field?.name;
+    const fieldValue = this.ContraVoucherPaymentForm.get(fieldName).value;
+
+    const resetFields = (field1, field2, value, toAmount) => {
+      this.ContraVoucherPaymentForm.get(field1).setValue(0);
+      this.ContraVoucherPaymentForm.get(field1).updateValueAndValidity();
+
+      this.ContraVoucherPaymentForm.get(field2).setValue(value);
+      this.ContraVoucherPaymentForm.get(field2).updateValueAndValidity();
+
+      this.ContraVoucherPaymentForm.get(toAmount).setValue(0);
+      this.ContraVoucherPaymentForm.get(toAmount).updateValueAndValidity();
+    };
+
+    if (fieldName === "FromDebitAmount") {
+      resetFields("FromCreditAmount", "ToCreditAmount", fieldValue, 'ToDebitAmount');
+    }
+
+    if (fieldName === "FromCreditAmount") {
+      resetFields("FromDebitAmount", "ToDebitAmount", fieldValue, 'ToCreditAmount');
+    }
+  }
 
   Submit() {
     const FromDebitAmount =
@@ -181,30 +204,9 @@ export class ContraVoucherCreationComponent implements OnInit {
       this.ContraVoucherPaymentForm.get("ToDebitAmount").value || 0;
     const ToCreditAmount =
       this.ContraVoucherPaymentForm.get("ToCreditAmount").value || 0;
-    const SetValidArray = [
-      parseFloat(FromDebitAmount),
-      parseFloat(FromCreditAmount),
-      parseFloat(ToDebitAmount),
-      parseFloat(ToCreditAmount),
-    ];
-    if(SetValidArray[0] == 0){
-      if(SetValidArray[1] == 0 || SetValidArray[2] == 0 || SetValidArray[3] != 0){
-        console.log("invalid")
-      }else{
-        console.log("valid")
-      }
-    }else if(SetValidArray[1] == 0){
-      if(SetValidArray[0] == 0 || SetValidArray[3] == 0 || SetValidArray[2] != 0){
-        console.log("invalid")
-      }else{
-        console.log("valid")
-      }
-    }else {
-      console.log("invalid")
-    }
+
     if (
-      FromDebitAmount != FromCreditAmount ||
-      ToDebitAmount != ToCreditAmount
+      FromDebitAmount == FromCreditAmount
     ) {
       this.snackBarUtilityService.ShowCommonSwal(
         "info",
@@ -214,7 +216,7 @@ export class ContraVoucherCreationComponent implements OnInit {
       this.snackBarUtilityService.commonToast(async () => {
         try {
           const totalPaymentAmount =
-            parseFloat(FromCreditAmount) + parseFloat(ToCreditAmount);
+            parseFloat(FromCreditAmount) + parseFloat(FromDebitAmount);
 
           this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
           this.debitVoucherRequestModel.docType = "VR";
@@ -299,7 +301,7 @@ export class ContraVoucherCreationComponent implements OnInit {
               credit: parseFloat(FromCreditAmount).toFixed(2),
               GSTRate: 0,
               GSTAmount: 0,
-              Total: parseFloat(FromDebitAmount).toFixed(2),
+              Total: parseFloat(FromDebitAmount).toFixed(2) + parseFloat(FromCreditAmount).toFixed(2),
               TDSApplicable: false,
               narration: "",
               PaymentMode: this.ContraVoucherPaymentForm.value.FromPaymentMode,
@@ -319,7 +321,7 @@ export class ContraVoucherCreationComponent implements OnInit {
               credit: ToCreditAmount,
               GSTRate: 0,
               GSTAmount: 0,
-              Total: ToDebitAmount,
+              Total: ToDebitAmount + ToCreditAmount,
               TDSApplicable: false,
               narration: "",
               PaymentMode: this.ContraVoucherPaymentForm.value.ToPaymentMode,
@@ -361,7 +363,7 @@ export class ContraVoucherCreationComponent implements OnInit {
             .catch((error) => {
               this.snackBarUtilityService.ShowCommonSwal("error", error);
             })
-            .finally(() => {});
+            .finally(() => { });
         } catch (error) {
           this.snackBarUtilityService.ShowCommonSwal("error", error.message);
         }

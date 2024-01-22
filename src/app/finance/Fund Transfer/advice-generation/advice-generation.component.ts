@@ -60,6 +60,16 @@ export class AdviceGenerationComponent implements OnInit {
           active: "Advice Acknowledge",
         },
       ];
+    } else if (this.NavigationStateRequest?.Type === "View") {
+      this.isUpdate = true;
+      this.submit = "View";
+      this.breadScrums = [
+        {
+          title: "View Acknowledge",
+          items: ["Finance"],
+          active: "View Acknowledge",
+        },
+      ];
     } else {
       this.breadScrums = [
         {

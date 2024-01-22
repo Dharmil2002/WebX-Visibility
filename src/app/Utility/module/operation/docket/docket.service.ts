@@ -40,7 +40,7 @@ export class DocketService {
     ) { }
 
     async updateDocket(data, filter) {
-        
+
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
@@ -259,7 +259,7 @@ export class DocketService {
     }
 
     async reverseDocketObjectMapping(docket, jsonControl) {
-        
+
         const pAYTYP = getValueFromJsonControl(jsonControl, "payType", docket.payType);
         const tRNMOD = getValueFromJsonControl(jsonControl, "transMode", docket.transMode);
         const vENDTY = getValueFromJsonControl(jsonControl, "vendorType", docket.vendorType);
@@ -331,10 +331,10 @@ export class DocketService {
             mODLOC: this.storage.branch,
             tRNHR: docket["tran_hour"],
             aCTWT: WtKg,
-            cHRWT:CWtKg,
-            pKGS:Pkg
+            cHRWT: CWtKg,
+            pKGS: Pkg
         };
-        
+
         return data;
     }
 
@@ -348,7 +348,7 @@ export class DocketService {
         return res.data;
     }
     async updateManyDockets(data, filter, collectionName) {
-        
+
         try {
             const commonRequestData = {
                 companyCode: this.storage.companyCode,
@@ -382,7 +382,7 @@ export class DocketService {
             throw error;
         }
     }
-    
+
     async addEventData(data) {
         const evnData = {
             "_id": `${this.storage.companyCode}${data.docketNumber}-1-EVN0002` + new Date(),
@@ -415,7 +415,7 @@ export class DocketService {
         return res;
     }
     async updateOperationData(data) {
-        
+
         let opsData = {
             "tOTWT": data.invoiceDetails.reduce((totalWeight, invoiceDetail) => totalWeight + invoiceDetail.actualWeight, 0),
             "tOTPKG": data.invoiceDetails.reduce((tOTPKG, noofPkts) => tOTPKG + noofPkts.noofPkts, 0),
@@ -433,83 +433,84 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPut('generic/update', req));
         return res;
     }
-    async getDocketsForAutoComplete(form, jsondata, controlName, codeStatus,billingParty="",isJob=false) {
-       
+    async getDocketsForAutoComplete(form, jsondata, controlName, codeStatus, billingParty = "", isJob = false) {
+
         try {
-          const dValue = form.controls[controlName].value;
-    
-          // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
-          if (dValue.length >= 3) {
-            let filter = {
-                docNo: { 'D$regex': `^${dValue}`, 'D$options': 'i' },
-                'D$or': [
-                    { oRGN: this.storage.branch },
-                    { dEST: this.storage.branch },
-                    {rAKENO:{'D$exists':false}}
-                ]
-            };
-            if (billingParty) {
-                filter['bPARTY'] = billingParty;
+            const dValue = form.controls[controlName].value;
+
+            // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+            if (dValue.length >= 3) {
+                let filter = {
+                    docNo: { 'D$regex': `^${dValue}`, 'D$options': 'i' },
+                    'D$or': [
+                        { oRGN: this.storage.branch },
+                        { dEST: this.storage.branch },
+                        { rAKENO: { 'D$exists': false } }
+                    ]
+                };
+                if (billingParty) {
+                    filter['bPARTY'] = billingParty;
+                }
+                if (isJob) {
+                    filter['jOBNO'] = ""
+                }
+                // Prepare the pincodeBody with the companyCode and the determined filter
+                const cityBody = {
+                    companyCode: localStorage.getItem("companyCode"),
+                    collectionName: "dockets",
+                    filter,
+                };
+
+                // Fetch pincode data from the masterService asynchronously
+                const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
+
+                // Extract the cityCodeData from the response 
+                /*here i return one more field other then name value beacuase it  used in Job entry Module*/
+                const codeData = dResponse.data.map((x) => { return { name: x.docNo, value: x.docNo, docketData: x } });
+
+                // Filter cityCodeData for partial matches
+                if (codeData.length === 0) {
+                    // Show a popup indicating no data found for the given pincode
+                    console.log(`No data found for Docket ${dValue}`);
+                    // Swal.fire({
+                    //   icon: "info",
+                    //   title: "No Data Found",
+                    //   text: `No data found for Customer ${cValue}`,
+                    //   showConfirmButton: true,
+                    // });
+                } else {
+                    // Call the filter function with the filtered data
+                    this.filter.Filter(
+                        jsondata,
+                        form,
+                        codeData,
+                        controlName,
+                        codeStatus
+                    );
+                    return codeData;
+                }
             }
-            if(isJob){
-                filter['jOBNO'] = ""
+            else {
+                return [];
             }
-            // Prepare the pincodeBody with the companyCode and the determined filter
-            const cityBody = {
-                companyCode: localStorage.getItem("companyCode"),
-                collectionName: "dockets",
-                filter,
-            };
-            
-            // Fetch pincode data from the masterService asynchronously
-            const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
-    
-            // Extract the cityCodeData from the response 
-            /*here i return one more field other then name value beacuase it  used in Job entry Module*/
-            const codeData = dResponse.data.map((x) => { return { name: x.docNo, value: x.docNo,docketData:x } });
-    
-            // Filter cityCodeData for partial matches
-            if (codeData.length === 0) {
-              // Show a popup indicating no data found for the given pincode
-              console.log(`No data found for Docket ${dValue}`);
-              // Swal.fire({
-              //   icon: "info",
-              //   title: "No Data Found",
-              //   text: `No data found for Customer ${cValue}`,
-              //   showConfirmButton: true,
-              // });
-            } else {
-              // Call the filter function with the filtered data
-              this.filter.Filter(
-                jsondata,
-                form,
-                codeData,
-                controlName,
-                codeStatus
-              );
-              return codeData;
-            }
-          }
-          else{
-            return [];
-          }
         } catch (error) {
-          // Handle any errors that may occur during the asynchronous operation
-          console.error("Error fetching data:", error);
+            // Handle any errors that may occur during the asynchronous operation
+            console.error("Error fetching data:", error);
         }
-      }
-      async getDocketDetails(filter={}) {
+    }
+    async getDocketDetails(filter = {}) {
         try {
             // Prepare the pincodeBody with the companyCode and the determined filter
             const cityBody = {
                 companyCode: localStorage.getItem("companyCode"),
                 collectionName: "docket_containers",
-                filter:filter
+                filter: filter
             };
             // Fetch pincode data from the masterService asynchronously
             const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
             return dResponse
         } catch (error) {
         }
-      }
+    }
+
 }

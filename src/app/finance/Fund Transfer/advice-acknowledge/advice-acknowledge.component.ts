@@ -151,7 +151,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
           eNTLOC: x.eNTLOC,
           aMT: x.aMT,
           sTNM: x.sTNM,
-          actions: x.sTCD == 1 ? ['Modify', 'Acknowledge', 'View'] : ['View'],
+          actions: this.GetactionsArray(x.sTCD, x.rBRANCH),
           OthersData: x
         })) ?? null;
       }
@@ -162,33 +162,21 @@ export class AdviceAcknowledgeComponent implements OnInit {
     }
   }
 
+  GetactionsArray(sTCD, rBRANCH) {
+    if (sTCD == 1 && rBRANCH == this.StorageService.branch) {
+      return ['Acknowledge', 'View'];
+    } else if (sTCD == 1 && rBRANCH != this.StorageService.branch) {
+      return ['Modify', 'View'];
+    } else {
+      return ['View'];
+    }
+  }
   //#region to handle actions
   async handleMenuItemClick(data) {
     let RequestData = data.data?.OthersData;
 
     switch (data.label.label) {
       case 'Acknowledge':
-        // RequestData.sTCD = 2;
-        // RequestData.sTNM = "Acknowledge";
-        // RequestData.mODDT = new Date();
-        // RequestData.mODBY = this.StorageService.userName;
-        // RequestData.mODLOC = this.StorageService.branch;
-        // const req = {
-        //   companyCode: this.companyCode,
-        //   filter: { _id: RequestData._id },
-        //   collectionName: "advice_details",
-        //   update: RequestData
-        // }
-
-        // const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
-        // if (res) {
-        //   Swal.fire({
-        //     icon: "success",
-        //     title: "Successful",
-        //     text: `Status is ${RequestData.sTNM}`,
-        //     showConfirmButton: true,
-        //   });
-        // }
         this.router.navigate(["/Finance/FundTransfer/AdviceGeneration"], {
           state: { data: RequestData, Type: "Acknowledge", },
         });
@@ -196,6 +184,11 @@ export class AdviceAcknowledgeComponent implements OnInit {
       case 'Modify':
         this.router.navigate(["/Finance/FundTransfer/AdviceGeneration"], {
           state: { data: RequestData, Type: "Modify", },
+        });
+        break;
+      case 'View':
+        this.router.navigate(["/Finance/FundTransfer/AdviceGeneration"], {
+          state: { data: RequestData, Type: "View", },
         });
         break;
     }

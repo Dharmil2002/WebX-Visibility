@@ -19,7 +19,7 @@ export class ConsignmentControl {
     this.ConsignmentControlArray = [
       {
         name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
-        value: docketDetail?.docketNumber|| 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
+        value: docketDetail?.docketNumber || 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
         additionalData: {
           metaData: "Basic"
         },
@@ -80,7 +80,7 @@ export class ConsignmentControl {
       },
       {
         name: 'movementType', label: 'Movement Type', placeholder: 'Movement Type', type: 'Staticdropdown',
-        value: [], 
+        value: [],
         Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
@@ -103,7 +103,7 @@ export class ConsignmentControl {
             message: "Payment Type is required",
           },
         ],
-        functions : {
+        functions: {
           onOptionSelect: 'getPrqDetails'
         },
         additionalData: {
@@ -211,11 +211,11 @@ export class ConsignmentControl {
             message: "Destination is required",
           }, {
             name: "autocomplete",
-        },
-        {
+          },
+          {
             name: "invalidAutocompleteObject",
             message: "Choose proper value",
-        }
+          }
         ],
         additionalData: {
           showNameAndValue: false,
@@ -353,16 +353,16 @@ export class ConsignmentControl {
           metaData: "Basic",
         },
       },
-        // {
-        //   name: 'cargo_type', label: 'Type of Cargo', placeholder: 'Type of Cargo', type: 'Staticdropdown',
-        //   value: [
-        //     { "name": "Volume Cargo", "value": "Volume Cargo" },
-        //     { "name": "Weight Cargo", "value": "Weight Cargo" }
-        //   ], Validations: [], generatecontrol: true, disable: false,
-        //   additionalData: {
-        //     metaData: "Basic",
-        //   },
-        // },
+      // {
+      //   name: 'cargo_type', label: 'Type of Cargo', placeholder: 'Type of Cargo', type: 'Staticdropdown',
+      //   value: [
+      //     { "name": "Volume Cargo", "value": "Volume Cargo" },
+      //     { "name": "Weight Cargo", "value": "Weight Cargo" }
+      //   ], Validations: [], generatecontrol: true, disable: false,
+      //   additionalData: {
+      //     metaData: "Basic",
+      //   },
+      // },
       {
         name: 'gp_ch_del', label: 'GP/CH/Del', placeholder: 'GP/CH/Del', type: 'text',
         value: docketDetail.gp_ch_del, Validations: [], generatecontrol: true, disable: false,
@@ -420,7 +420,7 @@ export class ConsignmentControl {
         label: " Consignor same as Billing Party",
         placeholder: "",
         type: "toggle",
-        value: docketDetail?.cnbp||false,
+        value: docketDetail?.cnbp || false,
         generatecontrol: true,
         disable: false,
         functions: { onChange: "onAutoBillingBased" },
@@ -435,7 +435,7 @@ export class ConsignmentControl {
         label: "Consignee same as Billing Party",
         placeholder: "",
         type: "toggle",
-        value: docketDetail?.cnebp||false,
+        value: docketDetail?.cnebp || false,
         generatecontrol: true,
         disable: false,
         functions: { onChange: "onAutoBillingBased" },
@@ -450,7 +450,7 @@ export class ConsignmentControl {
         label: "Container Detail",
         placeholder: "",
         type: "toggle",
-        value: docketDetail?.cd||false,
+        value: docketDetail?.cd || false,
         generatecontrol: true,
         disable: false,
         functions: { onChange: "containerDetail" },
@@ -522,14 +522,14 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number',type: 'mobile-number',
+        name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
         value: docketDetail.cncontactNumber, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "consignee"
         }
       },
       {
-        name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No',type: 'mobile-number',
+        name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'mobile-number',
         value: docketDetail.cnalternateContactNo, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "consignee"
@@ -573,11 +573,12 @@ export class ConsignmentControl {
       }
     ]
     this.containordetail = [
+
       {
         name: "containerNumber",
         label: "Container No",
         placeholder: "Container No",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -585,9 +586,22 @@ export class ConsignmentControl {
         Validations: [{
           name: "required",
           message: "Container No is required",
+        },
+        {
+          name: "invalidAutocompleteObject",
+          message: "Choose proper value",
+        },
+        {
+          name: "autocomplete",
         }],
         generatecontrol: true,
         disable: false,
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {
+          onOptionSelect: 'OnChnageContainerNumber'
+        },
       },
       {
         name: "containerType",
@@ -962,7 +976,7 @@ export class ConsignmentControl {
       },
       {
         name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
-        type: 'date', value:"", generatecontrol: true, disable: false,
+        type: 'date', value: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -1043,7 +1057,7 @@ export class ConsignmentControl {
         Validations: [],
         generatecontrol: false, disable: false
       },
-      
+
     ]
   }
   getConsignmentControlControls() {

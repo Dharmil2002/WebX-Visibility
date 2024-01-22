@@ -142,7 +142,6 @@ export class ContraVoucherCreationComponent implements OnInit {
     const FromCreditAmount = this.ContraVoucherPaymentForm.get("FromCreditAmount").value;
     const ToDebitAmount = this.ContraVoucherPaymentForm.get("ToDebitAmount").value;
     const ToCreditAmount = this.ContraVoucherPaymentForm.get("ToCreditAmount").value;
-
     if (FromDebitAmount != FromCreditAmount || ToDebitAmount != ToCreditAmount) {
       this.snackBarUtilityService.ShowCommonSwal(
         "info",

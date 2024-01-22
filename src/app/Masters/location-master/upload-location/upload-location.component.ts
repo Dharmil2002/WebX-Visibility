@@ -6,8 +6,10 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { LocationMaster } from 'src/app/core/models/Masters/LocationMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 
 @Component({
@@ -15,7 +17,6 @@ import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview
   templateUrl: './upload-location.component.html'
 })
 export class UploadLocationComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   fileUploadForm: UntypedFormGroup;
   CurrentContractDetails: any;
   routeList: any[];
@@ -36,7 +37,9 @@ export class UploadLocationComponent implements OnInit {
     private objGeneralService: GeneralService,
     private objState: StateService,
     private objPinCodeService: PinCodeService,
-    private objLocationService: LocationService
+    private objLocationService: LocationService,
+    private storage: StorageService,
+
   ) {
     this.fileUploadForm = fb.group({
       singleUpload: [""],
@@ -75,7 +78,7 @@ export class UploadLocationComponent implements OnInit {
         this.zonelist = await this.objState.getStateWithZone();
 
         this.countryList = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"))
-        console.log(this.countryList);
+        // console.log(this.countryList);
 
         // Fetch state details by state name
         const validationRules = [
@@ -88,7 +91,8 @@ export class UploadLocationComponent implements OnInit {
                 Exists: this.existingData.map((code) => {
                   return code.locCode;
                 })
-              }
+              },
+              { DuplicateFromList: true }
             ],
           },
           {
@@ -100,8 +104,8 @@ export class UploadLocationComponent implements OnInit {
                 Exists: this.existingData.map((code) => {
                   return code.locName;
                 })
-              }
-
+              },
+              { DuplicateFromList: true }
             ],
           },
           {
@@ -226,7 +230,8 @@ export class UploadLocationComponent implements OnInit {
                 Exists: this.existingData.map((code) => {
                   return code.gstNumber;
                 })
-              }
+              },
+              { DuplicateFromList: true }
             ],
           }
         ];
@@ -297,12 +302,12 @@ export class UploadLocationComponent implements OnInit {
   //#region to get Existing Data from collection
   async fetchExistingData() {
     const request = {
-      companyCode: this.companyCode,
+      companyCode: this.storage.companyCode,
       collectionName: "location_detail",
       filter: {},
     };
 
-    const response = await this.masterService.masterPost("generic/get", request).toPromise();
+    const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
     return response.data;
   }
   //#endregion
@@ -318,7 +323,7 @@ export class UploadLocationComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // this.setDropdownData(result)
+        this.saveLocation(result)
       }
     });
   }
@@ -334,6 +339,90 @@ export class UploadLocationComponent implements OnInit {
   //#region to call close function
   Close() {
     this.dialogRef.close()
+  }
+  //#endregion
+  //#region to process and save location data
+  saveLocation(data) {
+    if (data.error === null) {
+      // Log the input data for debugging purposes
+      console.log(data);
+
+      // Array to store processed location data
+      const locationData: LocationMaster[] = [];
+
+      // Process each element in the input data
+      data.forEach(element => {
+        // Call the processData function to transform a single location element
+        const processedData = this.processData(element, this.existingData, this.hierachy, this.pincodeList, this.zonelist, this.locOwnerShipList);
+
+        // Add the processed data to the locationData array
+        locationData.push(processedData);
+      });
+
+      // Log the final processed data array
+      console.log(locationData);
+    }
+  }
+
+  // Function to process a single location element
+  processData(element, existingData, hierachy, pincodeList, zonelist, locOwnerShipList) {
+    // Retrieve relevant data for transformation
+    const updateLocLevel = hierachy.find(item => item.name.toUpperCase() === element.LocationHirarchay.toUpperCase());
+    const updateReportLevel = hierachy.find(item => item.name.toUpperCase() === element.Reportingto.toUpperCase());
+    const updateReportLoc = existingData.find(item => item.locCode.toUpperCase() === element.ReportingLocation.toUpperCase());
+    const updatePincode = pincodeList.find(item => item.PIN === element.PinCode);
+    const updateOwnership = locOwnerShipList.find(item => item.name === element.LocationOwnership.toUpperCase());
+    const updateState = zonelist.find(item => item.STNM.toUpperCase() === element.State.toUpperCase());
+
+    // Create a new LocationMaster instance to store processed data
+    const processedData = new LocationMaster({});
+
+    // Set basic properties
+    processedData._id = `${this.storage.companyCode}-${element.LocationCode}`;
+    processedData.companyCode = this.storage.companyCode;
+    processedData.locCode = element.LocationCode;
+    processedData.locName = element.LocationName;
+
+    // Set additional properties based on retrieved data
+    processedData.locRegion = element.Zone;
+    processedData.locCountry = element.Country;
+    processedData.locCity = element.City;
+
+    // Check if pincode information is available and update accordingly
+    if (updatePincode) {
+      processedData.locPincode = updatePincode.value;
+    }
+
+    // Check if state information is available and update accordingly
+    if (updateState) {
+      processedData.locState = updateState.STNM;
+      processedData.locStateId = updatePincode.ST;
+    }
+
+    // Set remaining properties
+    processedData.locAddr = element.Address;
+    processedData.gstNumber = element.GSTNumber;
+    processedData.activeFlag = false;
+
+    // Check if ownership information is available and update accordingly
+    if (updateOwnership) {
+      processedData.ownership = updatePincode.value;
+    }
+
+    // Set additional properties
+    processedData.Latitude = element.Lat;
+    processedData.Longitude = element.Log;
+    processedData.mappedPinCode = element.MappedAreaPinCode ? element.MappedAreaPinCode.split(',').map(pinCode => parseInt(pinCode.trim(), 10)) : [];
+    processedData.mappedCity = element.MappedAreaCity ? element.MappedAreaCity.split(',').map(pinCode => pinCode) : [];
+    processedData.mappedState = element.MappedAreaState ? element.MappedAreaState.split(',').map(pinCode => pinCode) : [];
+
+    // Set timestamp and user information
+    processedData.eNTDT = new Date();
+    processedData.eNTBY = this.storage.userName;
+    processedData.eNTLOC = this.storage.branch;
+
+    // Return the processed data
+    return processedData;
   }
   //#endregion
 }

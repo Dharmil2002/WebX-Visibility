@@ -5,6 +5,22 @@ export class FilterControl {
   constructor() {
     this.filterControlArray = [
       {
+        name: "start",
+        label: "SelectDateRange",
+        placeholder: "Select Date",
+        type: "daterangpicker",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+            support: "end",
+        },
+    }, 
+      {
         name: 'bookLoc',
         label: 'Booking Location',
         placeholder: 'Booking Location',
@@ -153,7 +169,27 @@ export class FilterControl {
           }
         ],
 
-      }
+      },
+      {
+        name: "end",
+        label: "",
+        placeholder: "Select Data Range",
+        type: "",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: [
+            {
+                name: "Select Data Range",
+            },
+            {
+                name: "required",
+                message: "StartDateRange is Required...!",
+            },
+        ],
+    },
     ];
 
   }

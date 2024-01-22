@@ -1,10 +1,10 @@
 // Import required modules and classes
 import { Component, HostListener, Inject, OnInit } from '@angular/core';
-import { rateDetailMapping } from './rate-utlity';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { getGeneric } from '../rake-update/rake-update-utility';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
+import { GenericService } from 'src/app/core/service/generic-services/generic-services';
+import { rakeUpdationModel } from 'src/app/Models/rake-updation/rake-updation';
 
 
 
@@ -42,46 +42,18 @@ export class RakeDetailComponent implements OnInit {
   width = '100vw';
   maxWidth: '232vw'
   // Column headers for the table
-  columnHeader = {
-    RakeNo: {
-      Title: "Rake No",
-      class: "matcolumncenter",
-      Style: "min-width:170px"
-    },
-    CNNo: {
-      Title: "CN No",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    BillingParty: {
-      Title: "Billing Party",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    FromToCity: {
-      Title: "From-To City",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    JobNo: {
-      Title: "Job No",
-      class: "matcolumncenter",
-      Style: "",
-    }
-  };
+  columnHeader = {};
 
   // List of static fields
   staticField = [
-    "RakeNo",
-    "CNNo",
-    "BillingParty",
-    "FromToCity",
-    "JobNo",
+    "code",
+    "name"
   ];
 
   // Constructor for the component
   constructor(@Inject(MAT_DIALOG_DATA) public item: any,
-  private masterService: MasterService, 
+  private rakeUpdation:rakeUpdationModel,
+  private genericService:GenericService,
   public dialogRef: MatDialogRef<GenericTableComponent> 
   ) { 
      this.getRateDetail(item);
@@ -92,9 +64,10 @@ export class RakeDetailComponent implements OnInit {
     // Initialize component properties and perform any necessary setup
   }
   async getRateDetail(item){
-   const getRakeDetail= await getGeneric(this.masterService,"rake_detail")
-    const rateDetail=await rateDetailMapping(getRakeDetail,item);
-    this.tableData=rateDetail;
+    const type=this.genericService.getSharedData();
+    this.columnHeader=this.rakeUpdation.getcolumnHeader(type.title);
+    this.tableData=item[type.title].flatMap((x)=>x).filter(item => typeof item === 'object' && item.code && item.name)
+    .map(item => ({ code: item.code, name: item.name }));
     this.tableLoad=false;
   }
   close(){

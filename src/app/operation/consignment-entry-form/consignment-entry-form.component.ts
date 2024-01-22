@@ -156,7 +156,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setGeneralMasterData(this.model.allformControl, this.deliveryTypes, "delivery_type");
     this.setGeneralMasterData(this.model.allformControl, this.wtUnits, "weight_in");
     this.setGeneralMasterData(this.model.allformControl, this.riskTypes, "risk");
-    this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
+   // this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
     const rateType = this.rateTypes.filter((x) => x.value != "RTTYP-0007");
     this.setGeneralMasterData(this.jsonControlArray, rateType, "freightRatetype");
     const prodCode = this.products.find((x) => x.name == "Road")?.value || "";
@@ -886,7 +886,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     setControlValue("packaging_type", docketDetails.packaging_type);
     setControlValue("weight_in", docketDetails.weight_in);
     setControlValue("delivery_type", docketDetails.delivery_type);
-    setControlValue("issuing_from", docketDetails.issuing_from);
+    //setControlValue("issuing_from", docketDetails.issuing_from);
 
     // Set Freight Table Form details.
     this.model.FreightTableForm.controls["freightRatetype"].setValue(docketDetails.freightRatetype);
@@ -1070,7 +1070,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "vendorType",
       "weight_in",
       "delivery_type",
-      "issuing_from",
+     // "issuing_from",
     ];
 
     controltabNames.forEach((controlName) => {
@@ -1137,7 +1137,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               { controlName: 'packaging_type', name: 'packaging_type_Name', value: 'packaging_type' },
               { controlName: 'risk', name: 'riskName', value: 'risk' },
               { controlName: 'delivery_type', name: 'delivery_type_Name', value: 'delivery_type' },
-              { controlName: 'issuing_from', name: 'issuing_from_Name', value: 'issuing_from' }
+             // { controlName: 'issuing_from', name: 'issuing_from_Name', value: 'issuing_from' }
             ]
           },
           {

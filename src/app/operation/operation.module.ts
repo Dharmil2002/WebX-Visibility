@@ -66,6 +66,7 @@ import { UpdateShipmentAmountComponent } from "./pending-billing/update-shipment
 import { BillSubmissionComponent } from "./pending-billing/bill-approval/submission/bill-submission/bill-submission.component";
 import { BillApprovalComponent } from "./pending-billing/bill-approval/bill-approval.component";
 import { JobViewPrintComponent } from './job-view-print/job-view-print.component';
+import { HandedOverUploadComponent } from './handed-over/handed-over-upload/handed-over-upload.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -110,7 +111,8 @@ import { JobViewPrintComponent } from './job-view-print/job-view-print.component
     UpdateShipmentAmountComponent,
     BillSubmissionComponent,
     BillApprovalComponent,
-    JobViewPrintComponent
+    JobViewPrintComponent,
+    HandedOverUploadComponent
     
     
   ],

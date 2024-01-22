@@ -1,0 +1,11 @@
+<!-- [downloadFunction]="Download"  -->
+<app-generic-bulk-upload 
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="fileUploadForm">
+            <div class="col">
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

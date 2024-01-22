@@ -79,7 +79,7 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'movementType', label: 'Movement Type', placeholder: 'Movement Type', type: 'Staticdropdown',
+        name: 'movementType', label: 'Cargo Type', placeholder: 'Cargo Type', type: 'Staticdropdown',
         value: [],
         Validations: [], generatecontrol: true, disable: false,
         additionalData: {
@@ -392,13 +392,13 @@ export class ConsignmentControl {
       //     metaData: "Basic",
       //   },
       // },
-      {
-        name: 'issuing_from', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
-        value: [], Validations: [], generatecontrol: true, disable: false,
-        additionalData: {
-          metaData: "Basic",
-        },
-      },
+      // {
+      //   name: 'issuing_from', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
+      //   value: [], Validations: [], generatecontrol: true, disable: false,
+      //   additionalData: {
+      //     metaData: "Basic",
+      //   },
+      // },
       {
         name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No', type: "dropdown",
         value: docketDetail.vehicleNo,
@@ -414,6 +414,18 @@ export class ConsignmentControl {
           showNameAndValue: false,
           metaData: "Basic",
         },
+      },
+      {
+        name: '',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: '',
+        Validations: [],
+        generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic"
+        }
       },
       {
         name: "cnbp",

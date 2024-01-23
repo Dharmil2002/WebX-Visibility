@@ -880,10 +880,13 @@ export class BalancePaymentComponent implements OnInit {
                 iGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTRate) || 0,
                 cGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTRate) || 0,
                 sGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTRate) || 0,
+                uGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTRate) || 0,
+                uGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0,
                 iGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0,
                 cGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
                 sGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
                 aMT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0,
+
               },
             }, BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
               return {

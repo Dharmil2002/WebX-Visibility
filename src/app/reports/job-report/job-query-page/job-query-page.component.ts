@@ -623,7 +623,9 @@ export class JobQueryPageComponent implements OnInit {
   }
 
   async save() {
-    let data = await this.jobRegisterService.getJobregisterReportDetail();
+    const startValue = new Date(this.jobQueryTableForm.controls.start.value);
+    const endValue = new Date(this.jobQueryTableForm.controls.end.value);
+    let data = await this.jobRegisterService.getJobregisterReportDetail(startValue,endValue);
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
       ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
       : [];
@@ -638,13 +640,9 @@ export class JobQueryPageComponent implements OnInit {
       const jobDet = jobNo.length === 0 || jobNo.includes(record.jobNo);
       const locDet = Location.length === 0 || Location.includes(record.jobLocation);
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
-      const startValue = new Date(this.jobQueryTableForm.controls.start.value);
-      const endValue = new Date(this.jobQueryTableForm.controls.end.value);
-      const entryTime = new Date(record.ojobDate);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
       // Return true if all conditions are met, indicating the record should be included in the result
-      return jobDet && locDet && cnoteno && isDateRangeValid;
+      return jobDet && locDet && cnoteno;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
     // const selectedData = filteredRecords;
@@ -661,7 +659,7 @@ export class JobQueryPageComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { ojobDate, jobLocation, ...rest } = record;
+      const { jobLocation, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Job-Summary-Report-${timeString}`, this.CSVHeader);

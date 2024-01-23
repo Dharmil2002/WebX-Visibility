@@ -84,11 +84,27 @@ export class CnwGstService {
      //      })
      //      return cnotegstList
      // }
-     async getCNoteGSTregisterReportDetail() {
+     async getCNoteGSTregisterReportDetail(start, end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "dockets",
-               filter: {}
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "dKTDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "dKTDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "job_details"
@@ -147,7 +163,6 @@ export class CnwGstService {
                const gstrt = (element?.gSTAMT || 0) / (element?.fRTRT || 1) + '%';
                let jobgstData = {
                     "docketNumber": element?.docNo || "",
-                    "odocketDate": element.dKTDT,
                     "docketDate": element?.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
                     "time": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
                     "edd": element.dKTDT ? (() => {

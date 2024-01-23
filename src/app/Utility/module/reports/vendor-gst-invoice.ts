@@ -13,11 +13,27 @@ export class VendorGSTInvoiceService {
           private storage: StorageService
      ) { }
 
-     async getvendorGstRegisterReportDetail() {
+     async getvendorGstRegisterReportDetail(start,end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "vend_bill_summary",
-               filter: {}
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "bDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "bDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
 
@@ -25,8 +41,7 @@ export class VendorGSTInvoiceService {
 
           res.data.map((element) => {
                
-               let vengstinvData = {
-                    "oentrydt": element.eNTDT,
+               let vengstinvData = { 
                     "SAC":element.gST.sACNM,
                     "DocumentType": element?.docNo || '',
                     "GSTRATE":element.gST.rATE||'',

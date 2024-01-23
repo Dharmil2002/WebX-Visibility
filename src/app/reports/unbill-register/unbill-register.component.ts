@@ -138,19 +138,16 @@ export class UnbillRegisterComponent implements OnInit {
   }
 
   async save() {
-    let data = await this.unbillRegisterService.getunbillRegisterReportDetail();
+    const startValue = new Date(this.unbillRegisTableForm.controls.start.value);
+    const endValue = new Date(this.unbillRegisTableForm.controls.end.value);
+    let data = await this.unbillRegisterService.getunbillRegisterReportDetail(startValue,endValue);
     const loc = Array.isArray(this.unbillRegisTableForm.value.locHandler)
       ? this.unbillRegisTableForm.value.locHandler.map(x => x.value)
       : [];
     const filteredRecords = data.filter(record => {
-      const des = loc.length === 0 || loc.includes(record.Destination);
-      const startValue = new Date(this.unbillRegisTableForm.controls.start.value);
-      const endValue = new Date(this.unbillRegisTableForm.controls.end.value);
-      const entryTime = new Date(record.odKTDT);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
+      const des = loc.length === 0 || loc.includes(record.Destination); 
 
-      return isDateRangeValid && des
+      return des
     });
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {
@@ -165,11 +162,11 @@ export class UnbillRegisterComponent implements OnInit {
       }
       return;
     }
-    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { odKTDT, ...rest } = record;
-      return rest;
-    });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
+    // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+    //   const { odKTDT, ...rest } = record;
+    //   return rest;
+    // });
+    exportAsExcelFile(filteredRecords, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
    }
 
   functionCallHandler($event) {

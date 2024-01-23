@@ -13,11 +13,27 @@ export class SalesRegisterService {
           private storage: StorageService
      ) { }
 
-     async getsalesRegisterReportDetail() {
+     async getsalesRegisterReportDetail(start, end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "dockets",
-               filter: {}
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "dKTDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "dKTDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "cust_contract"
@@ -148,7 +164,6 @@ export class SalesRegisterService {
                     Consigneegst = customerConsigneedet.GSTdetails[0].gstNo
                }
                let salesData = {
-                    "ocNOTEDT": element?.dKTDT,
                     "cNOTENO": element?.docNo || '',
                     "cNOTEDT": element?.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
                     "tIME": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT

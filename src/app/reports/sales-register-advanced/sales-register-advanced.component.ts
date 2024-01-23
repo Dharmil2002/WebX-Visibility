@@ -407,7 +407,9 @@ export class SalesRegisterAdvancedComponent implements OnInit {
   }
 
   async save() {
-    let data = await this.salesRegisterService.getsalesRegisterReportDetail();
+    const startValue = new Date(this.salesregisterTableForm.controls.start.value);
+    const endValue = new Date(this.salesregisterTableForm.controls.end.value);
+    let data = await this.salesRegisterService.getsalesRegisterReportDetail(startValue, endValue);
     const fromloc = Array.isArray(this.salesregisterTableForm.value.fromlocHandler)
       ? this.salesregisterTableForm.value.fromlocHandler.map(x => x.value)
       : [];
@@ -433,12 +435,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       const booktpDet = bookingtype.length === 0 || bookingtype.includes(record.booktp);
       const cnoteDet = cnote.length === 0 || cnote.includes(record.cNOTENO);
       const tranmodeDet = transitmode.length === 0 || transitmode.includes(record.tRANMODE);
-      const startValue = new Date(this.salesregisterTableForm.controls.start.value);
-      const endValue = new Date(this.salesregisterTableForm.controls.end.value);
-      const entryTime = new Date(record.ocNOTEDT);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return origin && dest && paytpDet && booktpDet && cnoteDet && tranmodeDet && isDateRangeValid;
+      return origin && dest && paytpDet && booktpDet && cnoteDet && tranmodeDet;
     })
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {
@@ -454,7 +452,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { ocNOTEDT,destin,origin,booktp, ...rest } = record;
+      const { destin, origin, booktp, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Sales_Register_Advance_Report-${timeString}`, this.CSVHeader);

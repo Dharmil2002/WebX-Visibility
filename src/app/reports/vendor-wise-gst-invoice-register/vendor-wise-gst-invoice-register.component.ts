@@ -200,19 +200,16 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
   }
 
   async save() {
-    let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail();
+    const startValue = new Date(this.vendorgstregisTableForm.controls.start.value);
+    const endValue = new Date(this.vendorgstregisTableForm.controls.end.value);
+    let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(startValue, endValue);
     const sacData = Array.isArray(this.vendorgstregisTableForm.value.saccdHandler)
       ? this.vendorgstregisTableForm.value.saccdHandler.map(x => x.name)
       : [];
     const filteredRecords = data.filter(record => {
       const sacDet = sacData.length === 0 || sacData.includes(record.sac);
-      const startValue = new Date(this.vendorgstregisTableForm.controls.start.value);
-      const endValue = new Date(this.vendorgstregisTableForm.controls.end.value);
-      const entryTime = new Date(record.oentrydt);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid && sacDet;
+      return sacDet;
     });
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {
@@ -227,11 +224,11 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       }
       return;
     }
-    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { oentrydt, ...rest } = record;
-      return rest;
-    });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
+    // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+    //   const { ...rest } = record;
+    //   return rest;
+    // });
+    exportAsExcelFile(filteredRecords, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

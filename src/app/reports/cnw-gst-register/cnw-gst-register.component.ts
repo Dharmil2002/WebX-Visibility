@@ -232,8 +232,10 @@ export class CnwGstRegisterComponent implements OnInit {
   }
 
   async save() {
+    const startValue = new Date(this.cnoteTableForm.controls.start.value);
+    const endValue = new Date(this.cnoteTableForm.controls.end.value);
     // Fetch data from the service
-    let data = await this.cnwGstService.getCNoteGSTregisterReportDetail();
+    let data = await this.cnwGstService.getCNoteGSTregisterReportDetail(startValue, endValue);
     // Extract selected values from the form
     const payment = Array.isArray(this.cnoteTableForm.value.payTypeHandler)
       ? this.cnoteTableForm.value.payTypeHandler.map(x => x.name)
@@ -266,13 +268,7 @@ export class CnwGstRegisterComponent implements OnInit {
       const fromLocDet = fromLocation.length === 0 || fromLocation.includes(record.oRGN);
       const toLocDet = toLocation.length === 0 || toLocation.includes(record.dEST);
 
-      const startValue = new Date(this.cnoteTableForm.controls.start.value);
-      const endValue = new Date(this.cnoteTableForm.controls.end.value);
-      const entryTime = new Date(record.odocketDate);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
-
-      return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet && isDateRangeValid && custDet;
+      return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet && custDet;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
     // const selectedData = filteredRecords;
@@ -289,7 +285,7 @@ export class CnwGstRegisterComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { odocketDate, tCT, fCT, oRGN, dEST, cSGNNM, ...rest } = record;
+      const { tCT, fCT, oRGN, dEST, cSGNNM, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);

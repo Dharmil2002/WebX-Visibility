@@ -12,11 +12,27 @@ export class UnbillRegisterService {
           private masterServices: MasterService,
           private storage: StorageService
      ) { }
-     async getunbillRegisterReportDetail() {
+     async getunbillRegisterReportDetail(start,end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "dockets",
-               filter: {}
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "dKTDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "dKTDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "job_details"
@@ -33,8 +49,7 @@ export class UnbillRegisterService {
                     CHANo = chaDet.cHAID
                }
 
-               let unbillData = {
-                    "odKTDT": element?.dKTDT,
+               let unbillData = { 
                     "DocketNo": element?.docNo || '',
                     "DocketDate": formatDocketDate(element?.dKTDT || ''),
                     "Origin": element?.oRGN || "",

@@ -15,12 +15,27 @@ export class JobRegisterService {
         private storage: StorageService
     ) { }
 
-    async getJobregisterReportDetail() {
-
+    async getJobregisterReportDetail(start, end) {
+        const startValue = start;
+        const endValue = end;
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "job_header",
-            filter: {}
+            filter: {
+                cID: this.storage.companyCode,
+                "D$and": [
+                    {
+                        "jDT": {
+                            "D$gte": startValue
+                        }
+                    },
+                    {
+                        "jDT": {
+                            "D$lte": endValue
+                        }
+                    }
+                ]
+            }
         }
         const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
         reqBody.collectionName = "job_details"
@@ -58,7 +73,6 @@ export class JobRegisterService {
             const charWeight = docketsDet ? docketsDet.map(entry => entry.cHRWT).join(', ') : "";
             let jobData = {
                 "jobNo": element?.jID || '',
-                "ojobDate": element.jDT,
                 "jobDate": formatDocketDate(element?.jDT || new Date()),
                 "cNoteNumber": docketsNumbers,
                 "cNoteDate": formatDocketDate(docketDates ? docketDates.split(', ')[0] : new Date()),

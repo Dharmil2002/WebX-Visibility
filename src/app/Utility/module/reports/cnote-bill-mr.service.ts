@@ -15,11 +15,27 @@ export class CnoteBillMRService {
           private storage: StorageService
      ) { }
 
-     async getCNoteBillMRReportDetail() {
+     async getCNoteBillMRReportDetail(start, end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "dockets",
-               filter: { cID: this.storage.companyCode }
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "dKTDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "dKTDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "cust_bill_headers"
@@ -48,6 +64,8 @@ export class CnoteBillMRService {
           });
           let cnotebillList = [];
           res.data.map((element) => {
+                    
+
                const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
                const relevantCharges = docketCharges.filter(charge => charge.dKTNO === element?.dKTNO);
                const custBillHeaderDet = rescustBillHeaders.data ? rescustBillHeaders.data.find((entry) => entry.bILLNO === custBillDet?.bILLNO) : null;
@@ -114,29 +132,6 @@ export class CnoteBillMRService {
                     billColAt = custbillcollDet.lOC;
                     mrNo = custbillcollDet.mRNO
                }
-               // dockets
-               // if (docDet) {
-               //      deliveryType = docDet.dELTYN
-               //      pAYBAS = docDet.pAYTYPNM
-               //      vehNo = docDet.vEHNO
-               //      billPartyNM = docDet.bPARTYNM
-               //      docketeditDt = docDet.eNTDT
-               //      moveType = docDet.mODNM
-               //      TransMode = docDet.tRNMODNM
-               //      DocketDt = docDet.dKTDT
-               //      fromCity = docDet.fCT
-               //      toCity = docDet.tCT
-               //      actualWeight = docDet.aCTWT
-               //      packs = docDet.pKGS
-               //      chargedWeight = docDet.cHRWT
-               //      cubicWeight = docDet.cFTWT
-               //      riskType = docDet.rSKTYN
-               //      gstAmt = docDet.gSTAMT
-               //      FRTRt = docDet.fRTRT
-               //      FRTRtType = docDet.fRTRTYN
-               //      otherChar = docDet.oTHAMT
-               //      freigthAmt = docDet.fRTAMT
-               // }
                if (docinvDet) {
                     invNo = docinvDet.iNVNO
                     invDt = docinvDet.eNTDT
@@ -150,7 +145,6 @@ export class CnoteBillMRService {
                     contParty = custcontractDet.cUSTNM
                }
                let cnotebillData = {
-                    "oeNTDT": element.eNTDT,
                     "bOOKINGTPE": element.dELTYN || '',
                     "dEST": element?.dEST,
                     "oRGN": element?.oRGN,
@@ -176,7 +170,7 @@ export class CnoteBillMRService {
                     "mRNETAMT": "0.00",
                     "mRSTAT": "",
                     "dEMCHAR": "0.00",
-                    "cNOTENO": element?.dKTNO || "",
+                    "cNOTENO": element.dKTNO || '',
                     "cNOTEDT": element.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
                     "tIME": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
                     "eDD": element.dKTDT ? (() => {
@@ -202,7 +196,7 @@ export class CnoteBillMRService {
                     "mOVTYPE": element.mODNM || '',
                     "tRANMODE": element.tRNMODNM || '',
                     // "sTAT": element?.bSTSNM || '',
-                    "sTAT": "Stock avaiable @ " + element?.dEST,
+                    "sTAT": "Stock avaiable @ " + element?.dEST || '',
                     "lOADTPE": "FTL",
                     "rEM": "",
                     "bILLAT": billLoc || '',

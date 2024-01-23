@@ -530,7 +530,6 @@ export const ROUTES: RouteInfo[] =
       }
       ],
     },
-
     {
       path: "",
       title: "Finance",
@@ -619,6 +618,97 @@ export const ROUTES: RouteInfo[] =
           groupTitle: false,
           submenu: []
         }
+      ],
+    },
+    {
+      path: "",
+      title: "Reports",
+      moduleName: "Reports",
+      icon: "pie-chart",
+      class: "menu-toggle",
+      groupTitle: false,
+      submenu: [
+        {
+          "path": "Reports/job-query",
+          "title": "Job Register Report",
+          "moduleName": "Job Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/cnote-GST-register",
+          "title": "Consignment Note GST Register Report",
+          "moduleName": "Consignment Note GST Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/cnote-Bill-MR-Report",
+          "title": "Consignment Note Bill MR Register Report",
+          "moduleName": "Consignment Note Bill MR Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/sales-register-report",
+          "title": "Sales Register Advanced Report",
+          "moduleName": "Sales Register Advanced Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/vendor-wise-gst-invoice-register-report",
+          "title": "Vendor Wise GST Invoice Register Report",
+          "moduleName": "Vendor Wise GST Invoice Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/customer-wise-gst-invoice-register-report",
+          "title": "Customer wise GST Invoice Register Report",
+          "moduleName": "Customer wise GST Invoice Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/unbilled-register-report",
+          "title": "UnBilled Register Report",
+          "moduleName": "UnBilled Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/customer-outstanding-report",
+          "title": "Customer Outstanding Register Report",
+          "moduleName": "Customer Outstanding Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/vendor-wise-outstanding-report",
+          "title": "Vendor Wise Outstanding Report",
+          "moduleName": "Vendor Wise Outstanding Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
       ],
     },
   ]

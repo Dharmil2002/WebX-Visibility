@@ -160,6 +160,10 @@ export class BalancePaymentComponent implements OnInit {
   AlljsonControlVendorBalanceTaxationTDSFilterArray: any;
   IsModifyAction = false;
   GSTSACcodeData: any;
+
+  DebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
+  jsonControlDebitVoucherTaxationPaymentSummaryArray: any;
+
   constructor(
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -274,7 +278,34 @@ export class BalancePaymentComponent implements OnInit {
     this.PaymentHeaderFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlPaymentHeaderFilterArray,
     ]);
+
+    this.jsonControlDebitVoucherTaxationPaymentSummaryArray = this.vendorBalancePaymentControl.getVendorBalancePaymentSummaryArrayControls();
+    this.DebitVoucherTaxationPaymentSummaryForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherTaxationPaymentSummaryArray]);
+
+
     this.BindDropDowns();
+  }
+  OnChangeCheckBox(event) {
+    const TotalPaymentAmount = this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
+    const netPayable = event?.event?.checked ? Math.ceil(TotalPaymentAmount) : TotalPaymentAmount;
+    this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(netPayable);
+  }
+  CalculatePaymentAmount() {
+    const TotalTHCamount = this.tableData
+      .filter(x => x.isSelected)
+      .reduce((sum, x) => sum + parseInt(x.THCamount), 0);
+
+    let TDSAmount = parseFloat(this.VendorBalanceTaxationTDSFilterForm.controls.TDSAmount.value) || 0;
+    let GSTAmount = parseFloat(this.VendorBalanceTaxationGSTFilterForm.controls.GSTAmount.value) || 0;
+
+
+    const CalculatedSumWithTDS = TotalTHCamount - parseFloat(TDSAmount.toFixed(2));;
+    const CalculatedSum = CalculatedSumWithTDS + parseFloat(GSTAmount.toFixed(2));;
+    const formattedCalculatedSum = CalculatedSum.toFixed(2);
+
+    this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").setValue(formattedCalculatedSum);
+    this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(formattedCalculatedSum);
+
   }
   BindDropDowns() {
     this.jsonControlVendorBalanceTaxationTDSFilterArray.forEach((data) => {
@@ -570,6 +601,7 @@ export class BalancePaymentComponent implements OnInit {
       this.VendorBalanceTaxationTDSFilterForm.controls["TDSAmount"].setValue(
         TDSamount
       );
+      this.CalculatePaymentAmount();
     }
   }
 
@@ -640,6 +672,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     this.TDSSectionFieldChanged();
     this.StateChange();
+    this.CalculatePaymentAmount();
   }
 
   BeneficiarydetailsViewFunctions(event) {
@@ -721,6 +754,7 @@ export class BalancePaymentComponent implements OnInit {
     this.VendorBalanceTaxationGSTFilterForm.get("GSTAmount").setValue(
       (+GSTCalculateAmount * GSTinput.length).toFixed(2)
     );
+    this.CalculatePaymentAmount();
   }
 
   RedirectToTHCPayment() {
@@ -793,6 +827,9 @@ export class BalancePaymentComponent implements OnInit {
         "Please Select Atleast One THC"
       );
     } else {
+      const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+      const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+      const RoundOffAmount = NetPayable - PaymentAmount;
       this.snackBarUtilityService.commonToast(async () => {
         try {
           const vendorBillEntry: VendorBillEntry = {
@@ -809,9 +846,9 @@ export class BalancePaymentComponent implements OnInit {
               gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.VGSTNumber.value,
               tHCAMT: this.THCamount,
               aDVAMT: this.AdvanceTotal,
-              bALAMT: this.BalancePending,
-              rOUNOFFAMT: 0,
-              bALPBAMT: generateVoucher == true ? 0 : this.BalancePending,
+              bALAMT: NetPayable,
+              rOUNOFFAMT: RoundOffAmount,
+              bALPBAMT: generateVoucher == true ? 0 : NetPayable,
               bSTAT: generateVoucher == true ? 4 : 1,
               bSTATNM: generateVoucher == true ? "Paid" : "Awaiting Approval",
               eNTDT: new Date(),
@@ -904,12 +941,15 @@ export class BalancePaymentComponent implements OnInit {
           return this.snackBarUtilityService.ShowCommonSwal("error", "Please Fill Payment Details");
         }
 
-        const PaymentAmount = parseFloat(
-          this.THCamount.toFixed(2)
-        );
-        const NetPayable = parseFloat(
-          this.THCamount.toFixed(2)
-        );
+        // const PaymentAmount = parseFloat(
+        //   this.THCamount.toFixed(2)
+        // );
+        // const NetPayable = parseFloat(
+        //   this.THCamount.toFixed(2)
+        // );
+        const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+        const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+        const RoundOffAmount = NetPayable - PaymentAmount;
 
         this.debitVoucherRequestModel.companyCode = this.companyCode;
         this.debitVoucherRequestModel.docType = "VR";
@@ -956,7 +996,7 @@ export class BalancePaymentComponent implements OnInit {
 
         this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
         this.debitVoucherDataRequestModel.netPayable = NetPayable;
-        this.debitVoucherDataRequestModel.roundOff = 0;
+        this.debitVoucherDataRequestModel.roundOff = RoundOffAmount;
         this.debitVoucherDataRequestModel.voucherCanceled = false;
 
         this.debitVoucherDataRequestModel.paymentMode =

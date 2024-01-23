@@ -5,6 +5,7 @@ export class VendorBalancePaymentControl {
   VendorBalanceTaxationGSTArray: FormControls[];
   VendorBalanceSummaryArray: FormControls[];
   VendorBalanceTaxationPaymentDetailsArray: FormControls[];
+  VendorBalanceTaxationPaymentSummaryArray: FormControls[];
   constructor(FormValues) {
     this.VendorBalanceTaxationTDSArray = [
       {
@@ -632,7 +633,35 @@ export class VendorBalancePaymentControl {
         },
       },
     ];
+    this.VendorBalanceTaxationPaymentSummaryArray = [
+      {
+        name: 'PaymentAmount',
+        label: 'Payment Amount ₹',
+        placeholder: 'Payment Amount ₹',
+        type: 'number',
+        value: "",
+        Validations: [],
+        generatecontrol: true, disable: true,
+        additionalData: {
+          metaData: "PaymentAmount"
+        }
+      },
+
+      {
+        name: 'NetPayable',
+        label: 'Net Payable ₹',
+        placeholder: 'Net Payable ₹',
+        type: 'number',
+        value: "",
+        Validations: [],
+        generatecontrol: true, disable: true,
+        additionalData: {
+          metaData: "NetPayable"
+        }
+      },
+    ];
   }
+
   getVendorBalanceTaxationTDSArrayControls() {
     return this.VendorBalanceTaxationTDSArray;
   }
@@ -647,5 +676,8 @@ export class VendorBalancePaymentControl {
   }
   getTPaymentHeaderFilterArrayControls() {
     return this.PaymenBalanceFilterArray;
+  }
+  getVendorBalancePaymentSummaryArrayControls() {
+    return this.VendorBalanceTaxationPaymentSummaryArray;
   }
 }

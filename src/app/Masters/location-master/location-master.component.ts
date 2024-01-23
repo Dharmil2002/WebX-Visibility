@@ -40,9 +40,10 @@ export class LocationMasterComponent implements OnInit {
     'actions': 'max-width:8%'
   };
   headerForCsv = {
-    "srNo": "Sr No",
     'locCode': 'Location Code',
     'locName': 'Location Name',
+    '': "Location Hirarchay",
+    'ownership': 'Location Ownership',
     'locAddress': 'Location Address',
     'reportLoc': 'Reporting Location',
     "activeFlag": "Active Status",
@@ -128,6 +129,7 @@ export class LocationMasterComponent implements OnInit {
 
         // Assign the modified and sorted data back to this.csv
         this.csv = modifiedData;
+        console.log(this.csv);
         this.tableLoad = false;
       } catch (error) {
         console.error("Error processing user data:", error);
@@ -169,8 +171,8 @@ export class LocationMasterComponent implements OnInit {
       this.getLocationDetails();
     }
   }
-   //#region to call upload function
-   upload() {
+  //#region to call upload function
+  upload() {
     const dialogRef = this.dialog.open(this.uploadComponent, {
       width: "800px",
       height: "500px",

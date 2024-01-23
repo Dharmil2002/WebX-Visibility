@@ -63,6 +63,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() centerAligned;
   @Input() columnWidths: { [key: string]: string };
   @Output() functionCallEmitter = new EventEmitter();
+  @Output() uploadEvent = new EventEmitter<any>();
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
@@ -167,14 +168,11 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   }
   //#endregion
 
-  //#region Funtion to open Dialog for bulkUpload
+  //#region to emit function to open Dialog for bulkUpload
   onUploadClick() {
-    this.dialog.open(
-      this.uploadComponent,
-      {
-        width: '800px',
-        height: '500px',
-      });
+    if (this.uploadComponent) {
+      this.uploadEvent.emit()
+    }
   }
   //#endregion
 

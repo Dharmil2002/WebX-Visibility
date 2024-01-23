@@ -171,6 +171,7 @@ import { ShardProductChargesComponent } from './shard-product/shard-product-char
 import { ShardProductServicesComponent } from './shard-product/shard-product-services/shard-product-services.component';
 import { ShardProductAddComponent } from './shard-product/shard-product-add/shard-product-add.component';
 import { UploadLocationComponent } from './location-master/upload-location/upload-location.component';
+import { AddressService } from "../Utility/module/masters/Address/address.service";
 @NgModule({
   imports: [
     CommonModule,
@@ -371,6 +372,7 @@ import { UploadLocationComponent } from './location-master/upload-location/uploa
     StateService,
     SessionService,
     EncryptionService,
+    AddressService
   ],
 })
 export class MastersModule {}

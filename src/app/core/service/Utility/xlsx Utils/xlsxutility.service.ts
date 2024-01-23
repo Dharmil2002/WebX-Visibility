@@ -89,24 +89,25 @@ export class xlsxutilityService {
     // Check if there is at least one element without errors and rules are provided
     if (filteredDataWithoutErrors.length > 0 && rules.length > 0) {
 
-      // Find the rule that has "DuplicateFromList" validation for the "Location" field
-      const duplicateRule = rules.find(rule => rule.Validations.some(validation => 'DuplicateFromList' in validation));
+      // Find the rule that has "DuplicateFromList" validation for the specified field
+      const duplicateRules = rules.filter(rule => rule.Validations.some(validation => 'DuplicateFromList' in validation));
 
-      if (duplicateRule) {
+      // Iterate through each duplicate rule
+      duplicateRules.forEach((duplicateRule) => {
         const existingLocations = new Set();
 
-        // Iterate through filteredDataWithoutErrors to find duplicates in the "Location" field
+        // Iterate through filteredDataWithoutErrors to find duplicates in the specified field
         filteredDataWithoutErrors.forEach((item) => {
-          const location = item[duplicateRule.ItemsName];
+          const fieldValue = item[duplicateRule.ItemsName];
 
-          if (existingLocations.has(location)) {
+          if (existingLocations.has(fieldValue)) {
             item.error = item.error || [];
             item.error.push(`Duplicate Entry.`);
           } else {
-            existingLocations.add(location);
+            existingLocations.add(fieldValue);
           }
         });
-      }
+      });
     }
 
     return forkJoin(validationObservables).pipe(

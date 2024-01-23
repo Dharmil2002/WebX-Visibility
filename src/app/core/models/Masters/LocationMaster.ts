@@ -30,7 +30,7 @@ export class LocationMaster {
   constructor(LocationMaster) {
     {
       this.locLevel = LocationMaster.locLevel || '';
-      this.reportTo = LocationMaster.reportTo || '';
+      //this.reportTo = LocationMaster.reportTo || '';
       this.reportLoc = LocationMaster.reportLoc || '';
       this.locCode = LocationMaster.locCode || '';
       this.locName = LocationMaster.locName || '';
@@ -40,7 +40,7 @@ export class LocationMaster {
       this.locStateId = LocationMaster.locStateId || 0;
       this.locCity = LocationMaster.locCity || '';
       this.ownership = LocationMaster.ownership || '';
-      this.locZone = LocationMaster.locZone || '';
+      //this.locZone = LocationMaster.locZone || '';
       this.activeFlag = LocationMaster.activeFlag || false;
       this.Latitude = LocationMaster.latitude || '';
       this.Longitude = LocationMaster.longitude || '';

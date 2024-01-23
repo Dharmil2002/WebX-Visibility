@@ -88,7 +88,7 @@ export class RakeEntryControl {
                     onModel:"getVendors",
                 },
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 }
             },
             {

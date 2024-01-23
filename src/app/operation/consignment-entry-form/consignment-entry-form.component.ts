@@ -509,7 +509,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           "containerNumber",
           false
         );
-        debugger
         const containerNumber = this.model.containerTableForm.get('containerNumber');
         containerNumber.setValidators([Validators.required, autocompleteObjectValidator()]);
         containerNumber.updateValueAndValidity();
@@ -916,8 +915,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         x.invoiceAmount = x.iNVAMT;
         x.noofPkts = x.pKGS;
         x.materialName = x.mTNM;
-        x.actualWeight = x.aCTWT;
-        x.chargedWeight = x.cHRWT;
+        x.actualWeight = (parseFloat(x.aCTWT) / 1000).toString();
+        x.chargedWeight = (parseFloat(x.cHRWT) / 1000).toString();
         x.invoice = true;
         x.expiryDateO = x.eXPDT;
         x.actions = ["Edit", "Remove"];
@@ -1186,6 +1185,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       let invDet = [];
       let contDet = [];
       invoiceDetails.invoiceDetails.forEach(i => {
+        const actualWeight = parseFloat(i.actualWeight)  * 1000;
+        const chargedWeight = parseFloat(i.chargedWeight)  * 1000;
         invDet.push({
           cID: this.storage.companyCode,
           //dKTNO:  //To be set from service
@@ -1196,9 +1197,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           eXPDT: i.expiryDateO,
           pKGS: (parseInt(i.noofPkts) || 0),
           mTNM: i.materialName,
-          aCTWT: (parseFloat(i.actualWeight) || 0),
+          aCTWT: actualWeight,
           cFTWT: 0,
-          cHRWT: (parseFloat(i.chargedWeight) || 0),
+          cHRWT: chargedWeight,
           vOL: {
             uNIT: "FT",
             l: 0.000,

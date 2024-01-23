@@ -84,13 +84,28 @@ export class ProductShardControls {
       },
       {
         name: "ChargesType",
-        label: "",
+        label: "Charges Type:-",
         placeholder: "",
         type: "radiobutton",
         value: [
           { value: "V", name: "Vendor", checked: true },
           { value: "C", name: "Customer" },
           { value: "B", name: "Both" },
+        ],
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
+
+      {
+        name: "ChargesBooktype",
+        label: "",
+        placeholder: "",
+        type: "radiobutton",
+        value: [
+          { value: "Booking", name: "Booking", checked: true },
+          { value: "Delivery", name: "Delivery" },
+          { value: "Both", name: "Both" },
         ],
         Validations: [],
         generatecontrol: true,

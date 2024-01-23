@@ -302,7 +302,7 @@
                   </ng-container>
                   <!--Radio Button-->
                   <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-                    <mat-label>{{formItem.label}}</mat-label>&nbsp;
+                    <mat-label><b style="margin-left: 12px;"> {{formItem.label}}</b></mat-label>&nbsp;
                     <mat-radio-group [formControlName]="formItem.name"
                       (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
                       <mat-radio-button style=" margin: auto 5px; margin-top: 15px;"

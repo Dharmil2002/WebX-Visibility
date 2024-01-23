@@ -110,6 +110,7 @@ export class ShardProductChargesComponent implements OnInit {
       this.TableForm.controls["ChargesName"].setValue(this.UpdatedData.cHNM);
       this.TableForm.controls["ChargesType"].setValue(this.UpdatedData.cHTY);
       this.TableForm.controls["ChargesID"].setValue(this.UpdatedData.cHCD);
+      this.TableForm.controls["ChargesBooktype"].setValue(this.UpdatedData.cHBTY);
     }
   }
   async GetTableData() {
@@ -138,9 +139,11 @@ export class ShardProductChargesComponent implements OnInit {
     }
   }
   async save() {
+    console.log('this.TableForm.value.ChargesBooktype' ,this.TableForm.value.ChargesBooktype)
     const Body = {
       cHNM: this.TableForm.value.ChargesName,
       cHTY: this.TableForm.value.ChargesType,
+      cHBTY: this.TableForm.value.ChargesBooktype,
       mODDT: new Date(),
       mODBY: localStorage.getItem("UserName"),
       aCTV: true,
@@ -173,31 +176,31 @@ export class ShardProductChargesComponent implements OnInit {
       data: this.isUpdate ? undefined : Body,
     };
 
-    // const res = this.isUpdate
-    //   ? await firstValueFrom(
-    //       this.masterService.masterPut("generic/update", req)
-    //     )
-    //   : await firstValueFrom(
-    //       this.masterService.masterPost("generic/create", req)
-    //     );
+    const res = this.isUpdate
+      ? await firstValueFrom(
+          this.masterService.masterPut("generic/update", req)
+        )
+      : await firstValueFrom(
+          this.masterService.masterPost("generic/create", req)
+        );
 
-    // if (res?.success) {
-    //   Swal.fire({
-    //     icon: "success",
-    //     title: "Data inserted Successful",
-    //     text: res.message,
-    //     showConfirmButton: true,
-    //   });
-    //   this.GetTableData();
-    //   this.Tabletab = !this.Tabletab;
-    // } else {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Data not inserted",
-    //     text: res.message,
-    //     showConfirmButton: true,
-    //   });
-    // }
+    if (res?.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Data inserted Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+      this.GetTableData();
+      this.Tabletab = !this.Tabletab;
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Data not inserted",
+        text: res.message,
+        showConfirmButton: true,
+      });
+    }
   }
   close() {
     this.dialogRef.close({ isSuccess: false });

@@ -23,6 +23,10 @@ export class LocationMaster {
   mappedPinCode: any;
   pincodeHandler: any[]
   gstNumber: string;
+  companyCode: number;
+  eNTBY: string;
+  eNTLOC: string;
+  eNTDT: Date;
   constructor(LocationMaster) {
     {
       this.locLevel = LocationMaster.locLevel || '';

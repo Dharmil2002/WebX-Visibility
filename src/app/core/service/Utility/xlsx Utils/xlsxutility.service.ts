@@ -24,7 +24,7 @@ export class xlsxutilityService {
             errors.push(`${rule.ItemsName} is required.`);
           }
           // Perform case-insensitive and type-insensitive comparison for TakeFromList
-          if ("TakeFromList" in validation && !validation.TakeFromList.some(listItem =>
+          if ("TakeFromList" in validation && value && !validation.TakeFromList.some(listItem =>
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} is not in the allowed list.`);
           }
@@ -101,7 +101,7 @@ export class xlsxutilityService {
 
           if (existingLocations.has(location)) {
             item.error = item.error || [];
-            item.error.push(`Duplicate Entry for Location.`);
+            item.error.push(`Duplicate Entry.`);
           } else {
             existingLocations.add(location);
           }

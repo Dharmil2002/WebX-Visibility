@@ -171,6 +171,8 @@ import { ShardProductChargesComponent } from './shard-product/shard-product-char
 import { ShardProductServicesComponent } from './shard-product/shard-product-services/shard-product-services.component';
 import { ShardProductAddComponent } from './shard-product/shard-product-add/shard-product-add.component';
 import { UploadLocationComponent } from './location-master/upload-location/upload-location.component';
+import { ContainerStatusListComponent } from "./container-status-update/container-status-list/container-status-list.component";
+import { AddContainerStatusComponent } from "./container-status-update/add-container-status/add-container-status.component";
 import { AddressService } from "../Utility/module/masters/Address/address.service";
 @NgModule({
   imports: [
@@ -358,6 +360,8 @@ import { AddressService } from "../Utility/module/masters/Address/address.servic
     ShardProductServicesComponent,
     ShardProductAddComponent,
     UploadLocationComponent,
+    ContainerStatusListComponent,
+    AddContainerStatusComponent
   ],
 
   providers: [
@@ -371,8 +375,8 @@ import { AddressService } from "../Utility/module/masters/Address/address.servic
     PinCodeService,
     StateService,
     SessionService,
+    AddressService,
     EncryptionService,
-    AddressService
   ],
 })
 export class MastersModule {}

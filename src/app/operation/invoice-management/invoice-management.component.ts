@@ -166,6 +166,7 @@ export class InvoiceManagementComponent implements OnInit {
   }
    getKpiCount() {
     const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
+   // const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
     const createShipDataObject = (
       count: number,
       title: string,

@@ -191,13 +191,13 @@ export class JobEntryPageComponent implements OnInit {
     this.blTableForm = formGroupBuilder(this.fb, [this.jsonFormBlControls]);
     this.jobEntryTableForm.controls['transportedBy'].setValue('T01');
     this.jobEntryTableForm.controls['jobType'].setValue('J02');
+    this.getDropDownDetail();
 
   }
 
   async autoFillJobDetails() {
     this.jobTableLoad = true
     const { jobHeader, jobChallan } = await this.jobEntryService.getjobDetailsByJob(this.jobDetails.jobNo);
-    //transportMode: 'tMODE',
     if (jobHeader) {
       const fields = {
         jobId: 'jID',
@@ -228,7 +228,7 @@ export class JobEntryPageComponent implements OnInit {
         }
       });
     }
-    this.jobEntryTableForm.controls['tMODE'].setValue({name:jobHeader?.tMODENM||"",value:jobHeader?.tMODE||""});
+    this.jobEntryTableForm.controls['transportedBy'].setValue({name:jobHeader?.tMODENM||"",value:jobHeader?.tMODE||""});
     if (jobChallan.length > 0) {
       let challan = [];
       jobChallan.forEach((element, index) => {
@@ -261,6 +261,7 @@ export class JobEntryPageComponent implements OnInit {
       this.isBlLoad = false;
       this.jobTableLoad = false;
     }
+    
   }
   async getDropDownDetail() {
     if (this.isUpdate) { this.autoFillJobDetails() }
@@ -291,7 +292,6 @@ export class JobEntryPageComponent implements OnInit {
         this.jobEntryTableForm.controls['transportMode'].disable();
         const remove = ['exportType'];
         this.jsonJobFormControls = this.jsonAllJobControls.filter((x) => !remove.includes(x.name));
-        console.log(this.jsonFormBlControls + "First Case");
         break;
       case "T01":
         this.jobEntryTableForm.controls['transportMode'].enable();

@@ -416,7 +416,7 @@ export class ConsignmentControl {
         },
       },
       {
-        name: '',
+        name: 'test',
         label: '',
         placeholder: '',
         type: '',

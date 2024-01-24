@@ -144,7 +144,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.rateTypes = await this.generalService.getGeneralMasterData("RTTYP");
     this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
     this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
-    this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
+   // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
 
     // Find the form control with the name 'packaging_type'
@@ -489,39 +489,41 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*End*/
   async ContainerNumbersSetup() {
-    if (this.model.consignmentTableForm.controls["cd"].value == true) {
-
-      this.jsonContainerDetail.forEach((x) => {
-        if (x.name === "containerNumber") {
-          x.type = this.model.consignmentTableForm.value.vendorType == "1" ? "dropdown" : "text";
+    const consignmentForm = this.model.consignmentTableForm;
+    const containerForm = this.model.containerTableForm;
+    if (consignmentForm.controls["cd"].value) {
+      this.jsonContainerDetail.forEach(detail => {
+        if (detail.name === "containerNumber") {
+          detail.type = ["1", "4"].includes(consignmentForm.value.vendorType) ? "dropdown" : "text";
         }
       });
-      console.log(this.jsonContainerDetail)
-      if (this.model.consignmentTableForm.value.vendorType == "1") {
-        const data =
-          await getcontainerstatusFromApi(
-            this.operationService, this.model.consignmentTableForm.value.vendorName?.value
+      const vendorType = consignmentForm.value.vendorType;
+      const isVendorType1or4 = vendorType === "1" || vendorType === "4";
+      const containerNumberControl = containerForm.get('containerNumber');
+  
+      if (isVendorType1or4) {
+        const data = await getcontainerstatusFromApi(this.operationService, parseInt(vendorType));
+        
+        if (data.length > 0) {
+          this.filter.Filter(
+            this.jsonContainerDetail,
+            containerForm,
+            data,
+            "containerNumber",
+            false
           );
-        this.filter.Filter(
-          this.jsonContainerDetail,
-          this.model.containerTableForm,
-          data,
-          "containerNumber",
-          false
-        );
-        const containerNumber = this.model.containerTableForm.get('containerNumber');
-        containerNumber.setValidators([Validators.required, autocompleteObjectValidator()]);
-        containerNumber.updateValueAndValidity();
-
+          containerNumberControl.setValidators([Validators.required, autocompleteObjectValidator()]);
+        } else {
+          containerNumberControl.setValidators([Validators.required]);
+        }
+      } else {
+        containerNumberControl.setValidators([Validators.required]);
       }
-      else {
-        const containerNumber = this.model.containerTableForm.get('containerNumber');
-        containerNumber.setValidators([Validators.required]);
-        containerNumber.updateValueAndValidity();
-      }
+  
+      containerNumberControl.updateValueAndValidity();
     }
-
   }
+  
 
   OnChnageContainerNumber(event) {
     const ContainerType = event?.eventArgs?.option?.value?.data?.cNTYPNM;
@@ -1016,6 +1018,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.isSubmit = true;
     // Remove all form errors
     const tabcontrols = this.model.consignmentTableForm;
+    tabcontrols.removeControl['test'];
     clearValidatorsAndValidate(tabcontrols);
     const contractcontrols = this.model.consignmentTableForm;
     clearValidatorsAndValidate(contractcontrols);

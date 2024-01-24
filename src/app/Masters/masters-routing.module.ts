@@ -91,6 +91,8 @@ import { ListContainerComponent } from './Container Master/list-container/list-c
 import { AddContainerComponent } from './Container Master/add-container/add-container.component';
 import { ViewPrintComponent } from './view-print/view-print.component';
 import { ProductListComponent } from './shard-product/product-list/product-list.component';
+import { AddContainerStatusComponent } from './container-status-update/add-container-status/add-container-status.component';
+import { ContainerStatusListComponent } from './container-status-update/container-status-list/container-status-list.component';
 
 
 const routes: Routes = [
@@ -200,9 +202,9 @@ const routes: Routes = [
 
   { path: "ContainerMaster/AddContainer", component: AddContainerComponent },
   { path: "ContainerMaster/ListContainer", component: ListContainerComponent },
-
-
-  { path: "shardProduct/shardProductList", component: ProductListComponent },
+  { path: "Container/Status/Add", component: AddContainerStatusComponent },
+  { path: "Container/Status/list", component: ContainerStatusListComponent },
+  { path: "shardProduct/shardProductList", component: ProductListComponent }
 ];
 
 @NgModule({

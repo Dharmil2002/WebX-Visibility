@@ -8,12 +8,15 @@
     *ngIf="!tableLoad"
       [dynamicControls]="dynamicControls"
       [columnHeader]="columnHeader"
+      [csvHeaders]="csvHeader"
       [tableData]="tableData"
       [metaData]="metaData"
       [uploadComponent]=uploadComponent
+      [csvFileName]="csvFileName"
       (uploadEvent)="upload()" 
       [selectAllRequired]="true"
-      (selectAllClicked)="getCalucationDetails($event)"
+      (onFlagChange)="selectValue($event)"
+      (selectAllClicked)="onSelectAllClicked($event)"
       [staticField]="staticField">
     </app-generic-table-v2>
     <div class="row">

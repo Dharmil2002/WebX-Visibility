@@ -119,6 +119,16 @@ export class DocketService {
         const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
         return res.data;
     }
+    async getDockets(filter) {
+        const req = {
+            "companyCode": localStorage.getItem("companyCode"),
+            "filter": filter,
+            "collectionName": "dockets"
+        }
+
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
+        return res.data;
+    }
 
     async addDktDetail(data) {
 

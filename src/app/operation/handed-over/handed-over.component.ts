@@ -142,7 +142,7 @@ export class HandedOverComponent implements OnInit {
       const shipmentNos = this.data.cnNos.flatMap((x) => x).filter(item => typeof item === 'object' && item.code && item.name)
         .map(item => item.name);
       // Preparing a filter for the docket query
-      const rakeFilter = { rAKENO: this.data.RakeNo, dKTNO: { D$in: shipmentNos }, cONTFORCD: "" };
+      const rakeFilter = { rAKENO: this.data.RakeNo, dKTNO: { D$in: shipmentNos }, cONTFORCD:{D$ne:"CONTFOR-0003"} };
       // Fetching docket data based on the filter
       // const docketList = await this.rakeEntryService.fetchData('docket_containers', {
       //   cID: this.storage.companyCode,
@@ -187,13 +187,13 @@ export class HandedOverComponent implements OnInit {
     let selectedContainers = this.tableData
       .filter(x => x.isSelected)
       .map(container => container.cNID);
+     const containerFor=this.containerFor.find(x=>x.value==this.handTableForm.value.containerFor)?.name||"";
     const data = {
       cONTFORCD: this.handTableForm.value.containerFor,
-      cONTFORNM: this.handTableForm.value.containerFor,
-      oRG: this.storage.companyCode,
+      cONTFORNM: containerFor,
+      oRG: this.storage.branch,
       dEST: "",
-      isEMPT: "N",
-      sTS: "1",
+      sTS: 1,
       sTSNM: "Available",
       mODDT: new Date(),
       mODLOC: this.storage.branch,
@@ -201,12 +201,15 @@ export class HandedOverComponent implements OnInit {
       dKTNO: "",
       rAKENO: ""
     }
-    const rakeStatus = {
-      sTS: "2",
-      sTSNM: "Available",
-    }
+    
     const rakeDetails = await this.rakeEntryService.updateRakeContainer(data, { cNID: { 'D$in': selectedContainers }, cID: this.storage.companyCode, rAKENO: this.data.RakeNo }, "container_status");
-    await this.rakeEntryService.updateRakeContainer(data, { cNID: { 'D$in': selectedContainers }, cID: this.storage.companyCode, rAKENO: this.data.RakeNo }, "container_status");
+   if(this.tableData.length==selectedContainers.length){
+    const rakeStatus = {
+      sTS: 2,
+      oSTSN: "RakeUpdated",
+    }
+    await this.rakeEntryService.updateRakeContainer(rakeStatus, { docNo: this.data?.RakeNo||"", cID: this.storage.companyCode}, "rake_headers");
+  }
     if (rakeDetails) {
       Swal.fire({
         icon: "success",

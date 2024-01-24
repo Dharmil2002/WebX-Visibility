@@ -84,13 +84,12 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
     }
 }
 export async function getcontainerstatusFromApi(operationService, filterdata) {
-
     const reqbody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "container_status",
         filter: {
             sTS: 1,
-            vNTYP: filterdata.VendorType,
+            vNTYP: filterdata,
             oRG: localStorage.getItem('Branch'),
         }
     };

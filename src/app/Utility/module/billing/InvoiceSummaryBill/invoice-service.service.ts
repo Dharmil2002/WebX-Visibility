@@ -195,7 +195,7 @@ export class InvoiceServiceService {
       "dKTCNT": data?.shipmentCount || 0.00,
       "CURR": "INR",
       "dKTTOT": data?.shipmentTotal || 0.00,
-      "gROSSAMT": data?.shipmentTotal || 0.00,
+      "gROSSAMT": data?.invoiceTotal || 0.00,
       //"aDDCHRG": 0.00,
       "rOUNOFFAMT": data?.roundOff||0,
       "aMT": data?.finalInvoice || 0.00,
@@ -204,7 +204,7 @@ export class InvoiceServiceService {
       //"cNBY": "",
       //"cNRES": "",
       "custDetails": jsonBillingList,
-      "eNTDT": new Date().toISOString(),
+      "eNTDT": new Date(),
       "eNTLOC": this.storage.branch,
       "eNTBY": this.storage.userName,
       //"mODDT": new Date(),
@@ -400,7 +400,6 @@ export class InvoiceServiceService {
     };
     const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
     const filterData = res.data.map((element) => {
-      console.log(element);
       const cOL= element.hasOwnProperty('cOL')?element.cOL.bALAMT:0;
       element.collected =cOL;
       element.deductions = element?.bALAMT||0;
@@ -562,6 +561,7 @@ export class InvoiceServiceService {
       _id: "",
       bILLNO: item?.bILLNO || 0,
       mRNO: "",
+      dAMT: item?.deductions || 0,
       aMT: item?.collectionAmount || 0,
       tRNO: "",
       vUCHNO: "",

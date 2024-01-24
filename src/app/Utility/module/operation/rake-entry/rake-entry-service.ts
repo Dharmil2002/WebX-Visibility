@@ -173,10 +173,9 @@ export class RakeEntryService {
   }
   async getRakeDetail() {
     // Fetch rake headers
-    const rakeHeadersRes = await this.fetchData(Collections.rake_headers, { cID: this.storage.companyCode, 'D$or': [
+    const rakeHeadersRes = await this.fetchData(Collections.rake_headers, { cID: this.storage.companyCode,sTS:1,'D$or': [
       { lOC: this.storage.branch },
-      { dEST: this.storage.branch },
-      {sTS:1}
+      { dEST: this.storage.branch }
   ] });
     const rakeNo = rakeHeadersRes.data.map(x => x.rAKEID);
     // Define a common filter for subsequent requests
@@ -224,12 +223,12 @@ export class RakeEntryService {
         CurrentStatus: "At " + localStorage.getItem("Branch"),
         CNNo: uniquecnNos.size,
         cnNos: Array.from(docketList),
+        entryDate: element?.eNTDT ?? '',
         actions: element.dEST==this.storage.branch?"Updated":""
       }
-    
       RakeDetails.push(jsonRake);
     });
-     return RakeDetails;
+     return RakeDetails.reverse();
   }
   
 }

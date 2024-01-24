@@ -880,6 +880,29 @@
         "ViewPrint"
       ],
       "router": "Masters/ViewPrint"
+    },
+    {
+      "title": "Container Status List",
+      "tag": [
+        "Container",
+        "Container Status",
+        "list",
+        "Masters",
+        "Container/Status/list"
+      ],
+      "router":  "Masters/Container/Status/list"
+    },
+    {
+      "title": "Container Status Add",
+      "tag": [
+        "Add Container",
+        "Container Add",
+        "Add",
+        "Masters",
+        "Container Status Add",
+        "Container/Status/Add"
+      ],
+      "router": "Masters/Container/Status/Add"
     }
   ]
 }

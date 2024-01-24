@@ -173,7 +173,47 @@ export class RakeEntryPageComponent implements OnInit {
         this.definition.columnHeader = this.definition.columnHeader;
         //this.loadTempData(jobDetail);
         this.getGeneralMasterData();
+       
+    }
 
+    async autoFillJobDetails() {
+        if(this.jobDetail){
+         const jobType=this.movementType.find(x=>x.name==this.jobDetail.jobType)?.value||"";
+         this.rakeEntryTableForm.controls['movementType'].setValue(jobType);
+         if (this.jobDetail.jobType == "Export" || (this.jobDetail.jobType == "import" && this.jobDetail.tBYNM == "Third Party")) {
+            const dockets=await this.docketService.getDockets({jOBNO:this.jobDetail.jobNo});
+            if(dockets){
+            const allDkt=dockets.map((x)=>x.docNo);
+             const containerDetails= await this.docketService.getDocketDetails({dKTNO: { 'D$in': allDkt }});
+             let shipments=[]
+             dockets.forEach((x)=>{
+             const container=containerDetails.data.filter((y)=>y.dKTNO==x.docNo);
+             const json = {
+                cnNo:x.docNo,
+                cnDate: formatDate(x.dKTDT, "dd-MM-yy HH:mm"),
+                contCnt:container.length,
+                noOfPkg: x?.pKGS||0,
+                weight:x?.aCTWT||0,
+                fCity:x?.fCT||0,
+                tCity:x?.tCT||0,
+                billingParty:x?.bPARTY||0,
+                billingPartyCode:x?.bPARTYNM||0,
+                cnDateDateUtc:x?.dKTDT||0,
+                type: 'cn',
+                jsonColumn: this.definition.jsonColumn,
+                staticField: ['cNID', 'cNTYP'],
+                tableData: container?container:[],
+                actions: ["Edit", "Remove"]
+            };
+            shipments.push(json);
+        });
+               this.tableData=shipments
+                this.isLoad = false;
+                this.tableLoad = false;
+            }
+            // Code to execute if either condition is met
+        }
+        }
     }
 
     functionCallHandler($event) {
@@ -232,7 +272,6 @@ export class RakeEntryPageComponent implements OnInit {
     
      /*End*/
     async save() {
-        debugger;
         const container=this.rakeContainerTableForm.value;
         const forms = [this.rakeContainerTableForm, this.rakeDetailsTableForm, this.invDetailsTableForm];
         const confirmAndProceed = () => {
@@ -599,6 +638,7 @@ export class RakeEntryPageComponent implements OnInit {
         this.docType = await this.generalService.getGeneralMasterData("RAKEDOCTYPE");
         setGeneralMasterData(this.jsonControlArray, this.movementType, "movementType");
         this.tranMode = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+        this.autoFillJobDetails();
         
     }
    /*End*/

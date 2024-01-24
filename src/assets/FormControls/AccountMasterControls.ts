@@ -433,10 +433,10 @@ export class AccountMasterControls {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Perent Group Code is required",
-          },
+          // {
+          //   name: "required",
+          //   message: "Perent Group Code is required",
+          // },
           {
             name: "autocomplete",
           },

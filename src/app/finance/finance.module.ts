@@ -66,8 +66,9 @@ import { JournalVoucherCreationComponent } from './VoucherEntry/Journal Voucher/
 import { JournalVoucherCreationModalComponent } from './VoucherEntry/Journal Voucher/Modals/journal-voucher-creation-modal/journal-voucher-creation-modal.component';
 import { OpeningBalanceLedgerComponent } from './opening-balance-ledger/opening-balance-ledger.component';
 import { ContraVoucherCreationComponent } from './VoucherEntry/Contra Voucher/contra-voucher-creation/contra-voucher-creation.component';
-import { AdviceGenerationComponent } from './advice-generation/advice-generation/advice-generation.component';
-import { AdviceAcknowledgeComponent } from './advice-acknowledge/advice-acknowledge.component';
+import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/advice-generation.component';
+import { AdviceAcknowledgeComponent } from './Fund Transfer/advice-acknowledge/advice-acknowledge.component';
+import { AdviceAcknowledgeFiltersComponent } from './Fund Transfer/Models/advice-acknowledge-filters/advice-acknowledge-filters.component';
 
 @NgModule({
     declarations: [
@@ -101,7 +102,8 @@ import { AdviceAcknowledgeComponent } from './advice-acknowledge/advice-acknowle
         OpeningBalanceLedgerComponent,
         ContraVoucherCreationComponent,
         AdviceGenerationComponent,
-        AdviceAcknowledgeComponent
+        AdviceAcknowledgeComponent,
+        AdviceAcknowledgeFiltersComponent
     ],
     imports: [
         CommonModule,

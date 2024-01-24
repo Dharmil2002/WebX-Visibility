@@ -11,7 +11,7 @@ export class HandoverControl {
                 type: "date",
                 value: new Date(),
                 generatecontrol: true,
-                disable: true,
+                disable: false,
                 Validations: [],
                 additionalData: {
                     minDate: new Date(),

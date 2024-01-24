@@ -703,6 +703,20 @@
       "router": "Finance/VoucherEntry/DebitVoucher"
     },
     {
+      "title": "Finance/FundTransfer/AdviceGeneration",
+      "tag": [
+        "Finance/FundTransfer/AdviceGeneration"
+      ],
+      "router": "Finance/FundTransfer/AdviceGeneration"
+    },
+    {
+      "title": "Finance/FundTransfer/AdviceAcknowledge",
+      "tag": [
+        "Finance/FundTransfer/AdviceAcknowledge"
+      ],
+      "router": "Finance/FundTransfer/AdviceAcknowledge"
+    },
+    {
       "title": "Finance/VoucherEntry/JournalVoucher",
       "tag": [
         "Finance/VoucherEntry/JournalVoucher"
@@ -866,6 +880,29 @@
         "ViewPrint"
       ],
       "router": "Masters/ViewPrint"
+    },
+    {
+      "title": "Container Status List",
+      "tag": [
+        "Container",
+        "Container Status",
+        "list",
+        "Masters",
+        "Container/Status/list"
+      ],
+      "router":  "Masters/Container/Status/list"
+    },
+    {
+      "title": "Container Status Add",
+      "tag": [
+        "Add Container",
+        "Container Add",
+        "Add",
+        "Masters",
+        "Container Status Add",
+        "Container/Status/Add"
+      ],
+      "router": "Masters/Container/Status/Add"
     }
   ]
 }

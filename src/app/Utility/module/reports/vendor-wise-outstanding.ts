@@ -12,11 +12,27 @@ export class VendorWiseOutService {
           private storage: StorageService
      ) { }
 
-     async getvendorWiseOutReportDetail() {
+     async getvendorWiseOutReportDetail(start, end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "vend_bill_summary",
-               filter: {}
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "bDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "bDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "vend_bill_payment"
@@ -25,7 +41,6 @@ export class VendorWiseOutService {
           let venoutList = [];
 
           res.data.map((element, index) => {
-
                const voucherDet = resvoucher.data ? resvoucher.data.find((entry) => entry.bILLNO === element?.docNo) : null;
                let voucher = 0;
                let accountAmt = 0;
@@ -33,19 +48,15 @@ export class VendorWiseOutService {
                     voucher = voucherDet.vUCHNO;
                     accountAmt = voucherDet.bILLAMT;
                }
-
+               `${element?.vND.cD || ''} : ${element?.vND.nM || ''}`
                let venoutData = {
                     "lOC": element.eNTLOC,
-                    "obDT": element.bDT,
-                    "srNo": element.srNo = index + 1,
-                    "vendorCD": element?.vND.cD || '',
-                    "vendor": element?.vND.nM || '',
+                    "srNo": index + 1,
+                    // "vendorCD": element?.vND.cD || '',
+                    // "vendor": element?.vND.nM || '',
+                    "vendor": `${element?.vND.cD || ''} : ${element?.vND.nM || ''}`,
                     "openingBal": element?.tHCAMT || '',
-                    "manualVoucher": voucher,
-                    "paidAdvanceAmount": element?.aDVAMT || '',
-                    "totalPayable": element?.gST.aMT || '',
-                    "onAccountAmt": accountAmt,
-                    "totalBillAmtFrom010423To111223": "",
+                    "totalBillAmtFrom010423To111223": '',
                     "paidAmtFrom010423To111223": "",
                     "finalized": "",
                     "unFinalized": "",
@@ -56,11 +67,15 @@ export class VendorWiseOutService {
                     "121-150": "",
                     "151-180": "",
                     ">180": "",
+                    "totalPayable": element?.gST.aMT || '',
+                    "onAccountAmt": accountAmt,
+                    "manualVoucher": voucher,
                     "jVAmt": "",
+                    "paidAdvanceAmount": element?.aDVAMT || '',
                     "ledgerBalance": ""
                }
                venoutList.push(venoutData)
-          })
+          });
           return venoutList;
      }
 }
@@ -110,7 +125,7 @@ export function exportAsExcelFile(json: any[], excelFileName: string, customHead
           }
      }
      // Create a workbook containing the worksheet.
-     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+     const workbook: XLSX.WorkBook = { Sheets: { 'Vendor_Wise_Outstanding_Report': worksheet }, SheetNames: ['Vendor_Wise_Outstanding_Report'] };
      // Write the workbook to an Excel file with the specified filename.
      XLSX.writeFile(workbook, `${excelFileName}.xlsx`);
 }

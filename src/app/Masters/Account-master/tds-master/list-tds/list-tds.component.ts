@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-list-tds",
@@ -29,32 +31,39 @@ export class ListTdsComponent implements OnInit {
     TDScode: {
       Title: "TDS code",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
     TDSsection: {
       Title: "TDS section",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
     PaymentType: {
       Title: "Payment Type",
-      class: "matcolumncenter",
-      Style: "min-width:15%",
+      class: "matcolumnleft",
+      Style: "min-width:30%",
     },
     RateForHUF: {
       Title: "Rate For HUF",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
     Thresholdlimit: {
       Title: "Threshold Limit",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
     RateForOthers: {
       Title: "Rate For Others",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
+    },
+    isActive: {
+      type: "Activetoggle",
+      Title: "Active",
+      class: "matcolumncenter",
+      Style: "min-width:10%",
+      functionName: "ActiveFunction",
     },
     EditAction: {
       type: "iconClick",
@@ -102,6 +111,27 @@ export class ListTdsComponent implements OnInit {
   }
   EditFunction(event){
     this.Route.navigate(["/Masters/AccountMaster/AddTds"], { state: { data: event?.data } });
+  }
+
+  async ActiveFunction(event){
+    const Body = {
+      isActive:event.data.isActive
+    }
+    const req = {
+      companyCode: this.CompanyCode,
+      collectionName: "tds_detail",
+      filter: { TDScode: event.data.TDScode },
+      update: Body,
+    };
+    const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+    if(res.success){
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+    }
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;

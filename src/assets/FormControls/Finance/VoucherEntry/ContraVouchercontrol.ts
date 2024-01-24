@@ -230,6 +230,9 @@ export class ContraVoucherControl {
             pattern: '^[^-]+$'
           },
         ],
+        functions: {
+          onChange: "onChangeAmount"
+        },
 
       },
       {
@@ -251,7 +254,9 @@ export class ContraVoucherControl {
             pattern: '^[^-]+$'
           },
         ],
-
+        functions: {
+          onChange: "onChangeAmount"
+        },
       },
       {
         name: "FromChequeOrRefNo",
@@ -350,7 +355,7 @@ export class ContraVoucherControl {
         type: "number",
         value: 0,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -371,7 +376,7 @@ export class ContraVoucherControl {
         type: "number",
         value: 0,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",

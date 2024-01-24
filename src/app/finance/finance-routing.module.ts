@@ -15,8 +15,8 @@ import { VendorBillPaymentDetailsComponent } from './Vendor Bills/vendor-bill-pa
 import { JournalVoucherCreationComponent } from './VoucherEntry/Journal Voucher/journal-voucher-creation/journal-voucher-creation.component';
 import { OpeningBalanceLedgerComponent } from './opening-balance-ledger/opening-balance-ledger.component';
 import { ContraVoucherCreationComponent } from './VoucherEntry/Contra Voucher/contra-voucher-creation/contra-voucher-creation.component';
-import { AdviceGenerationComponent } from './advice-generation/advice-generation/advice-generation.component';
-import { AdviceAcknowledgeComponent } from './advice-acknowledge/advice-acknowledge.component';
+import { AdviceAcknowledgeComponent } from './Fund Transfer/advice-acknowledge/advice-acknowledge.component';
+import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/advice-generation.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -34,8 +34,9 @@ const routes: Routes = [
   { path: 'VoucherEntry/JournalVoucher', component: JournalVoucherCreationComponent },
   { path: "opening-balance", component: OpeningBalanceLedgerComponent },
   { path: 'VoucherEntry/ContraVoucher', component: ContraVoucherCreationComponent },
-  { path: 'AdviceGeneration', component: AdviceGenerationComponent},
-  { path: 'AdviceAcknowledge', component: AdviceAcknowledgeComponent},
+  { path: 'FundTransfer/AdviceGeneration', component: AdviceGenerationComponent },
+  { path: 'FundTransfer/AdviceAcknowledge', component: AdviceAcknowledgeComponent },
+
 ];
 
 @NgModule({

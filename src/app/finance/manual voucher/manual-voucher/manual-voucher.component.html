@@ -1,3 +1,11 @@
+<form [formGroup]="VoucherSummaryForm">
+  <app-form-webxpress [form]="VoucherSummaryForm" [FormTitle]="" [formData]="jsonControlVoucherSummaryArray"
+    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+    [showSaveAndCancelButton]="false" [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'">
+  </app-form-webxpress>
+</form>
+
+
 <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
   [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
   [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"

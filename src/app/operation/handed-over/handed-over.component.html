@@ -4,10 +4,20 @@
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-    [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-    [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
-    [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath">
+    <app-generic-table-v2
+    *ngIf="!tableLoad"
+      [dynamicControls]="dynamicControls"
+      [columnHeader]="columnHeader"
+      [csvHeaders]="csvHeader"
+      [tableData]="tableData"
+      [metaData]="metaData"
+      [uploadComponent]=uploadComponent
+      [csvFileName]="csvFileName"
+      (uploadEvent)="upload()" 
+      [selectAllRequired]="true"
+      (onFlagChange)="selectValue($event)"
+      (selectAllClicked)="onSelectAllClicked($event)"
+      [staticField]="staticField">
     </app-generic-table-v2>
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -15,7 +25,7 @@
 
                 <button mat-button (click)="cancel()">Back</button>
                 <button class="msr-3" mat-raised-button color="primary"
-                    (click)="save()">Save</button>
+                    (click)="save()" [disabled]="!isSelected">Save</button>
             </div>
         </div>  
     </div>

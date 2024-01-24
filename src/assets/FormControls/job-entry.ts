@@ -641,7 +641,7 @@ export class JobControl {
                 type: "date",
                 value: "",
                 additionalData: {
-                    metaData: ""
+                    maxDate: new Date(),
                 },
                 generatecontrol: true,
                 disable: false,
@@ -669,7 +669,7 @@ export class JobControl {
                 type: "date",
                 value: "",
                 additionalData: {
-                    metaData: ""
+                    maxDate: new Date(),
                 },
                 generatecontrol: true,
                 disable: false,

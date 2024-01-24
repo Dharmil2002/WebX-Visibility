@@ -111,17 +111,17 @@ export class JobTrackerComponent implements OnInit {
       {
         title: "Awaiting for CHA Entry",
         class: "info-box7 bg-c-Bottle-light order-info-box7",
-        filterCondition: (x) => x.statusCode === "0",
+        filterCondition: (x) => x.sTS == "1",
       },
       {
         title: "Awaiting for Rake Entry",
         class: "info-box7 bg-c-Grape-light order-info-box7",
-        filterCondition: (x) => x.statusCode === "1",
+        filterCondition: (x) => x.sTS == "2",
       },
       {
         title: "Awaiting for Rake Updation",
         class: "info-box7 bg-c-Daisy-light order-info-box7",
-        filterCondition: (x) => x.statusCode !== "1" && x.statusCode !== "0",
+        filterCondition: (x) => x.sTS != "1" && x.sTS != "2",
       },
     ];
     

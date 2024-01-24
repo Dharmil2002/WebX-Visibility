@@ -1,6 +1,4 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { getGeneric, rakeFieldMapping } from './rake-update-utility';
 import { RakeDetailComponent } from '../rake-detail/rake-detail.component';
 import { Router } from '@angular/router';
 import { RakeEntryService } from 'src/app/Utility/module/operation/rake-entry/rake-entry-service';
@@ -95,17 +93,14 @@ export class RakeUpdateComponent implements OnInit {
     "iconName"
   ];
   linkArray = [
-   // { Row: 'Action', Path: 'Operation/Handover', componentDetails: "" },
-    { Row: 'BillingParty', Path: '', componentDetails: RakeDetailComponent },
-    { Row: 'CNNo', Path: '', componentDetails: RakeDetailComponent },
-    { Row: 'JobNo', Path: '', componentDetails: RakeDetailComponent }
+    { Row: 'BillingParty', Path: '', componentDetails: RakeDetailComponent,title:"billingPartyDetails"},
+    { Row: 'CNNo', Path: '', componentDetails: RakeDetailComponent,title:"cnNos"}
   ]
   
   addAndEditPath: string;
   allColumnFilter:any;
 
   constructor(
-    private masterService: MasterService,
     private rakeService:RakeEntryService,
     private router: Router
     ) { 
@@ -143,7 +138,6 @@ export class RakeUpdateComponent implements OnInit {
     ];
   }
   async getRakeDetail() {
-    debugger;
     const rakeDetail = await this.rakeService.getRakeDetail();
     this.tableData = rakeDetail;
     this.tableLoad = false;

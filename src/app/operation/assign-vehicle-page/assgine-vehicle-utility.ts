@@ -63,7 +63,7 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
  *              to the calling code. The error message will be logged to the console as well.
  */
 export async function getVehicleStatusFromApi(companyCode, operationService) {
-   
+
     const reqbody = {
         companyCode: companyCode,
         collectionName: "vehicle_status",
@@ -83,7 +83,31 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
         throw error; // Optionally, re-throw the error to propagate it to the calling code
     }
 }
+export async function getcontainerstatusFromApi(operationService, filterdata) {
+    const reqbody = {
+        companyCode: localStorage.getItem('companyCode'),
+        collectionName: "container_status",
+        filter: {
+            sTS: 1,
+            vNTYP: filterdata,
+            oRG: localStorage.getItem('Branch'),
+        }
+    };
 
+    try {
+        const res: any = await firstValueFrom(operationService.operationMongoPost("generic/get", reqbody));
+        return res.data
+            .map((obj) => ({
+                name: obj?.cNID || "",
+                value: obj?.cNID || "",
+                data: obj,
+            }));
+    } catch (error) {
+        // Handle any errors that might occur during the API call
+        console.error("Error fetching vehicle details:", error);
+        throw error; // Optionally, re-throw the error to propagate it to the calling code
+    }
+}
 
 ///////  ********** Tables *********** ////////////
 

@@ -24,7 +24,7 @@ export class xlsxutilityService {
             errors.push(`${rule.ItemsName} is required.`);
           }
           // Perform case-insensitive and type-insensitive comparison for TakeFromList
-          if ("TakeFromList" in validation && !validation.TakeFromList.some(listItem =>
+          if ("TakeFromList" in validation && value && !validation.TakeFromList.some(listItem =>
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} is not in the allowed list.`);
           }
@@ -37,8 +37,11 @@ export class xlsxutilityService {
           if ("MaxValue" in validation && !isNaN(parseFloat(value)) && parseFloat(value) > validation.MaxValue) {
             errors.push(`${rule.ItemsName} must be at least ${validation.MaxValue}.`);
           }
-          if ("Pattern" in validation && validation.Pattern instanceof RegExp && !validation.Pattern.test(value)) {
-            errors.push(`${rule.ItemsName} does not match the required pattern.`);
+          if ("Pattern" in validation && typeof validation.Pattern === "string") {
+            const regexPattern = new RegExp(validation.Pattern);
+            if (!regexPattern.test(value)) {
+              errors.push(`${rule.ItemsName} does not match the pattern.`);
+            }
           }
           if ("Exists" in validation && validation.Exists.find(listItem =>
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
@@ -67,6 +70,9 @@ export class xlsxutilityService {
             validationObservables.push(validationObservable);
           }
         }
+        if (errors.length > 0) {
+          break; // Exit the loop if errors are found
+        }
       }
 
       item.error = errors.length > 0 ? errors : null;
@@ -83,24 +89,25 @@ export class xlsxutilityService {
     // Check if there is at least one element without errors and rules are provided
     if (filteredDataWithoutErrors.length > 0 && rules.length > 0) {
 
-      // Find the rule that has "DuplicateFromList" validation for the "Location" field
-      const duplicateRule = rules.find(rule => rule.Validations.some(validation => 'DuplicateFromList' in validation));
+      // Find the rule that has "DuplicateFromList" validation for the specified field
+      const duplicateRules = rules.filter(rule => rule.Validations.some(validation => 'DuplicateFromList' in validation));
 
-      if (duplicateRule) {
+      // Iterate through each duplicate rule
+      duplicateRules.forEach((duplicateRule) => {
         const existingLocations = new Set();
 
-        // Iterate through filteredDataWithoutErrors to find duplicates in the "Location" field
+        // Iterate through filteredDataWithoutErrors to find duplicates in the specified field
         filteredDataWithoutErrors.forEach((item) => {
-          const location = item[duplicateRule.ItemsName];
+          const fieldValue = item[duplicateRule.ItemsName];
 
-          if (existingLocations.has(location)) {
+          if (existingLocations.has(fieldValue)) {
             item.error = item.error || [];
-            item.error.push(`Duplicate Entry for Location.`);
+            item.error.push(`Duplicate Entry.`);
           } else {
-            existingLocations.add(location);
+            existingLocations.add(fieldValue);
           }
         });
-      }
+      });
     }
 
     return forkJoin(validationObservables).pipe(

@@ -1,0 +1,10 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+
+    <div *ngIf="tableData">
+        <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData"
+            [FormTitle]="'Advice Acknowledge'" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+            (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [menuItems]="menuItems"
+            [Link]="linkArray" [EventButton]="EventButton" [staticField]="staticField">
+        </app-generic-table-v2>
+    </div>
+</app-common-wrapper-webxpress>

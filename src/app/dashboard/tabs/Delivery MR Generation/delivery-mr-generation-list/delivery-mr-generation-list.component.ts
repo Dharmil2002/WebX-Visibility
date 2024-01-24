@@ -116,11 +116,29 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       // Generate KPI data based on the modified data
       this.boxData = kpiData(modifiedData);
 
-      // Update tableData property with the modified data
-      this.tableData = modifiedData.map(x => ({
-        ...x,
-        Actions: x.status === 'Delivery MR Generated' ? '' : 'Delivery MR Generation'
-      }));
+      this.tableData = modifiedData.map(item => {
+        // Extract the destination location from the event data
+        const location = item.orgdest;
+
+        // Extract the branch information from the destination location
+        // and remove any leading or trailing whitespaces
+        const result = location.split(":")[1].trim();
+        let actions = item.status === 'Delivery MR Generated' ? '' : '';
+        // Check if the branch matches the specified branch
+        if (this.branch && this.branch.trim() === result) {
+          // Assign the action only if the condition is met
+          actions = item.status === 'Delivery MR Generated' ? '' : 'Delivery MR Generation';
+
+          // Return the modified object
+          return {
+            ...item,
+            Actions: actions
+          };
+        }
+
+        // If the branch does not match or the status is 'Delivery MR Generated', return the original object
+        return item;
+      });
 
       // Set tableload to false to indicate that the table loading is complete
       this.tableload = false;
@@ -150,33 +168,33 @@ export class DeliveryMrGenerationListComponent implements OnInit {
   // #region to validate if the current branch matches the Consignment Note destination
   validateLocation(event) {
 
-    // Extract the destination location from the event data
-    const location = event.data.orgdest;
+    // // Extract the destination location from the event data
+    // const location = event.data.orgdest;
 
-    // Extract the branch information from the destination location
-    // and remove any leading or trailing whitespaces
-    const result = location.split(":")[1].trim();
+    // // Extract the branch information from the destination location
+    // // and remove any leading or trailing whitespaces
+    // const result = location.split(":")[1].trim();
 
-    // Check if the branch is defined and matches the extracted destination
-    if (this.branch && this.branch.trim() === result) {
+    // // Check if the branch is defined and matches the extracted destination
+    // if (this.branch && this.branch.trim() === result) {
 
-      // If the branches match, navigate to the DeliveryMrGeneration page
-      this.router.navigate(["/dashboard/DeliveryMrGeneration"], {
-        state: {
-          data: event
-        },
-      });
-    } else {
-      // If the branches don't match, display an informative message using SweetAlert
-      Swal.fire({
-        icon: "info",
-        title: "Current Branch doesn't match with Consignment Note destination",
-        showConfirmButton: true,
-      });
+    // If the branches match, navigate to the DeliveryMrGeneration page
+    this.router.navigate(["/dashboard/DeliveryMrGeneration"], {
+      state: {
+        data: event
+      },
+    });
+    // } else {
+    //   // If the branches don't match, display an informative message using SweetAlert
+    //   Swal.fire({
+    //     icon: "info",
+    //     title: "Current Branch doesn't match with Consignment Note destination",
+    //     showConfirmButton: true,
+    //   });
 
-      // Return from the function to prevent further execution
-      return;
-    }
+    //   // Return from the function to prevent further execution
+    //   return;
+    // }
   }
   //#endregion
 }

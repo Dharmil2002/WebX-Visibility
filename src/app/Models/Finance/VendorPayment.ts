@@ -43,8 +43,10 @@ export class VendorBillEntry {
       rATE?: number;
       iGRT?: number;
       cGRT?: number;
+      uGRT?: number;
       sGRT?: number;
       iGST?: number;
+      uGST?: number;
       cGST?: number;
       sGST?: number;
       aMT?: number;
@@ -200,7 +202,7 @@ export class BillList {
   // AdvancePayedAmount: number;
   // billAmount: number;
   PaymentAmount: number;
- // PendingAmount: number;
+  // PendingAmount: number;
   ispartial: boolean;
 
 }

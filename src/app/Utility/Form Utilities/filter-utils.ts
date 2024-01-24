@@ -26,3 +26,13 @@ export function isEmptyForm(Form: UntypedFormGroup): boolean {
   });
 }
 /*End*/
+// Below function is for check the form group is empty or not for async method
+export async function isEmptyFormValue(Form: UntypedFormGroup): Promise<boolean> {
+  // Add 'await' before any asynchronous operation inside the function, if necessary
+  return Object.keys(Form.value).every(key => {
+    // Check if the property is empty. This can be adjusted based on how you define "empty" (e.g., consider whitespace, null, undefined)
+    let value = Form.value[key];
+    return value == null || value === '';
+  });
+}
+// End

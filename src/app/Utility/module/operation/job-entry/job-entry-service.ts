@@ -187,7 +187,6 @@ export class JobEntryService {
 
   }
   jobFieldMapping(data, containerType) {
-      debugger
     const jobMapping = {
       _id: "",
       cID: this.storage.companyCode,
@@ -343,6 +342,7 @@ export class JobEntryService {
           totalChaAmt:chaDetail?chaDetail.tOTAMT:"",
           chaDate:chaDetail?formatDocketDate(chaDetail.eNTDT):'',
           status: this.statusMapping[sTSKey] || this.statusMapping["default"],
+          sTS:element?.sTS,
           Action: this.actionMapping[sTSKey] || this.actionMapping["default"]
         }
         jobSummary.push(job);

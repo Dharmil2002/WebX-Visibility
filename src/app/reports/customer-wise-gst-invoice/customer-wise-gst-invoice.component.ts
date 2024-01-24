@@ -192,20 +192,15 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
   }
 
   async save() {
-    let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail();
+    const startValue = new Date(this.CustGSTInvTableForm.controls.start.value);
+    const endValue = new Date(this.CustGSTInvTableForm.controls.end.value);
+    let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail(startValue, endValue);
     const customerName = Array.isArray(this.CustGSTInvTableForm.value.custnmcdHandler)
       ? this.CustGSTInvTableForm.value.custnmcdHandler.map(x => x.value)
       : [];
-    console.log("customerName", customerName)
     const filteredRecords = data.filter(record => {
       const custNm = customerName.length === 0 || customerName.includes(record.ocustName);
-      const startValue = new Date(this.CustGSTInvTableForm.controls.start.value);
-      const endValue = new Date(this.CustGSTInvTableForm.controls.end.value);
-      const entryTime = new Date(record.obGNDT);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
-
-      return isDateRangeValid && custNm;
+      return custNm;
     });
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {
@@ -220,11 +215,11 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
       }
       return;
     }
-    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { obGNDT, ocustName, ...rest } = record;
-      return rest;
-    });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
+    // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+    //   const {  ocustName, ...rest } = record;
+    //   return rest;
+    // });
+    exportAsExcelFile(filteredRecords, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

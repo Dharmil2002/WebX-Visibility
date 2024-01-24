@@ -88,7 +88,7 @@ export class RakeEntryControl {
                     onModel:"getVendors",
                 },
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 }
             },
             {
@@ -549,7 +549,8 @@ export class RakeEntryControl {
                 message: "RR Date is required",
             }],
             additionalData: {
-            }
+                maxDate: new Date(),
+              },
         }],
             this.invDetails = [{
                 name: "invNum",
@@ -573,7 +574,8 @@ export class RakeEntryControl {
                     message: "Enter Inv Date is required",
                 }],
                 additionalData: {
-                }
+                maxDate: new Date(),
+              },
             },
             {
                 name: "invAmt",

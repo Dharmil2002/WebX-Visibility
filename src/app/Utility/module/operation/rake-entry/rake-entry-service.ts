@@ -4,12 +4,12 @@ import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunc
 import { Collections, OperationActions } from "src/app/config/myconstants";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: "root",
 })
-export class RakeEntryService {
-
+export class RakeEntryService { 
   constructor(
     private operations: OperationService,
     private storage: StorageService
@@ -38,7 +38,24 @@ export class RakeEntryService {
     const res = this.operations.operationPost('generic/create', reqBody).toPromise();
     return res;
   }
-  async addRakeDetails(data) {
+  async updateRakeContainer(data, filter,collectionName) {
+    
+    const requestBody = {
+      companyCode: this.storage.companyCode,
+      collectionName:collectionName,
+      filter: filter,
+      update: data
+    };
+  
+    try {
+      const response = await firstValueFrom(this.operations.operationMongoPut('generic/update', requestBody));
+      return response;
+    } catch (error) {
+      Swal.fire("Error!", "Failed to update rake container details.", "error");
+    }
+  }
+  
+  async addRakeDetails(data) {  
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const req = {
@@ -147,7 +164,6 @@ export class RakeEntryService {
   }
 
   async fetchData(collection, filter) {
-    debugger
     const req = {
       companyCode: this.storage.companyCode,
       collectionName: collection,
@@ -157,7 +173,10 @@ export class RakeEntryService {
   }
   async getRakeDetail() {
     // Fetch rake headers
-    const rakeHeadersRes = await this.fetchData(Collections.rake_headers, { lOC: this.storage.branch });
+    const rakeHeadersRes = await this.fetchData(Collections.rake_headers, { cID: this.storage.companyCode,sTS:1,'D$or': [
+      { lOC: this.storage.branch },
+      { dEST: this.storage.branch }
+  ] });
     const rakeNo = rakeHeadersRes.data.map(x => x.rAKEID);
     // Define a common filter for subsequent requests
     const rakeFilter = { rAKEID: { D$in: rakeNo } };
@@ -179,10 +198,17 @@ export class RakeEntryService {
     
       const uniqueBillingParties = new Set();
       const uniquecnNos = new Set();
-    
+      let billingPartys = new Map<string,{}>();
+      let docketList = new Map<string,{}>();
       filteredContainers.forEach(item => {
-        if (item.bPARTY) uniqueBillingParties.add(item.bPARTY);
-        if (item.dKTNO) uniquecnNos.add(item.dKTNO);
+        if (item.bPARTY) {
+          uniqueBillingParties.add(item.bPARTY)
+          billingPartys.set(item.bPARTY,{code:item.bPARTY,name:item.bPARTYNM});
+        };
+        if (item.dKTNO) {
+          uniquecnNos.add(item.dKTNO)
+          docketList.set(item.dKTNO,{code:item.bPARTYNM,name:item.dKTNO});
+        };
       });
     
       const jsonRake = {
@@ -193,15 +219,16 @@ export class RakeEntryService {
         FromToCity: `${element?.fCT ?? ''}-${element?.tCT ?? ''}`,
         Weight: weight,
         BillingParty: uniqueBillingParties.size,
-        BillingPartyList: Array.from(uniqueBillingParties),
+        billingPartyDetails: Array.from(billingPartys),
         CurrentStatus: "At " + localStorage.getItem("Branch"),
         CNNo: uniquecnNos.size,
-        CNNoList: Array.from(uniquecnNos),
-        actions: "Updated"
+        cnNos: Array.from(docketList),
+        entryDate: element?.eNTDT ?? '',
+        actions: element.dEST==this.storage.branch?"Updated":""
       }
-    
       RakeDetails.push(jsonRake);
     });
-     return RakeDetails;
+     return RakeDetails.reverse();
   }
+  
 }

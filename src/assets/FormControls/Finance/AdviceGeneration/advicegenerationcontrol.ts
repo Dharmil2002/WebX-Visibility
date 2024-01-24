@@ -2,22 +2,25 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class AdviceGenerationControl {
   AdviceGenerationArray: FormControls[];
-  constructor() {
+  AdviceGenerationPaymentArray: FormControls[];
+  constructor(FormValues: any, Type: any) {
     this.AdviceGenerationArray = [
       {
-        name: 'brand', label: '', placeholder: '', type: 'radiobutton',
-        value: [{ value: 'DA', name: 'Debit Advice', "checked": true }, { value: 'CA', name: 'Credit Advice' }],
+        name: 'AdviceType', label: '', placeholder: '', type: 'radiobutton',
+        value: [{ value: 'D', name: 'Debit Advice', "checked": true },
+        { value: 'C', name: 'Credit Advice' }],
         Validations: [],
-        generatecontrol: true, disable: false
+        generatecontrol: true,
+        disable: Type == "Acknowledge" ? true : false,
       },
       {
         name: "adviceDate",
         label: "Advice Date",
         placeholder: "select Advice Date",
         type: "date",
-        value: "",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aDDT : new Date(),
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [],
       },
       {
@@ -25,9 +28,9 @@ export class AdviceGenerationControl {
         label: "Raised on Branch",
         placeholder: "Select Raised on Branch",
         type: "dropdown",
-        value: "",
+        value: Type == "Modify" ? FormValues?.rBRANCH : "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [
           {
             name: "required",
@@ -50,41 +53,31 @@ export class AdviceGenerationControl {
         label: "Reason for Advice",
         placeholder: "Enter Reason for Advice",
         type: "text",
-        value: "",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.rEASION : "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [
-          {
-            // name: "pattern",
-            // message: "Please Enter alphanumeric of length 25!",
-            // pattern: "^[a-zA-Z0-9]{0,25}$",
-          },
+
         ],
         functions: {
-          //onChange: "CheckERPId",
+
         },
       },
       {
         name: "applicableAmount",
-        label: "Applicable Amount ",
+        label: "Applicable Amount (₹)",
         placeholder: "Enter Applicable Amount ",
-        type: "text",
-        value:"",
+        type: "number",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aMT : "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [
           {
             name: "required",
             message: "Applicable Amount is required",
           },
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter only text!",
-          //   pattern: "^[a-zA-Z ]{0,100}$",
-          // },
         ],
         functions: {
-          //onChange: "CheckUserName",
         },
       },
       {
@@ -92,138 +85,175 @@ export class AdviceGenerationControl {
         label: "Advice Generation Location",
         placeholder: "Advice Generation Location",
         type: "text",
-        value:"",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.eNTLOC : localStorage.getItem("Branch"),
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [
-          {
-            name: "required",
-            message: "Advice Generation Location is required",
-          },
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter only text!",
-          //   pattern: "^[a-zA-Z ]{0,100}$",
-          // },
         ],
         functions: {
-          //onChange: "CheckUserName",
         },
       },
+
+
+    ];
+    this.AdviceGenerationPaymentArray = [
+
       {
-        name: "paymentMode",
+        name: "PaymentMode",
         label: "Payment Mode",
-        placeholder: "Select Payment Mode",
+        placeholder: "Payment Mode",
         type: "dropdown",
         value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [
           {
             name: "required",
-            message: "Payment Mode is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
+            message: "Payment Mode is required",
           },
         ],
         additionalData: {
           showNameAndValue: false,
         },
-      },
-      {
-        name: "cashbankAccount",
-        label: "Cash/Bank Account",
-        placeholder: "Cash/Bank Account",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Cash/Bank Account is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
+        functions: {
+          onOptionSelect: "OnPaymentModeChange"
         },
       },
+
       {
-        name: "bankName",
-        label: "Bank Name",
-        placeholder: "Bank Name",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Bank Name is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-      {
-        name: "chequeNumber",
-        label: "Cheque Number",
-        placeholder: "Enter Cheque Number",
+        name: "ChequeOrRefNo",
+        label: "Cheque/Ref No.",
+        placeholder: "Cheque/Ref No.",
         type: "text",
-        value: "",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.cHEQREF : "",
         generatecontrol: true,
-        disable: false,
+        disable: Type == "Acknowledge" ? true : false,
         Validations: [
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter alphanumeric 250 digit!",
-          //   pattern: "^[a-zA-Z 0-9 , ]{0,250}$",
-          // },
-        ],
+          {
+            name: "required",
+            message: "Cheque/Ref No is required"
+          },],
       },
       {
-        name: "chequeDate",
-        label: "Cheque Date",
-        placeholder: "select Cheque Date",
+        name: "Bank",
+        label: "Select Bank",
+        placeholder: "Select Bank",
+        type: "dropdown",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aCNM : "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: Type == "Acknowledge" ? true : false,
+        Validations: [
+          {
+            name: "required",
+            message: "Bank is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+
+      {
+        name: "CashAccount",
+        label: "Cash Account",
+        placeholder: "Cash Account",
+        type: "dropdown",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aCNM : "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: Type == "Acknowledge" ? true : false,
+        Validations: [
+          {
+            name: "required",
+            message: "Account is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "Date",
+        label: "Date",
+        placeholder: "Date",
+        type: "date",
+        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.eNTDT : "",
+        generatecontrol: true,
+        disable: Type == "Acknowledge" ? true : false,
+        Validations: [],
+        additionalData: {
+
+        },
+      },
+      {
+        name: "Depositedin",
+        label: "Deposited in",
+        placeholder: "Deposited in",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: Type == "Acknowledge" ? true : false,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Deposited is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "Depositedon",
+        label: "Deposited on",
+        placeholder: "Deposited on",
         type: "date",
         value: "",
-        generatecontrol: true,
+        generatecontrol: Type == "Acknowledge" ? true : false,
         disable: false,
         Validations: [],
-      },
-      {
-        name: "isActive",
-        label: "Active Flag",
-        placeholder: "",
-        type: "toggle",
-        value: "",
-        generatecontrol: false,
-        disable: false,
-        Validations: [],
+        additionalData: {
+
+        },
       },
     ];
   }
   getFormControls() {
     return this.AdviceGenerationArray;
+  }
+  getPaymentFormControls() {
+    return this.AdviceGenerationPaymentArray;
   }
 }

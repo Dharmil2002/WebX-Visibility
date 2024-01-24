@@ -140,7 +140,7 @@
                     <mat-label class="fontbold">{{formItem.label}}</mat-label>
                     <input matInput [matDatepicker]="picker" formControlName={{formItem.name}}
                       [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
-                      [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
+                      [disabled]="formItem.disable" [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
                 , eventArgs: $event})">
                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
@@ -293,7 +293,8 @@
                   <!--Checkbox-->
                   <ng-container *ngIf="formItem.type === 'checkbox'">
                     <ng-container *ngIf="formItem.generatecontrol">
-                      <mat-checkbox class="example-full-width" [formControlName]="formItem.name"  (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                      <mat-checkbox class="example-full-width" [formControlName]="formItem.name"
+                        (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
                         style=" margin: auto 5px; margin-top: 15px;">
                         {{formItem.label}}
                       </mat-checkbox>
@@ -301,7 +302,7 @@
                   </ng-container>
                   <!--Radio Button-->
                   <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-                    <mat-label>{{formItem.label}}</mat-label>&nbsp;
+                    <mat-label><b style="margin-left: 12px;"> {{formItem.label}}</b></mat-label>&nbsp;
                     <mat-radio-group [formControlName]="formItem.name"
                       (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
                       <mat-radio-button style=" margin: auto 5px; margin-top: 15px;"

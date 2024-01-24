@@ -356,7 +356,7 @@ export class AccountGroupComponent implements OnInit {
         gRPNM: this.AccountGroupForm.value.GroupName,
         pGCD: this.AccountGroupForm.value.GroupCodeType.value,
         pGNM: this.AccountGroupForm.value.GroupCodeType.name,
-        gLEVEL:`${parseInt(this.AccountGroupForm.value.GroupCodeType.level)+1}`,
+        gLEVEL: parseInt(this.AccountGroupForm.value.GroupCodeType.level || 0) + 1,
         cATNM: this.AccountGroupForm.value.CategoryCode.name,
         cATCD: this.AccountGroupForm.value.CategoryCode.value,
         bCATNM:this.AccountGroupForm.value.BalanceSheet.name,

@@ -62,7 +62,7 @@ export class PrqSummaryPageComponent implements OnInit {
     if (data.label) {
       if (data.label.route) {
         const inputDate = moment(data.data.pickUpDate, "DD-MM-YY HH:mm", true);
-      
+
         // Use current date and time for 'today'
         const today = moment();
         // Check if 'inputDate' is before today (ignoring time)
@@ -94,7 +94,7 @@ export class PrqSummaryPageComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
 
-  //Kpi count 
+  //Kpi count
   getPrqKpiCount() {
     const createShipDataObject = (
       count: number,
@@ -105,9 +105,9 @@ export class PrqSummaryPageComponent implements OnInit {
       title,
       class: `info-box7 ${className} order-info-box7`,
     });
-    const prqAssign = this.allPrq.filter((x) => x.status == "2");
-    const notPrqAssign = this.allPrq.filter((x) => x.status == "1");
-    const rejectAssign = this.allPrq.filter((x) => x.status == "5");
+    const prqAssign = this.allPrq.filter((x) => x.sTS == "2");
+    const notPrqAssign = this.allPrq.filter((x) => x.sTS == "1");
+    const rejectAssign = this.allPrq.filter((x) => x.sTS == "5");
     const shipData = [
       createShipDataObject(this.allPrq.length, "PRQ Count", "bg-c-Bottle-light"),
       createShipDataObject(prqAssign.length, "PRQ Assigned", "bg-c-Grape-light"),

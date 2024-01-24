@@ -5,5 +5,6 @@
         [Link]="linkArray" [FormTitle]="'Result'" [showHeader]='false'
         (functionCallEmitter)="functionCallHandler($event)">
     </app-generic-table-v2>
-    <h4>Quick link :<a href="/dashboard/DeliveryMrGeneration">Click here for generate more delivery</a> </h4>
+    <h4>Quick link : <a (click)="generateDelivery()" style="cursor: pointer; text-decoration: underline; color: blue;">
+            Click here for generate more delivery</a> </h4>
 </app-common-wrapper-webxpress>

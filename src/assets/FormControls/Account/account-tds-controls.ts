@@ -5,7 +5,7 @@ export class AccountTdsControls {
   constructor(isUpdate , UpdateData) {
     this.AccountTdsArray = [
       {
-        name: "TDSSection",
+        name: "TDSsection",
         label: "TDS Section",
         placeholder: "TDS Section",
         type: "text",
@@ -17,11 +17,6 @@ export class AccountTdsControls {
             name: "required",
             message: "TDS Section is required",
           },
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter alphanumeric length 2 to 100",
-          //   pattern: "^[a-zA-Z0-9 ]{2,100}$",
-          // },
         ],
         functions: {
           onChange:"CheckTDSSection"
@@ -55,8 +50,12 @@ export class AccountTdsControls {
         disable: false,
         Validations: [
           {
+            name: "required",
+            message: "Threshold limit is required",
+          },
+          {
             name: "pattern",
-            message: "Please Enter only numeric length 4 to 200",
+            message: "Please Enter only numeric length 1 to 100",
             pattern: "^[0-9]{1,100}$",
           },
         ],
@@ -107,6 +106,86 @@ export class AccountTdsControls {
         ],
         functions: {
         },
+      },
+      {
+        name: "RateForITR",
+        label: "Rate for ITR",
+        placeholder: "Rate for ITR",
+        type: "text",
+        value: isUpdate?UpdateData.RateForITR:"",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only numeric length 1 to 100",
+            pattern: "^[0-9]{1,100}$",
+          },
+        ],
+        functions: {},
+      },
+      {
+        name: "RateForWithoutITR",
+        label: "Rate for Without ITR",
+        placeholder: "Rate for Without ITR",
+        type: "text",
+        value: isUpdate?UpdateData.RateForWithoutITR:"",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only numeric length 1 to 100",
+            pattern: "^[0-9]{1,100}$",
+          },
+        ],
+        functions: {},
+      },
+      {
+        name: "LowRate",
+        label: "Low Rate",
+        placeholder: "Low Rate",
+        type: "text",
+        value: isUpdate?UpdateData.LowRate:"",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only numeric length 1 to 100",
+            pattern: "^[0-9]{1,100}$",
+          },
+        ],
+        functions: {},
+      },
+      {
+        name: "HighRate",
+        label: "High Rate",
+        placeholder: "High Rate",
+        type: "text",
+        value: isUpdate?UpdateData.HighRate:"",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only numeric length 1 to 100",
+            pattern: "^[0-9]{1,100}$",
+          },
+        ],
+        functions: {},
+      },
+
+      {
+        name: "isActive",
+        label: "TDS Active",
+        placeholder: "",
+        type: "toggle",
+        value: isUpdate? UpdateData.isActive:false,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        functions: {},
       },
     ];
   }

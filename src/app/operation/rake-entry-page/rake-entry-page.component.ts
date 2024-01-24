@@ -11,7 +11,7 @@ import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComp
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import {assignDetail, getTypeName, setGeneralMasterData} from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import {getTypeName, setGeneralMasterData} from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { RakeEntryService } from "src/app/Utility/module/operation/rake-entry/rake-entry-service";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
@@ -20,6 +20,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { isEmptyFormValue } from "src/app/Utility/Form Utilities/filter-utils";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -172,7 +173,47 @@ export class RakeEntryPageComponent implements OnInit {
         this.definition.columnHeader = this.definition.columnHeader;
         //this.loadTempData(jobDetail);
         this.getGeneralMasterData();
+       
+    }
 
+    async autoFillJobDetails() {
+        if(this.jobDetail){
+         const jobType=this.movementType.find(x=>x.name==this.jobDetail.jobType)?.value||"";
+         this.rakeEntryTableForm.controls['movementType'].setValue(jobType);
+         if (this.jobDetail.jobType == "Export" || (this.jobDetail.jobType == "import" && this.jobDetail.tBYNM == "Third Party")) {
+            const dockets=await this.docketService.getDockets({jOBNO:this.jobDetail.jobNo});
+            if(dockets){
+            const allDkt=dockets.map((x)=>x.docNo);
+             const containerDetails= await this.docketService.getDocketDetails({dKTNO: { 'D$in': allDkt }});
+             let shipments=[]
+             dockets.forEach((x)=>{
+             const container=containerDetails.data.filter((y)=>y.dKTNO==x.docNo);
+             const json = {
+                cnNo:x.docNo,
+                cnDate: formatDate(x.dKTDT, "dd-MM-yy HH:mm"),
+                contCnt:container.length,
+                noOfPkg: x?.pKGS||0,
+                weight:x?.aCTWT||0,
+                fCity:x?.fCT||0,
+                tCity:x?.tCT||0,
+                billingParty:x?.bPARTY||0,
+                billingPartyCode:x?.bPARTYNM||0,
+                cnDateDateUtc:x?.dKTDT||0,
+                type: 'cn',
+                jsonColumn: this.definition.jsonColumn,
+                staticField: ['cNID', 'cNTYP'],
+                tableData: container?container:[],
+                actions: ["Edit", "Remove"]
+            };
+            shipments.push(json);
+        });
+               this.tableData=shipments
+                this.isLoad = false;
+                this.tableLoad = false;
+            }
+            // Code to execute if either condition is met
+        }
+        }
     }
 
     functionCallHandler($event) {
@@ -185,13 +226,9 @@ export class RakeEntryPageComponent implements OnInit {
             console.log("failed");
         }
     }
-
- 
-    
     cancel() {
         this.goBack('Job')
     }
-
     goBack(tabIndex: string): void {
         this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
     }
@@ -235,14 +272,46 @@ export class RakeEntryPageComponent implements OnInit {
     
      /*End*/
     async save() {
-        debugger
-        const containerDetail = this.tableData;
-        const rakeDetail = this.tableRakeData;
-        const invoiceDetail = this.tableInvData;
+        const container=this.rakeContainerTableForm.value;
+        const forms = [this.rakeContainerTableForm, this.rakeDetailsTableForm, this.invDetailsTableForm];
+        const confirmAndProceed = () => {
+            return Swal.fire({
+                title: 'Are you sure?',
+                text: 'You have unsaved changes in the table. Are you sure you want to continue and discard these changes?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Continue',
+                cancelButtonText: 'No, Go Back'
+            });
+        };
+        const newValue=new Set();
+        const checkFormsAndProceed = async () => {
+            for (const form of forms) {
+                const isForm=await isEmptyFormValue(form);
+                newValue.add(isForm);
+                if (!await isEmptyFormValue(form)) {
+                    const result = await confirmAndProceed();
+                    if (result.isConfirmed) {
+                        this.addRakeDetails();
+                        break; // Stop checking other forms if the user confirms
+                    } else {
+                        return; // Exit the function if the user does not confirm
+                    }
+                }
+            }
+        
+            // Call addRakeDetails if all forms are empty or after user confirmation
+            this.addRakeDetails();
+        };
+        checkFormsAndProceed();
+    }
+    async addRakeDetails() {
         let bindData = {
-            containerDetail: assignDetail(containerDetail, this.rakeContainerTableForm.value),
-            rakeDetail: assignDetail(rakeDetail, this.rakeDetailsTableForm.value),
-            invoiceDetail: assignDetail(invoiceDetail, this.invDetailsTableForm.value)
+            containerDetail: this.tableData,
+            rakeDetail: this.tableRakeData,
+            invoiceDetail: this.tableInvData
         };
         const viaCity = this.rakeEntryTableForm.controls['viaControlHandler'].value;
         const cityMap = viaCity ? viaCity.map((x) => x.name) : [];
@@ -253,10 +322,10 @@ export class RakeEntryPageComponent implements OnInit {
         dataEntry['loadTypeName'] =await getTypeName(dataEntry.loadType, this.loadType);
         dataEntry['movementType'] = dataEntry.movementType;
         dataEntry['movementTypeName'] = await getTypeName(dataEntry.movementType, this.movementType);
-        dataEntry['documentType'] = await getTypeName(dataEntry.documentType, this.docType,true);
         dataEntry['documentTypeName'] = dataEntry.documentType;
-        dataEntry['transportMode'] = await getTypeName(dataEntry.transportMode, this.tranMode,true);
+        dataEntry['documentType'] = await getTypeName(dataEntry.documentType, this.docType,true);
         dataEntry['transportModeName'] = dataEntry.transportMode;
+        dataEntry['transportMode'] =await getTypeName(dataEntry.transportMode, this.tranMode,true) ;
         dataEntry['jobNo'] = this.jobDetail?.jobNo||"";
         const allData = {
             ...dataEntry,
@@ -273,7 +342,6 @@ export class RakeEntryPageComponent implements OnInit {
             });
             this.goBack("Job");
           }
-
     }
 
 
@@ -366,7 +434,10 @@ export class RakeEntryPageComponent implements OnInit {
             'weight',
             'tCity',
             'fCity',
-            'billingParty'
+            'billingParty',
+            'billingPartyCode',
+            'contDtl',
+            'noOfContainer'
         ];
         fieldsToClear.forEach(field => {
             this.rakeContainerTableForm.controls[field].setValue("");
@@ -391,7 +462,10 @@ export class RakeEntryPageComponent implements OnInit {
             this.tableData = this.tableData.filter(x => x.cnNo !== data.data.cnNo);
         } else {
             const cnNoToFind = data?.data?.cnNo;
-            const dktDetails = cnNoToFind ? this.shipments.find(x => x.value === cnNoToFind) : '';
+            const dktDetails = {
+                name:cnNoToFind,
+                value:cnNoToFind
+            };
             this.rakeContainerTableForm.controls['cnNo'].setValue(
                 dktDetails || ""
             );
@@ -413,6 +487,7 @@ export class RakeEntryPageComponent implements OnInit {
             this.rakeContainerTableForm.controls["billingParty"].setValue(
                 data.data?.billingParty || ""
             );
+            this.rakeContainerTableForm.controls['noOfContainer'].setValue(data.data?.contCnt||0)
             this.tableData = this.tableData.filter(x => x['cnNo'] !== data.data.cnNo);;
 
         }
@@ -563,6 +638,7 @@ export class RakeEntryPageComponent implements OnInit {
         this.docType = await this.generalService.getGeneralMasterData("RAKEDOCTYPE");
         setGeneralMasterData(this.jsonControlArray, this.movementType, "movementType");
         this.tranMode = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+        this.autoFillJobDetails();
         
     }
    /*End*/

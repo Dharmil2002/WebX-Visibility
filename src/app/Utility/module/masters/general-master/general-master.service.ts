@@ -17,6 +17,7 @@ export class GeneralService {
  * @returns A Promise that resolves to an array of AutoComplete objects.
  */
 async getGeneralMasterData(codeType): Promise<AutoComplete[]> {
+    
     // Construct the request body with the companyCode, collectionName, and filter.
     const reqBody = {
         companyCode: localStorage.getItem("companyCode"),

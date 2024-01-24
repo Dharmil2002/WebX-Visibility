@@ -110,7 +110,6 @@ export class VendorOutstandingReportComponent implements OnInit {
   }
   CSVHeader = {
     "srNo": "Sr No",
-    "vendorCD":"Vendor Code",
     "vendor": "Vendor",
     "openingBal": "Opening Balance",
     "totalBillAmtFrom010423To111223": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
@@ -185,7 +184,9 @@ export class VendorOutstandingReportComponent implements OnInit {
   }
 
   async save() {
-    let data = await this.vendorWiseOutService.getvendorWiseOutReportDetail();
+    const startValue = new Date(this.VendWiseOutTableForm.controls.start.value);
+    const endValue = new Date(this.VendWiseOutTableForm.controls.end.value);
+    let data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(startValue,endValue);
     const locData = Array.isArray(this.VendWiseOutTableForm.value.locHandler)
       ? this.VendWiseOutTableForm.value.locHandler.map(x => x.name)
       : [];
@@ -195,13 +196,8 @@ export class VendorOutstandingReportComponent implements OnInit {
     const filteredRecords = data.filter(record => {
       const locDet = locData.length === 0 || locData.includes(record.lOC);
       const venNMDet = vendNMData.length === 0 || vendNMData.includes(record.Vendor);
-      const startValue = new Date(this.VendWiseOutTableForm.controls.start.value);
-      const endValue = new Date(this.VendWiseOutTableForm.controls.end.value);
-      const entryTime = new Date(record.obDT);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid && locDet && venNMDet;
+      return locDet && venNMDet;
     });
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {
@@ -217,7 +213,7 @@ export class VendorOutstandingReportComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { obDT,lOC, ...rest } = record;
+      const { lOC, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Vendor_Wise_Outstanding_Report-${timeString}`, this.CSVHeader);

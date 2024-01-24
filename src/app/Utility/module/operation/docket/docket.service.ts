@@ -40,7 +40,7 @@ export class DocketService {
     ) { }
 
     async updateDocket(data, filter) {
-        
+
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
@@ -117,6 +117,16 @@ export class DocketService {
         }
 
         const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
+        return res.data;
+    }
+    async getDockets(filter) {
+        const req = {
+            "companyCode": localStorage.getItem("companyCode"),
+            "filter": filter,
+            "collectionName": "dockets"
+        }
+
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data;
     }
 
@@ -259,7 +269,7 @@ export class DocketService {
     }
 
     async reverseDocketObjectMapping(docket, jsonControl) {
-        
+
         const pAYTYP = getValueFromJsonControl(jsonControl, "payType", docket.payType);
         const tRNMOD = getValueFromJsonControl(jsonControl, "transMode", docket.transMode);
         const vENDTY = getValueFromJsonControl(jsonControl, "vendorType", docket.vendorType);
@@ -331,10 +341,10 @@ export class DocketService {
             mODLOC: this.storage.branch,
             tRNHR: docket["tran_hour"],
             aCTWT: WtKg,
-            cHRWT:CWtKg,
-            pKGS:Pkg
+            cHRWT: CWtKg,
+            pKGS: Pkg
         };
-        
+
         return data;
     }
 
@@ -348,7 +358,7 @@ export class DocketService {
         return res.data;
     }
     async updateManyDockets(data, filter, collectionName) {
-        
+
         try {
             const commonRequestData = {
                 companyCode: this.storage.companyCode,
@@ -382,7 +392,7 @@ export class DocketService {
             throw error;
         }
     }
-    
+
     async addEventData(data) {
         const evnData = {
             "_id": `${this.storage.companyCode}${data.docketNumber}-1-EVN0002` + new Date(),
@@ -415,7 +425,7 @@ export class DocketService {
         return res;
     }
     async updateOperationData(data) {
-        
+
         let opsData = {
             "tOTWT": data.invoiceDetails.reduce((totalWeight, invoiceDetail) => totalWeight + invoiceDetail.actualWeight, 0),
             "tOTPKG": data.invoiceDetails.reduce((tOTPKG, noofPkts) => tOTPKG + noofPkts.noofPkts, 0),
@@ -433,7 +443,7 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPut('generic/update', req));
         return res;
     }
-    async getDocketsForAutoComplete(form, jsondata, controlName, codeStatus,billingParty="") {
+    async getDocketsForAutoComplete(form, jsondata, controlName, codeStatus,billingParty="",isJob=false) {
        
         try {
           const dValue = form.controls[controlName].value;
@@ -442,14 +452,17 @@ export class DocketService {
           if (dValue.length >= 3) {
             let filter = {
                 docNo: { 'D$regex': `^${dValue}`, 'D$options': 'i' },
-                jOBNO: "",
                 'D$or': [
                     { oRGN: this.storage.branch },
-                    { dEST: this.storage.branch }
+                    { dEST: this.storage.branch },
+                    {rAKENO:{'D$exists':false}}
                 ]
             };
             if (billingParty) {
                 filter['bPARTY'] = billingParty;
+            }
+            if(isJob){
+                filter['jOBNO'] = ""
             }
             // Prepare the pincodeBody with the companyCode and the determined filter
             const cityBody = {
@@ -468,7 +481,6 @@ export class DocketService {
             // Filter cityCodeData for partial matches
             if (codeData.length === 0) {
               // Show a popup indicating no data found for the given pincode
-              console.log(`No data found for Docket ${dValue}`);
               // Swal.fire({
               //   icon: "info",
               //   title: "No Data Found",
@@ -495,18 +507,19 @@ export class DocketService {
           console.error("Error fetching data:", error);
         }
       }
-      async getDocketDetails(filter={}) {
+    async getDocketDetails(filter = {}) {
         try {
             // Prepare the pincodeBody with the companyCode and the determined filter
             const cityBody = {
                 companyCode: localStorage.getItem("companyCode"),
                 collectionName: "docket_containers",
-                filter:filter
+                filter: filter
             };
             // Fetch pincode data from the masterService asynchronously
             const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
             return dResponse
         } catch (error) {
         }
-      }
+    }
+
 }

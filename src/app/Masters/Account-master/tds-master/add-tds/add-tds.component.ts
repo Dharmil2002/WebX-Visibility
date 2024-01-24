@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder } from "@angular/forms";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -51,6 +51,9 @@ export class AddTdsComponent implements OnInit {
     this.jsonControlArray = AccountFormControls.getAccountTdsArray();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.TdsForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    const Thresholdlimit = this.TdsForm.get("Thresholdlimit");
+    Thresholdlimit.setValidators([Validators.pattern(/^[0-9]{1,100}$/)]);
+    Thresholdlimit.updateValueAndValidity();
   }
 
   async checkValueExists(fieldName, errorMessage) {
@@ -66,7 +69,9 @@ export class AddTdsComponent implements OnInit {
       };
 
       // Send the request to fetch user data
-      const tdslist = await firstValueFrom (this.masterService.masterPost("generic/get", req));
+      const tdslist = await firstValueFrom(
+        this.masterService.masterPost("generic/get", req)
+      );
 
       // Check if data exists for the given filter criteria
       if (tdslist.data.length > 0) {
@@ -78,7 +83,7 @@ export class AddTdsComponent implements OnInit {
           showCloseButton: false,
           showCancelButton: false,
           showConfirmButton: true,
-          confirmButtonText: "OK"
+          confirmButtonText: "OK",
         });
 
         // Reset the input field
@@ -86,7 +91,10 @@ export class AddTdsComponent implements OnInit {
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+      console.error(
+        `An error occurred while fetching ${fieldName} details:`,
+        error
+      );
     }
   }
 
@@ -95,6 +103,18 @@ export class AddTdsComponent implements OnInit {
   }
   async CheckPaymentType() {
     await this.checkValueExists("PaymentType", "Nature of Payment");
+    if (this.TdsForm.value.PaymentType.toLowerCase() == "purchase") {
+      const Thresholdlimit = this.TdsForm.get("Thresholdlimit");
+      Thresholdlimit.setValidators([
+        Validators.required,
+        Validators.pattern(/^[0-9]{1,100}$/),
+      ]);
+      Thresholdlimit.updateValueAndValidity();
+    } else {
+      const Thresholdlimit = this.TdsForm.get("Thresholdlimit");
+      Thresholdlimit.setValidators([Validators.pattern(/^[0-9]{1,100}$/)]);
+      Thresholdlimit.updateValueAndValidity();
+    }
   }
 
   functionCallHandler($event) {
@@ -105,39 +125,18 @@ export class AddTdsComponent implements OnInit {
       console.log("failed");
     }
   }
-  // async hendelsave(body) {
-  //   const req = {
-  //     companyCode: this.CompanyCode,
-  //     collectionName: "tds_detail",
-  //     filter: this.isUpdate
-  //       ? { AccountCode: this.UpdateData.AccountCode }
-  //       : undefined,
-  //     update: this.isUpdate ? body : undefined,
-  //     data: this.isUpdate ? undefined : body,
-  //   };
-
-  //   const res = this.isUpdate
-  //     ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
-  //     : await firstValueFrom (this.masterService.masterPost("generic/create", req))
-
-  //   if (res.success) {
-  //     this.Route.navigateByUrl("/Masters/AccountMaster/ListTds");
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Successful",
-  //       text: res.message,
-  //       showConfirmButton: true,
-  //     });
-  //   }
-  // }
 
   async save() {
     const commonBody = {
-      TDSsection: this.TdsForm.value.TDSSection,
       PaymentType: this.TdsForm.value.PaymentType,
       RateForHUF: this.TdsForm.value.RateForHUF,
       Thresholdlimit: this.TdsForm.value.Thresholdlimit,
       RateForOthers: this.TdsForm.value.RateForOthers,
+      RateForITR: parseInt(this.TdsForm.value.RateForITR) || 0,
+      RateForWithoutITR: parseInt(this.TdsForm.value.RateForWithoutITR) || 0,
+      LowRate: parseInt(this.TdsForm.value.LowRate) || 0,
+      HighRate: parseInt(this.TdsForm.value.HighRate) || 0,
+      isActive: this.TdsForm.value.isActive,
     };
     if (this.isUpdate) {
       const req = {
@@ -148,17 +147,24 @@ export class AddTdsComponent implements OnInit {
       };
       await this.handleRequest(req);
     } else {
-      const tabledata = await firstValueFrom (this.masterService
-        .masterPost("generic/get", {
+      const tabledata = await firstValueFrom(
+        this.masterService.masterPost("generic/get", {
           companyCode: this.CompanyCode,
           collectionName: "tds_detail",
           filter: {},
-        }));
-        const index= parseInt(tabledata.data.length === 0 ? 0 : tabledata.data[tabledata.data.length-1].TDScode)+1
-        // const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
+        })
+      );
+      const index =
+        parseInt(
+          tabledata.data.length === 0
+            ? 0
+            : tabledata.data[tabledata.data.length - 1].TDScode
+        ) + 1;
+      // const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
       const body = {
-        _id:index,
-        TDScode:index,
+        _id: index,
+        TDScode: index,
+        TDSsection: this.TdsForm.value.TDSsection,
         eNTBY: localStorage.getItem("UserName"),
         eNTDT: new Date(),
         companyCode: this.CompanyCode,
@@ -175,8 +181,12 @@ export class AddTdsComponent implements OnInit {
 
   async handleRequest(req: any) {
     const res = this.isUpdate
-      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
-      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
+      ? await firstValueFrom(
+          this.masterService.masterPut("generic/update", req)
+        )
+      : await firstValueFrom(
+          this.masterService.masterPost("generic/create", req)
+        );
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/ListTds");

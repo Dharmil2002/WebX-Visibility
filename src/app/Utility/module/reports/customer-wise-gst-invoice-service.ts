@@ -13,11 +13,27 @@ export class CustGSTInvoiceService {
           private storage: StorageService
      ) { }
 
-     async getcustomerGstRegisterReportDetail() {
+     async getcustomerGstRegisterReportDetail(start, end) {
+          const startValue = start;
+          const endValue = end;
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "cust_bill_headers",
-               filter: {}
+               filter: {
+                    cID: this.storage.companyCode,
+                    "D$and": [
+                         {
+                              "bGNDT": {
+                                   "D$gte": startValue
+                              }
+                         },
+                         {
+                              "bGNDT": {
+                                   "D$lte": endValue
+                              }
+                         }
+                    ]
+               }
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
           reqBody.collectionName = "cust_bill_details"
@@ -44,8 +60,6 @@ export class CustGSTInvoiceService {
                     invAmt = docketinvDet.iNVAMT
                }
                let custgstinvData = {
-                    "obGNDT": element.bGNDT,
-                    "ocustName": element?.cUST.nM,
                     "BILLNO": element?.bILLNO || '',
                     "BILLDT": formatDocketDate(element?.bGNDT || ''),
                     "DocumentType": '',

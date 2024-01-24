@@ -18,7 +18,7 @@ import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleSt
 import { xlsxutilityService } from "src/app/core/service/Utility/xlsx Utils/xlsxutility.service";
 import { XlsxPreviewPageComponent } from "src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component";
 import { MatDialog } from "@angular/material/dialog";
-import { getVehicleStatusFromApi } from "../assign-vehicle-page/assgine-vehicle-utility";
+import { getVehicleStatusFromApi, getcontainerstatusFromApi } from "../assign-vehicle-page/assgine-vehicle-utility";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
@@ -144,7 +144,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.rateTypes = await this.generalService.getGeneralMasterData("RTTYP");
     this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
     this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
-    this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
+   // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
 
     // Find the form control with the name 'packaging_type'
@@ -156,10 +156,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setGeneralMasterData(this.model.allformControl, this.deliveryTypes, "delivery_type");
     this.setGeneralMasterData(this.model.allformControl, this.wtUnits, "weight_in");
     this.setGeneralMasterData(this.model.allformControl, this.riskTypes, "risk");
-    this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
-    const rateType= this.rateTypes.filter((x) => x.value != "RTTYP-0007");
-    this.setGeneralMasterData(this.jsonControlArray,rateType, "freightRatetype");
-    const prodCode= this.products.find((x)=>x.name=="Road")?.value||"";
+   // this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
+    const rateType = this.rateTypes.filter((x) => x.value != "RTTYP-0007");
+    this.setGeneralMasterData(this.jsonControlArray, rateType, "freightRatetype");
+    const prodCode = this.products.find((x) => x.name == "Road")?.value || "";
     this.model.consignmentTableForm.controls["transMode"].setValue(prodCode);
 
   }
@@ -268,10 +268,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     Diffrent variaty of the data i did like this in future also removed this condition this is managed by it self 
     issue Found in Vehicle and Vendor Master*/
     let vehType;
-    if(vehicleDetail.vendorType=='Market'){
+    if (vehicleDetail.vendorType == 'Market') {
       vehType = this.vendorTypes.find(f => f.name == vehicleDetail?.vendorType);
     }
-    else{
+    else {
       vehType = this.vendorTypes.find(f => f.value == vehicleDetail?.vendorTypeCode);
     }
     /*End*/
@@ -310,7 +310,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     else {
       let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
       const vendor = vendors[0];
-      this.setFormValue(this.model.consignmentTableForm,"vendorName", vendor);
+      this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
       this.model.consignmentTableForm.controls['vehicleNo'].setValue({ name: this.model.prqData?.vEHNO || "", value: this.model.prqData?.vEHNO || "" });
 
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
@@ -321,8 +321,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.containerTableForm.controls["containerType"].setValue({ name: this.model.prqData?.typeContainer || "", value: this.model.prqData?.typeContainerCode || "" });
       this.model.containerTableForm.controls["containerCapacity"].setValue(this.model.prqData?.size || 0);
     }
-    const prodCode= this.products.find((x)=>x.name=="Road")?.value||"";
-    this.setFormValue(this.model.consignmentTableForm, "transMode",prodCode);
+    const prodCode = this.products.find((x) => x.name == "Road")?.value || "";
+    this.setFormValue(this.model.consignmentTableForm, "transMode", prodCode);
   }
 
   setFormValue(
@@ -346,9 +346,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async bindDataFromDropdown() {
-    
+
     const locDetails = await this.locationService.locationFromApi({ locCode: this.storage.branch });
-    if (!locDetails.length || locDetails[0].locLevel == 1){
+    if (!locDetails.length || locDetails[0].locLevel == 1) {
       Swal.fire({
         icon: 'info', // Change the icon to 'info' for an informational message
         title: 'Information', // Update the title to reflect the nature of the message
@@ -357,13 +357,13 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         showCancelButton: false, // Keep this as false if you don't need a cancel button
         showConfirmButton: true, // Set to true to show a confirm button
         confirmButtonText: 'OK' // You can customize the text of the confirm button
-    });
-        this.navService.navigateTotab(
-          "docket",
-          "dashboard/Index"
-        );
-       return false;
-     }
+      });
+      this.navService.navigateTotab(
+        "docket",
+        "dashboard/Index"
+      );
+      return false;
+    }
     const vehicleList = await getVehicleStatusFromApi(
       this.storage.companyCode,
       this.operationService
@@ -483,8 +483,59 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.vehicleNo,
       this.model.vehicleNoStatus
     );
+
+
+    this.ContainerNumbersSetup();
   }
   /*End*/
+  async ContainerNumbersSetup() {
+    const consignmentForm = this.model.consignmentTableForm;
+    const containerForm = this.model.containerTableForm;
+    if (consignmentForm.controls["cd"].value) {
+      this.jsonContainerDetail.forEach(detail => {
+        if (detail.name === "containerNumber") {
+          detail.type = ["1", "4"].includes(consignmentForm.value.vendorType) ? "dropdown" : "text";
+        }
+      });
+      const vendorType = consignmentForm.value.vendorType;
+      const isVendorType1or4 = vendorType === "1" || vendorType === "4";
+      const containerNumberControl = containerForm.get('containerNumber');
+  
+      if (isVendorType1or4) {
+        const data = await getcontainerstatusFromApi(this.operationService, parseInt(vendorType));
+        
+        if (data.length > 0) {
+          this.filter.Filter(
+            this.jsonContainerDetail,
+            containerForm,
+            data,
+            "containerNumber",
+            false
+          );
+          containerNumberControl.setValidators([Validators.required, autocompleteObjectValidator()]);
+        } else {
+          containerNumberControl.setValidators([Validators.required]);
+        }
+      } else {
+        containerNumberControl.setValidators([Validators.required]);
+      }
+  
+      containerNumberControl.updateValueAndValidity();
+    }
+  }
+  
+
+  OnChnageContainerNumber(event) {
+    const ContainerType = event?.eventArgs?.option?.value?.data?.cNTYPNM;
+    const containerCapacity = this.model.containerTypeList.find(
+      (x) => x.name.trim() === ContainerType.trim()
+    );
+    this.model.containerTableForm.controls["containerType"].setValue(containerCapacity);
+    this.model.containerTableForm.controls["containerCapacity"].setValue(
+      containerCapacity.loadCapacity
+    );
+
+  }
   onAutoBillingBased(event) {
     const fieldConsignorName = 'consignorName';
     const fieldConsigneeName = 'consigneeName';
@@ -590,7 +641,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     await delay(delayDuration);
     const json = {
       id: tableData.length + 1,
-      containerNumber: this.model.containerTableForm.value.containerNumber,
+      containerNumber: typeof (this.model.containerTableForm.value.containerNumber) == 'object' ? this.model.containerTableForm.value.containerNumber.name : this.model.containerTableForm.value.containerNumber,
       containerType: this.model.containerTableForm.value.containerType.value,
       containerCapacity: this.model.containerTableForm.value.containerCapacity,
       isEmpty: this.model.containerTableForm.value.isEmpty ? "Y" : "N",
@@ -836,7 +887,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     setControlValue("packaging_type", docketDetails.packaging_type);
     setControlValue("weight_in", docketDetails.weight_in);
     setControlValue("delivery_type", docketDetails.delivery_type);
-    setControlValue("issuing_from", docketDetails.issuing_from);
+    //setControlValue("issuing_from", docketDetails.issuing_from);
 
     // Set Freight Table Form details.
     this.model.FreightTableForm.controls["freightRatetype"].setValue(docketDetails.freightRatetype);
@@ -866,8 +917,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         x.invoiceAmount = x.iNVAMT;
         x.noofPkts = x.pKGS;
         x.materialName = x.mTNM;
-        x.actualWeight = x.aCTWT;
-        x.chargedWeight = x.cHRWT;
+        x.actualWeight = (parseFloat(x.aCTWT) / 1000).toString();
+        x.chargedWeight = (parseFloat(x.cHRWT) / 1000).toString();
         x.invoice = true;
         x.expiryDateO = x.eXPDT;
         x.actions = ["Edit", "Remove"];
@@ -946,7 +997,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const cd = this.model.consignmentTableForm.controls["cd"].value;
     if (cd) {
       this.contFlag = true;
-      this.setGeneralMasterData(this.jsonControlArray,this.rateTypes, "freightRatetype");
+      this.setGeneralMasterData(this.jsonControlArray, this.rateTypes, "freightRatetype");
       this.filter.Filter(
         this.jsonContainerDetail,
         this.model.containerTableForm,
@@ -954,9 +1005,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.model.containerType,
         this.model.containerTypeStatus
       );
+      this.ContainerNumbersSetup();
     } else {
-      const rateType= this.rateTypes.filter((x) => x.value != "RTTYP-0007");
-      this.setGeneralMasterData(this.jsonControlArray,rateType, "freightRatetype");
+      const rateType = this.rateTypes.filter((x) => x.value != "RTTYP-0007");
+      this.setGeneralMasterData(this.jsonControlArray, rateType, "freightRatetype");
       this.contFlag = false;
     }
   }
@@ -966,6 +1018,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.isSubmit = true;
     // Remove all form errors
     const tabcontrols = this.model.consignmentTableForm;
+    tabcontrols.removeControl['test'];
     clearValidatorsAndValidate(tabcontrols);
     const contractcontrols = this.model.consignmentTableForm;
     clearValidatorsAndValidate(contractcontrols);
@@ -1019,7 +1072,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "vendorType",
       "weight_in",
       "delivery_type",
-      "issuing_from",
+     // "issuing_from",
     ];
 
     controltabNames.forEach((controlName) => {
@@ -1086,7 +1139,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               { controlName: 'packaging_type', name: 'packaging_type_Name', value: 'packaging_type' },
               { controlName: 'risk', name: 'riskName', value: 'risk' },
               { controlName: 'delivery_type', name: 'delivery_type_Name', value: 'delivery_type' },
-              { controlName: 'issuing_from', name: 'issuing_from_Name', value: 'issuing_from' }
+             // { controlName: 'issuing_from', name: 'issuing_from_Name', value: 'issuing_from' }
             ]
           },
           {
@@ -1135,6 +1188,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       let invDet = [];
       let contDet = [];
       invoiceDetails.invoiceDetails.forEach(i => {
+        const actualWeight = parseFloat(i.actualWeight)  * 1000;
+        const chargedWeight = parseFloat(i.chargedWeight)  * 1000;
         invDet.push({
           cID: this.storage.companyCode,
           //dKTNO:  //To be set from service
@@ -1145,9 +1200,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           eXPDT: i.expiryDateO,
           pKGS: (parseInt(i.noofPkts) || 0),
           mTNM: i.materialName,
-          aCTWT: (parseFloat(i.actualWeight) || 0),
+          aCTWT: actualWeight,
           cFTWT: 0,
-          cHRWT: (parseFloat(i.chargedWeight) || 0),
+          cHRWT: chargedWeight,
           vOL: {
             uNIT: "FT",
             l: 0.000,
@@ -1324,7 +1379,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.docketService.updateManyDockets(invDet, filter, "docket_invoices"),
         this.docketService.updateManyDockets(contDet, filter, "docket_containers"),
         this.docketService.addEventData(docketDetails),
-        this.docketService.updateOperationData(docketDetails)
+        this.docketService.updateOperationData(docketDetails),
       ]);
 
       Swal.fire({

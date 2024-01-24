@@ -70,7 +70,7 @@ export class ContainerFormControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -111,7 +111,7 @@ export class ContainerFormControls {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
         functions: {},
       },

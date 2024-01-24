@@ -365,8 +365,10 @@ export class CnoteBillMrReportComponent implements OnInit {
   }
 
   async save() {
+    const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
+    const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
     // Fetch data from the service
-    let data = await this.cnoteBillMRService.getCNoteBillMRReportDetail();
+    let data = await this.cnoteBillMRService.getCNoteBillMRReportDetail(startValue,endValue);
     // Extract selected values from the form
     const payment = Array.isArray(this.cnoteBillMRTableForm.value.payTypeHandler)
       ? this.cnoteBillMRTableForm.value.payTypeHandler.map(x => x.name)
@@ -398,13 +400,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       const booktpDet = bookingtype.length === 0 || bookingtype.includes(record.bOOKINGTPE);
       const tranmodeDet = transitmode.length === 0 || transitmode.includes(record.tRANMODE);
       const customerDet = customer.length === 0 || customer.includes(record.bILLPAR);
-      const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
-      const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
-      const entryTime = new Date(record.oeNTDT);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
-
-      return isDateRangeValid && des && origin && movtype && paytpDet && booktpDet && tranmodeDet && customerDet;
+      return des && origin && movtype && paytpDet && booktpDet && tranmodeDet && customerDet;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
     // const selectedData = filteredRecords;
@@ -421,7 +417,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       return;
     }
     const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { oRGN,dEST, bOOKINGTPE,oeNTDT,  ...rest } = record;
+      const { oRGN,dEST, bOOKINGTPE, ...rest } = record;
       return rest;
     });
     exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_Bill_MR_Report-${timeString}`,this.CSVHeader);

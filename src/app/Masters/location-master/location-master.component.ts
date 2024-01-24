@@ -6,6 +6,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 import { UploadLocationComponent } from './upload-location/upload-location.component';
 import { MatDialog } from '@angular/material/dialog';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 
 @Component({
   selector: 'app-location-master',
@@ -42,11 +43,26 @@ export class LocationMasterComponent implements OnInit {
   headerForCsv = {
     'locCode': 'Location Code',
     'locName': 'Location Name',
-    '': "Location Hirarchay",
-    'ownership': 'Location Ownership',
-    'locAddress': 'Location Address',
+    'locHirarchay': "Location Hirarchay",
+    'reportingto': "Reporting to",
     'reportLoc': 'Reporting Location',
-    "activeFlag": "Active Status",
+    'locPincode': 'Pin Code',
+    'locRegion': 'Zone',
+    'locCountry': 'Country',
+    'locCity': 'City',
+    'locState': 'State',
+    'locAddr': 'Address',
+    'ownership': 'Location Ownership',
+    'Latitude': 'Lat',
+    'Longitude': 'Log',
+    'mappedPinCode': 'Mapped Area-Pin Code',
+    'mappedCity': 'Mapped Area - City',
+    "mappedState": "Mapped Area State",
+    'gstNumber': 'GST Number',
+    'eNTBY': "Uploaded By",
+    'eNTDT': "Uploaded on"
+
+
   }
   breadScrums = [
     {
@@ -68,27 +84,19 @@ export class LocationMasterComponent implements OnInit {
     private masterService: MasterService,
     private storage: StorageService,
     private dialog: MatDialog,
+    private objGeneralService: GeneralService
   ) {
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
     this.csvFileName = "Location Details";
     this.centerAlignedData = ["locPincode"]
   }
   ngOnInit(): void {
-    this.getOwnership();
     this.getLocationDetails();
   }
-  async getOwnership() {
-    const generalReqBody = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "General_master",
-    };
 
-    const generalResponse = await firstValueFrom(this.masterService.masterPost("generic/get", generalReqBody));
-    return generalResponse.data
-  }
   //#region to get location Details
   async getLocationDetails() {
+    this.tableLoad = true;
     let req = {
       "companyCode": this.companyCode,
       "filter": { companyCode: this.storage.companyCode },
@@ -98,23 +106,26 @@ export class LocationMasterComponent implements OnInit {
     if (res && Array.isArray(res.data)) {
       try {
         // Get the ownership descriptions using the getOwnership() function
-        const ownershipDescriptions = await this.getOwnership();
+        const ownershipDescriptions = await this.objGeneralService.getGeneralMasterData("LOC_OWN");
+        const hierachylist = await this.objGeneralService.getGeneralMasterData("HRCHY");
         const sortedData = res.data.sort((a, b) => new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime());
 
         // Modify each object in res.data
         const modifiedData = sortedData.map(obj => {
           // Find the matching ownership description
-          const ownershipObject = ownershipDescriptions.find(x => x.codeId === obj.ownership);
-
+          const ownershipObject = ownershipDescriptions.find(x => x.value === obj.ownership);
+          const LocationHirarchay = hierachylist.find(item => parseInt(item.value) === obj.locLevel);
+          const Reportingto = hierachylist.find(item => parseInt(item.value) === obj.reportLevel);
           // Set the ownership property to the codeDesc if found, or an empty string if not found
-          const ownership = ownershipObject ? ownershipObject.codeDesc : '';
+          const ownership = ownershipObject ? ownershipObject.name : '';
 
           // Convert locCode and locName to uppercase
           const locCode = obj.locCode;
           const locName = obj.locName.toUpperCase();
           const locCity = obj.locCity.toUpperCase();
           const locPincode = parseInt(obj.locPincode, 10); // Specify the radix for parseInt
-
+          const locHirarchay = LocationHirarchay.name;
+          const reportingto = Reportingto.name;
           // Create a modified object
           return {
             ...obj,
@@ -123,16 +134,19 @@ export class LocationMasterComponent implements OnInit {
             locName,
             locCity,
             locPincode,
+            locHirarchay,
+            reportingto,
             eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
         });
 
         // Assign the modified and sorted data back to this.csv
         this.csv = modifiedData;
-        console.log(this.csv);
+        // console.log(this.csv);
         this.tableLoad = false;
       } catch (error) {
         console.error("Error processing user data:", error);
+        this.tableLoad = false;
       }
     }
   }
@@ -142,17 +156,14 @@ export class LocationMasterComponent implements OnInit {
     let locCode = det.locCode;
     // Remove the "id" field from the form controls
     delete det._id;
-    delete det.eNTDT
+    delete det.eNTDT;
+    delete det.ownership;
+    delete det.reportingto;
+    delete det.locHirarchay;
     det['mODDT'] = new Date()
     det['mODBY'] = localStorage.getItem("UserName")
     det['mODLOC'] = localStorage.getItem("Branch")
-    const ownershipDescriptions = await this.getOwnership();
-    const ownershipObject = ownershipDescriptions.find(
-      (x) => x.codeDesc === det.ownership
-    );
-    // Set the ownership property to the codeDesc if found, or an empty string if not found
-    const ownership = ownershipObject ? ownershipObject.codeId : '';
-    det.ownership = ownership
+
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "location_detail",

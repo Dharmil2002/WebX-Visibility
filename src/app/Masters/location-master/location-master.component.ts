@@ -124,8 +124,8 @@ export class LocationMasterComponent implements OnInit {
           const locName = obj.locName.toUpperCase();
           const locCity = obj.locCity.toUpperCase();
           const locPincode = parseInt(obj.locPincode, 10); // Specify the radix for parseInt
-          const locHirarchay = LocationHirarchay.name;
-          const reportingto = Reportingto.name;
+          const locHirarchay = LocationHirarchay ? LocationHirarchay.name : '';
+          const reportingto = Reportingto ? Reportingto.name : '';
           // Create a modified object
           return {
             ...obj,
@@ -145,7 +145,7 @@ export class LocationMasterComponent implements OnInit {
         // console.log(this.csv);
         this.tableLoad = false;
       } catch (error) {
-        console.error("Error processing user data:", error);
+        console.error("Error processing location data:", error);
         this.tableLoad = false;
       }
     }

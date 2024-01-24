@@ -74,7 +74,7 @@ export class ManualVoucherComponent implements OnInit {
 
   ]
   VoucherControl: VoucherControlControl;
-
+  AllTableData = [];
   VoucherSummaryForm: UntypedFormGroup;
   jsonControlVoucherSummaryArray: any;
 
@@ -85,7 +85,7 @@ export class ManualVoucherComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils
   ) {
-    this.addAndEditPath = "Finance/DebitVoucher";
+    this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;
@@ -110,7 +110,7 @@ export class ManualVoucherComponent implements OnInit {
   }
   async getVoucherList() {
     const detail = await manualvoucharDetail(this.masterService);
-    const result = detail.map((x) => {
+    this.AllTableData = detail.map((x) => {
       const formattedDate = this.datePipe.transform(x.tTDT, 'dd-MMM-yy HH:mm a');
       const createdDate = this.datePipe.transform(x.eDT, 'dd-MMM-yy HH:mm a');
       return {
@@ -119,13 +119,14 @@ export class ManualVoucherComponent implements OnInit {
       };
     });
 
-    this.tableData = result;
+    this.tableData = this.AllTableData;
     this.tableLoad = false;
 
-    const uniqueTYP = new Set(result.map(item => item.tTYP));
+    const uniqueTYP = new Set(this.AllTableData.map(item => item.tTYP));
 
     // Convert Set to array if needed
     const uniqueTYPArray = Array.from(uniqueTYP);
+    console.log(uniqueTYPArray)
 
     const voucherTypelist: any[] = uniqueTYPArray.map(item => ({
       name: item,
@@ -141,6 +142,35 @@ export class ManualVoucherComponent implements OnInit {
     );
   }
 
+  VoucherTypeFieldChanged(event) {
+    const selectedField = event?.eventArgs.option.value.value
+    this.tableLoad = true;
+    this.tableData = this.AllTableData.filter(item => item.tTYP == selectedField)
+    this.tableLoad = false;
+
+    switch (selectedField) {
+      case "DebitVoucher":
+        this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
+        break;
+      case "VendorBillPayment":
+        this.addAndEditPath = "Finance/VendorPayment/VendorBillPayment";
+        break;
+      case "Journal Voucher":
+        this.addAndEditPath = "Finance/VoucherEntry/JournalVoucher";
+        break;
+      case "Contra Voucher":
+        this.addAndEditPath = "Finance/VoucherEntry/ContraVoucher";
+        break;
+      case "Delivery MR Voucher":
+        this.addAndEditPath = "dashboard/Index";
+        break;
+      default:
+        this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
+        break;
+
+    }
+
+  }
   async handleMenuItemClick(data) {
     if (data.label.label === "Modify") {
       this.router.navigate(['Finance/DebitVoucher'], {

@@ -8,7 +8,6 @@ import {
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
-  Validators,
 } from "@angular/forms";
 import { Subject, firstValueFrom } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -22,6 +21,8 @@ import { Router } from "@angular/router";
 import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
+import { MatDialog } from "@angular/material/dialog";
+import { FreightChargeUploadComponent } from "./freight-charge-upload/freight-charge-upload.component";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -121,7 +122,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   UpdateData: any;
   capacityCode: any;
   capacityStatus: any;
-
+  uploadComponent = FreightChargeUploadComponent;
   //#endregion
   constructor(
     private fb: UntypedFormBuilder,
@@ -132,7 +133,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private sessionService: SessionService,
     private storage: StorageService,
-    private objContainerService: ContainerService
+    private objContainerService: ContainerService,
+    private dialog: MatDialog
   ) {
     // Retrieve the stored value from session storage
     // const storedData = sessionStorage.getItem("ServiceSelectiondata");
@@ -317,6 +319,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   //#region Set OriginRateOptions
   SetOptions(event) {
+    console.log(event);
+    console.log(this.PinCodeList.data);
+
     let fieldName = event.field.name;
     console.log("fieldName", fieldName);
     const search = this.FreightMatrixForm.controls[fieldName].value;
@@ -361,8 +366,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       } else {
         return isUpdate
           ? commonConditions &&
-              item.cAP == formData.capacity.name &&
-              item._id != this.UpdateData._id
+          item.cAP == formData.capacity.name &&
+          item._id != this.UpdateData._id
           : commonConditions && item.cAP == formData.capacity.name;
       }
     };
@@ -527,4 +532,15 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     this.EventButton.name = "Update";
     this.initializeFormControl();
   }
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableData();
+    });
+  }
+  //#endregion
 }

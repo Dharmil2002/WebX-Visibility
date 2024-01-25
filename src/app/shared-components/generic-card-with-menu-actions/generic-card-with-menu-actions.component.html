@@ -20,6 +20,7 @@
             <div [class]="box.class" style="height:90%;width:90%">
                 <div class="info-box7-block" style="text-align:center;">
                     <h5 class="m-b-10 m-t-20 white">{{box.title}}</h5>
+                    <h2 *ngIf="box?.count" class="m-b-10 white">{{box?.count}}</h2>
                 </div>
             </div>
         </div>

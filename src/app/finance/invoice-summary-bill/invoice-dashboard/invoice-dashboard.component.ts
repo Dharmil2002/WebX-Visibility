@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { InvoiceCountService } from 'src/app/Utility/module/billing/invoice-count.service';
 
 @Component({
   selector: 'app-invoice-dashboard',
@@ -11,6 +12,7 @@ export class InvoiceDashboardComponent implements OnInit {
   TransactionsMore: any;
   OnlinePaymentApprovals: any;
   jsonUrl = '../../../assets/data/dashboard-data.json'
+  tableload = true;
   breadscrums = [
     {
       title: "Bill Payment Dashboard",
@@ -28,23 +30,98 @@ export class InvoiceDashboardComponent implements OnInit {
       console.log("failed");
     }
   }
-  constructor(private http: HttpClient, private router: Router,) {
-    this.Transactions = Transactions;
-    this.TransactionsMore = TransactionsMore;
+  constructor(private http: HttpClient, private router: Router,
+    private objInvoiceCountService: InvoiceCountService) {
   }
 
 
   ngOnInit(): void {
+    this.getBoxData();
   }
-  MultiLevelMenuClick(event) {
-    // if (event.data.id == 1) {
-    //   this.router.navigate(['/Finance/VendorPayment/THC-Payment']);
-    // }
-    // if (event.data.id == 7) {
-    //   this.router.navigate(['/Finance/VendorPayment/VendorBillPayment']);
-    // }
-  }
+  //#region to get counts of boxes
+  async getBoxData() {
+    this.tableload = true;
+    const invoiceCount = await this.objInvoiceCountService.getDocketCount({ sTS: 0 });
+    const invoicestsCount = await this.objInvoiceCountService.getDocketbilCount({ fSTS: 1 });
+    const invCount = await this.objInvoiceCountService.getInvCount({ bSTS: 1 });
 
+    const filter = {
+      $pipeline: [
+        {
+          '$match': {
+            '$or': [
+              {
+                'pOD': ''
+              }, {
+                'pOD': null
+              }, {
+                'pOD': undefined
+              }, {
+                'pOD': {
+                  '$exists': false
+                }
+              }
+            ],
+            '$and': [
+              {
+                'sTS': 3
+              }
+            ]
+          }
+        }, {
+          '$group': {
+            '_id': null,
+            'emptyCount': {
+              '$sum': 1
+            }
+          }
+        }
+      ]
+    };
+
+    const podCount = await this.objInvoiceCountService.getPengPodCount(filter);
+
+    // Calculate the count of unbilled shipments
+    const unbilledShipments = invoiceCount.length;
+
+    // Calculate the total amount of unbilled shipments
+    const totalamt = invoiceCount.reduce((total, element) => total + element.tOTAMT, 0);
+
+    // Calculate the count of shipments approved for billing
+    const approvedForBilling = invoicestsCount.length;
+    const Generated = invCount.length;
+    const InvoiceAmount = invCount.reduce((total, element) => total + element.aMT, 0);
+
+    this.Transactions = Transactions;
+    this.TransactionsMore = TransactionsMore;
+
+    // Update Transactions object based on conditions
+    this.Transactions.Items.forEach(item => {
+      if (item.title === "Unbilled Shipments") {
+        item['count'] = unbilledShipments;
+      } else if (item.title === "Unbilled Amount") {
+        item['count'] = totalamt;
+      } else if (item.title === "Approved For Billing") {
+        item['count'] = approvedForBilling;
+      } else if (item.title === "Pending PODs") {
+        item['count'] = '0';
+      }
+    });
+    // Update Transactions object based on conditions
+    this.TransactionsMore.Items.forEach(item => {
+      if (item.title === "Generated") {
+        item['count'] = Generated;
+      } else if (item.title === "Invoice Amount") {
+        item['count'] = InvoiceAmount;
+      } else if (item.title === "Outstanding") {
+        item['count'] = InvoiceAmount;
+      } else if (item.title === "Amount pending") {
+        item['count'] = InvoiceAmount;
+      }
+    });
+    this.tableload = false;
+  }
+  //#endregion
 }
 
 const Transactions = {

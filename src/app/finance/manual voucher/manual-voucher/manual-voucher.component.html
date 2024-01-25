@@ -9,5 +9,5 @@
 <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
   [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
   [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-  (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath" [TableStyle]="TableStyle">
+  (menuItemClicked)="handleMenuItemClick($event)" (functionCallEmitter)="functionCallHandler($event)" [addAndEditPath]="addAndEditPath" [TableStyle]="TableStyle">
 </app-generic-table-v2>

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { InvoiceCountService } from 'src/app/Utility/module/billing/invoice-count.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-invoice-dashboard',
@@ -31,7 +32,8 @@ export class InvoiceDashboardComponent implements OnInit {
     }
   }
   constructor(private http: HttpClient, private router: Router,
-    private objInvoiceCountService: InvoiceCountService) {
+    private objInvoiceCountService: InvoiceCountService,
+    private storage: StorageService,) {
   }
 
 
@@ -41,15 +43,15 @@ export class InvoiceDashboardComponent implements OnInit {
   //#region to get counts of boxes
   async getBoxData() {
     this.tableload = true;
-    const invoiceCount = await this.objInvoiceCountService.getDocketCount({ sTS: 0 });
-    const invoicestsCount = await this.objInvoiceCountService.getDocketbilCount({ fSTS: 1 });
-    const invCount = await this.objInvoiceCountService.getInvCount({ bSTS: 1 });
+    const invoiceCount = await this.objInvoiceCountService.getDocketCount({ sTS: 0, bLOC: this.storage.branch });
+    const invoicestsCount = await this.objInvoiceCountService.getDocketbilCount({ fSTS: 1, oRGN: this.storage.branch });
+    const invCount = await this.objInvoiceCountService.getInvCount({ bSTS: 1, bLOC: this.storage.branch });
 
     const filter = {
-      $pipeline: [
+      "D$pipeline": [
         {
-          '$match': {
-            '$or': [
+          "D$match": {
+            "D$or": [
               {
                 'pOD': ''
               }, {
@@ -58,28 +60,29 @@ export class InvoiceDashboardComponent implements OnInit {
                 'pOD': undefined
               }, {
                 'pOD': {
-                  '$exists': false
+                  "D$exists": false
                 }
               }
             ],
-            '$and': [
+            "D$and": [
               {
                 'sTS': 3
               }
             ]
           }
         }, {
-          '$group': {
+          "D$group": {
             '_id': null,
             'emptyCount': {
-              '$sum': 1
+              "D$sum": 1
             }
           }
         }
       ]
     };
 
-    const podCount = await this.objInvoiceCountService.getPengPodCount(filter);
+    // const podCount = await this.objInvoiceCountService.getPengPodCount(filter);
+    // console.log(podCount);
 
     // Calculate the count of unbilled shipments
     const unbilledShipments = invoiceCount.length;

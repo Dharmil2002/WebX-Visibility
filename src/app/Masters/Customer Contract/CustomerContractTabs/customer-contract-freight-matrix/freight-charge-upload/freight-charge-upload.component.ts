@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
@@ -7,11 +7,12 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { PayBasisdetailFromApi, productdetailFromApi } from '../../../CustomerContractAPIUtitlity';
+import { PayBasisdetailFromApi, checkForDuplicatesInFreightUpload, productdetailFromApi } from '../../../CustomerContractAPIUtitlity';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
-import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
-import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
+import { checkForDuplicatesInBulkUpload } from 'src/app/Masters/vendor-contract/vendorContractApiUtility';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-freight-charge-upload',
@@ -38,14 +39,13 @@ export class FreightChargeUploadComponent implements OnInit {
     private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private objContainerService: ContainerService,
-    private objPinCodeService: PinCodeService,
-    private objState: StateService
+    private objlocationEntitySearch: locationEntitySearch
   ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
-      console.log(this.CurrentContractDetails);
+      // console.log(this.CurrentContractDetails);
     });
     this.fileUploadForm = fb.group({
       singleUpload: [""],
@@ -79,10 +79,10 @@ export class FreightChargeUploadComponent implements OnInit {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
-        const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+        const RateData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
         this.rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
           (x, index) => {
-            return RatData.find((t) => t.value == x);
+            return RateData.find((t) => t.value == x);
           }
         );
         const containerData = await this.objContainerService.getContainerList();
@@ -95,33 +95,39 @@ export class FreightChargeUploadComponent implements OnInit {
           value: item.value,
         }));
         this.capacityList = [...containerDataWithPrefix, ...containerData];
-        const pincodeList = await this.objPinCodeService.pinCodeDetail();
-        const zonelist = await this.objState.getStateWithZone();
-        this.transportMode = await productdetailFromApi(this.masterService);
-        console.log(zonelist);
+        const stateReqBody = {
+          companyCode: this.storage.companyCode,
+          filter: {},
+          collectionName: "state_master",
+        };
+        const pincodeReqBody = {
+          companyCode: this.storage.companyCode,
+          filter: {},
+          collectionName: "pincode_master",
+        };
+        const zonelist = await firstValueFrom(
+          this.masterService.masterPost("generic/get", stateReqBody)
+        );
+        const pincodeList = await firstValueFrom(
+          this.masterService.masterPost("generic/get", pincodeReqBody)
+        );
 
-        this.arealist = [...pincodeList, zonelist]
-        console.log(this.arealist);
+        this.transportMode = await productdetailFromApi(this.masterService);
+        this.arealist = this.objlocationEntitySearch.GetMergedData(
+          pincodeList,
+          zonelist,
+          "ST"
+        );
 
         const validationRules = [
           {
             ItemsName: "From",
             Validations: [{ Required: true },
-            {
-              TakeFromList: this.arealist.map((x) => {
-                return x.PIN, x.ZN, x.STNM;
-              }),
-            }
             ],
           },
           {
             ItemsName: "To",
             Validations: [{ Required: true },
-            {
-              TakeFromList: this.arealist.map((x) => {
-                return x.PIN, x.ZN, x.STNM;
-              }),
-            }
             ],
           },
           {
@@ -136,11 +142,12 @@ export class FreightChargeUploadComponent implements OnInit {
           },
           {
             ItemsName: "Capacity",
-            Validations: [{ Required: true }, {
-              TakeFromList: this.capacityList.map((x) => {
-                return x.name;
-              }),
-            },
+            Validations: [
+              {
+                TakeFromList: this.capacityList.map((x) => {
+                  return x.name;
+                }),
+              },
             ],
           },
           {
@@ -151,12 +158,10 @@ export class FreightChargeUploadComponent implements OnInit {
               { MinValue: 1 }
             ],
           },
-
-
           {
             ItemsName: "TransitDays",
             Validations: [
-              // { Required: true },
+              { Required: true },
               { Numeric: true },
               { MinValue: 1 },
               //{ CompareMinMaxValue: true }
@@ -172,13 +177,61 @@ export class FreightChargeUploadComponent implements OnInit {
             ],
           },
         ];
-console.log(vehicleData);
 
-        var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        const rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+
         rPromise.then(async response => {
-          console.log(response);
-          this.OpenPreview(response);
-        })
+
+          const validateAndFilter = (element, property) => {
+            element.error = element.error || [];
+
+            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN'];
+            const foundMatch = this.arealist.find(x =>
+              propertiesToCheck.some(prop =>
+                typeof x[prop] === 'string' &&
+                x[prop].toLowerCase() === element[property].toLowerCase()
+              )
+            );
+
+            if (!foundMatch) {
+              element.error.push(`${property} is not in the allowed list.`);
+            } else {
+
+              // Find the matched property
+              const matchedProperty = propertiesToCheck.find(prop =>
+                typeof foundMatch[prop] === 'string' &&
+                foundMatch[prop].toLowerCase() === element[property].toLowerCase()
+              );
+
+              // Set element[property] and element[property + 'TYPE']
+              element[property] = foundMatch[matchedProperty];
+              element[property + 'TYPE'] = matchedProperty;
+            }
+          };
+
+          const filteredData = response.map(element => {
+            validateAndFilter(element, 'From');
+            validateAndFilter(element, 'To');
+            if (element.error.length < 1) {
+              element.error = null;
+            }
+            return element;
+          });
+          console.log(filteredData);
+          const fromKey = "From";
+          const toKey = "To";
+          const capacityKey = 'Capacity';
+          const tblfromKey = "fROM";
+          const tbltoKey = "tO";
+          const tblcapacityKey = 'cAP';
+
+          // Call the function with the specified keys
+          const data = await checkForDuplicatesInFreightUpload(filteredData, this.existingData, fromKey, toKey, capacityKey, tblfromKey, tbltoKey, tblcapacityKey);
+          console.log(data);
+
+          this.OpenPreview(filteredData);
+        });
+
       });
     }
   }
@@ -200,7 +253,7 @@ console.log(vehicleData);
     const request = {
       companyCode: this.storage.companyCode,
       collectionName: "cust_contract_freight_charge_matrix",
-      filter: filter,
+      filter: { cONID: this.CurrentContractDetails.cONID },
     };
 
     const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
@@ -219,9 +272,127 @@ console.log(vehicleData);
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // this.saveData(result)
+        this.saveData(result)
       }
     });
+  }
+  //#endregion
+  //#region to save data
+  async saveData(result) {
+    try {
+
+      const freightChargeData = [];
+
+      // Generate a new ID based on existing data
+      const newId = this.generateNewId(this.existingData);
+      console.log(newId);
+
+      // Process preview data to create vendor contract data
+      result.forEach(element => {
+        const processedData = this.processData(newId, element, this.rateTypedata, this.capacityList, this.transportMode)
+        freightChargeData.push(processedData);
+      });
+      if (!freightChargeData) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Valid Data Uploaded",
+          showConfirmButton: true,
+        });
+        return;
+      } else {
+        // Log the formatted dat
+        //console.log(formattedData);
+        const createRequest = {
+          companyCode: this.storage.companyCode,
+          collectionName: "cust_contract_freight_charge_matrix",
+          data: freightChargeData,
+        };
+        console.log(createRequest);
+
+        const response = await firstValueFrom(this.masterService.masterPost("generic/create", createRequest));
+        if (response) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Valid Data Uploaded",
+            showConfirmButton: true,
+          });
+        }
+      }
+
+    } catch (error) {
+      // Handle any errors that occurred during the process
+      console.error("Error:", error);
+    }
+  }
+
+  generateNewId(existingData) {
+    let newId;
+
+    if (existingData) {
+      // Extract the last vendor code from the existing contract
+      const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
+      const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
+
+      // Check if the extraction was successful
+      if (!isNaN(lastId)) {
+        // Increment the last vendor code
+        newId = lastId + 1;
+      } else {
+        // If extraction was not successful, set newId to 0
+        newId = 0;
+      }
+    } else {
+      newId = 0;
+    }
+
+    return newId;
+  }
+  processData(newId, element, rateTypedata, capacityList, transportMode) {
+    const processedData: any = {};
+
+    const updaterateType = rateTypedata.find(item => item.name.toUpperCase() === element.RateType.toUpperCase());
+    const updatecAP = capacityList.find(item => item.name.toUpperCase() === element.Capacity.toUpperCase());
+    const updatetransportMode = transportMode.find(item => item.name.toUpperCase() === element.TransportMode.toUpperCase());
+
+    // Set basic properties
+    processedData._id = `${this.storage.companyCode}-${this.CurrentContractDetails.cONID}-${newId}`;
+    processedData.cONID = this.CurrentContractDetails.cONID;
+    processedData.companyCode = this.storage.companyCode;
+    processedData.fROM = element.From
+    processedData.fTYPE = element.FromTYPE
+    processedData.tO = element.To
+    processedData.tTYPE = element.ToTYPE
+
+    // Add processed rate type information if available
+    if (updaterateType) {
+      processedData.rTYP = updaterateType.name;
+    }
+    // Add processed rate type information if available
+    if (updatecAP) {
+      processedData.cAP = updatecAP.name;
+    }
+    // Add processed rate type information if available
+    if (updatetransportMode) {
+      processedData.tMODNM = updatetransportMode.name;
+      processedData.tMODID = updatetransportMode.value;
+    }
+    processedData.tRDYS = element.TransitDays
+    processedData.rT = parseFloat(element.Rate);
+    processedData.fCID = newId;
+    processedData.lTYPE = this.ServiceSelectiondata.loadType;
+
+    // Set timestamp and user information
+    processedData.eNTDT = new Date();
+    processedData.eNTBY = this.storage.userName;
+    processedData.eNTLOC = this.storage.branch;
+
+    // Return the processed data
+    return processedData;
+
   }
   //#endregion
 }

@@ -11,7 +11,6 @@ import { PayBasisdetailFromApi, checkForDuplicatesInFreightUpload, productdetail
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
-import { checkForDuplicatesInBulkUpload } from 'src/app/Masters/vendor-contract/vendorContractApiUtility';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -27,7 +26,6 @@ export class FreightChargeUploadComponent implements OnInit {
   rateTypedata: any;
   arealist: any[];
   transportMode: any;
-
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -67,7 +65,7 @@ export class FreightChargeUploadComponent implements OnInit {
     };
   }
 
-  //#region to select filey
+  //#region to select file
   selectedFile(event) {
     let fileList: FileList = event.target.files;
     if (fileList.length !== 1) {
@@ -164,7 +162,6 @@ export class FreightChargeUploadComponent implements OnInit {
               { Required: true },
               { Numeric: true },
               { MinValue: 1 },
-              //{ CompareMinMaxValue: true }
             ],
           },
           {
@@ -217,7 +214,7 @@ export class FreightChargeUploadComponent implements OnInit {
             }
             return element;
           });
-          console.log(filteredData);
+
           const fromKey = "From";
           const toKey = "To";
           const capacityKey = 'Capacity';
@@ -227,14 +224,14 @@ export class FreightChargeUploadComponent implements OnInit {
 
           // Call the function with the specified keys
           const data = await checkForDuplicatesInFreightUpload(filteredData, this.existingData, fromKey, toKey, capacityKey, tblfromKey, tbltoKey, tblcapacityKey);
-          console.log(data);
 
-          this.OpenPreview(filteredData);
+          this.OpenPreview(data);
         });
 
       });
     }
   }
+  //#endregion
   //#region to call close function
   Close() {
     this.dialogRef.close()
@@ -285,14 +282,35 @@ export class FreightChargeUploadComponent implements OnInit {
 
       // Generate a new ID based on existing data
       const newId = this.generateNewId(this.existingData);
-      console.log(newId);
 
       // Process preview data to create vendor contract data
       result.forEach(element => {
-        const processedData = this.processData(newId, element, this.rateTypedata, this.capacityList, this.transportMode)
+        const processedData = this.processData(element, this.rateTypedata, this.capacityList, this.transportMode)
         freightChargeData.push(processedData);
       });
-      if (!freightChargeData) {
+
+      // Format the final data with additional information
+      const formattedData = this.formatFreightData(freightChargeData, newId);
+
+      if (formattedData.length === 0) {
+        // Display success message
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No Valid Data to Upload",
+          showConfirmButton: true,
+        });
+        return;
+      }
+
+      const createRequest = {
+        companyCode: this.storage.companyCode,
+        collectionName: "cust_contract_freight_charge_matrix",
+        data: formattedData,
+      };
+
+      const response = await firstValueFrom(this.masterService.masterPost("generic/create", createRequest));
+      if (response) {
         // Display success message
         Swal.fire({
           icon: "success",
@@ -300,35 +318,22 @@ export class FreightChargeUploadComponent implements OnInit {
           text: "Valid Data Uploaded",
           showConfirmButton: true,
         });
-        return;
-      } else {
-        // Log the formatted dat
-        //console.log(formattedData);
-        const createRequest = {
-          companyCode: this.storage.companyCode,
-          collectionName: "cust_contract_freight_charge_matrix",
-          data: freightChargeData,
-        };
-        console.log(createRequest);
-
-        const response = await firstValueFrom(this.masterService.masterPost("generic/create", createRequest));
-        if (response) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "Valid Data Uploaded",
-            showConfirmButton: true,
-          });
-        }
       }
 
     } catch (error) {
       // Handle any errors that occurred during the process
       console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error,
+        showConfirmButton: true,
+      });
+      return;
     }
   }
 
+  // function to generate new _id
   generateNewId(existingData) {
     let newId;
 
@@ -351,17 +356,17 @@ export class FreightChargeUploadComponent implements OnInit {
 
     return newId;
   }
-  processData(newId, element, rateTypedata, capacityList, transportMode) {
+
+  // function to process data and prepare request body
+  processData(element, rateTypedata, capacityList, transportMode) {
     const processedData: any = {};
 
     const updaterateType = rateTypedata.find(item => item.name.toUpperCase() === element.RateType.toUpperCase());
-    const updatecAP = capacityList.find(item => item.name.toUpperCase() === element.Capacity.toUpperCase());
     const updatetransportMode = transportMode.find(item => item.name.toUpperCase() === element.TransportMode.toUpperCase());
 
     // Set basic properties
-    processedData._id = `${this.storage.companyCode}-${this.CurrentContractDetails.cONID}-${newId}`;
     processedData.cONID = this.CurrentContractDetails.cONID;
-    processedData.companyCode = this.storage.companyCode;
+    processedData.cID = this.storage.companyCode;
     processedData.fROM = element.From
     processedData.fTYPE = element.FromTYPE
     processedData.tO = element.To
@@ -371,8 +376,10 @@ export class FreightChargeUploadComponent implements OnInit {
     if (updaterateType) {
       processedData.rTYP = updaterateType.name;
     }
+
     // Add processed rate type information if available
-    if (updatecAP) {
+    if (element.Capacity) {
+      const updatecAP = capacityList.find(item => item.name.toUpperCase() === element.Capacity.toUpperCase());
       processedData.cAP = updatecAP.name;
     }
     // Add processed rate type information if available
@@ -382,7 +389,6 @@ export class FreightChargeUploadComponent implements OnInit {
     }
     processedData.tRDYS = element.TransitDays
     processedData.rT = parseFloat(element.Rate);
-    processedData.fCID = newId;
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
 
     // Set timestamp and user information
@@ -393,6 +399,20 @@ export class FreightChargeUploadComponent implements OnInit {
     // Return the processed data
     return processedData;
 
+  }
+
+  // Function to format contract data
+  formatFreightData(processedData, newId) {
+
+    return processedData.map((item, index) => {
+      const formattedItem = {
+        _id: `${this.storage.companyCode}-${this.CurrentContractDetails.cONID}-${newId + index}`,
+        fCID: newId + index,
+        ...item,
+      };
+
+      return formattedItem;
+    });
   }
   //#endregion
 }

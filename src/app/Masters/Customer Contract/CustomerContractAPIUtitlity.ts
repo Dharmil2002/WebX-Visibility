@@ -132,6 +132,10 @@ export async function GetContractBasedOnCustomerAndProductListFromApi(masterServ
  */
 export async function checkForDuplicatesInFreightUpload(data, tableData, flfromKey, fltoKey,
   flcapacityKey, tblfromKey, tbltoKey, tblcapacityKey) {
+
+  // Set default values for keys
+  flcapacityKey = flcapacityKey || '';
+
   // Set to store unique combinations of Route and Capacity from tableData
   const uniqueEntries = new Set();
 
@@ -155,7 +159,7 @@ export async function checkForDuplicatesInFreightUpload(data, tableData, flfromK
     // Check if the key is already in the set (duplicate entry)
     if (uniqueEntries.has(key)) {
       // Push an error message to the 'error' array
-      entry.error.push(`Duplicate entry for ${key}`);
+      entry.error.push(`Duplicate entry`);
     } else {
       // Add the key to the set if it's not a duplicate
       uniqueEntries.add(key);

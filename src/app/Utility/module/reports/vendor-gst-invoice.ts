@@ -15,7 +15,7 @@ export class VendorGSTInvoiceService {
           private objStateService: StateService
      ) { }
 
-     async getvendorGstRegisterReportDetail(start, end) {
+     async getvendorGstRegisterReportDetail(start, end, docNo) {
           const startValue = start;
           const endValue = end;
           const reqBody = {
@@ -23,20 +23,36 @@ export class VendorGSTInvoiceService {
                collectionName: "vend_bill_summary",
                filter: {
                     cID: this.storage.companyCode,
-                    "D$and": [
-                         {
-                              "bDT": {
-                                   "D$gte": startValue
-                              }
-                         },
-                         {
-                              "bDT": {
-                                   "D$lte": endValue
-                              }
-                         }
-                    ]
                }
           }
+
+          // Check if the array contains only empty strings
+          const isEmptyDocNo = docNo.every(value => value === "");
+
+          // Add date range conditions if docNo are not present
+          if (isEmptyDocNo) {
+               reqBody.filter["D$and"] = [
+                    {
+                         "bDT": {
+                              "D$gte": startValue,
+                         },
+                    },
+
+                    {
+                         "bDT": {
+                              "D$lte": endValue,
+                         },
+                    }
+               ];
+          }
+
+          // Add docNo condition if docNoArray is present
+          if (!isEmptyDocNo) {
+               reqBody.filter["docNo"] = {
+                    "D$in": docNo,
+               };
+          }
+
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
 
           let vengstinvList = [];

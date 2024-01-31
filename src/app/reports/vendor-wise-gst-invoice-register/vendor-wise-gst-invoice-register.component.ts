@@ -4,9 +4,8 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { VendorService } from 'src/app/Utility/module/masters/vendor-master/vendor.service';
-import { VendorGSTInvoiceService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
-import { VendorDetail } from 'src/app/core/models/Masters/vendor-master/vendor-master';
+import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { VendorGSTInvoiceService, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { vendorWiseGSTControl } from 'src/assets/FormControls/Vendor-Wise-GST-Register-Report/vendor-wise-gst-register';
@@ -42,13 +41,17 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
   sacDet: any;
   sacName: any;
   sacStatus: any;
+  stateName: any;
+  stateStatus: any;
 
   constructor(
     private storage: StorageService,
     private masterServices: MasterService,
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
-    private vendorGSTInvoiceService: VendorGSTInvoiceService
+    private vendorGSTInvoiceService: VendorGSTInvoiceService,
+    private objStateService: StateService
+
   ) {
     this.initializeFormControl()
   }
@@ -126,6 +129,13 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     this.sacStatus = this.jsonvendgstregisFormArray.find(
       (data) => data.name === "saccd"
     )?.additionalData.showNameAndValue;
+    this.stateName = this.jsonvendgstregisFormArray.find(
+      (data) => data.name === "gststate"
+    )?.name;
+    this.stateStatus = this.jsonvendgstregisFormArray.find(
+      (data) => data.name === "gststate"
+    )?.additionalData.showNameAndValue;
+
     this.vendorgstregisTableForm = formGroupBuilder(this.fb, [this.jsonvendgstregisFormArray]);
   }
 
@@ -181,6 +191,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
 
     this.venNameDet = venNameDet;
     this.sacDet = sacDet;
+    const statelist = await this.objStateService.getState();
 
     this.filter.Filter(
       this.jsonvendgstregisFormArray,
@@ -197,39 +208,86 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       this.sacStatus
     );
 
+    this.filter.Filter(
+      this.jsonvendgstregisFormArray,
+      this.vendorgstregisTableForm,
+      statelist,
+      this.stateName,
+      this.stateStatus
+    );
+
   }
 
+  //#region to apply filters and download excel file
   async save() {
+
+    // Extract values from the form
     const startValue = new Date(this.vendorgstregisTableForm.controls.start.value);
     const endValue = new Date(this.vendorgstregisTableForm.controls.end.value);
-    let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(startValue, endValue);
+    const docummentNo = this.vendorgstregisTableForm.value.docNo;
+    const cancelBill = this.vendorgstregisTableForm.value.cannon;
+
+    // Check if a comma is present in docNo
+    const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
+
+    // Extract vendor names from vennmcdHandler if it's an array
+    const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
+      ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => x.name)
+      : [];
+
+    // Get data from the service
+    let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(startValue, endValue, docNoArray);
+
+    // Extract saccdHandler, gststateHandler values
     const sacData = Array.isArray(this.vendorgstregisTableForm.value.saccdHandler)
       ? this.vendorgstregisTableForm.value.saccdHandler.map(x => x.name)
       : [];
-    const filteredRecords = data.filter(record => {
-      const sacDet = sacData.length === 0 || sacData.includes(record.sac);
 
+    const stateData = Array.isArray(this.vendorgstregisTableForm.value.gststateHandler)
+      ? this.vendorgstregisTableForm.value.gststateHandler.map(x => x.name)
+      : [];
+
+    // Filter data based on SAC (Service Accounting Code)
+    data = data.filter(record => {
+      const recordSacLowerCase = record.SAC.toLowerCase(); // Convert to lowercase for case-insensitive comparison
+      const isSacDataEmpty = sacData.length === 0;
+      const isSacIncluded = isSacDataEmpty || sacData.some(sac => recordSacLowerCase.includes(sac.toLowerCase()));
+      return isSacIncluded;
+    });
+
+    // Filter data based on state
+    data = data.filter(record => {
+      const sacDet = stateData.length === 0 || stateData.includes(record.BillGenState);
       return sacDet;
     });
-    // const selectedData = filteredRecords;
-    if (filteredRecords.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (filteredRecords) {
-        Swal.fire({
-          icon: "error",
-          title: "No Records Found",
-          text: "Cannot Download CSV",
-          showConfirmButton: true,
-        });
-      }
+
+    // Filter data based on vendor names
+    data = data.filter(record => {
+      const partyName = record.Party.split(':')[1]?.trim().toLowerCase(); // Extract and convert to lowercase
+      const vendrnmLowerCase = vendrnm.map(name => name.toLowerCase()); // Convert array elements to lowercase
+      const isVendrnmEmpty = vendrnmLowerCase.length === 0;
+      const isPartyIncluded = isVendrnmEmpty || vendrnmLowerCase.includes(partyName);
+      return isPartyIncluded;
+    });
+
+    // Filter data based on cancelled status
+    const filteredRecord = cancelBill === 'Cancelled' ? data.find(record => record.BILLSTATUS === 'Cancelled') : data;
+
+    // Check if there are records after filtering
+    if (!filteredRecord || (Array.isArray(filteredRecord) && filteredRecord.length === 0)) {
+      Swal.fire({
+        icon: "error",
+        title: "No Records Found",
+        text: "Cannot Download CSV",
+        showConfirmButton: true,
+      });
       return;
     }
-    // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-    //   const { ...rest } = record;
-    //   return rest;
-    // });
-    exportAsExcelFile(filteredRecords, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
+
+    // Export the record to Excel
+    exportAsExcelFile(filteredRecord, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
   }
+  //#endregion
 
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call

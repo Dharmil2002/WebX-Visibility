@@ -79,7 +79,7 @@ export class AccountBankControls {
           {
             name: "pattern",
             message: "Please Enter alphanumeric EX. ABCD1234567",
-            pattern: "^[A-Z]{4}[0-9]{7}$",
+            pattern: "^[A-Z]{3,4}[0-9]{7}$",
           },
         ],
         functions: {

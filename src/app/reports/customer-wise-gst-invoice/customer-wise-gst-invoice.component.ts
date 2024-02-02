@@ -34,10 +34,6 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     custNameData: any;
     sacData: any
   };
-  customerDetailList: any;
-  sacList: any;
-  custNameDet: any;
-  sacDet: any;
   custName: any;
   custStatus: any;
   stateName: any;
@@ -77,6 +73,7 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     "CGST": "CGST",
     "SGSTUGST": "SGSTUGST",
     "CNAMT": "CNAMT",
+    "Discount": "Discount",
     "TotalInvoice_Value": "Total Invoice Value",
     "TDSRate": "TDS Rate",
     "TDSAmount": "TDS Amount",
@@ -170,19 +167,15 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
 
     const custNameDet = mergedData.custNameData
       .map(element => ({
-        name: element.customerCode.toString(),
-        value: element.customerName.toString(),
+        name: element.customerName.toString(),
+        value: element.customerCode.toString()
       }));
     const sacDet = mergedData.sacData.map(element => ({
       name: element.SNM,
       value: element.SHCD
     }));
+  
 
-    this.customerDetailList = custNameDet;
-    this.sacList = sacDet;
-
-    this.custNameDet = custNameDet;
-    this.sacDet = sacDet;
     const statelist = await this.objStateService.getState();
 
     this.filter.Filter(

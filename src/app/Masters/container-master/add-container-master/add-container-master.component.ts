@@ -43,7 +43,7 @@ export class AddContainerMasterComponent implements OnInit {
 
   ngOnInit() {
     this.getContainerTypeData();
-    this.backPath = "/Masters/ContainerMaster/ContainerMasterList";
+    this.backPath = "/Masters/ContainerMaster/ContainerTypeMasterList";
   }
   constructor(
     private Route: Router,
@@ -106,7 +106,7 @@ export class AddContainerMasterComponent implements OnInit {
     ]);
   }
   cancel() {
-    this.Route.navigateByUrl("/Masters/ContainerMaster/ContainerMasterList");
+    this.Route.navigateByUrl("/Masters/ContainerMaster/ContainerTypeMasterList");
   }
 
   //#region Save Function
@@ -141,7 +141,7 @@ export class AddContainerMasterComponent implements OnInit {
           showConfirmButton: true,
         });
         this.Route.navigateByUrl(
-          "/Masters/ContainerMaster/ContainerMasterList"
+          "/Masters/ContainerMaster/ContainerTypeMasterList"
         );
       }
     } else {
@@ -187,7 +187,7 @@ export class AddContainerMasterComponent implements OnInit {
           showConfirmButton: true,
         });
         this.Route.navigateByUrl(
-          "/Masters/ContainerMaster/ContainerMasterList"
+          "/Masters/ContainerMaster/ContainerTypeMasterList"
         );
       }
     }

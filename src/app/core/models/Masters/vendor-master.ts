@@ -1,42 +1,120 @@
 export class VendorMaster {
-  vendorCode: string
-  vendorName: any
-  vendorCity: string
-  vendorState: string
-  vendorCountry: string
-  vendorType: string
-  vendorSubType: any
-  vendorAddress: any
-  vendorLocation: any
-  vendorPinCode: any
-  vendorPhoneNo: any
-  emailId: any
-  isActive: any
-  panNo: any
-  panCardScan: any
-  _id: string
-  noPANRegistration: boolean
+  vendorCode: string;
+  vendorName: any;
+  vendorCity: string;
+  vendorState: string;
+  vendorCountry: string;
+  msmeType: string;
+  msmeTypeName: string;
+  tdsSection: string;
+  tdsSectionName: string;
+  lowTDSLimit: any;
+  effectiveFrom: any;
+  dateofFilling: any;
+  financialYear: any;
+  vendorAdvance: any;
+  validUpto: any;
+  vendorType: string;
+  city: string;
+  upiId: string;
+  uCC: string;
+  uploadKYC: string;
+  contactPerson: string;
+  vendorSubType: any;
+  vendorAddress: any;
+  vendorLocation: any;
+  vendorPinCode: any;
+  vendorPhoneNo: any;
+  emailId: any;
+  isActive: any;
+  isTDSDeclaration: any;
+  hTDSRA: any;
+  panNo: any;
+  panCardScan: any;
+  uPRC: any;
+  uTDSD: any;
+  itrnumber: any;
+  _id: string;
+  noPANRegistration: boolean;
   cinNumber: string;
-  msmeNumber: string
-  msmeScan: any
-  isBlackListed: boolean
-  gstNumber: string
-  gstState: string
-  gstAddress: string
-  gstCity: string
-  gstPincode: string
-  msmeRegistered: boolean
-  otherdetails: any
-  vendorManager: string
+  msmeNumber: string;
+  msmeScan: any;
+  isBlackListed: boolean;
+  isLowRateApplicable: boolean;
+  mobileNumber: number;
+  isBankregistered: boolean;
+  gstNumber: string;
+  bankACNumber: any;
+  ifscCode: string;
+  bankName: string;
+  emails: string;
+  bankBrachName: string;
+  gstState: string;
+  gstAddress: string;
+  gstCity: string;
+  gstPincode: string;
+  msmeRegistered: boolean;
+  isGSTregistered: boolean;
+  otherdetails: any;
+  vendorManager: string;
   constructor(VendorMaster) {
     {
-      this.vendorCode = VendorMaster.vendorCode || 'System Genrated';
-      this.vendorName = VendorMaster.vendorName || '';
+      this.vendorCode = VendorMaster.vendorCode || "System Genrated";
+      this.vendorName = VendorMaster.vendorName || "";
+      this.bankACNumber = VendorMaster.bankACNumber || "";
       this.isActive = VendorMaster.isActive || false;
       this.noPANRegistration = VendorMaster.noPANRegistration || false;
       this.isBlackListed = VendorMaster.isBlackListed || false;
+      this.isLowRateApplicable = VendorMaster.isLowRateApplicable || false;
+      this.isBankregistered = VendorMaster.isBankregistered || false;
+      this.isTDSDeclaration = VendorMaster.isTDSDeclaration || false;
+      this.hTDSRA = VendorMaster.hTDSRA || false;
+      this.isGSTregistered = VendorMaster.isGSTregistered || false;
       this.msmeRegistered = VendorMaster.msmeRegistered || false;
-      this.msmeScan = VendorMaster.msmeScan || '';
+      this.msmeScan = VendorMaster.msmeScan || "";
+      this.vendorCity = VendorMaster.vendorCity || "";
+      this.vendorState = VendorMaster.vendorState || "";
+      this.vendorCountry = VendorMaster.vendorCountry || "";
+      this.msmeType = VendorMaster.msmeType || "";
+      this.msmeTypeName = VendorMaster.msmeTypeName || "";
+      this.tdsSection = VendorMaster.tdsSection || "";
+      this.lowTDSLimit = VendorMaster.lowTDSLimit || "";
+      this.effectiveFrom = VendorMaster.effectiveFrom || "";
+      this.dateofFilling = VendorMaster.dateofFilling || "";
+      this.financialYear = VendorMaster.financialYear || "";
+      this.vendorAdvance = VendorMaster.vendorAdvance || "";
+      this.validUpto = VendorMaster.validUpto || "";
+      this.vendorType = VendorMaster.vendorType || "";
+      this.city = VendorMaster.city || "";
+      this.upiId = VendorMaster.upiId || "";
+      this.uCC = VendorMaster.uCC || "";
+      this.uploadKYC = VendorMaster.uploadKYC || "";
+      this.contactPerson = VendorMaster.contactPerson || "";
+      this.vendorSubType = VendorMaster.vendorSubType || "";
+      this.vendorAddress = VendorMaster.vendorAddress || "";
+      this.vendorLocation = VendorMaster.vendorLocation || "";
+      this.vendorPinCode = VendorMaster.vendorPinCode || "";
+      this.vendorPhoneNo = VendorMaster.vendorPhoneNo || "";
+      this.emailId = VendorMaster.emailId || "";
+      this.panNo = VendorMaster.panNo || "";
+      this.panCardScan = VendorMaster.panCardScan || "";
+      this.uPRC = VendorMaster.uPRC || "";
+      this.uTDSD = VendorMaster.uTDSD || "";
+      this.itrnumber = VendorMaster.itrnumber || "";
+      this.cinNumber = VendorMaster.cinNumber || "";
+      this.msmeNumber = VendorMaster.msmeNumber || "";
+      this.mobileNumber = VendorMaster.mobileNumber || "";
+      this.gstNumber = VendorMaster.gstNumber || "";
+      this.ifscCode = VendorMaster.ifscCode || "";
+      this.bankName = VendorMaster.bankName || "";
+      this.emails = VendorMaster.emails || "";
+      this.bankBrachName = VendorMaster.bankBrachName || "";
+      this.gstState = VendorMaster.gstState || "";
+      this.gstAddress = VendorMaster.gstAddress || "";
+      this.gstCity = VendorMaster.gstCity || "";
+      this.gstPincode = VendorMaster.gstPincode || "";
+      this.otherdetails = VendorMaster.otherdetails || "";
+      this.vendorManager = VendorMaster.vendorManager || "";
     }
   }
 }

@@ -25,7 +25,10 @@ export function parseCustomDate(dateString, format) {
 export const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1)
   .toString()
   .slice(-2)}`;
-/* 
+  const thisfullYear = (new Date()).getFullYear();
+  const lastYear = thisYear + 1;
+export const finYear = `${thisfullYear}-${lastYear}`;
+/*
   The following variables are used to generate a date and time string for a file name.
 */
 export const commonCurrentDate = new Date();
@@ -38,6 +41,6 @@ export const timeString=`${commonDay}${commonMonth}${commonYear}${commonHours}${
 /*End*/
 
 export function runningNumber(){
-  
+
   return `${moment().format("YYMMDDHH")}${Math.floor(1000 + Math.random() * 9000)}`
-};        
+};

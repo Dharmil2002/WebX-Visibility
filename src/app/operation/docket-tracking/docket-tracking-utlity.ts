@@ -8,11 +8,12 @@
 export async function getDocketFromApiDetail(
     companyCode,docketNo, operationService
 ) {
+    const Mode = localStorage.getItem('Mode')
     const reqBody = {
         companyCode: companyCode,
-        collectionName: "cnote_tracking",
+        collectionName: Mode=="FTL"?"docket_events":"docket_events_ltl",
         filter: {
-            dktNo:docketNo
+            dKTNO:docketNo
         }
     };
     try {

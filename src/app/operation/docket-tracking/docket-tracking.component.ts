@@ -37,16 +37,16 @@ export class DocketTrackingComponent implements OnInit {
   companyCode = parseInt(localStorage.getItem("companyCode"));
   userName = localStorage.getItem("Username");
   columnHeader = {
-    upDt:"Date",
-    documnetNo: "Transaction Number",
-    loc: "Location",
-    event: "Event",
+    eNTDT:"Date",
+    eVNID: "Transaction Number",
+    eNTLOC: "Location",
+    Event: "Event",
   };
   headerForCsv = {
-    upDt:"Date",
-    documnetNo: "Transaction Number",
-    loc: "Location",
-    event: "Event",
+    eNTDT:"Date",
+    eVNID: "Transaction Number",
+    eNTLOC: "Location",
+    Event: "Event",
   };
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
@@ -101,53 +101,18 @@ export class DocketTrackingComponent implements OnInit {
     this.tableload = true;
 
     // Introduce a delay of 2 seconds
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // await new Promise(resolve => setTimeout(resolve, 1000));
 
     const docketList = await getDocketFromApiDetail(this.companyCode, this.docketNo, this.operationService);
-    const tableDetail = docketList.map((x) => {
-      if (x.upDt) {
-        x.upDt = formatDate(x.upDt, 'dd/MM/yyyy HH:mm:ss');
-      }
-      //1: Booking, 2: Loading Sheet Generated, 3: Manifest Generated, 4: THC Generated, 5: Departure, 6: Arrival, 7: Unloading/Stock Update, 8: Delivered, 9: Attempted
-      if(x.event.startsWith("Booked")){
-        x.statusCode = "1",
-        x.status = "Booking",
-        x.documnetNo = x.dktNo
-      }
-      else if(x.event.startsWith("Loading Sheet Generated At")){
-        x.statusCode = "2",
-        x.status = "Loading",
-        x.documnetNo = x.lsno
-      }
-      else if(x.event.startsWith("Menifest Generated At")){
-        x.statusCode = "3",
-        x.status = "Loading",
-        x.documnetNo = x.mfno
-      }
-      else if(x.event.startsWith("Departed From")){
-        x.statusCode = "5",
-        x.status = "Departure",
-        x.documnetNo = x.tripId
-      }
-      else if(x.event.startsWith("Vehicle Arrival at")){
-        x.statusCode = "6",
-        x.status = "Arrival",
-        x.documnetNo = x.tripId
-      }
-      else if(x.event.startsWith("UnLoaded At")){
-        x.statusCode = "7",
-        x.status = "Unloading",
-        x.documnetNo = (x.tripId && x.tripId != "") ? x.tripId : x.mfno
-      }
-      return x;
-    });
-    const sortedTableDetail = tableDetail.sort((a, b) => {
-      const dateA = moment(a.upDt).valueOf(); // Converts to Unix timestamp in milliseconds
-      const dateB = moment(b.upDt).valueOf(); // Converts to Unix timestamp in milliseconds
-      return dateB - dateA; // Sorting by date and time in descending order
-    });
+    console.log('docketList',docketList)
     if (docketList.length > 0) {
-      this.tableData = sortedTableDetail;
+      this.tableData = docketList.map((x)=>{
+        return {
+          ...x,
+          eNTDT:moment(x.eNTDT).format("DD/MM/YYYY"),
+          Event:`${x.sTS}: ${x.eVNDES}`
+        }
+      });
       this.tableload = false;
       this.load = false;
     } else {

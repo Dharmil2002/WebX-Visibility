@@ -773,7 +773,7 @@ export class ThcGenerationComponent implements OnInit {
     if (isMarket) {
       const vehicleData = {
         vID: this.thcTableForm.value.vehicle,
-        vndNM: this.thcTableForm.value.vendorName,
+        vndNM: this.thcTableForm.value.vendorName?.name || "",
         vndPH: this.marketVehicleTableForm.value.vMobileNo,
         pANNO: this.marketVehicleTableForm.value.driverPan,
         wTCAP: this.marketVehicleTableForm.value.vehicleSize,

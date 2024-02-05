@@ -24,9 +24,11 @@ export class ManualVoucherComponent implements OnInit {
   TableStyle = "width:100%"
   columnHeader = {
     vNO: {
-      Title: "Voucher No",
+      Title: "Voucher No", 
       class: "matcolumncenter",
       Style: "max-width:200px",
+      type: "Link",
+      functionName: "VoucherNoFunction",
     },
     tTYP: {
       Title: "Voucher Type",
@@ -61,7 +63,7 @@ export class ManualVoucherComponent implements OnInit {
 
   };
   staticField = [
-    "vNO",
+    // "vNO",
     "tTYP",
     "tTDT",
     "pAMT",
@@ -179,5 +181,14 @@ export class ManualVoucherComponent implements OnInit {
         },
       });
     }
+  }
+  VoucherNoFunction(event) {
+    const templateBody = {
+      DocNo: event.data.vNO,
+      templateName: "Voucher View-Print",
+    };
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, "", "width=1000,height=800");
   }
 }

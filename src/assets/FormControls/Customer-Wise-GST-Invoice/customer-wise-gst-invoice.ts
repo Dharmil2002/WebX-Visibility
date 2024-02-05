@@ -48,12 +48,8 @@ export class customerWiseGSTInvControl {
                     name: 'gststate',
                     label: 'GST State',
                     placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         // { value: "Transaction", name: "Transaction" },
-                         // { value: "General", name: "General" },
-                         // { value: "Debit Note", name: "Debit Note" }
-                    ],
+                    type: 'multiselect',
+                    value: [],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -61,7 +57,7 @@ export class customerWiseGSTInvControl {
                     ],
                     additionalData: {
                          support: "gststateHandler",
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     functions: {
                          onToggleAll: "toggleSelectAll",
@@ -155,11 +151,61 @@ export class customerWiseGSTInvControl {
                     generatecontrol: true, disable: false
                },
                {
-                    name: 'docNo', 
-                    label: "Document Number", 
-                    placeholder: "", 
-                    type: 'text', 
-                    value:'',
+                    name: 'docNo',
+                    label: "Document Number",
+                    placeholder: "",
+                    type: '',
+                    value: '',
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: []
+               },
+               {
+                    name: 'docNo',
+                    label: "Document Number",
+                    placeholder: "",
+                    type: '',
+                    value: '',
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: []
+               },
+               {
+                    name: 'docNo',
+                    label: "Document Number",
+                    placeholder: "",
+                    type: '',
+                    value: '',
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: []
+               },
+               {
+                    name: 'docNo',
+                    label: "Document Number",
+                    placeholder: "",
+                    type: 'OR',
+                    value: '',
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: []
+               },
+               {
+                    name: 'docNo',
+                    label: "Document Number",
+                    placeholder: "",
+                    type: '',
+                    value: '',
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: []
+               },
+               {
+                    name: 'docNo',
+                    label: "Document Number",
+                    placeholder: "Please Enter Document Number comma(,) separated",
+                    type: 'text',
+                    value: '',
                     generatecontrol: true,
                     disable: false,
                     Validations: []

@@ -41,7 +41,7 @@ export class AddBankComponent implements OnInit {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
-      this.FormTitle = "Edit TDS";
+      this.FormTitle = "Edit Bank";
     }
   }
 

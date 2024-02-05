@@ -450,20 +450,20 @@
       "router": "Masters/CityLocationMapping/CityLocationIndex"
     },
     {
-      "title": "ListContainerType",
+      "title": "ContainerTypeMaster/ListContainerType",
       "tag": [
         "ContainerMaster",
         "ContainerMasterTypeList"
       ],
-      "router": "Masters/ContainerMaster/ContainerMasterList"
+      "router": "Masters/ContainerMaster/ContainerTypeMasterList"
     },
     {
-      "title": "AddContainerType",
+      "title": "ContainerTypeMaster/AddContainerType",
       "tag": [
         "ContainerMaster",
         "AddContainerType"
       ],
-      "router": "Masters/ContainerMaster/AddContainerMaster"
+      "router": "Masters/ContainerMaster/AddContainerTypeMaster"
     },
     {
       "title": "VendorContract/VendorContractList",

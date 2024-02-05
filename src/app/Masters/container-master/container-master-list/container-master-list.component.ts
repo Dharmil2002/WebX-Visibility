@@ -45,7 +45,7 @@ export class ContainerMasterListComponent implements OnInit {
   tableData: any;
   csvFileName: string;
   constructor(private masterService: MasterService) {
-    this.addAndEditPath = "/Masters/ContainerMaster/AddContainerMaster";
+    this.addAndEditPath = "/Masters/ContainerMaster/AddContainerTypeMaster";
   }
   ngOnInit(): void {
     this.csvFileName = "Container Master";
@@ -57,22 +57,22 @@ export class ContainerMasterListComponent implements OnInit {
       "collectionName": "container_detail",
       "filter": {}
     };
-  
+
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
-        
+
         if (res && res.data && res.data.length > 0) {
           // Sort the data based on entryDate in descending order
           const sortedData = res.data.sort((a, b) => {
             return new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime();
           });
-  
+
           // Display the latest record
           const latestRecord = sortedData[0];
           const latestEntryDate = latestRecord.entryDate;
-  
+
           // You can use the latestRecord object or latestEntryDate as needed for display.
-  
+
           // If you want to add srNo to each object in the array, you can still do that
           const dataWithSrno = sortedData.map((obj, index) => {
             return {
@@ -80,14 +80,14 @@ export class ContainerMasterListComponent implements OnInit {
               // srNo: index + 1
             };
           });
-  
+
           this.csv = dataWithSrno;
           this.tableLoad = false;
         }
       }
     });
   }
-  
+
   isActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls

@@ -66,7 +66,7 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
     });
     this.dialogRef.close(filteredData);
   }
-  close(){
+  close() {
     this.dialogRef.close('');
   }
   isAllSelected() {
@@ -83,7 +83,8 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
   }
   SetList() {
     const tableTitle = Object.keys(this.objResult[0]);
-    tableTitle.forEach((value, index) => {
+
+    this.displayedColumns = tableTitle.map((value) => {
       const Mydata: MyObject = {
         Key: value,
         title: value,
@@ -91,21 +92,19 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
         className: "matcolumncenter",
         show: true
       };
-      if (Mydata.Key == 'error') {
-        Mydata.title = "Errors",
-          Mydata.width = "300";
+
+      if (Mydata.Key === 'error') {
+        Mydata.title = "Errors";
+        Mydata.width = "300";
       }
       if (this.maxTextLengths.hasOwnProperty(Mydata.Key)) {
         Mydata.width = String(this.maxTextLengths[Mydata.Key] * 8);
       }
-      this.displayedColumns.push(Mydata);
+
+      return Mydata;
     });
 
-    this.columnKeys = this.displayedColumns.map((column) => column.Key);
-    const lastElement = this.columnKeys.pop();
-    this.columnKeys.unshift(lastElement);
-    this.columnKeys.unshift('status')
-    this.columnKeys.unshift('select')
+    this.columnKeys = ['select', 'status', 'error', ...tableTitle.filter(key => key !== 'select' && key !== 'status' && key !== 'error')];
 
     this.dataSource.data = this.objResult;
     this.dataSource.sort = this.sort;

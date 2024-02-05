@@ -4,7 +4,8 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { CustGSTInvoiceService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
+import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { CustGSTInvoiceService, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { customerWiseGSTInvControl } from 'src/assets/FormControls/Customer-Wise-GST-Invoice/customer-wise-gst-invoice';
@@ -33,19 +34,18 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     custNameData: any;
     sacData: any
   };
-  customerDetailList: any;
-  sacList: any;
-  custNameDet: any;
-  sacDet: any;
   custName: any;
   custStatus: any;
+  stateName: any;
+  stateStatus: any;
 
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private storage: StorageService,
     private masterServices: MasterService,
-    private custGSTInvoiceService: CustGSTInvoiceService
+    private custGSTInvoiceService: CustGSTInvoiceService,
+    private objStateService: StateService
   ) {
     this.initializeFormControl();
   }
@@ -73,6 +73,7 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     "CGST": "CGST",
     "SGSTUGST": "SGSTUGST",
     "CNAMT": "CNAMT",
+    "Discount": "Discount",
     "TotalInvoice_Value": "Total Invoice Value",
     "TDSRate": "TDS Rate",
     "TDSAmount": "TDS Amount",
@@ -120,6 +121,12 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     this.sacStatus = this.jsonCustGSTInvFormArray.find(
       (data) => data.name === "saccd"
     )?.additionalData.showNameAndValue;
+    this.stateName = this.jsonCustGSTInvFormArray.find(
+      (data) => data.name === "gststate"
+    )?.name;
+    this.stateStatus = this.jsonCustGSTInvFormArray.find(
+      (data) => data.name === "gststate"
+    )?.additionalData.showNameAndValue;
     this.CustGSTInvTableForm = formGroupBuilder(this.fb, [this.jsonCustGSTInvFormArray]);
   }
 
@@ -160,19 +167,16 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
 
     const custNameDet = mergedData.custNameData
       .map(element => ({
-        name: element.customerCode.toString(),
-        value: element.customerName.toString(),
+        name: element.customerName.toString(),
+        value: element.customerCode.toString()
       }));
     const sacDet = mergedData.sacData.map(element => ({
       name: element.SNM,
       value: element.SHCD
     }));
+  
 
-    this.customerDetailList = custNameDet;
-    this.sacList = sacDet;
-
-    this.custNameDet = custNameDet;
-    this.sacDet = sacDet;
+    const statelist = await this.objStateService.getState();
 
     this.filter.Filter(
       this.jsonCustGSTInvFormArray,
@@ -188,39 +192,83 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
       this.sacName,
       this.sacStatus
     );
-
+    this.filter.Filter(
+      this.jsonCustGSTInvFormArray,
+      this.CustGSTInvTableForm,
+      statelist,
+      this.stateName,
+      this.stateStatus
+    );
   }
 
+  //#region to apply filters and based on that download excel file
   async save() {
+    // Extracting values from the form controls
     const startValue = new Date(this.CustGSTInvTableForm.controls.start.value);
     const endValue = new Date(this.CustGSTInvTableForm.controls.end.value);
-    let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail(startValue, endValue);
+    const docummentNo = this.CustGSTInvTableForm.value.docNo;
+    const cancelBill = this.CustGSTInvTableForm.value.cannon;
+
+    // Splitting docNo into an array if it contains a comma
+    const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
+
+    // Extracting customer names from custnmcdHandler if it's an array
     const customerName = Array.isArray(this.CustGSTInvTableForm.value.custnmcdHandler)
       ? this.CustGSTInvTableForm.value.custnmcdHandler.map(x => x.value)
       : [];
-    const filteredRecords = data.filter(record => {
-      const custNm = customerName.length === 0 || customerName.includes(record.ocustName);
-      return custNm;
+
+    // Extracting saccdHandler, gststateHandler values
+    const sacData = Array.isArray(this.CustGSTInvTableForm.value.saccdHandler)
+      ? this.CustGSTInvTableForm.value.saccdHandler.map(x => x.name)
+      : [];
+    const stateData = Array.isArray(this.CustGSTInvTableForm.value.gststateHandler)
+      ? this.CustGSTInvTableForm.value.gststateHandler.map(x => x.name)
+      : [];
+
+    // Fetching data from the service based on provided parameters
+    let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail(startValue, endValue, docNoArray);
+
+    // Filter data based on state
+    data = data.filter(record => {
+      const sacDet = stateData.length === 0 || stateData.includes(record.BillGenState);
+      return sacDet;
     });
-    // const selectedData = filteredRecords;
-    if (filteredRecords.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (filteredRecords) {
-        Swal.fire({
-          icon: "error",
-          title: "No Records Found",
-          text: "Cannot Download CSV",
-          showConfirmButton: true,
-        });
-      }
+
+    // Filter data based on SAC (Service Accounting Code)
+    data = data.filter(record => {
+      const recordSacLowerCase = record.SAC.toLowerCase(); // Convert to lowercase for case-insensitive comparison
+      const isSacDataEmpty = sacData.length === 0;
+      const isSacIncluded = isSacDataEmpty || sacData.some(sac => recordSacLowerCase.includes(sac.toLowerCase()));
+      return isSacIncluded;
+    });
+
+    // Filter data based on customer names
+    data = data.filter(record => {
+      const partyName = record.Party.split(':')[1]?.trim().toLowerCase(); // Extract and convert to lowercase
+      const customerNameLowerCase = customerName.map(name => name.toLowerCase()); // Convert array elements to lowercase
+      const iscustomerNameEmpty = customerNameLowerCase.length === 0;
+      const isPartyIncluded = iscustomerNameEmpty || customerNameLowerCase.includes(partyName);
+      return isPartyIncluded;
+    });
+
+    // Filtering data based on cancelled status
+    const filteredRecord = cancelBill === 'Cancelled' ? data.find(record => record.BILLSTATUS === 'Cancelled') : data;
+
+    // Checking if there are records after filtering and displaying an error if not
+    if (!filteredRecord || (Array.isArray(filteredRecord) && filteredRecord.length === 0)) {
+      Swal.fire({
+        icon: "error",
+        title: "No Records Found",
+        text: "Cannot Download CSV",
+        showConfirmButton: true,
+      });
       return;
     }
-    // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-    //   const {  ocustName, ...rest } = record;
-    //   return rest;
-    // });
-    exportAsExcelFile(filteredRecords, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
+
+    // Exporting filtered data to Excel
+    exportAsExcelFile(filteredRecord, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
   }
+  //#endregion
 
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call

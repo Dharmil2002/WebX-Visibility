@@ -25,10 +25,13 @@ export class ManifestGeneratedComponent implements OnInit {
     "PackagesLoadedBooked": "Packages Loaded/Booked",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
-    "Action": "Print"
+    "hyperlink": "Print"
   }
   centerAlignedData = ['PackagesLoadedBooked', 'WeightKg', 'VolumeCFT'];
-
+  hyperlinkControls = {
+    functionName:"GeneralMultipleView",
+    value:"Print"
+  }
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "MFNumber": "MF Number",
@@ -48,7 +51,7 @@ export class ManifestGeneratedComponent implements OnInit {
   ]
   toggleArray = []
   menuItems = [
-    { label: 'Print', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+    { label: 'Print', function: "GeneralMultipleView" },
   ]
   linkArray = [
 
@@ -139,4 +142,14 @@ export class ManifestGeneratedComponent implements OnInit {
     this.dialogRef.close(this.csv)
   }
 
+  GeneralMultipleView(event){
+    console.log('event' , event)
+    const MFNumber = event.data.MFNumber
+    const templateBody = {
+      DocNo: MFNumber,
+      templateName: 'Manifest View-Print'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
+  }
 }

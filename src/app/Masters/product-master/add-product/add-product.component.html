@@ -13,17 +13,10 @@
         <div>
             <form [formGroup]="customerTableForm">
                 <app-form-webxpress [form]="customerTableForm" [formData]="jsonControlArray"
-                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'" [showSaveAndCancelButton]="false"
+                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'" [showSaveAndCancelButton]="true"
                     (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
                 </app-form-webxpress>
             </form>
-        </div>
-        <div class="row" style="margin-top: 10px; margin-left: 20px;">
-            <div class="col-3">
-                <button type="button" [disabled]="!customerTableForm.valid" (click)="save()" mat-raised-button color="primary">
-                    Submit
-                </button>
-            </div>
         </div>
     </div>
 </div>

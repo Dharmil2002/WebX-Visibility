@@ -204,6 +204,7 @@ export class AddContainerComponent implements OnInit {
       cNTYPCD: this.containerTableForm.value.containerType.value,
       cNNO: this.containerTableForm.value.ContainerNumber,
       vNTYP: this.containerTableForm.value.VendorType.name,
+      vNTYPCD: this.containerTableForm.value.VendorType.value,
       vNNM: this.containerTableForm.value.VendorName.name,
       vNCD: this.containerTableForm.value.VendorName.value,
       gRW: +this.containerTableForm.value.GrossWeight,

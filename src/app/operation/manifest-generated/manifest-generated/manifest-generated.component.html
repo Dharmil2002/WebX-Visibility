@@ -1,7 +1,7 @@
     Manifest Generation
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [toggleArray]="toggleArray" (functionCallEmitter)="functionCallHandler($event)" [hyperlinkControls]="hyperlinkControls" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">
     </generic-table-webxpress>
     <div class="row">

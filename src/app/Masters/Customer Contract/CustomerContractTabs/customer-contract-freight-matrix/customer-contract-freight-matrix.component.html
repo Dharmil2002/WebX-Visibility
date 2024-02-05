@@ -16,5 +16,5 @@
 <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
     [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
     (functionCallEmitter)="functionCallHandler($event)"
-    [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)">
+    [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)" [uploadComponent]= true  (uploadEvent)="upload()">
 </app-generic-table-v2>

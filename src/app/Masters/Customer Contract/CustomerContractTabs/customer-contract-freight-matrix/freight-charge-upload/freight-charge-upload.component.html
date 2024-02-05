@@ -1,0 +1,13 @@
+<app-generic-bulk-upload 
+    [title]="'Freight Charge Matrix Bulk Upload'" 
+    [downloadFunction]="Download"
+    [fileName]="'Freight Charge Matrix Upload'" 
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="fileUploadForm">
+            <div class="col">
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

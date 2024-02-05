@@ -174,6 +174,7 @@ import { UploadLocationComponent } from './location-master/upload-location/uploa
 import { ContainerStatusListComponent } from "./container-status-update/container-status-list/container-status-list.component";
 import { AddContainerStatusComponent } from "./container-status-update/add-container-status/add-container-status.component";
 import { AddressService } from "../Utility/module/masters/Address/address.service";
+import { FreightChargeUploadComponent } from './Customer Contract/CustomerContractTabs/customer-contract-freight-matrix/freight-charge-upload/freight-charge-upload.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -361,7 +362,8 @@ import { AddressService } from "../Utility/module/masters/Address/address.servic
     ShardProductAddComponent,
     UploadLocationComponent,
     ContainerStatusListComponent,
-    AddContainerStatusComponent
+    AddContainerStatusComponent,
+    FreightChargeUploadComponent
   ],
 
   providers: [

@@ -4,16 +4,18 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { formatDocketDate } from "../../commonFunction/arrayCommonFunction/uniqArray";
 import * as XLSX from 'xlsx';
+import { StateService } from "../masters/state/state.service";
 @Injectable({
      providedIn: "root",
 })
 export class VendorGSTInvoiceService {
      constructor(
           private masterServices: MasterService,
-          private storage: StorageService
+          private storage: StorageService,
+          private objStateService: StateService
      ) { }
 
-     async getvendorGstRegisterReportDetail(start,end) {
+     async getvendorGstRegisterReportDetail(start, end, docNo) {
           const startValue = start;
           const endValue = end;
           const reqBody = {
@@ -21,72 +23,92 @@ export class VendorGSTInvoiceService {
                collectionName: "vend_bill_summary",
                filter: {
                     cID: this.storage.companyCode,
-                    "D$and": [
-                         {
-                              "bDT": {
-                                   "D$gte": startValue
-                              }
-                         },
-                         {
-                              "bDT": {
-                                   "D$lte": endValue
-                              }
-                         }
-                    ]
                }
           }
+
+          // Check if the array contains only empty strings
+          const isEmptyDocNo = docNo.every(value => value === "");
+
+          // Add date range conditions if docNo are not present
+          if (isEmptyDocNo) {
+               reqBody.filter["D$and"] = [
+                    {
+                         "bDT": {
+                              "D$gte": startValue,
+                         },
+                    },
+
+                    {
+                         "bDT": {
+                              "D$lte": endValue,
+                         },
+                    }
+               ];
+          }
+
+          // Add docNo condition if docNoArray is present
+          if (!isEmptyDocNo) {
+               reqBody.filter["docNo"] = {
+                    "D$in": docNo,
+               };
+          }
+
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
 
           let vengstinvList = [];
 
-          res.data.map((element) => {
-               
-               let vengstinvData = { 
-                    "SAC":element.gST.sACNM,
-                    "DocumentType": element?.docNo || '',
-                    "GSTRATE":element.gST.rATE||'',
-                    "TDS_Rate":element.tDS.rATE||'',
-                    "TDS_Amount":element.tDS.aMT||'',
-                    "BILLNO":element?.docNo||'',
-                    "BILLDT":formatDocketDate(element?.bDT||''),
-                    "BILLSTATUS":element?.bSTATNM||'',
-                    "BillBanch":element?.eNTLOC||'',  
-                    "BillGenState":element?.eNTLOC||'', 
-                    "Generation_GSTNO":element?.gST.iGST||'',
-                    "Bill_Sub_At":element?.eNTLOC||'',  
-                    "TCS_Rate":element?.tDS.rATE||'',
-                    "TCS_Amount":element?.tDS.aMT||'',
-                    "MANUALBILLNO":element?.docNo||'',
+          await Promise.all(res.data.map(async (element) => {
+
+               const billGenState = await this.objStateService.fetchStateByFilterId(element?.sT, "ST");
+               const partyState = await this.objStateService.fetchStateByFilterId(element?.vND.sT, "ST");
+
+               let vengstinvData = {
+                    "BILLNO": element?.docNo || '',
+                    "BILLDT": formatDocketDate(element?.bDT || ''),
+                    "DocumentType": 'Transcation Bill',
+                    "BILLSTATUS": element?.bSTATNM || '',
+                    "BillGenState": billGenState[0]?.STNM,
+                    "BillBanch": element?.eNTLOC || '',
+                    "Generation_GSTNO": element?.gSTIN || '',
                     "Party": `${element?.vND.cD || ''} : ${element?.vND.nM || ''}`,
-                    "PartyType": "",
-                    "Bill_To_State": "",
-                    "Party_GSTN": "",
+                    "PartyType": element?.vND.gSTREG ? "Registered" : "UnRegistered",
+                    "Bill_To_State": partyState[0]?.STNM,
+                    "Party_GSTN": element?.vND.gSTIN || '',
+                    "Bill_Sub_At": element?.eNTLOC || '',
                     "BusinessType": "",
-                    "Total_Taxable_Value": "",
+                    "Total_Taxable_Value": element?.tHCAMT || 0.00,
+                    "SAC": element.gST.sACNM,
+                    "TCS_Rate": 0,
+                    "TCS_Amount": 0.00,
+                    "GSTRATE": element?.gST.rATE || 0,
                     "RCM": "",
-                    "IGST": "",
-                    "CGST": "",
-                    "SGST_UGST": "",
-                    "Total_Invoice_Value": "",
-                    "TDS Ledger ": "",
-                    "TDS Section Description ": "",
+                    "IGST": element?.gST.iGST || 0,
+                    "CGST": element?.gST.cGST || 0,
+                    "SGST_UGST": element?.gST.sGST || 0,
+                    "Total_Invoice_Value": element?.bALAMT || 0.00,
+                    "TDS_Rate": element.tDS.rATE || 0,
+                    "TDS_Amount": element.tDS.aMT || 0.00,
+                    "TDS Ledger ": element?.tDS.sEC || '',
+                    "TDS Section Description ": element?.tDS.sECD || "",
                     "REMARK": "",
                     "ReceiverName": "",
                     "ApplicableTax": "",
                     "ECommerceGSTIN": "",
-                    "VENDORBILLDT": "",
-                    "Currency": "",
+                    "VENDORBILLDT": formatDocketDate(element?.bDT || ''),
+                    "MANUALBILLNO": element?.docNo || '',
+                    "Currency": "INR",
                     "ExchangeRt": "",
                     "CurrencyAmt": "",
                     "PayBasis": "",
                     "Narration": "",
-                    "UserId": "",
+                    "UserId": element?.eNTBY || '',
                     "GSTExemptionCat": "",
                     "IrnNo": "",
-                    "InvNetValue": "",
+                    "InvNetValue": element?.bALAMT || 0.00,
                }
                vengstinvList.push(vengstinvData)
-          })
+          }));
+
           return vengstinvList;
      }
 }

@@ -18,9 +18,9 @@ export class AdviceGenerationControl {
         label: "Advice Date",
         placeholder: "select Advice Date",
         type: "date",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aDDT : new Date(),
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.aDDT : new Date(),
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [],
       },
       {
@@ -28,9 +28,9 @@ export class AdviceGenerationControl {
         label: "Raised on Branch",
         placeholder: "Select Raised on Branch",
         type: "dropdown",
-        value: Type == "Modify" ? FormValues?.rBRANCH : "",
+        value: Type == "Modify" || Type === "View" ? FormValues?.rBRANCH : "",
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [
           {
             name: "required",
@@ -53,9 +53,9 @@ export class AdviceGenerationControl {
         label: "Reason for Advice",
         placeholder: "Enter Reason for Advice",
         type: "text",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.rEASION : "",
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.rEASION : "",
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [
 
         ],
@@ -68,9 +68,9 @@ export class AdviceGenerationControl {
         label: "Applicable Amount (₹)",
         placeholder: "Enter Applicable Amount ",
         type: "number",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aMT : "",
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.aMT : "",
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [
           {
             name: "required",
@@ -85,9 +85,9 @@ export class AdviceGenerationControl {
         label: "Advice Generation Location",
         placeholder: "Advice Generation Location",
         type: "text",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.eNTLOC : localStorage.getItem("Branch"),
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.eNTLOC : localStorage.getItem("Branch"),
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [
         ],
         functions: {
@@ -108,7 +108,7 @@ export class AdviceGenerationControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [
           {
             name: "required",
@@ -128,7 +128,7 @@ export class AdviceGenerationControl {
         label: "Cheque/Ref No.",
         placeholder: "Cheque/Ref No.",
         type: "text",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.cHEQREF : "",
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.cHEQREF : "",
         generatecontrol: true,
         disable: Type == "Acknowledge" ? true : false,
         Validations: [
@@ -142,7 +142,7 @@ export class AdviceGenerationControl {
         label: "Select Bank",
         placeholder: "Select Bank",
         type: "dropdown",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aCNM : "",
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.aCNM : "",
         filterOptions: "",
         displaywith: "",
         generatecontrol: true,
@@ -171,7 +171,7 @@ export class AdviceGenerationControl {
         label: "Cash Account",
         placeholder: "Cash Account",
         type: "dropdown",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.aCNM : "",
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.aCNM : "",
         filterOptions: "",
         displaywith: "",
         generatecontrol: true,
@@ -199,9 +199,9 @@ export class AdviceGenerationControl {
         label: "Date",
         placeholder: "Date",
         type: "date",
-        value: Type === "Modify" || Type === "Acknowledge" ? FormValues?.eNTDT : "",
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.eNTDT : "",
         generatecontrol: true,
-        disable: Type == "Acknowledge" ? true : false,
+        disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [],
         additionalData: {
 
@@ -215,7 +215,7 @@ export class AdviceGenerationControl {
         value: "",
         filterOptions: "",
         displaywith: "",
-        generatecontrol: Type == "Acknowledge" ? true : false,
+        generatecontrol: Type == "Acknowledge" || Type === "View" ? true : false,
         disable: false,
         Validations: [
           {
@@ -240,8 +240,8 @@ export class AdviceGenerationControl {
         label: "Deposited on",
         placeholder: "Deposited on",
         type: "date",
-        value: "",
-        generatecontrol: Type == "Acknowledge" ? true : false,
+        value: Type === "View" ? FormValues?.dDT : "",
+        generatecontrol: Type == "Acknowledge" || Type === "View" ? true : false,
         disable: false,
         Validations: [],
         additionalData: {

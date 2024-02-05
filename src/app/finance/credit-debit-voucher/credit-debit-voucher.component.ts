@@ -323,6 +323,7 @@ export class DebitVoucherComponent implements OnInit {
     this.BindLedger(Preparedfor);
   }
   async PartyNameFieldChanged(event) {
+    debugger
     const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
     const PartyName = this.DebitVoucherSummaryForm.value.PartyName
     const Partystate = this.DebitVoucherSummaryForm.get('Partystate');
@@ -779,8 +780,8 @@ export class DebitVoucherComponent implements OnInit {
 
         this.debitVoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
         this.debitVoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
-        this.debitVoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value;
-        this.debitVoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name;
+        this.debitVoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
+        this.debitVoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName;
         this.debitVoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
         this.debitVoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
         this.debitVoucherDataRequestModel.entryDate = new Date();
@@ -881,8 +882,8 @@ export class DebitVoucherComponent implements OnInit {
                 transType: "DebitVoucher",
                 docType: "Voucher",
                 docNo: res?.data?.mainData?.ops[0].vNO,
-                partyCode: this.DebitVoucherSummaryForm.value?.PartyName?.value,
-                partyName: this.DebitVoucherSummaryForm.value?.PartyName?.name,
+                partyCode: this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,
                 entryBy: localStorage.getItem("UserName"),
                 entryDate: Date(),
                 debit: transformedData,

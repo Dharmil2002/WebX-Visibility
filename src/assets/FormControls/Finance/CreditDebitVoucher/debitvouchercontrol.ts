@@ -152,7 +152,8 @@ export class DebitVoucherControl {
           metaData: "Basic"
         },
         functions: {
-          onOptionSelect: "PartyNameFieldChanged"
+          onOptionSelect: "PartyNameFieldChanged",
+          onChange: "PartyNameFieldChanged"
         },
       },
       {

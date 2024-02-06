@@ -1546,6 +1546,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           if (match) {
             x.containerCapacity = match?.loadCapacity || "";
           }
+          if (!('isEmpty' in x)) {
+            // If isEmpty property is not present, assign false to it
+            x.isEmpty = "N";
+          }
           if (detail) {
             Swal.fire({
               icon: "error",
@@ -1554,14 +1558,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             });
             return null; // Returning null to indicate that this element should be removed
           }
-          if (!x.isEmpty) {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: `IsEmpty is Required`,
-            });
-            return null; // Returning null to indicate that this element should be removed
-          }
+          // if (!x.isEmpty) {
+          //   Swal.fire({
+          //     icon: "error",
+          //     title: "Error",
+          //     text: `IsEmpty is Required`,
+          //   });
+          //   return null; // Returning null to indicate that this element should be removed
+          // }
           // Modify 'x' if needed
           // For example, you can add the index to the element
           containerNo.push(x.containerNumber);

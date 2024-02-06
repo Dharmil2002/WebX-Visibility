@@ -101,7 +101,7 @@ export class DocketTrackingComponent implements OnInit {
     this.tableload = true;
 
     // Introduce a delay of 2 seconds
-    // await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const docketList = await getDocketFromApiDetail(this.companyCode, this.docketNo, this.operationService);
     console.log('docketList',docketList)

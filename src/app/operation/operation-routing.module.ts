@@ -32,6 +32,8 @@ import { ThcGenerationComponent } from "./thc-generation/thc-generation.componen
 // import { PrqViewComponent } from "./ViewPrint/prq-view/prq-view.component";
 import { CommonViewPrintComponent } from "./ViewPrint/common-view-print/common-view-print.component";
 import { JobViewPrintComponent } from "./job-view-print/job-view-print.component";
+import { ConsignmentOperationComponent } from "./consignment-operation/consignment-operation.component";
+import { ConsingmentSummaryComponent } from "./consingment-summary/consingment-summary.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -160,6 +162,14 @@ const routes: Routes = [
   {
     path: "jobviewprint",
     component: JobViewPrintComponent
+  },
+  {
+    path: "ConsignmentOperation",
+    component: ConsignmentOperationComponent
+  },
+  {
+    path: "ConsignmentSummary",
+    component: ConsingmentSummaryComponent
   },
 ]
 

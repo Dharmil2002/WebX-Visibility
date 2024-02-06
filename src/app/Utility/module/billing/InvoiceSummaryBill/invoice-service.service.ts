@@ -8,6 +8,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '../../masters/customer/customer.service';
+import { CustomerBillStatus } from 'src/app/Models/docStatus';
 
 @Injectable({
   providedIn: 'root'
@@ -149,8 +150,8 @@ export class InvoiceServiceService {
       "bDUEDT": data?.dueDate || new Date(),
       "bLOC": this.storage.branch,
       "pAYBAS": data?.pAYBAS || "",
-      "bSTS": 1,
-      "bSTSNM": "Generated",
+      "bSTS": CustomerBillStatus.Generated,
+      "bSTSNM": CustomerBillStatus[CustomerBillStatus.Generated],
       "bSTSDT": new Date(),
       "eXMT": data?.gstExempted || false,
       "eXMTRES": data?.ExemptionReason || "",

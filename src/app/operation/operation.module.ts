@@ -69,6 +69,7 @@ import { JobViewPrintComponent } from './job-view-print/job-view-print.component
 import { HandedOverUploadComponent } from './handed-over/handed-over-upload/handed-over-upload.component';
 import { ConsignmentOperationComponent } from './consignment-operation/consignment-operation.component';
 import { ConsingmentSummaryComponent } from './consingment-summary/consingment-summary.component';
+import { ConsignmentFilterComponent } from './consignment-filter/consignment-filter.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -116,7 +117,8 @@ import { ConsingmentSummaryComponent } from './consingment-summary/consingment-s
     JobViewPrintComponent,
     HandedOverUploadComponent,
     ConsignmentOperationComponent,
-    ConsingmentSummaryComponent
+    ConsingmentSummaryComponent,
+    ConsignmentFilterComponent
     
     
   ],

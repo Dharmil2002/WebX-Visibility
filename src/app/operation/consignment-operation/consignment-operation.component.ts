@@ -49,26 +49,6 @@ export class ConsignmentOperationComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    // RateForOthers: {
-    //   Title: "Rate For Others",
-    //   class: "matcolumncenter",
-    //   Style: "min-width:10%",
-    // },
-    // isActive: {
-    //   type: "Activetoggle",
-    //   Title: "Active",
-    //   class: "matcolumncenter",
-    //   Style: "min-width:10%",
-    //   functionName: "ActiveFunction",
-    // },
-    // EditAction: {
-    //   type: "iconClick",
-    //   Title: "Action",
-    //   class: "matcolumncenter",
-    //   Style: "min-width:10%",
-    //   functionName: "EditFunction",
-    //   iconName: "edit",
-    // },
   };
   staticField = [
     "Date",

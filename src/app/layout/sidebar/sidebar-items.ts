@@ -148,7 +148,7 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
-              "path": "Masters/ContainerMaster/ContainerMasterList",
+              "path": "Masters/ContainerMaster/ListContainer",
               "title": "Container master",
               "moduleName": "Container master",
               "icon": "",

@@ -34,6 +34,7 @@ import { CommonViewPrintComponent } from "./ViewPrint/common-view-print/common-v
 import { JobViewPrintComponent } from "./job-view-print/job-view-print.component";
 import { ConsignmentOperationComponent } from "./consignment-operation/consignment-operation.component";
 import { ConsingmentSummaryComponent } from "./consingment-summary/consingment-summary.component";
+import { ConsignmentFilterComponent } from "./consignment-filter/consignment-filter.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -170,6 +171,10 @@ const routes: Routes = [
   {
     path: "ConsignmentSummary",
     component: ConsingmentSummaryComponent
+  },
+  {
+    path: "ConsignmentFilter",
+    component: ConsignmentFilterComponent
   },
 ]
 

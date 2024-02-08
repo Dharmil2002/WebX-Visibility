@@ -118,7 +118,7 @@ export class PrqEntryPageComponent implements OnInit {
       }
       else {
         this.prqEntryTableForm.controls["vEHSIZE"].setValue(
-          `${this.prqDetail?.vehicleSizeCode || ""}`
+          this.prqDetail?.vehicleSizeCode || ""
         );
       }
       this.prqEntryTableForm.controls["fCITY"].setValue({

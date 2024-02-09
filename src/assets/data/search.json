@@ -861,6 +861,14 @@
       "router": "Reports/vendor-wise-outstanding-report"
     },
     {
+      "title": "Reports/General-ledger-report",
+      "tag": [
+        "Generalledgerreport",
+        "Generalledgerreport"
+      ],
+      "router": "Reports/General-ledger-report"
+    },
+    {
       "title": "AddContainerMaster",
       "tag": [
         "Add Container"

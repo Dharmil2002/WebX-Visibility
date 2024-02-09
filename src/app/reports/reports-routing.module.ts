@@ -9,6 +9,7 @@ import { CustomerWiseGstInvoiceComponent } from './customer-wise-gst-invoice/cus
 import { UnbillRegisterComponent } from './unbill-register/unbill-register.component';
 import { CustomerOutstandingReportComponent } from './customer-outstanding-report/customer-outstanding-report.component';
 import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
+import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
 
 
 const routes: Routes = [
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: "unbilled-register-report", component: UnbillRegisterComponent },
   { path: "customer-outstanding-report", component: CustomerOutstandingReportComponent },
   { path: "vendor-wise-outstanding-report", component: VendorOutstandingReportComponent },
+  { path: "General-ledger-report", component: GeneralLedgerReportComponent },
 ];
 
 @NgModule({

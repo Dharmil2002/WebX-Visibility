@@ -30,7 +30,10 @@ export class MasterService {
   companyGst: any;
   businessTypeList = '../../../assets/data/businessType.json'
   regexPattern = '../../../assets/data/regexPattern.json'
-  thcDetail='../../../assets/data/thc-viewprint.json'
+  thcDetail = '../../../assets/data/thc-viewprint.json'
+  vendorGstReport = '../../../assets/ReportFiles/vendorGstReport.json';
+  generalLedgerReport = '../../../assets/ReportFiles/generalLedger.json';
+
   constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.
@@ -52,15 +55,15 @@ export class MasterService {
   masterMongoPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
- masterMongoRemove(ApiURL,Request){
-  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  masterMongoRemove(ApiURL, Request) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  const options = {
-    headers: headers,
-    body: Request
-  };
+    const options = {
+      headers: headers,
+      body: Request
+    };
 
-    return this.http.delete<any>(`${environment.APIBaseURL}` + ApiURL,options);
+    return this.http.delete<any>(`${environment.APIBaseURL}` + ApiURL, options);
   }
   setValueheaderCode(data: string) {
     this.headerCode = data

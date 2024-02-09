@@ -1,0 +1,201 @@
+[
+    {
+        "FieldName": "docNo",
+        "Caption": "BILLNO"
+    },
+    {
+        "FieldName": "bDT",
+        "Caption": "BILLDT",
+        "DataType": "Date",
+        "Format": "DD MMM YYYY"
+    },
+    {
+        "Caption": "DocumentType",
+        "Default": "Transcation Bill"
+    },
+    {
+        "FieldName": "bSTATNM",
+        "Caption": "BILLSTATUS"
+    },
+    {
+        "FieldName": "sT",
+        "Caption": "Bill_Gen_State"
+    },
+    {
+        "FieldName": "eNTLOC",
+        "Caption": "Bill_Banch"
+    },
+    {
+        "FieldName": "gSTIN",
+        "Caption": "Generation_GSTNO"
+    },
+    {
+        "FieldName": "vND.cD",
+        "Caption": "PartyCode"
+    },
+    {
+        "FieldName": "vND.nM",
+        "Caption": "PartyName"
+    },
+    {
+        "FieldName": "vND.gSTREG",
+        "Caption": "PartyType"
+    },
+    {
+        "FieldName": "vND.sT",
+        "Caption": "Bill_To_State"
+    },
+    {
+        "FieldName": "vND.gSTIN",
+        "Caption": "Party_GSTN"
+    },
+    {
+        "FieldName": "eNTLOC",
+        "Caption": "Bill_Sub_At"
+    },
+    {
+        "Caption": "BusinessType"
+    },
+    {
+        "FieldName": "tHCAMT",
+        "Caption": "Total_Taxable_Value",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "gST.sACNM",
+        "Caption": "SAC"
+    },
+    {
+        "Caption": "TCS_Rate",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "Caption": "TCS_Amount",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "gST.rATE",
+        "Caption": "GSTRATE",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "Caption": "RCM"
+    },
+    {
+        "FieldName": "gST.iGST",
+        "Caption": "IGST",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "gST.cGST",
+        "Caption": "CGST",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "gST.sGST",
+        "Caption": "SGST_UGST",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "bALAMT",
+        "Caption": "Total_Invoice_Value",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "tDS.rATE",
+        "Caption": "TDS_Rate",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "tDS.aMT",
+        "Caption": "TDS_Amount",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "FieldName": "tDS.sEC",
+        "Caption": "TDS Ledger "
+    },
+    {
+        "FieldName": "tDS.sECD",
+        "Caption": "TDS Section Description "
+    },
+    {
+        "Caption": "REMARK"
+    },
+    {
+        "Caption": "ReceiverName"
+    },
+    {
+        "Caption": "ApplicableTax"
+    },
+    {
+        "Caption": "ECommerceGSTIN"
+    },
+    {
+        "FieldName": "bDT",
+        "Caption": "VENDORBILLDT",
+        "DataType": "Date",
+        "Format": "DD MMM YYYY"
+    },
+    {
+        "FieldName": "docNo",
+        "Caption": "MANUALBILLNO"
+    },
+    {
+        "Caption": "Currency",
+        "Default": "INR"
+    },
+    {
+        "Caption": "ExchangeRate",
+        "DataType": "Number"
+    },
+    {
+        "Caption": "CurrencyAmount",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    },
+    {
+        "Caption": "PayBasis"
+    },
+    {
+        "Caption": "Narration"
+    },
+    {
+        "FieldName": "eNTBY",
+        "Caption": "UserId"
+    },
+    {
+        "Caption": "GSTExemptionCategory"
+    },
+    {
+        "Caption": "IrnNo"
+    },
+    {
+        "FieldName": "bALAMT",
+        "Caption": "Invoice_Net_Value",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0
+    }
+]

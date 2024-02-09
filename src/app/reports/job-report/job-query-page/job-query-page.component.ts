@@ -13,8 +13,9 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
 import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
+import { jobQueryControl } from 'src/assets/FormControls/Reports/job-reports/job-query';
 
-import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
+// import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
 import Swal from 'sweetalert2';
 
 @Component({

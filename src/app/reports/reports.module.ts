@@ -50,6 +50,7 @@ import { UnbillRegisterComponent } from './unbill-register/unbill-register.compo
 import { CustomerOutstandingReportComponent } from './customer-outstanding-report/customer-outstanding-report.component';
 import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
 import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
+import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -96,6 +97,7 @@ import { GeneralLedgerReportComponent } from './general-ledger-report/general-le
   ],
 
   declarations: [
+    PrqRegisterReportComponent,
     JobQueryPageComponent,
     CnwGstRegisterComponent,
     CnoteBillMrReportComponent,

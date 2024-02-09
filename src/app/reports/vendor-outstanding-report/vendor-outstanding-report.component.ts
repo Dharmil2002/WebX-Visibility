@@ -6,12 +6,13 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { VendorWiseOutService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-wise-outstanding';
+import { VendorWiseOutService, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-wise-outstanding';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { vendOutControl } from 'src/assets/FormControls/Vendor-Outstanding-report/vendor-outstanding-report';
+// import { vendOutControl } from 'src/assets/FormControls/Vendor-Outstanding-report/vendor-outstanding-report';
 import Swal from 'sweetalert2';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
+import { vendOutControl } from 'src/assets/FormControls/Reports/Vendor-Outstanding-report/vendor-outstanding-report';
 
 @Component({
   selector: 'app-vendor-outstanding-report',
@@ -93,6 +94,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     )?.additionalData.showNameAndValue;
     this.VendWiseOutTableForm = formGroupBuilder(this.fb, [this.jsonVendWiseOutFormArray]);
   }
+
   toggleSelectAll(argData: any) {
     let fieldName = argData.field.name;
     let autocompleteSupport = argData.field.additionalData.support;
@@ -108,12 +110,14 @@ export class VendorOutstandingReportComponent implements OnInit {
         );
       });
   }
+
   CSVHeader = {
-    "srNo": "Sr No",
     "vendor": "Vendor",
+    "loc":"Location",
     "openingBal": "Opening Balance",
-    "totalBillAmtFrom010423To111223": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
-    "paidAmtFrom010423To111223": "Paid Amount From 01 Apr 2023 To 11 Dec 2023",
+    "totalBill": "Total Bill",
+    "totalBillAmt": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
+    "paidAmt": "Paid Amount From 01 Apr 2023 To 11 Dec 2023",
     "finalized": "Finalized",
     "unFinalized": "Un-Finalized",
     "0-30": "0-30",
@@ -142,7 +146,6 @@ export class VendorOutstandingReportComponent implements OnInit {
     const venNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", venNameReq));
     const mergedData = {
       venNameData: venNameRes?.data,
-      // venTypeData: venNameRes?.data,
     };
     this.allData = mergedData;
     const venNameDet = mergedData.venNameData
@@ -150,16 +153,9 @@ export class VendorOutstandingReportComponent implements OnInit {
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),
       }));
-    // const venTypeDet = mergedData.venTypeData
-    //   .map(element => ({
-    //     name: element.vendorType,
-    //     value: element.vendorType,
-    //   }));
-
     this.vendorDetailList = venNameDet;
-    // this.vendTypeDetail = venTypeDet;
+
     this.venNameDet = venNameDet;
-    // this.venTypeDet = venTypeDet
     this.filter.Filter(
       this.jsonVendWiseOutFormArray,
       this.VendWiseOutTableForm,
@@ -184,25 +180,29 @@ export class VendorOutstandingReportComponent implements OnInit {
   }
 
   async save() {
+    const reportTp = Array.isArray(this.VendWiseOutTableForm.value.rpttype)?'':this.VendWiseOutTableForm.value.rpttype;
+    const reportbasis = Array.isArray(this.VendWiseOutTableForm.value.rptbasis)?'':this.VendWiseOutTableForm.value.rptbasis;
     const startValue = new Date(this.VendWiseOutTableForm.controls.start.value);
     const endValue = new Date(this.VendWiseOutTableForm.controls.end.value);
-    let data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(startValue,endValue);
-    const locData = Array.isArray(this.VendWiseOutTableForm.value.locHandler)
-      ? this.VendWiseOutTableForm.value.locHandler.map(x => x.name)
-      : [];
-    const vendNMData = Array.isArray(this.VendWiseOutTableForm.value.vendnmcdHandler)
-      ? this.VendWiseOutTableForm.value.vendnmcdHandler.map(x => x.name)
-      : [];
-    const filteredRecords = data.filter(record => {
-      const locDet = locData.length === 0 || locData.includes(record.lOC);
-      const venNMDet = vendNMData.length === 0 || vendNMData.includes(record.Vendor);
 
-      return locDet && venNMDet;
-    });
-    // const selectedData = filteredRecords;
-    if (filteredRecords.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (filteredRecords) {
+    const formattedStartDate = startValue.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const formattedEndDate = endValue.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    this.CSVHeader = {
+      ...this.CSVHeader,
+      "totalBillAmt": `Total Bill Amount From ${formattedStartDate} To ${formattedEndDate}`,
+      "paidAmt": `Paid Amount From ${formattedStartDate} To ${formattedEndDate}`,
+    };
+    const locData = Array.isArray(this.VendWiseOutTableForm.value.locHandler)
+      ? this.VendWiseOutTableForm.value.locHandler.map(x => { return { locCode: x.value, locName: x.name }; })
+      : [];
+    const vendData = Array.isArray(this.VendWiseOutTableForm.value.vendnmcdHandler)
+      ? this.VendWiseOutTableForm.value.vendnmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
+      : [];
+    const data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(startValue, endValue, locData, vendData, reportbasis, reportTp);
+
+    if (data.length === 0) {
+      if (data) {
         Swal.fire({
           icon: "error",
           title: "No Records Found",
@@ -212,11 +212,8 @@ export class VendorOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { lOC, ...rest } = record;
-      return rest;
-    });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Vendor_Wise_Outstanding_Report-${timeString}`, this.CSVHeader);
+    // Assuming exportAsExcelFile is a function that exports data to Excel
+    exportAsExcelFile(data, `Vendor_Wise_Outstanding_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

@@ -1,9 +1,9 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
-export class custOutControl {
-     CustOutControlArray: FormControls[];
+export class vendOutControl {
+     VendOutControlArray: FormControls[];
      constructor() {
-          this.CustOutControlArray = [
+          this.VendOutControlArray = [
                {
                     name: "start",
                     label: "Invoice Date",
@@ -22,13 +22,13 @@ export class custOutControl {
                },
                {
                     name: 'rptbasis',
-                    label: 'Report Basis on',
+                    label: 'Report Based on',
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Invoice Generation", name: "Invoice Generation" },
-                         { value: "Invoice Submission", name: "Invoice Submission" },
-                         { value: "Invoice Collection", name: "Invoice Collection" },
+                         { value: "4", name: "Vendor Invoice Generation" },
+                         { value: "2", name: "Vendor Invoice Finalization" },
+                         { value: "3", name: "Vendor Invoice Payment" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -45,28 +45,8 @@ export class custOutControl {
                     generatecontrol: true, disable: false
                },
                {
-                    name: 'gststate',
-                    label: 'GST State',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "gststateHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
-               {
                     name: 'loc',
-                    label: 'From Location',
+                    label: 'Location',
                     placeholder: 'From Location',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
@@ -81,14 +61,45 @@ export class custOutControl {
                     generatecontrol: true, disable: false
                },
                {
+                    name: 'vendtype',
+                    label: 'Vendor Type',
+                    placeholder: 'From Location',
+                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "vendtypeHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: 'vennmcd',
+                    label: 'Vendor Name & Code',
+                    placeholder: 'From Location',
+                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "vendnmcdHandler",
+                         showNameAndValue: true,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
                     name: 'rpttype',
                     label: 'Report Type',
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Customer Wise", name: "Customer Wise" },
-                         { value: "Customer wise location wise", name: "Customer wise location wise" },
-                         { value: "Location wise Customer wise", name: "Location wise Customer wise" },
+                         { value: "1", name: "Vendor Wise" },
+                         { value: "2", name: "Location Wise Vendor Wise" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -96,7 +107,7 @@ export class custOutControl {
                     Validations: [
                     ],
                     additionalData: {
-                         support: "rpttypeHandler",
+                         support: "rptbasisHandler",
                          showNameAndValue: false,
                     },
                     functions: {
@@ -105,38 +116,18 @@ export class custOutControl {
                     generatecontrol: true, disable: false
                },
                {
-                    name: 'custnmcd',
-                    label: 'Customer Name &  Code',
-                    placeholder: '',
-                    type: 'multiselect',
-                    value: [],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "custnmcdHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
-               {
-                    name: 'custnmcdHandler',
-                    label: 'custnmcdHandler',
-                    placeholder: 'custnmcdHandler',
+                    name: 'vendnmcdHandler',
+                    label: 'vendnmcdHandler',
+                    placeholder: 'vendnmcdHandler',
                     type: '',
                     value: '',
                     Validations: [],
                     generatecontrol: false, disable: false
                },
                {
-                    name: 'rpttypeHandler',
-                    label: 'rpttypeHandler',
-                    placeholder: 'rpttypeHandler',
+                    name: 'vendtypeHandler',
+                    label: 'vendtypeHandler',
+                    placeholder: 'vendtypeHandler',
                     type: '',
                     value: '',
                     Validations: [],
@@ -146,15 +137,6 @@ export class custOutControl {
                     name: 'locHandler',
                     label: 'locHandler',
                     placeholder: 'locHandler',
-                    type: '',
-                    value: '',
-                    Validations: [],
-                    generatecontrol: false, disable: false
-               },
-               {
-                    name: 'gststateHandler',
-                    label: 'gststateHandler',
-                    placeholder: 'gststateHandler',
                     type: '',
                     value: '',
                     Validations: [],
@@ -182,7 +164,6 @@ export class custOutControl {
                     Validations: [],
                }
           ]
+
      }
-          
 }
-     

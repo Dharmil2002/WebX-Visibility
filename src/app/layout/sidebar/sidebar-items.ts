@@ -709,6 +709,15 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": []
         },
+        {
+          "path": "Reports/PRQ-Register-report",
+          "title": "PRQ Register Report",
+          "moduleName": "PRQ Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
       ],
     },
   ]

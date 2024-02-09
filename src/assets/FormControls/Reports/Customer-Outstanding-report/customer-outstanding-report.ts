@@ -1,9 +1,9 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
-export class vendOutControl {
-     VendOutControlArray: FormControls[];
+export class custOutControl {
+     CustOutControlArray: FormControls[];
      constructor() {
-          this.VendOutControlArray = [
+          this.CustOutControlArray = [
                {
                     name: "start",
                     label: "Invoice Date",
@@ -26,18 +26,54 @@ export class vendOutControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Vendor Invoice Generation", name: "Vendor Invoice Generation" },
-                         { value: "Vendor Invoice Finalization", name: "Vendor Invoice Finalization" },
-                         { value: "Vendor Invoice Payment", name: "Vendor Invoice Payment" },
+                         { value: "1", name: "Invoice Generation" },
+                         { value: "3", name: "Invoice Submission" },
+                         { value: "4", name: "Invoice Collection" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     Validations: [
                     ],
+                    // additionalData: {
+                    //      support: "rptbasisHandler",
+                    //      showNameAndValue: false,
+                    // },
+                    // functions: {
+                    //      onToggleAll: "toggleSelectAll"
+                    // },
+                    generatecontrol: true, disable: false
+               },
+               // {
+               //      name: 'gststate',
+               //      label: 'GST State',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "gststateHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
+               {
+                    name: 'gststate',
+                    label: 'GST State',
+                    placeholder: 'GST State',
+                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+                    Validations: [
+                    ],
                     additionalData: {
-                         support: "rptbasisHandler",
-                         showNameAndValue: false,
+                         support: "gstStHandler",
+                         showNameAndValue: true,
                     },
                     functions: {
                          onToggleAll: "toggleSelectAll",
@@ -46,45 +82,13 @@ export class vendOutControl {
                },
                {
                     name: 'loc',
-                    label: 'Location',
+                    label: 'From Location',
                     placeholder: 'From Location',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],
                     additionalData: {
                          support: "locHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
-               {
-                    name: 'vendtype',
-                    label: 'Vendor Type',
-                    placeholder: 'From Location',
-                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "vendtypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
-               {
-                    name: 'vennmcd',
-                    label: 'Vendor Name & Code',
-                    placeholder: 'From Location',
-                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "vendnmcdHandler",
                          showNameAndValue: true,
                     },
                     functions: {
@@ -98,8 +102,10 @@ export class vendOutControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Vendor Wise", name: "Vendor Wise" },
-                         { value: "Location Wise Vendor Wise", name: "Location Wise Vendor Wise" },
+                         { value: "1", name: "Customer Wise" },
+                         { value: "2", name: "Customer Wise Location Wise" },
+                         { value: "3", name: "Location Wise Customer Wise" },
+                         // { value: "4", name: "Customer Group Wise" }
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -107,7 +113,7 @@ export class vendOutControl {
                     Validations: [
                     ],
                     additionalData: {
-                         support: "rptbasisHandler",
+                         support: "rpttypeHandler",
                          showNameAndValue: false,
                     },
                     functions: {
@@ -116,18 +122,47 @@ export class vendOutControl {
                     generatecontrol: true, disable: false
                },
                {
-                    name: 'vendnmcdHandler',
-                    label: 'vendnmcdHandler',
-                    placeholder: 'vendnmcdHandler',
+                    name: 'custnmcd',
+                    label: 'Customer Name &  Code',
+                    placeholder: '',
+                    type: 'multiselect',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "custnmcdHandler",
+                         showNameAndValue: true,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: 'custnmcdHandler',
+                    label: 'custnmcdHandler',
+                    placeholder: 'custnmcdHandler',
                     type: '',
                     value: '',
                     Validations: [],
                     generatecontrol: false, disable: false
                },
                {
-                    name: 'vendtypeHandler',
-                    label: 'vendtypeHandler',
-                    placeholder: 'vendtypeHandler',
+                    name: 'rpttypeHandler',
+                    label: 'rpttypeHandler',
+                    placeholder: 'rpttypeHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'gstStHandler',
+                    label: 'gstStHandler',
+                    placeholder: 'gstStHandler',
                     type: '',
                     value: '',
                     Validations: [],
@@ -137,6 +172,15 @@ export class vendOutControl {
                     name: 'locHandler',
                     label: 'locHandler',
                     placeholder: 'locHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'gststateHandler',
+                    label: 'gststateHandler',
+                    placeholder: 'gststateHandler',
                     type: '',
                     value: '',
                     Validations: [],
@@ -164,6 +208,6 @@ export class vendOutControl {
                     Validations: [],
                }
           ]
-
      }
+
 }

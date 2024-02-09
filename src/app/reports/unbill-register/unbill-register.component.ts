@@ -6,7 +6,8 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { UnbillRegisterService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/unbill-register.service';
-import { billRegControl } from 'src/assets/FormControls/Unbill-Register/unbill-register';
+import { billRegControl } from 'src/assets/FormControls/Reports/Unbill-Register/unbill-register';
+// import { billRegControl } from 'src/assets/FormControls/Unbill-Register/unbill-register';
 import Swal from 'sweetalert2';
 
 @Component({

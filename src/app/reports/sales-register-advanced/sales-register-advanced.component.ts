@@ -11,7 +11,8 @@ import { CustomerService } from 'src/app/Utility/module/masters/customer/custome
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { convertToCSV, exportAsExcelFile, SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
-import { salesRegisterControl } from 'src/assets/FormControls/sales-register/sales-register-advance';
+import { salesRegisterControl } from 'src/assets/FormControls/Reports/sales-register/sales-register-advance';
+// import { salesRegisterControl } from 'src/assets/FormControls/sales-register/sales-register-advance';
 import Swal from 'sweetalert2';
 
 @Component({

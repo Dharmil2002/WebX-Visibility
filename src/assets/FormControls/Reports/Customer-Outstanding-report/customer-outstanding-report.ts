@@ -96,31 +96,31 @@ export class custOutControl {
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: 'rpttype',
-                    label: 'Report Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "1", name: "Customer Wise" },
-                         { value: "2", name: "Customer Wise Location Wise" },
-                         { value: "3", name: "Location Wise Customer Wise" },
-                         // { value: "4", name: "Customer Group Wise" }
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "rpttypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'rpttype',
+               //      label: 'Report Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "1", name: "Customer Wise" },
+               //           { value: "2", name: "Customer Wise Location Wise" },
+               //           { value: "3", name: "Location Wise Customer Wise" },
+               //           // { value: "4", name: "Customer Group Wise" }
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "rpttypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: 'custnmcd',
                     label: 'Customer Name &  Code',

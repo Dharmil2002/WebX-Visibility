@@ -160,9 +160,10 @@ export class prqreportService {
         const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
         // Format the date using moment
         res.data.forEach(item => {
-            item.prqDt = moment(item.prqDt).format('YYYY-MM-DD');
-            item.PickDtTime = moment(item.PickDtTime).format('YYYY-MM-DD');
-            item.ConsigNoteDt = moment(item.ConsigNoteDt).format('YYYY-MM-DD');
+            item.prqDt = item.prqDt ? moment(item.prqDt).format('YYYY-MM-DD') : "";
+            item.PickDtTime = item.PickDtTime ? moment(item.PickDtTime).format('YYYY-MM-DD') : "";
+            item.ConsigNoteDt = item.ConsigNoteDt ? moment(item.ConsigNoteDt).format('YYYY-MM-DD') : "";
+            item.THCDt = item.THCDt ? moment(item.THCDt).format('YYYY-MM-DD') : "";
         });
         return res.data;
     }

@@ -64,6 +64,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   ewayBill: boolean = true;
   prqFlag: boolean;
   jsonControlArray: any;
+  NonFreightjsonControlArray: any;
   jsonInvoiceDetail: any;
   jsonControlArrayConsignor: any;
   jsonControlArrayConsignee: any;
@@ -82,7 +83,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   products: AutoComplete[];
 
   linkArray = [];
-
+  NonFreightLoaded = false;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -198,6 +199,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       ...this.jsonControlArrayConsignee,
     ];
     this.jsonControlArray = this.model.FreightFromControl.getFreightControlControls();
+    this.NonFreightjsonControlArray = this.model.FreightFromControl.getFreightControlControls();
     this.jsonContainerDetail = this.model.ConsignmentFormControls.getContainerDetail();
     this.jsonInvoiceDetail = this.model.ConsignmentFormControls.getInvoiceDetail();
     this.jsonEwayBill = this.model.ConsignmentFormControls.getEwayBillDetail();
@@ -209,6 +211,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.allformControl,
     ]);
     this.model.FreightTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+
     this.model.containerTableForm = formGroupBuilder(this.fb, [
       this.jsonContainerDetail,
     ]);
@@ -1730,19 +1733,28 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "capacity": containerCode
     }
 
+    //let reqBody = { "companyCode": 10065, "customerCode": "CUST00012", "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9 }
+
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
-      .then((res: any) => {
+      .then(async (res: any) => {
         if (res.length == 1) {
+
+          this.NonFreightjsonControlArray = await this.GenerateControls(res[0].NonFreightChargeMatrixDetails)
+          this.NonFreightLoaded = true
+          this.model.NonFreightTableForm = formGroupBuilder(this.fb, [
+            this.NonFreightjsonControlArray
+          ]);
+
+          this.model.FreightTableForm.controls["freight_rate"].setValue(res[0].FreightChargeMatrixDetails?.rT);
+          this.model.FreightTableForm.controls["freightRatetype"].setValue(res[0].FreightChargeMatrixDetails?.rTYPCD);
+          this.calculateFreight();
+
           Swal.fire({
             icon: "success",
             title: "Contract Invoked Successfully",
             text: "ContractId: " + res[0].docNo,
             showConfirmButton: false,
           });
-
-          this.model.FreightTableForm.controls["freight_rate"].setValue(res[0].FreightChargeMatrixDetails?.rT);
-          this.model.FreightTableForm.controls["freightRatetype"].setValue(res[0].FreightChargeMatrixDetails?.rTYPCD);
-          this.calculateFreight();
 
         } else {
           Swal.fire({
@@ -1763,5 +1775,29 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         });
       });
   }
+  GenerateControls(data) {
 
+    return data
+      .filter((x) => x.cBT === "Fixed")
+      .map((x) => ({
+        name: x.sCT.replaceAll(/\s/g, ""),
+        label: x.sCT,
+        placeholder: x.sCT,
+        type: "number",
+        value: x.nFC,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        functions: {
+          //onChange: "OnChangeFixedAmounts",
+        },
+      }));
+  }
 }

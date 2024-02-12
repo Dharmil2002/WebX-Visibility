@@ -239,6 +239,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       mINV: this.NonFreightMatrixForm.value.MinValue,
       rT: this.NonFreightMatrixForm.value.Rate,
       rTYPE: this.NonFreightMatrixForm.value.rateType.name,
+      rTYPCD: this.NonFreightMatrixForm.value.rateType.value,
       mODDT: new Date(),
       mODLOC: this.storage.branch,
       mODBY: this.storage.userName,

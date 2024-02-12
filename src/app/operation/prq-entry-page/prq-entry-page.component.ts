@@ -22,6 +22,8 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { firstValueFrom } from "rxjs";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 
 @Component({
   selector: "app-prq-entry-page",
@@ -32,7 +34,7 @@ export class PrqEntryPageComponent implements OnInit {
   prqControls: PrqEntryControls;
   prqEntryTableForm: UntypedFormGroup;
   jsonControlPrqArray: FormControls[];
-  iSShow:boolean = true;
+  iSShow: boolean = true;
   fromCity: string; //it's used in getCity() for the binding a fromCity
   fromCityStatus: boolean; //it's used in getCity() for binding fromCity
   toCity: string; //it's used in getCity() for binding ToCity
@@ -73,11 +75,14 @@ export class PrqEntryPageComponent implements OnInit {
   allFormGrop: FormControls[];
   resContainer: any;
   branchCode = localStorage.getItem("Branch");
+  paymentBase: any;
+  vehicleType: any;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private router: Router,
     public dialog: MatDialog,
+    private operationService: OperationService,
     private containerService: ContainerService,
     private locationService: LocationService,
     private pinCodeService: PinCodeService,
@@ -94,9 +99,9 @@ export class PrqEntryPageComponent implements OnInit {
       this.breadScrums[0].active = 'PRQ Modify'
       this.breadScrums[0].title = 'PRQ Modify'
       this.submit = 'Modify';
-    } 
+    }
     this.initializeFormControl();
-    this.getGeneralmasterData();    
+    this.getGeneralmasterData();
   }
 
   ngOnInit(): void {
@@ -111,7 +116,7 @@ export class PrqEntryPageComponent implements OnInit {
 
       this.prqEntryTableForm.controls["cARTYP"].setValue(`${this.prqDetail.carrierTypeCode}`);
       this.disableSize()
-      
+
       if (this.prqDetail.carrierTypeCode == "3") {
         const containerlist = this.resContainer.find((x) => x.name == this.prqDetail?.typeContainer || x.value == this.prqDetail?.typeContainerCode);
         this.prqEntryTableForm.controls["cNTYP"].setValue(containerlist);
@@ -216,15 +221,17 @@ export class PrqEntryPageComponent implements OnInit {
   }
   /*End*/
 
-  async getCustomer(event) {        
-    await this.customerService.getCustomerForAutoComplete(this.prqEntryTableForm, this.allFormGrop, event.field.name, this.billingPartytatus );
+  async getCustomer(event) {
+    await this.customerService.getCustomerForAutoComplete(this.prqEntryTableForm, this.allFormGrop, event.field.name, this.billingPartytatus);
   }
 
   async getGeneralmasterData() {
-    const carrierType: AutoComplete[] = await this.generalService.getGeneralMasterData("CARTYP");    
+    const carrierType: AutoComplete[] = await this.generalService.getGeneralMasterData("CARTYP");
     const vehicleType: AutoComplete[] = await this.generalService.getGeneralMasterData("VEHSIZE");
     const paymentBase: AutoComplete[] = await this.generalService.getGeneralMasterData("PAYTYP");
- 
+    this.paymentBase = paymentBase;
+    this.vehicleType = vehicleType;
+
     this.setGeneralMasterData(this.allFormGrop, carrierType, "cARTYP");
     this.setGeneralMasterData(this.allFormGrop, vehicleType, "vEHSIZE");
     this.setGeneralMasterData(this.allFormGrop, paymentBase, "pAYTYP");
@@ -232,8 +239,7 @@ export class PrqEntryPageComponent implements OnInit {
     this.autoFill();
   }
 
-  setGeneralMasterData(controls: any[], data: AutoComplete[], controlName: string)
-  {
+  setGeneralMasterData(controls: any[], data: AutoComplete[], controlName: string) {
     const control = controls.find((x) => x.name === controlName);
     if (control) {
       control.value = data;
@@ -252,7 +258,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
-      this.iSShow=false;
+    this.iSShow = false;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
 
@@ -262,25 +268,25 @@ export class PrqEntryPageComponent implements OnInit {
     prqDetails['fCITY'] = this.prqEntryTableForm.value.fCITY.name;
     prqDetails['tCITY'] = this.prqEntryTableForm.value.tCITY.name;
 
-    const cntrNames = 
-    [
-      { controlName: 'cARTYP',  name: 'cARTYPNM', value: 'cARTYP' },
-      { controlName: 'vEHSIZE', name: 'vEHSIZENM', value: 'vEHSIZE' },
-      { controlName: 'pAYTYP', name: 'pAYTYPNM', value: 'pAYTYP' },
-    ]
+    const cntrNames =
+      [
+        { controlName: 'cARTYP', name: 'cARTYPNM', value: 'cARTYP' },
+        { controlName: 'vEHSIZE', name: 'vEHSIZENM', value: 'vEHSIZE' },
+        { controlName: 'pAYTYP', name: 'pAYTYPNM', value: 'pAYTYP' },
+      ]
 
     cntrNames.forEach((c) => {
       let ctrl = this.prqEntryTableForm.controls[c.controlName];
       if (ctrl && ctrl.value) {
         prqDetails[c.value] = ctrl.value;
         let cData = this.allFormGrop.find(f => f.name == c.controlName).value.find(f => f.value == ctrl.value);
-        if(cData){
+        if (cData) {
           prqDetails[c.name] = cData.name;
         }
       }
     });
-    
-    if(prqDetails.cARTYP == "3") {
+
+    if (prqDetails.cARTYP == "3") {
       prqDetails['cNTSIZE'] = this.prqEntryTableForm.value.cNTSIZE;
       prqDetails['cNTYP'] = this.prqEntryTableForm.value.cNTYP.value;
       prqDetails['cNTYPNM'] = this.prqEntryTableForm.value.cNTYP.name;
@@ -295,7 +301,7 @@ export class PrqEntryPageComponent implements OnInit {
 
     prqDetails['sTS'] = 0;
     prqDetails['sTSNM'] = "Awaiting Confirmation";
-    
+
     clearValidatorsAndValidate(tabcontrols);
     this.prqEntryTableForm.controls["cNTYP"].enable();
     this.prqEntryTableForm.controls["cNTSIZE"].enable();
@@ -313,7 +319,7 @@ export class PrqEntryPageComponent implements OnInit {
     this.prqEntryTableForm.controls["cNTYP"].setValue(
       this.prqEntryTableForm.controls["cNTYP"].value?.name || ""
     );
-   
+
     const controlNames = ["cARTYP", "pAYTYP", "vEHSIZE"];
     controlNames.forEach((controlName) => {
       if (Array.isArray(this.prqEntryTableForm.value[controlName])) {
@@ -344,7 +350,7 @@ export class PrqEntryPageComponent implements OnInit {
         });
       }
     } else {
-      
+
       prqDetails['mODDT'] = new Date();
       prqDetails['mODLOC'] = this.storage.branch;
       prqDetails['mODBY'] = this.storage.userName;
@@ -368,7 +374,7 @@ export class PrqEntryPageComponent implements OnInit {
       // const tabIndex = 6; // Adjust the tab index as needed
       // showConfirmationDialog(this.prqEntryTableForm.value, this.masterService, this.goBack.bind(this), tabIndex);
     }
-    this.iSShow=true;
+    this.iSShow = true;
     // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
@@ -378,13 +384,13 @@ export class PrqEntryPageComponent implements OnInit {
     });
   }
   async bindDataFromDropdown() {
-    
-    this.resContainer = await this.containerService.containerFromApi();    
+
+    this.resContainer = await this.containerService.containerFromApi();
     if (this.isUpdate) {
       this.prqEntryTableForm.controls["bRCD"].setValue(this.prqDetail.prqBranch);
     }
-    else 
-      this.prqEntryTableForm.controls["bRCD"].setValue(this.storage.branch);    
+    else
+      this.prqEntryTableForm.controls["bRCD"].setValue(this.storage.branch);
   }
 
   async bilingChanged() {
@@ -399,7 +405,7 @@ export class PrqEntryPageComponent implements OnInit {
       // )
       .slice(0, 5);
     if (prqDetail.length > 0) {
-      this.prqView(prqDetail);     
+      this.prqView(prqDetail);
     }
   }
 
@@ -422,7 +428,7 @@ export class PrqEntryPageComponent implements OnInit {
         this.prqEntryTableForm.get("cARTYP"),
         result.carrierTypeCode.toString()
       );
-      if (result.carrierType?.toLowerCase() != "container" ) {
+      if (result.carrierType?.toLowerCase() != "container") {
         setControlValue(
           this.prqEntryTableForm.get("vEHSIZE"),
           result?.vehicleSizeCode ?? ""
@@ -457,10 +463,10 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   disableSize() {
-   
+
     if (this.prqEntryTableForm.controls['cARTYP'].value === "3") {
       this.jsonControlPrqArray = this.allFormGrop.filter((x) => x.name !== "vEHSIZE");
-      
+
       this.filter.Filter(
         this.jsonControlPrqArray,
         this.prqEntryTableForm,
@@ -483,9 +489,62 @@ export class PrqEntryPageComponent implements OnInit {
   }
   //#endregion
   async setVehicleSize() {
-    
+
     const vehcileSize = this.prqEntryTableForm.value.vEHSIZE;
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
-  
+  InvockedContract() {
+    console.log(this.prqEntryTableForm.value)
+
+    const paymentBasesName = this.paymentBase.find(x => x.value == this.prqEntryTableForm.value.pAYTYP).name;
+    // const TransMode = this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name;
+    let containerCode;
+    if (this.prqEntryTableForm.value?.cARTYP == "3") {
+      containerCode = this.prqEntryTableForm.value.cNTYP?.value;
+    } else {
+      containerCode = this.prqEntryTableForm.value.vEHSIZE;
+    }
+    let reqBody =
+    {
+      "companyCode": this.storage.companyCode,
+      "customerCode": this.prqEntryTableForm.value.bPARTY.value,
+      "contractDate": this.prqEntryTableForm.value.pICKDT,
+      "productName": "Road",
+      "basis": paymentBasesName,
+      "from": this.prqEntryTableForm.value.fCITY.value,
+      "to": this.prqEntryTableForm.value.tCITY.value,
+      "capacity": containerCode,
+    }
+
+    firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
+      .then((res: any) => {
+        if (res.length == 1) {
+          Swal.fire({
+            icon: "success",
+            title: "Contract Invoked Successfully",
+            text: "ContractId: " + res[0].docNo,
+            showConfirmButton: false,
+          });
+
+          this.prqEntryTableForm.controls["cONTRAMT"].setValue(res[0].FreightChargeMatrixDetails?.rT);
+
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Contract Invoked Failed",
+            showConfirmButton: false,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `Something went wrong! ${err.message}`,
+          showConfirmButton: false,
+        });
+      });
+  }
 }

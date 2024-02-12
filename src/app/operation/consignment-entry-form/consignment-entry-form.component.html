@@ -95,7 +95,17 @@
       </div>
     </div>
     <!-- End -->
+    <!-- Non Freight Detail  -->
+    <div *ngIf="NonFreightLoaded">
 
+
+      <form [formGroup]="model.NonFreightTableForm">
+        <app-form-webxpress [form]="model.NonFreightTableForm" [FormTitle]="'Non Freight Details'"
+          [formData]="NonFreightjsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
     <!--Freight Detail  -->
     <form [formGroup]="model.FreightTableForm">
       <app-form-webxpress [form]="model.FreightTableForm" [FormTitle]="'Freight Details'" [formData]="jsonControlArray"

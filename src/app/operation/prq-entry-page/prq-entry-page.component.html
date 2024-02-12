@@ -1,11 +1,21 @@
+<style>
+    .floatButton {
+        position: fixed;
+        top: 22%;
+        right: 7%;
+        z-index: 1;
+    }
+</style>
+<button class="floatButton" *ngIf="prqEntryTableForm.valid" mat-flat-button matTooltip="Invocked Contract"
+    (click)="InvockedContract()" color="primary">
+    Invoked
+</button>
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
 
-    <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
-
-        <form [formGroup]="prqEntryTableForm">
-            <app-form-webxpress [form]="prqEntryTableForm" [formData]="jsonControlPrqArray"
-                [showSaveAndCancelButton]="iSShow" (callFunction)="functionCallHandler($event)"
-                (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
-            </app-form-webxpress>
-        </form>
-
-    </app-common-wrapper-webxpress>
+    <form [formGroup]="prqEntryTableForm">
+        <app-form-webxpress [form]="prqEntryTableForm" [FormTitle]="'PRQ Form'" [formData]="jsonControlPrqArray"
+            [showSaveAndCancelButton]="iSShow" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

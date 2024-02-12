@@ -227,7 +227,7 @@ export class AccountBankControls {
         label: "Locations",
         placeholder: "Select CustomerLocations",
         type: "",
-        value: "",
+        value: [],
         Validations: [],
         generatecontrol: false,
         disable: false,

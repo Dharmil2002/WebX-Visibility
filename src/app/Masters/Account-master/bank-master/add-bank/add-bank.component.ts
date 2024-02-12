@@ -140,7 +140,6 @@ export class AddBankComponent implements OnInit {
   }
 
   async AccountTypeFunction() {
-    console.log(this.BankForm.value.AccountType.name)
     if (this.BankForm.value.AccountType.name == "CC") {
       const CreditLimit = this.BankForm.get("CreditLimit");
       CreditLimit.setValidators([Validators.required]);
@@ -297,7 +296,7 @@ export class AddBankComponent implements OnInit {
         parseInt(
           tabledata.data.length === 0
             ? 0
-            : tabledata.data[tabledata.data.length - 1].Bankcode.substring(3)
+            : tabledata.data[tabledata.data.length - 1].Bankcode
         ) + 1;
       const bankcode = `BAN${
         index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""

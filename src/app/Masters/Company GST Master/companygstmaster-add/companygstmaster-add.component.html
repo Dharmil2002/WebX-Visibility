@@ -1,11 +1,18 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <form [formGroup]="companyGstTableForm">
+    <!-- <form [formGroup]="companyGstTableForm">
         <app-form-webxpress [form]="companyGstTableForm" [formData]="jsonControlArray"
             (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
+    </form> -->
+
+    <form [formGroup]="companyGstTableForm">
+        <app-form-webxpress [form]="companyGstTableForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
+            [FormTitle]="''" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)" >
+        </app-form-webxpress>
     </form>
-    <app-table-boilerplate *ngIf="tableView" [tableData]="tableData" [columnHeader]="displayedColumns1"
+    <!-- <app-table-boilerplate *ngIf="tableView" [tableData]="tableData" [columnHeader]="displayedColumns1"
         title="GSTIN Deatils" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
         (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
         [ActionObject]="actionObject"></app-table-boilerplate>
@@ -21,5 +28,5 @@
                 </div>
             </div>
         </div>
-    </ng-container>
+    </ng-container> -->
 </app-common-wrapper-webxpress>

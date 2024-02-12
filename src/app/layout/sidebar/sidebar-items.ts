@@ -718,6 +718,15 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": []
         },
+        {
+          "path": "Reports/General-ledger-report",
+          "title": "General Ledger Report",
+          "moduleName": "General Ledger Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
       ],
     },
   ]

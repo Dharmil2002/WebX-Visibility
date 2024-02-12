@@ -1,9 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import {
-  UntypedFormBuilder,
-  UntypedFormGroup,
-  Validators,
-} from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
@@ -36,9 +32,6 @@ export class AddVehicleMasterComponent implements OnInit {
   vehicleTable: vehicleModel;
   vehicleTableForm: UntypedFormGroup;
   jsonControlVehicleArray: any;
-  accordionData: any;
-  assetName: any;
-  assetNameStatus: any;
   vendorType: any;
   vendorTypeStatus: any;
   vendorName: any;
@@ -46,17 +39,10 @@ export class AddVehicleMasterComponent implements OnInit {
   gpsProvider: any;
   gpsProviderStatus: any;
   ftlTypeDesc: any;
-  ftlTypeStatus: any;
-  assetNameData: any;
   vendorTypeData: any;
   gpsProviderData: any;
-  assetNameDetail: any;
   vendorTypDetail: any;
   gpsProviderDetail: any;
-  permitState: any;
-  permitStateStatus: any;
-  permitStateDetail: any;
-  routeLoc: any;
   routeStatus: any;
   submit = "Save";
   protected _onDestroy = new Subject<void>();
@@ -66,33 +52,25 @@ export class AddVehicleMasterComponent implements OnInit {
   allData: {
     // vehicleData: vehicleRes?.data,
     vehTypeData: any;
-    // venTypeData: any;
-    routeData: any;
-    venNameData: any;
+    // venTypeData: any;   
   };
   vehTypeDet: any;
-  vehTypeData: any;
   divisionList: any;
   division: any;
   divisionStatus: any;
   venTypeDet: any;
   venTypeData: any;
-  venNameDet: any;
   routeDet: any;
   routeName: any;
   ftlTypeDescStatus: any;
   ftlTypeDescName: any;
-  ftlTypeDet: any;
-  updateCountry: any;
   divisionAccess: any;
   vendorData: any;
-  RouteData: any;
   controllBranch: any;
   location: any;
   locationStatus: any;
   backPath: string;
   vendorDetail: any;
-  vendorDetailList: any;
 
   constructor(
     private masterService: MasterService,
@@ -105,6 +83,7 @@ export class AddVehicleMasterComponent implements OnInit {
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
+      console.log(this.vehicleTable);
 
       this.isUpdate = true;
       this.submit = "Modify";
@@ -140,12 +119,10 @@ export class AddVehicleMasterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.getDropDownDataVendor();
     this.getDropDownData();
     this.getDataAndPopulateForm();
     this.getAllMastersData();
     this.backPath = "/Masters/VehicleMaster/VehicleMasterList";
-    // this.vendorFieldChanged();
     this.getDropDownList();
   }
 
@@ -205,33 +182,13 @@ export class AddVehicleMasterComponent implements OnInit {
     });
   }
 
-  // getDropDownDataVendor() {
-  //   this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-  //     const {
-  //       vendorTypeDropdown,
-  //     } = res;
-  //     this.vendorTypeData = vendorTypeDropdown;
-  //     if (this.isUpdate) {
-  //       this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vehicleTable.vendorType);
-  //       this.vehicleTableForm.controls.vendorType.setValue(this.vendorTypDetail);
-  //     }
-  //     const filterParams = [
-  //       [this.jsonControlVehicleArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
-  //     ];
-
-  //     filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
-  //       this.filter.Filter(jsonControlArray, this.vehicleTableForm, dropdownData, formControl, statusControl);
-  //     });
-  //   });
-  // }
-
   //#region
   async getDropDownData() {
     try {
       const res: any = await firstValueFrom(
         this.masterService.getJsonFileDetails("dropDownUrl")
       );
-      const { vendorTypeDropdown, divisionAccess } = res;
+      const { divisionAccess } = res;
 
       this.divisionList = divisionAccess;
 
@@ -263,7 +220,6 @@ export class AddVehicleMasterComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", Body)
     );
-    console.log("res", res);
 
     if (res.success && res.data.length > 0) {
       const VendorTypeData = res.data.map((x) => {
@@ -272,7 +228,7 @@ export class AddVehicleMasterComponent implements OnInit {
           value: x.codeId,
         };
       });
-      console.log("VendorTypeData", VendorTypeData);
+      //console.log("VendorTypeData", VendorTypeData);
       if (this.isUpdate) {
         const element = VendorTypeData.find(
           (x) => x.name == this.vehicleTable.vendorType
@@ -314,7 +270,7 @@ export class AddVehicleMasterComponent implements OnInit {
         .get("capacity")
         .setValue(
           parseFloat(this.vehicleTableForm.value.gvw) -
-            parseFloat(this.vehicleTableForm.value.unldWt)
+          parseFloat(this.vehicleTableForm.value.unldWt)
         );
     }
   }
@@ -344,27 +300,7 @@ export class AddVehicleMasterComponent implements OnInit {
         filter: {},
         collectionName: "vehicleType_detail",
       };
-      // let venTypeReq = {
-      //   "companyCode": this.companyCode,
-      //   "filter": {},
-      //   "collectionName": "vendor_detail"
-      // };
-      let venNameReq = {
-        companyCode: this.companyCode,
-        filter: {},
-        collectionName: "vendor_detail",
-      };
-      let routeReq = {
-        companyCode: this.companyCode,
-        filter: {},
-        collectionName: "routeMasterLocWise",
-      };
-      const routeRes = await firstValueFrom(
-        this.masterService.masterPost("generic/get", routeReq)
-      );
-      const venNameRes = await firstValueFrom(
-        this.masterService.masterPost("generic/get", venNameReq)
-      );
+
       const vehTypeRes = await firstValueFrom(
         this.masterService.masterPost("generic/get", vehTypeReq)
       );
@@ -373,8 +309,6 @@ export class AddVehicleMasterComponent implements OnInit {
       );
       const mergedData = {
         vehTypeData: vehTypeRes?.data,
-        venNameData: venNameRes?.data,
-        routeData: routeRes?.data,
         fltType: generalMasterResponse.data,
       };
 
@@ -384,25 +318,8 @@ export class AddVehicleMasterComponent implements OnInit {
         value: element.vehicleTypeCode.toString(),
       }));
 
-      // Define the user's location (change this to the actual user's location)
-      const userLocation = localStorage.Branch;
-
-      // Filter the vendor names based on the user's location
-      const venNameDet = mergedData.venNameData
-        // .filter(element => element.isActive && element.vendorLocation.includes(userLocation))
-        .filter((element) => element.isActive)
-        .map((element) => ({
-          name: element.vendorName.toString(),
-          value: element.vendorCode.toString(),
-          type: element.vendorType.toString(),
-        }));
-
-      // Assign the filtered vendor names to the vendorDetailList variable
-      this.vendorDetailList = venNameDet;
-
       // let routeDet = [];
-      const routeDet =
-        await this.objRouteLocationService.getRouteLocationDetail();
+      this.routeDet = await this.objRouteLocationService.getRouteLocationDetail();
 
       const FTLtype = mergedData.fltType
         .filter((item) => item.codeType === "FTLTYP")
@@ -413,10 +330,6 @@ export class AddVehicleMasterComponent implements OnInit {
         });
 
       this.vehTypeDet = vehTypeDet;
-      // this.venTypeDet = venTypeDet;
-      this.venNameDet = venNameDet;
-      this.routeDet = routeDet;
-      // this.ftlTypeDet = ftlTypeDet;
 
       this.filter.Filter(
         this.jsonControlVehicleArray,
@@ -426,26 +339,10 @@ export class AddVehicleMasterComponent implements OnInit {
         this.vehicleTypeStatus
       );
 
-      // this.filter.Filter(
-      //   this.jsonControlVehicleArray,
-      //   this.vehicleTableForm,
-      //   venTypeDet,
-      //   this.vendorType,
-      //   this.vendorTypeStatus
-      // );
-
-      // this.filter.Filter(
-      //   this.jsonControlVehicleArray,
-      //   this.vehicleTableForm,
-      //   venNameDet,
-      //   this.vendorName,
-      //   this.vendorNameStatus
-      // );
-
       this.filter.Filter(
         this.jsonControlVehicleArray,
         this.vehicleTableForm,
-        routeDet,
+        this.routeDet,
         this.routeName,
         this.routeStatus
       );
@@ -497,9 +394,8 @@ export class AddVehicleMasterComponent implements OnInit {
         vendorType: parseInt(this.vehicleTableForm.value.vendorType.value),
       },
     };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", Body)
-    );
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
+
     if (res.success && res.data.length > 0) {
       const vendorNameData = res.data.map((x) => {
         return {
@@ -508,7 +404,7 @@ export class AddVehicleMasterComponent implements OnInit {
         };
       });
       if (this.isUpdate) {
-        const element = this.venNameDet.find(
+        const element = vendorNameData.find(
           (x) => x.name === this.vehicleTable.vendorName
         );
         this.vehicleTableForm.controls.vendorName.setValue(element);
@@ -533,23 +429,17 @@ export class AddVehicleMasterComponent implements OnInit {
   //#region
   autofillDropdown() {
     if (this.isUpdate) {
-      this.vehTypeData = this.vehTypeDet.find(
+
+      const vehTypeData = this.vehTypeDet.find(
         (x) => x.name == this.vehicleTable.vehicleType
       );
-      this.vehicleTableForm.controls.vehicleType.setValue(this.vehTypeData);
+      this.vehicleTableForm.controls.vehicleType.setValue(vehTypeData);
 
-      // if (this.vehicleTable.vendorName) {
-      // this.vendorData = this.venNameDet.find((x) => x.name === this.vehicleTable.vendorName);
-      // this.vehicleTableForm.controls.vendorName.setValue(this.vendorData);
-      // }
-
-      // this.venTypeData = this.vendorTypeData.find((x) => x.name == this.vehicleTable.vendorType);
-      // this.vehicleTableForm.controls.vendorType.setValue(this.venTypeData);
-
-      this.RouteData = this.routeDet.find(
+      const RouteData = this.routeDet.find(
         (x) => x.name == this.vehicleTable.route
       );
-      this.vehicleTableForm.controls.route.setValue(this.RouteData);
+
+      this.vehicleTableForm.controls.route.setValue(RouteData);
     }
   }
   //#endregion
@@ -658,8 +548,8 @@ export class AddVehicleMasterComponent implements OnInit {
     const formValue = this.vehicleTableForm.value;
     formValue.vendorName
       ? this.vehicleTableForm.controls["vendorCode"].setValue(
-          formValue.vendorName.value
-        )
+        formValue.vendorName.value
+      )
       : "";
     this.vehicleTableForm.controls["vehicleTypeCode"].setValue(
       formValue.vehicleType.value

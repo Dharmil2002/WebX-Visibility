@@ -25,10 +25,10 @@ export class RouteLocationService {
 
       // Process the data and create an array of route details
       const routeDet = response.data.map(item => {
-        const gstDetails = item.GSTdetails;
+        const routeDetails = item.routeDetails;
 
-        // Extract an array of loccd values from GSTdetails
-        const locations = gstDetails.map(detail => detail.loccd);
+        // Extract an array of loccd values from routeDetails
+        const locations = routeDetails.map(detail => detail.loccd);
 
         // Create a name by joining the loccd values with commas
         const name = locations.join(' - ');

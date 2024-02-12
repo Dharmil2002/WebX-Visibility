@@ -144,7 +144,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.rateTypes = await this.generalService.getGeneralMasterData("RTTYP");
     this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
     this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
-   // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
+    // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
 
     // Find the form control with the name 'packaging_type'
@@ -156,7 +156,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setGeneralMasterData(this.model.allformControl, this.deliveryTypes, "delivery_type");
     this.setGeneralMasterData(this.model.allformControl, this.wtUnits, "weight_in");
     this.setGeneralMasterData(this.model.allformControl, this.riskTypes, "risk");
-   // this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
+    // this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
     const rateType = this.rateTypes.filter((x) => x.value != "RTTYP-0007");
     this.setGeneralMasterData(this.jsonControlArray, rateType, "freightRatetype");
     const prodCode = this.products.find((x) => x.name == "Road")?.value || "";
@@ -500,10 +500,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const vendorType = consignmentForm.value.vendorType;
       const isVendorType1or4 = vendorType === "1" || vendorType === "4";
       const containerNumberControl = containerForm.get('containerNumber');
-  
+
       if (isVendorType1or4) {
         const data = await getcontainerstatusFromApi(this.operationService, parseInt(vendorType));
-        
+
         if (data.length > 0) {
           this.filter.Filter(
             this.jsonContainerDetail,
@@ -519,11 +519,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       } else {
         containerNumberControl.setValidators([Validators.required]);
       }
-  
+
       containerNumberControl.updateValueAndValidity();
     }
   }
-  
+
 
   OnChnageContainerNumber(event) {
     const ContainerType = event?.eventArgs?.option?.value?.data?.cNTYPNM;
@@ -1072,7 +1072,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "vendorType",
       "weight_in",
       "delivery_type",
-     // "issuing_from",
+      // "issuing_from",
     ];
 
     controltabNames.forEach((controlName) => {
@@ -1139,7 +1139,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               { controlName: 'packaging_type', name: 'packaging_type_Name', value: 'packaging_type' },
               { controlName: 'risk', name: 'riskName', value: 'risk' },
               { controlName: 'delivery_type', name: 'delivery_type_Name', value: 'delivery_type' },
-             // { controlName: 'issuing_from', name: 'issuing_from_Name', value: 'issuing_from' }
+              // { controlName: 'issuing_from', name: 'issuing_from_Name', value: 'issuing_from' }
             ]
           },
           {
@@ -1188,8 +1188,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       let invDet = [];
       let contDet = [];
       invoiceDetails.invoiceDetails.forEach(i => {
-        const actualWeight = parseFloat(i.actualWeight)  * 1000;
-        const chargedWeight = parseFloat(i.chargedWeight)  * 1000;
+        const actualWeight = parseFloat(i.actualWeight) * 1000;
+        const chargedWeight = parseFloat(i.chargedWeight) * 1000;
         invDet.push({
           cID: this.storage.companyCode,
           //dKTNO:  //To be set from service
@@ -1706,4 +1706,62 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.invoiceData = [];
     this.model.tableData = [];
   }
+
+  // Contract Invoked Section
+
+  InvockedContract() {
+    const paymentBasesName = this.paymentBases.find(x => x.value == this.model.consignmentTableForm.value.payType).name;
+    const TransMode = this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name;
+    let containerCode;
+    if (this.model.consignmentTableForm.value.cd) {
+      containerCode = this.model.containerTableForm.value.containerType?.containerCode;
+    } else {
+      containerCode = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
+    }
+    let reqBody =
+    {
+      "companyCode": this.storage.companyCode,
+      "customerCode": this.model.consignmentTableForm.value.billingParty.value,
+      "contractDate": this.model.consignmentTableForm.value.docketDate,
+      "productName": TransMode,
+      "basis": paymentBasesName,
+      "from": this.model.consignmentTableForm.value.fromCity.value,
+      "to": this.model.consignmentTableForm.value.toCity.value,
+      "capacity": containerCode
+    }
+
+    firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
+      .then((res: any) => {
+        if (res.length == 1) {
+          Swal.fire({
+            icon: "success",
+            title: "Contract Invoked Successfully",
+            text: "ContractId: " + res[0].docNo,
+            showConfirmButton: false,
+          });
+
+          this.model.FreightTableForm.controls["freight_rate"].setValue(res[0].FreightChargeMatrixDetails?.rT);
+          this.model.FreightTableForm.controls["freightRatetype"].setValue(res[0].FreightChargeMatrixDetails?.rTYPCD);
+          this.calculateFreight();
+
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Contract Invoked Failed",
+            showConfirmButton: false,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `Something went wrong! ${err.message}`,
+          showConfirmButton: false,
+        });
+      });
+  }
+
 }

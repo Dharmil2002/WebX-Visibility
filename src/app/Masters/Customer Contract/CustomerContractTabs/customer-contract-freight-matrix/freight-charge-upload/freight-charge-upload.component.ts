@@ -86,7 +86,7 @@ export class FreightChargeUploadComponent implements OnInit {
         const containerData = await this.objContainerService.getContainerList();
         const vehicleData = await PayBasisdetailFromApi(
           this.masterService,
-          "VehicleCapacity"
+          "VEHSIZE"
         );
         const containerDataWithPrefix = vehicleData.map((item) => ({
           name: `Veh- ${item.name}`,

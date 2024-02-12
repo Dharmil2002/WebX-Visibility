@@ -77,7 +77,7 @@ export class ContainerService {
     const request = {
       companyCode: this.companyCode,
       collectionName: 'container_detail',
-      filter: {}
+      filter: { activeFlag: true }
     };
     const res = await this.masterService.masterPost('generic/get', request).toPromise();
     const sortedData = res.data.sort((a, b) => {

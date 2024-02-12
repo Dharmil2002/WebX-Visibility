@@ -867,8 +867,8 @@ export class DebitVoucherComponent implements OnInit {
               var transformedData = this.tableData.map(function (item) {
                 // Split the "Ledger" value into "accCode" and "accName"
                 return {
-                  "accCode": item.Ledger,
-                  "accName": item.LedgerHdn,
+                  "accCode": item.LedgerHdn,
+                  "accName": item.Ledger,
                   "amount": item.Total,
                   "narration": item.Narration ?? ""
                 };

@@ -32,6 +32,7 @@ export class InvoiceManagementComponent implements OnInit {
     edit: false,
     csv: false,
   };
+  unBillingData: any;
   boxData: { count: number; title: string; class: string; }[];
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
@@ -132,6 +133,7 @@ export class InvoiceManagementComponent implements OnInit {
 
     }
     const detail = await this.InvoiceService.getinvoiceDetailBill(requestData);
+    this.unBillingData = await this.InvoiceService.getPendingDetails(requestData.startDate, requestData.endDate, requestData.customerName);
     // Format the start and end dates using DatePipe
     this.tableData = detail.filter((item) => item.pendColAmt != 0 || item.penApAmt != 0);
     this.tableLoad = false;
@@ -166,6 +168,8 @@ export class InvoiceManagementComponent implements OnInit {
   }
   getKpiCount() {
     const invoiceGenerated = this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
+    const totolApproved = this.unBillingData.map((item) => item.dockets).length;
+    const unBillamt = this.unBillingData.reduce((acc, item) => acc + item.sum, 0);
     // const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
     const createShipDataObject = (
       count: number,
@@ -178,9 +182,9 @@ export class InvoiceManagementComponent implements OnInit {
     });
     const pendingBilling = [
       createShipDataObject(invoiceGenerated, "Invoice Generated", "bg-c-Bottle-light"),
-      createShipDataObject(0, "Unbilled Amount", "bg-c-Grape-light"),
-      createShipDataObject(0, "Pending Approval", "bg-c-Daisy-light"),
-      createShipDataObject(0, "Pending PODs", "bg-c-Grape-light"),
+      createShipDataObject(unBillamt, "Unbilled Amount", "bg-c-Grape-light"),
+      createShipDataObject(totolApproved, "Pending Approval", "bg-c-Daisy-light"),
+      createShipDataObject(totolApproved, "Pending PODs", "bg-c-Grape-light"),
     ];
     this.boxData = pendingBilling
   }

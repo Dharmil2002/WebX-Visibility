@@ -61,6 +61,10 @@ export class GeneralLedgerReport {
                 autocomplete: "",
                 displaywith: "",
                 Validations: [
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
                 ],
                 additionalData: {
                     showNameAndValue: false,
@@ -97,7 +101,10 @@ export class GeneralLedgerReport {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [],
+                Validations: [{
+                    name: "invalidAutocomplete",
+                    message: "Choose proper value",
+                },],
                 additionalData: {
                     // support: "branchHandler",
                     showNameAndValue: false,
@@ -118,6 +125,10 @@ export class GeneralLedgerReport {
                 autocomplete: "",
                 displaywith: "",
                 Validations: [
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
                 ],
                 additionalData: {
                     showNameAndValue: false,

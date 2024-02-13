@@ -230,11 +230,30 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     }
   }
   async Save() {
+
+    let Tablereq = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "cust_contract_non_freight_charge_matrix_details",
+      filter: {fROM: this.NonFreightMatrixForm.value.From.name , tO: this.NonFreightMatrixForm.value.To.name},
+    };
+    const Tableres = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Tablereq)
+    );
+    if(Tableres.data.length > 0){
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: 'enter valid data',
+        showConfirmButton: true,
+      });
+      return 
+    }
+
     const body = {
       fROM: this.NonFreightMatrixForm.value.From.name,
       fTYPE: this.NonFreightMatrixForm.value.From.value,
       tO: this.NonFreightMatrixForm.value.To.name,
-      tTYPE: this.NonFreightMatrixForm.value.To.name,
+      tTYPE: this.NonFreightMatrixForm.value.To.value,
       mAXV: this.NonFreightMatrixForm.value.MaxValue,
       mINV: this.NonFreightMatrixForm.value.MinValue,
       rT: this.NonFreightMatrixForm.value.Rate,

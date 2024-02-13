@@ -27,7 +27,7 @@ export class prqreportService {
                     'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
                 },
                 ...(billParty.length > 0 ? [{ bPARTY: { 'D$in': billParty } }] : []), // Billing Party condition
-                ...(prqArray.length > 0 ? [{ pRQNO: { 'D$in': prqArray } }] : []), // Billing Party condition
+                ...(prqArray.length > 0 ? [{ pRQNO: { 'D$in': prqArray } }] : []), // PRQNo condition
             ]
         };
         console.log("matchQuery", matchQuery)

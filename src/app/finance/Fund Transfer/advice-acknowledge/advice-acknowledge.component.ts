@@ -59,7 +59,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
     eNTDT: {
       Title: "Created on ⟨Date⟩",
       class: "matcolumncenter",
-      Style: "min-width:10%",
+      Style: "min-width:15%",
     },
     docNo: {
       Title: "Advice No",
@@ -69,12 +69,12 @@ export class AdviceAcknowledgeComponent implements OnInit {
     rBRANCH: {
       Title: "Advice Branch",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
     eNTLOC: {
       Title: "Raised on Branch ",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
     aMT: {
       Title: "Amount ⟨₹⟩",
@@ -146,7 +146,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
         this.tableData = result.map((x, index) => ({
           SrNo: index + 1,
           docNo: x.docNo,
-          eNTDT: formatDate(x.eNTDT, "dd MMM yyyy"),
+          eNTDT: formatDate(x.eNTDT, "dd MMM yyyy HH:mm:ss"),
           rBRANCH: x.rBRANCH,
           eNTLOC: x.eNTLOC,
           aMT: x.aMT,

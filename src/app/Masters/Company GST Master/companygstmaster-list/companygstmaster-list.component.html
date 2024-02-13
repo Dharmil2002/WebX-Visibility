@@ -1,22 +1,11 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
     <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-6" style="margin-bottom: 0px;">
+        <div class="col-lg-12 col-md-12 col-sm-12" style="margin-bottom: 0px;">
             <form [formGroup]="companyGstTableForm">
                 <app-form-webxpress [form]="companyGstTableForm" [formData]="jsonControlArray"
-                    (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-6" style="margin-bottom: 0px;">
-            <div class="row mt-2">
-                <div class="row" align="end">
-                    <div class="example-button-row">
-                        <button type="button" mat-raised-button color="primary" (click)="addUpdate()">
-                            Add/Update
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <!-- Loading Generic table as parent component and passing  required data-->
@@ -29,9 +18,14 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+    <!-- <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
         [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
-    </generic-table-webxpress>
+    </generic-table-webxpress> -->
+
+    <app-generic-table-v2 *ngIf="tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="TableData" [EventButton]="EventButton" (functionCallEmitter)="functionCallHandler($event)"
+     [FormTitle]="'GST List'" [staticField]="staticField">
+  </app-generic-table-v2>
 </app-common-wrapper-webxpress>

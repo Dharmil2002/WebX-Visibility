@@ -264,7 +264,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const containerData = await this.objContainerService.getContainerList();
     const vehicleData = await PayBasisdetailFromApi(
       this.masterService,
-      "VehicleCapacity"
+      "VEHSIZE"
     );
     const containerDataWithPrefix = vehicleData.map((item) => ({
       name: `Veh- ${item.name}`,
@@ -393,10 +393,15 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       tO: this.FreightMatrixForm.value.To.name,
       tTYPE: this.FreightMatrixForm.value.To.value,
       rTYP: this.FreightMatrixForm.value.rateType.name,
+      rTYPCD: this.FreightMatrixForm.value.rateType.value,
       cAP:
         this.ServiceSelectiondata.loadType != "LT-0002"
-          ? this.FreightMatrixForm.value.capacity.name
+          ? `${this.FreightMatrixForm.value.capacity.name}`
           : 0,
+      cAPCD:
+        this.ServiceSelectiondata.loadType != "LT-0002"
+          ? this.FreightMatrixForm.value.capacity.value
+          : "",
       rT: +this.FreightMatrixForm.value.Rate,
       mODDT: new Date(),
       mODLOC: this.storage.branch,

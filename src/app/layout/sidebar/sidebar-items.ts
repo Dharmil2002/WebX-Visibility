@@ -148,7 +148,7 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
-              "path": "Masters/ContainerMaster/ContainerMasterList",
+              "path": "Masters/ContainerMaster/ListContainer",
               "title": "Container master",
               "moduleName": "Container master",
               "icon": "",
@@ -704,6 +704,24 @@ export const ROUTES: RouteInfo[] =
           "path": "Reports/vendor-wise-outstanding-report",
           "title": "Vendor Wise Outstanding Report",
           "moduleName": "Vendor Wise Outstanding Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/PRQ-Register-report",
+          "title": "PRQ Register Report",
+          "moduleName": "PRQ Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/General-ledger-report",
+          "title": "General Ledger Report",
+          "moduleName": "General Ledger Report",
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,

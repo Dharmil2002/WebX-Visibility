@@ -37,7 +37,7 @@ export class xlsxutilityService {
           if ("MaxValue" in validation && !isNaN(parseFloat(value)) && parseFloat(value) > validation.MaxValue) {
             errors.push(`${rule.ItemsName} must be at least ${validation.MaxValue}.`);
           }
-          if ("Pattern" in validation && typeof validation.Pattern === "string") {
+          if ("Pattern" in validation && value && typeof validation.Pattern === "string") {
             const regexPattern = new RegExp(validation.Pattern);
             if (!regexPattern.test(value)) {
               errors.push(`${rule.ItemsName} does not match the pattern.`);

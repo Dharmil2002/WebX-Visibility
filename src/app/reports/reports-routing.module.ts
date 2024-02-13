@@ -9,9 +9,12 @@ import { CustomerWiseGstInvoiceComponent } from './customer-wise-gst-invoice/cus
 import { UnbillRegisterComponent } from './unbill-register/unbill-register.component';
 import { CustomerOutstandingReportComponent } from './customer-outstanding-report/customer-outstanding-report.component';
 import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
+import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
+import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 
 
 const routes: Routes = [
+  { path: "PRQ-Register-report", component: PrqRegisterReportComponent },
   { path: "job-query", component: JobQueryPageComponent },
   { path: "cnote-GST-register", component: CnwGstRegisterComponent },
   { path: "cnote-Bill-MR-Report", component: CnoteBillMrReportComponent },
@@ -21,6 +24,7 @@ const routes: Routes = [
   { path: "unbilled-register-report", component: UnbillRegisterComponent },
   { path: "customer-outstanding-report", component: CustomerOutstandingReportComponent },
   { path: "vendor-wise-outstanding-report", component: VendorOutstandingReportComponent },
+  { path: "General-ledger-report", component: GeneralLedgerReportComponent },
 ];
 
 @NgModule({

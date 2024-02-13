@@ -1,0 +1,85 @@
+[
+    {
+        "FieldName": "accName",
+        "Caption": "AccountCode"
+    },
+    {
+        "FieldName": "accCode",
+        "Caption": "AccountName"
+    },
+    {
+        "FieldName": "accName",
+        "Caption": "Category"
+    },
+    {
+        "Caption": "Vendor Manual Bill Number"
+    },
+    {
+        "Caption": "Vendor Bill Date",
+        "DataType": "Date",
+        "Format": "DD MMM YYYY"
+    },
+    {
+        "FieldName": "vNO",
+        "Caption": "Voucher No"
+    },
+    {
+        "FieldName": "eDT",
+        "Caption": "Date",
+        "DataType": "Date",
+        "Format": "DD MMM YYYY"
+    },
+    {
+        "Caption": "Particular"
+    },
+    {
+        "FieldName": "debit",
+        "Caption": "Debit",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0.00
+    },
+    {
+        "FieldName": "credit",
+        "Caption": "Credit",
+        "DataType": "Number",
+        "Format": 2,
+        "Default": 0.00
+    },
+    {
+        "FieldName": "pCODE",
+        "Caption": "PartyCode"
+    },
+    {
+        "FieldName": "pNAME",
+        "Caption": "PartyName"
+    },
+    {
+        "FieldName": "docNo",
+        "Caption": "Document No"
+    },
+    {
+        "FieldName": "narration",
+        "Caption": "Narration"
+    },
+    {
+        "Caption": "Payment Narration"
+    },
+    {
+        "FieldName": "rNO",
+        "Caption": "Cheque No"
+    },
+    {
+        "FieldName": "dT",
+        "Caption": "Cheque Date",
+        "DataType": "Date",
+        "Format": "DD MMM YYYY"
+    },
+    {
+        "FieldName": "branch",
+        "Caption": "LocName"
+    },
+    {
+        "Caption": "StateFilter"
+    }
+]

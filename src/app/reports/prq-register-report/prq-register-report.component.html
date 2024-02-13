@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+     <form [formGroup]="prqregisterTableForm">
+          <app-form-webxpress [form]="prqregisterTableForm" [FormTitle]="'PRQ Register Report'" [formData]="jsonprqregisterFormArray"
+               (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+               [showSaveButton]="true" [submit]="'Download'">
+          </app-form-webxpress>
+     </form>
+</app-common-wrapper-webxpress>

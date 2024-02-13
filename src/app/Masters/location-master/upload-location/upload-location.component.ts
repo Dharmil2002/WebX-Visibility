@@ -30,7 +30,7 @@ export class UploadLocationComponent implements OnInit {
   pincodeList: any[];
   countryList: any;
   zonelist: any;
-  
+
   constructor(
     private fb: UntypedFormBuilder,
     private xlsxUtils: xlsxutilityService,
@@ -190,13 +190,7 @@ export class UploadLocationComponent implements OnInit {
           {
             ItemsName: "GSTNumber",
             Validations: [
-              { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
-              {
-                Exists: this.existingData.map((code) => {
-                  return code.gstNumber;
-                })
-              },
-              { DuplicateFromList: true }
+              { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" }
             ],
           }
         ];

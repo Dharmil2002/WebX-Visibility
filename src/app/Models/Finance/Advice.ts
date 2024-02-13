@@ -9,7 +9,7 @@ export class AdviceGeneration {
     aDTYP?: string;
     rBRANCH?: string;
     rEASION?: string;
-
+    vNO?: string;
     aMT?: number;
     pMODE?: string;
     cHEQREF?: string;

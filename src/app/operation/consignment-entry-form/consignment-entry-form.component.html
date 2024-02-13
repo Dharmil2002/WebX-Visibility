@@ -3,8 +3,8 @@
   <div *ngIf="ewayBill">
     <form [formGroup]="model.invoiceTableForm">
       <app-form-webxpress [form]="model.invoiceTableForm" [formData]="jsonEwayBill"
-        (functionCallEmitter)="functionCallHandler($event)" [submit]="model.buttons.ewayBillButton" [showSaveAndCancelButton]="true"
-        (callFunction)="functionCallHandler($event)">
+        (functionCallEmitter)="functionCallHandler($event)" [submit]="model.buttons.ewayBillButton"
+        [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
       <div class="paddingdiv">
         <a class="link-info pointer" (click)="flagEwayBill()">&rarr; Continue Without E-way Bill </a>
@@ -15,9 +15,9 @@
   <!--  Basic Detail-->
   <div *ngIf="!ewayBill">
     <form [formGroup]="model.consignmentTableForm">
-      <app-form-webxpress [form]="model.consignmentTableForm" [FormTitle]="'Basic Detail'" [formData]="jsonControlArrayBasic"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
+      <app-form-webxpress [form]="model.consignmentTableForm" [FormTitle]="'Basic Detail'"
+        [formData]="jsonControlArrayBasic" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <!-- End -->
@@ -63,11 +63,12 @@
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="model.dynamicControls" [columnHeader]="model.columnHeader"
-      [tableData]="model.tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="model.menuItems"
-      [staticField]="model.staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
-      [addFlag]="addFlag" (addEmitter)="addPopUp($event)" [showHeader]=false>
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="model.dynamicControls"
+      [columnHeader]="model.columnHeader" [tableData]="model.tableData" (selectAllClicked)="onSelectAllClicked($event)"
+      [menuItems]="model.menuItems" [staticField]="model.staticField" [Link]="linkArray" [height]="height"
+      [width]="width" [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+      (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
+      [showHeader]=false>
     </app-generic-table-v2>
     <!--  Invoice Details-->
     <form [formGroup]="model.invoiceTableForm">
@@ -77,11 +78,13 @@
         [EventButton]="model.invoiceTableForm.valid==true ? model.buttons.addInvoiceEventButton : false">
       </app-form-webxpress>
 
-      <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="model.dynamicControls" [columnHeader]="model.columnInvoice"
-        [tableData]="model.invoiceData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="model.menuItems"
-        [staticField]="model.staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
-        [addFlag]="addFlag" (addEmitter)="addPopUp($event)" [showHeader]=false>
+      <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="model.dynamicControls"
+        [columnHeader]="model.columnInvoice" [tableData]="model.invoiceData"
+        (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="model.menuItems"
+        [staticField]="model.staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width"
+        [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+        (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
+        [showHeader]=false>
       </app-generic-table-v2>
     </form>
 
@@ -92,7 +95,17 @@
       </div>
     </div>
     <!-- End -->
+    <!-- Non Freight Detail  -->
+    <div *ngIf="NonFreightLoaded">
 
+
+      <form [formGroup]="model.NonFreightTableForm">
+        <app-form-webxpress [form]="model.NonFreightTableForm" [FormTitle]="'Non Freight Details'"
+          [formData]="NonFreightjsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
     <!--Freight Detail  -->
     <form [formGroup]="model.FreightTableForm">
       <app-form-webxpress [form]="model.FreightTableForm" [FormTitle]="'Freight Details'" [formData]="jsonControlArray"
@@ -108,8 +121,17 @@
             Loading...
           </div> -->
           <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
-          <button class="msr-3" mat-raised-button color="primary" [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" (click)="save()">{{isUpdate?"Edit Docket":"Generate Docket"}} </button>
+          <button class="msr-3" mat-raised-button color="primary"
+            [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit"
+            (click)="save()">{{isUpdate?"Edit Docket":"Generate Docket"}} </button>
           <button class="msr-3" mat-raised-button color="primary">Back</button>
+          <button class="msr-3" [disabled]="!this.model.consignmentTableForm.value?.billingParty ||
+            !this.model.consignmentTableForm.value?.docketDate ||
+            !this.model.consignmentTableForm.value?.toCity ||
+            !this.model.consignmentTableForm.value?.payType ||
+            !this.model.consignmentTableForm.value?.transMode" (click)="InvockedContract()" mat-raised-button
+            color="primary">Invoked</button>
+
         </div>
       </div>
     </div>

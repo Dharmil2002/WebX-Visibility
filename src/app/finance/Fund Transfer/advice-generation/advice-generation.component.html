@@ -11,12 +11,12 @@
             (callFunction)="functionCallHandler($event)" [FormTitle]="'Payment Details'">
         </app-form-webxpress>
     </form>
-    <div class="row">
+    <div class="row" *ngIf="submit !='View'">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
                 <button [disabled]="!AdviceTableForm.valid || 
                    !AdvicePaymentForm.valid" class="msr-3" mat-raised-button color="primary"
-                    (click)="GenerateAdvice()">{{submit}}</button>
+                    (click)="AdviceVoucherGeneration()">{{submit}}</button>
             </div>
         </div>
     </div>

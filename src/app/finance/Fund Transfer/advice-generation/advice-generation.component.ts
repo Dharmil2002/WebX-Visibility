@@ -15,6 +15,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { firstValueFrom } from "rxjs";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import Swal from "sweetalert2";
+import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from "src/app/Models/Finance/Finance";
 
 @Component({
   selector: 'app-advice-generation',
@@ -34,6 +35,8 @@ export class AdviceGenerationComponent implements OnInit {
   isUpdate = false;
   AllLocationsList: any;
   NavigationStateRequest: any;
+  debitVoucherRequestModel = new DebitVoucherRequestModel();
+  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
   constructor(private fb: UntypedFormBuilder, private router: Router,
     private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService, private storage: StorageService, private filter: FilterUtils, private route: Router, private masterService: MasterService,) {
@@ -93,19 +96,21 @@ export class AdviceGenerationComponent implements OnInit {
     this.AdviceTableForm = formGroupBuilder(this.fb, [this.jsonControlAdviceGenerationArray,]);
 
     this.jsonControlAdvicePaymentGenerationArray = this.AdviceFormControls.getPaymentFormControls();
-    if (this.NavigationStateRequest?.Type != "Acknowledge") {
+    if (this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
+
+    } else {
       this.jsonControlAdvicePaymentGenerationArray = this.jsonControlAdvicePaymentGenerationArray.filter(x => x.name != "Depositedin");
     }
     this.AlljsonControlAdvicePaymentGenerationArray = this.jsonControlAdvicePaymentGenerationArray
     this.AdvicePaymentForm = formGroupBuilder(this.fb, [this.jsonControlAdvicePaymentGenerationArray,]);
-    if (this.NavigationStateRequest?.Type == "Modify" || this.NavigationStateRequest?.Type == "Acknowledge") {
+    if (this.NavigationStateRequest?.Type == "Modify" || this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
       this.SetModifyData();
     }
 
   }
   SetModifyData() {
     this.AdviceTableForm.get('AdviceType').setValue(this.NavigationStateRequest?.data?.aDTYP);
-    if (this.NavigationStateRequest?.Type == "Acknowledge") {
+    if (this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
       this.AdviceTableForm.get('AdviceType').disable();
     }
 
@@ -127,7 +132,7 @@ export class AdviceGenerationComponent implements OnInit {
       "PaymentMode",
       true
     );
-    if (this.NavigationStateRequest?.Type == "Modify" || this.NavigationStateRequest?.Type == "Acknowledge") {
+    if (this.NavigationStateRequest?.Type == "Modify" || this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
       const raisedonBranch = this.AllLocationsList.find(x => x.name == this.NavigationStateRequest?.data?.rBRANCH)
       this.AdviceTableForm.get('raisedonBranch').setValue(raisedonBranch);
       const PaymentModedata = PaymentMode.find(x => x.name == this.NavigationStateRequest?.data?.pMODE)
@@ -172,7 +177,7 @@ export class AdviceGenerationComponent implements OnInit {
         if (event == true) {
           const SelectedBank = responseFromAPIBank.find(x => x.value == this.NavigationStateRequest?.data?.aCNM)
           Bank.setValue(SelectedBank);
-          if (this.NavigationStateRequest?.Type == "Acknowledge") {
+          if (this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
             this.filter.Filter(
               this.jsonControlAdvicePaymentGenerationArray,
               this.AdvicePaymentForm,
@@ -180,6 +185,9 @@ export class AdviceGenerationComponent implements OnInit {
               "Depositedin",
               false
             );
+            const Depositedin = this.AdvicePaymentForm.get('Depositedin');
+            const SelectedBank = responseFromAPIBank.find(x => x.value == this.NavigationStateRequest?.data?.dACCD)
+            Depositedin.setValue(SelectedBank);
           }
         }
         const ChequeOrRefNo = this.AdvicePaymentForm.get('ChequeOrRefNo');
@@ -208,7 +216,7 @@ export class AdviceGenerationComponent implements OnInit {
         if (event == true) {
           const SelectedCash = responseFromAPICash.find(x => x.value == this.NavigationStateRequest?.data?.aCNM)
           CashAccountS.setValue(SelectedCash);
-          if (this.NavigationStateRequest?.Type == "Acknowledge") {
+          if (this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
             this.filter.Filter(
               this.jsonControlAdvicePaymentGenerationArray,
               this.AdvicePaymentForm,
@@ -216,6 +224,9 @@ export class AdviceGenerationComponent implements OnInit {
               "Depositedin",
               false
             );
+            const Depositedin = this.AdvicePaymentForm.get('Depositedin');
+            const SelectedBank = responseFromAPICash.find(x => x.value == this.NavigationStateRequest?.data?.dACCD)
+            Depositedin.setValue(SelectedBank);
           }
         }
         const BankS = this.AdvicePaymentForm.get('Bank');
@@ -230,6 +241,43 @@ export class AdviceGenerationComponent implements OnInit {
 
         break;
       case 'RTGS/UTR':
+        const responseFromAPIBankRTGS = await GetBankDetailFromApi(this.masterService, raisedonBranch)
+        this.filter.Filter(
+          this.jsonControlAdvicePaymentGenerationArray,
+          this.AdvicePaymentForm,
+          responseFromAPIBankRTGS,
+          "Bank",
+          false
+        );
+        const BankRTGS = this.AdvicePaymentForm.get('Bank');
+        BankRTGS.setValidators([Validators.required, autocompleteObjectValidator()]);
+        BankRTGS.updateValueAndValidity();
+
+        if (event == true) {
+          const SelectedBank = responseFromAPIBankRTGS.find(x => x.value == this.NavigationStateRequest?.data?.aCNM)
+          BankRTGS.setValue(SelectedBank);
+          if (this.NavigationStateRequest?.Type == "Acknowledge" || this.NavigationStateRequest?.Type == "View") {
+            this.filter.Filter(
+              this.jsonControlAdvicePaymentGenerationArray,
+              this.AdvicePaymentForm,
+              responseFromAPIBankRTGS,
+              "Depositedin",
+              false
+            );
+            const Depositedin = this.AdvicePaymentForm.get('Depositedin');
+            const SelectedBank = responseFromAPIBankRTGS.find(x => x.value == this.NavigationStateRequest?.data?.dACCD)
+            Depositedin.setValue(SelectedBank);
+          }
+        }
+        const ChequeOrRefNoRTGS = this.AdvicePaymentForm.get('ChequeOrRefNo');
+        ChequeOrRefNoRTGS.setValidators([Validators.required]);
+        ChequeOrRefNoRTGS.updateValueAndValidity();
+
+        const CashAccountRTGS = this.AdvicePaymentForm.get('CashAccount');
+        CashAccountRTGS.setValue("");
+        CashAccountRTGS.clearValidators();
+        CashAccountRTGS.updateValueAndValidity();
+
         break;
     }
 
@@ -250,7 +298,7 @@ export class AdviceGenerationComponent implements OnInit {
     }
   }
 
-  async GenerateAdvice() {
+  async GenerateAdvice(vno) {
     if (this.NavigationStateRequest?.Type == "Acknowledge") {
 
       let RequestData = this.NavigationStateRequest?.data;
@@ -308,6 +356,7 @@ export class AdviceGenerationComponent implements OnInit {
               aCCD: AccountDetails?.name,
               aCNM: AccountDetails?.value,
               aDT: this.AdvicePaymentForm.value.Date,
+              vNO: vno,
               sTCD: 1,
               sTNM: "Generated",
               dACCD: "",
@@ -315,6 +364,7 @@ export class AdviceGenerationComponent implements OnInit {
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
+
             }
           }
           if (this.isUpdate) {
@@ -353,6 +403,114 @@ export class AdviceGenerationComponent implements OnInit {
           this.snackBarUtilityService.ShowCommonSwal("error", error);
         }
       }, "Advice Generating..!");
+    }
+  }
+  AdviceVoucherGeneration() {
+    if (!this.isUpdate && this.submit == "Save") {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          const TotalAmount = this.AdviceTableForm.value.applicableAmount;
+
+          this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
+          this.debitVoucherRequestModel.docType = "VR";
+          this.debitVoucherRequestModel.branch = this.AdviceTableForm.value.raisedonBranch?.name
+          this.debitVoucherRequestModel.finYear = financialYear;
+
+          this.debitVoucherDataRequestModel.voucherNo = "";
+          this.debitVoucherDataRequestModel.transType = "Advice Voucher";
+          this.debitVoucherDataRequestModel.transDate = new Date();
+          this.debitVoucherDataRequestModel.docType = "VR";
+          this.debitVoucherDataRequestModel.branch = this.storage.branch;
+          this.debitVoucherDataRequestModel.finYear = financialYear;
+
+          this.debitVoucherDataRequestModel.accLocation =
+            this.storage.branch;
+          this.debitVoucherDataRequestModel.preperedFor = "Vendor";
+          this.debitVoucherDataRequestModel.partyCode = "";
+          this.debitVoucherDataRequestModel.partyName = "";
+          this.debitVoucherDataRequestModel.partyState = "";
+          this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
+          this.debitVoucherDataRequestModel.entryDate = new Date();
+          this.debitVoucherDataRequestModel.panNo = "";
+
+          this.debitVoucherDataRequestModel.tdsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tdsSectionName = undefined
+          this.debitVoucherDataRequestModel.tdsRate = 0;
+          this.debitVoucherDataRequestModel.tdsAmount = 0;
+          this.debitVoucherDataRequestModel.tdsAtlineitem = false;
+          this.debitVoucherDataRequestModel.tcsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tcsSectionName = undefined
+          this.debitVoucherDataRequestModel.tcsRate = 0;
+          this.debitVoucherDataRequestModel.tcsAmount = 0;
+
+          this.debitVoucherDataRequestModel.IGST = 0;
+          this.debitVoucherDataRequestModel.SGST = 0;
+          this.debitVoucherDataRequestModel.CGST = 0;
+          this.debitVoucherDataRequestModel.UGST = 0;
+          this.debitVoucherDataRequestModel.GSTTotal = 0;
+
+          this.debitVoucherDataRequestModel.paymentAmt = TotalAmount
+          this.debitVoucherDataRequestModel.netPayable = TotalAmount
+          this.debitVoucherDataRequestModel.roundOff = 0;
+          this.debitVoucherDataRequestModel.voucherCanceled = false;
+
+          this.debitVoucherDataRequestModel.paymentMode = this.AdvicePaymentForm.value.PaymentMode?.value,
+            this.debitVoucherDataRequestModel.refNo = this.AdvicePaymentForm.value.ChequeOrRefNo,
+            this.debitVoucherDataRequestModel.accountName = this.AdvicePaymentForm.value?.Bank?.name;
+          this.debitVoucherDataRequestModel.date = this.AdvicePaymentForm.value.Date
+          this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+          this.debitVoucherDataRequestModel.paymentAmount = TotalAmount
+
+          const companyCode = this.storage.companyCode;
+          const CurrentBranchCode = this.storage.branch;
+          var VoucherlineitemList = [
+            {
+              companyCode: companyCode,
+              voucherNo: "",
+              transType: "Advice Voucher",
+              transDate: new Date(),
+              finYear: financialYear,
+              branch: CurrentBranchCode,
+              accCode: "TEST",
+              accName: "TEST",
+              sacCode: "TEST",
+              sacName: "TEST",
+              debit: this.AdviceTableForm.value.AdviceType == "D" ? TotalAmount : 0,
+              credit: this.AdviceTableForm.value.AdviceType == "C" ? TotalAmount : 0,
+              GSTRate: 0,
+              GSTAmount: 0,
+              Total: TotalAmount,
+              TDSApplicable: false,
+              narration: "",
+            }
+          ];
+
+
+
+          this.debitVoucherRequestModel.details = VoucherlineitemList;
+          this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+          this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+
+          firstValueFrom(this.voucherServicesService
+            .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+              if (res.success) {
+                console.log(res?.data?.mainData?.ops[0].vNO)
+                this.GenerateAdvice(res?.data?.mainData?.ops[0].vNO)
+              }
+            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+            .finally(() => {
+
+            });
+
+        } catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            error.message
+          );
+        }
+      }, "Advice Voucher Generating..!");
+    } else {
+      this.GenerateAdvice("");
     }
   }
 }

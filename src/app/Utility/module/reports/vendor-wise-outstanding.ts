@@ -12,100 +12,92 @@ export class VendorWiseOutService {
           private storage: StorageService
      ) { }
 
-     async getvendorWiseOutReportDetail(start, end) {
-          const startValue = start;
-          const endValue = end;
+     async getvendorWiseOutReportDetail(start, end, locations, vendors, reportbasis, reportTp) {
+          // Extract vendor names and status names from the request object
+          const vendorNames = vendors ? vendors.map(x => x.vCD) || [] : [];
+          const locCodes = locations ? locations.map(x => x.locCode) || [] : [];
+
+          // Build the match query based on provided conditions
+          let matchQuery = {
+               'D$and': [
+                    { bDT: { 'D$gte': start } }, // Convert start date to ISO format
+                    { bDT: { 'D$lte': end } }, // Bill date less than or equal to end date
+                    {
+                         'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
+                    },
+                    ...(vendorNames.length > 0 ? [{ 'vND.nM': { 'D$in': vendorNames } }] : []), // Vendor names condition
+                    ...(locCodes.length > 0 ? [{ eNTLOC: { 'D$in': locCodes } }] : []), // Location code condition
+                    ...(reportbasis ? [{ 'bSTAT': parseInt(reportbasis) }] : []),
+                    // (reportTp === 1 ? [{ 'vND.nM': { 'D$in': vendorNames } }] : (reportTp === 2 ? [{ eNTLOC: { 'D$in': locCodes } }] : []))
+               ],
+          };
+
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "vend_bill_summary",
-               filter: {
-                    cID: this.storage.companyCode,
-                    "D$and": [
-                         {
-                              "bDT": {
-                                   "D$gte": startValue
-                              }
-                         },
-                         {
-                              "bDT": {
-                                   "D$lte": endValue
-                              }
+               filters: [
+                    {
+                         D$match: matchQuery,
+                    },
+                    {
+                         D$addFields: {
+                              vendor: { D$concat: [{ D$toString: '$vND.cD' }, ' : ', '$vND.nM'] },
+                              age: {
+                                   D$floor: {
+                                        D$divide: [
+                                             { D$subtract: [new Date(), "$bDT"] },
+                                             //31536000000, // Number of milliseconds in a year
+                                             86400000 // Number of milliseconds in a day
+                                        ]
+                                   }
+                              },
+                              paidAmount: { D$subtract: ["$bALAMT", "$bALPBAMT"] }
                          }
-                    ]
-               }
-          }
-          const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "vend_bill_payment"
-          const resvoucher = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+                    },
+                    {
+                         D$group: {
+                              _id: "$vendor", // replace with the field you are grouping by
+                              vendor: { D$first: "$vendor" },
+                              loc: { D$first: "$eNTLOC" },
+                              openingBal: { D$sum: 0 }, // replace with the desired value if necessary
+                              totalBillAmt: { D$sum: '$bALAMT' },
+                              paidAmt: { D$sum: '$paidAmount' },
+                              finalized: { D$sum: { D$cond: { if: { D$ne: ['$bSTAT', 1] }, then: '$bALAMT', else: 0 } } },
+                              unFinalized: { D$sum: { D$cond: { if: { D$eq: ['$bSTAT', 1] }, then: '$bALAMT', else: 0 } } },
+                              '0-30': { D$sum: { D$cond: { if: { D$lte: ['$age', 30] }, then: '$bALAMT', else: 0 } } },
+                              '31-60': { D$sum: { D$cond: { if: { D$and: [{ D$gt: ['$age', 30] }, { D$lte: ['$age', 60] }] }, then: '$bALAMT', else: 0 } } },
+                              '61-90': { D$sum: { D$cond: { if: { D$and: [{ D$gt: ['$age', 60] }, { D$lte: ['$age', 90] }] }, then: '$bALAMT', else: 0 } } },
+                              '91-120': { D$sum: { D$cond: { if: { D$and: [{ D$gt: ['$age', 90] }, { D$lte: ['$age', 120] }] }, then: '$bALAMT', else: 0 } } },
+                              '121-150': { D$sum: { D$cond: { if: { D$and: [{ D$gt: ['$age', 120] }, { D$lte: ['$age', 150] }] }, then: '$bALAMT', else: 0 } } },
+                              '151-180': { D$sum: { D$cond: { if: { D$and: [{ D$gt: ['$age', 150] }, { D$lte: ['$age', 180] }] }, then: '$bALAMT', else: 0 } } },
+                              '>180': { D$sum: { D$cond: { if: { D$gte: ['$age', 180] }, then: '$bALAMT', else: 0 } } },
+                              totalPayable: { D$sum: '$bALAMT' },
+                              onAccountAmt: { D$sum: 0 }, // replace with the desired value if necessary
+                              manualVoucher: { D$first: '' }, // replace with the desired value if necessary
+                              jVAmt: { D$sum: 0 }, // replace with the desired value if necessary
+                              paidAdvanceAmount: { D$sum: '$aDVAMT' },
+                              ledgerBalance: { D$sum: 0 } // replace with the desired value if necessary
+                         }
+                    }
+               ]
+          };
 
-          let venoutList = [];
-
-          res.data.map((element, index) => {
-               const voucherDet = resvoucher.data ? resvoucher.data.find((entry) => entry.bILLNO === element?.docNo) : null;
-               let voucher = 0;
-               let accountAmt = 0;
-               if (voucherDet) {
-                    voucher = voucherDet.vUCHNO;
-                    accountAmt = voucherDet.bILLAMT;
-               }
-               `${element?.vND.cD || ''} : ${element?.vND.nM || ''}`
-               let venoutData = {
-                    "lOC": element.eNTLOC,
-                    "srNo": index + 1,
-                    // "vendorCD": element?.vND.cD || '',
-                    // "vendor": element?.vND.nM || '',
-                    "vendor": `${element?.vND.cD || ''} : ${element?.vND.nM || ''}`,
-                    "openingBal": element?.tHCAMT || '',
-                    "totalBillAmtFrom010423To111223": '',
-                    "paidAmtFrom010423To111223": "",
-                    "finalized": "",
-                    "unFinalized": "",
-                    "0-30": "",
-                    "31-60": "",
-                    "61-90": "",
-                    "91-120": "",
-                    "121-150": "",
-                    "151-180": "",
-                    ">180": "",
-                    "totalPayable": element?.gST.aMT || '',
-                    "onAccountAmt": accountAmt,
-                    "manualVoucher": voucher,
-                    "jVAmt": "",
-                    "paidAdvanceAmount": element?.aDVAMT || '',
-                    "ledgerBalance": ""
-               }
-               venoutList.push(venoutData)
-          });
-          return venoutList;
+          const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
+          return res.data;
      }
 }
 
-export function convertToCSV(data: any[], headers: { [key: string]: string }): string {
-     const replaceCommaAndWhitespace = (value: any): string => {
-          // Check if value is null or undefined before calling toString
-          if (value == null) {
-               return '';
-          }
-          // Replace commas with another character or an empty string
-          return value.toString().replace(/,/g, '');
-     };
-
-     // Generate header row using custom headers
-     const header = '\uFEFF' + Object.keys(headers).map(key => replaceCommaAndWhitespace(headers[key])).join(',') + '\n';
-
-     // Generate data rows using custom headers
-     const rows = data.map(row =>
-          Object.keys(headers).map(key => replaceCommaAndWhitespace(row[key])).join(',') + '\n'
-     );
-
-     return header + rows.join('');
-}
-
 export function exportAsExcelFile(json: any[], excelFileName: string, customHeaders: Record<string, string>): void {
+     // Remove the _id field from each row in the JSON data
+     const cleanedJson = json.map(row => {
+          delete row._id;
+          return row;
+     });
+
      // Convert the JSON data to an Excel worksheet using XLSX.utils.json_to_sheet.
-     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(json);
+     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(cleanedJson);
      // Get the keys (headers) from the first row of the JSON data.
-     const headerKeys = Object.keys(json[0]);
+     const headerKeys = Object.keys(cleanedJson[0]);
      // Iterate through the header keys and replace the default headers with custom headers.
      for (let i = 0; i < headerKeys.length; i++) {
           const headerKey = headerKeys[i];

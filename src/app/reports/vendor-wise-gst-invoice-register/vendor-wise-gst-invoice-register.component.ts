@@ -183,7 +183,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       }));
     const sacDet = mergedData.sacData.map(element => ({
       name: element.SNM,
-      value: element.SHCD
+      value: element.SID,
     }));
 
     this.vendorDetailList = venNameDet;
@@ -225,67 +225,52 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     const startValue = new Date(this.vendorgstregisTableForm.controls.start.value);
     const endValue = new Date(this.vendorgstregisTableForm.controls.end.value);
     const docummentNo = this.vendorgstregisTableForm.value.docNo;
-    const cancelBill = this.vendorgstregisTableForm.value.cannon;
-
+    let cancelBill = this.vendorgstregisTableForm.value.cannon || [];
+    cancelBill = cancelBill.length < 2 ? cancelBill : [];
     // Check if a comma is present in docNo
     const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
 
     // Extract vendor names from vennmcdHandler if it's an array
     const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
-      ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => x.name)
+      ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => parseInt(x.value))
       : [];
-
-    // Get data from the service
-    let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(startValue, endValue, docNoArray);
 
     // Extract saccdHandler, gststateHandler values
     const sacData = Array.isArray(this.vendorgstregisTableForm.value.saccdHandler)
-      ? this.vendorgstregisTableForm.value.saccdHandler.map(x => x.name)
+      ? this.vendorgstregisTableForm.value.saccdHandler.map(x => parseInt(x.value))
       : [];
 
     const stateData = Array.isArray(this.vendorgstregisTableForm.value.gststateHandler)
-      ? this.vendorgstregisTableForm.value.gststateHandler.map(x => x.name)
+      ? this.vendorgstregisTableForm.value.gststateHandler.map(x => parseInt(x.value))
       : [];
 
-    // Filter data based on SAC (Service Accounting Code)
-    data = data.filter(record => {
-      const recordSacLowerCase = record.SAC.toLowerCase(); // Convert to lowercase for case-insensitive comparison
-      const isSacDataEmpty = sacData.length === 0;
-      const isSacIncluded = isSacDataEmpty || sacData.some(sac => recordSacLowerCase.includes(sac.toLowerCase()));
-      return isSacIncluded;
-    });
+    const reqBody = { startValue, endValue, sacData, vendrnm, cancelBill, stateData }
+    try {
+      // Get data from the service
+      let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(reqBody, docNoArray);
 
-    // Filter data based on state
-    data = data.filter(record => {
-      const sacDet = stateData.length === 0 || stateData.includes(record.BillGenState);
-      return sacDet;
-    });
+      // Filter data based on cancelBill
+      data = cancelBill === 'Cancelled' ? data.filter(x => x.BILLSTATUS !== 'Cancelled') : data;
 
-    // Filter data based on vendor names
-    data = data.filter(record => {
-      const partyName = record.Party.split(':')[1]?.trim().toLowerCase(); // Extract and convert to lowercase
-      const vendrnmLowerCase = vendrnm.map(name => name.toLowerCase()); // Convert array elements to lowercase
-      const isVendrnmEmpty = vendrnmLowerCase.length === 0;
-      const isPartyIncluded = isVendrnmEmpty || vendrnmLowerCase.includes(partyName);
-      return isPartyIncluded;
-    });
+      if (data.length === 0) {
+        // Display a message or take appropriate action when no records are found
+        if (data) {
+          Swal.fire({
+            icon: "error",
+            title: "No Records Found",
+            text: "Cannot Download CSV",
+            showConfirmButton: true,
+          });
+        }
+        return;
+      }
 
-    // Filter data based on cancelled status
-    const filteredRecord = cancelBill === 'Cancelled' ? data.find(record => record.BILLSTATUS === 'Cancelled') : data;
+      // Export the record to Excel
+      exportAsExcelFile(data, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
 
-    // Check if there are records after filtering
-    if (!filteredRecord || (Array.isArray(filteredRecord) && filteredRecord.length === 0)) {
-      Swal.fire({
-        icon: "error",
-        title: "No Records Found",
-        text: "Cannot Download CSV",
-        showConfirmButton: true,
-      });
-      return;
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
-
-    // Export the record to Excel
-    exportAsExcelFile(filteredRecord, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
   }
   //#endregion
 

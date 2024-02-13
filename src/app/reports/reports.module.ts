@@ -49,6 +49,8 @@ import { CustomerWiseGstInvoiceComponent } from './customer-wise-gst-invoice/cus
 import { UnbillRegisterComponent } from './unbill-register/unbill-register.component';
 import { CustomerOutstandingReportComponent } from './customer-outstanding-report/customer-outstanding-report.component';
 import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
+import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
+import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -95,6 +97,7 @@ import { VendorOutstandingReportComponent } from './vendor-outstanding-report/ve
   ],
 
   declarations: [
+    PrqRegisterReportComponent,
     JobQueryPageComponent,
     CnwGstRegisterComponent,
     CnoteBillMrReportComponent,
@@ -103,7 +106,8 @@ import { VendorOutstandingReportComponent } from './vendor-outstanding-report/ve
     CustomerWiseGstInvoiceComponent,
     UnbillRegisterComponent,
     CustomerOutstandingReportComponent,
-    VendorOutstandingReportComponent
+    VendorOutstandingReportComponent,
+    GeneralLedgerReportComponent
   ],
   exports:[],
 

@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="ConsignmentFilterForm">
+        <app-form-webxpress [form]="ConsignmentFilterForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
+            [FormTitle]="''" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

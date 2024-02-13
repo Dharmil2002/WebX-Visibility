@@ -26,38 +26,54 @@ export class custOutControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Invoice Generation", name: "Invoice Generation" },
-                         { value: "Invoice Submission", name: "Invoice Submission" },
-                         { value: "Invoice Collection", name: "Invoice Collection" },
+                         { value: "1", name: "Invoice Generation" },
+                         { value: "3", name: "Invoice Submission" },
+                         { value: "4", name: "Invoice Collection" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     Validations: [
                     ],
-                    additionalData: {
-                         support: "rptbasisHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
+                    // additionalData: {
+                    //      support: "rptbasisHandler",
+                    //      showNameAndValue: false,
+                    // },
+                    // functions: {
+                    //      onToggleAll: "toggleSelectAll"
+                    // },
                     generatecontrol: true, disable: false
                },
+               // {
+               //      name: 'gststate',
+               //      label: 'GST State',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "gststateHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: 'gststate',
                     label: 'GST State',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
+                    placeholder: 'GST State',
+                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],
                     additionalData: {
-                         support: "gststateHandler",
-                         showNameAndValue: false,
+                         support: "gstStHandler",
+                         showNameAndValue: true,
                     },
                     functions: {
                          onToggleAll: "toggleSelectAll",
@@ -73,37 +89,38 @@ export class custOutControl {
                     ],
                     additionalData: {
                          support: "locHandler",
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     functions: {
                          onToggleAll: "toggleSelectAll",
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: 'rpttype',
-                    label: 'Report Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Customer Wise", name: "Customer Wise" },
-                         { value: "Customer wise location wise", name: "Customer wise location wise" },
-                         { value: "Location wise Customer wise", name: "Location wise Customer wise" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "rpttypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'rpttype',
+               //      label: 'Report Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "1", name: "Customer Wise" },
+               //           { value: "2", name: "Customer Wise Location Wise" },
+               //           { value: "3", name: "Location Wise Customer Wise" },
+               //           // { value: "4", name: "Customer Group Wise" }
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "rpttypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: 'custnmcd',
                     label: 'Customer Name &  Code',
@@ -117,7 +134,7 @@ export class custOutControl {
                     ],
                     additionalData: {
                          support: "custnmcdHandler",
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     functions: {
                          onToggleAll: "toggleSelectAll",
@@ -137,6 +154,15 @@ export class custOutControl {
                     name: 'rpttypeHandler',
                     label: 'rpttypeHandler',
                     placeholder: 'rpttypeHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'gstStHandler',
+                    label: 'gstStHandler',
+                    placeholder: 'gstStHandler',
                     type: '',
                     value: '',
                     Validations: [],
@@ -183,6 +209,5 @@ export class custOutControl {
                }
           ]
      }
-          
+
 }
-     

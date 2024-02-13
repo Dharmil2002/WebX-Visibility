@@ -861,6 +861,22 @@
       "router": "Reports/vendor-wise-outstanding-report"
     },
     {
+      "title": "Reports/General-ledger-report",
+      "tag": [
+        "Generalledgerreport",
+        "Generalledgerreport"
+      ],
+      "router": "Reports/General-ledger-report"
+    },
+    {
+      "title": "Reports/PRQ-Register-report",
+      "tag": [
+        "PRQreport",
+        "PRQreport"
+      ],
+      "router": "Reports/PRQ-Register-report"
+    },
+    {
       "title": "AddContainerMaster",
       "tag": [
         "Add Container"

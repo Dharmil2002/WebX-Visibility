@@ -5,12 +5,12 @@ import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { CustOutstandingService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-outstanding-service';
+import { CustOutstandingService, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-outstanding-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { custOutControl } from 'src/assets/FormControls/Customer-Outstanding-report/customer-outstanding-report';
+import { custOutControl } from 'src/assets/FormControls/Reports/Customer-Outstanding-report/customer-outstanding-report';
+// import { custOutControl } from 'src/assets/FormControls/Customer-Outstanding-report/customer-outstanding-report';
 import Swal from 'sweetalert2';
-import { log } from 'util';
 
 @Component({
   selector: 'app-customer-outstanding-report',
@@ -34,9 +34,15 @@ export class CustomerOutstandingReportComponent implements OnInit {
   custStatus: any;
   custNameDet: any;
   customerDetailList: any;
+  stateList: any;
   allData: {
     custNameData: any;
+    stateData: any;
   };
+  gstSTName: any;
+  gstSTStatus: any;
+  stateDet: any;
+  selectedInvoiceType: string;
   constructor(
     private custOutstandingService: CustOutstandingService,
     private fb: UntypedFormBuilder,
@@ -62,13 +68,13 @@ export class CustomerOutstandingReportComponent implements OnInit {
   }
 
   CSVHeader = {
-    "custCode": "Customer Code",
     "cust": "Customer",
+    "loc":"Location",
     "openingBal": "Opening Balance",
     "billAmt": "Bill Amount",
     "unsubmittedAmt": "Un Submitted Amount",
     "submittedAmt": "Submitted Amount",
-    "collectionAmt": "Collection Amount",
+    "collectedAmt": "Collected Amount",
     "0-15": "0-15",
     "16-30": "16-30",
     "31-45": "31-45",
@@ -100,6 +106,13 @@ export class CustomerOutstandingReportComponent implements OnInit {
     this.custStatus = this.jsonCustOutFormArray.find(
       (data) => data.name === "custnmcd"
     )?.additionalData.showNameAndValue;
+
+    this.gstSTName = this.jsonCustOutFormArray.find(
+      (data) => data.name === "gststate"
+    )?.name;
+    this.gstSTStatus = this.jsonCustOutFormArray.find(
+      (data) => data.name === "gststate"
+    )?.additionalData.showNameAndValue;
     this.CustOutTableForm = formGroupBuilder(this.fb, [this.jsonCustOutFormArray]);
   }
 
@@ -119,64 +132,126 @@ export class CustomerOutstandingReportComponent implements OnInit {
       });
   }
 
+  // async getDropDownList() {
+  //   const locationList = await this.locationService.getLocationList();
+  //   // const StateList = await this.pinCodeService.getStateNestedData();
+  //   let custNameReq = {
+  //     "companyCode": this.storage.companyCode,
+  //     "filter": {},
+  //     "collectionName": "customer_detail"
+  //   };
+  //   let stateReq = {
+  //     "companyCode": this.storage.companyCode,
+  //     "filter": {},
+  //     "collectionName": "state_master"
+  //   };
+  //   const custNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", custNameReq));
+  //   const stateRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", stateReq));
+  //   const mergedData = {
+  //     custNameData: custNameRes?.data,
+  //     stateData: stateRes?.data,
+  //   };
+  //   this.allData = mergedData;
+  //   const custNameDet = mergedData.custNameData
+  //     .map(element => ({
+  //       name: element.customerName.toString(),
+  //       value: element.customerCode.toString(),
+  //     }));
+  //   const stateDet = mergedData.stateData
+  //     .map(element => ({
+  //       name: element.STNM,
+  //       value: element.ST,
+  //     }));
+  //   this.customerDetailList = custNameDet;
+  //   this.stateList = stateDet;
+  //   this.custNameDet = custNameDet;
+  //   this.stateDet = stateDet;
+  //   this.filter.Filter(
+  //     this.jsonCustOutFormArray,
+  //     this.CustOutTableForm,
+  //     locationList,
+  //     this.locName,
+  //     this.locStatus
+  //   );
+  //   this.filter.Filter(
+  //     this.jsonCustOutFormArray,
+  //     this.CustOutTableForm,
+  //     custNameDet,
+  //     this.custName,
+  //     this.custStatus
+  //   );
+  //   this.filter.Filter(
+  //     this.jsonCustOutFormArray,
+  //     this.CustOutTableForm,
+  //     stateDet,
+  //     this.gstSTName,
+  //     this.gstSTStatus
+  //   );
+  // }
+
   async getDropDownList() {
+    // Fetch location list
     const locationList = await this.locationService.getLocationList();
-    let custNameReq = {
-      "companyCode": this.storage.companyCode,
-      "filter": {},
-      "collectionName": "customer_detail"
+    // Prepare requests for customer names and state data
+    const custNameReq = {
+      companyCode: this.storage.companyCode,
+      filter: {},
+      collectionName: "customer_detail"
     };
-    const custNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", custNameReq));
-    const mergedData = {
-      custNameData: custNameRes?.data,
+    const stateReq = {
+      companyCode: this.storage.companyCode,
+      filter: {},
+      collectionName: "state_master"
     };
-    this.allData = mergedData;
-    const custNameDet = mergedData.custNameData
-      .map(element => ({
-        name: element.customerName.toString(),
-        value: element.customerCode.toString(),
-      }));
+    // Send requests concurrently and await their responses
+    const custNameResPromise = this.masterServices.masterMongoPost("generic/get", custNameReq);
+    const stateResPromise = this.masterServices.masterMongoPost("generic/get", stateReq);
+
+    const custNameRes = await firstValueFrom(custNameResPromise);
+    const stateRes = await firstValueFrom(stateResPromise);
+    // Extract data from responses or set empty arrays if no data
+    const custNameData = custNameRes?.data || [];
+    const stateData = stateRes?.data || [];
+    // Extract required details from customer names and state data
+    const custNameDet = custNameData.map(({ customerName, customerCode }) => ({
+      name: customerName.toString(),
+      value: customerCode.toString(),
+    }));
+
+    const stateDet = stateData.map(({ STNM, ST }) => ({
+      name: STNM,
+      value: ST,
+    }));
+    // Store all data and derived details
+    this.allData = { custNameData, stateData };
     this.customerDetailList = custNameDet;
+    this.stateList = stateDet;
     this.custNameDet = custNameDet;
-    this.filter.Filter(
-      this.jsonCustOutFormArray,
-      this.CustOutTableForm,
-      locationList,
-      this.locName,
-      this.locStatus
-    );
-    this.filter.Filter(
-      this.jsonCustOutFormArray,
-      this.CustOutTableForm,
-      custNameDet,
-      this.custName,
-      this.custStatus
-    );
+    this.stateDet = stateDet;
+
+    // Filter and update UI
+    this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, locationList, this.locName, this.locStatus);
+    this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, custNameDet, this.custName, this.custStatus);
+    this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, stateDet, this.gstSTName, this.gstSTStatus);
   }
 
   async save() {
-    let data = await this.custOutstandingService.getcustomerOutstandingReportDetail()
+    const reportbasis = Array.isArray(this.CustOutTableForm.value.rptbasis)?'':this.CustOutTableForm.value.rptbasis;
+    const startValue = new Date(this.CustOutTableForm.controls.start.value);
+    const endValue = new Date(this.CustOutTableForm.controls.end.value);
     const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
-      ? this.CustOutTableForm.value.locHandler.map(x => x.value)
+      ? this.CustOutTableForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
+      : [];
+    const gstST = Array.isArray(this.CustOutTableForm.value.gstStHandler)
+      ? this.CustOutTableForm.value.gstStHandler.map(x => { return { gstCD: x.value, gstNM: x.name }; })
       : [];
     const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
-      ? this.CustOutTableForm.value.custnmcdHandler.map(x => x.name)
+      ? this.CustOutTableForm.value.custnmcdHandler.map(x => { return { custCD: x.value, custNm: x.name }; })
       : [];
-    const filteredRecords = data.filter(record => {
-      const locDet = loct.length === 0 || loct.includes(record.oloc);
-      const custDet = cust.length === 0 || cust.includes(record.cust);
-      const startValue = new Date(this.CustOutTableForm.controls.start.value);
-      const endValue = new Date(this.CustOutTableForm.controls.end.value);
-      const entryTime = new Date(record.obGNDT);
-      endValue.setHours(23, 59, 59, 999);
-      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid && locDet && custDet;
-    });
-    // const selectedData = filteredRecords;
-    if (filteredRecords.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (filteredRecords) {
+    let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(startValue, endValue, loct, cust, gstST, reportbasis);
+    if (data.length === 0) {
+      if (data) {
         Swal.fire({
           icon: "error",
           title: "No Records Found",
@@ -186,11 +261,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
       }
       return;
     }
-    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { obGNDT,oloc, ...rest } = record;
-      return rest;
-    });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
+    exportAsExcelFile(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

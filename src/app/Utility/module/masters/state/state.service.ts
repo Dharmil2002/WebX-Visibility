@@ -62,7 +62,7 @@ export class StateService {
         // Map the response data to the desired format
         const mappedStates = stateResponse.data.map((stateData: any) => {
           return {
-            name: stateData.STNM, value: stateData.STSN
+            name: stateData.STNM, value: stateData.ST
           };
         });
 
@@ -77,6 +77,7 @@ export class StateService {
       throw error;
     }
   }
+  
   //#endregion
   //#region to get state list
   async getStateWithZone(filter = {}) {

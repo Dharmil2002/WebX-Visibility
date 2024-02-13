@@ -78,8 +78,8 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter only numeric max 99",
-            pattern: "^[0-9]{1,2}$",
+            message: "Please Enter only numeric Ex:'1234.00','1234'",
+            pattern: "^[0-9]+(.[0-9]{1,2})?$",
           },
         ],
         functions: {
@@ -100,8 +100,8 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter only numeric max 99",
-            pattern: "^[0-9]{1,2}$",
+            message: "Please Enter only numeric Ex:'1234.00','1234'",
+            pattern: "^[0-9]+(.[0-9]{1,2})?$",
           },
         ],
         functions: {
@@ -118,8 +118,8 @@ export class AccountTdsControls {
         Validations: [
           {
             name: "pattern",
-            message: "Please Enter only numeric length 1 to 100",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric Ex:'1234.00','1234'",
+            pattern: "^[0-9]+(.[0-9]{1,2})?$",
           },
         ],
         functions: {},
@@ -135,8 +135,8 @@ export class AccountTdsControls {
         Validations: [
           {
             name: "pattern",
-            message: "Please Enter only numeric length 1 to 100",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric Ex:'1234.00','1234'",
+            pattern: "^[0-9]+(.[0-9]{1,2})?$",
           },
         ],
         functions: {},
@@ -152,8 +152,8 @@ export class AccountTdsControls {
         Validations: [
           {
             name: "pattern",
-            message: "Please Enter only numeric length 1 to 100",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric Ex:'1234.00','1234'",
+            pattern: "^[0-9]+(.[0-9]{1,2})?$",
           },
         ],
         functions: {},
@@ -169,8 +169,8 @@ export class AccountTdsControls {
         Validations: [
           {
             name: "pattern",
-            message: "Please Enter only numeric length 1 to 100",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric Ex:'1234.00','1234'",
+            pattern: "^[0-9]+(.[0-9]{1,2})?$",
           },
         ],
         functions: {},

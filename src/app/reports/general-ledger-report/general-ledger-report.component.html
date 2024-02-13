@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="generalLedgerForm">
+        <app-form-webxpress [form]="generalLedgerForm" [FormTitle]="'General Ledger Report'"
+            [formData]="jsonGeneralLedgerArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Download'">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

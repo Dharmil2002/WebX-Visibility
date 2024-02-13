@@ -23,7 +23,7 @@ export class InvoiceManagementComponent implements OnInit {
   linkArray = [
     { Row: "pendCol", Path: "Finance/InvoiceCollection" },
     { Row: "penAp", Path: "Finance/bill-approval" },
-]
+  ]
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   isTouchUIActivated = false;
   range: FormGroup;
@@ -32,6 +32,7 @@ export class InvoiceManagementComponent implements OnInit {
     edit: false,
     csv: false,
   };
+  unBillingData: any;
   boxData: { count: number; title: string; class: string; }[];
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
@@ -97,9 +98,9 @@ export class InvoiceManagementComponent implements OnInit {
   constructor(
     private InvoiceService: InvoiceServiceService,
     private DashboardFilterPage: FormBuilder,
-    private storage:StorageService,
+    private storage: StorageService,
     private matDialog: MatDialog,
-    private genericService:GenericService
+    private genericService: GenericService
   ) {
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
@@ -123,17 +124,18 @@ export class InvoiceManagementComponent implements OnInit {
   async get(event) {
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
-    const requestData={
-       startDate:event?event.start:this.range.controls.start.value,
-       endDate :event?event.end:this.range.controls.end.value,
-       branch:this.storage.branch,
-       customerName:event?event.customer:[],
-       locationNames:event?event.bookLoc:[]
+    const requestData = {
+      startDate: event ? event.start : this.range.controls.start.value,
+      endDate: event ? event.end : this.range.controls.end.value,
+      branch: this.storage.branch,
+      customerName: event ? event.customer : [],
+      locationNames: event ? event.bookLoc : []
 
     }
     const detail = await this.InvoiceService.getinvoiceDetailBill(requestData);
+    this.unBillingData = await this.InvoiceService.getPendingDetails(requestData.startDate, requestData.endDate, requestData.customerName);
     // Format the start and end dates using DatePipe
-   this.tableData = detail.filter((item) => item.pendColAmt != 0 || item.penApAmt != 0);
+    this.tableData = detail.filter((item) => item.pendColAmt != 0 || item.penApAmt != 0);
     this.tableLoad = false;
     this.getKpiCount();
   }
@@ -147,11 +149,11 @@ export class InvoiceManagementComponent implements OnInit {
       data: "",
     });
     dialogRef.afterClosed().subscribe((result) => {
-      
+
       if (result != undefined) {
         this.get(result);
       }
-      else{
+      else {
         this.genericService.clearSharedData();
       }
     });
@@ -164,9 +166,11 @@ export class InvoiceManagementComponent implements OnInit {
       console.log("failed");
     }
   }
-   getKpiCount() {
-    const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
-   // const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
+  getKpiCount() {
+    const invoiceGenerated = this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
+    const totolApproved = this.unBillingData.map((item) => item.dockets).length;
+    const unBillamt = this.unBillingData.reduce((acc, item) => acc + item.sum, 0);
+    // const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
     const createShipDataObject = (
       count: number,
       title: string,
@@ -178,9 +182,9 @@ export class InvoiceManagementComponent implements OnInit {
     });
     const pendingBilling = [
       createShipDataObject(invoiceGenerated, "Invoice Generated", "bg-c-Bottle-light"),
-      createShipDataObject(1000, "Unbilled Amount", "bg-c-Grape-light"),
-      createShipDataObject(1400, "Pending Approval", "bg-c-Daisy-light"),
-      createShipDataObject(250, "Pending PODs", "bg-c-Grape-light"),
+      createShipDataObject(unBillamt, "Unbilled Amount", "bg-c-Grape-light"),
+      createShipDataObject(totolApproved, "Pending Approval", "bg-c-Daisy-light"),
+      createShipDataObject(totolApproved, "Pending PODs", "bg-c-Grape-light"),
     ];
     this.boxData = pendingBilling
   }

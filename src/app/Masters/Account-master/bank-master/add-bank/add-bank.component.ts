@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder } from "@angular/forms";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
@@ -32,6 +32,8 @@ export class AddBankComponent implements OnInit {
   ApplicationLocationsStatus: any;
   protected _onDestroy = new Subject<void>();
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  AccountTypeCode: any;
+  AccountTypeStatus: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -74,6 +76,13 @@ export class AddBankComponent implements OnInit {
         this.ApplicationLocationsStatus = data.additionalData.showNameAndValue;
         this.getApplicationLocationsDropdown();
       }
+
+      if (data.name === "AccountType") {
+        // Set category-related variables
+        this.AccountTypeCode = data.name;
+        this.AccountTypeStatus = data.additionalData.showNameAndValue;
+        this.getAccountTypeDropdown();
+      }
     });
   }
   async checkValueExists(fieldName, errorMessage) {
@@ -89,7 +98,9 @@ export class AddBankComponent implements OnInit {
       };
 
       // Send the request to fetch user data
-      const userlist = await firstValueFrom (this.masterService.masterPost("generic/get", req));
+      const userlist = await firstValueFrom(
+        this.masterService.masterPost("generic/get", req)
+      );
 
       // Check if data exists for the given filter criteria
       if (userlist.data.length > 0) {
@@ -101,7 +112,7 @@ export class AddBankComponent implements OnInit {
           showCloseButton: false,
           showCancelButton: false,
           showConfirmButton: true,
-          confirmButtonText: "OK"
+          confirmButtonText: "OK",
         });
 
         // Reset the input field
@@ -109,7 +120,10 @@ export class AddBankComponent implements OnInit {
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+      console.error(
+        `An error occurred while fetching ${fieldName} details:`,
+        error
+      );
     }
   }
   async CheckAccountnumber() {
@@ -124,14 +138,27 @@ export class AddBankComponent implements OnInit {
   async CheckSWIFTcode() {
     await this.checkValueExists("SWIFTcode", "SWIFT code");
   }
+
+  async AccountTypeFunction() {
+    if (this.BankForm.value.AccountType.name == "CC") {
+      const CreditLimit = this.BankForm.get("CreditLimit");
+      CreditLimit.setValidators([Validators.required]);
+      CreditLimit.updateValueAndValidity();
+    } else {
+      const CreditLimit = this.BankForm.get("CreditLimit");
+      CreditLimit.clearValidators();
+      CreditLimit.updateValueAndValidity();
+    }
+  }
   async getBanknameDropdown() {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
       filter: { codeType: "BNK", activeFlag: true },
     };
-    const res = await firstValueFrom (this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
 
     if (res.success && res.data.length > 0) {
       const Banknamedata = res.data.map((x) => {
@@ -164,8 +191,9 @@ export class AddBankComponent implements OnInit {
       filter: {},
     };
 
-    const res = await firstValueFrom (this.masterService
-      .masterPost("generic/get", Body));
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
 
     if (res.success && res.data.length > 0) {
       let LocationsData = [];
@@ -193,16 +221,60 @@ export class AddBankComponent implements OnInit {
     }
   }
 
+  getAccountTypeDropdown() {
+    const data = [
+      {
+        name: "Saving",
+        value: "1",
+      },
+      {
+        name: "Current",
+        value: "2",
+      },
+      {
+        name: "CC",
+        value: "3",
+      },
+      {
+        name: "RD",
+        value: "4",
+      },
+      {
+        name: "Fixed deposit",
+        value: "5",
+      },
+    ];
+    if(this.isUpdate){
+      const element = data.find(x => x.name == this.UpdateData.AccountTypeName)
+      this.BankForm.controls["AccountType"].setValue(element);
+    }
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.BankForm,
+      data,
+      this.AccountTypeCode,
+      this.AccountTypeStatus
+    );
+    this.AccountTypeFunction()
+  }
+
   async save() {
     const commonBody = {
       Bankname: this.BankForm.value.Bankname.name,
       Accountnumber: this.BankForm.value.Accountnumber,
       IFSCcode: this.BankForm.value.IFSCcode,
       MICRcode: this.BankForm.value.MICRcode,
-      SWIFTcode: this.BankForm.value.SWIFTcode === 0 ? "":this.BankForm.value.SWIFTcode,
+      SWIFTcode:
+        this.BankForm.value.SWIFTcode === 0
+          ? ""
+          : this.BankForm.value.SWIFTcode,
       ApplicationLocations: this.BankForm.value.LocationsDrop.map(
         (x) => x.value
       ),
+      BankAddress:this.BankForm.value.BankAddress,
+      AccountTypeName:this.BankForm.value.AccountType.name,
+      CreditLimit: parseInt(this.BankForm.value.CreditLimit) || 0,
+      isActive:this.BankForm.value.isActive,
     };
     if (this.isUpdate) {
       const req = {
@@ -213,16 +285,25 @@ export class AddBankComponent implements OnInit {
       };
       await this.handleRequest(req);
     } else {
-      const tabledata = await firstValueFrom (this.masterService.masterPost("generic/get", {
+      const tabledata = await firstValueFrom(
+        this.masterService.masterPost("generic/get", {
           companyCode: this.CompanyCode,
           collectionName: "Bank_detail",
           filter: {},
-        }));
-        const index= parseInt(tabledata.data.length === 0 ? 0 : tabledata.data[tabledata.data.length-1].Bankcode.substring(3))+1
-          const bankcode=`BAN${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
+        })
+      );
+      const index =
+        parseInt(
+          tabledata.data.length === 0
+            ? 0
+            : tabledata.data[tabledata.data.length - 1].Bankcode
+        ) + 1;
+      const bankcode = `BAN${
+        index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
+      }${index}`;
       const body = {
-        _id:`${this.CompanyCode}-${bankcode}`,
-        Bankcode:bankcode,
+        _id: `${this.CompanyCode}-${bankcode}`,
+        Bankcode: bankcode,
         entryBy: localStorage.getItem("UserName"),
         entryDate: new Date(),
         companyCode: this.CompanyCode,
@@ -239,8 +320,12 @@ export class AddBankComponent implements OnInit {
 
   async handleRequest(req: any) {
     const res = this.isUpdate
-      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
-      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
+      ? await firstValueFrom(
+          this.masterService.masterPut("generic/update", req)
+        )
+      : await firstValueFrom(
+          this.masterService.masterPost("generic/create", req)
+        );
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/BankAccountMasterList");

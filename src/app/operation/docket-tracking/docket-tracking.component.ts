@@ -101,7 +101,7 @@ export class DocketTrackingComponent implements OnInit {
     this.tableload = true;
 
     // Introduce a delay of 2 seconds
-    // await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const docketList = await getDocketFromApiDetail(this.companyCode, this.docketNo, this.operationService);
     console.log('docketList',docketList)
@@ -110,7 +110,7 @@ export class DocketTrackingComponent implements OnInit {
         return {
           ...x,
           eNTDT:moment(x.eNTDT).format("DD/MM/YYYY"),
-          Event:`${x.sTS}: ${x.eVNDES}`
+          Event:x.eVNDES
         }
       });
       this.tableload = false;

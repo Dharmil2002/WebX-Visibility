@@ -22,13 +22,13 @@ export class vendOutControl {
                },
                {
                     name: 'rptbasis',
-                    label: 'Report Basis on',
+                    label: 'Report Based on',
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Vendor Invoice Generation", name: "Vendor Invoice Generation" },
-                         { value: "Vendor Invoice Finalization", name: "Vendor Invoice Finalization" },
-                         { value: "Vendor Invoice Payment", name: "Vendor Invoice Payment" },
+                         { value: "4", name: "Vendor Invoice Generation" },
+                         { value: "2", name: "Vendor Invoice Finalization" },
+                         { value: "3", name: "Vendor Invoice Payment" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -60,22 +60,22 @@ export class vendOutControl {
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: 'vendtype',
-                    label: 'Vendor Type',
-                    placeholder: 'From Location',
-                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "vendtypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'vendtype',
+               //      label: 'Vendor Type',
+               //      placeholder: 'From Location',
+               //      type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "vendtypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: 'vennmcd',
                     label: 'Vendor Name & Code',
@@ -92,29 +92,29 @@ export class vendOutControl {
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: 'rpttype',
-                    label: 'Report Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Vendor Wise", name: "Vendor Wise" },
-                         { value: "Location Wise Vendor Wise", name: "Location Wise Vendor Wise" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "rptbasisHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'rpttype',
+               //      label: 'Report Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "1", name: "Vendor Wise" },
+               //           { value: "2", name: "Location Wise Vendor Wise" },
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "rptbasisHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: 'vendnmcdHandler',
                     label: 'vendnmcdHandler',

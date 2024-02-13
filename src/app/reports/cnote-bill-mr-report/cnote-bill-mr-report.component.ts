@@ -12,7 +12,8 @@ import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { cNoteBillMRControl } from 'src/assets/FormControls/cnote-bill-mr-report/cnote-bill-mr-report';
+import { cNoteBillMRControl } from 'src/assets/FormControls/Reports/cnote-bill-mr-report/cnote-bill-mr-report';
+// import { cNoteBillMRControl } from 'src/assets/FormControls/cnote-bill-mr-report/cnote-bill-mr-report';
 import Swal from 'sweetalert2';
 
 @Component({

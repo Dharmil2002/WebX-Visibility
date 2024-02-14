@@ -5,6 +5,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { formatDocketDate } from "../../commonFunction/arrayCommonFunction/uniqArray";
 import * as XLSX from 'xlsx';
+import moment from "moment";
 @Injectable({
      providedIn: "root",
 })
@@ -15,311 +16,319 @@ export class CnoteBillMRService {
           private storage: StorageService
      ) { }
 
-     async getCNoteBillMRReportDetail(start, end) {
-          const startValue = start;
-          const endValue = end;
+     async getCNoteBillMRReportDetail(start, end, fromloc, toloc, payment, transitmode, businessType, movType, bookingType, customer, billAt, docketArray) {
+          debugger
+          const loc = fromloc ? fromloc.map(x => x.locCD) || [] : [];
+          const Toloc = toloc ? toloc.map(x => x.locCD) || [] : [];
+          const payBasis = payment ? payment.map(x => x.payNM) || [] : [];
+          const tranMode = transitmode ? transitmode.map(x => x.tranNM) || [] : [];
+          const movement = movType ? movType.map(x => x.movNM) || [] : [];
+          const booking = bookingType ? bookingType.map(x => x.bookNM) || [] : [];
+          const cust = customer ? customer.map(x => x.custNM) || [] : [];
+          const billLoc = billAt ? billAt.map(x => x.billCD) || [] : [];
+
+          let matchQuery = {
+               'D$and': [
+                    { dKTDT: { 'D$gte': start } }, // Convert start date to ISO format
+                    { dKTDT: { 'D$lte': end } }, // prq date less than or equal to end date
+                    {
+                         'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
+                    },
+                    ...(docketArray.length > 0 ? [{ dKTNO: { 'D$in': docketArray } }] : []), // PRQNo condition
+                    ...(loc.length > 0 ? [{ oRGN: { 'D$in': loc } }] : []), // From Location condition
+                    ...(Toloc.length > 0 ? [{ dEST: { 'D$in': Toloc } }] : []), // To Location condition
+                    ...(payBasis.length > 0 ? [{ pAYTYPNM: { 'D$in': payBasis } }] : []), // Payment Basis condition
+                    ...(tranMode.length > 0 ? [{ tRNMODNM: { 'D$in': tranMode } }] : []), // Transit Mode condition
+                    // ...(businessType.length > 0 ? [{ bUSVRT: { 'D$in': businessType } }] : []), // Business Type condition
+                    ...(movement.length > 0 ? [{ mODNM: { 'D$in': movement } }] : []), // Movement Type condition
+                    ...(booking.length > 0 ? [{ dELTYN: { 'D$in': booking } }] : []), // Booking Type condition
+                    ...(cust.length > 0 ? [{ bPARTYNM: { 'D$in': cust } }] : []), // Customer condition
+                    ...(billLoc.length > 0 ? [{ oRGN: { 'D$in': billLoc } }] : []), // Bill At condition
+               ]
+          };
+
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "dockets",
-               filter: {
-                    cID: this.storage.companyCode,
-                    "D$and": [
-                         {
-                              "dKTDT": {
-                                   "D$gte": startValue
-                              }
-                         },
-                         {
-                              "dKTDT": {
-                                   "D$lte": endValue
-                              }
+               filters: [
+                    {
+                         D$match: matchQuery,
+                    },
+                    {
+                         "D$lookup": {
+                              "from": "cust_bill_details",
+                              "let": { "dKTNO": "$dKTNO" },
+                              "pipeline": [
+                                   {
+                                        "D$match": {
+                                             "D$and": [
+                                                  { "D$expr": { "D$eq": ["$dKTNO", "$$dKTNO"] } },
+                                                  { "cNL": { "D$in": [false, null] } }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              "as": "custbilldetail"
                          }
-                    ]
-               }
-          }
-          const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "cust_bill_headers"
-          const rescustBillHeaders = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "cust_bill_collection"
-          const rescustbillcoll = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "cust_bill_details"
-          const rescustBill = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "docket_invoices"
-          const resdocinv = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "docket_fin_det"
-          const resdocfin = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "cust_contract"
-          const rescuscontract = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          let docketCharges = [];
-          resdocfin.data.forEach(element => {
-               if (element.cHG.length > 0) {
-                    element.cHG.forEach(chg => {
-                         const docketCharge = {
-                              dKTNO: element?.dKTNO || "",
-                              [chg.cHGNM]: chg?.aMT || 0.00
+                    },
+                    {
+                         "D$unwind": { "path": "$custbilldetail", "preserveNullAndEmptyArrays": true }
+                    },
+                    {
+                         "D$lookup": {
+                              "from": "cust_bill_headers",
+                              "let": { "bILLNO": "$custbilldetail.bILLNO" },
+                              "pipeline": [
+                                   {
+                                        "D$match": {
+                                             "D$and": [
+                                                  { "D$expr": { "D$eq": ["$bILLNO", "$$bILLNO"] } },
+                                                  { "cNL": { "D$in": [false, null] } }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              "as": "custbillheader"
                          }
-                         docketCharges.push(docketCharge);
-                    });
+                    },
+                    {
+                         "D$unwind": { "path": "$custbillheader", "preserveNullAndEmptyArrays": true }
+                    },
+                    {
+                         "D$lookup": {
+                              "from": "cust_bill_collection",
+                              "let": { "bILLNO": "$custbillheader.bILLNO" },
+                              "pipeline": [
+                                   {
+                                        "D$match": {
+                                             "D$and": [
+                                                  { "D$expr": { "D$eq": ["$bILLNO", "$$bILLNO"] } },
+                                                  { "cNL": { "D$in": [false, null] } }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              "as": "custbillcollection"
+                         }
+                    },
+                    {
+                         "D$unwind": { "path": "$custbillcollection", "preserveNullAndEmptyArrays": true }
+                    },
+                    {
+                         "D$lookup": {
+                              "from": "cust_contract",
+                              "let": { "bPARTYNM": "$bPARTY" },
+                              "pipeline": [
+                                   {
+                                        "D$match": {
+                                             "D$and": [
+                                                  { "D$expr": { "D$eq": ["$cUSTNM", "$$bPARTYNM"] } },
+                                                  { "cNL": { "D$in": [false, null] } }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              "as": "custcontract"
+                         }
+                    },
+                    {
+                         "D$unwind": { "path": "$custcontract", "preserveNullAndEmptyArrays": true }
+                    },
+                    {
+                         "D$lookup": {
+                              "from": "docket_invoices",
+                              "let": { "dKTNO": "$dKTNO" },
+                              "pipeline": [
+                                   {
+                                        "D$match": {
+                                             "D$and": [
+                                                  { "D$expr": { "D$eq": ["$dKTNO", "$$dKTNO"] } },
+                                                  { "cNL": { "D$in": [false, null] } }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              "as": "docketinvoice"
+                         }
+                    },
+                    {
+                         "D$unwind": { "path": "$docketinvoice", "preserveNullAndEmptyArrays": true }
+                    },
+                    {
+                         "D$project": {
+                              "mANUALBILLNO": { "D$ifNull": ["$custbilldetail.bILLNO", ""] },
+                              "bILLGENAT": { "D$ifNull": ["$custbillheader.bLOC", ""] },
+                              "bILLDT": { "D$ifNull": ["$custbillheader.bGNDT", ""] },
+                              "bILSUBAT": { "D$ifNull": ["$custbillheader.sUB.lOC", ""] },
+                              "bILLSUBDT": { "D$ifNull": ["$custbillheader.sUB.dTM", ""] },
+                              "bILLcOLLECTAT": { "D$ifNull": ["$custbillheader.cOL.lOC", ""] },
+                              "bILLCOLLECTDT": { "D$ifNull": ["$custbillheader.sUB.dTM", ""] },
+                              "bILLAMT": { "D$ifNull": ["$custbillheader.aMT", ""] },
+                              "bILLPENAMT": { "D$ifNull": ["$custbillheader.cOL.bALAMT", ""] },
+                              "bILLPAR": { "D$ifNull": ["$bPARTYNM", ""] },
+                              "bILLST": { "D$ifNull": ["$custbillheader.bSTSNM", ""] },
+                              "bILLNO": { "D$ifNull": ["$custbilldetail.bILLNO", ""] },
+                              "mRNO": { "D$ifNull": ["$custbillcollection.mRNO", ""] },
+                              "mANUALMRNO": { "D$ifNull": ["$custbillcollection.mRNO", ""] },
+                              "mRDT": { "D$ifNull": ["$custbillcollection.dTM", ""] },
+                              "mRCLOSEDT": "",
+                              "mRENTRYDT": { "D$ifNull": ["$custbillcollection.eNTDT", ""] },
+                              "mRGENAT": { "D$ifNull": ["$custbillcollection.lOC", ""] },
+                              "mRAMT": { "D$ifNull": ["$custbillcollection.aMT", ""] },
+                              "mRNETAMT": { "D$ifNull": ["$custbillcollection.aMT", ""] },
+                              "mRSTAT": "",
+                              "dEMCHAR": "",
+                              "cNOTENO": { "D$ifNull": ["$dKTNO", ""] },
+                              "cNOTEDT": { "D$ifNull": ["$dKTDT", ""] },
+                              "tIME": { "D$ifNull": ["$dKTDT", ""] },
+                              "eDD": "",
+                              "bOOKBRANCH": { "D$ifNull": ["$oRGN", ""] },
+                              "dELIBRANCH": { "D$ifNull": ["$dEST", ""] },
+                              "pAYTYPE": { "D$ifNull": ["$pAYTYPNM", ""] },
+                              "bUSTYPE": { "D$ifNull": ["$custbillheader.bUSVRT", ""] },
+                              "pROD": "",
+                              "cONID": { "D$ifNull": ["$custcontract.cONID", ""] },
+                              "cONTPARTY": { "D$ifNull": ["$custcontract.cUSTNM", ""] },
+                              "sERTYPE": "FTL",
+                              "vEHNO": { "D$ifNull": ["$vEHNO", ""] },
+                              "bILLPARTYNM": { "D$ifNull": ["$bPARTYNM", ""] },
+                              "bACODE": "",
+                              "eEDD": "",
+                              "lASTEDITBY": { "D$ifNull": ["$mODBY", ""] },
+                              "cNOTEEDITDT": { "D$ifNull": ["$eNTDT", ""] },
+                              "cUSTREFNO": "",
+                              "mOVTYPE": { "D$ifNull": ["$mODNM", ""] },
+                              "tRANMODE": { "D$ifNull": ["$tRNMODNM", ""] },
+                              "sTAT": { "D$ifNull": ["$dEST", ""] },
+                              "lOADTPE": "FTL",
+                              "rEM": "",
+                              "bILLAT": { "D$ifNull": ["$custbillheader.bLOC", ""] },
+                              "pINCODE": "",
+                              "lOCALCNOTE": "",
+                              "fROMZN": "",
+                              "tOZN": "",
+                              "oDA": "",
+                              "fROMCITY": { "D$ifNull": ["$fCT", ""] },
+                              "tOCITY": { "D$ifNull": ["$tCT", ""] },
+                              "dRIVNM": "",
+                              "pKGS": { "D$ifNull": ["$pKGS", ""] },
+                              "aCTWT": { "D$ifNull": ["$aCTWT", ""] },
+                              "cHARWT": { "D$ifNull": ["$cHRWT", ""] },
+                              "sPEINSTRUCT": "",
+                              "pKGTPE": "Carton Box",
+                              "cUBICWT": { "D$ifNull": ["$cFTWT", ""] },
+                              "cHRPKG": { "D$ifNull": ["$pKGS", ""] },
+                              "cHARGKM": "",
+                              "iNVNO": { "D$ifNull": ["$docketinvoice.iNVNO", ""] },
+                              "iNVDT": { "D$ifNull": ["$docketinvoice.eNTDT", ""] },
+                              "dELVALUE": { "D$ifNull": ["$docketinvoice.iNVAMT", ""] },
+                              "lEN": "",
+                              "bRTH": "",
+                              "hGT": "",
+                              "cONTENT": "",
+                              "bATCHNO": "",
+                              "pARTNO": "",
+                              "pARTDESC": "",
+                              "pARTQUAN": "",
+                              "fUELRTTPE": "",
+                              "fOVRTTPE": "",
+                              "cFTRATIO": "",
+                              "tTCFT": "",
+                              "sEROPTEDFOR": "",
+                              "fSCCHARRT": "",
+                              "fOV": "",
+                              "mULDELIV": "",
+                              "mULPICKUP": "",
+                              "rISKTPE": { "D$ifNull": ["$rSKTYN", ""] },
+                              "cOD/DOD": "",
+                              "dACC": "",
+                              "dEF": "",
+                              "pOLNO": "",
+                              "pOLDT": "",
+                              "wTTPE": "",
+                              "dEFAULTCARDRT": "",
+                              "fUELPERRT": "",
+                              "CONID": "",
+                              "sUBTOT": { "D$ifNull": ["$custbilldetail.sUBTOT", ""] },
+                              "dOCTOT": { "D$ifNull": ["$tOTAMT", ""] },
+                              "gSTAMT": { "D$ifNull": ["$gSTAMT", ""] },
+                              "fRTRT": { "D$ifNull": ["$fRTRT", ""] },
+                              "fRTTPE": { "D$ifNull": ["$fRTRTYN", ""] },
+                              "fRIGHTCHAR": { "D$ifNull": ["$fRTAMT", ""] },
+                              "oTHERCHAR": { "D$ifNull": ["$oTHAMT", ""] },
+                              "gREENTAX": "",
+                              "dROPCHAR": "",
+                              "dOCCHAR": "",
+                              "wARECHAR": "",
+                              "dEDUC": "",
+                              "hOLISERVCHAR": "",
+                              "fOVCHAR": "",
+                              "cOD/DODCHAR": "",
+                              "aPPCHAR": "",
+                              "oDACHAR": "",
+                              "fUELCHAR": "",
+                              "mULPICKUPCHAR": "",
+                              "uNLOADCHAR": "",
+                              "mULTIDELCHAR": "",
+                              "lOADCHAR": "",
+                              "gSTRT": { "D$ifNull": ["$custbillheader.gST.rATE", ""] },
+                              "gSTCHAR": { "D$ifNull": ["$custbillheader.gST.aMT", ""] },
+                              "vATRT": "",
+                              "vATAMT": '',
+                              "cALAMITYRT": "",
+                              "cALAMITYAMT": "",
+                              "aDVAMT": "",
+                              "aDVREMARK": "",
+                              "dPHRT": "",
+                              "dPHAMT": "",
+                              "dISCRT": "",
+                              "dISCAMT": ""
+                         }
+                    }
+               ]
+          };
+          const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
+          // const uniqueResults = res.data.reduce((acc, curr) => {
+          //      if (!acc.some(item => item.cNOTENO === curr.cNOTENO)) {
+          //           acc.push(curr);
+          //      }
+          //      return acc;
+          // }, []);
+          const uniqueResults = res.data.reduce((acc, curr) => {
+               const existingItem = acc.find(item => item.cNOTENO === curr.cNOTENO);
+               if (existingItem) {
+                    existingItem.iNVNO += `, ${curr.iNVNO}`;
+                    existingItem.mANUALBILLNO += `, ${curr.mANUALBILLNO}`;
+               } else {
+                    acc.push(curr);
                }
+               return acc;
+          }, []);
+          uniqueResults.forEach(item => {
+               item.bILLDT = item.bILLDT ? moment(item.bILLDT).format('YYYY-MM-DD') : "";
+               item.bILLSUBDT = item.bILLSUBDT ? moment(item.bILLSUBDT).format('YYYY-MM-DD') : "";
+               item.bILLCOLLECTDT = item.bILLCOLLECTDT ? moment(item.bILLCOLLECTDT).format('YYYY-MM-DD') : "";
+               item.cNOTEDT = item.cNOTEDT ? moment(item.cNOTEDT).format('YYYY-MM-DD') : "";
+               item.tIME = item.tIME ? moment(item.tIME).format('HH:mm') : "";
+               item.mRDT = item.mRDT ? moment(item.mRDT).format('YYYY-MM-DD') : "";
+               item.cNOTEEDITDT = item.cNOTEEDITDT ? moment(item.cNOTEEDITDT).format('YYYY-MM-DD') : "";
+               item.iNVDT = item.iNVDT ? moment(item.iNVDT).format('YYYY-MM-DD') : "";
           });
-          let cnotebillList = [];
-          res.data.map((element) => {
-                    
-
-               const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
-               const relevantCharges = docketCharges.filter(charge => charge.dKTNO === element?.dKTNO);
-               const custBillHeaderDet = rescustBillHeaders.data ? rescustBillHeaders.data.find((entry) => entry.bILLNO === custBillDet?.bILLNO) : null;
-               const custbillcollDet = rescustbillcoll.data ? rescustbillcoll.data.find((entry) => entry.bILLNO === custBillDet?.bILLNO) : null;
-               const docinvDet = resdocinv.data ? resdocinv.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
-               const custcontractDet = rescuscontract.data ? rescuscontract.data.find((entry) => entry.cUSTNM === element?.bPARTYNM) : null;
-               let pAYBAS = 0;
-               let billGenDt = 0;
-               let subLoc = 0;
-               let subDt = 0;
-               let billColAt = 0;
-               let billAmt = 0;
-               let billcollDt = 0;
-               let billParty = 0;
-               let billStatus = 0;
-               let mrNo = 0;
-               let deliveryType = 0;
-               let businessType = 0;
-               let vehNo = 0;
-               let billPartyNM = 0;
-               let docketeditDt = 0;
-               let moveType = 0;
-               let TransMode = 0;
-               let DocketDt = 0;
-               let toCity = 0;
-               let fromCity = 0;
-               let actualWeight = 0;
-               let packs = 0;
-               let chargedWeight = 0;
-               let cubicWeight = 0;
-               let invNo = 0;
-               let invDt = 0;
-               let len = 0;
-               let breadth = 0;
-               let height = 0;
-               let riskType = 0;
-               let gstAmt = 0;
-               let FRTRt = 0;
-               let FRTRtType = 0;
-               let otherChar = 0;
-               let freigthAmt = 0;
-               let billGenLoc = 0;
-               let GSTrate = 0;
-               let GSTChar = 0;
-               let contId = 0;
-               let contParty = 0;
-               let decvalue = 0;
-               let billLoc = 0;
-               if (custBillHeaderDet) {
-                    billGenDt = custBillHeaderDet.bGNDT;
-                    subLoc = custBillHeaderDet.sUB.lOC;
-                    subDt = custBillHeaderDet.sUB.dTM;
-                    // billParty = custBillHeaderDet.cUST.nM
-                    billStatus = custBillHeaderDet.bSTSNM
-                    businessType = custBillHeaderDet.bUSVRT
-                    billGenLoc = custBillHeaderDet.gEN.lOC
-                    billLoc = custBillHeaderDet.bLOC
-                    GSTrate = custBillHeaderDet.gST.rATE
-                    GSTChar = custBillHeaderDet.gST.aMT
-               }
-               if (custbillcollDet) {
-                    billAmt = custbillcollDet.aMT
-                    billcollDt = custbillcollDet.dTM
-                    billColAt = custbillcollDet.lOC;
-                    mrNo = custbillcollDet.mRNO
-               }
-               if (docinvDet) {
-                    invNo = docinvDet.iNVNO
-                    invDt = docinvDet.eNTDT
-                    len = docinvDet.vOL.l
-                    breadth = docinvDet.vOL.b
-                    height = docinvDet.vOL.h
-                    decvalue = docinvDet.iNVAMT
-               }
-               if (custcontractDet) {
-                    contId = custcontractDet.cONID
-                    contParty = custcontractDet.cUSTNM
-               }
-               let cnotebillData = {
-                    "bOOKINGTPE": element.dELTYN || '',
-                    "dEST": element?.dEST,
-                    "oRGN": element?.oRGN,
-                    "mANUALBILLNO": custBillDet?.bILLNO || '',
-                    "bILLGENAT": billGenLoc || '',
-                    "bILLDT": formatDocketDate(billGenDt || ''),
-                    "bILSUBAT": subLoc || '',
-                    "bILLSUBDT": formatDocketDate(subDt || ''),
-                    "bILLcOLLECTAT": billColAt || '',
-                    "bILLCOLLECTDT": formatDocketDate(billcollDt || ''),
-                    "bILLAMT": billAmt || '0.00',
-                    "bILLPAR": element?.bPARTYNM || '',
-                    "bILLPENAMT": "0.00",
-                    "bILLST": billStatus || '',
-                    "bILLNO": custBillDet?.bILLNO || '',
-                    "mRNO": mrNo || '',
-                    "mANUALMRNO": mrNo || '',
-                    "mRDT": formatDocketDate(billcollDt || ''),
-                    "mRCLOSEDT": "",
-                    "mRENTRYDT": "",
-                    "mRGENAT": "",
-                    "mRAMT": "0.00",
-                    "mRNETAMT": "0.00",
-                    "mRSTAT": "",
-                    "dEMCHAR": "0.00",
-                    "cNOTENO": element.dKTNO || '',
-                    "cNOTEDT": element.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
-                    "tIME": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
-                    "eDD": element.dKTDT ? (() => {
-                         const cNOTEDate = new Date(element.dKTDT);
-                         cNOTEDate.setDate(cNOTEDate.getDate() + 1);
-                         return cNOTEDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-');
-                    })() : "",
-                    "bOOKBRANCH": element?.oRGN || "",
-                    "dELIBRANCH": element?.dEST || "",
-                    "pAYTYPE": element.pAYTYPNM || '',
-                    "bUSTYPE": businessType || '',
-                    "pROD": "Road",
-                    "cONID": contId || '',
-                    "cONTPARTY": contParty || '',
-                    "sERTYPE": "FTL",
-                    "vEHNO": element.vEHNO || '',
-                    "bILLPARTYNM": element.bPARTYNM || '',
-                    "bACODE": "",
-                    "eEDD": "",
-                    "lASTEDITBY": element?.mODBY || '',
-                    "cNOTEEDITDT": formatDocketDate(element.eNTDT || ''),
-                    "cUSTREFNO": "",
-                    "mOVTYPE": element.mODNM || '',
-                    "tRANMODE": element.tRNMODNM || '',
-                    // "sTAT": element?.bSTSNM || '',
-                    "sTAT": "Stock avaiable @ " + element?.dEST || '',
-                    "lOADTPE": "FTL",
-                    "rEM": "",
-                    "bILLAT": billLoc || '',
-                    "pINCODE": "",
-                    "lOCALCNOTE": "",
-                    "fROMZN": "",
-                    "tOZN": "",
-                    "oDA": "",
-                    "fROMCITY": element.fCT || '',
-                    "tOCITY": element.tCT || '',
-                    "pKGS": element.pKGS || '',
-                    "aCTWT": element.aCTWT || '',
-                    "cHARWT": element.cHRWT || '',
-                    "sPEINSTRUCT": "",
-                    "pKGTPE": "Carton Box",
-                    "cUBICWT": element.cFTWT || '',
-                    "cHRPKG": element.pKGS || '',
-                    "cHARGKM": "0.00",
-                    "iNVNO": invNo || '',
-                    "iNVDT": formatDocketDate(invDt || ''),
-                    "dELVALUE": decvalue || '',
-                    "lEN": len || '',
-                    "bRTH": breadth || '',
-                    "hGT": height || '',
-                    "cONTENT": "",
-                    "bATCHNO": "",
-                    "pARTNO": "",
-                    "pARTDESC": "",
-                    "pARTQUAN": "0",
-                    "fUELRTTPE": "",
-                    "fOVRTTPE": "",
-                    "cFTRATIO": "0",
-                    "tTCFT": "0.00",
-                    "sEROPTEDFOR": "",
-                    "fSCCHARRT": "",
-                    "fOV": "",
-                    "mULDELIV": "",
-                    "mULPICKUP": "",
-                    "rISKTPE": element.rSKTYN || '',
-                    "cOD/DOD": "",
-                    "dACC": "",
-                    "dEF": "",
-                    "pOLNO": "",
-                    "pOLDT": "",
-                    "wTTPE": "",
-                    "dEFAULTCARDRT": "0.00",
-                    "fUELPERRT": "0.00",
-                    "sUBTOT": custBillDet?.sUBTOT || '0.00',
-                    "dOCTOT": element?.tOTAMT || '0.00',
-                    "gSTAMT": element.gSTAMT || '0.00',
-                    "fRTRT": element.fRTRT || '0.00',
-                    "fRTTPE": element.fRTRTYN || '',
-                    "fRIGHTCHAR": element.fRTAMT || '0.00',
-                    "oTHERCHAR": element.oTHAMT || '00.00',
-                    "gREENTAX": '0.00',
-                    "dROPCHAR": '0.00',
-                    "dOCCHAR": '0.00',
-                    "wARECHAR": '0.00',
-                    "dEDUC": '0.00',
-                    "hOLISERVCHAR": '0.00',
-                    "fOVCHAR": '0.00',
-                    "cOD/DODCHAR": '0.00',
-                    "aPPCHAR": '0.00',
-                    "oDACHAR": '0.00',
-                    "fUELCHAR": '0.00',
-                    "mULPICKUPCHAR": '0.00',
-                    "uNLOADCHAR": '0.00',
-                    "mULTIDELCHAR": '0.00',
-                    "lOADCHAR": '0.00',
-                    "gSTRT": GSTrate || '',
-                    "gSTCHAR": GSTChar || '',
-                    "vATRT": "0.00",
-                    "vATAMT": "0.00",
-                    "cALAMITYRT": "0.00",
-                    "cALAMITYAMT": "0.0",
-                    "aDVAMT": "0.00",
-                    "aDVREMARK": "",
-                    "dPHRT": "0.00",
-                    "dPHAMT": "0.00",
-                    "dISCRT": "0.00",
-                    "dISCAMT": "0.00"
-               }
-               const loadingCharge = relevantCharges.find(charge => charge.hasOwnProperty("Loading"));
-               const UnloadingCharge = relevantCharges.find(charge => charge.hasOwnProperty("Unloading"));
-
-               if (loadingCharge) {
-                    cnotebillData.lOADCHAR = loadingCharge.Loading !== undefined ? Number(loadingCharge.Loading).toFixed(2) : "0.00";
-                    cnotebillData.uNLOADCHAR = UnloadingCharge.Unloading !== undefined ? Number(UnloadingCharge.Unloading).toFixed(2) : "0.00";
-
-               }
-               cnotebillList.push(cnotebillData);
-          })
-          return cnotebillList
+          return uniqueResults;
      }
-}
-
-export function convertToCSV(data: any[], headers: { [key: string]: string }): string {
-     const replaceCommaAndWhitespace = (value: any): string => {
-          // Check if value is null or undefined before calling toString
-          if (value == null) {
-               return '';
-          }
-          // Replace commas with another character or an empty string
-          return value.toString().replace(/,/g, '');
-     };
-
-     // Generate header row using custom headers
-     const header = '\uFEFF' + Object.keys(headers).map(key => replaceCommaAndWhitespace(headers[key])).join(',') + '\n';
-
-     // Generate data rows using custom headers
-     const rows = data.map(row =>
-          Object.keys(headers).map(key => replaceCommaAndWhitespace(row[key])).join(',') + '\n'
-     );
-
-     return header + rows.join('');
 }
 
 // This function exports data to an Excel file using the XLSX library.
 export function exportAsExcelFile(json: any[], excelFileName: string, customHeaders: Record<string, string>): void {
+     // // Remove the _id field from each row in the JSON data
+     const cleanedJson = json.map(row => {
+          delete row._id;
+          return row;
+     });
      // Convert the JSON data to an Excel worksheet using XLSX.utils.json_to_sheet.
-     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(json);
-     // Get the keys (headers) from the first row of the JSON data.
-     const headerKeys = Object.keys(json[0]);
+     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(cleanedJson);
+     // Get the keys (headers) from the first row of the cleanedJson data.
+     const headerKeys = Object.keys(cleanedJson[0]);
      // Iterate through the header keys and replace the default headers with custom headers.
      for (let i = 0; i < headerKeys.length; i++) {
           const headerKey = headerKeys[i];

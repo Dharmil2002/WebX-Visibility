@@ -1,4 +1,5 @@
 import { extractUniqueValues } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { runningNumber } from "src/app/Utility/date/date-utils";
 
 // This utility function groups shipments by leg
@@ -23,9 +24,9 @@ export function groupShipmentsByLeg(shipingTableData) {
     groupedData[leg].Shipment += 1;
 
     // Calculate Packages, WeightKg, and VolumeCFT for the current leg
-    groupedData[leg].Packages += element.Packages;
-    groupedData[leg].WeightKg += element.KgWt;
-    groupedData[leg].VolumeCFT += element.CftVolume;
+    groupedData[leg].Packages += ConvertToNumber(element.Packages)
+    groupedData[leg].WeightKg += ConvertToNumber(element.KgWt || 0, 2);
+    groupedData[leg].VolumeCFT += ConvertToNumber(element.CftVolume);
   });
 
   return Object.values(groupedData);

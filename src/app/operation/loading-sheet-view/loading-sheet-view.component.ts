@@ -42,23 +42,23 @@ Currently, all flows are working together without proper separation.
   ];
   columnHeader = {
     "checkBoxRequired": "",
-    "Shipment": "Shipment",
-    "Origin": "Origin",
-    "Destination": "Destination",
-    "Packages": "Packages",
-    "KgWeight": "Weight",
-    "CftVolume": "Volume",
+    "dKTNO": "Shipment",
+    "oRGN": "Origin",
+    "dEST": "Destination",
+    "pKGS": "Packages",
+    "aCTWT": "Weight",
+    "cFTTOT": "Volume",
   };
   centerAlignedData = ['Shipment', 'Packages', 'KgWeight', 'CftVolume'];
 
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
-    "Shipment": "Shipment",
-    "Origin": "Origin",
-    "Destination": "Destination",
-    "Packages": "Packages",
-    "KgWeight": "Weight",
-    "CftVolume": "Volume",
+    "dKTNO": "Shipment",
+    "oRGN": "Origin",
+    "dEST": "Destination",
+    "pKGS": "Packages",
+    "aCTWT": "Weight",
+    "cFTTOT": "Volume",
   }
 
   METADATA = {
@@ -66,18 +66,17 @@ Currently, all flows are working together without proper separation.
     // selectAllorRenderedData : false,
     noColumnSort: ['checkBoxRequired']
   }
-  loadinSheet: any;
+  loadingSheet: any;
   dataDetails: any;
   //#endregion
 
   constructor(
-    private _cnoteService: CnoteService,
-    private operationService: OperationService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any
   ) {
+     
     if (item) {
-      this.loadinSheet = item;
+      this.loadingSheet = item;
       this.IscheckBoxRequired = true;
     }
     this.getLoadingSheetDetails();
@@ -94,60 +93,17 @@ Currently, all flows are working together without proper separation.
   }
   updateShipping() {
     // Create a JSON object with the shipping details
-    let jsonShipping = {
-      shipping: this.dataDetails ? this.dataDetails : this.tableData.filter((x) => x.isSelected == true)
-    };
-
+    const shipment=this.tableData.filter((x) => x.isSelected == true)
     // Close the dialog and pass the JSON object as the result
-    this.dialogRef.close(jsonShipping);
+    this.dialogRef.close(shipment);
   }
 
   getLoadingSheetDetails() {
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "docket",
-      filter:{}
-    };
-    // Retrieve arrival data from the operation service
-    this.operationService.operationMongoPost('generic/get', req).subscribe(res => {
-      const shipingDetails = res.data;
-      let tableArray = shipingDetails.filter((x) => {
-        const orgLoc = x.orgLoc ? x.orgLoc.toLowerCase().trim() : '';
-        const legParts = this.loadinSheet.leg.split('-');
-        const legPart1 = legParts[0] ? legParts[0].toLowerCase().trim() : '';
-        const legPart2 = legParts[1] ? legParts[1].toLowerCase().trim() : '';
-
-        return orgLoc === legPart1 && x.destination.split(':')[1]?.toLowerCase().trim() === legPart2 && x.lsNo == "";
-      });
-
-      const shipmentDetails = tableArray.map((item) => ({
-        isSelected: false,
-        Shipment: item.docketNumber,
-        Origin: item.orgLoc,
-        Destination: item.destination.split(':')[1].trim(),
-        Packages: parseInt(item.totalChargedNoOfpkg||0),
-        KgWeight: parseInt(item.chrgwt||0),
-        CftVolume: parseInt(item.cft_tot||0),
-      }));
-      let originalArray = this._cnoteService.getShipingData()
-     
-      const selectedShipmemt = originalArray;
-      // Assuming shipmentDetails and selectedShipmemt are your two arrays
-
-      // Loop through each item in shipmentDetails
-      shipmentDetails.forEach((shipment) => {
-        // Find the matching item in selectedShipmemt based on the docketNumber field
-        const matchingShipment = selectedShipmemt.find((selected) => selected.docketNumber === shipment.Shipment);
-
-        // If a matching item is found, update the isSelected field in shipmentDetails to true
-        if (matchingShipment) {
-          shipment.isSelected = true;
-        }
-      });
-      this.tableData = shipmentDetails;
-
+    this.tableData = this.loadingSheet.extra.map(x => {
+      return { ...x, leg: this.loadingSheet.leg };
+  });
+  
       this.tableload = false;
-    });
   }
 
   goBack(): void {

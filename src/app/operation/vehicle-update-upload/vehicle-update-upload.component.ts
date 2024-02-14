@@ -3,12 +3,14 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { updateTracking } from './vehicleLoadingUtility';
+import { firstValueFrom } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
+import { ManifestService } from 'src/app/Utility/module/operation/mf-service/mf-service';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -86,130 +88,100 @@ export class VehicleUpdateUploadComponent implements OnInit {
   tripDetails: any;
   dktDetailFromApi: any;
   packageData: any;
+  dktList: any;
   constructor(
     private Route: Router,
+    private mfService:ManifestService,
     private dialog: MatDialog,
     public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private cdr: ChangeDetectorRef,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private storage:StorageService
   ) {
     if (item.LoadingSheet) {
+      
       this.shipmentStatus = 'Loaded'
       this.vehicelLoadData = item;
     }
 
-    this.getTripDetailData();
+    this.getLoadingSheet();
     this.IntializeFormControl()
   }
 
   ngOnInit(): void {
   }
 
-  getTripDetailData() {
-
+  async getLoadingSheet() {
+  
     const reqBody = {
       "companyCode": this.companyCode,
-      "collectionName": "trip_detail",
-      "filter":{}
-
+      "collectionName": "ls_headers_ltl",
+      "filter":{cID:this.storage.companyCode,tHC:this.vehicelLoadData.tripId,lSNO:this.vehicelLoadData.LoadingSheet}
     }
-    this.operationService.operationMongoPost('generic/get', reqBody).subscribe(res => {
-      if (res) {
-
-        this.tripDetails = res.data.find((x) => x.tripId === this.vehicelLoadData.tripId);
-        this.getShipmentData();
-        this.autoBindData();
-
-      }
-    });
-  }
-
-  getShipmentData() {
-    const reqBody = {
+    const res=  await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqBody));
+    const reqDetBody = {
       "companyCode": this.companyCode,
-      "collectionName": "docket",
-      "filter":{}
-
+      "collectionName": "ls_details_ltl",
+      "filter":{cID:this.storage.companyCode,lSNO:this.vehicelLoadData.LoadingSheet}
     }
-    this.operationService.operationMongoPost('generic/get', reqBody).subscribe(res => {
-      if (res) {
-        this.dktDetailFromApi = res.data
-        this.getLoadingSheet();
-      }
-    });
-  }
-  getLoadingSheet() {
-
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "loadingSheet_detail",
-      "filter":{}
-
-    }
-    this.operationService.operationMongoPost('generic/get', reqBody).subscribe(res => {
+    const resDetails=  await firstValueFrom(this.operationService.operationMongoPost('generic/get',reqDetBody));
       if (res.data) {
         let dataLoading = []
-        const loadingSheetDetail = res.data.filter((x) => x.lsno === this.vehicelLoadData.LoadingSheet)
-        loadingSheetDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
-          let shipmentData = this.dktDetailFromApi.filter((x) => x.lsNo === this.vehicelLoadData.LoadingSheet);
+         res.data.forEach((element: any) => { // Specify the type of 'element' as 'any'
           let json = {
-            "Leg": element?.leg.replace(" ", "") || '',
-            "Shipment": shipmentData?.length || 0,
-            "Packages": parseInt(element?.pacakges) || 0,
-            "WeightKg": parseInt(element?.weightKg) || 0,
-            "VolumeCFT": parseInt(element?.volumeCFT) || 0
+            "Leg": element?.lEG.replace(" ", "") || '',
+            "Shipment": element?.tOTDKT || 0,
+            "Packages": parseInt(element?.pKGS) || 0,
+            "WeightKg": parseInt(element?.wT) || 0,
+            "VolumeCFT": parseInt(element?.vCFT) || 0
           };
           dataLoading.push(json);
         });
         this.shipingDataTable = dataLoading;
-
         let docketData = []
-        let dktDetail = this.dktDetailFromApi.filter((x) => x.lsNo === this.vehicelLoadData.LoadingSheet)
-        dktDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
+        if(resDetails.data.length>0){
+         this.dktList=resDetails.data.map((x)=>x.dKTNO);
+        resDetails.data.forEach((element: any) => { // Specify the type of 'element' as 'any'
           let lsDetails = res.data.find((x) => x.lsno === element.lsNo);
           let json = {
-            "Shipment": element?.docketNumber || '',
-            "Origin": element?.orgLoc || '',
-            "Destination": element?.destination.split(":")[1] || '',
-            "Packages": parseInt(element?.totalChargedNoOfpkg) || 0,
+            "Shipment": element?.dKTNO || '',
+            "Origin": element?.bLOC || '',
+            "Destination": element?.dLOC || '',
+            "Packages": parseInt(element?.pKGS) || 0,
+            "weight": parseInt(element?.wT) || 0,
+            "cft": parseInt(element?.vCFT) || 0,
             "loaded": 0,
-            "Pending": parseInt(element?.totalChargedNoOfpkg) || 0,
-            "Leg": lsDetails?.leg.replace(" ", "") || '',
+            "Pending": parseInt(element?.pKGS) || 0,
+            "Leg": lsDetails?.lEG.replace(" ", "") || '',
           };
           docketData.push(json);
         });
         this.loadingTableData = docketData;
+      }
         this.kpiData("")
       }
-    });
     this.getPackagesData();
+    this.autoBindData();
   }
 
-  getPackagesData() {
+  async getPackagesData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "collectionName": "docketScan",
-      "filter":{},
+      "collectionName": "docket_pkgs_ltl",
+      "filter":{dKTNO:{"D$in":this.dktList},sFX:0,"D$or":[{"mFNO":{"D$exists":false}},{"mFNO":""}]}
     }
-    this.operationService.operationMongoPost('generic/get', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.packageData = res.data;
-        }
-      }
-    })
+    const res= await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqBody));
+    this.packageData = res.data;
   }
   updatePackage() {
-
-  
     if(this.scanPackage){
       this.tableload = true;
     // Get the trimmed values of scan and leg
     const scanValue = this.scanPackage;
     // Find the unload package based on scan and leg values
-    const loadPackage = this.packageData.find(x => x.bcSerialNo.trim() === scanValue.trim());
+    const loadPackage = this.packageData.find(x => x.pKGSNO.trim() === scanValue.trim());
     const loading = vehicleLoadingScan(loadPackage, this.loadingTableData)
     if (loading) {
       this.kpiData(loading);
@@ -251,10 +223,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   autoBindData() {
     const vehicleControl = this.loadingSheetTableForm.get('vehicle');
-    vehicleControl?.patchValue(this.arrivalData?.VehicleNo || '');
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripDetails?.vehicleNo || '')
+    vehicleControl?.patchValue(this.vehicelLoadData?.vehNo || '');
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.vehicelLoadData?.vehNo || '')
     this.loadingSheetTableForm.controls['Route'].setValue(this.vehicelLoadData?.route || '')
-    this.loadingSheetTableForm.controls['tripID'].setValue(this.tripDetails?.tripId || '')
+    this.loadingSheetTableForm.controls['tripID'].setValue(this.vehicelLoadData?.tripId || '')
     this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.currentBranch || '')
     this.loadingSheetTableForm.controls['Loadingsheet'].setValue(this.vehicelLoadData?.LoadingSheet || '')
   }
@@ -285,34 +257,30 @@ export class VehicleUpdateUploadComponent implements OnInit {
       console.log("failed");
     }
   }
-  CompleteScan() {
-
+  async CompleteScan() {
     let packageChecked = false;
     const exists = this.loadingTableData.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
-
       packageChecked = this.loadingTableData.every(obj => obj.Packages === obj.loaded);
-
     }
-    
-    if (packageChecked) {
+    const fieldMapping=await this.mfService.getFieldMapping(this.loadingTableData,this.shipingDataTable,this.vehicelLoadData,this.packageData);
+    const resMf=await this.mfService.createMfDetails(fieldMapping);
+    if (resMf) {
       if (this.shipmentStatus == 'Loaded') {
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
           width: '100%', // Set the desired width
-          data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable } // Pass the data object
+          data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable,mfNo:resMf} // Pass the data object
         });
 
         dialogRef.afterClosed().subscribe(result => {
-
-          this.generateMeniFest(result);
           Swal.fire({
             icon: "success",
             title: "Successful",
             text: `Manifest Generated Successfully`,
             showConfirmButton: true,
           })
-
-          // Handle the result after the dialog is closed
+          this.goBack('Departures');
+          this.dialogRef.close("");
         });
       }
       else {
@@ -322,7 +290,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: `Arrival Scan done Successfully`,
           showConfirmButton: true,
         })
-        this.dialogRef.close(this.loadingSheetTableForm.value)
+        this.dialogRef.close(this.loadingSheetTableForm.value);
+        this.goBack('Departures');
+        this.dialogRef.close("");
       }
     }
     else {
@@ -338,116 +308,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   Close(): void {
     this.dialogRef.close()
   }
-  async generateMeniFest(result) {
-    let menifestData = [];
-
-    for (const element of this.loadingTableData) {
-      let menifestDetails = result.find((x) => x.Leg === element.Leg);
-      await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber, this.vehicelLoadData?.tripId);
-
-      const jsonDetails = {
-        "_id": menifestDetails?.MFNumber || "",
-        "mfNo": menifestDetails?.MFNumber || "",
-        "leg": menifestDetails?.Leg || "",
-        "lsNo": this.vehicelLoadData?.LoadingSheet || "",
-        "tripId": this.vehicelLoadData?.tripId || "",
-        "totDkt": result.length,
-        "totPkg": menifestDetails?.PackagesLoadedBooked || "",
-        "tot_cft": menifestDetails?.VolumeCFT || "",
-        "WeightKg": menifestDetails?.WeightKg || "",
-        "entryDate": new Date(),
-        "entryBy": this.userName
-      };
-
-      menifestData.push(jsonDetails);
-    }
-
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "menifest_detail",
-      "data": menifestData[0]
-    };
-
-    this.operationService.operationMongoPost('generic/create', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          if (this.vehicelLoadData.count === 1) {
-            this.updateTripStatus();
-          } else {
-            if (res) {
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: `Vehicle Loaded Successfully`,
-                showConfirmButton: true,
-              });
-              this.goBack('Departures');
-              this.dialogRef.close("");
-            }
-          }
-        }
-      }
-    });
-  }
-
-  async updatedocketDetail(dktNo, mfNumber, tripId) {
-    let mfDetails = {
-      mfNo: mfNumber,
-      tripId: tripId
-    };
-     await updateTracking(this.companyCode,this.operationService,mfDetails,dktNo)
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "docket",
-      filter:{docketNumber: dktNo},/*here i added docketNumber this number */
-      update: {
-        ...mfDetails
-      }
-    };
-
-    return new Promise((resolve, reject) => {
-      this.operationService.operationMongoPut("generic/update", reqBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            resolve(res);
-          }
-        },
-        error: (err) => {
-          reject(err);
-        }
-      });
-    });
-  }
-
-  updateTripStatus() {
-    let tripDetails = {
-      status: "Depart Vehicle"
-    }
-    const id=this.vehicelLoadData?.id || "";
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "trip_detail",
-      "filter": {_id: id},
-      "update": {
-        ...tripDetails,
-      }
-    }
-    this.operationService.operationMongoPut("generic/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: `Vehicle Load Successfully`,//
-            showConfirmButton: true,
-          })
-          this.goBack('Departures');
-          this.dialogRef.close("")
-        }
-      }
-    })
-  }
- 
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }

@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <form [formGroup]="quickDocketTableForm">
-        <app-form-webxpress [form]="quickDocketTableForm" [formData]="jsonControlDocketArray" [showSaveAndCancelButton]="true"
+        <app-form-webxpress [form]="quickDocketTableForm" [FormTitle]="'CNote Quick Booking '" [formData]="jsonControlDocketArray" [showSaveAndCancelButton]="true"
             (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>

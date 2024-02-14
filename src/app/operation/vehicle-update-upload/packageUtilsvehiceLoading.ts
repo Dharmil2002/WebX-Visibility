@@ -43,8 +43,7 @@ export function vehicleLoadingScan(loadPackage: any,csv: any[]): any {
   }
 
   // Find the element in the csv array that matches the shipment
-  const element = csv.find(e => e.Shipment === loadPackage.dockNo);
-
+  const element = csv.find(e => e.Shipment === loadPackage.dKTNO);
   // Check if the element exists and the number of Loaded packages is less than the total packages
   if (!element || (element.hasOwnProperty('loaded') && element.Packages <= element.loaded)) {
     // Invalid operation, packages must be greater than Loaded

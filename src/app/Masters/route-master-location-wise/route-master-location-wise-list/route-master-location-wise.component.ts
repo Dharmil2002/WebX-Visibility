@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 
@@ -14,7 +15,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   linkArray = []
   columnHeader = {
     // "srNo": "Sr No",
-    "updatedDate": 'Created Date',
+    "entryDate": 'Created Date',
     'routeMode': 'Route Mode',
     'routeId': 'Route Code',
     'routeName': 'Route Name',
@@ -60,21 +61,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
     this.masterService.masterPost('generic/get', req).subscribe({
         next: (res: any) => {
             if (res) {
-                // Process each object in the array
-                this.csv = res.data.map((obj, index) => {
-                    obj["srNo"] = index + 1;
-
-                    // Check if GSTdetails exists and is an array
-                    if (Array.isArray(obj.GSTdetails)) {
-                        const loccdValues = obj.GSTdetails.map((gst) => gst.loccd);
-                        const route = loccdValues.join("-");
-                        obj["routeName"] = route;
-                    } else {
-                        obj["routeName"] = ''; // Or set a default value if GSTdetails is not an array
-                    }
-
-                    return obj;
-                });
+                this.csv = res.data.map((x)=>{x.entryDate=formatDocketDate(x.eNTDT); return x} );
                 this.tableLoad = false;
             }
         }

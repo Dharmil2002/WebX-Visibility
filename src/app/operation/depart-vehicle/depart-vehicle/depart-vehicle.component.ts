@@ -14,9 +14,12 @@ import {
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
 import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail, updateTracking } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
+import { firstValueFrom } from "rxjs";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
 
 
 @Component({
@@ -44,9 +47,9 @@ export class DepartVehicleComponent implements OnInit {
   };
   linkArray = [{ Row: "Shipments", Path: "Operation/LoadingSheetView" }];
 
-  hyperlinkControls={
-    value:"manifest",
-    functionName:"viewMenifest"
+  hyperlinkControls = {
+    value: "manifest",
+    functionName: "viewMenifest"
   }
   //declaring breadscrum
   breadscrums = [
@@ -119,7 +122,9 @@ export class DepartVehicleComponent implements OnInit {
     private Route: Router,
     private dialog: MatDialog,
     private fb: UntypedFormBuilder,
-    private _operationService: OperationService
+    private thcService: ThcService,
+    private _operationService: OperationService,
+    private departureService:DepartureService
   ) {
     // if (data) {
     //   this.tripData = data
@@ -132,93 +137,101 @@ export class DepartVehicleComponent implements OnInit {
     this.autoBindData();
     this.fetchShipmentData();
     this.vehicleDetails();
-    this.getTripDetail();
     // this.autoBindData()
   }
 
-  autoBindData() {
-
+  async autoBindData() {
     // Map of control names to their corresponding data keys
     const loadingSheetFormControlsMap = {
       Route: "RouteandSchedule",
       tripID: "TripID",
       Expected: "Expected",
     };
-
     // Loop through the control mappings and update form values
     Object.entries(loadingSheetFormControlsMap).forEach(([controlName, dataKey]) => {
       const formControl = this.loadingSheetTableForm.controls[controlName];
       const value = this.tripData?.[dataKey] || "";
       formControl.setValue(value);
     });
-
     // Set value for the "vehicle" control
     const vehicleNo = {
       name: this.tripData.VehicleNo,
       value: this.tripData.VehicleNo,
     };
     this.loadingSheetTableForm.controls["vehicle"].setValue(vehicleNo);
-
-    // Set value for the "LoadingLocation" control
     const loadingLocationFormControl = this.loadingSheetTableForm.controls["LoadingLocation"];
     const loadingLocationValue = localStorage.getItem("Branch") || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
+   
+
   }
 
-  vehicleDetails() {
-    const reqbody = {
-      companyCode: this.companyCode,
-      collectionName: "vehicle_detail",
-      filter:{}
-    };
-    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.vehicleDetail = res.data.find(
-            (x) => x.vehicleNo === this.tripData.VehicleNo
-          );
-          this.departvehicleTableForm.controls["VendorType"].setValue(
-            this.vehicleDetail?.vendorType || ""
-          );
-          this.departvehicleTableForm.controls["Vendor"].setValue(
-            this.vehicleDetail?.vendorName || ""
-          );
-          this.getDriverDetails();
-          this.fetchLoadingSheetDetailFromApi();
-          this.loadVehicleDetails();
-        }
-      },
-    });
-  }
-  getDriverDetails() {
-    const reqbody = {
-      companyCode: this.companyCode,
-      collectionName: "driver_detail",
-      filter:{}
-    };
-    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          const driverDetails = res.data.find(
-            (x) => x.vehicleNo === this.tripData.VehicleNo
-          );
-          this.departvehicleTableForm.controls["Driver"].setValue(
-            driverDetails?.driverName || ""
-          );
-          this.departvehicleTableForm.controls["DriverMob"].setValue(
-            driverDetails?.telno || ""
-          );
-          this.departvehicleTableForm.controls["License"].setValue(
-            driverDetails?.licenseNo || ""
-          );
-          this.departvehicleTableForm.controls["Expiry"].setValue(
-            driverDetails?.valdityDt || ""
-          );
-        }
-      },
-    });
-  }
+  async vehicleDetails() {
+    try {
+      const reqbody = {
+        companyCode: this.companyCode,
+        collectionName: "vehicle_status",
+        filter: { vehNo: this.tripData.VehicleNo }
+      };
+      const reqVeh = {
+        companyCode: this.companyCode,
+        collectionName: "vehicle_detail",
+        filter: {vehicleNo: this.tripData.VehicleNo}
+      };
+      // Execute parallel API calls
+      const [res, resVeh, thcDetails] = await Promise.all([
+        firstValueFrom(this._operationService.operationMongoPost("generic/getOne", reqbody)),
+        firstValueFrom(this._operationService.operationMongoPost("generic/getOne", reqVeh)),
+        this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
+      ]);
+      if (res) {
+        const { data } = res;
+        this.departvehicleTableForm.controls["VendorType"].setValue(data?.vendorType || "");
+        this.departvehicleTableForm.controls["Vendor"].setValue(data?.vendor || "");
+        this.departvehicleTableForm.controls["Driver"].setValue(data?.driver || "");
+        this.departvehicleTableForm.controls["DriverMob"].setValue(data?.dMobNo || "");
+        this.departvehicleTableForm.controls["License"].setValue(data?.lcNo || "");
+        this.departvehicleTableForm.controls["Expiry"].setValue(formatDocketDate(data?.lcExpireDate));
+      }
+      if (resVeh) {
+        const { data } = resVeh;
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehicleType || "");
+        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehicleTypeCode || "");
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(data?.cft || 0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedKg'].setValue(data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(data?.cft || 0); // Assuming you meant cft here for consistency
+        // THC Details handling
+        if (thcDetails) {
+      
+          const { data: thcData } = thcDetails;
+          this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(thcData?.lOADED.wT || 0);
+          this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(thcData?.lOADED.vOL || 0);
+          this.loadingSheetTableForm.controls['WeightUtilization'].setValue(thcData?.uTI.wT || 0);
+          this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(thcData?.uTI.vOL || 0);
+          this.advanceTableForm.controls['ContractAmt'].setValue(thcData?.cHG.cTAMT || 0);
+          this.advanceTableForm.controls['OtherChrge'].setValue(thcData?.cHG.oAMT || 0);
+          this.advanceTableForm.controls['Loading'].setValue(thcData?.cHG.lOADING || 0);
+          this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
+          this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
+          this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
+          this.advanceTableForm.controls['TotalTripAmt'].setValue(thcData?.cHG.tOTAMT || 0);
+          this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
+          this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
+          this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
+          this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
+          this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
+          this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
+          this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
 
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching vehicle details:", error);
+      // Handle error appropriately
+    }
+  }
+  
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
     this.jsonControlArray =
@@ -252,7 +265,6 @@ export class DepartVehicleComponent implements OnInit {
 
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
-
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
 
@@ -273,89 +285,55 @@ export class DepartVehicleComponent implements OnInit {
   /**
  * Fetches shipment data from the API and updates the boxData and tableload properties.
  */
-  fetchShipmentData() {
-    // Prepare request payload
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "docket",
-      filter:{}
-    };
-
-    // Send request and handle response
-    this._operationService.operationMongoPost("generic/get", req).subscribe({
-      next: async (res: any) => {
-        // Update shipmentData property with the received data
-        this.shipmentData = res.data;
-        this.getShipingDetails()
-      },
-    });
-  }
-  getShipingDetails() {
-
-    const reqbody = {
-      companyCode: this.companyCode,
-      collectionName: "menifest_detail",
-      filter:{}
-    };
-    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Filter menifestDetails based on mfNo and unloading=0
-          const filteredMenifestDetails = res.data.filter((manifest) => {
-            const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo&&item.unloading==0);
-            matchedShipment && this.listDocket.push(matchedShipment.docketNumber);
-            return matchedShipment && matchedShipment.unloading == 0 && manifest.tripId === this.tripData.TripID
-          });
-          let menifestList: any = [];
-          filteredMenifestDetails.forEach((element) => {
-            let json = {
-              leg: element.leg,
-              manifest: element.mfNo,
-              shipments_lb: element.totDkt,
-              packages_lb: element.totPkg,
-              weight_kg: parseFloat(element?.WeightKg || 0),
-              volume_cft: parseFloat(element?.tot_cft || 0),
-            };
-            menifestList.push(json);
-            this.menifestTableData = menifestList;
-            this.tableload = false;
-            this.docketDetails();
-
-          });
-        }
-      },
-    });
-
-  }
-  docketDetails() {
-    const reqbody = {
-      companyCode: this.companyCode,
-      collectionName: "loadingSheet_detail",
-      filter:{}
-    };
-    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.lsDetails = res.data.find(
-            (lsDetails) => lsDetails.tripId === this.tripData.TripID
-          );
-          // this.vehicleTypeDropdown();
-
-        }
-      },
-    });
-  }
-  async loadVehicleDetails() {
+  async fetchShipmentData() {
     try {
-      const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
-      this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
-      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
-      this.loadingSheetTableForm.controls['CapacityKg'].setValue(vehicleData.capacity);
+      // Prepare request payload for manifest headers
+      const headersRequest = {
+        companyCode: this.companyCode,
+        collectionName: "mf_headers_ltl",
+        filter: { tHC: this.tripData.TripID,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}],}
+      };
+      
+      const headersResponse = await firstValueFrom(this._operationService.operationMongoPost("generic/get", headersRequest));
+      
+      if (headersResponse.data.length === 0) {
+        return; // Early return if no data found
+      }
+      
+      // Extract manifest numbers (MFNO) from response
+      const manifestNumbers = headersResponse.data.map(header => header.mFNO);
+      
+      // Prepare request for manifest details
+      const detailsRequest = {
+        companyCode: this.companyCode,
+        collectionName: "mf_details_ltl",
+        filter: { mFNO: { "D$in": manifestNumbers },"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]}
+      };
+      
+      const detailsResponse = await firstValueFrom(this._operationService.operationMongoPost("generic/get", detailsRequest));
+      this.shipmentData = detailsResponse.data;
+      
+      // Process manifest table data
+      this.menifestTableData = headersResponse.data.map(header => {
+        const totalWeight = detailsResponse.data.reduce((total, detail) => 
+          detail.mFNO === header.mFNO ? total + detail.lDWT : total, 0);
+        const totalVolume = detailsResponse.data.reduce((total, detail) => 
+          detail.mFNO === header.mFNO ? total + detail.lDVOL : total, 0);
+        
+        return {
+          leg: header.leg || "",
+          manifest: header.mFNO || '',
+          shipments_lb: header.dKTS || "",
+          packages_lb: header.pKGS || 0,
+          weight_kg: totalWeight,
+          volume_cft: totalVolume
+        };
+      });
+      this.tableload = false;
     } catch (error) {
+      // Handle error appropriately
     }
   }
-
-
 
   loadingSheetGenerate() {
     //Check if BcSerialType is "E"
@@ -368,7 +346,6 @@ export class DepartVehicleComponent implements OnInit {
       });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log("The dialog was closed", result);
       // Handle the result after the dialog is closed
     });
   }
@@ -395,8 +372,8 @@ export class DepartVehicleComponent implements OnInit {
 
   Close() {
 
-    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value||"");
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value||"");
+    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
     const loadingArray = [this.loadingSheetTableForm.value];
     const departArray = [this.departvehicleTableForm.value];
     const advancearray = [this.advanceTableForm.value];
@@ -415,25 +392,13 @@ export class DepartVehicleComponent implements OnInit {
     mergedData['lsno'] = this.lsDetails?.lsno || '';
     mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);
-    
+
   }
 
 
-  addDepartData(departData) {
-
-    const reqbody = {
-      "companyCode": this.companyCode,
-      "collectionName": "trip_transaction_history",
-      "data": departData
-    }
-    this._operationService.operationMongoPost('generic/create', reqbody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.updateTrip();
-        }
-
-      }
-    })
+  async addDepartData(departData) {
+      const depart= await this.departureService.getFieldDepartureMapping(departData,this.shipmentData);
+      this.goBack('Departures');
   }
   updateTrip() {
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
@@ -452,7 +417,7 @@ export class DepartVehicleComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_detail",
-      "filter":{_id: this.tripData.id},
+      "filter": { _id: this.tripData.id },
       "update": {
         ...tripDetails,
       }
@@ -460,7 +425,7 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-       
+
           this.docketStatus();
         }
       }
@@ -512,7 +477,7 @@ export class DepartVehicleComponent implements OnInit {
     const lsDetail = loadingSheetDetail.length > 1
       ? loadingSheetDetail[loadingSheetDetail.length - 1]
       : (loadingSheetDetail[0] || null);
-   
+
     // Update loading sheet table form controls with loading sheet details
     if (lsDetail) {
       this.loadingSheetTableForm.controls["Capacity"].setValue(
@@ -540,8 +505,8 @@ export class DepartVehicleComponent implements OnInit {
         lsDetail?.WeightUtilization || 0
       );
     }
-     // Update departure vehicle form controls with driver details
-     if (driverDetail&&driverDetail[0]) {
+    // Update departure vehicle form controls with driver details
+    if (driverDetail && driverDetail[0]) {
       this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
       this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
       this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
@@ -549,7 +514,7 @@ export class DepartVehicleComponent implements OnInit {
       convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
       this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
 
-    } 
+    }
     // Rest of your code that depends on loadingSheetDetail
   }
 
@@ -565,59 +530,15 @@ export class DepartVehicleComponent implements OnInit {
     const totalTripAmt = parseFloat(this.advanceTableForm.controls['TotalTripAmt'].value) || 0;
     calculateBalanceAmount(this.balanceTableForm, totalTripAmt);
   }
-  async getTripDetail() {
-    const reqBody = {
-      companyCode: this.companyCode,
-      type: "operation",
-      collection: "trip_transaction_history",
-      query: {
-        id: this.tripData.TripID,
-      }
-    }
-    const resTrip = await this._operationService.operationPost("common/getOne", reqBody).toPromise();
-    if (resTrip) {
-      const tripDetail = resTrip.data.db.data.trip_transaction_history[0];
-      const advanceControls = this.advanceTableForm.controls;
-      const balanceControls = this.balanceTableForm.controls;
-      const departureControls = this.departureTableForm.controls;
-
-      if (tripDetail) {
-        const fieldsToUpdate = [
-          'ContractAmt', 'OtherChrge', 'Loading', 'Unloading', 'Enroute',
-          'Misc', 'TotalTripAmt', 'PaidByCash', 'PaidbyBank', 'PaidbyFuel',
-          'PaidbyCard', 'TotalAdv', 'BalanceAmt'
-        ];
-
-        fieldsToUpdate.forEach(field => {
-          if (tripDetail.hasOwnProperty(field)) {
-            const fieldValue = tripDetail[field] !== null ? tripDetail[field] : '';
-            if (advanceControls[field]) {
-              advanceControls[field].setValue(fieldValue !== '' ? fieldValue : 0);
-            }
-            if (balanceControls[field]) {
-              balanceControls[field].setValue(fieldValue !== '' ? fieldValue : 0);
-            }
-            if (departureControls[field]) {
-              departureControls[field].setValue(fieldValue !== '' ? fieldValue : '');
-            }
-          }
-        });
-
-
-      }
-    }
-
-
-  }
   async docketStatus() {
 
     for (const element of this.listDocket) {
-        try {
-            await updateTracking(this.companyCode, this._operationService, element, this.next);
-           
-        } catch (error) {
-            console.error('Error updating docket status:', error);
-        }
+      try {
+        await updateTracking(this.companyCode, this._operationService, element, this.next);
+
+      } catch (error) {
+        console.error('Error updating docket status:', error);
+      }
     }
     Swal.fire({
       icon: "success",
@@ -625,11 +546,11 @@ export class DepartVehicleComponent implements OnInit {
       text: `Vehicle is departed`,
       showConfirmButton: true,
     })
-      this.goBack('Departures');
-}
+    this.goBack('Departures');
+  }
 
   // async docketStatus() {
- 
+
   //    // Create an array of promises for updateTracking calls
   //    const updatePromises =  this.listDocket.map(async element => {
   //     await updateTracking(this.companyCode, this._operationService, element,this.next);
@@ -639,7 +560,7 @@ export class DepartVehicleComponent implements OnInit {
   // await Promise.all(updatePromises);
 
   // }
-  viewMenifest(event){
+  viewMenifest(event) {
     const req = {
       templateName: "Manifest View-Print",
       DocNo: event.data?.manifest,

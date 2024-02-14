@@ -239,4 +239,13 @@ export class ThcService {
         const result = await this.operationService.operationMongoPost(OperationActions.CreateThc, request).toPromise();
         return result;
     }
+    async getThcDetailsByNo(tripId) {
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.thc_summary_ltl,
+            filter: { docNo: tripId }
+        };
+        let nestedDetail = await firstValueFrom(this.operationService.operationPost("generic/getOne", reqBody));
+        return nestedDetail;
+    }
 }

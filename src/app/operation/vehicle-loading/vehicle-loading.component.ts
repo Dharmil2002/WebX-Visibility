@@ -8,6 +8,8 @@ import { ViewPrintComponent } from '../view-print/view-print.component';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { setFormControlValue } from 'src/app/Utility/commonFunction/setFormValue/setFormValue';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vehicle-loading',
@@ -22,9 +24,9 @@ export class VehicleLoadingComponent implements OnInit {
   // Declaring breadscrum
   breadscrums = [
     {
-      title: "vehicle-loading",
+      title: "Vehicle-Loading",
       items: ["Loading-Sheet"],
-      active: "vehicle-loading"
+      active: "Vehicle-Loading"
     }
   ];
 
@@ -37,8 +39,6 @@ export class VehicleLoadingComponent implements OnInit {
       Title:"Loading Sheet",
       class: "matcolumnleft",
       Style: "min-width:200px",
-      type:'windowLink',
-      functionName:'OpenLoadingSheet'
     },
     Manifest: {
       Title: "Manifest",
@@ -71,14 +71,14 @@ export class VehicleLoadingComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:100px",
     },
-    // printPending: {
-    //   Title: "Hrs",
-    //   class: "matcolumnleft",
-    //   Style: "min-width:100px",
-    // },
+    printPending: {
+      Title: "Hrs",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
   };
   staticField = [
-    // "LoadingSheet",
+    "LoadingSheet",
     "Manifest",
     "Leg",
     "Shipments",
@@ -129,7 +129,8 @@ export class VehicleLoadingComponent implements OnInit {
     private Route: Router, // Injecting Router service
     private navigationService: NavigationService, // Injecting NavigationService
     private operationService: OperationService, // Injecting OperationService
-    private fb: UntypedFormBuilder// Injecting UntypedFormBuilder
+    private fb: UntypedFormBuilder,// Injecting UntypedFormBuilder
+    private storage: StorageService
   ) {
     // Check if there is data in the state passed through navigation
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -172,21 +173,43 @@ export class VehicleLoadingComponent implements OnInit {
     this.getLoadingSheetData();
   }
 
-  getLoadingSheetData() {
+  async getLoadingSheetData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "collectionName": "loadingSheet_detail",
-      "filter":{}
+      "collectionName": "ls_headers_ltl",
+      "filter":{tHC:this.tripData.TripID,"D$or":[{mFNO:{"D$exists":false}},{mFNO:""}],lOC:this.storage.branch}
     }
     // Call the operationService to get JSON file details from 'arrivalUrl'
-    this.operationService.operationPost('generic/get', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.tripDetails = res.data.filter((x) => x.tripId === this.tripData.TripID);
-          this.getDocketDetails();
+    const res= await firstValueFrom(this.operationService.operationPost('generic/get', reqBody));
+    this.tripDetails=res.data;
+         if (res) {
+          let dataLoading = [];
+          if (res.data.length>0) {
+            res.data.forEach((element: any) => {
+              // Specify the type of 'element' as 'any'
+                let json = {
+                  id: this.tripData.id,
+                  route: this.vehicleLoadingTableForm.controls['Route']?.value || "",
+                  tripId: this.tripData?.TripID || '',
+                  LoadingSheet: element?.lSNO || '',
+                  Manifest: '',
+                  Leg: element?.lEG || '',
+                  Shipments: element?.tOTDKT|| 0,
+                  Packages: element?.pKGS || '',
+                  ShipmentsLoaded: 0,
+                  PackagesLoaded: 0,
+                  Pending:element?.tOTDKT || 0,
+                  vehNo: this.vehicleLoadingTableForm.controls['Vehicle']?.value || '',
+                  Action: 'Load Vehicle',
+                  printPending: 'print'
+                };
+                dataLoading.push(json);
+            });
+          }
+          // Add the "count" key to each object in the 'dataLoading' array using 'map'
+          this.tableData = dataLoading.map((obj, index) => ({ ...obj, count: dataLoading.length }));;
+          this.tableload = false;
         }
-      }
-    })
   }
 
   functionCallHandler($event) {
@@ -206,62 +229,9 @@ export class VehicleLoadingComponent implements OnInit {
       console.log("failed");
     }
   }
-  getDocketDetails() {
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "docket",
-      "filter":{}
-    }
-    this.operationService.operationPost('generic/get', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
 
-          let dataLoading = [];
-          if (this.tripDetails) {
-          
-            let count = 0
-            this.tripDetails.forEach((element: any) => {
-              // Specify the type of 'element' as 'any'
-              let shipmentData = res.data.filter((x) => x.lsNo === element.lsno && x.mfNo == "");
-              if (shipmentData.length > 0) {
-                let json = {
-                  id: this.tripData.id,
-                  route: this.vehicleLoadingTableForm.controls['Route']?.value || "",
-                  tripId: this.tripData?.TripID || '',
-                  LoadingSheet: element?.lsno || '',
-                  Manifest: '',
-                  Leg: element?.leg || '',
-                  Shipments: shipmentData?.length || 0,
-                  Packages: element?.pacakges || '',
-                  ShipmentsLoaded: 0,
-                  PackagesLoaded: 0,
-                  Pending: shipmentData?.length || 0,
-                  Action: 'Load Vehicle',
-                  printPending: 'print'
-                };
-                count++
-                dataLoading.push(json);
-              }
-            });
-          }
-          // Add the "count" key to each object in the 'dataLoading' array using 'map'
-          this.tableData = dataLoading.map((obj, index) => ({ ...obj, count: dataLoading.length }));;
-          this.tableload = false;
-        }
-      }
-    })
-  }
   goBack(tabIndex: string): void {
     this.navigationService.navigateTotab(tabIndex, '/dashboard/Index');
   }
-  OpenLoadingSheet(event){
-    console.log('event' , event)
-    const LoadingSheet = event.data.LoadingSheet
-    const templateBody = {
-      DocNo: LoadingSheet,
-      templateName: 'LoadingSheet View-Print'
-    }
-    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-    window.open(url, '', 'width=1000,height=800');
-  }
+  
 }

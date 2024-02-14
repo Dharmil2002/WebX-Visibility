@@ -6,7 +6,13 @@ import { firstValueFrom } from "rxjs";
 import { getValueFromJsonControl } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import Swal from "sweetalert2";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-
+import { financialYear} from "src/app/Utility/date/date-utils";
+import { NavigationService } from "src/app/Utility/commonFunction/route/route";
+import { format, isValid, parseISO } from "date-fns";
+import moment from "moment";
+import { roundNumber } from "src/app/Utility/commonfunction";
+import { ConvertToDate, ConvertToNumber, isValidDate, roundToNumber } from "src/app/Utility/commonFunction/common";
+import { DocketFinStatus, DocketStatus } from "src/app/Models/docStatus";
 @Injectable({
     providedIn: "root",
 })
@@ -32,11 +38,48 @@ export class DocketService {
         }
         // Add more status mappings as needed
     };
+    statusLTLMapping = {
+        default: {
+            status: "",
+            actions: [""],
+        },
+        "0": {
+            status: "Quick Completion",
+            actions: ["Edit Docket"],
+        },
+        "1": {
+            status: "Booked",
+            actions: [""],
+        },
+        "2": {
+            status:"Loading Sheet Generated",
+            actions: [""],
+        },
+        "3": {
+            status: "Manifest Sheet Generated",
+            actions: [""],
+        },
+        "4": {
+            status: "Departed",
+            actions: [""],
+        },
+        "5": {
+            status: "Arrived",
+            actions: [""],
+        },
+        "6": {
+            status: `${"In stock"} ${"at"} ${this.storage.branch}`,
+            actions: [""],
+        }
+        // Add more status mappings as needed
+    };
+
 
     constructor(
         private operation: OperationService,
         private storage: StorageService,
-        private filter: FilterUtils
+        private filter: FilterUtils,
+        private navService: NavigationService
     ) { }
 
     async updateDocket(data, filter) {
@@ -163,7 +206,6 @@ export class DocketService {
                 sFX: parseInt(element.sFX) + 1,
                 cLOC: this.storage.branch,
                 cNO: '',
-                nLoc: '',
                 tId: tripId,
                 tOTWT: element.totWeight,
                 tOTPKG: element.noOfPkg,
@@ -395,30 +437,27 @@ export class DocketService {
 
     async addEventData(data) {
         const evnData = {
-            "_id": `${this.storage.companyCode}${data.docketNumber}-1-EVN0002` + new Date(),
+            "_id": `${this.storage.companyCode}${data.docketNumber}-1-EVN0002-${moment().format("YYYYMMDDHHmmss")}`,
             "cID": this.storage.companyCode,
             "dKTNO": data.docketNumber,
             "sFX": 1,
             "cNO": null,
             "lOC": this.storage.branch,
             "eVNID": "EVN0002",
-            "eVNDES": "Update Shipment",
+            "eVNDES": "Docket Entry",
             "eVNDT": new Date(),
-            "eVNSRC": "Docket Update",
-            "nLOC": null,
+            "eVNSRC": "Docket Entry",
             "dOCTY": "CN",
             "dOCNO": "",
-            "eTA": null,
-            "sTS": "2",
-            "sTSNM": "Update Shipment",
-            "oPSTS": "1",
-            "eNTDT": new Date(),
+            "sTS": DocketStatus.Booked,
+            "sTSNM": DocketStatus[DocketStatus.Booked],
+            "oPSSTS": `Booked at ${this.storage.branch} on ${moment(data.docketDate).format("DD MMM YYYY @ hh:mm A")}.`,
             "eNTLOC": this.storage.branch,
             "eNTBY": this.storage.userName
         }
         const req = {
             companyCode: this.storage.companyCode,
-            collectionName: "docket_events",
+            collectionName: "docket_events_ltl",
             data: evnData
         }
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/create', req));
@@ -521,5 +560,354 @@ export class DocketService {
         } catch (error) {
         }
     }
+    /* here the api is for only get LTL details */
+    async getDocketsDetailsLtl(filter={}){
+        
+    const reqBody={
+        companyCode:this.storage.companyCode,
+        collectionName:"dockets_ltl",
+        filter:filter
+     }
+     const res=await firstValueFrom(this.operation.operationMongoPost('generic/get',reqBody));
+     return res.data;
+    }
+    /*End*/
+    /*here the code is for mapping of the LTL details*/
+     async getMappingDocketDetails(dockets=[]) {
+          // Modify the data
+          if(dockets.length>0){
+          const modifiedData = dockets.map((item: any) => {
+      
+            let formattedDate = "";
+      
+            if (item.dKTDT) {
+              const parsedDate = parseISO(item.dKTDT);
+              if (isValid(parsedDate)) {
+                formattedDate = format(parsedDate, "dd-MM-yy HH:mm");
+              }
+            }
+            return {
+              no: item?.dKTNO ?? "",
+              date: formattedDate,
+              paymentType: item?.pAYTYPNM ?? "",
+              contractParty: `${item.bPARTY}-${item.bPARTYNM}`,
+              orgdest: `${item?.oRGN ?? ""} : ${item?.dEST}`,
+              fromCityToCity: `${item?.fCT ?? ""} : ${item?.tCT ?? ""}`,
+              noofPackages: parseInt(item?.pKGS||0),
+              chargedWeight: parseInt(item?.cHRWT||0),
+              actualWeight: parseInt(item?.aCTWT||0),
+              status: this.statusLTLMapping[item.oSTS.toString()]?.status ?? "",
+              Action: item?.iSCOM ==true
+                ? item?.oSTS == 1 ? "" : ""
+                : "Quick Completion",
+              isComplete: item?.iSCOM || false,
+              docketsDetails:item
+            };
+          });
+          // Return the modified data
+          modifiedData.sort((a: any, b: any) => {
+            const dateA = a.dKTDT ? new Date(a.dKTDT) : null;
+            const dateB = b.dKTDT ? new Date(b.dKTDT) : null;
+            if (dateA && dateB) {
+              return dateB.getTime() - dateA.getTime();
+            } else if (dateA) {
+              return -1;
+            } else if (dateB) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+          return modifiedData;
+        }
+    }
+    /*End*/
+    /**
+     * Maps docket details from longhand to shorthand notation.
+     * @param {Object} formData - The source data for mapping.
+     * @returns {Object} - The mapped docket details in shorthand notation.
+     */
+    async quickDocketsMapping(formData) {
+        
+        return {
+            "cID":this.storage.companyCode,
+            "dKTNO": "", // If this is supposed to be a dynamic value, consider updating it similar to others
+            "dKTDT":formData.docketDate,
+            "pAYTYP": formData.payType,
+            "pAYTYPNM":formData.pAYTYPNM,
+            "bPARTY":formData.billingParty?.value||"",
+            "bPARTYNM":formData.billingParty?.name||"",
+            "oRGN": formData?.orgLoc||"",
+            "cLOC":this.storage.branch||"",
+            "iSCOM":false,
+            "dEST":formData.destination.value,
+            "fCT":formData.fromCity.value,
+            "tCT":formData.toCity.value,
+            "vEHNO":formData.vehNo?.value|| ( formData.vehNo || ""),
+            "pKGS": formData?.totalChargedNoOfpkg || 0,
+            "aCTWT": formData?.actualwt || 0,
+            "cHRWT": formData?.chrgwt || 0,
+            "eNTDT":new Date(),
+            "eNTBY":this.storage.userName,
+            "eNTLOC":this.storage.branch,
+            "oSTS": DocketStatus.Awaiting_Completion,
+            "oSTSN": DocketStatus[DocketStatus.Awaiting_Completion].replace(/_/g, " "),
+            "mOD":this.storage.mode,
+            "cURR":"INR"
+        };
+    }
+    /*End*/
+    /*here the code for the docket Booking Create */
+    async createDocket(data) {
+        let reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets_ltl",
+            docType: "CN",
+            branch: this.storage.branch,
+            finYear: financialYear,
+            data: data,
+            party: data["bPARTYNM"],
+          };
+        const res = await firstValueFrom(this.operation.operationMongoPost('operation/docket/ltl/create',reqBody)).then((res: any) => {
+            Swal.fire({
+              icon: "success",
+              title: "Booked Successfully",
+              text: "DocketNo: " + res.data,
+              showConfirmButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Redirect to the desired page after the success message is confirmed.
+                this.navService.navigateTotab(
+                  "docket",
+                  "dashboard/Index"
+                );
+              }
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: `Something went wrong! ${err.message}`,
+              showConfirmButton: true,
+            });
+          });;
+        return res;
+    }
+    /*End*/
+   /*here the code for the dashboard KPI for the list*/
+   async  kpiData(StockCountData: any[]): Promise<any[]> {
+    const lsCount = StockCountData.filter((x) => x.state !=2);
+    // Helper function to create a shipData object
+    const createShipDataObject = (
+      count: number,
+      title: string,
+      className: string
+    ) => ({
+      count,
+      title,
+      class: `info-box7 ${className} order-info-box7`,
+    });
+  
+    // Create an array of shipData objects with dynamic values
+    const shipData = [
+      createShipDataObject(StockCountData.length, "Total", "bg-c-Bottle-light"),
+      createShipDataObject(StockCountData.filter((x) => x.iSCOM ==true).length, "Completion", "bg-c-Grape-light"),
+      createShipDataObject(lsCount.length, "Loading Sheet", "bg-c-Daisy-light"),
+      createShipDataObject(0, "Delivery", "bg-c-Grape-light"),
+    ];
+    return shipData;
+  }
+   /*End*/
+   /*Here the code for the docket Field Mapping*/
+   async docketLTLFieldMapping(data,isUpdate=false) {
+    
+        let docketField= {
+        "_id":data?.id || "",
+        "cID":this.storage.companyCode,
+        "docNo":data?.docketNumber||"",
+        "dKTNO":data?.docketNumber||"",        
+        "dKTDT": ConvertToDate(data?.docketDate),
+        "pAYTYP": data?.payType||"",
+        "pAYTYPNM":data?.payTypeName||"",
+        "bPARTY":data?.billingParty.value||"",
+        "bPARTYNM":data?.billingParty.name||"",
+        "oRGN":data?.orgLoc||"",
+        "fCT":data?.fromCity?.value||"",
+        "dEST":data?.destination?.value||"",
+        "tCT":data?.toCity?.value||"",
+        "vEHNO": data?.vehNo?.value || (data?.vehNo||""),
+        "pKGS": parseInt(data?.totalChargedNoOfpkg || 0),
+        "aCTWT": ConvertToNumber(data?.actualwt || 0 , 3),
+        "cHRWT": ConvertToNumber(data?.chrgwt|| 0, 3),
+        "iSCOM": true,
+        "iSAPP": (data?.appoint == "Y") || false,
+        "aPP":{
+            "aPPHNO": data?.AppointmentContactNumber||"",
+            "aPPDT": ConvertToDate(data?.AppointmentDate),
+            "aPFRMTM": ConvertToDate(data?.AppointmentFromTime),
+            "aPTOTM": ConvertToDate(data?.AppointmentToTime),
+            "aPPRMK": data?.AppointmentRemarks||"",
+            "aPNM": data?.NameOfPerson||""
+        },
+        "cFTRATO": parseFloat(data?.cft_ratio || 0),
+        "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
+        "cSGE":{
+              "cD": data?.consignorName?.value||"",
+              "nM":data?.consignorName?.name||"",
+              "cT":data?.consignorCity?.value||"",
+              "pIN":data?.consignorPinCode?.value||"",
+              "aDD":data?.consignorAddress||"",
+              "gST":data?.consignorGSTINNO||"",
+              "mOB":data?.consignorMobileNo||"",
+              "tEL":data?.consignorTelephoneNo||"", 
+        },
+        "cSGN":{
+            "cD": data?.consigneeName?.value||"",
+            "nM":data?.consigneeName?.name||"",
+            "cT":data?.consigneeCity?.value||"",
+            "pIN":data?.consigneePinCode?.value||"",
+            "aDD":data?.consigneeAddress||"",
+            "gST":data?.consigneeGSTINNO||"",
+            "mOB":data?.consigneeMobNo||"",
+            "tEL":data?.consigneeTelNo||"", 
+        },
+        "eDD": ConvertToDate(data?.edd),        
+        "iSVOL": data?.f_vol || false,
+        "iSLOCAL": data?.local || false,
+        "iSODA": data?.oda || false,
+        "fRTRT": ConvertToNumber(data?.fRTRT|| 0, 2),
+        "fRTRTY":data?.fRTRTY || "",
+        "fRTRTYN":data?.fRTRTY || "",
+        "fRTAMT":  ConvertToNumber(data?.fRTAMT|| 0, 2),
+        "oTHAMT":  ConvertToNumber(data?.oTHAMT|| 0, 2),
+        "gROAMT":  ConvertToNumber(data?.gROAMT|| 0, 2),
+        "rCM": data?.rCM || "",
+        "gSTAMT": ConvertToNumber(data?.gSTAMT|| 0, 2),
+        "gSTCHAMT": ConvertToNumber(data?.gSTCHAMT|| 0, 2),
+        "tOTAMT": ConvertToNumber(data?.tOTAMT|| 0, 2),
+        "pKGTYN":data?.pkgsTypeName||"",
+        "pKGTY":data?.pkgsType||"",
+        "rSKTY":data?.rskty||"",
+        "rSKTYN":data?.rsktyName||"",
+        "sVCTYP":data?.svcType||"",
+        "sVCTYPN":data?.svcTypeName||"",
+        "iNVTOT": ConvertToNumber(data?.totalDeclaredValue|| 0, 2),
+        "pARTQTY": parseInt(data?.totalPartQuantity || 0),
+        "tRNMOD":data?.tranType||"",
+        "tRNMODNM":data?.tranTypeName||"",
+        "eNTBY":this.storage.userName,
+        "eNTDT":new Date(),
+        "eNTLOC":this.storage.branch,
+        "oSTS": DocketStatus.Booked,
+        "oSTSN": DocketStatus[DocketStatus.Booked],        
+        "fSTS": DocketFinStatus.Pending,
+        "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
+        "cONTRACT": "",
+        };
 
+        let invoiceDetails = data.invoiceDetails.map((element) => {
+         let l = ConvertToNumber(element?.LENGTH || 0, 3);
+         let b = ConvertToNumber(element?.BREADTH || 0, 3);
+         let h = ConvertToNumber(element?.HEIGHT || 0, 3);
+
+         const invoiceJson= {
+              "_id": isUpdate?`${this.storage.companyCode}-${data?.docketNumber}-${element?.INVNO}`:"",
+              "cID": this.storage.companyCode,
+              "dKTNO": isUpdate?data?.docketNumber:"",
+              "iNVNO": element?.INVNO || "",
+              "iNVDT": ConvertToDate(element?.INVDT),
+              "vOL": {
+                "uNIT": "CM",
+                "l": l,
+                "b": b,
+                "h": h,
+                "cU": roundToNumber(l * b *h, 3),
+              },
+              "iNVAMT": ConvertToNumber(element?.DECLVAL || 0, 2),
+              "cURR": "INR",
+              "pKGS": parseInt(element?.NO_PKGS || 0),
+              "cFTWT": ConvertToNumber(element?.CUB_WT || 0, 2),
+              "aCTWT": ConvertToNumber(element?.ACT_WT || 0, 2),
+              "cHRWT": ConvertToNumber(element?.ACT_WT || 0, 2),
+              "mTNM": element?.Invoice_Product || "",
+              "hSN": element?.HSN_CODE || "",
+              "hSNNM": element?.HSN_CODE || "",
+              "eWBNO": data?.ewbNo||"",
+              "eWBDT": ConvertToDate(element?.ewbDate),
+              "eXPDT": ConvertToDate(data?.ewbExprired),
+              "eNTBY":this.storage.userName,
+              "eNTDT":new Date(),
+              "eNTLOC":this.storage.branch,
+            }
+            return invoiceJson;
+        });
+
+        docketField["iNVTOT"] = invoiceDetails.reduce((a, c) => a + (c.iNVAMT || 0), 0);
+
+      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails};
+   }
+   /*End*/
+   /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
+    async operationsFieldMapping(data,invoiceDetails=[]){
+    const ops={
+        _id: `${this.storage.companyCode}-${data.dKTNO}`,
+        cID:this.storage.companyCode,
+        dKTNO: data?.dKTNO||"",
+        sFX: 0,
+        cLOC: data?.oRGN||"",        
+        tOTWT: ConvertToNumber(data?.aCTWT || 0 , 2),
+        tOTPKG: parseInt(data?.pKGS||0),
+        vEHNO: data?.vEHNO || "",                
+        sTS: DocketStatus.Booked,
+        sTSNM: DocketStatus[DocketStatus.Booked],
+        sTSTM: ConvertToDate(data?.dKTDT),
+        oPSSTS:`Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format('YYYYMMDDHHmmss')} and awaiting completion.`,
+        iSDEL: false,        
+        eNTDT: data?.eNTDT,
+        eNTLOC: data?.eNTLOC||"",
+        eNTBY: data?.eNTBY||""
+     }  
+    //Prepare Event Data
+    let evnData = {
+          _id: `${this.storage.companyCode}-${data.dKTNO}-0-EVN0001-${moment(data?.eNTDT).format('YYYYMMDDHHmmss')}`,
+          cID:this.storage.companyCode,
+          dKTNO: data?.dKTNO||"",
+          sFX: 0,
+          lOC:this.storage.branch,
+          eVNID:'EVN0001',
+          eVNDES:'Booking',
+          eVNDT: new Date(),
+          eVNSRC:'Quick Completion',          
+          dOCTY: 'CN',
+          dOCNO: data?.dKTNO||"",
+          sTS: DocketStatus.Booked,
+          sTSNM: DocketStatus[DocketStatus.Booked],
+          oPSSTS: `Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format("DD MMM YYYY @ hh:mm A")} and awaiting completion.`,
+          eNTDT: data?.eNTDT,
+          eNTLOC: data?.eNTLOC||"",
+          eNTBY: data?.eNTBY||""
+        };
+    let reqBody = {
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_ops_det_ltl",
+        data:ops
+      };
+        await firstValueFrom(this.operation.operationMongoPost('generic/create',reqBody));
+    let reqinvoice = {
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_invoices_ltl",
+        data:invoiceDetails
+      };
+      await firstValueFrom(this.operation.operationMongoPost('generic/create',reqinvoice));
+      let reqEvent = {
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_events_ltl",
+        data:evnData
+      };
+      await firstValueFrom(this.operation.operationMongoPost('generic/create',reqEvent));
+      return true
+    }
+   /*End*/
 }

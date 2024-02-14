@@ -25,13 +25,10 @@ export class ManifestGeneratedComponent implements OnInit {
     "PackagesLoadedBooked": "Packages Loaded/Booked",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
-    "hyperlink": "Print"
+    "Action": "Print"
   }
   centerAlignedData = ['PackagesLoadedBooked', 'WeightKg', 'VolumeCFT'];
-  hyperlinkControls = {
-    functionName:"GeneralMultipleView",
-    value:"Print"
-  }
+
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "MFNumber": "MF Number",
@@ -51,7 +48,7 @@ export class ManifestGeneratedComponent implements OnInit {
   ]
   toggleArray = []
   menuItems = [
-    { label: 'Print', function: "GeneralMultipleView" },
+    { label: 'Print', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
   ]
   linkArray = [
 
@@ -65,12 +62,14 @@ export class ManifestGeneratedComponent implements OnInit {
   loadingData: any;
   formdata: any;
   menifest: any;
+  mfNo: any;
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     public dialogRef: MatDialogRef<ManifestGeneratedComponent>,
     private cnoteService: CnoteService
     ) {
     if (item) {
+      this.mfNo=item?.mfNo||"";
       this.menifest = item.loadingSheetData;
       this.getMenifest();
 
@@ -102,9 +101,8 @@ export class ManifestGeneratedComponent implements OnInit {
     let MeniFestDetails: any[] = [];
     groupedDataWithoutKey.forEach(element => {
 
-      let randomNumber = "MF/" + this.orgBranch + "/"+runningNumber();
       let meniFestjson = {
-        MFNumber: randomNumber,
+        MFNumber: this.mfNo,
         Leg: element?.Leg || '',
         ShipmentsLoadedBooked: element.ShipmentCount + "/" + element.ShipmentCount,
         PackagesLoadedBooked: element?.TotalPackages || '' + "/" + element?.TotalPackages || '',
@@ -142,14 +140,4 @@ export class ManifestGeneratedComponent implements OnInit {
     this.dialogRef.close(this.csv)
   }
 
-  GeneralMultipleView(event){
-    console.log('event' , event)
-    const MFNumber = event.data.MFNumber
-    const templateBody = {
-      DocNo: MFNumber,
-      templateName: 'Manifest View-Print'
-    }
-    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-    window.open(url, '', 'width=1000,height=800');
-  }
 }

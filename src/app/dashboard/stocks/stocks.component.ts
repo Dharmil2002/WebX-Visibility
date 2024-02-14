@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { OperationService } from "src/app/core/service/operations/operation.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import Swal from "sweetalert2";
-import { getDocketDetailsFromApi, kpiData } from "./stockCommon";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-stocks",
@@ -131,7 +131,10 @@ export class StocksComponent
   boxData: { count: any; title: any; class: string }[];
   branch = localStorage.getItem("Branch");
   // declararing properties
-  constructor(private operationService: OperationService) {
+  constructor(
+  private docketService:DocketService,
+  private storage:StorageService
+  ) {
     super();
     this.addAndEditPath = "Operation/QuickCreateDocket";
   }
@@ -144,29 +147,14 @@ export class StocksComponent
    */
   async getDocketDetails() {
     try {
-      // Send request and await response
-      const modifiedData = await getDocketDetailsFromApi(
-        this.companyCode,
-        this.branch,
-        this.operationService
-      );
-
-      // Update tableData property with the modified data
-      this.tableData = modifiedData;
-
-      // Generate KPI data based on the modified data
-      this.boxData = kpiData(modifiedData);
-
-      // Set tableload to false to indicate that the table loading is complete
+      const data =await this.docketService.getDocketsDetailsLtl({cID:this.storage.companyCode,"D$or":[{oRGN:this.storage.branch},{cLOC:this.storage.branch}]});
+      const modifiedData =await this.docketService.getMappingDocketDetails(data);
+      this.boxData =await this.docketService.kpiData(data);
+      this.tableData = modifiedData.reverse();
       this.tableload = false;
     } catch (error) {
-      // Handle error by displaying an error message
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Oops! Something went wrong. Please try again later.",
-        showConfirmButton: true,
-      });
+      this.tableData =[];
+      this.tableload = false;
     }
   }
 }

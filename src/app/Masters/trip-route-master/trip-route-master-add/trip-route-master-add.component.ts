@@ -195,7 +195,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             stoppageTime: this.tableData.map((item) => parseInt(item.stoppageTime)),
             onw_ret: this.tableData.map((item) => item.onw_ret),
             entryBy: localStorage.getItem('Username'),
-            entryDate: new Date().toISOString()
+            entryDate: new Date()
           };
 
           if (this.isUpdate) {
@@ -205,7 +205,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
               collectionName: "trip_route_details",
-              filter: { _id: id },
+              filter: { tripRouteId:this.tripRouteTableForm.value.tripRouteId},
               update: transformedData
             };
             this.masterService.masterPut('generic/update', req).subscribe({

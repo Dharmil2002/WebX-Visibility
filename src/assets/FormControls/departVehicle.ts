@@ -65,6 +65,16 @@ export class DepartVehicleControl {
                 generatecontrol: true,
                 disable: false
             },
+            {
+                name: 'vendorTypeCode',
+                label: 'Vendor Type',
+                placeholder: '',
+                type: '',
+                value:'',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
         ];
     }
     getDepartVehicleFormControls() {
@@ -87,7 +97,7 @@ export class AdvanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
             {
@@ -99,7 +109,7 @@ export class AdvanceControl {
                 Validations: [],
                 generatecontrol: true, disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
             {
@@ -111,7 +121,7 @@ export class AdvanceControl {
                 Validations: [],
                 generatecontrol: true, disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
 
@@ -125,7 +135,7 @@ export class AdvanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
 
@@ -139,7 +149,7 @@ export class AdvanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
 
@@ -153,7 +163,7 @@ export class AdvanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
             {
@@ -188,7 +198,7 @@ export class BalanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
             {
@@ -200,7 +210,7 @@ export class BalanceControl {
                 Validations: [],
                 generatecontrol: true, disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
             {
@@ -212,7 +222,7 @@ export class BalanceControl {
                 Validations: [],
                 generatecontrol: true, disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
 
@@ -226,7 +236,7 @@ export class BalanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
 
@@ -240,7 +250,7 @@ export class BalanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModelChange:'onCalculateTotal'
+                    onModel:'onCalculateTotal'
                 }
             },
 

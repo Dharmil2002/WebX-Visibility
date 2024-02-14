@@ -1,11 +1,12 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
     <form [formGroup]="vehicleLoadingTableForm">
-        <app-form-without-auto-complete-webxpress [form]="vehicleLoadingTableForm" [formData]="jsonControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-without-auto-complete-webxpress>
+        <app-form-webxpress [form]="vehicleLoadingTableForm"  [FormTitle]="'Vehicle Loading'" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
     </form>
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+        [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
         [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [boxData]="boxData" [height]="height"
         [width]="width" [maxWidth]="maxWidth">
     </app-generic-table-v2>

@@ -14,7 +14,7 @@ let uniqueShipments: Set<number> = new Set();
 
 export function handlePackageUpdate(scanValue: string, legValue: string, currentBranch: string, data: any, csv: any[], boxData: any, cdr: any) {
 
-  const unloadPackage = data.find((x: any) => x.bcSerialNo.trim() === scanValue);
+  const unloadPackage = data.find((x: any) => x.pKGSNO.trim() === scanValue);
 
   if (!unloadPackage) {
     showError("Not Allow to Unload Package", "This package does not belong to the current branch.");
@@ -24,8 +24,7 @@ export function handlePackageUpdate(scanValue: string, legValue: string, current
     showError("Already Scanned", "Your Package ID is already scanned.");
     return;
   }
-
-  const element = csv.find((e: any) => e.Shipment === unloadPackage.dockNo);
+  const element = csv.find((e: any) => e.Shipment === unloadPackage.dKTNO);
 
   if (!element || (element.hasOwnProperty('Unloaded') && element.Packages <= element.Unloaded)) {
     showError("Invalid Operation", "Cannot perform the operation. Packages must be greater than Unloaded.");
@@ -50,7 +49,7 @@ export function handlePackageUpdate(scanValue: string, legValue: string, current
 
   const event = {
     shipment: uniqueShipments.size,
-    Package: totalUnloadedPackages,
+    Package: totalUnloadedPackages
   };
 
   // Call kpiData function

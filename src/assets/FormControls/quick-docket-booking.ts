@@ -44,12 +44,7 @@ export class QuickBookingControls {
         label: "Payment Type",
         placeholder: "Payment Type",
         type: "Staticdropdown",
-        value: [
-          { value: "PAID", name: "PAID" },
-          { value: "TBB", name: "TBB" },
-          { value: "TO PAY", name: "TO PAY" },
-          { value: "FOC", name: "FOC" },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -76,6 +71,9 @@ export class QuickBookingControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onModel: "getCustomer"
+        },
         Validations: [
           {
             name: "required",
@@ -118,6 +116,9 @@ export class QuickBookingControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onModel:"getPincodeDetail"
+        },
         Validations: [
           {
             name: "required",
@@ -146,6 +147,10 @@ export class QuickBookingControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+         onModel:"destionationDropDown",
+         onOptionSelect: 'toCity'
+        },
         Validations: [
           {
             name: "required",
@@ -187,6 +192,9 @@ export class QuickBookingControls {
             message: "Choose proper value",
           }
         ],
+        functions:{
+          onModel:"getPincodeDetail"
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -225,7 +233,7 @@ export class QuickBookingControls {
           },
         ],
         functions: {
-          change: "",
+          onModel: "preventNegative",
         },
       },
       {
@@ -247,6 +255,7 @@ export class QuickBookingControls {
         ],
         functions: {
           change: "",
+          onModel: "preventNegative"
         },
       },
       {
@@ -268,6 +277,7 @@ export class QuickBookingControls {
         ],
         functions: {
           change: "",
+          onModel: "preventNegative"
         },
       },
     ];

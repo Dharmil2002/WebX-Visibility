@@ -296,7 +296,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.svcType = await this.generalService.getGeneralMasterData("BUSVERT");
     this.riskType = await this.generalService.getGeneralMasterData("RSKTYP");
     this.pkgsType = await this.generalService.getGeneralMasterData("PKGS");
-    this.tranType = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    this.tranType = await this.generalService.getGeneralMasterData("tran_mode");
     setGeneralMasterData(this.contractControlArray, this.paymentType, "payType");
     setGeneralMasterData(this.contractControlArray, this.svcType, "svcType");
     setGeneralMasterData(this.contractControlArray, this.riskType, "rskty");
@@ -516,16 +516,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   /*End*/
   async saveData() {
     // Remove all form errors
-    if (this.contractForm.controls['f_vol'].value &&
-      this.tableData.some(item => !['LENGTH', 'BREADTH', 'HEIGHT','DECLVAL'].every(field => item[field] && item[field] !== ''))) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'Please enter the LENGTH, BREADTH, and HEIGHT for each item.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false
-    }
     const tabcontrols = this.tabForm;
     clearValidatorsAndValidate(tabcontrols);
     const contractcontrols = this.contractForm;

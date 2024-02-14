@@ -1,46 +1,50 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
-<form [formGroup]="loadingSheetTableForm">
-    <app-form-without-auto-complete-webxpress [form]="loadingSheetTableForm" [formData]="jsonControlArray"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-    </app-form-without-auto-complete-webxpress>
-</form>
-Load Details
-<generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="menifestTableData"
-        [csvFileName]="csvFileName" [hyperlinkControls]="hyperlinkControls"   [columnWidths]="columnWidths" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)"
-        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">
-    </generic-table-webxpress>
-Vendor Detail
-    <form [formGroup]="departvehicleTableForm">
-        <app-form-without-auto-complete-webxpress [form]="departvehicleTableForm" [formData]="departControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-without-auto-complete-webxpress>
+    <form [formGroup]="loadingSheetTableForm">
+        <app-form-webxpress [form]="loadingSheetTableForm" [FormTitle]="'Trip Details'" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
     </form>
-   Advance and Balance
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="menifestTableData"
+        [csvFileName]="csvFileName" [hyperlinkControls]="hyperlinkControls" [columnWidths]="columnWidths"
+        (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray" [toggleArray]="toggleArray"
+        [menuItems]="menuItems" (functionCallEmitter)="functionCallHandler($event)"
+        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
+        [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">
+    </generic-table-webxpress>
+    <form [formGroup]="departvehicleTableForm">
+        <app-form-webxpress [form]="departvehicleTableForm" [FormTitle]="'Vendor Detail'"
+            [formData]="departControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
     <form [formGroup]="advanceTableForm">
-        <app-form-without-auto-complete-webxpress [form]="advanceTableForm" [formData]="advanceControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-without-auto-complete-webxpress>
+        <app-form-webxpress [form]="advanceTableForm" [FormTitle]="'Advance and Balance'"
+            [formData]="advanceControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
     </form>
     <form [formGroup]="balanceTableForm">
-        <app-form-without-auto-complete-webxpress [form]="balanceTableForm" [formData]="balanceControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-without-auto-complete-webxpress>
+        <app-form-webxpress [form]="balanceTableForm" [FormTitle]="'Balance Amount'" [formData]="balanceControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
     </form>
-    Departure Details
     <form [formGroup]="departureTableForm">
-        <app-form-without-auto-complete-webxpress [form]="departureTableForm" [formData]="departureControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-without-auto-complete-webxpress>
+        <app-form-webxpress [form]="departureTableForm" [FormTitle]="'Departure Details'"
+            [formData]="departureControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
     </form>
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
-          <div class="example-button-row d-flex justify-content-end">
-            <button class="msr-3" mat-raised-button color="primary" [disabled]="!departureTableForm.valid"  (click)="Close()">Depart</button>
-            <button class="msr-3" mat-raised-button color="primary" *ngIf="!CEWBflag"  (click)="GenerateCEWB()">Generate</button>
-          </div>
+            <div class="example-button-row d-flex justify-content-end">
+                <button class="msr-3" mat-raised-button color="primary" [disabled]="!departureTableForm.valid"
+                    (click)="Close()">Depart</button>
+                <button class="msr-3" mat-raised-button color="primary" *ngIf="!CEWBflag"
+                    (click)="GenerateCEWB()">Generate</button>
+            </div>
         </div>
-      </div>
+    </div>
 
 </app-common-wrapper-webxpress>
-

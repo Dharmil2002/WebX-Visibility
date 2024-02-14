@@ -11,7 +11,7 @@ import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/gener
 import { exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { GeneralLedgerReport } from 'src/assets/FormControls/General-Ledger-Report/general-ledger-report';
+import { GeneralLedgerReport } from 'src/assets/FormControls/Reports/General-Ledger-Report/general-ledger-report';
 import Swal from 'sweetalert2';
 
 @Component({

@@ -29,7 +29,6 @@ export class MasterService {
   customerGst: any;
   companyGst: any;
   businessTypeList = '../../../assets/data/businessType.json'
-  regexPattern = '../../../assets/data/regexPattern.json'
   thcDetail = '../../../assets/data/thc-viewprint.json'
   vendorGstReport = '../../../assets/ReportFiles/vendorGstReport.json';
   generalLedgerReport = '../../../assets/ReportFiles/generalLedger.json';

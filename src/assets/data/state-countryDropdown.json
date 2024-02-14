@@ -562,15 +562,15 @@
     "documentTypeDropDown": [
         {
             "name": "CNote",
-            "value": "dkt"
+            "value": "CN"
         },
         {
             "name": "Delivery MR",
-            "value": "dmr"
+            "value": "DMR"
         },
         {
             "name": "UBI Series",
-            "value": "ubis"
+            "value": "UBIS"
         }
     ],
     "vehicleTypeDropdown": [

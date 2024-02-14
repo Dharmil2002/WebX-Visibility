@@ -10,6 +10,8 @@ import { processProperties } from '../../processUtility';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
 @Component({
   selector: 'app-add-dcr-series',
   templateUrl: './add-dcr-series.component.html'
@@ -282,6 +284,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       this.customerList = mergedData.customerData
         .filter(element =>
           element.activeFlag &&
+          Array.isArray(element.customerLocations) &&
           element.customerLocations.some(location => location === allotToLocation.value)
         )
         .map(element => ({
@@ -510,10 +513,17 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   async getPattern() {
     try {
       const documentType = this.addDcrTableForm.value.documentType;
-      const regexPattern = await this.masterService.getJsonFileDetails("regexPattern").toPromise();
-      const matchingPattern = regexPattern.find(pattern => pattern.companyCode === this.companyCode && pattern.documentId === documentType);
+      const req = {
+        companyCode: this.companyCode,
+        collectionName: "dcr_rules",
+        filter: {},
+      };
+      const regexPattern = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      // console.log(regexPattern);
 
-      if (!matchingPattern || !matchingPattern.required) {
+      const matchingPattern = regexPattern.data.find(pattern => pattern.cID === this.companyCode && pattern.dOCID === documentType);
+
+      if (!matchingPattern || !matchingPattern.rEQ) {
         console.log("No matching patterns found.");
         return;
       }
@@ -523,7 +533,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       if (control) {
         const customValidations = [
           Validators.required, // Add the required validator with its default error message
-          Validators.pattern(matchingPattern.regexPattern), // Add the pattern validator with its default error message
+          Validators.pattern(matchingPattern.rRGXPTRN), // Add the pattern validator with its default error message
         ];
 
         // Set custom error messages for required and pattern validations
@@ -537,7 +547,6 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       }
     } catch (error) {
       console.error("Error while fetching regex patterns:", error);
-      // Handle the error, e.g., display an error message to the user.
     }
   }
   //#endregion

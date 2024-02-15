@@ -510,7 +510,7 @@ export class AddAccountComponent implements OnInit {
       gRPNM: this.AccountForm.value.GroupCode.name,
       cATCD: this.AccountForm.value.AccountCategory.value,
       cATNM: this.AccountForm.value.AccountCategory.name,
-      bCATCD: this.AccountForm.value.BalanceSheet.value.substr(0, 3),
+      bCATCD: this.AccountForm.value.BalanceSheet.value,
       bCATNM: this.AccountForm.value.BalanceSheet.name,
       bANCD: this.AccountForm.value.bank.value || "",
       bANM: this.AccountForm.value.bank.name || "",
@@ -578,7 +578,8 @@ export class AddAccountComponent implements OnInit {
   }
 
   Cancle() {
-    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+    // this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+    console.log(this.AccountForm.value.BalanceSheet.value.substr(0, 3))
   }
 
   functionCallHandler($event) {

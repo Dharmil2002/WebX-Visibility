@@ -997,7 +997,7 @@ export class BalancePaymentComponent implements OnInit {
           this.debitVoucherDataRequestModel.UGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0,
           this.debitVoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0;
 
-        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+        this.debitVoucherDataRequestModel.GrossAmount = PaymentAmount;
         this.debitVoucherDataRequestModel.netPayable = NetPayable;
         this.debitVoucherDataRequestModel.roundOff = RoundOffAmount;
         this.debitVoucherDataRequestModel.voucherCanceled = false;
@@ -1011,7 +1011,6 @@ export class BalancePaymentComponent implements OnInit {
         this.debitVoucherDataRequestModel.date =
           PaymenDetails.Date;
         this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-        this.debitVoucherDataRequestModel.paymentAmount = NetPayable;
 
         const companyCode = this.companyCode;
         const CurrentBranchCode = this.storage.branch;

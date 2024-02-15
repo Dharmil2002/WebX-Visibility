@@ -449,7 +449,7 @@ export class AdviceGenerationComponent implements OnInit {
           this.debitVoucherDataRequestModel.UGST = 0;
           this.debitVoucherDataRequestModel.GSTTotal = 0;
 
-          this.debitVoucherDataRequestModel.paymentAmt = TotalAmount
+          this.debitVoucherDataRequestModel.GrossAmount = TotalAmount
           this.debitVoucherDataRequestModel.netPayable = TotalAmount
           this.debitVoucherDataRequestModel.roundOff = 0;
           this.debitVoucherDataRequestModel.voucherCanceled = false;
@@ -459,7 +459,6 @@ export class AdviceGenerationComponent implements OnInit {
             this.debitVoucherDataRequestModel.accountName = this.AdvicePaymentForm.value?.Bank?.name;
           this.debitVoucherDataRequestModel.date = this.AdvicePaymentForm.value.Date
           this.debitVoucherDataRequestModel.scanSupportingDocument = "";
-          this.debitVoucherDataRequestModel.paymentAmount = TotalAmount
 
           const companyCode = this.storage.companyCode;
           const CurrentBranchCode = this.storage.branch;

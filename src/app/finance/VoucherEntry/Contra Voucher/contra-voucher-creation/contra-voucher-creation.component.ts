@@ -256,7 +256,7 @@ export class ContraVoucherCreationComponent implements OnInit {
           this.debitVoucherDataRequestModel.UGST = 0;
           this.debitVoucherDataRequestModel.GSTTotal = 0;
 
-          this.debitVoucherDataRequestModel.paymentAmt = parseFloat(
+          this.debitVoucherDataRequestModel.GrossAmount = parseFloat(
             totalPaymentAmount.toFixed(2)
           );
           this.debitVoucherDataRequestModel.netPayable = parseFloat(
@@ -270,9 +270,6 @@ export class ContraVoucherCreationComponent implements OnInit {
           this.debitVoucherDataRequestModel.accountName = undefined;
           this.debitVoucherDataRequestModel.date = undefined;
           this.debitVoucherDataRequestModel.scanSupportingDocument = "";
-          this.debitVoucherDataRequestModel.paymentAmount = parseFloat(
-            totalPaymentAmount.toFixed(2)
-          );
 
           this.debitVoucherDataRequestModel.mANNUM =
             this.ContraVoucherSummaryForm.get("ManualNumber").value;

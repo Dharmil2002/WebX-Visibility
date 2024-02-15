@@ -897,7 +897,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.debitVoucherDataRequestModel.UGST = 0;
         this.debitVoucherDataRequestModel.GSTTotal = this.billingForm.value.GSTAmount;
 
-        this.debitVoucherDataRequestModel.paymentAmt = this.billingForm.value.DeliveryMRNetAmount
+        this.debitVoucherDataRequestModel.GrossAmount = this.billingForm.value.DeliveryMRNetAmount
         this.debitVoucherDataRequestModel.netPayable = this.billingForm.value.CollectionAmount
         this.debitVoucherDataRequestModel.roundOff = this.billingForm.value.roundOffAmt || 0;
         this.debitVoucherDataRequestModel.voucherCanceled = false;

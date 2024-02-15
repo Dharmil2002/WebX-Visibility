@@ -538,7 +538,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.debitVoucherDataRequestModel.tcsRate = undefined;
         this.debitVoucherDataRequestModel.tcsAmount = undefined;
 
-        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+        this.debitVoucherDataRequestModel.GrossAmount = PaymentAmount;
         this.debitVoucherDataRequestModel.netPayable = NetPayable;
         this.debitVoucherDataRequestModel.roundOff = 0;
         this.debitVoucherDataRequestModel.voucherCanceled = false;
@@ -548,7 +548,6 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.debitVoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
         this.debitVoucherDataRequestModel.date = PaymenDetails.Date;
         this.debitVoucherDataRequestModel.scanSupportingDocument = "";
-        this.debitVoucherDataRequestModel.paymentAmount = NetPayable;
 
         var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
           return {

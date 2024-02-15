@@ -24,7 +24,7 @@ export class ManualVoucherComponent implements OnInit {
   TableStyle = "width:100%"
   columnHeader = {
     vNO: {
-      Title: "Voucher No", 
+      Title: "Voucher No",
       class: "matcolumncenter",
       Style: "max-width:200px",
       type: "Link",
@@ -40,7 +40,7 @@ export class ManualVoucherComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    pAMT: {
+    nNETP: {
       Title: "Amount (₹)",
       class: "matcolumncenter",
       Style: "max-width: 120px",
@@ -66,7 +66,7 @@ export class ManualVoucherComponent implements OnInit {
     // "vNO",
     "tTYP",
     "tTDT",
-    "pAMT",
+    "nNETP",
     "eBY",
     "eDT",
     "vCAN"

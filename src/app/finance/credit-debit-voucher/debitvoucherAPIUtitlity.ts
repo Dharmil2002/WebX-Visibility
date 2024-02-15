@@ -1,7 +1,7 @@
 export async function customerFromApi(masterService) {
     const branch = localStorage.getItem("Branch");
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: parseInt(localStorage.getItem('companyCode')),
         collectionName: "customer_detail",
         filter: {}
     }
@@ -17,7 +17,7 @@ export async function customerFromApi(masterService) {
 
 export async function vendorFromApi(masterService) {
     let req = {
-        "companyCode": localStorage.getItem('companyCode'),
+        "companyCode": parseInt(localStorage.getItem('companyCode')),
         "collectionName": "vendor_detail",
         "filter": {}
     }
@@ -34,7 +34,7 @@ export async function vendorFromApi(masterService) {
 export async function UsersFromApi(masterService) {
     const branch = localStorage.getItem("Branch");
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: parseInt(localStorage.getItem('companyCode')),
         collectionName: "user_master",
         filter: {}
     }
@@ -49,7 +49,7 @@ export async function UsersFromApi(masterService) {
 }
 export async function DriversFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: parseInt(localStorage.getItem('companyCode')),
         collectionName: "driver_detail",
         filter: {}
     }
@@ -64,7 +64,7 @@ export async function DriversFromApi(masterService) {
 }
 export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = { vendorCode };
         const req = { companyCode, collectionName: 'vendor_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
@@ -79,7 +79,7 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
 }
 export async function GetSingleCustomerDetailsFromApi(masterService, customerCode) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = { customerCode };
         const req = { companyCode, collectionName: 'customer_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
@@ -97,7 +97,7 @@ export async function GetSingleCustomerDetailsFromApi(masterService, customerCod
 
 export async function GetLocationDetailFromApi(masterService) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = {};
         const req = { companyCode, collectionName: 'location_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
@@ -115,7 +115,7 @@ export async function GetLocationDetailFromApi(masterService) {
 
 export async function GetsachsnFromApi(masterService) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = {};
         const req = { companyCode, collectionName: 'sachsn_master', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
@@ -131,7 +131,7 @@ export async function GetsachsnFromApi(masterService) {
 }
 export async function GetAccountDetailFromApi(masterService, AccountCategoryName, AccountingLocations) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = {
             iSSYS: true,
             cATNM: AccountCategoryName,
@@ -162,7 +162,7 @@ export async function GetDocumentsWiseListFromApi(
     fixedoriginvalue?
 ) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filters = [
             {
                 field: field,
@@ -205,7 +205,7 @@ export async function GetDocumentsWiseListFromApi(
 
 export async function GetBankDetailFromApi(masterService, ApplicationLocations) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = {
             ApplicationLocations: ApplicationLocations,
         };

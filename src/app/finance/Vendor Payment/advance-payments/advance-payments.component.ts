@@ -425,7 +425,7 @@ export class AdvancePaymentsComponent implements OnInit {
       this.snackBarUtilityService.commonToast(async () => {
         try {
 
-          const PaymentAmount = parseFloat(
+          const GrossAmount = parseFloat(
             this.PayableSummaryFilterForm.get("TotalTHCAmount").value
           );
           const NetPayable = parseFloat(
@@ -475,7 +475,7 @@ export class AdvancePaymentsComponent implements OnInit {
           this.debitVoucherDataRequestModel.UGST = 0;
           this.debitVoucherDataRequestModel.GSTTotal = 0;
 
-          this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+          this.debitVoucherDataRequestModel.GrossAmount = GrossAmount;
           this.debitVoucherDataRequestModel.netPayable = NetPayable;
           this.debitVoucherDataRequestModel.roundOff = 0;
           this.debitVoucherDataRequestModel.voucherCanceled = false;
@@ -489,7 +489,6 @@ export class AdvancePaymentsComponent implements OnInit {
           this.debitVoucherDataRequestModel.date =
             this.PaymentSummaryFilterForm.value.Date;
           this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-          this.debitVoucherDataRequestModel.paymentAmount = NetPayable;
 
           const companyCode = this.companyCode;
           const CurrentBranchCode = this.storage.branch;

@@ -313,7 +313,7 @@ export class JournalVoucherCreationComponent implements OnInit {
           this.debitVoucherDataRequestModel.UGST = 0;
           this.debitVoucherDataRequestModel.GSTTotal = 0;
 
-          this.debitVoucherDataRequestModel.paymentAmt = this.totalCredit;
+          this.debitVoucherDataRequestModel.GrossAmount = this.totalCredit;
           this.debitVoucherDataRequestModel.netPayable = this.totalCredit;
           this.debitVoucherDataRequestModel.roundOff = 0;
           this.debitVoucherDataRequestModel.voucherCanceled = false;
@@ -323,7 +323,6 @@ export class JournalVoucherCreationComponent implements OnInit {
           this.debitVoucherDataRequestModel.accountName = undefined;
           this.debitVoucherDataRequestModel.date = undefined;
           this.debitVoucherDataRequestModel.scanSupportingDocument = "";
-          this.debitVoucherDataRequestModel.paymentAmount = this.totalCredit;
 
           this.debitVoucherDataRequestModel.mANNUM = this.JournalVoucherSummaryForm.get("ManualNumber").value;
           this.debitVoucherDataRequestModel.mREFNUM = this.JournalVoucherSummaryForm.get("ReferenceNumber").value;

@@ -803,7 +803,7 @@ export class DebitVoucherComponent implements OnInit {
         this.debitVoucherDataRequestModel.UGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.UGST) || 0;
         this.debitVoucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+        this.debitVoucherDataRequestModel.GrossAmount = PaymentAmount;
         this.debitVoucherDataRequestModel.netPayable = NetPayable;
         this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
         this.debitVoucherDataRequestModel.voucherCanceled = false
@@ -813,7 +813,6 @@ export class DebitVoucherComponent implements OnInit {
         this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
         this.debitVoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
         this.debitVoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
-        this.debitVoucherDataRequestModel.paymentAmount = NetPayable
 
 
         const companyCode = this.companyCode;

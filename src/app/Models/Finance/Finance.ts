@@ -39,7 +39,7 @@ export class DebitVoucherDataRequestModel {
   SGST: number
   CGST: number
   GSTTotal: number
-  paymentAmt: number
+  GrossAmount: number
   netPayable: number
   roundOff: number
   voucherCanceled: boolean
@@ -48,7 +48,6 @@ export class DebitVoucherDataRequestModel {
   accountName: string
   date: string
   scanSupportingDocument: string
-  paymentAmount: number
   mANNUM: string
   mREFNUM: string
   nAR: string;

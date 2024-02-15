@@ -71,7 +71,8 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     "Bill_Sub_At": "Bill Sub At",
     "BusinessType": "Business Type",
     "Total_Taxable_Value": "Total Taxable Value",
-    "SAC": "SAC",
+    "SAC Code": "SAC Code",
+    "SAC Name": "SAC Name",
     "TCS_Rate": "TCS Rate",
     "TCS_Amount": "TCS Amount",
     "GSTRATE": "GSTRATE",
@@ -181,10 +182,12 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
         value: element.vendorCode.toString(),
         type: element.vendorType.toString(),
       }));
-    const sacDet = mergedData.sacData.map(element => ({
-      name: element.SNM,
-      value: element.SID,
-    }));
+      const sacDet = mergedData.sacData
+      .filter(element => element.SNM !== "" && element.SNM !== undefined && element.SNM !== null)
+      .map(element => ({
+        name: element.SNM,
+        value: element.SID,
+      }));    
 
     this.vendorDetailList = venNameDet;
     this.sacList = sacDet;

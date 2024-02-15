@@ -170,11 +170,13 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
         name: element.customerName.toString(),
         value: element.customerCode.toString()
       }));
-    const sacDet = mergedData.sacData.map(element => ({
-      name: element.SNM,
-      value: element.SHCD
-    }));
-  
+
+    const sacDet = mergedData.sacData
+      .filter(element => element.SNM !== "" && element.SNM !== undefined && element.SNM !== null)
+      .map(element => ({
+        name: element.SNM,
+        value: element.SID,
+      }));
 
     const statelist = await this.objStateService.getState();
 

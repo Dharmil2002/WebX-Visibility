@@ -124,24 +124,29 @@ export const getValueFromJsonControl = (jsonControl, name, value) => {
   return null;
 };
 
-export function aggregateData(data, groupByColumns, aggregationRules, fixedColumns) {
+export function aggregateData(data, groupByColumns, aggregationRules, fixedColumns, includeChildItems = false) {
   const groups = {};
 
   for (const item of data) {
     const key = groupByColumns.map(column => item[column] ?? "").join('-');
     if (!groups[key]) {
-      groups[key] = { ...item };
+      groups[key] = { ...item, items: []};
       fixedColumns.forEach(fixedColumn => {
         groups[key][fixedColumn.field] = fixedColumn.calculate(item);
       });
+    }
+    
+    if (includeChildItems) {
+      groups[key].items.push(item);
     }
 
     const group = groups[key];
 
     aggregationRules.forEach(rule => {
       const { inputField, outputField, operation, condition } = rule;
-      if (!group[outputField])
+      if (!group[outputField]) {
         group[outputField] = undefined;
+      }
 
       if (!condition || condition(item)) {
         if (operation === 'sum') {
@@ -156,8 +161,12 @@ export function aggregateData(data, groupByColumns, aggregationRules, fixedColum
   const allowedFields = [
     ...groupByColumns,
     ...aggregationRules.map(rule => rule.outputField),
-    ...fixedColumns.map(column => column.field),
+    ...fixedColumns.map(column => column.field)
   ];
+  
+  if (includeChildItems) {
+    allowedFields.push('items');
+  }
 
   for (const key in groups) {
     if (groups.hasOwnProperty(key)) {

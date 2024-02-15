@@ -174,10 +174,11 @@ export class VehicleLoadingComponent implements OnInit {
   }
 
   async getLoadingSheetData() {
+    if(!this.tripData) return;
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "ls_headers_ltl",
-      "filter":{tHC:this.tripData.TripID,"D$or":[{mFNO:{"D$exists":false}},{mFNO:""}],lOC:this.storage.branch}
+      "filter": { tHC:this.tripData.TripID, "D$or":[{mFNO:{"D$exists":false}}, {mFNO:""}], lOC:this.storage.branch }
     }
     // Call the operationService to get JSON file details from 'arrivalUrl'
     const res= await firstValueFrom(this.operationService.operationPost('generic/get', reqBody));

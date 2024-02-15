@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -29,12 +29,13 @@ export class VehicleUpdateUploadComponent implements OnInit {
   jsonControlArray: any;
   jsonscanControlArray: any;
   shipments = [];
-  scanPackage: string;
+  scanPackage: string = '';
   currentBranch: string = localStorage.getItem("Branch") || '';
   companyCode: number = parseInt(localStorage.getItem('companyCode'));
   userName: string = localStorage.getItem('Username');
   columnHeader = {
     "Shipment": "Shipment",
+    "Suffix": "Suffix",
     "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
@@ -42,7 +43,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "Pending": "Pending",
     "Leg": "Leg",
   };
-  centerAlignedData = ['Shipment', 'Packages', 'loaded', 'Pending'];
+  centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'loaded', 'Pending'];
 
   shipingHeader = {
     "Leg": "Leg",
@@ -89,65 +90,74 @@ export class VehicleUpdateUploadComponent implements OnInit {
   dktDetailFromApi: any;
   packageData: any;
   dktList: any;
+
+  @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
+  
   constructor(
     private Route: Router,
-    private mfService:ManifestService,
+    private mfService: ManifestService,
     private dialog: MatDialog,
     public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
-    private storage:StorageService
+    private storage: StorageService
   ) {
     if (item.LoadingSheet) {
-      
+
       this.shipmentStatus = 'Loaded'
       this.vehicelLoadData = item;
     }
 
     this.getLoadingSheet();
-    this.IntializeFormControl()
+    this.IntializeFormControl()    
   }
 
   ngOnInit(): void {
+    
   }
 
   async getLoadingSheet() {
-  
+
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "ls_headers_ltl",
-      "filter":{cID:this.storage.companyCode,tHC:this.vehicelLoadData.tripId,lSNO:this.vehicelLoadData.LoadingSheet}
+      "filter": { cID: this.storage.companyCode, tHC: this.vehicelLoadData.tripId, lSNO: this.vehicelLoadData.LoadingSheet }
     }
-    const res=  await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqBody));
+    const res = await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqBody));
     const reqDetBody = {
       "companyCode": this.companyCode,
       "collectionName": "ls_details_ltl",
-      "filter":{cID:this.storage.companyCode,lSNO:this.vehicelLoadData.LoadingSheet}
+      "filter": { cID: this.storage.companyCode, lSNO: this.vehicelLoadData.LoadingSheet }
     }
-    const resDetails=  await firstValueFrom(this.operationService.operationMongoPost('generic/get',reqDetBody));
-      if (res.data) {
-        let dataLoading = []
-         res.data.forEach((element: any) => { // Specify the type of 'element' as 'any'
-          let json = {
-            "Leg": element?.lEG.replace(" ", "") || '',
-            "Shipment": element?.tOTDKT || 0,
-            "Packages": parseInt(element?.pKGS) || 0,
-            "WeightKg": parseInt(element?.wT) || 0,
-            "VolumeCFT": parseInt(element?.vCFT) || 0
-          };
-          dataLoading.push(json);
-        });
-        this.shipingDataTable = dataLoading;
-        let docketData = []
-        if(resDetails.data.length>0){
-         this.dktList=resDetails.data.map((x)=>x.dKTNO);
-        resDetails.data.forEach((element: any) => { // Specify the type of 'element' as 'any'
-          let lsDetails = res.data.find((x) => x.lsno === element.lsNo);
+    const resDetails = await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqDetBody));
+    if (res.data) {
+      let dataLoading = []
+      res.data.forEach((element: any) => { // Specify the type of 'element' as 'any'
+        let json = {
+          "Leg": element?.lEG.replace(" ", "") || '',
+          "Shipment": element?.tOTDKT || 0,
+          "Packages": parseInt(element?.pKGS) || 0,
+          "WeightKg": parseInt(element?.wT) || 0,
+          "VolumeCFT": parseInt(element?.vCFT) || 0
+        };
+        dataLoading.push(json);
+      });
+
+      this.shipingDataTable = dataLoading;
+      let docketData = []
+
+      if (resDetails.data.length > 0) {
+
+        this.dktList = resDetails.data.map((x) => `${x.dKTNO}-${x.sFX}`);
+
+        resDetails.data.forEach((element: any) => { // Specify the type of 'element' as 'any'          
+          let lsDetails = res.data.find((x) => x.lSNO === element.lSNO);
           let json = {
             "Shipment": element?.dKTNO || '',
-            "Origin": element?.bLOC || '',
+            "Suffix": element?.sFX || 0,
+            "Origin": element?.bLOC || element?.lOC || '',
             "Destination": element?.dLOC || '',
             "Packages": parseInt(element?.pKGS) || 0,
             "weight": parseInt(element?.wT) || 0,
@@ -160,8 +170,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
         });
         this.loadingTableData = docketData;
       }
-        this.kpiData("")
-      }
+      this.kpiData("")
+    }
     this.getPackagesData();
     this.autoBindData();
   }
@@ -170,34 +180,61 @@ export class VehicleUpdateUploadComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "docket_pkgs_ltl",
-      "filter":{dKTNO:{"D$in":this.dktList},sFX:0,"D$or":[{"mFNO":{"D$exists":false}},{"mFNO":""}]}
+      "filter": { 
+        cID: this.storage.companyCode, 
+        lSNO: this.vehicelLoadData.LoadingSheet,
+        "D$or": [{ "mFNO": { "D$exists": false } }, { "mFNO": "" }] 
+      }
     }
-    const res= await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqBody));
+    const res = await firstValueFrom(this.operationService.operationMongoPost('generic/get', reqBody));
     this.packageData = res.data;
   }
+
   updatePackage() {
-    if(this.scanPackage){
+    if (this.scanPackage) {
       this.tableload = true;
-    // Get the trimmed values of scan and leg
-    const scanValue = this.scanPackage;
-    // Find the unload package based on scan and leg values
-    const loadPackage = this.packageData.find(x => x.pKGSNO.trim() === scanValue.trim());
-    const loading = vehicleLoadingScan(loadPackage, this.loadingTableData)
-    if (loading) {
-      this.kpiData(loading);
+      // Get the trimmed values of scan and leg
+      const scanValue = this.scanPackage;
+      // Find the unload package based on scan and leg values
+      
+      const loadPackage = this.packageData.find(x => x.pKGSNO.trim() === scanValue.trim());    
+      const loading = vehicleLoadingScan(loadPackage, this.loadingTableData)      
+      if (loading) {
+        const { status, ...options}  = loading;
+        if(!status) {
+          Swal.fire( { 
+            ...options,
+            didClose: () => {
+              this.clearAndFocusOnScan();
+            }
+          })
+        }
+        else {
+          this.kpiData(options);
+        }
+      }
+      this.cdr.detectChanges(); // Trigger change detection
+      this.tableload = false;
+      this.clearAndFocusOnScan();
     }
-    this.cdr.detectChanges(); // Trigger change detection
-    this.tableload = false;
-  }
-  else{
-    Swal.fire({
-      icon: "error",
+    else {
+      Swal.fire({
+        icon: "error",
         title: "Scan Package",
         text: `Please Enter Package No`,
         showConfirmButton: true,
-    })
+        didClose: () => {
+          this.clearAndFocusOnScan();
+        }
+      });      
+    }
   }
+
+  clearAndFocusOnScan() {    
+    this.scanPackage = '';
+    this.scanPackageInput.nativeElement.focus();
   }
+
   kpiData(event) {
 
     let packages = 0;
@@ -238,7 +275,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
 
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-
+    
   }
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -263,13 +300,13 @@ export class VehicleUpdateUploadComponent implements OnInit {
     if (exists) {
       packageChecked = this.loadingTableData.every(obj => obj.Packages === obj.loaded);
     }
-    const fieldMapping=await this.mfService.getFieldMapping(this.loadingTableData,this.shipingDataTable,this.vehicelLoadData,this.packageData);
-    const resMf=await this.mfService.createMfDetails(fieldMapping);
+    const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
+    const resMf = await this.mfService.createMfDetails(fieldMapping);
     if (resMf) {
       if (this.shipmentStatus == 'Loaded') {
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
           width: '100%', // Set the desired width
-          data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable,mfNo:resMf} // Pass the data object
+          data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable, mfNo: resMf } // Pass the data object
         });
 
         dialogRef.afterClosed().subscribe(result => {

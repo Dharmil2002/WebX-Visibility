@@ -31,8 +31,7 @@ export class DepartureService {
     private vendor:VendorService
   ) {
   }
-  async getRouteSchedule() {
-    debugger
+  async getRouteSchedule() {    
     try {
       // Fetching route data based on company code and branch location
       const routeData = await this.fetchData(Collections.trip_Route_Schedule, { cLOC: this.storage.branch,iSACT:true });

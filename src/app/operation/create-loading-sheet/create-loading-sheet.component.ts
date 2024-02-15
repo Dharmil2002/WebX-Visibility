@@ -9,7 +9,7 @@ import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { LodingSheetGenerateSuccessComponent } from "../loding-sheet-generate-success/loding-sheet-generate-success.component";
 import { LoadingSheetViewComponent } from "../loading-sheet-view/loading-sheet-view.component";
-import { getVehicleDetailFromApi,updateTracking } from "./loadingSheetCommon";
+import { getVehicleDetailFromApi, updateTracking } from "./loadingSheetCommon";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
@@ -111,7 +111,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   NoDocket: boolean;
   departFlag: boolean = false;
   alldocket: any;
-  isUpdate: boolean=false;
+  isUpdate: boolean = false;
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -121,7 +121,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private storage: StorageService,
-    private loadingSheetService:LoadingSheetService
+    private loadingSheetService: LoadingSheetService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       // Retrieve tripData and shippingData from the navigation state
@@ -142,8 +142,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       if (route) {
         this.navigationService.navigateTo(route, this.tripData);
       }
-      if(this.tripData.Action=="Update Trip"){
-        this.isUpdate=true;
+      if (this.tripData.Action == "Update Trip") {
+        this.isUpdate = true;
       }
 
     }
@@ -214,7 +214,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.lsDetails = lsDetail[lsDetail.length - 1];
       this.departFlag = true;
       this.getCapacity();
-      if(!this.tripData.VehicleNo){
+      if (!this.tripData.VehicleNo) {
         this.GetVehicleDropDown();
       }
     } else {
@@ -281,7 +281,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   // Function to retrieve shipment data
   async getshipmentData() {
-  
+
     if (!this.isShipmentUpdate) {
       let routeDetail =
         this.tripData?.RouteandSchedule.split(":")[1].split("-");
@@ -291,495 +291,494 @@ export class CreateLoadingSheetComponent implements OnInit {
       // Update route details if shipment is not being updated
     }
     const [orgn, ...nextLocs] = this.tripData?.RouteandSchedule.split(":")[1].split("-");
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "dockets_ltl",
-      filter: {
-        oRGN: this.orgBranch,
-        iSCOM: true,
-        'D$or': [{ lSNO: { "D$exists": false } }, { lSNO: "" }],
-      }
-    };
-    const res = await firstValueFrom(this._operationService.operationMongoPost("generic/get", req));
-    if (res.data.length > 0) {
-      this.shipmentData=res.data.map((x) => {
+   
+    const res = await this.loadingSheetService.getDocketsForLoadingSheet(nextLocs);
+    if (res.data.length > 0) 
+    {
+      this.shipmentData = res.data.map((x) => {
         x.pKGS = parseInt(x.pKGS || 0);
-        x.cHRWT = parseFloat(x.cHRWT   || 0);
+        x.aCTWT = parseFloat(x.aCTWT || 0);
+        x.cHRWT = parseFloat(x.cHRWT || 0);
         x.cFTTOT = parseFloat(x.cFTTOT || 0);
         x.dktCount = 1;
-        x.orgLoc=x.oRGN;
+        x.curLoc = x.cLOC;
+        x.orgLoc = x.oRGN;
         x.destLoc = x.dEST;
         return x;
       }).filter(f => nextLocs.includes(f.destLoc));
     }
-    const gropuColumns = ['orgLoc', 'destLoc'];
+
+    const gropuColumns = ['curLoc', 'destLoc'];
     const aggregationRules = [
       { outputField: 'count', inputField: 'dktCount', operation: 'sum' },
       { outputField: 'packages', inputField: 'pKGS', operation: 'sum' },
-      { outputField: 'weightKg', inputField: 'cHRWT', operation: 'sum' },
+      { outputField: 'weightKg', inputField: 'aCTWT', operation: 'sum' },
       { outputField: 'volumeCFT', inputField: 'cFTTOT', operation: 'sum' },
     ];
     const fixedColumn = [
-      { field: 'leg', calculate: item => { return `${item.orgLoc}-${item.destLoc}` } }
+      { field: 'leg', calculate: item => { return `${item.curLoc}-${item.destLoc}` } }
     ];
-    let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn);
-    let dockets = [];
-    aggData = aggData.map((l: any) => {
-      let docs = this.shipmentData.filter(f => f.orgLoc == l.orgLoc && f.destLoc == l.destLoc);
-      //l.Dockets = docs;
-      dockets.push(...docs);
-      return l;
-    });
 
-    //Here i user cnoteDetails varible to used in updateDocketDetails() method
-    this._cnoteService.setShipingData(dockets);
-    this.alldocket = dockets;
-    this.cnoteDetails = dockets;
-    const groupedShipments = aggData;
-    if (groupedShipments.length > 0) {
-      this.tableload = false;
-    } else {
-      this.departFlag = true;
-    }
-   groupedShipments.forEach(item => {
-      if (item['extra'] && Array.isArray(item['extra'])) {
-        item['extra'] .forEach(subItem => {
-          subItem.isSelected = true;
-        });
+    if(this.shipmentData && this.shipmentData.length > 0) {
+      let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn, true);
+      let dockets = [];
+      aggData = aggData.map((l: any) => {
+        let docs = this.shipmentData.filter(f => f.curLoc == l.curLoc && f.destLoc == l.destLoc);
+        //l.Dockets = docs;
+        dockets.push(...docs);
+        return l;
+      });
+   
+
+      //Here i user cnoteDetails varible to used in updateDocketDetails() method
+      this._cnoteService.setShipingData(dockets);
+      this.alldocket = dockets;
+      this.cnoteDetails = dockets;
+      const groupedShipments = aggData;
+      if (groupedShipments.length > 0) {
+        this.tableload = false;
+      } else {
+        this.departFlag = true;
       }
-    });
-    this.tableData =groupedShipments
-
-}
-ngOnDestroy(): void {
-  this._cnoteService.setShipingData([]);
-  // Perform cleanup, unsubscribe from observables, etc.
-}
-  async loadingSheetGenerate() {
-  const shipment = this.tableData.filter((x) => x.isSelected);
-  if(shipment.length==0){
-    SwalerrorMessage("error", "Please Select Any one Record", "", true);
-    return false;
-  }
-  const lsForm = this.loadingSheetTableForm.value;
-  if(this.isUpdate&&this.tripData.TripID){
-    const tripData= await this.loadingSheetService.updatetripFieldMapping(lsForm,shipment);
-    const lsDetails= await this.loadingSheetService.updateLoadingSheet(tripData);
-    this.tableData.forEach((ls) => {
-    const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
-    // Check if a matching detail was found
-    if (matchingDetail) {
-        // If found, update the LoadingSheet and Action for the current ls
-        ls.LoadingSheet = matchingDetail.lSNO;
-        ls.Action = "Print";
+      groupedShipments.forEach(item => {
+        if (item['items'] && Array.isArray(item['items'])) {
+          item['items'].forEach(subItem => {
+            subItem.isSelected = true;
+          });
+        }
+      });
+      this.tableData = groupedShipments
     }
-    });
   }
-  else{
-     const tripData=await this.loadingSheetService.tripFieldMapping(lsForm,shipment);
-     const lsDetails= await this.loadingSheetService.createLoadingSheet(tripData);
-     this.tableData.forEach((ls) => {
-      const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
-      // Check if a matching detail was found
-      if (matchingDetail) {
+  ngOnDestroy(): void {
+    this._cnoteService.setShipingData([]);
+    // Perform cleanup, unsubscribe from observables, etc.
+  }
+  async loadingSheetGenerate() {
+    const shipment = this.tableData.filter((x) => x.isSelected);
+    if (shipment.length == 0) {
+      SwalerrorMessage("error", "Please Select Any one Record", "", true);
+      return false;
+    }
+    const lsForm = this.loadingSheetTableForm.value;
+    if (this.isUpdate && this.tripData.TripID) {
+      const tripData = await this.loadingSheetService.updatetripFieldMapping(lsForm, shipment);
+      const lsDetails = await this.loadingSheetService.updateLoadingSheet(tripData);
+      this.tableData.forEach((ls) => {
+        const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
+        // Check if a matching detail was found
+        if (matchingDetail) {
           // If found, update the LoadingSheet and Action for the current ls
           ls.LoadingSheet = matchingDetail.lSNO;
           ls.Action = "Print";
-      }
-     });
+        }
+      });
+    }
+    else {
+      const tripData = await this.loadingSheetService.tripFieldMapping(lsForm, shipment);
+      const lsDetails = await this.loadingSheetService.createLoadingSheet(tripData);
+      this.tableData.forEach((ls) => {
+        const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
+        // Check if a matching detail was found
+        if (matchingDetail) {
+          // If found, update the LoadingSheet and Action for the current ls
+          ls.LoadingSheet = matchingDetail.lSNO;
+          ls.Action = "Print";
+        }
+      });
 
+    }
+    const data = this.tableData.filter((x) => x.LoadingSheet != "")
+    const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+      this.dialog.open(LodingSheetGenerateSuccessComponent, {
+        width: "100%", // Set the desired width
+        data: this.tableData.filter((x) => x.hasOwnProperty('LoadingSheet')), // Pass the data object
+      });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.goBack('Departures');
+      // Handle the result after the dialog is closed
+    });
+    // this.isSubmit = true;
+    // const loadedData = this.tableData.filter((x) => x.isSelected)
+    // this.loadingData = loadedData;
+    // if (!this.loadingSheetTableForm.value.vehicle) {
+    //   SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
+    // } else {
+    //   if (loadedData) {
+    //     loadedData.forEach(obj => {
+    //       let randomNumber = "LS/" + this.orgBranch + "/" + runningNumber();
+    //       obj.LoadingSheet = randomNumber;
+    //       obj.Action = "Print";
+    //     });
+    //     this.addTripData();
+
+    //   } else {
+    //     SwalerrorMessage("error", "Please Select Any one Record", "", true);
+    //   }
+    // }
   }
-  const data=this.tableData.filter((x)=>x.LoadingSheet!="")
-  const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
-    this.dialog.open(LodingSheetGenerateSuccessComponent, {
-      width: "100%", // Set the desired width
-      data: this.tableData.filter((x)=>x.hasOwnProperty('LoadingSheet')), // Pass the data object
-    });
 
-  dialogRef.afterClosed().subscribe((result) => {
-    this.goBack('Departures');
-    // Handle the result after the dialog is closed
-  });
-  // this.isSubmit = true;
-  // const loadedData = this.tableData.filter((x) => x.isSelected)
-  // this.loadingData = loadedData;
-  // if (!this.loadingSheetTableForm.value.vehicle) {
-  //   SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
-  // } else {
-  //   if (loadedData) {
-  //     loadedData.forEach(obj => {
-  //       let randomNumber = "LS/" + this.orgBranch + "/" + runningNumber();
-  //       obj.LoadingSheet = randomNumber;
-  //       obj.Action = "Print";
-  //     });
-  //     this.addTripData();
+  updateLoadingData(event) {
+    if (event) {
+      let totalPackages = 0, totalWeightKg = 0, totalVolumeCFT = 0;
+      // Calculate totals in a single iteration
+      event.forEach(item => {
+        totalPackages += item.pKGS;
+        totalWeightKg += item.aCTWT;
+        totalVolumeCFT += item.cFTTOT;
+      });
+      this.tableData.forEach(row => {
+        if (row.leg.trim() === event[0].leg.trim()) {
+          row.count = event.length;
+          row.weightKg = totalWeightKg;
+          row.volumeCFT = totalVolumeCFT;
+          row.packages = totalPackages;
 
-  //   } else {
-  //     SwalerrorMessage("error", "Please Select Any one Record", "", true);
-  //   }
-  // }
-}
-
-updateLoadingData(event) {
-  if (event) {
-    let totalPackages = 0, totalWeightKg = 0, totalVolumeCFT = 0;
-    // Calculate totals in a single iteration
-    event.forEach(item => {
-      totalPackages += item.pKGS;
-      totalWeightKg += item.aCTWT;
-      totalVolumeCFT += item.cFTTOT;
-    });
-    this.tableData.forEach(row => {
-      if (row.leg.trim() === event[0].leg.trim()) {
-        row.count = event.length;
-        row.weightKg = totalWeightKg;
-        row.volumeCFT = totalVolumeCFT;
-        row.packages = totalPackages;
-
-        // Update isSelected based on event data
-        row.extra.forEach(detail => {
-          detail.isSelected = event.some(e => e.dKTNO === detail.dKTNO);
-        });
-      }
-    });
+          // Update isSelected based on event data
+          row.items.forEach(detail => {
+            detail.isSelected = event.some(e => e.dKTNO === detail.dKTNO);
+          });
+        }
+      });
+    }
+    this.getCapacity();
   }
-  this.getCapacity();
-}
 
 
-// get vehicleNo
-GetVehicleDropDown() {
-  const vehRequest = {
-    companyCode: this.companyCode,
-    collectionName: "vehicle_status",
-    filter: {status:"Available",currentLocation:this.storage.branch}
-  };
+  // get vehicleNo
+  GetVehicleDropDown() {
+    const vehRequest = {
+      companyCode: this.companyCode,
+      collectionName: "vehicle_status",
+      filter: { status: "Available", currentLocation: this.storage.branch }
+    };
 
-  // Fetch data from the JSON endpoint
-  this._operationService
-    .operationMongoPost("generic/get", vehRequest)
-    .subscribe((res) => {
-      if (res) {
+    // Fetch data from the JSON endpoint
+    this._operationService
+      .operationMongoPost("generic/get", vehRequest)
+      .subscribe((res) => {
+        if (res) {
 
-        let vehicleDetails = res.data.map((x) => {
+          let vehicleDetails = res.data.map((x) => {
             return { name: x.vehNo, value: x.vehNo };
           });
 
-        this.filter.Filter(
-          this.jsonControlArray,
-          this.loadingSheetTableForm,
-          vehicleDetails,
-          this.vehicleNoControlName,
-          this.vehicleControlStatus
-        );
-      }
-    });
-}
+          this.filter.Filter(
+            this.jsonControlArray,
+            this.loadingSheetTableForm,
+            vehicleDetails,
+            this.vehicleNoControlName,
+            this.vehicleControlStatus
+          );
+        }
+      });
+  }
 
   //Add tripData
   async addTripData() {
-  if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
-    const randomNumber =
-      "TH/" +
-      this.orgBranch +
-      "/" +
-      runningNumber();
+    if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
+      const randomNumber =
+        "TH/" +
+        this.orgBranch +
+        "/" +
+        runningNumber();
 
-    this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
-    // Generate and set a random tripID if not already set
-  }
-  let tripDetails = {
-    startTime: new Date(),
-    vehicleNo: this.loadingSheetTableForm.value.vehicle.value,
-    tripId: this.loadingSheetTableForm.value.tripID,
-    status: "Vehicle Loading",
-    updateBy: this.userName,
-    updateDate: new Date().toISOString()
-  };
-  const reqBody = {
-    companyCode: this.companyCode,
-    collectionName: "trip_detail",
-    filter: { _id: this.tripData.id },
-    update: {
-      ...tripDetails,
-    },
-  };
-  try {
-    // Await the API call's response before proceeding
-    const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
-    if (res) {
-      // If response is successful, call the next function
-      await this.getDetailsByLeg();
+      this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
+      // Generate and set a random tripID if not already set
     }
-  } catch (error) {
-    // Handle any errors that might occur during the API call
-    console.error('Error occurred during the API call:', error);
+    let tripDetails = {
+      startTime: new Date(),
+      vehicleNo: this.loadingSheetTableForm.value.vehicle.value,
+      tripId: this.loadingSheetTableForm.value.tripID,
+      status: "Vehicle Loading",
+      updateBy: this.userName,
+      updateDate: new Date().toISOString()
+    };
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "trip_detail",
+      filter: { _id: this.tripData.id },
+      update: {
+        ...tripDetails,
+      },
+    };
+    try {
+      // Await the API call's response before proceeding
+      const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
+      if (res) {
+        // If response is successful, call the next function
+        await this.getDetailsByLeg();
+      }
+    } catch (error) {
+      // Handle any errors that might occur during the API call
+      console.error('Error occurred during the API call:', error);
+    }
   }
-}
   async getDetailsByLeg() {
-  for (const leg of this.loadingData) {
-    const [org_loc, destination] = leg.leg.split("-").map(part => part.trim());
+    for (const leg of this.loadingData) {
+      const [org_loc, destination] = leg.leg.split("-").map(part => part.trim());
 
-    const matchingShipments = this.cnoteDetails.filter(
-      shipment =>
-        shipment.orgLoc === org_loc &&
-        shipment.destination.split(":")[1].trim() === destination
-    );
-
-    await this.addLsDetails(leg);
-
-    if (matchingShipments.length > 0) {
-      const updatePromises = matchingShipments.map(matchingShipment =>
-        this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet)
+      const matchingShipments = this.cnoteDetails.filter(
+        shipment =>
+          shipment.orgLoc === org_loc &&
+          shipment.destination.split(":")[1].trim() === destination
       );
-      await Promise.all(updatePromises);
-    }
-  }
-  this.isSubmit = false;
-  // Add your message here
-  const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
-    this.dialog.open(LodingSheetGenerateSuccessComponent, {
-      width: "100%", // Set the desired width
-      data: this.loadingData, // Pass the data object
-    });
 
-  dialogRef.afterClosed().subscribe((result) => {
-    this.goBack('Departures');
-    // Handle the result after the dialog is closed
-  });
-}
+      await this.addLsDetails(leg);
+
+      if (matchingShipments.length > 0) {
+        const updatePromises = matchingShipments.map(matchingShipment =>
+          this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet)
+        );
+        await Promise.all(updatePromises);
+      }
+    }
+    this.isSubmit = false;
+    // Add your message here
+    const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+      this.dialog.open(LodingSheetGenerateSuccessComponent, {
+        width: "100%", // Set the desired width
+        data: this.loadingData, // Pass the data object
+      });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.goBack('Departures');
+      // Handle the result after the dialog is closed
+    });
+  }
 
   async updateDocketDetails(docket, lsNo) {
-  let loadingSheetData = {
-    lsNo: lsNo
-  };
-  const trackingDocket = {
-    lsNo: lsNo,
-    tripId: this.loadingSheetTableForm.value.tripID,
-    vehNo: this.loadingSheetTableForm.controls["vehicle"].value?.value || "",
-    route: this.tripData?.RouteandSchedule || "",
-    dktNo: docket
-  };
+    let loadingSheetData = {
+      lsNo: lsNo
+    };
+    const trackingDocket = {
+      lsNo: lsNo,
+      tripId: this.loadingSheetTableForm.value.tripID,
+      vehNo: this.loadingSheetTableForm.controls["vehicle"].value?.value || "",
+      route: this.tripData?.RouteandSchedule || "",
+      dktNo: docket
+    };
 
-  try {
-    await Promise.all([
-      await updateTracking(this.companyCode, this._operationService, trackingDocket),
-      await this.updateOperationService(docket, loadingSheetData)
-    ]);
-  } catch (error) {
-    console.error('Error occurred during the API call:', error);
-  }
-}
-  async addLsDetails(leg) {
-  const lsDetails = {
-    _id: leg.LoadingSheet,
-    lsno: leg.LoadingSheet,
-    leg: leg.leg,
-    vehno: this.loadingSheetTableForm.value.vehicle.value,
-    tripId: this.loadingSheetTableForm.value?.tripID,
-    location: this.orgBranch,
-    pacakges: leg.packages,
-    weightKg: leg.weightKg,
-    volumeCFT: leg.volumeCFT,
-    entryBy: this.userName,
-    loadedKg: parseFloat(this.loadingSheetTableForm.value.LoadedKg),
-    loadedVolumeCft: parseFloat(this.loadingSheetTableForm.value.LoadedvolumeCFT),
-    loadAddedKg: parseFloat(this.loadingSheetTableForm.value.LoadaddedKg),
-    WeightUtilization: parseFloat(this.loadingSheetTableForm.value.WeightUtilization),
-    volumeUtilization: parseFloat(this.loadingSheetTableForm.value.VolumeUtilization),
-    capacity: this.loadingSheetTableForm.value?.Capacity || 0,
-    capacityVolumeCFT: this.loadingSheetTableForm.value?.CapacityVolumeCFT || 0,
-    volumeAddedCFT: this.loadingSheetTableForm.value?.VolumeaddedCFT || 0,
-    entryDate: new Date().toISOString()
-  };
-  const reqBody = {
-    companyCode: this.companyCode,
-    collectionName: "loadingSheet_detail",
-    data: lsDetails,
-  };
-  try {
-    const res = await this._operationService.operationMongoPost("generic/create", reqBody).toPromise();
-    if (res) {
-      // Perform any necessary actions after the API call
-    }
-  } catch (error) {
-    console.error('Error occurred during the API call:', error);
-  }
-}
-updateVehicleStatus() {
-
-  const vehicleDetails = {
-    status: "On Transit",
-    tripId: this.loadingSheetTableForm.value?.tripID,
-    route: this.tripData?.RouteandSchedule
-  };
-  const reqBody = {
-    companyCode: this.companyCode,
-    collectionName: "vehicle_status",
-    filter: { _id: this.loadingSheetTableForm.value.vehicle.value },
-    update: {
-      ...vehicleDetails,
-    },
-  };
-  this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
-    next: (res: any) => {
-      if (res) {
-
-      }
-    },
-  });
-}
-  async loadVehicleDetails() {
-  try {
-    const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
-    this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
-    this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
-    this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
-    this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
-  } catch (error) {
-  }
-}
-goBack(tabIndex: string): void {
-  this.navigationService.navigateTotab(
-    tabIndex,
-    "/dashboard/Index"
-  );
-}
-
-getCapacity() {
-  // Check if this.loadingData is empty
-  // Set all values to 0
-  this.loadingSheetTableForm.controls['LoadedKg'].setValue(0);
-  this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(0);
-  this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(0);
-  this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(0);
-  this.loadingSheetTableForm.controls['WeightUtilization'].setValue(0);
-  this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(0);
-  if (this.lsDetails) {
-    this.loadingSheetTableForm.controls['LoadedKg'].setValue(this.lsDetails?.loadedKg || 0);
-    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(this.lsDetails?.loadedVolumeCft || 0);
-  }
-  // Calculate the previously loaded values from the form
-  let loadedKgInput = parseInt(this.loadingSheetTableForm.value?.LoadedKg || 0);
-  let loadedCftInput = parseInt(this.loadingSheetTableForm.value?.LoadedvolumeCFT || 0);
-
-  // Initialize these variables to zero
-  let loadAddedKg = 0;
-  let volAddedCft = 0;
-
-  const processedLegs = new Set();
-
-  this.tableData.forEach(element => {
-    if (element?.isSelected) {
-      // Check if the leg has been processed already
-      if (!processedLegs.has(element?.leg)) {
-        const weightKg = parseInt(element?.weightKg) || 0;
-        const volumeCFT = parseInt(element?.volumeCFT) || 0;
-
-        loadAddedKg += isNaN(weightKg) ? 0 : weightKg;
-        volAddedCft += isNaN(volumeCFT) ? 0 : volumeCFT;
-
-        // Mark the leg as processed
-        processedLegs.add(element?.leg);
-      }
-    }
-  });
-
-  // Calculate the total loaded values, including previously loaded values
-  loadedKgInput += loadAddedKg;
-  loadedCftInput += volAddedCft;
-
-  // Set NaN values to 0
-  loadedKgInput = isNaN(loadedKgInput) ? 0 : loadedKgInput;
-  loadedCftInput = isNaN(loadedCftInput) ? 0 : loadedCftInput;
-
-  let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
-  let loadedTons = loadedKgInput / 1000;
-  let percentage = (loadedTons * 100) / capacityTons;
-  // Update the form controls with the calculated values
-  this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(isNaN(loadAddedKg) ? 0 : loadAddedKg);
-  this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(isNaN(volAddedCft) ? 0 : volAddedCft);
-  this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(isNaN(loadedCftInput) ? 0 : loadedCftInput);
-  this.loadingSheetTableForm.controls['LoadedKg'].setValue(isNaN(loadedKgInput) ? 0 : loadedKgInput);
-  this.loadingSheetTableForm.controls['WeightUtilization'].setValue(isNaN(percentage) ? 0 : percentage.toFixed(2));
-  const volumeUtilization = loadedCftInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityVolumeCFT'].value);
-  this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(isNaN(volumeUtilization) ? 0 : volumeUtilization.toFixed(2));
-  if (percentage > 100 || volumeUtilization > 100) {
-    let errorMessage = "Capacity has been exceeded.";
-
-    if (volumeUtilization > 100) {
-      errorMessage = "Cubic feet volume is greater than vehicle volume.";
-    }
-
-    Swal.fire({
-      icon: "error",
-      title: "Capacity Exceeded",
-      text: errorMessage,
-      showConfirmButton: true,
-    });
-    this.loadingData.forEach((loadingItem) => {
-      this.tableData = this.tableData.map((tableItem) => {
-        if (loadingItem.leg === tableItem.leg) {
-          return { ...tableItem, isSelected: false };
-        }
-        return tableItem;
-      });
-    });
-
-
-  }
-
-
-}
-  async departVehicle() {
-  const vehicleValue = this.loadingSheetTableForm.controls["vehicle"].value.value;
-  if (vehicleValue) {
     try {
-      if(this.isUpdate){
-        const lsForm = this.loadingSheetTableForm.value;
-        await this.loadingSheetService.departUpdate(lsForm);
-      }
-      else{
-      const lsForm = this.loadingSheetTableForm.value;
-      const departField= await this.loadingSheetService.departVehicle(lsForm);
-      await this.loadingSheetService.depart(departField);
-      }
-      Swal.fire({
-        icon: "info",
-        title: "Departure",
-        text: "Vehicle is ready to depart",
-        showConfirmButton: true,
-      });
-
-      this.goBack('Departures');
+      await Promise.all([
+        await updateTracking(this.companyCode, this._operationService, trackingDocket),
+        await this.updateOperationService(docket, loadingSheetData)
+      ]);
     } catch (error) {
       console.error('Error occurred during the API call:', error);
     }
-  } else {
-    SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
   }
-}
-  async updateOperationService(docket, loadingSheetData) {
-  const reqBody = {
-    companyCode: this.companyCode,
-    collectionName: "docket",
-    filter: {
-      docketNumber: docket,
-    },
-    update: {
-      ...loadingSheetData
+  async addLsDetails(leg) {
+    const lsDetails = {
+      _id: leg.LoadingSheet,
+      lsno: leg.LoadingSheet,
+      leg: leg.leg,
+      vehno: this.loadingSheetTableForm.value.vehicle.value,
+      tripId: this.loadingSheetTableForm.value?.tripID,
+      location: this.orgBranch,
+      pacakges: leg.packages,
+      weightKg: leg.weightKg,
+      volumeCFT: leg.volumeCFT,
+      entryBy: this.userName,
+      loadedKg: parseFloat(this.loadingSheetTableForm.value.LoadedKg),
+      loadedVolumeCft: parseFloat(this.loadingSheetTableForm.value.LoadedvolumeCFT),
+      loadAddedKg: parseFloat(this.loadingSheetTableForm.value.LoadaddedKg),
+      WeightUtilization: parseFloat(this.loadingSheetTableForm.value.WeightUtilization),
+      volumeUtilization: parseFloat(this.loadingSheetTableForm.value.VolumeUtilization),
+      capacity: this.loadingSheetTableForm.value?.Capacity || 0,
+      capacityVolumeCFT: this.loadingSheetTableForm.value?.CapacityVolumeCFT || 0,
+      volumeAddedCFT: this.loadingSheetTableForm.value?.VolumeaddedCFT || 0,
+      entryDate: new Date().toISOString()
+    };
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "loadingSheet_detail",
+      data: lsDetails,
+    };
+    try {
+      const res = await this._operationService.operationMongoPost("generic/create", reqBody).toPromise();
+      if (res) {
+        // Perform any necessary actions after the API call
+      }
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
     }
-  };
+  }
+  updateVehicleStatus() {
 
-  try {
-    const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
-    if (res) {
-      await this.updateVehicleStatus();
-    }
-  } catch (error) {
-    console.error('Error occurred during the API call:', error);
+    const vehicleDetails = {
+      status: "On Transit",
+      tripId: this.loadingSheetTableForm.value?.tripID,
+      route: this.tripData?.RouteandSchedule
+    };
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "vehicle_status",
+      filter: { _id: this.loadingSheetTableForm.value.vehicle.value },
+      update: {
+        ...vehicleDetails,
+      },
+    };
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+
+        }
+      },
+    });
   }
-}
+  async loadVehicleDetails() {
+    try {
+      const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
+      this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
+      this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
+      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
+      this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
+    } catch (error) {
+    }
+  }
+  goBack(tabIndex: string): void {
+    this.navigationService.navigateTotab(
+      tabIndex,
+      "/dashboard/Index"
+    );
+  }
+
+  getCapacity() {
+    // Check if this.loadingData is empty
+    // Set all values to 0
+    this.loadingSheetTableForm.controls['LoadedKg'].setValue(0);
+    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(0);
+    this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(0);
+    this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(0);
+    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(0);
+    this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(0);
+    if (this.lsDetails) {
+      this.loadingSheetTableForm.controls['LoadedKg'].setValue(this.lsDetails?.loadedKg || 0);
+      this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(this.lsDetails?.loadedVolumeCft || 0);
+    }
+    // Calculate the previously loaded values from the form
+    let loadedKgInput = parseInt(this.loadingSheetTableForm.value?.LoadedKg || 0);
+    let loadedCftInput = parseInt(this.loadingSheetTableForm.value?.LoadedvolumeCFT || 0);
+
+    // Initialize these variables to zero
+    let loadAddedKg = 0;
+    let volAddedCft = 0;
+
+    const processedLegs = new Set();
+
+    this.tableData.forEach(element => {
+      if (element?.isSelected) {
+        // Check if the leg has been processed already
+        if (!processedLegs.has(element?.leg)) {
+          const weightKg = parseInt(element?.weightKg) || 0;
+          const volumeCFT = parseInt(element?.volumeCFT) || 0;
+
+          loadAddedKg += isNaN(weightKg) ? 0 : weightKg;
+          volAddedCft += isNaN(volumeCFT) ? 0 : volumeCFT;
+
+          // Mark the leg as processed
+          processedLegs.add(element?.leg);
+        }
+      }
+    });
+
+    // Calculate the total loaded values, including previously loaded values
+    loadedKgInput += loadAddedKg;
+    loadedCftInput += volAddedCft;
+
+    // Set NaN values to 0
+    loadedKgInput = isNaN(loadedKgInput) ? 0 : loadedKgInput;
+    loadedCftInput = isNaN(loadedCftInput) ? 0 : loadedCftInput;
+
+    let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
+    let loadedTons = loadedKgInput / 1000;
+    let percentage = (loadedTons * 100) / capacityTons;
+    // Update the form controls with the calculated values
+    this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(isNaN(loadAddedKg) ? 0 : loadAddedKg);
+    this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(isNaN(volAddedCft) ? 0 : volAddedCft);
+    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(isNaN(loadedCftInput) ? 0 : loadedCftInput);
+    this.loadingSheetTableForm.controls['LoadedKg'].setValue(isNaN(loadedKgInput) ? 0 : loadedKgInput);
+    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(isNaN(percentage) ? 0 : percentage.toFixed(2));
+    const volumeUtilization = loadedCftInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityVolumeCFT'].value);
+    this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(isNaN(volumeUtilization) ? 0 : volumeUtilization.toFixed(2));
+    if (percentage > 100 || volumeUtilization > 100) {
+      let errorMessage = "Capacity has been exceeded.";
+
+      if (volumeUtilization > 100) {
+        errorMessage = "Cubic feet volume is greater than vehicle volume.";
+      }
+
+      Swal.fire({
+        icon: "error",
+        title: "Capacity Exceeded",
+        text: errorMessage,
+        showConfirmButton: true,
+      });
+      this.loadingData.forEach((loadingItem) => {
+        this.tableData = this.tableData.map((tableItem) => {
+          if (loadingItem.leg === tableItem.leg) {
+            return { ...tableItem, isSelected: false };
+          }
+          return tableItem;
+        });
+      });
+
+
+    }
+
+
+  }
+  async departVehicle() {
+    const vehicleValue = this.loadingSheetTableForm.controls["vehicle"].value.value;
+    if (vehicleValue) {
+      try {
+        if (this.isUpdate) {
+          const lsForm = this.loadingSheetTableForm.value;
+          await this.loadingSheetService.departUpdate(lsForm);
+        }
+        else {
+          const lsForm = this.loadingSheetTableForm.value;
+          const departField = await this.loadingSheetService.departVehicle(lsForm);
+          await this.loadingSheetService.depart(departField);
+        }
+        Swal.fire({
+          icon: "info",
+          title: "Departure",
+          text: "Vehicle is ready to depart",
+          showConfirmButton: true,
+        });
+
+        this.goBack('Departures');
+      } catch (error) {
+        console.error('Error occurred during the API call:', error);
+      }
+    } else {
+      SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
+    }
+  }
+  async updateOperationService(docket, loadingSheetData) {
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "docket",
+      filter: {
+        docketNumber: docket,
+      },
+      update: {
+        ...loadingSheetData
+      }
+    };
+
+    try {
+      const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
+      if (res) {
+        await this.updateVehicleStatus();
+      }
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
+    }
+  }
 
 
 }

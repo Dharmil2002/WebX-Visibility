@@ -43,17 +43,21 @@ Currently, all flows are working together without proper separation.
   columnHeader = {
     "checkBoxRequired": "",
     "dKTNO": "Shipment",
+    "sFX": "Suffix",
+    "cLOC": "Current Location",
     "oRGN": "Origin",
     "dEST": "Destination",
     "pKGS": "Packages",
     "aCTWT": "Weight",
     "cFTTOT": "Volume",
   };
-  centerAlignedData = ['Shipment', 'Packages', 'KgWeight', 'CftVolume'];
+  centerAlignedData = ['Shipment','Suffix', 'Packages', 'KgWeight', 'CftVolume'];
 
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "dKTNO": "Shipment",
+    "sFX": "Suffix",
+    "cLOC": "Current Location",
     "oRGN": "Origin",
     "dEST": "Destination",
     "pKGS": "Packages",
@@ -99,7 +103,7 @@ Currently, all flows are working together without proper separation.
   }
 
   getLoadingSheetDetails() {
-    this.tableData = this.loadingSheet.extra.map(x => {
+    this.tableData = this.loadingSheet.items.map(x => {
       return { ...x, leg: this.loadingSheet.leg };
   });
   

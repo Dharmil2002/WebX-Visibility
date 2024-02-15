@@ -5,7 +5,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import moment from "moment";
-import { DocketStatus } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus } from "src/app/Models/docStatus";
 
 @Injectable({
     providedIn: "root",
@@ -47,7 +47,7 @@ export class ManifestService {
                     "cID": this.storage.companyCode,
                     "mFNO": "",
                     "dKTNO": element?.Shipment || "",
-                    "sFX": 0,
+                    "sFX": element?.Suffix || 0,
                     "oRGN": element?.Origin || "",
                     "dEST": element?.Destination || "",
                     "pKGS": parseInt(element?.Packages) || 0,
@@ -65,10 +65,10 @@ export class ManifestService {
                     _id: ``,
                     cID:this.storage.companyCode,
                     dKTNO:element?.Shipment||"",
-                    sFX: 0,
+                    sFX: element?.Suffix || 0,
                     lOC:this.storage.branch,
-                    eVNID:'EVN0003',
-                    eVNDES:'Manifest Generated',
+                    eVNID: DocketEvents.Menifest_Generation,
+                    eVNDES:DocketEvents[DocketEvents.Menifest_Generation].replace(/_/g," "),
                     eVNDT:new Date(),
                     eVNSRC:'Manifest Generated',
                     dOCTY: 'MF',
@@ -93,7 +93,7 @@ export class ManifestService {
                 "cID":this.storage.companyCode,
                 "mFNO": "",
                 "dKTNO":x?.dKTNO||"",
-                "sFX": 0,
+                "sFX": x?.sFX||0,
                 "pKGSNO":x?.pKGSNO||"",  
                 "iSARR": false,
                 "eNTDT":new Date(),

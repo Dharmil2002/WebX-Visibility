@@ -28,16 +28,6 @@ export enum CustomerBillStatus {
     Collected = 5,
     Cancelled = 9
 }
-
-export enum VehicleStatus {
-    Available= 1,
-    Awaiting_Loading= 2,
-    Awaiting_Departure= 3,
-    Departed= 4,
-    Arrived= 5,
-    Unloaded= 6
-}
-
 export enum DocketEvents {
     QuickBooking = "EVN0001",
     Booking = "EVN0001",
@@ -50,3 +40,21 @@ export enum DocketEvents {
     DRS_Upload = "EVN0008",
     Delivery_Update = "EVN0009"
 };
+export enum VehicleStatus {
+    Available= 1,
+    Awaiting_Loading= 2,
+    Awaiting_Departure= 3,
+    Departed= 4,
+    Arrived= 5,
+    Unloaded= 6
+}
+
+export function getEnumNameByValue(enumObj: any, value: string): string | null {
+    let foundKey = null;
+    Object.keys(enumObj).forEach(key => {
+        if (enumObj[key] === value) {
+            foundKey = key;
+        }
+    });
+    return foundKey;
+}

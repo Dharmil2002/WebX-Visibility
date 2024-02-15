@@ -295,10 +295,15 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
   }
   async CompleteScan() {
-    let packageChecked = false;
-    const exists = this.loadingTableData.some(obj => obj.hasOwnProperty("loaded"));
-    if (exists) {
-      packageChecked = this.loadingTableData.every(obj => obj.Packages === obj.loaded);
+    let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
+    if(packageChecked){
+      Swal.fire({
+        icon: "error",
+        title: "load Package",
+        text: `Please load All  Your Package`,
+        showConfirmButton: true,
+      })
+      return;
     }
     const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
     const resMf = await this.mfService.createMfDetails(fieldMapping);
@@ -331,14 +336,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
         this.goBack('Departures');
         this.dialogRef.close("");
       }
-    }
-    else {
-      Swal.fire({
-        icon: "error",
-        title: "load Package",
-        text: `Please load All  Your Package`,
-        showConfirmButton: true,
-      })
     }
 
   }

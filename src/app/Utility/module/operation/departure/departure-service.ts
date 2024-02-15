@@ -9,7 +9,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 import { VendorService } from "../../masters/vendor-master/vendor.service";
-import { DocketStatus } from "src/app/Models/docStatus";
+import { DocketStatus, VehicleStatus } from "src/app/Models/docStatus";
 
 @Injectable({
   providedIn: "root"
@@ -151,8 +151,8 @@ export class DepartureService {
     await firstValueFrom(this.operation.operationMongoPut("generic/update", reqthc));
     const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
     const tripDetails = {
-      sTS: 4,
-      sTSNM: "Depart Vehicle",
+      sTS:VehicleStatus.Departed,
+      sTSNM:VehicleStatus[VehicleStatus.Departed],
       nXTLOC: next
     }
     const reqDepart = {

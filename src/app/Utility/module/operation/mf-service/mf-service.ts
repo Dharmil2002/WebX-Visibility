@@ -4,8 +4,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
-import moment from "moment";
-import { DocketEvents, DocketStatus } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, getEnumNameByValue } from "src/app/Models/docStatus";
 
 @Injectable({
     providedIn: "root",
@@ -16,6 +15,7 @@ export class ManifestService {
         private operationService: OperationService
     ) { }
     async getFieldMapping(details, header, formField,pkgs) {
+        debugger
         const lsNo={lSNO:formField?.LoadingSheet||"",rUTCD:formField.route.split(":")[0].trim(),count:parseInt(formField.count)}
         const mfHeader = {
             "_id": "",
@@ -68,7 +68,7 @@ export class ManifestService {
                     sFX: element?.Suffix || 0,
                     lOC:this.storage.branch,
                     eVNID: DocketEvents.Menifest_Generation,
-                    eVNDES:DocketEvents[DocketEvents.Menifest_Generation].replace(/_/g," "),
+                    eVNDES: getEnumNameByValue(DocketEvents, DocketEvents.Menifest_Generation)?.replace(/_/g, " "),
                     eVNDT:new Date(),
                     eVNSRC:'Manifest Generated',
                     dOCTY: 'MF',

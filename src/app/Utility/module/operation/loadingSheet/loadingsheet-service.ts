@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
-import { DocketEvents, DocketStatus } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, getEnumNameByValue } from "src/app/Models/docStatus";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { OperationService } from "src/app/core/service/operations/operation.service";
@@ -24,7 +24,7 @@ export class LoadingSheetService {
         'D$and': [
           { cLOC: this.storage.branch },
           { dEST: { 'D$in': nextLocs } },
-          //{ dEST: { 'D$ne': this.storage.branch } },
+          { dEST: { 'D$ne': this.storage.branch } },
           { sTS: { 'D$in': [DocketStatus.Booked, DocketStatus.In_Transhipment_Stock] } },
           { 'D$or': [{ lSNO: { "D$exists": false } }, { lSNO: "" }] },
         ]
@@ -255,7 +255,7 @@ export class LoadingSheetService {
               cNO: null,
               lOC: this.storage.branch,
               eVNID: DocketEvents.Loading_Sheet_Generation,
-              eVNDES: DocketEvents[DocketEvents.Loading_Sheet_Generation].replace(/_/g, " "),
+              eVNDES: getEnumNameByValue(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
               eVNDT: new Date(),
               eVNSRC: 'Loading Sheet',
               dOCTY: 'LS',
@@ -433,7 +433,7 @@ export class LoadingSheetService {
               cNO: null,
               lOC: this.storage.branch,
               eVNID: DocketEvents.Loading_Sheet_Generation,
-              eVNDES: DocketEvents[DocketEvents.Loading_Sheet_Generation].replace(/_/g, " "),
+              eVNDES:getEnumNameByValue(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
               eVNDT: new Date(),
               eVNSRC: 'Loading Sheet',
               dOCTY: '',

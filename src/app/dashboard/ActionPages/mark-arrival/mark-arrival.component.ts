@@ -105,6 +105,7 @@ export class MarkArrivalComponent implements OnInit {
     })
   }
   async getManifestDetail() {
+    debugger;
     const shipment= await this.arrivalService.getThcWiseMeniFest({tHC:this.MarkArrivalTable.TripID,iSARR:false,"D$or":[{iSDEL:false},{iSDEL:{D$exists:false}}]});
     this.mfList=shipment
   }

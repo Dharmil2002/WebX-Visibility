@@ -43,7 +43,7 @@ export class InvoiceDashboardComponent implements OnInit {
   //#region to get counts of boxes
   async getBoxData() {
     this.tableload = true;
-    const invoiceCount = await this.objInvoiceCountService.getDocketCount({ sTS: 0, bLOC: this.storage.branch });
+    const invoiceCount = await this.objInvoiceCountService.getDocketCount({ isBILLED: false, bLOC: this.storage.branch });
     const invoicestsCount = await this.objInvoiceCountService.getDocketbilCount({ fSTS: 1, oRGN: this.storage.branch });
     const invCount = await this.objInvoiceCountService.getInvCount({ bSTS: 1, bLOC: this.storage.branch });
 

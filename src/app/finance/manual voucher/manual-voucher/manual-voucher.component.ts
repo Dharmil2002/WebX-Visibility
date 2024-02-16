@@ -45,12 +45,12 @@ export class ManualVoucherComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width: 120px",
     },
-    eBY: {
+    eNTBY: {
       Title: "Created By",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    eDT: {
+    eNTDT: {
       Title: "Created on",
       class: "matcolumncenter",
       Style: "max-width: 200px",
@@ -67,8 +67,8 @@ export class ManualVoucherComponent implements OnInit {
     "tTYP",
     "tTDT",
     "nNETP",
-    "eBY",
-    "eDT",
+    "eNTBY",
+    "eNTDT",
     "vCAN"
   ];
 

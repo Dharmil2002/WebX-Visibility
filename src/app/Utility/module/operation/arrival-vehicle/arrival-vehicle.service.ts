@@ -60,24 +60,25 @@ export class ArrivalVehicleService {
                     }
                 },
                 {
-                    "D$unwind": { "path": "$md", "preserveNullAndEmptyArrays": true }
+                    "D$unwind": { "path": "$md", "preserveNullAndEmptyArrays": false }
                 },
                 {
                     "D$project": {
                         "docNo": 1,
-                        "dKTNO": { "D$ifNull": ["$md.dKTNO", null] },
-                        "tHCNO": { "D$ifNull": ["$mfHeader.tHC", null] },
-                        "pKGS": { "D$ifNull": ["$md.pKGS", null] },
-                        "sFX": { "D$ifNull": ["$md.sFX", null] },
-                        "dkt": { "D$ifNull": ["$mfHeader.dKTS", null] },
-                        "lEG": { "D$ifNull": ["$mfHeader.leg", null] },
-                        "oRG": { "D$ifNull": ["$mfHeader.oRGN", null] },
-                        "dEST": { "D$ifNull": ["$mfHeader.dEST", null] },
-                        "wT": { "D$ifNull": ["$md.wT", null] },
-                        "vOL": { "D$ifNull": ["$md.vOL", null] },
-                        "iSARR": { "D$ifNull": ["$mfHeader.iSARR", null] },
-                        "rUTCD": { "D$ifNull": ["$mfHeader.rUTCD", null] },
-                        "rUTNM": { "D$ifNull": ["$mfHeader.rUTNM", null] },
+                        "mFNO": "$mfHeader.docNo",
+                        "dKTNO": "$md.dKTNO",
+                        "tHCNO": "$mfHeader.tHC",
+                        "pKGS": "$md.pKGS",
+                        "sFX": "$md.sFX",
+                        "dkt": "$mfHeader.dKTS",
+                        "lEG": "$mfHeader.leg",
+                        "oRG": "$mfHeader.oRGN",
+                        "dEST": "$mfHeader.dEST",
+                        "wT": "$md.wT",
+                        "vOL": "$md.vOL",
+                        "iSARR": "$mfHeader.iSARR",
+                        "rUTCD": "$mfHeader.rUTCD",
+                        "rUTNM": "$mfHeader.rUTNM",
                         "mFDT": {
                             "D$ifNull": ["$mfHeader.mFDT", "$mfHeader.eNTDT"]
                         }

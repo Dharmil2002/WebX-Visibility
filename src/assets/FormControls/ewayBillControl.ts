@@ -1,4 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 
 export class EwayBillControls {
   private docketFields: FormControls[];
@@ -14,8 +15,8 @@ export class EwayBillControls {
     this.docketFields = [
       {
         name: "docketNumber",
-        label: "CNote No",
-        placeholder: "CNote No",
+        label: `${DocCalledAs.Docket} No`,
+        placeholder: `${DocCalledAs.Docket} No`,
         type: "text",
         value: "Computerized",
         filterOptions: "",
@@ -30,8 +31,8 @@ export class EwayBillControls {
       },
       {
         name: "docketDate",
-        label: "C Note Date",
-        placeholder: "C Note Date",
+        label: `${DocCalledAs.Docket} Date`,
+        placeholder:`${DocCalledAs.Docket} Date`,
         type: "date",
         value:new Date(),
         filterOptions: "",

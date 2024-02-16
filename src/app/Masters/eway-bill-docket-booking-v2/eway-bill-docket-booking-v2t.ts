@@ -20,6 +20,7 @@ import { LocationService } from "src/app/Utility/module/masters/location/locatio
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear} from "src/app/Utility/date/date-utils";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 @Component({
   selector: "app-eway-example",
   templateUrl: "./eway-bill-docket-booking-v2.html",
@@ -27,9 +28,9 @@ import { financialYear} from "src/app/Utility/date/date-utils";
 export class EwayBillDocketBookingV2Component implements OnInit {
   breadscrums = [
     {
-      title: "EwayBillDocket",
+      title: `${DocCalledAs.Docket} Generation`,
       items: ["Masters"],
-      active: "CNoteGeneration",
+      active: `${DocCalledAs.Docket} Generation`,
     },
   ];
   ewayBillTab: EwayBillControls; // a example of model , whose form we have to display
@@ -268,11 +269,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
     // Set up data for tabs and contracts
     this.tabData = {
-      "Cnote Details": this.docketControlArray,
+      [`${DocCalledAs.Docket} Details`]: this.docketControlArray,
       "Consignor Details": this.consignorControlArray,
       "Consignee Details": this.consigneeControlArray,
       "Appointment Based Delivery": this.appointmentControlArray
     };
+    
 
     this.contractData = {
       "Contract Details": this.contractControlArray,

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -43,16 +43,16 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   columnHeader = {
     "Shipment": "Shipment",
-    "Origin": "Origin",
     "Suffix":"Suffix",
+    "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
     "Unloaded": "Unloaded",
     "Pending": "Pending",
     "Leg": "Leg",
   }
-  centerShippingData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
-  centerAlignedData = ['Shipment', 'Packages', 'Unloaded', 'Pending'];
+  centerShippingData = ['Shipment', 'Suffix', 'Packages', 'WeightKg', 'VolumeCFT'];
+  centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'Unloaded', 'Pending'];
   shipmentStatus: string = 'Unloaded';
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -98,7 +98,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
   shipingDataTable: any;
   packageData: any;
   updateTrip: any;
+  mfNos: string[];
 
+  scanMessage: string = '';
+  @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
 
   constructor(
     private Route: Router,
@@ -125,7 +128,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   async getLoadingSheetDetail() {
     const shipmentData = await this.arrivalService.getThcWiseMeniFest({tHC:this.arrivalData?.TripID,dEST:this.storage.branch,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]});
-    
+    if(!shipmentData)
+      return;
+    this.mfNos = shipmentData.map((x)=>x.mFNO);
+
     this.csv = shipmentData.map((shipment) => ({
       Shipment: shipment.dKTNO||"",
       Origin: shipment.oRG||"",
@@ -150,12 +156,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.shipingDataTable = shipingTableDataArray;
     this.getPackagesData();
   }
-  async getPackagesData() {
-    const shipment= this.csv.map((x) => x.Shipment);
+  async getPackagesData() {    
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "docket_pkgs_ltl",
-      "filter": {"dKTNO":{"D$in":shipment}}
+      "filter": {"mFNO":{"D$in": this.mfNos}}
     }
     const res= await firstValueFrom(this._operation.operationMongoPost('generic/get', reqBody));
     this.packageData = res.data;
@@ -170,23 +175,37 @@ export class UpdateLoadingSheetComponent implements OnInit {
       let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
       // Call kpiData function
       if (PackageUpdate) {
-        this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
-        this.scanPkgs.push(scanValue);
+        const { status, ...options}  = PackageUpdate;
+        if(!status) {
+          this.scanMessage = options.text;         
+        }
+        else {          
+          this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+          this.scanPkgs.push(scanValue);
+          this.scanMessage = '';          
+        }
       }
       this.cdr.detectChanges(); // Trigger change detection
       this.tableload = false;
-      
+      this.clearAndFocusOnScan();
     }
     else {
-      Swal.fire({
-        icon: "error",
-        title: "Scan Package",
-        text: `Please Enter Package No`,
-        showConfirmButton: true,
-      })
+      this.scanMessage = `Please Enter Package No`;
+      this.clearAndFocusOnScan();
+      return;
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "Scan Package",
+      //   text: `Please Enter Package No`,
+      //   showConfirmButton: true,
+      // })
     }
   }
-
+  
+  clearAndFocusOnScan() {    
+    this.scanPackage = '';    
+    this.scanPackageInput.nativeElement.focus();
+  }
 
   setArrivalDataBindData() {
     autoBindData(this.loadingSheetTableForm.controls, {

@@ -90,6 +90,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   dktDetailFromApi: any;
   packageData: any;
   dktList: any;
+  scanMessage: string = '';
 
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
   
@@ -201,31 +202,35 @@ export class VehicleUpdateUploadComponent implements OnInit {
       if (loading) {
         const { status, ...options}  = loading;
         if(!status) {
-          Swal.fire( { 
-            ...options,
-            didClose: () => {
-              this.clearAndFocusOnScan();
-            }
-          })
+          this.scanMessage = options.text;         
+          // Swal.fire( { 
+          //   ...options,
+          //   didClose: () => {
+          //     this.clearAndFocusOnScan();
+          //   }
+          // })
         }
         else {
+          this.scanMessage = "";
           this.kpiData(options);
         }
       }
       this.cdr.detectChanges(); // Trigger change detection
-      this.tableload = false;
+      this.tableload = false;     
       this.clearAndFocusOnScan();
     }
-    else {
-      Swal.fire({
-        icon: "error",
-        title: "Scan Package",
-        text: `Please Enter Package No`,
-        showConfirmButton: true,
-        didClose: () => {
-          this.clearAndFocusOnScan();
-        }
-      });      
+    else {      
+      this.scanMessage = `Please Enter Package No`
+      this.clearAndFocusOnScan();
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "Scan Package",
+      //   text: `Please Enter Package No`,
+      //   showConfirmButton: true,
+      //   didClose: () => {
+      //     this.clearAndFocusOnScan();
+      //   }
+      // });      
     }
   }
 

@@ -231,9 +231,14 @@ export class QuickBookingControls {
             name: "required",
             message: "Charged No of Packages is required",
           },
+          {
+            name: "pattern",
+            message: "Invalid Charged No of Packages",
+            pattern: '^[0-9]+$'
+          }
         ],
         functions: {
-          onModel: "preventNegative",
+          keypress: "intigerOnly",
         },
       },
       {

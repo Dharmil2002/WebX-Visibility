@@ -3,6 +3,8 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import Swal from "sweetalert2";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocketStatus } from "src/app/Models/docStatus";
 
 @Component({
   selector: "app-stocks",
@@ -51,12 +53,12 @@ export class StocksComponent
 
   columnHeader = {
     no: {
-      Title:"Cnote",
+      Title: DocCalledAs.Docket,
       class: "matcolumnleft",
       Style: "min-width:15%",
     },
     date: {
-      Title: "Date of Cnote",
+      Title: `${DocCalledAs.Docket} Date`,
       class: "matcolumnleft",
       Style: "min-width:80px",
     },
@@ -104,8 +106,8 @@ export class StocksComponent
   //#endregion
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
-    no: "Cnote",
-    date: "Date of Cnote",
+    no: DocCalledAs.Docket,
+    date: `${DocCalledAs.Docket} Date`,
     paymentType: "Payment Type",
     contractParty: "Contract Party",
     orgdest: "Origin-Destination",
@@ -147,7 +149,14 @@ export class StocksComponent
    */
   async getDocketDetails() {
     try {
-      const data =await this.docketService.getDocketList({cID:this.storage.companyCode,cLOC:this.storage.branch});
+
+      let matches = { 
+        cID: this.storage.companyCode,
+        cLOC: this.storage.branch ,
+        sTS: { 'D$nin': [DocketStatus.Delivered,DocketStatus.Cancelled]}
+      };
+
+      const data =await this.docketService.getDocketList(matches);
       const modifiedData =await this.docketService.getMappingDocketDetails(data);
       this.boxData =await this.docketService.kpiData(data);
       this.tableData = modifiedData.reverse();

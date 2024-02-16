@@ -15,8 +15,13 @@
 <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
 <div class="search-bar-container">
     <input #scanPackageInput type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()"  class="search-bar-input">
-    <button class="search-bar-button"(click)="updatePackage()">Scan</button>
+    <button class="search-bar-button"(click)="updatePackage()">Scan</button>   
+    &nbsp;
+    <mat-error>
+        <div class="list-group-item-text danger m-2">{{scanMessage}}</div>
+    </mat-error>     
 </div>
+
 
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="loadingTableData"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"

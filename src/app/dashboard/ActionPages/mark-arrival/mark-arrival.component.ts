@@ -127,6 +127,7 @@ export class MarkArrivalComponent implements OnInit {
   updateTripData() {
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
+    
     let tripStatus, tripDetails,stCode,stName;
     if (dktStatus === "dktAvail") {
       stCode=5,
@@ -174,7 +175,7 @@ export class MarkArrivalComponent implements OnInit {
             Swal.fire({
               icon: "info",
               title: "Trip is close",
-              text: "Trip is close at" + this.currentBranch,
+              text: "Trip is close at " + this.currentBranch,
               showConfirmButton: true
             });
             this.getPreviousData();

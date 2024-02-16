@@ -124,7 +124,7 @@ export class VehicleLoadingComponent implements OnInit {
   tableload: boolean = true;
   tripDetails: any;
   docketDetail: any;
-
+  
   constructor(
     private Route: Router, // Injecting Router service
     private navigationService: NavigationService, // Injecting NavigationService

@@ -12,29 +12,50 @@ let uniqueShipments: Set<number> = new Set();
  * @returns The event object
  */
 
-export function handlePackageUpdate(scanValue: string, legValue: string, currentBranch: string, data: any, csv: any[], boxData: any, cdr: any) {
+export function handlePackageUpdate(scanValue: string, legValue: string, currentBranch: string, data: any, csv: any[], boxData: any, cdr: any): any  {
 
   const unloadPackage = data.find((x: any) => x.pKGSNO.trim() === scanValue);
 
   if (!unloadPackage) {
-    showError("Not Allow to Unload Package", "This package does not belong to the current branch.");
-    return;
+    return {
+      status: false,
+      icon: "error",
+      title: "Not Allow to Unload Package",
+      text: "This package does not belong to the current branch.",
+      showConfirmButton: true,
+    };
+
+    //showError("Not Allow to Unload Package", "This package does not belong to the current branch.");
+    //return;
   }
   if (unloadPackage.ScanFlag) {
-    showError("Already Scanned", "Your Package ID is already scanned.");
-    return;
+    return {
+      status: false,
+      icon: "error",
+      title: "Already Scanned",
+      text: "Your Package ID is already scanned.",
+      showConfirmButton: true,
+    };
+    //showError("Already Scanned", "Your Package ID is already scanned.");
+    //return;
   }
   const element = csv.find((e: any) => e.Shipment === unloadPackage.dKTNO);
 
   if (!element || (element.hasOwnProperty('Unloaded') && element.Packages <= element.Unloaded)) {
-    showError("Invalid Operation", "Cannot perform the operation. Packages must be greater than Unloaded.");
-    return;
+    return {
+      status: false,
+      icon: "error",
+      title: "Invalid Operation",
+      text: "Cannot perform the operation. Packages must be greater than Unloaded.",
+      showConfirmButton: true,
+    };
+    //showError("Invalid Operation", "Cannot perform the operation. Packages must be greater than Unloaded.");
+    //return;
   }
   if (!uniqueShipments.has(element.Shipment)) {
     uniqueShipments.add(element.Shipment);
   }
   
-
   element.Pending--;
   element.Unloaded = (element.Unloaded || 0) + 1;
   unloadPackage.ScanFlag = true;
@@ -48,6 +69,7 @@ export function handlePackageUpdate(scanValue: string, legValue: string, current
   //End
 
   const event = {
+    status: true,
     shipment: uniqueShipments.size,
     Package: totalUnloadedPackages
   };

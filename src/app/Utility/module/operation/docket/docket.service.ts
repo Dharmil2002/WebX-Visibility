@@ -580,24 +580,25 @@ export class DocketService {
       
             let formattedDate = "";
       
-            if (item.dockets.dKTDT) {
-              const parsedDate = parseISO(item.dockets.dKTDT);
+            if (item.dKTDT) {
+              const parsedDate = parseISO(item.dKTDT);
               if (isValid(parsedDate)) {
                 formattedDate = format(parsedDate, "dd-MM-yy HH:mm");
               }
             }
             return {
               no: item?.dKTNO ?? "",
+              sfx: item?.sFX ?? 0,
               date: formattedDate,
-              paymentType: item.dockets?.pAYTYPNM ?? "",
-              contractParty: `${item.dockets.bPARTY}-${item.dockets.bPARTYNM}`,
+              paymentType: item?.pAYTYPNM ?? "",
+              contractParty: `${item?.bPARTY}-${item?.bPARTYNM}`,
               orgdest: `${item?.oRGN ?? ""} : ${item?.dEST}`,
               fromCityToCity: `${item?.fCT ?? ""} : ${item?.tCT ?? ""}`,
               noofPackages: parseInt(item?.pKGS||0),
               chargedWeight: parseInt(item?.cHRWT||0),
               actualWeight: parseInt(item?.aCTWT||0),
               status: this.statusLTLMapping[item.sTS.toString()]?.status ?? "",
-              Action: item.dockets?.iSCOM ==true
+              Action: item?.iSCOM ==true
                 ? item?.STS == 1 ? "" : ""
                 : "Quick Completion",
               isComplete: item?.iSCOM || false,
@@ -935,25 +936,55 @@ export class DocketService {
                                         "D$eq": ["$docNo", "$$docNoVar"] // Use "$docNo" from "dockets_ltl" and compare it with "docNoVar"
                                     }
                                 }
-                            },
-                            {
-                                "D$project": {
-                                    "_id": 0,
-                                    "pAYTYP": 1,
-                                    "pAYTYPNM": 1,
-                                    "iSCOM":1,
-                                    "bPARTY":1,
-                                    "dKTDT":1,
-                                    "bPARTYNM":1
-                                }
                             }
                         ],
                         "as": "dockets"
+                    },                    
+                },
+                {
+                    'D$unwind': {
+                      path: "$dockets",
+                      preserveNullAndEmptyArrays: false,
                     }
                 },
                 {
-                    "D$unwind": "$dockets"
-                }
+                    'D$project': {
+                        _id: 1,
+                        cID: 1,
+                        dKTNO: 1,
+                        sFX: 1,
+                        cLOC: 1,
+                        tOTWT: 1,
+                        tOTPKG: 1,
+                        vEHNO: 1,
+                        sTS: 1,
+                        sTSNM: 1,
+                        sTSTM: 1,
+                        iSDEL: 1,
+                        eNTDT: 1,
+                        eNTLOC: 1,
+                        eNTBY: 1,
+                        mODBY: 1,
+                        mODDT: 1,
+                        mODLOC: 1,
+                        tHC: 1,
+                        oPSSTS: 1,
+                        dEST: 1,
+                        oRGN: 1,
+                        aCTWT: 1,
+                        cFTTOT: 1,
+                        cHRWT: 1,
+                        pKGS: 1,
+                        dKTDT: "$dockets.dKTDT",
+                        fCT: "$dockets.fCT",
+                        tCT: "$dockets.tCT",
+                        pAYTYP: "$dockets.pAYTYP",
+                        pAYTYPNM: "$dockets.pAYTYPNM",
+                        iSCOM: "$dockets.iSCOM",
+                        bPARTY: "$dockets.bPARTY",
+                        bPARTYNM: "$dockets.bPARTYNM",                        
+                    },
+                  },
             ]
             
         }

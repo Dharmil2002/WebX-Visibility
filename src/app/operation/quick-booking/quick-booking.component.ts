@@ -108,6 +108,16 @@ export class QuickBookingComponent implements OnInit {
     }
   }
 
+  intigerOnly(event): boolean {    
+    console.log(event);
+    const charCode = event.eventArgs.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.eventArgs.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
   /*here i initilize the function which used to bind dropdown Controls*/
   commonDropDownMapping() {
     const mapControlArray = (controlArray, mappings) => {

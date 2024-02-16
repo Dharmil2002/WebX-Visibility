@@ -7,6 +7,10 @@ import { BillApproval } from 'src/app/Models/bill-approval/bill-approval';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
 
 @Component({
   selector: 'app-bill-approval',
@@ -37,12 +41,16 @@ export class BillApprovalComponent implements OnInit {
     edit: true,
     csv: false,
   };
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   constructor(
     private invoiceService: InvoiceServiceService,
     private billApproval: BillApproval,/*this is a model object here so please dont remove bcz this model object is used in html page*/
     public dialog: MatDialog,
     private storage: StorageService,
-    private router: Router
+    private router: Router,
+    public snackBarUtilityService: SnackBarUtilityService,
+    private voucherServicesService: VoucherServicesService,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
 
@@ -76,10 +84,10 @@ export class BillApprovalComponent implements OnInit {
           aBY: this.storage.userName
         }
       }
+
       const res = await this.invoiceService.updateInvoiceStatus(filter, status);
       if (res) {
-        this.getApprovalData();
-        SwalerrorMessage("success", "Success", "The invoice has been successfully approved.", true)
+        this.AccountPosting(data.data);
       }
     }
     else if (data.label.label == "Cancel Bill") {
@@ -102,7 +110,7 @@ export class BillApprovalComponent implements OnInit {
             cNL: true,
             cNLDT: new Date(),
             cNBY: this.storage.userName,
-            cNRES:  result.value//required cancel reason in popup
+            cNRES: result.value//required cancel reason in popup
           }
           const res = await this.invoiceService.updateInvoiceStatus(filter, status);
           const filteDkt = {
@@ -135,6 +143,195 @@ export class BillApprovalComponent implements OnInit {
       });
     }
 
+  }
+  // Account Posting When  When Bill Has been Generated/ Finalized	
+  async AccountPosting(data) {
+
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const TotalAmount = data?.aMT;
+        const GstAmount = data?.gST?.aMT;
+
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transType = "bill-approvalVoucher";
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = data?.cUST?.cD || "",
+          this.VoucherDataRequestModel.partyName = data?.cUST?.nM || "",
+          this.VoucherDataRequestModel.partyState = data?.cUST?.sT || "",
+          this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
+
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = data?.gST?.iGST || 0;
+        this.VoucherDataRequestModel.SGST = data?.gST?.sGST || 0;
+        this.VoucherDataRequestModel.CGST = data?.gST?.cGST || 0;
+        this.VoucherDataRequestModel.UGST = data?.gST?.UTGST || 0;
+        this.VoucherDataRequestModel.GSTTotal = GstAmount;
+
+        this.VoucherDataRequestModel.GrossAmount = data?.gROSSAMT || 0;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = data?.rOUNOFFAMT;
+        this.VoucherDataRequestModel.voucherCanceled = false
+
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+
+        var VoucherlineitemList = this.GetVouchersLedgers(data);
+
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.branch,
+                transType: "bill-approvalVoucher",
+                docType: "Voucher",
+                docNo: res?.data?.mainData?.ops[0].vNO,
+                partyCode: data?.cUST?.cD || "",
+                partyName: data?.cUST?.nM || "",
+                entryBy: localStorage.getItem("UserName"),
+                entryDate: Date(),
+                debit: VoucherlineitemList.map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "amount": item.Total,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                credit: VoucherlineitemList.map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "amount": item.Total,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Bill Approval Voucher Created",
+                      text: "Voucher No: " + reqBody.docNo,
+                      showConfirmButton: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        Swal.hideLoading();
+                        setTimeout(() => {
+                          Swal.close();
+                        }, 2000);
+                        this.getApprovalData();
+                        SwalerrorMessage("success", "Success", "The invoice has been successfully approved.", true)
+                      }
+                    });
+
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+
+    }, "C-Note Booking Voucher Generating..!");
+
+  }
+  GetVouchersLedgers(data) {
+    const TotalAmount = data?.aMT;
+    const GstAmount = data?.gST?.aMT;
+    const GstRate = data?.gST?.rATE;
+
+    const createVoucher = (accCode, accName, debit, credit) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transType: "bill-approvalVoucher",
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: GstRate,
+      GSTAmount: credit, // Assuming GSTAmount is the same as credit for simplicity
+      Total: GstAmount,
+      TDSApplicable: false,
+      narration: `When Customer Bill freight is Generated :${data.bILLNO}`,
+    });
+
+    const response = [
+      createVoucher("AST002002", "Billed debtors", TotalAmount, 0),
+      createVoucher("AST001001", "Unbilled debtors", 0, TotalAmount),
+      createVoucher("EXP001042", "Round off ledger", data?.rOUNOFFAMT, data?.rOUNOFFAMT,),
+    ];
+
+    const gstTypeMapping = {
+      UGST: { accCode: "LIA002002", accName: "UGST payable", prop: "uGST" },
+      CGST: { accCode: "LIA002003", accName: "CGST payable", prop: "cGST" },
+      IGST: { accCode: "LIA002004", accName: "iGST payable", prop: "iGST" },
+      SGST: { accCode: "LIA002005", accName: "sGST payable", prop: "sGST" },
+    };
+
+    const gstType = data?.gST?.tYP;
+
+    if (gstType && gstTypeMapping[gstType]) {
+      const { accCode, accName, prop } = gstTypeMapping[gstType];
+      response.push(createVoucher(accCode, accName, data?.gST?.[prop], data?.gST?.[prop]));
+    }
+
+    return response;
   }
 
 }

@@ -33,7 +33,7 @@ import { firstValueFrom } from "rxjs";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from "src/app/Models/Finance/Finance";
+import { VoucherDataRequestModel, VoucherRequestModel } from "src/app/Models/Finance/Finance";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 
 @Component({
@@ -88,8 +88,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   linkArray = [];
   NonFreightLoaded = false;
 
-  debitVoucherRequestModel = new DebitVoucherRequestModel();
-  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
 
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
@@ -1910,53 +1910,53 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         let GSTAmount = 0;
         const TotalAmount = this.model.FreightTableForm.controls['totalAmount'].value;
 
-        this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
-        this.debitVoucherRequestModel.docType = "VR";
-        this.debitVoucherRequestModel.branch = this.storage.branch;
-        this.debitVoucherRequestModel.finYear = financialYear
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
 
-        this.debitVoucherDataRequestModel.voucherNo = "";
-        this.debitVoucherDataRequestModel.transType = "CNoteBookedVoucher";
-        this.debitVoucherDataRequestModel.transDate = this.model.consignmentTableForm.value.docketDate
-        this.debitVoucherDataRequestModel.docType = "VR";
-        this.debitVoucherDataRequestModel.branch = this.storage.branch;
-        this.debitVoucherDataRequestModel.finYear = financialYear
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transType = "CNoteBookedVoucher";
+        this.VoucherDataRequestModel.transDate = this.model.consignmentTableForm.value.docketDate
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
 
-        this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
-        this.debitVoucherDataRequestModel.preperedFor = "Customer";
-        this.debitVoucherDataRequestModel.partyCode = this.model.consignmentTableForm.value?.billingParty?.value,
-          this.debitVoucherDataRequestModel.partyName = this.model.consignmentTableForm.value?.billingParty?.name,
-          this.debitVoucherDataRequestModel.partyState = "";
-        this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-        this.debitVoucherDataRequestModel.entryDate = new Date();
-        this.debitVoucherDataRequestModel.panNo = ""
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = this.model.consignmentTableForm.value?.billingParty?.value,
+          this.VoucherDataRequestModel.partyName = this.model.consignmentTableForm.value?.billingParty?.name,
+          this.VoucherDataRequestModel.partyState = "";
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
 
-        this.debitVoucherDataRequestModel.tdsSectionCode = "";
-        this.debitVoucherDataRequestModel.tdsSectionName = "";
-        this.debitVoucherDataRequestModel.tdsRate = 0;
-        this.debitVoucherDataRequestModel.tdsAmount = 0;
-        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-        this.debitVoucherDataRequestModel.tcsSectionCode = "";
-        this.debitVoucherDataRequestModel.tcsSectionName = "";
-        this.debitVoucherDataRequestModel.tcsRate = 0;
-        this.debitVoucherDataRequestModel.tcsAmount = 0;
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.debitVoucherDataRequestModel.IGST = 0;
-        this.debitVoucherDataRequestModel.SGST = 0;
-        this.debitVoucherDataRequestModel.CGST = 0;
-        this.debitVoucherDataRequestModel.UGST = 0;
-        this.debitVoucherDataRequestModel.GSTTotal = GSTAmount;
+        this.VoucherDataRequestModel.IGST = 0;
+        this.VoucherDataRequestModel.SGST = 0;
+        this.VoucherDataRequestModel.CGST = 0;
+        this.VoucherDataRequestModel.UGST = 0;
+        this.VoucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.debitVoucherDataRequestModel.GrossAmount = TotalAmount;
-        this.debitVoucherDataRequestModel.netPayable = TotalAmount;
-        this.debitVoucherDataRequestModel.roundOff = 0;
-        this.debitVoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.GrossAmount = TotalAmount;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = 0;
+        this.VoucherDataRequestModel.voucherCanceled = false
 
-        this.debitVoucherDataRequestModel.paymentMode = "";
-        this.debitVoucherDataRequestModel.refNo = "";
-        this.debitVoucherDataRequestModel.accountName = "";
-        this.debitVoucherDataRequestModel.date = "";
-        this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
 
         var VoucherlineitemList = [{
 
@@ -1999,12 +1999,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           "narration": `when C note No ${DocketNo} Is Booked`
         }];
 
-        this.debitVoucherRequestModel.details = VoucherlineitemList
-        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
           .subscribe({
             next: (res: any) => {
 

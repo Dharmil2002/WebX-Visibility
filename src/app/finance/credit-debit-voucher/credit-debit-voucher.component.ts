@@ -17,7 +17,7 @@ import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUt
 import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 import { DebitVoucherPreviewComponent } from '../Modals/debit-voucher-preview/debit-voucher-preview.component';
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
@@ -27,8 +27,8 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 })
 export class DebitVoucherComponent implements OnInit {
   companyCode: number | null
-  debitVoucherRequestModel = new DebitVoucherRequestModel();
-  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   breadScrums = [
     {
       title: "Debit Voucher",
@@ -764,55 +764,55 @@ export class DebitVoucherComponent implements OnInit {
         const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
         const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
 
-        this.debitVoucherRequestModel.companyCode = this.companyCode;
-        this.debitVoucherRequestModel.docType = "VR";
-        this.debitVoucherRequestModel.branch = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
-        this.debitVoucherRequestModel.finYear = financialYear
+        this.VoucherRequestModel.companyCode = this.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+        this.VoucherRequestModel.finYear = financialYear
 
 
-        //this.debitVoucherDataRequestModel.companyCode = this.companyCode;
-        this.debitVoucherDataRequestModel.voucherNo = "";
-        this.debitVoucherDataRequestModel.transType = "DebitVoucher";
-        this.debitVoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
-        this.debitVoucherDataRequestModel.docType = "VR";
-        this.debitVoucherDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
-        this.debitVoucherDataRequestModel.finYear = financialYear
+        //this.VoucherDataRequestModel.companyCode = this.companyCode;
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transType = "DebitVoucher";
+        this.VoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.VoucherDataRequestModel.finYear = financialYear
 
-        this.debitVoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
-        this.debitVoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
-        this.debitVoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
-        this.debitVoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName;
-        this.debitVoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
-        this.debitVoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
-        this.debitVoucherDataRequestModel.entryDate = new Date();
-        this.debitVoucherDataRequestModel.panNo = ""
+        this.VoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
+        this.VoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
+        this.VoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
+        this.VoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName;
+        this.VoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
+        this.VoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
 
-        this.debitVoucherDataRequestModel.tdsSectionCode = this.DebitVoucherTaxationTDSForm.value.TDSSection.value;
-        this.debitVoucherDataRequestModel.tdsSectionName = this.DebitVoucherTaxationTDSForm.value.TDSSection.name;
-        this.debitVoucherDataRequestModel.tdsRate = Number(this.DebitVoucherTaxationTDSForm.value.TDSRate) ?? 0;
-        this.debitVoucherDataRequestModel.tdsAmount = parseFloat(this.DebitVoucherTaxationTDSForm.value.TDSDeduction) || 0;
-        this.debitVoucherDataRequestModel.tdsAtlineitem = this.TDSAtLineItem
-        this.debitVoucherDataRequestModel.tcsSectionCode = this.DebitVoucherTaxationTCSForm.value.TCSSection.value;
-        this.debitVoucherDataRequestModel.tcsSectionName = this.DebitVoucherTaxationTCSForm.value.TCSSection.name;
-        this.debitVoucherDataRequestModel.tcsRate = Number(this.DebitVoucherTaxationTCSForm.value.TCSRate) ?? 0;
-        this.debitVoucherDataRequestModel.tcsAmount = parseFloat(this.DebitVoucherTaxationTCSForm.value.TCSDeduction) || 0;
+        this.VoucherDataRequestModel.tdsSectionCode = this.DebitVoucherTaxationTDSForm.value.TDSSection.value;
+        this.VoucherDataRequestModel.tdsSectionName = this.DebitVoucherTaxationTDSForm.value.TDSSection.name;
+        this.VoucherDataRequestModel.tdsRate = Number(this.DebitVoucherTaxationTDSForm.value.TDSRate) ?? 0;
+        this.VoucherDataRequestModel.tdsAmount = parseFloat(this.DebitVoucherTaxationTDSForm.value.TDSDeduction) || 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = this.TDSAtLineItem
+        this.VoucherDataRequestModel.tcsSectionCode = this.DebitVoucherTaxationTCSForm.value.TCSSection.value;
+        this.VoucherDataRequestModel.tcsSectionName = this.DebitVoucherTaxationTCSForm.value.TCSSection.name;
+        this.VoucherDataRequestModel.tcsRate = Number(this.DebitVoucherTaxationTCSForm.value.TCSRate) ?? 0;
+        this.VoucherDataRequestModel.tcsAmount = parseFloat(this.DebitVoucherTaxationTCSForm.value.TCSDeduction) || 0;
 
-        this.debitVoucherDataRequestModel.IGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.IGST) || 0;
-        this.debitVoucherDataRequestModel.SGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.SGST) || 0;
-        this.debitVoucherDataRequestModel.CGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.CGST) || 0;
-        this.debitVoucherDataRequestModel.UGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.UGST) || 0;
-        this.debitVoucherDataRequestModel.GSTTotal = GSTAmount;
+        this.VoucherDataRequestModel.IGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.IGST) || 0;
+        this.VoucherDataRequestModel.SGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.SGST) || 0;
+        this.VoucherDataRequestModel.CGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.CGST) || 0;
+        this.VoucherDataRequestModel.UGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.UGST) || 0;
+        this.VoucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.debitVoucherDataRequestModel.GrossAmount = PaymentAmount;
-        this.debitVoucherDataRequestModel.netPayable = NetPayable;
-        this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
-        this.debitVoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+        this.VoucherDataRequestModel.netPayable = NetPayable;
+        this.VoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
+        this.VoucherDataRequestModel.voucherCanceled = false
 
-        this.debitVoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
-        this.debitVoucherDataRequestModel.refNo = this.DebitVoucherTaxationPaymentDetailsForm.value.ChequeOrRefNo;
-        this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
-        this.debitVoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
-        this.debitVoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
+        this.VoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
+        this.VoucherDataRequestModel.refNo = this.DebitVoucherTaxationPaymentDetailsForm.value.ChequeOrRefNo;
+        this.VoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
+        this.VoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
+        this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
 
 
         const companyCode = this.companyCode;
@@ -855,12 +855,12 @@ export class DebitVoucherComponent implements OnInit {
           };
         });
 
-        this.debitVoucherRequestModel.details = VoucherlineitemList
-        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-        this.debitVoucherRequestModel.debitAgainstDocumentList = debitAgainstDocumentList;
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = debitAgainstDocumentList;
 
         this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
           .subscribe({
             next: (res: any) => {
               var transformedData = this.tableData.map(function (item) {

@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { JournalVoucherCreationModalComponent } from '../Modals/journal-voucher-creation-modal/journal-voucher-creation-modal.component';
 import { Router } from '@angular/router';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
 import { firstValueFrom } from 'rxjs';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -52,8 +52,8 @@ export class JournalVoucherCreationComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  debitVoucherRequestModel = new DebitVoucherRequestModel();
-  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   totalDebit: number;
   totalCredit: number;
   staticField = ['Ledger', 'DebitAmount', 'CreditAmount', 'Narration']
@@ -276,56 +276,56 @@ export class JournalVoucherCreationComponent implements OnInit {
 
 
 
-          this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
-          this.debitVoucherRequestModel.docType = "VR";
-          this.debitVoucherRequestModel.branch = this.storage.branch;
-          this.debitVoucherRequestModel.finYear = financialYear;
+          this.VoucherRequestModel.companyCode = this.storage.companyCode;
+          this.VoucherRequestModel.docType = "VR";
+          this.VoucherRequestModel.branch = this.storage.branch;
+          this.VoucherRequestModel.finYear = financialYear;
 
-          this.debitVoucherDataRequestModel.voucherNo = "";
-          this.debitVoucherDataRequestModel.transType = "Journal Voucher";
-          this.debitVoucherDataRequestModel.transDate = new Date();
-          this.debitVoucherDataRequestModel.docType = "VR";
-          this.debitVoucherDataRequestModel.branch = this.storage.branch;
-          this.debitVoucherDataRequestModel.finYear = financialYear;
+          this.VoucherDataRequestModel.voucherNo = "";
+          this.VoucherDataRequestModel.transType = "Journal Voucher";
+          this.VoucherDataRequestModel.transDate = new Date();
+          this.VoucherDataRequestModel.docType = "VR";
+          this.VoucherDataRequestModel.branch = this.storage.branch;
+          this.VoucherDataRequestModel.finYear = financialYear;
 
-          this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
-          this.debitVoucherDataRequestModel.preperedFor = this.JournalVoucherSummaryForm.value.Preparedfor;
-          this.debitVoucherDataRequestModel.partyCode = this.JournalVoucherSummaryForm.value.PartyName?.value;
-          this.debitVoucherDataRequestModel.partyName = this.JournalVoucherSummaryForm.value.PartyName?.name;
-          this.debitVoucherDataRequestModel.partyState = ""
-          this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-          this.debitVoucherDataRequestModel.entryDate = new Date();
-          this.debitVoucherDataRequestModel.panNo = this.JournalVoucherSummaryForm.get("PANnumber").value;
+          this.VoucherDataRequestModel.accLocation = this.storage.branch;
+          this.VoucherDataRequestModel.preperedFor = this.JournalVoucherSummaryForm.value.Preparedfor;
+          this.VoucherDataRequestModel.partyCode = this.JournalVoucherSummaryForm.value.PartyName?.value;
+          this.VoucherDataRequestModel.partyName = this.JournalVoucherSummaryForm.value.PartyName?.name;
+          this.VoucherDataRequestModel.partyState = ""
+          this.VoucherDataRequestModel.entryBy = this.storage.userName;
+          this.VoucherDataRequestModel.entryDate = new Date();
+          this.VoucherDataRequestModel.panNo = this.JournalVoucherSummaryForm.get("PANnumber").value;
 
-          this.debitVoucherDataRequestModel.tdsSectionCode = undefined
-          this.debitVoucherDataRequestModel.tdsSectionName = undefined
-          this.debitVoucherDataRequestModel.tdsRate = 0;
-          this.debitVoucherDataRequestModel.tdsAmount = 0;
-          this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-          this.debitVoucherDataRequestModel.tcsSectionCode = undefined
-          this.debitVoucherDataRequestModel.tcsSectionName = undefined
-          this.debitVoucherDataRequestModel.tcsRate = 0;
-          this.debitVoucherDataRequestModel.tcsAmount = 0;
+          this.VoucherDataRequestModel.tdsSectionCode = undefined
+          this.VoucherDataRequestModel.tdsSectionName = undefined
+          this.VoucherDataRequestModel.tdsRate = 0;
+          this.VoucherDataRequestModel.tdsAmount = 0;
+          this.VoucherDataRequestModel.tdsAtlineitem = false;
+          this.VoucherDataRequestModel.tcsSectionCode = undefined
+          this.VoucherDataRequestModel.tcsSectionName = undefined
+          this.VoucherDataRequestModel.tcsRate = 0;
+          this.VoucherDataRequestModel.tcsAmount = 0;
 
-          this.debitVoucherDataRequestModel.IGST = 0;
-          this.debitVoucherDataRequestModel.SGST = 0;
-          this.debitVoucherDataRequestModel.CGST = 0;
-          this.debitVoucherDataRequestModel.UGST = 0;
-          this.debitVoucherDataRequestModel.GSTTotal = 0;
+          this.VoucherDataRequestModel.IGST = 0;
+          this.VoucherDataRequestModel.SGST = 0;
+          this.VoucherDataRequestModel.CGST = 0;
+          this.VoucherDataRequestModel.UGST = 0;
+          this.VoucherDataRequestModel.GSTTotal = 0;
 
-          this.debitVoucherDataRequestModel.GrossAmount = this.totalCredit;
-          this.debitVoucherDataRequestModel.netPayable = this.totalCredit;
-          this.debitVoucherDataRequestModel.roundOff = 0;
-          this.debitVoucherDataRequestModel.voucherCanceled = false;
+          this.VoucherDataRequestModel.GrossAmount = this.totalCredit;
+          this.VoucherDataRequestModel.netPayable = this.totalCredit;
+          this.VoucherDataRequestModel.roundOff = 0;
+          this.VoucherDataRequestModel.voucherCanceled = false;
 
-          this.debitVoucherDataRequestModel.paymentMode = undefined;
-          this.debitVoucherDataRequestModel.refNo = undefined;
-          this.debitVoucherDataRequestModel.accountName = undefined;
-          this.debitVoucherDataRequestModel.date = undefined;
-          this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+          this.VoucherDataRequestModel.paymentMode = undefined;
+          this.VoucherDataRequestModel.refNo = undefined;
+          this.VoucherDataRequestModel.accountName = undefined;
+          this.VoucherDataRequestModel.date = undefined;
+          this.VoucherDataRequestModel.scanSupportingDocument = "";
 
-          this.debitVoucherDataRequestModel.mANNUM = this.JournalVoucherSummaryForm.get("ManualNumber").value;
-          this.debitVoucherDataRequestModel.mREFNUM = this.JournalVoucherSummaryForm.get("ReferenceNumber").value;
+          this.VoucherDataRequestModel.mANNUM = this.JournalVoucherSummaryForm.get("ManualNumber").value;
+          this.VoucherDataRequestModel.mREFNUM = this.JournalVoucherSummaryForm.get("ReferenceNumber").value;
 
           const companyCode = this.storage.companyCode;
           const CurrentBranchCode = this.storage.branch;
@@ -352,12 +352,12 @@ export class JournalVoucherCreationComponent implements OnInit {
           });
 
 
-          this.debitVoucherRequestModel.details = VoucherlineitemList;
-          this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-          this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+          this.VoucherRequestModel.details = VoucherlineitemList;
+          this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+          this.VoucherRequestModel.debitAgainstDocumentList = [];
 
           firstValueFrom(this.voucherServicesService
-            .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+            .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
               if (res.success) {
                 Swal.fire({
                   icon: "success",

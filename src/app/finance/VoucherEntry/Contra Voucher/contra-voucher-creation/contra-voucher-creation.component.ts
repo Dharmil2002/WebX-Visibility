@@ -8,8 +8,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { firstValueFrom, from } from "rxjs";
 import {
-  DebitVoucherRequestModel,
-  DebitVoucherDataRequestModel,
+  VoucherRequestModel,
+  VoucherDataRequestModel,
 } from "src/app/Models/Finance/Finance";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
@@ -47,8 +47,8 @@ export class ContraVoucherCreationComponent implements OnInit {
   ContraVoucherPaymentForm: UntypedFormGroup;
   jsonControlContraVoucherPaymentArray: any;
 
-  debitVoucherRequestModel = new DebitVoucherRequestModel();
-  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
 
   AccountGroupList: any;
   constructor(
@@ -218,64 +218,64 @@ export class ContraVoucherCreationComponent implements OnInit {
           const totalPaymentAmount =
             parseFloat(FromCreditAmount) + parseFloat(FromDebitAmount);
 
-          this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
-          this.debitVoucherRequestModel.docType = "VR";
-          this.debitVoucherRequestModel.branch = this.storage.branch;
-          this.debitVoucherRequestModel.finYear = financialYear;
+          this.VoucherRequestModel.companyCode = this.storage.companyCode;
+          this.VoucherRequestModel.docType = "VR";
+          this.VoucherRequestModel.branch = this.storage.branch;
+          this.VoucherRequestModel.finYear = financialYear;
 
-          this.debitVoucherDataRequestModel.voucherNo = "";
-          this.debitVoucherDataRequestModel.transType = "Contra Voucher";
-          this.debitVoucherDataRequestModel.transDate = new Date();
-          this.debitVoucherDataRequestModel.docType = "VR";
-          this.debitVoucherDataRequestModel.branch = this.storage.branch;
-          this.debitVoucherDataRequestModel.finYear = financialYear;
+          this.VoucherDataRequestModel.voucherNo = "";
+          this.VoucherDataRequestModel.transType = "Contra Voucher";
+          this.VoucherDataRequestModel.transDate = new Date();
+          this.VoucherDataRequestModel.docType = "VR";
+          this.VoucherDataRequestModel.branch = this.storage.branch;
+          this.VoucherDataRequestModel.finYear = financialYear;
 
-          this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
-          this.debitVoucherDataRequestModel.preperedFor =
+          this.VoucherDataRequestModel.accLocation = this.storage.branch;
+          this.VoucherDataRequestModel.preperedFor =
             this.ContraVoucherSummaryForm.value.Preparedfor;
-          this.debitVoucherDataRequestModel.partyCode = undefined;
-          this.debitVoucherDataRequestModel.partyName = undefined;
-          this.debitVoucherDataRequestModel.partyState = undefined;
-          this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-          this.debitVoucherDataRequestModel.entryDate = new Date();
-          this.debitVoucherDataRequestModel.panNo = undefined;
+          this.VoucherDataRequestModel.partyCode = undefined;
+          this.VoucherDataRequestModel.partyName = undefined;
+          this.VoucherDataRequestModel.partyState = undefined;
+          this.VoucherDataRequestModel.entryBy = this.storage.userName;
+          this.VoucherDataRequestModel.entryDate = new Date();
+          this.VoucherDataRequestModel.panNo = undefined;
 
-          this.debitVoucherDataRequestModel.tdsSectionCode = undefined;
-          this.debitVoucherDataRequestModel.tdsSectionName = undefined;
-          this.debitVoucherDataRequestModel.tdsRate = 0;
-          this.debitVoucherDataRequestModel.tdsAmount = 0;
-          this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-          this.debitVoucherDataRequestModel.tcsSectionCode = undefined;
-          this.debitVoucherDataRequestModel.tcsSectionName = undefined;
-          this.debitVoucherDataRequestModel.tcsRate = 0;
-          this.debitVoucherDataRequestModel.tcsAmount = 0;
+          this.VoucherDataRequestModel.tdsSectionCode = undefined;
+          this.VoucherDataRequestModel.tdsSectionName = undefined;
+          this.VoucherDataRequestModel.tdsRate = 0;
+          this.VoucherDataRequestModel.tdsAmount = 0;
+          this.VoucherDataRequestModel.tdsAtlineitem = false;
+          this.VoucherDataRequestModel.tcsSectionCode = undefined;
+          this.VoucherDataRequestModel.tcsSectionName = undefined;
+          this.VoucherDataRequestModel.tcsRate = 0;
+          this.VoucherDataRequestModel.tcsAmount = 0;
 
-          this.debitVoucherDataRequestModel.IGST = 0;
-          this.debitVoucherDataRequestModel.SGST = 0;
-          this.debitVoucherDataRequestModel.CGST = 0;
-          this.debitVoucherDataRequestModel.UGST = 0;
-          this.debitVoucherDataRequestModel.GSTTotal = 0;
+          this.VoucherDataRequestModel.IGST = 0;
+          this.VoucherDataRequestModel.SGST = 0;
+          this.VoucherDataRequestModel.CGST = 0;
+          this.VoucherDataRequestModel.UGST = 0;
+          this.VoucherDataRequestModel.GSTTotal = 0;
 
-          this.debitVoucherDataRequestModel.GrossAmount = parseFloat(
+          this.VoucherDataRequestModel.GrossAmount = parseFloat(
             totalPaymentAmount.toFixed(2)
           );
-          this.debitVoucherDataRequestModel.netPayable = parseFloat(
+          this.VoucherDataRequestModel.netPayable = parseFloat(
             totalPaymentAmount.toFixed(2)
           );
-          this.debitVoucherDataRequestModel.roundOff = 0;
-          this.debitVoucherDataRequestModel.voucherCanceled = false;
+          this.VoucherDataRequestModel.roundOff = 0;
+          this.VoucherDataRequestModel.voucherCanceled = false;
 
-          this.debitVoucherDataRequestModel.paymentMode = undefined;
-          this.debitVoucherDataRequestModel.refNo = undefined;
-          this.debitVoucherDataRequestModel.accountName = undefined;
-          this.debitVoucherDataRequestModel.date = undefined;
-          this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+          this.VoucherDataRequestModel.paymentMode = undefined;
+          this.VoucherDataRequestModel.refNo = undefined;
+          this.VoucherDataRequestModel.accountName = undefined;
+          this.VoucherDataRequestModel.date = undefined;
+          this.VoucherDataRequestModel.scanSupportingDocument = "";
 
-          this.debitVoucherDataRequestModel.mANNUM =
+          this.VoucherDataRequestModel.mANNUM =
             this.ContraVoucherSummaryForm.get("ManualNumber").value;
-          this.debitVoucherDataRequestModel.mREFNUM =
+          this.VoucherDataRequestModel.mREFNUM =
             this.ContraVoucherSummaryForm.get("ReferenceNumber").value;
-          this.debitVoucherDataRequestModel.nAR =
+          this.VoucherDataRequestModel.nAR =
             this.ContraVoucherSummaryForm.get("Narration").value;
 
           const companyCode = this.storage.companyCode;
@@ -325,15 +325,15 @@ export class ContraVoucherCreationComponent implements OnInit {
             },
           ];
 
-          this.debitVoucherRequestModel.details = VoucherlineitemList;
-          this.debitVoucherRequestModel.data =
-            this.debitVoucherDataRequestModel;
-          this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+          this.VoucherRequestModel.details = VoucherlineitemList;
+          this.VoucherRequestModel.data =
+            this.VoucherDataRequestModel;
+          this.VoucherRequestModel.debitAgainstDocumentList = [];
 
           firstValueFrom(
             this.voucherServicesService.FinancePost(
               "fin/account/voucherentry",
-              this.debitVoucherRequestModel
+              this.VoucherRequestModel
             )
           )
             .then((res: any) => {

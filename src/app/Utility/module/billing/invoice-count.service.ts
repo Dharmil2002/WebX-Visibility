@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -8,85 +9,9 @@ import Swal from 'sweetalert2';
 })
 export class InvoiceCountService {
 
-  constructor(private operationService: OperationService,) { }
-  //#region to get docket list
-  async getDocketCount(filter = {}) {
-    try {
-      // Prepare the request object
-      const req = {
-        companyCode: localStorage.getItem("companyCode"),
-        filter: filter,
-        collectionName: "docket_fin_det",
-      };
+  constructor(private operationService: OperationService,
+    private storage: StorageService) { }
 
-      // Fetch data from the 'docket' collection using the masterService
-      const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
-
-      return res.data;
-
-    } catch (error) {
-      // Display error message
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error,
-        showConfirmButton: true,
-      });
-    }
-  }
-  //#endregion
-  //#region to get docket list
-  async getDocketbilCount(filter = {}) {
-    try {
-      // Prepare the request object
-      const req = {
-        companyCode: localStorage.getItem("companyCode"),
-        filter: filter,
-        collectionName: "dockets",
-      };
-
-      // Fetch data from the 'docket' collection using the masterService
-      const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
-
-      return res.data;
-
-    } catch (error) {
-      // Display error message
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error,
-        showConfirmButton: true,
-      });
-    }
-  }
-  //#endregion
-  //#region to get docket list
-  async getInvCount(filter = {}) {
-    try {
-      // Prepare the request object
-      const req = {
-        companyCode: localStorage.getItem("companyCode"),
-        filter: filter,
-        collectionName: "cust_bill_headers",
-      };
-
-      // Fetch data from the 'docket' collection using the masterService
-      const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
-
-      return res.data;
-
-    } catch (error) {
-      // Display error message
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error,
-        showConfirmButton: true,
-      });
-    }
-  }
-  //#endregion
   //#region to get Pending count list
   async getPengPodCount(filter = {}) {
     try {
@@ -110,6 +35,95 @@ export class InvoiceCountService {
         text: error,
         showConfirmButton: true,
       });
+    }
+  }
+  //#endregion
+
+  //#region to get docket list
+  async getDashboardData() {
+    try {
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_fin_det",
+        filters: [
+          {
+            D$facet: {
+              docket_fin_det_facet: [
+                { D$match: { isBILLED: false, bLOC: this.storage.branch } },
+                {
+                  D$lookup: {
+                    from: "dockets",
+                    let: { cID: "$cID" },
+                    pipeline: [
+                      {
+                        D$match: {
+                          D$expr: {
+                            D$and: [
+                              { D$eq: ["$cID", "$$cID"] },
+                              { D$eq: ["$fSTS", 1] },
+                              { D$eq: ["$oRGN", this.storage.branch] },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                    as: "financialDetails",
+                  },
+                },
+                {
+                  D$lookup: {
+                    from: "cust_bill_headers",
+                    let: { cID: "$cID" },
+                    pipeline: [
+                      {
+                        D$match: {
+                          D$expr: {
+                            D$and: [
+                              { D$eq: ["$cID", "$$cID"] },
+                              { D$eq: ["$bSTS", 1] },
+                              { D$eq: ["$bLOC", this.storage.branch] },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                    as: "cust_bill_headers",
+                  },
+                },
+                {
+                  D$group: {
+                    _id: null,
+                    Unbilled_aMT: { D$sum: "$tOTAMT" },
+                    Unbilledcount: { D$sum: 1 },
+                    approvedBillCount: { D$first: { D$size: "$financialDetails" } },
+                    cust_bill_headers: {
+                      D$addToSet: {
+                        count: { D$size: "$cust_bill_headers" },
+                        total: { D$sum: "$cust_bill_headers.aMT" },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            D$project: {
+              dashboardCounts: {
+                D$mergeObjects: {
+                  D$arrayElemAt: ["$docket_fin_det_facet", 0],
+                },
+              },
+            },
+          },
+        ]
+      };
+
+      const res = await firstValueFrom(this.operationService.operationPost('generic/query', req));
+      // console.log(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("An error occurred:", error);
     }
   }
   //#endregion

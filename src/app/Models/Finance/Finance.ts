@@ -1,14 +1,14 @@
-export class DebitVoucherRequestModel {
+export class VoucherRequestModel {
   companyCode: number
   docType: string
   branch: string
   finYear: string
-  data: DebitVoucherDataRequestModel
+  data: VoucherDataRequestModel
   details: DebitVoucherdetailsRequestModel[]
   debitAgainstDocumentList: DebitAgainstDocumentList[]
 }
 
-export class DebitVoucherDataRequestModel {
+export class VoucherDataRequestModel {
   //companyCode: number
   voucherNo: string
   transType: string

@@ -1,0 +1,5 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="TableData" [FormTitle]="'POD Details'" (functionCallEmitter)="functionCallHandler($event)" [staticField]="staticField">
+    </app-generic-table-v2>
+</app-common-wrapper-webxpress>

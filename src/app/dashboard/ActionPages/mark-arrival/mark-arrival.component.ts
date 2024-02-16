@@ -105,7 +105,7 @@ export class MarkArrivalComponent implements OnInit {
     })
   }
   async getManifestDetail() {
-    debugger;
+    
     const shipment= await this.arrivalService.getThcWiseMeniFest({tHC:this.MarkArrivalTable.TripID,iSARR:false,"D$or":[{iSDEL:false},{iSDEL:{D$exists:false}}]});
     this.mfList=shipment
   }
@@ -120,11 +120,11 @@ export class MarkArrivalComponent implements OnInit {
     const tripId = this.MarkArrivalTableForm.value?.TripID || "";
     const res=await this.arrivalService.fieldMappingMarkArrival(tripDetailForm,this.mfList);
     if(res){
-      this.updateTripData(tripId)
+      this.updateTripData()
     }
   }
 
-  updateTripData(tripId) {
+  updateTripData() {
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
     let tripStatus, tripDetails,stCode,stName;

@@ -147,7 +147,7 @@ export class StocksComponent
    */
   async getDocketDetails() {
     try {
-      const data =await this.docketService.getDocketsDetailsLtl({cID:this.storage.companyCode,"D$or":[{oRGN:this.storage.branch},{cLOC:this.storage.branch}]});
+      const data =await this.docketService.getDocketList({cID:this.storage.companyCode,cLOC:this.storage.branch});
       const modifiedData =await this.docketService.getMappingDocketDetails(data);
       this.boxData =await this.docketService.kpiData(data);
       this.tableData = modifiedData.reverse();

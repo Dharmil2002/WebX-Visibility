@@ -68,6 +68,7 @@ export class ArrivalVehicleService {
                         "dKTNO": { "D$ifNull": ["$md.dKTNO", null] },
                         "tHCNO": { "D$ifNull": ["$mfHeader.tHC", null] },
                         "pKGS": { "D$ifNull": ["$md.pKGS", null] },
+                        "sFX": { "D$ifNull": ["$md.sFX", null] },
                         "dkt": { "D$ifNull": ["$mfHeader.dKTS", null] },
                         "lEG": { "D$ifNull": ["$mfHeader.leg", null] },
                         "oRG": { "D$ifNull": ["$mfHeader.oRGN", null] },
@@ -168,7 +169,7 @@ export class ArrivalVehicleService {
                 filter: { mFNO: { "D$in": mfNo } },
                 update: mfData
             }
-            await firstValueFrom(this.operation.operationMongoPut("generic/update", updateMfDetails));
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", updateMfDetails));
             const addEvnt = {
                 companyCode: this.storage.companyCode,
                 collectionName: "docket_events_ltl",
@@ -176,13 +177,6 @@ export class ArrivalVehicleService {
             }
             await firstValueFrom(this.operation.operationPost("generic/create", addEvnt));
            const dkt= dktList.map((x) => x.dKTNO);
-            const reqDktArrived = {
-                companyCode: this.storage.companyCode,
-                collectionName: "dockets_ltl",
-                filter: {docNo:{"D$in":dkt}},
-                update: { "oSTS": DocketStatus.Arrived, "oSTSN": DocketStatus[DocketStatus.Arrived] }
-            }
-            await firstValueFrom(this.operation.operationMongoPut("generic/update", reqDktArrived));
             const reqDktOpsArrived = {
                 companyCode: this.storage.companyCode,
                 collectionName: "docket_ops_det_ltl",
@@ -196,7 +190,7 @@ export class ArrivalVehicleService {
                     "mODLOC": this.storage.branch
                 }
             }
-            await firstValueFrom(this.operation.operationMongoPut("generic/update",reqDktOpsArrived));
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll",reqDktOpsArrived));
           
             
         }
@@ -207,7 +201,6 @@ export class ArrivalVehicleService {
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
         let eventJson = dktList;
         const dktCount = dktList.length;
-        const dktNo = dktList.map((x) => x.Shipment);
         const unloadPackage = sumProperty(dktList, 'Packages');
         const unloadWeightKg = sumProperty(dktList, 'WeightKg');
         const volumeCFT = sumProperty(dktList, 'VolumeCFT');
@@ -224,7 +217,6 @@ export class ArrivalVehicleService {
                 sEALRES: ""
             }
         }
-       
         if (dktList.length > 0) {
             eventJson = dktList.map(element => {
                 const evn = {
@@ -261,11 +253,11 @@ export class ArrivalVehicleService {
             "mODLOC": this.storage.branch,
             "mODBY": this.storage.userName
         }
-        const dktSts = {
-            oSTS: DocketStatus.In_Transhipment_Stock,
-            oSTSN: DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
-            cLOC: this.storage.branch
-        }
+        // const dktSts = {
+        //     oSTS: DocketStatus.In_Transhipment_Stock,
+        //     oSTSN: DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
+        //     cLOC: this.storage.branch
+        // }
         const ls = {
             cLOC: this.storage.branch
         }
@@ -276,21 +268,15 @@ export class ArrivalVehicleService {
             update: thcSummaryJson
         }
         await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
-
+        let dockets = dktList.map((d) => `${d.Shipment}-${d.Suffix	}`);
         const reqOps = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_ops_det_ltl",
-            filter: { dKTNO: { "D$in": dktNo } },
+            filter:{ "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] },dockets] } }  ,
             update: dktOps
         }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", reqOps));
-        const reqDkt = {
-            companyCode: this.storage.companyCode,
-            collectionName: "dockets_ltl",
-            filter: { docNo: { "D$in": dktNo } },
-            update: dktSts
-        }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", reqDkt));
+        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
+
         const reqEvent = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_events_ltl",
@@ -303,14 +289,14 @@ export class ArrivalVehicleService {
             filter: { pKGSNO: { "D$in": scanDkt } },
             update: ls
         }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", reqPkg));
+        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqPkg));
         const reqMF = {
             companyCode: this.storage.companyCode,
             collectionName: "mf_pkgs_details",
             filter: { pKGSNO: { "D$in": scanDkt } },
             update: { cLOC: this.storage.branch, iSARR: true }
         }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", reqMF));
+        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMF));
         const mfNo = dktList.map((x) => x.mfNo);
         const reqMf = {
             companyCode: this.storage.companyCode,
@@ -318,14 +304,14 @@ export class ArrivalVehicleService {
             filter: { mFNO: { "D$in": mfNo } },
             update: { iSDEL: true }
         }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", reqMf));
+        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMf));
         const reqMfDet = {
             companyCode: this.storage.companyCode,
             collectionName: "mf_details_ltl",
             filter: { mFNO: { "D$in": mfNo } },
             update: { iSDEL: true }
         }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", reqMfDet));
+        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMfDet));
         if (next) {
             const tripStatus = {
                 cLOC: this.storage.branch,

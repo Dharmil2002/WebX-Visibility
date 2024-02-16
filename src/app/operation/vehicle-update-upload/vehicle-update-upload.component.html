@@ -1,7 +1,8 @@
 <form [formGroup]="loadingSheetTableForm">
-    <app-form-without-auto-complete-webxpress [form]="loadingSheetTableForm" [formData]="updateListData"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-    </app-form-without-auto-complete-webxpress>
+    <app-form-webxpress [form]="loadingSheetTableForm" [FormTitle]="'Vehicle Loading'"
+    [formData]="updateListData" (functionCallEmitter)="functionCallHandler($event)"
+    [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+  </app-form-webxpress>
 </form>
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="shipingHeader" [tableData]="shipingDataTable"
 [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="shipingHeaderForCsv"

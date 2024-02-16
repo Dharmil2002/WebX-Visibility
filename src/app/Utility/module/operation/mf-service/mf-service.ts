@@ -15,7 +15,6 @@ export class ManifestService {
         private operationService: OperationService
     ) { }
     async getFieldMapping(details, header, formField,pkgs) {
-        debugger
         const lsNo={lSNO:formField?.LoadingSheet||"",rUTCD:formField.route.split(":")[0].trim(),count:parseInt(formField.count)}
         const mfHeader = {
             "_id": "",
@@ -68,7 +67,7 @@ export class ManifestService {
                     sFX: element?.Suffix || 0,
                     lOC:this.storage.branch,
                     eVNID: DocketEvents.Menifest_Generation,
-                    eVNDES: getEnumNameByValue(DocketEvents, DocketEvents.Menifest_Generation)?.replace(/_/g, " "),
+                    eVNDES:getEnumNameByValue(DocketEvents, DocketEvents.Menifest_Generation)?.replace(/_/g, " "),
                     eVNDT:new Date(),
                     eVNSRC:'Manifest Generated',
                     dOCTY: 'MF',

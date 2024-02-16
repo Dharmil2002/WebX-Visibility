@@ -44,6 +44,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   columnHeader = {
     "Shipment": "Shipment",
     "Origin": "Origin",
+    "Suffix":"Suffix",
     "Destination": "Destination",
     "Packages": "Packages",
     "Unloaded": "Unloaded",
@@ -56,6 +57,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",
+    "Suffix":"Suffix",
     "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
@@ -128,6 +130,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       Shipment: shipment.dKTNO||"",
       Origin: shipment.oRG||"",
       Destination: shipment?.dEST||"",
+      Suffix: shipment.sFX||"",
       Packages: parseInt(shipment.pKGS),
       Unloaded: 0,
       Pending: parseInt(shipment.pKGS),

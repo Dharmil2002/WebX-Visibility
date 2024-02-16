@@ -148,7 +148,7 @@ export class DepartureService {
       filter: { docNo: data.tripID },
       update: thcSummary
     }
-    await firstValueFrom(this.operation.operationMongoPut("generic/update", reqthc));
+    await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqthc));
     const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
     const tripDetails = {
       sTS:VehicleStatus.Departed,
@@ -191,13 +191,13 @@ export class DepartureService {
         data:eventJson
       }
       await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
-      const reqDktDepart={
-        companyCode: this.storage.companyCode,
-        collectionName:"dockets_ltl",
-        filter:{docNo:{"D$in":dktNoList}},
-        update:{"oSTS":DocketStatus.Departed,"oSTSN":DocketStatus[DocketStatus.Departed]}
-      }
-      await firstValueFrom(this.operation.operationMongoPut("generic/update", reqDktDepart));
+      // const reqDktDepart={
+      //   companyCode: this.storage.companyCode,
+      //   collectionName:"dockets_ltl",
+      //   filter:{docNo:{"D$in":dktNoList}},
+      //   update:{"oSTS":DocketStatus.Departed,"oSTSN":DocketStatus[DocketStatus.Departed]}
+      // }
+      // await firstValueFrom(this.operation.operationMongoPut("generic/update", reqDktDepart));
       const reqDktOpsDepart={
         companyCode: this.storage.companyCode,
         collectionName:"docket_ops_det_ltl",
@@ -210,7 +210,7 @@ export class DepartureService {
         "mODDT":new Date(),
         "mODLOC":this.storage.branch}
       }
-      await firstValueFrom(this.operation.operationMongoPut("generic/update",reqDktOpsDepart));
+      await firstValueFrom(this.operation.operationMongoPut("generic/updateAll",reqDktOpsDepart));
     }
     Swal.fire({
       icon: "info",

@@ -109,7 +109,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
       this.shipmentStatus = 'Loaded'
       this.vehicelLoadData = item;
     }
-
     this.getLoadingSheet();
     this.IntializeFormControl()    
   }
@@ -273,7 +272,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
     this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
     this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
-
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
     
   }

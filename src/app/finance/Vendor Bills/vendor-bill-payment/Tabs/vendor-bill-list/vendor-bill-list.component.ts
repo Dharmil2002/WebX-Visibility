@@ -343,7 +343,6 @@ export class VendorBillListComponent implements OnInit {
       }, {});
     // Convert the unique vendor objects back to an array
     const resultArray: any[] = Object.values(uniqueItems);
-    debugger
 
     if (resultArray.length == 1) {
       switch (resultArray[0].StatusCode) {

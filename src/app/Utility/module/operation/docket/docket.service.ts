@@ -580,8 +580,8 @@ export class DocketService {
       
             let formattedDate = "";
       
-            if (item.dKTDT) {
-              const parsedDate = parseISO(item.dKTDT);
+            if (item.dockets.dKTDT) {
+              const parsedDate = parseISO(item.dockets.dKTDT);
               if (isValid(parsedDate)) {
                 formattedDate = format(parsedDate, "dd-MM-yy HH:mm");
               }
@@ -589,16 +589,16 @@ export class DocketService {
             return {
               no: item?.dKTNO ?? "",
               date: formattedDate,
-              paymentType: item?.pAYTYPNM ?? "",
-              contractParty: `${item.bPARTY}-${item.bPARTYNM}`,
+              paymentType: item.dockets?.pAYTYPNM ?? "",
+              contractParty: `${item.dockets.bPARTY}-${item.dockets.bPARTYNM}`,
               orgdest: `${item?.oRGN ?? ""} : ${item?.dEST}`,
               fromCityToCity: `${item?.fCT ?? ""} : ${item?.tCT ?? ""}`,
               noofPackages: parseInt(item?.pKGS||0),
               chargedWeight: parseInt(item?.cHRWT||0),
               actualWeight: parseInt(item?.aCTWT||0),
-              status: this.statusLTLMapping[item.oSTS.toString()]?.status ?? "",
-              Action: item?.iSCOM ==true
-                ? item?.oSTS == 1 ? "" : ""
+              status: this.statusLTLMapping[item.sTS.toString()]?.status ?? "",
+              Action: item.dockets?.iSCOM ==true
+                ? item?.STS == 1 ? "" : ""
                 : "Quick Completion",
               isComplete: item?.iSCOM || false,
               docketsDetails:item
@@ -606,8 +606,8 @@ export class DocketService {
           });
           // Return the modified data
           modifiedData.sort((a: any, b: any) => {
-            const dateA = a.dKTDT ? new Date(a.dKTDT) : null;
-            const dateB = b.dKTDT ? new Date(b.dKTDT) : null;
+            const dateA = a.eNTDT ? new Date(a.eNTDT) : null;
+            const dateB = b.eNTDT ? new Date(b.eNTDT) : null;
             if (dateA && dateB) {
               return dateB.getTime() - dateA.getTime();
             } else if (dateA) {
@@ -647,6 +647,7 @@ export class DocketService {
             "pKGS": formData?.totalChargedNoOfpkg || 0,
             "aCTWT": formData?.actualwt || 0,
             "cHRWT": formData?.chrgwt || 0,
+            "cFTTOT":0,
             "eNTDT":new Date(),
             "eNTBY":this.storage.userName,
             "eNTLOC":this.storage.branch,
@@ -852,8 +853,6 @@ export class DocketService {
    /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
     async operationsFieldMapping(data,invoiceDetails=[]){
     const ops={
-        _id: `${this.storage.companyCode}-${data.dKTNO}`,
-        cID:this.storage.companyCode,
         dKTNO: data?.dKTNO||"",
         sFX: 0,
         oRGN: data?.oRGN||"",
@@ -869,9 +868,9 @@ export class DocketService {
         sTSTM: ConvertToDate(data?.dKTDT),
         oPSSTS:`Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format('DD MMM YYYY @ hh:mm A')}.`,
         iSDEL: false,        
-        eNTDT: data?.eNTDT,
-        eNTLOC: data?.eNTLOC||"",
-        eNTBY: data?.eNTBY||""
+        mODDT: data?.eNTDT,
+        mODLOC: data?.eNTLOC||"",
+        mODBY: data?.eNTBY||""
      }  
     //Prepare Event Data
     let evnData = {
@@ -888,7 +887,7 @@ export class DocketService {
           dOCNO: data?.dKTNO||"",
           sTS: DocketStatus.Booked,
           sTSNM: DocketStatus[DocketStatus.Booked],
-          oPSSTS: `Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format("DD MMM YYYY @ hh:mm A")} and awaiting completion.`,
+          oPSSTS: `Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format("DD MMM YYYY @ hh:mm A")}`,
           eNTDT: data?.eNTDT,
           eNTLOC: data?.eNTLOC||"",
           eNTBY: data?.eNTBY||""
@@ -896,9 +895,10 @@ export class DocketService {
     let reqBody = {
         companyCode: this.storage.companyCode,
         collectionName: "docket_ops_det_ltl",
-        data:ops
+        filter:{dKTNO:data?.dKTNO},
+        update:ops
       };
-        await firstValueFrom(this.operation.operationMongoPost('generic/create',reqBody));
+        await firstValueFrom(this.operation.operationMongoPut('generic/update',reqBody));
     let reqinvoice = {
         companyCode: this.storage.companyCode,
         collectionName: "docket_invoices_ltl",
@@ -914,4 +914,51 @@ export class DocketService {
       return true
     }
    /*End*/
+       /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
+       async getDocketList(filter) {
+        let matchQuery = filter
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filters: [
+                {
+                    D$match: matchQuery,
+                },
+                {
+                    "D$lookup": {
+                        "from": "dockets_ltl",
+                        "let": { "docNoVar": "$dKTNO" }, // Define a variable "docNoVar" to use in the pipeline. Assumes "$dKTNO" is from "mfHeader"
+                        "pipeline": [
+                            {
+                                "D$match": {
+                                    "D$expr": { 
+                                        "D$eq": ["$docNo", "$$docNoVar"] // Use "$docNo" from "dockets_ltl" and compare it with "docNoVar"
+                                    }
+                                }
+                            },
+                            {
+                                "D$project": {
+                                    "_id": 0,
+                                    "pAYTYP": 1,
+                                    "pAYTYPNM": 1,
+                                    "iSCOM":1,
+                                    "bPARTY":1,
+                                    "dKTDT":1,
+                                    "bPARTYNM":1
+                                }
+                            }
+                        ],
+                        "as": "dockets"
+                    }
+                },
+                {
+                    "D$unwind": "$dockets"
+                }
+            ]
+            
+        }
+        // Send request and handle response
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
+        return res.data;
+    }
 }

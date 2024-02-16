@@ -33,6 +33,7 @@ export class LoadingSheetService {
     return await firstValueFrom(this.operationService.operationMongoPost("generic/get", req));
   }
   async tripFieldMapping(data, tabledata) {
+    
     let tripSummary = {
       "_id": "",
       "cID": this.storage.companyCode,
@@ -40,8 +41,8 @@ export class LoadingSheetService {
       "tHCDT": new Date(),
       "cLOC": this.storage.branch,
       "dEST": data?.Route.split(":")[1].split("-")[1],
-      "fCT": "",
-      "tCT": "",
+      // "fCT": "",
+      // "tCT": "",
       "rUTCD": data?.Route.split(":")[0] || "",
       "rUTNM": data?.Route.split(":")[1] || "",
       "vEHNO": data?.vehicle.value || "",
@@ -237,7 +238,7 @@ export class LoadingSheetService {
               "cID": this.storage.companyCode,
               "dKTNO": ls?.dKTNO || "",
               "sFX": ls?.sFX || 0,
-              "lOC": element?.curLoc || "",
+              "lOC":element?.curLoc || "",
               "bLOC": ls?.oRGN || "",
               "dLOC": ls?.dEST || "",
               "pKGS": ls?.pKGS || 0,
@@ -416,8 +417,8 @@ export class LoadingSheetService {
               "cID": this.storage.companyCode,
               "dKTNO": ls?.dKTNO || "",
               "sFX": ls?.sFX || 0,
-              "bLOC": element?.orgLoc || "",
-              "dLOC": element?.destLoc || "",
+              "bLOC": ls?.oRGN || "",
+              "dLOC": ls?.dEST || "",
               "pKGS": ls?.pKGS || 0,
               "wT": ls?.aCTWT || 0,
               "vCFT": element?.volumeCFT || "",
@@ -472,8 +473,6 @@ export class LoadingSheetService {
       "tHCDT": new Date(),
       "cLOC": this.storage.branch,
       "dEST": data?.Route.split(":")[1].split("-")[1],
-      "fCT": "",
-      "tCT": "",
       "rUTCD": data?.Route.split(":")[0] || "",
       "rUTNM": data?.Route.split(":")[1] || "",
       "vEHNO": data?.vehicle.value || "",

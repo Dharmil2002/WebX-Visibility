@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
+import moment from "moment";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -67,6 +68,10 @@ export class ConsignmentFilterComponent implements OnInit {
         name: "Summary Tracking",
         value: "2",
       },
+      {
+        name: "POD Tracking",
+        value: "3",
+      },
     ];
     this.filter.Filter(
       this.jsonControlArray,
@@ -81,16 +86,24 @@ export class ConsignmentFilterComponent implements OnInit {
     if (this.ConsignmentFilterForm.value.DocumentType.value == "1") {
       const sendData = {
         DocNo: this.ConsignmentFilterForm.value.DocketNumber,
-        end: this.ConsignmentFilterForm.value.end,
-        start: this.ConsignmentFilterForm.value.start,
+        start: moment(this.ConsignmentFilterForm.value.start).format('DD-MM-YYYY HH:mm Z'),
+        end: moment(this.ConsignmentFilterForm.value.end).format('DD-MM-YYYY HH:mm Z'),
       };
-      console.log(this.ConsignmentFilterForm.value.DocumentType.value , sendData)
-    } else {
+      console.log('sendData' ,sendData)
+      this.Route.navigate(["Operation/ConsignmentOperation"], { state: { data: sendData } });
+    } else if (this.ConsignmentFilterForm.value.DocumentType.value == "2") {
       const sendData = {
         DocNo: this.ConsignmentFilterForm.value.DocketNumber,
       };
-      console.log(this.ConsignmentFilterForm.value.DocumentType.value , sendData)
-    }
+      this.Route.navigate(["Operation/ConsignmentSummary"], { state: { data: sendData } });
+    } else if (this.ConsignmentFilterForm.value.DocumentType.value == "3") {
+      const sendData = {
+        DocNo: this.ConsignmentFilterForm.value.DocketNumber,
+        start: moment(this.ConsignmentFilterForm.value.start).format('DD-MM-YYYY HH:mm Z'),
+        end: moment(this.ConsignmentFilterForm.value.end).format('DD-MM-YYYY HH:mm Z'),
+      };
+      this.Route.navigate(["Operation/ConsignmentPOD"], { state: { data: sendData } });
+    } 
   }
 
   functionCallHandler($event) {

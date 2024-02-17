@@ -15,7 +15,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   linkArray = []
   columnHeader = {
     // "srNo": "Sr No",
-    "entryDate": 'Created Date',
+    "eNTDT": 'Created Date',
     'routeMode': 'Route Mode',
     'routeId': 'Route Code',
     'routeName': 'Route Name',
@@ -61,7 +61,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
     this.masterService.masterPost('generic/get', req).subscribe({
         next: (res: any) => {
             if (res) {
-                this.csv = res.data.map((x)=>{x.entryDate=formatDocketDate(x.eNTDT); return x} );
+                this.csv = res.data.map((x)=>{x.eNTDT=formatDocketDate(x.eNTDT); return x} );;
                 this.tableLoad = false;
             }
         }

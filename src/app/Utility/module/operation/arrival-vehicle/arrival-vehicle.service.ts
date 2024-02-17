@@ -203,7 +203,7 @@ export class ArrivalVehicleService {
     }
     /*End*/
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
-
+         debugger
         let eventJson = dktList;
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'Packages');
@@ -405,7 +405,7 @@ export class ArrivalVehicleService {
             const reqVehicle = {
                 companyCode: this.storage.companyCode,
                 collectionName: "vehicle_status",
-                filter: { vehNo: data.vehicle },
+                filter: { vehNo: data.VehicleNo },
                 update: { currentLocation: this.storage.branch, tripId: "", route: "",status: "Available" }
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/update", reqVehicle));

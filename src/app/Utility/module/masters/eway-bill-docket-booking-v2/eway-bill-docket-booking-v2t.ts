@@ -614,6 +614,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         if (result.isConfirmed) {
           this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
         }
+        else{
+          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+        }
       }
     } catch (error) {
       Swal.fire({

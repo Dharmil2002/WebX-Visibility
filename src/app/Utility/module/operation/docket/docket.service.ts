@@ -70,6 +70,10 @@ export class DocketService {
         "6": {
             status: `${"In stock"} ${"at"} ${this.storage.branch}`,
             actions: [""],
+        },
+        "7": {
+            status: `${"In stock available for delivery "} ${"at"} ${this.storage.branch}`,
+            actions: [""],
         }
         // Add more status mappings as needed
     };

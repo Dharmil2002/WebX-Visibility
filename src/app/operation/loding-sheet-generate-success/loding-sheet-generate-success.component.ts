@@ -51,6 +51,9 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
   }
+  columnWidths = {
+    'LoadingSheet': 'min-width:20%'
+  };
   // linkArray = [
 
   // ]

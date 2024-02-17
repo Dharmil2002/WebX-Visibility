@@ -202,7 +202,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   async fetchShipmentData() {
     // Prepare request payload
     // Send request and handle response
-        const shipment= await this.depatureService.getThcWiseMeniFest({dEST:this.storage.branch});
+        const shipment= await this.depatureService.getThcWiseMeniFest({dEST:this.storage.branch,"D$or":[{iSDEL:false},{iSDEL:{"D$exists":false}}]});
         const sumTotalChargedNoOfpkg = shipment.reduce((total, count) => {
           return total + parseInt(count.pKGS);
         }, 0);

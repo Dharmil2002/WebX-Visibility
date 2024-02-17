@@ -10,7 +10,7 @@
          -->
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="tableData"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
-    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+    [csvFileName]="csvFileName" [columnWidths]="columnWidths" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
     [toggleArray]="toggleArray" [menuItems]="menuItems" [centerAligned]="centerAlignedData" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
 </generic-table-webxpress>
 <div class="row">

@@ -51,6 +51,9 @@ Currently, all flows are working together without proper separation.
     "aCTWT": "Weight",
     "cFTTOT": "Volume",
   };
+  columnWidths = {
+    'Shipment': 'min-width:20%'
+  };
   centerAlignedData = ['Shipment','Suffix', 'Packages', 'KgWeight', 'CftVolume'];
 
   //#region declaring Csv File's Header as key and value Pair

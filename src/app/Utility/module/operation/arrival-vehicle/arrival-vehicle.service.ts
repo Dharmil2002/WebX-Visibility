@@ -104,7 +104,7 @@ export class ArrivalVehicleService {
     /*End*/
     /*Below function is for register entry of mark Arrival*/
     async fieldMappingMarkArrival(data, dktList) {
-        debugger
+        
         let eventJson = dktList;
         const arrivalData = {
             aRR: {
@@ -178,32 +178,32 @@ export class ArrivalVehicleService {
                 data: eventJson
             }
             await firstValueFrom(this.operation.operationPost("generic/create", addEvnt));
-           const dkt=dktList.map((x)=>`${x.dKTNO}-${x.sFX}`);
-           if(dkt.length>0){
-            const reqDktOpsArrived = {
-                companyCode: this.storage.companyCode,
-                collectionName: "docket_ops_det_ltl",
-                filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] },dkt] } },
-                update: {
-                    "sTS": DocketStatus.Arrived,
-                    "sTSNM": DocketStatus[DocketStatus.Arrived],
-                    "oPSSTS":`Arrived at ${this.storage.branch} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}.`,
-                    "mODBY": this.storage.userName,
-                    "mODDT": new Date(),
-                    "mODLOC": this.storage.branch
+            const dkt = dktList.map((x) => `${x.dKTNO}-${x.sFX}`);
+            if (dkt.length > 0) {
+                const reqDktOpsArrived = {
+                    companyCode: this.storage.companyCode,
+                    collectionName: "docket_ops_det_ltl",
+                    filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dkt] } },
+                    update: {
+                        "sTS": DocketStatus.Arrived,
+                        "sTSNM": DocketStatus[DocketStatus.Arrived],
+                        "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}.`,
+                        "mODBY": this.storage.userName,
+                        "mODDT": new Date(),
+                        "mODLOC": this.storage.branch
+                    }
                 }
+                await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqDktOpsArrived));
             }
-            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll",reqDktOpsArrived));
+
+
         }
-          
-            
-        }
-     
+
         return true
     }
     /*End*/
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
-        debugger
+
         let eventJson = dktList;
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'Packages');
@@ -222,8 +222,90 @@ export class ArrivalVehicleService {
                 sEALRES: ""
             }
         }
-        if (dktList.length > 0) {
-            eventJson = dktList.map(element => {
+        const ls = {
+            cLOC: this.storage.branch
+        }
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "thc_summary_ltl",
+            filter: { docNo: data.TripID },
+            update: thcSummaryJson
+        }
+        await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
+        const destDocket = dktList.filter((x) => x.Destination == this.storage.branch);
+        const transDocket = dktList.filter((x) => x.Destination != this.storage.branch);
+        if (destDocket.length > 0) {
+            const dockets = destDocket.map((d) => `${d.Shipment}-${d.Suffix}`)
+            const dktOps = {
+                "cLOC": this.storage.branch,
+                "tHC": "",
+                "sTS": DocketStatus.In_Delivery_Stock,
+                "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
+                "sTSTM": new Date(),
+                "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                "mODDT": new Date(),
+                "mODLOC": this.storage.branch,
+                "mODBY": this.storage.userName
+            }
+
+            const reqOps = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
+                update: dktOps
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
+            const eventJson = dktList.map(element => {
+                const evn = {
+                    "_id": `${this.storage.companyCode}-${element.Shipment}-0-EVN0004- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "cID": this.storage.companyCode,
+                    "dKTNO": element.Shipment,
+                    "sFX": 0,
+                    "lOC": this.storage.branch,
+                    "eVNID": "EVN0004",
+                    "eVNDES": "The shipment is currently in Delivery stock.",
+                    "eVNDT": new Date(),
+                    "eVNSRC": "Arrival Scan",
+                    "dOCTY": "TH",
+                    "dOCNO": data?.tripID || "",
+                    "sTS": DocketStatus.In_Delivery_Stock,
+                    "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
+                    "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                    "eNTDT": new Date(),
+                    "eNTLOC": this.storage.branch,
+                    "eNTBY": this.storage.userName
+                }
+                return evn
+            });
+            const reqEvent = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_events_ltl",
+                data: eventJson
+            }
+            await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
+        }
+        if (transDocket.length > 0) {
+            const dockets = transDocket.map((d) => `${d.Shipment}-${d.Suffix}`)
+            const dktOps = {
+                "cLOC": this.storage.branch,
+                "tHC": "",
+                "sTS": DocketStatus.In_Transhipment_Stock,
+                "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
+                "sTSTM": new Date(),
+                "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                "mODDT": new Date(),
+                "mODLOC": this.storage.branch,
+                "mODBY": this.storage.userName
+            }
+
+            const reqOps = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
+                update: dktOps
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
+            const eventJson = dktList.map(element => {
                 const evn = {
                     "_id": `${this.storage.companyCode}-${element.Shipment}-0-EVN0004- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                     "cID": this.storage.companyCode,
@@ -238,56 +320,21 @@ export class ArrivalVehicleService {
                     "dOCNO": data?.tripID || "",
                     "sTS": DocketStatus.In_Transhipment_Stock,
                     "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
-                    "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}.`,
+                    "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
                     "eNTBY": this.storage.userName
                 }
                 return evn
             });
+            const reqEvent = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_events_ltl",
+                data: eventJson
+            }
+            await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
         }
-        const dktOps = {
-            "cLOC": this.storage.branch,
-            "tHC": "",
-            "sTS": DocketStatus.In_Transhipment_Stock,
-            "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
-            "sTSTM": new Date(),
-            "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
-            "iSDEL": true,
-            "mODDT": new Date(),
-            "mODLOC": this.storage.branch,
-            "mODBY": this.storage.userName
-        }
-        // const dktSts = {
-        //     oSTS: DocketStatus.In_Transhipment_Stock,
-        //     oSTSN: DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
-        //     cLOC: this.storage.branch
-        // }
-        const ls = {
-            cLOC: this.storage.branch
-        }
-        const req = {
-            companyCode: this.storage.companyCode,
-            collectionName: "thc_summary_ltl",
-            filter: { docNo: data.TripID },
-            update: thcSummaryJson
-        }
-        await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
-        let dockets = dktList.map((d) => `${d.Shipment}-${d.Suffix	}`);
-        const reqOps = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_ops_det_ltl",
-            filter:{ "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] },dockets] } }  ,
-            update: dktOps
-        }
-        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
 
-        const reqEvent = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_events_ltl",
-            data: eventJson
-        }
-        await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
         const reqPkg = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_pkgs_ltl",
@@ -339,7 +386,7 @@ export class ArrivalVehicleService {
             })
         }
         else {
-    
+
             const tripStatus = {
                 cLOC: data.Route.split(":")[1].split("-")[0],
                 nXTLOC: "",
@@ -355,13 +402,13 @@ export class ArrivalVehicleService {
                 update: tripStatus
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/update", reqTrip));
-            const reqVehicle={
+            const reqVehicle = {
                 companyCode: this.storage.companyCode,
-                collectionName:"vehicle_status",
-                filter:{vehNo:data.vehicle},
-                update:{currentLocation:this.storage.branch,tripId:"",route:""}
+                collectionName: "vehicle_status",
+                filter: { vehNo: data.vehicle },
+                update: { currentLocation: this.storage.branch, tripId: "", route: "",status: "Available" }
             }
-            await firstValueFrom(this.operation.operationMongoPut("generic/update",reqVehicle));
+            await firstValueFrom(this.operation.operationMongoPut("generic/update", reqVehicle));
             Swal.fire({
                 icon: "info",
                 title: "Trip is close",

@@ -677,13 +677,11 @@ export class DocketService {
               text: "DocketNo: " + res.data,
               showConfirmButton: true,
             }).then((result) => {
-              if (result.isConfirmed) {
                 // Redirect to the desired page after the success message is confirmed.
                 this.navService.navigateTotab(
                   "docket",
                   "dashboard/Index"
                 );
-              }
             });
           })
           .catch((err) => {

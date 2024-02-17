@@ -69,8 +69,10 @@ export class DepartureService {
     return (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
   }
   async getFieldDepartureMapping(data, shipment) {
+    debugger
     const vendorCode=await this.vendor.getVendorDetail(data?.Vendor);
     const dktNoList = shipment?shipment.map((x) => x.dKTNO):[];
+    const dktSfx=shipment.map((x)=>`${x.dKTNO}-${x.sFX}`);
     let eventJson = dktNoList;
     const thcSummary = {
       "tHCDT": new Date(),
@@ -201,7 +203,7 @@ export class DepartureService {
       const reqDktOpsDepart={
         companyCode: this.storage.companyCode,
         collectionName:"docket_ops_det_ltl",
-        filter:{dKTNO:{"D$in":dktNoList}},
+        filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dktSfx] } },
         update:{
         "sTS":DocketStatus.Departed,
         "sTSNM":DocketStatus[DocketStatus.Departed],

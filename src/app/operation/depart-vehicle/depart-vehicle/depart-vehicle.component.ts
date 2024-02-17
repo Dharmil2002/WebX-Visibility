@@ -397,7 +397,7 @@ export class DepartVehicleComponent implements OnInit {
 
 
   async addDepartData(departData) {
-      const depart= await this.departureService.getFieldDepartureMapping(departData,this.shipmentData);
+       await this.departureService.getFieldDepartureMapping(departData,this.shipmentData);
       this.goBack('Departures');
   }
   updateTrip() {

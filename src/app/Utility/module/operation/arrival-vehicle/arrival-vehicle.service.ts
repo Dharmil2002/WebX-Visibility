@@ -104,6 +104,7 @@ export class ArrivalVehicleService {
     /*End*/
     /*Below function is for register entry of mark Arrival*/
     async fieldMappingMarkArrival(data, dktList) {
+        debugger
         let eventJson = dktList;
         const arrivalData = {
             aRR: {
@@ -177,11 +178,12 @@ export class ArrivalVehicleService {
                 data: eventJson
             }
             await firstValueFrom(this.operation.operationPost("generic/create", addEvnt));
-           const dkt= dktList.map((x) => x.dKTNO);
+           const dkt=dktList.map((x)=>`${x.dKTNO}-${x.sFX}`);
+           if(dkt.length>0){
             const reqDktOpsArrived = {
                 companyCode: this.storage.companyCode,
                 collectionName: "docket_ops_det_ltl",
-                filter: {dKTNO:{"D$in":dkt }},
+                filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] },dkt] } },
                 update: {
                     "sTS": DocketStatus.Arrived,
                     "sTSNM": DocketStatus[DocketStatus.Arrived],
@@ -192,6 +194,7 @@ export class ArrivalVehicleService {
                 }
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/updateAll",reqDktOpsArrived));
+        }
           
             
         }
@@ -200,6 +203,7 @@ export class ArrivalVehicleService {
     }
     /*End*/
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
+        debugger
         let eventJson = dktList;
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'Packages');

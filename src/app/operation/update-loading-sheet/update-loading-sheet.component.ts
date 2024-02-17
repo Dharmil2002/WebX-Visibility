@@ -53,6 +53,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   centerShippingData = ['Shipment', 'Suffix', 'Packages', 'WeightKg', 'VolumeCFT'];
   centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'Unloaded', 'Pending'];
+  columnWidths = {
+    'Shipment': 'min-width:20%'
+  };
   shipmentStatus: string = 'Unloaded';
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -75,9 +78,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
   //declaring breadscrum
   breadscrums = [
     {
-      title: "Update Loading Sheet",
+      title: "Vehicle Unloading",
       items: ["Home"],
-      active: "Update Loading Sheet"
+      active: "Vehicle Unloading"
     }
   ]
   toggleArray = []
@@ -127,6 +130,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async getLoadingSheetDetail() {
+    debugger
     const shipmentData = await this.arrivalService.getThcWiseMeniFest({tHC:this.arrivalData?.TripID,dEST:this.storage.branch,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]});
     if(!shipmentData)
       return;
@@ -136,7 +140,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       Shipment: shipment.dKTNO||"",
       Origin: shipment.oRG||"",
       Destination: shipment?.dEST||"",
-      Suffix: shipment.sFX||"",
+      Suffix: shipment?.sFX||0,
       Packages: parseInt(shipment.pKGS),
       Unloaded: 0,
       Pending: parseInt(shipment.pKGS),

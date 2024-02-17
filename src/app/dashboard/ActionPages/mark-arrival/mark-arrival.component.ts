@@ -106,10 +106,11 @@ export class MarkArrivalComponent implements OnInit {
   }
   async getManifestDetail() {
     
-    const shipment= await this.arrivalService.getThcWiseMeniFest({tHC:this.MarkArrivalTable.TripID,iSARR:false,"D$or":[{iSDEL:false},{iSDEL:{D$exists:false}}]});
+    const shipment= await this.arrivalService.getThcWiseMeniFest({tHC:this.MarkArrivalTable.TripID,"D$or":[{iSDEL:false},{iSDEL:{D$exists:false}}]});
     this.mfList=shipment
   }
   async save() {
+    debugger
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -117,7 +118,6 @@ export class MarkArrivalComponent implements OnInit {
       )
 
     let tripDetailForm = this.MarkArrivalTableForm.value
-    const tripId = this.MarkArrivalTableForm.value?.TripID || "";
     const res=await this.arrivalService.fieldMappingMarkArrival(tripDetailForm,this.mfList);
     if(res){
       this.updateTripData()
@@ -125,6 +125,7 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   updateTripData() {
+    debugger
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
     

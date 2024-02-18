@@ -130,7 +130,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async getLoadingSheetDetail() {
-    debugger
+    
     const shipmentData = await this.arrivalService.getThcWiseMeniFest({tHC:this.arrivalData?.TripID,dEST:this.storage.branch,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]});
     if(!shipmentData)
       return;

@@ -69,7 +69,7 @@ export class DepartureService {
     return (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
   }
   async getFieldDepartureMapping(data, shipment) {
-    debugger
+    
     const vendorCode=await this.vendor.getVendorDetail(data?.Vendor);
     const dktNoList = shipment?shipment.map((x) => x.dKTNO):[];
     const dktSfx=shipment.map((x)=>`${x.dKTNO}-${x.sFX}`);

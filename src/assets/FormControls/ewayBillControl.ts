@@ -990,6 +990,9 @@ export class EwayBillControls {
         generatecontrol: true,
         disable: false,
         Validations: [],
+        functions:{
+          onChange:"calculateInvoiceTotal"
+        }
       },
       {
         name: "cft_tot",

@@ -203,7 +203,7 @@ export class ArrivalVehicleService {
     }
     /*End*/
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
-         debugger
+         
         let eventJson = dktList;
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'Packages');

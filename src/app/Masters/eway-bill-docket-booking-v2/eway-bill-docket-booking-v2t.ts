@@ -79,6 +79,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       name: "Invoice No.",
       key: "inputString",
       style: "min-width:150px",
+      functions: {
+        onChange: "checkInvoiceExist",
+      },
     },
     INVDT: {
       name: "Invoice Date",
@@ -611,22 +614,20 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       }
       // Make the POST request and wait for the response.
       const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
-  
       // Check if response is successful.
       if (res) {
         // Display success message.
-        const result = await Swal.fire({
+        await Swal.fire({
           icon: "success",
           title: "Booked Successfully",
           text: "DocketNo: " + this.tabForm.controls["docketNumber"].value,
           showConfirmButton: true,
-        });
-  
-        // Redirect after confirmation.
-        if (result.isConfirmed) {
+        }).then((result) => {
+          // Redirect after the alert is closed, regardless of whether it is confirmed or not.
           this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-        }
+        });
       }
+      
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -703,9 +704,11 @@ export class EwayBillDocketBookingV2Component implements OnInit {
           this.tableData.splice(index, 1);
           this.tableData = this.tableData;
           swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
+          this.calculateInvoiceTotal();
           event.callback(true);
         } else if (result.isConfirmed) {
           swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
+          this.calculateInvoiceTotal();
           event.callback(false);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithBootstrapButtons.fire(
@@ -713,6 +716,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             "Your item is safe :)",
             "error"
           );
+          this.calculateInvoiceTotal();
           event.callback(false);
         }
       });
@@ -722,5 +726,30 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
   calculateInvoiceTotal() {
     calculateInvoiceTotalCommon(this.tableData, this.contractForm);
+  }
+  async checkInvoiceExist(data){
+    
+    if(data.row.INVNO){
+    const res=await this.docketService.checkInvoiceExistLTL({cID:this.storage.companyCode,iNVNO:data.row.INVNO});
+    if(res){
+      Swal.fire({
+        icon: 'info',
+        title: 'Invoice Exists',
+        text: `Invoice number ${data.row.INVNO} already exists.`
+      });
+      data.row.INVNO = '';
+    }
+    else{
+      const existingInvoice = this.tableData.filter((item) => item.INVNO == data.row.INVNO);
+      if(existingInvoice.length>1){
+        Swal.fire({
+          icon: 'info',
+          title: 'Invoice Exists',
+          text: `Invoice number ${data.row.INVNO} already exists.`
+        });
+        data.row.INVNO = '';
+      }
+    }
+    }
   }
 }

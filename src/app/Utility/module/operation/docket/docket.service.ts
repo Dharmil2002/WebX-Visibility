@@ -737,6 +737,7 @@ export class DocketService {
         "pAYTYPNM":data?.payTypeName||"",
         "bPARTY":data?.billingParty.value||"",
         "bPARTYNM":data?.billingParty.name||"",
+        "cLOC":this.storage.branch||"",
         "oRGN":data?.orgLoc||"",
         "fCT":data?.fromCity?.value||"",
         "dEST":data?.destination?.value||"",
@@ -993,5 +994,15 @@ export class DocketService {
         // Send request and handle response
         const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
         return res.data;
+    }
+    async checkInvoiceExistLTL(filter){
+        
+       const req={
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_invoices_ltl",
+        filter:filter
+       }
+       const res =await firstValueFrom(this.operation.operationMongoPost('generic/get',req));
+       return res.data.length>0?true:false;
     }
 }

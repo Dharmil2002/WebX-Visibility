@@ -177,7 +177,7 @@ export class GeneralLedgerReportComponent implements OnInit {
     const state = Array.isArray(this.generalLedgerForm.value.stateHandler)
       ? this.generalLedgerForm.value.stateHandler.map(x => x.name)
       : [];
-    const fnYear = this.generalLedgerForm.value.Fyear.name;
+    const fnYear = this.generalLedgerForm.value.Fyear.value;
     const category = this.generalLedgerForm.value.category.name;
     const branch = this.generalLedgerForm.value.branch.name;
     const individual = this.generalLedgerForm.value.Individual;

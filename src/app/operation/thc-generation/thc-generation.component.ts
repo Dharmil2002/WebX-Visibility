@@ -94,42 +94,42 @@ export class ThcGenerationComponent implements OnInit {
     checkBoxRequired: {
       Title: "Select",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      Style: "max-width:8%",
     },
     bPARTYNM: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:150px",
+      Style: "min-width:15%",
     },
     docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "min-width:150px",
+      Style: "min-width:20%",
     },
     cNO: {
       Title: "Container Id",
       class: "matcolumnleft",
-      Style: "min-width:150px",
+      Style: "min-width:10%",
     },
     fCT: {
       Title: "From City",
       class: "matcolumncenter",
-      Style: "min-width:150px",
+      Style: "min-width:12%",
     },
     tCT: {
       Title: "To City",
-      class: "matcolumnleft",
-      Style: "min-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:12%",
     },
     aCTWT: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      Style: "min-width:8%",
     },
     pKGS: {
       Title: "No of Packets ",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      Style: "max-width:10%",
     },
     pod: {
       Title: "Pod",

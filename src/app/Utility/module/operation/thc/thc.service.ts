@@ -56,7 +56,7 @@ export class ThcService {
                 cNO: element?.cNO || "",
                 fCT: element.fCT,
                 tCT: element.tCT,
-                aCTWT: dkt?.tOTWT || 0,
+                aCTWT: Number(dkt?.tOTWT || 0).toFixed(2), // Ensure two decimal places
                 pKGS: dkt?.tOTPKG || 0,
                 pod: element?.pOD || "",
                 receiveBy: element?.rCVBY || "",

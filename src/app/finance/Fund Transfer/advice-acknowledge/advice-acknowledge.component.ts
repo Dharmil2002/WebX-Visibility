@@ -12,7 +12,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { AdviceGenerationControl } from 'src/assets/FormControls/Finance/AdviceGeneration/advicegenerationcontrol';
 import Swal from 'sweetalert2';
-import { GetLocationDetailFromApi, GetBankDetailFromApi, GetAccountDetailFromApi } from '../../credit-debit-voucher/debitvoucherAPIUtitlity';
+import { GetLocationDetailFromApi, GetBankDetailFromApi, GetAccountDetailFromApi } from '../../Debit Voucher/debitvoucherAPIUtitlity';
 import { AdviceGeneration } from "src/app/Models/Finance/Advice";
 import { AdviceAcknowledgeControl } from '../../../../assets/FormControls/Finance/AdviceAcknowledge/adviceacknowledgecontrol';
 import { MatDialog } from '@angular/material/dialog';

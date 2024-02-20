@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { InvoiceSummaryBillComponent } from './invoice-summary-bill/invoice-summary-bill.component';
 import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/add-manual-voucher.component';
-import { DebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.component';
 import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
 import { InvoiceCollectionComponent } from './invoice-collection/invoice-collection.component';
@@ -17,6 +16,7 @@ import { OpeningBalanceLedgerComponent } from './opening-balance-ledger/opening-
 import { ContraVoucherCreationComponent } from './VoucherEntry/Contra Voucher/contra-voucher-creation/contra-voucher-creation.component';
 import { AdviceAcknowledgeComponent } from './Fund Transfer/advice-acknowledge/advice-acknowledge.component';
 import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/advice-generation.component';
+import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },

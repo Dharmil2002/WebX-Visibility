@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
-import { GetDocumentsWiseListFromApi } from '../../credit-debit-voucher/debitvoucherAPIUtitlity';
+import { GetDocumentsWiseListFromApi } from '../../Debit Voucher/debitvoucherAPIUtitlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({

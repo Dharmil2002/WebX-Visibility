@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { GetLedgerDocument } from '../../credit-debit-voucher/debitvoucherCommonUtitlity';
+import { GetLedgerDocument } from '../../Debit Voucher/debitvoucherCommonUtitlity';
 import { AddDetailsDebitAgainstDocumentModalComponent } from '../add-details-debit-against-document-modal/add-details-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 

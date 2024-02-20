@@ -22,8 +22,8 @@ import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 @Component({
-  selector: 'app-credit-debit-voucher',
-  templateUrl: './credit-debit-voucher.component.html',
+  selector: 'app-debit-voucher',
+  templateUrl: './debit-voucher.component.html',
 })
 export class DebitVoucherComponent implements OnInit {
   companyCode: number | null

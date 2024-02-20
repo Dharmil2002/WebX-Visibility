@@ -9,7 +9,6 @@ export class VoucherRequestModel {
 }
 
 export class VoucherDataRequestModel {
-  //companyCode: number
   voucherNo: string
   transType: string
   transDate: Date
@@ -83,4 +82,13 @@ export class DebitAgainstDocumentList {
   Document: string
   DebitAmountAgaintsDocument: string
   DocumentType: string
+}
+
+
+export enum VoucherType {
+  DebitVoucher = 0,
+  CreditVoucher = 1,
+  JournalVoucher = 2,
+  ContraVoucher = 3,
+
 }

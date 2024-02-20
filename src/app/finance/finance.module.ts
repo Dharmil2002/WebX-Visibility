@@ -42,7 +42,6 @@ import { VoucherServicesService } from '../core/service/Finance/voucher-services
 import { AddVoucherDetailsModalComponent } from './Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { AddDebitAgainstDocumentModalComponent } from './Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { AddDetailsDebitAgainstDocumentModalComponent } from './Modals/add-details-debit-against-document-modal/add-details-debit-against-document-modal.component';
-import { DebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { DebitVoucherPreviewComponent } from './Modals/debit-voucher-preview/debit-voucher-preview.component';
 import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.component';
 import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
@@ -69,6 +68,7 @@ import { ContraVoucherCreationComponent } from './VoucherEntry/Contra Voucher/co
 import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/advice-generation.component';
 import { AdviceAcknowledgeComponent } from './Fund Transfer/advice-acknowledge/advice-acknowledge.component';
 import { AdviceAcknowledgeFiltersComponent } from './Fund Transfer/Models/advice-acknowledge-filters/advice-acknowledge-filters.component';
+import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
 
 @NgModule({
     declarations: [

@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { AdviceGenerationControl } from "src/assets/FormControls/Finance/AdviceGeneration/advicegenerationcontrol";
-import { GetAccountDetailFromApi, GetBankDetailFromApi, GetLocationDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
+import { GetAccountDetailFromApi, GetBankDetailFromApi, GetLocationDetailFromApi } from "../../Debit Voucher/debitvoucherAPIUtitlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";

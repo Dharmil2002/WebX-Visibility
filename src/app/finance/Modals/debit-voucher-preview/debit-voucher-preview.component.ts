@@ -2,7 +2,7 @@ import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { GetDebitLedgerPreviewcolumnHeader, GetLedgercolumnHeader } from '../../credit-debit-voucher/debitvoucherCommonUtitlity';
+import { GetDebitLedgerPreviewcolumnHeader, GetLedgercolumnHeader } from '../../Debit Voucher/debitvoucherCommonUtitlity';
 
 @Component({
   selector: 'app-debit-voucher-preview',

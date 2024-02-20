@@ -23,7 +23,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import {
   GetAccountDetailFromApi,
   GetBankDetailFromApi,
-} from "src/app/finance/credit-debit-voucher/debitvoucherAPIUtitlity";
+} from "src/app/finance/Debit Voucher/debitvoucherAPIUtitlity";
 import { ContraVoucherControl } from "src/assets/FormControls/Finance/VoucherEntry/ContraVouchercontrol";
 import Swal from "sweetalert2";
 

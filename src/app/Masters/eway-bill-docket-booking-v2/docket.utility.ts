@@ -43,7 +43,7 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
     const height = x.HEIGHT || 0;
     const cftRatio = WebxConvert.objectToDecimal(contractForm.controls['cft_ratio']?.value, 0);
     const noPkgs = WebxConvert.objectToDecimal(parseInt(x.NO_PKGS || 0), 0);
-    cftVolume = length * breadth * height * cftRatio * noPkgs;
+    cftVolume += length * breadth * height * cftRatio * noPkgs;
 
     // Update total charged values
     totalChargedNoofPackages += parseInt(x.NO_PKGS || 0);
@@ -59,7 +59,7 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
 
   contractForm.controls["totalChargedNoOfpkg"].setValue(totalChargedNoofPackages);
   contractForm.controls["totalDeclaredValue"].setValue(totalDeclaredValue.toFixed(2));
-  contractForm.controls["cft_tot"].setValue(cftVolume);
+  contractForm.controls["cft_tot"].setValue(cftVolume?.toFixed(2)||0);
   contractForm.controls["totalPartQuantity"].setValue(0);
   contractForm.controls["actualwt"].setValue(totalActualValue);
   //TotalPartQuantity calculation parts are pending

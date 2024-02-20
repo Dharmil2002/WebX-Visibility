@@ -70,6 +70,7 @@ import { HandedOverUploadComponent } from './handed-over/handed-over-upload/hand
 import { ConsignmentOperationComponent } from './consignment-operation/consignment-operation.component';
 import { ConsingmentSummaryComponent } from './consingment-summary/consingment-summary.component';
 import { ConsignmentFilterComponent } from './consignment-filter/consignment-filter.component';
+import { ConsignmentPodComponent } from './consignment-pod/consignment-pod.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -118,7 +119,8 @@ import { ConsignmentFilterComponent } from './consignment-filter/consignment-fil
     HandedOverUploadComponent,
     ConsignmentOperationComponent,
     ConsingmentSummaryComponent,
-    ConsignmentFilterComponent
+    ConsignmentFilterComponent,
+    ConsignmentPodComponent
     
     
   ],

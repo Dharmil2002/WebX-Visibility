@@ -1,4 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 
 export class EwayBillControls {
   private docketFields: FormControls[];
@@ -14,8 +15,8 @@ export class EwayBillControls {
     this.docketFields = [
       {
         name: "docketNumber",
-        label: "CNote No",
-        placeholder: "CNote No",
+        label: `${DocCalledAs.Docket} No`,
+        placeholder: `${DocCalledAs.Docket} No`,
         type: "text",
         value: "Computerized",
         filterOptions: "",
@@ -30,8 +31,8 @@ export class EwayBillControls {
       },
       {
         name: "docketDate",
-        label: "C Note Date",
-        placeholder: "C Note Date",
+        label: `${DocCalledAs.Docket} Date`,
+        placeholder:`${DocCalledAs.Docket} Date`,
         type: "date",
         value:new Date(),
         filterOptions: "",
@@ -60,6 +61,9 @@ export class EwayBillControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        functions: {
+          onModel: "getCustomer",
+        },
         Validations: [
           {
             name: "required",
@@ -91,6 +95,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions:{
+          onModel:"getCityDetail"
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -114,6 +121,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions:{
+          onModel:"getCityDetail"
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -139,6 +149,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions: {
+          onModel: "getCustomer",
+        },
         additionalData: {
           showNameAndValue: true,
         },
@@ -175,6 +188,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions:{
+          onModel:"getCityDetail"
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -190,6 +206,9 @@ export class EwayBillControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        functions:{
+          onModel:"getPinCodeDetail"
+        },
         Validations: [
           {
             name: "required",
@@ -206,7 +225,7 @@ export class EwayBillControls {
         name: "consignorTelephoneNo",
         label: "Consignor TelephoneNo",
         placeholder: "Consignor TelephoneNo",
-        type: "number",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -224,7 +243,7 @@ export class EwayBillControls {
         name: "consignorMobileNo",
         label: "Consignor MobileNo",
         placeholder: "Consignor MobileNo",
-        type: "number",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -277,6 +296,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions: {
+          onModel: "getCustomer",
+        },
         additionalData: {
           showNameAndValue: true,
         },
@@ -314,12 +336,15 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions:{
+          onModel:"getCityDetail"
+        },
         additionalData: {
           showNameAndValue: false,
         },
       },
       {
-        name: "consigneePincode",
+        name: "consigneePinCode",
         label: "Consignee Pincode",
         placeholder: "Consignee Pincode",
         type: "dropdown",
@@ -337,6 +362,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions:{
+          onModel:"getPinCodeDetail"
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -345,7 +373,7 @@ export class EwayBillControls {
         name: "consigneeTelNo",
         label: "Consignee TelephoneNo",
         placeholder: "Consignee TelephoneNo",
-        type: "number",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -363,7 +391,7 @@ export class EwayBillControls {
         name: "consigneeMobNo",
         label: "Consignee MobileNo",
         placeholder: "Consignee MobileNo",
-        type: "number",
+        type: "mobile-number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -820,6 +848,9 @@ export class EwayBillControls {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions:{
+          onModel:"destionationDropDown"
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -829,24 +860,7 @@ export class EwayBillControls {
         label: "Payment Type",
         placeholder: "Payment Type",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "PAID",
-            name: "PAID",
-          },
-          {
-            value: "TBB",
-            name: "TBB",
-          },
-          {
-            value: "TO PAY",
-            name: "TO PAY",
-          },
-          {
-            value: "FOC",
-            name: "FOC",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -867,20 +881,7 @@ export class EwayBillControls {
         label: "Service Type",
         placeholder: "Service Type",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "LTL",
-            name: "LTL",
-          },
-          {
-            value: "FTL",
-            name: "FTL",
-          },
-          {
-            value: "FCL",
-            name: "FCL",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -927,16 +928,7 @@ export class EwayBillControls {
         label: "Risk Type",
         placeholder: "Risk Type",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "Carrier's Risk",
-            name: "Carrier's Risk",
-          },
-          {
-            value: "Owner's Risk",
-            name: "Owner's Risk",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -948,56 +940,11 @@ export class EwayBillControls {
         },
       },
       {
-        name: "pkgs",
+        name: "pkgsType",
         label: "Packaging Type",
         placeholder: "Packaging Type",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "Wooden Box",
-            name: "Wooden Box",
-          },
-          {
-            value: "BAG",
-            name: "BAG",
-          },
-          {
-            value: "Drum",
-            name: "Drum",
-          },
-          {
-            value: "Cars",
-            name: "Cars",
-          },
-          {
-            value: "Plastic drum",
-            name: "Plastic drum",
-          },
-          {
-            value: "Metal drum",
-            name: "Metal drum",
-          },
-          {
-            value: "Lose Cargo",
-            name: "Lose Cargo",
-          },
-          {
-            value: "Gunny Bundel",
-            name: "Gunny Bundel",
-          },
-          {
-            value: "Plastic crate",
-            name: "Plastic crate",
-          },
-          {
-            value: "Metal Box",
-            name: "Metal Box",
-          },
-          {
-            value: "Carton Box ",
-            name: "Carton Box ",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -1009,36 +956,11 @@ export class EwayBillControls {
         },
       },
       {
-        name: "trn",
+        name: "tranType",
         label: "Product",
         placeholder: "Product",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "AIR",
-            name: "AIR",
-          },
-          {
-            value: "ROAD",
-            name: "ROAD",
-          },
-          {
-            value: "RAIL",
-            name: "RAIL",
-          },
-          {
-            value: "EXPRESS",
-            name: "EXPRESS",
-          },
-          {
-            value: "Road 2W",
-            name: "Road 2W",
-          },
-          {
-            value: "Road 4W",
-            name: "Road 4W",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -1068,6 +990,9 @@ export class EwayBillControls {
         generatecontrol: true,
         disable: false,
         Validations: [],
+        functions:{
+          onChange:"calculateInvoiceTotal"
+        }
       },
       {
         name: "cft_tot",
@@ -1138,10 +1063,6 @@ export class EwayBillControls {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Volumetric is required",
-          },
         ],
       },
       {

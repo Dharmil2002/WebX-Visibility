@@ -1,20 +1,27 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Subject, firstValueFrom } from "rxjs";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { EwayBillControls } from "src/assets/FormControls/ewayBillControl";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
-import { addTracking, calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
-import { getCity } from "src/app/operation/quick-booking/quick-utility";
+import {calculateInvoiceTotalCommon} from "./docket.utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
-import { runningNumber } from "src/app/Utility/date/date-utils";
-
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import { StorageService } from "src/app/core/service/storage.service";
+import { financialYear} from "src/app/Utility/date/date-utils";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { MatStepper } from "@angular/material/stepper";
 @Component({
   selector: "app-eway-example",
   templateUrl: "./eway-bill-docket-booking-v2.html",
@@ -22,9 +29,9 @@ import { runningNumber } from "src/app/Utility/date/date-utils";
 export class EwayBillDocketBookingV2Component implements OnInit {
   breadscrums = [
     {
-      title: "EwayBillDocket",
+      title: `${DocCalledAs.Docket} Generation`,
       items: ["Masters"],
-      active: "CNoteGeneration",
+      active: `${DocCalledAs.Docket} Generation`,
     },
   ];
   ewayBillTab: EwayBillControls; // a example of model , whose form we have to display
@@ -62,6 +69,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCityStatus: any;
   ewayData: any;
   userName = localStorage.getItem("Username");
+  @ViewChild('stepper') private myStepper: MatStepper;
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -73,12 +81,15 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       name: "Invoice No.",
       key: "inputString",
       style: "min-width:150px",
+      functions: {
+        onChange: "checkInvoiceExist",
+      },
     },
     INVDT: {
       name: "Invoice Date",
       key: "date",
       additionalData: {
-        minDate: new Date(),
+        maxDate: new Date(),
       },
       style: "max-width:350px",
     },
@@ -189,13 +200,23 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   vehicleNo: string;
   docketId: string;
   prqFlag: boolean;
+  paymentType:AutoComplete[];
+  svcType: AutoComplete[];
+  riskType: AutoComplete[];
+  pkgsType: AutoComplete[];
+  tranType: AutoComplete[];
   constructor(
-    private masterService: MasterService,
+   private locationService:LocationService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
+    private generalService: GeneralService,
     private operationService: OperationService,
+    private pinCodeService: PinCodeService,
     private route: Router,
-    private _NavigationService: NavigationService
+    private docketService:DocketService,
+    private _NavigationService: NavigationService,
+    private customerService:CustomerService,
+    private storage:StorageService
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
@@ -215,7 +236,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   ngOnInit(): void {
     this.loadTempData();
     this.initializeFormControl();
-    this.getPincodeDetails();
+    this.getDataFromGeneralMaster();
   }
 
   functionCallHandler($event) {
@@ -235,11 +256,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       console.log("failed");
     }
   }
-
   // Initialize form control
   initializeFormControl() {
     this.ewayBillTab = new EwayBillControls();
-
     // Get control arrays for different sections
     this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
     this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
@@ -254,190 +273,147 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
     // Set up data for tabs and contracts
     this.tabData = {
-      "Cnote Details": this.docketControlArray,
+      [`${DocCalledAs.Docket} Details`]: this.docketControlArray,
       "Consignor Details": this.consignorControlArray,
       "Consignee Details": this.consigneeControlArray,
-      "Appointment Based Delivery": this.appointmentControlArray,
-      "Container Details": this.containerControlArray,
+      "Appointment Based Delivery": this.appointmentControlArray
     };
+    
 
     this.contractData = {
       "Contract Details": this.contractControlArray,
       "Total Summary": this.totalSummaryControlArray,
       "E-Way Bill Details": this.ewayBillControlArray,
     };
-
     // Perform common drop-down mapping
     this.commonDropDownMapping();
-
     // Build form groups
     this.tabForm = formGroupBuilder(this.fb, Object.values(this.tabData));
     this.contractForm = formGroupBuilder(
       this.fb,
       Object.values(this.contractData)
     );
-
     // Set initial values for the form controls
     this.tabForm.controls["appoint"].setValue("N");
-
-    // bind Quick docket Data
     this.bindQuickdocketData();
   }
+  async getDataFromGeneralMaster() {
+    this.paymentType = await this.generalService.getGeneralMasterData("PAYTYP");
+    this.svcType = await this.generalService.getGeneralMasterData("BUSVERT");
+    this.riskType = await this.generalService.getGeneralMasterData("RSKTYP");
+    this.pkgsType = await this.generalService.getGeneralMasterData("PKGS");
+    this.tranType = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    setGeneralMasterData(this.contractControlArray, this.paymentType, "payType");
+    setGeneralMasterData(this.contractControlArray, this.svcType, "svcType");
+    setGeneralMasterData(this.contractControlArray, this.riskType, "rskty");
+    setGeneralMasterData(this.contractControlArray, this.pkgsType, "pkgsType");
+    setGeneralMasterData(this.contractControlArray, this.tranType, "tranType");
+  }
 
-  async getCity() {
+  /*get City From PinCode Master*/
+  async getCityDetail(event) {
+    const controlMap = new Map([
+      ['fromCity', this.docketControlArray],
+      ['toCity', this.docketControlArray],
+      ['consignorCity', this.consignorControlArray],
+      ['consigneeCity', this.consigneeControlArray]
+    ]);
+    const { name } = event.field;
+    const jsonControls = controlMap.get(name);
+    const cityMapping = event.field.name == "fromCity" ? this.fromCityStatus : this.toCityStatus;
+    await this.pinCodeService.getCity(
+      this.tabForm,
+      jsonControls,
+      event.field.name,
+      cityMapping
+    );
+  }
+  /*end*/
+    /*get PinCode From PinCode Master*/
+    async getPinCodeDetail(event) {
+      
+      const controlMap = new Map([
+        ['consignorPinCode', this.consignorControlArray],
+        ['consigneePinCode', this.consigneeControlArray],
+      ]);
+      const controlCity = new Map([
+        ['consignorPinCode','consignorCity'],
+        ['consigneePinCode','consigneeCity'],
+      ]);
+      const { name } = event.field;
+      const jsonControls = controlMap.get(name);
+      const city = controlCity.get(name);
+      const cityMapping = this.consignorPinCodeStatus;
+      await this.pinCodeService.getPincodes(
+        this.tabForm,
+        jsonControls,
+        event.field.name,
+        cityMapping,
+        this.tabForm.controls[city]?.value.value
+      );
+    }
+    /*end*/
+  async getCustomer(event) {
+    const controlMap = new Map([
+      ['billingParty', this.docketControlArray],
+      ['consignorName', this.consignorControlArray],
+      ['consigneeName', this.consigneeControlArray]
+    ]);
+    const { name } = event.field;
+    const jsonControls = controlMap.get(name);
+  
+    if (!jsonControls) {
+      console.error(`Invalid field name: ${name}`);
+      return;
+    }
     try {
-      const cityDetail = await getCity(this.companyCode, this.masterService);
-      if (this.quickDocket) {
-        this.tabForm.controls["fromCity"].setValue(
-          cityDetail.find((x) => x.name === this.DocketDetails[0]?.fromCity || "")
-        );
-        this.tabForm.controls["toCity"].setValue(
-          cityDetail.find((x) => x.name === this.DocketDetails[0]?.toCity || "")
-        );
-      }
-      if (cityDetail) {
-        if (cityDetail) {
-          this.filter.Filter(
-            this.docketControlArray,
-            this.tabForm,
-            cityDetail,
-            this.fromCity,
-            this.fromCityStatus
-          ); // Filter the docket control array based on fromCity details
-
-          this.filter.Filter(
-            this.docketControlArray,
-            this.tabForm,
-            cityDetail,
-            this.toCity,
-            this.toCityStatus
-          ); // Filter the docket control array based on toCity details
-
-          this.filter.Filter(
-            this.consignorControlArray,
-            this.tabForm,
-            cityDetail,
-            this.consignorCity,
-            this.consignorCityStatus
-          ); // Filter the consignor control array based on consignorCity details
-
-          this.filter.Filter(
-            this.consigneeControlArray,
-            this.tabForm,
-            cityDetail,
-            this.consigneeCity,
-            this.consigneeNameStatus
-          ); // Filter the consignee control array based on consigneeCity details
-
-        }
-      }
+      // Assuming the method returns a value you need
+      await this.customerService.getCustomerForAutoComplete(this.tabForm, jsonControls, name, this.customerStatus);
+      // Handle the response or additional logic here
     } catch (error) {
-      console.error("Error getting city details:", error);
+      // Additional error handling logic here
     }
   }
-  customerDetails() {
-    this.masterService.getJsonFileDetails("customer").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.docketControlArray,
-            this.tabForm,
-            res,
-            this.customer,
-            this.customerStatus
-          ); // Filter the docket control array based on customer details
-
-          this.filter.Filter(
-            this.consignorControlArray,
-            this.tabForm,
-            res,
-            this.consignorName,
-            this.consignorStatus
-          ); // Filter the consignor control array based on customer details
-
-          this.filter.Filter(
-            this.consigneeControlArray,
-            this.tabForm,
-            res,
-            this.consigneeName,
-            this.consigneeNameStatus
-          ); // Filter the consignee control array based on customer details
-          if (this.quickDocket) {
-            this.tabForm.controls["billingParty"].setValue(
-              res.find(
-                (x) => x.name === this.DocketDetails[0]?.billingParty || ""
-              )
-            );
-          }
-        }
-      },
-    });
-  }
-
-  // Get EwayBill data
-
+  
   async bindQuickdocketData() {
-
     if (this.quickDocket) {
-      const reqBody = {
-        companyCode: this.companyCode,
-        collectionName: "docket",
-        filter: {
-          docketNumber: this.quickdocketDetaildata.no,
-        },
-      };
-
-      try {
-        const res: any = await this.operationService.operationMongoPost("generic/get", reqBody).toPromise();
-
-        if (res) {
-          this.DocketDetails = res.data;
-          this.contractForm.controls["payType"].setValue(this.DocketDetails[0]?.payType || "");
-          this.vehicleNo = this.DocketDetails[0]?.vehNo;
-          this.contractForm.controls["totalChargedNoOfpkg"].setValue(this.DocketDetails[0]?.totalChargedNoOfpkg || "");
-          this.contractForm.controls["actualwt"].setValue(this.DocketDetails[0]?.actualwt || "");
-          this.contractForm.controls["chrgwt"].setValue(this.DocketDetails[0]?.chrgwt || "");
-          this.docketId = this.DocketDetails[0]?.id || "";
-          this.tabForm.controls["docketNumber"].setValue(this.DocketDetails[0]?.docketNumber || "");
-          this.tabForm.controls["docketDate"].setValue(this.DocketDetails[0]?.docketDate || "");
-          this.tableData[0].NO_PKGS = this.DocketDetails[0]?.totalChargedNoOfpkg || "";
-          this.tableData[0].ACT_WT = this.DocketDetails[0]?.actualwt || "";
-        }
-      } catch (error) {
-        // Handle error here
-      }
-    }
-    if (this.prqFlag) {
-
-      const billingParty = {
-        name: this.quickdocketDetaildata?.billingParty || "",
-        value: this.quickdocketDetaildata?.billingParty || ""
-      }
-      const fromCity = {
-        name: this.quickdocketDetaildata?.fromCity || "",
-        value: this.quickdocketDetaildata?.fromCity || ""
-      }
-      const toCity = {
-        name: this.quickdocketDetaildata?.toCity || "",
-        value: this.quickdocketDetaildata?.toCity || ""
-      }
-      this.tabForm.controls['billingParty'].setValue(billingParty);
-      this.tabForm.controls['consignorName'].setValue(billingParty);
-      this.tabForm.controls['consignorCity'].setValue(fromCity);
-      this.tabForm.controls['docketDate'].setValue(new Date(this.quickdocketDetaildata?.pickUpDate || new Date()));
-      this.tabForm.controls['consignorMobileNo'].setValue(this.quickdocketDetaildata?.contactNo || "");
-      this.tabForm.controls['fromCity'].setValue(fromCity);
-      this.tabForm.controls['toCity'].setValue(toCity);
-      console.log(this.tabForm.value);
-    }
-
-    this.getCity();
-    this.customerDetails();
-    this.destionationDropDown();
+          this.DocketDetails=this.quickdocketDetaildata?.docketsDetails||{};
+          const contract=this.contractForm.value;
+          this.contractForm.controls["payType"].setValue(this.DocketDetails?.pAYTYP || "");
+          this.vehicleNo = this.DocketDetails?.vEHNO;
+          this.contractForm.controls["totalChargedNoOfpkg"].setValue(this.DocketDetails?.pKGS || "");
+          this.contractForm.controls["actualwt"].setValue(this.DocketDetails?.aCTWT || "");
+          this.contractForm.controls["chrgwt"].setValue(this.DocketDetails?.cHRWT || "");
+          this.tabForm.controls["docketNumber"].setValue(this.DocketDetails?.dKTNO || "");
+          this.tabForm.controls["docketDate"].setValue(this.DocketDetails?.dKTDT || "");
+          const billingParties={
+            name:this.DocketDetails?.bPARTYNM||"",
+            value:this.DocketDetails?.bPARTY||""
+          }
+          this.tabForm.controls["billingParty"].setValue(billingParties);
+          const fCity={
+            name:this.DocketDetails?.fCT||"",
+            value:this.DocketDetails?.fCT||""
+          }
+          this.tabForm.controls["fromCity"].setValue(fCity);
+          const tCity={
+            name:this.DocketDetails?.tCT||"",
+            value:this.DocketDetails?.tCT||""
+          }
+          this.tabForm.controls["toCity"].setValue(tCity);
+          const destionation={
+            name:this.DocketDetails?.dEST||"",
+            value:this.DocketDetails?.dEST||""
+          }
+          this.contractForm.controls["destination"].setValue(destionation);
+          this.tableData[0].NO_PKGS = this.DocketDetails?.pKGS || "";
+          this.tableData[0].ACT_WT = this.DocketDetails?.aCTWT || "";
+        }    
+    //this.getCity();
+    //this.customerDetails();
+    //this.destionationDropDown();
 
   }
-
-
   // Load temporary data
   loadTempData() {
     this.tableData = [
@@ -528,37 +504,39 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   //End
   //destionation
   //destionation
-  destionationDropDown() {
-    this.masterService.getJsonFileDetails("destination").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.contractControlArray,
-            this.contractForm,
-            res,
-            this.destination,
-            this.destinationStatus
-          );
-          if (this.quickDocket) {
-            this.contractForm.controls["destination"].setValue(
-              res.find(
-                (x) => x.name === this.DocketDetails[0]?.destination || ""
-              )
-            );
-          }
-        }
-      },
-    });
+     /*here i  created a Function for the destination*/
+  async destionationDropDown() {
+    if (this.contractForm.controls.destination.value.length > 2) {
+      const destinationMapping = await this.locationService.locationFromApi({
+        locCode: { 'D$regex': `^${this.contractForm.controls.destination.value}`, 'D$options': 'i' },
+      });
+      this.filter.Filter(
+        this.contractControlArray,
+        this.contractForm,
+        destinationMapping,
+        this.destination,
+        this.destinationStatus
+      );
+    }
   }
-  //end
+  /*End*/
   async saveData() {
     // Remove all form errors
+    if (this.contractForm.controls['f_vol'].value &&
+      this.tableData.some(item => !['LENGTH', 'BREADTH', 'HEIGHT','DECLVAL'].every(field => item[field] && item[field] !== ''))) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Please enter the LENGTH, BREADTH, and HEIGHT for each item.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return false
+    }
     const tabcontrols = this.tabForm;
     clearValidatorsAndValidate(tabcontrols);
     const contractcontrols = this.contractForm;
     clearValidatorsAndValidate(contractcontrols);
     /*End*/
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const controlNames = ["svcType", "payType", "rskty", "pkgs", "trn"];
     controlNames.forEach((controlName) => {
       if (Array.isArray(this.contractForm.value[controlName])) {
@@ -568,98 +546,56 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     let invoiceDetails = {
       invoiceDetails: this.tableData,
     };
-    const controltabNames = [
-      "containerCapacity",
-      "containerSize1",
-      "containerSize2",
-      "containerType",
-    ];
-    controltabNames.forEach((controlName) => {
-      if (Array.isArray(this.tabForm.value[controlName])) {
-        this.tabForm.controls[controlName].setValue("");
-      }
-    });
-    this.tabForm.controls["fromCity"].setValue(
-      this.tabForm.value.fromCity?.name || ""
-    );
-    this.tabForm.controls["toCity"].setValue(
-      this.tabForm.value.toCity?.name || ""
-    );
-    this.tabForm.controls["billingParty"].setValue(
-      this.tabForm.value?.billingParty.name || ""
-    );
-    this.tabForm.controls["consignorName"].setValue(
-      this.tabForm.value?.consignorName.name || ""
-    );
-    this.tabForm.controls["consignorCity"].setValue(
-      this.tabForm.value?.consignorCity.name || ""
-    );
-    this.tabForm.controls["consigneeCity"].setValue(
-      this.tabForm.value?.consigneeCity.name || ""
-    );
-    this.tabForm.controls["consigneeName"].setValue(
-      this.tabForm.value?.consigneeName.name || ""
-    );
-    this.contractForm.controls["destination"].setValue(
-      this.contractForm.value?.destination.name || ""
-    );
+
+    let dockDetails = {
+        ...this.tabForm.value,
+        ...this.contractForm.value,
+        ...invoiceDetails,
+      };
+      dockDetails['payTypeName']=this.paymentType.find((x)=>x.value==dockDetails['payType'])?.name||'';
+      dockDetails['rsktyName']=this.riskType.find((x)=>x.value==dockDetails['rskty'])?.name||'';
+      dockDetails['pkgsTypeName']=this.pkgsType.find((x)=>x.value==dockDetails['pkgsType'])?.name||'';
+      dockDetails['svcTypeName']=this.svcType.find((x)=>x.value==dockDetails['svcType'])?.name||'';
+      dockDetails['tranTypeName']=this.tranType.find((x)=>x.value==dockDetails['tranType'])?.name||'';
+      dockDetails['vehNo']= this.vehicleNo?this.vehicleNo:"";
+     const res=await this.docketService.docketLTLFieldMapping(dockDetails,this.quickDocket);
+     let docketDetails={}
+     docketDetails=res?.docketsDetails||{};
+     docketDetails['invoiceDetails']=res?.invoiceDetails||[];
+     
     //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
-      let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "", unloadloc: "" };
-      let docketDetails = {
-        ...this.tabForm.value,
-        ...this.contractForm.value,
-        ...invoiceDetails,
-        ...id,
-      };
-
-      await addTracking(this.companyCode, this.operationService, docketDetails)
-
+      delete docketDetails['_id'];
+      delete docketDetails['invoiceDetails'];
+      //await addTracking(this.companyCode, this.operationService, docketDetails)
       let reqBody = {
         companyCode: this.companyCode,
-        collectionName: "docket",
-        filter: { docketNumber: this.tabForm.controls["docketNumber"].value },
+        collectionName: "dockets_ltl",
+        filter: { docNo: this.tabForm.controls["docketNumber"].value },
         update: {
-          ...docketDetails,
+          ...res?.docketsDetails,
         },
       };
-      this.operationService.operationMongoPut("generic/update", reqBody).subscribe({
-        next: (res: any) => {
-          this.Addseries();
-        },
-      });
+      const resUpdate= await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
+      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails);
+      if(resUpdate){
+        this.Addseries();
+      }
     } else {
-      const  newRunningNumber=await runningNumber();
-      this.dockNo = `CN${dynamicValue}${newRunningNumber}`;
-      this.tabForm.controls["docketNumber"].setValue(this.dockNo);
-
-      let id = {
-        _id: this.dockNo,
-        isComplete: 1,
-        unloading: 0,
-        lsNo: "",
-        mfNo: "",
-        entryBy: this.userName,
-        entryDate: new Date().toISOString(),
-        unloadloc: ""
-      };
-      let docketDetails = {
-        ...this.tabForm.value,
-        ...this.contractForm.value,
-        ...invoiceDetails,
-        ...id,
-      };
-      await addTracking(this.companyCode, this.operationService, docketDetails)
       let reqBody = {
-        companyCode: this.companyCode,
-        collectionName: "docket",
+        companyCode: this.storage.companyCode,
+        collectionName: "dockets_ltl",
+        docType: "CN",
+        branch: this.storage.branch,
+        finYear: financialYear,
         data: docketDetails,
+        party: docketDetails["bPARTYNM"],
       };
-      this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
-        next: (res: any) => {
-          this.Addseries();
-        },
-      });
+      const res= await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));
+      if(res.data){
+        this.tabForm.controls["docketNumber"].setValue(res.data);
+        await this.Addseries();
+      }
     }
   }
   async Addseries() {
@@ -674,28 +610,25 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       // Prepare the request body.
       const reqBody = {
         companyCode: this.companyCode,
-        collectionName: "docketScan",
-        data: resultArray,
-      };
-  
+        collectionName: "docket_pkgs_ltl",
+        data: resultArray
+      }
       // Make the POST request and wait for the response.
       const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
-  
       // Check if response is successful.
       if (res) {
         // Display success message.
-        const result = await Swal.fire({
+        await Swal.fire({
           icon: "success",
           title: "Booked Successfully",
           text: "DocketNo: " + this.tabForm.controls["docketNumber"].value,
           showConfirmButton: true,
-        });
-  
-        // Redirect after confirmation.
-        if (result.isConfirmed) {
+        }).then((result) => {
+          // Redirect after the alert is closed, regardless of whether it is confirmed or not.
           this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-        }
+        });
       }
+      
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -708,20 +641,20 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   async generateArray(companyCode, dockno, pkg) {
     return new Promise((resolve, reject) => {
       const array = Array.from({ length: pkg }, (_, index) => {
-        const serialNo = (index + 1).toString().padStart(3, "0");
+        const serialNo = (index + 1).toString().padStart(4, "0");
         const bcSerialNo = `${dockno}-${serialNo}`;
-        const entryDateTime = new Date().toISOString();
         const bcDockSf = "0";
         return {
-          _id: bcSerialNo,
-          companyCode: companyCode,
-          dockNo: dockno,
-          bcSerialNo: bcSerialNo,
-          entryDateTime: entryDateTime,
-          bcDockSf: bcDockSf,
-          loc: this.branch,
-          entryBy: this.userName,
-          entryDate: new Date().toISOString()
+          _id:`${companyCode}-${bcSerialNo}`,
+          cID: companyCode,
+          dKTNO: dockno,
+          pKGSNO: bcSerialNo,
+          sFX: bcDockSf,
+          lOC:this.storage.branch,
+          cLOC:this.storage.branch,
+          eNTBY:this.storage.userName,
+          eNTLOC:this.storage.branch,
+          eNTDT:new Date()
         };
       });
 
@@ -772,9 +705,11 @@ export class EwayBillDocketBookingV2Component implements OnInit {
           this.tableData.splice(index, 1);
           this.tableData = this.tableData;
           swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
+          this.calculateInvoiceTotal();
           event.callback(true);
         } else if (result.isConfirmed) {
           swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
+          this.calculateInvoiceTotal();
           event.callback(false);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithBootstrapButtons.fire(
@@ -782,6 +717,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             "Your item is safe :)",
             "error"
           );
+          this.calculateInvoiceTotal();
           event.callback(false);
         }
       });
@@ -792,32 +728,29 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   calculateInvoiceTotal() {
     calculateInvoiceTotalCommon(this.tableData, this.contractForm);
   }
-  async getPincodeDetails() {
-    try {
-      const pinCode = await getPincode(this.companyCode, this.masterService);
-      if (pinCode) {
-        this.filter.Filter(
-          this.consigneeControlArray,
-          this.tabForm,
-          pinCode,
-          this.consigneePincode,
-          this.consigneePincodeStatus
-        );
-
-        this.filter.Filter(
-          this.consignorControlArray,
-          this.tabForm,
-          pinCode,
-          this.consignorPinCode,
-          this.consignorPinCodeStatus
-        );
-      }
-    } catch (error) {
-      console.error("Error getting pincode details:", error);
-    }
-  }
-  getDetail(){
+  async checkInvoiceExist(data){
     
-   console.log(this.tabForm.value)
+    if(data.row.INVNO){
+    const res=await this.docketService.checkInvoiceExistLTL({cID:this.storage.companyCode,iNVNO:data.row.INVNO});
+    if(res){
+      Swal.fire({
+        icon: 'info',
+        title: 'Invoice Exists',
+        text: `Invoice number ${data.row.INVNO} already exists.`
+      });
+      data.row.INVNO = '';
+    }
+    else{
+      const existingInvoice = this.tableData.filter((item) => item.INVNO == data.row.INVNO);
+      if(existingInvoice.length>1){
+        Swal.fire({
+          icon: 'info',
+          title: 'Invoice Exists',
+          text: `Invoice number ${data.row.INVNO} already exists.`
+        });
+        data.row.INVNO = '';
+      }
+    }
+    }
   }
 }

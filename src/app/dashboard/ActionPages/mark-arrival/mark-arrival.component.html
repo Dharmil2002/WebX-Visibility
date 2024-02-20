@@ -1,6 +1,7 @@
 <form [formGroup]="MarkArrivalTableForm">
-    <app-form-webxpress [form]="MarkArrivalTableForm" [formData]="jsonControlArray" [uploadedFiles]="uploadedFiles"
+    <app-form-webxpress [form]="MarkArrivalTableForm" [FormTitle]="'Mark Arrival'"   [formData]="jsonControlArray" [uploadedFiles]="uploadedFiles"
         (callFunction)="functionCaller($event)" (functionCallEmitter)="functionCaller($event)"
         [showSaveAndCancelButton]="true">
     </app-form-webxpress>
 </form>
+

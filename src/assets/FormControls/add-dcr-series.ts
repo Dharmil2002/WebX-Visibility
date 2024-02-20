@@ -10,9 +10,9 @@ export class AddDcrSeriesControl {
                 placeholder: 'Search And Select Document Type',
                 type: "Staticdropdown",
                 value: [
-                    { value: "dkt", name: "CNote" },
-                    { value: "dmr", name: "Delivery MR", },
-                    { value: "ubis", name: "UBI Series", }
+                    { value: "CN", name: "CNote" },
+                    { value: "DMR", name: "Delivery MR", },
+                    { value: "UBIS", name: "UBI Series", }
                 ],
                 Validations: [
                     {
@@ -45,6 +45,10 @@ export class AddDcrSeriesControl {
                     //     name: "required",
                     //     message: "Business Type is required"
                     // }
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    }
                 ]
             },
             {

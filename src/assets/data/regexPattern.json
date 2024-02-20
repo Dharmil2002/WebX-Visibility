@@ -1,35 +1,38 @@
 [
     {
-        "companyCode": 10065,
-        "documentId": "dkt",
-        "required": true,
-        "length": 7,
-        "noOfCharacter": 3,
-        "noOfDigit": 4,
-        "characterRequired": true,
-        "regexPattern": "^[A-Za-z]{3}\\d{4}$",
-        "message": "Length should be 7 and pattern should be: ZZZ9999"
+        "_id": "10068-CN",
+        "cID": 10068,
+        "dOCID": "CN",
+        "rEQ": true,
+        "lENGTH": 7,
+        "nOFCHAR": 3,
+        "nOOFDIGIT": 4,
+        "iSCHAR": true,
+        "rRGXPTRN": "^[A-Za-z]{3}\\d{4}$",
+        "mSG": "Length should be 7 and pattern should be: ZZZ9999"
     },
     {
-        "companyCode": 10065,
-        "documentId": "dmr",
-        "required": true,
-        "length": 7,
-        "noOfCharacter": 3,
-        "noOfDigit": 4,
-        "characterRequired": true,
-        "regexPattern": "^[A-Za-z]{3}\\d{4}$",
-        "message": "Length should be 7 and pattern should be: ZZZ9999"
+        "_id": "10068-DMR",
+        "cID": 10068,
+        "dOCID": "DMR",
+        "rEQ": true,
+        "lENGTH": 7,
+        "nOFCHAR": 3,
+        "nOOFDIGIT": 4,
+        "iSCHAR": true,
+        "rRGXPTRN": "^[A-Za-z]{3}\\d{4}$",
+        "mSG": "Length should be 7 and pattern should be: ZZZ9999"
     },
     {
-        "companyCode": 10065,
-        "documentId": "ubis",
-        "required": true,
-        "length": 7,
-        "noOfCharacter": 3,
-        "noOfDigit": 4,
-        "characterRequired": true,
-        "regexPattern": "^[A-Za-z]{3}\\d{4}$",
-        "message": "Length should be 7 and pattern should be: ZZZ9999"
+        "_id": "10068-UBIS",
+        "cID": 10068,
+        "dOCID": "UBIS",
+        "rEQ": true,
+        "lENGTH": 7,
+        "nOFCHAR": 3,
+        "nOOFDIGIT": 4,
+        "iSCHAR": true,
+        "rRGXPTRN": "^[A-Za-z]{3}\\d{4}$",
+        "mSG": "Length should be 7 and pattern should be: ZZZ9999"
     }
 ]

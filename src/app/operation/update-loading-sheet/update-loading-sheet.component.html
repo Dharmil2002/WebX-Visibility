@@ -1,7 +1,10 @@
 <form [formGroup]="loadingSheetTableForm">
-    <app-form-without-auto-complete-webxpress [form]="loadingSheetTableForm" [formData]="updateListData"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-    </app-form-without-auto-complete-webxpress>
+
+    <app-form-webxpress [form]="loadingSheetTableForm" [FormTitle]="'Vehicle Unloading'"
+    [formData]="updateListData" (functionCallEmitter)="functionCallHandler($event)"
+    [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+  </app-form-webxpress>
+
 </form>
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="shipingHeader" [tableData]="shipingDataTable"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="shipingHeaderForCsv"
@@ -13,15 +16,19 @@
 <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
 
 <div class="search-bar-container">
-    <input type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()" class="search-bar-input">
+    <input #scanPackageInput type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()" class="search-bar-input">
     <button class="search-bar-button"(click)="updatePackage()">Scan</button>
+    &nbsp;
+    <mat-error>
+        <div class="list-group-item-text danger m-2">{{scanMessage}}</div>
+    </mat-error>  
 </div>
 
 
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
     [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-    [toggleArray]="toggleArray" [extraData]="extraData" [menuItems]="menuItems"
+    [toggleArray]="toggleArray"[columnWidths]="columnWidths"  [extraData]="extraData" [menuItems]="menuItems"
     (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
     [centerAligned]="centerAlignedData">
 </generic-table-webxpress>

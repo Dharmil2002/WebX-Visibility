@@ -64,8 +64,12 @@
         "Default": 0
     },
     {
+        "FieldName": "gST.sAC",
+        "Caption": "SAC Code"
+    },
+    {
         "FieldName": "gST.sACNM",
-        "Caption": "SAC"
+        "Caption": "SAC Name"
     },
     {
         "Caption": "TCS_Rate",

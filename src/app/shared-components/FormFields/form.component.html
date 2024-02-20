@@ -77,7 +77,8 @@
                             suffix={{formItem.suffix}} mask="{{formItem.mask}}" autocomplete="off"
                             (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
                             (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
-                            (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+                            (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
+                            (keypress)="functionCalled({field :formItem , functionName:formItem.functions?.keypress, eventArgs: $event })">
                         </ng-container>
                         <ng-container *ngIf="(formItem.type=='mobile-number')">
                           <input matInput type="{{'number'}}" formControlName={{formItem.name}}

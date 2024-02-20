@@ -1,16 +1,21 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component,OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { MasterService } from "src/app/core/service/Masters/master.service";
-import { OperationService } from "src/app/core/service/operations/operation.service";
 import { QuickBookingControls } from "src/assets/FormControls/quick-docket-booking";
-import Swal from "sweetalert2";
-import { getCity } from "./quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
-import { runningNumber } from "src/app/Utility/date/date-utils";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { StorageService } from "src/app/core/service/storage.service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-quick-booking",
@@ -45,23 +50,26 @@ export class QuickBookingComponent implements OnInit {
       active: "CNote Quick Booking",
     },
   ];
+  paymentType: AutoComplete[];
 
   constructor(
     private fb: UntypedFormBuilder,
-    private masterService: MasterService,
     private filter: FilterUtils,
-    private operationService: OperationService,
-    private _NavigationService: NavigationService
+    private generalService: GeneralService,
+    private customerService: CustomerService,
+    private _NavigationService: NavigationService,
+    private docketService:DocketService,
+    private locationService: LocationService,
+    private storage: StorageService,
+    private pinCodeService: PinCodeService,
+    private vehicleService:VehicleService
   ) {
     this.initializeFormControl();
-    this.getCity();
-    this.customerDetails();
-    this.destionationDropDown();
-    this.GetVehicleDetails();
   }
 
   ngOnInit(): void {
     // Component initialization logic goes here
+    this.getVehicleDetails();
   }
 
   initializeFormControl() {
@@ -70,11 +78,18 @@ export class QuickBookingComponent implements OnInit {
     // Get form controls for Quick Booking section
     this.jsonControlDocketArray = this.docketControls.getDocketFieldControls();
     this.commonDropDownMapping();
+    this.getDataFromGeneralMaster();
     // Create the form group using the form builder and the form controls array
     this.quickDocketTableForm = formGroupBuilder(this.fb, [
       this.jsonControlDocketArray,
     ]);
-    this.quickDocketTableForm.controls["payType"].setValue("TBB");
+    
+  }
+
+  async getDataFromGeneralMaster() {
+    this.paymentType = await this.generalService.getGeneralMasterData("PAYTYP");
+    setGeneralMasterData(this.jsonControlDocketArray, this.paymentType, "payType");
+    this.quickDocketTableForm.controls["payType"].setValue(this.paymentType.find((x)=>x.name=="TBB").value);
   }
 
   functionCallHandler($event) {
@@ -91,6 +106,16 @@ export class QuickBookingComponent implements OnInit {
       // we have to handle , if function not exists.
       console.log("failed");
     }
+  }
+
+  intigerOnly(event): boolean {    
+    console.log(event);
+    const charCode = event.eventArgs.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.eventArgs.preventDefault();
+      return false;
+    }
+    return true;
   }
 
   /*here i initilize the function which used to bind dropdown Controls*/
@@ -115,141 +140,81 @@ export class QuickBookingComponent implements OnInit {
     ];
     mapControlArray(this.jsonControlDocketArray, docketMappings); // Map docket control array
   }
-  async getCity() {
-    try {
-      const cityDetail = await getCity(this.companyCode, this.masterService);
-
-      if (cityDetail) {
-        this.filter.Filter(
-          this.jsonControlDocketArray,
-          this.quickDocketTableForm,
-          cityDetail,
-          this.fromCity,
-          this.fromCityStatus
-        ); // Filter the docket control array based on fromCity details
-
-        this.filter.Filter(
-          this.jsonControlDocketArray,
-          this.quickDocketTableForm,
-          cityDetail,
-          this.toCity,
-          this.toCityStatus
-        ); // Filter the docket control array based on toCity details
-      }
-    } catch (error) {
-      console.error("Error getting city details:", error);
+  /*get City From PinCode Master*/
+  async getPincodeDetail(event) {
+    const cityMapping = event.field.name == "fromCity" ? this.fromCityStatus : this.toCityStatus;
+    await this.pinCodeService.getCity(
+      this.quickDocketTableForm,
+      this.jsonControlDocketArray,
+      event.field.name,
+      cityMapping
+    );
+  }
+  /*end*/
+  // Customer details
+  async getCustomer(event) {
+    await this.customerService.getCustomerForAutoComplete(this.quickDocketTableForm, this.jsonControlDocketArray, event.field.name, this.customerStatus);
+  }
+  /*here i  created a Function for the destination*/
+  async destionationDropDown() {
+    if (this.quickDocketTableForm.controls.destination.value.length > 2) {
+      const destinationMapping = await this.locationService.locationFromApi({
+        locCode: { 'D$regex': `^${this.quickDocketTableForm.controls.destination.value}`, 'D$options': 'i' },
+      });
+      this.filter.Filter(this.jsonControlDocketArray, this.quickDocketTableForm, destinationMapping, this.destination, this.destinationStatus);
     }
   }
-
-  // Customer details
-  customerDetails() {
-    this.masterService.getJsonFileDetails("customer").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.jsonControlDocketArray,
-            this.quickDocketTableForm,
-            res,
-            this.customer,
-            this.customerStatus
-          ); // Filter the docket control array based on customer details
-        }
-      },
-    });
-  }
-  //destionation
-  destionationDropDown() {
-    this.masterService.getJsonFileDetails("destination").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.jsonControlDocketArray,
-            this.quickDocketTableForm,
-            res,
-            this.destination,
-            this.destinationStatus
-          );
-        }
-      },
-    });
-  }
+  /*End*/
   // get vehicleNo
-  GetVehicleDetails() {
-    //throw new Error("Method not implemented.");
-    // Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails("masterUrl").subscribe((res) => {
-      if (res) {
-        let VehicleData = res.vehicleMaster.map((x) => {
-          return { name: x.vehicleNo, value: x.vehicleNo };
-        });
-        this.filter.Filter(
-          this.jsonControlDocketArray,
-          this.quickDocketTableForm,
-          VehicleData,
-          this.vehNo,
-          this.vehicleStatus
-        );
-      }
-    });
+  async getVehicleDetails() {
+    const vehileList=await this.vehicleService.getVehicleNo(
+      {
+      currentLocation:this.storage.branch, status:"Available"}, true);
+    this.filter.Filter(
+      this.jsonControlDocketArray,
+      this.quickDocketTableForm,
+      vehileList,
+      this.vehNo,
+      this.vehicleStatus
+    );
   }
   cancel() {
     this._NavigationService.navigateTotab(
-     'DocketStock',
+      'DocketStock',
       "dashboard/Index"
     );
-    }
-   
-  save() {
-    // Remove all form errors
-    const controls = this.quickDocketTableForm;
-    clearValidatorsAndValidate(controls);
-    /*End*/
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value    
-    let docketNo = `CN${dynamicValue}${runningNumber()}`;
-    this.quickDocketTableForm.controls["docketNumber"].setValue(docketNo);
-    this.quickDocketTableForm.controls["fromCity"].setValue(
-      this.quickDocketTableForm.value.fromCity?.name || ""
-    );
-    this.quickDocketTableForm.controls["toCity"].setValue(
-      this.quickDocketTableForm.value.toCity?.name || ""
-    );
-    this.quickDocketTableForm.controls["billingParty"].setValue(
-      this.quickDocketTableForm.value?.billingParty.name || ""
-    );
-    this.quickDocketTableForm.controls["destination"].setValue(
-      this.quickDocketTableForm.value?.destination.name || ""
-    );
-    this.quickDocketTableForm.controls["vehNo"].setValue(
-      this.quickDocketTableForm.value?.vehNo.name || ""
-    );
-
-    let id = { _id: docketNo, isComplete: 0,unloading: 0, lsNo: "", mfNo: "",unloadloc:"",entryBy:this.userName,entryDate:new Date().toISOString()};
-
-    let docketDetails = { ...this.quickDocketTableForm.value, ...id };
-
-    let reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "docket",
-      data: docketDetails
-    };
-    this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
-      next: (res: any) => {
-        Swal.fire({
-          icon: "success",
-          title: "Booked Successfully",
-          text: "DocketNo: " + docketNo,
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Redirect to the desired page after the success message is confirmed.
-            this._NavigationService.navigateTotab(
-              'DocketStock',
-              "dashboard/Index"
-            );
-          }
-        });
-      },
-    });
   }
-   
+
+  async save() {
+
+    // Clear form validators and revalidate the form
+    const formControls = this.quickDocketTableForm;
+    clearValidatorsAndValidate(formControls);
+    // Prepare request data
+    const requestData = { ...formControls.value, isComplete: false };
+    // Set payment type name based on selected value
+    const paymentTypeEntry = this.paymentType.find(entry => entry.value === requestData.payType);
+    requestData.pAYTYPNM = paymentTypeEntry ? paymentTypeEntry.name : "";
+    const fieldMapping = await this.docketService.quickDocketsMapping(requestData);
+    await this.docketService.createDocket(fieldMapping);
+  }
+  
+  preventNegative(event) {
+    // Extract the field value directly using destructuring for cleaner access
+    const { name } = event.field;
+    const fieldValue = this.quickDocketTableForm.controls[name].value;
+    // Use a more direct method to check for negative values
+    if (Number(fieldValue) < 0) {
+      // Display the error message using SweetAlert
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Negative values are not allowed.'
+      });
+      // Reset the field value to 0 to prevent negative input
+      this.quickDocketTableForm.controls[name].setValue(0);
+    }
+  }
+  
+
 }

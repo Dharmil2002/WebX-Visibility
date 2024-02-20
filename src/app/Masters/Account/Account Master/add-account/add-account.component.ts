@@ -336,7 +336,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const bank = this.UpdateData.bANCD;
-        const selectedData = BankData.find((x) => x.value==bank||x.name==bank);
+        const selectedData = BankData.find((x) => x.value == bank || x.name == bank);
         this.AccountForm.controls["bank"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -368,7 +368,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const bank = this.UpdateData.tSEC;
-        const selectedData = TDSData.find((x) => x.value==bank || x.name==bank);
+        const selectedData = TDSData.find((x) => x.value == bank || x.name == bank);
         this.AccountForm.controls["TDSsection"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -510,7 +510,7 @@ export class AddAccountComponent implements OnInit {
       gRPNM: this.AccountForm.value.GroupCode.name,
       cATCD: this.AccountForm.value.AccountCategory.value,
       cATNM: this.AccountForm.value.AccountCategory.name,
-      bCATCD: this.AccountForm.value.BalanceSheet.value.substr(0, 3),
+      bCATCD: this.AccountForm.value.BalanceSheet.value,
       bCATNM: this.AccountForm.value.BalanceSheet.name,
       bANCD: this.AccountForm.value.bank.value || "",
       bANM: this.AccountForm.value.bank.name || "",
@@ -521,10 +521,10 @@ export class AddAccountComponent implements OnInit {
       iSSYS: this.AccountForm.value.ActiveFlag,
       pARTNM: this.AccountForm.value.PartySelection.name,
       rHUF: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection.data.RateForHUF
+        ? this.AccountForm.value.TDSsection?.data?.RateForHUF
         : "",
       rOTHER: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection.data.RateForOthers
+        ? this.AccountForm.value.TDSsection?.data?.RateForOthers
         : "",
     };
     if (!this.isUpdate) {
@@ -532,8 +532,8 @@ export class AddAccountComponent implements OnInit {
         this.TableData.length === 0
           ? 1
           : parseInt(
-              this.TableData[this.TableData.length - 1].aCCD.substring(3)
-            ) + 1;
+            this.TableData[this.TableData.length - 1].aCCD.substring(3)
+          ) + 1;
       const accountcode = `${this.AccountForm.value.GroupCode.name.substr(
         0,
         3
@@ -560,11 +560,11 @@ export class AddAccountComponent implements OnInit {
 
     const res = this.isUpdate
       ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
+        this.masterService.masterPut("generic/update", req)
+      )
       : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+        this.masterService.masterPost("generic/create", req)
+      );
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
@@ -578,7 +578,8 @@ export class AddAccountComponent implements OnInit {
   }
 
   Cancle() {
-    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+    // this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+    console.log(this.AccountForm.value.BalanceSheet.value.substr(0, 3))
   }
 
   functionCallHandler($event) {

@@ -56,29 +56,29 @@ export class cNoteBillMRControl {
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: 'flowType',
-                    label: 'Flow Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Incoming", name: "Incoming" },
-                         { value: "Outgoing", name: "Outgoing", }
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "flowTypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'flowType',
+               //      label: 'Flow Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "Incoming", name: "Incoming" },
+               //           { value: "Outgoing", name: "Outgoing", }
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "flowTypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: "pAYBAS",
                     label: "Payment Basis",
@@ -119,29 +119,29 @@ export class cNoteBillMRControl {
                          onToggleAll: "toggleSelectAll"
                     },
                },
-               {
-                    name: 'busType',
-                    label: 'Business Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Express", name: "Express" },
-                         { value: "FTL", name: "FTL" }
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "busiTypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'busType',
+               //      label: 'Business Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "Express", name: "Express" },
+               //           { value: "FTL", name: "FTL" }
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "busiTypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: "movType",
                     label: "Movement Type",
@@ -162,39 +162,39 @@ export class cNoteBillMRControl {
                          onToggleAll: "toggleSelectAll"
                     },
                },
-               {
-                    name: 'status',
-                    label: 'Status',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Billed", name: "Billed" },
-                         { value: "Unbilled", name: "Unbilled" },
-                         { value: "Delivered", name: "Delivered" },
-                         { value: "Undelivered", name: "Undelivered" },
-                         { value: "Cancelled", name: "Cancelled" },
-                         { value: "Finalized", name: "Finalized" },
-                         { value: "Quick", name: "Quick" },
-                         { value: "Quick not completed", name: "Quick not completed" },
-                         { value: "Quick Completed", name: "Quick Completed" },
-                         { value: "POD Scanned", name: "POD Scanned" },
-                         { value: "POD Not Scanned", name: "POD Not Scanned" },
-                         { value: "POD scanned but not billed", name: "POD scanned but not billed" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "statusHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'status',
+               //      label: 'Status',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "Billed", name: "Billed" },
+               //           { value: "Unbilled", name: "Unbilled" },
+               //           { value: "Delivered", name: "Delivered" },
+               //           { value: "Undelivered", name: "Undelivered" },
+               //           { value: "Cancelled", name: "Cancelled" },
+               //           { value: "Finalized", name: "Finalized" },
+               //           { value: "Quick", name: "Quick" },
+               //           { value: "Quick not completed", name: "Quick not completed" },
+               //           { value: "Quick Completed", name: "Quick Completed" },
+               //           { value: "POD Scanned", name: "POD Scanned" },
+               //           { value: "POD Not Scanned", name: "POD Not Scanned" },
+               //           { value: "POD scanned but not billed", name: "POD scanned but not billed" },
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "statusHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: "bookType",
                     label: "Booking Type",
@@ -255,27 +255,41 @@ export class cNoteBillMRControl {
                          onToggleAll: "toggleSelectAll"
                     },
                },
+               // {
+               //      name: 'cnote',
+               //      label: 'CNote Number',
+               //      placeholder: '',
+               //      type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           isIndeterminate: false,
+               //           isChecked: false,
+               //           support: "cnoteHandler",
+               //           showNameAndValue: false,
+               //           Validations: [{
+               //                name: "",
+               //                message: ""
+               //           }]
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
-                    name: 'cnote',
-                    label: 'CNote Number',
-                    placeholder: '',
-                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         isIndeterminate: false,
-                         isChecked: false,
-                         support: "cnoteHandler",
-                         showNameAndValue: false,
-                         Validations: [{
-                              name: "",
-                              message: ""
-                         }]
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
+                    name: "cnote",
+                    label: "CNote Number",
+                    placeholder: "",
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [],
+                    additionalData: {},
                },
                {
                     name: 'cnoteHandler',

@@ -1,3 +1,4 @@
+import { Action } from "rxjs/internal/scheduler/Action";
 import Swal from "sweetalert2";
 let uniqueShipments: Set<number> = new Set();
 /**
@@ -11,13 +12,24 @@ export function vehicleLoadingScan(loadPackage: any,csv: any[]): any {
   // Check if the unload package exists
   if (!loadPackage) {
     // Package does not belong to the current branch
-    Swal.fire({
+    return {
+      status: false,
       icon: "error",
       title: "Not Allowed to Load Package",
       text: "This package does not belong to the current branch.",
       showConfirmButton: true,
-    });
-    return;
+    };
+    // Swal.fire({
+    //   icon: "error",
+    //   title: "Not Allowed to Load Package",
+    //   text: "This package does not belong to the current branch.",
+    //   showConfirmButton: true,
+    //   didClose: () => {
+    //     const inputAccName = document.getElementById('scanPackageInput') as HTMLInputElement;        
+    //     inputAccName.focus();
+    //   }
+    // })
+    // return;
   }
 
   // // If destination does not belong to the current location, disallow unloading the package
@@ -33,28 +45,49 @@ export function vehicleLoadingScan(loadPackage: any,csv: any[]): any {
 
   // Check if the package is already scanned
   if (loadPackage.ScanFlag) {
-    Swal.fire({
+    return {
+      status: false,
       icon: "info",
       title: "Already Scanned",
       text: "Your Package ID is already scanned.",
       showConfirmButton: true,
-    });
-    return;
+    };
+    // Swal.fire({
+    //   icon: "info",
+    //   title: "Already Scanned",
+    //   text: "Your Package ID is already scanned.",
+    //   showConfirmButton: true,
+    //   didClose: () => {
+    //     const inputAccName = document.getElementById('scanPackageInput') as HTMLInputElement;        
+    //     inputAccName.focus();
+    //   }
+    // });
+    // return;
   }
-
   // Find the element in the csv array that matches the shipment
-  const element = csv.find(e => e.Shipment === loadPackage.dockNo);
-
+  const element = csv.find(e => e.Shipment === loadPackage.dKTNO && e.Suffix === loadPackage.sFX);
   // Check if the element exists and the number of Loaded packages is less than the total packages
   if (!element || (element.hasOwnProperty('loaded') && element.Packages <= element.loaded)) {
     // Invalid operation, packages must be greater than Loaded
-    Swal.fire({
+    return {
+      status: false,
       icon: "error",
       title: "Invalid Operation",
       text: "Cannot perform the operation. Packages must be greater than loaded.",
       showConfirmButton: true,
-    });
-    return;
+    };
+
+    // Swal.fire({
+    //   icon: "error",
+    //   title: "Invalid Operation",
+    //   text: "Cannot perform the operation. Packages must be greater than loaded.",
+    //   showConfirmButton: true,
+    //   didClose: () => {
+    //     const inputAccName = document.getElementById('scanPackageInput') as HTMLInputElement;        
+    //     inputAccName.focus();
+    //   }      
+    // });
+    // return;
   }
 
 
@@ -72,6 +105,7 @@ export function vehicleLoadingScan(loadPackage: any,csv: any[]): any {
     uniqueShipments.add(element.Shipment);
   }
   const event = {
+    status: true,
     shipment: uniqueShipments.size,
     Package: totalLoadedPackages,
   };

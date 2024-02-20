@@ -110,7 +110,7 @@ export class DocketTrackingComponent implements OnInit {
         return {
           ...x,
           eNTDT:moment(x.eNTDT).format("DD/MM/YYYY"),
-          Event:x.eVNDES
+          Event:x.oPSSTS
         }
       });
       this.tableload = false;

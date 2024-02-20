@@ -114,7 +114,7 @@ export class AccountBankControls {
         label: "SWIFT code",
         placeholder: "SWIFT code",
         type: "government-id",
-        value: isUpdate ? UpdateData.SWIFTcode : "",
+        value: isUpdate ? `${UpdateData.SWIFTcode}` : "",
         generatecontrol: true,
         disable: false,
         Validations: [

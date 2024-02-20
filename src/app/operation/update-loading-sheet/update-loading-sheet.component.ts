@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -12,6 +12,9 @@ import { groupShipmentsByLeg, updateTracking } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
+import { firstValueFrom } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -40,6 +43,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   columnHeader = {
     "Shipment": "Shipment",
+    "Suffix":"Suffix",
     "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
@@ -47,12 +51,16 @@ export class UpdateLoadingSheetComponent implements OnInit {
     "Pending": "Pending",
     "Leg": "Leg",
   }
-  centerShippingData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
-  centerAlignedData = ['Shipment', 'Packages', 'Unloaded', 'Pending'];
+  centerShippingData = ['Shipment', 'Suffix', 'Packages', 'WeightKg', 'VolumeCFT'];
+  centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'Unloaded', 'Pending'];
+  columnWidths = {
+    'Shipment': 'min-width:20%'
+  };
   shipmentStatus: string = 'Unloaded';
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",
+    "Suffix":"Suffix",
     "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
@@ -70,9 +78,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
   //declaring breadscrum
   breadscrums = [
     {
-      title: "Update Loading Sheet",
+      title: "Vehicle Unloading",
       items: ["Home"],
-      active: "Update Loading Sheet"
+      active: "Vehicle Unloading"
     }
   ]
   toggleArray = []
@@ -86,13 +94,17 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingData: any;
   formdata: any;
   arrivalData: any;
+  scanPkgs:string[]=[];
   boxData: { count: any; title: any; class: string; }[];
   updateListData: any;
   Scan: any;
   shipingDataTable: any;
   packageData: any;
   updateTrip: any;
+  mfNos: string[];
 
+  scanMessage: string = '';
+  @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
 
   constructor(
     private Route: Router,
@@ -100,7 +112,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private _operation: OperationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private storage:StorageService,
+    private arrivalService: ArrivalVehicleService
   ) {
 
     // Set the initial shipment status to 'Unloaded'
@@ -115,86 +129,45 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.IntializeFormControl();
   }
 
-  getLoadingSheetDetail() {
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "menifest_detail",
-      "filter": {}
-    }
-    this._operation.operationMongoPost('generic/get', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          const mfDetail = res.data.filter((x) => x.tripId === this.arrivalData?.TripID);
-          this.getShippningData(mfDetail)
-        }
-      }
-    })
+  async getLoadingSheetDetail() {
+    
+    const shipmentData = await this.arrivalService.getThcWiseMeniFest({tHC:this.arrivalData?.TripID,dEST:this.storage.branch,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]});
+    if(!shipmentData)
+      return;
+    this.mfNos = shipmentData.map((x)=>x.mFNO);
+
+    this.csv = shipmentData.map((shipment) => ({
+      Shipment: shipment.dKTNO||"",
+      Origin: shipment.oRG||"",
+      Destination: shipment?.dEST||"",
+      Suffix: shipment?.sFX||0,
+      Packages: parseInt(shipment.pKGS),
+      Unloaded: 0,
+      Pending: parseInt(shipment.pKGS),
+      Leg: shipment?.lEG||"",
+      KgWt: shipment?.wT||"",
+      mfNo:shipment?.docNo||"",
+      CftVolume: shipment?.vOL || ""
+    }));
+    this.boxData = kpiData(this.csv, this.shipmentStatus, "");
+    this.tableload = false;
+    let shipingTableData = this.csv;
+    // Group shipments by leg using the utility function
+    let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
+    // Set the leg of the arrivalData
+    this.arrivalData.Leg = shipingTableData[0]?.Leg;
+    // Set the shipingDataTable to the grouped data
+    this.shipingDataTable = shipingTableDataArray;
+    this.getPackagesData();
   }
-
-
-  getShippningData(menifestNo) {
-
+  async getPackagesData() {    
     const reqBody = {
       "companyCode": this.companyCode,
-      "collectionName": "docket",
-      "filter": {}
-
+      "collectionName": "docket_pkgs_ltl",
+      "filter": {"mFNO":{"D$in": this.mfNos}}
     }
-    this._operation.operationPost('generic/get', reqBody).subscribe(res => {
-      if (res) {
-        this.updateTrip = res.data;
-        const arrivalData = res.data.filter((x) => {
-          const destinationParts = x.destination ? x.destination.split(":")[1].trim() : "";
-          return destinationParts === this.currentBranch && menifestNo.some((manifestItem) => manifestItem.mfNo === x.mfNo);
-        });
-        // Filter shipments based on route and branch
-        let filteredShipments = filterShipments(arrivalData, this.arrivalData?.Route, this.currentBranch);
-
-        // Update CSV and boxData
-        this.csv = filteredShipments.map((shipment) => ({
-          Shipment: shipment.docketNumber || "",
-          Origin: shipment.orgLoc || "",
-          Destination: shipment.destination ? shipment.destination.split(":")[1].trim() : "",
-          Packages: parseInt(shipment.totalChargedNoOfpkg),
-          Unloaded: 0,
-          Pending: parseInt(shipment.totalChargedNoOfpkg),
-          Leg: (shipment.orgLoc || "") + ":" + (shipment.destination ? shipment.destination.split(":")[1].trim() : ""),
-          KgWt: parseInt(shipment?.actualwt) || 0,
-          CftVolume: shipment?.cft_tot || ""
-        }));
-        this.boxData = kpiData(this.csv, this.shipmentStatus, "");
-        this.tableload = false;
-
-        let shipingTableData = this.csv;
-
-        // Group shipments by leg using the utility function
-        let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
-
-        // Set the leg of the arrivalData
-        this.arrivalData.Leg = shipingTableData[0]?.Leg;
-
-        // Set the shipingDataTable to the grouped data
-        this.shipingDataTable = shipingTableDataArray;
-        this.getPackagesData();
-      }
-    });
-    // Update pending shipments
-
-  }
-
-  getPackagesData() {
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "docketScan",
-      "filter": {}
-    }
-    this._operation.operationMongoPost('generic/get', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.packageData = res.data;
-        }
-      }
-    })
+    const res= await firstValueFrom(this._operation.operationMongoPost('generic/get', reqBody));
+    this.packageData = res.data;
   }
 
   updatePackage() {
@@ -202,26 +175,41 @@ export class UpdateLoadingSheetComponent implements OnInit {
       this.tableload = true;
       const scanValue = this.scanPackage.trim();
       const legValue = this.arrivalData.Route.trim();
-
       // Call the imported function to handle the logic
       let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
       // Call kpiData function
       if (PackageUpdate) {
-        this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+        const { status, ...options}  = PackageUpdate;
+        if(!status) {
+          this.scanMessage = options.text;         
+        }
+        else {          
+          this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+          this.scanPkgs.push(scanValue);
+          this.scanMessage = '';          
+        }
       }
       this.cdr.detectChanges(); // Trigger change detection
       this.tableload = false;
+      this.clearAndFocusOnScan();
     }
     else {
-      Swal.fire({
-        icon: "error",
-        title: "Scan Package",
-        text: `Please Enter Package No`,
-        showConfirmButton: true,
-      })
+      this.scanMessage = `Please Enter Package No`;
+      this.clearAndFocusOnScan();
+      return;
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "Scan Package",
+      //   text: `Please Enter Package No`,
+      //   showConfirmButton: true,
+      // })
     }
   }
-
+  
+  clearAndFocusOnScan() {    
+    this.scanPackage = '';    
+    this.scanPackageInput.nativeElement.focus();
+  }
 
   setArrivalDataBindData() {
     autoBindData(this.loadingSheetTableForm.controls, {
@@ -297,7 +285,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   async CompleteScan() {
-
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
@@ -305,17 +292,13 @@ export class UpdateLoadingSheetComponent implements OnInit {
     if (exists) {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
-
-    // Create an array of promises for UpdateDocketDetail calls
-    const updatePromises = locationWiseData.map(element => {
-      return this.UpdateDocketDetail(element.Shipment);
-    });
-
-    // Wait for all UpdateDocketDetail promises to resolve
-    await Promise.all(updatePromises);
-
     if (packageChecked) {
-      this.updateTripStatus();
+      const res=await this.arrivalService.fieldMappingArrivalScan(this.arrivalData,locationWiseData,this.packageData);
+      if(res){
+        this.dialogRef.close(this.loadingSheetTableForm.value)
+        this.goBack('Departures')
+      }
+     // this.updateTripStatus();
     } else {
       Swal.fire({
         icon: "error",
@@ -330,10 +313,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
     if (dkt) {
       await updateTracking(this.companyCode, this._operation, dkt,this.arrivalData?.TripID);
     }
-    // const lsDetail = await loadingSheetDetails(this.companyCode, this._operation, this.arrivalData?.TripID);
-    // lsDetail.forEach(async element => {
-    //   await updateLoadingSheet(this.companyCode, this._operation, element.lsno, element.loadAddedKg, element.loadedVolumeCft)
-    // });
     const reqbody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -445,8 +424,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
             text: `Arrival Scan done Successfully`,
             showConfirmButton: true,
           })
-          this.dialogRef.close(this.loadingSheetTableForm.value)
-          this.goBack('Departures')
+       
         }
       }
     })

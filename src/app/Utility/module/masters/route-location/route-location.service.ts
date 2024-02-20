@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Injectable({
@@ -17,22 +18,16 @@ export class RouteLocationService {
         // Specify the collection name for route master locations
         collectionName: 'routeMasterLocWise',
         // Use an empty filter
-        filter: {}
+        filter: {companyCode: parseInt(localStorage.getItem("companyCode"))}
       };
 
       // Send a POST request to the 'generic/get' endpoint using the masterService
-      const response = await this.masterService.masterPost('generic/get', request).toPromise();
-
+      const response = await firstValueFrom(this.masterService.masterPost('generic/get', request));
       // Process the data and create an array of route details
       const routeDet = response.data.map(item => {
-        const routeDetails = item.routeDetails;
-
-        // Extract an array of loccd values from routeDetails
-        const locations = routeDetails.map(detail => detail.loccd);
-
         // Create a name by joining the loccd values with commas
-        const name = locations.join(' - ');
-        const value = item.routeId;
+        const name = item?.routeName||"";
+        const value = item?.routeId||"";
 
         return {
           name,

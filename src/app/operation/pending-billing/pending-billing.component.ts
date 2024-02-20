@@ -28,9 +28,9 @@ export class PendingBillingComponent implements OnInit {
   menuItemflag: boolean = true;
   boxData: { count: number; title: string; class: string; }[];
   linkArray = [
-    { Row: "action", Path: "Finance/InvoiceSummaryBill",title:{"status":1} },
-    { Row: 'dockets', Path: '', componentDetails: ShipmentEditBillingComponent,title:{"shipment":"apDkt"} },
-    { Row: 'pendShipment', Path: '', componentDetails: ShipmentEditBillingComponent,title:{"shipment":"penDkt"}  },
+    { Row: "action", Path: "Finance/InvoiceSummaryBill", title: { "status": 1 } },
+    { Row: 'dockets', Path: '', componentDetails: ShipmentEditBillingComponent, title: { "shipment": "apDkt" } },
+    { Row: 'pendShipment', Path: '', componentDetails: ShipmentEditBillingComponent, title: { "shipment": "penDkt" } },
   ]
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   public filteredMultiLocation: ReplaySubject<menuAccesDropdown[]> =
@@ -92,11 +92,11 @@ export class PendingBillingComponent implements OnInit {
   constructor(
     private invoiceService: InvoiceServiceService,
     private matDialog: MatDialog,
-    private genericService:GenericService
+    private genericService: GenericService
   ) {
-  
+
     this.getFilterData();
-  
+
   }
   getFilterData() {
     const now = new Date();
@@ -128,7 +128,7 @@ export class PendingBillingComponent implements OnInit {
 
 
   async get(data) {
-    this.tableLoad = true; 
+    this.tableLoad = true;
     const unBillingData = await this.invoiceService.getPendingDetails(data.start, data.end, data.customer);
     this.tableData = unBillingData.map(item => {
       item.action = item.dockets != 0 ? "Generate Invoice" : "";
@@ -149,12 +149,12 @@ export class PendingBillingComponent implements OnInit {
       data: "",
     });
     dialogRef.afterClosed().subscribe((result) => {
-      
+
       if (result != undefined) {
         this.get(result);
       }
-      else{
-        this.getFilterData() 
+      else {
+        this.getFilterData()
         this.genericService.clearSharedData();
       }
     });
@@ -164,15 +164,15 @@ export class PendingBillingComponent implements OnInit {
       this.getKpiCount();
       this.get(result);
     }
-    else{
+    else {
       this.getKpiCount();
-      this.getFilterData() 
+      this.getFilterData()
       this.genericService.clearSharedData();
     }
   }
   getKpiCount() {
-    const totalShipment= this.tableData.map((item) => item.dKTNO).length;
-    const totolApproved = this.tableData.map((item) => item.dockets).length;
+    const totalShipment = this.tableData.reduce((acc, item) => acc + item.pendShipment, 0);
+    const totolApproved = this.tableData.reduce((acc, item) => acc + item.dockets, 0); //this.tableData.map((item) => item.dockets).length;
     const unBillamt = this.tableData.reduce((acc, item) => acc + item.sum, 0);
     const createShipDataObject = (
       count: number,

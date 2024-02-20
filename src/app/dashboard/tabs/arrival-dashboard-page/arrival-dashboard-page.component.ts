@@ -5,6 +5,9 @@ import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sh
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { DatePipe } from '@angular/common';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { firstValueFrom } from 'rxjs';
+import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -103,7 +106,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   constructor(
     private CnoteService: CnoteService,
     private _operation: OperationService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private storage:StorageService,
+    private depatureService: ArrivalVehicleService
   ) {
 
     super();
@@ -111,7 +116,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;
     this.drillDownPath = 'example/drillDown'
-    this.getRouteDetail();
+    this.getArrivalDetails();
   }
   ngOnInit(): void {
     this.viewComponent = MarkArrivalComponent //setting Path to add data
@@ -121,34 +126,32 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       // if companyCode is not found , we should logout immmediately.
     }
   }
-  getRouteDetail() {
-    let reqbody = {
-      companyCode: this.companyCode,
-      collectionName: "route",
-      filter:{}
-    };
-    this._operation.operationMongoPost('generic/get', reqbody).subscribe({
-      next: (res: any) => {
-        this.routeDetails = res.data;
-        this.getArrivalDetails();
-      }
-    })
-  }
+  // getRouteDetail() {
+  //   let reqbody = {
+  //     companyCode: this.companyCode,
+  //     collectionName: "route",
+  //     filter:{}
+  //   };
+  //   this._operation.operationMongoPost('generic/get', reqbody).subscribe({
+  //     next: (res: any) => {
+  //       this.routeDetails = res.data;
+  //       this.getArrivalDetails();
+  //     }
+  //   })
+  // }
 
-  getArrivalDetails() {
+  async getArrivalDetails() {
+  
     const reqbody =
     {
       "companyCode": this.companyCode,
-      "collectionName": "trip_detail",
-       "filter":{}
+      "collectionName": "trip_Route_Schedule",
+      "filter":{nXTLOC:this.storage.branch,cID:this.companyCode}
     }
-    this._operation.operationMongoPost('generic/get', reqbody).subscribe({
-      next: (res: any) => {
-        if (res) {
-
-          const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase() && x.status!="close");
+    const res=await firstValueFrom(this._operation.operationMongoPost('generic/get', reqbody));
           let tableData = [];
-          arrivalDetails.forEach(element => {
+          if(res.data.length>0){
+            res.data.forEach(element => {
             const currentDate = new Date();
             /*here  the of schedule is not avaible so i can trying to ad delay manually*/
             const expectedTime = new Date(currentDate.getTime() + 10 * 60000); // 10 minutes in milliseconds
@@ -163,25 +166,22 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
             const timeDifferenceInMilliseconds = diffScheduleTime.getTime() - diffSexpectedTime.getTime();
             const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
             const statusToActionMap = {
-              "depart": "Vehicle Arrival",
-              "arrival": "Arrival Scan"
+               4: "Vehicle Arrival",
+               5: "Arrival Scan"
             };
           
-            let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
-            const routeCode = routeDetails?.routeCode ?? 'Unknown';
-            const routeName = routeDetails?.routeName ?? 'Unnamed';
-            if (element.status === "depart" || element.status === "arrival") {
+            if (element.sTS==4||element.sTS ==5) {
               let arrivalData = {
                 "id": element?._id || "",
-                "Route": routeCode + ":" + routeName,
-                "VehicleNo": element?.vehicleNo || '',
-                "TripID": element?.tripId || '',
-                "Location": this.branch,
+                "Route":element?.rUTCD + ":" + element?.rUTNM,
+                "VehicleNo": element?.vEHNO || '',
+                "TripID": element?.tHC || '',
+                "Location": this.storage.branch,
                 "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
                 "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
                 "Status": timeDifferenceInHours > 0 ? "Delay" : "On Time",
                 "Hrs": timeDifferenceInHours.toFixed(2),
-                "Action": statusToActionMap[element?.status]
+                "Action": statusToActionMap[element?.sTS]
               };
               tableData.push(arrivalData);
               // Display or use arrivalData as needed
@@ -190,36 +190,22 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
           this.fetchShipmentData();
           this.arrivalTableData = tableData;
           this.tableload = false;
-
-
         }
-      }
-    })
+        else{
+          this.arrivalTableData = [];
+          this.tableload = false;
+        }
   }
   /**
     * Fetches shipment data from the API and updates the boxData and tableload properties.
     */
-  fetchShipmentData() {
-
+  async fetchShipmentData() {
     // Prepare request payload
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "docket",
-      filter:{}
-    };
-
     // Send request and handle response
-    this._operation.operationMongoPost("generic/get", req).subscribe({
-      next: async (res: any) => {
-        const boxData = res.data.filter((x) => {
-          const destination = x.destination ? x.destination.split(":")[1].trim() : "";
-          return destination === this.branch.trim() && x.unloading === 0 && x.mfNo !== '';
-        });
-        const sumTotalChargedNoOfpkg = boxData.reduce((total, count) => {
-          return total + parseInt(count.totalChargedNoOfpkg);
+        const shipment= await this.depatureService.getThcWiseMeniFest({dEST:this.storage.branch,"D$or":[{iSDEL:false},{iSDEL:{"D$exists":false}}]});
+        const sumTotalChargedNoOfpkg = shipment.reduce((total, count) => {
+          return total + parseInt(count.pKGS);
         }, 0);
-
-
         const createShipDataObject = (count, title, className) => ({
           count,
           title,
@@ -229,16 +215,12 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         const shipData = [
           createShipDataObject(this.arrivalTableData.length, "Routes", "bg-c-Bottle-light"),
           createShipDataObject(this.arrivalTableData.length, "Vehicles", "bg-c-Grape-light"),
-          createShipDataObject(boxData.length, "Shipments", "bg-c-Daisy-light"),
+          createShipDataObject(shipment.length, "Shipments", "bg-c-Daisy-light"),
           createShipDataObject(sumTotalChargedNoOfpkg, "Packages", "bg-c-Grape-light")
         ];
-
         this.boxData = shipData;
-        const shipmentStatus = boxData.length <= 0 ? 'noDkt' : 'dktAvail';
+        const shipmentStatus = shipment.length <= 0 ? 'noDkt' : 'dktAvail';
         this._operation.setShipmentStatus(shipmentStatus);
-        
-      },
-    });
   }
   updateDepartureData(event) {
     

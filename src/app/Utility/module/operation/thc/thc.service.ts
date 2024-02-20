@@ -56,7 +56,7 @@ export class ThcService {
                 cNO: element?.cNO || "",
                 fCT: element.fCT,
                 tCT: element.tCT,
-                aCTWT: dkt?.tOTWT || 0,
+                aCTWT: Number(dkt?.tOTWT || 0).toFixed(2), // Ensure two decimal places
                 pKGS: dkt?.tOTPKG || 0,
                 pod: element?.pOD || "",
                 receiveBy: element?.rCVBY || "",
@@ -238,5 +238,14 @@ export class ThcService {
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operationService.operationMongoPost(OperationActions.CreateThc, request).toPromise();
         return result;
+    }
+    async getThcDetailsByNo(tripId) {
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.thc_summary_ltl,
+            filter: { docNo: tripId }
+        };
+        let nestedDetail = await firstValueFrom(this.operationService.operationPost("generic/getOne", reqBody));
+        return nestedDetail;
     }
 }

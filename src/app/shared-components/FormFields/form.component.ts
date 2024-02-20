@@ -167,4 +167,14 @@ export class FormComponent {
     context["functionName"] = functionName;
     this.functionCallEmitter.emit(context);
   }
+
+  intigerOnly(event): boolean {    
+    console.log(event);
+    const charCode = event.eventArgs.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.eventArgs.preventDefault();
+      return false;
+    }
+    return true;
+  }
 }

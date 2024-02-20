@@ -233,7 +233,12 @@ export class RouteLocationControl {
                 value: routeLocationData?.distKm,
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Distance is required.."
+                    }
+                ],
                 functions: {
                     'onChange': "calRouteKm" // Function to be called on change event
                 },
@@ -247,7 +252,10 @@ export class RouteLocationControl {
                 value: routeLocationData?.trtimeHr,
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [ {
+                    name: "required",
+                    message: "Transit is required.."
+                }],
 
             },
             {
@@ -258,7 +266,10 @@ export class RouteLocationControl {
                 value: routeLocationData?.sttimeHr,
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [ {
+                    name: "required",
+                    message: "Stoppage is required.."
+                }],
 
             },
             {

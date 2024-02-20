@@ -11,7 +11,11 @@ export const Collections = {
     thcsummary: 'thc_summary',
     chaHeaders: 'cha_headers',
     chaDetails: 'cha_details',
-    rake_headers: 'rake_headers'
+    rake_headers: 'rake_headers',
+    route_headers: 'route_schedules_headers',
+    trip_Route_Schedule: 'trip_Route_Schedule',
+    route_details: 'route_schedules_details',
+    thc_summary_ltl: 'thc_summary_ltl'
 };
 
 export const GenericActions = {

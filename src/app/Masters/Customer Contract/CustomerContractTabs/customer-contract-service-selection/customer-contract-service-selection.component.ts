@@ -35,8 +35,7 @@ interface CurrentAccessListType {
 })
 export class CustomerContractServiceSelectionComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
-{
+  implements OnInit {
   companyCode: number | null;
   @Input() contractData: any;
   //#region Form Configration Fields
@@ -750,7 +749,7 @@ export class CustomerContractServiceSelectionComponent
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {}
+  ngOnChanges(changes: SimpleChanges) { }
 
   async SetDefaultProductsData() {
     //#region  Set Default Products
@@ -937,7 +936,7 @@ export class CustomerContractServiceSelectionComponent
   }
 
   async SaveServiceSelection(event) {
-    
+
     let hasError = false; // Initialize the flag
     let contractDetails = {};
     const formValues = this.ServicesForm.value;
@@ -1129,7 +1128,7 @@ export class CustomerContractServiceSelectionComponent
   async InsuranceCarrierRiskSelectionSave() {
     const tableData = this.tableData;
     if (tableData.length > 0) {
-        if(this.isInsuranceExist){
+      if (this.isInsuranceExist) {
         const rmReq = {
           companyCode: this.storage.companyCode,
           collectionName: "cust_contract_insurance",
@@ -1140,7 +1139,7 @@ export class CustomerContractServiceSelectionComponent
       let incData = [];
       tableData.forEach((element, index) => {
         const requestBody = {
-          _id: this.companyCode + "-" + this.contractData.cONID + "-" + index+1,
+          _id: this.companyCode + "-" + this.contractData.cONID + "-" + index + 1,
           cID: this.companyCode,
           cONID: this.contractData.cONID,
           iVFROM: parseInt(element.InvoiceValueFrom),
@@ -1180,19 +1179,19 @@ export class CustomerContractServiceSelectionComponent
   async FuelSurchargeDataSave() {
     const FtableData = this.FtableData;
     if (FtableData.length > 0) {
-        if(this.isFuelData){
+      if (this.isFuelData) {
         const fsreq = {
           companyCode: this.storage.companyCode,
           collectionName: "cust_contract_fuelsurcharge",
           filter: { cONID: this.contractData.cONID },
         };
-        await firstValueFrom (this.masterService
+        await firstValueFrom(this.masterService
           .masterMongoRemove("generic/removeAll", fsreq));
       }
       let flsData = [];
       FtableData.forEach((element, index) => {
         const requestBody = {
-          _id: this.companyCode + "-" + this.contractData.cONID + "-" + index+1,
+          _id: this.companyCode + "-" + this.contractData.cONID + "-" + index + 1,
           cID: this.companyCode,
           cONID: this.contractData.cONID,
           fTYPE: element.FuelTypevalue,
@@ -1216,7 +1215,7 @@ export class CustomerContractServiceSelectionComponent
       };
       const method = "generic/create";
       try {
-        await firstValueFrom (this.masterService.masterPost(method, req));
+        await firstValueFrom(this.masterService.masterPost(method, req));
 
         return true;
       } catch (error) {
@@ -1239,11 +1238,11 @@ export class CustomerContractServiceSelectionComponent
       collectionName: "cust_contract_insurance",
       filter: { cONID: this.contractData.cONID },
     };
-    const res = await firstValueFrom (this.masterService
+    const res = await firstValueFrom(this.masterService
       .masterPost("generic/get", reqBody));
     if (res) {
       this.tableData = res.data;
-      this.isInsuranceExist=this.tableData.length>0?true:false;
+      this.isInsuranceExist = this.tableData.length > 0 ? true : false;
       this.tableData.forEach((item) => {
         (item.id = item._id),
           (item.InvoiceValueFrom = item.iVFROM),
@@ -1299,7 +1298,7 @@ export class CustomerContractServiceSelectionComponent
           actions: ["Edit", "Remove"],
         };
       });
-      this.isFuelData=this.FtableData.length>0?true:false;
+      this.isFuelData = this.FtableData.length > 0 ? true : false;
       this.FtableLoad = false;
     }
   }
@@ -1417,10 +1416,10 @@ export class CustomerContractServiceSelectionComponent
       });
       return;
     }
-    if (tovalue && InvoiceValueFrom && tovalue > InvoiceValueFrom) {
+    if (tovalue && InvoiceValueFrom && tovalue < InvoiceValueFrom) {
       // Display an error message using SweetAlert (Swal)
       this.CommanSwalWithReturn(
-        "InvoiceValueFrom charge must be greater than or equal to InvoiceValueTO charge.",
+        "InvoiceValueTO charge must be greater than or equal to  InvoiceValueFromcharge.",
         "error"
       );
 

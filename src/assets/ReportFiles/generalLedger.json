@@ -1,14 +1,14 @@
 [
     {
-        "FieldName": "accName",
+        "FieldName": "accCode",
         "Caption": "AccountCode"
     },
     {
-        "FieldName": "accCode",
+        "FieldName": "accName",
         "Caption": "AccountName"
     },
     {
-        "FieldName": "accName",
+        "FieldName": "accCode",
         "Caption": "Category"
     },
     {

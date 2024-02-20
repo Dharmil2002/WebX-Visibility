@@ -1,8 +1,10 @@
 import { Component, OnInit } from "@angular/core";
-import { OperationService } from "src/app/core/service/operations/operation.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import Swal from "sweetalert2";
-import { getDocketDetailsFromApi, kpiData } from "./stockCommon";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import { StorageService } from "src/app/core/service/storage.service";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocketStatus } from "src/app/Models/docStatus";
 
 @Component({
   selector: "app-stocks",
@@ -51,12 +53,12 @@ export class StocksComponent
 
   columnHeader = {
     no: {
-      Title:"Cnote",
+      Title: DocCalledAs.Docket,
       class: "matcolumnleft",
       Style: "min-width:15%",
     },
     date: {
-      Title: "Date of Cnote",
+      Title: `${DocCalledAs.Docket} Date`,
       class: "matcolumnleft",
       Style: "min-width:80px",
     },
@@ -104,8 +106,8 @@ export class StocksComponent
   //#endregion
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
-    no: "Cnote",
-    date: "Date of Cnote",
+    no: DocCalledAs.Docket,
+    date: `${DocCalledAs.Docket} Date`,
     paymentType: "Payment Type",
     contractParty: "Contract Party",
     orgdest: "Origin-Destination",
@@ -131,7 +133,10 @@ export class StocksComponent
   boxData: { count: any; title: any; class: string }[];
   branch = localStorage.getItem("Branch");
   // declararing properties
-  constructor(private operationService: OperationService) {
+  constructor(
+  private docketService:DocketService,
+  private storage:StorageService
+  ) {
     super();
     this.addAndEditPath = "Operation/QuickCreateDocket";
   }
@@ -144,29 +149,21 @@ export class StocksComponent
    */
   async getDocketDetails() {
     try {
-      // Send request and await response
-      const modifiedData = await getDocketDetailsFromApi(
-        this.companyCode,
-        this.branch,
-        this.operationService
-      );
 
-      // Update tableData property with the modified data
-      this.tableData = modifiedData;
+      let matches = { 
+        cID: this.storage.companyCode,
+        cLOC: this.storage.branch ,
+        sTS: { 'D$nin': [DocketStatus.Delivered,DocketStatus.Cancelled]}
+      };
 
-      // Generate KPI data based on the modified data
-      this.boxData = kpiData(modifiedData);
-
-      // Set tableload to false to indicate that the table loading is complete
+      const data =await this.docketService.getDocketList(matches);
+      const modifiedData =await this.docketService.getMappingDocketDetails(data);
+      this.boxData =await this.docketService.kpiData(data);
+      this.tableData = modifiedData.reverse();
       this.tableload = false;
     } catch (error) {
-      // Handle error by displaying an error message
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Oops! Something went wrong. Please try again later.",
-        showConfirmButton: true,
-      });
+      this.tableData =[];
+      this.tableload = false;
     }
   }
 }

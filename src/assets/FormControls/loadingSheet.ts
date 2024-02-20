@@ -153,6 +153,16 @@ export class loadingControl {
                 Validations: [],
                 generatecontrol: true,
                 disable: true
+            },
+            {
+                name: 'vehicleTypeCode',
+                label: 'Vehicle Type Code',
+                placeholder: '',
+                type: '',
+                value:'',
+                Validations: [],
+                generatecontrol: true,
+                disable: true
             }
         ];
     }

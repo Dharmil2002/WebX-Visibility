@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { vehicleMarket } from 'src/app/Models/vehicle-market/vehicle-market';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Injectable({
     providedIn: 'root'
@@ -8,7 +10,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 export class VehicleService {
 
-    constructor(private masterService: MasterService,) { }
+    constructor(private masterService: MasterService,private storage:StorageService) { }
 
     /**
      * Retrieves vehicle details based on the provided filter.
@@ -44,5 +46,22 @@ export class VehicleService {
         };
         // Making an asynchronous request to fetch vehicle data using the master service
         return this.masterService.masterPost("generic/get",req).toPromise();
+    }
+    async getVehicleNo(filter, isDropdown) {
+        try {
+            const req = {
+                companyCode:this.storage.companyCode,
+                collectionName: "vehicle_status",
+                filter: filter,
+            };
+            // Fetch vehicle data and destructure to get the data property
+            const { data } = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+            // If isDropdown is true, transform data to dropdown format, else return raw data
+            return isDropdown
+                ? data.map(item => ({ value: item.vehNo, name: item.vehNo }))
+                : data;
+        } catch (error) {
+            return isDropdown ? [] : null; // or any other appropriate default value
+        }
     }
 }

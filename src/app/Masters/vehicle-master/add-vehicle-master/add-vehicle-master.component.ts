@@ -313,7 +313,7 @@ export class AddVehicleMasterComponent implements OnInit {
       };
 
       this.allData = mergedData;
-      const vehTypeDet = mergedData.vehTypeData.map((element) => ({
+      const vehTypeDet = mergedData.vehTypeData?.map((element) => ({
         name: element.vehicleTypeName.toString(),
         value: element.vehicleTypeCode.toString(),
       }));

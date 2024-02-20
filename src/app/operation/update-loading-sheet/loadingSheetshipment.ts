@@ -26,7 +26,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, oper
         }
         let vehicleDetails = {
             rptLoc,
-            status: isClose ? "available" : "In Transit",
+            status: isClose ? "Available" : "In Transit",
             ...(isClose
                 ? {
                     tripId: "",

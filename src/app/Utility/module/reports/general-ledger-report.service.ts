@@ -71,46 +71,50 @@ export class GeneralLedgerReportService {
       // console.log(res.data);
       const reportFile: any = await firstValueFrom(this.masterService.getJsonFileDetails('generalLedgerReport'));
 
-      let reportData: any[] = [];
-      reportData = prepareReportData(res.data, reportFile);
-      const category = await this.getAccountDetail();
+      if (res.data && res.data.length > 0) {
+        let reportData: any[] = [];
+        reportData = prepareReportData(res.data, reportFile);
+        const category = await this.getAccountDetail();
 
-      // Calculate total debit and credit
-      const total = reportData.reduce((accumulator, item) => {
-        // Update the "Category" property based on the 'category' array
-        item["Category"] = category.find(a => a.value == item["Category"])?.category || item["Category"];
+        // Calculate total debit and credit
+        const total = reportData.reduce((accumulator, item) => {
+          // Update the "Category" property based on the 'category' array
+          item["Category"] = category.find(a => a.value == item["Category"])?.category || item["Category"];
 
-        // Update the totals
-        accumulator.totalDebit += item.Debit ? parseFloat(item.Debit) : 0;
-        accumulator.totalCredit += item.Credit ? parseFloat(item.Credit) : 0;
+          // Update the totals
+          accumulator.totalDebit += item.Debit ? parseFloat(item.Debit) : 0;
+          accumulator.totalCredit += item.Credit ? parseFloat(item.Credit) : 0;
 
-        return accumulator;
-      }, { totalDebit: 0, totalCredit: 0 });
+          return accumulator;
+        }, { totalDebit: 0, totalCredit: 0 });
 
-      // Add a new row with the specified values
-      const newRow = {
-        "AccountCode": "Total for A/C (Dr./Cr.) : ",
-        "Debit": total.totalDebit.toFixed(2),
-        "Credit": total.totalCredit.toFixed(2),
-        "AccountName": " ",
-        "Category": " ",
-        "Voucher No": " ",
-        "Date": " ",
-        "PartyCode": " ",
-        "PartyName": " ",
-        "Narration": " ",
-        "LocName": " ",
-        "Cheque Date": " ",
-        "Document No": " "
-      };
+        // Add a new row with the specified values
+        const newRow = {
+          "AccountCode": "Total for A/C (Dr./Cr.) : ",
+          "Debit": total.totalDebit.toFixed(2),
+          "Credit": total.totalCredit.toFixed(2),
+          "AccountName": " ",
+          "Category": " ",
+          "Voucher No": " ",
+          "Date": " ",
+          "PartyCode": " ",
+          "PartyName": " ",
+          "Narration": " ",
+          "LocName": " ",
+          "Cheque Date": " ",
+          "Document No": " "
+        };
 
-      reportData.push(newRow);
+        reportData.push(newRow);
 
-      return reportData;
+        return reportData;
+      }
+
     } catch (error) {
       console.error("An error occurred:", error);
-      return [];
     }
+
+    return [];
   }
   //#endregion
   //#region to account list
@@ -141,8 +145,8 @@ export class GeneralLedgerReportService {
     const previousYearShort: string = `${+currentYearShort - 1}`;
 
     const financialYear = [
-      { name: `${previousYearShort}${currentYearShort}`, value: `${previousYearShort}${currentYearShort}` },
-      { name: `${currentYearShort}${nextYearShort}`, value: `${currentYearShort}${nextYearShort}` },
+      { name: `${previousYearShort} - ${currentYearShort}`, value: `${previousYearShort}${currentYearShort}` },
+      { name: `${currentYearShort} - ${nextYearShort}`, value: `${currentYearShort}${nextYearShort}` },
     ];
 
     return financialYear;

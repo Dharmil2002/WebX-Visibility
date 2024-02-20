@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Injectable({
@@ -16,8 +17,7 @@ export class VendorService {
     };
 
     // Send a POST request to the 'generic/get' endpoint using the masterService
-    const response = await this.masterService.masterPost('generic/get', request).toPromise();
-
+    const response = await firstValueFrom(this.masterService.masterPost('generic/get', request));
     // Return the data from the response
     return response.data;
   }

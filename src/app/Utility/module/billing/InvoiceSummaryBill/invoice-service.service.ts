@@ -18,7 +18,7 @@ export class InvoiceServiceService {
   constructor(
     private storage: StorageService,
     private operationService: OperationService,
-    private customerService:CustomerService
+    private customerService: CustomerService
   ) { }
 
   async getInvoice(shipment: string[], status: number = 0) {
@@ -31,7 +31,7 @@ export class InvoiceServiceService {
     return res.data;
   }
 
-  async filterShipment(shipments,isShipment:boolean=false) {
+  async filterShipment(shipments, isShipment: boolean = false) {
     const filterShipmentList = [];
     const req = {
       companyCode: this.storage.companyCode,
@@ -51,9 +51,9 @@ export class InvoiceServiceService {
           state: locDetails.data[0].locState || "", // Assuming locState is the state you want to assign
           vehicleNo: element?.vEHNO || "",
           amount: element?.gROAMT || "",
-          gst: isShipment?element.gSTAMT:0.00,
+          gst: isShipment ? element.gSTAMT : 0.00,
           gstChrgAmt: element?.gSTCHAMT || "",
-          total:isShipment? element.gROAMT+element.gSTAMT:element.gROAMT,
+          total: isShipment ? element.gROAMT + element.gSTAMT : element.gROAMT,
           noOfpkg: element?.pKGS || 0.00,
           weight: element?.aCTWT || 0.00,
           isSelected: false,
@@ -71,7 +71,7 @@ export class InvoiceServiceService {
     return filterShipmentList;
   }
 
-  getInvoiceDetail(shipment,gstRate) {
+  getInvoiceDetail(shipment, gstRate) {
 
     const stateInvoiceMap = new Map();
     for (const element of shipment) {
@@ -84,7 +84,7 @@ export class InvoiceServiceService {
           countSelected: 0,
           subTotalAmount: 0,
           gstCharged: 0,
-          gstRate:gstRate,
+          gstRate: gstRate,
           extraData: [element],
         });
       } else {
@@ -104,41 +104,43 @@ export class InvoiceServiceService {
   async addBillDetails(data, bill) {
     const customerName = (data?.customerName?.[0] || "").split('-')[1]?.trim() || "";
     const customerCode = (data?.customerName?.[0] || "").split('-')[0]?.trim() || "";
-    const  custList=await this.customerService.customerFromFilter({customerCode:customerCode},false);
+    const custList = await this.customerService.customerFromFilter({ customerCode: customerCode }, false);
+    const custGroup = await this.customerService.customerGroupFilter(custList[0]?.customerGroup);
+
     let jsonBillingList = [];
     bill.forEach((element) => {
       element?.extraData.forEach(nested => {
-      const gstType=['SGST', 'CGST', 'UTGST']
-      let jsonBilling = {
-        _id: "",
-        bILLNO: "",
-        dKTNO: nested?.shipment || "",
-        cID: this.storage.companyCode,
-        oRGN: nested?.extraData?.oRGN || "",
-        dEST: nested?.extraData?.dEST || "",
-        dKTDT: nested?.extraData?.dKTDT,
-        cHRGWT:nested?.extraData.cHRWT,
-        dKTAMT: nested?.amount || 0.00,
-        dKTTOT: nested?.total || 0.00,
-        sUBTOT: nested?.amount || 0.00,
-        gSTTOT:data?.gstExempted==false?nested?.gstChrgAmt:0.00,
-        gSTRT:data?.gstExempted==false?nested?.gst:0.00,
-        tOTAMT: nested?.total || 0.00,
-        //pAMT: 0.00,
-        fCHRG: nested.extraData?.fRATE || 0.00,
-        //fLSCHRG: 0.00,
-        sGST:gstType.includes(data?.gstType)?parseFloat(element.gstCharged) / 2:0,
-        sGSTRT:gstType.includes(data?.gstType)?parseFloat(data.gstRate) / 2:0,
-        cGST:gstType.includes(data?.gstType)?parseFloat(element.gstCharged) / 2:0,
-        cGSTRT:gstType.includes(data?.gstType)?parseFloat(data.gstRate) / 2:0,
-        iGST:data?.gstType == "IGST" ? element.gstCharged:0,
-        iGSTRT: data?.gstType == "IGST"?data.gstRate:0,
-        eNTDT:new Date(),
-        eNTLOC:this.storage.branch || "",
-        eNTBY:this.storage?.userName|| "",
-      }
-      jsonBillingList.push(jsonBilling);
-    });
+        const gstType = ['SGST', 'CGST', 'UTGST']
+        let jsonBilling = {
+          _id: "",
+          bILLNO: "",
+          dKTNO: nested?.shipment || "",
+          cID: this.storage.companyCode,
+          oRGN: nested?.extraData?.oRGN || "",
+          dEST: nested?.extraData?.dEST || "",
+          dKTDT: nested?.extraData?.dKTDT,
+          cHRGWT: nested?.extraData.cHRWT,
+          dKTAMT: nested?.amount || 0.00,
+          dKTTOT: nested?.total || 0.00,
+          sUBTOT: nested?.amount || 0.00,
+          gSTTOT: data?.gstExempted == false ? nested?.gstChrgAmt : 0.00,
+          gSTRT: data?.gstExempted == false ? nested?.gst : 0.00,
+          tOTAMT: nested?.total || 0.00,
+          //pAMT: 0.00,
+          fCHRG: nested.extraData?.fRATE || 0.00,
+          //fLSCHRG: 0.00,
+          sGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) / 2 : 0,
+          sGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) / 2 : 0,
+          cGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) / 2 : 0,
+          cGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) / 2 : 0,
+          iGST: data?.gstType == "IGST" ? element.gstCharged : 0,
+          iGSTRT: data?.gstType == "IGST" ? data.gstRate : 0,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch || "",
+          eNTBY: this.storage?.userName || "",
+        }
+        jsonBillingList.push(jsonBilling);
+      });
     })
     const billData = {
       "_id": `${this.storage.companyCode}-${data?.invoiceNo}` || "",
@@ -157,31 +159,33 @@ export class InvoiceServiceService {
       "eXMTRES": data?.ExemptionReason || "",
       "gEN": {
         "lOC": this.storage.branch,
-        "cT":data?.gstCt||"",
-        "sT":data?.gstSt||"",
+        "cT": data?.gstCt || "",
+        "sT": data?.gstSt || "",
         "gSTIN": data?.cGstin || "",
       },
       "sUB": {
-        "lOC":data?.submissionOffice||"",
+        "lOC": data?.submissionOffice || "",
         "tO": "",
         "tOMOB": "",
         "dTM": "",
-        "dOC":""
+        "dOC": ""
       },
       "cOL": {
-        "lOC":data?.collectionOffice||"",
+        "lOC": data?.collectionOffice || "",
         "aMT": 0.00,
         "bALAMT": 0.00
       },
       "cUST": {
         "cD": customerCode,
         "nM": customerName,
-        "tEL":custList[0]?.customer_mobile||"",
-        "aDD":custList[0]?.RegisteredAddress||"",
-        "eML":custList[0]?.Customer_Emails||"",
-        "cT":custList[0]?.city||"",
-        "sT": custList[0]?.state||"",
-        "gSTIN":data?.cGstin||"",
+        "tEL": custList[0]?.customer_mobile || "",
+        "aDD": custList[0]?.RegisteredAddress || "",
+        "eML": custList[0]?.Customer_Emails || "",
+        "cT": custList[0]?.city || "",
+        "sT": custList[0]?.state || "",
+        "gSTIN": data?.cGstin || "",
+        "cGCD": custGroup?.groupCode || "",
+        "cGNM": custGroup?.groupName || "",
       },
       "gST": {
         "tYP": data?.gstType || "", // SGST, UTGST, IGST
@@ -198,7 +202,7 @@ export class InvoiceServiceService {
       "dKTTOT": data?.shipmentTotal || 0.00,
       "gROSSAMT": data?.invoiceTotal || 0.00,
       //"aDDCHRG": 0.00,
-      "rOUNOFFAMT": data?.roundOff||0,
+      "rOUNOFFAMT": data?.roundOff || 0,
       "aMT": data?.finalInvoice || 0.00,
       //"cNL": false,
       //"cNLDT": "",
@@ -401,9 +405,9 @@ export class InvoiceServiceService {
     };
     const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
     const filterData = res.data.map((element) => {
-      const cOL= element.hasOwnProperty('cOL')?element.cOL.bALAMT:0;
-      element.collected =cOL;
-      element.deductions = element?.bALAMT||0;
+      const cOL = element.hasOwnProperty('cOL') ? element.cOL.bALAMT : 0;
+      element.collected = cOL;
+      element.deductions = element?.bALAMT || 0;
       element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
       element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
       element.collectionAmount = parseFloat(element.aMT) - parseFloat(cOL);
@@ -463,7 +467,7 @@ export class InvoiceServiceService {
       x.bGNDT = formatDate(x.bGNDT, 'dd-MM-yy hh:mm');
       x.customerName = `${x.cUST.cD}:${x.cUST.nM}`;
       x.status = x.bSTSNM;
-      x.pendingAmt = x.cOL?x.cOL.bALAMT:0;
+      x.pendingAmt = x.cOL ? x.cOL.bALAMT : 0;
       x.actions = x.bSTS == 1 ? ['Approve Bill', 'Cancel Bill'] : ['Submission Bill'];
       return x;
     });
@@ -490,7 +494,7 @@ export class InvoiceServiceService {
       companyCode: this.storage.companyCode,
       collectionName: "docket_fin_det",
       filter: filter,
-      update: {isBILLED:false,bILLNO:""}
+      update: { isBILLED: false, bILLNO: "" }
     }
     const res = await firstValueFrom(this.operationService.operationMongoPut("generic/updateAll", req));
     return res
@@ -557,7 +561,7 @@ export class InvoiceServiceService {
       eNTLOC: this.storage?.branch || "",
       eNTBY: this.storage?.userName || "",
     };
-  
+
     const collectedData = data.map((item) => ({
       _id: "",
       bILLNO: item?.bILLNO || 0,
@@ -568,31 +572,31 @@ export class InvoiceServiceService {
       vUCHNO: "",
       ...commonProperties,
     }));
-  
+
     const colData = {
       formData: formGroup,
       collectedData: collectedData,
-      tabledata:data
+      tabledata: data
     };
-  
+
     return colData;
   }
-  
-/*End*/
-/*Save CollectionData*/
-  async saveCollection(data){
-  
-  const req={
-    companyCode:this.storage.companyCode,
-    collectionName:"Cust_bill_collection",
-    data:data,
-    docType: "MR",
-    branch: this.storage.branch,
-    finYear: financialYear
+
+  /*End*/
+  /*Save CollectionData*/
+  async saveCollection(data) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "Cust_bill_collection",
+      data: data,
+      docType: "MR",
+      branch: this.storage.branch,
+      finYear: financialYear
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPost("finance/bill/cust/addCustomerCollection", req));
+    return res;
   }
-  const res=await firstValueFrom(this.operationService.operationMongoPost("finance/bill/cust/addCustomerCollection",req));
-  return res;
-}
-/*End*/
+  /*End*/
 
 }

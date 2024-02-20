@@ -140,8 +140,8 @@ export class CustomerService {
           })) ?? null;
         return filterMap.sort((a, b) => a.name.localeCompare(b.name));
       }
-      else{
-      // Map the response data to a more usable format
+      else {
+        // Map the response data to a more usable format
         return res?.data;
       }
     }
@@ -152,5 +152,29 @@ export class CustomerService {
       return null; // Return null to indicate an error occurred
     }
   }
+  // This async function retrieves customer data from an API using the masterService.
+  async customerGroupFilter(groupName) {
 
+    const reqBody = {
+      companyCode: localStorage.getItem("companyCode"),
+      collectionName: "customerGroup_detail",
+      filter: {
+        activeFlag: true,
+        groupName: groupName
+      },
+    };
+
+    try {
+
+      const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
+      return res?.data?.[0];
+
+    }
+    // Sort the mapped data in ascending order by customer name
+    catch (error) {
+      // Handle any errors that occur during the API request
+      console.error("An error occurred:", error);
+      return null; // Return null to indicate an error occurred
+    }
+  }
 }

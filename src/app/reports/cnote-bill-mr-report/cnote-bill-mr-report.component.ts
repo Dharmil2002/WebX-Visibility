@@ -7,7 +7,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { CnoteBillMRService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
+import { CnoteBillMRService, exportAsExcelFile } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -282,31 +282,7 @@ export class CnoteBillMrReportComponent implements OnInit {
     const tranmode: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "tran_mode" }, "codeDesc", "codeId");
     const booking: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "DELTYP" }, "codeDesc", "codeId");
     const customer = await this.customerService.customerFromApi();
-    let cnoteReq = {
-      "companyCode": this.storage.companyCode,
-      "filter": {},
-      "collectionName": "dockets"
-    };
-    const cnoteRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", cnoteReq));
 
-    const mergedData = {
-      cnoteData: cnoteRes?.data
-    };
-    this.allData = mergedData;
-    const cnoteDet = mergedData.cnoteData
-      .map(element => ({
-        name: element.docNo,
-        value: element.docNo,
-      }));
-    this.cnoteDetailList = cnoteDet;
-    this.cnoteDet = cnoteDet;
-    this.filter.Filter(
-      this.jsoncnoteBillMRFormArray,
-      this.cnoteBillMRTableForm,
-      cnoteDet,
-      this.cnoteName,
-      this.cnoteStatus
-    );
     this.filter.Filter(
       this.jsoncnoteBillMRFormArray,
       this.cnoteBillMRTableForm,
@@ -366,48 +342,38 @@ export class CnoteBillMrReportComponent implements OnInit {
   }
 
   async save() {
+    const docketNo = this.cnoteBillMRTableForm.value.cnote;
+    const docketArray = docketNo ? docketNo.includes(',') ? docketNo.split(',') : [docketNo] : [];
     const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
     const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
-    // Fetch data from the service
-    let data = await this.cnoteBillMRService.getCNoteBillMRReportDetail(startValue,endValue);
-    // Extract selected values from the form
-    const payment = Array.isArray(this.cnoteBillMRTableForm.value.payTypeHandler)
-      ? this.cnoteBillMRTableForm.value.payTypeHandler.map(x => x.name)
-      : [];
-    const bookingtype = Array.isArray(this.cnoteBillMRTableForm.value.bookTypeHandler)
-      ? this.cnoteBillMRTableForm.value.bookTypeHandler.map(x => x.name)
-      : [];
-    const transitmode = Array.isArray(this.cnoteBillMRTableForm.value.transitHandler)
-      ? this.cnoteBillMRTableForm.value.transitHandler.map(x => x.name)
+    const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
+      ? this.cnoteBillMRTableForm.value.fromlocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
       : [];
     const toloc = Array.isArray(this.cnoteBillMRTableForm.value.tolocHandler)
-      ? this.cnoteBillMRTableForm.value.tolocHandler.map(x => x.value)
+      ? this.cnoteBillMRTableForm.value.tolocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
       : [];
-    const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
-      ? this.cnoteBillMRTableForm.value.fromlocHandler.map(x => x.value)
+    const payment = Array.isArray(this.cnoteBillMRTableForm.value.payTypeHandler)
+      ? this.cnoteBillMRTableForm.value.payTypeHandler.map(x => { return { payCD: x.value, payNM: x.name }; })
       : [];
-    const movetype = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
-      ? this.cnoteBillMRTableForm.value.movTypeHandler.map(x => x.name)
+    const transitmode = Array.isArray(this.cnoteBillMRTableForm.value.transitHandler)
+      ? this.cnoteBillMRTableForm.value.transitHandler.map(x => { return { tranCD: x.value, tranNM: x.name }; })
+      : [];
+    const businessType = Array.isArray(this.cnoteBillMRTableForm.value.busType) ? '' : this.cnoteBillMRTableForm.value.busType;
+    const movType = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
+      ? this.cnoteBillMRTableForm.value.movTypeHandler.map(x => { return { movCD: x.value, movNM: x.name }; })
+      : [];
+    const bookingType = Array.isArray(this.cnoteBillMRTableForm.value.bookTypeHandler)
+      ? this.cnoteBillMRTableForm.value.bookTypeHandler.map(x => { return { bookCD: x.value, bookNM: x.name }; })
       : [];
     const customer = Array.isArray(this.cnoteBillMRTableForm.value.custHandler)
-      ? this.cnoteBillMRTableForm.value.custHandler.map(x => x.name)
+      ? this.cnoteBillMRTableForm.value.custHandler.map(x => { return { custCD: x.value, custNM: x.name }; })
       : [];
-    // Filter records based on form values
-    const filteredRecords = data.filter(record => {
-      const origin = fromloc.length === 0 || fromloc.includes(record.oRGN);
-      const movtype = movetype.length === 0 || movetype.includes(record.mOVTYPE);
-      const paytpDet = payment.length === 0 || payment.includes(record.pAYTYPE);
-      const des = toloc.length === 0 || toloc.includes(record.dEST);
-      const booktpDet = bookingtype.length === 0 || bookingtype.includes(record.bOOKINGTPE);
-      const tranmodeDet = transitmode.length === 0 || transitmode.includes(record.tRANMODE);
-      const customerDet = customer.length === 0 || customer.includes(record.bILLPAR);
-      return des && origin && movtype && paytpDet && booktpDet && tranmodeDet && customerDet;
-    });
-    // Assuming you have your selected data in a variable called 'selectedData'
-    // const selectedData = filteredRecords;
-    if (filteredRecords.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (filteredRecords) {
+    const billAt = Array.isArray(this.cnoteBillMRTableForm.value.billHandler)
+      ? this.cnoteBillMRTableForm.value.billHandler.map(x => { return { billCD: x.value, billNM: x.name }; })
+      : [];
+    const data = await this.cnoteBillMRService.getCNoteBillMRReportDetail(startValue, endValue, fromloc, toloc, payment, transitmode, businessType, movType, bookingType, customer, billAt, docketArray)
+    if (data.length === 0) {
+      if (data) {
         Swal.fire({
           icon: "error",
           title: "No Records Found",
@@ -417,11 +383,7 @@ export class CnoteBillMrReportComponent implements OnInit {
       }
       return;
     }
-    const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-      const { oRGN,dEST, bOOKINGTPE, ...rest } = record;
-      return rest;
-    });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_Bill_MR_Report-${timeString}`,this.CSVHeader);
+    exportAsExcelFile(data, `Cnote_Bill_MR_Report-${timeString}`, this.CSVHeader);
   }
 
   toggleSelectAll(argData: any) {

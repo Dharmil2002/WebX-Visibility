@@ -21,7 +21,7 @@ import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { Vendbillpayment } from "src/app/Models/Finance/VendorPayment";
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel, } from "src/app/Models/Finance/Finance";
+import { VoucherDataRequestModel, VoucherRequestModel, } from "src/app/Models/Finance/Finance";
 import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
@@ -145,8 +145,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   BillPaymentData: any;
   vendor: any;
   backPath: string;
-  debitVoucherRequestModel = new DebitVoucherRequestModel();
-  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   TotalBillAmount: number;
   TotalDebitNote: number;
   TotalPaidAmount: number;
@@ -511,44 +511,43 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           this.TotalPendingAmount.toFixed(2)
         );
 
-        this.debitVoucherRequestModel.companyCode = this.companyCode;
-        this.debitVoucherRequestModel.docType = "VR";
-        this.debitVoucherRequestModel.branch = this.storage.branch;
-        this.debitVoucherRequestModel.finYear = financialYear;
+        this.VoucherRequestModel.companyCode = this.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear;
 
-        // this.debitVoucherDataRequestModel.companyCode = this.companyCode;
-        this.debitVoucherDataRequestModel.voucherNo = "";
-        this.debitVoucherDataRequestModel.transType = "VendorBillPayment";
-        this.debitVoucherDataRequestModel.transDate = new Date();
-        this.debitVoucherDataRequestModel.docType = "VR";
-        this.debitVoucherDataRequestModel.branch = this.storage.branch;
-        this.debitVoucherDataRequestModel.finYear = financialYear;
+        // this.VoucherDataRequestModel.companyCode = this.companyCode;
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transType = "VendorBillPayment";
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
-        this.debitVoucherDataRequestModel.preperedFor = "Vendor";
-        this.debitVoucherDataRequestModel.partyCode = this.billData[0]?.vnCode ? this.billData[0]?.vnCode.toString() : '';
-        this.debitVoucherDataRequestModel.partyName = this.billData[0]?.vnName ? this.billData[0]?.vnName : '';
-        this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-        this.debitVoucherDataRequestModel.entryDate = new Date();
-        this.debitVoucherDataRequestModel.panNo = this.vendorbillPaymentForm.get("VendorPANNumber").value;
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Vendor";
+        this.VoucherDataRequestModel.partyCode = this.billData[0]?.vnCode ? this.billData[0]?.vnCode.toString() : '';
+        this.VoucherDataRequestModel.partyName = this.billData[0]?.vnName ? this.billData[0]?.vnName : '';
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = this.vendorbillPaymentForm.get("VendorPANNumber").value;
 
-        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-        this.debitVoucherDataRequestModel.tcsSectionCode = undefined;
-        this.debitVoucherDataRequestModel.tcsSectionName = undefined
-        this.debitVoucherDataRequestModel.tcsRate = undefined;
-        this.debitVoucherDataRequestModel.tcsAmount = undefined;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = undefined;
+        this.VoucherDataRequestModel.tcsSectionName = undefined
+        this.VoucherDataRequestModel.tcsRate = undefined;
+        this.VoucherDataRequestModel.tcsAmount = undefined;
 
-        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
-        this.debitVoucherDataRequestModel.netPayable = NetPayable;
-        this.debitVoucherDataRequestModel.roundOff = 0;
-        this.debitVoucherDataRequestModel.voucherCanceled = false;
+        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+        this.VoucherDataRequestModel.netPayable = NetPayable;
+        this.VoucherDataRequestModel.roundOff = 0;
+        this.VoucherDataRequestModel.voucherCanceled = false;
 
-        this.debitVoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
-        this.debitVoucherDataRequestModel.refNo = PaymenDetails?.ChequeOrRefNo || "";
-        this.debitVoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
-        this.debitVoucherDataRequestModel.date = PaymenDetails.Date;
-        this.debitVoucherDataRequestModel.scanSupportingDocument = "";
-        this.debitVoucherDataRequestModel.paymentAmount = NetPayable;
+        this.VoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
+        this.VoucherDataRequestModel.refNo = PaymenDetails?.ChequeOrRefNo || "";
+        this.VoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
+        this.VoucherDataRequestModel.date = PaymenDetails.Date;
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
 
         var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
           return {
@@ -570,11 +569,11 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           };
         });
 
-        this.debitVoucherRequestModel.details = VoucherlineitemList;
-        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+        this.VoucherRequestModel.details = VoucherlineitemList;
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
 
-        firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+        firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
           this.GenerateVendorBills(res?.data?.mainData?.ops[0].vNO, PaymenDetails)
 
           Swal.fire({

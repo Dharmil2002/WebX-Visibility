@@ -8,6 +8,9 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { RouteLocationControl } from 'src/assets/FormControls/routeLocationControl';
 import { DatePipe } from '@angular/common';
 import { columnHeader, generateRouteCode, staticField } from './route-location-utility';
+import { firstValueFrom } from 'rxjs';
+import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-route-master-location-add',
@@ -58,8 +61,12 @@ export class RouteMasterLocationAddComponent implements OnInit {
   locationDet: any;
   branchDet: any;
 
-  constructor(private fb: UntypedFormBuilder, private route: Router,
-    private masterService: MasterService, private filter: FilterUtils,
+  constructor
+  (private fb: UntypedFormBuilder,
+   private route: Router,
+   private masterService: MasterService,
+   private filter: FilterUtils,
+   private storage:StorageService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
@@ -71,8 +78,8 @@ export class RouteMasterLocationAddComponent implements OnInit {
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
-      if (this.data && this.data.GSTdetails && Array.isArray(this.data.GSTdetails)) {
-        this.tableData = this.data.GSTdetails.map((x, index) => {
+      if (this.data && this.data.routeDetails && Array.isArray(this.data.routeDetails)) {
+        this.tableData = this.data.routeDetails.map((x, index) => {
           return {
             ...x,
             actions: ["Edit", "Remove"],
@@ -106,9 +113,6 @@ export class RouteMasterLocationAddComponent implements OnInit {
   ngOnInit(): void {
     this.intializeFormControls();
     this.initializeRouteFormControl();
-    // this.getControlBranchDropdown();
-    // this.getloccdDropdown();
-    // this.bindDropdown();
     this.getAllMastersData();
     this.backPath = "/Masters/RouteLocationWise/RouteList";
   }
@@ -165,9 +169,8 @@ export class RouteMasterLocationAddComponent implements OnInit {
         filter: {},
         collectionName: "location_detail",
       };
-      const locationRes = await this.masterService
-        .masterPost("generic/get", locationReq)
-        .toPromise();
+      const locationRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", locationReq))
       const mergedData = {
         locationData: locationRes?.data,
         branchData: locationRes?.data,
@@ -247,7 +250,6 @@ export class RouteMasterLocationAddComponent implements OnInit {
       this.tableData.length == 0 ? 1 : this.tableData.slice(-1)[0].Srno + 1;
     // Prepare the new row data
     const Body = {
-      Srno: parseInt(Index),
       loccd: this.RouteDetailTableForm.value.loccd.value,
       distKm: this.RouteDetailTableForm.value.distKm,
       trtimeHr: this.RouteDetailTableForm.value.trtimeHr,
@@ -309,24 +311,18 @@ export class RouteMasterLocationAddComponent implements OnInit {
 
   //#region 
   async save() {
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      filter: {},
-      "collectionName": "routeMasterLocWise"
-    }
-    const res = await this.masterService.masterPost('generic/get', req).toPromise();
-    // Generate srno for each object in the array
-    const lastRoute = res.data[res.data.length - 1];
-    const lastRouteCode = lastRoute ? parseInt(lastRoute.routeId.substring(1)) : 0;
-    // Function to generate a new route code
-
+    const lastRt = await this.getListId();    
+    const lastCode = lastRt?.routeId || "R0000";
     if (this.isUpdate) {
-      this.newRouteCode = this.data._id
+      this.newRouteCode = this.data._id;
     } else {
-      this.newRouteCode = generateRouteCode(lastRouteCode);
+      this.newRouteCode = nextKeyCode(lastCode);
     }
-    const Body = {
+    const routeCode=this.tableData.map((x) => x.loccd);
+    const routeName=routeCode.join('-');
+    let Body = {
       ...this.routeMasterLocationForm.value,
+      cID:this.storage.companyCode,
       routeId: this.newRouteCode,
       routeMode: this.routeMasterLocationForm.value.routeMode,
       routeCat: this.routeMasterLocationForm.value.routeCat,
@@ -336,11 +332,11 @@ export class RouteMasterLocationAddComponent implements OnInit {
       routeType: this.routeMasterLocationForm.value.routeType,
       scheduleType: this.routeMasterLocationForm.value.scheduleType,
       isActive: this.routeMasterLocationForm.value.isActive,
+      routeName:routeName,
       updatedBy: localStorage.getItem("UserName"),
       _id: this.newRouteCode,
       companyCode: localStorage.getItem("companyCode"),
-      updatedDate: new Date(),
-      GSTdetails: this.tableData.map((x) => {
+      routeDetails: this.tableData.map((x) => {
         return {
           loccd: x.loccd,
           distKm: x.distKm,
@@ -354,25 +350,52 @@ export class RouteMasterLocationAddComponent implements OnInit {
         };
       }),
     };
-
+  
+   let routeMasterLocWise ={
+      "_id":`${this.storage.companyCode}-${this.newRouteCode}`,
+      "cID": this.storage.companyCode,
+      "tHC": "",
+      "rUTCD":this.newRouteCode,
+      "rUTNM":routeName,
+      "sTM": new Date(),
+      "cTM": "",
+      "vEHNO": "",
+      "sTS": 1,
+      "sTSNM": "Route Added",
+      "cLOC":this.storage.branch,
+      "oRG":this.storage.branch,
+      "iSACT": this.routeMasterLocationForm.value.isActive,
+      "dEST": "",
+      "nXTLOC": "",
+      "nXTETA": ""
+    }
     // this.customerTableForm.removeControl("customerLocationsDrop")
     if (this.isUpdate) {
-      let id = this.routeMasterLocationForm.value.routeId
-      delete Body.id;
-      // delete Body.customerCode;
+      Body['mODDT']= new Date();
+      Body['mODLOC']=this.storage.branch;
+      Body['mODBY']=this.storage.userName;
+      routeMasterLocWise['mODDT']= new Date();
+      routeMasterLocWise['mODLOC']=this.storage.branch;
+      routeMasterLocWise['mODBY']=this.storage.userName;
+      
       let req = {
         companyCode: this.companyCode,
         collectionName: "routeMasterLocWise",
-        filter: { routeId: id },
+        filter: { routeId:  this.routeMasterLocationForm.value.routeId },
         update: Body,
       };
-      //API FOR UPDATE
-      this.masterService.masterPut("generic/update", req).subscribe({
-        next: (res) => {
+      let reqloc = {
+        companyCode: this.companyCode,
+        collectionName: "trip_Route_Schedule",
+        filter: { rUTCD:  this.routeMasterLocationForm.value.routeId },
+        update: Body,
+      };
+      const res= await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      await firstValueFrom(this.masterService.masterPut("generic/update", reqloc));
           this.route.navigateByUrl(
             "/Masters/RouteLocationWise/RouteList"
           );
-          if (res.success) {
+          if (res) {
             Swal.fire({
               icon: "success",
               title: "Successful",
@@ -380,21 +403,26 @@ export class RouteMasterLocationAddComponent implements OnInit {
               showConfirmButton: true,
             });
           }
-          //
-        },
-        error: (err) => {
-          console.log(err);
-        },
-      });
     } else {
+      Body['eNTDT']= new Date();
+      Body['eNTLOC']=this.storage.branch;
+      Body['eNTBY']=this.storage.userName;
+      routeMasterLocWise['eNTDT']= new Date();
+      routeMasterLocWise['eNTLOC']=this.storage.branch;
+      routeMasterLocWise['eNTBY']=this.storage.userName;
       let req = {
         companyCode: this.companyCode,
         collectionName: "routeMasterLocWise",
         data: Body,
       };
-      await this.masterService.masterPost("generic/create", req).subscribe({
-        next: (res) => {
-          if (res.success) {
+      let reqloc = {
+        companyCode: this.companyCode,
+        collectionName: "trip_Route_Schedule",
+        data:routeMasterLocWise
+      };
+      const res=await firstValueFrom(this.masterService.masterPost("generic/create", req))
+      await firstValueFrom(this.masterService.masterPost("generic/create", reqloc))
+          if (res) {
             this.route.navigateByUrl(
               "/Masters/RouteLocationWise/RouteList"
             );
@@ -405,11 +433,6 @@ export class RouteMasterLocationAddComponent implements OnInit {
               showConfirmButton: true,
             });
           }
-        },
-        error: (err) => {
-          console.log("err", err);
-        },
-      });
     }
   }
   //#endregion
@@ -432,6 +455,17 @@ export class RouteMasterLocationAddComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       console.log("failed");
+    }
+  }
+  async getListId() {
+    try {
+      let query = { companyCode: this.companyCode };
+      const req = { companyCode: this.companyCode, collectionName: "routeMasterLocWise", filter: query, sorting: {eNTDT:-1} };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
+      return response?.data;
+    } catch (error) {
+      console.error("Error fetching user list:", error);
+      throw error;
     }
   }
 }

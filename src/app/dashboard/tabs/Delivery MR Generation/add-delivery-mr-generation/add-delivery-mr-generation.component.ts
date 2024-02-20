@@ -16,7 +16,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 
 @Component({
@@ -44,8 +44,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   };
   linkArray = [];
 
-  debitVoucherRequestModel = new DebitVoucherRequestModel();
-  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
 
   columnHeader = {
     consignmentNoteNumber: {
@@ -860,53 +860,53 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.snackBarUtilityService.commonToast(async () => {
       try {
 
-        this.debitVoucherRequestModel.companyCode = this.storage.companyCode;
-        this.debitVoucherRequestModel.docType = "VR";
-        this.debitVoucherRequestModel.branch = this.storage.branch;
-        this.debitVoucherRequestModel.finYear = financialYear;
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.voucherNo = "";
-        this.debitVoucherDataRequestModel.transType = "Delivery MR Voucher";
-        this.debitVoucherDataRequestModel.transDate = new Date();
-        this.debitVoucherDataRequestModel.docType = "VR";
-        this.debitVoucherDataRequestModel.branch = this.storage.branch;
-        this.debitVoucherDataRequestModel.finYear = financialYear;
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transType = "Delivery MR Voucher";
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.accLocation = this.storage.branch;
-        this.debitVoucherDataRequestModel.preperedFor = "Customer"
-        this.debitVoucherDataRequestModel.partyCode = ""
-        this.debitVoucherDataRequestModel.partyName = this.filteredDocket[0]?.billingParty;
-        this.debitVoucherDataRequestModel.partyState = this.billingForm.value.StateofSupply.name
-        this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-        this.debitVoucherDataRequestModel.entryDate = new Date();
-        this.debitVoucherDataRequestModel.panNo = ""
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer"
+        this.VoucherDataRequestModel.partyCode = ""
+        this.VoucherDataRequestModel.partyName = this.filteredDocket[0]?.billingParty;
+        this.VoucherDataRequestModel.partyState = this.billingForm.value.StateofSupply.name
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
 
-        this.debitVoucherDataRequestModel.tdsSectionCode = this.billingForm.value.SACCode.value;
-        this.debitVoucherDataRequestModel.tdsSectionName = this.billingForm.value.SACCode.name;
-        this.debitVoucherDataRequestModel.tdsRate = this.billingForm.value.TDSRate;
-        this.debitVoucherDataRequestModel.tdsAmount = this.billingForm.value.TDSAmount;
-        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-        this.debitVoucherDataRequestModel.tcsSectionCode = undefined
-        this.debitVoucherDataRequestModel.tcsSectionName = undefined
-        this.debitVoucherDataRequestModel.tcsRate = 0;
-        this.debitVoucherDataRequestModel.tcsAmount = 0;
+        this.VoucherDataRequestModel.tdsSectionCode = this.billingForm.value.SACCode.value;
+        this.VoucherDataRequestModel.tdsSectionName = this.billingForm.value.SACCode.name;
+        this.VoucherDataRequestModel.tdsRate = this.billingForm.value.TDSRate;
+        this.VoucherDataRequestModel.tdsAmount = this.billingForm.value.TDSAmount;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = undefined
+        this.VoucherDataRequestModel.tcsSectionName = undefined
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.debitVoucherDataRequestModel.IGST = 0;
-        this.debitVoucherDataRequestModel.SGST = 0;
-        this.debitVoucherDataRequestModel.CGST = 0;
-        this.debitVoucherDataRequestModel.UGST = 0;
-        this.debitVoucherDataRequestModel.GSTTotal = this.billingForm.value.GSTAmount;
+        this.VoucherDataRequestModel.IGST = 0;
+        this.VoucherDataRequestModel.SGST = 0;
+        this.VoucherDataRequestModel.CGST = 0;
+        this.VoucherDataRequestModel.UGST = 0;
+        this.VoucherDataRequestModel.GSTTotal = this.billingForm.value.GSTAmount;
 
-        this.debitVoucherDataRequestModel.paymentAmt = this.billingForm.value.DeliveryMRNetAmount
-        this.debitVoucherDataRequestModel.netPayable = this.billingForm.value.CollectionAmount
-        this.debitVoucherDataRequestModel.roundOff = this.billingForm.value.roundOffAmt || 0;
-        this.debitVoucherDataRequestModel.voucherCanceled = false;
+        this.VoucherDataRequestModel.GrossAmount = this.billingForm.value.DeliveryMRNetAmount
+        this.VoucherDataRequestModel.netPayable = this.billingForm.value.CollectionAmount
+        this.VoucherDataRequestModel.roundOff = this.billingForm.value.roundOffAmt || 0;
+        this.VoucherDataRequestModel.voucherCanceled = false;
 
-        this.debitVoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
-        this.debitVoucherDataRequestModel.refNo = this.PaymentSummaryFilterForm.value?.ChequeOrRefNo;
-        this.debitVoucherDataRequestModel.accountName = this.PaymentSummaryFilterForm.value?.Bank.name;
-        this.debitVoucherDataRequestModel.date = this.PaymentSummaryFilterForm.value?.Date;
-        this.debitVoucherDataRequestModel.scanSupportingDocument = "";
+        this.VoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
+        this.VoucherDataRequestModel.refNo = this.PaymentSummaryFilterForm.value?.ChequeOrRefNo;
+        this.VoucherDataRequestModel.accountName = this.PaymentSummaryFilterForm.value?.Bank.name;
+        this.VoucherDataRequestModel.date = this.PaymentSummaryFilterForm.value?.Date;
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
 
 
         const companyCode = this.storage.companyCode;
@@ -940,13 +940,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           voucherLineItemList.push(voucherLineItem);
         });
 
-        this.debitVoucherRequestModel.details = voucherLineItemList;
-        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
-        console.log(this.debitVoucherRequestModel);
+        this.VoucherRequestModel.details = voucherLineItemList;
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+        console.log(this.VoucherRequestModel);
 
         firstValueFrom(this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
             if (res.success) {
               Swal.hideLoading();
               Swal.close();

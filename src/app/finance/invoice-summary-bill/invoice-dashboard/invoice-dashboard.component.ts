@@ -42,87 +42,91 @@ export class InvoiceDashboardComponent implements OnInit {
   }
   //#region to get counts of boxes
   async getBoxData() {
-    this.tableload = true;
-    const invoiceCount = await this.objInvoiceCountService.getDocketCount({ sTS: 0, bLOC: this.storage.branch });
-    const invoicestsCount = await this.objInvoiceCountService.getDocketbilCount({ fSTS: 1, oRGN: this.storage.branch });
-    const invCount = await this.objInvoiceCountService.getInvCount({ bSTS: 1, bLOC: this.storage.branch });
+    try {
+      this.tableload = true;
 
-    const filter = {
-      "D$pipeline": [
-        {
-          "D$match": {
-            "D$or": [
-              {
-                'pOD': ''
-              }, {
-                'pOD': null
-              }, {
-                'pOD': undefined
-              }, {
-                'pOD': {
-                  "D$exists": false
-                }
-              }
-            ],
-            "D$and": [
-              {
-                'sTS': 3
-              }
-            ]
-          }
-        }, {
-          "D$group": {
-            '_id': null,
-            'emptyCount': {
-              "D$sum": 1
+      // Fetch data from the service
+      const count = await this.objInvoiceCountService.getDashboardData();
+
+      // Define a filter for shipments without POD
+      const podFilter = {
+        "D$pipeline": [
+          {
+            "D$match": {
+              "D$or": [
+                { 'pOD': '' },
+                { 'pOD': null },
+                { 'pOD': undefined },
+                { 'pOD': { "D$exists": false } }
+              ],
+              "D$and": [
+                { 'sTS': 3 }
+              ]
+            }
+          },
+          {
+            "D$group": {
+              '_id': null,
+              'emptyCount': { "D$sum": 1 }
             }
           }
+        ]
+      };
+
+      // Fetch count of shipments without POD
+      //const emptyPodCount = await this.objInvoiceCountService.getPengPodCount(podFilter);    
+
+      // Extract relevant data
+      const dashboardCounts = count[0]?.dashboardCounts || {};
+      const custBillHeaders = dashboardCounts.cust_bill_headers || [{}];
+
+      // Destructure data for better readability
+      const {
+        Unbilledcount,
+        Unbilled_aMT,
+        approvedBillCount
+      } = dashboardCounts;
+
+      this.Transactions = Transactions;
+      this.TransactionsMore = TransactionsMore;
+
+      // Update Transactions object based on conditions
+      this.Transactions.Items.forEach(item => {
+        switch (item.title) {
+          case "Unbilled Shipments":
+            item['count'] = Unbilledcount || '0';
+            break;
+          case "Unbilled Amount":
+            item['count'] = Unbilled_aMT || '0.00';
+            break;
+          case "Approved For Billing":
+            item['count'] = approvedBillCount || '0';
+            break;
+          case "Pending PODs":
+            item['count'] = '0';
+            break;
         }
-      ]
-    };
+      });
 
-    // const podCount = await this.objInvoiceCountService.getPengPodCount(filter);
-    // console.log(podCount);
+      // Update TransactionsMore object based on conditions
+      this.TransactionsMore.Items.forEach(item => {
+        switch (item.title) {
+          case "Generated":
+            item['count'] = custBillHeaders[0]?.count || '0';
+            break;
+          case "Invoice Amount":
+          case "Outstanding":
+          case "Amount pending":
+            item['count'] = custBillHeaders[0]?.total || '0.00';
+            break;
+        }
+      });
 
-    // Calculate the count of unbilled shipments
-    const unbilledShipments = invoiceCount.length;
-
-    // Calculate the total amount of unbilled shipments
-    const totalamt = invoiceCount.reduce((total, element) => total + element.tOTAMT, 0);
-
-    // Calculate the count of shipments approved for billing
-    const approvedForBilling = invoicestsCount.length;
-    const Generated = invCount.length;
-    const InvoiceAmount = invCount.reduce((total, element) => total + element.aMT, 0);
-
-    this.Transactions = Transactions;
-    this.TransactionsMore = TransactionsMore;
-
-    // Update Transactions object based on conditions
-    this.Transactions.Items.forEach(item => {
-      if (item.title === "Unbilled Shipments") {
-        item['count'] = unbilledShipments;
-      } else if (item.title === "Unbilled Amount") {
-        item['count'] = totalamt;
-      } else if (item.title === "Approved For Billing") {
-        item['count'] = approvedForBilling;
-      } else if (item.title === "Pending PODs") {
-        item['count'] = '0';
-      }
-    });
-    // Update Transactions object based on conditions
-    this.TransactionsMore.Items.forEach(item => {
-      if (item.title === "Generated") {
-        item['count'] = Generated;
-      } else if (item.title === "Invoice Amount") {
-        item['count'] = InvoiceAmount;
-      } else if (item.title === "Outstanding") {
-        item['count'] = InvoiceAmount;
-      } else if (item.title === "Amount pending") {
-        item['count'] = InvoiceAmount;
-      }
-    });
-    this.tableload = false;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      this.tableload = false;
+    }
   }
   //#endregion
 }

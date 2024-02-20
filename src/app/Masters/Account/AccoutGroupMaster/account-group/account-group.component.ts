@@ -27,7 +27,6 @@ export class AccountGroupComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-
     gRPCD: {
       Title: "Account Group Code",
       class: "matcolumncenter",
@@ -264,11 +263,11 @@ export class AccountGroupComponent implements OnInit {
 
   async getGroupCodeTypeDropdown() {
     this.AccountGroupForm.controls["GroupCodeType"].setValue("");
-    const Value = this.AccountGroupForm.value.CategoryCode.name;
+    const Value = this.AccountGroupForm.value.CategoryCode.value;
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "account_group_detail",
-      filter: { cATNM: Value },
+      filter: { cATCD: Value },
     };
 
     const res = await firstValueFrom(this.masterService
@@ -354,9 +353,9 @@ export class AccountGroupComponent implements OnInit {
         cID: this.CompanyCode,
         gRPCD:groupcode,
         gRPNM: this.AccountGroupForm.value.GroupName,
-        pGCD: this.AccountGroupForm.value.GroupCodeType.value,
-        pGNM: this.AccountGroupForm.value.GroupCodeType.name,
-        gLEVEL: parseInt(this.AccountGroupForm.value.GroupCodeType.level || 0) + 1,
+        pGCD: this.AccountGroupForm.value.GroupCodeType?.value || "",
+        pGNM: this.AccountGroupForm.value.GroupCodeType?.name || "",
+        gLEVEL: parseInt(this.AccountGroupForm.value.GroupCodeType.level)+ 1 || 0,
         cATNM: this.AccountGroupForm.value.CategoryCode.name,
         cATCD: this.AccountGroupForm.value.CategoryCode.value,
         bCATNM:this.AccountGroupForm.value.BalanceSheet.name,

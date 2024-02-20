@@ -25,10 +25,10 @@
                     <div class="header">
                     </div>
                     <div class="body">
-                        <mat-stepper [linear]="isLinear" #stepper>
+                        <mat-stepper [linear]="isLinear" #stepper >
                             <!-- Step 1 Details -->
                             <div>
-                                <mat-step>
+                                <mat-step [editable]="true" [stepControl]="tabForm">
                                     <ng-template matStepLabel>Basic Details</ng-template>
                                     <form [formGroup]="tabForm">
                                         <generic-accordion-webxpress [AccordionForm]="tabForm"
@@ -51,7 +51,7 @@
 
                             <!-- Step 2 Details -->
                             <div>
-                                <mat-step>
+                                <mat-step [editable]="false" [stepControl]="contractForm">
                                     <ng-template matStepLabel>Contract Details</ng-template>
                                     <form [formGroup]="contractForm">
                                         <generic-accordion-webxpress [AccordionForm]="contractForm"
@@ -71,7 +71,7 @@
 
                                                 <button mat-button matStepperPrevious>Back</button>
                                                 <button class="msr-3" mat-raised-button color="primary"
-                                                    (click)="saveData()">Book Docket</button>
+                                                    (click)="saveData()" [disabled]="!contractForm.valid">Book Docket</button>
                                             </div>
                                         </div>  
                                     </div>

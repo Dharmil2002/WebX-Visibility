@@ -67,4 +67,20 @@ export class JournalVoucherCreationModalComponent implements OnInit {
   cancel(event) {
     this.dialogRef.close()
   }
+  onChangeAmount(event) {
+    const fieldName = event?.field?.name;
+
+    const resetFields = (field1) => {
+      this.JournalVoucherDetailsForm.get(field1).setValue(0.00);
+      this.JournalVoucherDetailsForm.get(field1).updateValueAndValidity();
+    };
+
+    if (fieldName === "DebitAmount") {
+      resetFields("CreditAmount");
+    }
+
+    if (fieldName === "CreditAmount") {
+      resetFields("DebitAmount");
+    }
+  }
 }

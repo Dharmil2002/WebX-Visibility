@@ -230,6 +230,9 @@ export class JournalVoucherControl {
             pattern: '^[^-]+$'
           },
         ],
+        functions: {
+          onChange: "onChangeAmount"
+        },
 
       },
       {
@@ -251,7 +254,9 @@ export class JournalVoucherControl {
             pattern: '^[^-]+$'
           },
         ],
-
+        functions: {
+          onChange: "onChangeAmount"
+        },
       },
 
       {

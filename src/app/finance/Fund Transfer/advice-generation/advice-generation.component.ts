@@ -15,7 +15,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { firstValueFrom } from "rxjs";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import Swal from "sweetalert2";
-import { VoucherDataRequestModel, VoucherRequestModel } from "src/app/Models/Finance/Finance";
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from "src/app/Models/Finance/Finance";
 
 @Component({
   selector: 'app-advice-generation',
@@ -417,7 +417,11 @@ export class AdviceGenerationComponent implements OnInit {
           this.VoucherRequestModel.finYear = financialYear;
 
           this.VoucherDataRequestModel.voucherNo = "";
-          this.VoucherDataRequestModel.transType = "Advice Voucher";
+          this.VoucherDataRequestModel.transCode = VoucherInstanceType.AdviceVoucherCreation;
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.AdviceVoucherCreation];
+          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
           this.VoucherDataRequestModel.transDate = new Date();
           this.VoucherDataRequestModel.docType = "VR";
           this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -466,7 +470,10 @@ export class AdviceGenerationComponent implements OnInit {
             {
               companyCode: companyCode,
               voucherNo: "",
-              transType: "Advice Voucher",
+              transCode: VoucherInstanceType.AdviceVoucherCreation,
+              transType: VoucherInstanceType[VoucherInstanceType.AdviceVoucherCreation],
+              voucherCode: VoucherType.JournalVoucher,
+              voucherType: VoucherType[VoucherType.JournalVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
-import { DocketEvents, DocketStatus, getEnumNameByValue } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { OperationService } from "src/app/core/service/operations/operation.service";
@@ -33,14 +33,16 @@ export class LoadingSheetService {
     return await firstValueFrom(this.operationService.operationMongoPost("generic/get", req));
   }
   async tripFieldMapping(data, tabledata) {
+    const route = data?.Route.split(":")[1].split("-");
     
     let tripSummary = {
       "_id": "",
       "cID": this.storage.companyCode,
       "docNo": "",
       "tHCDT": new Date(),
-      "cLOC": this.storage.branch,
-      "dEST": data?.Route.split(":")[1].split("-")[1],
+      "lOC": this.storage.branch,
+      "oRGN": this.storage.branch,
+      "dEST": route[route.length - 1],      
       // "fCT": "",
       // "tCT": "",
       "rUTCD": data?.Route.split(":")[0] || "",
@@ -130,68 +132,9 @@ export class LoadingSheetService {
       "eNTLOC": this.storage.branch,
       "eNTBY": this.storage.userName
     }
-    let tripMovement = [];
-    tabledata.forEach(element => {
-      let trip =
-      {
-        "_id": "",
-        "tHC": "",
-        "cID": this.storage.companyCode,
-        "fLOC": element?.curLoc || "",
-        "tLOC": element?.destLoc || "",
-        "lOAD": {
-          "dKTS": element?.count || 0,
-          "pKGS": element?.packages || 0,
-          "wT": element?.weightKg || 0,
-          "vOL": element?.volumeCFT || 0,
-          "vWT": 0,
-          "sEALNO": "",
-          "rMK": ""
-        },
-        "cAP": {
-          "wT": data?.Capacity || 0,
-          "vOL": data?.VolumeaddedCFT || 0,
-          "vWT": 0
-        },
-        "uTI": {
-          "wT": data?.WeightUtilization,
-          "vOL": data?.VolumeUtilization,
-          "vWT": 0
-        },
-        "dPT": {
-          "sCHDT": null,
-          "eXPDT": null,
-          "aCTDT": null,
-          "gPSDT": null,
-          "oDOMT": 0
-        },
-        "aRR": {
-          "sCHDT": null,
-          "eXPDT": null,
-          "aCTDT": null,
-          "gPSDT": null,
-          "oDOMT": 0
-        },
-        "uNLOAD": {
-          "dKTS": 0,
-          "pKGS": 0,
-          "wT": 0,
-          "vOL": 0,
-          "vWT": 0,
-          "sEALNO": "",
-          "rMK": "",
-          "sEALRES": ""
-        },
-        "sCHDIST": 0,
-        "aCTDIST": 0,
-        "gPSDIST": 0,
-        "eNTDT": new Date(),
-        "eNTLOC": this.storage.branch,
-        "eNTBY": this.storage.userName
-      }
-      tripMovement.push(trip);
-    });
 
+    let tripMovement = [];
+   
     let lsHeader = []
     let lsDetail = []
     let dktList = [];
@@ -256,7 +199,7 @@ export class LoadingSheetService {
               cNO: null,
               lOC: this.storage.branch,
               eVNID: DocketEvents.Loading_Sheet_Generation,
-              eVNDES: getEnumNameByValue(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
+              eVNDES: getEnumName(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
               eVNDT: new Date(),
               eVNSRC: 'Loading Sheet',
               dOCTY: 'LS',
@@ -272,10 +215,8 @@ export class LoadingSheetService {
             lsDetail.push(json);
             dktList.push(ls?.dKTNO);
           });
-
         }
       })
-
     }
     return {
       tripSummary: tripSummary,
@@ -434,7 +375,7 @@ export class LoadingSheetService {
               cNO: null,
               lOC: this.storage.branch,
               eVNID: DocketEvents.Loading_Sheet_Generation,
-              eVNDES:getEnumNameByValue(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
+              eVNDES:getEnumName(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
               eVNDT: new Date(),
               eVNSRC: 'Loading Sheet',
               dOCTY: '',

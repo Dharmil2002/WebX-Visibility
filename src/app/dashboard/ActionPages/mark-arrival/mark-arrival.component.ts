@@ -118,7 +118,7 @@ export class MarkArrivalComponent implements OnInit {
       )
 
     let tripDetailForm = this.MarkArrivalTableForm.value
-    const res=await this.arrivalService.fieldMappingMarkArrival(tripDetailForm,this.mfList);
+    const res=await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm,this.mfList);
     if(res){
       this.updateTripData()
     }
@@ -229,18 +229,17 @@ export class MarkArrivalComponent implements OnInit {
 
   async checkSealNumber() {
     let isMatchingSeal=false
-    const sealNo=await this.arrivalService.getCheckOnce({tHC:this.MarkArrivalTable.TripID,"D$expr": {
-      "D$eq": [
-         "$aRR.sEALNO",this.MarkArrivalTableForm.value.Sealno
-       ]
-     },});
-    if(sealNo.length>0){
-      isMatchingSeal=true
-    }
-    else{
-      isMatchingSeal=false
-    }
+    const sealNo=await this.arrivalService.getCheckOnce({
+      "_id": `${this.storage.companyCode}-${this.MarkArrivalTable.TripID}-${this.MarkArrivalTable.cLOC}-${this.storage.branch}`,
+      "D$expr": {
+        "D$eq": [ "$lOAD.sEALNO",this.MarkArrivalTableForm.value.Sealno ] 
+      }
+    });
+
+    isMatchingSeal= ( sealNo?.lOAD?.sEALNO == this.MarkArrivalTableForm.value.Sealno)
+    
     this.MarkArrivalTableForm.controls.SealStatus.setValue(isMatchingSeal ? 'Matching' : 'Not Matching');
+    
     this.jsonControlArray.forEach(data => {
       if (data.name === 'Reason') {
         // Set Late Reason related variables

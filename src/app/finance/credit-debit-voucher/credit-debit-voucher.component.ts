@@ -78,7 +78,7 @@ export class DebitVoucherComponent implements OnInit {
   staticField = ['Ledger', 'SACCode', 'DebitAmount', 'GSTRate', 'GSTAmount', 'Total', 'TDSApplicable', 'Narration']
 
   columnHeader = GetLedgercolumnHeader()
-
+  AccountsBanksList: any;
   tableData: any = [];
   DebitAgainstDocumentList: any = [];
   SACCodeList: any = [];
@@ -323,7 +323,6 @@ export class DebitVoucherComponent implements OnInit {
     this.BindLedger(Preparedfor);
   }
   async PartyNameFieldChanged(event) {
-    debugger
     const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
     const PartyName = this.DebitVoucherSummaryForm.value.PartyName
     const Partystate = this.DebitVoucherSummaryForm.get('Partystate');
@@ -541,7 +540,7 @@ export class DebitVoucherComponent implements OnInit {
     const Accountinglocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
     switch (PaymentMode) {
       case 'Cheque':
-        // const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
         const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
         this.filter.Filter(
           this.jsonControlDebitVoucherTaxationPaymentDetailsArray,
@@ -645,31 +644,53 @@ export class DebitVoucherComponent implements OnInit {
     const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
     if (PaymentAmount != NetPayable) {
       const Amount = NetPayable - PaymentAmount;
+      const isAmountNegative = Amount < 0;
+
       var RoundOffList = {
         "Instance": "debit voucher",
-        "Value": "Round Off Amount",
-        "Ledgercode": "AC007",
-        "Ledgername": "Round off ledger",
-        "SubLedger": "ASSET",
-        "Dr": Amount.toFixed(2),
-        "Cr": "",
+        "Value": "Round off Amount",
+        "Ledgercode": "EXP002014",
+        "Ledgername": "Round off Amount",
+        "SubLedger": "EXPENSE",
+        "Dr": isAmountNegative ? "" : Amount.toFixed(2),
+        "Cr": isAmountNegative ? (-Amount).toFixed(2) : "",
         "Location": Accountinglocation,
         "Narration": ""
       };
+
       FinalListOfDebitVoucher.push(RoundOffList)
     }
 
     this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
+      let LeadgerCode;
+      let LeadgerName;
+      if (item.name == "IGST") {
+        LeadgerCode = "LIA002004";
+        LeadgerName = "IGST payable";
+      }
+      if (item.name == "UGST") {
+        LeadgerCode = "LIA002002";
+        LeadgerName = "UGST payable";
+      }
+      if (item.name == "SGST") {
+        LeadgerCode = "LIA002001";
+        LeadgerName = "SGST payable";
+      }
+      if (item.name == "CGST") {
+        LeadgerCode = "LIA002003";
+        LeadgerName = "CGST payable";
+      }
+
       let GSTData = {
         "Instance": "debit voucher",
-        "Value": item.name,
-        "Ledgercode": item.name,
-        "Ledgername": `${item.name} Payable`,
+        "Value": LeadgerName,
+        "Ledgercode": LeadgerCode,
+        "Ledgername": LeadgerName,
         "SubLedger": "LIABILITY",
         "Dr": (parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value)).toFixed(2),
         "Cr": "",
         "Location": Accountinglocation,
-        "Narration": ""
+        "Narration": LeadgerName,
       };
       FinalListOfDebitVoucher.push(GSTData)
     });
@@ -681,13 +702,13 @@ export class DebitVoucherComponent implements OnInit {
       let TDSData = {
         "Instance": "debit voucher",
         "Value": "TDS",
-        "Ledgercode": TDSSection.name,
-        "Ledgername": TDSSection.value,
+        "Ledgercode": TDSSection.value,
+        "Ledgername": TDSSection.name,
         "SubLedger": "LIABILITY",
         "Dr": "",
         "Cr": TDSAmount.toFixed(2),
         "Location": Accountinglocation,
-        "Narration": ""
+        "Narration": TDSSection.name,
       };
       FinalListOfDebitVoucher.push(TDSData)
     }
@@ -699,13 +720,13 @@ export class DebitVoucherComponent implements OnInit {
       let TCSData = {
         "Instance": "debit voucher",
         "Value": "TCS",
-        "Ledgercode": TCSSection.name,
-        "Ledgername": TCSSection.value,
+        "Ledgercode": TCSSection.value,
+        "Ledgername": TCSSection.name,
         "SubLedger": "LIABILITY",
         "Dr": "",
         "Cr": TCSAmount.toFixed(2),
         "Location": Accountinglocation,
-        "Narration": ""
+        "Narration": TCSSection.name,
       };
       FinalListOfDebitVoucher.push(TCSData)
     }
@@ -715,7 +736,17 @@ export class DebitVoucherComponent implements OnInit {
     let Leadgerdata;
     switch (PaymentMode) {
       case 'Cheque':
-        Leadgerdata = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value
+        const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
+        const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+        if (AccountDetails != undefined) {
+          Leadgerdata = {
+            name: AccountDetails?.aCNM,
+            value: AccountDetails?.aCCD
+          }
+        } else {
+          this.snackBarUtilityService.ShowCommonSwal("error", "Please select valid Bank Which is mapped with Account Master")
+          return;
+        }
         break;
       case 'Cash':
         Leadgerdata = this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value
@@ -748,11 +779,11 @@ export class DebitVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.SubmitRequest()
+        this.SubmitRequest(FinalListOfDebitVoucher)
       }
     });
   }
-  async SubmitRequest() {
+  async SubmitRequest(FinalListOfDebitVoucher) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = 0;
@@ -775,7 +806,7 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherDataRequestModel.transType = "DebitVoucher";
         this.VoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
         this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.VoucherDataRequestModel.branch = localStorage.getItem("Branch");
         this.VoucherDataRequestModel.finYear = financialYear
 
         this.VoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
@@ -805,7 +836,7 @@ export class DebitVoucherComponent implements OnInit {
 
         this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
         this.VoucherDataRequestModel.netPayable = NetPayable;
-        this.VoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
+        this.VoucherDataRequestModel.roundOff = +(NetPayable - PaymentAmount).toFixed(2);
         this.VoucherDataRequestModel.voucherCanceled = false
 
         this.VoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
@@ -816,16 +847,38 @@ export class DebitVoucherComponent implements OnInit {
 
 
         const companyCode = this.companyCode;
-        const CurrentBranchCode = localStorage.getItem("CurrentBranchCode");
-        var VoucherlineitemList = this.tableData.map(function (item) {
+        const Branch = localStorage.getItem("Branch");
+        // var VoucherlineitemList = this.tableData.map(function (item) {
+        //   return {
+
+        //     "companyCode": companyCode,
+        //     "voucherNo": "",
+        //     "transType": "DebitVoucher",
+        //     "transDate": new Date(),
+        //     "finYear": financialYear,
+        //     "branch": Branch,
+        //     "accCode": item.LedgerHdn,
+        //     "accName": item.Ledger,
+        //     "sacCode": item.SACCodeHdn.toString(),
+        //     "sacName": item.SACCode,
+        //     "debit": parseFloat(item.DebitAmount).toFixed(2),
+        //     "credit": 0,
+        //     "GSTRate": item.GSTRate,
+        //     "GSTAmount": parseFloat(item.GSTAmount).toFixed(2),
+        //     "Total": item.Total,
+        //     "TDSApplicable": item.TDSApplicable == "Yes" ? true : false,
+        //     "narration": item.Narration ?? ""
+        //   };
+        // });
+        let Accountdata = this.tableData.map(function (item) {
           return {
 
-            "companyCode": companyCode,
+            "companyCode": localStorage.getItem("companyCode"),
             "voucherNo": "",
             "transType": "DebitVoucher",
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": CurrentBranchCode,
+            "branch": localStorage.getItem("Branch"),
             "accCode": item.LedgerHdn,
             "accName": item.Ledger,
             "sacCode": item.SACCodeHdn.toString(),
@@ -839,6 +892,34 @@ export class DebitVoucherComponent implements OnInit {
             "narration": item.Narration ?? ""
           };
         });
+        var Data = FinalListOfDebitVoucher
+          .filter(item => item.Value != "Voucher line item")
+          .map(function (item) {
+            const debitAmount = parseFloat(item.Dr) || 0;
+            const creditAmount = parseFloat(item.Cr) || 0;
+
+            return {
+              "companyCode": localStorage.getItem("companyCode"),
+              "voucherNo": "",
+              "transType": "DebitVoucher",
+              "transDate": new Date(),
+              "finYear": financialYear,
+              "branch": localStorage.getItem("Branch"),
+              "accCode": `${item.Ledgercode}`,
+              "accName": item.Ledgername,
+              "sacCode": "",
+              "sacName": "",
+              "debit": debitAmount.toFixed(2),
+              "credit": creditAmount.toFixed(2),
+              "GSTRate": 0,
+              "GSTAmount": 0,
+              "Total": (debitAmount + creditAmount).toFixed(2),
+              "TDSApplicable": false,
+              "narration": item.Narration ? item.Narration : item.Ledgername,
+            };
+          });
+
+        var VoucherlineitemList = [...Accountdata, ...Data];
 
         var debitAgainstDocumentList = this.DebitAgainstDocumentList.map(function (item) {
           return {
@@ -848,7 +929,7 @@ export class DebitVoucherComponent implements OnInit {
             "transType": "DebitVoucher",
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": CurrentBranchCode,
+            "branch": Branch,
             "Document": item?.Document,
             "DebitAmountAgaintsDocument": parseFloat(item?.DebitAmountAgaintsDocument) || 0,
             "DocumentType": item?.DocumentType,
@@ -863,21 +944,28 @@ export class DebitVoucherComponent implements OnInit {
           .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
           .subscribe({
             next: (res: any) => {
-              var transformedData = this.tableData.map(function (item) {
-                // Split the "Ledger" value into "accCode" and "accName"
+              var CreditData = FinalListOfDebitVoucher.filter(item => item.Dr == "").map(function (item) {
                 return {
-                  "accCode": item.LedgerHdn,
-                  "accName": item.Ledger,
-                  "amount": item.Total,
-                  "narration": item.Narration ?? ""
+                  "accCode": `${item.Ledgercode}`,
+                  "accName": item.Ledgername,
+                  "amount": item.Cr,
+                  "narration": item.Narration ? item.Narration : item.Ledgername,
                 };
-              });
+              })
+              var DebitData = FinalListOfDebitVoucher.filter(item => item.Cr == "").map(function (item) {
+                return {
+                  "accCode": `${item.Ledgercode}`,
+                  "accName": item.Ledgername,
+                  "amount": item.Dr,
+                  "narration": item.Narration ? item.Narration : item.Ledgername,
+                };
+              })
               let reqBody = {
                 companyCode: this.companyCode,
-                voucherNo: res?.data?.mainData?.insertedId,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transDate: Date(),
                 finYear: financialYear,
-                branch: localStorage.getItem("CurrentBranchCode"),
+                branch: localStorage.getItem("Branch"),
                 transType: "DebitVoucher",
                 docType: "Voucher",
                 docNo: res?.data?.mainData?.ops[0].vNO,
@@ -885,8 +973,8 @@ export class DebitVoucherComponent implements OnInit {
                 partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,
                 entryBy: localStorage.getItem("UserName"),
                 entryDate: Date(),
-                debit: transformedData,
-                credit: transformedData,
+                debit: DebitData,
+                credit: CreditData,
 
               };
 

@@ -138,6 +138,7 @@ export class DocketService {
                 x.ftCity = `${x.fCT}-${x.tCT}`;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions;
+                x.aCTWT = Number(x.aCTWT || 0).toFixed(2); // Ensure two decimal places
                 x.billingParty = `${x.bPARTY}:${x.bPARTYNM}`//x.billingParty || "";
                 x.createOn = formatDocketDate(x?.eNTDT || new Date())
                 return x;

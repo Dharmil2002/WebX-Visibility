@@ -29,7 +29,7 @@ export class DocketListComponent implements OnInit {
     docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "min-width:300px",
+      Style: "min-width:295px",
       type:'windowLink',
       functionName:'OpenCnote'
     },
@@ -41,7 +41,7 @@ export class DocketListComponent implements OnInit {
     aCTWT: {
       Title: "Act Wt(Kg)",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "max-width:75px",
     },
     pKGS: {
       Title: "Pkg Count",

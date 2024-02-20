@@ -21,6 +21,20 @@ export class custOutControl {
                     },
                },
                {
+                    name: "asondate",
+                    label: "As on Date",
+                    placeholder: "",
+                    type: "date",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [],
+                    additionalData: {},
+               },
+               {
                     name: 'rptbasis',
                     label: 'Report Basis on',
                     placeholder: '',
@@ -140,6 +154,35 @@ export class custOutControl {
                          onToggleAll: "toggleSelectAll",
                     },
                     generatecontrol: true, disable: false
+               },
+               {
+                    name: 'custgp',
+                    label: 'Customer Group',
+                    placeholder: '',
+                    type: 'multiselect',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "custgroupHandler",
+                         showNameAndValue: true,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: 'custgroupHandler',
+                    label: 'custgroupHandler',
+                    placeholder: 'custgroupHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
                },
                {
                     name: 'custnmcdHandler',

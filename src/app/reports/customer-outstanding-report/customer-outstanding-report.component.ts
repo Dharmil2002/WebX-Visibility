@@ -43,6 +43,10 @@ export class CustomerOutstandingReportComponent implements OnInit {
   gstSTStatus: any;
   stateDet: any;
   selectedInvoiceType: string;
+  custGPName: any;
+  custGPStatus: any;
+  custGroupDetailList: any;
+  custGroupDet: any;
   constructor(
     private custOutstandingService: CustOutstandingService,
     private fb: UntypedFormBuilder,
@@ -69,7 +73,8 @@ export class CustomerOutstandingReportComponent implements OnInit {
 
   CSVHeader = {
     "cust": "Customer",
-    "loc":"Location",
+    "custGrp": "Customer Group",
+    "loc": "Location",
     "openingBal": "Opening Balance",
     "billAmt": "Bill Amount",
     "unsubmittedAmt": "Un Submitted Amount",
@@ -112,6 +117,13 @@ export class CustomerOutstandingReportComponent implements OnInit {
     )?.name;
     this.gstSTStatus = this.jsonCustOutFormArray.find(
       (data) => data.name === "gststate"
+    )?.additionalData.showNameAndValue;
+
+    this.custGPName = this.jsonCustOutFormArray.find(
+      (data) => data.name === "custgp"
+    )?.name;
+    this.custGPStatus = this.jsonCustOutFormArray.find(
+      (data) => data.name === "custgp"
     )?.additionalData.showNameAndValue;
     this.CustOutTableForm = formGroupBuilder(this.fb, [this.jsonCustOutFormArray]);
   }
@@ -203,19 +215,32 @@ export class CustomerOutstandingReportComponent implements OnInit {
       filter: {},
       collectionName: "state_master"
     };
+    const custGrpReq = {
+      companyCode: this.storage.companyCode,
+      filter: {},
+      collectionName: "customerGroup_detail"
+    };
     // Send requests concurrently and await their responses
     const custNameResPromise = this.masterServices.masterMongoPost("generic/get", custNameReq);
+    const custGrpReqResPromise = this.masterServices.masterMongoPost("generic/get", custGrpReq);
     const stateResPromise = this.masterServices.masterMongoPost("generic/get", stateReq);
 
     const custNameRes = await firstValueFrom(custNameResPromise);
+    const custGrpRes = await firstValueFrom(custGrpReqResPromise);
     const stateRes = await firstValueFrom(stateResPromise);
     // Extract data from responses or set empty arrays if no data
     const custNameData = custNameRes?.data || [];
+    const custGrpData = custGrpRes?.data || [];
     const stateData = stateRes?.data || [];
     // Extract required details from customer names and state data
     const custNameDet = custNameData.map(({ customerName, customerCode }) => ({
       name: customerName.toString(),
       value: customerCode.toString(),
+    }));
+
+    const custGroupDet = custGrpData.map(element => ({
+      name: element.groupName.toString(),
+      value: element.groupCode.toString(),
     }));
 
     const stateDet = stateData.map(({ STNM, ST }) => ({
@@ -225,19 +250,23 @@ export class CustomerOutstandingReportComponent implements OnInit {
     // Store all data and derived details
     this.allData = { custNameData, stateData };
     this.customerDetailList = custNameDet;
+    this.custGroupDetailList = custGroupDet;
     this.stateList = stateDet;
     this.custNameDet = custNameDet;
+    this.custGroupDet = custGroupDet;
     this.stateDet = stateDet;
 
     // Filter and update UI
     this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, locationList, this.locName, this.locStatus);
     this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, custNameDet, this.custName, this.custStatus);
     this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, stateDet, this.gstSTName, this.gstSTStatus);
+    this.filter.Filter(this.jsonCustOutFormArray, this.CustOutTableForm, custGroupDet, this.custGPName, this.custGPStatus);
   }
 
   async save() {
-    const reportbasis = Array.isArray(this.CustOutTableForm.value.rptbasis)?'':this.CustOutTableForm.value.rptbasis;
+    const reportbasis = Array.isArray(this.CustOutTableForm.value.rptbasis) ? '' : this.CustOutTableForm.value.rptbasis;
     const startValue = new Date(this.CustOutTableForm.controls.start.value);
+    const ASonDateValue = new Date(this.CustOutTableForm.controls?.asondate.value);
     const endValue = new Date(this.CustOutTableForm.controls.end.value);
     const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
       ? this.CustOutTableForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
@@ -248,8 +277,10 @@ export class CustomerOutstandingReportComponent implements OnInit {
     const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
       ? this.CustOutTableForm.value.custnmcdHandler.map(x => { return { custCD: x.value, custNm: x.name }; })
       : [];
-
-    let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(startValue, endValue, loct, cust, gstST, reportbasis);
+    const custGrp = Array.isArray(this.CustOutTableForm.value.custgroupHandler)
+      ? this.CustOutTableForm.value.custgroupHandler.map(x => { return { cgpCD: x.value, cgpNm: x.name }; })
+      : [];
+    let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(ASonDateValue,startValue, endValue, loct, cust, gstST, reportbasis, custGrp);
     if (data.length === 0) {
       if (data) {
         Swal.fire({

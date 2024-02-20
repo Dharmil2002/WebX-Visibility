@@ -207,13 +207,15 @@ export async function GetBankDetailFromApi(masterService, ApplicationLocations) 
     try {
         const companyCode = parseInt(localStorage.getItem('companyCode'));
         const filter = {
+            isActive: true,
             ApplicationLocations: ApplicationLocations,
         };
         const req = { companyCode, collectionName: 'Bank_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
         if (res && res.data) {
             return res.data.map(x => ({
-                name: x.Bankname, value: x.Bankcode, ...x
+                name: x.Bankname, value: x.
+                    Accountnumber, ...x
             }));
         }
     } catch (error) {

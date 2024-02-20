@@ -145,8 +145,8 @@ export class GeneralLedgerReportService {
     const previousYearShort: string = `${+currentYearShort - 1}`;
 
     const financialYear = [
-      { name: `${previousYearShort}${currentYearShort}`, value: `${previousYearShort}${currentYearShort}` },
-      { name: `${currentYearShort}${nextYearShort}`, value: `${currentYearShort}${nextYearShort}` },
+      { name: `${previousYearShort} - ${currentYearShort}`, value: `${previousYearShort}${currentYearShort}` },
+      { name: `${currentYearShort} - ${nextYearShort}`, value: `${currentYearShort}${nextYearShort}` },
     ];
 
     return financialYear;

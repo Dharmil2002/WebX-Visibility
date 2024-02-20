@@ -139,7 +139,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   ngOnInit(): void {
     this.getGeneralmasterData().then(() => {
       this.bindDataFromDropdown();
-      //  this.InvockedContract()
+      //this.InvockedContract()
       this.isTableLoad = false;
     });
     this.backPath = "/dashboard/Index?tab=6";
@@ -1736,7 +1736,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "capacity": containerCode
     }
 
-    // let reqBody = { "companyCode": 10065, "customerCode": "CUST00012", "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9 }
+    //let reqBody = { "companyCode": 10065, "customerCode": "CUST00012", "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9 }
 
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
       .then(async (res: any) => {
@@ -1744,13 +1744,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
           this.NonFreightjsonControlArray = await this.GenerateControls(res[0]?.NonFreightChargeMatrixDetails)
           if (res[0]?.NonFreightChargeMatrixDetailsDetails && this.model.invoiceData.length > 0) {
-            const NoOfPackets = this.model.invoiceData.reduce(
-              (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noofPkts']),
-              0
-            );
+            const actualWeight = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
             const Multipointdelivery = res[0]?.NonFreightChargeMatrixDetailsDetails?.[0]
             Multipointdelivery.functionName = "OnChangeFixedAmounts"
-            Multipointdelivery.value = Multipointdelivery.rT * NoOfPackets;
+            Multipointdelivery.value = Multipointdelivery.rT * (actualWeight * 1000);
             Multipointdelivery.name = "Multipointdelivery"
             Multipointdelivery.label = "Multi-Point Delivery"
             Multipointdelivery.placeholder = "Multi-Point Delivery"
@@ -1807,11 +1804,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     switch (fieldName) {
       case "COD/DOD":
         if (this.model.invoiceData.length > 0) {
-          const NoOfPackets = this.model.invoiceData.reduce(
-            (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noofPkts']),
+          const actualWeightInTon = this.model.invoiceData.reduce(
+            (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['actualWeight']),
             0
           );
-          const value = Math.min(Math.max(data.mIN, data.rT * NoOfPackets), data.mAX);
+          const actualWeight = actualWeightInTon * 1000;
+          const value = Math.min(Math.max(data.mIN, data.rT * actualWeight), data.mAX);
           return {
             "functionName": "",
             "value": value,
@@ -1831,13 +1829,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             (acc, amount) => parseFloat(acc) + parseFloat(amount['invoiceAmount']),
             0
           );
-          const NoOfPackets = this.model.invoiceData.reduce(
-            (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noofPkts']),
+          const actualWeightInTon = this.model.invoiceData.reduce(
+            (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['actualWeight']),
             0
           );
+          const actualWeight = actualWeightInTon * 1000;
           const Insurance = data.FreightChargeInsuranceDetails.find(x => x.iVFROM <= TotalInvoiceAmount && x.iVTO >= TotalInvoiceAmount);
           if (Insurance) {
-            const TotalInsuranceValue = Insurance.rT * NoOfPackets;
+            const TotalInsuranceValue = Insurance.rT * actualWeight;
             const value = Math.min(Math.max(Insurance.mIN, TotalInsuranceValue), Insurance.mAX);
 
             return {

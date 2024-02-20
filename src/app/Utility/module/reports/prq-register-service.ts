@@ -30,7 +30,6 @@ export class prqreportService {
                 ...(prqArray.length > 0 ? [{ pRQNO: { 'D$in': prqArray } }] : []), // PRQNo condition
             ]
         };
-        console.log("matchQuery", matchQuery)
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "prq_summary",

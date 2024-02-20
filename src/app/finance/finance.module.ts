@@ -69,6 +69,8 @@ import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/adv
 import { AdviceAcknowledgeComponent } from './Fund Transfer/advice-acknowledge/advice-acknowledge.component';
 import { AdviceAcknowledgeFiltersComponent } from './Fund Transfer/Models/advice-acknowledge-filters/advice-acknowledge-filters.component';
 import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
+import { CreditVoucherComponent } from './credit-voucher/credit-voucher.component';
+import { AddCreditVoucherDetailsModalComponent } from './credit-voucher/add-credit-voucher-details-modal/add-credit-voucher-details-modal.component';
 
 @NgModule({
     declarations: [
@@ -103,7 +105,9 @@ import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
         ContraVoucherCreationComponent,
         AdviceGenerationComponent,
         AdviceAcknowledgeComponent,
-        AdviceAcknowledgeFiltersComponent
+        AdviceAcknowledgeFiltersComponent,
+        CreditVoucherComponent,
+        AddCreditVoucherDetailsModalComponent
     ],
     imports: [
         CommonModule,

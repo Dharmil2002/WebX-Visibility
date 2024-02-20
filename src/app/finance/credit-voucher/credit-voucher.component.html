@@ -1,0 +1,51 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="creditVoucherSummaryForm">
+        <app-form-webxpress [form]="creditVoucherSummaryForm" [FormTitle]="'Summary'"
+            [formData]="jsonControlCreditVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+
+    <app-generic-table-v2 *ngIf="LoadVoucherDetails && creditVoucherSummaryForm.valid"
+        [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData"
+        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [FormTitle]="'Details'"
+        [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
+        (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true (AddNewButtonEvent)="addCreditData()"
+        (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)">
+    </app-generic-table-v2>
+
+    <div class="row">
+        <div class="col-5">
+            <form [formGroup]="creditVoucherPaymentSummaryForm">
+                <app-form-webxpress [form]="creditVoucherPaymentSummaryForm" [FormTitle]="'Payment Summary'"
+                    [DisplayCheckbox]="true" [CheckBoxMessage]="'Round Off'"
+                    [formData]="jsonControlCreditVoucherPaymentSummaryArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col">
+            <form [formGroup]="creditVoucherPaymentDetailsForm">
+                <app-form-webxpress [form]="creditVoucherPaymentDetailsForm" [FormTitle]="'Payment Details'"
+                    [formData]="jsonControlCreditVoucherPaymentDetailsArray"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button [disabled]="!DebitVoucherSummaryForm.valid || 
+                tableData.length==0 || !DebitVoucherTaxationPaymentDetailsForm.valid" class="msr-3" mat-raised-button
+                    color="primary" (click)="Submit()">Submit</button>
+                <button mat-button (click)="cancel('Billing​')">Back</button>
+            </div>
+        </div>
+    </div> -->
+</app-common-wrapper-webxpress>

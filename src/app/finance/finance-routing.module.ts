@@ -17,6 +17,7 @@ import { ContraVoucherCreationComponent } from './VoucherEntry/Contra Voucher/co
 import { AdviceAcknowledgeComponent } from './Fund Transfer/advice-acknowledge/advice-acknowledge.component';
 import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/advice-generation.component';
 import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
+import { CreditVoucherComponent } from './credit-voucher/credit-voucher.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -36,6 +37,7 @@ const routes: Routes = [
   { path: 'VoucherEntry/ContraVoucher', component: ContraVoucherCreationComponent },
   { path: 'FundTransfer/AdviceGeneration', component: AdviceGenerationComponent },
   { path: 'FundTransfer/AdviceAcknowledge', component: AdviceAcknowledgeComponent },
+  { path: 'CreditVoucher', component: CreditVoucherComponent },
 
 ];
 

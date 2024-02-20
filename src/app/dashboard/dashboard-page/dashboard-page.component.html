@@ -61,7 +61,7 @@
                         PRQ Summary
                     </ng-template>
                     <app-prq-summary-page (CurrentIndex)="GetSelectedIndex($event)"
-                        [selectedIndex]="6"  *ngIf="tabName === 'PRQ'"></app-prq-summary-page>
+                        [selectedIndex]="6" ></app-prq-summary-page>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('docket')" label="docket">
                     <ng-template mat-tab-label>

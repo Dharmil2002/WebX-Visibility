@@ -17,7 +17,7 @@ export class CnoteBillMRService {
      ) { }
 
      async getCNoteBillMRReportDetail(start, end, fromloc, toloc, payment, transitmode, businessType, movType, bookingType, customer, billAt, docketArray) {
-          debugger
+          
           const loc = fromloc ? fromloc.map(x => x.locCD) || [] : [];
           const Toloc = toloc ? toloc.map(x => x.locCD) || [] : [];
           const payBasis = payment ? payment.map(x => x.payNM) || [] : [];

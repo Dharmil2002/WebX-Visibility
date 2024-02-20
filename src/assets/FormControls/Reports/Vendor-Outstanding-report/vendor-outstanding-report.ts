@@ -26,7 +26,7 @@ export class vendOutControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "4", name: "Vendor Invoice Generation" },
+                         { value: "1", name: "Vendor Invoice Generation" },
                          { value: "2", name: "Vendor Invoice Finalization" },
                          { value: "3", name: "Vendor Invoice Payment" },
                     ],

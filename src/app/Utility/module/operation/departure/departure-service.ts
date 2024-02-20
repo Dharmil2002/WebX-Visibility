@@ -9,7 +9,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 import { VendorService } from "../../masters/vendor-master/vendor.service";
-import { DocketStatus, VehicleStatus } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, VehicleStatus, getEnumName } from "src/app/Models/docStatus";
 
 @Injectable({
   providedIn: "root"
@@ -74,89 +74,254 @@ export class DepartureService {
     const dktNoList = shipment?shipment.map((x) => x.dKTNO):[];
     const dktSfx=shipment.map((x)=>`${x.dKTNO}-${x.sFX}`);
     let eventJson = dktNoList;
-    const thcSummary = {
-      "tHCDT": new Date(),
-      "vND": {
-        "tY": vendorCode[0]?.vendorType || "",
-        "tYNM": data?.VendorType || "",
-        "cD":vendorCode[0]?.vendorCode || "",
-        "nM": data?.Vendor || "",
-        "pAN": vendorCode[0]?.panNo || "",
-      },
-      "oPSST": 1,
-      "oPSSTNM": "THC GENERATED",
-      "fINST": 0,
-      "fINSTNM": "",
-      "cONTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
-      "aDVPENAMT": 0,
-      "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
-      "cHG": {
-        "cTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
-        "oAMT": ConvertToNumber(data?.OtherChrge || 0, 2),
-        "lOADING": ConvertToNumber(data?.Loading || 0, 2),
-        "uNLOADING": ConvertToNumber(data?.Unloading || 0, 2),
-        "eNROUTE": ConvertToNumber(data?.Enroute || 0, 2),
-        "mISC": ConvertToNumber(data?.Misc || 0, 2),
-        "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2)
-      },
-      "aDV": {
-        "aAMT": ConvertToNumber(data?.Advance || 0, 2),
-        "pCASH": ConvertToNumber(data?.PaidByCash || 0, 2),
-        "pBANK": ConvertToNumber(data?.PaidbyBank || 0, 2),
-        "pFUEL": ConvertToNumber(data?.PaidbyFuel || 0, 2),
-        "pCARD": ConvertToNumber(data?.PaidbyCard || 0, 2),
-        "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
-      },
-      "bALAMT": data?.BalanceAmt || 0,
-      "aDPAYAT": "",
-      "bLPAYAT": "",
-      "tMODE": "",
-      "tMODENM": "",
-      "iSBILLED": false,
-      "bILLNO": "",
-      "dRV": {
-        "nM": data?.Driver || "",
-        "mNO": data?.DriverMob || "",
-        "lNO": data?.License || "",
-        "lEDT": ConvertToDate(data?.Expiry)
-      },
-      "dPT": {
-        "sCHDT": ConvertToDate(data?.DeptartureTime),
-        "eXPDT": ConvertToDate(data?.DeptartureTime),
-        "aCTDT": ConvertToDate(data?.DeptartureTime),
-        "oDOMT": 0,
-        "cEWB": data?.Cewb || ""
-      },
-      "aRR": {
-        "sCHDT":null,
-        "eXPDT":null,
-        "aCTDT":null,
-        "sEALNO": data?.DepartureSeal || "",
-        "kM": "",
-        "aCRBY": "",
-        "aRBY": ""
-      },
-      "sCHDIST": 0,
-      "aCTDIST": 0,
-      "gPSDIST": 0,
-      "cNL": false,
-      "mODDT": new Date(),
-      "mODLOC": this.storage.branch,
-      "mODBY": this.storage.userName
+    const origin = data.Route.split(":")[1].split("-")[0];
+    const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
+debugger;
+    const legID = `${this.storage.companyCode}-${data.tripID}-${this.storage.branch}-${next}`;
+        
+    const getLeg = {
+      companyCode: this.storage.companyCode,
+      collectionName: "thc_movement_ltl",
+      filter: { _id: legID},      
     }
-    const reqthc = {
+    let isLegExist = false;
+    let thc_movment = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", getLeg));    
+    let legData = thc_movment.data;    
+    isLegExist = (legData?._id == legID);
+
+    let thcSummary = {};    
+    if(this.storage.branch == origin) 
+    {
+      thcSummary = {
+        "tHCDT": new Date(),
+        "vND": {
+          "tY": vendorCode[0]?.vendorType || "",
+          "tYNM": data?.VendorType || "",
+          "cD":vendorCode[0]?.vendorCode || "",
+          "nM": data?.Vendor || "",
+          "pAN": vendorCode[0]?.panNo || "",
+        },
+        "oPSST": 1,
+        "oPSSTNM": "In Transit",
+        "fINST": 0,
+        "fINSTNM": "",
+        "cONTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
+        "aDVPENAMT": 0,
+        "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
+        "cAP": {
+          "wT": data?.Capacity || 0,
+          "vOL": data?.VolumeaddedCFT || 0,
+          "vWT": 0
+        },
+        "uTI": {
+          "wT": data?.WeightUtilization,
+          "vOL": data?.VolumeUtilization,
+          "vWT": 0
+        },    
+        "cHG": {
+          "cTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
+          "oAMT": ConvertToNumber(data?.OtherChrge || 0, 2),
+          "lOADING": ConvertToNumber(data?.Loading || 0, 2),
+          "uNLOADING": ConvertToNumber(data?.Unloading || 0, 2),
+          "eNROUTE": ConvertToNumber(data?.Enroute || 0, 2),
+          "mISC": ConvertToNumber(data?.Misc || 0, 2),
+          "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2)
+        },
+        "aDV": {
+          "aAMT": ConvertToNumber(data?.Advance || 0, 2),
+          "pCASH": ConvertToNumber(data?.PaidByCash || 0, 2),
+          "pBANK": ConvertToNumber(data?.PaidbyBank || 0, 2),
+          "pFUEL": ConvertToNumber(data?.PaidbyFuel || 0, 2),
+          "pCARD": ConvertToNumber(data?.PaidbyCard || 0, 2),
+          "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
+        },
+        "bALAMT": data?.BalanceAmt || 0,
+        "aDPAYAT": "",
+        "bLPAYAT": "",
+        "tMODE": "",
+        "tMODENM": "",
+        "iSBILLED": false,
+        "bILLNO": "",
+        "dRV": {
+          "nM": data?.Driver || "",
+          "mNO": data?.DriverMob || "",
+          "lNO": data?.License || "",
+          "lEDT": ConvertToDate(data?.Expiry)
+        },
+        "fLOC": this.storage.branch,
+        "tLOC": next,
+        "dPT": {          
+          "sCHDT": ConvertToDate(data?.DeptartureTime),
+          "eXPDT": ConvertToDate(data?.DeptartureTime),
+          "aCTDT": ConvertToDate(data?.DeptartureTime),
+          "oDOMT": 0,
+          "cEWB": data?.Cewb || ""
+        },
+        "aRR": {
+          "sCHDT":null,
+          "eXPDT":null,
+          "aCTDT":null,          
+          "kM": "",
+          "aCRBY": "",
+          "aRBY": ""
+        },
+        "sCHDIST": 0,
+        "aCTDIST": 0,
+        "gPSDIST": 0,
+        "mODDT": new Date(),
+        "mODLOC": this.storage.branch,
+        "mODBY": this.storage.userName
+      }
+    }
+    else {
+      thcSummary = {
+        "oPSST": 1,
+        "oPSSTNM": "In Transit",
+        "cAP": {
+          "wT": data?.Capacity || 0,
+          "vOL": data?.VolumeaddedCFT || 0,
+          "vWT": 0
+        },
+        "uTI": {
+          "wT": data?.WeightUtilization,
+          "vOL": data?.VolumeUtilization,
+          "vWT": 0
+        },
+        "fLOC": this.storage.branch,
+        "tLOC": next,   
+        "mODDT": new Date(),
+        "mODLOC": this.storage.branch,
+        "mODBY": this.storage.userName    
+      }
+    }
+    
+    const tsReq = {
       companyCode: this.storage.companyCode,
       collectionName: "thc_summary_ltl",
-      filter: { docNo: data.tripID },
+      filter: { _id: `${this.storage.companyCode}-${data.tripID}`},
       update: thcSummary
     }
-    await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqthc));
-    const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
+    await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", tsReq));
+    
+    let loadedWT = shipment.reduce((a, c) => { return a + c.lDWT; }, 0) || 0; 
+    let loadedVol = shipment.reduce((a, c) => { return a + c.lDVOL; }, 0) || 0;
+
+    if(!isLegExist) {            
+      legData = {
+        "_id": legID,
+        "tHC": data.tripID,
+        "cID": this.storage.companyCode,
+        "fLOC": this.storage.branch || "",
+        "tLOC": next || "",
+        "lOAD": {
+          "dKTS": shipment.filter(f => f.lDPKG > 0).length || 0,
+          "pKGS": shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0,
+          "wT": loadedWT || 0, 
+          "vOL": loadedVol || 0,
+          "vWT": 0,
+          "rMK": "",
+          "sEALNO": data?.DepartureSeal || "",
+        },
+        "cAP": {
+          "wT": data?.Capacity || 0,
+          "vOL": data?.VolumeaddedCFT || 0,
+          "vWT": 0
+        },
+        "uTI": {
+          "wT": data?.WeightUtilization,
+          "vOL": data?.VolumeUtilization,
+          "vWT": 0
+        },
+        "dPT": {
+          "sCHDT": ConvertToDate(data?.DeptartureTime),
+          "eXPDT": ConvertToDate(data?.DeptartureTime),
+          "aCTDT": ConvertToDate(data?.DeptartureTime),
+          "gPSDT": null,         
+          "oDOMT": 0
+        },
+        "aRR": {
+          "sCHDT": null,
+          "eXPDT": null,
+          "aCTDT": null,
+          "gPSDT": null,
+          "oDOMT": 0
+        },
+        "uNLOAD": {
+          "dKTS": 0,
+          "pKGS": 0,
+          "wT": 0,
+          "vOL": 0,
+          "vWT": 0,
+          "sEALNO": "",
+          "rMK": "",
+          "sEALRES": ""
+        },
+        "sCHDIST": 0,
+        "aCTDIST": 0,
+        "gPSDIST": 0,
+        "eNTDT": new Date(),
+        "eNTLOC": this.storage.branch,
+        "eNTBY": this.storage.userName
+      }
+    }
+    else {
+      legData = {
+        "lOAD": {
+          "dKTS": shipment.filter(f => f.lDPKG > 0).length || 0,
+          "pKGS": shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0,
+          "wT": loadedWT || 0, 
+          "vOL": loadedVol || 0,
+          "vWT": 0,
+          "rMK": "",
+          "sEALNO": data?.DepartureSeal || "",
+        },
+        "cAP": {
+          "wT": data?.Capacity || 0,
+          "vOL": data?.VolumeaddedCFT || 0,
+          "vWT": 0
+        },
+        "uTI": {
+          "wT": data?.WeightUtilization,
+          "vOL": data?.VolumeUtilization,
+          "vWT": 0
+        },
+        "dPT": {
+          "sCHDT": ConvertToDate(data?.DeptartureTime),
+          "eXPDT": ConvertToDate(data?.DeptartureTime),
+          "aCTDT": ConvertToDate(data?.DeptartureTime),
+          "gPSDT": null,         
+          "oDOMT": 0
+        },
+        "mODDT": new Date(),
+        "mODLOC": this.storage.branch,
+        "mODBY": this.storage.userName
+      }
+    }
+
+    if(isLegExist) {
+      const reqthc = {
+        companyCode: this.storage.companyCode,
+        collectionName: "thc_movement_ltl",
+        filter: { _id: legID },
+        update: legData
+      }  
+      await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqthc));
+    }
+    else {
+      const reqthc = {
+        companyCode: this.storage.companyCode,
+        collectionName: "thc_movement_ltl",        
+        data: legData
+      }  
+      await firstValueFrom(this.operation.operationMongoPost("generic/create", reqthc));
+    }
+  
     const tripDetails = {
       sTS:VehicleStatus.Departed,
-      sTSNM:VehicleStatus[VehicleStatus.Departed],
+      sTSNM:VehicleStatus[VehicleStatus.Departed],      
       nXTLOC: next
     }
+
     const reqDepart = {
       companyCode: this.storage.companyCode,
       collectionName: "trip_Route_Schedule",
@@ -167,13 +332,13 @@ export class DepartureService {
     if (dktNoList.length > 0) {
       eventJson = dktNoList.map((element,index) => {
         const evn = {
-          "_id": `${this.storage.companyCode}-${element}-${index}-EVN0004-${moment(new Date()).format('YYYYMMDDHHmmss')}`, // Safely accessing the ID
+          "_id": `${this.storage.companyCode}-${element}-${index}-${DocketEvents.Departure}-${moment(new Date()).format('YYYYMMDDHHmmss')}`, // Safely accessing the ID
           "cID": this.storage.companyCode,
           "dKTNO": element,
           "sFX": 0,
           "lOC": this.storage.branch,
-          "eVNID": "EVN0004",
-          "eVNDES": "Vehicle Departed",
+          "eVNID": DocketEvents.Departure,
+          "eVNDES": getEnumName(DocketEvents, DocketEvents.Departure),
           "eVNDT": new Date(),
           "eVNSRC": "Depart Vehicle",
           "dOCTY": "TH",
@@ -193,13 +358,7 @@ export class DepartureService {
         data:eventJson
       }
       await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
-      // const reqDktDepart={
-      //   companyCode: this.storage.companyCode,
-      //   collectionName:"dockets_ltl",
-      //   filter:{docNo:{"D$in":dktNoList}},
-      //   update:{"oSTS":DocketStatus.Departed,"oSTSN":DocketStatus[DocketStatus.Departed]}
-      // }
-      // await firstValueFrom(this.operation.operationMongoPut("generic/update", reqDktDepart));
+     
       const reqDktOpsDepart={
         companyCode: this.storage.companyCode,
         collectionName:"docket_ops_det_ltl",

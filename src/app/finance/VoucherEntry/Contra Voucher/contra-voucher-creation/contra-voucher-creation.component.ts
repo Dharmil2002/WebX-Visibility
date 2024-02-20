@@ -10,6 +10,8 @@ import { firstValueFrom, from } from "rxjs";
 import {
   VoucherRequestModel,
   VoucherDataRequestModel,
+  VoucherInstanceType,
+  VoucherType,
 } from "src/app/Models/Finance/Finance";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
@@ -23,7 +25,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import {
   GetAccountDetailFromApi,
   GetBankDetailFromApi,
-} from "src/app/finance/credit-debit-voucher/debitvoucherAPIUtitlity";
+} from "src/app/finance/Debit Voucher/debitvoucherAPIUtitlity";
 import { ContraVoucherControl } from "src/assets/FormControls/Finance/VoucherEntry/ContraVouchercontrol";
 import Swal from "sweetalert2";
 
@@ -224,7 +226,10 @@ export class ContraVoucherCreationComponent implements OnInit {
           this.VoucherRequestModel.finYear = financialYear;
 
           this.VoucherDataRequestModel.voucherNo = "";
-          this.VoucherDataRequestModel.transType = "Contra Voucher";
+          this.VoucherDataRequestModel.transCode = VoucherInstanceType.ContraVoucherCreation;
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.ContraVoucherCreation];
+          this.VoucherDataRequestModel.voucherCode = VoucherType.ContraVoucher;
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.ContraVoucher];
           this.VoucherDataRequestModel.transDate = new Date();
           this.VoucherDataRequestModel.docType = "VR";
           this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -284,7 +289,10 @@ export class ContraVoucherCreationComponent implements OnInit {
             {
               companyCode: companyCode,
               voucherNo: "",
-              transType: "Contra Voucher",
+              transCode: VoucherInstanceType.ContraVoucherCreation,
+              transType: VoucherInstanceType[VoucherInstanceType.ContraVoucherCreation],
+              voucherCode: VoucherType.JournalVoucher,
+              voucherType: VoucherType[VoucherType.JournalVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,
@@ -306,7 +314,10 @@ export class ContraVoucherCreationComponent implements OnInit {
             {
               companyCode: companyCode,
               voucherNo: "",
-              transType: "Contra Voucher",
+              transCode: VoucherInstanceType.ContraVoucherCreation,
+              transType: VoucherInstanceType[VoucherInstanceType.ContraVoucherCreation],
+              voucherCode: VoucherType.JournalVoucher,
+              voucherType: VoucherType[VoucherType.JournalVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,

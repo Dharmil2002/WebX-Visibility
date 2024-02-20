@@ -17,13 +17,13 @@ import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUt
 import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 import { DebitVoucherPreviewComponent } from '../Modals/debit-voucher-preview/debit-voucher-preview.component';
-import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 @Component({
-  selector: 'app-credit-debit-voucher',
-  templateUrl: './credit-debit-voucher.component.html',
+  selector: 'app-debit-voucher',
+  templateUrl: './debit-voucher.component.html',
 })
 export class DebitVoucherComponent implements OnInit {
   companyCode: number | null
@@ -648,14 +648,14 @@ export class DebitVoucherComponent implements OnInit {
 
       var RoundOffList = {
         "Instance": "debit voucher",
-        "Value": "Round off Amount",
-        "Ledgercode": "EXP002014",
-        "Ledgername": "Round off Amount",
+        "Value": ledgerInfo['Round off Amount'].LeadgerName,
+        "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
+        "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
         "SubLedger": "EXPENSE",
         "Dr": isAmountNegative ? "" : Amount.toFixed(2),
         "Cr": isAmountNegative ? (-Amount).toFixed(2) : "",
         "Location": Accountinglocation,
-        "Narration": ""
+        "Narration": ledgerInfo['Round off Amount'].LeadgerName,
       };
 
       FinalListOfDebitVoucher.push(RoundOffList)
@@ -664,21 +664,15 @@ export class DebitVoucherComponent implements OnInit {
     this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
       let LeadgerCode;
       let LeadgerName;
-      if (item.name == "IGST") {
-        LeadgerCode = "LIA002004";
-        LeadgerName = "IGST payable";
+      const itemInfo = ledgerInfo[item.name];
+      if (itemInfo) {
+        LeadgerCode = itemInfo.LeadgerCode;
+        LeadgerName = itemInfo.LeadgerName;
+
       }
-      if (item.name == "UGST") {
-        LeadgerCode = "LIA002002";
-        LeadgerName = "UGST payable";
-      }
-      if (item.name == "SGST") {
-        LeadgerCode = "LIA002001";
-        LeadgerName = "SGST payable";
-      }
-      if (item.name == "CGST") {
-        LeadgerCode = "LIA002003";
-        LeadgerName = "CGST payable";
+      else {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Item with name ${itemName} not found in ledgerInfo object. Please contact support.")
+        return;
       }
 
       let GSTData = {
@@ -800,10 +794,11 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherRequestModel.branch = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
         this.VoucherRequestModel.finYear = financialYear
 
-
-        //this.VoucherDataRequestModel.companyCode = this.companyCode;
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transType = "DebitVoucher";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.DebitVoucherCreation;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.DebitVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
         this.VoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = localStorage.getItem("Branch");
@@ -848,34 +843,16 @@ export class DebitVoucherComponent implements OnInit {
 
         const companyCode = this.companyCode;
         const Branch = localStorage.getItem("Branch");
-        // var VoucherlineitemList = this.tableData.map(function (item) {
-        //   return {
 
-        //     "companyCode": companyCode,
-        //     "voucherNo": "",
-        //     "transType": "DebitVoucher",
-        //     "transDate": new Date(),
-        //     "finYear": financialYear,
-        //     "branch": Branch,
-        //     "accCode": item.LedgerHdn,
-        //     "accName": item.Ledger,
-        //     "sacCode": item.SACCodeHdn.toString(),
-        //     "sacName": item.SACCode,
-        //     "debit": parseFloat(item.DebitAmount).toFixed(2),
-        //     "credit": 0,
-        //     "GSTRate": item.GSTRate,
-        //     "GSTAmount": parseFloat(item.GSTAmount).toFixed(2),
-        //     "Total": item.Total,
-        //     "TDSApplicable": item.TDSApplicable == "Yes" ? true : false,
-        //     "narration": item.Narration ?? ""
-        //   };
-        // });
         let Accountdata = this.tableData.map(function (item) {
           return {
 
             "companyCode": localStorage.getItem("companyCode"),
             "voucherNo": "",
-            "transType": "DebitVoucher",
+            "transCode": VoucherInstanceType.DebitVoucherCreation,
+            "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
+            "voucherCode": VoucherType.DebitVoucher,
+            "voucherType": VoucherType[VoucherType.DebitVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
             "branch": localStorage.getItem("Branch"),
@@ -901,7 +878,10 @@ export class DebitVoucherComponent implements OnInit {
             return {
               "companyCode": localStorage.getItem("companyCode"),
               "voucherNo": "",
-              "transType": "DebitVoucher",
+              "transCode": VoucherInstanceType.DebitVoucherCreation,
+              "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
+              "voucherCode": VoucherType.DebitVoucher,
+              "voucherType": VoucherType[VoucherType.DebitVoucher],
               "transDate": new Date(),
               "finYear": financialYear,
               "branch": localStorage.getItem("Branch"),
@@ -926,7 +906,10 @@ export class DebitVoucherComponent implements OnInit {
 
             "companyCode": companyCode,
             "voucherNo": "",
-            "transType": "DebitVoucher",
+            "transCode": VoucherInstanceType.DebitVoucherCreation,
+            "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
+            "voucherCode": VoucherType.DebitVoucher,
+            "voucherType": VoucherType[VoucherType.DebitVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
             "branch": Branch,
@@ -966,8 +949,12 @@ export class DebitVoucherComponent implements OnInit {
                 transDate: Date(),
                 finYear: financialYear,
                 branch: localStorage.getItem("Branch"),
-                transType: "DebitVoucher",
+                transCode: VoucherInstanceType.DebitVoucherCreation,
+                transType: VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
+                voucherCode: VoucherType.DebitVoucher,
+                voucherType: VoucherType[VoucherType.DebitVoucher],
                 docType: "Voucher",
+                partyType: this.DebitVoucherSummaryForm.value.Preparedfor,
                 docNo: res?.data?.mainData?.ops[0].vNO,
                 partyCode: this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,

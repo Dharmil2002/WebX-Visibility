@@ -5,7 +5,7 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { openingbalanceControls } from "src/assets/FormControls/Finance/opening balance/openingbalanceControls";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { GetLocationDetailFromApi } from "../credit-debit-voucher/debitvoucherAPIUtitlity";
+import { GetLocationDetailFromApi } from "../Debit Voucher/debitvoucherAPIUtitlity";
 
 @Component({
   selector: "app-opening-balance-ledger",
@@ -33,7 +33,7 @@ export class OpeningBalanceLedgerComponent implements OnInit {
     private masterService: MasterService,
     private filter: FilterUtils,
 
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -70,8 +70,8 @@ export class OpeningBalanceLedgerComponent implements OnInit {
     });
   }
 
-  async getBranchCodeDropdown(){
-    
+  async getBranchCodeDropdown() {
+
 
     const AllLocationsList = await GetLocationDetailFromApi(this.masterService)
     this.filter.Filter(
@@ -110,17 +110,17 @@ export class OpeningBalanceLedgerComponent implements OnInit {
       );
     }
   }
-  async getAccountCodeDropdown(){
+  async getAccountCodeDropdown() {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "account_detail",
-      filter: { cATCD: this.openingbalanceForm.value.AccountCategory.value},
+      filter: { cATCD: this.openingbalanceForm.value.AccountCategory.value },
     };
 
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", Body)
     );
-    console.log('res' ,res)
+    console.log('res', res)
     if (res.success && res.data.length > 0) {
       const Acdata = res.data.map((x) => {
         return {
@@ -138,7 +138,7 @@ export class OpeningBalanceLedgerComponent implements OnInit {
       );
     }
   }
-  getAccountDescription(){
+  getAccountDescription() {
     this.openingbalanceForm.controls["AccountDescription"].setValue(this.openingbalanceForm.value.AccountCode.aCNM);
   }
   functionCallHandler($event) {

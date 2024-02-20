@@ -12,7 +12,7 @@ import { VendorPaymentControl } from "src/assets/FormControls/Finance/VendorPaym
 import { THCAmountsDetailComponent } from "../Modal/thcamounts-detail/thcamounts-detail.component";
 import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
+import { GetAccountDetailFromApi } from "../../Debit Voucher/debitvoucherAPIUtitlity";
 import { Router } from "@angular/router";
 import {
   GetAdvancePaymentListFromApi,

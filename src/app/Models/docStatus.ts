@@ -38,7 +38,8 @@ export enum DocketEvents {
     Arrival = "EVN0006",
     DRS_Generation = "EVN0007",
     DRS_Upload = "EVN0008",
-    Delivery_Update = "EVN0009"
+    Delivery_Update = "EVN0009",
+    Arrival_Scan = "EVN0010",
 };
 export enum VehicleStatus {
     Available= 1,
@@ -49,7 +50,7 @@ export enum VehicleStatus {
     Unloaded= 6
 }
 
-export function getEnumNameByValue(enumObj: any, value: string): string | null {
+export function getEnumName(enumObj: any, value: string): string | null {
     let foundKey = null;
     Object.keys(enumObj).forEach(key => {
         if (enumObj[key] === value) {

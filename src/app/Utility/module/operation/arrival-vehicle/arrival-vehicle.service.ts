@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
-import { DocketStatus } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { ConvertToDate, sumProperty } from "src/app/Utility/commonFunction/common";
 import { OperationService } from "src/app/core/service/operations/operation.service";
@@ -95,30 +95,43 @@ export class ArrivalVehicleService {
     async getCheckOnce(filter) {
         const req = {
             companyCode: this.storage.companyCode,
-            collectionName: "thc_summary_ltl",
+            collectionName: "thc_movement_ltl",
             filter: filter
         }
-        const res = await firstValueFrom(this.operation.operationMongoPost("generic/get", req));
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", req));
         return res.data;
     }
     /*End*/
+
     /*Below function is for register entry of mark Arrival*/
-    async fieldMappingMarkArrival(data, dktList) {
+    async fieldMappingMarkArrival(trip, data, dktList) {
+        let legID =  `${this.storage.companyCode}-${trip.TripID}-${trip.cLOC}-${trip.nXTLOC}`;
+        var lagData = await this.getCheckOnce({
+            "_id": legID,
+        });
+        if(!lagData && lagData?._id != legID)
+            return;
         
         let eventJson = dktList;
         const arrivalData = {
             aRR: {
                 "sCHDT": null,
-                "eXPDT": data?.ETA || "",
+                "eXPDT": ConvertToDate(data?.ETA || data?.ArrivalTime),
                 "aCTDT": ConvertToDate(data?.ArrivalTime || new Date()),
+                "oDOMT": 0,
+                "aRBY": this.storage.userName
+            },
+            uNLOAD: {
+                "dKTS": 0,
+                "pKGS": 0,
+                "wT": 0,
+                "vOL": 0,
+                "vWT": 0,
                 "sEALNO": data?.Sealno || "",
                 "sEALSTS": data?.SealStatus || "",
                 "lTRES": data?.LateReason || "",
                 "rES": data.Reason || "",
                 "pOD": data.Upload || "",
-                "kM": "",
-                "aCRBY": "",
-                "aRBY": this.storage.userName
             },
             mODDT: new Date(),
             mODLOC: this.storage.branch,
@@ -130,13 +143,13 @@ export class ArrivalVehicleService {
         if (dktList.length > 0) {
             eventJson = dktList.map(element => {
                 const evn = {
-                    "_id": `${this.storage.companyCode}-${element?.dKTNO}-${element?.docNo}-0-EVN0005-${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "_id": `${this.storage.companyCode}-${element?.dKTNO}-${element?.docNo}-${element?.sFX}-${DocketEvents.Arrival}-${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                     "cID": this.storage.companyCode,
                     "dKTNO": element?.dKTNO || "",
                     "sFX": 0,
                     "lOC": this.storage.branch,
-                    "eVNID": "EVN0005",
-                    "eVNDES": "Vehicle Arrived",
+                    "eVNID": DocketEvents.Arrival,
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival),
                     "eVNDT": new Date(),
                     "eVNSRC": "Vehicle Arrived",
                     "dOCTY": "TH",
@@ -150,13 +163,23 @@ export class ArrivalVehicleService {
                 }
                 return evn
             });
+
             const updateThc = {
                 companyCode: this.storage.companyCode,
                 collectionName: "thc_summary_ltl",
                 filter: { docNo: data?.TripID },
-                update: arrivalData
+                update: arrivalData.aRR
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/update", updateThc));
+
+            const updateMovement = {
+                companyCode: this.storage.companyCode,
+                collectionName: "thc_movement_ltl",
+                filter: { _id: legID },
+                update: arrivalData
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/update", updateMovement));
+
             const mfNo = dktList.map((x) => x.docNo);
             const updateMfHeader = {
                 companyCode: this.storage.companyCode,
@@ -203,23 +226,28 @@ export class ArrivalVehicleService {
     }
     /*End*/
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
-         
+        
+        let legID =  `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
+        var lagData = await this.getCheckOnce({
+            "_id": legID,
+        });
+        if(!lagData && lagData?._id != legID)
+            return;
+
         let eventJson = dktList;
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'Packages');
         const unloadWeightKg = sumProperty(dktList, 'WeightKg');
         const volumeCFT = sumProperty(dktList, 'VolumeCFT');
         const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
-        const thcSummaryJson = {
-            unload: {
+
+        const legUnloadData = {
+            uNLOAD: {
                 dKTS: dktCount,
                 pKGS: unloadPackage,
                 wT: unloadWeightKg,
                 vOL: volumeCFT,
                 vWT: 0, // Assuming this is to be calculated or filled in later
-                sEALNO: "",
-                rMK: "",
-                sEALRES: ""
             }
         }
         const ls = {
@@ -227,13 +255,16 @@ export class ArrivalVehicleService {
         }
         const req = {
             companyCode: this.storage.companyCode,
-            collectionName: "thc_summary_ltl",
-            filter: { docNo: data.TripID },
-            update: thcSummaryJson
+            collectionName: "thc_movement_ltl",
+            filter: { _id: legID },
+            update: legUnloadData
         }
         await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
+
+
         const destDocket = dktList.filter((x) => x.Destination == this.storage.branch);
         const transDocket = dktList.filter((x) => x.Destination != this.storage.branch);
+
         if (destDocket.length > 0) {
             const dockets = destDocket.map((d) => `${d.Shipment}-${d.Suffix}`)
             const dktOps = {
@@ -255,15 +286,15 @@ export class ArrivalVehicleService {
                 update: dktOps
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
-            const eventJson = dktList.map(element => {
+            const eventJson = dktList.map(dkt => {
                 const evn = {
-                    "_id": `${this.storage.companyCode}-${element.Shipment}-0-EVN0004- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.sFX}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                     "cID": this.storage.companyCode,
-                    "dKTNO": element.Shipment,
+                    "dKTNO": dkt.Shipment,
                     "sFX": 0,
                     "lOC": this.storage.branch,
-                    "eVNID": "EVN0004",
-                    "eVNDES": "The shipment is currently in Delivery stock.",
+                    "eVNID": DocketEvents.Arrival_Scan,
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan),
                     "eVNDT": new Date(),
                     "eVNSRC": "Arrival Scan",
                     "dOCTY": "TH",
@@ -305,15 +336,15 @@ export class ArrivalVehicleService {
                 update: dktOps
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
-            const eventJson = dktList.map(element => {
+            const eventJson = dktList.map(dkt => {
                 const evn = {
-                    "_id": `${this.storage.companyCode}-${element.Shipment}-0-EVN0004- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.sFX}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                     "cID": this.storage.companyCode,
-                    "dKTNO": element.Shipment,
+                    "dKTNO": dkt.Shipment,
                     "sFX": 0,
                     "lOC": this.storage.branch,
-                    "eVNID": "EVN0004",
-                    "eVNDES": "The shipment is currently in stock.",
+                    "eVNID": DocketEvents.Arrival_Scan,
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan),
                     "eVNDT": new Date(),
                     "eVNSRC": "Arrival Scan",
                     "dOCTY": "TH",
@@ -324,7 +355,7 @@ export class ArrivalVehicleService {
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
                     "eNTBY": this.storage.userName
-                }
+                };
                 return evn
             });
             const reqEvent = {
@@ -387,6 +418,19 @@ export class ArrivalVehicleService {
         }
         else {
 
+            const thcSummary = {
+                oPSST: 2,
+                oPSSTNM: "Closed"
+            }
+    
+            const reqTHC = {
+                companyCode: this.storage.companyCode,
+                collectionName: "thc_summary_ltl",
+                filter: { docNo: legID },
+                update: thcSummary
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/update", reqTHC));
+
             const tripStatus = {
                 cLOC: data.Route.split(":")[1].split("-")[0],
                 nXTLOC: "",
@@ -401,6 +445,7 @@ export class ArrivalVehicleService {
                 filter: { tHC: data.TripID },
                 update: tripStatus
             }
+
             await firstValueFrom(this.operation.operationMongoPut("generic/update", reqTrip));
             const reqVehicle = {
                 companyCode: this.storage.companyCode,
@@ -408,6 +453,7 @@ export class ArrivalVehicleService {
                 filter: { vehNo: data.VehicleNo },
                 update: { currentLocation: this.storage.branch, tripId: "", route: "",status: "Available" }
             }
+            
             await firstValueFrom(this.operation.operationMongoPut("generic/update", reqVehicle));
             Swal.fire({
                 icon: "info",

@@ -4,7 +4,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
-import { DocketEvents, DocketStatus, getEnumNameByValue } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
 
 @Injectable({
     providedIn: "root",
@@ -67,7 +67,7 @@ export class ManifestService {
                     sFX: element?.Suffix || 0,
                     lOC:this.storage.branch,
                     eVNID: DocketEvents.Menifest_Generation,
-                    eVNDES:getEnumNameByValue(DocketEvents, DocketEvents.Menifest_Generation)?.replace(/_/g, " "),
+                    eVNDES:getEnumName(DocketEvents, DocketEvents.Menifest_Generation)?.replace(/_/g, " "),
                     eVNDT:new Date(),
                     eVNSRC:'Manifest Generated',
                     dOCTY: 'MF',

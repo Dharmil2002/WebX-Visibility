@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeliveryMrGenerationModalComponent } from '../delivery-mr-generation-modal/delivery-mr-generation-modal.component';
 import { Router } from '@angular/router';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { GetAccountDetailFromApi, GetsachsnFromApi } from 'src/app/finance/credit-debit-voucher/debitvoucherAPIUtitlity';
+import { GetAccountDetailFromApi, GetsachsnFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { firstValueFrom } from 'rxjs';

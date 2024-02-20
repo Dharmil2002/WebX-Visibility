@@ -180,7 +180,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
                 "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
                 "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
                 "Status": timeDifferenceInHours > 0 ? "Delay" : "On Time",
-                "Hrs": timeDifferenceInHours.toFixed(2),
+                "Hrs": timeDifferenceInHours.toFixed(2),                
+                "cLOC": element?.cLOC,
+                "nXTLOC": element?.nXTLOC,
                 "Action": statusToActionMap[element?.sTS]
               };
               tableData.push(arrivalData);

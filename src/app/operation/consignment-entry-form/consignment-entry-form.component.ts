@@ -33,7 +33,7 @@ import { firstValueFrom } from "rxjs";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
-import { VoucherDataRequestModel, VoucherRequestModel } from "src/app/Models/Finance/Finance";
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 
 @Component({
@@ -1902,8 +1902,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
   // Account Posting When  C Note Booked 	
   async AccountPosting(DocketNo) {
-
-
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = 0;
@@ -1915,7 +1913,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.VoucherRequestModel.finYear = financialYear
 
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transType = "CNoteBookedVoucher";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBookedVoucher;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
         this.VoucherDataRequestModel.transDate = this.model.consignmentTableForm.value.docketDate
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -1961,12 +1963,15 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
           "companyCode": this.storage.companyCode,
           "voucherNo": "",
-          "transType": "CNoteBookedVoucher",
+          "transCode": VoucherInstanceType.CNoteBookedVoucher,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher],
+          "voucherCode": VoucherType.JournalVoucher,
+          "voucherType": VoucherType[VoucherType.JournalVoucher],
           "transDate": new Date(),
           "finYear": financialYear,
           "branch": this.storage.branch,
-          "accCode": "AST001001",
-          "accName": "Unbilled debtors",
+          "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
+          "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
           "sacCode": "",
           "sacName": "",
           "debit": TotalAmount,
@@ -1981,12 +1986,15 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
           "companyCode": this.storage.companyCode,
           "voucherNo": "",
-          "transType": "CNoteBookedVoucher",
+          "transCode": VoucherInstanceType.CNoteBookedVoucher,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher],
+          "voucherCode": VoucherType.JournalVoucher,
+          "voucherType": VoucherType[VoucherType.JournalVoucher],
           "transDate": new Date(),
           "finYear": financialYear,
           "branch": this.storage.branch,
-          "accCode": "INC001003",
-          "accName": `Freight income - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
+          "accCode": ledgerInfo['Freight income'].LeadgerCode,
+          "accName": `${ledgerInfo['Freight income'].LeadgerName} - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
           "sacCode": "",
           "sacName": "",
           "debit": 0,
@@ -2010,25 +2018,29 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               let reqBody = {
                 companyCode: this.storage.companyCode,
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transCode: VoucherInstanceType.CNoteBookedVoucher,
+                transType: VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
                 transDate: Date(),
                 finYear: financialYear,
                 branch: this.storage.branch,
-                transType: "CNoteBookedVoucher",
                 docType: "Voucher",
+                partyType: "Customer",
                 docNo: res?.data?.mainData?.ops[0].vNO,
                 partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
                 partyName: this.model.consignmentTableForm.value?.billingParty?.name,
                 entryBy: localStorage.getItem("UserName"),
                 entryDate: Date(),
                 debit: [{
-                  "accCode": "AST001001",
-                  "accName": "Unbilled debtors",
+                  "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
+                  "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
                   "amount": TotalAmount,
                   "narration": `when C note No ${DocketNo} Is Booked`
                 }],
                 credit: [{
-                  "accCode": "INC001003",
-                  "accName": "Freight income - Road",
+                  "accCode": ledgerInfo['Freight income'].LeadgerCode,
+                  "accName": ledgerInfo['Freight income'].LeadgerName + " - Road",
                   "amount": TotalAmount,
                   "narration": `when C note No ${DocketNo} Is Booked`
                 }],

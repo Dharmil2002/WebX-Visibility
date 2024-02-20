@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { JournalVoucherCreationModalComponent } from '../Modals/journal-voucher-creation-modal/journal-voucher-creation-modal.component';
 import { Router } from '@angular/router';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
 import { firstValueFrom } from 'rxjs';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -282,7 +282,12 @@ export class JournalVoucherCreationComponent implements OnInit {
           this.VoucherRequestModel.finYear = financialYear;
 
           this.VoucherDataRequestModel.voucherNo = "";
-          this.VoucherDataRequestModel.transType = "Journal Voucher";
+
+          this.VoucherDataRequestModel.transCode = VoucherInstanceType.JournalVoucherCreation;
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.JournalVoucherCreation];
+          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
           this.VoucherDataRequestModel.transDate = new Date();
           this.VoucherDataRequestModel.docType = "VR";
           this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -333,7 +338,10 @@ export class JournalVoucherCreationComponent implements OnInit {
             return {
               companyCode: companyCode,
               voucherNo: "",
-              transType: "Journal Voucher",
+              transCode: VoucherInstanceType.JournalVoucherCreation,
+              transType: VoucherInstanceType[VoucherInstanceType.JournalVoucherCreation],
+              voucherCode: VoucherType.JournalVoucher,
+              voucherType: VoucherType[VoucherType.JournalVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,
@@ -345,9 +353,9 @@ export class JournalVoucherCreationComponent implements OnInit {
               credit: parseFloat(item.CreditAmount).toFixed(2),
               GSTRate: 0,
               GSTAmount: 0,
-              Total: parseFloat(item.DebitAmount).toFixed(2),
+              Total: (parseFloat(item.CreditAmount) + parseFloat(item.DebitAmount)).toFixed(2),
               TDSApplicable: false,
-              narration: item.Narration ?? ""
+              narration: item.Narration ? item.Narration : item.Ledger,
             };
           });
 
@@ -359,20 +367,86 @@ export class JournalVoucherCreationComponent implements OnInit {
           firstValueFrom(this.voucherServicesService
             .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
               if (res.success) {
-                Swal.fire({
-                  icon: "success",
-                  title: "Jornal Voucher Created Successfully",
-                  text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-                  showConfirmButton: true,
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    Swal.hideLoading();
-                    setTimeout(() => {
-                      Swal.close();
-                    }, 2000);
-                    this.navigationService.navigateTotab("Voucher", "dashboard/Index");
-                  }
-                });
+                var CreditData = this.tableData.filter(item => item.DebitAmount == 0).map(function (item) {
+                  return {
+                    "accCode": `${item.LedgerHdn}`,
+                    "accName": item.Ledger,
+                    "amount": item.CreditAmount,
+                    "narration": item.Narration ? item.Narration : item.Ledger,
+                  };
+                })
+                var DebitData = this.tableData.filter(item => item.CreditAmount == 0).map(function (item) {
+                  return {
+                    "accCode": `${item.LedgerHdn}`,
+                    "accName": item.Ledger,
+                    "amount": item.DebitAmount,
+                    "narration": item.Narration ? item.Narration : item.Ledger,
+                  };
+                })
+                let reqBody = {
+                  companyCode: localStorage.getItem("companyCode"),
+                  voucherNo: res?.data?.mainData?.ops[0].vNO,
+                  transDate: Date(),
+                  finYear: financialYear,
+                  branch: localStorage.getItem("Branch"),
+                  transCode: VoucherInstanceType.JournalVoucherCreation,
+                  transType: VoucherInstanceType[VoucherInstanceType.JournalVoucherCreation],
+                  voucherCode: VoucherType.JournalVoucher,
+                  voucherType: VoucherType[VoucherType.JournalVoucher],
+                  docType: "Voucher",
+                  partyType: this.JournalVoucherSummaryForm.value.Preparedfor,
+                  docNo: res?.data?.mainData?.ops[0].vNO,
+                  partyCode: this.JournalVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                  partyName: this.JournalVoucherSummaryForm.value.PartyName?.name ?? this.JournalVoucherSummaryForm.value.PartyName,
+                  entryBy: localStorage.getItem("UserName"),
+                  entryDate: Date(),
+                  debit: DebitData,
+                  credit: CreditData,
+
+                };
+
+                this.voucherServicesService
+                  .FinancePost("fin/account/posting", reqBody)
+                  .subscribe({
+                    next: (res: any) => {
+                      Swal.fire({
+                        icon: "success",
+                        title: "Jornal Voucher Created Successfully",
+                        text: "Voucher No: " + reqBody.docNo,
+                        showConfirmButton: true,
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          Swal.hideLoading();
+                          setTimeout(() => {
+                            Swal.close();
+                          }, 2000);
+                          this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                        }
+                      });
+                    },
+                    error: (err: any) => {
+
+                      if (err.status === 400) {
+                        this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                      } else {
+                        this.snackBarUtilityService.ShowCommonSwal("error", err);
+                      }
+                    },
+                  });
+                // Swal.fire({
+                //   icon: "success",
+                //   title: "Jornal Voucher Created Successfully",
+                //   text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+                //   showConfirmButton: true,
+                // }).then((result) => {
+                //   if (result.isConfirmed) {
+                //     Swal.hideLoading();
+                //     setTimeout(() => {
+                //       Swal.close();
+                //     }, 2000);
+                //     this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                //   }
+                // });
               }
             }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
             .finally(() => {

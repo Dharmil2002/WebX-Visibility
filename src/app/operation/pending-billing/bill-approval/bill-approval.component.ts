@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
-import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 
 @Component({
   selector: 'app-bill-approval',
@@ -146,7 +146,6 @@ export class BillApprovalComponent implements OnInit {
   }
   // Account Posting When  When Bill Has been Generated/ Finalized	
   async AccountPosting(data) {
-
     this.snackBarUtilityService.commonToast(async () => {
       try {
         const TotalAmount = data?.aMT;
@@ -158,8 +157,11 @@ export class BillApprovalComponent implements OnInit {
         this.VoucherRequestModel.finYear = financialYear
 
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transType = "bill-approvalVoucher";
-        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApprovalVoucher,
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApprovalVoucher],
+          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher,
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher],
+          this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
         this.VoucherDataRequestModel.finYear = financialYear
@@ -199,7 +201,6 @@ export class BillApprovalComponent implements OnInit {
         this.VoucherDataRequestModel.accountName = "";
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
-
         var VoucherlineitemList = this.GetVouchersLedgers(data);
 
         this.VoucherRequestModel.details = VoucherlineitemList
@@ -217,26 +218,30 @@ export class BillApprovalComponent implements OnInit {
                 transDate: Date(),
                 finYear: financialYear,
                 branch: this.storage.branch,
-                transType: "bill-approvalVoucher",
+                transCode: VoucherInstanceType.BillApprovalVoucher,
+                transType: VoucherInstanceType[VoucherInstanceType.BillApprovalVoucher],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
                 docType: "Voucher",
+                partyType: "Customer",
                 docNo: res?.data?.mainData?.ops[0].vNO,
                 partyCode: data?.cUST?.cD || "",
                 partyName: data?.cUST?.nM || "",
                 entryBy: localStorage.getItem("UserName"),
                 entryDate: Date(),
-                debit: VoucherlineitemList.map(function (item) {
+                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
                   return {
                     "accCode": item.accCode,
                     "accName": item.accName,
-                    "amount": item.Total,
+                    "amount": item.debit,
                     "narration": item.narration ?? ""
                   };
                 }),
-                credit: VoucherlineitemList.map(function (item) {
+                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
                   return {
                     "accCode": item.accCode,
                     "accName": item.accName,
-                    "amount": item.Total,
+                    "amount": item.credit,
                     "narration": item.narration ?? ""
                   };
                 }),
@@ -288,13 +293,17 @@ export class BillApprovalComponent implements OnInit {
   }
   GetVouchersLedgers(data) {
     const TotalAmount = data?.aMT;
+    const DocketAmount = data?.dKTTOT;
     const GstAmount = data?.gST?.aMT;
     const GstRate = data?.gST?.rATE;
 
     const createVoucher = (accCode, accName, debit, credit) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
-      transType: "bill-approvalVoucher",
+      transCode: VoucherInstanceType.BillApprovalVoucher,
+      transType: VoucherInstanceType[VoucherInstanceType.BillApprovalVoucher],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
       transDate: new Date(),
       finYear: financialYear,
       branch: this.storage.branch,
@@ -305,30 +314,33 @@ export class BillApprovalComponent implements OnInit {
       debit,
       credit,
       GSTRate: GstRate,
-      GSTAmount: credit, // Assuming GSTAmount is the same as credit for simplicity
-      Total: GstAmount,
+      GSTAmount: GstAmount,//credit,
+      Total: debit + credit,
       TDSApplicable: false,
       narration: `When Customer Bill freight is Generated :${data.bILLNO}`,
     });
 
     const response = [
-      createVoucher("AST002002", "Billed debtors", TotalAmount, 0),
-      createVoucher("AST001001", "Unbilled debtors", 0, TotalAmount),
-      createVoucher("EXP001042", "Round off ledger", data?.rOUNOFFAMT, data?.rOUNOFFAMT,),
+      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, TotalAmount, 0),
+      createVoucher(ledgerInfo['Unbilled debtors'].LeadgerCode, ledgerInfo['Unbilled debtors'].LeadgerName, 0, DocketAmount),
     ];
+    if (data?.rOUNOFFAMT > 0) {
+      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, data?.rOUNOFFAMT, 0));
+    }
+
 
     const gstTypeMapping = {
-      UGST: { accCode: "LIA002002", accName: "UGST payable", prop: "uGST" },
-      CGST: { accCode: "LIA002003", accName: "CGST payable", prop: "cGST" },
-      IGST: { accCode: "LIA002004", accName: "iGST payable", prop: "iGST" },
-      SGST: { accCode: "LIA002005", accName: "sGST payable", prop: "sGST" },
+      UGST: { accCode: ledgerInfo['UGST'].LeadgerCode, accName: ledgerInfo['UGST'].LeadgerName, prop: "uGST" },
+      CGST: { accCode: ledgerInfo['CGST'].LeadgerCode, accName: ledgerInfo['CGST'].LeadgerName, prop: "cGST" },
+      IGST: { accCode: ledgerInfo['IGST'].LeadgerCode, accName: ledgerInfo['IGST'].LeadgerName, prop: "iGST" },
+      SGST: { accCode: ledgerInfo['SGST'].LeadgerCode, accName: ledgerInfo['SGST'].LeadgerName, prop: "sGST" },
     };
 
     const gstType = data?.gST?.tYP;
 
     if (gstType && gstTypeMapping[gstType]) {
       const { accCode, accName, prop } = gstTypeMapping[gstType];
-      response.push(createVoucher(accCode, accName, data?.gST?.[prop], data?.gST?.[prop]));
+      response.push(createVoucher(accCode, accName, 0, data?.gST?.[prop]));
     }
 
     return response;

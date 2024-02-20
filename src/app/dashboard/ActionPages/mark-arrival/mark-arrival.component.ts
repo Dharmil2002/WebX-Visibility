@@ -110,7 +110,7 @@ export class MarkArrivalComponent implements OnInit {
     this.mfList=shipment
   }
   async save() {
-    debugger
+    
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -125,7 +125,7 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   updateTripData() {
-    debugger
+    
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
     

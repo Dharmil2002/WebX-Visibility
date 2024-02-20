@@ -1063,10 +1063,6 @@ export class EwayBillControls {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Volumetric is required",
-          },
         ],
       },
       {

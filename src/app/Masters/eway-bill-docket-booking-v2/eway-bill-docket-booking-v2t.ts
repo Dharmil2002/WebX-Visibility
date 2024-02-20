@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Subject, firstValueFrom } from "rxjs";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
@@ -21,6 +21,7 @@ import { DocketService } from "src/app/Utility/module/operation/docket/docket.se
 import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear} from "src/app/Utility/date/date-utils";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { MatStepper } from "@angular/material/stepper";
 @Component({
   selector: "app-eway-example",
   templateUrl: "./eway-bill-docket-booking-v2.html",
@@ -68,6 +69,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCityStatus: any;
   ewayData: any;
   userName = localStorage.getItem("Username");
+  @ViewChild('stepper') private myStepper: MatStepper;
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -254,7 +256,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       console.log("failed");
     }
   }
-
   // Initialize form control
   initializeFormControl() {
     this.ewayBillTab = new EwayBillControls();

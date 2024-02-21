@@ -1,13 +1,20 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
     <form [formGroup]="RunSheetTableForm">
-        <app-form-without-auto-complete-webxpress [form]="RunSheetTableForm" [formData]="jsonControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-without-auto-complete-webxpress>
+      <app-form-webxpress [form]="RunSheetTableForm" [FormTitle]="'Create Run Sheet'"
+        [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+      </app-form-webxpress>
     </form>
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+    <!-- <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
         [csvHeaders]="headerForCsv" [toggleArray]="toggleArray" [menuItems]="menuItems" [menuItemFlag]="menuItemflag"
         [Link]="linkArray" [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData"(onFlagChange)="IsActiveFuntion($event)">
-    </generic-table-webxpress>
+    </generic-table-webxpress> -->
+    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls"
+    [columnHeader]="columnHeader" [tableData]="csv" [menuItems]="menuItems" [staticField]="staticField"
+    [Link]="linkArray" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [metaData]="metaData"
+    (onFlagChange)="selectCheckBox($event)" [onFlagChangeGetAll]="true" [selectAllRequired]="true"
+    [showHeader]='false'>
+    </app-generic-table-v2>
     <div class="row" *ngIf="!tableload">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row d-flex justify-content-end">

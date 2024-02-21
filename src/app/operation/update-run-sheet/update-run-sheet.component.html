@@ -1,28 +1,27 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums">
-
+<app-common-wrapper-webxpress [breadscrums]="breadscrums"[backPath]="backPath">
 <form [formGroup]="updateSheetTableForm">
-    <app-form-without-auto-complete-webxpress [form]="updateSheetTableForm" [formData]="updateRunSheetData"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-    </app-form-without-auto-complete-webxpress>
+  <app-form-webxpress [form]="updateSheetTableForm" [FormTitle]="'Update Run Sheet'"
+    [formData]="updateRunSheetData" (functionCallEmitter)="functionCallHandler($event)"
+    (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+  </app-form-webxpress>
 </form>
+
 <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
-<div class="row" *ngIf="!tableload">
-<form [formGroup]="updateSheetTableForm">
-    <app-form-without-auto-complete-webxpress [form]="updateSheetTableForm" [formData]="Scan"
-        (functionCallEmitter)="functionCallHandler($event)" >
-    </app-form-without-auto-complete-webxpress>
-    <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableload" (click)="updatePackage()">Scan</button>
-</form>
 
+<div class="search-bar-container">
+  <input #scanPackageInput type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()" class="search-bar-input">
+  <button class="search-bar-button"(click)="updatePackage()">Scan</button>
+  &nbsp;
+  <mat-error>
+      <div class="list-group-item-text danger m-2">{{scanMessage}}</div>
+  </mat-error>
 </div>
-
-<generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
-    [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
-    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-    [toggleArray]="toggleArray" [extraData]="extraData" [menuItems]="menuItems"
-    (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
-    [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">
-</generic-table-webxpress>
+<app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls"
+[columnHeader]="columnHeader" [tableData]="csv" [menuItems]="menuItems" [staticField]="staticField"
+[Link]="linkArray" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [metaData]="METADATA"
+(onFlagChange)="selectCheckBox($event)" [onFlagChangeGetAll]="true" [selectAllRequired]="true"
+[showHeader]='false'>
+</app-generic-table-v2>
 <div class="row" *ngIf="!tableload">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-end">

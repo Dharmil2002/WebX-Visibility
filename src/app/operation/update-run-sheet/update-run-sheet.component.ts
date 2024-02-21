@@ -19,23 +19,41 @@ export class UpdateRunSheetComponent implements OnInit {
   branch = localStorage.getItem("Branch");
   data: [] | any;
   tripData: any;
+  scanPackage: string;
+  scanMessage: string = '';
   tabledata: any;
+  backPath: string;
   updateSheetTableForm: UntypedFormGroup
   UpdaterunControlArray: any;
-  columnHeader = {
-    "shipment": "Shipments",
-    "packages": "Packages",
-    "loaded": "Loaded",
-    "pending": "Pending",
-  }
   centerAlignedData = ['packages', 'loaded','pending'];
-  //  #region declaring Csv File's Header as key and value Pair
-  headerForCsv = {
-    "shipment": "Shipment",
-    "packages": "Packages",
-    "loaded": "Loaded",
-    "pending": "Pending",
-  }
+  columnHeader = {
+    shipment: {
+      Title: "Shipments",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    packages: {
+      Title: "Packages",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    loaded: {
+      Title: "Loaded",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    pending: {
+      Title: "Pending",
+      class: "matcolumncenter",
+      Style: "min-width:20%",
+    }
+  };
+  staticField = [
+    "shipment",
+    "packages",
+    "loaded",
+    "pending"
+  ];
   //declaring breadscrum
   breadscrums = [
     {
@@ -112,6 +130,7 @@ export class UpdateRunSheetComponent implements OnInit {
     this.kpiData("")
   }
   ngOnInit(): void {
+    this.backPath = "/dashboard/Index";
   }
 
   kpiData(event) {
@@ -155,7 +174,7 @@ export class UpdateRunSheetComponent implements OnInit {
     let functionName = $event.functionName;     // name of the function , we have to call
     // we can add more arguments here, if needed. like as shown
     // $event['fieldName'] = field.name;
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -172,7 +191,7 @@ export class UpdateRunSheetComponent implements OnInit {
       packageChecked = this.csv.every(obj => obj.packages === obj.loaded);
     }
     if (packageChecked) {
-  
+
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -181,7 +200,7 @@ export class UpdateRunSheetComponent implements OnInit {
         })
         this.DepartDelivery() ;
         this.dialogRef.close(this.updateSheetTableForm.value)
-        
+
     }
     else {
       Swal.fire({
@@ -198,7 +217,7 @@ export class UpdateRunSheetComponent implements OnInit {
     this.tableload = true;
     // Get the trimmed values of scan and leg
     const scanValue = this.updateSheetTableForm.value.Scan.trim();
-   
+
     // Find the unload package based on scan and leg values
     const loadPackage =  this.runsheetDetails.packages.find(x => x.packageId.trim() === scanValue && x.cluster.trim() === this.tripData.columnData.Cluster);
 

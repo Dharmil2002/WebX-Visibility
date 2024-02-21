@@ -19,6 +19,7 @@ export class CreateRunSheetComponent implements OnInit {
   jsonControlArray: any;
   RunSheetTable: any;
   runsheetData: any;
+  backPath: string;
   //declaring breadscrum
   orgBranch: string = localStorage.getItem("Branch");
   breadscrums = [
@@ -41,20 +42,71 @@ export class CreateRunSheetComponent implements OnInit {
   }
   toggleArray = []
   menuItems = []
+  METADATA = {
+    checkBoxRequired: true,
+    selectAllorRenderedData: false,
+    noColumnSort: ["checkBoxRequired"],
+  };
   linkArray = []
   columnHeader = {
-    "documentId": "Document",
-    "type": "Type",
-    "customer": "Customer",
-    "address": "Address",
-    "pincode": "Pin code",
-    "packages": "Packages",
-    "weight": "Weight",
-    "volume": "Volume",
-    "checkBoxRequired": "Select"
-  }
-  centerAlignedData = ['Pincode', 'Packages', 'Weight', 'Volume'];
+    checkBoxRequired: {
+      Title: "Select",
+      class: "matcolumncenter",
+      Style: "max-width:80px",
+    },
+    documentId: {
+      Title: "Document",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    type: {
+      Title: "Type",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    customer: {
+      Title: "Customer",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    address: {
+      Title: "Address",
+      class: "matcolumncenter",
+      Style: "min-width:20%",
+    },
+    pincode: {
+      Title: "Pin code",
+      class: "matcolumncenter",
+      Style: "min-width:10%",
+    },
+    packages: {
+      Title: "Packages",
+      class: "matcolumncenter",
+      Style: "max-width:95px",
+    },
+    weight: {
+      Title: "Weight",
+      class: "matcolumncenter",
+      Style: "max-width:90px",
+    },
+    volume: {
+      Title: "Volume",
+      class: "matcolumncenter",
+      Style: "max-width:90px",
+    },
+  };
+  branch = localStorage.getItem("Branch");
 
+  staticField = [
+    "documentId",
+    "type",
+    "customer",
+    "address",
+    "pincode",
+    "packages",
+    "weight",
+    "volume"
+  ];
   dynamicControls = {
     add: false,
     edit: false,
@@ -66,6 +118,7 @@ export class CreateRunSheetComponent implements OnInit {
       this.autoBindData();
       this.csv = res['shipment'].filter((x) => x.cluster == this.RunSheetTable.columnData.Cluster);
       this.tableload = false;
+      this.backPath = "/dashboard/Index";
     });
   }
   IntializeFormControl() {
@@ -81,7 +134,7 @@ export class CreateRunSheetComponent implements OnInit {
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
     // we can add more arguments here, if needed. like as shown
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -112,7 +165,7 @@ export class CreateRunSheetComponent implements OnInit {
     }
   }
   GenerateRunsheet() {
-   
+
     if (this.runSheetData == undefined) {
       // If no item has isSelected set to true, return or perform any desired action.
       this.ObjSnackBarUtility.ShowCommonSwal1('error', 'Please select atleast one Cluster to generate Runsheet!', false, false, false);
@@ -133,8 +186,8 @@ export class CreateRunSheetComponent implements OnInit {
       loadedVol: this.RunSheetTableForm?.value.LoadVol,
       weightUtilization: this.RunSheetTableForm?.value.WeightUti,
       volumeUtilization: this.RunSheetTableForm?.value.VolUti,
-      Pickup:this.RunSheetTableForm?.value.Pickup||'',
-      Delivery:this.RunSheetTableForm?.value.Delivery||'',
+      // Pickup:this.RunSheetTableForm?.value.Pickup||'',
+      // Delivery:this.RunSheetTableForm?.value.Delivery||'',
       action: "Depart"
     }
     let runSheetDetils = {

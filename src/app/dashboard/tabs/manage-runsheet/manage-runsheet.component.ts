@@ -16,7 +16,7 @@ export class ManageRunsheetComponent
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   tableData: any[];
-  addAndEditPath: string;
+  addAndEditPath:string;
   drillDownPath: string;
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
@@ -30,10 +30,11 @@ export class ManageRunsheetComponent
     },
   ];
   dynamicControls = {
-    add: false,
+    add: true,
     edit: true,
     csv: false,
   };
+
   /*Below is Link Array it will Used When We Want a DrillDown
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
@@ -101,7 +102,7 @@ export class ManageRunsheetComponent
   ) {
     super();
     this.csvFileName = "exampleUserData.csv";
-    this.addAndEditPath = "example/form";
+    this.addAndEditPath='Operation/UpdateDelivery';
     this.IscheckBoxRequired = true;
     this.drillDownPath = "example/drillDown";
     this.getManagedRunSheetDetails();
@@ -129,7 +130,7 @@ export class ManageRunsheetComponent
 
   }
   getRunSheet(dataapi) {
-   
+
     this.operationService.getJsonFileDetails('runSheerUrl').subscribe(res => {
       this.data = res;
       let data = createRunSheetData(this.data, "", false);

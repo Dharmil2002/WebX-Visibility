@@ -5,15 +5,21 @@ export class RunSheetControl {
     constructor() {
         this.RunSheetControlArray = [
             {
-                name: 'RunSheetID',
-                label: 'Run Sheet ID',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
-            }, {
+              name: "RunSheetID",
+              label: "Run Sheet ID",
+              placeholder: "System Generated",
+              type: "text",
+              value:"System Generated",
+              generatecontrol: true,
+              disable: true,
+              Validations: [
+                {
+                  name: "required",
+                  message: "User ID is required",
+                },
+              ],
+            },
+             {
                 name: 'Cluster',
                 label: 'Cluster',
                 placeholder: '',
@@ -124,29 +130,44 @@ export class RunSheetControl {
                 Validations: [],
                 generatecontrol: true,
                 disable: false
-            }
-            ,
+            },
             {
-                name: 'Pickup',
-                label: 'Pickup',
-                placeholder: '',
-                type: 'toggle',
-                value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
+              name: "RadioAccountCode",
+              label: "",
+              placeholder: "",
+              type: "radiobutton",
+              value: [
+                {value: "Pickup ",name: "Pickup"},
+                { value: "Delivery", name: "Delivery", checked: true },
+              ],
+              Validations: [],
+              generatecontrol: true,
+              disable: false,
+              functions: {
+                  // onChange:'SelectAccountCode'
+              },
             }
-            ,
-            {
-                name: 'Delivery',
-                label: 'Delivery',
-                placeholder: '',
-                type: 'toggle',
-                value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
-            }
+            // {
+            //     name: 'Pickup',
+            //     label: 'Pickup',
+            //     placeholder: '',
+            //     type: 'toggle',
+            //     value: '',
+            //     Validations: [],
+            //     generatecontrol: true,
+            //     disable: false
+            // }
+            // ,
+            // {
+            //     name: 'Delivery',
+            //     label: 'Delivery',
+            //     placeholder: '',
+            //     type: 'toggle',
+            //     value: '',
+            //     Validations: [],
+            //     generatecontrol: true,
+            //     disable: false
+            // }
         ];
     }
     RunSheetFormControls() {

@@ -54,17 +54,7 @@ export class UpdateloadingRunControl {
                 name: 'Departuretime',
                 label: 'Departure Time',
                 placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
-            },
-            {
-                name: 'Scan',
-                label: 'Scan',
-                placeholder: '',
-                type: 'text',
+                type: 'time',
                 value: '',
                 Validations: [],
                 generatecontrol: true,

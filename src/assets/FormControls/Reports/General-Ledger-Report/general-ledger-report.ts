@@ -5,6 +5,26 @@ export class GeneralLedgerReport {
     constructor() {
         this.generalLedgerControlArray = [
             {
+                name: 'Fyear',
+                label: 'Financial Year ',
+                placeholder: 'Financial Year ',
+                type: 'dropdown',
+                value: [],
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: false,
+                },
+                generatecontrol: true, disable: false
+            },
+            {
                 name: "start",
                 label: "Select Document Date ",
                 placeholder: "Select Document Date ",
@@ -115,26 +135,7 @@ export class GeneralLedgerReport {
                 generatecontrol: true, disable: false
             },
 
-            {
-                name: 'Fyear',
-                label: 'Financial Year ',
-                placeholder: 'Financial Year ',
-                type: 'dropdown',
-                value: [],
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    },
-                ],
-                additionalData: {
-                    showNameAndValue: false,
-                },
-                generatecontrol: true, disable: false
-            },
+
             {
                 name: "Individual",
                 label: "",

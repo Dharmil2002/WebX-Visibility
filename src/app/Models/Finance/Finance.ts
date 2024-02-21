@@ -67,6 +67,7 @@ export class DebitVoucherdetailsRequestModel {
   branch: string
   accCode: string
   accName: string
+  //accCategory: string
   sacCode: string
   sacName: string
   debit: number

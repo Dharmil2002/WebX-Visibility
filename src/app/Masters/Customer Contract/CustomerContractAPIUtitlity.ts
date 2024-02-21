@@ -29,7 +29,7 @@ export async function PayBasisdetailFromApi(masterService, filterType?) {
   const reqBody = {
     companyCode: localStorage.getItem("companyCode"),
     collectionName: "General_master",
-    filter: { codeType: filterType },
+    filter: { codeType: filterType, activeFlag: true },
   };
   try {
     const PayBasisResponse = await masterService

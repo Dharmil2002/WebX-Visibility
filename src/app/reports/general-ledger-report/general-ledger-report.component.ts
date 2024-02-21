@@ -58,6 +58,8 @@ export class GeneralLedgerReportComponent implements OnInit {
     "LocName": "LocName",
     "StateFilter": "StateFilter",
   }
+  //ReportingBranches: [];
+  ReportingBranches: string[] = [];
   protected _onDestroy = new Subject<void>();
 
   constructor(private fb: UntypedFormBuilder,
@@ -128,18 +130,19 @@ export class GeneralLedgerReportComponent implements OnInit {
   async getDropdownData() {
     try {
       // Fetch data from various services
+      const financialYearlist = this.generalLedgerReportService.getFinancialYear();
       const statelist = await this.stateService.getState();
       const branchList = await this.locationService.locationFromApi();
       const categorylist = await PayBasisdetailFromApi(this.masterService, "MCT");
       const accountList = await this.generalLedgerReportService.getAccountDetail();
-      const financialYearlist = this.generalLedgerReportService.getFinancialYear();
 
       // Apply filters for each dropdown
+      this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
       this.filterDropdown(this.stateName, this.stateStatus, statelist);
       this.filterDropdown(this.branchName, this.branchStatus, branchList);
       this.filterDropdown(this.categoryName, this.categoryStatus, categorylist);
       this.filterDropdown(this.accountName, this.accountStatus, accountList);
-      this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
+
 
       // Set default values for 'branch' and 'Fyear' controls
       const loginBranch = branchList.find(x => x.name === this.storage.branch);
@@ -147,6 +150,8 @@ export class GeneralLedgerReportComponent implements OnInit {
 
       this.generalLedgerForm.controls["branch"].setValue(loginBranch);
       this.generalLedgerForm.controls["Fyear"].setValue(selectedFinancialYear);
+
+
     } catch (error) {
       console.error('An error occurred in getDropdownData:', error.message || error);
     }
@@ -171,6 +176,12 @@ export class GeneralLedgerReportComponent implements OnInit {
   //#endregion
   //#region to export data in csv file
   async save() {
+    if (this.generalLedgerForm.value.Individual == "N") {
+      this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.generalLedgerForm.value.branch.name);
+    } else {
+      this.ReportingBranches.push(this.generalLedgerForm.value.branch.name);
+    }
+
     const startValue = new Date(this.generalLedgerForm.controls.start.value);
     const endValue = new Date(this.generalLedgerForm.controls.end.value);
     const reportTyp = this.generalLedgerForm.value.reportTyp;
@@ -179,17 +190,16 @@ export class GeneralLedgerReportComponent implements OnInit {
       : [];
     const fnYear = this.generalLedgerForm.value.Fyear.value;
     const category = this.generalLedgerForm.value.category.name;
-    const branch = this.generalLedgerForm.value.branch.name;
+    const branch = this.ReportingBranches;
     const individual = this.generalLedgerForm.value.Individual;
     const accountCode = Array.isArray(this.generalLedgerForm.value.accountHandler)
       ? this.generalLedgerForm.value.accountHandler.map(x => x.value)
       : [];
     const reqBody = {
-      startValue, endValue, reportTyp, state, fnYear: parseInt(fnYear), // Parse fnYear to ensure it is a number
+      startValue, endValue, reportTyp, state, fnYear: parseInt(fnYear),
       category, branch, individual, accountCode
     }
     const data = await this.generalLedgerReportService.getGeneralLedger(reqBody)
-    // console.log(data);
     if (data.length === 0) {
       // Display a message or take appropriate action when no records are found
       if (data) {

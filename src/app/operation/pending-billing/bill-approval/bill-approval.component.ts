@@ -157,8 +157,8 @@ export class BillApprovalComponent implements OnInit {
         this.VoucherRequestModel.finYear = financialYear
 
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApprovalVoucher,
-          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApprovalVoucher],
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval,
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval],
           this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher,
           this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher],
           this.VoucherDataRequestModel.transDate = new Date();
@@ -218,8 +218,8 @@ export class BillApprovalComponent implements OnInit {
                 transDate: Date(),
                 finYear: financialYear,
                 branch: this.storage.branch,
-                transCode: VoucherInstanceType.BillApprovalVoucher,
-                transType: VoucherInstanceType[VoucherInstanceType.BillApprovalVoucher],
+                transCode: VoucherInstanceType.BillApproval,
+                transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
                 voucherCode: VoucherType.JournalVoucher,
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 docType: "Voucher",
@@ -300,8 +300,8 @@ export class BillApprovalComponent implements OnInit {
     const createVoucher = (accCode, accName, debit, credit) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
-      transCode: VoucherInstanceType.BillApprovalVoucher,
-      transType: VoucherInstanceType[VoucherInstanceType.BillApprovalVoucher],
+      transCode: VoucherInstanceType.BillApproval,
+      transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
       voucherCode: VoucherType.JournalVoucher,
       voucherType: VoucherType[VoucherType.JournalVoucher],
       transDate: new Date(),

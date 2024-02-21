@@ -1913,8 +1913,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.VoucherRequestModel.finYear = financialYear
 
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBookedVoucher;
-        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher];
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBooking;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CNoteBooking];
         this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
         this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
 
@@ -1963,8 +1963,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
           "companyCode": this.storage.companyCode,
           "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBookedVoucher,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher],
+          "transCode": VoucherInstanceType.CNoteBooking,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
           "voucherCode": VoucherType.JournalVoucher,
           "voucherType": VoucherType[VoucherType.JournalVoucher],
           "transDate": new Date(),
@@ -1986,8 +1986,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
           "companyCode": this.storage.companyCode,
           "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBookedVoucher,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher],
+          "transCode": VoucherInstanceType.CNoteBooking,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
           "voucherCode": VoucherType.JournalVoucher,
           "voucherType": VoucherType[VoucherType.JournalVoucher],
           "transDate": new Date(),
@@ -2018,8 +2018,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               let reqBody = {
                 companyCode: this.storage.companyCode,
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transCode: VoucherInstanceType.CNoteBookedVoucher,
-                transType: VoucherInstanceType[VoucherInstanceType.CNoteBookedVoucher],
+                transCode: VoucherInstanceType.CNoteBooking,
+                transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
                 voucherCode: VoucherType.JournalVoucher,
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 transDate: Date(),

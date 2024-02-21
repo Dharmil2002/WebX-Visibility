@@ -104,8 +104,8 @@ export enum VoucherType {
 
 export enum VoucherInstanceType {
   DebitVoucherCreation = 0,
-  CNoteBookedVoucher = 1,
-  BillApprovalVoucher = 2,
+  CNoteBooking = 1,
+  BillApproval = 2,
   ContraVoucherCreation = 3,
   AdviceVoucherCreation = 4,
   JournalVoucherCreation = 5,

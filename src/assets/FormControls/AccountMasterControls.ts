@@ -382,6 +382,36 @@ export class AccountMasterControls {
       //   generatecontrol: false,
       //   disable: false,
       // },
+      {
+        name: "bSSCH",
+        label: "BS Schedule",
+        placeholder: "BS Schedule",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          // {
+          //   name: "required",
+          //   message: "BS Schedule is required",
+          // },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
+      {
+        name: "iSTRUEPST",
+        label: "Receptance",
+        placeholder: "",
+        type: "toggle",
+        value: false,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        functions: {},
+      },
     ];
 
     this.AccountGroupAddArray = [

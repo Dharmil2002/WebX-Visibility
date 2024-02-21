@@ -7,6 +7,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AddressMaster } from "src/app/core/models/Masters/address-master";
 import { AddressControl } from "src/assets/FormControls/address-master";
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 @Component({
   selector: 'app-address-master-add',
   templateUrl: './address-master-add.component.html',
@@ -31,6 +32,10 @@ export class AddressMasterAddComponent implements OnInit {
   data: any;
   pincodeDataFetched = false;
   submit = 'Save';
+  protected _onDestroy = new Subject<void>();
+  customerName: any;
+  customerNameStatus: any;
+
   //#endregion
 
   ngOnInit() {
@@ -79,14 +84,21 @@ export class AddressMasterAddComponent implements OnInit {
   initializeFormControl() {
     this.addressFormControls = new AddressControl(this.addressTabledata, this.isUpdate);
     this.jsonControlGroupArray = this.addressFormControls.getFormControls();
+    this.addressTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
+    this.bindDropdown();
+  }
+  bindDropdown(){
     this.jsonControlGroupArray.forEach(data => {
       if (data.name === 'pincode') {
         // Set Pincode related variables
         this.pincodeList = data.name;
         this.pincodeStatus = data.additionalData.showNameAndValue;
       }
+      if (data.name === 'customerName') {
+        // Set Pincode related variables
+        this.getCustomerNameData(data.name,data.additionalData.showNameAndValue)
+      }
     });
-    this.addressTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
     this.Route.navigateByUrl('/Masters/AddressMaster/AddressMasterList');
@@ -158,12 +170,53 @@ export class AddressMasterAddComponent implements OnInit {
   }
   //#endregion
 
+  async getCustomerNameData(name,status){
+    const Body = {
+      companyCode: this.companyCode,
+      collectionName: "customer_detail",
+      filter: {},
+    };
+
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
+
+    if (res.success && res.data.length > 0) {
+      let customerData = [];
+      res.data.forEach((x) => {
+        customerData.push({
+          name: x.customerName,
+          value: x.customerCode,
+        });
+      });
+      this.filter.Filter(
+        this.jsonControlGroupArray,
+        this.addressTableForm,
+        customerData,
+        name,
+        status
+      );
+      // is Update
+      if (this.isUpdate) {
+        const customer = this.data.customerName;
+        const selectedData = customerData.filter((x) =>
+          customer.includes(x.value)
+        );
+        this.addressTableForm.controls["customerNameDropdown"].setValue(selectedData);
+      }
+    }
+  }
+
   //#region Save Data
   save() {
     this.addressTableForm.controls["pincode"].setValue(this.addressTableForm.value.pincode.name);
     // Clear any errors in the form controls
     Object.values(this.addressTableForm.controls).forEach(control => control.setErrors(null));
-
+    const customerName = this.addressTableForm.value.customerNameDropdown?.map((x)=>{
+      return x.value
+    })
+    this.addressTableForm.removeControl("customerNameDropdown");
+    this.addressTableForm.controls["customerName"].setValue(customerName);
     if (this.isUpdate) {
       let id = this.addressTableForm.value._id;
       this.addressTableForm.removeControl("_id");
@@ -272,5 +325,21 @@ export class AddressMasterAddComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.addressTableForm.controls['activeFlag'].setValue(event);
+  }
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlGroupArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlGroupArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.addressTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
   }
 }

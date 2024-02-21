@@ -115,6 +115,52 @@ export class AddressControl {
                 Validations: []
             },
             {
+                name: 'customerName',
+                label: 'Customer Name',
+                placeholder: 'Customer Name',
+                type: 'multiselect',
+                value: "",
+                Validations: [],
+                additionalData: {
+                    isIndeterminate: false,
+                    isChecked: false,
+                    support: "customerNameDropdown",
+                    showNameAndValue: true,
+                    Validations: [{
+                        name: "required",
+                        message: "Customer Name is Required...!",
+                    }],
+                  },
+                  functions: {
+                    onToggleAll: "toggleSelectAll",
+                  },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'customerNameDropdown',
+                label: 'Customer Name',
+                placeholder: 'Customer Name',
+                type: '',
+                value: [],
+                Validations: [{
+                    name: "required",
+                    message: "Customer Name is Required...!",
+                }
+                ],
+                generatecontrol: false, disable: false
+            },
+
+            // {
+            //     name: "LocationsDrop",
+            //     label: "Locations",
+            //     placeholder: "Select CustomerLocations",
+            //     type: "",
+            //     value: [],
+            //     Validations: [],
+            //     generatecontrol: false,
+            //     disable: false,
+            //   },
+            {
                 name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: false, disable: false,
                 Validations: []
             },

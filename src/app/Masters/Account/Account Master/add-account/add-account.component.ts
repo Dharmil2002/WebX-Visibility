@@ -149,6 +149,8 @@ export class AddAccountComponent implements OnInit {
       this.AccountForm.controls["isTDSapplicable"].setValue(
         this.UpdateData.isTDS == 0 ? false : true
       );
+      this.AccountForm.controls["bSSCH"].setValue(this.UpdateData.bSSCH);
+      this.AccountForm.controls["iSTRUEPST"].setValue(this.UpdateData.iSTRUEPST);
     }
   }
 
@@ -336,7 +338,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const bank = this.UpdateData.bANCD;
-        const selectedData = BankData.find((x) => x.value == bank || x.name == bank);
+        const selectedData = BankData.find((x) => x.value==bank||x.name==bank);
         this.AccountForm.controls["bank"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -368,7 +370,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const bank = this.UpdateData.tSEC;
-        const selectedData = TDSData.find((x) => x.value == bank || x.name == bank);
+        const selectedData = TDSData.find((x) => x.value==bank || x.name==bank);
         this.AccountForm.controls["TDSsection"].setValue(selectedData);
       }
       this.filter.Filter(
@@ -498,10 +500,9 @@ export class AddAccountComponent implements OnInit {
         (x) => !bankfiled.includes(x.name)
       );
     }
-
   }
 
-  async Save() {
+  async save() {
     const commonBody = {
       aCNM: this.AccountForm.value.AccountDescription,
       mATCD: this.AccountForm.value.MainCategory.value,
@@ -515,16 +516,18 @@ export class AddAccountComponent implements OnInit {
       bANCD: this.AccountForm.value.bank.value || "",
       bANM: this.AccountForm.value.bank.name || "",
       isTDS: this.AccountForm.value.isTDSapplicable,
+      bSSCH: this.AccountForm.value.bSSCH,
+      iSTRUEPST: this.AccountForm.value.iSTRUEPST,
       tSEC: this.AccountForm.value.isTDSapplicable
         ? this.AccountForm.value.TDSsection.name
         : "",
       iSSYS: this.AccountForm.value.ActiveFlag,
       pARTNM: this.AccountForm.value.PartySelection.name,
       rHUF: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection?.data?.RateForHUF
+        ? this.AccountForm.value.TDSsection.data.RateForHUF
         : "",
       rOTHER: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection?.data?.RateForOthers
+        ? this.AccountForm.value.TDSsection.data.RateForOthers
         : "",
     };
     if (!this.isUpdate) {
@@ -532,8 +535,8 @@ export class AddAccountComponent implements OnInit {
         this.TableData.length === 0
           ? 1
           : parseInt(
-            this.TableData[this.TableData.length - 1].aCCD.substring(3)
-          ) + 1;
+              this.TableData[this.TableData.length - 1].aCCD.substring(3)
+            ) + 1;
       const accountcode = `${this.AccountForm.value.GroupCode.name.substr(
         0,
         3
@@ -560,11 +563,11 @@ export class AddAccountComponent implements OnInit {
 
     const res = this.isUpdate
       ? await firstValueFrom(
-        this.masterService.masterPut("generic/update", req)
-      )
+          this.masterService.masterPut("generic/update", req)
+        )
       : await firstValueFrom(
-        this.masterService.masterPost("generic/create", req)
-      );
+          this.masterService.masterPost("generic/create", req)
+        );
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
@@ -577,9 +580,8 @@ export class AddAccountComponent implements OnInit {
     }
   }
 
-  Cancle() {
-    // this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
-    console.log(this.AccountForm.value.BalanceSheet.value.substr(0, 3))
+  cancel() {
+    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
   }
 
   functionCallHandler($event) {

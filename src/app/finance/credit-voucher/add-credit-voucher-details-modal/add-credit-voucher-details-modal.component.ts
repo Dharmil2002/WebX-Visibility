@@ -58,9 +58,12 @@ export class AddCreditVoucherDetailsModalComponent implements OnInit {
   //#endregion
   save(event) {
     const Ledger = this.CreditVoucherDetailsForm.value['Ledger'];
-    this.CreditVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name)
-    this.CreditVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
-    this.dialogRef.close(this.CreditVoucherDetailsForm.value)
+
+    this.CreditVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name);
+    this.CreditVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value);
+    this.CreditVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value);
+    this.CreditVoucherDetailsForm.controls.SubCategoryName.patchValue(Ledger.SubCategoryName);
+    this.dialogRef.close(this.CreditVoucherDetailsForm.value);
   }
   cancel(event) {
     this.dialogRef.close()

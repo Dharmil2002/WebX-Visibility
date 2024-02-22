@@ -28,7 +28,7 @@
         </div>
         <div class="col">
             <form [formGroup]="creditVoucherPaymentDetailsForm">
-                <app-form-webxpress [form]="creditVoucherPaymentDetailsForm" [FormTitle]="'Payment Details'"
+                <app-form-webxpress [form]="creditVoucherPaymentDetailsForm" [FormTitle]="'Receipt Details'"
                     [formData]="jsonControlCreditVoucherPaymentDetailsArray"
                     (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                     [showSaveAndCancelButton]="false">
@@ -38,14 +38,14 @@
     </div>
 
 
-    <!-- <div class="row">
+    <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
-                <button [disabled]="!DebitVoucherSummaryForm.valid || 
-                tableData.length==0 || !DebitVoucherTaxationPaymentDetailsForm.valid" class="msr-3" mat-raised-button
-                    color="primary" (click)="Submit()">Submit</button>
+                <button [disabled]="!creditVoucherSummaryForm.valid || 
+                tableData.length==0 || !creditVoucherPaymentDetailsForm.valid" class="msr-3" mat-raised-button
+                    color="primary" (click)="saveCreditData()">Submit</button>
                 <button mat-button (click)="cancel('Billing​')">Back</button>
             </div>
         </div>
-    </div> -->
+    </div>
 </app-common-wrapper-webxpress>

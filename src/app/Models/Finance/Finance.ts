@@ -110,6 +110,7 @@ export enum VoucherInstanceType {
   ContraVoucherCreation = 3,
   AdviceVoucherCreation = 4,
   JournalVoucherCreation = 5,
+  CreditVoucherCreation = 6,
 }
 
 export const ledgerInfo = {

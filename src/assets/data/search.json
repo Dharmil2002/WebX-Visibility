@@ -696,6 +696,13 @@
       "router": "Masters/BeneficiaryMaster/AddBeneficiaryMaster"
     },
     {
+      "title": "Finance/VoucherEntry/CreditVoucher",
+      "tag": [
+        "Finance/VoucherEntry/CreditVoucher"
+      ],
+      "router": "Finance/VoucherEntry/CreditVoucher"
+    },
+    {
       "title": "Finance/VoucherEntry/DebitVoucher",
       "tag": [
         "Finance/VoucherEntry/DebitVoucher"

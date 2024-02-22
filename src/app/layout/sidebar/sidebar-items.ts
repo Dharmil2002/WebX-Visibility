@@ -586,6 +586,17 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Finance/VoucherEntry/CreditVoucher",
+              "title": "Credit Voucher",
+              "moduleName": "Credit Voucher",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+
           ]
         },
         {

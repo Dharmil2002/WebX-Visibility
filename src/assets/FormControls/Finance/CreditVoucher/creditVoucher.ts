@@ -3,6 +3,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class CreditVoucherControl {
     creditVoucherSummaryArray: FormControls[];
     creditVoucherDetailsArray: FormControls[];
+    creditVoucherReceiptDetailsArray: FormControls[];
     constructor(FormValues) {
         this.creditVoucherSummaryArray = [
 
@@ -66,7 +67,7 @@ export class CreditVoucherControl {
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "Basic"
-                }                
+                }
             },
             {
                 name: "Receivedfrom",
@@ -139,7 +140,7 @@ export class CreditVoucherControl {
                 additionalData: {
                     showNameAndValue: true,
                     metaData: "Basic"
-                }                
+                }
             },
             {
                 name: "Preparedby",
@@ -240,13 +241,191 @@ export class CreditVoucherControl {
                 generatecontrol: false,
                 disable: false,
                 Validations: [],
+            },
+            {
+                name: "SubCategoryName",
+                label: "",
+                placeholder: "",
+                type: "",
+                value: "",
+                generatecontrol: false,
+                disable: false,
+                Validations: [],
+            },
+        ];
+        this.creditVoucherReceiptDetailsArray = [
+            {
+                name: "ReceiptMode",
+                label: "Receipt Mode",
+                placeholder: "Receipt Mode",
+                type: "Staticdropdown",
+                value: [
+                    {
+                        value: "Cheque",
+                        name: "Cheque",
+                    },
+                    {
+                        value: "Cash",
+                        name: "Cash",
+                    },
+                    {
+                        value: "RTGS/UTR",
+                        name: "RTGS/UTR",
+                    },
+
+                ],
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Receipt Mode is required",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: true,
+                },
+                functions: {
+                    onSelection: "OnPaymentModeChange"
+                },
+            },
+            {
+                name: "ChequeOrRefNo",
+                label: "Cheque/Ref No.",
+                placeholder: "Cheque/Ref No.",
+                type: "text",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Cheque/Ref No is required"
+                    },],
+            },
+            {
+                name: "DepositBank",
+                label: "Deposit bank",
+                placeholder: "Deposit bank",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Bank is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: true,
+                    metaData: "Basic"
+                },
+            },
+            {
+                name: "receivedBank",
+                label: "Received Bank",
+                placeholder: "Received Bank",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Bank is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: true,
+                    metaData: "Basic"
+                },
+            },
+            {
+                name: "CashAccount",
+                label: "Cash Account",
+                placeholder: "Cash Account",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Account is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: true,
+                    metaData: "Basic"
+                },
+            },
+            {
+                name: "ChequeDate",
+                label: "Cheque Date",
+                placeholder: "Cheque Date",
+                type: "date",
+                value: new Date(),
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                additionalData: {
+                    minDate: new Date(),
+                },
+            },
+            {
+                name: "DepositDate",
+                label: "Deposit Date",
+                placeholder: "Deposit Date",
+                type: "date",
+                value: new Date(),
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                additionalData: {
+                    minDate: new Date(),
+                },
             }
-        ]
+
+        ];
     }
     getCreditVoucherSummaryArrayControls() {
         return this.creditVoucherSummaryArray;
     }
     getCreditVoucherDetailArrayControls() {
         return this.creditVoucherDetailsArray;
+    }
+    getCreditVoucherReceiptDetailArrayControls() {
+        return this.creditVoucherReceiptDetailsArray;
     }
 }

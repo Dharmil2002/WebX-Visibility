@@ -1,0 +1,14 @@
+<div mat-dialog-title style="display: flex;
+  justify-content: end;margin:0px;">
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body" style="max-height: 420px;">
+    <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData"
+        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [FormTitle]="'Preview'"
+        [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="true" [DisplayAddNewButton]=false
+        [DisplayCheckbox]="false" [EventButton]="EventButton" (functionCallEmitter)="functionCallHandler($event)"
+        [TitleBoxData]="this.TotalAmountList" (callFunction)="functionCallHandler($event)">
+    </app-generic-table-v2>
+</div>

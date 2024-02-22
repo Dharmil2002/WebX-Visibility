@@ -24,14 +24,14 @@
       </form>
     </div>
     <!-- Driver Detail -->
-
-    <form [formGroup]="thcTableForm">
-      <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
-      </app-form-webxpress>
-    </form>
-
+    <div *ngIf="!marketVendor">
+      <form [formGroup]="thcTableForm">
+        <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+          (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
     <!-- End -->
     <!-- Docket Detail -->
     <div *ngIf="addThc">
@@ -71,7 +71,10 @@
       [tableData]="tableData" [metaData]="metaData" [disbleCheckbox]="disbleCheckbox" [menuItems]="menuItems"
       [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
       [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
-      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">
+      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles"  [EventButton]="EventButton"
+      (functionCallEmitter)="functionCallHandler($event)"
+      (callFunction)="functionCallHandler($event)"
+      >
     </app-generic-table-v2>
     <div class="row">
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">

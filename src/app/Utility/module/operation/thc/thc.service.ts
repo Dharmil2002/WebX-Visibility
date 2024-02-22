@@ -14,87 +14,71 @@ export class ThcService {
         private storage: StorageService
     ) { }
 
-    async getShipmentFiltered(branch, prqNo = null, fromCity = null, toCity = null, DocketsContainersWise = false) {
+    async getShipmentFiltered(prqNo = null, fromCity = null, toCity = null, fromDate = null, toDate = null, containersWise = false) {
 
-        let filter = { oRGN: branch, oSTS: 1 }
-        if ((prqNo && prqNo !== "")) {
-            filter["pRQNO"] = prqNo;
-        }
-        if ((fromCity && fromCity !== "")) {
-            filter["fCT"] = fromCity;
-        }
-        if ((toCity && toCity !== "")) {
-            filter["tCT"] = toCity;
-        }
-        filter["iSCONT"] = DocketsContainersWise;
+        let matchQuery = {
+            'D$and': [
+                 { sTS: { D$in: [1,4] } },
+                 ...( fromDate ?  [{ 'dKTDT': { 'D$gte': fromDate } }] : []) ,
+                 ...( toDate ?  [{ 'dKTDT': { 'D$lte': toDate } }] : []) ,
+                 ...( ( prqNo && prqNo != "" ) ? [{ 'pRQNO': prqNo }] : []) ,
+                 ...( ( fromCity && fromCity != "" ) ? [{ 'cCT': fromCity }] : []) ,
+                 ...( ( toCity && toCity != "" ) ? [{ 'tCT': toCity }] : []) ,
+                 ...( containersWise ? [{ 'cNO': { 'D$nin': ["", null] } }] : [{ 'cNO': { 'D$in': ["", null] } }] ) ,
+            ],
+       };
 
-        const reqBody = {
-            companyCode: this.storage.companyCode,
-            collectionName: Collections.Dockets,
-            filter: filter
-        };
-        // Perform an asynchronous operation to fetch data from the operation service
-        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqBody));
-        const dockets = result.data.map((x) => x.dKTNO);
-        const reqOpBody = {
-            companyCode: this.storage.companyCode,
-            collectionName: Collections.docketOp,
-            filter: {
-                sTS: 1,
-                dKTNO: { D$in: dockets }, D$or: [
-                    { tOTPKG: { D$gt: 0 } },
-                    { tOTWT: { D$gt: 0 } }
-                ]
+       const reqBody = {
+        companyCode: this.storage.companyCode,
+        collectionName: Collections.docketOp,
+        filters: [  
+            {
+                "D$match": matchQuery
+            }, {
+                "D$lookup": {
+                    "from": Collections.Dockets,
+                    "let": { "dKTNO": "$dKTNO" },
+                    "pipeline": [
+                        {
+                            "D$match": {
+                                "D$and": [
+                                { "D$expr": { "D$eq": ["$dKTNO", "$$dKTNO"] } },
+                                { "cNL": { "D$in": [false, null] } }
+                            ]
+                            }
+                        }
+                    ],
+                    "as": "docket"
+                }
+            }, {
+                "D$unwind": { "path": "$docket", "preserveNullAndEmptyArrays": false }
             }
-        };
-        const dktDetail = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqOpBody));
-        const createShipmentObject = (element, dkt) => {
+        ]};
+
+        const res = await firstValueFrom(this.operationService.operationMongoPost("generic/query", reqBody));
+        const createShipmentObjectContainerWise = (ops) => {
             return {
-                bPARTYNM: element.bPARTYNM,
-                docNo: element.dKTNO,
-                sFX: element?.sFX || 0,
-                cNO: element?.cNO || "",
-                fCT: element.fCT,
-                tCT: element.tCT,
-                aCTWT: Number(dkt?.tOTWT || 0).toFixed(2), // Ensure two decimal places
-                pKGS: dkt?.tOTPKG || 0,
-                pod: element?.pOD || "",
-                receiveBy: element?.rCVBY || "",
-                arrivalTime: element?.aRRTM || "",
-                remarks: element?.rEMARKS || "",
-                transitHours: element?.tRNHR || 0,
-            };
-        };
-        const createShipmentObjectContainerWise = (ops, dkt) => {
-            return {
-                bPARTYNM: dkt.bPARTYNM,
-                docNo: dkt.dKTNO,
+                bPARTYNM: ops.docket.bPARTYNM,
+                docNo: ops.dKTNO,
                 sFX: ops?.sFX || 0,
-                cNO: ops?.cNO || "",
-                fCT: dkt.fCT,
-                tCT: dkt.tCT,
+                cNO: ops?.cNO,
+                fCT: ops.oCT || ops.docket.fCT || "",
+                tCT: ops.dCT || ops.docket.tCT || "",
                 aCTWT: ops?.tOTWT || 0,
                 pKGS: ops?.tOTPKG || 0,
-                pod: dkt?.pOD || "",
-                receiveBy: dkt?.rCVBY || "",
-                arrivalTime: dkt?.aRRTM || "",
-                remarks: dkt?.rEMARKS || "",
-                transitHours: dkt?.tRNHR || 0,
+                pod: ops.docket?.pOD || "",
+                receiveBy: ops?.rCVBY || "",
+                arrivalTime: ops?.aRRTM || "",
+                remarks: ops?.rEMARKS || "",
+                transitHours: ops?.tRNHR || 0,
             };
         };
-        let docketList;
-        if (DocketsContainersWise) {
-            docketList = dktDetail.data.map((element) => { //ops Data 
-                const dkt = result.data.find((x) => x.dKTNO === element.dKTNO);  // Dockets Data
-                return createShipmentObjectContainerWise(element, dkt);
-            });
-        } else {
-            docketList = result.data.map((element) => {// Dockets Data
-                const dkt = dktDetail.data.find((x) => x.dKTNO === element.dKTNO); //ops Data 
-                return createShipmentObject(element, dkt);
-            });
-        }
-        return docketList;
+
+        let docketList = res.data.map((ops) => {
+            return createShipmentObjectContainerWise(ops);
+        });
+            
+        return docketList || [];
     }
 
     async getShipment(vehicle = false,filter = {}) {
@@ -158,20 +142,34 @@ export class ThcService {
         const result = await this.operationService.operationMongoPost(OperationActions.CreateThc, reqBody).toPromise();
         return result;
     }
-    async getThcDetail() {
 
-        const startDate = new Date();
-        startDate.setMonth(startDate.getMonth() - 1);
-        const endDate = new Date();
+    async getLocationDetail(locCode) {
+        var locBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "location_detail",
+            filter: { 
+                companyCode: this.storage.companyCode,
+                locCode: locCode
+            }
+        }
+        const locRes = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, locBody));
+        return locRes.data;
+    }
+
+    async getThcDetail(filter = null) {
+
+        // const startDate = new Date();
+        // startDate.setMonth(startDate.getMonth() - 1);
+        // const endDate = new Date();
 
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.thcsummary,
-            filter: {} //{ tripDate: { $gte: startDate, $lte: endDate } }
+            filter: filter || {}
         };
 
         // Perform an asynchronous operation to fetch data from the operation service
-        const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
+        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqBody));
         return result;
     }
     async getNestedDockDetail(shipments, isUpdate) {

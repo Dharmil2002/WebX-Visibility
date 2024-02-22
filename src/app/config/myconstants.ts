@@ -20,6 +20,7 @@ export const Collections = {
 
 export const GenericActions = {
     Get: 'generic/get',
+    GetOne: 'generic/getOne',
     Create: 'generic/create',
     Update: 'generic/update'
 };

@@ -421,6 +421,7 @@ export class CreditVoucherComponent implements OnInit {
       };
     });
     FinalListOfCreditVoucher = VoucherlineitemList;
+
     // Calculate Round Off 
     const PaymentAmount = parseFloat(this.creditVoucherPaymentSummaryForm.get("PaymentAmount").value);
     const NetPayable = parseFloat(this.creditVoucherPaymentSummaryForm.get("NetPayable").value);
@@ -429,13 +430,13 @@ export class CreditVoucherComponent implements OnInit {
       const isAmountNegative = Amount < 0;
 
       var RoundOffList = {
-        "Instance": "debit voucher",
+        "Instance": "Credit voucher",
         "Value": ledgerInfo['Round off Amount'].LeadgerName,
         "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
         "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
         "SubLedger": "EXPENSE",
-        "Dr": isAmountNegative ? "" : Amount.toFixed(2),
-        "Cr": isAmountNegative ? (-Amount).toFixed(2) : "",
+        "Dr": isAmountNegative ? (-Amount).toFixed(2) : "",
+        "Cr": isAmountNegative ? "" : Amount.toFixed(2),
         "Location": Accountinglocation,
         "Narration": ledgerInfo['Round off Amount'].LeadgerName,
       };
@@ -484,8 +485,8 @@ export class CreditVoucherComponent implements OnInit {
       "Ledgercode": Leadgerdata?.value,
       "Ledgername": Leadgerdata?.name,
       "SubLedger": "BANK",
-      "Dr": "",
-      "Cr": NetPayable.toFixed(2),
+      "Dr": NetPayable.toFixed(2),
+      "Cr": "",
       "Location": Accountinglocation,
       "Narration": ""
     };

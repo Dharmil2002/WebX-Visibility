@@ -136,6 +136,16 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/Menu/MenuAccessRights",
+              "title": "Menu Access Rights",
+              "moduleName": "Menu Access Rights",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
         },

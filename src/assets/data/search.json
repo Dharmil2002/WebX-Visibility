@@ -169,6 +169,14 @@
       "router": "Masters/CustomerMaster/AddCustomerMaster"
     },
     {
+      "title": "Menu/MenuAccessRights",
+      "tag": [
+        "MenuAccessRights",
+        "MenuAccessRights"
+      ],
+      "router": "Masters/Menu/MenuAccessRights"
+    },
+    {
       "title": "DocumentControlRegister/AddDCR",
       "tag": [
         "DocumentControlRegister",

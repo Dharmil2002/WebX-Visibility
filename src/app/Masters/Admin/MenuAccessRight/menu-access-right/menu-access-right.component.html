@@ -1,0 +1,45 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+  <div class="row">
+    <div class="col-md-6">
+      <form [formGroup]="MenuAccessTableForm">
+        <app-form-webxpress
+          [FormTitle]="'Criteria'"
+          [form]="MenuAccessTableForm"
+          [formData]="jsonControlMenuArray"
+          (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveButton]="true"
+          [submit]="'Show'"
+        ></app-form-webxpress>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-4">
+          <h5 style="position: relative; display: inline-block;">Select Menu<i class="fas fa-caret-down ml-2"></i></h5>
+        </div>
+        <div class="col-md-8">
+          <div class="text-right">
+            <span (click)="collapseAll()" data-toggle="tooltip" title="Collapse All">
+              <i class="fas fa-compress fa-lg"></i>
+            </span>&nbsp;&nbsp;&nbsp;
+            <span (click)="expandAll()" data-toggle="tooltip" title="Expand All">
+              <i class="fas fa-expand fa-lg"></i>
+            </span>&nbsp;&nbsp;&nbsp;
+            <span (click)="checkedAll()" data-toggle="tooltip" title="Check All">
+              <i class="far fa-check-square fa-lg"></i>
+            </span>&nbsp;&nbsp;&nbsp;
+            <span (click)="deCheckedAll()" data-toggle="tooltip" title="Uncheck All">
+              <i class="far fa-square fa-lg"></i>
+            </span>&nbsp;&nbsp;&nbsp;
+          </div>
+        </div>
+
+      </div>
+      <app-tree-view-webxpress
+        [data]="menuData"
+        [nodeChecked]="menuData"
+        (dataEvent)="getTreeviewData($event)"
+      ></app-tree-view-webxpress>
+    </div>
+  </div>
+</app-common-wrapper-webxpress>

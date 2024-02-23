@@ -1,0 +1,1185 @@
+{
+  "MenuId": 1,
+  "MenuPath": "1",
+  "MenuName": "Home",
+  "MenuLevel": 1,
+  "Type": "None",
+  "HasLink": false,
+  "children": [
+    {
+      "MenuId": 2,
+      "MenuPath": "2/1",
+      "MenuName": "Dashboards",
+      "MenuGroup": "LTL",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "MenuLink": "/dashboard/GlobeDashboardPage",
+      "Type": "Menu",
+      "HasLink": true,
+      "children": [
+        {
+          "MenuId": 4,
+          "MenuPath": "4/2/1",
+          "MenuName": "Dashboard",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 5,
+          "MenuPath": "5/2/1",
+          "MenuName": "DocketStock",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 6,
+          "MenuPath": "6/2/1",
+          "MenuName": "Arrivals",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 7,
+              "MenuPath": "7/6/2/1",
+              "MenuName": "Mark Arrival",
+              "MenuGroup": "LTL",
+              "MenuLevel": 4,
+              "ParentId": 6,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 8,
+              "MenuPath": "8/6/2/1",
+              "MenuName": "Arrival Scan",
+              "MenuGroup": "LTL",
+              "MenuLevel": 4,
+              "ParentId": 6,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 9,
+          "MenuPath": "9/2/1",
+          "MenuName": "Departures",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 10,
+              "MenuPath": "10/9/2/1",
+              "MenuName": "Create LS",
+              "MenuGroup": "LTL",
+              "MenuLevel": 4,
+              "ParentId": 9,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 11,
+              "MenuPath": "11/9/2/1",
+              "MenuName": "Create MF",
+              "MenuGroup": "LTL",
+              "MenuLevel": 4,
+              "ParentId": 9,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 12,
+              "MenuPath": "12/9/2/1",
+              "MenuName": "Create Trip",
+              "MenuGroup": "LTL",
+              "MenuLevel": 4,
+              "ParentId": 9,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 13,
+              "MenuPath": "13/9/2/1",
+              "MenuName": "Depart Vehicle",
+              "MenuGroup": "LTL",
+              "MenuLevel": 4,
+              "ParentId": 9,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 14,
+          "MenuPath": "14/2/1",
+          "MenuName": "Delivery",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 15,
+          "MenuPath": "15/2/1",
+          "MenuName": "POD/COD",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 16,
+          "MenuPath": "16/2/1",
+          "MenuName": "Quick Docket",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 17,
+          "MenuPath": "17/2/1",
+          "MenuName": "Create Docket",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 2,
+          "Type": "Tab",
+          "HasLink": false
+        }
+      ]
+    },
+    {
+      "MenuId": 3,
+      "MenuPath": "3/1",
+      "MenuName": "Masters &amp; Utilities",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "Type": "Menu",
+      "HasLink": false,
+      "children": [
+        {
+          "MenuId": 18,
+          "MenuPath": "18/3/1",
+          "MenuName": "Admin",
+          "MenuLevel": 3,
+          "ParentId": 3,
+          "Type": "Menu",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 19,
+              "MenuPath": "19/18/3/1",
+              "MenuName": "Holiday Master",
+              "MenuLevel": 4,
+              "ParentId": 18,
+              "MenuLink": "/Masters/HolidayMaster/HolidayMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            }
+          ]
+        },
+        {
+          "MenuId": 20,
+          "MenuPath": "20/3/1",
+          "MenuName": "Company Structure",
+          "MenuLevel": 3,
+          "ParentId": 3,
+          "Type": "Menu",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 21,
+              "MenuPath": "21/20/3/1",
+              "MenuName": "Container master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/ContainerMaster/ContainerMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 22,
+              "MenuPath": "22/20/3/1",
+              "MenuName": "State master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/StateMaster/StateMasterView",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 23,
+              "MenuPath": "23/20/3/1",
+              "MenuName": "City master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/CityMaster/CityMasterView",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 24,
+              "MenuPath": "24/20/3/1",
+              "MenuName": "Cluster Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/ClusterMaster/ClusterMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 25,
+              "MenuPath": "25/20/3/1",
+              "MenuName": "Address Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/AddressMaster/AddressMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 26,
+              "MenuPath": "26/20/3/1",
+              "MenuName": "Location Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/LocationMaster/LocationMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 27,
+              "MenuPath": "27/20/3/1",
+              "MenuName": "Driver Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/DriverMaster/DriverMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 28,
+              "MenuPath": "28/20/3/1",
+              "MenuName": "Fleet Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/FleetMaster/FleetMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 29,
+              "MenuPath": "29/20/3/1",
+              "MenuName": "Vendor Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/VendorMaster/VendorMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 30,
+              "MenuPath": "30/20/3/1",
+              "MenuName": "Company Setup Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/CompanyMaster/AddCompany",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 31,
+              "MenuPath": "31/20/3/1",
+              "MenuName": "Customer Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/CustomerMaster/CustomerMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 32,
+              "MenuPath": "32/20/3/1",
+              "MenuName": "Pin code Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/PinCodeMaster/PinCodeMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 33,
+              "MenuPath": "33/20/3/1",
+              "MenuName": "Vehicle Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/VehicleMaster/VehicleMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 34,
+              "MenuPath": "34/20/3/1",
+              "MenuName": "Vehicle Type Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/VehicleTypeMaster/VehicleTypeMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 35,
+              "MenuPath": "35/20/3/1",
+              "MenuName": "General Master",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/GeneralMaster/GeneralMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 36,
+              "MenuPath": "36/20/3/1",
+              "MenuName": "Pincode to Location Mapping",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/PincodeLocation/PincodeLocationMapping",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 37,
+              "MenuPath": "37/20/3/1",
+              "MenuName": "City Location Mapping",
+              "MenuLevel": 4,
+              "ParentId": 20,
+              "MenuLink": "/Masters/CityLocationMapping/CityLocationIndex",
+              "Type": "Menu",
+              "HasLink": true
+            }
+          ]
+        },
+        {
+          "MenuId": 38,
+          "MenuPath": "38/3/1",
+          "MenuName": "Stakeholders",
+          "MenuLevel": 3,
+          "ParentId": 3,
+          "Type": "Menu",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 39,
+              "MenuPath": "39/38/3/1",
+              "MenuName": "Customer Group Master",
+              "MenuLevel": 4,
+              "ParentId": 38,
+              "MenuLink": "/Masters/CustomerGroupMaster/CustomerGroupMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 40,
+              "MenuPath": "40/38/3/1",
+              "MenuName": "User Master",
+              "MenuLevel": 4,
+              "ParentId": 38,
+              "MenuLink": "/Masters/UserMaster/UserMasterView",
+              "Type": "Menu",
+              "HasLink": true
+            }
+          ]
+        },
+        {
+          "MenuId": 41,
+          "MenuPath": "41/3/1",
+          "MenuName": "Contract Management",
+          "MenuLevel": 3,
+          "ParentId": 3,
+          "Type": "Menu",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 42,
+              "MenuPath": "42/41/3/1",
+              "MenuName": "Vendor Contract",
+              "MenuLevel": 4,
+              "ParentId": 41,
+              "MenuLink": "/Masters/VendorContract/VendorQueryPage",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 43,
+              "MenuPath": "43/41/3/1",
+              "MenuName": "Customer Contract",
+              "MenuLevel": 4,
+              "ParentId": 41,
+              "MenuLink": "/Masters/CustomerContract/QueryPage",
+              "Type": "Menu",
+              "HasLink": true
+            }
+          ]
+        },
+        {
+          "MenuId": 44,
+          "MenuPath": "44/3/1",
+          "MenuName": "Document Control",
+          "MenuLevel": 3,
+          "ParentId": 3,
+          "Type": "Menu",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 45,
+              "MenuPath": "45/44/3/1",
+              "MenuName": "Add DCR Series",
+              "MenuLevel": 4,
+              "ParentId": 44,
+              "MenuLink": "/Masters/DocumentControlRegister/AddDCR",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 46,
+              "MenuPath": "46/44/3/1",
+              "MenuName": "Track and Manage DCR",
+              "MenuLevel": 4,
+              "ParentId": 44,
+              "MenuLink": "/Masters/DocumentControlRegister/TrackDCR",
+              "Type": "Menu",
+              "HasLink": true
+            }
+          ]
+        },
+        {
+          "MenuId": 47,
+          "MenuPath": "47/3/1",
+          "MenuName": "Transport Related",
+          "MenuLevel": 3,
+          "ParentId": 3,
+          "Type": "Menu",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 48,
+              "MenuPath": "48/47/3/1",
+              "MenuName": "Route Master - Location wise",
+              "MenuLevel": 4,
+              "ParentId": 47,
+              "MenuLink": "/Masters/RouteLocationWise/RouteList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 49,
+              "MenuPath": "49/47/3/1",
+              "MenuName": "Route Schedule Master",
+              "MenuLevel": 4,
+              "ParentId": 47,
+              "MenuLink": "/Masters/RouteScheduleMaster/RouteScheduleMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            },
+            {
+              "MenuId": 50,
+              "MenuPath": "50/47/3/1",
+              "MenuName": "Trip Route Master",
+              "MenuLevel": 4,
+              "ParentId": 47,
+              "MenuLink": "/Masters/TripRouteMaster/TripRouteMasterList",
+              "Type": "Menu",
+              "HasLink": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "MenuId": 51,
+      "MenuPath": "51/1",
+      "MenuName": "Operations",
+      "MenuGroup": "LTL",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "Type": "Menu",
+      "HasLink": false,
+      "children": [
+        {
+          "MenuId": 52,
+          "MenuPath": "52/51/1",
+          "MenuName": "Quick Create Docket",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Operation/QuickCreateDocket",
+          "Type": "Menu",
+          "HasLink": true
+        },
+        {
+          "MenuId": 53,
+          "MenuPath": "53/51/1",
+          "MenuName": "Eway Bill Docket Booking",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Masters/Docket/EwayBillDocketBookingV2",
+          "Type": "Menu",
+          "HasLink": true
+        },
+        {
+          "MenuId": 54,
+          "MenuPath": "54/51/1",
+          "MenuName": "Docket Tracking",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Operation/DocketTracking",
+          "Type": "Menu",
+          "HasLink": true
+        },
+        {
+          "MenuId": 55,
+          "MenuPath": "55/51/1",
+          "MenuName": "Consignment Entry",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Operation/ConsignmentEntry",
+          "Type": "Menu",
+          "HasLink": true
+        },
+        {
+          "MenuId": 56,
+          "MenuPath": "56/51/1",
+          "MenuName": "Vehicle Status",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Masters/Vehicle/Status",
+          "Type": "Menu",
+          "HasLink": true
+        },
+        {
+          "MenuId": 57,
+          "MenuPath": "57/51/1",
+          "MenuName": "Unbilled",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Operation/Unbilled",
+          "Type": "Menu",
+          "HasLink": true
+        },
+        {
+          "MenuId": 58,
+          "MenuPath": "58/51/1",
+          "MenuName": "Request Outbox",
+          "MenuGroup": "LTL",
+          "MenuLevel": 3,
+          "ParentId": 51,
+          "MenuLink": "/Operation/IssueTracker",
+          "Type": "Menu",
+          "HasLink": true
+        }
+      ]
+    },
+    {
+      "MenuId": 59,
+      "MenuPath": "59/1",
+      "MenuName": "Dashboards",
+      "MenuGroup": "FTL",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "MenuLink": "/dashboard/GlobeDashboardPage",
+      "Type": "Menu",
+      "HasLink": true,
+      "children": [
+        {
+          "MenuId": 60,
+          "MenuPath": "60/59/1",
+          "MenuName": "PRQ Summary",
+          "MenuGroup": "FTL",
+          "MenuLevel": 3,
+          "ParentId": 59,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 61,
+              "MenuPath": "61/60/59/1",
+              "MenuName": "Create",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 62,
+              "MenuPath": "62/60/59/1",
+              "MenuName": "Modify",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 63,
+              "MenuPath": "63/60/59/1",
+              "MenuName": "Confirm",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 64,
+              "MenuPath": "64/60/59/1",
+              "MenuName": "Cancle",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 65,
+              "MenuPath": "65/60/59/1",
+              "MenuName": "Assign Vehicle",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 66,
+              "MenuPath": "66/60/59/1",
+              "MenuName": "Create Docket",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 67,
+              "MenuPath": "67/60/59/1",
+              "MenuName": "Create THC",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 60,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 68,
+          "MenuPath": "68/59/1",
+          "MenuName": "Docket Summary",
+          "MenuGroup": "FTL",
+          "MenuLevel": 3,
+          "ParentId": 59,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 69,
+              "MenuPath": "69/68/59/1",
+              "MenuName": "Create",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 68,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 70,
+              "MenuPath": "70/68/59/1",
+              "MenuName": "Modify",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 68,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 71,
+          "MenuPath": "71/59/1",
+          "MenuName": "THC Summary",
+          "MenuGroup": "FTL",
+          "MenuLevel": 3,
+          "ParentId": 59,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 72,
+              "MenuPath": "72/71/59/1",
+              "MenuName": "Create",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 71,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 73,
+              "MenuPath": "73/71/59/1",
+              "MenuName": "Modify",
+              "MenuGroup": "FTL",
+              "MenuLevel": 4,
+              "ParentId": 71,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "MenuId": 74,
+      "MenuPath": "74/1",
+      "MenuName": "Dashboards",
+      "MenuGroup": "FTL",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "MenuLink": "/dashboard/GlobeDashboardPage",
+      "Type": "Menu",
+      "HasLink": true,
+      "children": [
+        {
+          "MenuId": 75,
+          "MenuPath": "75/74/1",
+          "MenuName": "Job Summary",
+          "MenuGroup": "IMPORT",
+          "MenuLevel": 3,
+          "ParentId": 74,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 76,
+              "MenuPath": "76/75/74/1",
+              "MenuName": "Job Entry",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 75,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 77,
+              "MenuPath": "77/75/74/1",
+              "MenuName": "CHA Entry",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 75,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 78,
+              "MenuPath": "78/75/74/1",
+              "MenuName": "Rake Entry",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 75,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 79,
+          "MenuPath": "79/74/1",
+          "MenuName": "Rake Updation",
+          "MenuGroup": "IMPORT",
+          "MenuLevel": 3,
+          "ParentId": 74,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 80,
+              "MenuPath": "80/79/74/1",
+              "MenuName": "Modify",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 79,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 81,
+              "MenuPath": "81/79/74/1",
+              "MenuName": "Handover",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 79,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 82,
+          "MenuPath": "82/74/1",
+          "MenuName": "Job Tracker",
+          "MenuGroup": "IMPORT",
+          "MenuLevel": 3,
+          "ParentId": 74,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 83,
+              "MenuPath": "83/82/74/1",
+              "MenuName": "Customer billing",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 82,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 84,
+              "MenuPath": "84/82/74/1",
+              "MenuName": "CHA Billing",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 82,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 85,
+              "MenuPath": "85/82/74/1",
+              "MenuName": "Vendor Billing",
+              "MenuGroup": "IMPORT",
+              "MenuLevel": 4,
+              "ParentId": 82,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "MenuId": 86,
+      "MenuPath": "86/1",
+      "MenuName": "Dashboards",
+      "MenuGroup": "EXPORT",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "MenuLink": "/dashboard/GlobeDashboardPage",
+      "Type": "Menu",
+      "HasLink": true,
+      "children": [
+        {
+          "MenuId": 87,
+          "MenuPath": "87/86/1",
+          "MenuName": "PRQ Summary",
+          "MenuGroup": "EXPORT",
+          "MenuLevel": 3,
+          "ParentId": 86,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 88,
+              "MenuPath": "88/87/86/1",
+              "MenuName": "Create",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 89,
+              "MenuPath": "89/87/86/1",
+              "MenuName": "Modify",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 90,
+              "MenuPath": "90/87/86/1",
+              "MenuName": "Confirm",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 91,
+              "MenuPath": "91/87/86/1",
+              "MenuName": "Cancle",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 92,
+              "MenuPath": "92/87/86/1",
+              "MenuName": "Assign Vehicle",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 93,
+              "MenuPath": "93/87/86/1",
+              "MenuName": "Create Docket",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 94,
+              "MenuPath": "94/87/86/1",
+              "MenuName": "Create THC",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 87,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 95,
+          "MenuPath": "95/86/1",
+          "MenuName": "Docket Summary",
+          "MenuGroup": "EXPORT",
+          "MenuLevel": 3,
+          "ParentId": 86,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 96,
+              "MenuPath": "96/95/86/1",
+              "MenuName": "Create",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 95,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 97,
+              "MenuPath": "97/95/86/1",
+              "MenuName": "Modify",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 95,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 98,
+          "MenuPath": "98/86/1",
+          "MenuName": "Job Summary",
+          "MenuGroup": "EXPORT",
+          "MenuLevel": 3,
+          "ParentId": 86,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 99,
+              "MenuPath": "99/98/86/1",
+              "MenuName": "Job Entry",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 98,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 100,
+              "MenuPath": "100/98/86/1",
+              "MenuName": "CHA Entry",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 98,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 101,
+              "MenuPath": "101/98/86/1",
+              "MenuName": "Rake Entry",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 98,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 102,
+          "MenuPath": "102/86/1",
+          "MenuName": "Job Tracker",
+          "MenuGroup": "EXPORT",
+          "MenuLevel": 3,
+          "ParentId": 86,
+          "Type": "Tab",
+          "HasLink": false,
+          "children": [
+            {
+              "MenuId": 103,
+              "MenuPath": "103/102/86/1",
+              "MenuName": "Customer billing",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 102,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 104,
+              "MenuPath": "104/102/86/1",
+              "MenuName": "CHA Billing",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 102,
+              "Type": "Action",
+              "HasLink": false
+            },
+            {
+              "MenuId": 105,
+              "MenuPath": "105/102/86/1",
+              "MenuName": "Vendor Billing",
+              "MenuGroup": "EXPORT",
+              "MenuLevel": 4,
+              "ParentId": 102,
+              "Type": "Action",
+              "HasLink": false
+            }
+          ]
+        },
+        {
+          "MenuId": 106,
+          "MenuPath": "106/86/1",
+          "MenuName": "THC Summary",
+          "MenuGroup": "EXPORT",
+          "MenuLevel": 3,
+          "ParentId": 86,
+          "Type": "Tab",
+          "HasLink": false
+        }
+      ]
+    },
+    {
+      "MenuId": 109,
+      "MenuPath": "109/1",
+      "MenuName": "Dashboards",
+      "MenuGroup": "BILLING",
+      "MenuLevel": 2,
+      "ParentId": 1,
+      "MenuLink": "/dashboard/GlobeDashboardPage",
+      "Type": "Menu",
+      "HasLink": true,
+      "children": [
+        {
+          "MenuId": 110,
+          "MenuPath": "110/109/1",
+          "MenuName": "Dashboard",
+          "MenuGroup": "BILLING",
+          "MenuLevel": 3,
+          "ParentId": 109,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 111,
+          "MenuPath": "111/109/1",
+          "MenuName": "Pending Billing​",
+          "MenuGroup": "BILLING",
+          "MenuLevel": 3,
+          "ParentId": 109,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 112,
+          "MenuPath": "112/109/1",
+          "MenuName": "Invoice Management",
+          "MenuGroup": "BILLING",
+          "MenuLevel": 3,
+          "ParentId": 109,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 113,
+          "MenuPath": "113/109/1",
+          "MenuName": "Manual Voucher",
+          "MenuGroup": "BILLING",
+          "MenuLevel": 3,
+          "ParentId": 109,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 114,
+          "MenuPath": "114/109/1",
+          "MenuName": "Bank Reconciliation",
+          "MenuGroup": "BILLING",
+          "MenuLevel": 3,
+          "ParentId": 109,
+          "Type": "Tab",
+          "HasLink": false
+        },
+        {
+          "MenuId": 115,
+          "MenuPath": "115/109/1",
+          "MenuName": "TDS Reconciliation",
+          "MenuGroup": "BILLING",
+          "MenuLevel": 3,
+          "ParentId": 109,
+          "Type": "Tab",
+          "HasLink": false
+        }
+      ]
+    }
+  ]
+}

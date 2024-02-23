@@ -10,6 +10,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
 import { TreeViewComponent } from "src/app/shared-components/tree-view/tree-view.component";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { menuAccesRightControl } from "src/assets/FormControls/MenuAccessRightControl";
@@ -21,8 +22,7 @@ import Swal from "sweetalert2";
 })
 export class MenuAccessRightComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
-{
+  implements OnInit {
   @ViewChild(TreeViewComponent) treeViewComponent: TreeViewComponent;
   displayProgressSpinner: boolean;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -51,6 +51,7 @@ export class MenuAccessRightComponent
     private filter: FilterUtils,
     public ObjSnackBarUtility: SnackBarUtilityService,
     private masterService: MasterService,
+    private menuService: MenuService,
     private router: Router
   ) {
     super();
@@ -129,29 +130,42 @@ export class MenuAccessRightComponent
   }
   //#endregion
   //#region to get User Data
-  getMenuList() {
-    this.masterService.getJsonFileDetails("MenuData").subscribe({
-      next: (res) => {
-        if (res) {
-          if (res) {
-            // Generate the treeData using the generateTreeData function with userMenuList
-            const treeDataLst = this.buildTree(res, null);
-            this.menuData = treeDataLst; // Assign treeDataLst JSON to menuData property of treeview componant
-          }
-        }
-      },
-      error: (error) => {
-        this.error = error;
-        this.ObjSnackBarUtility.showNotification(
-          "snackbar-danger",
-          error,
-          "top",
-          "right"
-        );
-      },
-      complete() {},
-    });
+  async getMenuList() {
+
+    var res: any = await firstValueFrom(this.menuService.getMenuData());
+    if (res) {
+
+      const rootNodes = this.buildHierarchy(res.data);
+      console.log("rootNodes", rootNodes);
+
+      const treeDataLst = this.buildTree(rootNodes, null);
+      this.menuData = treeDataLst; // Assign treeDataLst JSON to menuData property of treeview componant      
+    }
   }
+
+  buildHierarchy(items: any[]): any[] {
+    const itemMap = new Map<string, any>();
+    const rootItems: any[] = [];
+  
+    // Step 1: Initialize the map and identify root items
+    items.forEach(item => {
+      item.children = []; // Initialize the childs array
+      itemMap.set(item.MenuId, item);
+      if (!item.ParentId) {
+        rootItems.push(item);
+      }
+    });
+  
+    // Step 2: Build the hierarchy
+    items.forEach(item => {
+      if (item.ParentId) {
+        const parent = itemMap.get(item.ParentId);
+        parent?.children?.push(item);
+      }
+    });  
+    return rootItems; // Return the hierarchical structure
+  }
+
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find((item) => parseInt(item.value) === name);
   }
@@ -211,8 +225,8 @@ export class MenuAccessRightComponent
       uSRID: this.MenuAccessTableForm.value.Users.value,
       mEST:
         checkedValue.length > 0 ||
-        checkedValue != null ||
-        checkedValue != undefined
+          checkedValue != null ||
+          checkedValue != undefined
           ? checkedValue
           : [],
       eNTBY: localStorage.getItem("UserName"),

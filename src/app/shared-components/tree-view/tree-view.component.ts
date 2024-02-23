@@ -2,7 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { TreeItemFlatNode, TreeItemNode } from 'src/app/core/models/Comman Model/CommonModel';
+import { TreeItemFlatNode, TreeItemNode } from 'src/app/Models/Comman Model/CommonModel';
 
 @Component({
   selector: 'app-tree-view-webxpress',

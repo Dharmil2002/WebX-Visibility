@@ -233,6 +233,7 @@ export class BillApprovalComponent implements OnInit {
                   return {
                     "accCode": item.accCode,
                     "accName": item.accName,
+                    "accCategory": item.accCategory,
                     "amount": item.debit,
                     "narration": item.narration ?? ""
                   };
@@ -241,6 +242,7 @@ export class BillApprovalComponent implements OnInit {
                   return {
                     "accCode": item.accCode,
                     "accName": item.accName,
+                    "accCategory": item.accCategory,
                     "amount": item.credit,
                     "narration": item.narration ?? ""
                   };
@@ -297,7 +299,7 @@ export class BillApprovalComponent implements OnInit {
     const GstAmount = data?.gST?.aMT;
     const GstRate = data?.gST?.rATE;
 
-    const createVoucher = (accCode, accName, debit, credit) => ({
+    const createVoucher = (accCode, accName, accCategory, debit, credit) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.BillApproval,
@@ -309,6 +311,7 @@ export class BillApprovalComponent implements OnInit {
       branch: this.storage.branch,
       accCode,
       accName,
+      accCategory,
       sacCode: "",
       sacName: "",
       debit,
@@ -321,26 +324,26 @@ export class BillApprovalComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, TotalAmount, 0),
-      createVoucher(ledgerInfo['Unbilled debtors'].LeadgerCode, ledgerInfo['Unbilled debtors'].LeadgerName, 0, DocketAmount),
+      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, TotalAmount, 0),
+      createVoucher(ledgerInfo['Unbilled debtors'].LeadgerCode, ledgerInfo['Unbilled debtors'].LeadgerName, ledgerInfo['Unbilled debtors'].LeadgerCategory, 0, DocketAmount),
     ];
     if (data?.rOUNOFFAMT > 0) {
-      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, data?.rOUNOFFAMT, 0));
+      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, ledgerInfo['Unbilled debtors'].LeadgerCategory, data?.rOUNOFFAMT, 0));
     }
 
 
     const gstTypeMapping = {
-      UGST: { accCode: ledgerInfo['UGST'].LeadgerCode, accName: ledgerInfo['UGST'].LeadgerName, prop: "uGST" },
-      CGST: { accCode: ledgerInfo['CGST'].LeadgerCode, accName: ledgerInfo['CGST'].LeadgerName, prop: "cGST" },
-      IGST: { accCode: ledgerInfo['IGST'].LeadgerCode, accName: ledgerInfo['IGST'].LeadgerName, prop: "iGST" },
-      SGST: { accCode: ledgerInfo['SGST'].LeadgerCode, accName: ledgerInfo['SGST'].LeadgerName, prop: "sGST" },
+      UGST: { accCode: ledgerInfo['UGST'].LeadgerCode, accName: ledgerInfo['UGST'].LeadgerName, accCategory: ledgerInfo['UGST'].LeadgerCategory, prop: "uGST" },
+      CGST: { accCode: ledgerInfo['CGST'].LeadgerCode, accName: ledgerInfo['CGST'].LeadgerName, accCategory: ledgerInfo['CGST'].LeadgerCategory, prop: "cGST" },
+      IGST: { accCode: ledgerInfo['IGST'].LeadgerCode, accName: ledgerInfo['IGST'].LeadgerName, accCategory: ledgerInfo['IGST'].LeadgerCategory, prop: "iGST" },
+      SGST: { accCode: ledgerInfo['SGST'].LeadgerCode, accName: ledgerInfo['SGST'].LeadgerName, accCategory: ledgerInfo['SGST'].LeadgerCategory, prop: "sGST" },
     };
 
     const gstType = data?.gST?.tYP;
 
     if (gstType && gstTypeMapping[gstType]) {
-      const { accCode, accName, prop } = gstTypeMapping[gstType];
-      response.push(createVoucher(accCode, accName, 0, data?.gST?.[prop]));
+      const { accCode, accName, accCategory, prop } = gstTypeMapping[gstType];
+      response.push(createVoucher(accCode, accName, accCategory, 0, data?.gST?.[prop]));
     }
 
     return response;

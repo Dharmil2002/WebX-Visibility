@@ -1972,6 +1972,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           "branch": this.storage.branch,
           "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
           "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
+          "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
           "sacCode": "",
           "sacName": "",
           "debit": TotalAmount,
@@ -1995,6 +1996,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           "branch": this.storage.branch,
           "accCode": ledgerInfo['Freight income'].LeadgerCode,
           "accName": `${ledgerInfo['Freight income'].LeadgerName} - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
+          "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
           "sacCode": "",
           "sacName": "",
           "debit": 0,
@@ -2035,12 +2037,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                 debit: [{
                   "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
                   "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
+                  "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
                   "amount": TotalAmount,
                   "narration": `when C note No ${DocketNo} Is Booked`
                 }],
                 credit: [{
                   "accCode": ledgerInfo['Freight income'].LeadgerCode,
                   "accName": ledgerInfo['Freight income'].LeadgerName + " - Road",
+                  "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
                   "amount": TotalAmount,
                   "narration": `when C note No ${DocketNo} Is Booked`
                 }],

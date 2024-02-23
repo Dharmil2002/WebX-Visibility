@@ -30,7 +30,7 @@ export class ManualVoucherComponent implements OnInit {
       type: "Link",
       functionName: "VoucherNoFunction",
     },
-    tTYP: {
+    vTYPNM: {
       Title: "Voucher Type",
       class: "matcolumncenter",
       Style: "max-width: 160px",
@@ -64,7 +64,7 @@ export class ManualVoucherComponent implements OnInit {
   };
   staticField = [
     // "vNO",
-    "tTYP",
+    "vTYPNM",
     "tTDT",
     "nNETP",
     "eNTBY",
@@ -124,7 +124,7 @@ export class ManualVoucherComponent implements OnInit {
     this.tableData = this.AllTableData;
     this.tableLoad = false;
 
-    const uniqueTYP = new Set(this.AllTableData.map(item => item.tTYP));
+    const uniqueTYP = new Set(this.AllTableData.map(item => item.vTYPNM));
 
     // Convert Set to array if needed
     const uniqueTYPArray = Array.from(uniqueTYP);
@@ -147,25 +147,27 @@ export class ManualVoucherComponent implements OnInit {
   VoucherTypeFieldChanged(event) {
     const selectedField = event?.eventArgs.option.value.value
     this.tableLoad = true;
-    this.tableData = this.AllTableData.filter(item => item.tTYP == selectedField)
+    this.tableData = this.AllTableData.filter(item => item.vTYPNM == selectedField)
     this.tableLoad = false;
+
+
 
     switch (selectedField) {
       case "DebitVoucher":
         this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
         break;
-      case "VendorBillPayment":
-        this.addAndEditPath = "Finance/VendorPayment/VendorBillPayment";
-        break;
-      case "Journal Voucher":
+      // case "VendorBillPayment":
+      //   this.addAndEditPath = "Finance/VendorPayment/VendorBillPayment";
+      //   break;
+      case "JournalVoucher":
         this.addAndEditPath = "Finance/VoucherEntry/JournalVoucher";
         break;
-      case "Contra Voucher":
+      case "ContraVoucher":
         this.addAndEditPath = "Finance/VoucherEntry/ContraVoucher";
         break;
-      case "Delivery MR Voucher":
-        this.addAndEditPath = "dashboard/Index";
-        break;
+      // case "Delivery MR Voucher":
+      //   this.addAndEditPath = "dashboard/Index";
+      //   break;
       default:
         this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
         break;

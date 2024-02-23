@@ -73,7 +73,7 @@ export class AddVoucherDetailsModalComponent implements OnInit {
     this.DebitVoucherDetailsForm.controls.SACCode.patchValue(SACCode.name)
     this.DebitVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
     this.DebitVoucherDetailsForm.controls.SACCodeHdn.patchValue(SACCode.value)
-    this.DebitVoucherDetailsForm.controls.SubCategoryName.patchValue(Ledger.SubCategoryName)
+    this.DebitVoucherDetailsForm.controls.SubCategoryName.patchValue(Ledger.mRPNM)
     this.dialogRef.close(this.DebitVoucherDetailsForm.value)
   }
   cancel(event) {

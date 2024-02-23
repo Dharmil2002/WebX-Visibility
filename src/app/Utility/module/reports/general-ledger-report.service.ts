@@ -23,6 +23,7 @@ export class GeneralLedgerReportService {
           }, // Convert start date to ISO format
           { vDT: { 'D$lte': data.endValue } }, // Bill date less than or equal to end date       
           ...(data.state.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pST', data.state] } }] : []), // State names condition
+          ...(data?.category ? [{ aCCAT: { 'D$in': [data.category] } }] : []), // account code condition
           ...([{ lOC: { 'D$in': data.branch } }]), //branch condition
           ...(data.fnYear ? [{ 'fY': data.fnYear }] : []), // financial year condition
           ...(data.accountCode.length > 0 ? [{ aCCCD: { 'D$in': data.accountCode } }] : []), // account code condition

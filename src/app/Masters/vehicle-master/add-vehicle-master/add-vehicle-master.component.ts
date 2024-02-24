@@ -268,10 +268,7 @@ export class AddVehicleMasterComponent implements OnInit {
     } else {
       this.vehicleTableForm
         .get("capacity")
-        .setValue(
-          parseFloat(this.vehicleTableForm.value.gvw) -
-          parseFloat(this.vehicleTableForm.value.unldWt)
-        );
+        .setValue((parseFloat(this.vehicleTableForm.value.gvw) - parseFloat(this.vehicleTableForm.value.unldWt)).toFixed(2));
     }
   }
   //#endregion

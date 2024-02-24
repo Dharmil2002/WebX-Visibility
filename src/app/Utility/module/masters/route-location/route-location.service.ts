@@ -24,16 +24,12 @@ export class RouteLocationService {
       // Send a POST request to the 'generic/get' endpoint using the masterService
       const response = await firstValueFrom(this.masterService.masterPost('generic/get', request));
       // Process the data and create an array of route details
-      const routeDet = response.data.map(item => {
-        // Create a name by joining the loccd values with commas
-        const name = item?.routeName||"";
-        const value = item?.routeId||"";
-
-        return {
-          name,
-          value
-        };
-      });
+      const routeDet = response.data
+        .filter(item => item.routeName !== "" && item.routeName !== undefined)
+        .map(item => ({
+          name: item.routeName,
+          value: item.routeId || ""
+        }));
 
       return routeDet;
     } catch (error) {

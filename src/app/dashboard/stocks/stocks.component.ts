@@ -60,12 +60,12 @@ export class StocksComponent
     date: {
       Title: `${DocCalledAs.Docket} Date`,
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:125px",
     },
     paymentType: {
       Title: "Pay Type",
       class: "matcolumnleft",
-      Style: "max-width:70px",
+      Style: "min-width:15px",
     },
     contractParty: {
       Title:"Contract Party",
@@ -83,14 +83,14 @@ export class StocksComponent
       Style: "max-width:70px",
     },
     actualWeight: {
-      Title: "Act Wt",
+      Title: "Actual Weight",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:145px",
     },
     chargedWeight: {
-      Title: "Chg Wt",
+      Title: "Charged Weight",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:155px",
     },
     status: {
       Title: "Status",

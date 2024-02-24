@@ -176,10 +176,11 @@
                                             (change)="isActive(element)" [(ngModel)]="element[tableData]">
                                         </mat-slide-toggle>
                                     </ng-container>
-                                    <a *ngIf="shouldDisplayLink(tableData)" class="pointer"
-                                        style="text-decoration: underline; color: #36cbe9;"
-                                        (click)="drillDownData(element,tableData)" (ngInit)="triggered = false"><u>{{
-                                            formatData(element[tableData], tableData) }}</u></a>
+                                    <a *ngIf="shouldDisplayLink(tableData)" class="pointer" color="rgba(0,0,0,.87)"
+                                        style="text-decoration: underline; color: rgba(0,0,0,.87);"
+                                        (click)="drillDownData(element, tableData)" (ngInit)="triggered = false">
+                                        {{ formatData(element[tableData], tableData) }}
+                                    </a>
                                     <button mat-icon-button *ngIf="tableData=='actions'"
                                         [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="editCall(element)"
                                         (click)="$event.stopPropagation()" class="tbl-action-btn">
@@ -282,7 +283,7 @@
 
     .windowLink {
         /* color: #36cbe9; */
-        font-weight: bold;
+        /* font-weight: bold; */
         cursor: pointer;
         margin: auto 0px;
     }

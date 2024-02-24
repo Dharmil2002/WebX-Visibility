@@ -20,9 +20,9 @@ export class JobTrackerComponent implements OnInit {
   allColumnFilter:any;
   columnHeader = {
     createdOn:{
-      Title: "Created On",
+      Title: "Created Date",
       class: "matcolumncenter",
-      Style: "max-width: 160px",
+      Style: "min-width:140px",
     },
     jobNo: {
       Title: "Job No",
@@ -32,22 +32,22 @@ export class JobTrackerComponent implements OnInit {
     jobDate: {
       Title: "Job Date",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:125px",
     },
     jobType: {
-      Title: "Job type",
+      Title: "Job Type",
       class: "matcolumncenter",
-      Style: "max-width: 90px",
+      Style: "min-width:110px",
     },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:130px",
     },
     fromToCity: {
       Title: "From & To City",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:150px",
     },
     jobLocation: {
       Title: "Loc",
@@ -62,12 +62,12 @@ export class JobTrackerComponent implements OnInit {
     totalChaAmt: {
       Title: "CHA Amount Rs.",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:160px",
     },
     chaDate: {
       Title: "CHA Date",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:125px"
     }
   };
   //#endregion
@@ -91,22 +91,22 @@ export class JobTrackerComponent implements OnInit {
   ]
   constructor(
     private masterService: MasterService,
-    private jobService:JobEntryService
-    ) { 
-    this.allColumnFilter=this.columnHeader
-   }
+    private jobService: JobEntryService
+  ) {
+    this.allColumnFilter = this.columnHeader
+  }
 
   ngOnInit(): void {
     this.getRakeDetail();
     this.getDashboadData();
   }
   getDashboadData() {
-   
+
   }
-  async getRakeDetail(){
+  async getRakeDetail() {
     let data = await this.jobService.getJobDetails();
     this.tableData = data;
-    this.tableLoad=false;
+    this.tableLoad = false;
     const boxData = [
       {
         title: "Awaiting for CHA Entry",
@@ -124,14 +124,14 @@ export class JobTrackerComponent implements OnInit {
         filterCondition: (x) => x.sTS != "1" && x.sTS != "2",
       },
     ];
-    
+
     const result = boxData.map((box) => ({
       count: data.filter(box.filterCondition).length,
       title: box.title,
       class: box.class,
     }));
-    this.boxData=result;
+    this.boxData = result;
     // Use the 'result' array for further processing
-    
+
   }
 }

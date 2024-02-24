@@ -17,41 +17,41 @@ export class DocketListComponent implements OnInit {
    /* column header is for the changes css or title in the table*/
   columnHeader = {
     createOn: {
-      Title: "Created On",
+      Title: "Created Date",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "min-width:150px",
     },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "max-width:300px",
+      Style: "min-width:180px",
     },
     docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "min-width:295px",
+      Style: "min-width:220px",
       type:'windowLink',
       functionName:'OpenCnote'
     },
     ftCity: {
       Title: "From-To City",
       class: "matcolumncenter",
-      Style: "max-width:200px",
+      Style: "min-width:150px",
     },
     aCTWT: {
-      Title: "Act Wt(Kg)",
+      Title: "Actual Weight(Kg)",
       class: "matcolumncenter",
-      Style: "max-width:75px",
+      Style: "min-width:175px",
     },
     pKGS: {
-      Title: "Pkg Count",
+      Title: "Package Count",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:150px",
     },
     fRTAMT: {
       Title: "FV(₹)",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:30px",
     },
     //  invoiceCount: {
     //   Title: "Inv Count",
@@ -61,12 +61,12 @@ export class DocketListComponent implements OnInit {
     status:{
       Title: "Status",
       class: "matcolumncenter",
-      Style: "min-width:140px",
+      Style: "min-width:80px",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:100px",
+      Style: "max-width:65px",
     }
   };
   //#endregion
@@ -86,11 +86,11 @@ export class DocketListComponent implements OnInit {
 
   /*.......End................*/
   /* here the varible declare for menu Item option Both is required */
-  menuItems=[
-    {label:"Edit Docket"}
+  menuItems = [
+    { label: "Edit Docket" }
   ]
   menuItemflag: boolean = true;
-//  TableStyle = "width:90%"
+  //  TableStyle = "width:90%"
   /*.......End................*/
   /*Here the Controls which Is Hide search or add Button in table*/
   dynamicControls = {
@@ -100,25 +100,25 @@ export class DocketListComponent implements OnInit {
   };
   /*.......End................*/
 
-  addAndEditPath='Operation/ConsignmentEntry';
+  addAndEditPath = 'Operation/ConsignmentEntry';
   // menuItems = [{label:"Edit Docket"},{label:"View"}];
 
   constructor(
     private router: Router,
-    private docketService:DocketService,
+    private docketService: DocketService,
     private thcService: ThcService
-    ) {
+  ) {
     this.getShipmentDetail();
-    this.allColumnFilter=this.columnHeader
+    this.allColumnFilter = this.columnHeader
   }
 
   ngOnInit(): void {
   }
 
   async getShipmentDetail() {
-   /*below the method to get docket Detail using service*/
+    /*below the method to get docket Detail using service*/
     const shipmentList = await this.thcService.getShipment(false);
-    this.tableData = await this.docketService.processShipmentList(shipmentList,this.orgBranch)
+    this.tableData = await this.docketService.processShipmentList(shipmentList, this.orgBranch)
     this.tableLoad = false;
     /*end*/
   }
@@ -160,12 +160,12 @@ export class DocketListComponent implements OnInit {
       console.log("failed");
     }
   }
-  OpenCnote(data){
+  OpenCnote(data) {
     const templateBody = {
-      DocNo:data.docNo,
-      templateName:'Docket View-Print'
+      DocNo: data.docNo,
+      templateName: 'Docket View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-    window.open(url,'','width=1000,height=800');
+    window.open(url, '', 'width=1000,height=800');
   }
 }

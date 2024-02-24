@@ -36,12 +36,12 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     date: {
       Title: "Date of Cnote",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:150px",
     },
     paymentType: {
       Title: "Pay Type",
       class: "matcolumnleft",
-      Style: "max-width:70px",
+      Style: "min-width:130px",
     },
     contractParty: {
       Title: "Contract Party",
@@ -51,22 +51,22 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     orgdest: {
       Title: "Org-Dest",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:130px",
     },
     noofPackages: {
       Title: "Pkgs",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:70px",
     },
     actualWeight: {
-      Title: "Act Wt",
+      Title: "Actual Weight",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:145px",
     },
     chargedWeight: {
-      Title: "Chg Wt",
+      Title: "Charged Weight",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:155px",
     },
     status: {
       Title: "Status",
@@ -127,7 +127,8 @@ export class DeliveryMrGenerationListComponent implements OnInit {
         // Check if the branch matches the specified branch
         if (this.branch && this.branch.trim() === result) {
           // Assign the action only if the condition is met
-          actions = item.status === 'Delivery MR Generated' ? '' : 'Delivery MR Generation';
+          //  actions = item.status === 'Delivery MR Generated' ? '' : 'Delivery MR Generation';
+          actions = item.status === 'Delivery MR Generated' ? '' : 'Delivery MR';
 
           // Return the modified object
           return {

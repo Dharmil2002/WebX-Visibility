@@ -41,14 +41,14 @@ export class ManualVoucherComponent implements OnInit {
       Style: "max-width: 200px",
     },
     nNETP: {
-      Title: "Amount (₹)",
+      Title: "Amount(₹)",
       class: "matcolumncenter",
-      Style: "max-width: 120px",
+      Style: "max-width: 150px",
     },
     eNTBY: {
       Title: "Created By",
       class: "matcolumncenter",
-      Style: "max-width: 200px",
+      Style: "max-width: 150px",
     },
     eNTDT: {
       Title: "Created on",

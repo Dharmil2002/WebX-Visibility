@@ -22,7 +22,8 @@ import Swal from "sweetalert2";
 })
 export class MenuAccessRightComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit {
+  implements OnInit
+{
   @ViewChild(TreeViewComponent) treeViewComponent: TreeViewComponent;
   displayProgressSpinner: boolean;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -52,10 +53,9 @@ export class MenuAccessRightComponent
     public ObjSnackBarUtility: SnackBarUtilityService,
     private masterService: MasterService,
     private menuService: MenuService,
-    private router: Router
+    private router: Router,
   ) {
     super();
-    // this.MenuAccessTable = new menuAccessRightMaster({});
     this.initializeFormControl();
   }
 
@@ -89,11 +89,8 @@ export class MenuAccessRightComponent
   }
 
   functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
-
     // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
@@ -131,102 +128,97 @@ export class MenuAccessRightComponent
   //#endregion
   //#region to get User Data
   async getMenuList() {
-
     var res: any = await firstValueFrom(this.menuService.getMenuData());
     if (res) {
-
-      const rootNodes = this.buildHierarchy(res.data);
-      console.log("rootNodes", rootNodes);
-
-      const treeDataLst = this.buildTree(rootNodes, null);
-      this.menuData = treeDataLst; // Assign treeDataLst JSON to menuData property of treeview componant      
+      this.menuList = this.buildHierarchy(res.data);
+      const treeDataLst = this.buildTree(this.menuList, null);
+      this.menuData = treeDataLst; // Assign treeDataLst JSON to menuData property of treeview componant
     }
   }
 
   buildHierarchy(items: any[]): any[] {
     const itemMap = new Map<string, any>();
     const rootItems: any[] = [];
-  
     // Step 1: Initialize the map and identify root items
-    items.forEach(item => {
+    items.forEach((item) => {
       item.children = []; // Initialize the childs array
       itemMap.set(item.MenuId, item);
       if (!item.ParentId) {
         rootItems.push(item);
       }
     });
-  
+
     // Step 2: Build the hierarchy
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.ParentId) {
         const parent = itemMap.get(item.ParentId);
         parent?.children?.push(item);
       }
-    });  
+    });
     return rootItems; // Return the hierarchical structure
-  }
-
-  findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find((item) => parseInt(item.value) === name);
   }
   //#endregion
 
   //#region on User Select of submit
-  save() {
-    debugger;
-    const Body = {
-      ...this.menuData,
-      ...this.MenuAccessTableForm.value,
-    };
-    console.log("Body", Body);
+  async save() {
+    try {
+      const req = {
+        companyCode: this.companyCode,
+        collectionName: "role_Access",
+        filter: {cID: this.companyCode,uSRID: this.MenuAccessTableForm.value.Users.value},
+      };
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      let MenuLst = res.data;
+      if (MenuLst.length>0) {
+        this.isUpdate = true;
+        // Extract the menu IDs for the user
+        var userMenuList: number[] = MenuLst[0].mEST;
+        // Generate the treeData using the buildTree function with userMenuList
+        const treeDataLst = this.buildTree(this.menuList, userMenuList);
+        this.menuData = treeDataLst; // Assign treeDataLst JSON to menuData property
+      }
+    } catch (error) {
+      console.error("Error fetching Menu details:", error);
+    }
+  }
 
-    // var MenuData ={
-    //   CompanyCode: parseInt(localStorage.getItem("CompanyCode")),
-    //   UserId: this.MenuAccessTableForm.value.Users.value,
-    //   BranchId: localStorage.getItem("MainBranchCode"),
-    //   IsMvc: true,
-    //   IsTMSMvc: false,
-    //   MenuId: null
-    // }
+  buildTree(
+    menuList: any[],
+    userMenuList: number[] | null
+  ): { [key: string]: TreeItemNode } {
+    const treeData: { [key: string]: TreeItemNode } = {};
+    const type = ["None", "Menu"];
+    function buildNode(menuItem: any): TreeItemNode {
+      const node: TreeItemNode = {
+        item: type.includes(menuItem.Type)
+          ? `${menuItem.MenuName}`
+          : `${menuItem.MenuName} - ${menuItem.Type}`,
+        id: menuItem.MenuId,
+        children: menuItem.children ? menuItem.children.map(buildNode) : [],
+        checked: userMenuList ? userMenuList.includes(menuItem.MenuId) : false,
+      };
+      return node;
+    }
+    menuList.forEach((menuItem) => {
+      const node = buildNode(menuItem);
+      treeData[menuItem.MenuName] = node;
+    });
 
-    // this.subs.sink = this.AssignmenutotenantService.postCommon(
-    //   "DMS/Master/Menu" , MenuData
-    // ).subscribe({
-    //   next: (res) => {
-    //     if (res) {
-    //       let MenuLst = res.menuList;
-    //       if(MenuLst){
-    //         // Extract the menu IDs for the user
-    //         var userMenuList: number[] = [];
-    //         this.getMenuIds(MenuLst, userMenuList);
-
-    //         // Generate the treeData using the buildTree function with userMenuList
-    //         const treeDataLst = this.buildTree(this.menuList,userMenuList);
-    //         this.menuData = treeDataLst; // Assign treeDataLst JSON to menuData property
-    //       }
-    //     }
-    //   },
-    //   error: (error) => {
-    //     this.error = error;
-    //     this.ObjSnackBarUtility.showNotification("snackbar-danger", error, "top", "right");
-    //   },
-    //   complete() {},
-    // });
+    return treeData;
   }
 
   /*Below the method for the use child component data is used to the parent compant data which is retriev used @output() EventEmitter*/
   async getTreeviewData(event) {
-    debugger;
     const checkedValue = event.map((item) => item.id); // Get the checked value skipping the first item
-
     var jdata = {
       _id: `${this.companyCode}-${this.MenuAccessTableForm.value.Users.value}`,
       cID: parseInt(localStorage.getItem("companyCode")),
       uSRID: this.MenuAccessTableForm.value.Users.value,
+      uSRNM: this.MenuAccessTableForm.value.Users.name,
       mEST:
         checkedValue.length > 0 ||
-          checkedValue != null ||
-          checkedValue != undefined
+        checkedValue != null ||
+        checkedValue != undefined
           ? checkedValue
           : [],
       eNTBY: localStorage.getItem("UserName"),
@@ -260,7 +252,9 @@ export class MenuAccessRightComponent
           text: res.message,
           showConfirmButton: true,
         });
-        // this.route.navigateByUrl("/Masters/VendorMaster/VendorMasterList");
+        this.MenuAccessTableForm.reset();
+        this.getMenuList();
+        this.getUserData();
       }
     } else {
       let req = {
@@ -279,7 +273,9 @@ export class MenuAccessRightComponent
           text: res.message,
           showConfirmButton: true,
         });
-        // this.route.navigateByUrl("/Masters/VendorMaster/VendorMasterList");
+        this.MenuAccessTableForm.reset();
+        this.getMenuList();
+        this.getUserData();
       }
     }
   }
@@ -305,34 +301,4 @@ export class MenuAccessRightComponent
     this.collapseAll();
   }
 
-  // convert any Menu jsonarray into TreeItemNode class for bind node data
-  buildTree(
-    menuList: any[],
-    userMenuList: number[] | null
-  ): { [key: string]: TreeItemNode } {
-    const treeData: { [key: string]: TreeItemNode } = {};
-    function buildNode(menuItem: any): TreeItemNode {
-      const node: TreeItemNode = {
-        item: `${menuItem.MenuName} - ${menuItem.Type}`,
-        id: menuItem.MenuId,
-        children: menuItem.children ? menuItem.children.map(buildNode) : [],
-        checked: userMenuList ? userMenuList.includes(menuItem.MenuId) : false,
-      };
-      return node;
-    }
-    menuList.forEach((menuItem) => {
-      const node = buildNode(menuItem);
-      treeData[menuItem.MenuName] = node;
-    });
-
-    return treeData;
-  }
-  getMenuIds(menu: any[], ids: number[]): void {
-    for (const item of menu) {
-      ids.push(item.MenuId);
-      if (item.children) {
-        this.getMenuIds(item.children, ids);
-      }
-    }
-  }
 }

@@ -22,7 +22,7 @@ export class ListContainerComponent implements OnInit {
   ];
   isTableLode = true;
   dynamicControls = {
-    add: false,
+    add: true,
     edit: false,
     csv: true,
   };
@@ -35,60 +35,55 @@ export class ListContainerComponent implements OnInit {
     entryDate: {
       Title: "Created on ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:10%",
     },
     cNTYPNM: {
       Title: "Container Type ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:12%",
     },
     cNNO: {
-      Title: "Container Number ",
+      Title: "Container No. ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:12%",
     },
     vNTYP: {
       Title: "Vendor Type ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:12%",
     },
     vNNM: {
       Title: "Vendor Name ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:12%",
     },
     gRW: {
-      Title: "Gross Weight ",
+      Title: "Gross W. ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:10%",
     },
     tRW: {
-      Title: "Tare Weight ",
+      Title: "Tare W. ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:8%",
     },
     nETW: {
-      Title: "Net Weight ",
+      Title: "Net W. ",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:8%",
     },
     aCT: {
       Title: "Active ",
       type: "Activetoggle",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:8%",
       functionName: "ActivetoggleFunction",
     },
-    // Location: {
-    //   Title: "Available at Location",
-    //   class: "matcolumncenter",
-    //   Style: "",
-    // },
     EditAction: {
       type: "iconClick",
       Title: "Action",
       class: "matcolumncenter",
-      Style: "",
+      Style: "min-width:8%",
       functionName: "EditFunction",
       iconName: "edit",
     },

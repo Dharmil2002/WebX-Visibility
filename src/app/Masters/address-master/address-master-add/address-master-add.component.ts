@@ -198,7 +198,7 @@ export class AddressMasterAddComponent implements OnInit {
       );
       // is Update
       if (this.isUpdate) {
-        const customer = this.data.customerName;
+        const customer = this.data.customerName?.map(x=>x.value);
         const selectedData = customerData.filter((x) =>
           customer.includes(x.value)
         );
@@ -212,9 +212,7 @@ export class AddressMasterAddComponent implements OnInit {
     this.addressTableForm.controls["pincode"].setValue(this.addressTableForm.value.pincode.name);
     // Clear any errors in the form controls
     Object.values(this.addressTableForm.controls).forEach(control => control.setErrors(null));
-    const customerName = this.addressTableForm.value.customerNameDropdown?.map((x)=>{
-      return x.value
-    })
+    const customerName = this.addressTableForm.value.customerNameDropdown
     this.addressTableForm.removeControl("customerNameDropdown");
     this.addressTableForm.controls["customerName"].setValue(customerName);
     if (this.isUpdate) {

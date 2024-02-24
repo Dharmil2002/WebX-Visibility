@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 
@@ -41,9 +42,11 @@ export class AddressMasterListComponent implements OnInit {
       Style: "max-width:480px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;",
     },
     activeFlag: {
-      Title: "Active Status",
-      class: "matcolumnleft",
+      type: "Activetoggle",
+      Title: "Active",
+      class: "matcolumncenter",
       Style: "max-width:100px",
+      functionName: "ActiveFunction",
     },
     actions: {
       Title: "Active Status",
@@ -114,30 +117,33 @@ export class AddressMasterListComponent implements OnInit {
     }
   }
 
-  IsActiveFuntion(det) {
-    let id = det._id;
-    // Remove the "id" field from the form controls
-    delete det._id;
-    // delete det.srNo;
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+  async ActiveFunction(event) { 
+    const Body = {
+      activeFlag:event.data.activeFlag
+    }
+    const req = {
+      companyCode: this.companyCode,
       collectionName: "address_detail",
-      filter: { _id: id },
-      update: det
+      filter: { _id: event.data._id },
+      update: Body,
     };
-    this.masterService.masterPut('generic/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.getAddressDetails();
-        }
-      }
-    });
+    const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+    if(res.success){
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+    }
+  }
+
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
   }
 }

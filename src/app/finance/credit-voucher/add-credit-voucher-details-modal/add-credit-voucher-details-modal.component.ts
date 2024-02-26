@@ -62,7 +62,7 @@ export class AddCreditVoucherDetailsModalComponent implements OnInit {
     this.CreditVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name);
     this.CreditVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value);
     this.CreditVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value);
-    this.CreditVoucherDetailsForm.controls.SubCategoryName.patchValue(Ledger.SubCategoryName);
+    this.CreditVoucherDetailsForm.controls.SubCategoryName.patchValue(Ledger.mRPNM);
     this.dialogRef.close(this.CreditVoucherDetailsForm.value);
   }
   cancel(event) {

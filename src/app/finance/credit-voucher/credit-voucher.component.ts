@@ -16,6 +16,9 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { CreditVoucherPreviewComponent } from './credit-voucher-preview/credit-voucher-preview.component';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { CreditVoucherDataRequestModel, CreditVoucherRequestModel } from 'src/app/Models/Finance/CreditVoucher';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import Swal from 'sweetalert2';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 @Component({
   selector: 'app-credit-voucher',
   templateUrl: './credit-voucher.component.html'
@@ -83,10 +86,12 @@ export class CreditVoucherComponent implements OnInit {
   creditAgainstDocumentList: any = [];
   constructor(
     private fb: UntypedFormBuilder,
+    private voucherServicesService: VoucherServicesService,
     private masterService: MasterService,
     private filter: FilterUtils,
     private storage: StorageService,
     private matDialog: MatDialog,
+    private navigationService: NavigationService,
     private router: Router,
     private snackBarUtilityService: SnackBarUtilityService,
 
@@ -414,7 +419,7 @@ export class CreditVoucherComponent implements OnInit {
         "Ledgercode": item.LedgerHdn,
         "Ledgername": item.Ledger,
         "SubLedger": item.SubCategoryName,
-        "Dr": "",
+        "Dr": 0,
         "Cr": parseFloat(item.CreditAmount).toFixed(2),
         "Location": Accountinglocation,
         "Narration": item.Narration
@@ -435,8 +440,8 @@ export class CreditVoucherComponent implements OnInit {
         "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
         "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
         "SubLedger": "EXPENSE",
-        "Dr": isAmountNegative ? (-Amount).toFixed(2) : "",
-        "Cr": isAmountNegative ? "" : Amount.toFixed(2),
+        "Dr": isAmountNegative ? (-Amount).toFixed(2) : 0,
+        "Cr": isAmountNegative ? 0 : Amount.toFixed(2),
         "Location": Accountinglocation,
         "Narration": ledgerInfo['Round off Amount'].LeadgerName,
       };
@@ -524,10 +529,10 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherRequestModel.finYear = financialYear
 
         this.creditVoucherDataRequestModel.voucherNo = "";
-        this.creditVoucherDataRequestModel.transCode = VoucherInstanceType.DebitVoucherCreation;
-        this.creditVoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation];
-        this.creditVoucherDataRequestModel.voucherCode = VoucherType.DebitVoucher;
-        this.creditVoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
+        this.creditVoucherDataRequestModel.transCode = VoucherInstanceType.CreditVoucherCreation;
+        this.creditVoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation];
+        this.creditVoucherDataRequestModel.voucherCode = VoucherType.CreditVoucher;
+        this.creditVoucherDataRequestModel.voucherType = VoucherType[VoucherType.CreditVoucher];
         this.creditVoucherDataRequestModel.transDate = this.creditVoucherSummaryForm.value.TransactionDate
         this.creditVoucherDataRequestModel.docType = "VR";
         this.creditVoucherDataRequestModel.branch = Branch;
@@ -548,9 +553,9 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.accountName = this.creditVoucherPaymentDetailsForm.value.DepositBank.name;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
 
-        let Accountdata = this.tableData.map(function (item) {
+        let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
-            "companyCode": companyCode,
+            "companyCode": localStorage.getItem("companyCode"),
             "voucherNo": "",
             "transCode": VoucherInstanceType.CreditVoucherCreation,
             "transType": VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
@@ -558,87 +563,109 @@ export class CreditVoucherComponent implements OnInit {
             "voucherType": VoucherType[VoucherType.CreditVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": Branch,
-            "accCode": item.LedgerHdn,
-            "accName": item.Ledger,
-            "debit": 0,
-            "credit": parseFloat(item.CreditAmount).toFixed(2),
-            "narration": item.Narration ?? ""
+            "branch": localStorage.getItem("Branch"),
+            "accCode": item.Ledgercode,
+            "accName": item.Ledgername,
+            "accCategory": item.SubLedger,
+            "sacCode": "",
+            "sacName": "",
+            "debit": parseFloat(item.Dr).toFixed(2),
+            "credit": parseFloat(item.Cr).toFixed(2),
+            "GSTRate": 0,
+            "GSTAmount": 0,
+            "Total": +(item.Dr - item.Cr).toFixed(2),
+            "TDSApplicable": false,
+            "narration": item.Narration ?? item.Ledgername,
           };
         });
 
         var VoucherlineitemList = Accountdata;
 
-        // var creditAgainstDocumentList = this.creditAgainstDocumentList.map(function (item) {
-        //   return {
 
-        //     "companyCode": companyCode,
-        //     "voucherNo": "",
-        //     "transCode": VoucherInstanceType.CreditVoucherCreation,
-        //     "transType": VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
-        //     "voucherCode": VoucherType.CreditVoucher,
-        //     "voucherType": VoucherType[VoucherType.CreditVoucher],
-        //     "transDate": new Date(),
-        //     "finYear": financialYear,
-        //     "branch": Branch,
-        //     "Document": item?.Document,
-        //     "DebitAmountAgaintsDocument": parseFloat(item?.DebitAmountAgaintsDocument) || 0,
-        //     "DocumentType": item?.DocumentType,
-        //   };
-        // });
 
         this.creditVoucherRequestModel.details = VoucherlineitemList
         this.creditVoucherRequestModel.data = this.creditVoucherDataRequestModel;
-        // this.creditVoucherRequestModel.creditAgainstDocumentList = creditAgainstDocumentList;
+        this.creditVoucherRequestModel.debitAgainstDocumentList = [];
 
         console.log(this.creditVoucherRequestModel);
 
-        // this.voucherServicesService
-        //   .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
-        //   .subscribe({
-        //     next: (res: any) => {
-        //       var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {
-        //         return {
-        //           "accCode": `${item.Ledgercode}`,
-        //           "accName": item.Ledgername,
-        //           "amount": item.Cr,
-        //           "narration": item.Narration ? item.Narration : item.Ledgername,
-        //         };
-        //       })
-        //       var DebitData = FinalListOfCreditVoucher.filter(item => item.Cr == "").map(function (item) {
-        //         return {
-        //           "accCode": `${item.Ledgercode}`,
-        //           "accName": item.Ledgername,
-        //           "amount": item.CR,
-        //           "narration": item.Narration ? item.Narration : item.Ledgername,
-        //         };
-        //       })
-        //       let reqBody = {
-        //         companyCode: companyCode,
-        //         voucherNo: res?.data?.mainData?.ops[0].vNO,
-        //         transDate: Date(),
-        //         finYear: financialYear,
-        //         branch: localStorage.getItem("Branch"),
-        //         transCode: VoucherInstanceType.DebitVoucherCreation,
-        //         transType: VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
-        //         voucherCode: VoucherType.DebitVoucher,
-        //         voucherType: VoucherType[VoucherType.DebitVoucher],
-        //         docType: "Voucher",
-        //         partyType: this.creditVoucherSummaryForm.value.Preparedfor,
-        //         docNo: res?.data?.mainData?.ops[0].vNO,
-        //         partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
-        //         partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
-        //         entryBy: localStorage.getItem("UserName"),
-        //         entryDate: Date(),
-        //         debit: DebitData,
-        //         credit: CreditData,
-        //       };
-        //       console.log(reqBody);
-        //     },
-        //     error: (err: any) => {
-        //       this.snackBarUtilityService.ShowCommonSwal("error", err);
-        //     },
-        //   });
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+              var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {
+                return {
+                  "accCode": `${item.Ledgercode}`,
+                  "accName": item.Ledgername,
+                  "amount": item.Cr,
+                  "accCategory": item.SubLedger,
+                  "narration": item.Narration ? item.Narration : item.Ledgername,
+                };
+              })
+              var DebitData = FinalListOfCreditVoucher.filter(item => item.Cr == "").map(function (item) {
+                return {
+                  "accCode": `${item.Ledgercode}`,
+                  "accName": item.Ledgername,
+                  "amount": item.Dr,
+                  "accCategory": item.SubLedger,
+                  "narration": item.Narration ? item.Narration : item.Ledgername,
+                };
+              })
+              let reqBody = {
+                companyCode: companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: localStorage.getItem("Branch"),
+                transCode: VoucherInstanceType.CreditVoucherCreation,
+                transType: VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
+                voucherCode: VoucherType.CreditVoucher,
+                voucherType: VoucherType[VoucherType.CreditVoucher],
+                docType: "Voucher",
+                partyType: this.creditVoucherSummaryForm.value.Preparedfor,
+                docNo: res?.data?.mainData?.ops[0].vNO,
+                partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
+                entryBy: localStorage.getItem("UserName"),
+                entryDate: Date(),
+                debit: DebitData,
+                credit: CreditData,
+              };
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Voucher Created Successfully",
+                      text: "Voucher No: " + reqBody.voucherNo,
+                      showConfirmButton: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        Swal.hideLoading();
+                        setTimeout(() => {
+                          Swal.close();
+                        }, 2000);
+                        this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                      }
+                    });
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+              console.log(reqBody);
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }

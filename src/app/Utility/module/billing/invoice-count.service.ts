@@ -94,8 +94,26 @@ export class InvoiceCountService {
                   D$group: {
                     _id: null,
                     Unbilled_aMT: { D$sum: "$tOTAMT" },
-                    Unbilledcount: { D$sum: 1 },
-                    approvedBillCount: { D$first: { D$size: "$financialDetails" } },
+                    Unbilledcount: {
+                      D$sum: {
+                        D$cond: {
+                          if: { D$eq: ['$sTS', 0] },
+                          then: 1,
+                          else: 0,
+                        },
+                      },
+                    },
+                    approvedBillCount: {
+                      D$sum: {
+                        D$cond: {
+                          if: { D$eq: ['$sTS', 1] },
+                          then: 1,
+                          else: 0,
+                        },
+                      },
+
+                      // D$first: { D$size: "$financialDetails" }
+                    },
                     cust_bill_headers: {
                       D$addToSet: {
                         count: { D$size: "$cust_bill_headers" },

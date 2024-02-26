@@ -5,7 +5,7 @@ export class CreditVoucherRequestModel {
     finYear: string
     data: CreditVoucherDataRequestModel
     details: CreditVoucherdetailsRequestModel[]
-    creditAgainstDocumentList: CreditAgainstDocumentList[]
+    debitAgainstDocumentList: CreditAgainstDocumentList[]
 }
 
 export class CreditVoucherDataRequestModel {
@@ -51,7 +51,7 @@ export class CreditVoucherdetailsRequestModel {
     sacCode: string
     sacName: string
     debit: number
-    credit: number    
+    credit: number
     narration: string;
     PaymentMode?: string
 }

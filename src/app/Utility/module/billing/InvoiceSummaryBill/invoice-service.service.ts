@@ -133,6 +133,8 @@ export class InvoiceServiceService {
           sGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) / 2 : 0,
           cGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) / 2 : 0,
           cGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) / 2 : 0,
+          uTGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) : 0,
+          uTGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) : 0,
           iGST: data?.gstType == "IGST" ? element.gstCharged : 0,
           iGSTRT: data?.gstType == "IGST" ? data.gstRate : 0,
           eNTDT: new Date(),
@@ -173,7 +175,7 @@ export class InvoiceServiceService {
       "cOL": {
         "lOC": data?.collectionOffice || "",
         "aMT": 0.00,
-        "bALAMT": 0.00
+        "bALAMT": data?.finalInvoice || 0.00,
       },
       "cUST": {
         "cD": customerCode,
@@ -192,6 +194,7 @@ export class InvoiceServiceService {
         "rATE": data?.gstRate || "",
         "iGST": data?.igst || 0.00,
         "cGST": data?.cgst || 0.00,
+        "uTGST": data?.utgst || 0.00,
         "sGST": data?.sgst || 0.00,
         "aMT": data?.gst || 0.00
       },
@@ -411,7 +414,7 @@ export class InvoiceServiceService {
       element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
       element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
       element.collectionAmount = parseFloat(element.aMT) - parseFloat(cOL);
-      element.pendingAmount = parseFloat(element.aMT) - parseFloat(cOL);
+      element.pendingAmount = parseFloat(cOL)
       return element;
 
     });
@@ -572,7 +575,7 @@ export class InvoiceServiceService {
       vUCHNO: "",
       ...commonProperties,
     }));
-
+    formGroup.location = this.storage.branch;
     const colData = {
       formData: formGroup,
       collectedData: collectedData,

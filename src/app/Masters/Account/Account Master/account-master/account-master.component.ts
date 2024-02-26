@@ -116,7 +116,6 @@ export class AccountMasterComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", Body)
       .toPromise();
-      console.log('res' , res)
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x, index) => {
         return {

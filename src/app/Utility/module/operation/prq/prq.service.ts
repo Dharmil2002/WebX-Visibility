@@ -56,7 +56,7 @@ export class PrqService {
       collectionName: "prq_summary",
       data: prqData,
       docType: "PRQ",
-      branch: branch,
+      branch: prqData.bRCD,
       party: party,
       finYear: financialYear, // Replace with a dynamic value if needed
     };
@@ -384,8 +384,14 @@ export class PrqService {
       vNDNM: element?.vNDNM || "",
       vEHNO:  element?.vEHNO || "",
       createdDate: formatDocketDate(element?.eNTDT || new Date()),
-      createDateOrg: element?.eNTDT
-    };
+      createDateOrg: element?.eNTDT,
+      //Below code added by manan sanghani
+      pAddressName : element.pADDNM ?? '',
+      oDRNO : element.oDRNO ?? '',
+      oDRDT : element?.oDRDT || new Date(element.oDRDT),
+      oDRBY : element.oDRBY ?? '',
+      rMKS : element.rMKS ?? '',
+       };
 
     return prqDataItem;
   }

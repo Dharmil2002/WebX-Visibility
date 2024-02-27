@@ -138,8 +138,11 @@ export class CustOutstandingService {
                                         },
                                    },
                                    collectedAmt: {
-                                        D$sum: "$coll.aMT",
+                                        D$sum: "$cOL.aMT",
                                    },
+                                   // collectedAmt: {
+                                   //      D$sum: "$coll.aMT",
+                                   // },
                               },
                          },
                          {
@@ -176,7 +179,7 @@ export class CustOutstandingService {
                                         D$sum: "$unsubmittedAmt",
                                    },
                                    submittedAmt: {
-                                        D$sum: "submittedAmt",
+                                        D$sum: "$submittedAmt",
                                    },
                                    collectedAmt: {
                                         D$sum: "$collectedAmt",

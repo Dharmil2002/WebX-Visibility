@@ -72,13 +72,11 @@ export class DepartureService {
     
     const vendorCode=await this.vendor.getVendorDetail(data?.Vendor);
     const dktNoList = shipment?shipment.map((x) => x.dKTNO):[];
-    const dktSfx=shipment.map((x)=>`${x.dKTNO}-${x.sFX}`);
+    const dktSfx=shipment?shipment.map((x)=>`${x.dKTNO}-${x.sFX}`):[];
     let eventJson = dktNoList;
     const origin = data.Route.split(":")[1].split("-")[0];
     const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
-debugger;
     const legID = `${this.storage.companyCode}-${data.tripID}-${this.storage.branch}-${next}`;
-        
     const getLeg = {
       companyCode: this.storage.companyCode,
       collectionName: "thc_movement_ltl",

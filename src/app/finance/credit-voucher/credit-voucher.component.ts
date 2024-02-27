@@ -623,7 +623,7 @@ export class CreditVoucherComponent implements OnInit {
                 voucherType: VoucherType[VoucherType.CreditVoucher],
                 docType: "Voucher",
                 partyType: this.creditVoucherSummaryForm.value.Preparedfor,
-                docNo: res?.data?.mainData?.ops[0].vNO,
+                docNo: "",
                 partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
                 entryBy: localStorage.getItem("UserName"),

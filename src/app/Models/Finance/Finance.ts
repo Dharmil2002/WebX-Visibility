@@ -14,6 +14,7 @@ export class VoucherDataRequestModel {
   transType: string
   voucherCode: number
   voucherType: string
+  transactionNumber: string = '';
   transDate: Date
   docType: string
   branch: string

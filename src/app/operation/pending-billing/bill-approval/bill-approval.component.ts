@@ -195,7 +195,7 @@ export class BillApprovalComponent implements OnInit {
         this.VoucherDataRequestModel.netPayable = TotalAmount;
         this.VoucherDataRequestModel.roundOff = data?.rOUNOFFAMT;
         this.VoucherDataRequestModel.voucherCanceled = false
-
+        this.VoucherDataRequestModel.transactionNumber = data.bILLNO;
         this.VoucherDataRequestModel.paymentMode = "";
         this.VoucherDataRequestModel.refNo = "";
         this.VoucherDataRequestModel.accountName = "";
@@ -224,7 +224,7 @@ export class BillApprovalComponent implements OnInit {
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 docType: "Voucher",
                 partyType: "Customer",
-                docNo: res?.data?.mainData?.ops[0].vNO,
+                docNo: data.bILLNO,
                 partyCode: data?.cUST?.cD || "",
                 partyName: data?.cUST?.nM || "",
                 entryBy: localStorage.getItem("UserName"),

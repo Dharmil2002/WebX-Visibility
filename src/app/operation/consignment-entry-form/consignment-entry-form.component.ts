@@ -1958,7 +1958,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.VoucherDataRequestModel.accountName = "";
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
-
+        this.VoucherDataRequestModel.transactionNumber = DocketNo;
         var VoucherlineitemList = [{
 
           "companyCode": this.storage.companyCode,
@@ -2029,7 +2029,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                 branch: this.storage.branch,
                 docType: "Voucher",
                 partyType: "Customer",
-                docNo: res?.data?.mainData?.ops[0].vNO,
+                transactionNumber: "",
+                docNo: DocketNo,
                 partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
                 partyName: this.model.consignmentTableForm.value?.billingParty?.name,
                 entryBy: localStorage.getItem("UserName"),

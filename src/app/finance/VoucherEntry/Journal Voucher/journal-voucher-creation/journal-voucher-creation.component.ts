@@ -399,7 +399,7 @@ export class JournalVoucherCreationComponent implements OnInit {
                   voucherType: VoucherType[VoucherType.JournalVoucher],
                   docType: "Voucher",
                   partyType: this.JournalVoucherSummaryForm.value.Preparedfor,
-                  docNo: res?.data?.mainData?.ops[0].vNO,
+                  docNo: "",
                   partyCode: this.JournalVoucherSummaryForm.value.PartyName?.value ?? "8888",
                   partyName: this.JournalVoucherSummaryForm.value.PartyName?.name ?? this.JournalVoucherSummaryForm.value.PartyName,
                   entryBy: localStorage.getItem("UserName"),

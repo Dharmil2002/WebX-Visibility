@@ -408,7 +408,7 @@ export class ContraVoucherCreationComponent implements OnInit {
                   voucherType: VoucherType[VoucherType.ContraVoucher],
                   docType: "Voucher",
                   partyType: this.ContraVoucherSummaryForm.value.Preparedfor,
-                  docNo: res?.data?.mainData?.ops[0].vNO,
+                  docNo: "",
                   partyCode: "",
                   partyName: "",
                   entryBy: this.storage.userName,

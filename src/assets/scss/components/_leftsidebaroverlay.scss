@@ -115,7 +115,7 @@
     position: relative;
     overflow-y: auto;
     height: 100vh;
-
+    cursor: pointer;
     .list {
       list-style: none;
       padding-left: 0;
@@ -582,7 +582,7 @@
         &.active {
           background-color: $theme-white-menu-list-active;
           .sidebarIcon .feather {
-            color:#03a9f3!important;
+            color: #03a9f3 !important;
           }
           > :first-child {
             i,
@@ -660,7 +660,7 @@
             }
           }
           .sidebarIcon .feather {
-            color: #03a9f3!important;
+            color: #03a9f3 !important;
           }
           .menu-top {
             background-color: rgba(0, 0, 0, 0.4);
@@ -673,7 +673,7 @@
         &.active {
           background-color: #03a9f3;
           .sidebarIcon .feather {
-            color:#03a9f3!important;
+            color: #03a9f3 !important;
           }
           > :first-child {
             i,
@@ -795,7 +795,7 @@
 }
 .sidebarIcon {
   .feather {
-    color:#03a9f3;
+    color: #03a9f3;
     height: 18px !important;
     width: 18px !important;
     text-align: center;

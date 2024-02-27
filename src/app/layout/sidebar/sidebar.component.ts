@@ -119,18 +119,32 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.renderer.removeClass(this.document.body, 'ls-closed');
     }
   }
-  mouseHover(e) {
-    const body = this.elementRef.nativeElement.closest('body');
-    if (body.classList.contains('submenu-closed')) {
-      this.renderer.addClass(this.document.body, 'side-closed-hover');
-      this.renderer.removeClass(this.document.body, 'submenu-closed');
+  mouseHover() {
+    const hasClass = this.document.body.classList.contains("side-closed");
+    if (hasClass) {
+      this.renderer.removeClass(this.document.body, "side-closed");
+      this.renderer.removeClass(this.document.body, "submenu-closed");
     }
   }
-  mouseOut(e) {
-    const body = this.elementRef.nativeElement.closest('body');
-    if (body.classList.contains('side-closed-hover')) {
-      this.renderer.removeClass(this.document.body, 'side-closed-hover');
-      this.renderer.addClass(this.document.body, 'submenu-closed');
+  mouseOut() {
+    const hasClass = this.elementRef.nativeElement.closest('body');
+    if (hasClass) {
+      this.renderer.addClass(this.document.body, "side-closed");
+      this.renderer.addClass(this.document.body, "submenu-closed");
     }
   }
+  // mouseHover(e) {
+  //   const body = this.elementRef.nativeElement.closest('body');
+  //   if (body.classList.contains('submenu-closed')) {
+  //     this.renderer.addClass(this.document.body, 'side-closed-hover');
+  //     this.renderer.removeClass(this.document.body, 'submenu-closed');
+  //   }
+  // }
+  // mouseOut(e) {
+  //   const body = this.elementRef.nativeElement.closest('body');
+  //   if (body.classList.contains('side-closed-hover')) {
+  //     this.renderer.removeClass(this.document.body, 'side-closed-hover');
+  //     this.renderer.addClass(this.document.body, 'submenu-closed');
+  //   }
+  // }
 }

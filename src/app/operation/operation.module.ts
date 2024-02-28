@@ -73,6 +73,7 @@ import { ConsignmentFilterComponent } from './consignment-filter/consignment-fil
 import { ConsignmentPodComponent } from './consignment-pod/consignment-pod.component';
 import { UpdateDeliveryComponent } from './update-delivery/update-delivery.component';
 import { DocketFiltersComponent } from "./thc-generation/filters/docket-filters/docket-filters.component";
+import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-modal/update-delivery-modal.component";
 
 @NgModule({
   declarations: [
@@ -125,7 +126,8 @@ import { DocketFiltersComponent } from "./thc-generation/filters/docket-filters/
     ConsignmentFilterComponent,
     ConsignmentPodComponent,
     UpdateDeliveryComponent,
-    DocketFiltersComponent    
+    DocketFiltersComponent,
+    UpdateDeliveryModalComponent    
   ],
   imports: [
     CommonModule,

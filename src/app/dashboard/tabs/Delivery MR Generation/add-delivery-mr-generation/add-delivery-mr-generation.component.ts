@@ -18,6 +18,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -51,7 +52,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     consignmentNoteNumber: {
       Title: "Consignment Note Number ",
       class: "matcolumnleft",
-      Style: "min-width:13em",
+      Style: "min-width:15em",
     },
     payBasis: {
       Title: "PayBasis",
@@ -177,6 +178,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private storage: StorageService,
     private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private docketService: DocketService,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
@@ -250,7 +252,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.filteredDocket.forEach(element => {
       const json = {
         id: this.tableData.length + 1,
-        consignmentNoteNumber: element.docketNumber,
+        consignmentNoteNumber: element.dKTNO,
         totalAmount: 0,
         Multipointdelivery: 0,
         Document: 0,
@@ -265,7 +267,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         rateDifference: 0,
         newSubTotal: 0,
         subTotal: 0,
-        payBasis: element.payType,
+        payBasis: element.pAYTYPNM,
         actions: ['Edit']
       };
       this.tableData.push(json);
@@ -273,9 +275,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.tableload = false;
 
     if (this.deliveryMrTableForm.value.Deliveredto === 'Receiver') {
-      this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].billingParty);
+      this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].bPARTYNM);
     } else {
-      this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].consigneeName);
+      this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].cSGN.nM);
     }
     this.headerDetails = this.deliveryMrTableForm.value;
     this.deliveryMrTableForm.reset();
@@ -285,9 +287,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   async hideControl() {
     const deliveredToValue = this.deliveryMrTableForm.value.Deliveredto;
 
-    const filter = { "docketNumber": this.docketNo };
-    const consigneeName = await this.getDocketList(filter);
-    const cgnm = consigneeName[0]?.consigneeName;
+    const filter = { "dKTNO": this.docketNo };
+    const consigneeName = await this.docketService.getDocketsDetailsLtl(filter);
+
+    const cgnm = consigneeName[0]?.cSGN.nM;
 
     const NameofReceiver = this.deliveryMrTableForm.get('NameofReceiver');
     const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
@@ -398,8 +401,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     try {
       const docketDataArray = await Promise.all(
         consignmentNoteNumbers.map(async (element) => {
-          const filter = { "docketNumber": element };
-          return this.getDocketList(filter);
+          const filter = { "dKTNO": element };
+          return await this.docketService.getDocketsDetailsLtl(filter)
         })
       );
 
@@ -410,11 +413,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.filteredDocket = flattenedDocketData.filter(
         (data, index, self) =>
           data !== null &&
-          index === self.findIndex((d) => d.docketNumber === data.docketNumber)
+          index === self.findIndex((d) => d.dKTNO === data.dKTNO)
       );
-
-      // const consigneeName = this.filteredDocket[0]?.consigneeName;
-      // this.deliveryMrTableForm.controls['Consignee'].setValue(consigneeName);
 
       if (this.filteredDocket.length === 0) {
         Swal.fire({
@@ -427,7 +427,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
 
       // Check if billingParty is the same for all elements
-      const uniqueBillingParties = [...new Set(this.filteredDocket.map(data => data.billingParty))];
+      const uniqueBillingParties = [...new Set(this.filteredDocket.map(data => data.bPARTYNM))];
 
       if (uniqueBillingParties.length !== 1) {
         // If billingParty is not the same for all elements, show an informative message
@@ -600,19 +600,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     bnknm ? this.PaymentSummaryFilterForm.controls['depositedIntoBank'].setValue(bnknm) : '';
   }
   //#endregion
-  //#region to get Docket list
-  async getDocketList(data = {}) {
-    const req = {
-      companyCode: this.storage.companyCode,
-      filter: data,
-      collectionName: "docket",
-    };
 
-    // Fetch data from the 'docket' collection using the masterService
-    const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
-    return res.data;
-  }
-  //#endregion
   //#region to calculate TDS related amount
   TDSSectionFieldChanged(event) {
     // Get the value of TDSSection from the form
@@ -874,8 +862,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Customer"
-        this.VoucherDataRequestModel.partyCode = ""
-        this.VoucherDataRequestModel.partyName = this.filteredDocket[0]?.billingParty;
+        this.VoucherDataRequestModel.partyCode = this.filteredDocket[0]?.bPARTY;
+        this.VoucherDataRequestModel.partyName = this.filteredDocket[0]?.bPARTYNM;
         this.VoucherDataRequestModel.partyState = this.billingForm.value.StateofSupply.name
         this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
@@ -915,7 +903,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         let voucherLineItemList = [];
 
         this.tableData.forEach(item => {
-          console.log(this.billingForm.value);
+          // console.log(this.billingForm.value);
 
           const voucherLineItem = {
             companyCode: companyCode,

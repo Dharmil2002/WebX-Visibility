@@ -12,6 +12,7 @@ export enum DocketStatus {
     Delivered = 10,//Delivered to ${receiverName} on ${deliveryDate}, reason : ${deliveryReason}
     Undelivered = 11,//Delivery attempted on ${aDT}, reason : ${reason} 
     Partial_Delivered = 12,//Partially delivered to ${receiverName} on ${deliveryDate}, reason : ${deliveryReason}
+    Del_MR_Generated = 13,//Delivery Mr Generated at ${cLOC} on ${Dt}
     Detained = 98,//Docket detained at ${cLOC} on ${Dt}
     Cancelled = 99//Docket cancelled on ${cNDT} by ${cNBY} , reason:${cNRES}
 }
@@ -40,6 +41,7 @@ export enum DocketEvents {
     DRS_Upload = "EVN0008",
     Delivery_Update = "EVN0009",
     Arrival_Scan = "EVN0010",
+    Del_MR_Generation = "EVN0011"
 };
 export enum VehicleStatus {
     Available= 1,

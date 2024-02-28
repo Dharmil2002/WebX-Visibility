@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { OperationService } from 'src/app/core/service/operations/operation.service';
-import Swal from 'sweetalert2';
-import { getDocketDetailsFromApi, kpiData } from '../../../stocks/stockCommon';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { DocketStatus } from 'src/app/Models/docStatus';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-delivery-mr-generation-list',
@@ -11,7 +12,6 @@ import { Router } from '@angular/router';
 export class DeliveryMrGenerationListComponent implements OnInit {
   tableData: [] | any;
   tableload = true; // flag , indicates if data is still loading or not , used to show loading animation
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
   menuItemflag: boolean = false;
   METADATA = {
     checkBoxRequired: true,
@@ -81,7 +81,6 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       functionName: "validateLocation"
     },
   };
-  branch = localStorage.getItem("Branch");
 
   staticField = [
     "no",
@@ -95,7 +94,9 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     "status"
   ];
   boxData: any[];
-  constructor(private operationService: OperationService,
+  constructor(
+    private docketService: DocketService,
+    private storage: StorageService,
     private router: Router,
   ) { }
 
@@ -105,45 +106,50 @@ export class DeliveryMrGenerationListComponent implements OnInit {
   //#region to get docket details
   async getDocketDetails() {
     try {
-      this.tableload = true;
-      // Send request and await response
-      const modifiedData = await getDocketDetailsFromApi(
-        this.companyCode,
-        this.branch,
-        this.operationService
-      );
+      // Define query parameters for docket service
+      const queryParameters = {
+        cID: this.storage.companyCode,
+        cLOC: this.storage.branch,
+        sTS: { 'D$in': [DocketStatus.In_Delivery_Stock] }
+      };
 
-      // Generate KPI data based on the modified data
-      this.boxData = kpiData(modifiedData);
+      // Fetch docket list based on the query parameters
+      const data = await this.docketService.getDocketList(queryParameters);
 
-      this.tableData = modifiedData.map(item => {
-        // Extract the destination location from the event data
-        const location = item.orgdest;
+      // Fetch mapping details for the docket data
+      const modifiedData = await this.docketService.getMappingDocketDetails(data);
 
-        // Extract the branch information from the destination location
-        // and remove any leading or trailing whitespaces
-        const result = location.split(":")[1].trim();
-        let actions = item.status === 'Delivery MR Generated' ? '' : '';
-        // Check if the branch matches the specified branch
-        if (this.branch && this.branch.trim() === result) {
-          // Assign the action only if the condition is met
-          //  actions = item.status === 'Delivery MR Generated' ? '' : 'Delivery MR Generation';
-          actions = item.status === 'Delivery MR Generated' ? '' : 'Delivery MR';
+      // Fetch key performance indicators (KPI) data
+      this.boxData = await this.docketService.kpiData(data);
+
+      // Reverse the modified data and map it with additional actions
+      this.tableData = modifiedData
+        .reverse()
+        .map(item => {
+
+          // Extract the destination location from the event data
+          const location = item.orgdest.split(":")[1].trim();
+          let actions = '';
+
+          // Check if the branch matches the specified branch
+          if (this.storage.branch && this.storage.branch.trim() === location) {
+            // Assign the action only if the condition is met
+                       
+            actions = item.status === 'Del_Mr_Generated' ? '' : 'Delivery MR';
+          }
 
           // Return the modified object
           return {
             ...item,
             Actions: actions
           };
-        }
+        });
 
-        // If the branch does not match or the status is 'Delivery MR Generated', return the original object
-        return item;
-      });
-
-      // Set tableload to false to indicate that the table loading is complete
+      // Set table load to false, indicating completion
       this.tableload = false;
     } catch (error) {
+      this.tableData = [];
+      this.tableload = false;
       // Handle error by displaying an error message
       Swal.fire({
         icon: "error",

@@ -460,7 +460,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
   async getListId() {
     try {
       let query = { companyCode: this.companyCode };
-      const req = { companyCode: this.companyCode, collectionName: "routeMasterLocWise", filter: query, sorting: {eNTDT:-1} };
+      const req = { companyCode: this.companyCode, collectionName: "routeMasterLocWise", filter: query, sorting: {routeId:-1} };
       const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
       return response?.data;
     } catch (error) {

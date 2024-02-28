@@ -232,7 +232,6 @@ export class PrqEntryPageComponent implements OnInit {
 
   //#region get Address Details
   async getAddressDetails() {
-    debugger;
     const addressRequest = {
       companyCode: this.companyCode,
       collectionName: "address_detail",

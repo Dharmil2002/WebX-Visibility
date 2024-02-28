@@ -13,7 +13,7 @@
          -->
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="tableData"
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [toggleArray]="toggleArray"[columnWidths]="columnWidths"  [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag"  [addAndEditPath]="addAndEditPath" [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">
     </generic-table-webxpress>
     </div>

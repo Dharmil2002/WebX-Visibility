@@ -167,17 +167,24 @@ export class VehicleStatusService {
   async getVehicleList(vehicleNo: string[]) {
     // Get the company code from local storage
     const companyCode = localStorage.getItem("companyCode");
-
     // Create a request object to fetch vehicle details
     const vehicleRequest = {
       companyCode,
       collectionName: "vehicle_detail",
       filter: { vehicleNo: { D$in: vehicleNo } },
     };
-
     // Fetch vehicle details from the database
     const vehicleResult = await firstValueFrom(this.operation.operationMongoPost('generic/get', vehicleRequest));
     return vehicleResult;
+  }
+  async getVehDetails(vehNo){
+    const req={
+      companyCode:this.storage.companyCode,
+      collectionName: "vehicle_detail",
+      filter:{vehicleNo:vehNo}
+    }
+    const vehicleResult = await firstValueFrom(this.operation.operationMongoPost('generic/getOne',req));
+    return vehicleResult.data;
   }
 
   async getAvailableVehicles() {

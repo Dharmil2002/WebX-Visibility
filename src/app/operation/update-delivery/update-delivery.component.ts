@@ -1,7 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import { DeliveryService } from 'src/app/Utility/module/operation/delivery/delivery.service';
 import { UpdateDeliveryControl } from 'src/assets/FormControls/update-delivery-controls';
+import { UpdateDeliveryModalComponent } from './update-delivery-modal/update-delivery-modal.component';
+import moment from 'moment';
 
 @Component({
   selector: 'app-update-delivery',
@@ -12,13 +17,14 @@ export class UpdateDeliveryComponent implements OnInit {
   backPath: string;
   csv: any[];
   tableload = false;
-  menuItems = []
   linkArray = []
   dynamicControls = {
     add: false,
     edit: false,
     //csv: true
   }
+  menuItems = [{ label: "Edit"}];
+  menuItemflag: boolean = true;
   jsonControlupdatedeliveryArray: any;
   updatedeliveryControls: UpdateDeliveryControl;
   boxData: { count: number; title: string; class: string; }[];
@@ -36,18 +42,8 @@ export class UpdateDeliveryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    packages: {
-      Title: "Packages",
-      class: "matcolumncenter",
-      Style: "min-width:10%",
-    },
-    delivered: {
-      Title: "Delivered",
-      class: "matcolumncenter",
-      Style: "min-width:10%",
-    },
-    person: {
-      Title: "Person",
+    status: {
+      Title: "Status",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
@@ -56,28 +52,33 @@ export class UpdateDeliveryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    pod: {
-      Title: "POD",
+    dDateTime: {
+      Title: "Date && Time",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    status: {
-      Title: "Status",
-      class: "matcolumncenter",
-      Style: "min-width:10%",
-    }
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:80px",
+    },
   };
   staticField = [
     "shipment",
-    "packages",
-    "delivered",
-    "person",
+    "status",
     "reason",
-    "pod",
-    "status"
+    "dDateTime"
   ];
+  deliveryData: any;
 
-  constructor(private fb: UntypedFormBuilder) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private route:Router,
+    public dialog: MatDialog,
+    private changeDetectorRef:ChangeDetectorRef,
+    private deliveryService:DeliveryService
+    ) {
+     this.deliveryData = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.initializeFormControl();
   }
 
@@ -92,8 +93,33 @@ export class UpdateDeliveryComponent implements OnInit {
     this.jsonControlupdatedeliveryArray = this.updatedeliveryControls.getupdatedeliveryFormControls();
     // Build the form group using formGroupBuilder function
     this.updatedeliveryTableForm = formGroupBuilder(this.fb, [this.jsonControlupdatedeliveryArray]);
+    this.autoFillDelivery();
   }
+  
+  autoFillDelivery(){
+    this.updatedeliveryTableForm.controls['Vehicle'].setValue(this.deliveryData?.columnData.vehicleNo||"");
+    this.updatedeliveryTableForm.controls['route'].setValue(this.deliveryData?.columnData.Cluster||"");
+    this.updatedeliveryTableForm.controls['tripid'].setValue(this.deliveryData?.columnData.RunSheet||"");
+    this.getShipments();
+  }
+  async getShipments() {
+    if(this.deliveryData?.columnData.RunSheet){
+     const res= await this.deliveryService.getDeliveryDetail({dRSNO:this.deliveryData?.columnData.RunSheet});
+      this.csv = res.map((x) => {
+        return {
+          shipment: x.dKTNO,
+          packages: x.pKGS,
+          delivered:"",
+          person:"",
+          reason:"",
+          pod: "",
+          status: "Yet To Deliver",
+          actions:["Edit"]
+        }
+      });
+    }
 
+  }
   kpiData(event) {
     const createShipDataObject = (count, title, className) => ({
       count,
@@ -123,4 +149,31 @@ export class UpdateDeliveryComponent implements OnInit {
       console.log("failed");
     }
   }
+  async handleMenuItemClick(data) {
+    if (data.label.label === "Edit") {
+      const dialogref = this.dialog.open(UpdateDeliveryModalComponent, {
+        data: data.data,
+        width: "800px",
+        height: "500px",
+      });
+      dialogref.afterClosed().subscribe((result) => {
+        if (result) {
+          this.tableload=true;
+           this.csv.map((x)=>{
+            if(x.shipment==result.dKTNO){
+              x.status=result.bookedPkgs==parseInt(result.deliveryPkgs)?"Delivered":"";
+              x.dateTime=result.DTTM;
+              x.dDateTime=moment.utc(result.DTTM).format("DD/MM/YYYY HH:MM:SS");
+              x.person=result.person;
+              x.reason=result.reason;
+              x.pod=result.pod;
+            }
+            return x;
+           })
+           this.tableload=false;
+           this.changeDetectorRef?.detectChanges();
+        }
+      });
+    }
+    }
 }

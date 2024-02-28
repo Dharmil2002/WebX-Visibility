@@ -46,7 +46,10 @@ export class UpdateloadingRunControl {
                 placeholder: '',
                 type: "text",
                 value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "Start Km is required"
+                }],
                 generatecontrol: true,
                 disable: false
             },
@@ -56,7 +59,10 @@ export class UpdateloadingRunControl {
                 placeholder: '',
                 type: 'time',
                 value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "Departure Time is required"
+                }],
                 generatecontrol: true,
                 disable: false
             },

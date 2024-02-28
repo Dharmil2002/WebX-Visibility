@@ -49,7 +49,17 @@ export enum VehicleStatus {
     Arrived= 5,
     Unloaded= 6
 }
-
+export enum runSheetAction{
+    Depart=1,
+    Update_Delivery=2
+}
+export enum DocketType {
+    Regular = 1,
+    Quick = 2
+}
+export enum DeliveryStatus {
+    yet_to_deliver=1
+}
 export function getEnumName(enumObj: any, value: string): string | null {
     let foundKey = null;
     Object.keys(enumObj).forEach(key => {
@@ -58,4 +68,10 @@ export function getEnumName(enumObj: any, value: string): string | null {
         }
     });
     return foundKey;
+}
+export enum DrsStatus {
+    Generated = 1,
+    Delivery_Out_Scan = 2,
+    Out_For_Delivery=3,
+    Closed=4
 }

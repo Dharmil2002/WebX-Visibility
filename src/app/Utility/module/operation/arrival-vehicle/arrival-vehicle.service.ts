@@ -24,7 +24,8 @@ export class ArrivalVehicleService {
             filters: [
                 {
                     D$match: matchQuery,
-                }, {
+                },
+                 {
                     "D$lookup": {
                         "from": "mf_headers_ltl",
                         "let": { "docNumber": "$docNo" }, // Renamed for clarity
@@ -436,6 +437,8 @@ export class ArrivalVehicleService {
                 nXTLOC: "",
                 vEHNO: "",
                 tHC: "",
+                lSNO:"",
+                mFNO:"",
                 sTS: 7,// Assuming this is the status code for "In Transit",
                 sTSNM: "Route Updated"
             }

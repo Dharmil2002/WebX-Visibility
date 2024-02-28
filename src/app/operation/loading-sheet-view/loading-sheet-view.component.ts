@@ -52,7 +52,8 @@ Currently, all flows are working together without proper separation.
     "cFTTOT": "Volume",
   };
   columnWidths = {
-    'Shipment': 'min-width:20%'
+    'dKTNO': 'min-width:20%',
+    'sFX': 'min-width:1%'
   };
   centerAlignedData = ['Shipment','Suffix', 'Packages', 'KgWeight', 'CftVolume'];
 

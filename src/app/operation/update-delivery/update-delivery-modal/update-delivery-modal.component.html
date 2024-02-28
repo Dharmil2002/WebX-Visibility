@@ -1,0 +1,14 @@
+<mat-dialog-content>
+    <!-- Title -->
+        <form [formGroup]="deliveryForm">
+            <app-form-webxpress [form]="deliveryForm" [FormTitle]="'Delivey Update'" [formData]="jsonControlArray" [uploadedFiles]="uploadedFiles"
+                (callFunction)="functionCaller($event)" (functionCallEmitter)="functionCaller($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
+          <div class="example-button-row d-flex justify-content-end">
+            <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
+              (click)="save()" [disabled]="!deliveryForm.valid">Save</button>
+            <button class="msr-3" mat-raised-button color="primary"   (click)="cancel()">Back</button>
+          </div>
+</mat-dialog-content>

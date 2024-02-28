@@ -12,7 +12,7 @@ export class UpdateDeliveryControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'route',
@@ -21,10 +21,10 @@ export class UpdateDeliveryControl {
                 type: 'text',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
             },
             {
-                name: "tripid",
+                name: "tripId",
                 label: "Trip ID",
                 placeholder: '',
                 type: "text",

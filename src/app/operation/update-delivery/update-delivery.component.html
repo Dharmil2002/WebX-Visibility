@@ -10,7 +10,7 @@
   <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
 
   <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-    [tableData]="csv" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+    [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
     [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)" [metaData]="METADATA" (onFlagChange)="selectCheckBox($event)"
     [onFlagChangeGetAll]="true" [selectAllRequired]="true" [showHeader]='false'>
   </app-generic-table-v2>

@@ -29,7 +29,10 @@ export class UpdateShipmentDeliveryControl {
                 placeholder: '',
                 type: 'datetimerpicker',
                 value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "'Date And Time is required"
+                }],
                 generatecontrol: true, disable: false
             },
             {
@@ -63,8 +66,8 @@ export class UpdateShipmentDeliveryControl {
                 name: "cODDODCharges",
                 label: "COD/DOD Charges",
                 placeholder: '',
-                type: "text",
-                value: '',
+                type:"text",
+                value:'0.00',
                 Validations: [],
                 generatecontrol: true, disable: true
             },
@@ -73,7 +76,7 @@ export class UpdateShipmentDeliveryControl {
                 label: 'COD/DOD Paid',
                 placeholder: '',
                 type: 'text',
-                value: '',
+                value:'0.00',
                 Validations: [],
                 generatecontrol: true, disable: true
             },

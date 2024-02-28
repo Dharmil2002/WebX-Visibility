@@ -5,17 +5,49 @@
       (callFunction)="functionCallHandler($event)" [FormTitle]="'Customer and GST Details'">
     </app-form-webxpress>
   </form>
-  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="InvoiceDetailscolumnHeader"
-  [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-  [menuItems]="menuItems" [staticField]="staticField" [selectAllRequired]="true"
-  (selectAllClicked)="getCalucationDetails($event)"(dialogClosed)="close($event)" (onFlagChange)="getCalucationDetails($event)" [Link]="linkArray" [height]="height" [width]="width"
-  [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath">
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls"
+    [columnHeader]="InvoiceDetailscolumnHeader" [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems"
+    [staticField]="staticField" [selectAllRequired]="true" (selectAllClicked)="getCalucationDetails($event)"
+    (dialogClosed)="close($event)" (onFlagChange)="getCalucationDetails($event)" [Link]="linkArray" [height]="height"
+    [width]="width" [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath">
   </app-generic-table-v2>
-  <form [formGroup]="CollectionSummaryTableForm">
+  <!-- <form [formGroup]="CollectionSummaryTableForm">
     <app-form-webxpress [form]="CollectionSummaryTableForm" [formData]="CollectionSummaryjsonControlArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
       (callFunction)="functionCallHandler($event)" [FormTitle]="'Collection Summary'">
     </app-form-webxpress>
-  </form>
-</app-common-wrapper-webxpress>
+  </form> -->
 
+  <div class="row">
+    <div class="col-5">
+      <form [formGroup]="DebitVoucherTaxationPaymentSummaryForm">
+        <app-form-webxpress [form]="DebitVoucherTaxationPaymentSummaryForm" [FormTitle]="'Payment Summary'"
+          [DisplayCheckbox]="true" [CheckBoxMessage]="'Round Off'"
+          [formData]="jsonControlDebitVoucherTaxationPaymentSummaryArray"
+          [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2'" (functionCallEmitter)="functionCallHandler($event)"
+          (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+      </form>
+    </div>
+    <div class="col">
+      <form [formGroup]="DebitVoucherTaxationPaymentDetailsForm">
+        <app-form-webxpress [form]="DebitVoucherTaxationPaymentDetailsForm" [FormTitle]="'Payment Details'"
+          [formData]="jsonControlDebitVoucherTaxationPaymentDetailsArray"
+          (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+      </form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+      <div class="example-button-row  d-flex justify-content-end">
+        <button [disabled]="!DebitVoucherTaxationPaymentSummaryForm.valid || 
+                  tableData.length==0 || !DebitVoucherTaxationPaymentDetailsForm.valid" class="msr-3" mat-raised-button
+          color="primary" (click)="save()">Submit</button>
+        <button mat-button (click)="cancel()">Back</button>
+      </div>
+    </div>
+  </div>
+
+</app-common-wrapper-webxpress>

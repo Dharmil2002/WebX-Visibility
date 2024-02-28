@@ -131,7 +131,7 @@ export class PrqEntryPageComponent implements OnInit {
         this.prqEntryTableForm.controls["cNTYP"].setValue(containerlist);
       } else {
         this.prqEntryTableForm.controls["vEHSIZE"].setValue(
-          this.prqDetail?.vehicleSizeCode || ""
+          `${this.prqDetail?.vehicleSizeCode || ""}`
         );
       }
       this.prqEntryTableForm.controls["fCITY"].setValue({
@@ -183,7 +183,10 @@ export class PrqEntryPageComponent implements OnInit {
       this.jsonControlPrqArray,
     ]);
     this.allFormGrop = this.jsonControlPrqArray;
-    this.prqEntryTableForm.controls['oDRDT'].setValue("");
+    if(!this.isUpdate){
+      this.prqEntryTableForm.controls['oDRDT'].setValue("");
+    }
+
   }
 
   mapControls() {

@@ -66,11 +66,11 @@ export class PrqSummaryPageComponent implements OnInit {
         // Use current date and time for 'today'
         const today = moment();
         // Check if 'inputDate' is before today (ignoring time)
-        if (inputDate.isBefore(today, "day")) {
+        if (inputDate.isAfter(today, "day")) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "This Pick-Up DateTime is for a past date and hence not allowed.",
+            text: "This Pick-Up DateTime is for a future date and hence not allowed.",
           });
           return null;
         }

@@ -1,4 +1,4 @@
-export class prqDetail {   
+export class prqDetail {
     prqNo: string;
     vehicleSize: string;
     vehicleSizeCode: string;
@@ -13,10 +13,10 @@ export class prqDetail {
     prqBranch:string;
     vehicleNo: string;
     contactNo: number;
-    pickupDate: Date;  
+    pickupDate: Date;
     status: string;
     statusCode: string;
-    containerSize:string;    
+    containerSize:string;
     typeContainer:string;
     typeContainerCode: string;
     payType:string;
@@ -28,7 +28,7 @@ export class prqDetail {
     oDRNO:string;
     oDRBY:string;
     rMKS:string;
-    oDRDT: Date;  
+    oDRDT: Date;
 
     constructor(data: any) {
         this.prqNo = data.prqNo ?? 'System Generated';
@@ -57,7 +57,7 @@ export class prqDetail {
         this.Action = data.Action ?? '';
         this.contractAmt=data.contractAmt??0;
         this.oDRNO = data.oDRNO ?? '';
-        this.oDRDT = data.oDRDT ?? new Date(data.oDRDT) ;
+        this.oDRDT = data.oDRDT ?? "" ;
         this.oDRBY = data.oDRBY ?? '';
         this.rMKS = data.rMKS ?? '';
     }

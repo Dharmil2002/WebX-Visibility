@@ -183,6 +183,7 @@ export class PrqEntryPageComponent implements OnInit {
       this.jsonControlPrqArray,
     ]);
     this.allFormGrop = this.jsonControlPrqArray;
+    this.prqEntryTableForm.controls['oDRDT'].setValue("");
   }
 
   mapControls() {
@@ -473,7 +474,7 @@ export class PrqEntryPageComponent implements OnInit {
       );
     }
   }
-  
+
   async bilingChanged() {
     const billingParty =
       this.prqEntryTableForm.controls["bPARTY"].value?.value || "";

@@ -11,12 +11,27 @@ export class CustOutstandingService {
           private masterServices: MasterService,
           private storage: StorageService
      ) { }
-
+     getISODateOrNull(date) {
+          if (isNaN(date.getTime())) {
+               return ''; // Return empty string if date is invalid
+          } else {
+               return date.toISOString(); // Convert to ISO format if date is valid
+          }
+     }
      async getcustomerOutstandingReportDetail(ASonDateValue, start, end, loct, cust, gstST, reportbasis, custGrp) {
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const cus = cust ? cust.map(x => x.custCD) || [] : [];
           const gstState = gstST ? gstST.map(x => x.gstNM) || [] : [];
           const custgrp = custGrp ? custGrp.map(x => x.cgpCD) || [] : [];
+          let ASonDateValueValid = true;
+          let dtmrequest = {}
+          if (ASonDateValue == "Invalid Date") {
+               ASonDateValueValid = false;
+               dtmrequest = { D$lte: this.getISODateOrNull(end) }
+          }
+          else {
+               dtmrequest = { D$lte: this.getISODateOrNull(ASonDateValue) }
+          }
 
           let matchQuery = {
                'D$and': [
@@ -95,8 +110,11 @@ export class CustOutstandingService {
                                                                  D$eq: ["$bILLNO", "$$bILLNO"],
                                                             },
                                                        },
+                                                       // {
+                                                       //      dTM: { D$lte: ASonDateValue }
+                                                       // },
                                                        {
-                                                            dTM: { D$lte: ASonDateValue }
+                                                            dTM: dtmrequest
                                                        },
                                                        {
                                                             cNL: {
@@ -137,12 +155,12 @@ export class CustOutstandingService {
                                              else: 0,
                                         },
                                    },
-                                   collectedAmt: {
-                                        D$sum: "$cOL.aMT",
-                                   },
                                    // collectedAmt: {
-                                   //      D$sum: "$coll.aMT",
+                                   //      D$sum: "$cOL.aMT",
                                    // },
+                                   collectedAmt: {
+                                        D$sum: "$coll.aMT",
+                                   },
                               },
                          },
                          {

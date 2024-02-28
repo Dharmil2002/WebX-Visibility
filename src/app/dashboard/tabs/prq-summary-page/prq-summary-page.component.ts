@@ -47,11 +47,7 @@ export class PrqSummaryPageComponent implements OnInit {
     this.getPrqDetails();
   }
   async getPrqDetails() { 
-    const Branch = localStorage.getItem("Branch");
-    // const Branch = "HQTR";
-
-
-    let data = await this.prqService.getPrqDetailFromApi(Branch);
+    let data = await this.prqService.getPrqDetailFromApi();
 
     this.tableData = data.tableData;
     this.allPrq = data.allPrqDetail;

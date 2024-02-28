@@ -190,13 +190,24 @@ export class PrqService {
   //................end.............//
 
   // This async function retrieves PRQ (Purchase Request) detail data from an API using the masterService.
-  async getPrqDetailFromApi(Branch) {
+  async getPrqDetailFromApi() {
+    const reqBarnch = {
+      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      collectionName: "location_detail",
+      filter: {locCode:this.branchCode},
+    }
+
+    const resBarnch = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBarnch));
+    let barnchCode;
+    if(resBarnch.success){
+      barnchCode = resBarnch.data.length > 0 ?resBarnch.data[0].locLevel:undefined
+    }
 
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_summary",
-      filter: Branch.toUpperCase() == "HQTR"?{}:{ bRCD: this.branchCode },
+      filter: barnchCode && barnchCode == 1?{}:{ bRCD: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
@@ -230,6 +241,10 @@ export class PrqService {
 
     return prqDetail;
   }
+
+  // async getLocationDetail(){
+
+  // }
 
   async getPrqForBooking(barnch, billingParty, payType) {
     // Prepare the request body with necessary parameters

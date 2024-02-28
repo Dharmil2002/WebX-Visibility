@@ -12,6 +12,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { VehicleTypeService } from 'src/app/Utility/module/masters/vehicle-type/vehicle-type-service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -37,7 +38,7 @@ export class CreateRunSheetComponent implements OnInit {
   tableload = false;
   csv: any[];
   runSheetData: any;
-  delType: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
+  delType:AutoComplete[];
   constructor(
     private Route: Router,
     private runSheetService: RunSheetService,

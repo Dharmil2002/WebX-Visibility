@@ -1183,7 +1183,7 @@ export class EwayBillControls {
       },
       {
         name: "LENGTH",
-        label: "Length (CM)",
+        label: "Length (FT)",
         placeholder: "",
         type: "text",
         value: '',
@@ -1193,7 +1193,7 @@ export class EwayBillControls {
       },
       {
         name: "BREADTH",
-        label: "Breadth (CM)",
+        label: "Breadth (FT)",
         placeholder: "",
         type: "text",
         value: '',
@@ -1203,7 +1203,7 @@ export class EwayBillControls {
       },
       {
         name: "HEIGHT",
-        label: "Height (CM)",
+        label: "Height (FT)",
         placeholder: "",
         type: "text",
         value: '',

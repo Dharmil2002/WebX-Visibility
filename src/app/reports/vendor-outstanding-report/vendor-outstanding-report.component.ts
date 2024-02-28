@@ -180,11 +180,10 @@ export class VendorOutstandingReportComponent implements OnInit {
   }
 
   async save() {
-    const reportTp = Array.isArray(this.VendWiseOutTableForm.value.rpttype)?'':this.VendWiseOutTableForm.value.rpttype;
     const reportbasis = Array.isArray(this.VendWiseOutTableForm.value.rptbasis)?'':this.VendWiseOutTableForm.value.rptbasis;
     const startValue = new Date(this.VendWiseOutTableForm.controls.start.value);
     const endValue = new Date(this.VendWiseOutTableForm.controls.end.value);
-
+    const ASonDateValue = new Date(this.VendWiseOutTableForm.controls?.asondate.value);
     const formattedStartDate = startValue.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
     const formattedEndDate = endValue.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 
@@ -199,7 +198,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     const vendData = Array.isArray(this.VendWiseOutTableForm.value.vendnmcdHandler)
       ? this.VendWiseOutTableForm.value.vendnmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
       : [];
-    const data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(startValue, endValue, locData, vendData, reportbasis, reportTp);
+    const data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(ASonDateValue, startValue, endValue, locData, vendData, reportbasis);
 
     if (data.length === 0) {
       if (data) {

@@ -169,6 +169,14 @@
       "router": "Masters/CustomerMaster/AddCustomerMaster"
     },
     {
+      "title": "Menu/MenuAccessRights",
+      "tag": [
+        "MenuAccessRights",
+        "MenuAccessRights"
+      ],
+      "router": "Masters/Menu/MenuAccessRights"
+    },
+    {
       "title": "DocumentControlRegister/AddDCR",
       "tag": [
         "DocumentControlRegister",
@@ -694,6 +702,13 @@
         "AddBeneficiaryMaster"
       ],
       "router": "Masters/BeneficiaryMaster/AddBeneficiaryMaster"
+    },
+    {
+      "title": "Finance/VoucherEntry/CreditVoucher",
+      "tag": [
+        "Finance/VoucherEntry/CreditVoucher"
+      ],
+      "router": "Finance/VoucherEntry/CreditVoucher"
     },
     {
       "title": "Finance/VoucherEntry/DebitVoucher",

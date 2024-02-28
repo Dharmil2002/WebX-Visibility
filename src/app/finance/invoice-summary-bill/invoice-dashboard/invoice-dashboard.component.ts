@@ -48,31 +48,6 @@ export class InvoiceDashboardComponent implements OnInit {
       // Fetch data from the service
       const count = await this.objInvoiceCountService.getDashboardData();
 
-      // Define a filter for shipments without POD
-      const podFilter = {
-        "D$pipeline": [
-          {
-            "D$match": {
-              "D$or": [
-                { 'pOD': '' },
-                { 'pOD': null },
-                { 'pOD': undefined },
-                { 'pOD': { "D$exists": false } }
-              ],
-              "D$and": [
-                { 'sTS': 3 }
-              ]
-            }
-          },
-          {
-            "D$group": {
-              '_id': null,
-              'emptyCount': { "D$sum": 1 }
-            }
-          }
-        ]
-      };
-
       // Fetch count of shipments without POD
       //const emptyPodCount = await this.objInvoiceCountService.getPengPodCount(podFilter);    
 
@@ -103,7 +78,7 @@ export class InvoiceDashboardComponent implements OnInit {
             item['count'] = approvedBillCount || '0';
             break;
           case "Pending PODs":
-            item['count'] = '0';
+            item['count'] = approvedBillCount || '0';
             break;
         }
       });

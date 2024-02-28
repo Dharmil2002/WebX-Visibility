@@ -1,11 +1,10 @@
-import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { UpdateRunSheetComponent } from "src/app/operation/update-run-sheet/update-run-sheet.component";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
-import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
-import { createRunSheetData } from "./runSheetHelper";
-import { OperationService } from "src/app/core/service/operations/operation.service";
+import { RunSheetService } from "src/app/Utility/module/operation/runsheet/runsheet.service";
+import { StorageService } from "src/app/core/service/storage.service";
+import { createShipDataObject } from "src/app/Utility/commonFunction/dashboard/dashboard";
 @Component({
   selector: "app-manage-runsheet",
   templateUrl: "./manage-runsheet.component.html",
@@ -16,7 +15,7 @@ export class ManageRunsheetComponent
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   tableData: any[];
-  addAndEditPath: string;
+  addAndEditPath:string;
   drillDownPath: string;
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
@@ -30,14 +29,18 @@ export class ManageRunsheetComponent
     },
   ];
   dynamicControls = {
-    add: false,
+    add: true,
     edit: true,
     csv: false,
   };
+
   /*Below is Link Array it will Used When We Want a DrillDown
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
-  linkArray = [{ Row: "Action", Path: "Operation/UpdateRunSheet" }];
+   const 
+  linkArray = [
+    { Row: "Action", Path: "Operation/UpdateRunSheet" }
+  ];
   menuItems = [
     {
       label: "Depart",
@@ -61,6 +64,7 @@ export class ManageRunsheetComponent
 
   columnHeader = {
     RunSheet: "Run Sheet",
+    vehicleNo: "Vehicle No",
     Cluster: "Cluster",
     Shipments: "Shipments",
     Packages: "Packages",
@@ -74,6 +78,9 @@ export class ManageRunsheetComponent
     checkBoxRequired: true,
     // selectAllorRenderedData : false,
     noColumnSort: ["checkBoxRequired"],
+  };
+  columnWidths = {
+    'RunSheet': 'min-width:15%'
   };
   //#endregion
   //#region declaring Csv File's Header as key and value Pair
@@ -96,12 +103,12 @@ export class ManageRunsheetComponent
 
   constructor(
     private Route: Router,
-    private operationService: OperationService, // Injecting OperationService,
-    private cnoteService: CnoteService
+    private storage:StorageService,
+    private runsheetService: RunSheetService
   ) {
     super();
     this.csvFileName = "exampleUserData.csv";
-    this.addAndEditPath = "example/form";
+    this.addAndEditPath='Operation/UpdateDelivery';
     this.IscheckBoxRequired = true;
     this.drillDownPath = "example/drillDown";
     this.getManagedRunSheetDetails();
@@ -113,83 +120,25 @@ export class ManageRunsheetComponent
 
   runSheetDetails() {
     this.shipmentData = [];
-    let runSheetJson = {
-      runsheetdata: this.cnoteService?.getRunSheetData() || 0,
-      updatedData: this.cnoteService?.getdepartRunSheetData() || 0
-    }
-    if (this.cnoteService?.getRunSheetData()) {
-      this.shipmentData.push(...this.cnoteService?.getRunSheetData().shippingData)
-    }
-
-    this.getRunSheet(runSheetJson);
-
+    this.getRunSheet();
   }
 
   ngOnInit(): void {
 
   }
-  getRunSheet(dataapi) {
+  async getRunSheet() {
+     const runSheetData = await this.runsheetService.getRunSheetManagementData({cID:this.storage.companyCode,lOC:this.storage.branch,oPSST:{"D$in":[1,2]}});
+     const tableData=await this.runsheetService.getRunSheetManagementFieldMapping(runSheetData);
+     this.tableData =tableData;
+     const shipment=tableData.reduce((total, shipment) => total + shipment.Shipments, 0);
+     const uniqueClusterNames = new Set(tableData.map(item => item.Cluster));
+     const shipData = [
+      createShipDataObject(uniqueClusterNames.size, "Clusters", "bg-c-Bottle-light"),
+      createShipDataObject(shipment, "Shipments for Delivery", "bg-c-Grape-light"),
+    ];
+    this.boxdata = shipData;
+    this.tableload = false;
    
-    this.operationService.getJsonFileDetails('runSheerUrl').subscribe(res => {
-      this.data = res;
-      let data = createRunSheetData(this.data, "", false);
-      let departRunSheetData = this.cnoteService?.departRunSheetData || ''
-      if (data) {
-        let csv
-        if (!dataapi && departRunSheetData) {
-          csv = data.csv.map(item => {
-            if (item.RunSheet === departRunSheetData.RunSheet) {
-              item.Action = "Update Delivery",
-                item.Status = "OUT FOR DELIVERY"
-            }
-            return item;
-          });
-        }
-        else {
-
-        }
-        this.tableData = data.csv;
-
-        this.tableload = false;
-        this.boxdata = data.boxdata;
-        this.shipmentData.push(...this.data.shipment);
-        if (dataapi) {
-
-          let dataApiRunsheet = createRunSheetData(dataapi.runsheetdata, dataapi.updatedData, true);
-          this.tableData.push(...dataApiRunsheet.csv);
-          if (departRunSheetData) {
-            this.tableData = data.csv.map(item => {
-              if (item.RunSheet === departRunSheetData.RunSheet) {
-                item.Action = "Update Delivery",
-                  item.Status = "OUT FOR DELIVERY"
-              }
-              return item;
-            });
-          }
-          let departVehicleData = {
-            runSheetdetails: this.tableData,
-            shipments: dataapi.runsheetdata
-          }
-          this.cnoteService.setDepartvehicleData(departVehicleData);
-
-          for (let newData of dataApiRunsheet.boxdata) {
-            let existingData = this.boxdata.find((data) => data.title === newData.title);
-            if (existingData) {
-              existingData.count += newData.count;
-            }
-          }
-          this.tableload = false;
-        }
-        /*this service is for pass data to depart Vehicle for scaning*/
-
-
-
-        /*End*/
-
-      }
-
-    });
-
   }
   handleMenuItemClick(label: any, element) {
     this.Route.navigate(["Operation/UpdateRunSheet"], {

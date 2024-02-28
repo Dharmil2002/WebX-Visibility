@@ -46,9 +46,12 @@ export class PrqSummaryPageComponent implements OnInit {
   ngOnInit(): void {
     this.getPrqDetails();
   }
-  async getPrqDetails() {
+  async getPrqDetails() { 
+    const Branch = localStorage.getItem("Branch");
+    // const Branch = "HQTR";
 
-    let data = await this.prqService.getPrqDetailFromApi();
+
+    let data = await this.prqService.getPrqDetailFromApi(Branch);
 
     this.tableData = data.tableData;
     this.allPrq = data.allPrqDetail;
@@ -66,11 +69,11 @@ export class PrqSummaryPageComponent implements OnInit {
         // Use current date and time for 'today'
         const today = moment();
         // Check if 'inputDate' is before today (ignoring time)
-        if (inputDate.isBefore(today, "day")) {
+        if (inputDate.isAfter(today, "day")) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "This Pick-Up DateTime is for a past date and hence not allowed.",
+            text: "This Pick-Up DateTime is for a future date and hence not allowed.",
           });
           return null;
         }

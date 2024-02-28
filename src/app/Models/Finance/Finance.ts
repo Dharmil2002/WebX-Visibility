@@ -14,6 +14,7 @@ export class VoucherDataRequestModel {
   transType: string
   voucherCode: number
   voucherType: string
+  transactionNumber: string = '';
   transDate: Date
   docType: string
   branch: string
@@ -104,44 +105,53 @@ export enum VoucherType {
 
 export enum VoucherInstanceType {
   DebitVoucherCreation = 0,
-  CNoteBookedVoucher = 1,
-  BillApprovalVoucher = 2,
+  CNoteBooking = 1,
+  BillApproval = 2,
   ContraVoucherCreation = 3,
   AdviceVoucherCreation = 4,
   JournalVoucherCreation = 5,
+  CreditVoucherCreation = 6,
 }
 
 export const ledgerInfo = {
   "IGST": {
     "LeadgerCode": "LIA002004",
-    "LeadgerName": "IGST payable"
+    "LeadgerName": "IGST payable",
+    "LeadgerCategory": "LIABILITY"
   },
   "UGST": {
     "LeadgerCode": "LIA002002",
-    "LeadgerName": "UGST payable"
+    "LeadgerName": "UGST payable",
+    "LeadgerCategory": "LIABILITY"
   },
   "SGST": {
     "LeadgerCode": "LIA002001",
-    "LeadgerName": "SGST payable"
+    "LeadgerName": "SGST payable",
+    "LeadgerCategory": "LIABILITY"
   },
   "CGST": {
     "LeadgerCode": "LIA002003",
-    "LeadgerName": "CGST payable"
+    "LeadgerName": "CGST payable",
+    "LeadgerCategory": "LIABILITY"
   },
   "Round off Amount": {
     "LeadgerCode": "EXP001042",
-    "LeadgerName": "Round off Amount"
+    "LeadgerName": "Round off Amount",
+    "LeadgerCategory": "EXPENSE"
   },
   "Unbilled debtors": {
     "LeadgerCode": "AST001001",
-    "LeadgerName": "Unbilled debtors"
+    "LeadgerName": "Unbilled debtors",
+    "LeadgerCategory": "ASSET"
   },
   "Freight income": {
     "LeadgerCode": "INC001003",
-    "LeadgerName": "Freight income"
+    "LeadgerName": "Freight income",
+    "LeadgerCategory": "INCOME"
   },
   "Billed debtors": {
     "LeadgerCode": "AST002002",
-    "LeadgerName": "Billed debtors"
+    "LeadgerName": "Billed debtors",
+    "LeadgerCategory": "ASSET"
   },
 };

@@ -37,7 +37,7 @@ const routes: Routes = [
   { path: 'VoucherEntry/ContraVoucher', component: ContraVoucherCreationComponent },
   { path: 'FundTransfer/AdviceGeneration', component: AdviceGenerationComponent },
   { path: 'FundTransfer/AdviceAcknowledge', component: AdviceAcknowledgeComponent },
-  { path: 'CreditVoucher', component: CreditVoucherComponent },
+  { path: 'VoucherEntry/CreditVoucher', component: CreditVoucherComponent },
 
 ];
 

@@ -7,6 +7,8 @@ export class Vehicle {
     vendor: string;
     vendorType: string;
     capacity: number;
+    lcNo: string;
+    lcExpireDate: Date;
   
     constructor({
       name = '',
@@ -16,7 +18,9 @@ export class Vehicle {
       vMobNo = '',
       vendor = '',
       vendorType = '',
-      capacity = 0
+      capacity = 0,
+      lcNo = '',
+      lcExpireDate = undefined
     }: {
       name?: string;
       value?: string;
@@ -26,6 +30,8 @@ export class Vehicle {
       vendor?: string;
       vendorType?: string;
       capacity?: number;
+      lcNo?: string;
+      lcExpireDate?: Date;
     }) {
       this.name = name;
       this.value = value;
@@ -35,6 +41,8 @@ export class Vehicle {
       this.vendor = vendor;
       this.vendorType = vendorType;
       this.capacity = capacity;
+      this.lcNo = lcNo;
+      this.lcExpireDate = lcExpireDate;
     }
   }
   

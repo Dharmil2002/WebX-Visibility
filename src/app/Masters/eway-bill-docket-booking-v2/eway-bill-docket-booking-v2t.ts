@@ -94,7 +94,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       style: "max-width:350px",
     },
     LENGTH: {
-      name: "Length (CM)",
+      name: "Length (FT)",
       key: "inputnumber",
       style: "min-width:150px",
       functions: {
@@ -102,7 +102,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       },
     },
     BREADTH: {
-      name: "Breadth (CM)",
+      name: "Breadth (FT)",
       key: "inputnumber",
      style: "min-width:150px",
       functions: {
@@ -110,7 +110,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       },
     },
     HEIGHT: {
-      name: "Height (CM)",
+      name: "Height (FT)",
       key: "inputnumber",
       functions: {
         onChange: "calculateInvoiceTotal",

@@ -1,3 +1,5 @@
+import { firstValueFrom } from "rxjs";
+
 const companyCode = localStorage.getItem("companyCode");
 /**
  * Adds an invoice detail to the database.
@@ -108,10 +110,9 @@ export async function getLocationApiDetail(masterService) {
     const req = {
         companyCode: companyCode,
         collectionName: "location_detail"
-
     }
     try {
-        const resLoc = await masterService.masterPost("generic/get", req).toPromise();
+        const resLoc:any = await firstValueFrom(masterService.masterPost("generic/get", req));
         return resLoc.data;
     }
     catch (error) {

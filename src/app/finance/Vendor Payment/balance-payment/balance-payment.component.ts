@@ -593,7 +593,7 @@ export class BalancePaymentComponent implements OnInit {
           x.value ==
           this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
       );
-      const TDSrate = FindData.rHUF.toFixed(2);
+      const TDSrate = FindData.rOTHER.toFixed(2);
       const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
       this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
         TDSrate

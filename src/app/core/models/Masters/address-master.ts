@@ -12,6 +12,7 @@ export class AddressMaster {
     entryBy: string;
     _id:string;
     cityName: any;
+    isActive: any;
     stateName: any;
     constructor(AddressMaster) {
         {

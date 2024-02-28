@@ -202,7 +202,9 @@
                     <mat-label class="fontbold">{{formItem.label}}</mat-label>
                     <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
                       formControlName={{formItem.name}} [readonly]="formItem.disable"
-                      (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
+                      (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"
+                      (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                      >
                     <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="formItem.displaywith"
                       (optionSelected)="functionCalled( {field :formItem , functionName:formItem.functions?.onOptionSelect, eventArgs: $event })">
                       <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
@@ -373,7 +375,7 @@
                   </mat-form-field>
                   <!-- OR -->
                   <div style="text-align: center; padding-top: 21px;" *ngIf="formItem.type=='OR'">
-                    <span class="label l-bg-purple shadow-style">OR</span>
+                    <span class="label l-bg-purple shadow-style">{{formItem?.label || 'OR'}}</span>
                   </div>
 
                   <div *ngIf="formItem.type === 'button' && formItem.generatecontrol"

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -54,6 +55,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
     private locationService: LocationService,
     private storage: StorageService,
     private masterServices: MasterService,
+    public snackBarUtilityService: SnackBarUtilityService,
   ) {
     this.initializeFormControl()
   }
@@ -264,35 +266,48 @@ export class CustomerOutstandingReportComponent implements OnInit {
   }
 
   async save() {
-    const reportbasis = Array.isArray(this.CustOutTableForm.value.rptbasis) ? '' : this.CustOutTableForm.value.rptbasis;
-    const startValue = new Date(this.CustOutTableForm.controls.start.value);
-    const ASonDateValue = new Date(this.CustOutTableForm.controls?.asondate.value);
-    const endValue = new Date(this.CustOutTableForm.controls.end.value);
-    const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
-      ? this.CustOutTableForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
-      : [];
-    const gstST = Array.isArray(this.CustOutTableForm.value.gstStHandler)
-      ? this.CustOutTableForm.value.gstStHandler.map(x => { return { gstCD: x.value, gstNM: x.name }; })
-      : [];
-    const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
-      ? this.CustOutTableForm.value.custnmcdHandler.map(x => { return { custCD: x.value, custNm: x.name }; })
-      : [];
-    const custGrp = Array.isArray(this.CustOutTableForm.value.custgroupHandler)
-      ? this.CustOutTableForm.value.custgroupHandler.map(x => { return { cgpCD: x.value, cgpNm: x.name }; })
-      : [];
-    let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(ASonDateValue,startValue, endValue, loct, cust, gstST, reportbasis, custGrp);
-    if (data.length === 0) {
-      if (data) {
-        Swal.fire({
-          icon: "error",
-          title: "No Records Found",
-          text: "Cannot Download CSV",
-          showConfirmButton: true,
-        });
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const reportbasis = Array.isArray(this.CustOutTableForm.value.rptbasis) ? '' : this.CustOutTableForm.value.rptbasis;
+        const startValue = new Date(this.CustOutTableForm.controls.start.value);
+        const ASonDateValue = new Date(this.CustOutTableForm.controls?.asondate.value);
+        const endValue = new Date(this.CustOutTableForm.controls.end.value);
+        const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
+          ? this.CustOutTableForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
+          : [];
+        const gstST = Array.isArray(this.CustOutTableForm.value.gstStHandler)
+          ? this.CustOutTableForm.value.gstStHandler.map(x => { return { gstCD: x.value, gstNM: x.name }; })
+          : [];
+        const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
+          ? this.CustOutTableForm.value.custnmcdHandler.map(x => { return { custCD: x.value, custNm: x.name }; })
+          : [];
+        const custGrp = Array.isArray(this.CustOutTableForm.value.custgroupHandler)
+          ? this.CustOutTableForm.value.custgroupHandler.map(x => { return { cgpCD: x.value, cgpNm: x.name }; })
+          : [];
+        let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(ASonDateValue, startValue, endValue, loct, cust, gstST, reportbasis, custGrp);
+        if (data.length === 0) {
+          if (data) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          return;
+        }
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 1000);
+        exportAsExcelFile(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          error.message
+        );
       }
-      return;
-    }
-    exportAsExcelFile(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
+    }, "Customer Outstanding Report Generating Please Wait..!");
   }
 
   functionCallHandler($event) {

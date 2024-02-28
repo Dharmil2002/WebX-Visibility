@@ -1,6 +1,8 @@
+import moment from "moment";
+import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
 
-export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo) {
+export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -11,22 +13,34 @@ export async function showConfirmationDialogThc(data, tripId, operationService, 
     });
 
     if (confirmationResult.isConfirmed) {
-        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo);
+        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation);
         return res
     }
 
 }
-async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo) {
+async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation) {
+    
     const updatePromises = podDetails.map(async (element) => {
+        //Event = EVN0004: Delivered, EVN0005: Arrived
+        //Status = 3: Delivered, 4: Arrived
+
+        let eventId = (element.tCT.toUpperCase() === currentLocation.locCity.toUpperCase()) ? "EVN0004" : "EVN0005";
+        let sts = (eventId == "EVN0004") ? 3 : 4;
+        let stsnm = (eventId == "EVN0004") ? "Delivered" : "Arrived";
+        let opsts = (eventId == "EVN0004") 
+                    ? `Delivered at  ${localStorage.getItem('Branch') } on ${ moment().format('DD MMM YYYY @ HH:mm A')}`
+                    : `Arrived at ${localStorage.getItem('Branch') } on ${ moment().format('DD MMM YYYY @ HH:mm A')}`;
+
         const reqBody = {
             "companyCode": localStorage.getItem('companyCode'),
             "collectionName": "docket_ops_det",
-            "filter": {
-                dKTNO: element.docNo, tHC: tripId
+            "filter": {                
+                tHC: tripId
             },
             "update": {
-                "sTS": 3,
-                "sTSNM": "delivered",
+                "sTS": sts,
+                "sTSNM": stsnm,
+                "oPSTS": opsts,
                 "rMRK": element.remarks,
                 "pOD": element.pod,
                 "aRVTM": element.arrivalTime,
@@ -36,36 +50,39 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "aRRWT": element.aCTWT,
                 "vEHNO": vehicleNo,
                 "cLOC": localStorage.getItem('Branch'),
+                "cCT": currentLocation.locCity.toUpperCase(),
+                "tHC": ""
             }
         };
+       
         const reqBodyDocketEvent = {
             "companyCode": localStorage.getItem('companyCode'),
             "collectionName": "docket_events",
             "data": {
-                "_id": `${localStorage.getItem('companyCode')}-${element.docNo}-0-EVN0004-${element.arrivalTime}`,
+                "_id": `${localStorage.getItem('companyCode')}-${element.docNo}-${element.sFX}-${element.cNO}-${eventId}-${element.arrivalTime}`,
                 "cID": localStorage.getItem('companyCode'),
                 "dKTNO": element.docNo,
-                "sFX": 0,
-                "cNO": element?.cNO || "",
+                "sFX": element.sFX || 0,
+                "cNO": element.cNO,
                 "lOC": localStorage.getItem('Branch'),
-                "eVNID": "EVN0004",
-                "eVNDES": "Delivered",
+                "eVNID": eventId,
+                "eVNDES": (eventId == "EVN0004") ? "Delivered" : "Arrived",
                 "eVNDT": new Date(),
-                "eVNSRC": "Docket Delivered",
+                "eVNSRC":"THC Arrival",
                 "nLOC": null,
                 "dOCTY": "",
                 "dOCNO": "",
                 "eTA": null,
-                "sTS": 4,
-                "sTSNM": "Delivered",
-                "oPSTS": "Docket Delivered - Delivered On " + localStorage.getItem('Branch'),
+                "sTS": sts,
+                "sTSNM": stsnm,
+                "oPSTS": opsts,
                 "eNTDT": new Date(),
                 "eNTLOC": localStorage.getItem('Branch'),
                 "eNTBY": localStorage.getItem('UserName'),
             }
         };
-        await operationService.operationMongoPost("generic/create", reqBodyDocketEvent).toPromise();
-        return operationService.operationMongoPut("generic/update", reqBody).toPromise();
+        await firstValueFrom(operationService.operationMongoPost("generic/create", reqBodyDocketEvent));
+        return firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
     });
     // Wait for all pod updates to complete
     await Promise.all(updatePromises);
@@ -78,7 +95,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
     };
 
     // Update THC summary
-    const thcResult = await operationService.operationMongoPut("generic/update", thcReqBody).toPromise();
+    const thcResult = await firstValueFrom(operationService.operationMongoPut("generic/update", thcReqBody));
 
     return thcResult;
 }

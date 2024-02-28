@@ -60,7 +60,7 @@ export function groupShipingRunsheetTableData(shipingTableData) {
  * @param csv - The CSV data array.
  * @returns The event object containing shipment and package information.
  */
-export function runSheetLoadingScan(loadPackage: any, cluster: string, csv: any[]): any {
+export function runSheetLoadingScan(loadPackage: any, csv: any[]): any {
 
   // Check if the unload package exists
   if (!loadPackage) {

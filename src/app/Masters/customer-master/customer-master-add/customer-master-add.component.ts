@@ -411,9 +411,6 @@ export class CustomerMasterAddComponent implements OnInit {
         }
       }
     }
-    this.customerTableForm.controls.city.setValue("");
-    this.customerTableForm.controls.state.setValue("");
-    this.customerTableForm.controls.Country.setValue("");
   }
 
   async getGSTPinCodeDropdown() {

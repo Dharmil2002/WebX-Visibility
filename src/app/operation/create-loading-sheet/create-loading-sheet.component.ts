@@ -608,7 +608,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   updateVehicleStatus() {
 
     const vehicleDetails = {
-      status: "On Transit",
+      status: "In-Transit",
       tripId: this.loadingSheetTableForm.value?.tripID,
       route: this.tripData?.RouteandSchedule
     };

@@ -51,7 +51,7 @@ export class ContraVoucherCreationComponent implements OnInit {
 
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
-
+  AccountsBanksList: any;
   AccountGroupList: any;
   constructor(
     private fb: UntypedFormBuilder,
@@ -107,14 +107,15 @@ export class ContraVoucherCreationComponent implements OnInit {
         : "ToAccountCode";
     switch (PaymentMode) {
       case "Bank":
-        const responseFromAPIBank = await GetBankDetailFromApi(
+        const BanksList = await GetBankDetailFromApi(
           this.masterService,
           this.storage.branch
         );
+        this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", this.storage.branch)
         this.filter.Filter(
           this.jsonControlContraVoucherPaymentArray,
           this.ContraVoucherPaymentForm,
-          responseFromAPIBank,
+          BanksList,
           AccountCode,
           false
         );
@@ -198,14 +199,11 @@ export class ContraVoucherCreationComponent implements OnInit {
   }
 
   Submit() {
-    const FromDebitAmount =
-      this.ContraVoucherPaymentForm.get("FromDebitAmount").value || 0;
-    const FromCreditAmount =
-      this.ContraVoucherPaymentForm.get("FromCreditAmount").value || 0;
-    const ToDebitAmount =
-      this.ContraVoucherPaymentForm.get("ToDebitAmount").value || 0;
-    const ToCreditAmount =
-      this.ContraVoucherPaymentForm.get("ToCreditAmount").value || 0;
+    const FromDebitAmount = parseFloat(this.ContraVoucherPaymentForm.get("FromDebitAmount").value || 0);
+    const FromCreditAmount = parseFloat(this.ContraVoucherPaymentForm.get("FromCreditAmount").value || 0);
+    const ToDebitAmount = parseFloat(this.ContraVoucherPaymentForm.get("ToDebitAmount").value || 0);
+    const ToCreditAmount = parseFloat(this.ContraVoucherPaymentForm.get("ToCreditAmount").value || 0);
+
 
     if (
       FromDebitAmount == FromCreditAmount
@@ -217,8 +215,41 @@ export class ContraVoucherCreationComponent implements OnInit {
     } else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
-          const totalPaymentAmount =
-            parseFloat(FromCreditAmount) + parseFloat(FromDebitAmount);
+
+          const form = this.ContraVoucherPaymentForm;
+
+          const setAccountCode = (paymentModeControl, accountCodeControl) => {
+            if (paymentModeControl.value === "Bank") {
+              const bankDetails: any = form.get(accountCodeControl).value;
+              const accountDetails = this.AccountsBanksList.find(item => item.bANCD === bankDetails?.value && item.bANM === bankDetails?.name);
+
+              if (accountDetails) {
+                const ledgerData = {
+                  name: accountDetails?.aCNM,
+                  value: accountDetails?.aCCD,
+                  mRPNM: accountDetails?.mRPNM
+                };
+
+                form.get(accountCodeControl).setValue(ledgerData);
+              } else {
+                this.snackBarUtilityService.ShowCommonSwal("error", "Please select a valid Bank that is mapped with the Account Master");
+                return false;
+              }
+            }
+            return true;
+          };
+
+          if (!setAccountCode(form.get("FromPaymentMode"), "FromAccountCode")) {
+            return;
+          }
+
+          if (!setAccountCode(form.get("ToPaymentMode"), "ToAccountCode")) {
+            return;
+          }
+
+
+
+          const totalPaymentAmount = FromCreditAmount + FromDebitAmount;
 
           this.VoucherRequestModel.companyCode = this.storage.companyCode;
           this.VoucherRequestModel.docType = "VR";
@@ -261,12 +292,8 @@ export class ContraVoucherCreationComponent implements OnInit {
           this.VoucherDataRequestModel.UGST = 0;
           this.VoucherDataRequestModel.GSTTotal = 0;
 
-          this.VoucherDataRequestModel.GrossAmount = parseFloat(
-            totalPaymentAmount.toFixed(2)
-          );
-          this.VoucherDataRequestModel.netPayable = parseFloat(
-            totalPaymentAmount.toFixed(2)
-          );
+          this.VoucherDataRequestModel.GrossAmount = totalPaymentAmount;
+          this.VoucherDataRequestModel.netPayable = totalPaymentAmount;
           this.VoucherDataRequestModel.roundOff = 0;
           this.VoucherDataRequestModel.voucherCanceled = false;
 
@@ -291,8 +318,8 @@ export class ContraVoucherCreationComponent implements OnInit {
               voucherNo: "",
               transCode: VoucherInstanceType.ContraVoucherCreation,
               transType: VoucherInstanceType[VoucherInstanceType.ContraVoucherCreation],
-              voucherCode: VoucherType.JournalVoucher,
-              voucherType: VoucherType[VoucherType.JournalVoucher],
+              voucherCode: VoucherType.ContraVoucher,
+              voucherType: VoucherType[VoucherType.ContraVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,
@@ -300,15 +327,16 @@ export class ContraVoucherCreationComponent implements OnInit {
                 this.ContraVoucherPaymentForm.value.FromAccountCode?.value,
               accName:
                 this.ContraVoucherPaymentForm.value.FromAccountCode?.name,
+              accCategory: this.ContraVoucherPaymentForm.value.FromAccountCode?.mRPNM,
               sacCode: "",
               sacName: "",
-              debit: parseFloat(FromDebitAmount).toFixed(2),
-              credit: parseFloat(FromCreditAmount).toFixed(2),
+              debit: FromDebitAmount,
+              credit: FromCreditAmount,
               GSTRate: 0,
               GSTAmount: 0,
-              Total: parseFloat(FromDebitAmount).toFixed(2) + parseFloat(FromCreditAmount).toFixed(2),
+              Total: FromDebitAmount + FromCreditAmount,
               TDSApplicable: false,
-              narration: "",
+              narration: this.ContraVoucherPaymentForm.value.FromAccountCode?.name,
               PaymentMode: this.ContraVoucherPaymentForm.value.FromPaymentMode,
             },
             {
@@ -316,8 +344,8 @@ export class ContraVoucherCreationComponent implements OnInit {
               voucherNo: "",
               transCode: VoucherInstanceType.ContraVoucherCreation,
               transType: VoucherInstanceType[VoucherInstanceType.ContraVoucherCreation],
-              voucherCode: VoucherType.JournalVoucher,
-              voucherType: VoucherType[VoucherType.JournalVoucher],
+              voucherCode: VoucherType.ContraVoucher,
+              voucherType: VoucherType[VoucherType.ContraVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,
@@ -325,13 +353,14 @@ export class ContraVoucherCreationComponent implements OnInit {
               accName: this.ContraVoucherPaymentForm.value.ToAccountCode?.name,
               sacCode: "",
               sacName: "",
+              accCategory: this.ContraVoucherPaymentForm.value.ToAccountCode?.mRPNM,
               debit: ToDebitAmount,
               credit: ToCreditAmount,
               GSTRate: 0,
               GSTAmount: 0,
               Total: ToDebitAmount + ToCreditAmount,
               TDSApplicable: false,
-              narration: "",
+              narration: this.ContraVoucherPaymentForm.value.ToAccountCode?.name,
               PaymentMode: this.ContraVoucherPaymentForm.value.ToPaymentMode,
             },
           ];
@@ -349,23 +378,74 @@ export class ContraVoucherCreationComponent implements OnInit {
           )
             .then((res: any) => {
               if (res.success) {
-                Swal.fire({
-                  icon: "success",
-                  title: "Contra Voucher Created Successfully",
-                  text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-                  showConfirmButton: true,
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    Swal.hideLoading();
-                    setTimeout(() => {
-                      Swal.close();
-                    }, 2000);
-                    this.navigationService.navigateTotab(
-                      "Voucher",
-                      "dashboard/Index"
-                    );
-                  }
-                });
+                var CreditData = VoucherlineitemList.filter(item => item.debit == 0.00).map(function (item) {
+                  return {
+                    "accCode": `${item.accCode}`,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.credit,
+                    "narration": item.narration ? item.narration : item.accName,
+                  };
+                })
+                var DebitData = VoucherlineitemList.filter(item => item.credit == 0.00).map(function (item) {
+                  return {
+                    "accCode": `${item.accCode}`,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.debit,
+                    "narration": item.narration ? item.narration : item.accName,
+                  };
+                })
+                let reqBody = {
+                  companyCode: this.storage.companyCode,
+                  voucherNo: res?.data?.mainData?.ops[0].vNO,
+                  transDate: Date(),
+                  finYear: financialYear,
+                  branch: this.storage.branch,
+                  transCode: VoucherInstanceType.ContraVoucherCreation,
+                  transType: VoucherInstanceType[VoucherInstanceType.ContraVoucherCreation],
+                  voucherCode: VoucherType.ContraVoucher,
+                  voucherType: VoucherType[VoucherType.ContraVoucher],
+                  docType: "Voucher",
+                  partyType: this.ContraVoucherSummaryForm.value.Preparedfor,
+                  docNo: "",
+                  partyCode: "",
+                  partyName: "",
+                  entryBy: this.storage.userName,
+                  entryDate: Date(),
+                  debit: DebitData,
+                  credit: CreditData,
+                };
+
+                this.voucherServicesService
+                  .FinancePost("fin/account/posting", reqBody)
+                  .subscribe({
+                    next: (res: any) => {
+                      Swal.fire({
+                        icon: "success",
+                        title: "Contra Voucher Created Successfully",
+                        text: "Voucher No: " + reqBody.voucherNo,
+                        showConfirmButton: true,
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          Swal.hideLoading();
+                          setTimeout(() => {
+                            Swal.close();
+                          }, 2000);
+                          this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                        }
+                      });
+                    },
+                    error: (err: any) => {
+
+                      if (err.status === 400) {
+                        this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                      } else {
+                        this.snackBarUtilityService.ShowCommonSwal("error", err);
+                      }
+                    },
+                  });
+
               }
             })
             .catch((error) => {

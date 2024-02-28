@@ -102,7 +102,7 @@ export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
 
 // export async function updateTracking(companyCode, operationService,dktNo,next) {
 //     const dockData = {
-//       status:"On Transit",
+//       status:"In-Transit",
 //       upBy:localStorage.getItem("Username"),
 //       upDt:new Date().toUTCString(),
 //       evnCd:""

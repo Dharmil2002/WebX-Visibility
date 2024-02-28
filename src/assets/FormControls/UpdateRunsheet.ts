@@ -46,7 +46,10 @@ export class UpdateloadingRunControl {
                 placeholder: '',
                 type: "text",
                 value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "Start Km is required"
+                }],
                 generatecontrol: true,
                 disable: false
             },
@@ -54,19 +57,12 @@ export class UpdateloadingRunControl {
                 name: 'Departuretime',
                 label: 'Departure Time',
                 placeholder: '',
-                type: 'text',
+                type: 'time',
                 value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
-            },
-            {
-                name: 'Scan',
-                label: 'Scan',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "Departure Time is required"
+                }],
                 generatecontrol: true,
                 disable: false
             },

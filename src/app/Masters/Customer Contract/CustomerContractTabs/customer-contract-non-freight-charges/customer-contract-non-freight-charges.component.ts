@@ -181,6 +181,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   async getselectChargesDropdown() {
     const AcGroupdata = await PayBasisdetailFromApi(this.masterService, "SCH");
+    console.log('AcGroupdata' ,AcGroupdata)
     this.filter.Filter(
       this.jsonControlArrayNonFreightCharges,
       this.NonFreightChargesForm,

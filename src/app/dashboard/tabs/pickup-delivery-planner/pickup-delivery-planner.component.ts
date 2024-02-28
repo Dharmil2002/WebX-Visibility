@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 @Component({
   selector: 'app-pickup-delivery-planner',
-  templateUrl: './pickup-delivery-planner.component.html',
+  templateUrl:'./pickup-delivery-planner.component.html',
 })
 export class PickupDeliveryPlannerComponent implements OnInit {
   @ViewChild('myTabGroup') myTabGroup: MatTabGroup;

@@ -170,7 +170,7 @@ export class MfdetailsList {
   cID: number
   dKTNO: string
   sFX: number
-  cNID: string
+  cNO: string
   oRGN: string
   dEST: string
   pKGS: number

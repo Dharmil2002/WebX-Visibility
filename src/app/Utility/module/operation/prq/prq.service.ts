@@ -56,7 +56,7 @@ export class PrqService {
       collectionName: "prq_summary",
       data: prqData,
       docType: "PRQ",
-      branch: branch,
+      branch: prqData.bRCD,
       party: party,
       finYear: financialYear, // Replace with a dynamic value if needed
     };
@@ -77,7 +77,7 @@ export class PrqService {
 
   //here the code to update prq status
   async updatePrqStatus(prqData) {
-    
+
     delete prqData.srNo;
     delete prqData.Action;
 
@@ -85,12 +85,12 @@ export class PrqService {
     prqData.status = this.status[prqData.status];
     let model;
     if(prqData.statusCode && prqData.prqNo) {
-      model = { 
+      model = {
         ...this.preparePrqDataModel({...prqData})
       };
     }
     else {
-      model = { 
+      model = {
         ...prqData
       };
     }
@@ -118,7 +118,7 @@ export class PrqService {
       confirmButtonText: "Yes, proceed",
       cancelButtonText: "Cancel",
     });
-    
+
     if (confirmationResult.isConfirmed) {
       prqDetail.statusCode = status;
       prqDetail.status = this.status[status];
@@ -126,7 +126,7 @@ export class PrqService {
       delete prqDetail.srNo;
       delete prqDetail.actions;
 
-      var model = { 
+      var model = {
         //...this.preparePrqDataModel({...prqDetail})
         cID: localStorage.getItem("companyCode"),
         pRQNO: prqDetail.prqNo || prqDetail.docNo || "",
@@ -181,7 +181,7 @@ export class PrqService {
       };
 
       const vehicleUpdate = await firstValueFrom(this.operation.operationMongoPut("generic/update", reqBody));
-      
+
       return vehicleUpdate; // Optionally, you can return the updated vehicle data.
     } catch (error) {
       throw error; // Re-throw the error to be handled at a higher level or log it.
@@ -190,13 +190,13 @@ export class PrqService {
   //................end.............//
 
   // This async function retrieves PRQ (Purchase Request) detail data from an API using the masterService.
-  async getPrqDetailFromApi() {
-    
+  async getPrqDetailFromApi(Branch) {
+
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_summary",
-      filter: { bRCD: this.branchCode },
+      filter: Branch.toUpperCase() == "HQTR"?{}:{ bRCD: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
@@ -206,10 +206,10 @@ export class PrqService {
     const prqData = res.data.filter( (x) => x.sTS !== 4 && x.sTS !== 5 );
 
     let prqList = [];
-    
+
     // Map and transform the PRQ data
     prqData.map((element, index) => {
-      let pqrData = this.preparePrqDetailObject(element, index);     
+      let pqrData = this.preparePrqDetailObject(element, index);
       prqList.push(pqrData)
       // You need to return the modified element
     });
@@ -273,7 +273,7 @@ export class PrqService {
 
     // Make an asynchronous request to the API using masterMongoPost method
     const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
-    
+
     let prqList = [];
     const prqDetails = res.data;
     // Map and transform the PRQ data
@@ -384,14 +384,21 @@ export class PrqService {
       vNDNM: element?.vNDNM || "",
       vEHNO:  element?.vEHNO || "",
       createdDate: formatDocketDate(element?.eNTDT || new Date()),
-      createDateOrg: element?.eNTDT
-    };
+      createDateOrg: element?.eNTDT,
+      //Below code added by manan sanghani
+      pAddressName : element.pADDNM ?? '',
+      oDRNO : element.oDRNO ?? '',
+      OrderDate: formatDocketDate(element?.oDRDT || new Date()),
+      oDRDT: element?.oDRDT || new Date(),
+      oDRBY : element.oDRBY ?? '',
+      rMKS : element.rMKS ?? '',
+       };
 
     return prqDataItem;
   }
 
   preparePrqDataModel(element) {
-    let prqDataItem = {            
+    let prqDataItem = {
       pRQNO: element?.prqNo || "",
       vEHSIZENM: element?.vehicleSize || "",
       vEHSIZE: element?.vehicleSizeCode || "",
@@ -418,7 +425,7 @@ export class PrqService {
     };
     return prqDataItem;
   }
-  
+
   // This function sets the assigned vehicle details.
   setassignVehicleDetail(data: any) {
     this.vehicleDetail = data;

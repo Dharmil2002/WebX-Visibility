@@ -242,6 +242,7 @@ export class JournalVoucherCreationComponent implements OnInit {
           id: this.tableData.length + 1,
           Ledger: result?.Ledger,
           LedgerHdn: result?.LedgerHdn,
+          SubLedger: result?.SubLedger,
           DebitAmount: result?.DebitAmount,
           CreditAmount: result?.CreditAmount,
           Narration: result?.Narration,
@@ -346,6 +347,7 @@ export class JournalVoucherCreationComponent implements OnInit {
               finYear: financialYear,
               branch: CurrentBranchCode,
               accCode: item.LedgerHdn,
+              accCategory: item.SubLedger,
               accName: item.Ledger,
               sacCode: "",
               sacName: "",
@@ -370,6 +372,7 @@ export class JournalVoucherCreationComponent implements OnInit {
                 var CreditData = this.tableData.filter(item => item.DebitAmount == 0).map(function (item) {
                   return {
                     "accCode": `${item.LedgerHdn}`,
+                    "accCategory": item.SubLedger,
                     "accName": item.Ledger,
                     "amount": item.CreditAmount,
                     "narration": item.Narration ? item.Narration : item.Ledger,
@@ -378,6 +381,7 @@ export class JournalVoucherCreationComponent implements OnInit {
                 var DebitData = this.tableData.filter(item => item.CreditAmount == 0).map(function (item) {
                   return {
                     "accCode": `${item.LedgerHdn}`,
+                    "accCategory": item.SubLedger,
                     "accName": item.Ledger,
                     "amount": item.DebitAmount,
                     "narration": item.Narration ? item.Narration : item.Ledger,
@@ -395,7 +399,7 @@ export class JournalVoucherCreationComponent implements OnInit {
                   voucherType: VoucherType[VoucherType.JournalVoucher],
                   docType: "Voucher",
                   partyType: this.JournalVoucherSummaryForm.value.Preparedfor,
-                  docNo: res?.data?.mainData?.ops[0].vNO,
+                  docNo: "",
                   partyCode: this.JournalVoucherSummaryForm.value.PartyName?.value ?? "8888",
                   partyName: this.JournalVoucherSummaryForm.value.PartyName?.name ?? this.JournalVoucherSummaryForm.value.PartyName,
                   entryBy: localStorage.getItem("UserName"),

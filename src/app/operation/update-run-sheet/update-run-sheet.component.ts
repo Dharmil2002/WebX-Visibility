@@ -1,12 +1,13 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { UpdateloadingRunControl } from '../../../assets/FormControls/UpdateRunsheet';
-import { runSheetLoadingScan, updateRunsheetPending } from './updateRunSheet';
 import Swal from 'sweetalert2';
+import { RunSheetService } from 'src/app/Utility/module/operation/runsheet/runsheet.service';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 
 @Component({
   selector: 'app-update-run-sheet',
@@ -14,28 +15,46 @@ import Swal from 'sweetalert2';
 })
 export class UpdateRunSheetComponent implements OnInit {
   jsonUrl = '../../../assets/data/create-runsheet-data.json'
-  tableload = false;
+  tableload = true;
   csv: any[];
   branch = localStorage.getItem("Branch");
   data: [] | any;
   tripData: any;
+  scanPackage: string;
+  scanMessage: string = '';
   tabledata: any;
+  backPath: string;
   updateSheetTableForm: UntypedFormGroup
   UpdaterunControlArray: any;
-  columnHeader = {
-    "shipment": "Shipments",
-    "packages": "Packages",
-    "loaded": "Loaded",
-    "pending": "Pending",
-  }
   centerAlignedData = ['packages', 'loaded','pending'];
-  //  #region declaring Csv File's Header as key and value Pair
-  headerForCsv = {
-    "shipment": "Shipment",
-    "packages": "Packages",
-    "loaded": "Loaded",
-    "pending": "Pending",
-  }
+  columnHeader = {
+    shipment: {
+      Title: "Shipments",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    packages: {
+      Title: "Packages",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    loaded: {
+      Title: "Loaded",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    pending: {
+      Title: "Pending",
+      class: "matcolumncenter",
+      Style: "min-width:20%",
+    }
+  };
+  staticField = [
+    "shipment",
+    "packages",
+    "loaded",
+    "pending"
+  ];
   //declaring breadscrum
   breadscrums = [
     {
@@ -60,60 +79,46 @@ export class UpdateRunSheetComponent implements OnInit {
   runsheetDetails: any;
   updateRunSheetData: any;
   Scan: any;
-  constructor(private Route: Router,
-    private http: HttpClient, private fb: UntypedFormBuilder,private cdr: ChangeDetectorRef, private cnoteService: CnoteService) {
-
+  packageList: any;
+  constructor(
+    private Route: Router,
+    private fb: UntypedFormBuilder,
+    private cdr: ChangeDetectorRef,
+    private runSheetService: RunSheetService,
+    private storage:StorageService,
+    private navigationService: NavigationService
+     ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
+      if(this.Route.getCurrentNavigation()?.extras?.state.data.columnData.oPSST==2){
+        this.navigationService.navigateTo("Operation/UpdateDelivery", this.tripData);
+      }
     }
 
     this.IntializeFormControl()
-    this.getRunSheetDetails();
+    this.autoBindData();
   }
-  autoBindData(runsheetDetails) {
-
-    let runSheetDetails = runsheetDetails;
-    let autoFillUpdateRunSheet = runSheetDetails.cluster.find((x) => x.cluster === this.tripData.columnData.Cluster)
-    this.updateSheetTableForm.controls['Vehicle'].setValue(autoFillUpdateRunSheet?.vehicleNo || '')
-    this.updateSheetTableForm.controls['Cluster'].setValue(autoFillUpdateRunSheet?.cluster || '')
+  autoBindData() {
+    this.updateSheetTableForm.controls['Vehicle'].setValue(this.tripData?.columnData.vehicleNo || '')
+    this.updateSheetTableForm.controls['Cluster'].setValue(this.tripData?.columnData.Cluster || '')
     this.updateSheetTableForm.controls['Runsheet'].setValue(this.tripData?.columnData.RunSheet || '')
     this.updateSheetTableForm.controls['LoadingLocation'].setValue(this.branch || '')
     this.updateSheetTableForm.controls['Startkm'].setValue(0)
     this.updateSheetTableForm.controls['Departuretime'].setValue('')
-    this.getShipingData(runSheetDetails)
+    this.getShipmentData();
   }
-  getShipingData(runSheetDetails) {
-    // Update pending shipments
-    let shipmentRoutingData=this.cnoteService.getDepartVehicleData();
-    let shipmentDetails=shipmentRoutingData?.shipments||''
-    let runSheetShipingDetails
-    let data= runSheetDetails.cluster.some((x)=>x.runSheetID=== this.tripData.columnData.RunSheet)
-    if(!data && shipmentDetails){
-     runSheetShipingDetails =shipmentDetails.shippingData.filter((x) => x.cluster === this.tripData.columnData.Cluster
-    );
-    }
-    else{
-      runSheetShipingDetails = runSheetDetails.shipment.filter((x) => x.cluster === this.tripData.columnData.Cluster
-      );
-    }
-    let shipments = updateRunsheetPending(runSheetShipingDetails,this.tripData.columnData.Cluster)
-
-    let runSheetList: any[] = [];
-    shipments.forEach(element => {
-      let runSheetJson = {
-        shipment: element?.documentId || '',
-        packages: element?.packages || '',
-        loaded: 0,
-        pending: element?.pending,
-      }
-      runSheetList.push(runSheetJson)
-    });
-    this.csv = runSheetList;
-    this.kpiData("")
+  async getShipmentData(){
+     const res= await this.runSheetService.drsShipmentDetails({cID:this.storage.companyCode,dRSNO:this.tripData.columnData.RunSheet});
+     const dktNo=res?.map((x)=>x.dKTNO);
+     this.packageList= await this.runSheetService.drsShipmetPkgs({cID:this.storage.companyCode,dKTNO:{"D$in":dktNo},sFX:0});
+     const shipmentData=await this.runSheetService.FieldMappingRunSheetdkts(res);
+     this.csv = shipmentData;
+     this.tableload=false;
+     this.kpiData("")
   }
   ngOnInit(): void {
+    this.backPath = "/dashboard/Index";
   }
-
   kpiData(event) {
     let packages = 0;
     let shipingloaded = 0;
@@ -148,14 +153,13 @@ export class UpdateRunSheetComponent implements OnInit {
   IsActiveFuntion($event) {
     this.loadingData = $event
   }
-
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
     // we can add more arguments here, if needed. like as shown
     // $event['fieldName'] = field.name;
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -163,25 +167,14 @@ export class UpdateRunSheetComponent implements OnInit {
       console.log("failed");
     }
   }
-
-  CompleteScan() {
-
+  async CompleteScan() {
     let packageChecked = false;
     const exists =  this.csv.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
       packageChecked = this.csv.every(obj => obj.packages === obj.loaded);
     }
     if (packageChecked) {
-  
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: `Depart Vehicle Succesful`,
-          showConfirmButton: true,
-        })
-        this.DepartDelivery() ;
-        this.dialogRef.close(this.updateSheetTableForm.value)
-        
+        await this.DepartDelivery() ;
     }
     else {
       Swal.fire({
@@ -194,41 +187,26 @@ export class UpdateRunSheetComponent implements OnInit {
 
   }
   updatePackage() {
-
     this.tableload = true;
     // Get the trimmed values of scan and leg
-    const scanValue = this.updateSheetTableForm.value.Scan.trim();
-   
+    const scanValue = this.scanPackage;
     // Find the unload package based on scan and leg values
-    const loadPackage =  this.runsheetDetails.packages.find(x => x.packageId.trim() === scanValue && x.cluster.trim() === this.tripData.columnData.Cluster);
-
-    const loading=runSheetLoadingScan(loadPackage, this.tripData.columnData.Cluster,this.csv)
+    const loading=this.runSheetService.handlePackageUpdate(scanValue,this.packageList, this.csv,this.cdr)
     if(loading){
     this.kpiData(loading);
     }
     this.cdr.detectChanges(); // Trigger change detection
     this.tableload=false;
   }
-  DepartDelivery() {
-    let updateStatus = {
-      RunSheet: this.tripData.columnData?.RunSheet || '',
-      Cluster: this.tripData.columnData?.RunSheet || '',
-      Shipments: this.tripData.columnData?.Shipments || '',
-      Packages: this.tripData.columnData?.Packages || '',
-      WeightKg: this.tripData.columnData?.WeightKg || '',
-      VolumeCFT: this.tripData.columnData?.VolumeCFT || '',
-      Status: "OUT FOR DELIVERY",
-      Action: "Update Delivery"
-    }
-    this.cnoteService.setdepartRunSheetData(updateStatus)
-    this.goBack('Delivery');
-  }
-  getRunSheetDetails() {
-
-    this.http.get(this.jsonUrl).subscribe((res: any) => {
-      this.runsheetDetails = res;
-      this.autoBindData(this.runsheetDetails)
+  async DepartDelivery() {
+    const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value,this.csv,this.packageList);
+    Swal.fire({
+      icon: "success",
+      title: "RunSheet Update Successfully",
+      text: `RunSheet Update Successfully with ${res}`,
+      showConfirmButton: true,
     })
+    this.goBack('Delivery');
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });

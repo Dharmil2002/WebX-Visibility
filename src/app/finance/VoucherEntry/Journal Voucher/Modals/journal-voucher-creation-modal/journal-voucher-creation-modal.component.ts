@@ -62,6 +62,7 @@ export class JournalVoucherCreationModalComponent implements OnInit {
     const Ledger = this.JournalVoucherDetailsForm.value['Ledger'];
     this.JournalVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name)
     this.JournalVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
+    this.JournalVoucherDetailsForm.controls.SubLedger.patchValue(Ledger.mRPNM)
     this.dialogRef.close(this.JournalVoucherDetailsForm.value)
   }
   cancel(event) {

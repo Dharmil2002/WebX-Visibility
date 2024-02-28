@@ -24,6 +24,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import { rules } from "src/app/Utility/commonFunction/rules/rule";
 
 @Component({
   selector: "app-prq-entry-page",
@@ -60,7 +61,7 @@ export class PrqEntryPageComponent implements OnInit {
   containerSizeCode: string;
   containerSizeStatus: boolean;
   allPrqDetail: any;
-  submit = 'Save';
+  submit = "Save";
   breadScrums = [
     {
       title: "PRQ Entry",
@@ -77,6 +78,9 @@ export class PrqEntryPageComponent implements OnInit {
   branchCode = localStorage.getItem("Branch");
   paymentBase: any;
   vehicleType: any;
+  AddressStatus: any;
+  Address: string;
+  userLocations: any;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -89,16 +93,16 @@ export class PrqEntryPageComponent implements OnInit {
     private prqService: PrqService,
     private storage: StorageService,
     private customerService: CustomerService,
-    private generalService: GeneralService
-
+    private generalService: GeneralService,
+    private masterService: MasterService
   ) {
     this.prqDetail = new prqDetail({});
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.prqDetail = router.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
-      this.breadScrums[0].active = 'PRQ Modify'
-      this.breadScrums[0].title = 'PRQ Modify'
-      this.submit = 'Modify';
+      this.breadScrums[0].active = "PRQ Modify";
+      this.breadScrums[0].title = "PRQ Modify";
+      this.submit = "Modify";
     }
     this.initializeFormControl();
     this.getGeneralmasterData();
@@ -113,17 +117,21 @@ export class PrqEntryPageComponent implements OnInit {
 
   autoFill() {
     if (this.isUpdate) {
-
-      this.prqEntryTableForm.controls["cARTYP"].setValue(`${this.prqDetail.carrierTypeCode}`);
-      this.disableSize()
+      this.prqEntryTableForm.controls["cARTYP"].setValue(
+        `${this.prqDetail.carrierTypeCode}`
+      );
+      this.disableSize();
 
       if (this.prqDetail.carrierTypeCode == "3") {
-        const containerlist = this.resContainer.find((x) => x.name == this.prqDetail?.typeContainer || x.value == this.prqDetail?.typeContainerCode);
+        const containerlist = this.resContainer.find(
+          (x) =>
+            x.name == this.prqDetail?.typeContainer ||
+            x.value == this.prqDetail?.typeContainerCode
+        );
         this.prqEntryTableForm.controls["cNTYP"].setValue(containerlist);
-      }
-      else {
+      } else {
         this.prqEntryTableForm.controls["vEHSIZE"].setValue(
-          this.prqDetail?.vehicleSizeCode || ""
+          `${this.prqDetail?.vehicleSizeCode || ""}`
         );
       }
       this.prqEntryTableForm.controls["fCITY"].setValue({
@@ -136,11 +144,15 @@ export class PrqEntryPageComponent implements OnInit {
       });
       this.prqEntryTableForm.controls["bPARTY"].setValue({
         name: this.prqDetail.billingParty,
-        value: this.prqDetail.billingPartyCode
+        value: this.prqDetail.billingPartyCode,
       });
       this.prqEntryTableForm.controls["cNTSIZE"].setValue(
         this.prqDetail.containerSize
       );
+      this.prqEntryTableForm.controls["pADD"].setValue({
+        name: this.prqDetail.pAddress,
+        value: this.prqDetail.pAddressName,
+      });
       this.prqEntryTableForm.controls["pAYTYP"].setValue(
         `${this.prqDetail?.payTypeCode || ""}`
       );
@@ -152,14 +164,28 @@ export class PrqEntryPageComponent implements OnInit {
 
   initializeFormControl() {
     // Create an instance of PrqEntryControls to get form controls for different sections
-    this.prqControls = new PrqEntryControls(this.prqDetail, this.isUpdate);
+    this.prqControls = new PrqEntryControls(
+      this.prqDetail,
+      this.isUpdate,
+      rules
+    );
     // Get form controls for PRQ Entry section
     this.jsonControlPrqArray = this.prqControls.getPrqEntryFieldControls();
+    this.jsonControlPrqArray.forEach((data) => {
+      if (data.name === "pADD") {
+        // Set location-related variables
+        this.Address = data.name;
+        this.AddressStatus = data.additionalData.showNameAndValue;
+      }
+    });
     // Create the form group using the form builder and the form controls array
     this.prqEntryTableForm = formGroupBuilder(this.fb, [
       this.jsonControlPrqArray,
     ]);
     this.allFormGrop = this.jsonControlPrqArray;
+    if(!this.isUpdate){
+      this.prqEntryTableForm.controls['oDRDT'].setValue("");
+    }
 
   }
 
@@ -177,10 +203,6 @@ export class PrqEntryPageComponent implements OnInit {
         variable: "typeContainerCode",
         status: "typeContainerStatus",
       },
-      // containerSize: {
-      //   variable: "containerSizeCode",
-      //   status: "containerSizeStatus",
-      // },
     };
     processProperties.call(
       this,
@@ -202,18 +224,9 @@ export class PrqEntryPageComponent implements OnInit {
   /*below the method a getting a default city Based on Location*/
   async getFromCity() {
     try {
-      const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
-      console.log(destinationMapping);
-      const city = {
-        name: destinationMapping[0].city,
-        value: destinationMapping[0].city
-      }
-      this.prqEntryTableForm.controls['fCITY'].setValue(city);
-
       if (!this.isUpdate) {
-        this.prqEntryTableForm.controls['cARTYP'].setValue("truck");
+        this.prqEntryTableForm.controls["cARTYP"].setValue("truck");
         this.disableSize();
-
       }
     } catch (error) {
       console.error("Error getting city details:", error);
@@ -221,14 +234,60 @@ export class PrqEntryPageComponent implements OnInit {
   }
   /*End*/
 
+  //#region get Address Details
+  async getAddressDetails() {
+    const addressRequest = {
+      companyCode: this.companyCode,
+      collectionName: "address_detail",
+      filters: [
+        {
+          D$match: {
+            cityName: this.prqEntryTableForm.controls["fCITY"].value.value,
+            customer: {
+              D$elemMatch: {
+                code:
+                  this.prqEntryTableForm.controls["bPARTY"].value?.value || "",
+              },
+            },
+          },
+        },
+      ],
+    };
+    const address = await firstValueFrom(
+      this.masterService.masterPost("generic/query", addressRequest)
+    );
+    const addressList = address.data.map((item) => {
+      return {
+        name: item.address,
+        value: item.addressCode,
+      };
+    });
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      addressList,
+      this.Address,
+      this.AddressStatus
+    );
+  }
+  //#endregion
+
   async getCustomer(event) {
-    await this.customerService.getCustomerForAutoComplete(this.prqEntryTableForm, this.allFormGrop, event.field.name, this.billingPartytatus);
+    await this.customerService.getCustomerForAutoComplete(
+      this.prqEntryTableForm,
+      this.allFormGrop,
+      event.field.name,
+      this.billingPartytatus
+    );
   }
 
   async getGeneralmasterData() {
-    const carrierType: AutoComplete[] = await this.generalService.getGeneralMasterData("CARTYP");
-    const vehicleType: AutoComplete[] = await this.generalService.getGeneralMasterData("VEHSIZE");
-    const paymentBase: AutoComplete[] = await this.generalService.getGeneralMasterData("PAYTYP");
+    const carrierType: AutoComplete[] =
+      await this.generalService.getGeneralMasterData("CARTYP");
+    const vehicleType: AutoComplete[] =
+      await this.generalService.getGeneralMasterData("VEHSIZE");
+    const paymentBase: AutoComplete[] =
+      await this.generalService.getGeneralMasterData("PAYTYP");
     this.paymentBase = paymentBase;
     this.vehicleType = vehicleType;
 
@@ -239,7 +298,11 @@ export class PrqEntryPageComponent implements OnInit {
     this.autoFill();
   }
 
-  setGeneralMasterData(controls: any[], data: AutoComplete[], controlName: string) {
+  setGeneralMasterData(
+    controls: any[],
+    data: AutoComplete[],
+    controlName: string
+  ) {
     const control = controls.find((x) => x.name === controlName);
     if (control) {
       control.value = data;
@@ -248,8 +311,24 @@ export class PrqEntryPageComponent implements OnInit {
 
   /*below the method for the getting a CityName for PinCode Collection*/
   async getPincodeDetail(event) {
-    const cityMapping = event.field.name == 'tCITY' ?? this.fromCityStatus;
-    this.pinCodeService.getCity(this.prqEntryTableForm, this.jsonControlPrqArray, event.field.name, cityMapping);
+    const cityMapping = event.field.name == "tCITY" ?? this.fromCityStatus;
+    this.pinCodeService.getCity(
+      this.prqEntryTableForm,
+      this.jsonControlPrqArray,
+      event.field.name,
+      cityMapping
+    );
+  }
+  /*End*/
+  /*below the method for the getting a CityName for PinCode Collection*/
+  async getFromCityDetail(event) {
+    const fcityMapping = event.field.name == "fCITY" ?? this.fromCityStatus;
+    this.pinCodeService.getCity(
+      this.prqEntryTableForm,
+      this.jsonControlPrqArray,
+      event.field.name,
+      fcityMapping
+    );
   }
   /*End*/
 
@@ -262,24 +341,28 @@ export class PrqEntryPageComponent implements OnInit {
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
 
-    prqDetails['cID'] = this.storage.companyCode;
-    prqDetails['bPARTY'] = this.prqEntryTableForm.value.bPARTY.value;
-    prqDetails['bPARTYNM'] = this.prqEntryTableForm.value.bPARTY.name;
-    prqDetails['fCITY'] = this.prqEntryTableForm.value.fCITY.name;
-    prqDetails['tCITY'] = this.prqEntryTableForm.value.tCITY.name;
+    prqDetails["cID"] = this.storage.companyCode;
+    prqDetails["bPARTY"] = this.prqEntryTableForm.value.bPARTY.value;
+    prqDetails["bPARTYNM"] = this.prqEntryTableForm.value.bPARTY.name;
+    prqDetails["fCITY"] = this.prqEntryTableForm.value.fCITY.name;
+    prqDetails["tCITY"] = this.prqEntryTableForm.value.tCITY.name;
+    prqDetails["bRCD"] = this.prqEntryTableForm.value.bRCD.name;
+    prqDetails["pADD"] = this.prqEntryTableForm.value.pADD?.value||"A8888";
+    prqDetails["pADDNM"] = this.prqEntryTableForm.value.pADD?.name||this.prqEntryTableForm.value.pADD;
 
-    const cntrNames =
-      [
-        { controlName: 'cARTYP', name: 'cARTYPNM', value: 'cARTYP' },
-        { controlName: 'vEHSIZE', name: 'vEHSIZENM', value: 'vEHSIZE' },
-        { controlName: 'pAYTYP', name: 'pAYTYPNM', value: 'pAYTYP' },
-      ]
+    const cntrNames = [
+      { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
+      { controlName: "vEHSIZE", name: "vEHSIZENM", value: "vEHSIZE" },
+      { controlName: "pAYTYP", name: "pAYTYPNM", value: "pAYTYP" },
+    ];
 
     cntrNames.forEach((c) => {
       let ctrl = this.prqEntryTableForm.controls[c.controlName];
       if (ctrl && ctrl.value) {
         prqDetails[c.value] = ctrl.value;
-        let cData = this.allFormGrop.find(f => f.name == c.controlName).value.find(f => f.value == ctrl.value);
+        let cData = this.allFormGrop
+          .find((f) => f.name == c.controlName)
+          .value.find((f) => f.value == ctrl.value);
         if (cData) {
           prqDetails[c.name] = cData.name;
         }
@@ -287,20 +370,19 @@ export class PrqEntryPageComponent implements OnInit {
     });
 
     if (prqDetails.cARTYP == "3") {
-      prqDetails['cNTSIZE'] = this.prqEntryTableForm.value.cNTSIZE;
-      prqDetails['cNTYP'] = this.prqEntryTableForm.value.cNTYP.value;
-      prqDetails['cNTYPNM'] = this.prqEntryTableForm.value.cNTYP.name;
-      prqDetails['vEHSIZE'] = 0;
-      prqDetails['vEHSIZENM'] = "";
-    }
-    else {
-      prqDetails['cNTSIZE'] = 0;
-      prqDetails['cNTYP'] = 0;
-      prqDetails['cNTYPNM'] = "";
+      prqDetails["cNTSIZE"] = this.prqEntryTableForm.value.cNTSIZE;
+      prqDetails["cNTYP"] = this.prqEntryTableForm.value.cNTYP.value;
+      prqDetails["cNTYPNM"] = this.prqEntryTableForm.value.cNTYP.name;
+      prqDetails["vEHSIZE"] = 0;
+      prqDetails["vEHSIZENM"] = "";
+    } else {
+      prqDetails["cNTSIZE"] = 0;
+      prqDetails["cNTYP"] = 0;
+      prqDetails["cNTYPNM"] = "";
     }
 
-    prqDetails['sTS'] = 0;
-    prqDetails['sTSNM'] = "Awaiting Confirmation";
+    prqDetails["sTS"] = 0;
+    prqDetails["sTSNM"] = "Awaiting Confirmation";
 
     clearValidatorsAndValidate(tabcontrols);
     this.prqEntryTableForm.controls["cNTYP"].enable();
@@ -328,15 +410,13 @@ export class PrqEntryPageComponent implements OnInit {
     });
 
     if (!this.isUpdate) {
-      prqDetails['docNo'] = "";
-      prqDetails['pRQNO'] = "";
-      prqDetails['eNTDT'] = new Date();
-      prqDetails['eNTLOC'] = this.storage.branch;
-      prqDetails['eNTBY'] = this.storage.userName;
+      prqDetails["docNo"] = "";
+      prqDetails["pRQNO"] = "";
+      prqDetails["eNTDT"] = new Date();
+      prqDetails["eNTLOC"] = this.storage.branch;
+      prqDetails["eNTBY"] = this.storage.userName;
 
-      const res = await this.prqService.addPrqData(
-        prqDetails,
-      );
+      const res = await this.prqService.addPrqData(prqDetails);
       if (res) {
         Swal.fire({
           icon: "success",
@@ -350,14 +430,11 @@ export class PrqEntryPageComponent implements OnInit {
         });
       }
     } else {
+      prqDetails["mODDT"] = new Date();
+      prqDetails["mODLOC"] = this.storage.branch;
+      prqDetails["mODBY"] = this.storage.userName;
 
-      prqDetails['mODDT'] = new Date();
-      prqDetails['mODLOC'] = this.storage.branch;
-      prqDetails['mODBY'] = this.storage.userName;
-
-      const res = await this.prqService.updatePrqStatus(
-        prqDetails,
-      );
+      const res = await this.prqService.updatePrqStatus(prqDetails);
 
       if (res) {
         Swal.fire({
@@ -384,20 +461,30 @@ export class PrqEntryPageComponent implements OnInit {
     });
   }
   async bindDataFromDropdown() {
-
     this.resContainer = await this.containerService.containerFromApi();
+    let locList = localStorage.getItem('userLocations');
+    let locations = locList.split(",")
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      locations.map((x)=>{return{name:x,value:x}}),
+      "bRCD",
+      false
+    );
     if (this.isUpdate) {
-      this.prqEntryTableForm.controls["bRCD"].setValue(this.prqDetail.prqBranch);
+      this.prqEntryTableForm.controls["bRCD"].setValue(
+        {value:this.prqDetail.prqBranch,name:this.prqDetail.prqBranch}
+      );
     }
-    else
-      this.prqEntryTableForm.controls["bRCD"].setValue(this.storage.branch);
   }
 
   async bilingChanged() {
     const billingParty =
       this.prqEntryTableForm.controls["bPARTY"].value?.value || "";
 
-    this.allPrqDetail = await this.prqService.getAllPrqDetailWithFilters(billingParty);
+    this.allPrqDetail = await this.prqService.getAllPrqDetailWithFilters(
+      billingParty
+    );
 
     let prqDetail = this.allPrqDetail.tableData
       // .filter(
@@ -407,6 +494,7 @@ export class PrqEntryPageComponent implements OnInit {
     if (prqDetail.length > 0) {
       this.prqView(prqDetail);
     }
+    this.getAddressDetails();
   }
 
   prqView(prqDetail) {
@@ -422,7 +510,6 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async autoFillPqrDetail(result) {
-
     if (result) {
       setControlValue(
         this.prqEntryTableForm.get("cARTYP"),
@@ -433,9 +520,9 @@ export class PrqEntryPageComponent implements OnInit {
           this.prqEntryTableForm.get("vEHSIZE"),
           result?.vehicleSizeCode ?? ""
         );
-      }
-      else {
-        setControlValue(this.prqEntryTableForm.get("cNTSIZE"),
+      } else {
+        setControlValue(
+          this.prqEntryTableForm.get("cNTSIZE"),
           result?.containerSize ?? ""
         );
         setControlValue(this.prqEntryTableForm.get("cNTYP"), {
@@ -452,20 +539,21 @@ export class PrqEntryPageComponent implements OnInit {
         name: result.toCity,
         value: result.toCity,
       });
-      setControlValue(this.prqEntryTableForm.get("bPARTY"), { name: result.billingParty, value: result.billingPartyCode });
-      setControlValue(
-        this.prqEntryTableForm.get("pHNO"),
-        result.contactNo
-      );
+      setControlValue(this.prqEntryTableForm.get("bPARTY"), {
+        name: result.billingParty,
+        value: result.billingPartyCode,
+      });
+      setControlValue(this.prqEntryTableForm.get("pHNO"), result.contactNo);
 
       setControlValue(this.prqEntryTableForm.get("pADD"), result?.pAddress);
     }
   }
 
   disableSize() {
-
-    if (this.prqEntryTableForm.controls['cARTYP'].value === "3") {
-      this.jsonControlPrqArray = this.allFormGrop.filter((x) => x.name !== "vEHSIZE");
+    if (this.prqEntryTableForm.controls["cARTYP"].value === "3") {
+      this.jsonControlPrqArray = this.allFormGrop.filter(
+        (x) => x.name !== "vEHSIZE"
+      );
 
       this.filter.Filter(
         this.jsonControlPrqArray,
@@ -475,28 +563,30 @@ export class PrqEntryPageComponent implements OnInit {
         this.typeContainerStatus
       );
     } else {
-
-      this.jsonControlPrqArray = this.allFormGrop.filter((x) => x.name != "cNTSIZE" && x.name != "cNTYP");
+      this.jsonControlPrqArray = this.allFormGrop.filter(
+        (x) => x.name != "cNTSIZE" && x.name != "cNTYP"
+      );
     }
   }
   //#region to set size of container
   async setContainerSize() {
-    const containerType = this.prqEntryTableForm.value.cNTYP.value
-    let size = await this.containerService.getContainersByFilter(containerType)
-    size = size[0].loadCapacity
+    const containerType = this.prqEntryTableForm.value.cNTYP.value;
+    let size = await this.containerService.getContainersByFilter(containerType);
+    size = size[0].loadCapacity;
     this.prqEntryTableForm.controls["cNTSIZE"].setValue(size);
     this.prqEntryTableForm.controls["sIZE"].setValue(size);
   }
   //#endregion
   async setVehicleSize() {
-
     const vehcileSize = this.prqEntryTableForm.value.vEHSIZE;
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
   InvockedContract() {
-    console.log(this.prqEntryTableForm.value)
+    console.log(this.prqEntryTableForm.value);
 
-    const paymentBasesName = this.paymentBase.find(x => x.value == this.prqEntryTableForm.value.pAYTYP).name;
+    const paymentBasesName = this.paymentBase.find(
+      (x) => x.value == this.prqEntryTableForm.value.pAYTYP
+    ).name;
     // const TransMode = this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name;
     let containerCode;
     if (this.prqEntryTableForm.value?.cARTYP == "3") {
@@ -504,19 +594,23 @@ export class PrqEntryPageComponent implements OnInit {
     } else {
       containerCode = this.prqEntryTableForm.value.vEHSIZE;
     }
-    let reqBody =
-    {
-      "companyCode": this.storage.companyCode,
-      "customerCode": this.prqEntryTableForm.value.bPARTY.value,
-      "contractDate": this.prqEntryTableForm.value.pICKDT,
-      "productName": "Road",
-      "basis": paymentBasesName,
-      "from": this.prqEntryTableForm.value.fCITY.value,
-      "to": this.prqEntryTableForm.value.tCITY.value,
-      "capacity": containerCode,
-    }
+    let reqBody = {
+      companyCode: this.storage.companyCode,
+      customerCode: this.prqEntryTableForm.value.bPARTY.value,
+      contractDate: this.prqEntryTableForm.value.pICKDT,
+      productName: "Road",
+      basis: paymentBasesName,
+      from: this.prqEntryTableForm.value.fCITY.value,
+      to: this.prqEntryTableForm.value.tCITY.value,
+      capacity: containerCode,
+    };
 
-    firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
+    firstValueFrom(
+      this.operationService.operationMongoPost(
+        "operation/docket/invokecontract",
+        reqBody
+      )
+    )
       .then((res: any) => {
         if (res.length == 1) {
           Swal.fire({
@@ -526,8 +620,9 @@ export class PrqEntryPageComponent implements OnInit {
             showConfirmButton: false,
           });
 
-          this.prqEntryTableForm.controls["cONTRAMT"].setValue(res[0].FreightChargeMatrixDetails?.rT);
-
+          this.prqEntryTableForm.controls["cONTRAMT"].setValue(
+            res[0].FreightChargeMatrixDetails?.rT
+          );
         } else {
           Swal.fire({
             icon: "error",

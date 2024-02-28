@@ -285,6 +285,16 @@ export class JournalVoucherControl {
         disable: false,
         Validations: [],
       },
+      {
+        name: "SubLedger",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
 
     ]
   }

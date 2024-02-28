@@ -1,6 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { RunSheetService } from 'src/app/Utility/module/operation/runsheet/runsheet.service';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 @Component({
   selector: 'app-pickup-del-page',
@@ -81,7 +85,11 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
   boxData: { count: any; title: any; class: string; }[];
   // declararing properties
 
-  constructor(private http: HttpClient, private Route: Router) {
+  constructor(
+    private Route: Router,
+    private runSheetService: RunSheetService,
+    private storage:StorageService
+    ) {
     super();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
@@ -99,84 +107,34 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
   ngOnInit(): void {
     this.getRunSheetDetails();
   }
-  getRunSheetDetails() {
-  
-    // Fetch data from the JSON endpoint
-    this.http.get(this.jsonUrl).subscribe((res: any) => {
-      this.data = res;
-
-      // Extract relevant data arrays from the response
-      const tableArray = this.data['cluster'].filter((x)=>x.action.trim()==="Create Run Sheet");
-      const shippingData = this.data['shipment'];
-      const pickUpData: any[] = [];
-
-      // Iterate over each element in tableArray
-      for (const element of tableArray) {
-        // Filter shippingData for delivery and pickup details of the current cluster
-        const shippingDetailsForDelivery = shippingData.filter(
-          (x: any) => x.cluster === element.cluster && x.type === 'Delivery'
-        );
-        const pickupRequests = shippingData.filter(
-          (x: any) => x.cluster === element.cluster && x.type === 'Pickup'
-        );
-
-        // Calculate total weight and total CFT for the delivery shipments
-        const totalWeight = shippingDetailsForDelivery.reduce(
-          (total: number, shipment: any) => total + shipment.weight,
-          0
-        );
-
-        const totalCFT = shippingDetailsForDelivery.reduce(
-          (total: number, shipment: any) => total + shipment.volume,
-          0
-        );
-
-        // Prepare an object with the required data for the current cluster
-        const clusterData = {
-          Cluster: element.cluster,
-          DeliveryShipments: shippingDetailsForDelivery.length,
-          PickupRequests: pickupRequests.length,
-          TotalWeight: totalWeight,
-          CFT: totalCFT,
-          Action: element.action,
-        };
-
-        // Add the cluster data to pickUpData array
-        pickUpData.push(clusterData);
-      }
-
+  async getRunSheetDetails() {
+     const res= await this.runSheetService.getRunSheetData({dEST:this.storage.branch,sTS:7,iSDEL:false});
+     const fieldMapping=await this.runSheetService.fieldMappingRunSheet(res)
       // Store the pickUpData in csv property
-      this.csv = pickUpData;
-
+      this.csv = fieldMapping;
       // Create shipData objects for displaying summary information
       const createShipDataObject = (count: number, title: string, className: string) => ({
         count,
         title,
         class: `info-box7 ${className} order-info-box7`,
       });
-
+       const delShipment=fieldMapping.reduce((acc,curr)=>acc+curr.DeliveryShipments,0)
       // Filter shippingData for delivery and pickup details
-      const deliveryShipments = shippingData.filter((x: any) => x.Type === 'Delivery');
-      const pickupRequests = shippingData.filter((x: any) => x.Type === 'Pickup');
+     // const deliveryShipments = shippingData.filter((x: any) => x.Type === 'Delivery');
+      //const pickupRequests = shippingData.filter((x: any) => x.Type === 'Pickup');
 
       // Prepare the shipData array with summary information
       const shipData = [
         createShipDataObject(this.csv.length, "Clusters", "bg-c-Bottle-light"),
-        createShipDataObject(deliveryShipments.length, "Shipments for Delivery", "bg-c-Grape-light"),
-        createShipDataObject(pickupRequests.length, "Pickup Requests", "bg-c-Daisy-light"),
+         createShipDataObject(delShipment, "Shipments for Delivery", "bg-c-Grape-light"),
+        createShipDataObject(0, "Pickup Requests", "bg-c-Daisy-light"),
       ];
 
       // Store the shipData in boxData property
       this.boxData = shipData;
-
       // Set tableload flag to false to indicate that the table has finished loading
       this.tableload = false;
-    });
   }
-
-
-
-
 
   handleMenuItemClick(label: any, element) {
 

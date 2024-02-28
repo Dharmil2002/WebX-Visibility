@@ -18,25 +18,27 @@ export class GeneralLedgerReportService {
       // Build the match query based on provided conditions          
       let matchQuery = {
         'D$and': [
-          { transDate: { 'D$gte': data.startValue } }, // Convert start date to ISO format
-          { transDate: { 'D$lte': data.endValue } }, // Bill date less than or equal to end date       
+          {
+            vDT: { 'D$gte': data.startValue }
+          }, // Convert start date to ISO format
+          { vDT: { 'D$lte': data.endValue } }, // Bill date less than or equal to end date       
           ...(data.state.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pST', data.state] } }] : []), // State names condition
-          ...(data.branch ? [{ 'branch': data.branch }] : []), //branch condition
-          // ...(data.category ? [{ 'bRC': data.category }] : []), // category condition
-          ...(data.fnYear ? [{ 'finYear': data.fnYear }] : []), // financial year condition
-          ...(data.accountCode.length > 0 ? [{ accName: { 'D$in': data.accountCode } }] : []), // account code condition
+          ...(data?.category ? [{ aCCAT: { 'D$in': [data.category] } }] : []), // account code condition
+          ...([{ lOC: { 'D$in': data.branch } }]), //branch condition
+          ...(data.fnYear ? [{ 'fY': data.fnYear }] : []), // financial year condition
+          ...(data.accountCode.length > 0 ? [{ aCCCD: { 'D$in': data.accountCode } }] : []), // account code condition
         ],
       };
 
       const reqBody = {
         companyCode: this.storage.companyCode,
-        collectionName: "acc_trans_2425",
+        collectionName: `acc_trans_${data.fnYear}`,
         filters: [
           {
             D$lookup: {
               from: "voucher_trans",
-              localField: "docNo",
-              foreignField: "docNo",
+              localField: "vNO",
+              foreignField: "vNO",
               as: "details",
             }
           },
@@ -50,17 +52,17 @@ export class GeneralLedgerReportService {
               "pCODE": "$details.pCODE",
               "pNAME": "$details.pNAME",
               "pST": "$details.pST", // Update to use the pST field from voucher_trans
-              "eDT": "$details.eDT",
+              "eDT": "$details.eNTDT",
               "rNO": "$details.rNO",
               "dT": "$details.dT",
-              "finYear": 1,
-              "credit": 1,
-              "debit": 1,
-              "branch": 1,
-              "accCode": 1,
-              "accName": 1,
-              "narration": 1,
-              "docNo": 1,
+              "fY": 1,
+              "cR": 1,
+              "dR": 1,
+              "lOC": 1,
+              "aCCCD": 1,
+              "aCCNM": 1,
+              "nRT": 1,
+              // "docNo": 1,
               //finalized: { D$sum: { D$cond: { if: { D$ne: ['$bSTAT', 1] }, then: '$bALAMT', else: 0 } } },
             }
           }
@@ -73,6 +75,8 @@ export class GeneralLedgerReportService {
 
       if (res.data && res.data.length > 0) {
         let reportData: any[] = [];
+
+
         reportData = prepareReportData(res.data, reportFile);
         const category = await this.getAccountDetail();
 
@@ -89,8 +93,25 @@ export class GeneralLedgerReportService {
         }, { totalDebit: 0, totalCredit: 0 });
 
         // Add a new row with the specified values
-        const newRow = {
-          "AccountCode": "Total for A/C (Dr./Cr.) : ",
+        // const Row = {
+        //   "AccountCode": "Total Transaction :",
+        //   "Debit": "0.00",
+        //   "Credit": "0.00",
+        //   "AccountName": " ",
+        //   "Category": " ",
+        //   "Voucher No": " ",
+        //   "Date": " ",
+        //   "PartyCode": " ",
+        //   "PartyName": " ",
+        //   "Narration": " ",
+        //   "LocName": " ",
+        //   "Cheque Date": " ",
+        //   "Document No": " "
+        // };
+        // reportData.unshift(Row);
+
+        const firstRow = {
+          "AccountCode": "Total Transaction :",
           "Debit": total.totalDebit.toFixed(2),
           "Credit": total.totalCredit.toFixed(2),
           "AccountName": " ",
@@ -104,8 +125,45 @@ export class GeneralLedgerReportService {
           "Cheque Date": " ",
           "Document No": " "
         };
+        reportData.push(firstRow);
 
-        reportData.push(newRow);
+        const isBalanced = total.totalDebit.toFixed(2) === total.totalCredit.toFixed(2);
+        const balanceAmount = isBalanced ? 0.00 : (total.totalDebit - total.totalCredit);
+
+        const secondRow = {
+          "AccountCode": "Total for A/C (Dr./Cr.) : ",
+          "Debit": isBalanced ? "0.00" : (balanceAmount > 0 ? balanceAmount.toFixed(2) : "0.00"),
+          "Credit": isBalanced ? "0.00" : (balanceAmount < 0 ? -balanceAmount.toFixed(2) : "0.00"),
+          "AccountName": " ",
+          "Category": " ",
+          "Voucher No": " ",
+          "Date": " ",
+          "PartyCode": " ",
+          "PartyName": " ",
+          "Narration": " ",
+          "LocName": " ",
+          "Cheque Date": " ",
+          "Document No": " "
+        };
+
+        reportData.push(secondRow);
+        const thirdRow = {
+          "AccountCode": "Closing Balance : ",
+          "Debit": isBalanced ? "0.00" : (balanceAmount > 0 ? balanceAmount.toFixed(2) : "0.00"),
+          "Credit": isBalanced ? "0.00" : (balanceAmount < 0 ? -balanceAmount.toFixed(2) : "0.00"),
+          "AccountName": " ",
+          "Category": " ",
+          "Voucher No": " ",
+          "Date": " ",
+          "PartyCode": " ",
+          "PartyName": " ",
+          "Narration": " ",
+          "LocName": " ",
+          "Cheque Date": " ",
+          "Document No": " "
+        };
+
+        reportData.push(thirdRow);
 
         return reportData;
       }
@@ -137,16 +195,38 @@ export class GeneralLedgerReportService {
     }
   }
   //#endregion
+  async GetReportingLocationsList(location) {
+    try {
+      const reqBody = {
+        companyCode: this.storage.companyCode,
+        collectionName: "location_detail",
+        filters: [
+          { D$match: { reportLoc: location } },
+          {
+            D$project: {
+              "_id": 0,
+              "locCode": 1,
+            }
+          }
+        ]
+      };
+      const response = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
+      return response?.data?.map(item => item.locCode) || [];
+    } catch (error) {
+      console.error('Error in getAccountDetail:', error.message || error);
+      return []; // Return an empty array in case of an error or missing data
+    }
+  }
+  //#endregio
   //#region to get financial Year
   getFinancialYear() {
     const currentYear = new Date().getFullYear();
-    const currentYearShort: string = `${currentYear % 100}`;
-    const nextYearShort: string = `${+currentYearShort + 1}`;
-    const previousYearShort: string = `${+currentYearShort - 1}`;
+    const nextYear = currentYear + 1;
+    const previousYear = currentYear - 1;
 
     const financialYear = [
-      { name: `${previousYearShort} - ${currentYearShort}`, value: `${previousYearShort}${currentYearShort}` },
-      { name: `${currentYearShort} - ${nextYearShort}`, value: `${currentYearShort}${nextYearShort}` },
+      { name: `${previousYear}-${currentYear}`, value: `${String(previousYear).slice(-2)}${String(currentYear).slice(-2)}` },
+      { name: `${currentYear}-${nextYear}`, value: `${String(currentYear).slice(-2)}${String(currentYear + 1).slice(-2)}` },
     ];
 
     return financialYear;

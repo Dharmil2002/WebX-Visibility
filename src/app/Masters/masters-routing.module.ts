@@ -93,6 +93,7 @@ import { ViewPrintComponent } from './view-print/view-print.component';
 import { ProductListComponent } from './shard-product/product-list/product-list.component';
 import { AddContainerStatusComponent } from './container-status-update/add-container-status/add-container-status.component';
 import { ContainerStatusListComponent } from './container-status-update/container-status-list/container-status-list.component';
+import { MenuAccessRightComponent } from './Admin/MenuAccessRight/menu-access-right/menu-access-right.component';
 
 
 const routes: Routes = [
@@ -172,8 +173,8 @@ const routes: Routes = [
   { path: "CustomerContract/CustomerIndex", component: CustomerContractTabsIndexComponent },
   { path: "CustomerContract/AddNewCustomerContract", component: AddNewCustomerContractComponent },
 
-
-
+  //Menu Access Right
+  { path: "Menu/MenuAccessRights", component: MenuAccessRightComponent },
   //Product Master Router
   { path: "ProductMaster/ListProduct", component: ListProductComponent },
   // { path: "ProductMaster/shardProductList", component: ShardProductComponent },

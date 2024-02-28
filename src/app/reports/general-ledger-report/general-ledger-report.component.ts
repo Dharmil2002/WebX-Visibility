@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subject, take, takeUntil } from 'rxjs';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { financialYear, timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -58,6 +59,8 @@ export class GeneralLedgerReportComponent implements OnInit {
     "LocName": "LocName",
     "StateFilter": "StateFilter",
   }
+  //ReportingBranches: [];
+  ReportingBranches: string[] = [];
   protected _onDestroy = new Subject<void>();
 
   constructor(private fb: UntypedFormBuilder,
@@ -66,6 +69,7 @@ export class GeneralLedgerReportComponent implements OnInit {
     private locationService: LocationService,
     private masterService: MasterService,
     private storage: StorageService,
+    public snackBarUtilityService: SnackBarUtilityService,
     private generalLedgerReportService: GeneralLedgerReportService,
   ) { }
 
@@ -128,18 +132,19 @@ export class GeneralLedgerReportComponent implements OnInit {
   async getDropdownData() {
     try {
       // Fetch data from various services
+      const financialYearlist = this.generalLedgerReportService.getFinancialYear();
       const statelist = await this.stateService.getState();
       const branchList = await this.locationService.locationFromApi();
       const categorylist = await PayBasisdetailFromApi(this.masterService, "MCT");
       const accountList = await this.generalLedgerReportService.getAccountDetail();
-      const financialYearlist = this.generalLedgerReportService.getFinancialYear();
 
       // Apply filters for each dropdown
+      this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
       this.filterDropdown(this.stateName, this.stateStatus, statelist);
       this.filterDropdown(this.branchName, this.branchStatus, branchList);
       this.filterDropdown(this.categoryName, this.categoryStatus, categorylist);
       this.filterDropdown(this.accountName, this.accountStatus, accountList);
-      this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
+
 
       // Set default values for 'branch' and 'Fyear' controls
       const loginBranch = branchList.find(x => x.name === this.storage.branch);
@@ -147,6 +152,8 @@ export class GeneralLedgerReportComponent implements OnInit {
 
       this.generalLedgerForm.controls["branch"].setValue(loginBranch);
       this.generalLedgerForm.controls["Fyear"].setValue(selectedFinancialYear);
+      this.generalLedgerForm.get('Individual').setValue("Y");
+
     } catch (error) {
       console.error('An error occurred in getDropdownData:', error.message || error);
     }
@@ -171,40 +178,64 @@ export class GeneralLedgerReportComponent implements OnInit {
   //#endregion
   //#region to export data in csv file
   async save() {
-    const startValue = new Date(this.generalLedgerForm.controls.start.value);
-    const endValue = new Date(this.generalLedgerForm.controls.end.value);
-    const reportTyp = this.generalLedgerForm.value.reportTyp;
-    const state = Array.isArray(this.generalLedgerForm.value.stateHandler)
-      ? this.generalLedgerForm.value.stateHandler.map(x => x.name)
-      : [];
-    const fnYear = this.generalLedgerForm.value.Fyear.value;
-    const category = this.generalLedgerForm.value.category.name;
-    const branch = this.generalLedgerForm.value.branch.name;
-    const individual = this.generalLedgerForm.value.Individual;
-    const accountCode = Array.isArray(this.generalLedgerForm.value.accountHandler)
-      ? this.generalLedgerForm.value.accountHandler.map(x => x.value)
-      : [];
-    const reqBody = {
-      startValue, endValue, reportTyp, state, fnYear: parseInt(fnYear), // Parse fnYear to ensure it is a number
-      category, branch, individual, accountCode
-    }
-    const data = await this.generalLedgerReportService.getGeneralLedger(reqBody)
-    // console.log(data);
-    if (data.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (data) {
-        Swal.fire({
-          icon: "error",
-          title: "No Records Found",
-          text: "Cannot Download CSV",
-          showConfirmButton: true,
-        });
-      }
-      return;
-    }
-    // Export the record to Excel
-    exportAsExcelFile(data, `General_Ledger_Report-${timeString}`, this.CSVHeader);
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        this.ReportingBranches = [];
+        if (this.generalLedgerForm.value.Individual == "N") {
+          this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.generalLedgerForm.value.branch.name);
+          this.ReportingBranches.push(this.generalLedgerForm.value.branch.name);
+        } else {
+          this.ReportingBranches.push(this.generalLedgerForm.value.branch.name);
+        }
 
+        const startValue = new Date(this.generalLedgerForm.controls.start.value);
+        const endValue = new Date(this.generalLedgerForm.controls.end.value);
+        const reportTyp = this.generalLedgerForm.value.reportTyp;
+        const state = Array.isArray(this.generalLedgerForm.value.stateHandler)
+          ? this.generalLedgerForm.value.stateHandler.map(x => x.name)
+          : [];
+        const fnYear = this.generalLedgerForm.value.Fyear.value;
+        const category = this.generalLedgerForm.value.category.name;
+        const branch = this.ReportingBranches;
+        const individual = this.generalLedgerForm.value.Individual;
+        const accountCode = Array.isArray(this.generalLedgerForm.value.accountHandler)
+          ? this.generalLedgerForm.value.accountHandler.map(x => x.value)
+          : [];
+        const reqBody = {
+          startValue, endValue, reportTyp, state, fnYear: parseInt(fnYear),
+          category, branch, individual, accountCode
+        }
+        const data = await this.generalLedgerReportService.getGeneralLedger(reqBody)
+        if (data.length === 0) {
+          Swal.hideLoading();
+          setTimeout(() => {
+            Swal.close();
+          }, 1000);
+
+          if (data) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          return;
+        }
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 1000);
+        // Export the record to Excel
+        exportAsExcelFile(data, `General_Ledger_Report-${timeString}`, this.CSVHeader);
+
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          error.message
+        );
+      }
+    }, "General Leadger Report Generating Please Wait..!");
   }
   //#endregion
   //#region to call toggle function

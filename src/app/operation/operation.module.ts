@@ -71,6 +71,10 @@ import { ConsignmentOperationComponent } from './consignment-operation/consignme
 import { ConsingmentSummaryComponent } from './consingment-summary/consingment-summary.component';
 import { ConsignmentFilterComponent } from './consignment-filter/consignment-filter.component';
 import { ConsignmentPodComponent } from './consignment-pod/consignment-pod.component';
+import { UpdateDeliveryComponent } from './update-delivery/update-delivery.component';
+import { DocketFiltersComponent } from "./thc-generation/filters/docket-filters/docket-filters.component";
+import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-modal/update-delivery-modal.component";
+
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -120,9 +124,10 @@ import { ConsignmentPodComponent } from './consignment-pod/consignment-pod.compo
     ConsignmentOperationComponent,
     ConsingmentSummaryComponent,
     ConsignmentFilterComponent,
-    ConsignmentPodComponent
-    
-    
+    ConsignmentPodComponent,
+    UpdateDeliveryComponent,
+    DocketFiltersComponent,
+    UpdateDeliveryModalComponent    
   ],
   imports: [
     CommonModule,

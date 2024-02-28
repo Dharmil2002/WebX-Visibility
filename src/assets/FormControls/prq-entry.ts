@@ -1,10 +1,20 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { prqDetail } from 'src/app/core/models/operations/prq/prq';
+// Get the current date
+
+
 /* here i create class for the bind controls in formGrop */
 export class PrqEntryControls {
+currentDate = new Date();
+   // Calculate the date one month ago
+oneMonthAgo = new Date();
+oneday: Date;
   private fieldMapping: FormControls[];
   // Constructor for initializing form controls.
-  constructor(prqDetail: prqDetail, isUpdate) {
+  constructor(prqDetail: prqDetail, isUpdate,rules) {
+      this.oneMonthAgo.setMonth(this.currentDate.getMonth() - parseInt(rules.prqBackDate));
+      this.oneday = new Date(this.currentDate);
+      this.oneday.setHours(this.currentDate.getHours() + 1);
     this.fieldMapping = [
       {
         name: "pRQNO",
@@ -42,7 +52,7 @@ export class PrqEntryControls {
         ],
         functions: {
           onModel: "getCustomer",
-          onOptionSelect: "bilingChanged"
+          onOptionSelect: "bilingChanged",
         },
         additionalData: {
           showNameAndValue: true,
@@ -69,7 +79,9 @@ export class PrqEntryControls {
           onDate: 'format'
         },
         additionalData: {
-          minDate: isUpdate ? "" : new Date(),
+           minDate: isUpdate ? "" :this.oneMonthAgo,
+           maxDate: isUpdate ? "" :this.oneday,
+          // maxDate: new Date(new Date().getMonth()-1, new Date().getDate()),
         },
       },
       {
@@ -161,17 +173,7 @@ export class PrqEntryControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "pattern",
-            message: "Please enter 10 digit mobile number",
-            pattern: "^[0-9]{10}$",
-          },
-          {
-            name: "required",
-            message: "Contact No is required",
-          },
-        ],
+        Validations: [],
         functions: {
           change: "",
         },
@@ -180,8 +182,8 @@ export class PrqEntryControls {
         name: "pADD",
         label: "Pick Up Address",
         placeholder: "Pick Up Address",
-        type: "text",
-        value: prqDetail.pAddress,
+        type: "dropdown",
+        value:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -191,10 +193,13 @@ export class PrqEntryControls {
           {
             name: "required",
             message: "Pick Up Address is required",
-          },
+          }
         ],
+        additionalData: {
+          showNameAndValue: true,
+        },
         functions: {
-          change: "",
+          // onOptionSelect: "setContainerSize"
         },
       },
       {
@@ -207,7 +212,7 @@ export class PrqEntryControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [
           {
             name: "required",
@@ -221,11 +226,12 @@ export class PrqEntryControls {
             message: "Choose proper value",
           }
         ],
-        functions: {
-          onOptionSelect: ''
-        },
         additionalData: {
           showNameAndValue: false,
+        },
+        functions: {
+          onOptionSelect: "getAddressDetails",
+          onModel: "getFromCityDetail",
         },
       },
       {
@@ -260,23 +266,33 @@ export class PrqEntryControls {
           onOptionSelect: ''
         },
       },
-
       {
         name: "bRCD",
         label: "PRQ Branch",
         placeholder: "PRQ Branch",
-        type: "text",
-        value: localStorage.getItem('Branch'),
+        type: "dropdown",
+        value:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [
+          {
+            name: "required",
+            message: "PRQ Branch is required",
+          },
+          {
+            name: "autocomplete"
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          }
         ],
         additionalData: {
-          showNameAndValue: true,
-        },
+          showNameAndValue: false,
+        }
       },
       {
         name: "pAYTYP",
@@ -307,7 +323,87 @@ export class PrqEntryControls {
         value: prqDetail.contractAmt,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Contract Amount(₹) is required",
+          },
+        ],
+      },
+      {
+        name: "oDRNO",
+        label: "Order Number",
+        placeholder: "Order Number",
+        type: "text",
+        value: prqDetail.oDRNO,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:"Please Enter alphanumeric Order Number of length 4 to 25",
+            pattern: "^.{4,25}$",
+          },
+        ],
+      },
+      {
+        name: "oDRDT",
+        label: "Order Date & Time",
+        placeholder: "Order Date & Time",
+        type: "datetimerpicker",
+        value: prqDetail.oDRDT,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        additionalData: {
+          minDate: isUpdate ? "" : this.oneMonthAgo,
+          maxDate: isUpdate ? "" :this.oneday
+       },
+      },
+      {
+        name: "oDRBY",
+        label: "Order By",
+        placeholder: "Order By",
+        type: "text",
+        value: prqDetail.oDRBY,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only alphabet Order By of length 4 to 100",
+            pattern: "^[a-z A-Z]{4,100}$",
+          },
+        ],
+      },
+      {
+        name: "rMKS",
+        label: "Remarks",
+        placeholder: "Remarks",
+        type: "text",
+        value: prqDetail.rMKS,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:"Please Enter alphanumeric Remarks of length 4 to 300",
+            pattern: "^.{4,300}$",
+          },
+        ],
       },
       {
         name: "sIZE",

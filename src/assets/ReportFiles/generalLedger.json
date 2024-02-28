@@ -1,23 +1,15 @@
 [
     {
-        "FieldName": "accCode",
+        "FieldName": "aCCCD",
         "Caption": "AccountCode"
     },
     {
-        "FieldName": "accName",
+        "FieldName": "aCCNM",
         "Caption": "AccountName"
     },
     {
-        "FieldName": "accCode",
+        "FieldName": "aCCCD",
         "Caption": "Category"
-    },
-    {
-        "Caption": "Vendor Manual Bill Number"
-    },
-    {
-        "Caption": "Vendor Bill Date",
-        "DataType": "Date",
-        "Format": "DD MMM YYYY"
     },
     {
         "FieldName": "vNO",
@@ -30,17 +22,14 @@
         "Format": "DD MMM YYYY"
     },
     {
-        "Caption": "Particular"
-    },
-    {
-        "FieldName": "debit",
+        "FieldName": "dR",
         "Caption": "Debit",
         "DataType": "Number",
         "Format": 2,
         "Default": 0.00
     },
     {
-        "FieldName": "credit",
+        "FieldName": "cR",
         "Caption": "Credit",
         "DataType": "Number",
         "Format": 2,
@@ -55,15 +44,12 @@
         "Caption": "PartyName"
     },
     {
-        "FieldName": "docNo",
+        "FieldName": "vNO",
         "Caption": "Document No"
     },
     {
-        "FieldName": "narration",
+        "FieldName": "nRT",
         "Caption": "Narration"
-    },
-    {
-        "Caption": "Payment Narration"
     },
     {
         "FieldName": "rNO",
@@ -76,10 +62,7 @@
         "Format": "DD MMM YYYY"
     },
     {
-        "FieldName": "branch",
+        "FieldName": "lOC",
         "Caption": "LocName"
-    },
-    {
-        "Caption": "StateFilter"
     }
 ]

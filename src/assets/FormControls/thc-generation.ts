@@ -152,7 +152,27 @@ export class thcControl {
                     }
 
                 },
-
+                {
+                    name: 'vehicle',
+                    label: 'Vehicle',
+                    placeholder: '',
+                    type: view ? 'text' : 'dropdown',
+                    value: '',
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Vehicle  is required",
+                        }],
+                    generatecontrol: true,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onOptionSelect: 'getVehicleDetail',
+                    },
+                    disable: view ? view : prq ? prq : update
+                },
                 {
                     name: "vendorType",
                     label: "Vendor Type",
@@ -197,29 +217,6 @@ export class thcControl {
                     }
                 },
                 {
-                    name: 'vehicle',
-                    label: 'Vehicle',
-                    placeholder: '',
-                    type: view ? 'text' : 'dropdown',
-                    value: '',
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Vehicle  is required",
-                        }],
-                    generatecontrol: true,
-                    additionalData: {
-                        showNameAndValue: false,
-                        metaData: "Basic"
-                    },
-                    functions: {
-                        onOptionSelect: 'getVehicleDetail'
-                    },
-                    disable: view ? view : prq ? prq : update
-                },
-
-
-                {
                     name: "panNo",
                     label: "Vendor PAN Number",
                     placeholder: "Vendor PAN Number",
@@ -243,8 +240,6 @@ export class thcControl {
                     functions: {},
                     additionalData: { metaData: "Basic" }
                 },
-
-
                 // {
                 //     name: 'closingBranch',
                 //     label: 'Closing Branch',

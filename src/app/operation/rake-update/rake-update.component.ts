@@ -34,7 +34,7 @@ export class RakeUpdateComponent implements OnInit {
     RakeEntryDate: {
       Title: "Rake Entry Date",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:158px",
     },
     RRNo: {
       Title: "RRNo",
@@ -44,12 +44,12 @@ export class RakeUpdateComponent implements OnInit {
     ContainerNo: {
       Title: "Cont No",
       class: "matcolumnleft",
-      Style: "max-width:70px",
+      Style: "min-width:110px",
     },
     FromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:150px",
     },
     Weight: {
       Title: "Weight",
@@ -59,12 +59,12 @@ export class RakeUpdateComponent implements OnInit {
     BillingParty: {
       Title: "Billing Party",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "min-width:130px",
     },
     CNNo: {
       Title: "CN No",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "min-width:70px",
     },
     // JobNo: {
     //   Title: "Job No",
@@ -74,12 +74,12 @@ export class RakeUpdateComponent implements OnInit {
     CurrentStatus: {
       Title: "Current Status",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:150px",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "max-width:65px",
     },
   };
   menuItems = [{ label: "Updated" }];

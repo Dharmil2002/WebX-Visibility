@@ -175,6 +175,7 @@ import { ContainerStatusListComponent } from "./container-status-update/containe
 import { AddContainerStatusComponent } from "./container-status-update/add-container-status/add-container-status.component";
 import { AddressService } from "../Utility/module/masters/Address/address.service";
 import { FreightChargeUploadComponent } from './Customer Contract/CustomerContractTabs/customer-contract-freight-matrix/freight-charge-upload/freight-charge-upload.component';
+import { MenuAccessRightComponent } from "./Admin/MenuAccessRight/menu-access-right/menu-access-right.component";
 @NgModule({
   imports: [
     CommonModule,
@@ -363,7 +364,8 @@ import { FreightChargeUploadComponent } from './Customer Contract/CustomerContra
     UploadLocationComponent,
     ContainerStatusListComponent,
     AddContainerStatusComponent,
-    FreightChargeUploadComponent
+    FreightChargeUploadComponent,
+    MenuAccessRightComponent
   ],
 
   providers: [

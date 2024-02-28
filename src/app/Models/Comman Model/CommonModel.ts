@@ -52,14 +52,18 @@ export class FileUploadModel {
 export class TreeItemNode {
   children: TreeItemNode[];
   item: string;
+  id: string;
+  checked: boolean;
 }
 export class menuAccesDropdown {
   constructor(public name: string, public value: string) { }
 }
 export class TreeItemFlatNode {
   item: string;
+  id: string;
   level: number;
   expandable: boolean;
+  checked: boolean;
 }
 
 export class BranchDropdown {

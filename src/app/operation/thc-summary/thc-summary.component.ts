@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { formatDate } from 'src/app/Utility/date/date-utils';
 import { MatDialog } from '@angular/material/dialog';
+import { StorageService } from 'src/app/core/service/storage.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-thc-summary',
@@ -29,9 +31,9 @@ export class ThcSummaryComponent implements OnInit {
   // < column name : Column name you want to display on table >
   columnHeader = {
     createOn: {
-      Title: "Create On",
+      Title: "Created Date",
       class: "matcolumncenter",
-      Style: "max-width:250px",
+      Style: "min-width:125px",
     },
     docNo: {
       Title: "THC No",
@@ -53,7 +55,7 @@ export class ThcSummaryComponent implements OnInit {
     loadedKg: {
       Title: "Loaded Kg",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      Style: "min-width:100px",
     },
     statusAction: {
       Title: "Status",
@@ -87,7 +89,8 @@ export class ThcSummaryComponent implements OnInit {
   constructor(
     private router: Router,
     public dialog: MatDialog,
-    private thcService: ThcService
+    private thcService: ThcService,
+    private storage: StorageService
   ) {
     this.getThcDetails();
     this.addAndEditPath = "Operation/thc-create";
@@ -98,29 +101,39 @@ export class ThcSummaryComponent implements OnInit {
 
   //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
-    const thcList = await this.thcService.getThcDetail();
-    const branch = localStorage.getItem("Branch");
-    const thcDetail = thcList.data.filter((x) => x.cLOC == branch || x.dEST.toLowerCase() === branch.toLowerCase())
-      .map((item) => {
-        const action = item.dEST.toLowerCase() === branch.toLowerCase();
-        if (item.eNTDT) {
-          item.createOn = formatDate(item.eNTDT, 'dd-MM-yy HH:mm');
-          item.statusAction = item?.oPSSTNM
-          item.loadedKg = item?.uTI?.wT
-          item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] : item.oPSST === 1 ? ["View"] : ["Delivered", "View"];
-        }
-        return item;
-      });
+    const branch = this.storage.branch;
+
+    const locData = await this.thcService.getLocationDetail(branch);
+    console.log('locData', locData)
+    const filter = {
+      cID: this.storage.companyCode,
+      D$or: [
+        { fCT: locData.locCity },
+        { tCT: locData.locCity },
+      ],
+      oPSST: { D$in: [1, 2] }
+    };
+
+    let thcList = await this.thcService.getThcDetail(filter);
+    const thcDetail = thcList.data.map((item) => {
+      const action = item.tCT.toLowerCase() === locData.locCity.toLowerCase();
+      if (item.eNTDT) {
+        item.createOn = moment(item.eNTDT).format('DD-MM-YY HH:mm');
+        item.statusAction = item?.oPSSTNM
+        item.loadedKg = item?.uTI?.wT
+        item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] : item.oPSST === 1 ? ["View"] : ["Delivered", "View"];
+      }
+      return item;
+    });
+
     // Sort the PRQ list by pickupDate in descending order
-    const sortedData = thcDetail.sort((a, b) => {
+    thcDetail.sort((a, b) => {
       const dateA: Date | any = new Date(a.eNTDT);
       const dateB: Date | any = new Date(b.eNTDT);
-
-      // Compare the date objects
       return dateB - dateA; // Sort in descending order
     });
 
-    this.tableData = sortedData;
+    this.tableData = thcDetail;
 
     this.tableLoad = false;
   }

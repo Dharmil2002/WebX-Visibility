@@ -12,6 +12,7 @@ export enum DocketStatus {
     Delivered = 10,//Delivered to ${receiverName} on ${deliveryDate}, reason : ${deliveryReason}
     Undelivered = 11,//Delivery attempted on ${aDT}, reason : ${reason} 
     Partial_Delivered = 12,//Partially delivered to ${receiverName} on ${deliveryDate}, reason : ${deliveryReason}
+    Del_MR_Generated = 13,//Delivery Mr Generated at ${cLOC} on ${Dt}
     Detained = 98,//Docket detained at ${cLOC} on ${Dt}
     Cancelled = 99//Docket cancelled on ${cNDT} by ${cNBY} , reason:${cNRES}
 }
@@ -40,6 +41,7 @@ export enum DocketEvents {
     DRS_Upload = "EVN0008",
     Delivery_Update = "EVN0009",
     Arrival_Scan = "EVN0010",
+    Del_MR_Generation = "EVN0011"
 };
 export enum VehicleStatus {
     Available= 1,
@@ -49,7 +51,17 @@ export enum VehicleStatus {
     Arrived= 5,
     Unloaded= 6
 }
-
+export enum runSheetAction{
+    Depart=1,
+    Update_Delivery=2
+}
+export enum DocketType {
+    Regular = 1,
+    Quick = 2
+}
+export enum DeliveryStatus {
+    yet_to_deliver=1
+}
 export function getEnumName(enumObj: any, value: string): string | null {
     let foundKey = null;
     Object.keys(enumObj).forEach(key => {
@@ -58,4 +70,10 @@ export function getEnumName(enumObj: any, value: string): string | null {
         }
     });
     return foundKey;
+}
+export enum DrsStatus {
+    Generated = 1,
+    Delivery_Out_Scan = 2,
+    Out_For_Delivery=3,
+    Closed=4
 }

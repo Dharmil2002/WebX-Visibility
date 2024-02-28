@@ -1,0 +1,26 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
+
+  <form [formGroup]="updatedeliveryTableForm">
+    <app-form-webxpress [form]="updatedeliveryTableForm" [FormTitle]="'Update Delivery'"
+      [formData]="jsonControlupdatedeliveryArray"  (functionCallEmitter)="functionCallHandler($event)"
+      (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+
+  <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+
+  <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="csv" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+    [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)" [metaData]="METADATA" (onFlagChange)="selectCheckBox($event)"
+    [onFlagChangeGetAll]="true" [selectAllRequired]="true" [showHeader]='false'>
+  </app-generic-table-v2>
+
+  <div class="row" *ngIf="!tableload">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+      <div class="example-button-row d-flex justify-content-end">
+        <button class="msr-3" mat-raised-button color="primary" (click)="CompleteScan()">UPDATE AND CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+</app-common-wrapper-webxpress>

@@ -109,7 +109,7 @@ export class InvoiceServiceService {
 
     let jsonBillingList = [];
     bill.forEach((element) => {
-      element?.extraData.forEach(nested => {
+      element?.extraData.filter(item => item.isSelected == true).forEach(nested => {
         const gstType = ['SGST', 'CGST', 'UTGST']
         let jsonBilling = {
           _id: "",
@@ -123,18 +123,20 @@ export class InvoiceServiceService {
           dKTAMT: nested?.amount || 0.00,
           dKTTOT: nested?.total || 0.00,
           sUBTOT: nested?.amount || 0.00,
-          gSTTOT: data?.gstExempted == false ? nested?.gstChrgAmt : 0.00,
-          gSTRT: data?.gstExempted == false ? nested?.gst : 0.00,
+          gSTTOT: data?.gstExempted == false ? nested?.gst : 0.00,
+          gSTRT: data?.gstExempted == false ? data.gstRate.replace('%', '') || 0 : 0.00,
           tOTAMT: nested?.total || 0.00,
           //pAMT: 0.00,
           fCHRG: nested.extraData?.fRATE || 0.00,
           //fLSCHRG: 0.00,
           sGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) / 2 : 0,
-          sGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) / 2 : 0,
+          sGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate.replace('%', '') || 0) / 2 : 0,
           cGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) / 2 : 0,
-          cGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate) / 2 : 0,
+          cGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate.replace('%', '') || 0) / 2 : 0,
+          uTGST: gstType.includes(data?.gstType) ? parseFloat(element.gstCharged) : 0,
+          uTGSTRT: gstType.includes(data?.gstType) ? parseFloat(data.gstRate.replace('%', '') || 0) : 0,
           iGST: data?.gstType == "IGST" ? element.gstCharged : 0,
-          iGSTRT: data?.gstType == "IGST" ? data.gstRate : 0,
+          iGSTRT: data?.gstType == "IGST" ? data.gstRate.replace('%', '') || 0 : 0,
           eNTDT: new Date(),
           eNTLOC: this.storage.branch || "",
           eNTBY: this.storage?.userName || "",
@@ -173,7 +175,7 @@ export class InvoiceServiceService {
       "cOL": {
         "lOC": data?.collectionOffice || "",
         "aMT": 0.00,
-        "bALAMT": 0.00
+        "bALAMT": data?.finalInvoice || 0.00,
       },
       "cUST": {
         "cD": customerCode,
@@ -189,9 +191,10 @@ export class InvoiceServiceService {
       },
       "gST": {
         "tYP": data?.gstType || "", // SGST, UTGST, IGST
-        "rATE": data?.gstRate || "",
+        "rATE": data?.gstRate.replace('%', '') || 0,
         "iGST": data?.igst || 0.00,
         "cGST": data?.cgst || 0.00,
+        "uTGST": data?.utgst || 0.00,
         "sGST": data?.sgst || 0.00,
         "aMT": data?.gst || 0.00
       },
@@ -411,7 +414,7 @@ export class InvoiceServiceService {
       element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
       element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
       element.collectionAmount = parseFloat(element.aMT) - parseFloat(cOL);
-      element.pendingAmount = parseFloat(element.aMT) - parseFloat(cOL);
+      element.pendingAmount = parseFloat(cOL)
       return element;
 
     });
@@ -549,14 +552,15 @@ export class InvoiceServiceService {
     }
   }
   /*here the function for the collection*/
-  async getCollectionJson(formGroup, data) {
+  async getCollectionJson(formGroup, data, paymentsection) {
     const commonProperties = {
       cID: this.storage.companyCode,
       lOC: this.storage.branch,
-      dTM: new Date(),
-      mOD: formGroup?.collectionMode || 0,
-      bANK: formGroup?.bank || "",
+      dTM: formGroup?.Date || new Date(),
+      mOD: formGroup?.PaymentMode || "",
+      bANK: formGroup?.Bank.name || "",
       bY: this.storage.userName,
+      tRNO: formGroup?.ChequeOrRefNo || "",
       eNTDT: new Date(),
       eNTLOC: this.storage?.branch || "",
       eNTBY: this.storage?.userName || "",
@@ -568,11 +572,11 @@ export class InvoiceServiceService {
       mRNO: "",
       dAMT: item?.deductions || 0,
       aMT: item?.collectionAmount || 0,
-      tRNO: "",
       vUCHNO: "",
       ...commonProperties,
     }));
-
+    formGroup.location = this.storage.branch;
+    formGroup.collectionTotal = paymentsection.NetPayable;
     const colData = {
       formData: formGroup,
       collectedData: collectedData,

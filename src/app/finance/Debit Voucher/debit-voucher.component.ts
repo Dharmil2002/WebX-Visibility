@@ -509,6 +509,7 @@ export class DebitVoucherComponent implements OnInit {
           SubCategoryName: result?.SubCategoryName,
           actions: ['Edit', 'Remove']
         }
+        console.log(json)
         this.tableData.push(json);
         this.LoadVoucherDetails = true;
         this.StateChange("");
@@ -853,11 +854,13 @@ export class DebitVoucherComponent implements OnInit {
             "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
             "voucherCode": VoucherType.DebitVoucher,
             "voucherType": VoucherType[VoucherType.DebitVoucher],
+            "transactionNumber": "",
             "transDate": new Date(),
             "finYear": financialYear,
             "branch": localStorage.getItem("Branch"),
             "accCode": item.LedgerHdn,
             "accName": item.Ledger,
+            "accCategory": item.SubLedger,
             "sacCode": item.SACCodeHdn.toString(),
             "sacName": item.SACCode,
             "debit": parseFloat(item.DebitAmount).toFixed(2),
@@ -882,11 +885,13 @@ export class DebitVoucherComponent implements OnInit {
               "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
               "voucherCode": VoucherType.DebitVoucher,
               "voucherType": VoucherType[VoucherType.DebitVoucher],
+              "transactionNumber": "",
               "transDate": new Date(),
               "finYear": financialYear,
               "branch": localStorage.getItem("Branch"),
               "accCode": `${item.Ledgercode}`,
               "accName": item.Ledgername,
+              "accCategory": item.SubLedger,
               "sacCode": "",
               "sacName": "",
               "debit": debitAmount.toFixed(2),
@@ -910,6 +915,7 @@ export class DebitVoucherComponent implements OnInit {
             "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
             "voucherCode": VoucherType.DebitVoucher,
             "voucherType": VoucherType[VoucherType.DebitVoucher],
+            "transactionNumber": "",
             "transDate": new Date(),
             "finYear": financialYear,
             "branch": Branch,
@@ -931,6 +937,7 @@ export class DebitVoucherComponent implements OnInit {
                 return {
                   "accCode": `${item.Ledgercode}`,
                   "accName": item.Ledgername,
+                  "accCategory": item.SubLedger,
                   "amount": item.Cr,
                   "narration": item.Narration ? item.Narration : item.Ledgername,
                 };
@@ -939,6 +946,7 @@ export class DebitVoucherComponent implements OnInit {
                 return {
                   "accCode": `${item.Ledgercode}`,
                   "accName": item.Ledgername,
+                  "accCategory": item.SubLedger,
                   "amount": item.Dr,
                   "narration": item.Narration ? item.Narration : item.Ledgername,
                 };
@@ -953,9 +961,10 @@ export class DebitVoucherComponent implements OnInit {
                 transType: VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
                 voucherCode: VoucherType.DebitVoucher,
                 voucherType: VoucherType[VoucherType.DebitVoucher],
+                transactionNumber: "",
                 docType: "Voucher",
                 partyType: this.DebitVoucherSummaryForm.value.Preparedfor,
-                docNo: res?.data?.mainData?.ops[0].vNO,
+                docNo: "",
                 partyCode: this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,
                 entryBy: localStorage.getItem("UserName"),

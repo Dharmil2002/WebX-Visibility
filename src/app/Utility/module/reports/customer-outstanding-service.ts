@@ -11,12 +11,27 @@ export class CustOutstandingService {
           private masterServices: MasterService,
           private storage: StorageService
      ) { }
-
+     getISODateOrNull(date) {
+          if (isNaN(date.getTime())) {
+               return ''; // Return empty string if date is invalid
+          } else {
+               return date.toISOString(); // Convert to ISO format if date is valid
+          }
+     }
      async getcustomerOutstandingReportDetail(ASonDateValue, start, end, loct, cust, gstST, reportbasis, custGrp) {
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const cus = cust ? cust.map(x => x.custCD) || [] : [];
           const gstState = gstST ? gstST.map(x => x.gstNM) || [] : [];
           const custgrp = custGrp ? custGrp.map(x => x.cgpCD) || [] : [];
+          let ASonDateValueValid = true;
+          let dtmrequest = {}
+          if (ASonDateValue == "Invalid Date") {
+               ASonDateValueValid = false;
+               dtmrequest = { D$lte: this.getISODateOrNull(end) }
+          }
+          else {
+               dtmrequest = { D$lte: this.getISODateOrNull(ASonDateValue) }
+          }
 
           let matchQuery = {
                'D$and': [
@@ -95,8 +110,11 @@ export class CustOutstandingService {
                                                                  D$eq: ["$bILLNO", "$$bILLNO"],
                                                             },
                                                        },
+                                                       // {
+                                                       //      dTM: { D$lte: ASonDateValue }
+                                                       // },
                                                        {
-                                                            dTM: { D$lte: ASonDateValue }
+                                                            dTM: dtmrequest
                                                        },
                                                        {
                                                             cNL: {
@@ -137,6 +155,9 @@ export class CustOutstandingService {
                                              else: 0,
                                         },
                                    },
+                                   // collectedAmt: {
+                                   //      D$sum: "$cOL.aMT",
+                                   // },
                                    collectedAmt: {
                                         D$sum: "$coll.aMT",
                                    },
@@ -176,7 +197,7 @@ export class CustOutstandingService {
                                         D$sum: "$unsubmittedAmt",
                                    },
                                    submittedAmt: {
-                                        D$sum: "submittedAmt",
+                                        D$sum: "$submittedAmt",
                                    },
                                    collectedAmt: {
                                         D$sum: "$collectedAmt",
@@ -366,56 +387,6 @@ export class CustOutstandingService {
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
           return res.data;
      }
-
-     // async getcustomerOutstandingReportDetail() {
-     //      const reqBody = {
-     //           companyCode: this.storage.companyCode,
-     //           collectionName: "cust_bill_headers",
-     //           filter: {}
-     //      }
-     //      const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-     //      reqBody.collectionName = "cust_bill_collection"
-     //      const rescustBill = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-
-     //      let custoutstandList = [];
-
-     //      res.data.map((element) => {
-
-     //           const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.bILLNO === element?.bILLNO) : null;
-     //           let Amount = 0;
-     //           if (custBillDet) {
-     //                Amount = custBillDet.aMT;
-     //           }
-
-     //           let custoutData = {
-     //                "oloc": element.bLOC,
-     //                "obGNDT": element.bGNDT,
-     //                "custCode": element.cUST.cD || '',
-     //                "cust": element.cUST.nM || '',
-     //                "openingBal": element.aMT || '',
-     //                "billAmt": element.aMT || '',
-     //                "unsubmittedAmt": element.aMT || '',
-     //                "submittedAmt": element.aMT || '',
-     //                "collectionAmt": Amount,
-     //                "TotalPending":'',
-     //                "ManualVoucherAmount":'',
-     //                "OnAccountBalance":'',
-     //                "LedgerBalance":'',
-     //                "0-15": "",
-     //                "16-30": "",
-     //                "31-45": "",
-     //                "46-60": "",
-     //                "61-75": "",
-     //                "75-90": "",
-     //                "91-120": "",
-     //                "120-180": "",
-     //                "180-365": "",
-     //                "Above 365": "",
-     //           }
-     //           custoutstandList.push(custoutData)
-     //      })
-     //      return custoutstandList;
-     // }
 }
 
 export function exportAsExcelFile(json: any[], excelFileName: string, customHeaders: Record<string, string>): void {

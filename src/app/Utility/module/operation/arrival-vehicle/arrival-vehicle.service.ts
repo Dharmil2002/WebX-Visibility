@@ -24,7 +24,8 @@ export class ArrivalVehicleService {
             filters: [
                 {
                     D$match: matchQuery,
-                }, {
+                },
+                 {
                     "D$lookup": {
                         "from": "mf_headers_ltl",
                         "let": { "docNumber": "$docNo" }, // Renamed for clarity
@@ -294,11 +295,11 @@ export class ArrivalVehicleService {
                     "sFX": 0,
                     "lOC": this.storage.branch,
                     "eVNID": DocketEvents.Arrival_Scan,
-                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan),
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan).replace(/_/g, " "),
                     "eVNDT": new Date(),
                     "eVNSRC": "Arrival Scan",
                     "dOCTY": "TH",
-                    "dOCNO": data?.tripID || "",
+                    "dOCNO": data?.TripID || "",
                     "sTS": DocketStatus.In_Delivery_Stock,
                     "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
                     "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
@@ -344,11 +345,11 @@ export class ArrivalVehicleService {
                     "sFX": 0,
                     "lOC": this.storage.branch,
                     "eVNID": DocketEvents.Arrival_Scan,
-                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan),
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan).replace(/_/g, " "),
                     "eVNDT": new Date(),
                     "eVNSRC": "Arrival Scan",
                     "dOCTY": "TH",
-                    "dOCNO": data?.tripID || "",
+                    "dOCNO": data?.TripID || "",
                     "sTS": DocketStatus.In_Transhipment_Stock,
                     "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
                     "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
@@ -436,6 +437,8 @@ export class ArrivalVehicleService {
                 nXTLOC: "",
                 vEHNO: "",
                 tHC: "",
+                lSNO:"",
+                mFNO:"",
                 sTS: 7,// Assuming this is the status code for "In Transit",
                 sTSNM: "Route Updated"
             }

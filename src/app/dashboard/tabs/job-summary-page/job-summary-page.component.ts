@@ -12,8 +12,8 @@ export class JobSummaryPageComponent implements OnInit {
     noColumnSort: ["checkBoxRequired"],
   };
   tableData: any[];
-  filterColumn:boolean=true;
-  allColumnFilter:any;
+  filterColumn: boolean = true;
+  allColumnFilter: any;
   dynamicControls = {
     add: true,
     edit: true,
@@ -24,31 +24,31 @@ export class JobSummaryPageComponent implements OnInit {
 
   columnHeader = {
     createdOn: {
-      Title: "Created On",
+      Title: "Created Date",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:140px",
     },
     jobNo: {
       Title: "Job No",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:220px",
       type: 'windowLink',
       functionName: 'OpenJob'
     },
     jobDate: {
       Title: "Job Date",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:125px",
     },
     jobType: {
       Title: "Job Type",
-      class: "matcolumnleft",
-      Style:  "max-width:70px",
+      class: "matcolumncenter",
+      Style: "min-width:110px",
     },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:180px",
+      Style: "min-width:130px",
     },
     fromToCity: {
       Title: "From-To City",
@@ -58,7 +58,7 @@ export class JobSummaryPageComponent implements OnInit {
     jobLocation: {
       Title: "Job Location",
       class: "matcolumnleft",
-      Style: "max-width:90px",
+      Style: "min-width:137px",
     },
     pkgs: {
       Title: "Pkgs",
@@ -73,12 +73,12 @@ export class JobSummaryPageComponent implements OnInit {
     status: {
       Title: "Status",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "max-width:90px",
     },
     Action: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:50px",
     },
   };
   //#endregion
@@ -95,10 +95,10 @@ export class JobSummaryPageComponent implements OnInit {
   addAndEditPath: string;
   linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
   constructor(
-    private jobservice:JobEntryService
-    ) {
+    private jobservice: JobEntryService
+  ) {
     this.addAndEditPath = "Operation/JobEntry";
-    this.allColumnFilter=this.columnHeader
+    this.allColumnFilter = this.columnHeader
   }
 
   ngOnInit(): void {

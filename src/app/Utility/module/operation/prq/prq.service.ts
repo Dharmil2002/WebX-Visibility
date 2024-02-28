@@ -190,13 +190,13 @@ export class PrqService {
   //................end.............//
 
   // This async function retrieves PRQ (Purchase Request) detail data from an API using the masterService.
-  async getPrqDetailFromApi() {
+  async getPrqDetailFromApi(Branch) {
 
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_summary",
-      filter: { bRCD: this.branchCode },
+      filter: Branch.toUpperCase() == "HQTR"?{}:{ bRCD: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method

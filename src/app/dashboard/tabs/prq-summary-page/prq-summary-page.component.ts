@@ -46,9 +46,12 @@ export class PrqSummaryPageComponent implements OnInit {
   ngOnInit(): void {
     this.getPrqDetails();
   }
-  async getPrqDetails() {
+  async getPrqDetails() { 
+    const Branch = localStorage.getItem("Branch");
+    // const Branch = "HQTR";
 
-    let data = await this.prqService.getPrqDetailFromApi();
+
+    let data = await this.prqService.getPrqDetailFromApi(Branch);
 
     this.tableData = data.tableData;
     this.allPrq = data.allPrqDetail;

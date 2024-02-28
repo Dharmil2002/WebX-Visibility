@@ -49,7 +49,7 @@ export class AddressMasterListComponent implements OnInit {
       functionName: "ActiveFunction",
     },
     actions: {
-      Title: "Active Status",
+      Title: "Actions",
       class: "matcolumnleft",
       Style: "max-width:100px",
     },

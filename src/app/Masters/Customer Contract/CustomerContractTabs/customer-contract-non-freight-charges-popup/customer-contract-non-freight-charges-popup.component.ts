@@ -107,6 +107,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   ) {
     this.ChargesData = data;
     this.getTableData();
+    console.log("ChargesData", this.ChargesData);
   }
 
   async getTableData() {
@@ -230,23 +231,28 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     }
   }
   async Save() {
-
+    const TableFilter = {
+      fROM: this.NonFreightMatrixForm.value.From.name,
+      tO: this.NonFreightMatrixForm.value.To.name,
+      cONID: this.ChargesData.cONID,
+      nFCID: this.ChargesData.nFCID,
+    }
     let Tablereq = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "cust_contract_non_freight_charge_matrix_details",
-      filter: {fROM: this.NonFreightMatrixForm.value.From.name , tO: this.NonFreightMatrixForm.value.To.name},
+      filter: TableFilter,
     };
     const Tableres = await firstValueFrom(
       this.masterService.masterPost("generic/get", Tablereq)
     );
-    if(Tableres.data.length > 0){
+    if (Tableres.data.length > 0 && !this.isUpdate) {
       Swal.fire({
         icon: "info",
         title: "info",
-        text: 'enter valid data',
+        text: "enter valid data",
         showConfirmButton: true,
       });
-      return 
+      return;
     }
 
     const body = {
@@ -278,6 +284,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       body["_id"] = `${this.companyCode}-${this.ChargesData.cONID}-${Index}`;
       body["cDID"] = Index;
       body["sCT"] = this.ChargesData.sCT;
+      body["nFCID"] = this.ChargesData.nFCID;
       body["cONID"] = this.ChargesData.cONID;
       body["cID"] = this.companyCode;
       body["eNTDT"] = new Date();

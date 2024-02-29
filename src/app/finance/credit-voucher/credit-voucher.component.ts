@@ -312,26 +312,14 @@ export class CreditVoucherComponent implements OnInit {
           "DepositBank",
           false
         );
-        this.filter.Filter(
-          this.jsonControlCreditVoucherPaymentDetailsArray,
-          this.creditVoucherPaymentDetailsForm,
-          responseFromAPIBank,
-          "receivedBank",
-          false
-        );
+       
         const depositBank = this.creditVoucherPaymentDetailsForm.get('DepositBank');
         depositBank.setValidators([Validators.required, autocompleteObjectValidator()]);
         depositBank.updateValueAndValidity();
-
-        const receivedBank = this.creditVoucherPaymentDetailsForm.get('receivedBank');
-        receivedBank.setValidators([Validators.required, autocompleteObjectValidator()]);
-        receivedBank.updateValueAndValidity();
-
+      
         const ChequeOrRefNo = this.creditVoucherPaymentDetailsForm.get('ChequeOrRefNo');
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
-
-
 
         const CashAccount = this.creditVoucherPaymentDetailsForm.get('CashAccount');
         CashAccount.setValue("");
@@ -460,13 +448,7 @@ export class CreditVoucherComponent implements OnInit {
         // Find the account details for the deposit bank in the AccountsBanksList
         const depositAccountDetails = this.AccountsBanksList.find(item => item.bANCD === depositBankValue?.value && item.bANM === depositBankValue?.name);
 
-        // Get received bank details from the creditVoucherPaymentDetailsForm
-        const receivedBankValue = this.creditVoucherPaymentDetailsForm.get("receivedBank").value;
-
-        // Find the account details for the received bank in the AccountsBanksList
-        const receivedAccountDetails = this.AccountsBanksList.find(item => item.bANCD === receivedBankValue?.value && item.bANM === receivedBankValue?.name);
-
-        if (depositAccountDetails != undefined || receivedAccountDetails != undefined) {
+        if (depositAccountDetails != undefined) {
           Leadgerdata = {
             name: depositAccountDetails?.aCNM,
             value: depositAccountDetails?.aCCD
@@ -491,7 +473,7 @@ export class CreditVoucherComponent implements OnInit {
       "Ledgername": Leadgerdata?.name,
       "SubLedger": "BANK",
       "Dr": NetPayable.toFixed(2),
-      "Cr": "",
+      "Cr": 0,
       "Location": Accountinglocation,
       "Narration": ""
     };

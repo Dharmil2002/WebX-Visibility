@@ -92,23 +92,24 @@ export class GeneralLedgerReportService {
           return accumulator;
         }, { totalDebit: 0, totalCredit: 0 });
 
-        // Add a new row with the specified values
-        // const Row = {
-        //   "AccountCode": "Total Transaction :",
-        //   "Debit": "0.00",
-        //   "Credit": "0.00",
-        //   "AccountName": " ",
-        //   "Category": " ",
-        //   "Voucher No": " ",
-        //   "Date": " ",
-        //   "PartyCode": " ",
-        //   "PartyName": " ",
-        //   "Narration": " ",
-        //   "LocName": " ",
-        //   "Cheque Date": " ",
-        //   "Document No": " "
-        // };
-        // reportData.unshift(Row);
+        //Add a new row with the specified values
+        const Row = {
+          "AccountCode": "Opening Balance :",
+          "AccountName": " ",
+          "Category": " ",
+          "Voucher No": " ",
+          "Date": " ",
+          "Debit": "0.00",
+          "Credit": "0.00",
+          "PartyCode": " ",
+          "PartyName": " ",
+          "Document No": " ",
+          "Narration": " ",
+          "Cheque No": " ",
+          "Cheque Date": " ",
+          "LocName": " ",
+        };
+        reportData.unshift(Row);
 
         const firstRow = {
           "AccountCode": "Total Transaction :",

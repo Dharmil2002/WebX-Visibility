@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -26,7 +26,7 @@ export class UpdateRunSheetComponent implements OnInit {
   backPath: string;
   updateSheetTableForm: UntypedFormGroup
   UpdaterunControlArray: any;
-  centerAlignedData = ['packages', 'loaded','pending'];
+  centerAlignedData = ['packages', 'loaded', 'pending'];
   columnHeader = {
     shipment: {
       Title: "Shipments",
@@ -71,6 +71,7 @@ export class UpdateRunSheetComponent implements OnInit {
     edit: false,
     //csv: true
   }
+  @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
   loadingData: any;
   formdata: any;
   arrivalData: any;
@@ -85,12 +86,12 @@ export class UpdateRunSheetComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private cdr: ChangeDetectorRef,
     private runSheetService: RunSheetService,
-    private storage:StorageService,
+    private storage: StorageService,
     private navigationService: NavigationService
-     ) {
+  ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
-      if(this.Route.getCurrentNavigation()?.extras?.state.data.columnData.oPSST==2){
+      if (this.Route.getCurrentNavigation()?.extras?.state.data.columnData.oPSST == 2) {
         this.navigationService.navigateTo("Operation/UpdateDelivery", this.tripData);
       }
     }
@@ -107,14 +108,14 @@ export class UpdateRunSheetComponent implements OnInit {
     this.updateSheetTableForm.controls['Departuretime'].setValue('')
     this.getShipmentData();
   }
-  async getShipmentData(){
-     const res= await this.runSheetService.drsShipmentDetails({cID:this.storage.companyCode,dRSNO:this.tripData.columnData.RunSheet});
-     const dktNo=res?.map((x)=>x.dKTNO);
-     this.packageList= await this.runSheetService.drsShipmetPkgs({cID:this.storage.companyCode,dKTNO:{"D$in":dktNo},sFX:0});
-     const shipmentData=await this.runSheetService.FieldMappingRunSheetdkts(res);
-     this.csv = shipmentData;
-     this.tableload=false;
-     this.kpiData("")
+  async getShipmentData() {
+    const res = await this.runSheetService.drsShipmentDetails({ cID: this.storage.companyCode, dRSNO: this.tripData.columnData.RunSheet });
+    const dktNo = res?.map((x) => x.dKTNO);
+    this.packageList = await this.runSheetService.drsShipmetPkgs({ cID: this.storage.companyCode, dKTNO: { "D$in": dktNo }, sFX: 0 });
+    const shipmentData = await this.runSheetService.FieldMappingRunSheetdkts(res);
+    this.csv = shipmentData;
+    this.tableload = false;
+    this.kpiData("")
   }
   ngOnInit(): void {
     this.backPath = "/dashboard/Index";
@@ -169,12 +170,12 @@ export class UpdateRunSheetComponent implements OnInit {
   }
   async CompleteScan() {
     let packageChecked = false;
-    const exists =  this.csv.some(obj => obj.hasOwnProperty("loaded"));
+    const exists = this.csv.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
       packageChecked = this.csv.every(obj => obj.packages === obj.loaded);
     }
     if (packageChecked) {
-        await this.DepartDelivery() ;
+      await this.DepartDelivery();
     }
     else {
       Swal.fire({
@@ -189,17 +190,36 @@ export class UpdateRunSheetComponent implements OnInit {
   updatePackage() {
     this.tableload = true;
     // Get the trimmed values of scan and leg
-    const scanValue = this.scanPackage;
-    // Find the unload package based on scan and leg values
-    const loading=this.runSheetService.handlePackageUpdate(scanValue,this.packageList, this.csv,this.cdr)
-    if(loading){
-    this.kpiData(loading);
+    if (this.scanPackage) {
+      const scanValue = this.scanPackage;
+      // Find the unload package based on scan and leg values
+      const loading = this.runSheetService.handlePackageUpdate(scanValue, this.packageList, this.csv, this.cdr)
+      if (loading) {
+        const { status, ...options } = loading;
+        if (!status) {
+          this.scanMessage = options.text;
+        }
+        else {
+          this.scanMessage = '';
+          this.kpiData(loading);
+        }
+      }
+      this.cdr.detectChanges(); // Trigger change detection
+      this.tableload = false;
+      this.clearAndFocusOnScan();
     }
-    this.cdr.detectChanges(); // Trigger change detection
-    this.tableload=false;
+    else {
+      this.scanMessage = `Please Enter Package No`;
+      this.clearAndFocusOnScan();
+      return;
+    }
+  }
+  clearAndFocusOnScan() {
+    this.scanPackage = '';
+    this.scanPackageInput.nativeElement.focus();
   }
   async DepartDelivery() {
-    const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value,this.csv,this.packageList);
+    const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList);
     Swal.fire({
       icon: "success",
       title: "RunSheet Update Successfully",

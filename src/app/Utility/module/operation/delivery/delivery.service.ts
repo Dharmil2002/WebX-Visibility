@@ -16,7 +16,7 @@ export class DeliveryService {
   ) { }
 
   async getDeliveryDetail(filter) {
-    debugger
+    
     const req = {
       companyCode: this.storage.companyCode,
       collectionName: "drs_details",

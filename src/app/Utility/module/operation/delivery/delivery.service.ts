@@ -16,6 +16,7 @@ export class DeliveryService {
   ) { }
 
   async getDeliveryDetail(filter) {
+    debugger
     const req = {
       companyCode: this.storage.companyCode,
       collectionName: "drs_details",
@@ -25,6 +26,7 @@ export class DeliveryService {
     return res.data;
   }
   async deliveryUpdate(data, shipment) {
+    
     const evnData = shipment.map((item) => {
       const evnData = {
         "_id": `${this.storage.companyCode}${item.dKTNO}-${item.sFX}-${DocketEvents.Delivery_Update}-${moment().format("YYYYMMDDHHmmss")}`,
@@ -41,7 +43,7 @@ export class DeliveryService {
         "dOCNO":data.tripId,
         "sTS":data.statusCd,
         "sTSNM": DocketStatus[data.statusCd],
-        "oPSSTS":`Delivered to ${item.person} on ${moment(item.dateTime).format("DD MMM YYYY @ hh:mm A")}${item.deliveryReason ? `, reason: ${item.deliveryReason}` : ''}`,
+        "oPSSTS":`Delivered to ${item.person} on ${moment(item.dateTime).format("DD MMM YYYY @ hh:mm A")}${item.reason ? `, reason: ${item.reason}` : ''}`,
         "eNTLOC": this.storage.branch,
         "eNTBY": this.storage.userName
       }

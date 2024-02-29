@@ -339,7 +339,7 @@ export class CreateRunSheetComponent implements OnInit {
   }
   async generalMaster(){
     this.delType = await this.generalService.getGeneralMasterData("RUNDELTYP");
-    const delType=this.delType.find((x)=>x.name=="Delivery")
+    const delType=this.delType.find((x)=>x.name=="Delivery");
     setGeneralMasterData(this.jsonControlArray, this.delType, "deliveryType");
     this.RunSheetTableForm.controls['deliveryType'].setValue(delType.value)
     this.RunSheetTableForm.controls['deliveryType'].disable();

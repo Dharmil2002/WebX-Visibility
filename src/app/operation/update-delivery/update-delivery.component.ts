@@ -119,6 +119,8 @@ export class UpdateDeliveryComponent implements OnInit {
           delivered:"",
           person:"",
           reason:"",
+          ltReason:"",
+          deliveryPartial:"",
           pod: "",
           statusCd:DeliveryStatus.Yet_to_deliver,
           status:DeliveryStatus[DeliveryStatus.Yet_to_deliver].replace(/_/g, " "),
@@ -183,9 +185,9 @@ export class UpdateDeliveryComponent implements OnInit {
               x.codDodPaid=result?.codDodPaid||"0.00",
               x.dDateTime=moment.utc(result.DTTM).format("DD/MM/YYYY HH:MM:SS");
               x.deliveryPartial=result.deliveryPartial||"",
-              x.remarks= result.remarks||"",
               x.pod= result.pod||"",
               x.ltReason=result.ltReason||"",
+              x.reason=result?.deliveryPartial||result?.ltReason||"",
               x.startKm=result?.startKm||0,
               x.person=result?.person||this.storage.branch
             }
@@ -201,7 +203,7 @@ export class UpdateDeliveryComponent implements OnInit {
       bookedPkgs = parseInt(bookedPkgs, 10);
       deliveryPkgs = parseInt(deliveryPkgs, 10);
       if (bookedPkgs === deliveryPkgs) {
-        return { status: DeliveryStatus[DeliveryStatus.Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Yet_to_deliver}; // Adjust based on actual logic
+        return { status: DeliveryStatus[DeliveryStatus.Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Delivered}; // Adjust based on actual logic
       } else if (deliveryPkgs == 0) {
         return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Un_Delivered };
       } else if (bookedPkgs < deliveryPkgs) {
@@ -211,6 +213,16 @@ export class UpdateDeliveryComponent implements OnInit {
       }
   }
   async CompleteScan(){
+    const status = this.tableData.every(x => x.dateTime);
+    if (!status) { // If not every item has a non-empty dateTime, show the error
+      Swal.fire({
+        icon: "error",
+        title: "Please fill the delivery details",
+        showConfirmButton: true,
+      });
+      return false;
+    }
+    else{
     const res = await this.deliveryService.deliveryUpdate(this.updatedeliveryTableForm.value,this.tableData);
     if(res){
       Swal.fire({
@@ -225,6 +237,9 @@ export class UpdateDeliveryComponent implements OnInit {
             "dashboard/Index"
           );
     })
+  }
     }
+    
+    
   }
 }

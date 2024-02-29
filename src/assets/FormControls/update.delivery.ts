@@ -14,15 +14,6 @@ export class UpdateShipmentDeliveryControl {
                 generatecontrol: true,
                 disable: true
             },
-            {
-                name: 'block',
-                label: 'Date And Time',
-                placeholder: '',
-                type: '',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
              {
                 name: 'DTTM',
                 label: 'Date And Time',
@@ -33,6 +24,15 @@ export class UpdateShipmentDeliveryControl {
                     name: "required",
                     message: "'Date And Time is required"
                 }],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'pod',
+                label: 'POD',
+                placeholder: '',
+                type:'file',
+                value: '',
+                Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -60,6 +60,9 @@ export class UpdateShipmentDeliveryControl {
                 type: 'number',
                 value: '',
                 Validations: [],
+                functions:{
+                    onChange:"deliveryPkgsChange"
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -79,15 +82,6 @@ export class UpdateShipmentDeliveryControl {
                 value:'0.00',
                 Validations: [],
                 generatecontrol: true, disable: true
-            },
-            {
-                name: 'block1',
-                label: '',
-                placeholder: '',
-                type: '',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: false
             },
             {
                 name: 'deliveryPartial',
@@ -111,15 +105,6 @@ export class UpdateShipmentDeliveryControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'pod',
-                label: 'POD',
-                placeholder: '',
-                type:'file',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'ltReason',
                 label: 'Late Reason',
                 placeholder: '',
@@ -129,7 +114,7 @@ export class UpdateShipmentDeliveryControl {
                 additionalData:{
                     showNameAndValue:false
                 },
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: false
             },
             {
                 name: "startKm",

@@ -136,7 +136,7 @@ export class AccountGroupComponent implements OnInit {
     this.bindDropdown();
   }
 
-  Cancle() {
+  cancel() {
     this.isUpdate = false
     this.FirstUpdate = false
     this.showTable = !this.showTable;
@@ -310,7 +310,7 @@ export class AccountGroupComponent implements OnInit {
     }
   }
 
-  async Save() {
+  async save() {
     if(this.isUpdate){
       const Body = {
         gRPNM: this.AccountGroupForm.value.GroupName,
@@ -331,7 +331,7 @@ export class AccountGroupComponent implements OnInit {
       const res = await firstValueFrom(this.masterService
         .masterPut("generic/update", req));
       if (res.success) {
-        this.Cancle();
+        this.cancel();
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -375,7 +375,7 @@ export class AccountGroupComponent implements OnInit {
       const res = await firstValueFrom(this.masterService
         .masterPost("generic/create", req));
       if (res.success) {
-        this.Cancle();
+        this.cancel();
         Swal.fire({
           icon: "success",
           title: "Successful",

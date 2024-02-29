@@ -61,6 +61,7 @@ export class ConsignmentOperationComponent implements OnInit {
   constructor(private Route: Router, private masterService: MasterService) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.DocData = this.Route.getCurrentNavigation().extras?.state.data;
+      console.log('this.DocData' ,this.DocData)
     } else {
       this.Route.navigateByUrl("Operation/ConsignmentFilter");
     }
@@ -82,6 +83,7 @@ export class ConsignmentOperationComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
+      console.log('res' , res)
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x) => {
         return {
@@ -91,7 +93,6 @@ export class ConsignmentOperationComponent implements OnInit {
         };
       });
     } else {
-      this.isTableLode = true;
       this.TableData = [];
       Swal.fire({
         icon: "info",
@@ -100,6 +101,7 @@ export class ConsignmentOperationComponent implements OnInit {
         showConfirmButton: true,
       });
     }
+    this.isTableLode = true;
   }
 
   functionCallHandler(event) {}

@@ -145,7 +145,7 @@ export class AccountListFilterComponent implements OnInit {
     });
   }
 
-  Save() {
+  save() {
     let Body;
     if (this.AccountQueryForm.value.AccountCode != "") {
       Body = {
@@ -164,7 +164,7 @@ export class AccountListFilterComponent implements OnInit {
     }
     this.dialogRef.close({ event: true, data: Body });
   }
-  Cancle() {
+  cancel() {
     this.dialogRef.close({ event: false, data: "" });
   }
 }

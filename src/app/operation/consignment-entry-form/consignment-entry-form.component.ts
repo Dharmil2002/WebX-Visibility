@@ -64,7 +64,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   marketVendor: boolean;
   ccbp: boolean = true;
   addFlag: boolean = true;
-  ewayBill: boolean = false;
+  ewayBill: boolean = true;
   prqFlag: boolean;
   jsonControlArray: any;
   NonFreightjsonControlArray: any;
@@ -139,7 +139,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   ngOnInit(): void {
     this.getGeneralmasterData().then(() => {
       this.bindDataFromDropdown();
-      this.InvockedContract()
+      // this.InvockedContract()
       this.isTableLoad = false;
     });
     this.backPath = "/dashboard/Index?tab=6";
@@ -1725,22 +1725,22 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     } else {
       containerCode = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
     }
-    // let reqBody =
-    // {
-    //   "companyCode": this.storage.companyCode,
-    //   "customerCode": this.model.consignmentTableForm.value.billingParty.value,
-    //   "contractDate": this.model.consignmentTableForm.value.docketDate,
-    //   "productName": TransMode,
-    //   "basis": paymentBasesName,
-    //   "from": this.model.consignmentTableForm.value.fromCity.value,
-    //   "to": this.model.consignmentTableForm.value.toCity.value,
-    //   "capacity": containerCode
-    // }
-
-    let reqBody = {
-      "companyCode": 10065, "customerCode": "CUST00022",
-      "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9
+    let reqBody =
+    {
+      "companyCode": this.storage.companyCode,
+      "customerCode": this.model.consignmentTableForm.value.billingParty.value,
+      "contractDate": this.model.consignmentTableForm.value.docketDate,
+      "productName": TransMode,
+      "basis": paymentBasesName,
+      "from": this.model.consignmentTableForm.value.fromCity.value,
+      "to": this.model.consignmentTableForm.value.toCity.value,
+      "capacity": containerCode
     }
+
+    // let reqBody = {
+    //   "companyCode": 10065, "customerCode": "CUST00022",
+    //   "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9
+    // }
 
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
       .then(async (res: any) => {

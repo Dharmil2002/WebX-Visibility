@@ -14,6 +14,12 @@ import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComp
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { GetAccountDetailFromApi, GetBankDetailFromApi } from '../Debit Voucher/debitvoucherAPIUtitlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-invoice-collection',
@@ -121,6 +127,8 @@ export class InvoiceCollectionComponent implements OnInit {
   AlljsonControlDebitVoucherTaxationPaymentDetailsArray: any;
 
   AccountsBanksList: any;
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -128,12 +136,13 @@ export class InvoiceCollectionComponent implements OnInit {
     private masterService: MasterService,
     private invoiceService: InvoiceServiceService,
     private generalService: GeneralService,
+    public snackBarUtilityService: SnackBarUtilityService,
+    private voucherServicesService: VoucherServicesService,
     private storage: StorageService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
 
       this.invoiceDetail = this.router.getCurrentNavigation()?.extras?.state.data.columnData;
-
       if (this.invoiceDetail.pendCol == 0) {
         this.alertForTheZeroAmt()
       }
@@ -208,44 +217,12 @@ export class InvoiceCollectionComponent implements OnInit {
   tab(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
-  async save() {
-    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
-    if (NetPayable <= 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Warning',
-        text: 'Net payable amount should be greater than 0',
-        timer: 2000,
-        showCancelButton: false,
-        showConfirmButton: false
-      });
-      return;
-    }
-    const data = await this.invoiceService.getCollectionJson(this.DebitVoucherTaxationPaymentDetailsForm.value, this.tableData, this.DebitVoucherTaxationPaymentSummaryForm.value);
-    const res = await this.invoiceService.saveCollection(data);
-    if (res) {
-      const MRNo = res.ops[0].mRNO; // Add this line to get MRNo
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: `Invoice collection saved successfully. MRNo: ${MRNo}`,
-        timer: 2000,
-        showCancelButton: false,
-        showConfirmButton: true, // Add this line to show the "OK" button
-        confirmButtonText: 'OK' // Add this line to set the text of the "OK" button
-      }).then(() => {
-        this.tab('Management​');
-      });
-    }
-  }
+
   getCalucationDetails(event) {
-    const total = event.reduce((accumulator, eventItem) => {
-      if (eventItem.isSelected) {
-        return accumulator + eventItem.collectionAmount;
-      } else {
-        return 0;
-      }
+    const total = this.tableData.filter(item => item.isSelected == true).reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['collectionAmount']);
     }, 0);
+
     this.DebitVoucherTaxationPaymentSummaryForm.controls['PaymentAmount'].setValue(Math.abs(total));
     const TotalPaymentAmount = this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
     const netPayable = event?.event?.checked ? Math.ceil(TotalPaymentAmount) : TotalPaymentAmount;
@@ -345,5 +322,255 @@ export class InvoiceCollectionComponent implements OnInit {
         x.collectionAmount = (parseFloat(x?.aMT || 0.00) - parseFloat(x?.deductions || 0.00)).toFixed(2);
       }
     })
+  }
+  async save() {
+    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+    if (NetPayable <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'Net payable amount should be greater than 0',
+        timer: 2000,
+        showCancelButton: false,
+        showConfirmButton: false
+      });
+      return;
+    }
+
+    const data = await this.invoiceService.getCollectionJson(this.DebitVoucherTaxationPaymentDetailsForm.value, this.tableData, this.DebitVoucherTaxationPaymentSummaryForm.value);
+    const res = await this.invoiceService.saveCollection(data);
+    if (res) {
+      this.AccountPosting(this.tableData[0], res.ops[0].mRNO)
+    }
+  }
+  // Account Posting When  When Bill Has been Collected	
+  async AccountPosting(data, mRNO) {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const TotalAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+        const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+
+        const GstAmount = data?.gST?.aMT;
+
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillCollection,
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillCollection],
+          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher,
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher],
+          this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = data?.cUST?.cD || "",
+          this.VoucherDataRequestModel.partyName = data?.cUST?.nM || "",
+          this.VoucherDataRequestModel.partyState = data?.cUST?.sT || "",
+          this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
+
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = data?.gST?.iGST || 0;
+        this.VoucherDataRequestModel.SGST = data?.gST?.sGST || 0;
+        this.VoucherDataRequestModel.CGST = data?.gST?.cGST || 0;
+        this.VoucherDataRequestModel.UGST = data?.gST?.UTGST || 0;
+        this.VoucherDataRequestModel.GSTTotal = GstAmount;
+
+        this.VoucherDataRequestModel.GrossAmount = data?.gROSSAMT || 0;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = +(TotalAmount - PaymentAmount);
+        this.VoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.transactionNumber = mRNO,
+          this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        var VoucherlineitemList = this.GetVouchersLedgers(data, mRNO);
+
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.branch,
+                transCode: VoucherInstanceType.BillCollection,
+                transType: VoucherInstanceType[VoucherInstanceType.BillCollection],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
+                docType: "Voucher",
+                partyType: "Customer",
+                docNo: mRNO,
+                partyCode: data?.cUST?.cD || "",
+                partyName: data?.cUST?.nM || "",
+                entryBy: localStorage.getItem("UserName"),
+                entryDate: Date(),
+                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.debit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.credit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    if (res?.success == true) {
+                      this.UpdateBillCollection(mRNO, reqBody.voucherNo)
+                    }
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+    }, "Customer Bill Collection Voucher Generating..!");
+
+  }
+  UpdateBillCollection(MrNo, VoucherNo) {
+
+    const updateRequest = { vUCHNO: VoucherNo };
+    const reqbillcollection = {
+      companyCode: this.storage.companyCode,
+      collectionName: "cust_bill_collection",
+      filter: { mRNO: MrNo },
+      update: updateRequest,
+    };
+    firstValueFrom(this.masterService.masterPut("generic/update", reqbillcollection)),
+      Swal.fire({
+        icon: "success",
+        title: "Invoice collection Successfully And Voucher Created",
+        text: "MR No: " + MrNo + "  Voucher No: " + VoucherNo,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.hideLoading();
+          setTimeout(() => {
+            this.tab('Management​');
+            Swal.close();
+          }, 2000);
+        }
+      });
+  }
+  GetVouchersLedgers(data, mRNO) {
+    const GstAmount = data?.gST?.aMT;
+    const GstRate = data?.gST?.rATE;
+
+    const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+
+    //const BillNumbersList = this.tableData.filter(item => item.isSelected == true).map(item => item.bILLNO);
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.BillCollection,
+      transType: VoucherInstanceType[VoucherInstanceType.BillCollection],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: GstRate,
+      GSTAmount: GstAmount,//credit,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Customer Bill freight is Finalized : ${mRNO}`,
+    });
+
+    const response = [
+      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, NetPayable, 0),
+    ];
+
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
+    if (PaymentMode == "Cash") {
+      const CashAccount = this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value;
+      response.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, PaymentAmount));
+    }
+    if (PaymentMode == "Cheque") {
+      const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
+      let Leadgerdata = {
+        name: "",
+        value: ""
+      }
+      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      if (AccountDetails != undefined) {
+        Leadgerdata = {
+          name: AccountDetails?.aCNM,
+          value: AccountDetails?.aCCD
+        }
+      }
+      response.push(createVoucher(Leadgerdata.value, Leadgerdata.name, "ASSET", 0, PaymentAmount));
+    }
+
+
+    if (PaymentAmount != NetPayable) {
+      const Amount = NetPayable - PaymentAmount;
+      const isAmountNegative = Amount < 0;
+      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName,
+        ledgerInfo['Unbilled debtors'].LeadgerCategory, isAmountNegative ? 0 : Amount.toFixed(2), isAmountNegative ? (-Amount).toFixed(2) : 0));
+
+    }
+
+    return response;
   }
 }

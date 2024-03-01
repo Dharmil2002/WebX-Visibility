@@ -2029,7 +2029,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                 branch: this.storage.branch,
                 docType: "Voucher",
                 partyType: "Customer",
-                transactionNumber: "",
                 docNo: DocketNo,
                 partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
                 partyName: this.model.consignmentTableForm.value?.billingParty?.name,
@@ -2059,7 +2058,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                     Swal.fire({
                       icon: "success",
                       title: "Booked Successfully And Voucher Created",
-                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.docNo,
+                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
                       showConfirmButton: true,
                     }).then((result) => {
                       if (result.isConfirmed) {

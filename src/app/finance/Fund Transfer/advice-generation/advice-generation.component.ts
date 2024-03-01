@@ -500,7 +500,6 @@ export class AdviceGenerationComponent implements OnInit {
           firstValueFrom(this.voucherServicesService
             .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
               if (res.success) {
-                console.log(res?.data?.mainData?.ops[0].vNO)
                 this.GenerateAdvice(res?.data?.mainData?.ops[0].vNO)
               }
             }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })

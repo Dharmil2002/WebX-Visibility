@@ -23,7 +23,9 @@ import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComp
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import {
   VoucherDataRequestModel,
+  VoucherInstanceType,
   VoucherRequestModel,
+  VoucherType,
 } from "src/app/Models/Finance/Finance";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
@@ -440,7 +442,11 @@ export class AdvancePaymentsComponent implements OnInit {
 
           // this.VoucherDataRequestModel.companyCode = this.companyCode;
           this.VoucherDataRequestModel.voucherNo = "";
-          this.VoucherDataRequestModel.transType = "AdvancePayment";
+          this.VoucherDataRequestModel.transCode = VoucherInstanceType.AdvancePayment;
+          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.AdvancePayment];
+          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
           this.VoucherDataRequestModel.transDate = new Date();
           this.VoucherDataRequestModel.docType = "VR";
           this.VoucherDataRequestModel.branch =
@@ -496,7 +502,10 @@ export class AdvancePaymentsComponent implements OnInit {
             return {
               companyCode: companyCode,
               voucherNo: "",
-              transType: "AdvancePayment",
+              transCode: VoucherInstanceType.AdvancePayment,
+              transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+              voucherCode: VoucherType.JournalVoucher,
+              voucherType: VoucherType[VoucherType.JournalVoucher],
               transDate: new Date(),
               finYear: financialYear,
               branch: CurrentBranchCode,

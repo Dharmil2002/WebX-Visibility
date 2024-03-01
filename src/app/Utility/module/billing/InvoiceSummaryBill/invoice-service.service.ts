@@ -408,13 +408,14 @@ export class InvoiceServiceService {
     };
     const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
     const filterData = res.data.map((element) => {
-      const cOL = element.hasOwnProperty('cOL') ? element.cOL.bALAMT : 0;
-      element.collected = cOL;
+      const CollectedAmount = element.hasOwnProperty('cOL') ? +element.cOL.aMT : 0;
+      const PendingAmount = element.hasOwnProperty('cOL') ? +element.cOL.bALAMT : 0;
+      element.collected = CollectedAmount;
       element.deductions = element?.bALAMT || 0;
       element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
       element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
-      element.collectionAmount = parseFloat(element.aMT) - parseFloat(cOL);
-      element.pendingAmount = parseFloat(cOL)
+      element.collectionAmount = PendingAmount - CollectedAmount || 0;
+      element.pendingAmount = PendingAmount
       return element;
 
     });
@@ -566,7 +567,7 @@ export class InvoiceServiceService {
       eNTBY: this.storage?.userName || "",
     };
 
-    const collectedData = data.map((item) => ({
+    const collectedData = data.filter(item => item.isSelected == true).map((item) => ({
       _id: "",
       bILLNO: item?.bILLNO || 0,
       mRNO: "",
@@ -580,7 +581,7 @@ export class InvoiceServiceService {
     const colData = {
       formData: formGroup,
       collectedData: collectedData,
-      tabledata: data
+      tabledata: data.filter(item => item.isSelected == true)
     };
 
     return colData;

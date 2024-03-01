@@ -854,7 +854,6 @@ export class DebitVoucherComponent implements OnInit {
             "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
             "voucherCode": VoucherType.DebitVoucher,
             "voucherType": VoucherType[VoucherType.DebitVoucher],
-            "transactionNumber": "",
             "transDate": new Date(),
             "finYear": financialYear,
             "branch": localStorage.getItem("Branch"),
@@ -885,7 +884,6 @@ export class DebitVoucherComponent implements OnInit {
               "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
               "voucherCode": VoucherType.DebitVoucher,
               "voucherType": VoucherType[VoucherType.DebitVoucher],
-              "transactionNumber": "",
               "transDate": new Date(),
               "finYear": financialYear,
               "branch": localStorage.getItem("Branch"),
@@ -915,7 +913,6 @@ export class DebitVoucherComponent implements OnInit {
             "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
             "voucherCode": VoucherType.DebitVoucher,
             "voucherType": VoucherType[VoucherType.DebitVoucher],
-            "transactionNumber": "",
             "transDate": new Date(),
             "finYear": financialYear,
             "branch": Branch,
@@ -961,7 +958,6 @@ export class DebitVoucherComponent implements OnInit {
                 transType: VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
                 voucherCode: VoucherType.DebitVoucher,
                 voucherType: VoucherType[VoucherType.DebitVoucher],
-                transactionNumber: "",
                 docType: "Voucher",
                 partyType: this.DebitVoucherSummaryForm.value.Preparedfor,
                 docNo: "",
@@ -981,7 +977,7 @@ export class DebitVoucherComponent implements OnInit {
                     Swal.fire({
                       icon: "success",
                       title: "Voucher Created Successfully",
-                      text: "Voucher No: " + reqBody.docNo,
+                      text: "Voucher No: " + reqBody.voucherNo,
                       showConfirmButton: true,
                     }).then((result) => {
                       if (result.isConfirmed) {

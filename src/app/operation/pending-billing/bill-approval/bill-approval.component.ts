@@ -256,7 +256,7 @@ export class BillApprovalComponent implements OnInit {
                     Swal.fire({
                       icon: "success",
                       title: "Bill Approval Voucher Created",
-                      text: "Voucher No: " + reqBody.docNo,
+                      text: "Voucher No: " + reqBody.voucherNo,
                       showConfirmButton: true,
                     }).then((result) => {
                       if (result.isConfirmed) {

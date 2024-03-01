@@ -11,9 +11,11 @@ import { CustomerOutstandingReportComponent } from './customer-outstanding-repor
 import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
 import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
 import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
+import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 
 
 const routes: Routes = [
+  { path: "Voucher-Register-report", component: VoucherRegisterReportComponent },
   { path: "PRQ-Register-report", component: PrqRegisterReportComponent },
   { path: "job-query", component: JobQueryPageComponent },
   { path: "cnote-GST-register", component: CnwGstRegisterComponent },

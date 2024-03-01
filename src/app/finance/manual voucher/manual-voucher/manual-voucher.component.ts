@@ -114,9 +114,9 @@ export class ManualVoucherComponent implements OnInit {
     const detail = await manualvoucharDetail(this.masterService);
     this.AllTableData = detail.map((x) => {
       const formattedDate = this.datePipe.transform(x.tTDT, 'dd-MMM-yy HH:mm a');
-      const createdDate = this.datePipe.transform(x.eDT, 'dd-MMM-yy HH:mm a');
+      const createdDate = this.datePipe.transform(x.eNTDT, 'dd-MMM-yy HH:mm a');
       return {
-        ...x, vCAN: "Generated", tTDT: formattedDate, eDT: createdDate,
+        ...x, vCAN: "Generated", tTDT: formattedDate, eNTDT: createdDate,
         actions: ["Modify", "Delete"]
       };
     });

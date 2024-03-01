@@ -1,4 +1,4 @@
-<div >
+<div>
     <ul class="m-0" style="padding-left: 10px; display: flex; justify-content: space-between;">
         <li style="margin: auto 0px; font-weight: 700; font-size: 1.5rem; list-style: none;">
             Shard Services Selection
@@ -30,16 +30,14 @@
     </div>
     <div style="width: 100%; margin: 30px auto; margin-bottom: 30px;" *ngIf="!tableTab">
         <app-generic-table-v2 *ngIf="isTable" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-                [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)"
-                (DeleteFunction)="DeleteFunction($event)"  [metaData]="metaData"
-                [staticField]="staticField">
-            </app-generic-table-v2>
+            [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)"
+            (DeleteFunction)="DeleteFunction($event)" [metaData]="metaData" [staticField]="staticField">
+        </app-generic-table-v2>
     </div>
 
     <div *ngIf="tableTab" class="row">
         <div class="col-12">
-            <div class="title"
-                style=" font-size: 18px; font-weight: 700; margin: 10px 0px 0px 10px ;">
+            <div class="title" style=" font-size: 18px; font-weight: 700; margin: 10px 0px 0px 10px ;">
                 + Add Shard Services
             </div>
         </div>
@@ -52,11 +50,11 @@
             </form>
         </div>
         <div style="display: flex;">
-            <button type="button" style="margin-right: 20px;" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
-                (click)="save()">
+            <button type="button" style="margin-right: 20px;" [disabled]="!customerTableForm.valid" mat-raised-button
+                color="primary" (click)="save()">
                 Submit
             </button>
-            <button type="button" mat-raised-button mat-button (click)="Cancle()">Cancel</button>
+            <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
         </div>
     </div>
 </div>

@@ -653,7 +653,7 @@
             {
               "MenuId": 64,
               "MenuPath": "64/60/59/1",
-              "MenuName": "Cancle",
+              "MenuName": "cancel",
               "MenuGroup": "FTL",
               "MenuLevel": 4,
               "ParentId": 60,
@@ -941,7 +941,7 @@
             {
               "MenuId": 91,
               "MenuPath": "91/87/86/1",
-              "MenuName": "Cancle",
+              "MenuName": "cancel",
               "MenuGroup": "EXPORT",
               "MenuLevel": 4,
               "ParentId": 87,

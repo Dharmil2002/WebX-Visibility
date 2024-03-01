@@ -1117,7 +1117,13 @@ export class EwayBillControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only numeric Max length 12.",
+            pattern: "^[0-9]{1,12}$",
+          }
+        ],
       },
       {
         name: "ewbDate",

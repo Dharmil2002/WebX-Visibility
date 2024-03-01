@@ -522,7 +522,7 @@ export class AddAccountComponent implements OnInit {
       iSSYS: this.AccountForm.value.ActiveFlag,
       pARTNM: this.AccountForm.value.PartySelection.name,
       rHUF: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection.data.RateForHUF
+        ? this.AccountForm.value.TDSsection?.data?.RateForHUF
         : "",
       rOTHER: this.AccountForm.value.isTDSapplicable
         ? this.AccountForm.value.TDSsection.data.RateForOthers

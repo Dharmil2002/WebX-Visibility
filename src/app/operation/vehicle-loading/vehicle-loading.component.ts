@@ -39,6 +39,8 @@ export class VehicleLoadingComponent implements OnInit {
       Title:"Loading Sheet",
       class: "matcolumnleft",
       Style: "min-width:200px",
+      type:'windowLink',
+      functionName:'OpenLoadingSheet'
     },
     Manifest: {
       Title: "Manifest",
@@ -71,14 +73,14 @@ export class VehicleLoadingComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:100px",
     },
-    printPending: {
-      Title: "Hrs",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
+    // printPending: {
+    //   Title: "Hrs",
+    //   class: "matcolumnleft",
+    //   Style: "min-width:100px",
+    // },
   };
   staticField = [
-    "LoadingSheet",
+    // "LoadingSheet",
     "Manifest",
     "Leg",
     "Shipments",
@@ -109,7 +111,7 @@ export class VehicleLoadingComponent implements OnInit {
 
   menuItems = [
     { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
-    { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+    // { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
 
@@ -234,5 +236,13 @@ export class VehicleLoadingComponent implements OnInit {
   goBack(tabIndex: string): void {
     this.navigationService.navigateTotab(tabIndex, '/dashboard/Index');
   }
-  
+  OpenLoadingSheet(event){
+    const LoadingSheet = event.data.LoadingSheet
+    const templateBody = {
+      DocNo: LoadingSheet,
+      templateName: 'LoadingSheet View-Print'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
+  }
 }

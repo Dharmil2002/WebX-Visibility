@@ -194,7 +194,7 @@ const shipData = [
 
 
   OpenManifest(data){
-    console.log('data' ,data.TripID)
+    // console.log('data' ,data.TripID)
 
     const TripID = data.TripID
     const templateBody = {

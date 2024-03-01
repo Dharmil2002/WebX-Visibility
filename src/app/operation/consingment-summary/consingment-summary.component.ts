@@ -33,10 +33,10 @@ export class ConsingmentSummaryComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getTableData()
   }
 
   async getTableData() {
-    console.log("this.DocData", this.DocData);
     const Mode = localStorage.getItem("Mode");
     const req = {
       companyCode: this.CompanyCode,
@@ -47,6 +47,7 @@ export class ConsingmentSummaryComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
+      console.log('res' , res)
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x) => {
         return {

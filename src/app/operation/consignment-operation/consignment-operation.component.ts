@@ -61,7 +61,7 @@ export class ConsignmentOperationComponent implements OnInit {
   constructor(private Route: Router, private masterService: MasterService) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.DocData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log('this.DocData' ,this.DocData)
+      // console.log('this.DocData' ,this.DocData)
     } else {
       this.Route.navigateByUrl("Operation/ConsignmentFilter");
     }
@@ -72,7 +72,7 @@ export class ConsignmentOperationComponent implements OnInit {
   }
 
   async getTableData() {
-    console.log("this.DocData", this.DocData);
+    // console.log("this.DocData", this.DocData);
     const Mode = localStorage.getItem("Mode");
     const req = {
       companyCode: this.CompanyCode,

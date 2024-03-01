@@ -83,7 +83,7 @@ export class ConsignmentFilterControls {
       },
       {
         name: "or",
-        label: "Entered Value",
+        label: "OR",
         placeholder: "Entered Value",
         type: "OR",
         value: "",

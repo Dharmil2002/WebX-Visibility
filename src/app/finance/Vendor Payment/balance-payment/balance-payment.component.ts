@@ -25,7 +25,9 @@ import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComp
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import {
   VoucherDataRequestModel,
+  VoucherInstanceType,
   VoucherRequestModel,
+  VoucherType,
 } from "src/app/Models/Finance/Finance";
 import {
   Vendbilldetails,
@@ -961,7 +963,11 @@ export class BalancePaymentComponent implements OnInit {
 
         // this.VoucherDataRequestModel.companyCode = this.companyCode;
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transType = "BalancePayment";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BalancePayment;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BalancePayment];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
         this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch =
@@ -1011,14 +1017,17 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherDataRequestModel.date =
           PaymenDetails.Date;
         this.VoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-
+        this.VoucherDataRequestModel.transactionNumber = BillNo;
         const companyCode = this.companyCode;
         const CurrentBranchCode = this.storage.branch;
         var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
           return {
             companyCode: companyCode,
             voucherNo: "",
-            transType: "BalancePayment",
+            transCode: VoucherInstanceType.BalancePayment,
+            transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
             transDate: new Date(),
             finYear: financialYear,
             branch: CurrentBranchCode,
@@ -1032,7 +1041,7 @@ export class BalancePaymentComponent implements OnInit {
             GSTAmount: 0,
             Total: parseFloat(item.THCamount).toFixed(2),
             TDSApplicable: false,
-            narration: "",
+            narration: "when THC Payment done for " + item.THC + " against Bill No " + BillNo,
           };
         });
 

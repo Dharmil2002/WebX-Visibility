@@ -139,7 +139,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   ngOnInit(): void {
     this.getGeneralmasterData().then(() => {
       this.bindDataFromDropdown();
-      //this.InvockedContract()
+      // this.InvockedContract()
       this.isTableLoad = false;
     });
     this.backPath = "/dashboard/Index?tab=6";
@@ -1262,6 +1262,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT: this.model.FreightTableForm.controls["gstChargedAmount"].value,
         cHG: "",
+        nFCHG: Object.entries(this.model.NonFreightTableForm.value).map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL })),
         tOTAMT: this.model.FreightTableForm.controls['totalAmount'].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -1736,24 +1737,32 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "capacity": containerCode
     }
 
-    //let reqBody = { "companyCode": 10065, "customerCode": "CUST00012", "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9 }
+    // let reqBody = {
+    //   "companyCode": 10065, "customerCode": "CUST00022",
+    //   "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9
+    // }
 
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
       .then(async (res: any) => {
         if (res.length == 1) {
 
-          this.NonFreightjsonControlArray = await this.GenerateControls(res[0]?.NonFreightChargeMatrixDetails)
-          if (res[0]?.NonFreightChargeMatrixDetailsDetails && this.model.invoiceData.length > 0) {
-            const actualWeight = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
-            const Multipointdelivery = res[0]?.NonFreightChargeMatrixDetailsDetails?.[0]
-            Multipointdelivery.functionName = "OnChangeFixedAmounts"
-            Multipointdelivery.value = Multipointdelivery.rT * (actualWeight * 1000);
-            Multipointdelivery.name = "Multipointdelivery"
-            Multipointdelivery.label = "Multi-Point Delivery"
-            Multipointdelivery.placeholder = "Multi-Point Delivery"
+          this.NonFreightjsonControlArray = await this.GenerateFixedChargesControls(res[0]?.NonFreightChargeMatrixDetails)
+          if (res[0]?.NonFreightChargeMatrixDetailsDetails) {
+            let actualWeightInTon
+            if (this.model.consignmentTableForm.value.cd) {
+              actualWeightInTon = this.model.containerTableForm.value.containerCapacity
+            } else {
+              actualWeightInTon = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
+            }
 
-            this.NonFreightjsonControlArray.push(this.GenerateControllsWithNameAndValue(Multipointdelivery))
+            res[0]?.NonFreightChargeMatrixDetailsDetails?.forEach(element => {
+              const calculationRatio = RateTypeCalculation.find(x => x.codeId == element.rTYPCD).calculationRatio;
+              const actualWeight = actualWeightInTon * calculationRatio;
+              const value = Math.min(Math.max(element.mINV, element.rT * actualWeight), element.mAXV);
+              this.NonFreightjsonControlArray.push(this.GenerateVariableChargesControls(element, value))
+            });
           }
+
           if (res[0]?.sERVSELEC) {
             res[0]?.sERVSELEC.forEach(element => {
               const ServiceResponse = this.GetServiceWiseCalculatedData(element, res[0]);
@@ -1803,12 +1812,17 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   GetServiceWiseCalculatedData(fieldName, data) {
     switch (fieldName) {
       case "COD/DOD":
-        if (this.model.invoiceData.length > 0) {
-          const actualWeightInTon = this.model.invoiceData.reduce(
-            (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['actualWeight']),
-            0
-          );
-          const actualWeight = actualWeightInTon * 1000;
+
+        let actualWeightInTon
+        if (this.model.consignmentTableForm.value.cd) {
+          actualWeightInTon = this.model.containerTableForm.value.containerCapacity
+        } else {
+          actualWeightInTon = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
+        }
+        if (actualWeightInTon) {
+          const calculationRatio = RateTypeCalculation.find(x => x.codeId == data.cODDODRTYP).calculationRatio;
+          const actualWeight = actualWeightInTon * calculationRatio;
+
           const value = Math.min(Math.max(data.mIN, data.rT * actualWeight), data.mAX);
           return {
             "functionName": "",
@@ -1833,9 +1847,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             (acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['actualWeight']),
             0
           );
-          const actualWeight = actualWeightInTon * 1000;
+
+
           const Insurance = data.FreightChargeInsuranceDetails.find(x => x.iVFROM <= TotalInvoiceAmount && x.iVTO >= TotalInvoiceAmount);
           if (Insurance) {
+            const calculationRatio = RateTypeCalculation.find(x => x.codeId == Insurance.rtType).calculationRatio;
+            const actualWeight = actualWeightInTon * calculationRatio;
             const TotalInsuranceValue = Insurance.rT * actualWeight;
             const value = Math.min(Math.max(Insurance.mIN, TotalInsuranceValue), Insurance.mAX);
 
@@ -1874,7 +1891,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       },
     }
   }
-  GenerateControls(data) {
+  GenerateFixedChargesControls(data) {
 
     return data
       .filter((x) => x.cBT === "Fixed")
@@ -1899,7 +1916,29 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         },
       }));
   }
+  GenerateVariableChargesControls(data, value) {
 
+    return {
+      name: data.sCT.replaceAll(/\s/g, ""),
+      label: data.sCT,
+      placeholder: data.sCT,
+      type: "number",
+      value: value,
+      generatecontrol: true,
+      disable: false,
+      Validations: [
+        {
+          name: "pattern",
+          message:
+            "Please Enter only positive numbers with up to two decimal places",
+          pattern: "^\\d+(\\.\\d{1,2})?$",
+        },
+      ],
+      functions: {
+        //onChange: "OnChangeFixedAmounts",
+      },
+    }
+  }
   // Account Posting When  C Note Booked 	
   async AccountPosting(DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {
@@ -2029,7 +2068,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                 branch: this.storage.branch,
                 docType: "Voucher",
                 partyType: "Customer",
-                transactionNumber: "",
                 docNo: DocketNo,
                 partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
                 partyName: this.model.consignmentTableForm.value?.billingParty?.name,
@@ -2059,7 +2097,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                     Swal.fire({
                       icon: "success",
                       title: "Booked Successfully And Voucher Created",
-                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.docNo,
+                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
                       showConfirmButton: true,
                     }).then((result) => {
                       if (result.isConfirmed) {
@@ -2098,3 +2136,44 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
   }
 }
+
+const RateTypeCalculation = [{
+  "codeId": "RTTYP-0004",
+  "codeDesc": "% of Freight",
+  "calculationRatio": 1000
+},
+{
+  "codeId": "RTTYP-0005",
+  "codeDesc": "Per Kg",
+  "calculationRatio": 1000
+},
+{
+  "codeId": "RTTYP-0003",
+  "codeDesc": "Per Km",
+  "calculationRatio": 1000
+},
+{
+  "codeId": "RTTYP-0006",
+  "codeDesc": "Per Pkg",
+  "calculationRatio": 1000
+},
+{
+  "codeId": "RTTYP-0001",
+  "codeDesc": "Flat",
+  "calculationRatio": 1000
+},
+{
+  "codeId": "RTTYP-0002",
+  "codeDesc": "Per Ton",
+  "calculationRatio": 1
+},
+{
+  "codeId": "RTTYP-0007",
+  "codeDesc": "Per Container",
+  "calculationRatio": 1
+},
+{
+  "codeId": "RTTYP-0008",
+  "codeDesc": "Per Litre",
+  "calculationRatio": 1000
+}]

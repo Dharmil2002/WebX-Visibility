@@ -183,7 +183,7 @@ export class PrqEntryPageComponent implements OnInit {
       this.jsonControlPrqArray,
     ]);
     this.allFormGrop = this.jsonControlPrqArray;
-    if(!this.isUpdate){
+    if (!this.isUpdate) {
       this.prqEntryTableForm.controls['oDRDT'].setValue("");
     }
 
@@ -347,8 +347,8 @@ export class PrqEntryPageComponent implements OnInit {
     prqDetails["fCITY"] = this.prqEntryTableForm.value.fCITY.name;
     prqDetails["tCITY"] = this.prqEntryTableForm.value.tCITY.name;
     prqDetails["bRCD"] = this.prqEntryTableForm.value.bRCD.name;
-    prqDetails["pADD"] = this.prqEntryTableForm.value.pADD?.value||"A8888";
-    prqDetails["pADDNM"] = this.prqEntryTableForm.value.pADD?.name||this.prqEntryTableForm.value.pADD;
+    prqDetails["pADD"] = this.prqEntryTableForm.value.pADD?.value || "A8888";
+    prqDetails["pADDNM"] = this.prqEntryTableForm.value.pADD?.name || this.prqEntryTableForm.value.pADD;
 
     const cntrNames = [
       { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
@@ -467,13 +467,13 @@ export class PrqEntryPageComponent implements OnInit {
     this.filter.Filter(
       this.jsonControlPrqArray,
       this.prqEntryTableForm,
-      locations.map((x)=>{return{name:x,value:x}}),
+      locations.map((x) => { return { name: x, value: x } }),
       "bRCD",
       false
     );
     if (this.isUpdate) {
       this.prqEntryTableForm.controls["bRCD"].setValue(
-        {value:this.prqDetail.prqBranch,name:this.prqDetail.prqBranch}
+        { value: this.prqDetail.prqBranch, name: this.prqDetail.prqBranch }
       );
     }
   }
@@ -620,9 +620,14 @@ export class PrqEntryPageComponent implements OnInit {
             showConfirmButton: false,
           });
 
-          this.prqEntryTableForm.controls["cONTRAMT"].setValue(
-            res[0].FreightChargeMatrixDetails?.rT
-          );
+          if (res[0].FreightChargeMatrixDetails?.rTYPCD == "RTTYP-0007") {
+            this.prqEntryTableForm.controls["cONTRAMT"].setValue(res[0].FreightChargeMatrixDetails?.rT);
+          }
+          else {
+            this.prqEntryTableForm.controls["cONTRAMT"].setValue(res[0].FreightChargeMatrixDetails?.rT * 1000);
+          }
+
+
         } else {
           Swal.fire({
             icon: "error",

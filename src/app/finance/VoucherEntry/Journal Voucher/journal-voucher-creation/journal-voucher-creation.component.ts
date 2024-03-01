@@ -257,8 +257,10 @@ export class JournalVoucherCreationComponent implements OnInit {
 
   }
   Submit() {
-    console.log(this.JournalVoucherSummaryForm.value);
-    console.log(this.tableData);
+    if (this.totalCredit == 0 && this.totalDebit == 0) {
+      this.snackBarUtilityService.ShowCommonSwal("info", "Please Enter Amount for Debit or Credit");
+      return;
+    }
 
     if (this.tableData.length == 0) {
       this.snackBarUtilityService.ShowCommonSwal(
@@ -416,7 +418,7 @@ export class JournalVoucherCreationComponent implements OnInit {
                       Swal.fire({
                         icon: "success",
                         title: "Jornal Voucher Created Successfully",
-                        text: "Voucher No: " + reqBody.docNo,
+                        text: "Voucher No: " + reqBody.voucherNo,
                         showConfirmButton: true,
                       }).then((result) => {
                         if (result.isConfirmed) {

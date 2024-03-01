@@ -134,7 +134,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
           // Check if the branch matches the specified branch
           if (this.storage.branch && this.storage.branch.trim() === location) {
             // Assign the action only if the condition is met
-                       
+
             actions = item.status === 'Del_Mr_Generated' ? '' : 'Delivery MR';
           }
 
@@ -150,13 +150,6 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     } catch (error) {
       this.tableData = [];
       this.tableload = false;
-      // Handle error by displaying an error message
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Oops! Something went wrong                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           . Please try again later.",
-        showConfirmButton: true,
-      });
     }
   }
   //#endregion

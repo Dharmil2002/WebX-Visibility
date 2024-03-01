@@ -236,7 +236,7 @@ export class DriverControls {
       {
         name: "addressProofDocNo",
         label: "Address Proof Doc No",
-        placeholder: "Enter Permanent City",
+        placeholder: "Enter Address Proof Doc No",
         type: "text",
         value: DriverTable.addressProofDocNo,
         generatecontrol: true,
@@ -257,7 +257,7 @@ export class DriverControls {
       {
         name: "addressProofScan",
         label: "Address Proof Scan",
-        placeholder: "",
+        placeholder: "Enter Address Proof Scan",
         type: "file",
         value: DriverTable.addressProofScan,
         Validations: [
@@ -323,7 +323,7 @@ export class DriverControls {
       {
         name: "DOBProofDocNo",
         label: "DOB proof doc no",
-        placeholder: "Enter Permanent City",
+        placeholder: "Enter DOB proof doc no",
         type: "text",
         value: DriverTable.DOBProofDocNo,
         generatecontrol: true,
@@ -344,7 +344,7 @@ export class DriverControls {
       {
         name: "DOBProofScan",
         label: "DOB proof scan",
-        placeholder: "",
+        placeholder: "Select DOB proof scan",
         type: "file",
         value: DriverTable.DOBProofScan,
         Validations: [

@@ -338,29 +338,11 @@ export class CreditVoucherControl {
                 name: "receivedBank",
                 label: "Received Bank",
                 placeholder: "Received Bank",
-                type: "dropdown",
+                type: "text",
                 value: "",
-                filterOptions: "",
-                displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Bank is required"
-                    },
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                ],
-                additionalData: {
-                    showNameAndValue: true,
-                    metaData: "Basic"
-                },
+                Validations: [],
             },
             {
                 name: "CashAccount",

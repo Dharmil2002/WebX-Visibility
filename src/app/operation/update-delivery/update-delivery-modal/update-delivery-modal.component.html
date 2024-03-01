@@ -1,4 +1,3 @@
-<mat-dialog-content>
     <!-- Title -->
         <form [formGroup]="deliveryForm">
             <app-form-webxpress [form]="deliveryForm" [FormTitle]="'Delivey Update'" [formData]="jsonControlArray" [uploadedFiles]="uploadedFiles"
@@ -11,4 +10,3 @@
               (click)="save()" [disabled]="!deliveryForm.valid">Save</button>
             <button class="msr-3" mat-raised-button color="primary"   (click)="cancel()">Back</button>
           </div>
-</mat-dialog-content>

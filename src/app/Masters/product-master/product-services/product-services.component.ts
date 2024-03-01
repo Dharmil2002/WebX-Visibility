@@ -236,7 +236,7 @@ export class ProductServicesComponent implements OnInit {
   close() {
     this.dialogRef.close();
   }
-  Cancle() {
+  cancel() {
     this.GetTableData();
     this.tableTab = !this.tableTab;
   }

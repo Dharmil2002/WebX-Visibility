@@ -513,6 +513,15 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       },
       {
+        path: "Operation/ConsignmentFilter",
+        title: "Consignment Tracking",
+        moduleName: "Consignment Tracking",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
         path: "Operation/ConsignmentEntry",
         title: "Consignment Entry",
         moduleName: "Consignment Entry",

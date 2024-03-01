@@ -34,14 +34,19 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
       }
     ]
   columnHeader = {
-    "LoadingSheet": "Loading Sheet",
+    "hyperlink": "Loading Sheet",
+    // hyperlink: "Manifest"
     "leg": "Leg",
     "count": "Shipments",
     "packages": "Packages",
     "weightKg": "Weight Kg",
     "volumeCFT": "Volume CFT",
-    "Action":"Print"
+    // "Action":"Print"
   };
+  hyperlinkControls = {
+    value: "LoadingSheet",
+    functionName: "viewLoadingSheet"
+  }
   centerAlignedData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",
@@ -52,7 +57,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     "VolumeCFT": "Volume CFT",
   }
   columnWidths = {
-    'LoadingSheet': 'min-width:20%'
+    'hyperlink': 'min-width:20%'
   };
   // linkArray = [
 
@@ -87,5 +92,13 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   close(){
     this.dialogRef.close(this.csv);
   }
-  
+  viewLoadingSheet(event){
+      console.log('viewMenifest', event)
+      // const req = {
+      //   templateName: "Manifest View-Print",
+      //   DocNo: event.data?.manifest,
+      // };
+      // const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+      // window.open(url, '', 'width=1000,height=800');
+  }
 }

@@ -14,22 +14,31 @@ export class UpdateShipmentDeliveryControl {
                 generatecontrol: true,
                 disable: true
             },
-            {
-                name: 'block',
-                label: 'Date And Time',
-                placeholder: '',
-                type: '',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
              {
                 name: 'DTTM',
                 label: 'Date And Time',
                 placeholder: '',
                 type: 'datetimerpicker',
                 value: '',
+                Validations: [{
+                    name: "required",
+                    message: "'Date And Time is required"
+                }],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'pod',
+                label: 'POD',
+                placeholder: '',
+                type:'file',
+                value: '',
                 Validations: [],
+                additionalData:{
+                    isFileSelected:false
+                },
+                functions: {
+                    onChange: 'getFilePod',
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -57,14 +66,17 @@ export class UpdateShipmentDeliveryControl {
                 type: 'number',
                 value: '',
                 Validations: [],
+                functions:{
+                    onChange:"deliveryPkgsChange"
+                },
                 generatecontrol: true, disable: false
             },
             {
                 name: "cODDODCharges",
                 label: "COD/DOD Charges",
                 placeholder: '',
-                type: "text",
-                value: '',
+                type:"text",
+                value:'0.00',
                 Validations: [],
                 generatecontrol: true, disable: true
             },
@@ -73,18 +85,9 @@ export class UpdateShipmentDeliveryControl {
                 label: 'COD/DOD Paid',
                 placeholder: '',
                 type: 'text',
-                value: '',
+                value:'0.00',
                 Validations: [],
                 generatecontrol: true, disable: true
-            },
-            {
-                name: 'block1',
-                label: '',
-                placeholder: '',
-                type: '',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: false
             },
             {
                 name: 'deliveryPartial',
@@ -108,15 +111,6 @@ export class UpdateShipmentDeliveryControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'pod',
-                label: 'POD',
-                placeholder: '',
-                type:'file',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'ltReason',
                 label: 'Late Reason',
                 placeholder: '',
@@ -126,7 +120,7 @@ export class UpdateShipmentDeliveryControl {
                 additionalData:{
                     showNameAndValue:false
                 },
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: false
             },
             {
                 name: "startKm",

@@ -42,7 +42,7 @@ export class ShardProductServicesComponent implements OnInit {
     },
   };
 
-  staticField = ["SrNo","sERNM","sERCD"]
+  staticField = ["SrNo", "sERNM", "sERCD"]
   dynamicControls = {
     add: false,
     edit: false,
@@ -51,8 +51,8 @@ export class ShardProductServicesComponent implements OnInit {
   ProductId: any;
   ProductName: any;
   tableTab = false;
-  ServicesNameList:any;
-  ServicesTypeList:any;
+  ServicesNameList: any;
+  ServicesTypeList: any;
   jsonControlArray: any[];
   customerTableForm: any;
   companyCode = parseInt(localStorage.getItem("companyCode"));
@@ -95,7 +95,7 @@ export class ShardProductServicesComponent implements OnInit {
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
 
-    if(this.isUpdate){
+    if (this.isUpdate) {
       this.customerTableForm.controls["ServicesName"].setValue(this.UpdateData.sERNM);
       this.customerTableForm.controls["ServicesID"].setValue(this.UpdateData.sERCD);
     }
@@ -150,7 +150,7 @@ export class ShardProductServicesComponent implements OnInit {
       mODDT: new Date(),
       mODBY: localStorage.getItem("UserName"),
     };
-    if(!this.isUpdate){
+    if (!this.isUpdate) {
       let Tablereq = {
         companyCode: this.companyCode,
         collectionName: "services",
@@ -162,10 +162,10 @@ export class ShardProductServicesComponent implements OnInit {
       );
       const LastCode = resVendor.data?.sERCD || "SER0000";
       const code = nextKeyCode(LastCode);
-      Body["_id"]=code;
-      Body["pRNM"]= this.ProductName;
-      Body["pRCD"]= this.ProductId;
-      Body["sERCD"]= code;
+      Body["_id"] = code;
+      Body["pRNM"] = this.ProductName;
+      Body["pRCD"] = this.ProductId;
+      Body["sERCD"] = code;
     }
     const req = {
       companyCode: this.companyCode,
@@ -177,11 +177,11 @@ export class ShardProductServicesComponent implements OnInit {
 
     const res = this.isUpdate
       ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
+        this.masterService.masterPut("generic/update", req)
+      )
       : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+        this.masterService.masterPost("generic/create", req)
+      );
     if (res?.success) {
       Swal.fire({
         icon: "success",
@@ -203,7 +203,7 @@ export class ShardProductServicesComponent implements OnInit {
   close() {
     this.dialogRef.close();
   }
-  Cancle() {
+  cancel() {
     this.GetTableData();
     this.tableTab = !this.tableTab;
     this.isUpdate = false;
@@ -221,7 +221,7 @@ export class ShardProductServicesComponent implements OnInit {
       console.log("failed");
     }
   }
-  EditFunction(event){
+  EditFunction(event) {
     this.isUpdate = true;
     this.UpdateData = event.data
     this.HendelFormFunction();

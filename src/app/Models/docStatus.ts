@@ -20,7 +20,13 @@ export enum DocketStatus {
 export enum DocketFinStatus {
     Pending = 0
 }
+export enum DeliveryStatus {
+    Yet_to_deliver=9,
+    Delivered=10,
+    Un_Delivered=11,
+    Part_Delivered=12,
 
+}
 export enum CustomerBillStatus {
     Generated = 1,
     Approved = 2,

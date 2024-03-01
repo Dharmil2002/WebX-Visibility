@@ -16,7 +16,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { VoucherDataRequestModel, VoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 
@@ -760,6 +760,16 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           //Send a POST request to create the job detail in the MongoDB collection.
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
           if (res) {
+            const reqBody = {
+              companyCode: this.storage.companyCode,
+              collectionName: "voucher_trans",
+              filter: { vNO: VoucherNo },
+              update: {
+                vTNO: res?.data?.chargeDetails?.data.ops[0]?.dLMRNO
+              }
+            };
+            await firstValueFrom(this.operation.operationPut("generic/update", reqBody));
+
             Swal.hideLoading();
             setTimeout(() => {
               Swal.close();
@@ -854,7 +864,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherRequestModel.finYear = financialYear;
 
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transType = "Delivery MR Voucher";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.DeliveryMR;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.DeliveryMR];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
         this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -908,7 +921,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const voucherLineItem = {
             companyCode: companyCode,
             voucherNo: "",
-            transType: "Delivery MR Voucher",
+            transCode: VoucherInstanceType.DeliveryMR,
+            transType: VoucherInstanceType[VoucherInstanceType.DeliveryMR],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
             transDate: new Date(),
             finYear: financialYear,
             branch: CurrentBranchCode,

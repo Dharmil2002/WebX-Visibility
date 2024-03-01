@@ -46,7 +46,7 @@ export class AddDcrSeriesControl {
                     //     message: "Business Type is required"
                     // }
                     {
-                        name: "invalidAutocomplete",
+                        name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }
                 ]

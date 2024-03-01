@@ -3,9 +3,11 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
 import { UpdateShipmentDeliveryControl } from 'src/assets/FormControls/update.delivery';
-
+import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-update-delivery-modal',
   templateUrl: './update-delivery-modal.component.html'
@@ -32,6 +34,8 @@ export class UpdateDeliveryModalComponent implements OnInit {
     private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog,
+    private filter: FilterUtils,
+    public generalService:GeneralService,
     private objImageHandling: ImageHandling
   ) {
     this.shipmentDetails = item;
@@ -63,6 +67,36 @@ export class UpdateDeliveryModalComponent implements OnInit {
     this.jsonControlArray = thcFormControls.getupdaterunsheetFormControls();
     this.deliveryForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.autoPopulateForm();
+    this.bindDropDown();
+  }
+  async bindDropDown(){
+    const lateDelivery = await this.generalService.getGeneralMasterData("LTDEP");
+    const partialDelivery = await this.generalService.getGeneralMasterData("PART_D");
+    const unDelivery = await this.generalService.getGeneralMasterData("UNDELY");
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.deliveryForm,
+      [...unDelivery,...partialDelivery],
+      'deliveryPartial',
+      false
+    );
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.deliveryForm,
+      lateDelivery,
+      'ltReason',
+      false
+    );
+
+  }
+  deliveryPkgsChange(){
+    const bookedPkgs = parseInt(this.deliveryForm.controls['bookedPkgs'].value);
+    const deliveryPkgs = this.deliveryForm.controls['deliveryPkgs'].value;
+    if(bookedPkgs < deliveryPkgs){
+    Swal.fire("Error","Delivery Pkgs should not be greater than Booked Pkgs","error");
+    this.deliveryForm.controls['deliveryPkgs'].setValue(0);
+    return false
+    }
   }
   autoPopulateForm(){
     this.deliveryForm.controls['dKTNO'].setValue(this.shipmentDetails.shipment);
@@ -73,14 +107,16 @@ export class UpdateDeliveryModalComponent implements OnInit {
     this.dialogRef.close()
   }
 
-  async getFilePod(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+   getFilePod(data) {
+    this.imageData =  this.objImageHandling.uploadFile(data.eventArgs, "pod", this.
     deliveryForm, this.imageData, "Delivery", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
 
   }
   async save() {
     const pod = this.imageData?.Upload || ""
     this.deliveryForm.controls['pod'].setValue(pod);
+    this.deliveryForm.controls['deliveryPartial'].setValue(this.deliveryForm.controls['deliveryPartial'].value?.name||"");
+    this.deliveryForm.controls['ltReason'].setValue(this.deliveryForm.controls['ltReason'].value?.name||"");
     // await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);
     this.dialogRef.close(this.deliveryForm.value)
   }

@@ -29,7 +29,7 @@ export class ManageRunsheetComponent
     },
   ];
   dynamicControls = {
-    add: true,
+    add: false,
     edit: true,
     csv: false,
   };

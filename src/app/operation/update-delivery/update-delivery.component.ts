@@ -7,6 +7,11 @@ import { DeliveryService } from 'src/app/Utility/module/operation/delivery/deliv
 import { UpdateDeliveryControl } from 'src/assets/FormControls/update-delivery-controls';
 import { UpdateDeliveryModalComponent } from './update-delivery-modal/update-delivery-modal.component';
 import moment from 'moment';
+import { DeliveryStatus } from 'src/app/Models/docStatus';
+import { StorageService } from 'src/app/core/service/storage.service';
+import Swal from 'sweetalert2';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-update-delivery',
@@ -15,7 +20,7 @@ import moment from 'moment';
 export class UpdateDeliveryComponent implements OnInit {
   updatedeliveryTableForm: UntypedFormGroup
   backPath: string;
-  csv: any[];
+  tableData: any[];
   tableload = false;
   linkArray = []
   dynamicControls = {
@@ -75,8 +80,11 @@ export class UpdateDeliveryComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private route:Router,
     public dialog: MatDialog,
+    private storage:StorageService,
     private changeDetectorRef:ChangeDetectorRef,
-    private deliveryService:DeliveryService
+    private deliveryService:DeliveryService,
+    public snackBarUtilityService: SnackBarUtilityService,
+    private navService: NavigationService
     ) {
      this.deliveryData = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.initializeFormControl();
@@ -99,22 +107,27 @@ export class UpdateDeliveryComponent implements OnInit {
   autoFillDelivery(){
     this.updatedeliveryTableForm.controls['Vehicle'].setValue(this.deliveryData?.columnData.vehicleNo||"");
     this.updatedeliveryTableForm.controls['route'].setValue(this.deliveryData?.columnData.Cluster||"");
-    this.updatedeliveryTableForm.controls['tripid'].setValue(this.deliveryData?.columnData.RunSheet||"");
+    this.updatedeliveryTableForm.controls['tripId'].setValue(this.deliveryData?.columnData.RunSheet||"");
     this.getShipments();
   }
   async getShipments() {
     if(this.deliveryData?.columnData.RunSheet){
      const res= await this.deliveryService.getDeliveryDetail({dRSNO:this.deliveryData?.columnData.RunSheet});
-      this.csv = res.map((x) => {
+      this.tableData = res.map((x) => {
         return {
           shipment: x.dKTNO,
           packages: x.pKGS,
+          sFX: x?.sFX||0,
           delivered:"",
           person:"",
           reason:"",
+          ltReason:"",
+          deliveryPartial:"",
           pod: "",
-          status: "Yet To Deliver",
-          actions:["Edit"]
+          statusCd:DeliveryStatus.Yet_to_deliver,
+          status:DeliveryStatus[DeliveryStatus.Yet_to_deliver].replace(/_/g, " "),
+          actions:["Edit"],
+          ...x
         }
       });
     }
@@ -153,20 +166,32 @@ export class UpdateDeliveryComponent implements OnInit {
     if (data.label.label === "Edit") {
       const dialogref = this.dialog.open(UpdateDeliveryModalComponent, {
         data: data.data,
-        width: "800px",
-        height: "500px",
+        height:"100vw",
+        width:"100vw",
+        maxWidth:"232vw"
       });
       dialogref.afterClosed().subscribe((result) => {
         if (result) {
           this.tableload=true;
-           this.csv.map((x)=>{
+           this.tableData.map((x)=>{
             if(x.shipment==result.dKTNO){
-              x.status=result.bookedPkgs==parseInt(result.deliveryPkgs)?"Delivered":"";
+              const { status, statusCd } = this.getStatusAndCode(result.bookedPkgs, result.deliveryPkgs);
+              x.status=status;
+              x.statusCd=statusCd;
               x.dateTime=result.DTTM;
+              x.remarks=result.remarks;
+              x.bookedPkgs=parseInt(result.bookedPkgs);
+              x.arrivedPkgs=parseInt(result.arrivedPkgs);
+              x.deliveryPkgs=parseInt(result.deliveryPkgs);
+              x.cODDODCharges=result?.cODDODCharges||"0.00",
+              x.codDodPaid=result?.codDodPaid||"0.00",
               x.dDateTime=moment.utc(result.DTTM).format("DD/MM/YYYY HH:MM:SS");
-              x.person=result.person;
-              x.reason=result.reason;
-              x.pod=result.pod;
+              x.deliveryPartial=result.deliveryPartial||"",
+              x.pod= result.pod||"",
+              x.ltReason=result.ltReason||"",
+              x.reason=result?.deliveryPartial||result?.ltReason||"",
+              x.startKm=result?.startKm||0,
+              x.person=result?.person||this.storage.branch
             }
             return x;
            })
@@ -176,4 +201,47 @@ export class UpdateDeliveryComponent implements OnInit {
       });
     }
     }
+    getStatusAndCode(bookedPkgs, deliveryPkgs) {
+      bookedPkgs = parseInt(bookedPkgs, 10);
+      deliveryPkgs = parseInt(deliveryPkgs, 10);
+      if (bookedPkgs === deliveryPkgs) {
+        return { status: DeliveryStatus[DeliveryStatus.Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Delivered}; // Adjust based on actual logic
+      } else if (deliveryPkgs == 0) {
+        return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Un_Delivered };
+      } else if (bookedPkgs < deliveryPkgs) {
+        return { status: DeliveryStatus[DeliveryStatus.Part_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Part_Delivered };
+      } else {
+        return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Un_Delivered}; // Adjust as needed
+      }
+  }
+  async CompleteScan(){
+    const status = this.tableData.every(x => x.dateTime);
+    if (!status) { // If not every item has a non-empty dateTime, show the error
+      Swal.fire({
+        icon: "error",
+        title: "Please fill the delivery details",
+        showConfirmButton: true,
+      });
+      return false;
+    }
+    else{
+      this.snackBarUtilityService.commonToast(async () => {  
+        const res = await this.deliveryService.deliveryUpdate(this.updatedeliveryTableForm.value,this.tableData);
+        if(res){
+          Swal.fire({
+            icon: "success",
+            title: "Delivery Update Successfully",
+            text: "DRS NO: " + this.updatedeliveryTableForm.controls['tripId'].value,
+            showConfirmButton: true,
+          }).then((result) => {
+              // Redirect to the desired page after the success message is confirmed.
+              this.navService.navigateTotab(
+                "docket",
+                "dashboard/Index"
+              );
+        })
+      }
+      },"Delivery Update Successfull");
+    }
+  }
 }

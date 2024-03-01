@@ -204,6 +204,10 @@ export class ContraVoucherCreationComponent implements OnInit {
     const ToDebitAmount = parseFloat(this.ContraVoucherPaymentForm.get("ToDebitAmount").value || 0);
     const ToCreditAmount = parseFloat(this.ContraVoucherPaymentForm.get("ToCreditAmount").value || 0);
 
+    if (FromDebitAmount == 0 && FromCreditAmount == 0 && ToDebitAmount == 0 && ToCreditAmount == 0) {
+      this.snackBarUtilityService.ShowCommonSwal("info", "Please Enter Amount for Debit or Credit");
+      return;
+    }
 
     if (
       FromDebitAmount == FromCreditAmount

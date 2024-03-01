@@ -114,6 +114,7 @@ export enum VoucherInstanceType {
   BillCollection = 7,
   AdvancePayment = 8,
   BalancePayment = 9,
+  DeliveryMR = 10,
 }
 
 export const ledgerInfo = {

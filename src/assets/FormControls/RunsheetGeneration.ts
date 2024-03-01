@@ -13,11 +13,7 @@ export class RunSheetControl {
               generatecontrol: true,
               disable: true,
               Validations: [
-                {
-                  name: "required",
-                  message: "User ID is required",
-                },
-              ],
+              ]
             },
              {
                 name: 'Cluster',
@@ -34,7 +30,12 @@ export class RunSheetControl {
                 placeholder: '',
                 type: "dropdown",
                 value: '',
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Vehicle is required",
+                  },
+                ],
                 additionalData: {
                   showNameAndValue: false,
                 },
@@ -51,7 +52,12 @@ export class RunSheetControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Vehicle Type is required",
+                  },
+                ],
                 generatecontrol: true, disable: true
             },
             {
@@ -60,7 +66,12 @@ export class RunSheetControl {
                 placeholder: '',
                 type: "text",
                 value: '',
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Vendor is required",
+                  }
+                ],
                 generatecontrol: true,
                 disable: false
             },
@@ -70,7 +81,12 @@ export class RunSheetControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Vendor Type is required",
+                  }
+                ],
                 generatecontrol: true,
                 disable: true
             }
@@ -101,7 +117,12 @@ export class RunSheetControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Driver Name is required",
+                  }
+                ],
                 generatecontrol: true,
                 disable: false
             },
@@ -111,7 +132,12 @@ export class RunSheetControl {
                 placeholder: '',
                 type: 'mobile-number',
                 value: '',
-                Validations: [],
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Driver Mobile No is required",
+                  }
+                ],
                 generatecontrol: true,
                 disable: false
             },
@@ -169,8 +195,7 @@ export class RunSheetControl {
                 Validations: [],
                 generatecontrol: true,
                 disable: false
-            }
-            ,
+            },
             {
                 name: 'LoadKg',
                 label: 'Loaded KG',

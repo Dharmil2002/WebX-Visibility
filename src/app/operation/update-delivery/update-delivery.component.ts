@@ -11,6 +11,7 @@ import { DeliveryStatus } from 'src/app/Models/docStatus';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-update-delivery',
@@ -82,6 +83,7 @@ export class UpdateDeliveryComponent implements OnInit {
     private storage:StorageService,
     private changeDetectorRef:ChangeDetectorRef,
     private deliveryService:DeliveryService,
+    public snackBarUtilityService: SnackBarUtilityService,
     private navService: NavigationService
     ) {
      this.deliveryData = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -223,23 +225,23 @@ export class UpdateDeliveryComponent implements OnInit {
       return false;
     }
     else{
-    const res = await this.deliveryService.deliveryUpdate(this.updatedeliveryTableForm.value,this.tableData);
-    if(res){
-      Swal.fire({
-        icon: "success",
-        title: "Delivery Update Successfully",
-        text: "DRS NO: " + this.updatedeliveryTableForm.controls['tripId'].value,
-        showConfirmButton: true,
-      }).then((result) => {
-          // Redirect to the desired page after the success message is confirmed.
-          this.navService.navigateTotab(
-            "docket",
-            "dashboard/Index"
-          );
-    })
-  }
+      this.snackBarUtilityService.commonToast(async () => {  
+        const res = await this.deliveryService.deliveryUpdate(this.updatedeliveryTableForm.value,this.tableData);
+        if(res){
+          Swal.fire({
+            icon: "success",
+            title: "Delivery Update Successfully",
+            text: "DRS NO: " + this.updatedeliveryTableForm.controls['tripId'].value,
+            showConfirmButton: true,
+          }).then((result) => {
+              // Redirect to the desired page after the success message is confirmed.
+              this.navService.navigateTotab(
+                "docket",
+                "dashboard/Index"
+              );
+        })
+      }
+      },"Delivery Update Successfull");
     }
-    
-    
   }
 }

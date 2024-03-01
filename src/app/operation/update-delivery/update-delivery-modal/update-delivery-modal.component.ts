@@ -107,8 +107,8 @@ export class UpdateDeliveryModalComponent implements OnInit {
     this.dialogRef.close()
   }
 
-  async getFilePod(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "pod", this.
+   getFilePod(data) {
+    this.imageData =  this.objImageHandling.uploadFile(data.eventArgs, "pod", this.
     deliveryForm, this.imageData, "Delivery", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
 
   }

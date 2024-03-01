@@ -46,7 +46,8 @@ export class CreateRunSheetComponent implements OnInit {
     private vehStatus: VehicleStatusService,
     private filter: FilterUtils,
     private generalService:GeneralService,
-    private vehicleTypeService: VehicleTypeService
+    private vehicleTypeService: VehicleTypeService,
+    public snackBarUtilityService: SnackBarUtilityService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.RunSheetTable = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -175,6 +176,7 @@ export class CreateRunSheetComponent implements OnInit {
     );
   }
   async getVehicleDetails() {
+    
     const fieldName = ["CapacityKg", "CapVol", "Vendor"];
     this.RunSheetTableForm.controls['Vendor'].setValue("")
     this.RunSheetTableForm.controls['CapacityKg'].setValue(0)
@@ -191,24 +193,28 @@ export class CreateRunSheetComponent implements OnInit {
         return x;
       });
       const vehDetails = await this.vehStatus.getVehDetails(this.RunSheetTableForm?.value.Vehicle.value);
+      this.RunSheetTableForm.controls['VehType'].setValue(vehDetails?.vehicleType||"")
       this.RunSheetTableForm.controls['CapVol'].setValue(vehDetails?.cft || "")
       this.RunSheetTableForm.controls['CapacityKg'].setValue(parseFloat(vehDetails?.capacity) * 1000 || 0)
       this.RunSheetTableForm.controls['Vendor'].setValue(vehDetails?.vendorName || "")
     }
     else {
-      this.jsonControlArray = this.jsonControlArray = this.jsonControlArray.map((x) => {
+      const res = await this.vehicleTypeService.getVehicleTypeList();
+      const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
+      this.jsonControlArray =this.jsonControlArray.map((x) => {
         if (fieldName.includes(x.name)) {
           x.disable = false;
         }
         if(x.name=="VehType"){
-          x.type="text"
-          x.disable = true
+          x.type="Staticdropdown",
+          x.disable = false,
+          x.value=vehicleType
         }
         return x;
       });
-
+    
     }
-    this.RunSheetTableForm.controls['VehType'].setValue(this.RunSheetTableForm?.value.Vehicle.type || "")
+ 
     this.RunSheetTableForm.controls['VenType'].setValue(this.RunSheetTableForm?.value.Vehicle.type || "")
   }
   selectCheckBox(event) {
@@ -302,6 +308,10 @@ export class CreateRunSheetComponent implements OnInit {
       this.RunSheetTableForm.controls['Vendor'].setValue("");
       this.RunSheetTableForm.controls['VenType'].setValue("");
       this.RunSheetTableForm.controls['vendPan'].setValue("");
+      this.RunSheetTableForm.controls['driverNm'].setValue("");
+      this.RunSheetTableForm.controls['driverMobile'].setValue("");
+      this.RunSheetTableForm.controls['lsNo'].setValue("");
+      this.RunSheetTableForm.controls['lcExpireDate'].setValue("");
       this.jsonControlArray = this.jsonControlArray.map((x) => {
         if (fieldName.includes(x.name)) {
           x.disable = false
@@ -313,6 +323,7 @@ export class CreateRunSheetComponent implements OnInit {
         }
         return x;
       });
+      this.RunSheetTableForm.controls['VenType'].setValue("Market");
     }
    
     
@@ -325,17 +336,20 @@ export class CreateRunSheetComponent implements OnInit {
      // this.ObjSnackBarUtility.ShowCommonSwal1('error', 'Please select atleast one Cluster to generate Runsheet!', false, false, false);
       return;
     }
-    const formData=this.RunSheetTableForm.getRawValue();
-    formData['deliveryTypeName']=this.delType.find((x)=>x.value==formData.deliveryType).name;
-    const res = await this.runSheetService.drsFieldMapping(this.RunSheetTableForm.value, this.csv);
-    await this.runSheetService.addRunSheet(res);
-    Swal.fire({
-      icon: "success",
-      title: "Successful",
-      text: `Run Sheet generated Successfully ${formData.RunSheetID}`,
-      showConfirmButton: true,
-    })
-    this.goBack('Delivery')
+    this.snackBarUtilityService.commonToast(async () => {
+      const formData=this.RunSheetTableForm.getRawValue();
+      formData['deliveryTypeName']=this.delType.find((x)=>x.value==formData.deliveryType).name;
+      const res = await this.runSheetService.drsFieldMapping(this.RunSheetTableForm.value, this.csv);
+      const runSheetNo=await this.runSheetService.addRunSheet(res);
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: `Run Sheet generated Successfully ${runSheetNo}`,
+        showConfirmButton: true,
+      })
+      this.goBack('Delivery')
+    },"Run Sheet generated Successfully")
+ 
   }
   async generalMaster(){
     this.delType = await this.generalService.getGeneralMasterData("RUNDELTYP");

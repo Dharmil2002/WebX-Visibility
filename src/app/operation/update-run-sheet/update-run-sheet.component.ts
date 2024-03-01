@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { RunSheetService } from 'src/app/Utility/module/operation/runsheet/runsheet.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-update-run-sheet',
@@ -87,6 +88,7 @@ export class UpdateRunSheetComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private runSheetService: RunSheetService,
     private storage: StorageService,
+    public snackBarUtilityService: SnackBarUtilityService,
     private navigationService: NavigationService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -219,14 +221,18 @@ export class UpdateRunSheetComponent implements OnInit {
     this.scanPackageInput.nativeElement.focus();
   }
   async DepartDelivery() {
-    const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList);
-    Swal.fire({
-      icon: "success",
-      title: "RunSheet Update Successfully",
-      text: `RunSheet Update Successfully with ${res}`,
-      showConfirmButton: true,
-    })
-    this.goBack('Delivery');
+    this.snackBarUtilityService.commonToast(async () => {
+      const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList);
+      Swal.fire({
+        icon: "success",
+        title: "RunSheet Update Successfully",
+        text: `RunSheet Update Successfully with ${this.updateSheetTableForm.value.Runsheet}`,
+        showConfirmButton: true,
+      })
+      this.goBack('Delivery');
+    },"RunSheet Departure Successfully");
+   
+  
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });

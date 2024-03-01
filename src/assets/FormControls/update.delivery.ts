@@ -33,6 +33,12 @@ export class UpdateShipmentDeliveryControl {
                 type:'file',
                 value: '',
                 Validations: [],
+                additionalData:{
+                    isFileSelected:false
+                },
+                functions: {
+                    onChange: 'getFilePod',
+                },
                 generatecontrol: true, disable: false
             },
             {

@@ -201,8 +201,8 @@ export class DepartureService {
     }
     await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", tsReq));
     
-    let loadedWT = shipment.reduce((a, c) => { return a + c.lDWT; }, 0) || 0; 
-    let loadedVol = shipment.reduce((a, c) => { return a + c.lDVOL; }, 0) || 0;
+    let loadedWT = shipment?shipment.reduce((a, c) => { return a + c.lDWT; }, 0) || 0:0; 
+    let loadedVol = shipment?shipment.reduce((a, c) => { return a + c.lDVOL; }, 0) || 0:0;
 
     if(!isLegExist) {            
       legData = {
@@ -212,8 +212,8 @@ export class DepartureService {
         "fLOC": this.storage.branch || "",
         "tLOC": next || "",
         "lOAD": {
-          "dKTS": shipment.filter(f => f.lDPKG > 0).length || 0,
-          "pKGS": shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0,
+          "dKTS":shipment?shipment.filter(f => f.lDPKG > 0).length || 0:0,
+          "pKGS":shipment?shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) ||0:0,
           "wT": loadedWT || 0, 
           "vOL": loadedVol || 0,
           "vWT": 0,
@@ -265,8 +265,8 @@ export class DepartureService {
     else {
       legData = {
         "lOAD": {
-          "dKTS": shipment.filter(f => f.lDPKG > 0).length || 0,
-          "pKGS": shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0,
+          "dKTS":shipment? shipment.filter(f => f.lDPKG > 0).length || 0:0,
+          "pKGS":shipment?shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0:0,
           "wT": loadedWT || 0, 
           "vOL": loadedVol || 0,
           "vWT": 0,

@@ -63,6 +63,7 @@ export class thcsummaryData {
   gPSDIST?: number
   tMODE: string
   tMODENM: string
+  iSEMPTY: boolean
   pRQNO: string
   cNL: boolean
   // cNDT?: Date

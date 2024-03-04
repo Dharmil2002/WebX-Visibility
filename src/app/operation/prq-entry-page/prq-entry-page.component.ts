@@ -630,8 +630,8 @@ export class PrqEntryPageComponent implements OnInit {
 
         } else {
           Swal.fire({
-            icon: "error",
-            title: "Error",
+            icon: "info",
+            title: "info",
             text: "Contract Invoked Failed",
             showConfirmButton: false,
           });

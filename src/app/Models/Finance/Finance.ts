@@ -158,4 +158,5 @@ export const ledgerInfo = {
     "LeadgerName": "Billed debtors",
     "LeadgerCategory": "ASSET"
   },
+
 };

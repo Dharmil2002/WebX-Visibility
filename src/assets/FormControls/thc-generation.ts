@@ -303,6 +303,23 @@ export class thcControl {
                     },
                 },
                 {
+                    name: 'IsEmpty',
+                    label: 'Is Empty',
+                    placeholder: '',
+                    type: 'toggle',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: true,
+                    disable: false,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onChange: 'onchangeIsEmptyFlag'
+                    },
+                },
+                {
                     name: 'driverName',
                     label: 'Driver Name',
                     placeholder: '',
@@ -858,6 +875,7 @@ export class thcControl {
                         metaData: "Basic"
                     }
                 },
+
                 {
                     name: "fitnessValidityDate",
                     label: "fitnessValidityDate",
@@ -1042,6 +1060,23 @@ export class thcControl {
                     maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
                 }
             },
+            {
+                name: 'SupplierName', label: "Supplier Name", placeholder: "", type: 'text',
+                value: "", generatecontrol: true, disable: false,
+                Validations: [
+                ],
+                additionalData: {
+                }
+            },
+            {
+                name: 'ContactNumber', label: "Contact Number", placeholder: "", type: 'number',
+                value: "", generatecontrol: true, disable: false,
+                Validations: [
+                ],
+                additionalData: {
+                }
+            },
+
             {
                 name: 'vendCode',
                 label: 'vendCode',

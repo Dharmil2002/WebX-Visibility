@@ -295,7 +295,7 @@ export class BalancePaymentComponent implements OnInit {
   CalculatePaymentAmount() {
     const TotalTHCamount = this.tableData
       .filter(x => x.isSelected)
-      .reduce((sum, x) => sum + parseInt(x.THCamount), 0);
+      .reduce((sum, x) => sum + parseInt(x.BalancePending), 0);
 
     let TDSAmount = parseFloat(this.VendorBalanceTaxationTDSFilterForm.controls.TDSAmount.value) || 0;
     let GSTAmount = parseFloat(this.VendorBalanceTaxationGSTFilterForm.controls.GSTAmount.value) || 0;

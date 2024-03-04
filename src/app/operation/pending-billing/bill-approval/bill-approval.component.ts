@@ -325,10 +325,10 @@ export class BillApprovalComponent implements OnInit {
 
     const response = [
       createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, TotalAmount, 0),
-      createVoucher(ledgerInfo['Unbilled debtors'].LeadgerCode, ledgerInfo['Unbilled debtors'].LeadgerName, ledgerInfo['Unbilled debtors'].LeadgerCategory, 0, DocketAmount),
+      createVoucher(ledgerInfo['Freight income'].LeadgerCode, ledgerInfo['Freight income'].LeadgerName, ledgerInfo['Freight income'].LeadgerCategory, 0, DocketAmount),
     ];
     if (data?.rOUNOFFAMT > 0) {
-      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, ledgerInfo['Unbilled debtors'].LeadgerCategory, data?.rOUNOFFAMT, 0));
+      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, ledgerInfo['Round off Amount'].LeadgerCategory, data?.rOUNOFFAMT, 0));
     }
 
 

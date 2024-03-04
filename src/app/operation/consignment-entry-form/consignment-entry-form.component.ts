@@ -1262,7 +1262,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT: this.model.FreightTableForm.controls["gstChargedAmount"].value,
         cHG: "",
-        nFCHG: Object.entries(this.model.NonFreightTableForm.value).map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL })),
+        nFCHG: this.model.NonFreightTableForm?.value
+          ? Object.entries(this.model.NonFreightTableForm.value)
+            .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
+            .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
+          : [],
+
         tOTAMT: this.model.FreightTableForm.controls['totalAmount'].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -1299,7 +1304,24 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       }
       firstValueFrom(this.operationService.operationMongoPost("operation/docket/create", reqBody))
         .then((res: any) => {
-          this.AccountPosting(res.data)
+          Swal.fire({
+            icon: "success",
+            title: "Booked Successfully",
+            text: "DocketNo: " + res.data,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.hideLoading();
+              setTimeout(() => {
+                Swal.close();
+              }, 2000);
+              this.navService.navigateTotab(
+                "docket",
+                "dashboard/Index"
+              );
+            }
+          });
+          // this.AccountPosting(res.data)
         })
         .catch((err) => {
           console.error(err);
@@ -1792,8 +1814,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
         } else {
           Swal.fire({
-            icon: "error",
-            title: "Error",
+            icon: "info",
+            title: "info",
             text: "Contract Invoked Failed",
             showConfirmButton: false,
           });
@@ -1940,201 +1962,201 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }
   }
   // Account Posting When  C Note Booked 	
-  async AccountPosting(DocketNo) {
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
-        let GSTAmount = 0;
-        const TotalAmount = this.model.FreightTableForm.controls['totalAmount'].value;
+  // async AccountPosting(DocketNo) {
+  //   this.snackBarUtilityService.commonToast(async () => {
+  //     try {
+  //       let GSTAmount = 0;
+  //       const TotalAmount = this.model.FreightTableForm.controls['totalAmount'].value;
 
-        this.VoucherRequestModel.companyCode = this.storage.companyCode;
-        this.VoucherRequestModel.docType = "VR";
-        this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear
+  //       this.VoucherRequestModel.companyCode = this.storage.companyCode;
+  //       this.VoucherRequestModel.docType = "VR";
+  //       this.VoucherRequestModel.branch = this.storage.branch;
+  //       this.VoucherRequestModel.finYear = financialYear
 
-        this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBooking;
-        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CNoteBooking];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+  //       this.VoucherDataRequestModel.voucherNo = "";
+  //       this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBooking;
+  //       this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CNoteBooking];
+  //       this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+  //       this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
 
-        this.VoucherDataRequestModel.transDate = this.model.consignmentTableForm.value.docketDate
-        this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = this.storage.branch;
-        this.VoucherDataRequestModel.finYear = financialYear
+  //       this.VoucherDataRequestModel.transDate = this.model.consignmentTableForm.value.docketDate
+  //       this.VoucherDataRequestModel.docType = "VR";
+  //       this.VoucherDataRequestModel.branch = this.storage.branch;
+  //       this.VoucherDataRequestModel.finYear = financialYear
 
-        this.VoucherDataRequestModel.accLocation = this.storage.branch;
-        this.VoucherDataRequestModel.preperedFor = "Customer";
-        this.VoucherDataRequestModel.partyCode = this.model.consignmentTableForm.value?.billingParty?.value,
-          this.VoucherDataRequestModel.partyName = this.model.consignmentTableForm.value?.billingParty?.name,
-          this.VoucherDataRequestModel.partyState = "";
-        this.VoucherDataRequestModel.entryBy = this.storage.userName;
-        this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo = ""
+  //       this.VoucherDataRequestModel.accLocation = this.storage.branch;
+  //       this.VoucherDataRequestModel.preperedFor = "Customer";
+  //       this.VoucherDataRequestModel.partyCode = this.model.consignmentTableForm.value?.billingParty?.value,
+  //         this.VoucherDataRequestModel.partyName = this.model.consignmentTableForm.value?.billingParty?.name,
+  //         this.VoucherDataRequestModel.partyState = "";
+  //       this.VoucherDataRequestModel.entryBy = this.storage.userName;
+  //       this.VoucherDataRequestModel.entryDate = new Date();
+  //       this.VoucherDataRequestModel.panNo = ""
 
-        this.VoucherDataRequestModel.tdsSectionCode = "";
-        this.VoucherDataRequestModel.tdsSectionName = "";
-        this.VoucherDataRequestModel.tdsRate = 0;
-        this.VoucherDataRequestModel.tdsAmount = 0;
-        this.VoucherDataRequestModel.tdsAtlineitem = false;
-        this.VoucherDataRequestModel.tcsSectionCode = "";
-        this.VoucherDataRequestModel.tcsSectionName = "";
-        this.VoucherDataRequestModel.tcsRate = 0;
-        this.VoucherDataRequestModel.tcsAmount = 0;
+  //       this.VoucherDataRequestModel.tdsSectionCode = "";
+  //       this.VoucherDataRequestModel.tdsSectionName = "";
+  //       this.VoucherDataRequestModel.tdsRate = 0;
+  //       this.VoucherDataRequestModel.tdsAmount = 0;
+  //       this.VoucherDataRequestModel.tdsAtlineitem = false;
+  //       this.VoucherDataRequestModel.tcsSectionCode = "";
+  //       this.VoucherDataRequestModel.tcsSectionName = "";
+  //       this.VoucherDataRequestModel.tcsRate = 0;
+  //       this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST = 0;
-        this.VoucherDataRequestModel.SGST = 0;
-        this.VoucherDataRequestModel.CGST = 0;
-        this.VoucherDataRequestModel.UGST = 0;
-        this.VoucherDataRequestModel.GSTTotal = GSTAmount;
+  //       this.VoucherDataRequestModel.IGST = 0;
+  //       this.VoucherDataRequestModel.SGST = 0;
+  //       this.VoucherDataRequestModel.CGST = 0;
+  //       this.VoucherDataRequestModel.UGST = 0;
+  //       this.VoucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.VoucherDataRequestModel.GrossAmount = TotalAmount;
-        this.VoucherDataRequestModel.netPayable = TotalAmount;
-        this.VoucherDataRequestModel.roundOff = 0;
-        this.VoucherDataRequestModel.voucherCanceled = false
+  //       this.VoucherDataRequestModel.GrossAmount = TotalAmount;
+  //       this.VoucherDataRequestModel.netPayable = TotalAmount;
+  //       this.VoucherDataRequestModel.roundOff = 0;
+  //       this.VoucherDataRequestModel.voucherCanceled = false
 
-        this.VoucherDataRequestModel.paymentMode = "";
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName = "";
-        this.VoucherDataRequestModel.date = "";
-        this.VoucherDataRequestModel.scanSupportingDocument = "";
-        this.VoucherDataRequestModel.transactionNumber = DocketNo;
-        var VoucherlineitemList = [{
+  //       this.VoucherDataRequestModel.paymentMode = "";
+  //       this.VoucherDataRequestModel.refNo = "";
+  //       this.VoucherDataRequestModel.accountName = "";
+  //       this.VoucherDataRequestModel.date = "";
+  //       this.VoucherDataRequestModel.scanSupportingDocument = "";
+  //       this.VoucherDataRequestModel.transactionNumber = DocketNo;
+  //       var VoucherlineitemList = [{
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
-          "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
-          "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": TotalAmount,
-          "credit": 0,
-          "GSTRate": 0,
-          "GSTAmount": 0,
-          "Total": TotalAmount,
-          "TDSApplicable": false,
-          "narration": `when C note No ${DocketNo} Is Booked`
-        },
-        {
+  //         "companyCode": this.storage.companyCode,
+  //         "voucherNo": "",
+  //         "transCode": VoucherInstanceType.CNoteBooking,
+  //         "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+  //         "voucherCode": VoucherType.JournalVoucher,
+  //         "voucherType": VoucherType[VoucherType.JournalVoucher],
+  //         "transDate": new Date(),
+  //         "finYear": financialYear,
+  //         "branch": this.storage.branch,
+  //         "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
+  //         "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
+  //         "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
+  //         "sacCode": "",
+  //         "sacName": "",
+  //         "debit": TotalAmount,
+  //         "credit": 0,
+  //         "GSTRate": 0,
+  //         "GSTAmount": 0,
+  //         "Total": TotalAmount,
+  //         "TDSApplicable": false,
+  //         "narration": `when C note No ${DocketNo} Is Booked`
+  //       },
+  //       {
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['Freight income'].LeadgerCode,
-          "accName": `${ledgerInfo['Freight income'].LeadgerName} - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
-          "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": 0,
-          "credit": TotalAmount,
-          "GSTRate": 0,
-          "GSTAmount": 0,
-          "Total": TotalAmount,
-          "TDSApplicable": false,
-          "narration": `when C note No ${DocketNo} Is Booked`
-        }];
+  //         "companyCode": this.storage.companyCode,
+  //         "voucherNo": "",
+  //         "transCode": VoucherInstanceType.CNoteBooking,
+  //         "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+  //         "voucherCode": VoucherType.JournalVoucher,
+  //         "voucherType": VoucherType[VoucherType.JournalVoucher],
+  //         "transDate": new Date(),
+  //         "finYear": financialYear,
+  //         "branch": this.storage.branch,
+  //         "accCode": ledgerInfo['Freight income'].LeadgerCode,
+  //         "accName": `${ledgerInfo['Freight income'].LeadgerName} - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
+  //         "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
+  //         "sacCode": "",
+  //         "sacName": "",
+  //         "debit": 0,
+  //         "credit": TotalAmount,
+  //         "GSTRate": 0,
+  //         "GSTAmount": 0,
+  //         "Total": TotalAmount,
+  //         "TDSApplicable": false,
+  //         "narration": `when C note No ${DocketNo} Is Booked`
+  //       }];
 
-        this.VoucherRequestModel.details = VoucherlineitemList
-        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-        this.VoucherRequestModel.debitAgainstDocumentList = [];
+  //       this.VoucherRequestModel.details = VoucherlineitemList
+  //       this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+  //       this.VoucherRequestModel.debitAgainstDocumentList = [];
 
-        this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
-          .subscribe({
-            next: (res: any) => {
+  //       this.voucherServicesService
+  //         .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+  //         .subscribe({
+  //           next: (res: any) => {
 
-              let reqBody = {
-                companyCode: this.storage.companyCode,
-                voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transCode: VoucherInstanceType.CNoteBooking,
-                transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
-                transDate: Date(),
-                finYear: financialYear,
-                branch: this.storage.branch,
-                docType: "Voucher",
-                partyType: "Customer",
-                docNo: DocketNo,
-                partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
-                partyName: this.model.consignmentTableForm.value?.billingParty?.name,
-                entryBy: localStorage.getItem("UserName"),
-                entryDate: Date(),
-                debit: [{
-                  "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
-                  "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
-                  "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
-                  "amount": TotalAmount,
-                  "narration": `when C note No ${DocketNo} Is Booked`
-                }],
-                credit: [{
-                  "accCode": ledgerInfo['Freight income'].LeadgerCode,
-                  "accName": ledgerInfo['Freight income'].LeadgerName + " - Road",
-                  "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
-                  "amount": TotalAmount,
-                  "narration": `when C note No ${DocketNo} Is Booked`
-                }],
+  //             let reqBody = {
+  //               companyCode: this.storage.companyCode,
+  //               voucherNo: res?.data?.mainData?.ops[0].vNO,
+  //               transCode: VoucherInstanceType.CNoteBooking,
+  //               transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+  //               voucherCode: VoucherType.JournalVoucher,
+  //               voucherType: VoucherType[VoucherType.JournalVoucher],
+  //               transDate: Date(),
+  //               finYear: financialYear,
+  //               branch: this.storage.branch,
+  //               docType: "Voucher",
+  //               partyType: "Customer",
+  //               docNo: DocketNo,
+  //               partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
+  //               partyName: this.model.consignmentTableForm.value?.billingParty?.name,
+  //               entryBy: localStorage.getItem("UserName"),
+  //               entryDate: Date(),
+  //               debit: [{
+  //                 "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
+  //                 "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
+  //                 "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
+  //                 "amount": TotalAmount,
+  //                 "narration": `when C note No ${DocketNo} Is Booked`
+  //               }],
+  //               credit: [{
+  //                 "accCode": ledgerInfo['Freight income'].LeadgerCode,
+  //                 "accName": ledgerInfo['Freight income'].LeadgerName + " - Road",
+  //                 "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
+  //                 "amount": TotalAmount,
+  //                 "narration": `when C note No ${DocketNo} Is Booked`
+  //               }],
 
-              };
+  //             };
 
-              this.voucherServicesService
-                .FinancePost("fin/account/posting", reqBody)
-                .subscribe({
-                  next: (res: any) => {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Booked Successfully And Voucher Created",
-                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
-                      showConfirmButton: true,
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        Swal.hideLoading();
-                        setTimeout(() => {
-                          Swal.close();
-                        }, 2000);
-                        this.navService.navigateTotab(
-                          "docket",
-                          "dashboard/Index"
-                        );
-                      }
-                    });
-                  },
-                  error: (err: any) => {
+  //             this.voucherServicesService
+  //               .FinancePost("fin/account/posting", reqBody)
+  //               .subscribe({
+  //                 next: (res: any) => {
+  //                   Swal.fire({
+  //                     icon: "success",
+  //                     title: "Booked Successfully And Voucher Created",
+  //                     text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
+  //                     showConfirmButton: true,
+  //                   }).then((result) => {
+  //                     if (result.isConfirmed) {
+  //                       Swal.hideLoading();
+  //                       setTimeout(() => {
+  //                         Swal.close();
+  //                       }, 2000);
+  //                       this.navService.navigateTotab(
+  //                         "docket",
+  //                         "dashboard/Index"
+  //                       );
+  //                     }
+  //                   });
+  //                 },
+  //                 error: (err: any) => {
 
-                    if (err.status === 400) {
-                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
-                    } else {
-                      this.snackBarUtilityService.ShowCommonSwal("error", err);
-                    }
-                  },
-                });
+  //                   if (err.status === 400) {
+  //                     this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+  //                   } else {
+  //                     this.snackBarUtilityService.ShowCommonSwal("error", err);
+  //                   }
+  //                 },
+  //               });
 
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-            },
-          });
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
-      }
+  //           },
+  //           error: (err: any) => {
+  //             this.snackBarUtilityService.ShowCommonSwal("error", err);
+  //           },
+  //         });
+  //     } catch (error) {
+  //       this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+  //     }
 
 
-    }, "C-Note Booking Voucher Generating..!");
+  //   }, "C-Note Booking Voucher Generating..!");
 
-  }
+  // }
 }
 
 const RateTypeCalculation = [{

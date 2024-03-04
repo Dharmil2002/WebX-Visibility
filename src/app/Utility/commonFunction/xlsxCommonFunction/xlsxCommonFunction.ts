@@ -29,7 +29,7 @@ export function exportAsExcelFile(json: any[], excelFileName: string, customHead
           }
      }
      // Create a workbook containing the worksheet.
-     const workbook: XLSX.WorkBook = { Sheets: { 'Voucher-Register_Report': worksheet }, SheetNames: ['Voucher-Register_Report'] };
+     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
      // Write the workbook to an Excel file with the specified filename.
      XLSX.writeFile(workbook, `${excelFileName}.xlsx`);
 }

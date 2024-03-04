@@ -2,9 +2,9 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
-import { formatDocketDate } from "../../commonFunction/arrayCommonFunction/uniqArray";
 import * as XLSX from 'xlsx';
 import { PayBasisdetailFromApi } from "src/app/Masters/Customer Contract/CustomerContractAPIUtitlity";
+import moment from "moment";
 @Injectable({
      providedIn: "root",
 })
@@ -13,141 +13,236 @@ export class CustGSTInvoiceService {
           private masterServices: MasterService,
           private storage: StorageService
      ) { }
+     //startValue, endValue, docNoArray, stateData, customerName
+     async getcustomerGstRegisterReportDetail(data) {
 
-     async getcustomerGstRegisterReportDetail(start, end, docNo) {
-          const startValue = start;
-          const endValue = end;
-          const reqBody = {
-               companyCode: this.storage.companyCode,
-               collectionName: "cust_bill_headers",
-               filter: {
-                    cID: this.storage.companyCode,
-               }
-          }
           // Check if the array contains only empty strings
-          const isEmptyDocNo = docNo.every(value => value === "");
+          const isEmptyDocNo = data.docNoArray.every(value => value === "");
+          let matchQuery
 
           // Add date range conditions if docNo are not present
           if (isEmptyDocNo) {
-               reqBody.filter["D$and"] = [
-                    {
-                         "bGNDT": {
-                              "D$gte": startValue,
-                         },
-                    },
-
-                    {
-                         "bGNDT": {
-                              "D$lte": endValue,
-                         },
-                    }
-               ];
+               matchQuery = {
+                    'D$and': [
+                         { bGNDT: { 'D$gte': data.startDate } }, // Convert start date to ISO format
+                         { bGNDT: { 'D$lte': data.endDate } }, // Bill date less than or equal to end date       
+                         ...(data.customerName.length > 0 ? [{ 'D$expr': { 'D$in': ['$cUST.cD', data.customerName] } }] : []), // State names condition
+                         ...(data.stateData.length > 0 ? [{ 'D$expr': { 'D$in': ['$cUST.sT', data.stateData] } }] : []), // State names condition              
+                    ],
+               };
           }
 
           // Add docNo condition if docNoArray is present
           if (!isEmptyDocNo) {
-               reqBody.filter["docNo"] = {
-                    "D$in": docNo,
+               matchQuery = {
+                    'docNo': { 'D$in': data.docNoArray }
                };
           }
 
-          const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "cust_bill_details"
-          const rescustdetail = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          reqBody.collectionName = "docket_invoices"
-          const resdocketinv = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+          const reqBody = {
+               companyCode: this.storage.companyCode,
+               collectionName: "cust_bill_headers",
+               filters: [
+                    {
+                         D$match: matchQuery
+                    },
+                    {
+                         D$addFields: {
+                              Party: {
+                                   D$concat: [
+                                        {
+                                             D$toString: "$cUST.cD",
+                                        },
+                                        " : ",
+                                        "$cUST.nM",
+                                   ],
+                              },
 
-          let custstinvList = [];
+                         },
+                    },
+                    {
+                         D$lookup: {
+                              from: "cust_bill_details",
+                              let: {
+                                   bILLNO: "$bILLNO"
+                              },
+                              pipeline: [
+                                   {
+                                        D$match: {
+                                             D$and: [
+                                                  {
+                                                       D$expr: {
+                                                            D$eq: ["$bILLNO", "$$bILLNO"]
+                                                       }
+                                                  },
+                                                  {
+                                                       cNL: {
+                                                            D$in: [false, null]
+                                                       }
+                                                  }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              as: "billDetails"
+                         }
+                    },
+                    {
+                         D$lookup: {
+                              from: "docket_invoices",
+                              let: {
+                                   dKTNO: { D$arrayElemAt: ["$billDetails.dKTNO", 0] } // Assuming there is only one element in the array
+                              },
+                              pipeline: [
+                                   {
+                                        D$match: {
+                                             D$and: [
+                                                  {
+                                                       D$expr: {
+                                                            D$eq: ["$dKTNO", "$$dKTNO"]
+                                                       }
+                                                  }
+                                             ]
+                                        }
+                                   }
+                              ],
+                              as: "docketInvoices"
+                         }
+                    },
+                    {
+                         D$project: {
+                              _id: 0, // Exclude the _id field
+                              BILLNO: "$bILLNO",
+                              BILLDT: "$bGNDT",
+                              DocumentType: "",
+                              BILLSTATUS: "$bSTSNM",
+                              BillGenState: "$cUST.sT",
+                              BillBanch: "$bLOC",
+                              Generation_GSTNO: "$gEN.gSTIN",
+                              Party: "$Party",
+                              PartyType: {
+                                   D$cond: {
+                                        if: {
+                                             D$eq: ["$cUST.gSTIN", ""]
+                                        },
+                                        then: "UnRegistered",
+                                        else: "Registered"
+                                   }
+                              },
+                              BillToState: "$cUST.sT",
+                              PartyGSTN: "$cUST.gSTIN",
+                              BillSubAt: "$bLOC",
+                              BusinessType: "$bUSVRT",
+                              Total_Taxable_Value: "$dKTTOT",
+                              SAC: "",
+                              GSTRATE: {
+                                   D$cond: {
+                                        if: {
+                                             D$ne: ["$gST.rATE", null]
+                                        },
+                                        then: "$gST.rATE",
+                                        else: "0.00"
+                                   }
+                              },
+                              GSTTotal: {
+                                   D$cond: {
+                                        if: {
+                                             D$ne: ["$gST.aMT", null]
+                                        },
+                                        then: "$gST.aMT",
+                                        else: "0.00"
+                                   }
+                              },
+                              RCM: "",
+                              IGST: "$gST.iGST",
+                              CGST: "$gST.cGST",
+                              SGSTUGST: "$gST.sGST",
+                              CNAMT: "",
+                              Discount: "$dAMT",
+                              TotalInvoice_Value: {
+                                   D$cond: {
+                                        if: {
+                                             D$ne: ["$aMT", null]
+                                        },
+                                        then: "$aMT",
+                                        else: "0.00"
+                                   }
+                              },
+                              TDSRate: "",
+                              TDSAmount: "",
+                              TDSSec: "",
+                              ReasonForIssue: "",
+                              InvoiceNo: { D$arrayElemAt: ["$docketInvoices.iNVNO", 0] },
+                              Manualno: { D$arrayElemAt: ["$docketInvoices.iNVNO", 0] },
+                              Currency: "$CURR",
+                              ExchangeRate: "",
+                              CurrencyAmount: "",
+                              GstExempted: {
+                                   D$cond: {
+                                        if: {
+                                             D$eq: ["$eXMT", true]
+                                        },
+                                        then: "Yes",
+                                        else: "No"
+                                   }
+                              },
+                              PayBasis: "$pAYBAS",
+                              Narration: "",
+                              UserId: "$eNTBY",
+                              ExemptionCategory: "",
+                              IrnNo: "",
+                         }
+                    }
 
-          await Promise.all(res.data.map(async (element) => {
+               ]
+          };
 
-               const isGSTINPresent = element?.cUST.gSTIN;
+          try {
+               // Fetch data from MongoDB
+               const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
+
+               // Fetch pay basis details
                let paybasis = await PayBasisdetailFromApi(this.masterServices, 'PAYTYP');
-               paybasis = paybasis.find(x => x.value === element?.pAYBAS)
 
-               const custdetailDet = rescustdetail.data ? rescustdetail.data.find((entry) => entry.bILLNO === element?.bILLNO) : null;
-               const docketinvDet = resdocketinv.data ? resdocketinv.data.find((entry) => entry.dKTNO === custdetailDet?.dKTNO) : null;
+               // Process data using Promise.all and map
+               const modifiedData = await Promise.all(res.data.map(async (item) => {
+                    // Find the matching pay basis
+                    const payBasisMatch = paybasis.find(pb => pb.value === item?.PayBasis);
+                    const payBasisName = payBasisMatch?.name || '';
 
-               let invoiceNo = 0;
+                    // Return the modified item
+                    return {
+                         ...item,
+                         PayBasis: payBasisName,
+                         BILLDT: moment(item.BILLDT).format('YYYY-MM-DD'),
+                         ExchangeRate: "1",
+                         CurrencyAmount: "0",
+                         TDSRate: "0",
+                         TDSAmount: "0.00",
+                         CNAMT: "0",
+                         DocumentType: "General Bill", // Set a specific value for DocumentType
+                    };
+               }));
 
-               if (docketinvDet) {
-                    invoiceNo = docketinvDet.iNVNO;
-                    //invAmt = docketinvDet.iNVAMT
-               }
-               let custgstinvData = {
-                    "BILLNO": element?.bILLNO || '',
-                    "BILLDT": formatDocketDate(element?.bGNDT || ''),
-                    "DocumentType": 'General Bill',
-                    "BILLSTATUS": element?.bSTSNM || '',
-                    "BillGenState": element?.cUST.sT || '',
-                    "BillBanch": element?.bLOC || '',
-                    "Generation_GSTNO": element?.gEN.gSTIN || '',
-                    "Party": `${element?.cUST.cD || ''} : ${element?.cUST.nM || ''}`,
-                    "PartyType": isGSTINPresent ? 'Registered' : 'UnRegistered',
-                    "BillToState": element?.cUST.sT || '',
-                    "PartyGSTN": element?.cUST.gSTIN || '',
-                    "BillSubAt": element?.bLOC || '',
-                    "BusinessType": element?.bUSVRT || '',
-                    "Total_Taxable_Value": element?.dKTTOT || 0.00,
-                    "SAC": "",
-                    "GSTRATE": element?.gST.rATE || 0,
-                    "GSTTotal": element?.gST.aMT || 0.00,
-                    "RCM": "",
-                    "IGST": element?.gST.iGST || 0,
-                    "CGST": element?.gST.cGST || 0,
-                    "SGSTUGST": element?.gST.sGST || 0,
-                    "CNAMT": 0,
-                    "Discount": element?.dAMT || 0,
-                    "TotalInvoice_Value": element?.aMT || 0.00,
-                    "TDSRate": 0,
-                    "TDSAmount": 0.00,
-                    "TDSSec": "",
-                    "ReasonForIssue": "",
-                    "InvoiceNo": invoiceNo || '',
-                    "Manualno": invoiceNo || '',
-                    "Currency": element?.CURR || '',
-                    "ExchangeRate": 1,
-                    "CurrencyAmount": 0,
-                    "GstExempted": element.eXMT ? 'Yes' : 'No',
-                    "PayBasis": paybasis?.name || '',
-                    "Narration": "",
-                    "UserId": element?.eNTBY || '',
-                    "ExemptionCategory": "",
-                    "IrnNo": "",
-               }
-               custstinvList.push(custgstinvData)
-          }));
+               return modifiedData;
+          } catch (error) {
+               console.error("Error in processing data:", error);
+               // Handle or throw the error based on your use case
+          }
 
-          return custstinvList;
+
      }
 }
 
-export function convertToCSV(data: any[], headers: { [key: string]: string }): string {
-     const replaceCommaAndWhitespace = (value: any): string => {
-          // Check if value is null or undefined before calling toString
-          if (value == null) {
-               return '';
-          }
-          // Replace commas with another character or an empty string
-          return value.toString().replace(/,/g, '');
-     };
-
-     // Generate header row using custom headers
-     const header = '\uFEFF' + Object.keys(headers).map(key => replaceCommaAndWhitespace(headers[key])).join(',') + '\n';
-
-     // Generate data rows using custom headers
-     const rows = data.map(row =>
-          Object.keys(headers).map(key => replaceCommaAndWhitespace(row[key])).join(',') + '\n'
-     );
-
-     return header + rows.join('');
-}
-
 export function exportAsExcelFile(json: any[], excelFileName: string, customHeaders: Record<string, string>): void {
+     const cleanedjson = json.map(row => {
+          delete row._id;
+          return row;
+     })
      // Convert the JSON data to an Excel worksheet using XLSX.utils.json_to_sheet.
-     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(json);
+     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(cleanedjson);
      // Get the keys (headers) from the first row of the JSON data.
-     const headerKeys = Object.keys(json[0]);
+     const headerKeys = Object.keys(cleanedjson[0]);
      // Iterate through the header keys and replace the default headers with custom headers.
      for (let i = 0; i < headerKeys.length; i++) {
           const headerKey = headerKeys[i];

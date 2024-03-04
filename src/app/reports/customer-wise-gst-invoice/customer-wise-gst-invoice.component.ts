@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import moment from 'moment';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -93,12 +94,9 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const now = new Date();
-    const lastweek = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 10
-    );
+    const now = moment().endOf('day').toDate();
+    const lastweek = moment().add(-10, 'days').startOf('day').toDate()
+
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
     this.CustGSTInvTableForm.controls["start"].setValue(lastweek);
     this.CustGSTInvTableForm.controls["end"].setValue(now);
@@ -206,8 +204,14 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
   //#region to apply filters and based on that download excel file
   async save() {
     // Extracting values from the form controls
+
+
     const startValue = new Date(this.CustGSTInvTableForm.controls.start.value);
     const endValue = new Date(this.CustGSTInvTableForm.controls.end.value);
+
+    const startDate = moment(startValue).startOf('day').toDate();
+    const endDate = moment(endValue).endOf('day').toDate();
+  
     const docummentNo = this.CustGSTInvTableForm.value.docNo;
     const cancelBill = this.CustGSTInvTableForm.value.cannon;
 
@@ -221,37 +225,17 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
 
     // Extracting saccdHandler, gststateHandler values
     const sacData = Array.isArray(this.CustGSTInvTableForm.value.saccdHandler)
-      ? this.CustGSTInvTableForm.value.saccdHandler.map(x => x.name)
+      ? this.CustGSTInvTableForm.value.saccdHandler.map(x => x.value)
       : [];
+
     const stateData = Array.isArray(this.CustGSTInvTableForm.value.gststateHandler)
       ? this.CustGSTInvTableForm.value.gststateHandler.map(x => x.name)
       : [];
+    const requestbody = { startDate, endDate, docNoArray, stateData, customerName }
+   // console.log(requestbody);
 
     // Fetching data from the service based on provided parameters
-    let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail(startValue, endValue, docNoArray);
-
-    // Filter data based on state
-    data = data.filter(record => {
-      const sacDet = stateData.length === 0 || stateData.includes(record.BillGenState);
-      return sacDet;
-    });
-
-    // Filter data based on SAC (Service Accounting Code)
-    data = data.filter(record => {
-      const recordSacLowerCase = record.SAC.toLowerCase(); // Convert to lowercase for case-insensitive comparison
-      const isSacDataEmpty = sacData.length === 0;
-      const isSacIncluded = isSacDataEmpty || sacData.some(sac => recordSacLowerCase.includes(sac.toLowerCase()));
-      return isSacIncluded;
-    });
-
-    // Filter data based on customer names
-    data = data.filter(record => {
-      const partyName = record.Party.split(':')[1]?.trim().toLowerCase(); // Extract and convert to lowercase
-      const customerNameLowerCase = customerName.map(name => name.toLowerCase()); // Convert array elements to lowercase
-      const iscustomerNameEmpty = customerNameLowerCase.length === 0;
-      const isPartyIncluded = iscustomerNameEmpty || customerNameLowerCase.includes(partyName);
-      return isPartyIncluded;
-    });
+    let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail(requestbody);
 
     // Filtering data based on cancelled status
     const filteredRecord = cancelBill === 'Cancelled' ? data.find(record => record.BILLSTATUS === 'Cancelled') : data;

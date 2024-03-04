@@ -2,7 +2,7 @@ import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
 
-export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation) {
+export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -13,12 +13,12 @@ export async function showConfirmationDialogThc(data, tripId, operationService, 
     });
 
     if (confirmationResult.isConfirmed) {
-        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation);
+        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise);
         return res
     }
 
 }
-async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation) {
+async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise) {
     
     const updatePromises = podDetails.map(async (element) => {
         //Event = EVN0004: Delivered, EVN0005: Arrived
@@ -31,12 +31,19 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                     ? `Delivered at  ${localStorage.getItem('Branch') } on ${ moment().format('DD MMM YYYY @ HH:mm A')}`
                     : `Arrived at ${localStorage.getItem('Branch') } on ${ moment().format('DD MMM YYYY @ HH:mm A')}`;
 
+        let filter = {                
+            tHC: tripId,
+            dKTNO: element.docNo,
+            sFX: element.sFX || 0,
+        };
+        if (containerwise) {
+            filter["cNO"] = element.cNO;
+        }
+        
         const reqBody = {
             "companyCode": localStorage.getItem('companyCode'),
             "collectionName": "docket_ops_det",
-            "filter": {                
-                tHC: tripId
-            },
+            "filter": filter,
             "update": {
                 "sTS": sts,
                 "sTSNM": stsnm,

@@ -839,7 +839,7 @@ export class ThcGenerationComponent implements OnInit {
         "aRR": newARR,
       };
 
-      const res = await showConfirmationDialogThc(requestBody, this.thcTableForm.get("tripId").value, this.operationService, podDetails, this.thcTableForm.get("vehicle").value, this.currentLocation);
+      const res = await showConfirmationDialogThc(requestBody, this.thcTableForm.get("tripId").value, this.operationService, podDetails, this.thcTableForm.get("vehicle").value, this.currentLocation, this.DocketsContainersWise);
       if (res) {
         Swal.fire({
           icon: "success",
@@ -1162,6 +1162,7 @@ export class ThcGenerationComponent implements OnInit {
     }
     if (this.isView || this.isUpdate)
     {
+      this.thcTableForm.controls["containerwise"].disable();
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];

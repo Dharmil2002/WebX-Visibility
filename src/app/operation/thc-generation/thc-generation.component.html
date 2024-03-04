@@ -71,7 +71,8 @@
       [tableData]="tableData" [metaData]="metaData" [disbleCheckbox]="disbleCheckbox" [menuItems]="menuItems"
       [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
       [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
-      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles"  [EventButton]="EventButton"
+      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles"  
+      [EventButton]="isUpdate !== true ? EventButton : null"
       (functionCallEmitter)="functionCallHandler($event)"
       (callFunction)="functionCallHandler($event)"
       >

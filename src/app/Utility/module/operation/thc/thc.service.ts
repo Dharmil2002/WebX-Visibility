@@ -234,7 +234,7 @@ export class ThcService {
     }
     async newsthcGeneration(request) {
         // Perform an asynchronous operation to fetch data from the operation service
-        const result = await this.operationService.operationMongoPost(OperationActions.CreateThc, request).toPromise();
+        const result = await firstValueFrom(this.operationService.operationMongoPost(OperationActions.CreateThc, request));
         return result;
     }
     async getThcDetailsByNo(tripId) {

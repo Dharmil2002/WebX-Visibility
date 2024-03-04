@@ -892,6 +892,14 @@
       "router": "Reports/PRQ-Register-report"
     },
     {
+      "title": "Reports/Voucher-Register-report",
+      "tag": [
+        "Vouchreport",
+        "Vouchreport"
+      ],
+      "router": "Reports/Voucher-Register-report"
+    },
+    {
       "title": "AddContainerMaster",
       "tag": [
         "Add Container"

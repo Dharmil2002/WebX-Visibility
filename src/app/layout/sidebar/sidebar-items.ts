@@ -759,6 +759,15 @@ export const ROUTES: RouteInfo[] =
           "submenu": []
         },
         {
+          "path": "Reports/Voucher-Register-report",
+          "title": "Voucher Register Report",
+          "moduleName": "Voucher Register Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
           "path": "Reports/General-ledger-report",
           "title": "General Ledger Report",
           "moduleName": "General Ledger Report",

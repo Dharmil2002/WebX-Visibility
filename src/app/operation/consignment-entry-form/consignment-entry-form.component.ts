@@ -1262,7 +1262,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT: this.model.FreightTableForm.controls["gstChargedAmount"].value,
         cHG: "",
-        nFCHG: Object.entries(this.model.NonFreightTableForm.value).map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL })),
+        nFCHG: this.model.NonFreightTableForm?.value
+          ? Object.entries(this.model.NonFreightTableForm.value)
+            .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
+            .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
+          : [],
         tOTAMT: this.model.FreightTableForm.controls['totalAmount'].value,
         sTS: 0,
         sTSNM: "Booked",

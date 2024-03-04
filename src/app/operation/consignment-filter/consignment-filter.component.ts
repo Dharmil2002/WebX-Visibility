@@ -83,24 +83,27 @@ export class ConsignmentFilterComponent implements OnInit {
   }
 
   save() {
+    const DocketNumber = this.ConsignmentFilterForm.value.DocketNumber?this.ConsignmentFilterForm.value.DocketNumber:undefined
+    const start = this.ConsignmentFilterForm.value.start?new Date(this.ConsignmentFilterForm.value.start):undefined
+    const end = this.ConsignmentFilterForm.value.end?new Date(this.ConsignmentFilterForm.value.end):undefined
+    
     if (this.ConsignmentFilterForm.value.DocumentType.value == "1") {
       const sendData = {
-        DocNo: this.ConsignmentFilterForm.value.DocketNumber,
-        start: moment(this.ConsignmentFilterForm.value.start).format('DD-MM-YYYY HH:mm Z'),
-        end: moment(this.ConsignmentFilterForm.value.end).format('DD-MM-YYYY HH:mm Z'),
+        DocNo: DocketNumber,
+        start: start,
+        end: end,
       };
-      console.log('sendData' ,sendData)
       this.Route.navigate(["Operation/ConsignmentOperation"], { state: { data: sendData } });
     } else if (this.ConsignmentFilterForm.value.DocumentType.value == "2") {
       const sendData = {
-        DocNo: this.ConsignmentFilterForm.value.DocketNumber,
+        DocNo: DocketNumber,
       };
       this.Route.navigate(["Operation/ConsignmentSummary"], { state: { data: sendData } });
     } else if (this.ConsignmentFilterForm.value.DocumentType.value == "3") {
       const sendData = {
-        DocNo: this.ConsignmentFilterForm.value.DocketNumber,
-        start: moment(this.ConsignmentFilterForm.value.start).format('DD-MM-YYYY HH:mm Z'),
-        end: moment(this.ConsignmentFilterForm.value.end).format('DD-MM-YYYY HH:mm Z'),
+        DocNo: DocketNumber,
+        start: start,
+        end: end,
       };
       this.Route.navigate(["Operation/ConsignmentPOD"], { state: { data: sendData } });
     } 

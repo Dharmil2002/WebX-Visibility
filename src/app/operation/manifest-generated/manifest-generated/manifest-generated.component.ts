@@ -19,13 +19,16 @@ export class ManifestGeneratedComponent implements OnInit {
   manifestControlArray: any;
   orgBranch: string = localStorage.getItem("Branch");
   columnHeader = {
-    "MFNumber": "MF Number",
+    "hyperlink": "MF Number",
     "Leg": "Leg",
     "ShipmentsLoadedBooked": "Shipments- Loaded/Booked",
     "PackagesLoadedBooked": "Packages Loaded/Booked",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
-    "Action": "Print"
+  }
+  hyperlinkControls = {
+    value: "MFNumber",
+    functionName: "viewMFview"
   }
   centerAlignedData = ['PackagesLoadedBooked', 'WeightKg', 'VolumeCFT'];
 
@@ -138,6 +141,15 @@ export class ManifestGeneratedComponent implements OnInit {
   }
   Close(): void {
     this.dialogRef.close(this.csv)
+  }
+
+  viewMFview(event){
+      const req = {
+        templateName: "Manifest View-Print",
+        DocNo: event.data?.MFNumber,
+      };
+      const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+      window.open(url, '', 'width=1000,height=800');
   }
 
 }

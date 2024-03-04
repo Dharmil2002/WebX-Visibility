@@ -68,22 +68,32 @@ export class ConsignmentOperationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getTableData();
+    if (this.DocData.DocNo) {
+      this.getTableData({ dKTNO: this.DocData.DocNo });
+    } else if (this.DocData.start && this.DocData.end) {
+      this.getTableData({
+        eVNDT: {
+          D$gte: this.DocData.start,
+          D$lt: this.DocData.end,
+        },
+      });
+    }else {
+      this.Route.navigate(["Operation/ConsignmentFilter"])
+    }
   }
 
-  async getTableData() {
-    // console.log("this.DocData", this.DocData);
+  async getTableData(filter) {
     const Mode = localStorage.getItem("Mode");
     const req = {
       companyCode: this.CompanyCode,
       collectionName: Mode == "FTL" ? "docket_events" : "docket_events_ltl",
-      filter: { dKTNO: this.DocData.DocNo },
+      filter,
     };
 
     const res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-      console.log('res' , res)
+    console.log("res", res);
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x) => {
         return {

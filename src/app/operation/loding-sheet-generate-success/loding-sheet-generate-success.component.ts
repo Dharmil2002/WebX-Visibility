@@ -35,7 +35,6 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     ]
   columnHeader = {
     "hyperlink": "Loading Sheet",
-    // hyperlink: "Manifest"
     "leg": "Leg",
     "count": "Shipments",
     "packages": "Packages",
@@ -76,8 +75,8 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     noColumnSort: ['checkBoxRequired']
   }
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,private CnoteService: CnoteService,public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,public Route:Router) {
-
-
+  
+    console.log('this.data',this.data)
     this.csv=this.data;
     Swal.fire({
       icon: "success",
@@ -92,13 +91,21 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   close(){
     this.dialogRef.close(this.csv);
   }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    console.log('functionName' ,functionName)
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
   viewLoadingSheet(event){
-      console.log('viewMenifest', event)
-      // const req = {
-      //   templateName: "Manifest View-Print",
-      //   DocNo: event.data?.manifest,
-      // };
-      // const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
-      // window.open(url, '', 'width=1000,height=800');
+      const req = {
+        templateName: "LoadingSheet View-Print",
+        DocNo: event.data?.LoadingSheet,
+      };
+      const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+      window.open(url, '', 'width=1000,height=800');
   }
 }

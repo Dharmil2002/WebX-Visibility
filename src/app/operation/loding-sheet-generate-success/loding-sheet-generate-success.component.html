@@ -1,8 +1,8 @@
 Loading Sheet Generation
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
-    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-    [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+    [csvFileName]="csvFileName" [hyperlinkControls]="hyperlinkControls" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+    [toggleArray]="toggleArray" [menuItems]="menuItems" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)"
     [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"  [centerAligned]="centerAlignedData">
 </generic-table-webxpress>
 <mat-dialog-actions>

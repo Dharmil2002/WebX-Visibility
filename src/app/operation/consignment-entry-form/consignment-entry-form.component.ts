@@ -1320,7 +1320,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
             .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
           : [],
-
         tOTAMT: this.model.FreightTableForm.controls['totalAmount'].value,
         sTS: 0,
         sTSNM: "Booked",

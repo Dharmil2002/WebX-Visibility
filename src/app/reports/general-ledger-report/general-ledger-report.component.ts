@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
@@ -75,12 +76,10 @@ export class GeneralLedgerReportComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFormControl()
-    const now = new Date();
-    const lastweek = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 10
-    );
+
+    const now = moment().endOf('day').toDate();
+    const lastweek = moment().add(-10, 'days').startOf('day').toDate()
+
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
     this.generalLedgerForm.controls["start"].setValue(lastweek);
     this.generalLedgerForm.controls["end"].setValue(now);
@@ -188,8 +187,12 @@ export class GeneralLedgerReportComponent implements OnInit {
           this.ReportingBranches.push(this.generalLedgerForm.value.branch.name);
         }
 
-        const startValue = new Date(this.generalLedgerForm.controls.start.value);
-        const endValue = new Date(this.generalLedgerForm.controls.end.value);
+        const startDate = new Date(this.generalLedgerForm.controls.start.value);
+        const endDate = new Date(this.generalLedgerForm.controls.end.value);
+
+        const startValue = moment(startDate).startOf('day').toDate();
+        const endValue = moment(endDate).endOf('day').toDate();
+
         const reportTyp = this.generalLedgerForm.value.reportTyp;
         const state = Array.isArray(this.generalLedgerForm.value.stateHandler)
           ? this.generalLedgerForm.value.stateHandler.map(x => x.name)

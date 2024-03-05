@@ -22,6 +22,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear} from "src/app/Utility/date/date-utils";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { MatStepper } from "@angular/material/stepper";
+import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
 @Component({
   selector: "app-eway-example",
   templateUrl: "./eway-bill-docket-booking-v2.html",
@@ -216,7 +217,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private docketService:DocketService,
     private _NavigationService: NavigationService,
     private customerService:CustomerService,
-    private storage:StorageService
+    private storage:StorageService,
+    private addressService:AddressService
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
@@ -453,7 +455,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     };
     this.tableData.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
   }
-
   // Display appointment
   displayAppointment($event) {
     const generateControl = $event.eventArgs.value === "Y"; // Check if value is "Y" to generate control
@@ -463,9 +464,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       }
     });
   }
-
   // Common drop-down mapping
-
   commonDropDownMapping() {
     const mapControlArray = (controlArray, mappings) => {
       controlArray.forEach((data) => {
@@ -752,5 +751,53 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       }
     }
     }
+  }
+  async getConsignorDetail(){
+    const consignor=this.tabForm.controls["consignorName"]?.value.value||"";
+    const fromCity=this.tabForm.controls["consignorCity"]?.value.value||"";
+    const filter=[
+      {
+        D$match: {
+          cityName: fromCity,
+          customer: {
+            D$elemMatch: {
+              code:consignor,
+            },
+          },
+        },
+      },
+    ]
+    const res= await this.addressService.getAddress(filter);
+    this.filter.Filter(
+      this.consignorControlArray,
+      this.tabForm,
+      res,
+     "consignorAddress",
+     false
+    );
+  }
+  async getConsigneeDetail(){
+    const consignee=this.tabForm.controls["consigneeName"]?.value.value||"";
+    const toCity=this.tabForm.controls["consigneeCity"]?.value.value||"";
+    const filter=[
+      {
+        D$match: {
+          cityName:toCity,
+          customer: {
+            D$elemMatch: {
+              code:consignee,
+            },
+          },
+        },
+      },
+    ]
+    const res= await this.addressService.getAddress(filter);
+    this.filter.Filter(
+      this.consigneeControlArray,
+      this.tabForm,
+      res,
+     "consigneeAddress",
+     false
+    );
   }
 }

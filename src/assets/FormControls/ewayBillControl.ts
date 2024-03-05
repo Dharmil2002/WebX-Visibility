@@ -151,6 +151,7 @@ export class EwayBillControls {
         ],
         functions: {
           onModel: "getCustomer",
+          onOptionSelect:"getConsignorDetail"
         },
         additionalData: {
           showNameAndValue: true,
@@ -189,6 +190,7 @@ export class EwayBillControls {
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
         functions:{
+          onOptionSelect:"getConsignorDetail",
           onModel:"getCityDetail"
         },
         additionalData: {
@@ -261,7 +263,7 @@ export class EwayBillControls {
         name: "consignorAddress",
         label: "Consignor Address",
         placeholder: "Consignor Address",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -274,6 +276,9 @@ export class EwayBillControls {
             message: "Consignor Address is required",
           },
         ],
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
     ];
     this.consigneeFields = [
@@ -298,6 +303,7 @@ export class EwayBillControls {
         ],
         functions: {
           onModel: "getCustomer",
+          onOptionSelect:"getConsigneeDetail"
         },
         additionalData: {
           showNameAndValue: true,
@@ -337,7 +343,8 @@ export class EwayBillControls {
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
         functions:{
-          onModel:"getCityDetail"
+          onModel:"getCityDetail",
+          onOptionSelect:"getConsigneeDetail"
         },
         additionalData: {
           showNameAndValue: false,
@@ -409,7 +416,7 @@ export class EwayBillControls {
         name: "consigneeAddress",
         label: "Consignee Address",
         placeholder: "Consignee Address",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -422,6 +429,9 @@ export class EwayBillControls {
             message: "Consignee Address is required",
           },
         ],
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
     ];
     this.appointmentControlArray = [
@@ -1120,9 +1130,13 @@ export class EwayBillControls {
         Validations: [
           {
             name: "pattern",
+
             message: "Please Enter only numeric Max length 12.",
+
             pattern: "^[0-9]{1,12}$",
+
           }
+
         ],
       },
       {

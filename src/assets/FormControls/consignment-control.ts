@@ -309,14 +309,14 @@ export class ConsignmentControl {
         }
       },
       {
-        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
+        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'dropdown',
         value: docketDetail.pAddress, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
         },
       },
       {
-        name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'text',
+        name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'dropdown',
         value: docketDetail.deliveryAddress, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic"

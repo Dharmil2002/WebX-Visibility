@@ -270,11 +270,13 @@ export class DocketService {
             "consignorCode": data.cSGNCD,
             "consignorName": data.cSGNNM,
             "pAddress": data.pADD,
+            "pAddressCode": data.pADDCD,
             "ccontactNumber": data.cSGEPH,
             "calternateContactNo": data.cSGEPH2,
             "consigneeCode": data.cSGECD,
             "consigneeName": data.cSGENM,
             "deliveryAddress": data.dADD,
+            "deliveryAddressCode": data.dADDCD,
             "cncontactNumber": data.cSGNPH,
             "cnalternateContactNo": data.cSGNPH2,
             "companyCode": data.cID,
@@ -314,7 +316,6 @@ export class DocketService {
         };
         return docket
     }
-
     async reverseDocketObjectMapping(docket, jsonControl) {
 
         const pAYTYP = getValueFromJsonControl(jsonControl, "payType", docket.payType);
@@ -353,12 +354,14 @@ export class DocketService {
             iSCEBP: docket["cnebp"],
             cSGNCD: docket["consignorName"].value,
             cSGNNM: docket["consignorName"].name,
-            pADD: docket["pAddress"],
+            pADDCD: docket["pAddress"]?.value||"A8888",
+            pADD: docket["pAddress"]?.name||docket["pAddress"],
             cSGEPH: docket["ccontactNumber"],
             cSGEPH2: docket["calternateContactNo"],
             cSGECD: docket["consigneeName"].value,
             cSGENM: docket["consigneeName"].name,
-            dADD: docket["deliveryAddress"],
+            dADDCD: docket["deliveryAddress"]?.value||"A8888",
+            dADD: docket["deliveryAddress"]?.name||docket["deliveryAddress"],
             cSGNPH: docket["cncontactNumber"],
             cSGNPH2: docket["cnalternateContactNo"],
             cID: docket["companyCode"],
@@ -764,7 +767,8 @@ export class DocketService {
               "nM":data?.consignorName?.name||"",
               "cT":data?.consignorCity?.value||"",
               "pIN":data?.consignorPinCode?.value||"",
-              "aDD":data?.consignorAddress||"",
+              "aDD":data.consignorAddress?.name||data.consignorAddress,
+              "aDDCD":data.consignorAddress?.value||"A8888",
               "gST":data?.consignorGSTINNO||"",
               "mOB":data?.consignorMobileNo||"",
               "tEL":data?.consignorTelephoneNo||"", 
@@ -774,7 +778,8 @@ export class DocketService {
             "nM":data?.consigneeName?.name||"",
             "cT":data?.consigneeCity?.value||"",
             "pIN":data?.consigneePinCode?.value||"",
-            "aDD":data?.consigneeAddress||"",
+            "aDD":data?.consigneeAddress?.name||data.consigneeAddress,
+            "aDDCD":data.consigneeAddress?.value||"A8888",
             "gST":data?.consigneeGSTINNO||"",
             "mOB":data?.consigneeMobNo||"",
             "tEL":data?.consigneeTelNo||"", 

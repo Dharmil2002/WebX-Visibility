@@ -35,7 +35,7 @@ import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
-
+import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -112,7 +112,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private storage: StorageService,
     private docketService: DocketService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private voucherServicesService: VoucherServicesService,
+    private addressService:AddressService
   ) {
     super();
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -294,10 +294,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.model.consignmentTableForm, "billingParty", billingParty);
     this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payTypeCode);
     this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pickupDate);
-    this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pAddress);
+    this.setFormValue(this.model.consignmentTableForm, "pAddress",{name:this.model.prqData?.pAddressName,value:this.model.prqData?.pAddress||"A8888"});
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);
-
     this.setFormValue(this.model.consignmentTableForm, "vendorType", vehType.value, false, "", "");
 
     // Done By Harikesh 
@@ -409,7 +408,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async getPrqDetails() {
-
     const prqNo = await this.prqService.getPrqForBooking(
       this.storage.branch,
       this.model.consignmentTableForm.value.billingParty.value,
@@ -423,6 +421,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }));
 
     this.filter.Filter(this.jsonControlArrayBasic, this.model.consignmentTableForm, prqDetail, this.model.prqNo, this.model.prqNoStatus);
+    this.AddressDetails();
   }
 
   /* below function was the call when */
@@ -432,6 +431,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       locCity: this.model.consignmentTableForm.get("toCity")?.value?.value.toUpperCase(),
     });
     this.filter.Filter(this.model.allformControl, this.model.consignmentTableForm, destinationMapping, this.model.destination, this.model.destinationStatus);
+    this.AddressDetails();
   }
   cancel() {
     this.navService.navigateTotab("docket", "dashboard/Index");
@@ -904,10 +904,58 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     // Set Freight Table Form details.
     this.model.FreightTableForm.controls["freightRatetype"].setValue(docketDetails.freightRatetype);
-
+    this.model.consignmentTableForm.controls["pAddress"].setValue({name:docketDetails.pAddress,value:docketDetails.pAddressCode||"A8888"});
+    this.model.consignmentTableForm.controls["deliveryAddress"].setValue({name:docketDetails.deliveryAddress,value:docketDetails.deliveryAddressCode||"A8888"});
     // Bind table data after form update.
     this.bindTableData();
   }
+  async AddressDetails(){
+    const billingParty=this.model.consignmentTableForm.controls["billingParty"]?.value.value||"";
+    const fromCity=this.model.consignmentTableForm.controls["fromCity"]?.value.value||"";
+    const toCity=this.model.consignmentTableForm.controls["toCity"]?.value.value||"";
+    const filter=[
+      {
+        D$match: {
+          cityName: fromCity,
+          activeFlag:true,
+          customer: {
+            D$elemMatch: {
+              code:billingParty,
+            },
+          },
+        },
+      },
+    ]
+    const picUpres= await this.addressService.getAddress(filter);
+    const filterAddress=[
+      {
+        D$match: {
+          cityName: toCity,
+          activeFlag:true,
+          customer: {
+            D$elemMatch: {
+              code:billingParty,
+            },
+          },
+        },
+      },
+    ]
+    const address= await this.addressService.getAddress(filterAddress);
+    this.filter.Filter(
+      this.model.allformControl,
+      this.model.consignmentTableForm,
+      picUpres,
+     "pAddress",
+     false
+    );
+    this.filter.Filter(
+      this.model.allformControl,
+      this.model.consignmentTableForm,
+      address,
+     "deliveryAddress",
+     false
+    );
+ }
   bindTableData() {
 
     if (this.model.docketDetail.invoiceDetails.length > 0) {
@@ -1126,6 +1174,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const bParty = this.model.consignmentTableForm.value.billingParty;
       const cSGE = this.model.consignmentTableForm.value.consigneeName;
       const cSGN = this.model.consignmentTableForm.value.consignorName;
+      docketDetails["deliveryAddress"] =  this.model.consignmentTableForm.controls['deliveryAddress']?.value.name||this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["deliveryAddressCode"] =  this.model.consignmentTableForm.controls['deliveryAddress']?.value.value||"A8888";
+      docketDetails["pAddress"] =  this.model.consignmentTableForm.controls['pAddress']?.value.name||this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["pAddressCode"] =  this.model.consignmentTableForm.controls['pAddress']?.value.value||"A8888";
       docketDetails["billingParty"] = bParty?.value;
       docketDetails["billingPartyName"] = bParty?.name;
       docketDetails["consignorCode"] = cSGN?.value;

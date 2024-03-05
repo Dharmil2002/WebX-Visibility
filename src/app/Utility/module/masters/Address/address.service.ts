@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -8,7 +9,10 @@ import Swal from 'sweetalert2';
 })
 export class AddressService {
 
-  constructor(private masterService: MasterService) { }
+  constructor(
+    private masterService: MasterService,
+    private storage:StorageService
+    ) { }
   //#region to get address list
   async getAddressDetail(filter = {}) {
     try {
@@ -34,4 +38,28 @@ export class AddressService {
     }
   }
   //#endregion
+  async getAddress(filter) {
+    const addressRequest = {
+      companyCode: this.storage.companyCode,
+      collectionName: "address_detail",
+      filters:filter
+    };
+    const address = await firstValueFrom(
+      this.masterService.masterPost("generic/query", addressRequest)
+    );
+    const addressList = address.data.map((item) => {
+      return {
+        name: item.address,
+        value: item.addressCode,
+      };
+    });
+    return addressList
+    // this.filter.Filter(
+    //   this.jsonControlPrqArray,
+    //   this.prqEntryTableForm,
+    //   addressList,
+    //   this.Address,
+    //   this.AddressStatus
+    // );
+  }
 }

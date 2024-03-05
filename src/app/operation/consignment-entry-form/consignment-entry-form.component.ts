@@ -36,6 +36,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
+import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -1235,8 +1236,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       docketDetails["pKGS"] = Pkg;
       const WtKg = Wt * 1000; // Convert Wt to kg (tons to kg)
       const CWtKg = CWt * 1000; // Convert CWt to kg (tons to kg)
-      docketDetails["aCTWT"] = WtKg;
-      docketDetails["cHRWT"] = CWtKg;
+      docketDetails["aCTWT"] = ConvertToNumber(WtKg || 0, 2);
+      docketDetails["cHRWT"] = ConvertToNumber(CWtKg || 0, 2);
       docketDetails["cFTWT"] = 0;
       docketDetails["vOL"] = 0;
       docketDetails["volume_in"] = 'FT';
@@ -1265,9 +1266,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           eXPDT: i.expiryDateO,
           pKGS: (parseInt(i.noofPkts) || 0),
           mTNM: i.materialName,
-          aCTWT: actualWeight,
+          aCTWT: ConvertToNumber(actualWeight || 0, 2),
           cFTWT: 0,
-          cHRWT: chargedWeight,
+          cHRWT:ConvertToNumber(chargedWeight || 0, 2),
           vOL: {
             uNIT: "FT",
             l: 0.000,
@@ -1413,9 +1414,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           eXPDT: i.expiryDateO,
           pKGS: (parseInt(i.noofPkts) || 0),
           mTNM: i.materialName,
-          aCTWT: (parseFloat(i.actualWeight) || 0),
+          aCTWT:ConvertToNumber(i.actualWeight || 0, 2),
           cFTWT: 0,
-          cHRWT: (parseFloat(i.chargedWeight) || 0),
+          cHRWT: ConvertToNumber(i.chargedWeight || 0, 2),
           vOL: {
             uNIT: "FT",
             l: 0.000,
@@ -1595,21 +1596,21 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }
     let TotalNonFreight = 0;
     if (this.model.NonFreightTableForm) {
-      TotalNonFreight = Object.keys(this.model.NonFreightTableForm.controls)
-        .reduce((total, key) => total + this.model.NonFreightTableForm.get(key).value, 0);
+      TotalNonFreight = ConvertToNumber(Object.keys(this.model.NonFreightTableForm.controls)
+        .reduce((total, key) => total + this.model.NonFreightTableForm.get(key).value, 0), 2) || 0;
     }
 
     const mfactor = rateTypeMap[freightRateType] || 1;
     let total = parseFloat(freightRate) * parseFloat(mfactor);
-    this.model.FreightTableForm.controls["freight_amount"]?.setValue(total);
-    this.model.FreightTableForm.get("grossAmount")?.setValue(
+    this.model.FreightTableForm.controls["freight_amount"]?.setValue(ConvertToNumber(total,2));
+    this.model.FreightTableForm.get("grossAmount")?.setValue(ConvertToNumber(
       (parseFloat(this.model.FreightTableForm.get("freight_amount")?.value) || 0) +
       (parseFloat(this.model.FreightTableForm.get("otherAmount")?.value) || 0) +
-      TotalNonFreight
+      TotalNonFreight,2)
     );
-    this.model.FreightTableForm.get("totalAmount")?.setValue(
+    this.model.FreightTableForm.get("totalAmount")?.setValue(ConvertToNumber(
       (parseFloat(this.model.FreightTableForm.get("grossAmount")?.value) || 0) +
-      (parseFloat(this.model.FreightTableForm.get("gstChargedAmount")?.value) || 0)
+      (parseFloat(this.model.FreightTableForm.get("gstChargedAmount")?.value) || 0))
     );
   }
 

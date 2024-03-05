@@ -143,7 +143,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
 
         const opsDetails: any = await firstValueFrom(operationService.operationMongoPost("generic/query", FilterRequest));
-        if (opsDetails && opsDetails?.data) {
+        if (opsDetails && opsDetails?.data && sts == 3) {
             if (opsDetails.data[0].TotalCount == opsDetails.data[0].Delivered) {
                 const reqBody = {
                     "companyCode": localStorage.getItem('companyCode'),
@@ -156,8 +156,38 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                         "oSTSN": "Delivered"
                     }
                 };
+
                 await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
+            } else {
+                const reqBody = {
+                    "companyCode": localStorage.getItem('companyCode'),
+                    "collectionName": "dockets",
+                    "filter": {
+                        "dKTNO": element.docNo
+                    },
+                    "update": {
+                        "oSTS": 5,
+                        "oSTSN": "Partially Delivered"
+                    }
+                };
+
+                await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
+
             }
+        }
+        if (sts == 4) {
+            const reqBody = {
+                "companyCode": localStorage.getItem('companyCode'),
+                "collectionName": "dockets",
+                "filter": {
+                    "dKTNO": element.docNo
+                },
+                "update": {
+                    "oSTS": sts,
+                    "oSTSN": stsnm
+                }
+            };
+            await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
         }
         return opsDetails;
     });

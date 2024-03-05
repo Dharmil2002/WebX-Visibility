@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import moment from 'moment';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { CustOutstandingService, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-outstanding-service';
+import { CustOutstandingService } from 'src/app/Utility/module/reports/customer-outstanding-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { custOutControl } from 'src/assets/FormControls/Reports/Customer-Outstanding-report/customer-outstanding-report';
@@ -61,12 +63,9 @@ export class CustomerOutstandingReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const now = new Date();
-    const lastweek = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 10
-    );
+    const now = moment().endOf('day').toDate();
+    const lastweek = moment().add(-10, 'days').startOf('day').toDate()
+
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
     this.CustOutTableForm.controls["start"].setValue(lastweek);
     this.CustOutTableForm.controls["end"].setValue(now);
@@ -272,6 +271,11 @@ export class CustomerOutstandingReportComponent implements OnInit {
         const startValue = new Date(this.CustOutTableForm.controls.start.value);
         const ASonDateValue = new Date(this.CustOutTableForm.controls?.asondate.value);
         const endValue = new Date(this.CustOutTableForm.controls.end.value);
+
+        const startDate = moment(startValue).startOf('day').toDate();
+        const endDate = moment(endValue).endOf('day').toDate();
+        const asonDate = moment(ASonDateValue).endOf('day').toDate();
+
         const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
           ? this.CustOutTableForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
           : [];
@@ -284,7 +288,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
         const custGrp = Array.isArray(this.CustOutTableForm.value.custgroupHandler)
           ? this.CustOutTableForm.value.custgroupHandler.map(x => { return { cgpCD: x.value, cgpNm: x.name }; })
           : [];
-        let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(ASonDateValue, startValue, endValue, loct, cust, gstST, reportbasis, custGrp);
+        let data = await this.custOutstandingService.getcustomerOutstandingReportDetail(asonDate, startDate, endDate, loct, cust, gstST, reportbasis, custGrp);
         if (data.length === 0) {
           if (data) {
             Swal.fire({
@@ -300,7 +304,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
-        exportAsExcelFile(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
+       exportAsExcelFile(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

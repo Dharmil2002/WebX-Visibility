@@ -160,17 +160,6 @@ export class AddressControl {
         disable: false,
       },
       {
-        name: "isActive",
-        label: "Active",
-        placeholder: "",
-        type: "toggle",
-        value: isUpdate? addressGroupTable.isActive:false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        functions: {},
-      },
-      {
         name: "customerNameDropdown",
         label: "Customer Name",
         placeholder: "Customer Name",

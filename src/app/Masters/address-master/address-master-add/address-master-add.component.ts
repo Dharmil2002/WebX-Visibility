@@ -124,48 +124,108 @@ export class AddressMasterAddComponent implements OnInit {
     this.Route.navigateByUrl("/Masters/AddressMaster/AddressMasterList");
   }
   //#region Pincode Dropdown
+  // async getPincodeData() {
+  //   // Check if data has already been fetched
+  //   if (this.isUpdate && this.pincodeDataFetched) {
+  //     return;
+  //   }
+  //   const pincodeReq = {
+  //     companyCode: this.companyCode,
+  //     collectionName: "pincode_master",
+  //     filter: {},
+  //   };
+
+  //   try {
+  //     // Fetch pincode data
+  //     const pincodeRes = await this.masterService
+  //       .masterPost("generic/get", pincodeReq)
+  //       .toPromise();
+  //     this.pincodeDet = pincodeRes?.data || [];
+
+  //     const pincodeList = this.pincodeDet.map((x) => ({
+  //       name: x.PIN.toString(),
+  //       value: x.PIN.toString(),
+  //     }));
+
+  //     // Update the form control if it's an update operation
+  //     if (this.isUpdate) {
+  //       const updatePin = pincodeList.find((x) => x.value == this.data.pincode);
+  //       this.addressTableForm.controls["pincode"].setValue(updatePin);
+  //     }
+
+  //     const pincodeValue = this.addressTableForm.controls["pincode"].value;
+
+  //     // Check if pincodeValue is a valid number
+  //     if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
+  //       const exactPincodeMatch = pincodeList.find(
+  //         (element) => element.name === pincodeValue
+  //       );
+
+  //       if (!exactPincodeMatch) {
+  //         const filteredPincodeDet = pincodeList.filter((element) =>
+  //           element.name.includes(pincodeValue.toString())
+  //         );
+
+  //         if (filteredPincodeDet.length === 0) {
+  //           // Show a popup indicating no data found for the given pincode
+  //           Swal.fire({
+  //             icon: "info",
+  //             title: "No Data Found",
+  //             text: `No data found for pincode ${pincodeValue}`,
+  //             showConfirmButton: true,
+  //           });
+  //         } else {
+  //           this.filter.Filter(
+  //             this.jsonControlGroupArray,
+  //             this.addressTableForm,
+  //             filteredPincodeDet,
+  //             this.pincodeList,
+  //             this.pincodeStatus
+  //           );
+  //         }
+  //       }
+  //     }
+  //     this.pincodeDataFetched = true;
+  //   } catch (error) {
+  //     console.error("Error fetching pincode data:", error);
+  //   }
+  // }
   async getPincodeData() {
-    // Check if data has already been fetched
-    if (this.isUpdate && this.pincodeDataFetched) {
-      return;
+    if (!this.isUpdate || !this.pincodeDataFetched) {
+      await this.fetchPincodeData();
     }
+
+    if (this.isUpdate) {
+      await this.fetchPincodeData();
+    }
+  }
+
+  async fetchPincodeData() {
     const pincodeReq = {
-      companyCode: this.companyCode,
-      collectionName: "pincode_master",
-      filter: {},
+      "companyCode": this.companyCode,
+      "collectionName": "pincode_master",
+      "filter": {}
     };
 
     try {
-      // Fetch pincode data
-      const pincodeRes = await this.masterService
-        .masterPost("generic/get", pincodeReq)
-        .toPromise();
+      const pincodeRes = await this.masterService.masterPost('generic/get', pincodeReq).toPromise();
       this.pincodeDet = pincodeRes?.data || [];
-
       const pincodeList = this.pincodeDet.map((x) => ({
         name: x.PIN.toString(),
         value: x.PIN.toString(),
       }));
 
-      // Update the form control if it's an update operation
-      if (this.isUpdate) {
+      const pincodeValue = this.addressTableForm.controls['pincode'].value;
+
+      if (this.isUpdate && !this.pincodeDataFetched) {
         const updatePin = pincodeList.find((x) => x.value == this.data.pincode);
-        this.addressTableForm.controls["pincode"].setValue(updatePin);
+        this.addressTableForm.controls['pincode'].setValue(updatePin);
       }
-
-      const pincodeValue = this.addressTableForm.controls["pincode"].value;
-
       // Check if pincodeValue is a valid number
       if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
-        const exactPincodeMatch = pincodeList.find(
-          (element) => element.name === pincodeValue
-        );
-
+        const exactPincodeMatch = pincodeList.find((element) => element.name === pincodeValue);
         if (!exactPincodeMatch) {
-          const filteredPincodeDet = pincodeList.filter((element) =>
-            element.name.includes(pincodeValue.toString())
-          );
-
+          const filteredPincodeDet = pincodeList.filter((element) => element.name.includes(pincodeValue.toString()));
           if (filteredPincodeDet.length === 0) {
             // Show a popup indicating no data found for the given pincode
             Swal.fire({
@@ -187,7 +247,7 @@ export class AddressMasterAddComponent implements OnInit {
       }
       this.pincodeDataFetched = true;
     } catch (error) {
-      console.error("Error fetching pincode data:", error);
+      console.error('Error fetching pincode data:', error);
     }
   }
   //#endregion

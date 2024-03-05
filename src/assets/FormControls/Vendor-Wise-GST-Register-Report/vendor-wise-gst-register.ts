@@ -182,7 +182,7 @@ export class vendorWiseGSTControl {
                },
                {
                     name: 'docNo',
-                    label: "Document Number",
+                    label: "",
                     placeholder: "",
                     type: 'OR',
                     value: '',
@@ -192,7 +192,7 @@ export class vendorWiseGSTControl {
                },
                {
                     name: 'docNo',
-                    label: "Document Number",
+                    label: "",
                     placeholder: "",
                     type: '',
                     value: '',

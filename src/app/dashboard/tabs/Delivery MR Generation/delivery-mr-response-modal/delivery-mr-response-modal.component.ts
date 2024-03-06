@@ -93,8 +93,23 @@ export class DeliveryMrResponseModalComponent implements OnInit {
     }));
     this.tableload = false;
   }
-  generateDelivery(): void {
-    // Use Router to navigate to the generated URL
-    this.router.navigate(["/dashboard/Index"])
+
+  //#region Navigation to Delivery tab
+
+  /**
+   * Navigates to the "Delivery" tab using the Router.
+   */
+  navigateToDeliveryTab(): void {
+    this.navigateWithTabIndex('Delivery');
   }
+
+  /**
+   * Navigates back to the specified tab index using the Router.
+   * @param tabIndex The index of the tab to navigate back to.
+   */
+  navigateWithTabIndex(tabIndex: string): void {
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
+  }
+
+  //#endregion
 }

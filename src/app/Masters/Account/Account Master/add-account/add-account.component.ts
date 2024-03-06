@@ -132,6 +132,15 @@ export class AddAccountComponent implements OnInit {
         this.UpdateData.iSTRUEPST
       );
     }
+
+    const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
+    this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+      (x) => !tdfield.includes(x.name)
+    );
+    this.AccountForm.get("TDSsection").clearValidators();
+    this.AccountForm.get("TDSsection").updateValueAndValidity();
+    this.AccountForm.get("bank").clearValidators();
+    this.AccountForm.get("bank").updateValueAndValidity();
   }
 
   bindDropdown() {
@@ -184,7 +193,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const element = AccountCategoryData.find(
-          (x) => x.name == this.UpdateData.cATNM
+          (x) => x.value == this.UpdateData.cATCD
         );
         this.AccountForm.controls["AccountCategory"].setValue(element);
       }

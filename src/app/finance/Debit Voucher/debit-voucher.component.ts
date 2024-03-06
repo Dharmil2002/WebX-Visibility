@@ -930,7 +930,7 @@ export class DebitVoucherComponent implements OnInit {
           .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
           .subscribe({
             next: (res: any) => {
-              var CreditData = FinalListOfDebitVoucher.filter(item => item.Dr == "").map(function (item) {
+              var CreditData = FinalListOfDebitVoucher.filter(item => item.Dr == "" && item.Cr != "0.00").map(function (item) {
                 return {
                   "accCode": `${item.Ledgercode}`,
                   "accName": item.Ledgername,
@@ -939,7 +939,7 @@ export class DebitVoucherComponent implements OnInit {
                   "narration": item.Narration ? item.Narration : item.Ledgername,
                 };
               })
-              var DebitData = FinalListOfDebitVoucher.filter(item => item.Cr == "").map(function (item) {
+              var DebitData = FinalListOfDebitVoucher.filter(item => item.Cr == "" && item.Dr != "0.00").map(function (item) {
                 return {
                   "accCode": `${item.Ledgercode}`,
                   "accName": item.Ledgername,

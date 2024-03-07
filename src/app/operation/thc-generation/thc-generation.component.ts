@@ -507,12 +507,13 @@ export class ThcGenerationComponent implements OnInit {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
       const validTransModes = ['Truck', 'Trailor', 'Container'];
-      const transMode = validTransModes.includes(this.prqDetail?.carrierType) ? 'P1' : '';
+      const transMode = validTransModes.includes(this.prqDetail?.carrierType) ? 'Road' : '';
+      const tranModeCode = this.products.find((x) => x.name == transMode).value;
       const jsonData = {
         vehicle: { name: this.prqDetail?.vEHNO, value: this.prqDetail?.vEHNO },
         vendorType: `${this.prqDetail?.vENDTY}` || "",
         vendorName: { name: this.prqDetail?.vNDNM || '', value: this.prqDetail?.vNDCD || '' },
-        transMode: transMode,
+        transMode: tranModeCode,
         route: this.prqDetail?.fromToCity || '',
         fromCity: { name: fromToCityParts[0], value: fromToCityParts[0] },
         toCity: { name: fromToCityParts[1], value: fromToCityParts[1] },
@@ -567,9 +568,10 @@ export class ThcGenerationComponent implements OnInit {
               // }
             }
           }
-          this.thcTableForm.controls['vendorName'].setValue({ name: this.prqDetail?.vNDNM, value: this.prqDetail?.vNDNM })
+          this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
         }
       }
+
     }
 
     if (!this.isView && !this.isUpdate) {
@@ -820,6 +822,7 @@ export class ThcGenerationComponent implements OnInit {
 
       await this.markerVehicleService.SaveVehicleData(vehicleData);
     }
+    
     const destinationMapping = await this.locationService.locationFromApi({ locCity: this.thcTableForm.controls['toCity'].value });
     this.thcTableForm.controls['closingBranch'].setValue(destinationMapping[0]?.value || "");
     if (this.isUpdate) {
@@ -841,7 +844,17 @@ export class ThcGenerationComponent implements OnInit {
         "aRR": newARR,
       };
 
-      const res = await showConfirmationDialogThc(requestBody, this.thcTableForm.get("tripId").value, this.operationService, podDetails, this.thcTableForm.get("vehicle").value, this.currentLocation, this.DocketsContainersWise);
+      const data=this.thcTableForm.getRawValue();
+      const res = await showConfirmationDialogThc(
+        requestBody,
+        this.thcTableForm.get("tripId").value,
+        this.operationService,
+        podDetails,
+        this.thcTableForm.get("vehicle").value,
+        this.currentLocation,
+        this.DocketsContainersWise,
+        data.prqNo
+      );
       if (res) {
         Swal.fire({
           icon: "success",
@@ -872,8 +885,7 @@ export class ThcGenerationComponent implements OnInit {
       const tHCGenerationRequst = await this.GenerateTHCgenerationRequestBody();
       if (tHCGenerationRequst) {
         const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
-
-        this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
+        // this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
         if (resThc) {
           Swal.fire({
             icon: "success",

@@ -2,7 +2,7 @@ import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
 
-export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise) {
+export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise,prqNo="") {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -13,13 +13,12 @@ export async function showConfirmationDialogThc(data, tripId, operationService, 
     });
 
     if (confirmationResult.isConfirmed) {
-        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise);
+        const res = await updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation,containerwise,prqNo);
         return res
     }
 
 }
-async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise) {
-
+async function updateThcStatus(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise,prqNo) {
     const updatePromises = podDetails.map(async (element) => {
         //Event = EVN0004: Delivered, EVN0005: Arrived
         //Status = 3: Delivered, 4: Arrived
@@ -158,6 +157,19 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 };
 
                 await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
+                const prqReq = {
+                    "companyCode": localStorage.getItem('companyCode'),
+                    "collectionName": "prq_summary",
+                    "filter": {
+                        "pRQNO":prqNo
+                    },
+                    "update": {
+                        "sTS": 8,
+                        "sTSNM": "Delivered"
+                    }
+                };
+
+                await firstValueFrom(operationService.operationMongoPut("generic/update", prqReq));
             } else {
                 const reqBody = {
                     "companyCode": localStorage.getItem('companyCode'),
@@ -172,6 +184,19 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 };
 
                 await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
+                const prqReq = {
+                    "companyCode": localStorage.getItem('companyCode'),
+                    "collectionName": "prq_summary",
+                    "filter": {
+                        "pRQNO":prqNo
+                    },
+                    "update": {
+                        "sTS": 9,
+                        "sTSNM":"Partially Delivered"
+                    }
+                };
+
+                await firstValueFrom(operationService.operationMongoPut("generic/update", prqReq));
 
             }
         }

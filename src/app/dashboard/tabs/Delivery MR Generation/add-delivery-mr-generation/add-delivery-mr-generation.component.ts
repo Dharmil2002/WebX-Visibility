@@ -466,14 +466,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     this.jsonControlPaymentArray =
       this.AlljsonControlPaymentSummaryFilterArray.filter(filterFunction);
-
+    const Accountinglocation = this.storage.branch;
     switch (PaymentMode) {
       case "Cheque":
-        const responseFromAPIBank = await GetAccountDetailFromApi(
-          this.masterService,
-          "BANK",
-          ''
-        );
+        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation);
         this.filter.Filter(
           this.jsonControlPaymentArray,
           this.PaymentSummaryFilterForm,
@@ -502,10 +498,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         ]);
         depositedIntoBank.updateValueAndValidity();
 
-        const ChequeOrRefNo =
-          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        const ChequeOrRefNo = this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
+
+        const issuedFromBank = this.PaymentSummaryFilterForm.get("issuedFromBank");
+        issuedFromBank.setValidators([Validators.required]);
+        issuedFromBank.updateValueAndValidity();
 
         const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount");
         CashAccount.setValue("");
@@ -516,7 +515,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       case "Cash":
         const responseFromAPICash = await GetAccountDetailFromApi(
           this.masterService,
-          "CASH", '');
+          "CASH",
+          Accountinglocation
+        );
         this.filter.Filter(
           this.jsonControlPaymentArray,
           this.PaymentSummaryFilterForm,
@@ -537,12 +538,20 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         BankS.clearValidators();
         BankS.updateValueAndValidity();
 
-        const ChequeOrRefNoS =
-          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        const ChequeOrRefNoS = this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
         ChequeOrRefNoS.setValue("");
         ChequeOrRefNoS.clearValidators();
         ChequeOrRefNoS.updateValueAndValidity();
 
+        const depositedInBank = this.PaymentSummaryFilterForm.get("depositedIntoBank");
+        depositedInBank.setValue("");
+        depositedInBank.clearValidators();
+        depositedInBank.updateValueAndValidity();
+
+        const issuedBank = this.PaymentSummaryFilterForm.get("issuedFromBank");
+        issuedBank.setValue("");
+        issuedBank.clearValidators();
+        issuedBank.updateValueAndValidity();
         break;
       case "RTGS/UTR":
         break;
@@ -600,7 +609,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     bnknm ? this.PaymentSummaryFilterForm.controls['depositedIntoBank'].setValue(bnknm) : '';
   }
   //#endregion
-
   //#region to calculate TDS related amount
   TDSSectionFieldChanged(event) {
     // Get the value of TDSSection from the form
@@ -852,7 +860,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
   }
   //#endregion
-
   GenerateVoucher() {
 
     this.snackBarUtilityService.commonToast(async () => {
@@ -970,5 +977,27 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }, "Delivery MR Voucher Generating..!");
 
   }
+  //#region to disable submit btn
+  isSubmitDisabled(): boolean {
+    return (
+      !this.PaymentSummaryFilterForm.valid ||
+      !this.billingForm.valid ||
+      this.TotalAmountList[0].count === '0.00'
+    );
+  }
+  //#endregion
+  //#region Navigation to Delivery tab
+  cancel(): void {
+    this.navigateWithTabIndex('Delivery');
+  }
 
+  /**
+   * Navigates back to the specified tab index using the Router.
+   * @param tabIndex The index of the tab to navigate back to.
+   */
+  navigateWithTabIndex(tabIndex: string): void {
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
+  }
+
+  //#endregion
 }

@@ -38,7 +38,10 @@
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
-                <button mat-button mat-raised-button color="primary" (click)="GenerateVoucher()">Submit</button>
+                <button [disabled]="isSubmitDisabled()" mat-button mat-raised-button color="primary"
+                    (click)="GenerateVoucher()">
+                    Submit
+                </button>
             </div>
         </div>
     </div>

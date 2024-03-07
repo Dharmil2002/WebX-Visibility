@@ -92,6 +92,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
 
+  InvoiceDetailsList: { count: any; title: string; class: string }[];
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -113,7 +114,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private storage: StorageService,
     private docketService: DocketService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private addressService:AddressService
+    private addressService: AddressService
   ) {
     super();
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -295,7 +296,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.model.consignmentTableForm, "billingParty", billingParty);
     this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payTypeCode);
     this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pickupDate);
-    this.setFormValue(this.model.consignmentTableForm, "pAddress",{name:this.model.prqData?.pAddressName,value:this.model.prqData?.pAddress||"A8888"});
+    this.setFormValue(this.model.consignmentTableForm, "pAddress", { name: this.model.prqData?.pAddressName, value: this.model.prqData?.pAddress || "A8888" });
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);
     this.setFormValue(this.model.consignmentTableForm, "vendorType", vehType.value, false, "", "");
@@ -554,26 +555,34 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const fieldConsignorName = 'consignorName';
     const fieldConsigneeName = 'consigneeName';
     const fieldContactNumber = 'ccontactNumber';
+    const fieldConsignorAddress = 'cnoAddress';
+    const fieldConsigneeAddress = 'cneAddress';
+    const fieldConsignorgst = 'cnogst';
+    const fieldConsigneegst = 'cnegst';
     const fieldConsigneeContactNumber = 'cncontactNumber';
     const fieldBillingParty = 'billingParty';
     const { field: { name: fieldName }, eventArgs: { checked } } = event;
     const { contactNo } = this.model.prqData || {};
     const billingPartyValue = this.model.consignmentTableForm.controls[fieldBillingParty].value;
-    const mobile = billingPartyValue?.mobile || '';
-
-    const updateForm = (nameField, contactField, billingPartyName) => {
+    const pAddress = this.model.consignmentTableForm.controls['pAddress'].value;
+    const deliveryAddress = this.model.consignmentTableForm.controls['deliveryAddress'].value;
+    const mobile = billingPartyValue?.otherdetails?.customer_mobile || '';
+    const gstvalue = billingPartyValue?.otherdetails?.GSTdetails[0]?.gstNo
+    const updateForm = (nameField, contactField, billingPartyName, addressfieldname, addressdieldvalue, gstfor, gstvalue) => {
       this.model.consignmentTableForm.controls[nameField].setValue(billingPartyName);
       this.model.consignmentTableForm.controls[contactField].setValue(contactNo || mobile);
+      this.model.consignmentTableForm.controls[addressfieldname].setValue(addressdieldvalue);
+      this.model.consignmentTableForm.controls[gstfor].setValue(gstvalue);
     };
 
     if (checked) {
       switch (fieldName) {
         case 'cnbp':
-          updateForm(fieldConsignorName, fieldContactNumber, billingPartyValue);
+          updateForm(fieldConsignorName, fieldContactNumber, billingPartyValue, fieldConsignorAddress, pAddress, fieldConsignorgst, gstvalue);
           this.expanded = true
           break;
         case 'cnebp':
-          updateForm(fieldConsigneeName, fieldConsigneeContactNumber, billingPartyValue);
+          updateForm(fieldConsigneeName, fieldConsigneeContactNumber, billingPartyValue, fieldConsigneeAddress, deliveryAddress, fieldConsigneegst, gstvalue);
           break;
         default:
         // Handle other cases or throw an error
@@ -582,12 +591,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       // done by harikesh 
       switch (fieldName) {
         case 'cnbp':
-          [fieldConsignorName, fieldContactNumber]
+          [fieldConsignorName, fieldContactNumber, fieldConsignorAddress]
             .forEach(field => this.model.consignmentTableForm.controls[field].setValue(''));
           this.expanded = false
           break;
         case 'cnebp':
-          [fieldConsigneeName, fieldConsigneeContactNumber]
+          [fieldConsigneeName, fieldConsigneeContactNumber, fieldConsigneeAddress]
             .forEach(field => this.model.consignmentTableForm.controls[field].setValue(''));
           break;
         default:
@@ -596,7 +605,59 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     }
   }
+  async SetConsignorAndConsigneeAddressDetails(CustomerName, customerType) {
+    const billingParty = CustomerName
+    const fromCity = this.model.consignmentTableForm.controls["fromCity"]?.value.value || "";
+    const toCity = this.model.consignmentTableForm.controls["toCity"]?.value.value || "";
 
+    if (customerType === 'consignor') {
+      const filter = [
+        {
+          D$match: {
+            cityName: fromCity,
+            activeFlag: true,
+            customer: {
+              D$elemMatch: {
+                code: billingParty,
+              },
+            },
+          },
+        },
+      ]
+      const picUpres = await this.addressService.getAddress(filter);
+      this.filter.Filter(
+        this.model.allformControl,
+        this.model.consignmentTableForm,
+        picUpres,
+        "cnoAddress",
+        false
+      );
+    }
+    if (customerType === 'consignee') {
+      const filterAddress = [
+        {
+          D$match: {
+            cityName: toCity,
+            activeFlag: true,
+            customer: {
+              D$elemMatch: {
+                code: billingParty,
+              },
+            },
+          },
+        },
+      ]
+      const address = await this.addressService.getAddress(filterAddress);
+
+      this.filter.Filter(
+        this.model.allformControl,
+        this.model.consignmentTableForm,
+        address,
+        "cneAddress",
+        false
+      );
+    }
+  }
   prqSelection() {
 
     this.model.prqData = this.model.prqNoDetail.find(
@@ -762,6 +823,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.invoiceTableForm.reset();
       this.tableLoadIn = false;
       this.loadIn = false;
+      this.SetInvoiceData();
     }
   }
 
@@ -795,6 +857,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.fillInvoiceDetails(data)
       }
     }
+    this.SetInvoiceData();
   }
 
   vendorFieldChanged() {
@@ -905,58 +968,76 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     // Set Freight Table Form details.
     this.model.FreightTableForm.controls["freightRatetype"].setValue(docketDetails.freightRatetype);
-    this.model.consignmentTableForm.controls["pAddress"].setValue({name:docketDetails.pAddress,value:docketDetails.pAddressCode||"A8888"});
-    this.model.consignmentTableForm.controls["deliveryAddress"].setValue({name:docketDetails.deliveryAddress,value:docketDetails.deliveryAddressCode||"A8888"});
+    this.model.consignmentTableForm.controls["pAddress"].setValue({ name: docketDetails.pAddress, value: docketDetails.pAddressCode || "A8888" });
+    this.model.consignmentTableForm.controls["deliveryAddress"].setValue({ name: docketDetails.deliveryAddress, value: docketDetails.deliveryAddressCode || "A8888" });
+    this.model.consignmentTableForm.controls["cnoAddress"].setValue({ name: docketDetails.cnoAddress, value: docketDetails.cnoAddress });
+    this.model.consignmentTableForm.controls["cnogst"].setValue(docketDetails.cnogst);
+    this.model.consignmentTableForm.controls["cneAddress"].setValue({ name: docketDetails.cneAddress, value: docketDetails.cneAddress });
+    this.model.consignmentTableForm.controls["cnegst"].setValue(docketDetails.cnegst);
     // Bind table data after form update.
     this.bindTableData();
   }
-  async AddressDetails(){
-    const billingParty=this.model.consignmentTableForm.controls["billingParty"]?.value.value||"";
-    const fromCity=this.model.consignmentTableForm.controls["fromCity"]?.value.value||"";
-    const toCity=this.model.consignmentTableForm.controls["toCity"]?.value.value||"";
-    const filter=[
+  async AddressDetails() {
+    const billingParty = this.model.consignmentTableForm.controls["billingParty"]?.value.value || "";
+    const fromCity = this.model.consignmentTableForm.controls["fromCity"]?.value.value || "";
+    const toCity = this.model.consignmentTableForm.controls["toCity"]?.value.value || "";
+    const filter = [
       {
         D$match: {
           cityName: fromCity,
-          activeFlag:true,
+          activeFlag: true,
           customer: {
             D$elemMatch: {
-              code:billingParty,
+              code: billingParty,
             },
           },
         },
       },
     ]
-    const picUpres= await this.addressService.getAddress(filter);
-    const filterAddress=[
+    const picUpres = await this.addressService.getAddress(filter);
+    const filterAddress = [
       {
         D$match: {
           cityName: toCity,
-          activeFlag:true,
+          activeFlag: true,
           customer: {
             D$elemMatch: {
-              code:billingParty,
+              code: billingParty,
             },
           },
         },
       },
     ]
-    const address= await this.addressService.getAddress(filterAddress);
+    const address = await this.addressService.getAddress(filterAddress);
     this.filter.Filter(
       this.model.allformControl,
       this.model.consignmentTableForm,
       picUpres,
-     "pAddress",
-     false
+      "pAddress",
+      false
     );
     this.filter.Filter(
       this.model.allformControl,
       this.model.consignmentTableForm,
       address,
-     "deliveryAddress",
-     false
+      "deliveryAddress",
+      false
     );
- }
+    this.filter.Filter(
+      this.model.allformControl,
+      this.model.consignmentTableForm,
+      picUpres,
+      "cnoAddress",
+      false
+    );
+    this.filter.Filter(
+      this.model.allformControl,
+      this.model.consignmentTableForm,
+      address,
+      "cneAddress",
+      false
+    );
+  }
   bindTableData() {
 
     if (this.model.docketDetail.invoiceDetails.length > 0) {
@@ -1175,10 +1256,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const bParty = this.model.consignmentTableForm.value.billingParty;
       const cSGE = this.model.consignmentTableForm.value.consigneeName;
       const cSGN = this.model.consignmentTableForm.value.consignorName;
-      docketDetails["deliveryAddress"] =  this.model.consignmentTableForm.controls['deliveryAddress']?.value.name||this.model.consignmentTableForm.controls['pAddress'].value
-      docketDetails["deliveryAddressCode"] =  this.model.consignmentTableForm.controls['deliveryAddress']?.value.value||"A8888";
-      docketDetails["pAddress"] =  this.model.consignmentTableForm.controls['pAddress']?.value.name||this.model.consignmentTableForm.controls['pAddress'].value
-      docketDetails["pAddressCode"] =  this.model.consignmentTableForm.controls['pAddress']?.value.value||"A8888";
+      docketDetails["deliveryAddress"] = this.model.consignmentTableForm.controls['deliveryAddress']?.value.name || this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["deliveryAddressCode"] = this.model.consignmentTableForm.controls['deliveryAddress']?.value.value || "A8888";
+      docketDetails["pAddress"] = this.model.consignmentTableForm.controls['pAddress']?.value.name || this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["pAddressCode"] = this.model.consignmentTableForm.controls['pAddress']?.value.value || "A8888";
+      docketDetails["cnoAddress"] = this.model.consignmentTableForm.controls['cnoAddress']?.value.name;
+      docketDetails["cnogst"] = this.model.consignmentTableForm.controls['cnogst']?.value;
+      docketDetails["cneAddress"] = this.model.consignmentTableForm.controls['cneAddress']?.value.name;
+      docketDetails["cnegst"] = this.model.consignmentTableForm.controls['cnegst']?.value;
       docketDetails["billingParty"] = bParty?.value;
       docketDetails["billingPartyName"] = bParty?.name;
       docketDetails["consignorCode"] = cSGN?.value;
@@ -1268,7 +1353,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           mTNM: i.materialName,
           aCTWT: ConvertToNumber(actualWeight || 0, 2),
           cFTWT: 0,
-          cHRWT:ConvertToNumber(chargedWeight || 0, 2),
+          cHRWT: ConvertToNumber(chargedWeight || 0, 2),
           vOL: {
             uNIT: "FT",
             l: 0.000,
@@ -1413,7 +1498,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           eXPDT: i.expiryDateO,
           pKGS: (parseInt(i.noofPkts) || 0),
           mTNM: i.materialName,
-          aCTWT:ConvertToNumber(i.actualWeight || 0, 2),
+          aCTWT: ConvertToNumber(i.actualWeight || 0, 2),
           cFTWT: 0,
           cHRWT: ConvertToNumber(i.chargedWeight || 0, 2),
           vOL: {
@@ -1601,11 +1686,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     const mfactor = rateTypeMap[freightRateType] || 1;
     let total = parseFloat(freightRate) * parseFloat(mfactor);
-    this.model.FreightTableForm.controls["freight_amount"]?.setValue(ConvertToNumber(total,2));
+    this.model.FreightTableForm.controls["freight_amount"]?.setValue(ConvertToNumber(total, 2));
     this.model.FreightTableForm.get("grossAmount")?.setValue(ConvertToNumber(
       (parseFloat(this.model.FreightTableForm.get("freight_amount")?.value) || 0) +
       (parseFloat(this.model.FreightTableForm.get("otherAmount")?.value) || 0) +
-      TotalNonFreight,2)
+      TotalNonFreight, 2)
     );
     this.model.FreightTableForm.get("totalAmount")?.setValue(ConvertToNumber(
       (parseFloat(this.model.FreightTableForm.get("grossAmount")?.value) || 0) +
@@ -1667,15 +1752,23 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*getConsignor*/
   getConsignor() {
     const mobile =
-      this.model.consignmentTableForm.controls["consignorName"].value?.mobile || "";
+      this.model.consignmentTableForm.controls["consignorName"].value?.otherdetails?.customer_mobile || "";
     this.model.consignmentTableForm.controls["ccontactNumber"].setValue(mobile);
+    const cnogst =
+      this.model.consignmentTableForm.controls["consignorName"].value?.otherdetails?.GSTdetails[0]?.gstNo || "";
+    this.model.consignmentTableForm.controls["cnogst"].setValue(cnogst);
+    this.SetConsignorAndConsigneeAddressDetails(this.model.consignmentTableForm.controls["consignorName"].value?.value, "consignor");
   }
   /*End*/
   /*getConsignee*/
   getConsignee() {
     const mobile =
-      this.model.consignmentTableForm.controls["consigneeName"].value?.mobile || "";
+      this.model.consignmentTableForm.controls["consigneeName"].value?.otherdetails?.customer_mobile || "";
     this.model.consignmentTableForm.controls["cncontactNumber"].setValue(mobile);
+    const cnegst =
+      this.model.consignmentTableForm.controls["consigneeName"].value?.otherdetails?.GSTdetails[0]?.gstNo || "";
+    this.model.consignmentTableForm.controls["cnegst"].setValue(cnegst);
+    this.SetConsignorAndConsigneeAddressDetails(this.model.consignmentTableForm.controls["consigneeName"].value?.value, "consignee");
   }
   /*End*/
   //validation for the Actual weight not greater then actual weight
@@ -1789,6 +1882,30 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.tableData = [];
   }
 
+  SetInvoiceData() {
+    this.InvoiceDetailsList = [
+      {
+        count: this.model.invoiceData.reduce((acc, invoiceAmount) => parseFloat(acc) + parseFloat(invoiceAmount['invoiceAmount']), 0),
+        title: "Invoice Amount",
+        class: `color-Ocean-danger`,
+      },
+      {
+        count: this.model.invoiceData.reduce((acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noofPkts']), 0),
+        title: "No of Pkts",
+        class: `color-Success-light`,
+      },
+      {
+        count: this.model.invoiceData.reduce((acc, actualWeight) => parseFloat(acc) + parseFloat(actualWeight['actualWeight']), 0),
+        title: "Actual Weight",
+        class: `color-Success-light`,
+      },
+      {
+        count: this.model.invoiceData.reduce((acc, chargedWeight) => parseFloat(acc) + parseFloat(chargedWeight['chargedWeight']), 0),
+        title: "Charged weight",
+        class: `color-Success-light`,
+      }
+    ]
+  }
   //Contract Invoked Section
   InvockedContract() {
     const paymentBasesName = this.paymentBases.find(x => x.value == this.model.consignmentTableForm.value.payType).name;

@@ -25,7 +25,7 @@
     <form [formGroup]="model.consignmentTableForm">
       <app-form-webxpress [form]="model.consignmentTableForm" [FormTitle]="'Consignor Detail'"
         [formData]="jsonControlArrayConsignor" (functionCallEmitter)="functionCallHandler($event)"
-        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [Expanded]=expanded>
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [Expanded]=!expanded>
       </app-form-webxpress>
     </form>
     <!-- End -->
@@ -84,7 +84,7 @@
         [staticField]="model.staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width"
         [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
         (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
-        [showHeader]=false>
+        [showHeader]=false [FormTitle]="'Invoice Details'" [TitleBoxData]="this.InvoiceDetailsList">
       </app-generic-table-v2>
     </form>
 

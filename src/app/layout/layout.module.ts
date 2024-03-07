@@ -4,7 +4,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatTabsModule } from "@angular/material/tabs";
-import { NgModule,CUSTOM_ELEMENTS_SCHEMA  } from "@angular/core";
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { NgbDropdownModule, NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { SharedModule } from "../shared/shared.module";
@@ -37,4 +37,4 @@ import { MatMenuModule } from "@angular/material/menu";
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // Add this line
 })
-export class LayoutModule {}
+export class LayoutModule { }

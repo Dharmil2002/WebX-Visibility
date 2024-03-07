@@ -168,7 +168,7 @@ th.mat-header-cell {
    * Leaf nodes need to have padding so as to align with other non-leaf nodes
    * under the same parent.
    */
-.example-tree div[role="group"]>.mat-tree-node {
+.example-tree div[role="group"] > .mat-tree-node {
   padding-left: 40px;
 }
 
@@ -206,7 +206,6 @@ th.mat-header-cell {
   }
 }
 
-
 .snackbar-success {
   background-color: rgba(24, 206, 15, 0.8) !important;
   color: #ffffff !important;
@@ -238,18 +237,18 @@ mat-slide-toggle {
 .fontbold {
   font-weight: 700;
 }
-.iconcolor{
+.iconcolor {
   color: white;
 }
 
-.custom-icon{
+.custom-icon {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.icon-pedding{
+.icon-pedding {
   padding-bottom: 50px;
   padding-top: 30px;
 }
@@ -288,7 +287,7 @@ mat-slide-toggle {
 }
 
 body {
-  background: #FAFAFA;
+  background: #fafafa;
 }
 
 .order-card {
@@ -304,13 +303,12 @@ body {
 }
 
 .bg-c-yellow {
-  background: linear-gradient(45deg, #FFB64D, #ffcb80);
+  background: linear-gradient(45deg, #ffb64d, #ffcb80);
 }
 
 .bg-c-pink {
-  background: linear-gradient(45deg, #FF5370, #ff869a);
+  background: linear-gradient(45deg, #ff5370, #ff869a);
 }
-
 
 .card {
   border-radius: 5px;
@@ -425,7 +423,6 @@ a {
 
 /* Custom loader styles */
 .customerloader {
-
   /* Custom styles for the loader */
   .loader-container {
     width: 150px;
@@ -454,6 +451,11 @@ a {
   padding-right: 40px;
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+.large-icon svg {
+  width: 30px;
+  height: 30px;
 }
 
 .search-bar-container {
@@ -500,7 +502,6 @@ a {
       outline: none;
     }
   }
-
 }
 
 .textCenter {
@@ -542,18 +543,17 @@ a {
   /* Set the width to match the input (optional) */
   z-index: 1000;
   /* Ensure it appears above other elements (optional) */
-  
 }
 
 /* Your component's CSS file or global styles */
 /* Your component's CSS file or global styles */
 .custom-input {
-  width: 425px;
   /* Set the default width for larger screens */
-  height: 40px;
+  width: 425px;
+  width: 500px;
   /* Set the default height */
+  height: 40px;
 }
-
 
 /* Your component's CSS file or global styles */
 .custom-input::placeholder {
@@ -562,6 +562,7 @@ a {
   /* Adjust the width as needed */
   /* Add other styling properties as needed */
   font-weight: 700;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Your component's CSS file or global styles */
@@ -580,10 +581,11 @@ a {
   width: 101%;
   border: 1px solid #ccc;
   border-top: none;
-  position: absolute;
+  // position: absolute;
   background-color: white;
+  border-radius: 5px;
   z-index: 1;
-  max-height: 200px;
+  max-height: 208px;
   overflow-y: auto;
 }
 
@@ -593,16 +595,16 @@ a {
 }
 
 .google-autocomplete-item {
-  padding: 5px 5px;
+  padding: 12px 10px;
   /* Adjust the padding to control vertical and horizontal spacing */
   cursor: pointer;
   transition: background-color 0.2s;
   position: relative;
-  margin-top: -24px;
+  margin-top: -4px;
 }
 
 .google-autocomplete-item:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -10px;
@@ -617,24 +619,23 @@ a {
 }
 /* Apply styles when the screen width is less than or equal to 768px and the zoom level is greater than 1x */
 @media screen and (min-width: 768px) and (min-resolution: 1.1dppx) {
-   /* CSS styles to apply when the screen width is 872 pixels or wider */
+  /* CSS styles to apply when the screen width is 872 pixels or wider */
   /* Add your styles here */
-  .custom-input {
-    width: 250px;
-    margin-left: -39px;
-  }
+
+  // .custom-input {
+  //   width: 250px;
+  //   margin-left: -39px;
+  // }
+
   .google-autocomplete-list {
-    margin-left: -39px;
+    // margin-left: -39px;
     width: 118%;
   }
 
   // .globehide{
   //   display:none!important;
   //   }
-  
 }
 .blur-effect {
   filter: blur(5px); /* Adjust the pixel value for more or less blur */
 }
-
-

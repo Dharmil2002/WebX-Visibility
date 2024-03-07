@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-6 custom-header">
+        <h3>Search Bar</h3>
+    </div>
+    <div class="col-6 d-flex justify-content-end">
+        <button mat-icon-button class="mb-2" (click)="Close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+<div class="row search-box">
+    <input type="text" class="form-control custom-input" placeholder="Search" [(ngModel)]="searchQuery" (input)="onSearchInput()" />
+    <ul class="google-autocomplete-list">
+        <li *ngFor="let option of autocompleteOptions" (click)="selectOption(option)"
+                class="google-autocomplete-item">
+            {{ option.name }}
+        </li>
+        <!-- <b>{{ autocompleteOptions[0].value }}</b> -->
+    </ul>
+</div>
+

@@ -57,6 +57,7 @@ import { msalConfig } from "./core/service/msal-config/msal-config";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
 import { locationEntitySearch } from "./Utility/locationEntitySearch";
+import { SearchComponent } from "./layout/header/search/search.component";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -86,7 +87,8 @@ export function createTranslateLoader(http: HttpClient): any {
     RightSidebarComponent,
     AuthLayoutComponent,
     MainLayoutComponent,
-    DashboardLayoutComponent
+    DashboardLayoutComponent,
+    SearchComponent
 
   ],
   imports: [

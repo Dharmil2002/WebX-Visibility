@@ -9,18 +9,30 @@
   margin-left: -43px;
 }
 
+.custom-header {
+  font-family: sans-serif, Arial, Helvetica;
+  margin-top: 10px;
+  font-size: 20px;
+  h3 {
+    margin-left: 3px;
+  }
+}
+
 .search-box {
+  // position: absolute;
+  margin: 2px;
   overflow: hidden;
-  width: 270px;
+  width: auto;
   vertical-align: middle;
   white-space: nowrap;
   input {
     &#search {
-      width: 250px;
-      height: 40px;
+      width: auto;
+      height: auto;
       background: rgb(255, 255, 255);
       border: none;
       font-size: 10pt;
+      font-family: "sans-serif";
       float: left;
       color: #fff;
       padding-left: 15px;

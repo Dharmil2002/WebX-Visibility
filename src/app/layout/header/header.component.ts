@@ -21,6 +21,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { MatDialog } from "@angular/material/dialog";
 import { VirtualLoginComponent } from "../virtual-login/virtual-login.component";
 import { StorageService } from "src/app/core/service/storage.service";
+import { SearchComponent } from "./search/search.component";
 const document: any = window.document;
 
 @Component({
@@ -45,7 +46,7 @@ export class HeaderComponent
   isOpenSidebar: boolean;
   Mode: string;
   searchQuery: string = '';
-  autocompleteOptions: any;
+  // autocompleteOptions: any;
   showAutocomplete: boolean = false;
   menuItems = ['LTL', 'FTL', 'Import', 'Export', 'Billing​', 'Accounts'];
   // Replace this with your actual data source or API call
@@ -64,7 +65,7 @@ export class HeaderComponent
     private configService: ConfigService,
     private authService: AuthService,
     private router: Router,
-    private storage:StorageService,
+    private storage: StorageService,
     public languageService: LanguageService,
     private breakpointObserver: BreakpointObserver
   ) {
@@ -102,7 +103,7 @@ export class HeaderComponent
   ngOnInit() {
     this.config = this.configService.configData;
     this.logo = this.storage.companyLogo;
-    this.companyCd=this.storage.companyCd;
+    this.companyCd = this.storage.companyCd;
     this.Mode = localStorage.getItem("Import");
     this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
     this.getCurrentFinancialYear();
@@ -155,7 +156,6 @@ export class HeaderComponent
       }
     }
   }
-
 
 
   callFullscreen() {
@@ -248,24 +248,48 @@ export class HeaderComponent
     this.isDropdownOpen = false; // Close the dropdown when an option is selected
     // Add any other logic you need here when a menu item is selected
   }
-  onSearchInput() {
-    this.showAutocomplete = true;
-    if (this.searchQuery.length > 0) {
-      this.autocompleteOptions = this.allOptions.filter((option) =>
-        option.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      )
-    }
-    else {
-      this.showAutocomplete = false;
-    }
+
+  openSearchPopup(): void {
+    const dialogRef = this.dialogModel.open(SearchComponent, {
+      width: '500px',
+      position: { top: '70px' },
+      data: { allOptions: this.allOptions, searchQuery: this.searchQuery }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
-  selectOption(option: any) {
-    this.searchQuery = option.name;
-    this.router.navigateByUrl(option.value);
-    this.searchQuery = "";
-    this.showAutocomplete = false;
-  }
+  // fetchData(): Promise<any[]> {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => {
+  //       const data = this.allOptions.filter((option) => 
+  //       option.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
+  //       resolve(data);
+  //     }, 1000);
+  //   });
+  // }
+
+  // onSearchInput() {
+  //   this.showAutocomplete = true;
+  //   if (this.searchQuery.length > 0) {
+  //     this.autocompleteOptions = this.allOptions.filter((option) =>
+  //       option.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+  //     )
+  //   }
+  //   else {
+  //     this.showAutocomplete = false;
+  //   }
+  // }
+
+  // selectOption(option: any) {
+  //   this.searchQuery = option.name;
+  //   this.router.navigateByUrl(option.value);
+  //   this.searchQuery = "";
+  //   this.showAutocomplete = false;
+  // }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: any) {
     if (!this.elementRef.nativeElement.contains(event.target)) {

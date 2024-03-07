@@ -94,7 +94,7 @@ export class CreateRunSheetComponent implements OnInit {
       Style: "min-width:10%",
     },
     packages: {
-      Title: "Packages",
+      Title: "Pkgs",
       class: "matcolumncenter",
       Style: "max-width:95px",
     },

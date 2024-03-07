@@ -29,6 +29,7 @@ export class PrqService {
     "2": "Awaiting For Docket",
     "3": "Ready For THC",
     "5": "Rejected",
+    "8":"Delivered",
     default: "THC Generated",
   };
   constructor(

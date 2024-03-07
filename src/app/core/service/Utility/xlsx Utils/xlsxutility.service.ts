@@ -1,3 +1,4 @@
+import { vehicleLoadingControl } from './../../../../../assets/FormControls/vehicleloading';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,6 +23,25 @@ export class xlsxutilityService {
         for (const validation of rule.Validations) {
           if ("Required" in validation && validation.Required && !value) {
             errors.push(`${rule.ItemsName} is required.`);
+          }
+          if ("dateLimit" in validation && value) {
+            const { MaxValue } = rule.Validations.find((x) => x.MaxValue);
+            const currentDate = new Date();
+            const oneMonthAgo = new Date(currentDate);
+            oneMonthAgo.setMonth(currentDate.getMonth() - parseInt(MaxValue));
+            const oneDay = new Date(currentDate);
+            oneDay.setHours(currentDate.getHours() + 1);
+
+            if (!value) {
+              errors.push(`${rule.ItemsName} is required.`);
+            } else {
+              const enteredDate = new Date(value);
+              if (enteredDate < oneMonthAgo || enteredDate > currentDate) {
+                errors.push(
+                  `${rule.ItemsName} must be within the past or current.`
+                );
+              }
+            }
           }
           // Perform case-insensitive and type-insensitive comparison for TakeFromList
           if ("TakeFromList" in validation && value && !validation.TakeFromList.some(listItem =>

@@ -4,22 +4,21 @@ import { IFieldDefinition } from "../../Interface/IFieldDefinition.interface";
 @Injectable({
   providedIn: "root",
 })
-
 export class PrqSummaryModel implements IFieldDefinition {
   constructor() {}
 
   public columnHeader = {
-    createdDate: {
-      Title: "Created Date",
+    actionsItems: {
+      Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:10%",
+      Style: "max-width:6%",
     },
     prqNo: {
       Title: "PRQ No",
       class: "matcolumnleft",
       Style: "min-width:18%",
-      type:'windowLink',
-      functionName:'OpenPrq'
+      type: "windowLink",
+      functionName: "OpenPrq",
     },
     size: {
       Title: "Veh/Cont-Size",
@@ -46,11 +45,12 @@ export class PrqSummaryModel implements IFieldDefinition {
       class: "matcolumnleft",
       Style: "min-width:6%",
     },
-    actionsItems: {
-      Title: "Action",
+    createdDate: {
+      Title: "Created Date",
       class: "matcolumnleft",
-      Style: "max-width:6%",
-    },
+      Style: "min-width:10%",
+    }
+
   };
 
   public staticField = [
@@ -64,7 +64,7 @@ export class PrqSummaryModel implements IFieldDefinition {
   ];
 
   public menuItems = [
-    { label: "Confirm", route: null, tabIndex: 6, status: "1", },
+    { label: "Confirm", route: null, tabIndex: 6, status: "1" },
     { label: "Reject", route: null, tabIndex: 6, status: "5" },
     { label: "Assign Vehicle", route: "/Operation/AssignVehicle" },
     { label: "Add Docket", route: "/Operation/ConsignmentEntry" },
@@ -92,4 +92,45 @@ export class PrqSummaryModel implements IFieldDefinition {
   getColumnStyle(columnName: string): string | undefined {
     return this.getColumnDetails(columnName, "Style");
   }
+}
+export class prqUpload {
+    _id:string;
+    pRQNO: string;
+    bPARTY: string;
+    pICKDT: Date;
+    cARTYP:number;
+    cNTYP: number;
+    cNTSIZE: number;
+    vEHSIZE: number;
+    pHNO: number;
+    pADD: string;
+    fCITY: string;
+    tCITY: string;
+    bRCD: string;
+    pAYTYP: string;
+    cONTRAMT:number;
+    oDRNO: string;
+    oDRDT:  Date;
+    oDRBY: string;
+    rMKS: string;
+    sIZE: number;
+    cID: number;
+    bPARTYNM: string;
+    pADDNM: string;
+    cARTYPNM: string;
+    vEHSIZENM:string;
+    pAYTYPNM: string;
+    cNTYPNM:string;
+    sTS: number;
+    sTSNM: string;
+    docNo: string;
+    eNTDT: Date;
+    eNTLOC:string;
+    eNTBY: string;
+    constructor() {
+      this.eNTBY = localStorage.getItem("UserName");
+      this.eNTLOC = localStorage.getItem("Branch");
+      this.eNTDT = new Date();
+      this.cID = parseInt(localStorage.getItem("companyCode"));
+    }
 }

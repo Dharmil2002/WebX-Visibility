@@ -1,0 +1,16 @@
+<app-generic-bulk-upload
+    [title]="'PRQ Upload'"
+    [isUploaded]="IsUploaded"
+    [downloadFunction]="Download"
+    [isDateMsg]=true
+    [fileName]="'PRQ'"
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="fileUploadForm">
+            <div class="col">
+                <!-- <mat-label>Upload File</mat-label> -->
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

@@ -5,6 +5,8 @@ import { PrqSummaryModel } from "src/app/Models/prq-model/prqsummary.model";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
+import { MatDialog } from "@angular/material/dialog";
+import { PrqBulkUploadComponent } from "../prq-bulk-upload/prq-bulk-upload.component";
 
 @Component({
   selector: "app-prq-summary-page",
@@ -26,6 +28,7 @@ export class PrqSummaryPageComponent implements OnInit {
     csv: false,
   };
   isLoad: boolean = false;
+  uploadComponent = PrqBulkUploadComponent;
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
@@ -38,7 +41,8 @@ export class PrqSummaryPageComponent implements OnInit {
   constructor(
     private router: Router,
     private prqService: PrqService,
-    private definition: PrqSummaryModel
+    private definition: PrqSummaryModel,
+    private dialog: MatDialog
   ) {
     this.addAndEditPath = "Operation/PRQEntry";
     this.allColumnFilter = this.definition.columnHeader;
@@ -161,4 +165,15 @@ export class PrqSummaryPageComponent implements OnInit {
     }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, "", "width=1000,height=800");
   }
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.getPrqDetails();
+      });
+    }
+    //#endregion
 }

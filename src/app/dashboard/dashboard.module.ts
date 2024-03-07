@@ -57,6 +57,7 @@ import { DeliveryMrGenerationListComponent } from './tabs/Delivery MR Generation
 import { AddDeliveryMrGenerationComponent } from './tabs/Delivery MR Generation/add-delivery-mr-generation/add-delivery-mr-generation.component';
 import { DeliveryMrGenerationModalComponent } from './tabs/Delivery MR Generation/delivery-mr-generation-modal/delivery-mr-generation-modal.component';
 import { DeliveryMrResponseModalComponent } from './tabs/Delivery MR Generation/delivery-mr-response-modal/delivery-mr-response-modal.component';
+import { PrqBulkUploadComponent } from './tabs/prq-bulk-upload/prq-bulk-upload.component';
 @NgModule({
   declarations: [
     DocketDashboardComponent,
@@ -89,6 +90,7 @@ import { DeliveryMrResponseModalComponent } from './tabs/Delivery MR Generation/
     AddDeliveryMrGenerationComponent,
     DeliveryMrGenerationModalComponent,
     DeliveryMrResponseModalComponent,
+    PrqBulkUploadComponent,
   ],
   imports: [
     CommonModule,

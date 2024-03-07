@@ -139,7 +139,7 @@ export class ConsignmentControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [
           {
             name: "required",
@@ -154,7 +154,8 @@ export class ConsignmentControl {
           },
         ],
         functions: {
-          onModel: "",
+          onModel: "getPincodeDetail",
+          onOptionSelect: 'getLocBasedOnCity'
         },
         additionalData: {
           showNameAndValue: false,
@@ -511,6 +512,47 @@ export class ConsignmentControl {
         }
       },
       {
+        name: "cnoAddress",
+        label: "Consignor Address",
+        placeholder: "Consignor Address",
+        type: "dropdown",
+        value: docketDetail?.cAddress,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+
+        ],
+        functions: {
+        },
+        additionalData: {
+          metaData: "consignor",
+        },
+      },
+      {
+        name: "cnogst",
+        label: "Consignor GST Number",
+        placeholder: "Consignor GST Number",
+        type: "text",
+        value: docketDetail?.cgstno,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+            message: "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+          }
+        ],
+        functions: {
+        },
+        additionalData: {
+          metaData: "consignor",
+        },
+      },
+      {
         name: "consigneeName",
         label: "Consignee Name",
         placeholder: "Consignee Name",
@@ -546,6 +588,47 @@ export class ConsignmentControl {
         additionalData: {
           metaData: "consignee"
         }
+      },
+      {
+        name: "cneAddress",
+        label: "Consignee Address",
+        placeholder: "Consignee Address",
+        type: "dropdown",
+        value: docketDetail?.cAddress,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+
+        ],
+        functions: {
+        },
+        additionalData: {
+          metaData: "consignee",
+        },
+      },
+      {
+        name: "cnegst",
+        label: "Consignee GST Number",
+        placeholder: "Consignee GST Number",
+        type: "text",
+        value: docketDetail?.cgstno,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+            message: "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+          }
+        ],
+        functions: {
+        },
+        additionalData: {
+          metaData: "consignee",
+        },
       },
       {
         name: 'companyCode',

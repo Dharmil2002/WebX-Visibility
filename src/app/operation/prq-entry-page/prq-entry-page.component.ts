@@ -621,10 +621,12 @@ export class PrqEntryPageComponent implements OnInit {
           });
 
           if (res[0].FreightChargeMatrixDetails?.rTYPCD == "RTTYP-0007") {
-            this.prqEntryTableForm.controls["cONTRAMT"].setValue(res[0].FreightChargeMatrixDetails?.rT * this.prqEntryTableForm?.value?.cNTSIZE);
+            const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * this.prqEntryTableForm?.value?.cNTSIZE
+            this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
           }
           else {
-            this.prqEntryTableForm.controls["cONTRAMT"].setValue(res[0].FreightChargeMatrixDetails?.rT * (containerCode * 1000));
+            const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * (containerCode * 1000);
+            this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
           }
 
 

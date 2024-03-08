@@ -587,6 +587,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         docType: "CN",
         branch: this.storage.branch,
         finYear: financialYear,
+        timeZone: this.storage.timeZone,
         data: docketDetails,
         party: docketDetails["bPARTYNM"],
       };

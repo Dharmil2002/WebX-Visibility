@@ -157,7 +157,7 @@ export class ArrivalVehicleService {
                     "dOCNO": data?.TripID || "",
                     "sTS": DocketStatus.Arrived,
                     "sTSNM": DocketStatus[DocketStatus.Arrived],
-                    "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}.`,
+                    "oPSSTS":`Arrived at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
                     "eNTBY": this.storage.userName
@@ -211,7 +211,7 @@ export class ArrivalVehicleService {
                     update: {
                         "sTS": DocketStatus.Arrived,
                         "sTSNM": DocketStatus[DocketStatus.Arrived],
-                        "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}.`,
+                        "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
                         "mODBY": this.storage.userName,
                         "mODDT": new Date(),
                         "mODLOC": this.storage.branch
@@ -274,7 +274,7 @@ export class ArrivalVehicleService {
                 "sTS": DocketStatus.In_Delivery_Stock,
                 "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
                 "sTSTM": new Date(),
-                "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
                 "mODDT": new Date(),
                 "mODLOC": this.storage.branch,
                 "mODBY": this.storage.userName
@@ -289,7 +289,7 @@ export class ArrivalVehicleService {
             await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
             const eventJson = dktList.map(dkt => {
                 const evn = {
-                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.sFX}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                     "cID": this.storage.companyCode,
                     "dKTNO": dkt.Shipment,
                     "sFX": 0,
@@ -302,7 +302,7 @@ export class ArrivalVehicleService {
                     "dOCNO": data?.TripID || "",
                     "sTS": DocketStatus.In_Delivery_Stock,
                     "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
-                    "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                    "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
                     "eNTBY": this.storage.userName
@@ -324,7 +324,7 @@ export class ArrivalVehicleService {
                 "sTS": DocketStatus.In_Transhipment_Stock,
                 "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
                 "sTSTM": new Date(),
-                "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
                 "mODDT": new Date(),
                 "mODLOC": this.storage.branch,
                 "mODBY": this.storage.userName
@@ -339,7 +339,7 @@ export class ArrivalVehicleService {
             await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
             const eventJson = dktList.map(dkt => {
                 const evn = {
-                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.sFX}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                     "cID": this.storage.companyCode,
                     "dKTNO": dkt.Shipment,
                     "sFX": 0,
@@ -352,7 +352,7 @@ export class ArrivalVehicleService {
                     "dOCNO": data?.TripID || "",
                     "sTS": DocketStatus.In_Transhipment_Stock,
                     "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
-                    "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                    "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
                     "eNTBY": this.storage.userName

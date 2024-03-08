@@ -467,7 +467,7 @@ export class DocketService {
             "dOCNO": "",
             "sTS": DocketStatus.Booked,
             "sTSNM": DocketStatus[DocketStatus.Booked],
-            "oPSSTS": `Booked at ${this.storage.branch} on ${moment(data.docketDate).format("DD MMM YYYY @ hh:mm A")}.`,
+            "oPSSTS": `Booked at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
             "eNTLOC": this.storage.branch,
             "eNTBY": this.storage.userName
         }
@@ -683,6 +683,7 @@ export class DocketService {
             docType: "CN",
             branch: this.storage.branch,
             finYear: financialYear,
+            timeZone: this.storage.timeZone,
             data: data,
             party: data["bPARTYNM"],
         };
@@ -864,7 +865,50 @@ export class DocketService {
         });
 
         docketField["iNVTOT"] = invoiceDetails.reduce((a, c) => a + (c.iNVAMT || 0), 0);
-
+      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails};
+   }
+   /*End*/
+   /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
+    async operationsFieldMapping(data,invoiceDetails=[]){
+    const ops={
+        dKTNO: data?.dKTNO||"",
+        sFX: 0,
+        oRGN: data?.oRGN||"",
+        dEST: data?.dEST||"",
+        cLOC: data?.oRGN||"",      
+        pKGS: parseInt(data?.pKGS||0),  
+        aCTWT: ConvertToNumber(data?.aCTWT || 0 , 3),
+        cHRWT: ConvertToNumber(data?.cHRWT || 0 , 3),
+        cFTTOT: ConvertToNumber(data?.cFTTOT || 0 , 3),        
+        vEHNO: data?.vEHNO || "",                
+        sTS: DocketStatus.Booked,
+        sTSNM: DocketStatus[DocketStatus.Booked],
+        sTSTM: ConvertToDate(data?.dKTDT),
+        oPSSTS:`Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+        iSDEL: false,        
+        mODDT: data?.eNTDT,
+        mODLOC: data?.eNTLOC||"",
+        mODBY: data?.eNTBY||""
+     }  
+    //Prepare Event Data
+    let evnData = {
+          _id: `${this.storage.companyCode}-${data.dKTNO}-0-EVN0001-${moment(data?.eNTDT).format('YYYYMMDDHHmmss')}`,
+          cID:this.storage.companyCode,
+          dKTNO: data?.dKTNO||"",
+          sFX: 0,
+          lOC:this.storage.branch,
+          eVNID:'EVN0001',
+          eVNDES:'Booking',
+          eVNDT: new Date(),
+          eVNSRC:'Quick Completion',          
+          dOCTY: 'CN',
+          dOCNO: data?.dKTNO||"",
+          sTS: DocketStatus.Booked,
+          sTSNM: DocketStatus[DocketStatus.Booked],
+          oPSSTS: `Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+          eNTDT: data?.eNTDT,
+          eNTLOC: data?.eNTLOC||"",
+          eNTBY: data?.eNTBY||""
         return { "docketsDetails": docketField, "invoiceDetails": invoiceDetails };
     }
     /*End*/

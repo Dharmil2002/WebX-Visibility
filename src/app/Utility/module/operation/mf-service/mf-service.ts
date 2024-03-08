@@ -113,6 +113,7 @@ export class ManifestService {
         docType: "MF",
         branch: this.storage.branch,
         finYear: financialYear,
+        timeZone: this.storage.timeZone,
         data: data
         }
         const res= await firstValueFrom(this.operationService.operationMongoPost("operation/mf/ltl/create",req));

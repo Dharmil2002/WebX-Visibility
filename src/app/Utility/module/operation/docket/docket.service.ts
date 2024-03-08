@@ -459,7 +459,7 @@ export class DocketService {
             "dOCNO": "",
             "sTS": DocketStatus.Booked,
             "sTSNM": DocketStatus[DocketStatus.Booked],
-            "oPSSTS": `Booked at ${this.storage.branch} on ${moment(data.docketDate).format("DD MMM YYYY @ hh:mm A")}.`,
+            "oPSSTS": `Booked at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
             "eNTLOC": this.storage.branch,
             "eNTBY": this.storage.userName
         }
@@ -675,6 +675,7 @@ export class DocketService {
             docType: "CN",
             branch: this.storage.branch,
             finYear: financialYear,
+            timeZone: this.storage.timeZone,
             data: data,
             party: data["bPARTYNM"],
           };
@@ -876,7 +877,7 @@ export class DocketService {
         sTS: DocketStatus.Booked,
         sTSNM: DocketStatus[DocketStatus.Booked],
         sTSTM: ConvertToDate(data?.dKTDT),
-        oPSSTS:`Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format('DD MMM YYYY @ hh:mm A')}.`,
+        oPSSTS:`Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
         iSDEL: false,        
         mODDT: data?.eNTDT,
         mODLOC: data?.eNTLOC||"",
@@ -897,7 +898,7 @@ export class DocketService {
           dOCNO: data?.dKTNO||"",
           sTS: DocketStatus.Booked,
           sTSNM: DocketStatus[DocketStatus.Booked],
-          oPSSTS: `Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format("DD MMM YYYY @ hh:mm A")}`,
+          oPSSTS: `Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
           eNTDT: data?.eNTDT,
           eNTLOC: data?.eNTLOC||"",
           eNTBY: data?.eNTBY||""

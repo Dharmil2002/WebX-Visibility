@@ -92,7 +92,7 @@ export class CustomerService {
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
 
         // Extract the cityCodeData from the response
-        const codeData = cResponse.data.map((x) => { return { name: x.customerName, value: x.customerCode } });
+        const codeData = cResponse.data.map((x) => { return { name: x.customerName, value: x.customerCode, otherdetails: x } });
 
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {

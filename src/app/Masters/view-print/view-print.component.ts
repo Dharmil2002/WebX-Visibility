@@ -7,6 +7,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { ViewPrintControl } from 'src/assets/FormControls/view-print';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-view-print',
   templateUrl: './view-print.component.html'
@@ -67,10 +68,44 @@ export class ViewPrintComponent implements OnInit {
     );
   }
 
+  // async save() {
+  //   const req = {
+  //     templateName: this.viewTableForm.value.vIEWTYPE.name,
+  //     DocNo: this.viewTableForm.value.dOCNO,
+  //   };
+  //   const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+  //   window.open(url, '', 'width=1000,height=800');
+  // }
   async save() {
+    // Function to display error message
+    const showError = (errorMessage) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+        showConfirmButton: true,
+      });
+    };
+
+    const docNo = this.viewTableForm.value.dOCNO;
+    const viewType = this.viewTableForm.value.vIEWTYPE;
+
+    // Check if DocNo is not entered
+    if (!docNo) {
+      showError("Please enter DocNo");
+      return;
+    }
+
+    // Check if templateName is not selected
+    if (!viewType) {
+      showError("Please select a View Type");
+      return;
+    }
+
+    // Form is complete, proceed with generating URL
     const req = {
-      templateName: this.viewTableForm.value.vIEWTYPE.name,
-      DocNo: this.viewTableForm.value.dOCNO,
+      templateName: viewType.name,
+      DocNo: docNo,
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, '', 'width=1000,height=800');

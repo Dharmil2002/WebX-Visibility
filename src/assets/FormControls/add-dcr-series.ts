@@ -41,14 +41,13 @@ export class AddDcrSeriesControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Business Type is required"
-                    // }
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
-                    }
+                    },
                 ]
             },
             {
@@ -138,7 +137,14 @@ export class AddDcrSeriesControl {
                     {
                         name: "required",
                         message: "Allot To is required"
-                    }
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
                 ],
                 functions: {
                     onOptionSelect: "getAllMastersData"
@@ -159,6 +165,13 @@ export class AddDcrSeriesControl {
                     {
                         name: "required",
                         message: "Allocate To is required"
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
                     }
                 ]
             },

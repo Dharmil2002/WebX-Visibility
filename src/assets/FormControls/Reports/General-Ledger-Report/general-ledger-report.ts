@@ -15,6 +15,9 @@ export class GeneralLedgerReport {
                 displaywith: "",
                 Validations: [
                     {
+                        name: "autocomplete",
+                    },
+                    {
                         name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
@@ -82,6 +85,9 @@ export class GeneralLedgerReport {
                 displaywith: "",
                 Validations: [
                     {
+                        name: "autocomplete",
+                    },
+                    {
                         name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
@@ -121,7 +127,10 @@ export class GeneralLedgerReport {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [{
+                Validations: [ {
+                    name: "autocomplete",
+                },
+                {
                     name: "invalidAutocomplete",
                     message: "Choose proper value",
                 },],

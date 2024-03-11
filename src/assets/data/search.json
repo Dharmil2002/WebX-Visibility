@@ -884,6 +884,14 @@
       "router": "Reports/General-ledger-report"
     },
     {
+      "title": "Reports/Cheque-Register-Report",
+      "tag": [
+        "ChequeRegisterReport",
+        "ChequeRegisterReport"
+      ],
+      "router": "Reports/Cheque-Register-Report"
+    },
+    {
       "title": "Reports/PRQ-Register-report",
       "tag": [
         "PRQreport",
@@ -929,7 +937,7 @@
         "Masters",
         "Container/Status/list"
       ],
-      "router":  "Masters/Container/Status/list"
+      "router": "Masters/Container/Status/list"
     },
     {
       "title": "Container Status Add",

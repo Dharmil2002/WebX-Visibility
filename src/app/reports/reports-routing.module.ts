@@ -12,6 +12,7 @@ import { VendorOutstandingReportComponent } from './vendor-outstanding-report/ve
 import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
 import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
+import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
 
 
 const routes: Routes = [
@@ -27,6 +28,7 @@ const routes: Routes = [
   { path: "customer-outstanding-report", component: CustomerOutstandingReportComponent },
   { path: "vendor-wise-outstanding-report", component: VendorOutstandingReportComponent },
   { path: "General-ledger-report", component: GeneralLedgerReportComponent },
+  { path: "Cheque-Register-Report", component: ChequeRegisterComponent },
 ];
 
 @NgModule({

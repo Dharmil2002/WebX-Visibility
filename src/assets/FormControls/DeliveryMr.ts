@@ -180,7 +180,7 @@ export class DeliveryMrGeneration {
                         message: "Bank is required"
                     },
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
                     {
@@ -212,7 +212,7 @@ export class DeliveryMrGeneration {
                         message: "Account is required"
                     },
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
                     {
@@ -277,7 +277,7 @@ export class DeliveryMrGeneration {
                         message: "Deposited into Bank is required"
                     },
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
                     {
@@ -331,7 +331,7 @@ export class DeliveryMrGeneration {
                         message: "Place of Supply is required"
                     },
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
                     {
@@ -360,7 +360,7 @@ export class DeliveryMrGeneration {
                         message: "SAC Code is required"
                     },
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
                     {
@@ -411,7 +411,7 @@ export class DeliveryMrGeneration {
                         message: "Place of Supply is required"
                     },
                     {
-                        name: "invalidAutocompleteObject",
+                        name: "invalidAutocomplete",
                         message: "Choose proper value",
                     },
                     {

@@ -14,6 +14,7 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { Subject, take, takeUntil } from 'rxjs';
 import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
+import moment from 'moment';
 @Component({
   selector: 'app-voucher-register-report',
   templateUrl: './voucher-register-report.component.html'
@@ -267,6 +268,8 @@ export class VoucherRegisterReportComponent implements OnInit {
 
         const startValue = new Date(this.voucherRegTableForm.controls.start.value);
         const endValue = new Date(this.voucherRegTableForm.controls.end.value);
+        const startDate = moment(startValue).startOf('day').toDate();
+        const endDate = moment(endValue).endOf('day').toDate();
 
         const docNo = this.voucherRegTableForm.value.docNo;
         const docNoArray = docNo.includes(',') ? docNo.split(',') : [docNo];
@@ -289,7 +292,7 @@ export class VoucherRegisterReportComponent implements OnInit {
         const branch = this.ReportingBranches;
         const individual = this.voucherRegTableForm.value.Individual;
         const reqBody = {
-          individual, branch, startValue, endValue, vNoArray, voucherTpData, tranTpData, partyTpData, partyNmData,
+          individual, branch, startDate, endDate, vNoArray, voucherTpData, tranTpData, partyTpData, partyNmData,
           docNoArray, cheqNo, vouchamt
         }
         const data = await this.voucherregService.getvoucherRegReportDetail(reqBody);

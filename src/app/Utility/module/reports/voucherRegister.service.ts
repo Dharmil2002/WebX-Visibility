@@ -20,8 +20,8 @@ export class voucherRegService {
           if (isEmptyDocNo) {
                matchQuery = {
                     'D$and': [
-                         { tTDT: { 'D$gte': data.startValue } }, // Convert start date to ISO format
-                         { tTDT: { 'D$lte': data.endValue } }, // date less than or equal to end date
+                         { tTDT: { 'D$gte': data.startDate } }, // Convert start date to ISO format
+                         { tTDT: { 'D$lte': data.endDate } }, // date less than or equal to end date
                          {
                               'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
                          },

@@ -1,0 +1,31 @@
+<section class="content">
+  <div class="container-fluid">
+      <div class="block-header" *ngFor="let breadscrum of breadscrums">
+          <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+          </app-breadcrumb>
+      </div>
+      <!-- <div class="row clearfix">
+          <div class="col-lg-12 col-md-12"> -->
+      <div class="card">
+          <mat-tab-group (selectedTabChange)="onTabChange($event)" (selectedIndexChange)="GetSelectedIndex($event)"
+              #myTabGroup>
+              <mat-tab label="DocketStock">
+                <ng-template mat-tab-label>
+                  ACTIVE SERIES
+                </ng-template>
+                <app-active-series *ngIf="myTabGroup.selectedIndex== 0"
+                    (CurrentIndex)="GetSelectedIndex($event)"></app-active-series>
+              </mat-tab>
+              <mat-tab label="Arrivals">
+                <ng-template mat-tab-label>
+                  COMPLETED SERIES
+                </ng-template>
+                <!-- <app-pickup-del-page *ngIf="myTabGroup.selectedIndex== 1"
+                    (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-del-page> -->
+              </mat-tab>
+          </mat-tab-group>
+      </div>
+      <!-- </div>
+      </div> -->
+  </div>
+</section>

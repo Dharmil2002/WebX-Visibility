@@ -4,21 +4,6 @@ export class ChequeRegister {
     chequeRegisterControlArray: FormControls[];
     constructor() {
         this.chequeRegisterControlArray = [
-
-            {
-                name: "start",
-                label: "Date Range ",
-                placeholder: "Select Date ",
-                type: "daterangpicker",
-                value: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [],
-                additionalData: {
-                    support: "end",
-                },
-            },
             {
                 name: 'DateType',
                 label: 'Date Type',
@@ -32,6 +17,20 @@ export class ChequeRegister {
                 generatecontrol: true, disable: false
             },
             {
+                name: "start",
+                label: "Date Range ",
+                placeholder: "Select Date ",
+                type: "daterangpicker",
+                value: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                additionalData: {
+                    support: "end",
+                },
+            },           
+            {
                 name: 'ChequeType',
                 label: 'Cheque Type',
                 placeholder: '',
@@ -44,31 +43,31 @@ export class ChequeRegister {
                 Validations: [],
                 generatecontrol: true, disable: false
             },
-            {
-                name: 'ReconcileStatus',
-                label: 'Select Reconcile Status',
-                placeholder: '',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Reconciled", name: "Reconciled" },
-                    { value: "Non Reconciled", name: "Non Reconciled" },
-                ],
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'ChequeBounceStatus',
-                label: 'Select Cheque Bounce Status',
-                placeholder: '',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Bounced", name: "Bounced" },
-                    { value: "Non Bounced ", name: "Non Bounced" },
-                    { value: "All ", name: "All" },
-                ],
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
+            // {
+            //     name: 'ReconcileStatus',
+            //     label: 'Select Reconcile Status',
+            //     placeholder: '',
+            //     type: 'Staticdropdown',
+            //     value: [
+            //         { value: "Reconciled", name: "Reconciled" },
+            //         { value: "Non Reconciled", name: "Non Reconciled" },
+            //     ],
+            //     Validations: [],
+            //     generatecontrol: true, disable: false
+            // },
+            // {
+            //     name: 'ChequeBounceStatus',
+            //     label: 'Select Cheque Bounce Status',
+            //     placeholder: '',
+            //     type: 'Staticdropdown',
+            //     value: [
+            //         { value: "Bounced", name: "Bounced" },
+            //         { value: "Non Bounced ", name: "Non Bounced" },
+            //         { value: "All ", name: "All" },
+            //     ],
+            //     Validations: [],
+            //     generatecontrol: true, disable: false
+            // },
             {
                 name: 'issuingBank',
                 label: 'Select Issuing Bank',
@@ -109,19 +108,19 @@ export class ChequeRegister {
                 },
                 generatecontrol: true, disable: false
             },
-            {
-                name: 'ChequeDepositStatus',
-                label: 'Select Cheque Deposit Status',
-                placeholder: '',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Deposited", name: "Deposited" },
-                    { value: "Non Deposited ", name: "Non Deposited" },
-                    { value: "All ", name: "All" },
-                ],
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
+            // {
+            //     name: 'ChequeDepositStatus',
+            //     label: 'Select Cheque Deposit Status',
+            //     placeholder: '',
+            //     type: 'Staticdropdown',
+            //     value: [
+            //         { value: "Deposited", name: "Deposited" },
+            //         { value: "Non Deposited ", name: "Non Deposited" },
+            //         { value: "All ", name: "All" },
+            //     ],
+            //     Validations: [],
+            //     generatecontrol: true, disable: false
+            // },
             {
                 name: 'customer',
                 label: 'Select Customer',

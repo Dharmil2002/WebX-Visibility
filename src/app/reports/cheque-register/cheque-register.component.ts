@@ -35,6 +35,8 @@ export class ChequeRegisterComponent implements OnInit {
   chequeRegisterForm: UntypedFormGroup;
   protected _onDestroy = new Subject<void>();
   CSVHeader = {
+    ChequeNo: "Cheque No",
+    ChequeDate: "Cheque Date",
     ChequeEntryDate: "Cheque Entry Date",
     Amount: "Amount",
     IssuedFromBank: "Issued From Bank",
@@ -97,6 +99,7 @@ export class ChequeRegisterComponent implements OnInit {
   save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
+        console.log(this.chequeRegisterForm.value);
 
         let ReportingBranches = [];
         if (this.chequeRegisterForm.value.Individual == "N") {
@@ -112,36 +115,36 @@ export class ChequeRegisterComponent implements OnInit {
         const startValue = moment(startDate).startOf('day').toDate();
         const endValue = moment(endDate).endOf('day').toDate();
 
-        const DateType = this.chequeRegisterForm.controls.DateType.value;
+        const DateType = this.chequeRegisterForm.value.DateType;
 
-        const ChequeType = this.chequeRegisterForm.controls.ChequeType.value;
-        const ReconcileStatus = this.chequeRegisterForm.controls.ReconcileStatus.value;
-        const ChequeBounceStatus = this.chequeRegisterForm.controls.ChequeBounceStatus.value;
-        const ChequeDepositStatus = this.chequeRegisterForm.controls.ChequeDepositStatus.value;
+        const ChequeType = this.chequeRegisterForm.value.ChequeType;
+
         const DisplayOnAccount = this.chequeRegisterForm.controls.DisplayOnAccount.value;
+
         const docummentNo = this.chequeRegisterForm.value.ChequeNo;
 
         // Check if a comma is present in docNo
         const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
 
         const customer = Array.isArray(this.chequeRegisterForm.value.custnmcdHandler)
-          ? this.chequeRegisterForm.value.custnmcdHandler.map(x => x.name)
+          ? this.chequeRegisterForm.value.custnmcdHandler.map(x => x.value)
           : [];
 
         const vendor = Array.isArray(this.chequeRegisterForm.value.vendorHandler)
-          ? this.chequeRegisterForm.value.vendorHandler.map(x => x.name)
+          ? this.chequeRegisterForm.value.vendorHandler.map(x => x.value)
           : [];
 
         const bank = Array.isArray(this.chequeRegisterForm.value.issuingBankHandler)
-          ? this.chequeRegisterForm.value.issuingBankHandler.map(x => x.name)
+          ? this.chequeRegisterForm.value.issuingBankHandler.map(x => x.value)
           : [];
 
         const branch = ReportingBranches;
 
         // Amount Search Range
         const Amt = this.chequeRegisterForm.controls.ChequeAmountRange.value.split("-") || 0;
-        const startAmt = Amt[0];
-        const endAmt = Amt[1];
+        const startAmt = Amt[0] || '';
+        const endAmt = Amt[1] || '';
+        console.log(`startAmt=${this.chequeRegisterForm.controls.ChequeAmountRange.value}`, endAmt);
 
         //  Check if endAmt is less than startAmt
         if (endAmt < startAmt) {
@@ -154,35 +157,34 @@ export class ChequeRegisterComponent implements OnInit {
           return; // Stop execution further
         }
         const optionalRequest = { docNoArray, startAmt, endAmt }
-        const reqBody = {
-          startValue, endValue, branch, bank, customer, vendor, DateType,
-          ChequeDepositStatus, ReconcileStatus, ChequeType
-        }
+        const reqBody = { startValue, endValue, branch, bank, customer, vendor, DateType, ChequeType }
+        console.log(reqBody);
+
         const data = await this.chequeRegisterService.getChequeRegister(reqBody, optionalRequest)
-        // console.log(data);
+        console.log(data);
 
-        // if (data.length === 0) {
-        //   Swal.hideLoading();
-        //   setTimeout(() => {
-        //     Swal.close();
-        //   }, 1000);
+        if (data.length === 0) {
+          Swal.hideLoading();
+          setTimeout(() => {
+            Swal.close();
+          }, 1000);
 
-        //   if (data) {
-        //     Swal.fire({
-        //       icon: "error",
-        //       title: "No Records Found",
-        //       text: "Cannot Download CSV",
-        //       showConfirmButton: true,
-        //     });
-        //   }
-        //   return;
-        // }
-        // Swal.hideLoading();
-        // setTimeout(() => {
-        //   Swal.close();
-        // }, 1000);
+          if (data) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          return;
+        }
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 1000);
         // Export the record to Excel
-        // exportAsExcelFile(data, `Cheque_Register_Report-${timeString}`, this.CSVHeader);
+        exportAsExcelFile(data, `Cheque_Register_Report-${timeString}`, this.CSVHeader);
 
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
@@ -190,7 +192,7 @@ export class ChequeRegisterComponent implements OnInit {
           error.message
         );
       }
-    }, "General Leadger Report Generating Please Wait..!");
+    }, "Cheque Register Report Generating Please Wait..!");
   }
   //#endregion
   //#region to get dropdown data

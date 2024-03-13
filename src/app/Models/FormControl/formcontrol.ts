@@ -17,11 +17,13 @@ export class FormControls {
     additionalData?: any;
     functions?: any;
     accessallowed?: boolean = true;
+    visible?: boolean = true;
 
     constructor(FormControlcc) {
         {
             this.generatecontrol = FormControlcc.generatecontrol || false;
             this.disable = FormControlcc.disable || false;
+            this.visible = FormControlcc.visible || FormControlcc.generatecontrol || true;
         }
     }
 }

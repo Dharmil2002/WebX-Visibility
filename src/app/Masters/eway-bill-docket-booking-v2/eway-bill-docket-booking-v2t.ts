@@ -231,14 +231,25 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       }
     }
 
-    this.bindQuickdocketData();
+    this.ewayBillTab = new EwayBillControls(this.generalService);
+    
+    this.ewayBillTab.applyFieldRules(this.companyCode).then(() => {
+      this.initializeFormControl();
+      this.getDataFromGeneralMaster();
+      this.bindQuickdocketData();     
+    });
   }
 
 
   ngOnInit(): void {
     this.loadTempData();
-    this.initializeFormControl();
-    this.getDataFromGeneralMaster();
+    
+    // this.ewayBillTab = new EwayBillControls(this.generalService);    
+    // this.ewayBillTab.applyFieldRules(this.companyCode).then(() => {
+    //   this.initializeFormControl();
+    //   this.getDataFromGeneralMaster();
+    //   this.bindQuickdocketData();     
+    // });
   }
 
   functionCallHandler($event) {
@@ -260,44 +271,44 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   // Initialize form control
   initializeFormControl() {
-    this.ewayBillTab = new EwayBillControls();
-    // Get control arrays for different sections
-    this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
-    this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
-    this.consigneeControlArray = this.ewayBillTab.getConsigneeFieldControls();
-    this.appointmentControlArray =
-      this.ewayBillTab.getAppointmentFieldControls();
-    this.containerControlArray = this.ewayBillTab.getContainerFieldControls();
-    this.contractControlArray = this.ewayBillTab.getContractFieldControls();
-    this.totalSummaryControlArray =
-      this.ewayBillTab.getTotalSummaryFieldControls();
-    this.ewayBillControlArray = this.ewayBillTab.getEwayBillFieldControls();
+   
+      // Get control arrays for different sections
+      this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
+      this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
+      this.consigneeControlArray = this.ewayBillTab.getConsigneeFieldControls();
+      this.appointmentControlArray =
+        this.ewayBillTab.getAppointmentFieldControls();
+      this.containerControlArray = this.ewayBillTab.getContainerFieldControls();
+      this.contractControlArray = this.ewayBillTab.getContractFieldControls();
+      this.totalSummaryControlArray =
+        this.ewayBillTab.getTotalSummaryFieldControls();
+      this.ewayBillControlArray = this.ewayBillTab.getEwayBillFieldControls();
 
-    // Set up data for tabs and contracts
-    this.tabData = {
-      [`${DocCalledAs.Docket} Details`]: this.docketControlArray,
-      "Consignor Details": this.consignorControlArray,
-      "Consignee Details": this.consigneeControlArray,
-      "Appointment Based Delivery": this.appointmentControlArray
-    };
-    
+      // Set up data for tabs and contracts
+      this.tabData = {
+        [`${DocCalledAs.Docket} Details`]: this.docketControlArray,
+        "Consignor Details": this.consignorControlArray,
+        "Consignee Details": this.consigneeControlArray,
+        "Appointment Based Delivery": this.appointmentControlArray
+      };
+      
 
-    this.contractData = {
-      "Contract Details": this.contractControlArray,
-      "Total Summary": this.totalSummaryControlArray,
-      "E-Way Bill Details": this.ewayBillControlArray,
-    };
-    // Perform common drop-down mapping
-    this.commonDropDownMapping();
-    // Build form groups
-    this.tabForm = formGroupBuilder(this.fb, Object.values(this.tabData));
-    this.contractForm = formGroupBuilder(
-      this.fb,
-      Object.values(this.contractData)
-    );
-    // Set initial values for the form controls
-    this.tabForm.controls["appoint"].setValue("N");
-    this.bindQuickdocketData();
+      this.contractData = {
+        "Contract Details": this.contractControlArray,
+        "Total Summary": this.totalSummaryControlArray,
+        "E-Way Bill Details": this.ewayBillControlArray,
+      };
+      // Perform common drop-down mapping
+      this.commonDropDownMapping();
+      // Build form groups
+      this.tabForm = formGroupBuilder(this.fb, Object.values(this.tabData));
+      this.contractForm = formGroupBuilder(
+        this.fb,
+        Object.values(this.contractData)
+      );
+      // Set initial values for the form controls
+      this.tabForm.controls["appoint"].setValue("N");
+      this.bindQuickdocketData();
   }
   async getDataFromGeneralMaster() {
     this.paymentType = await this.generalService.getGeneralMasterData("PAYTYP");

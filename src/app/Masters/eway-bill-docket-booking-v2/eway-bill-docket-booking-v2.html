@@ -30,9 +30,9 @@
                             <div>
                                 <mat-step [editable]="true" [stepControl]="tabForm">
                                     <ng-template matStepLabel>Basic Details</ng-template>
-                                    <form [formGroup]="tabForm">
-                                        <generic-accordion-webxpress [AccordionForm]="tabForm"
-                                            [accordionGroup]="tabData"
+                                    <form [formGroup]="tabForm" *ngIf="tabData">
+                                        <generic-accordion-webxpress
+                                            [AccordionForm]="tabForm" [accordionGroup]="tabData"
                                             [showSaveAndCancelButtonV]="showSaveAndCancelButton"
                                             (functionCallEmitter)="functionCallHandler($event)">
                                         </generic-accordion-webxpress>
@@ -50,7 +50,7 @@
                             <!----END--->
 
                             <!-- Step 2 Details -->
-                            <div>
+                            <div *ngIf="contractData">
                                 <mat-step [editable]="false" [stepControl]="contractForm">
                                     <ng-template matStepLabel>Contract Details</ng-template>
                                     <form [formGroup]="contractForm">

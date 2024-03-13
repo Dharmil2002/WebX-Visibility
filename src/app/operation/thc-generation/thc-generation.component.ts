@@ -231,6 +231,15 @@ export class ThcGenerationComponent implements OnInit {
   DocketsContainersWise: boolean = false;
   DocketsIsEmpty: boolean = false;
   currentLocation: any;
+
+  DocketFilterData = {
+    fCT: "",
+    tCT: "",
+    cCT: "",
+    sDT: moment().add(-15, 'days').startOf('day').toDate(),
+    eDT: moment().endOf('day').toDate()    
+  }
+
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -357,6 +366,8 @@ export class ThcGenerationComponent implements OnInit {
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonMarketVehicle]);
     this.getGeneralMasterData();
     this.getDropDownDetail();
+
+    //this.DocketFilterData.cCT = this.thcTableForm.controls['fromCity'].value?.value || ''
   }
   /*End*/
 
@@ -1009,13 +1020,8 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*End*/
 
-  DocketFilterData = {
-    fCT: this.storage.branch,
-    sDT: moment().add(-15, 'days').startOf('day').toDate(),
-    eDT: moment().endOf('day').toDate()
-  }
-
-  async filterDockets() {
+ 
+  async filterDockets() {    
     const dialogRef = this.dialog.open(DocketFiltersComponent, {
       data: { DefaultData: this.DocketFilterData },
       width: "30%",
@@ -1025,7 +1031,10 @@ export class ThcGenerationComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      if (result != undefined) {
+      if (result != undefined) {        
+        this.DocketFilterData.fCT = result.FromCity?.value || '';
+        this.DocketFilterData.tCT = result.ToCity?.value || '';
+        this.DocketFilterData.cCT = result.StockCity?.value || '';
         this.DocketFilterData.sDT = moment(result.StartDate).startOf('day').toDate();
         this.DocketFilterData.eDT = moment(result.EndDate).endOf('day').toDate();
         this.getDocketsForTHC();
@@ -1037,9 +1046,11 @@ export class ThcGenerationComponent implements OnInit {
     const pRQNO = this.thcTableForm.controls['prqNo'].value;
     const fromCity = this.thcTableForm.controls['fromCity'].value?.value || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.value || ''
+
     this.tableData = [];
 
-    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, fromCity.toUpperCase(), null, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
+    //this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, fromCity.toUpperCase(), null, null, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
+    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
     const filteredShipments = this.allShipment;
     const addEditAction = (shipments) => {
       return shipments.map((shipment) => {

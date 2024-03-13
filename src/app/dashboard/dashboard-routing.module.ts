@@ -9,8 +9,6 @@ import { UpdateStockComponent } from "./ActionPages/update-stock/update-stock.co
 import { JobTrackerComponent } from "./tabs/job-tracker/job-tracker.component";
 import { AddDeliveryMrGenerationComponent } from "./tabs/Delivery MR Generation/add-delivery-mr-generation/add-delivery-mr-generation.component";
 import { DeliveryMrResponseModalComponent } from "./tabs/Delivery MR Generation/delivery-mr-response-modal/delivery-mr-response-modal.component";
-import { HomePageComponent } from "./HomePage/home-page/home-page.component";
-import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-dashboard.component";
 const routes: Routes = [
   {
     path: "",
@@ -52,15 +50,6 @@ const routes: Routes = [
   {
     path:"DeliveryMrGeneration/Result",
     component:DeliveryMrResponseModalComponent
-  },
-
-  {
-    path:"home",
-    component:HomePageComponent
-  },
-  {
-    path:"ReportDashboard",
-    component:ReportDashboardComponent
   },
 
 ];

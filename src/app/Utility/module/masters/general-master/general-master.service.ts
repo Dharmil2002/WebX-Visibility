@@ -65,4 +65,19 @@ async getDataForMultiAutoComplete(containerName, filter, nameField, valueField )
     return res.data.map((x) => { return { name: x[nameField], value: x[valueField] } });
 }
 /*End*/
+
+async getData(containerName, filter) {
+    // Construct the request body with the companyCode, collectionName, and filter.
+    const reqBody = {
+        companyCode: localStorage.getItem("companyCode"),
+        collectionName: containerName,
+        filter: filter
+    };
+
+    // Send a POST request to the masterService to retrieve data and await the response.
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
+
+    // Map the GeneralMaster objects to AutoComplete objects and return the strongly typed result.
+    return res.data;
+}
 }

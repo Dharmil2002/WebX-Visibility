@@ -22,6 +22,87 @@ export class thcGenerationFilterControls {
                 },
               },
               {
+                name: "FromCity",
+                label: "From City",
+                placeholder: "From City",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [                 
+                  {
+                    name: "autocomplete"
+                  },
+                  {
+                    name: "invalidAutocomplete",
+                    message: "Choose proper value",
+                  }
+                ],
+                additionalData: {
+                  showNameAndValue: false,
+                },
+                functions: {
+                  onModel: "getCity",
+                },
+              },
+              {
+                name: "ToCity",
+                label: "To City",
+                placeholder: "To City",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [                  
+                  {
+                    name: "autocomplete"
+                  },
+                  {
+                    name: "invalidAutocomplete",
+                    message: "Choose proper value",
+                  }
+                ],
+                additionalData: {
+                  showNameAndValue: false,
+                },
+                functions: {
+                  onModel: "getCity",
+                },
+              },     
+              {
+                name: "StockCity",
+                label: "Stock City",
+                placeholder: "Stock City",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [                 
+                  {
+                    name: "autocomplete"
+                  },
+                  {
+                    name: "invalidAutocomplete",
+                    message: "Choose proper value",
+                  }
+                ],
+                additionalData: {
+                  showNameAndValue: false,
+                },
+                functions: {
+                  onModel: "getCity",
+                },
+              },         
+              {
                 name: "EndDate",
                 label: "",
                 placeholder: "Select Data Range",

@@ -133,13 +133,13 @@ export class ChequeRegisterComponent implements OnInit {
             : [parseInt(docummentNo.trim(), 10)];
         }
 
-        const customer = Array.isArray(this.chequeRegisterForm.value.custnmcdHandler)
-          ? this.chequeRegisterForm.value.custnmcdHandler.map(x => x.value)
-          : [];
-
-        const vendor = Array.isArray(this.chequeRegisterForm.value.vendorHandler)
+        const party = Array.isArray(this.chequeRegisterForm.value.vendorHandler)
           ? this.chequeRegisterForm.value.vendorHandler.map(x => x.value)
           : [];
+
+        if (Array.isArray(this.chequeRegisterForm.value.custnmcdHandler)) {
+          party.push(...this.chequeRegisterForm.value.custnmcdHandler.map(x => x.value));
+        }
 
         const bank = Array.isArray(this.chequeRegisterForm.value.issuingBankHandler)
           ? this.chequeRegisterForm.value.issuingBankHandler.map(x => x.value)
@@ -179,7 +179,7 @@ export class ChequeRegisterComponent implements OnInit {
           return; // Stop execution further
         }
         const optionalRequest = { docNoArray, startAmt, endAmt }
-        const reqBody = { startValue, endValue, branch, bank, customer, vendor, DateType, ChequeType }
+        const reqBody = { startValue, endValue, branch, bank, party, DateType, ChequeType }
 
         const data = await this.chequeRegisterService.getChequeRegister(reqBody, optionalRequest)
 

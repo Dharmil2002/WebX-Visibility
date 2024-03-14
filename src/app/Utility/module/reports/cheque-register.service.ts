@@ -12,6 +12,7 @@ export class ChequeRegisterService {
   constructor(private masterService: MasterService,
     private storage: StorageService,) { }
 
+  //#region to get cheque register report data as per the query
   async getChequeRegister(data, optionalRequest) {
 
     const hasStartAmt = optionalRequest.startAmt !== '' && optionalRequest.startAmt !== undefined;
@@ -34,10 +35,8 @@ export class ChequeRegisterService {
               : { dT: { 'D$gte': data.startValue, 'D$lte': data.endValue } },
           // Branch condition
           ...(data.branch.length > 0 ? [{ lOC: { 'D$in': data.branch } }] : []),
-          // Customer condition
-          ...(data.customer.length > 0 ? [{ pCODE: { 'D$in': data.customer } }] : []),
-          // Vendor condition
-          ...(data.vendor.length > 0 ? [{ pCODE: { 'D$in': data.vendor } }] : []),
+          // party condition
+          ...(data.party.length > 0 ? [{ pCODE: { 'D$in': data.party } }] : []),
           // Bank condition
           ...(data.bank.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.aCOD', data.bank] } }] : [])
         ]
@@ -125,4 +124,5 @@ export class ChequeRegisterService {
 
     return res.data;
   }
+  //#endregion
 }

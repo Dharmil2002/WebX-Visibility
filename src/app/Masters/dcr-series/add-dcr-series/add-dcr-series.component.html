@@ -5,11 +5,10 @@
       [showSaveAndCancelButton]="false">
     </app-form-webxpress>
   </form>
-  <button type="button" mat-raised-button color="primary" (click)="saveData()">
-    <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
-    <ng-template #saveButton>Save</ng-template>
+  <button type="button" mat-raised-button color="primary" (click)="saveData()" [disabled]="!addDcrTableForm.valid">
+   Save
   </button>&nbsp;&nbsp;
-  <button type="button" mat-raised-button color="primary" (click)="allocate()">
+  <button type="button" mat-raised-button color="primary" *ngIf="addDcrTableForm.valid" (click)="allocate()">
     Allocate
   </button>
 </app-common-wrapper-webxpress>

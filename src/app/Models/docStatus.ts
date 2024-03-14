@@ -2,7 +2,7 @@ export enum DocketStatus {
     Awaiting_Completion = 0,//Booked at {Orgin} on {BookingDate} and awaiting completion.
     Booked = 1,//Booked at {Orgin} on {BookingDate}.
     Awaiting_Loading = 2,//Loadingsheet generated ${lsNo} on ${lSDT} and awaiting loading at {cLOC}.
-    Loaded = 3,//Manifest generated ${mfNo} on ${mFDT} and awaiting departure from ${cLOC}. 
+    Loaded = 3,//Manifest generated ${mfNo} on ${mFDT} and awaiting departure from ${cLOC}.
     Departed = 4,//Departed from ${cLOC} to ${nextLoc} with THC {tHC} on ${depatureDate}.
     Arrived = 5,//Arrived at ${cLOC} on ${arrivalDate}.
     In_Transhipment_Stock = 6,//In stock at ${cLOC} and available for loadingsheet since ${scanDate}.
@@ -10,7 +10,7 @@ export enum DocketStatus {
     Awaiting_Delivery = 8,//DRS generated ${dRSNO} at ${cLOC} on ${dRSDT}.
     Out_For_Delivery = 9,//Out For Delivery with DRS ${dRSNO} from ${cLOC} since ${dRSDT}.
     Delivered = 10,//Delivered to ${receiverName} on ${deliveryDate}, reason : ${deliveryReason}
-    Undelivered = 11,//Delivery attempted on ${aDT}, reason : ${reason} 
+    Undelivered = 11,//Delivery attempted on ${aDT}, reason : ${reason}
     Partial_Delivered = 12,//Partially delivered to ${receiverName} on ${deliveryDate}, reason : ${deliveryReason}
     Del_MR_Generated = 13,//Delivery Mr Generated at ${cLOC} on ${Dt}
     Detained = 98,//Docket detained at ${cLOC} on ${Dt}
@@ -82,4 +82,15 @@ export enum DrsStatus {
     Delivery_Out_Scan = 2,
     Out_For_Delivery=3,
     Closed=4
+}
+
+export enum DcrEvents {
+  Added = 1,
+  Allocated = 2,
+  Reallocated = 3,
+  Assigned = 4,
+  Splitted = 5,
+  Declared_Void = 6,
+  Deallocated = 7,
+  Cancelled = 9
 }

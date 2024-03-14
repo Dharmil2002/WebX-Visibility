@@ -68,7 +68,7 @@ export class AddDcrSeriesControl {
           },
         ],
         functions: {
-          onChange: "checkValidation",
+          onChange: "isSeriesExists",
         },
       },
       {

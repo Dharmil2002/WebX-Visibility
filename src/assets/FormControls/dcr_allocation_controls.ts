@@ -11,16 +11,12 @@ export class DcrAllocationForm {
         placeholder: "Select Allocation Type",
         type: "Staticdropdown",
         value: [
-            { value: "Location", name: "Location" },
-            { value: "Customer", name: "Customer", },
+            { value: "L", name: "Location" },
+            { value: "C", name: "Customer", },
         ],
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Allocate To is required",
-          },
         ],
         // Additional properties like `generatecontrol` and `disable` can be added based on your requirements
         additionalData: {
@@ -58,6 +54,10 @@ export class DcrAllocationForm {
         generatecontrol: true,
         disable: false,
         Validations: [
+          {
+            name: "required",
+            message: "Customer is required",
+          },
         ],
         // Additional properties can be added.
         additionalData: {
@@ -70,9 +70,9 @@ export class DcrAllocationForm {
         placeholder: "Select Assignee",
         type: "Staticdropdown", // Change to "text" if assignee is free text input
         value: [
-          { value: "Employee", name: "Employee" },
-          { value: "BA", name: "BA", },
-          { value: "Customer", name: "Customer", },
+          { value: "E", name: "Employee" },
+          { value: "B", name: "BA", },
+          { value: "C", name: "Customer", },
           ],
         generatecontrol: true,
         disable: false,
@@ -111,35 +111,35 @@ export class DcrAllocationForm {
         name: "from",
         label: "From",
         placeholder: "Enter Starting Document Number",
-        type: "text",
-        value: allocationData?.from , // Set default value to 0
+        type: "number",
+        value: allocationData?.from ,
         generatecontrol: true,
         disable: false,
+
         Validations: [
           {
             name: "required",
             message: "From Document Number is required",
           },
         ],
-
-        // Additional properties can be added.
-
       },
       {
         name: "to",
         label: "To",
         placeholder: "Enter Ending Document Number",
-        type: "text",
+        type: "number",
         value: allocationData?.to, // Set default value to 0
         generatecontrol: true,
         disable: false,
+        functions:{
+          onChange:"toGreaterThanFromValidator",
+        },
         Validations: [
           {
             name: "required",
             message: "To Document Number is required",
           },
         ],
-
         // Additional properties can be added.
       },
       {
@@ -158,6 +158,19 @@ export class DcrAllocationForm {
         ],
         // Additional properties can be added.
 
+      },
+      {
+        name: 'isCancel',
+        label: 'Cancle Allocation',
+        placeholder: '',
+        type: 'toggle',
+        value: allocationData.isCancle,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        functions:{
+          onChange:"Cancel",
+        }
       },
     ];
   }

@@ -1349,7 +1349,8 @@ export class EwayBillControls {
     c.label = field.Caption;
     c.placeholder = field["Place Holder"];
     c.generatecontrol = field.Visible;
-    c.disable = field.ReadOnly;     
+    c.disable = field.ReadOnly;  
+    c.visible = field.Visible;   
     
     if(field.IsSystemGenerated) {
       c.value = "Computerized";

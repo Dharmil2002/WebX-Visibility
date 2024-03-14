@@ -271,8 +271,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   // Initialize form control
   initializeFormControl() {
-   
-      // Get control arrays for different sections
       this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
       this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
       this.consigneeControlArray = this.ewayBillTab.getConsigneeFieldControls();
@@ -308,6 +306,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       );
       // Set initial values for the form controls
       this.tabForm.controls["appoint"].setValue("N");
+      this.displayAppointment("N");
       this.bindQuickdocketData();
   }
   async getDataFromGeneralMaster() {
@@ -389,6 +388,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   
   async bindQuickdocketData() {
+    
     if (this.quickDocket) {
           this.DocketDetails=this.quickdocketDetaildata?.docketsDetails||{};
           const contract=this.contractForm.value;
@@ -468,10 +468,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   // Display appointment
   displayAppointment($event) {
-    const generateControl = $event.eventArgs.value === "Y"; // Check if value is "Y" to generate control
+    // Check if $event has property 'eventArgs'. If not, use $event directly for comparison.
+  const isY = $event.eventArgs ? $event.eventArgs.value === "Y" : $event === "Y";
+  const generateControl = isY; // True if either condition above results in "Y"
     this.appointmentControlArray.forEach((data) => {
       if (data.name !== "appoint") {
-        data.generatecontrol = generateControl; // Set generatecontrol property based on the generateControl value
+        data.generatecontrol = generateControl;
       }
     });
   }
@@ -737,6 +739,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
 
   calculateInvoiceTotal() {
+    debugger
     calculateInvoiceTotalCommon(this.tableData, this.contractForm);
   }
   async checkInvoiceExist(data){

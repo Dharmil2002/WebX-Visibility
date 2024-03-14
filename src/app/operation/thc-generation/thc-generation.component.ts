@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
@@ -1065,7 +1065,6 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   vendorFieldChanged() {
-    debugger
     this.marketVendor =false;
     const vendorType = this.thcTableForm.value.vendorType;
     this.jsonControlArray.forEach((x) => {
@@ -1306,10 +1305,28 @@ export class ThcGenerationComponent implements OnInit {
   {
     const transMode=this.thcTableForm.controls['transMode'].value;
     const transModeDetail=this.products.find((x)=>x.value==transMode);
+    const vehicle= this.thcTableForm.controls['vehicle'];
     if(transModeDetail.name=="Rail"){
       this.isRail=true
+      vehicle.clearValidators(); // Remove all validators from this control
+      vehicle.updateValueAndValidity(); // Update the validation status
+      this.jsonControlArray.forEach((x) => {
+       
+        if (x.name === "vehicle") {
+          x.disable =true
+        }
+      })
     }
     else{
+      vehicle.updateValueAndValidity(); // Update the validation status
+      this.jsonControlArray.forEach((x) => {
+       
+        if (x.name === "vehicle") {
+          x.disable =false
+        }
+      })
+      vehicle.setValidators([Validators.required]); // Remove all validators from this control
+      vehicle.updateValueAndValidity(); // Update the validation status
       this.isRail=false
     }
    

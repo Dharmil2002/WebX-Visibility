@@ -12,6 +12,7 @@ import { ContainerService } from 'src/app/Utility/module/masters/container/conta
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
 import Swal from 'sweetalert2';
+import moment from 'moment';
 
 @Component({
   selector: 'app-freight-charge-upload',
@@ -171,6 +172,20 @@ export class FreightChargeUploadComponent implements OnInit {
                 return x.name;
               }),
             },
+            ],
+          },
+          {
+            ItemsName: "ValidFromDate",
+            Validations: [
+              { Required: true },
+              { range: 1 },
+            ],
+          },
+          {
+            ItemsName: "ValidToDate",
+            Validations: [
+              { Required: true },
+              { range: 1 },
             ],
           },
         ];
@@ -390,6 +405,10 @@ export class FreightChargeUploadComponent implements OnInit {
     processedData.tRDYS = element.TransitDays
     processedData.rT = parseFloat(element.Rate);
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
+
+    // SET Start Date And End Date
+    processedData.vFDT = moment(element.ValidFromDate, 'DD-MM-YYYY').toDate();
+    processedData.vEDT = moment(element.ValidToDate, 'DD-MM-YYYY').toDate();
 
     // Set timestamp and user information
     processedData.eNTDT = new Date();

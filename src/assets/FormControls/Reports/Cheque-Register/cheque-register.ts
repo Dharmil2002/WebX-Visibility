@@ -29,7 +29,7 @@ export class ChequeRegister {
                 additionalData: {
                     support: "end",
                 },
-            },           
+            },
             {
                 name: 'ChequeType',
                 label: 'Cheque Type',
@@ -222,7 +222,7 @@ export class ChequeRegister {
                 label: "Cheque No",
                 placeholder: "Please Enter Cheque Number comma(,) separated",
                 type: 'text',
-                value: '',
+                value: [],
                 generatecontrol: true,
                 disable: false,
                 Validations: []
@@ -232,7 +232,7 @@ export class ChequeRegister {
                 label: "Search by Cheque Amount Range",
                 placeholder: "Please Enter Cheque Amount Range dash(-) separated",
                 type: 'text',
-                value: '',
+                value: [],
                 generatecontrol: true,
                 disable: false,
                 Validations: []

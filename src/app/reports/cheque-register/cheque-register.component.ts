@@ -99,7 +99,6 @@ export class ChequeRegisterComponent implements OnInit {
   save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        console.log(this.chequeRegisterForm.value);
 
         let ReportingBranches = [];
         if (this.chequeRegisterForm.value.Individual == "N") {
@@ -123,16 +122,24 @@ export class ChequeRegisterComponent implements OnInit {
 
         const docummentNo = this.chequeRegisterForm.value.ChequeNo;
 
-        // Check if a comma is present in docNo
-        const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
+        // Check if a comma is present in docNo      
+        let docNoArray;
 
-        const customer = Array.isArray(this.chequeRegisterForm.value.custnmcdHandler)
-          ? this.chequeRegisterForm.value.custnmcdHandler.map(x => x.value)
-          : [];
+        if (Array.isArray(docummentNo) && docummentNo.length === 0) {
+          docNoArray = [];
+        } else {
+          docNoArray = docummentNo.includes(',')
+            ? docummentNo.split(',').map(value => parseInt(value.trim(), 10))
+            : [parseInt(docummentNo.trim(), 10)];
+        }
 
-        const vendor = Array.isArray(this.chequeRegisterForm.value.vendorHandler)
+        const party = Array.isArray(this.chequeRegisterForm.value.vendorHandler)
           ? this.chequeRegisterForm.value.vendorHandler.map(x => x.value)
           : [];
+
+        if (Array.isArray(this.chequeRegisterForm.value.custnmcdHandler)) {
+          party.push(...this.chequeRegisterForm.value.custnmcdHandler.map(x => x.value));
+        }
 
         const bank = Array.isArray(this.chequeRegisterForm.value.issuingBankHandler)
           ? this.chequeRegisterForm.value.issuingBankHandler.map(x => x.value)
@@ -141,11 +148,26 @@ export class ChequeRegisterComponent implements OnInit {
         const branch = ReportingBranches;
 
         // Amount Search Range
-        const Amt = this.chequeRegisterForm.controls.ChequeAmountRange.value.split("-") || 0;
-        const startAmt = Amt[0] || '';
-        const endAmt = Amt[1] || '';
-        console.log(`startAmt=${this.chequeRegisterForm.controls.ChequeAmountRange.value}`, endAmt);
+        const chequeAmountRange = this.chequeRegisterForm.value.ChequeAmountRange;
 
+        let startAmt: number | undefined;
+        let endAmt: number | undefined;
+
+        if (Array.isArray(chequeAmountRange) && chequeAmountRange.length === 0) {
+          // If chequeAmountRange is an empty array
+          startAmt = undefined;
+          endAmt = undefined;
+        } else {
+          const Amt = chequeAmountRange.includes('-') ? chequeAmountRange.split("-") : [];
+
+          if (Amt.length > 0 && Amt[0].trim() !== '') {
+            startAmt = parseFloat(Amt[0].trim());
+          }
+
+          if (Amt.length > 1 && Amt[1].trim() !== '') {
+            endAmt = parseFloat(Amt[1].trim());
+          }
+        }
         //  Check if endAmt is less than startAmt
         if (endAmt < startAmt) {
           Swal.fire({
@@ -157,11 +179,9 @@ export class ChequeRegisterComponent implements OnInit {
           return; // Stop execution further
         }
         const optionalRequest = { docNoArray, startAmt, endAmt }
-        const reqBody = { startValue, endValue, branch, bank, customer, vendor, DateType, ChequeType }
-        console.log(reqBody);
+        const reqBody = { startValue, endValue, branch, bank, party, DateType, ChequeType }
 
         const data = await this.chequeRegisterService.getChequeRegister(reqBody, optionalRequest)
-        console.log(data);
 
         if (data.length === 0) {
           Swal.hideLoading();
@@ -189,7 +209,7 @@ export class ChequeRegisterComponent implements OnInit {
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
-          error.message
+          "Fail To Submit Data..!"
         );
       }
     }, "Cheque Register Report Generating Please Wait..!");

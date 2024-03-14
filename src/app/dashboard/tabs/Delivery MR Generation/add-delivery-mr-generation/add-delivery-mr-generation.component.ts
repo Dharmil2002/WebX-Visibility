@@ -773,7 +773,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
               collectionName: "voucher_trans",
               filter: { vNO: VoucherNo },
               update: {
-                vTNO: res?.data?.chargeDetails?.data.ops[0]?.dLMRNO
+                vTNO: res?.data?.chargeDetails?.ops[0]?.dLMRNO
               }
             };
             await firstValueFrom(this.operation.operationPut("generic/update", reqBody));

@@ -245,7 +245,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : update,
+                    disable: view ? view  : update,
                     Validations: [
                         {
                             name: "required",

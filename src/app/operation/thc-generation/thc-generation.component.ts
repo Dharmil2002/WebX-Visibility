@@ -542,7 +542,7 @@ export class ThcGenerationComponent implements OnInit {
         driverMno: vehicleDetail?.dMobNo || '',
         driverLno: vehicleDetail?.lcNo || '',
         driverLexd: vehicleDetail?.lcExpireDate || '',
-        panNo: vehicleDetail?.driverPan || '',
+        panNo: '',
         insuranceExpiryDate: new Date(),
         fitnessValidityDate: new Date(),
       };
@@ -552,6 +552,7 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls[controlName].setValue(jsonData[controlName]);
         }
       }
+      
       // /*here i set in both name value is vNDNM the blow condition only applye when the vendor type is market
       // after this autofill it is going to the vendotype changes function then after it set vendorname as textbox and vendor code set as 8888 in submit time
       // */
@@ -568,7 +569,7 @@ export class ThcGenerationComponent implements OnInit {
             vendor: vehData.vndNM || '',
             vMobileNo: vehData.vndPH || '',
             driver: vehData.drvNM || '',
-            driverPan: vehData.pANNO || '',
+            driverPan: vehData?.pANNO || '',
             lcNo: vehData.dLNO || '',
             lcExpireDate: vehData.dLEXP || new Date(),
             dmobileNo: vehData.drvPH || '',

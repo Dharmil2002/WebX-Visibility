@@ -23,7 +23,6 @@ import { DriverMaster } from "src/app/Models/driver-master/driver-master";
 import { DriverService } from "src/app/Utility/module/masters/driver-master/drivers.service";
 import { ShipmentDetail } from "src/app/Models/Shipment/shipment";
 import { getVendorDetails } from "../job-entry-page/job-entry-utility";
-import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
@@ -31,13 +30,12 @@ import { MarkerVehicleService } from "src/app/Utility/module/operation/market-ve
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ShipmentEditComponent } from "../shipment-edit/shipment-edit.component";
-import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel, ThcmovementDetails, UNload, UTi, thcsummaryData } from '../../Models/THC/THCModel';
+import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel, ThcmovementDetails, UNload, UTi, rakeDetails, thcsummaryData } from '../../Models/THC/THCModel';
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
 import moment from "moment";
-import { filter } from 'rxjs/operators';
 import { DocketFiltersComponent } from "./filters/docket-filters/docket-filters.component";
 import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
 
@@ -57,8 +55,8 @@ export class ThcGenerationComponent implements OnInit {
   ARr = new ARr();
   UNload = new UNload();
   mfheaderDetails = new MfheaderDetails();
-  
   mfdetailsList: MfdetailsList[] = [];
+  rakeData:rakeDetails[]=[];
   isRail:boolean=false;
   rrLoad: boolean = true;
   // End Code Of Harikesh
@@ -213,6 +211,7 @@ export class ThcGenerationComponent implements OnInit {
   branchCode: string;
   selectedData: [] = [];
   menuItems = [{ label: "Update" }];
+  rakeMenuItems = [{ label: "EditRake" },{ label: "RemoveRake"}];
   menuItemflag: boolean = true;
   jsonControlBasicArray: any;
   jsonControlVehLoadArray: any;
@@ -332,7 +331,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*here the function which is use for the intialize a form for thc*/
   IntializeFormControl() {
-    debugger
+
     const loadingControlForm = new thcControl(
       this.isUpdate || false,
       this.isView || false,
@@ -719,6 +718,7 @@ export class ThcGenerationComponent implements OnInit {
     this.selectedData = event;
   }
   async handleMenuItemClick(data) {
+
     if (data.label.label === "Update") {
       const dialogref = this.dialog.open(ThcUpdateComponent, {
         data: data.data,
@@ -756,6 +756,9 @@ export class ThcGenerationComponent implements OnInit {
 
       });
     }
+    if (data.label.label  === "EditRake") {
+      this.fillRakeDetails(data);
+  }
   }
   async createThc() {
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
@@ -1315,6 +1318,7 @@ export class ThcGenerationComponent implements OnInit {
     const transMode=this.thcTableForm.controls['transMode'].value;
     const transModeDetail=this.products.find((x)=>x.value==transMode);
     const vehicle= this.thcTableForm.controls['vehicle'];
+    const loadControl=["advPdAt","balAmtAt"];
     if(transModeDetail.name=="Rail"){
       this.isRail=true
       vehicle.clearValidators(); // Remove all validators from this control
@@ -1325,6 +1329,16 @@ export class ThcGenerationComponent implements OnInit {
           x.disable =true
         }
       })
+     this.jsonControlVehLoadArray.forEach(element => {
+        this.thcTableForm.controls[element.name].clearValidators();
+        this.thcTableForm.controls[element.name].updateValueAndValidity();
+        
+      });
+      this.jsonControlDriverArray.forEach(element => {
+        this.thcTableForm.controls[element.name].clearValidators();
+        this.thcTableForm.controls[element.name].updateValueAndValidity();
+        
+      });
     }
     else{
       vehicle.updateValueAndValidity(); // Update the validation status
@@ -1336,6 +1350,16 @@ export class ThcGenerationComponent implements OnInit {
       })
       vehicle.setValidators([Validators.required]); // Remove all validators from this control
       vehicle.updateValueAndValidity(); // Update the validation status
+      this.jsonControlVehLoadArray.forEach(element => {
+        this.thcTableForm.controls[element.name].setValidators([Validators.required]);
+        this.thcTableForm.controls[element.name].updateValueAndValidity();
+        
+      });
+      this.jsonControlDriverArray.forEach(element => {
+        this.thcTableForm.controls[element.name].setValidators([Validators.required]);
+        this.thcTableForm.controls[element.name].updateValueAndValidity();
+        
+      });
       this.isRail=false
     }
    
@@ -1357,6 +1381,7 @@ export class ThcGenerationComponent implements OnInit {
 
   }
   GenerateTHCgenerationRequestBody() {
+    debugger
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
 
@@ -1379,6 +1404,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.closingBranch = this.thcTableForm.controls['closingBranch'].value || "";
     this.thcsummaryData.fromCity = this.thcTableForm.controls['fromCity'].value || "";
     this.thcsummaryData.toCity = this.thcTableForm.controls['toCity'].value || "";
+    this.thcsummaryData.via=this.thcTableForm.controls['viaControlHandler'].value?this.thcTableForm.controls['viaControlHandler'].value.map((x)=>x.value):"";
     this.thcsummaryData.routecode = "9888";
     this.thcsummaryData.route = this.thcTableForm.controls['route'].value || "";
     this.thcsummaryData.vehicle = this.thcTableForm.controls['vehicle'].value || "";
@@ -1440,7 +1466,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.pRQNO = this.thcTableForm.controls['prqNo'].value || "";
     this.thcsummaryData.iSEMPTY = this.DocketsIsEmpty;
     //#endregion
-
+   const isRake=this.thcsummaryData.tMODENM=="Rail";
     //#region Load
     this.LOad.dKTS = this.tableData.filter(item => item.isSelected == true).length;
     this.LOad.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.pKGS, 0);
@@ -1452,13 +1478,13 @@ export class ThcGenerationComponent implements OnInit {
     //#endregion
 
     //#region CAp
-    this.CAp.wT = this.thcTableForm.controls['capacity'].value || 0;
+    this.CAp.wT = !isRake?this.thcTableForm.controls['capacity'].value || 0:0;
     this.CAp.vOL = 0;
     this.CAp.vWT = 0;
     //#endregion
 
     //#region UTi
-    this.UTi.wT = this.thcTableForm.controls['weightUtilization'].value || 0;
+    this.UTi.wT =  !isRake?this.thcTableForm.controls['weightUtilization'].value || 0:0;
     this.UTi.vOL = 0;
     this.UTi.vWT = 0;
     //#endregion
@@ -1565,9 +1591,16 @@ export class ThcGenerationComponent implements OnInit {
 
 
     this.tHCGenerationModel.data = this.thcsummaryData;
+    if(this.tableRakeData.length){
+      this.tableRakeData.forEach(element => {
+        this.rakeData.push({rRNO:element.rrNo,rRDT:element.orrDate});
+      });
+    this.tHCGenerationModel.data.rakeDetailsList = this.rakeData;
+    }
     this.tHCGenerationModel.mfdetailsList = this.mfdetailsList;
     this.tHCGenerationModel.mfheaderDetails = this.mfheaderDetails;
     this.tHCGenerationModel.thcmovementDetails = this.thcmovementDetails;
+ 
     return this.tHCGenerationModel;
 
   }
@@ -1586,6 +1619,7 @@ export class ThcGenerationComponent implements OnInit {
     }
 }
 async addRakeData() {
+  debugger
     this.rrLoad = true;
     const tableData = this.tableRakeData;
     if (tableData.length > 0) {
@@ -1614,7 +1648,7 @@ async addRakeData() {
         rrNo: this.rakeDetailsTableForm.controls['rrNo'].value,
         rrDate: formatDate(this.rakeDetailsTableForm.controls['rrDate'].value, "dd-MM-yy HH:mm"),
         orrDate: this.rakeDetailsTableForm.controls['rrDate'].value,
-        actions: ["Edit", "Remove"]
+        actions: ["EditRake", "RemoveRake"]
     };
     this.tableRakeData.push(json);
     this.rrLoad = false;
@@ -1625,6 +1659,7 @@ async addRakeData() {
     fieldsToClear.forEach(field => {
         this.rakeDetailsTableForm.controls[field].setValue("");
     });
+
 
 }
 

@@ -16,7 +16,8 @@ export class thcsummaryData {
   closingBranch?: string
   tHCDT: Date
   fromCity: string
-  toCity: string
+  toCity: string;
+  via:any;
   routecode: string
   route: string
   vehicle: string
@@ -69,6 +70,7 @@ export class thcsummaryData {
   // cNDT?: Date
   // cNBY?: string
   // cNRES?: string
+  rakeDetailsList?:rakeDetails[];
   eNTDT: Date
   eNTLOC: string
   eNTBY: string
@@ -192,4 +194,8 @@ export class MfdetailsList {
   // mODDT?: Date
   // mODLOC?: string
   // mODBY?: string
+}
+export class rakeDetails{
+  rRNO:string
+  rRDT:Date
 }

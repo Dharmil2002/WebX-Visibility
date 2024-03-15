@@ -491,8 +491,8 @@ export class AddDriverMasterComponent implements OnInit {
         driver:data.driverName,
         driverCD: data.manualDriverCode,
         lcExpireDate:data.valdityDt,
-        driverPan:data.licenseNo,
-        lcNo:""
+        driverPan:"",
+        lcNo:data.licenseNo
       }
       let req = {
         companyCode: this.companyCode,

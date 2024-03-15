@@ -9,8 +9,8 @@ import Swal from 'sweetalert2';
   templateUrl: './cluster-master-list.component.html',
 })
 export class ClusterMasterListComponent implements OnInit {
-  data: [] | any;
-  csv: any[];
+  data: [] | any; 
+  csv: any[];  
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));

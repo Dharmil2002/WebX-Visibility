@@ -13,9 +13,10 @@ import { GeneralLedgerReportComponent } from './general-ledger-report/general-le
 import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
-
+import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
 
 const routes: Routes = [
+  { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
   { path: "Voucher-Register-report", component: VoucherRegisterReportComponent },
   { path: "PRQ-Register-report", component: PrqRegisterReportComponent },
   { path: "job-query", component: JobQueryPageComponent },

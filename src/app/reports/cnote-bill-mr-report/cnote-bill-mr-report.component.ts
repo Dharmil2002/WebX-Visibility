@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import moment from 'moment';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { CnoteBillMRService, exportAsExcelFile } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
+import { CnoteBillMRService } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -198,17 +201,14 @@ export class CnoteBillMrReportComponent implements OnInit {
     private customerService: CustomerService,
     private operationService: OperationService,
     private masterServices: MasterService,
+    public snackBarUtilityService: SnackBarUtilityService,
   ) {
     this.initializeFormControl();
   }
 
   ngOnInit(): void {
-    const now = new Date();
-    const lastweek = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 10
-    );
+    const now = moment().endOf('day').toDate();
+    const lastweek = moment().add(-10, 'days').startOf('day').toDate()
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
     this.cnoteBillMRTableForm.controls["start"].setValue(lastweek);
     this.cnoteBillMRTableForm.controls["end"].setValue(now);
@@ -342,48 +342,65 @@ export class CnoteBillMrReportComponent implements OnInit {
   }
 
   async save() {
-    const docketNo = this.cnoteBillMRTableForm.value.cnote;
-    const docketArray = docketNo ? docketNo.includes(',') ? docketNo.split(',') : [docketNo] : [];
-    const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
-    const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
-    const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
-      ? this.cnoteBillMRTableForm.value.fromlocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
-      : [];
-    const toloc = Array.isArray(this.cnoteBillMRTableForm.value.tolocHandler)
-      ? this.cnoteBillMRTableForm.value.tolocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
-      : [];
-    const payment = Array.isArray(this.cnoteBillMRTableForm.value.payTypeHandler)
-      ? this.cnoteBillMRTableForm.value.payTypeHandler.map(x => { return { payCD: x.value, payNM: x.name }; })
-      : [];
-    const transitmode = Array.isArray(this.cnoteBillMRTableForm.value.transitHandler)
-      ? this.cnoteBillMRTableForm.value.transitHandler.map(x => { return { tranCD: x.value, tranNM: x.name }; })
-      : [];
-    const businessType = Array.isArray(this.cnoteBillMRTableForm.value.busType) ? '' : this.cnoteBillMRTableForm.value.busType;
-    const movType = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
-      ? this.cnoteBillMRTableForm.value.movTypeHandler.map(x => { return { movCD: x.value, movNM: x.name }; })
-      : [];
-    const bookingType = Array.isArray(this.cnoteBillMRTableForm.value.bookTypeHandler)
-      ? this.cnoteBillMRTableForm.value.bookTypeHandler.map(x => { return { bookCD: x.value, bookNM: x.name }; })
-      : [];
-    const customer = Array.isArray(this.cnoteBillMRTableForm.value.custHandler)
-      ? this.cnoteBillMRTableForm.value.custHandler.map(x => { return { custCD: x.value, custNM: x.name }; })
-      : [];
-    const billAt = Array.isArray(this.cnoteBillMRTableForm.value.billHandler)
-      ? this.cnoteBillMRTableForm.value.billHandler.map(x => { return { billCD: x.value, billNM: x.name }; })
-      : [];
-    const data = await this.cnoteBillMRService.getCNoteBillMRReportDetail(startValue, endValue, fromloc, toloc, payment, transitmode, businessType, movType, bookingType, customer, billAt, docketArray)
-    if (data.length === 0) {
-      if (data) {
-        Swal.fire({
-          icon: "error",
-          title: "No Records Found",
-          text: "Cannot Download CSV",
-          showConfirmButton: true,
-        });
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const docketNo = this.cnoteBillMRTableForm.value.cnote;
+        const docketArray = docketNo ? docketNo.includes(',') ? docketNo.split(',') : [docketNo] : [];
+        
+        const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
+        const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
+        const startDate = moment(startValue).startOf('day').toDate();
+        const endDate = moment(endValue).endOf('day').toDate();
+        
+        const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
+          ? this.cnoteBillMRTableForm.value.fromlocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
+          : [];
+        const toloc = Array.isArray(this.cnoteBillMRTableForm.value.tolocHandler)
+          ? this.cnoteBillMRTableForm.value.tolocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
+          : [];
+        const payment = Array.isArray(this.cnoteBillMRTableForm.value.payTypeHandler)
+          ? this.cnoteBillMRTableForm.value.payTypeHandler.map(x => { return { payCD: x.value, payNM: x.name }; })
+          : [];
+        const transitmode = Array.isArray(this.cnoteBillMRTableForm.value.transitHandler)
+          ? this.cnoteBillMRTableForm.value.transitHandler.map(x => { return { tranCD: x.value, tranNM: x.name }; })
+          : [];
+        const businessType = Array.isArray(this.cnoteBillMRTableForm.value.busType) ? '' : this.cnoteBillMRTableForm.value.busType;
+        const movType = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
+          ? this.cnoteBillMRTableForm.value.movTypeHandler.map(x => { return { movCD: x.value, movNM: x.name }; })
+          : [];
+        const bookingType = Array.isArray(this.cnoteBillMRTableForm.value.bookTypeHandler)
+          ? this.cnoteBillMRTableForm.value.bookTypeHandler.map(x => { return { bookCD: x.value, bookNM: x.name }; })
+          : [];
+        const customer = Array.isArray(this.cnoteBillMRTableForm.value.custHandler)
+          ? this.cnoteBillMRTableForm.value.custHandler.map(x => { return { custCD: x.value, custNM: x.name }; })
+          : [];
+        const billAt = Array.isArray(this.cnoteBillMRTableForm.value.billHandler)
+          ? this.cnoteBillMRTableForm.value.billHandler.map(x => { return { billCD: x.value, billNM: x.name }; })
+          : [];
+        const data = await this.cnoteBillMRService.getCNoteBillMRReportDetail(startDate, endDate, fromloc, toloc, payment, transitmode, businessType, movType, bookingType, customer, billAt, docketArray)
+        if (data.length === 0) {
+          if (data) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          return;
+        }
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 1000);
+        exportAsExcelFile(data, `Cnote_Bill_MR_Report-${timeString}`, this.CSVHeader);
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          error.message
+        );
       }
-      return;
-    }
-    exportAsExcelFile(data, `Cnote_Bill_MR_Report-${timeString}`, this.CSVHeader);
+    }, "Cnote Bill MR Report Generating Please Wait..!");
   }
 
   toggleSelectAll(argData: any) {

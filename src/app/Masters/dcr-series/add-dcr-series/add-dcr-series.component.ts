@@ -102,6 +102,7 @@ export class AddDcrSeriesComponent
       cID: this.companyCode,
       tYP: this.addDcrTableForm.value.documentType,
       bOOK: this.addDcrTableForm.value.bookCode,
+      oBOOK: this.addDcrTableForm.value.bookCode,
       fROM: this.addDcrTableForm.value.seriesFrom,
       tO: this.addDcrTableForm.value.seriesTo,
       pAGES: this.addDcrTableForm.value.totalLeaf,

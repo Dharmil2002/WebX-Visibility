@@ -5,8 +5,8 @@ export async function CustomerDetail(masterService) {
       const res = await masterService.masterPost('generic/get', req).toPromise();
       if (res && res.data) {
           return res.data.map(x => ({
-              name: x.customerCode,
-              value: x.customerName
+              name: x.customerName,
+              value: x.customerCode
             }));
       }
   } catch (error) {
@@ -21,8 +21,8 @@ export async function userDetail(masterService){
       const res = await masterService.masterPost('generic/get', req).toPromise();
       if (res && res.data) {
           return res.data.map(x => ({
-              name: x.userId,
-              value: x.name
+              name: x.name,
+              value: x.userId
             }));
       }
   } catch (error) {
@@ -37,8 +37,8 @@ export async function vendorDetail(masterService){
       const res = await masterService.masterPost('generic/get', req).toPromise();
       if (res && res.data) {
           return res.data.map(x => ({
-              name: x.vendorCode,
-              value: x.vendorName
+              name: x.vendorName,
+              value: x.vendorCode
             }));
       }
   } catch (error) {

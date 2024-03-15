@@ -1,6 +1,4 @@
 export class DCRModel {
-  // allocateTo: string;
-  isCancle: boolean;
   location: string;
   customer: string;
   assignTo: string;

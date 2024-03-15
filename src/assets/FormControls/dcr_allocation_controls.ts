@@ -46,25 +46,6 @@ export class DcrAllocationForm {
           },
       },
       {
-        name: "customer",
-        label: "Customer",
-        placeholder: "Select Customer",
-        type: "dropdown",
-        value:"", // Set default value
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Customer is required",
-          },
-        ],
-        // Additional properties can be added.
-        additionalData: {
-            showNameAndValue: true,
-          },
-      },
-      {
         name: "assignTo",
         label: "Assign To",
         placeholder: "Select Assignee",
@@ -111,7 +92,7 @@ export class DcrAllocationForm {
         name: "from",
         label: "From",
         placeholder: "Enter Starting Document Number",
-        type: "number",
+        type: "text",
         value: allocationData?.from ,
         generatecontrol: true,
         disable: false,
@@ -119,28 +100,12 @@ export class DcrAllocationForm {
         Validations: [
           {
             name: "required",
-            message: "From Document Number is required",
+            message: "From Document is required",
           },
         ],
-      },
-      {
-        name: "to",
-        label: "To",
-        placeholder: "Enter Ending Document Number",
-        type: "number",
-        value: allocationData?.to, // Set default value to 0
-        generatecontrol: true,
-        disable: false,
-        functions:{
-          onChange:"toGreaterThanFromValidator",
+        functions: {
+          onChange: "isSeriesExists",
         },
-        Validations: [
-          {
-            name: "required",
-            message: "To Document Number is required",
-          },
-        ],
-        // Additional properties can be added.
       },
       {
         name: "noOfPages",
@@ -156,21 +121,29 @@ export class DcrAllocationForm {
             message: "Number of Pages is required",
           },
         ],
-        // Additional properties can be added.
+        functions: {
+          onChange: "getSeriesTo",
+        },
 
       },
       {
-        name: 'isCancel',
-        label: 'Cancle Allocation',
-        placeholder: '',
-        type: 'toggle',
-        value: allocationData.isCancle,
+        name: "to",
+        label: "To",
+        placeholder: "Enter Ending Document Number",
+        type: "text",
+        value: allocationData?.to, // Set default value to 0
         generatecontrol: true,
         disable: false,
-        Validations: [],
         functions:{
-          onChange:"Cancel",
-        }
+          onChange:"toGreaterThanFromValidator",
+        },
+        Validations: [
+          {
+            name: "required",
+            message: "To Document is required",
+          },
+        ],
+        // Additional properties can be added.
       },
     ];
   }

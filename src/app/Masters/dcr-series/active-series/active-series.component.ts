@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { DcrAction } from 'src/app/Models/docStatus';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { createShipDataObject } from 'src/app/Utility/commonFunction/dashboard/dashboard';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -70,17 +72,17 @@ export class ActiveSeriesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "",//max-width:90px
     },
-    Location: {
+    aLOCD: {
       Title: "Location",
       class: "matcolumncenter",
       Style: "",//max-width:90px
     },
-    allocatedto: {
+    aSNTO: {
       Title: "Allocated to",
       class: "matcolumncenter",
       Style: "",//max-width:90px
     },
-    name: {
+    aSNNM: {
       Title: "Name",
       class: "matcolumncenter",
       Style: "",//max-width:90px
@@ -92,7 +94,7 @@ export class ActiveSeriesComponent implements OnInit {
     },
   };
 
-  staticField = [ "tYP", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT"];
+  staticField = [ "tYP", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
 
   constructor(private Route: Router,
     private masterService: MasterService,
@@ -118,16 +120,14 @@ export class ActiveSeriesComponent implements OnInit {
     );
   }
 
-  getDCRDetails() {
-    debugger
+  async getDCRDetails() {
     let req = {
       "companyCode": this.companyCode,
       "filter": {},
       "collectionName": "dcr_header"
     };
 
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
+   const res= await firstValueFrom(this.masterService.masterPost('generic/get', req));
         if (res) {
           // Sort the data based on updatedDate in descending order
           const sortedData = res.data.sort((a, b) => {
@@ -138,7 +138,7 @@ export class ActiveSeriesComponent implements OnInit {
             return {
               ...obj,
               tYP: typeName,// Replace document type with its name
-              action:obj.sTS == 1 ? "Allocate" : '',
+              action: DcrAction[obj.sTS].replace("_", " "),
               eNTDT: formatDocketDate(obj.eNTDT)
             };
           });
@@ -152,8 +152,6 @@ export class ActiveSeriesComponent implements OnInit {
           this.csv = this.tableData;
           this.tableLoad = false;
         }
-      }
-    });
   }
 
   // AddNew(){

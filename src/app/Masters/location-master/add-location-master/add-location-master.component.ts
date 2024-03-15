@@ -148,7 +148,7 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
-    
+
     this.locationFormControls = new LocationControl(
       this.locationTable,
       this.isUpdate,
@@ -411,14 +411,14 @@ export class AddLocationMasterComponent implements OnInit {
         this.locationTableForm.controls.locPincode.setValue({name:this.locationTable.locPincode,value: this.locationTable.locPincode});
         this.setReportLevelData(locLevel);
       }
-  
+
     }
 
   //#region to set state and city according to pincode
   async setStateCityData() {
     const {allData}=this.locationTableForm.controls.locPincode.value;
     console.log(allData);
-    
+
     allData.ST = parseInt(allData.ST);
     // Fetch and set the state name based on the state code
     const stateName = await this.objState.fetchStateByFilterId(
@@ -434,7 +434,7 @@ export class AddLocationMasterComponent implements OnInit {
   //#endregion
 
   setReportLevelData(event) {
-      
+
     if (this.isUpdate) {
       const reportLevel = this.hierachy.find(
         (x) => x.value == this.locationTable.reportLevel
@@ -454,7 +454,7 @@ export class AddLocationMasterComponent implements OnInit {
             text: `${this.locationTableForm.controls.locLevel.value.name} already exists!`,
             showConfirmButton: true,
           });
-    
+
           // Reset the input field
           this.locationTableForm.controls["locLevel"].setValue(0);
           this.CheckHQTR(this.locationTableForm.value.locLevel.value);
@@ -481,7 +481,7 @@ export class AddLocationMasterComponent implements OnInit {
       this.report,
       this.reportStatus
     );
-    
+
   }
   // setReportLocData(event) {
   //   const locHierachy =
@@ -567,7 +567,7 @@ export class AddLocationMasterComponent implements OnInit {
         showConfirmButton: true,
       });
       this.locationTableForm.controls.locCode.setValue("");
-    }    
+    }
   }
   async checkLocName() {
     await this.checkValueExists("locName", "Location Name");

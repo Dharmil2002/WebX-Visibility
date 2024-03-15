@@ -900,6 +900,14 @@
       "router": "Reports/PRQ-Register-report"
     },
     {
+      "title": "Reports/Cash-Bank-Book-Report",
+      "tag": [
+        "cashreport",
+        "cashreport"
+      ],
+      "router": "Reports/Cash-Bank-Book-Report"
+    },
+    {
       "title": "Reports/Voucher-Register-report",
       "tag": [
         "Vouchreport",

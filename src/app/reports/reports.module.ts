@@ -53,6 +53,7 @@ import { GeneralLedgerReportComponent } from './general-ledger-report/general-le
 import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
+import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -111,7 +112,8 @@ import { ChequeRegisterComponent } from './cheque-register/cheque-register.compo
     VendorOutstandingReportComponent,
     GeneralLedgerReportComponent,
     VoucherRegisterReportComponent,
-    ChequeRegisterComponent
+    ChequeRegisterComponent,
+    CashBankBookReportComponent
   ],
   exports:[],
 

@@ -326,7 +326,7 @@ export class AccountMasterControls {
         label: "TDS applicable",
         placeholder: "",
         type: "toggle",
-        value: "",
+        value: false,
         generatecontrol: true,
         disable: false,
         Validations: [],

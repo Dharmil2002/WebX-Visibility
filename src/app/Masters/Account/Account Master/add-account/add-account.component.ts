@@ -110,7 +110,7 @@ export class AddAccountComponent implements OnInit {
   initializeFormControl() {
     const AccountFormControls = new AccountMasterControls(this.isUpdate);
     this.AlljsonControlAccountArray = AccountFormControls.getAccountAddArray();
-    this.jsonControlAccountArray = AccountFormControls.getAccountAddArray()
+    this.jsonControlAccountArray = AccountFormControls.getAccountAddArray();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.AccountForm = formGroupBuilder(this.fb, [
       this.AlljsonControlAccountArray,
@@ -132,15 +132,6 @@ export class AddAccountComponent implements OnInit {
         this.UpdateData.iSTRUEPST
       );
     }
-
-    const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
-    this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-      (x) => !tdfield.includes(x.name)
-    );
-    this.AccountForm.get("TDSsection").clearValidators();
-    this.AccountForm.get("TDSsection").updateValueAndValidity();
-    this.AccountForm.get("bank").clearValidators();
-    this.AccountForm.get("bank").updateValueAndValidity();
   }
 
   bindDropdown() {
@@ -434,32 +425,55 @@ export class AddAccountComponent implements OnInit {
 
   HandlAccountCategory() {
     if (this.AccountForm.value.AccountCategory.name === "BANK") {
-      const bankfiled = ["TDSsection", "isTDSapplicable"];
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => !bankfiled.includes(x.name)
-      );
-      this.AccountForm.get("bank").setValidators([
-        Validators.required,
-        autocompleteObjectValidator(),
-      ]);
-      this.AccountForm.get("bank").updateValueAndValidity();
-      this.getBankDropdown();
+      this.isBankField();
     } else if (this.AccountForm.value.AccountCategory.name === "TDS") {
-      const bankfiled = ["TDSsection", "bank"];
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => !bankfiled.includes(x.name)
-      );
-      this.toggleTDSExempted();
+      this.isTDSField();
     } else {
-      const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => !tdfield.includes(x.name)
-      );
-      this.AccountForm.get("TDSsection").clearValidators();
-      this.AccountForm.get("TDSsection").updateValueAndValidity();
-      this.AccountForm.get("bank").clearValidators();
-      this.AccountForm.get("bank").updateValueAndValidity();
+      this.RemoveField();
     }
+  }
+
+  isTDSField() {
+    const bankfiled = ["TDSsection", "bank"];
+    this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+      (x) => !bankfiled.includes(x.name)
+    );
+    this.toggleTDSExempted();
+    this.AccountForm.get("TDSsection").clearValidators();
+    this.AccountForm.get("TDSsection").updateValueAndValidity();
+    this.AccountForm.get("TDSsection").setValue("");
+    this.AccountForm.get("bank").clearValidators();
+    this.AccountForm.get("bank").setValue("");
+    this.AccountForm.get("bank").updateValueAndValidity();
+  }
+
+  isBankField() {
+    const bankfiled = ["TDSsection", "isTDSapplicable"];
+    this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+      (x) => !bankfiled.includes(x.name)
+    );
+    this.AccountForm.get("bank").setValidators([
+      Validators.required,
+      autocompleteObjectValidator(),
+    ]);
+    this.AccountForm.get("bank").updateValueAndValidity();
+    this.getBankDropdown();
+    this.AccountForm.get("TDSsection").clearValidators();
+    this.AccountForm.get("TDSsection").updateValueAndValidity();
+    this.AccountForm.get("TDSsection").setValue("");
+  }
+
+  RemoveField() {
+    const tdfield = ["bank", "isTDSapplicable", "TDSsection"];
+    this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
+      (x) => !tdfield.includes(x.name)
+    );
+    this.AccountForm.get("TDSsection").clearValidators();
+    this.AccountForm.get("TDSsection").updateValueAndValidity();
+    this.AccountForm.get("TDSsection").setValue("");
+    this.AccountForm.get("bank").clearValidators();
+    this.AccountForm.get("bank").setValue("");
+    this.AccountForm.get("bank").updateValueAndValidity();
   }
 
   toggleSelectAll(argData: any) {
@@ -506,6 +520,9 @@ export class AddAccountComponent implements OnInit {
       this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
         (x) => !bankfiled.includes(x.name)
       );
+      this.AccountForm.get("TDSsection").clearValidators();
+      this.AccountForm.get("TDSsection").updateValueAndValidity();
+      this.AccountForm.get("TDSsection").setValue("");
     }
   }
 
@@ -526,15 +543,15 @@ export class AddAccountComponent implements OnInit {
       bSSCH: this.AccountForm.value.bSSCH,
       iSTRUEPST: this.AccountForm.value.iSTRUEPST,
       tSEC: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection.name
+        ? this.AccountForm.value.TDSsection?.name || ""
         : "",
       iSSYS: this.AccountForm.value.ActiveFlag,
       pARTNM: this.AccountForm.value.PartySelection.name,
       rHUF: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection?.data?.RateForHUF
+        ? this.AccountForm.value.TDSsection?.data?.RateForHUF || ""
         : "",
       rOTHER: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection.data.RateForOthers
+        ? this.AccountForm.value.TDSsection?.data?.RateForOthers || ""
         : "",
     };
     if (!this.isUpdate) {

@@ -122,4 +122,9 @@ export class ViewPrintComponent implements OnInit {
     }
   }
 
+  OpenTestView(){
+    const url = `${window.location.origin}/#/Masters/TestView`;
+    window.open(url, '', 'width=1000,height=800');
+  }
+
 }

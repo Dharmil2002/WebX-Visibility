@@ -174,7 +174,7 @@ export class ContainerFormControls {
         placeholder: "",
         type: "toggle",
         value: isUpdate ? UpdateData.aCT : false,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [],
       },

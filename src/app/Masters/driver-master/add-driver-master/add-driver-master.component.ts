@@ -481,7 +481,7 @@ export class AddDriverMasterComponent implements OnInit {
     );
     let vehS=vehStats?.data[0]
     const isExists = vehS != null && vehS?.vehNo;
-    //only update if exists
+    //only update if exists it will be store in vehicle Status
     if (isExists) {
       vehS={
         ...vehS,

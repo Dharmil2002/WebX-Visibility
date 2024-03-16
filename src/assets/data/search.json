@@ -753,6 +753,13 @@
       "router": "Finance/VendorPayment/Dashboard"
     },
     {
+      "title": "Finance/FAMasters/SetOpeningBalanceLedgerWise",
+      "tag": [
+        "Finance/FAMasters/SetOpeningBalanceLedgerWise"
+      ],
+      "router": "Finance/FAMasters/SetOpeningBalanceLedgerWise"
+    },
+    {
       "title": "CustomerContract/CustomerContractList",
       "tag": [
         "CustomerContract",

@@ -657,7 +657,27 @@ export const ROUTES: RouteInfo[] =
           class: "",
           groupTitle: false,
           submenu: []
-        }
+        },
+        {
+          "path": "",
+          "title": "FA Masters",
+          "moduleName": "FA Masters",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Finance/FAMasters/SetOpeningBalanceLedgerWise",
+              "title": "Set Opening Balance Ledger Wise",
+              "moduleName": "Set Opening Balance Ledger Wise",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+          ]
+        },
       ],
     },
     {

@@ -1,0 +1,17 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="setOpeningBalanceForm">
+        <app-form-webxpress [form]="setOpeningBalanceForm" [FormTitle]="'Set Ledger Wise Opening Balance'"
+            [formData]="jsonGeneralLedgerArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+
+    <app-generic-table-v2 *ngIf="!tableLoad" [selectAllRequired]="true"
+        [EventButton]="ShowSubmitButton==true ? EventButton : ''" (selectAllClicked)="TableSelectionsChange($event)"
+        [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData" [metaData]="metaData"
+        [staticField]="staticField" [Link]="linkArray" (functionCallEmitter)="functionCallHandler($event)"
+        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
+        [FormTitle]="'Set Ledger Wise Opening Balance'" [menuItems]="menuItems" [uploadComponent]=true
+        (uploadEvent)="upload()">
+    </app-generic-table-v2>
+</app-common-wrapper-webxpress>

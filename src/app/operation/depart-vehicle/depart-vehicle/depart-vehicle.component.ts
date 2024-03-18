@@ -418,8 +418,33 @@ export class DepartVehicleComponent implements OnInit {
       await this.openVehicleTracking(tripDet);
     }
     else{
+      if(tripDet?.length>0){
+        await this.pushDeptCT(tripDet[0]);
+        this.goBack('Departures');
+      }
       this.goBack('Departures');
     }
+  }
+  async pushDeptCT(tripDet){
+
+    let filter= {
+      // vehicleNo:'MH05AK8475'
+      vehicleNo:tripDet.vEHNO 
+    }
+    let vehicleDet=await this.departureService.fetchData('vehicle_detail',filter);
+    if(vehicleDet?.length>0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId!="" ){
+      const reqArrivalDeparture={
+        action:"TripArrivalDepartureUpdate",
+        reqBody:{
+          cid:this.companyCode,
+          EventType:'D',
+          loc:localStorage.getItem("Branch") || "",
+          tripId:tripDet.tHC
+        }
+      }
+      this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+    }
+
   }
   async openVehicleTracking(tripDet){
     let filter= {

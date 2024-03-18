@@ -54,6 +54,8 @@ import { PrqRegisterReportComponent } from './prq-register-report/prq-register-r
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -113,7 +115,9 @@ import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-b
     GeneralLedgerReportComponent,
     VoucherRegisterReportComponent,
     ChequeRegisterComponent,
-    CashBankBookReportComponent
+    CashBankBookReportComponent,
+    DashboardComponent,
+    ControlTowerDashboardComponent
   ],
   exports:[],
 

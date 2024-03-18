@@ -38,6 +38,7 @@ import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
 import moment from "moment";
 import { DocketFiltersComponent } from "./filters/docket-filters/docket-filters.component";
 import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
+import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
 
 @Component({
   selector: "app-thc-generation",
@@ -266,7 +267,8 @@ export class ThcGenerationComponent implements OnInit {
     private storage: StorageService,
     private generalService: GeneralService,
     private prqService: PrqService,
-    private definition: RakeEntryModel
+    private definition: RakeEntryModel,
+    private hawkeyeUtilityService: HawkeyeUtilityService
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -887,6 +889,16 @@ export class ThcGenerationComponent implements OnInit {
           text: `THC Number is ${this.thcTableForm.get("tripId").value}`,
           showConfirmButton: true,
         });
+        const reqArrivalDeparture={
+          action:"TripArrivalDepartureUpdateFTL",
+          reqBody:{
+            cid:this.companyCode,
+            EventType:'A',
+            loc:localStorage.getItem("Branch") || "",
+            tripId:this.thcTableForm.get("tripId").value
+          }
+        }
+        this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
         this.goBack("THC");
       }
     } else {
@@ -912,6 +924,59 @@ export class ThcGenerationComponent implements OnInit {
         const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
         // this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
         if (resThc) {
+          if(!isMarket && resThc.data?.mainData?.ops[0]?.docNo!=""){
+            await Swal.fire({
+              icon: "question",
+              title: "Tracking",
+              text: `Do you want vehicle tracking?`,
+              confirmButtonText: "Yes, track it!",
+              showConfirmButton: true,
+              showCancelButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                debugger
+                const req={
+                  action:"PushTripFTL",
+                  reqBody:{
+                    companyCode: this.companyCode,
+                    branch:localStorage.getItem("Branch") || "",
+                    tripId:resThc.data?.mainData?.ops[0]?.docNo,
+                    vehicleNo:resThc.data?.mainData?.ops[0]?.vEHNO
+                  }
+                };
+                this.hawkeyeUtilityService.pushToCTCommon(req);
+                this.goBack('THC');
+      
+                // const dialogref = this.dialog.open(THCTrackingComponent, {
+                //   width: "100vw",
+                //   height: "100vw",
+                //   maxWidth: "232vw",
+                //   data: vehicleDet[0],
+                // });
+                // dialogref.afterClosed().subscribe((result) => {
+                //   if(result && result!=""){
+                //     if(result?.gpsDeviceEnabled ==true && result?.gpsDeviceId!=""){
+                //       const req={
+                //         companyCode: this.companyCode,
+                //         branch:localStorage.getItem("Branch") || "",
+                //         tripId:"TH/DELB/2425/000046",
+                //         vehicleNo:result.vehicleNo
+                //       }
+                //       this.departureService.pushTripToCT(req);
+                //       this.goBack('Departures');
+                //     }
+                //     else{
+                //       this.goBack('Departures');
+                //     }
+                //   }
+                // });
+              }
+              else
+              {
+                this.goBack('THC');
+              }
+            });
+          }
           Swal.fire({
             icon: "success",
             title: "THC Generated Successfully",

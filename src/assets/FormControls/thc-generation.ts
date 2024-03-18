@@ -11,6 +11,7 @@ export class thcControl {
     private thcControlArray: FormControls[];
     private marketVehicle: FormControls[];
     private rakeDetails:FormControls[];
+    private charges:FormControls[];
     constructor(update: boolean, view: boolean, prq: boolean) {
 
         this.thcControlArray =
@@ -141,6 +142,29 @@ export class thcControl {
                     },
                 },
                 {
+                    name: "transMode",
+                    label: "Transport Mode",
+                    placeholder: "Transport Mode",
+                    type: "Staticdropdown",
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : prq ? prq : update,
+                    Validations: [{
+                        name: "required",
+                        message: "Transport Mode is required",
+                    }],
+                    functions: {
+                        onSelection: "transModeChanged"
+                    },
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                },
+                {
                     name: 'via', label: "Via", placeholder: "Multiselect via", type: 'multiselect',
                     value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
@@ -171,27 +195,7 @@ export class thcControl {
                     }
 
                 },
-                {
-                    name: 'vehicle',
-                    label: 'Vehicle',
-                    placeholder: '',
-                    type: view ? 'text' : 'dropdown',
-                    value: '',
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Vehicle  is required",
-                        }],
-                    generatecontrol: true,
-                    additionalData: {
-                        showNameAndValue: false,
-                        metaData: "Basic"
-                    },
-                    functions: {
-                        onOptionSelect: 'getVehicleDetail',
-                    },
-                    disable: view ? view : prq ? prq : update
-                },
+              
                 {
                     name: "vendorType",
                     label: "Vendor Type",
@@ -259,6 +263,109 @@ export class thcControl {
                     functions: {},
                     additionalData: { metaData: "Basic" }
                 },
+                {
+                    name: "venMobNo",
+                    label: "Vendor Mobile Number",
+                    placeholder: "Vendor Mobile Number",
+                    type: "mobile-number",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view  : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Vendor Mobile  is required",
+                        }
+                       ],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: "brokerName",
+                    label: "Broker Name",
+                    placeholder: "Broker Name",
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view  : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Broker Name  is required",
+                        }
+                       ],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: "brokerMobile",
+                    label: "Broker Contact Number",
+                    placeholder: "Broker Contact Number",
+                    type: "mobile-number",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view  : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Broker Contact Number  is required",
+                        }
+                       ],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: 'vehicle',
+                    label: 'Vehicle',
+                    placeholder: '',
+                    type: view ? 'text' : 'dropdown',
+                    value: '',
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Vehicle  is required",
+                        }],
+                    generatecontrol: true,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onOptionSelect: 'getVehicleDetail',
+                    },
+                    disable: view ? view : prq ? prq : update
+                },
+                {
+                    name: "vehSize",
+                    label: "Vehicle Size",
+                    placeholder: "Vehicle Size",
+                    type: "Staticdropdown",
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : prq ? prq : update,
+                    Validations: [{
+                        name: "required",
+                        message: "Vehicle Size is required",
+                    }],
+                    functions: {
+                    },
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                },
                 // {
                 //     name: 'closingBranch',
                 //     label: 'Closing Branch',
@@ -285,26 +392,20 @@ export class thcControl {
                 //     disable: view ? view : update
                 // },
                 {
-                    name: "transMode",
-                    label: "Transport Mode",
-                    placeholder: "Transport Mode",
-                    type: "Staticdropdown",
-                    value: [],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
+                    name: 'IsEmpty',
+                    label: 'Is Empty',
+                    placeholder: '',
+                    type: 'toggle',
+                    value: '',
+                    Validations: [],
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : update,
-                    Validations: [{
-                        name: "required",
-                        message: "Transport Mode is required",
-                    }],
-                    functions: {
-                        onSelection: "transModeChanged"
-                    },
+                    disable: false,
                     additionalData: {
                         showNameAndValue: false,
                         metaData: "Basic"
+                    },
+                    functions: {
+                        onChange: 'onchangeIsEmptyFlag'
                     },
                 },
                 {
@@ -325,21 +426,125 @@ export class thcControl {
                     },
                 },
                 {
-                    name: 'IsEmpty',
-                    label: 'Is Empty',
+                    name: 'tdsUpload',
+                    label: 'TDS Declaration',
                     placeholder: '',
-                    type: 'toggle',
+                    type: 'file',
                     value: '',
                     Validations: [],
+                    additionalData: {
+                        multiple: true,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onChange: 'GetFileList',
+                    },
                     generatecontrol: true,
-                    disable: false,
+                    disable:view ? view : update ? update :false
+                },
+                {
+                    name: "etaDate",
+                    label: 'ETA Date',
+                    placeholder: 'ETA Date',
+                    type: "datetimerpicker",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable:view ? view : update ? update :false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "ETA Date is required",
+                        },
+                    ],
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "Basic"
+                    },
+                },
+                {
+                    name: "engineNo",
+                    label: "Engine Number",
+                    placeholder: "Engine Number",
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable:view ? view : update ? update :false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Engine Number  is required",
+                        }
+                       ],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: "chasisNo",
+                    label: "Chasis Number",
+                    placeholder: "Chasis Number",
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable:view ? view : update ? update :false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Engine Number  is required",
+                        }
+                       ],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: 'inExdt',
+                    label:'Insurance Expiry Date',
+                    placeholder: '',
+                    type: 'date',
+                    value: '',
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Insurance Expiry Date  is required",
+                        }],
+                    generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
                         metaData: "Basic"
                     },
                     functions: {
-                        onChange: 'onchangeIsEmptyFlag'
+                        onOptionSelect: ''
                     },
+                    disable: view ? view : update ? update :false
+                },
+                {
+                    name: 'fitdt',
+                    label:'Fitness Validity Date',
+                    placeholder: '',
+                    type: 'date',
+                    value: '',
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Fitness Validity Date  is required",
+                        }],
+                    generatecontrol: true,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onOptionSelect: ''
+                    },
+                    disable: view ? view : update ? update :false
                 },
                 {
                     name: "viaControlHandler",
@@ -385,27 +590,6 @@ export class thcControl {
                     disable: true
                 },
                 {
-                    name: 'driverMno',
-                    label: 'Driver Mobile No',
-                    placeholder: '',
-                    type: 'number',
-                    value: '',
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Driver Mobile No is required",
-                        }],
-                    generatecontrol: true,
-                    additionalData: {
-                        showNameAndValue: false,
-                        metaData: "driver"
-                    },
-                    functions: {
-                        onOptionSelect: ''
-                    },
-                    disable: true
-                },
-                {
                     name: 'driverLno',
                     label: 'Driver License No',
                     placeholder: '',
@@ -436,6 +620,27 @@ export class thcControl {
                         {
                             name: "required",
                             message: "Driver License Expiry Date is required",
+                        }],
+                    generatecontrol: true,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "driver"
+                    },
+                    functions: {
+                        onOptionSelect: ''
+                    },
+                    disable: true
+                },
+                {
+                    name: 'driverMno',
+                    label: 'Driver Mobile No',
+                    placeholder: '',
+                    type: 'number',
+                    value: '',
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Driver Mobile No is required",
                         }],
                     generatecontrol: true,
                     additionalData: {
@@ -566,88 +771,7 @@ export class thcControl {
                     },
                     disable: true
                 },
-                {
-                    name: 'contAmt',
-                    label: 'Vendor Contract  Amount(₹)',
-                    placeholder: '',
-                    type: 'text',
-                    value: 0,
-                    Validations: [],
-                    functions: {
-                        onChange: 'onCalculateTotal'
-                    },
-                    generatecontrol: true,
-                    additionalData: {
-                        metaData: "vehLoad"
-                    },
-                    disable: view ? view : update
-                },
-                {
-                    name: 'advAmt',
-                    label: 'Advance Amount(₹)',
-                    placeholder: '',
-                    type: 'text',
-                    value: 0,
-                    Validations: [],
-                    functions: {
-                        onChange: 'onCalculateTotal'
-                    },
-                    generatecontrol: true,
-                    additionalData: {
-                        metaData: "vehLoad"
-                    },
-                    disable: view ? view : update
-                },
-                {
-                    name: 'balAmt',
-                    label: 'Balance Amount(₹)',
-                    placeholder: '',
-                    type: 'text',
-                    value: 0,
-                    functions: {
-                        onChange: 'onCalculateTotal'
-                    },
-                    Validations: [],
-                    generatecontrol: true,
-                    additionalData: {
-                        metaData: "vehLoad"
-                    },
-                    disable: true
-                },
-                {
-                    name: 'advPdAt',
-                    label: 'Advance Paid At',
-                    placeholder: '',
-                    type: 'dropdown',
-                    value: '',
-                    additionalData: {
-                        showNameAndValue: true,
-                        metaData: "vehLoad"
-                    },
-                    Validations: [{
-                        name: "required",
-                        message: "Advance Paid At  is required",
-                    }],
-                    generatecontrol: true,
-                    disable: view ? view : update
-                },
-                {
-                    name: 'balAmtAt',
-                    label: 'Balance Paid At',
-                    placeholder: '',
-                    type: 'dropdown',
-                    value: '',
-                    additionalData: {
-                        showNameAndValue: true,
-                        metaData: "vehLoad"
-                    },
-                    Validations: [{
-                        name: "required",
-                        message: "Balance Paid At is required",
-                    }],
-                    generatecontrol: true,
-                    disable: view ? view : update
-                },
+
                 {
                     name: 'overload',
                     label: 'Overload',
@@ -1176,7 +1300,76 @@ export class thcControl {
                 generatecontrol: false, disable: false
             },
         ]
-        this.rakeDetails = [{
+        this.rakeDetails = [
+        {
+            name: "rakeNumber",
+            label: "Rake Number",
+            placeholder: "Rake Number",
+            type: "text",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+                {
+                    name: "required",
+                    message: "Rake Number is required",
+                }
+            ],
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "rakeForm"
+            },
+        },
+        {
+            name: 'rakeDate', label: 'Rake Date', placeholder: 'Rake Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
+            generatecontrol: true, disable: false, Validations: [  {
+                name: "required",
+                message: "Rake Date is required",
+            }],
+            additionalData: {
+                maxDate: new Date(),
+                metaData: "rakeForm"
+              },
+        },
+        {
+            name: "fnrNo",
+            label: "FNR No",
+            placeholder: "FNR No",
+            type: "text",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+                {
+                    name: "required",
+                    message: "FNR No is required",
+                }
+            ],
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "rakeForm"
+            },
+        },
+        {
+            name: "noOfContrainer",
+            label: "No. of Container",
+            placeholder: "No. of Container",
+            type: "number",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+                {
+                    name: "required",
+                    message: "RR No is required",
+                }
+            ],
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "rakeForm"
+            },
+        },
+        {
             name: "rrNo",
             label: "RR No",
             placeholder: "Enter RR No",
@@ -1192,7 +1385,7 @@ export class thcControl {
             ],
             additionalData: {
                 showNameAndValue: true,
-                metaData: "rake"
+                metaData: "rakeArray"
             },
         },
         {
@@ -1203,8 +1396,156 @@ export class thcControl {
             }],
             additionalData: {
                 maxDate: new Date(),
-                metaData: "rake"
+                metaData: "rakeArray"
               },
+        },
+        {
+            name: "invNo",
+            label: "Invoice No.",
+            placeholder: "Invoice No.",
+            type: "text",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+                {
+                    name: "required",
+                    message: "Invoice No is required",
+                }
+            ],
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "rakeInvoice"
+            },
+        },
+        {
+            name: 'invDt', label: 'Invoice Date', placeholder: 'Invoice Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
+            generatecontrol: true, disable: false, Validations: [  {
+                name: "required",
+                message: "RR Date is required",
+            }],
+            additionalData: {
+                maxDate: new Date(),
+                metaData:"rakeInvoice"
+              },
+        },
+        {
+            name: "invAmt",
+            label: "Invoice Amount",
+            placeholder: "Invoice Amount",
+            type: "number",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+                {
+                    name: "required",
+                    message: "Invoice No is required",
+                }
+            ],
+            additionalData: {
+                showNameAndValue: true,
+                metaData:"rakeInvoice"
+            },
+        },
+    ]
+        this.charges = [{
+            name: 'contAmt',
+            label: 'Vendor Contract  Amount(₹)',
+            placeholder: '',
+            type: 'text',
+            value: 0,
+            Validations: [],
+            functions: {
+                onChange: 'onCalculateTotal'
+            },
+            generatecontrol: true,
+            additionalData: {
+                metaData: "vehLoad"
+            },
+            disable: view ? view : update
+        },
+        {
+            name: 'totAmt',
+            label: 'Total Amount(₹)',
+            placeholder: '',
+            type: 'text',
+            value: 0,
+            Validations: [],
+            functions: {
+                onChange: 'onCalculateTotal'
+            },
+            generatecontrol: true,
+            additionalData: {
+                metaData: "vehLoad"
+            },
+            disable: view ? view : update
+        },
+        {
+            name: 'advAmt',
+            label: 'Advance Amount(₹)',
+            placeholder: '',
+            type: 'text',
+            value: 0,
+            Validations: [],
+            functions: {
+                onChange: 'onCalculateTotal'
+            },
+            generatecontrol: true,
+            additionalData: {
+                metaData: "vehLoad"
+            },
+            disable: view ? view : update
+        },
+        {
+            name: 'balAmt',
+            label: 'Balance Amount(₹)',
+            placeholder: '',
+            type: 'text',
+            value: 0,
+            functions: {
+                onChange: 'onCalculateTotal'
+            },
+            Validations: [],
+            generatecontrol: true,
+            additionalData: {
+                metaData: "vehLoad"
+            },
+            disable: true
+        },
+        {
+            name: 'advPdAt',
+            label: 'Advance Paid At',
+            placeholder: '',
+            type: 'dropdown',
+            value: '',
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "vehLoad"
+            },
+            Validations: [{
+                name: "required",
+                message: "Advance Paid At  is required",
+            }],
+            generatecontrol: true,
+            disable: view ? view : update
+        },
+        {
+            name: 'balAmtAt',
+            label: 'Balance Paid At',
+            placeholder: '',
+            type: 'dropdown',
+            value: '',
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "vehLoad"
+            },
+            Validations: [{
+                name: "required",
+                message: "Balance Paid At is required",
+            }],
+            generatecontrol: true,
+            disable: view ? view : update
         }]
     }
     getThcFormControls() {
@@ -1213,7 +1554,9 @@ export class thcControl {
     getMarketVehicle() {
         return this.marketVehicle
     }
-  
+    getChargesControls(){
+        return this.charges
+    }
     getRakeDetailsControls() {
         return this.rakeDetails;
     }

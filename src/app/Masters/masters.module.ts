@@ -177,6 +177,7 @@ import { AddressService } from "../Utility/module/masters/Address/address.servic
 import { FreightChargeUploadComponent } from './Customer Contract/CustomerContractTabs/customer-contract-freight-matrix/freight-charge-upload/freight-charge-upload.component';
 import { MenuAccessRightComponent } from "./Admin/MenuAccessRight/menu-access-right/menu-access-right.component";
 import { TestViewComponent } from './view-print/View-test/test-view/test-view.component';
+import { DaburViewComponent } from './view-print/View-test/dabur-view/dabur-view.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -367,7 +368,8 @@ import { TestViewComponent } from './view-print/View-test/test-view/test-view.co
     AddContainerStatusComponent,
     FreightChargeUploadComponent,
     MenuAccessRightComponent,
-    TestViewComponent
+    TestViewComponent,
+    DaburViewComponent
   ],
 
   providers: [

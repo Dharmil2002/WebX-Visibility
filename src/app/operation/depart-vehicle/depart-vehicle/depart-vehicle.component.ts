@@ -443,6 +443,7 @@ export class DepartVehicleComponent implements OnInit {
         }
       }
       
+      
       this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
     }
 

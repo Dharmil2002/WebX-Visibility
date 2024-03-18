@@ -442,6 +442,7 @@ export class DepartVehicleComponent implements OnInit {
           tripId:tripDet.tHC
         }
       }
+      
       this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
     }
 

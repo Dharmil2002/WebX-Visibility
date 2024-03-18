@@ -1134,9 +1134,9 @@ export class EwayBillControls {
           {
             name: "pattern",
 
-            message: "Please Enter only numeric Max length 12.",
+            message: "Please Enter only numeric length 12.",
 
-            pattern: "^[0-9]{1,12}$",
+            pattern: "^[0-9]{12}$",
 
           }
 

@@ -16,7 +16,7 @@ export class AddressMasterListComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
-    updatedDate: {
+    eNTDT: {
       Title: "Created Date",
       class: "matcolumnleft",
       Style: "max-width:150px",
@@ -55,7 +55,7 @@ export class AddressMasterListComponent implements OnInit {
     },
   };
   staticField = [
-    "updatedDate",
+    "eNTDT",
     "addressCode",
     "manualCode",
     "cityName",
@@ -91,18 +91,18 @@ export class AddressMasterListComponent implements OnInit {
         if (response) {
           // Sort the data by updatedDate in descending order (most recent first)
           const sortedData = response.data.sort((a, b) => {
-            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
+            return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
           });
-          // Generate srno for each object in the array and format the updatedDate
+          // Generate srno for each object in the array and format the eNTDT
           const dataWithFormattedDate = sortedData.map((item, index) => {
-            const formattedDate = formatDate(item.updatedDate);
+            const formattedDate = formatDate(item.eNTDT);
             return {
               ...item,
-              updatedDate: formattedDate,
+              eNTDT: formattedDate,
             };
           });
           // Extract the updatedDate from the first element (latest record)
-          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
+          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].eNTDT : null;
           this.csv = dataWithFormattedDate;
           this.tableLoad = false;
         }
@@ -117,7 +117,7 @@ export class AddressMasterListComponent implements OnInit {
     }
   }
 
-  async ActiveFunction(event) { 
+  async ActiveFunction(event) {
     const Body = {
       activeFlag:event.data.activeFlag
     }

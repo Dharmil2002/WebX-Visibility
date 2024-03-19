@@ -33,9 +33,7 @@ import { ThcGenerationComponent } from "./thc-generation/thc-generation.componen
 import { CommonViewPrintComponent } from "./ViewPrint/common-view-print/common-view-print.component";
 import { JobViewPrintComponent } from "./job-view-print/job-view-print.component";
 import { ConsignmentOperationComponent } from "./consignment-operation/consignment-operation.component";
-import { ConsingmentSummaryComponent } from "./consingment-summary/consingment-summary.component";
 import { ConsignmentFilterComponent } from "./consignment-filter/consignment-filter.component";
-import { ConsignmentPodComponent } from "./consignment-pod/consignment-pod.component";
 import { UpdateDeliveryComponent } from "./update-delivery/update-delivery.component";
 const routes: Routes = [
   {
@@ -175,17 +173,10 @@ const routes: Routes = [
     component: ConsignmentOperationComponent
   },
   {
-    path: "ConsignmentSummary",
-    component: ConsingmentSummaryComponent
-  },
-  {
     path: "ConsignmentFilter",
     component: ConsignmentFilterComponent
   },
-  {
-    path: "ConsignmentPOD",
-    component: ConsignmentPodComponent
-  },
+  
 ]
 
 @NgModule({

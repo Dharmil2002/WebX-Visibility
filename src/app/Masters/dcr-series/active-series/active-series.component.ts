@@ -78,7 +78,7 @@ export class ActiveSeriesComponent implements OnInit {
       Style: "",//max-width:90px
     },
     aSNTO: {
-      Title: "Allocated to",
+      Title: "Assign to",
       class: "matcolumncenter",
       Style: "",//max-width:90px
     },

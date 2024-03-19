@@ -9,9 +9,9 @@ export class DcrManagementComponent implements OnInit {
 
   breadscrums = [
     {
-      title: "DCR Management Console",
+      title: "DCR Management",
       items: ["Master"],
-      active: "DCR Management Console"
+      active: "DCR Management"
     }
   ]
   @ViewChild('myTabGroup') myTabGroup: MatTabGroup;

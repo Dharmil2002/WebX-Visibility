@@ -1,18 +1,31 @@
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { filter } from "rxjs/operators";
 import { Component, OnInit } from "@angular/core";
-import {AbstractControl,UntypedFormBuilder,UntypedFormGroup} from "@angular/forms";
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+} from "@angular/forms";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CustomerDetail, userDetail, vendorDetail } from "./dcr-apiUtility";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
-import { DcrAllocationForm } from "src/assets/FormControls/dcr_allocation_controls";
 import { DCRModel } from "src/app/core/models/dcrallocation";
 import { firstValueFrom } from "rxjs";
 import { DcrEvents } from "src/app/Models/docStatus";
 import { StorageService } from "src/app/core/service/storage.service";
 import moment from "moment";
-import { nextKeyCodeByN } from "src/app/Utility/commonFunction/stringFunctions";
+import {
+  SeriesRange,
+  nextKeyCodeByN,
+  splitSeries,
+} from "src/app/Utility/commonFunction/stringFunctions";
+import { DcrAllocationForm } from "src/assets/FormControls/dcr_allocation_controls";
+import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { VendorService } from "src/app/Utility/module/masters/vendor-master/vendor.service";
 @Component({
   selector: "app-dcr-allocation",
   templateUrl: "./dcr-allocation.component.html",
@@ -27,6 +40,16 @@ export class DcrAllocationComponent implements OnInit {
   valuechanged: boolean = false;
   submit = "Save";
   originalJsonControlCustomerArray: any;
+  bookData: any[] = [];
+  allocateTo = [
+    { value: "L", name: "Location" },
+    { value: "C", name: "Customer" },
+  ];
+  assignTo = [
+    { value: "E", name: "Employee" },
+    { value: "B", name: "BA" },
+    { value: "C", name: "Customer" },
+  ];
   breadScrums = [
     {
       title: "DCR Allocation",
@@ -34,6 +57,7 @@ export class DcrAllocationComponent implements OnInit {
       active: "DCR Allocation",
     },
   ];
+  splitSeries: SeriesRange[];
 
   //#region constructor
   constructor(
@@ -41,14 +65,18 @@ export class DcrAllocationComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private route: Router,
-    private storage: StorageService
+    private storage: StorageService,
+    private dcrService: DCRService,
+    private customerService: CustomerService,
+    private locationService: LocationService,
+    private vendorService: VendorService
   ) {
+    debugger;
     this.DCRTable = new DCRModel();
-    this.initializeFormControl();
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.DCRTable = route.getCurrentNavigation().extras.state.data.columnData;
     }
-
+    this.initializeFormControl();
   }
   //#endregion
 
@@ -76,7 +104,7 @@ export class DcrAllocationComponent implements OnInit {
   //#endregion
 
   //#region getvalue
-  getvalue(){
+  getvalue() {
     this.DCRTableForm.controls["from"].setValue(this.DCRTable.fROM);
     this.DCRTableForm.controls["to"].setValue(this.DCRTable.tO);
     this.DCRTableForm.controls["noOfPages"].setValue(this.DCRTable.pAGES);
@@ -90,80 +118,90 @@ export class DcrAllocationComponent implements OnInit {
   }
   //#endregion
 
-    //#region to set series to.
-    getSeriesTo() {
-      // Get the 'from' and 'noOfPages' values from the form control
-      const { from, noOfPages } = this.DCRTableForm.value;
+  //#region to set series to.
+  getSeriesTo() {
+    // Get the 'from' and 'noOfPages' values from the form control
+    const { from, noOfPages } = this.DCRTableForm.value;
+    const toCode = nextKeyCodeByN(from, parseInt(noOfPages) - 1);
+    this.DCRTableForm.controls.to.setValue(toCode);
 
-      const toCode = nextKeyCodeByN(from, parseInt(noOfPages)-1);
+    // this.isSeriesExists();
+    this.isSeriesValid();
+  }
+  //#endregion
 
-      this.DCRTableForm.controls.to.setValue(toCode);
+  //#region isSeriesExists()
+  // async isSeriesExists(): Promise<boolean> {
+  //   const book = this.DCRTable.oBOOK;
+  //   const from = this.DCRTableForm.value.from;
+  //   const to = this.DCRTableForm.value.to;
 
-      this.isSeriesExists();
+  //     // this.DCRTableForm.controls.allocateTo.setValue("");
+  //     let filter = {}
+  //     if(!to){
+  //       filter = {
+  //         cID: this.storage.companyCode,
+  //         oBOOK: book,
+  //         D$or: [
+  //           { fROM: { D$lte: from }, tO: { D$gte: to } }, // Check if the value is within any range
+  //         ]
+  //       };
+  //     }
+  //     const req = {
+  //       companyCode: this.companyCode,
+  //       collectionName: "dcr_header",
+  //       filter: filter
+  //     };
+  //     const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req) );
+  //     const foundItem = res?.data || null;
+  //     if (!foundItem) {
+  //       this.DCRTableForm.controls["from"].setValue("");
+  //       this.DCRTableForm.controls["to"].setValue("");
+  //       this.DCRTableForm.controls["noOfPages"].setValue("");
+  //       let s = from + (to ? " - "+ to : "");
+  //       Swal.fire({
+  //         title: "error",
+  //         text: `Series [${s}] Out of Range book ${foundItem.oBOOK}.! Please try with another.`,
+  //         icon: "error",
+  //         showConfirmButton: true,
+  //       });
+  //       return false;
+  //     }
+  // }
+  //#endregion
+  async isSeriesValid() {
+    debugger;
+    const splitFrom = this.DCRTableForm.value.from;
+    const splitTo = this.DCRTableForm.value.to;
+
+    try {
+      this.splitSeries = splitSeries(
+        this.DCRTable.fROM,
+        this.DCRTable.tO,
+        splitFrom,
+        splitTo
+      );
+      console.log(this.splitSeries);
+      this.bookData = await this.dcrService.getDCR({
+        cID: this.storage.companyCode,
+        tYP: this.DCRTable.tYP,
+        oBOOK: this.DCRTable.bOOK,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error || "An error occurred while processing the request.",
+        showConfirmButton: true,
+      });
     }
-    //#endregion
-
-    //#region isSeriesExists()
-    async isSeriesExists(): Promise<boolean> {
-      const docType = this.DCRTableForm.value.documentType;
-      const from = this.DCRTableForm.value.from;
-      const to = this.DCRTableForm.value.to;
-
-        // this.DCRTableForm.controls.allocateTo.setValue("");
-        let filter = {}
-        if(!to){
-          filter = {
-            cID: this.storage.companyCode,
-            tYP: docType,
-            D$or: [
-              { fROM: { D$lte: from }, tO: { D$gte: from } }, // Check if the value is within any range
-              { fROM: from }, // Check if the value is the same as the 'from' value of any range
-              { tO: from }   // Check if the value is the same as the 'to' value of any range
-            ]
-          };
-        }
-        else {
-          filter = {
-            cID: this.storage.companyCode,
-            tYP: docType,
-            D$or:  [
-              { fROM: { D$lte: to }, tO: { D$gte: from } }, // Overlapping ranges
-              { fROM: { D$gte: from }, tO: { D$lte: to } }, // Contained ranges
-              { fROM: { D$gte: from, D$lte: to } },        // From within range
-              { tO: { D$gte: from, D$lte: to } }           // To within range
-            ]
-          };
-        }
-
-        const req = {
-          companyCode: this.companyCode,
-          collectionName: "dcr_header",
-          filter: filter
-        };
-
-        const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req) );
-        const foundItem = res?.data || null;
-        if (foundItem && foundItem.bOOK) {
-          this.DCRTableForm.controls["from"].setValue("");
-          this.DCRTableForm.controls["to"].setValue("");
-          this.DCRTableForm.controls["noOfPages"].setValue("");
-          let s = from + (to ? " - "+ to : "");
-          Swal.fire({
-            title: "error",
-            text: `Series [${s}] exists within a book ${foundItem.bOOK}.! Please try with another.`,
-            icon: "error",
-            showConfirmButton: true,
-          });
-          return false;
-        }
-    }
-    //#endregion
+  }
 
   //#region handleChange
   async handleChange() {
     const value = this.DCRTableForm.get("AllocateTo").value;
     let filterFunction;
-	//  const name =["AllocateTo","location","assignTo","noOfPages","name","from","to"]
+    //  const name =["AllocateTo","location","assignTo","noOfPages","name","from","to"]
     switch (value) {
       case "L":
         filterFunction = (x) =>
@@ -173,68 +211,71 @@ export class DcrAllocationComponent implements OnInit {
           x.name === "noOfPages" ||
           x.name === "name" ||
           x.name === "from" ||
-          x.name === "to"
+          x.name === "to";
+
+        this.locationService.locationFromApi();
+
         let req = {
           companyCode: this.companyCode,
           collectionName: "location_detail",
           filter: {},
         };
-        this.masterService.masterPost("generic/get", req).subscribe({
-          next: (res: any) => {
-            if (res) {
-              const locationdetails = res.data.map((x) => {
-                return {
-                  name: x.locName,
-                  value: x.locCode,
-                };
-              });
-              this.filter.Filter(
-                this.jsonControlCustomerArray,
-                this.DCRTableForm,
-                locationdetails,
-                "location",
-                true
-              );
-            }
-          },
-        });
-        // this.clearControlValidators(this.DCRTableForm.get("customer"))
+        try {
+          const res: any = await firstValueFrom(
+            this.masterService.masterPost("generic/get", req)
+          );
+          if (res) {
+            const locationdetails = res.data.map((x) => ({
+              name: x.locName,
+              value: x.locCode,
+            }));
+            this.filter.Filter(
+              this.jsonControlCustomerArray,
+              this.DCRTableForm,
+              locationdetails,
+              "location",
+              true
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching location details:", error);
+          // Handle errors here
+        }
         this.resetForm();
         break;
       case "C":
-        // this.DCRTableForm.get("name").setValue("")
         filterFunction = (x) =>
-          x.name !== "location" &&
-          x.name !== "assignTo" &&
-          // x.name !== "name" &&
-          x.name !== "noOfPages";
+          // x.name !== "location" &&
+          x.name !== "assignTo" && x.name !== "name" && x.name !== "noOfPages";
         let req1 = {
           companyCode: this.companyCode,
           collectionName: "customer_detail",
           filter: {},
         };
-        this.masterService.masterPost("generic/get", req1).subscribe({
-          next: (res: any) => {
-            if (res) {
-              const customerdetails = res.data.map((x) => {
-                return {
-                  name: x.customerName,
-                  value: x.customerCode,
-                };
-              });
-              this.filter.Filter(
-                this.jsonControlCustomerArray,
-                this.DCRTableForm,
-                customerdetails,
-                "name",
-                true
-              );
-            }
-          },
-        });
-        this.clearControlValidators(this.DCRTableForm.get("location"));
+        try {
+          const res: any = await firstValueFrom(
+            this.masterService.masterPost("generic/get", req1)
+          );
+          if (res) {
+            const customerdetails = res.data.map((x) => ({
+              name: x.customerName,
+              value: x.customerCode,
+            }));
+            this.filter.Filter(
+              this.jsonControlCustomerArray,
+              this.DCRTableForm,
+              customerdetails,
+              "location",
+              true
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching customer details:", error);
+          // Handle errors here
+        }
+        // this.clearControlValidators(this.DCRTableForm.get("location"));
         this.clearControlValidators(this.DCRTableForm.get("assignTo"));
-        // this.clearControlValidators(this.DCRTableForm.get("name"));
+        this.clearControlValidators(this.DCRTableForm.get("name"));
         this.clearControlValidators(this.DCRTableForm.get("noOfPages"));
         this.resetForm();
         break;
@@ -243,6 +284,25 @@ export class DcrAllocationComponent implements OnInit {
       this.originalJsonControlCustomerArray.filter(filterFunction);
   }
   //#endregion
+
+  async getCustomer(event) {
+    await this.customerService.getCustomerForAutoComplete(
+      this.DCRTableForm,
+      this.jsonControlCustomerArray,
+      event.field.name,
+      true
+    );
+  }
+
+  /*here i  created a Function for the destination*/
+  // async getLocations(event) {
+  //   if (this.DCRTableForm.controls.location.value.length > 2) {
+  //     const destinationMapping = await this.locationService.locationFromApi({
+  //       locCode: { 'D$regex': `^${this.DCRTableForm.controls.destination.value}`, 'D$options': 'i' },
+  //     });
+  //     this.filter.Filter(this.jsonControlDocketArray, this.quickDocketTableForm, destinationMapping, this.destination, this.destinationStatus);
+  //   }
+  // }
 
   //#region handleAssignChange
   async handleAssignChange() {
@@ -306,100 +366,248 @@ export class DcrAllocationComponent implements OnInit {
       this.DCRTableForm.controls["location"].setValue(
         this.DCRTableForm.value.location
       );
-      this.DCRTableForm.controls["name"].setValue(
-        this.DCRTableForm.value.name
-      );
+      this.DCRTableForm.controls["name"].setValue(this.DCRTableForm.value.name);
     }
     if (this.DCRTableForm.get("AllocateTo").value === "C") {
-      this.DCRTableForm.controls["name"].setValue(
-        this.DCRTableForm.value.name
-      );
-      delete this.DCRTableForm.value.location;
-      delete this.DCRTableForm.value.assignTo;
-      delete this.DCRTableForm.value.noOfPages;
+      this.DCRTableForm.controls["name"].setValue(this.DCRTableForm.value.name);
     }
 
-    const dcrAllocation = {
-      _id: `${this.DCRTable.cID}-${this.DCRTable.tYP}-${this.DCRTable.bOOK}`,
-      cID: this.DCRTable.cID,
-      tYP: this.DCRTable.tYP,
-      bOOK: `${this.DCRTable.bOOK}-${1}`,
-      oBOOK: this.DCRTable.oBOOK,
-      uSED: this.DCRTable.uSED,
-      vOID: this.DCRTable.vOID,
-      aLOTO: this.DCRTableForm.value?.AllocateTo || "",  //L: Location, C: Customer
-      aLOCD: this.DCRTableForm.value?.location.value || "",
-      aLONM: this.DCRTableForm.value?.location.name || "",
-      aSNTO: this.DCRTableForm.value?.assignTo || "",
-      aSNTONM: this.DCRTableForm.value?.assignTo.name|| "", //E: Location, B: BA, C: Customer
-      aSNCD: this.DCRTableForm.value?.name.value || "",
-      aSNNM: this.DCRTableForm.value?.name.name || "",
-      fROM: this.DCRTableForm.value?.from || "",
-      tO: this.DCRTableForm.value?.to || "",
-      pAGES: this.DCRTableForm.value?.noOfPages|| "",
-      sTS: DcrEvents.Allocated,
-      sTSN: DcrEvents[DcrEvents.Allocated],
-      eNTBY:this.storage.userName,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch
-    };
+    const aLOCTONM = this.allocateTo.find(
+      (x) => x.value == this.DCRTableForm.value?.AllocateTo
+    );
+    const aLONM = this.assignTo.find(
+      (x) => x.value == this.DCRTableForm.value?.assignTo
+    );
 
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      collectionName: "dcr_header",
-      data: dcrAllocation,
-    };
+    const splitFrom = this.DCRTableForm.value.from;
+    const splitTo = this.DCRTableForm.value.to;
 
-    const dcrHistory = {
-      _id: `${dcrAllocation.cID}-${dcrAllocation.tYP}-${dcrAllocation.bOOK}-${moment().format("YYDDMM-HHmmss")}`,
-      cID: dcrAllocation.cID,
-      tYP: dcrAllocation.tYP,
-      bOOK: `${dcrAllocation.bOOK}-${1}`,
-      oBOOK: dcrAllocation.oBOOK,
-      uSED: dcrAllocation.uSED,
-      vOID: dcrAllocation.vOID,
-      aLOTO: dcrAllocation?.aLOTO || "",  //L: Location, C: Customer
-      aLOCD: dcrAllocation?.aLOCD || "",
-      aLONM: dcrAllocation?.aLONM || "",
-      aSNTO: dcrAllocation?.aSNTO || "",  //E: Location, B: BA, C: Customer
-      aSNTONM:dcrAllocation?.aSNTONM || "",
-      aSNCD: dcrAllocation?.aSNCD || "",
-      aSNNM: dcrAllocation?.aSNNM || "",
-      fROM: dcrAllocation?.fROM || "",
-      tO: dcrAllocation?.tO || "",
-      pAGES: dcrAllocation?.pAGES || "",
-      sTS: DcrEvents.Allocated,
-      sTSN: DcrEvents[DcrEvents.Allocated],
-      eNTBY: dcrAllocation.eNTBY,
-      eNTDT: dcrAllocation.eNTDT,
-      eNTLOC: dcrAllocation.eNTLOC
-    };
-    let reqHis = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      collectionName: "dcr_history",
-      data: dcrHistory,
-    };
+    let seriesData: any[] = [];
 
-    const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
-    if (res) {
-      const resHis = await firstValueFrom(this.masterService.masterPost("generic/create", reqHis));
-      // Display success message
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: res.message,
-        showConfirmButton: true,
-        didClose: () => {
-          // This function will be called when the modal is fully closed and destroyed
-          this.route.navigateByUrl(
-            "/Masters/DCRManagement"
-          );
+    //Check Series is split or not
+    if (this.splitSeries.length > 1) {
+      this.splitSeries.forEach((m) => {
+        var ns = { ...this.DCRTable };
+
+        if (m.from == splitFrom) {
+          ns.aLOTO = this.DCRTableForm.value?.AllocateTo || ""; //L: Location, C: Customer
+          ns.aLOTONM = aLOCTONM?.name || "";
+          ns.aLOCD = this.DCRTableForm.value?.location.value || "";
+          ns.aLONM = this.DCRTableForm.value?.location.name || "";
+          ns.aSNTO = this.DCRTableForm.value?.assignTo || "";
+          ns.aSNTONM = aLONM?.name || ""; //E: Location, B: BA, C: Customer
+          ns.aSNCD = this.DCRTableForm.value?.name.value || "";
+          ns.aSNNM = this.DCRTableForm.value?.name.name || "";
+          ns.sTS = ns.aSNTO == "" ? DcrEvents.Allocated : DcrEvents.Assigned;
+          ns.sTSN =
+            ns.aSNTO == ""
+              ? DcrEvents[DcrEvents.Allocated]
+              : DcrEvents[DcrEvents.Assigned];
+
+          if (m.to != ns.tO) {
+            //Series is splitted
+            ns.tO = m.to;
+            ns.pAGES = m.itemCount;
+            ns.oBOOK = ns.bOOK;
+          }
+          if (this.DCRTable.fROM == m.from) {
+            ns.mODBY = this.storage.userName;
+            ns.mODDT = new Date();
+            ns.mODLOC = this.storage.branch;
+          }
+        } else {
+          //New Series from book
+
+          if (m.to != ns.tO) {
+            //Series is splitted
+            ns.tO = m.to;
+            ns.pAGES = m.itemCount;
+            ns.oBOOK = ns.bOOK;
+          }
+
+          if (ns.fROM == m.from) {
+            ns.mODBY = this.storage.userName;
+            ns.mODDT = new Date();
+            ns.mODLOC = this.storage.branch;
+          } else {
+            ns.eNTBY = this.storage.userName;
+            ns.eNTDT = new Date();
+            ns.eNTLOC = this.storage.branch;
+
+            delete ns.mODBY;
+            delete ns.mODDT;
+            delete ns.mODLOC;
+          }
+          seriesData.push(ns);
         }
       });
     }
-    this.DCRTableForm.reset()
+
+    seriesData.forEach((s) => {
+      if (this.bookData.length > 1 && s.fROM != this.DCRTable.fROM) {
+        s.bOOK = `${s.bOOK}-${this.bookData.length - 1}`;
+        s._id = `${s.cID}-${s.tYP}-${s.bOOK}`;
+      }
+
+      if (s.bOOK == this.DCRTable.bOOK) {
+        let req = {
+          companyCode: parseInt(localStorage.getItem("companyCode")),
+          collectionName: "dcr_header",
+          filter: { _id: s._id },
+          update: s,
+        };
+        console.log("Update", req);
+
+        const isSplit =
+          s.fROM != this.DCRTable.fROM || s.tO != this.DCRTable.tO;
+        var history = this.getHistoryDate(s, true, isSplit);
+        console.log(history);
+      } else {
+        let req = {
+          companyCode: parseInt(localStorage.getItem("companyCode")),
+          collectionName: "dcr_header",
+          data: s,
+        };
+
+        console.log("Add", req);
+
+        var history = this.getHistoryDate(s, false);
+        console.log(history);
+      }
+    });
+
+    // const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+    // if (res) {
+    //   const resHis = await firstValueFrom(this.masterService.masterPost("generic/create", reqHis));
+    //   // Display success message
+    //   Swal.fire({
+    //     icon: "success",
+    //     title: "Successful",
+    //     text: res.message,
+    //     showConfirmButton: true,
+    //     didClose: () => {
+    //       // This function will be called when the modal is fully closed and destroyed
+    //       this.route.navigateByUrl(
+    //         "/Masters/DCRManagement"
+    //       );
+    //     }
+    //   });
+    //}
+    this.DCRTableForm.reset();
   }
+
   //#endregion
+
+  getHistoryDate(dcr, singleStatus = false, isSplit = false) {
+    const tm = moment();
+    const history = [];
+
+    const commonProps = {
+      _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${dcr.sTS}-${tm.format(
+        "YYDDMM-HHmmss"
+      )}`,
+      cID: dcr.cID,
+      tYP: dcr.tYP,
+      bOOK: dcr.bOOK,
+      oBOOK: dcr.oBOOK,
+      fROM: dcr?.fROM || "",
+      tO: dcr?.tO || "",
+      pAGES: dcr?.pAGES || 0,
+      eNTBY: this.storage.userName,
+      eNTDT: tm,
+      eNTLOC: this.storage.branch,
+    };
+
+    if (isSplit) {
+      const slp = {
+        ...commonProps,
+        _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Splitted}-${tm
+          .add(-1, "seconds")
+          .format("YYDDMM-HHmmss")}`,
+        sTS: DcrEvents.Splitted,
+        sTSN: DcrEvents[DcrEvents.Splitted],
+        eNTDT: tm.add(-1, "seconds"),
+      };
+      history.push(slp);
+    }
+
+    switch (dcr.sTS) {
+      case DcrEvents.Added:
+        const hAdd = {
+          ...commonProps,
+          sTS: DcrEvents.Added,
+          sTSN: DcrEvents[DcrEvents.Added],
+        };
+        history.push(hAdd);
+        break;
+      case DcrEvents.Allocated:
+        const hAdd1 = {
+          ...commonProps,
+          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Added}-${tm
+            .add(-1, "seconds")
+            .format("YYDDMM-HHmmss")}`,
+          sTS: DcrEvents.Added,
+          sTSN: DcrEvents[DcrEvents.Added],
+          eNTDT: tm.add(-1, "seconds"),
+        };
+        if (!singleStatus) history.push(hAdd1);
+
+        const hAlo = {
+          ...commonProps,
+          sTS: DcrEvents.Allocated,
+          sTSN: DcrEvents[DcrEvents.Allocated],
+          aLOTO: dcr.aLOTO,
+          aLOTONM: dcr.aLOTONM,
+          aLOCD: dcr.aLOCD,
+          aLONM: dcr.aLONM,
+        };
+        history.push(hAlo);
+        break;
+      case DcrEvents.Assigned:
+        const hAdd2 = {
+          ...commonProps,
+          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Added}-${tm
+            .add(-2, "seconds")
+            .format("YYDDMM-HHmmss")}`,
+          sTS: DcrEvents.Added,
+          sTSN: DcrEvents[DcrEvents.Added],
+          eNTDT: tm.add(-2, "seconds"),
+        };
+        if (!singleStatus) history.push(hAdd2);
+
+        const hAlo1 = {
+          ...commonProps,
+          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Allocated}-${tm
+            .add(-1, "seconds")
+            .format("YYDDMM-HHmmss")}`,
+          sTS: DcrEvents.Allocated,
+          sTSN: DcrEvents[DcrEvents.Allocated],
+          aLOTO: dcr.aLOTO,
+          aLOTONM: dcr.aLOTONM,
+          aLOCD: dcr.aLOCD,
+          aLONM: dcr.aLONM,
+          eNTDT: tm.add(-1, "seconds"),
+        };
+        if (!singleStatus) history.push(hAlo1);
+
+        const hAsgn = {
+          ...commonProps,
+          sTS: DcrEvents.Assigned,
+          sTSN: DcrEvents[DcrEvents.Assigned],
+          aLOTO: dcr.aLOTO,
+          aLOTONM: dcr.aLOTONM,
+          aLOCD: dcr.aLOCD,
+          aLONM: dcr.aLONM,
+          aSNTO: dcr.aSNTO,
+          aSNTONM: dcr.aSNTONM,
+          aSNCD: dcr.aSNCD,
+          aSNNM: dcr.aSNNM,
+        };
+        history.push(hAsgn);
+        break;
+    }
+    return history;
+  }
 
   //#region cancel
   cancel() {
@@ -438,5 +646,4 @@ export class DcrAllocationComponent implements OnInit {
     }
   }
   //#endregion
-
 }

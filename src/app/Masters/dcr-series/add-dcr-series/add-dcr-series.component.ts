@@ -288,7 +288,6 @@ export class AddDcrSeriesComponent
       };
       const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req) );
       this.dcrRules = res.data;
-      console.log(this.dcrRules);
   }
 
 

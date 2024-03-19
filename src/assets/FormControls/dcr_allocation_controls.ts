@@ -29,7 +29,7 @@ export class DcrAllocationForm {
       {
         name: "location",
         label: "Location",
-        placeholder: "Select Location",
+        placeholder: "select proper options",
         type: "dropdown", // Change to "text" if location is free text input
         value:allocationData?.location, // Set default value
         generatecontrol: true,
@@ -57,12 +57,7 @@ export class DcrAllocationForm {
           ],
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Assign To is required",
-          },
-        ],
+        Validations: [],
         functions: {
           onSelection: "handleAssignChange",
       },
@@ -76,13 +71,7 @@ export class DcrAllocationForm {
         value: allocationData?.name , // Set default value
         generatecontrol: true,
         disable: false,
-        Validations: [
-          // Add validations if needed
-          {
-            name: "required",
-            message: "Name is required",
-          },
-        ],
+        Validations: [],
         // Additional properties can be added.
         additionalData: {
             showNameAndValue: true,
@@ -124,7 +113,6 @@ export class DcrAllocationForm {
         functions: {
           onChange: "getSeriesTo",
         },
-
       },
       {
         name: "to",

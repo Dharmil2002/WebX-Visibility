@@ -1,0 +1,279 @@
+<div class="Consignment_Tracking">
+
+    <app-common-wrapper-webxpress [breadscrums]="breadscrums">
+        <div class="m-0" style="width: 100%; background-color: white; padding: 10px;">
+            <div style="width: 100%; display: flex; justify-content: space-between;">
+                <div style="width: 30%;">
+                    <mat-form-field class="datepickercss" style="width: 100%" appearance="outline">
+                        <mat-label class="fontbold">date range</mat-label>
+                        <mat-date-range-input [rangePicker]="picker">
+                            <input matStartDate formControlName="StartDate" placeholder="Start date" />
+                            <input matEndDate formControlName="EndDate" placeholder="End date" />
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker [calendarHeaderComponent]="CustomeDatePickerComponent"
+                            [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                    </mat-form-field>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <button mat-raised-button (click)="ExportFunction()" color="primary">Export</button>
+                </div>
+            </div>
+            <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px;">
+                <div class="cardBox">
+                    <div class="card" style="z-index: 10; ">
+                        <p style="font-size: 16px; font-weight: bolder;">1</p>
+                        <p style="font-size: 14px;">Total Results</p>
+                    </div>
+                    <div class="card" style="z-index: 9; ">
+                        <p style="font-size: 16px; font-weight: bolder;">0</p>
+                        <p style="font-size: 14px;">Booked</p>
+                    </div>
+                    <div class="card" style="z-index: 8; ">
+                        <p style="font-size: 16px; font-weight: bolder;">1</p>
+                        <p style="font-size: 14px;"> In Transit</p>
+                    </div>
+                    <div class="card" style="z-index: 7; ">
+                        <p style="font-size: 16px; font-weight: bolder;">0</p>
+                        <p style="font-size: 14px;">OFD</p>
+                    </div>
+                    <div class="card" style="z-index: 6; ">
+                        <p style="font-size: 16px; font-weight: bolder;">0</p>
+                        <p style="font-size: 14px;">Delivered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 100%; display: flex; flex-direction: column; margin-top: 30px;">
+                <div class="trakingBox">
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Cnote No:
+                        </p>
+                        <p style="font-size: 15px; padding-top: 5px; ">
+                            100010001
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>EDD:</p>
+                            <p>03-03-2024</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>ATD:</p>
+                            <p>NA</p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 31%; ">
+                        <p>
+                            Status:
+                        </p>
+                        <p>
+                            In Transit | Pending for Stock Update @ DEL
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Booking Date:
+                        </p>
+                        <p>
+                            Fri,01 Mar 2024 05:39:PM
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 15%; text-align: center; ">
+                        <p>
+                            Transit Mode:
+                        </p>
+                        <p>
+                            TBB / Road / FTL
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>EWB:</p>
+                            <p></p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>Valid:</p>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Movement:
+                        </p>
+                        <p>
+                            MUMBAI -> DEL
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 25%; ">
+                        <p>
+                            Consignor:
+                        </p>
+                        <p>
+                            88880025:GLOBE CHARTER
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 24%; ">
+                        <p>
+                            Consignee:
+                        </p>
+                        <p>
+                            88880025:GLOBE CHARTER
+                        </p>
+                    </div>
+                    <div class="trakingCard"
+                        style="width: 15%; display: flex; justify-content: center; align-items: center; ">
+                        <button mat-stroked-button (click)="ViewFunction('data')" color="primary">View</button>
+                    </div>
+                </div>
+
+                <div class="trakingBox">
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Cnote No:
+                        </p>
+                        <p style="font-size: 15px; padding-top: 5px; ">
+                            100010001
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>EDD:</p>
+                            <p>03-03-2024</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>ATD:</p>
+                            <p>NA</p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 31%; ">
+                        <p>
+                            Status:
+                        </p>
+                        <p>
+                            In Transit | Pending for Stock Update @ DEL
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Booking Date:
+                        </p>
+                        <p>
+                            Fri,01 Mar 2024 05:39:PM
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 15%; text-align: center; ">
+                        <p>
+                            Transit Mode:
+                        </p>
+                        <p>
+                            TBB / Road / FTL
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>EWB:</p>
+                            <p></p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>Valid:</p>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Movement:
+                        </p>
+                        <p>
+                            MUMBAI -> DEL
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 25%; ">
+                        <p>
+                            Consignor:
+                        </p>
+                        <p>
+                            88880025:GLOBE CHARTER
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 24%; ">
+                        <p>
+                            Consignee:
+                        </p>
+                        <p>
+                            88880025:GLOBE CHARTER
+                        </p>
+                    </div>
+                    <div class="trakingCard"
+                        style="width: 15%; display: flex; justify-content: center; align-items: center; ">
+                        <button mat-stroked-button (click)="ViewFunction('data')" color="primary">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </app-common-wrapper-webxpress>
+</div>
+
+
+<style>
+    p,
+    div {
+        margin: 0;
+        padding: 0;
+    }
+
+    .datepicker {
+        display: flex;
+    }
+
+    .cardBox {
+        width: 60%;
+        display: flex;
+        height: 70px;
+        box-sizing: border-box;
+    }
+
+    .cardBox .card {
+        width: 20%;
+        border-radius: 5px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .card p {
+        text-align: center;
+    }
+
+    .trakingCard {
+        height: 60px;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        border-left: 2px solid rgba(0, 0, 0, 0.2);
+
+    }
+
+    .trakingBox {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 2px solid rgba(0, 0, 0, 0.2);
+        border-right: 2px solid rgba(0, 0, 0, 0.2);
+        color: rgb(26, 25, 25);
+        margin: 10px 0px;
+    }
+
+    .trakingCard p {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        padding: 0px 5px;
+        padding-top: 5px;
+    }
+
+    .scrollable-content {
+        overflow-y: visible;
+        overflow-x: visible;
+    }
+</style>

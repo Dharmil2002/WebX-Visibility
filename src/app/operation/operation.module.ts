@@ -72,6 +72,9 @@ import { ConsignmentFilterComponent } from './consignment-filter/consignment-fil
 import { UpdateDeliveryComponent } from './update-delivery/update-delivery.component';
 import { DocketFiltersComponent } from "./thc-generation/filters/docket-filters/docket-filters.component";
 import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-modal/update-delivery-modal.component";
+import { QueryPageComponent } from './consignmentTracking/query-page/query-page.component';
+import { TrackingPageComponent } from './consignmentTracking/tracking-page/tracking-page.component';
+import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-popup/view-tracking-popup.component';
 
 @NgModule({
   declarations: [
@@ -123,7 +126,10 @@ import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-
     ConsignmentFilterComponent,
     UpdateDeliveryComponent,
     DocketFiltersComponent,
-    UpdateDeliveryModalComponent    
+    UpdateDeliveryModalComponent,
+    QueryPageComponent,
+    TrackingPageComponent,
+    ViewTrackingPopupComponent    
   ],
   imports: [
     CommonModule,

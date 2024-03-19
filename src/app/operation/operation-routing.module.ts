@@ -35,6 +35,8 @@ import { JobViewPrintComponent } from "./job-view-print/job-view-print.component
 import { ConsignmentOperationComponent } from "./consignment-operation/consignment-operation.component";
 import { ConsignmentFilterComponent } from "./consignment-filter/consignment-filter.component";
 import { UpdateDeliveryComponent } from "./update-delivery/update-delivery.component";
+import { QueryPageComponent } from "./consignmentTracking/query-page/query-page.component";
+import { TrackingPageComponent } from "./consignmentTracking/tracking-page/tracking-page.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -175,6 +177,15 @@ const routes: Routes = [
   {
     path: "ConsignmentFilter",
     component: ConsignmentFilterComponent
+  },
+
+  {
+    path: "ConsignmentQuery",
+    component: QueryPageComponent
+  },
+  {
+    path: "ConsignmentTracking",
+    component: TrackingPageComponent
   },
   
 ]

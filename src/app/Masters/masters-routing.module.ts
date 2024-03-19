@@ -94,9 +94,6 @@ import { ProductListComponent } from './shard-product/product-list/product-list.
 import { AddContainerStatusComponent } from './container-status-update/add-container-status/add-container-status.component';
 import { ContainerStatusListComponent } from './container-status-update/container-status-list/container-status-list.component';
 import { MenuAccessRightComponent } from './Admin/MenuAccessRight/menu-access-right/menu-access-right.component';
-import { TestViewComponent } from './view-print/View-test/test-view/test-view.component';
-import { DaburViewComponent } from './view-print/View-test/dabur-view/dabur-view.component';
-
 
 const routes: Routes = [
   { path: "ViewPrint", component: ViewPrintComponent },
@@ -208,10 +205,6 @@ const routes: Routes = [
   { path: "Container/Status/Add", component: AddContainerStatusComponent },
   { path: "Container/Status/list", component: ContainerStatusListComponent },
   { path: "shardProduct/shardProductList", component: ProductListComponent },
-
-
-  { path: "TestView", component: TestViewComponent },
-  { path: "DaburView", component: DaburViewComponent }
 
 
 ];

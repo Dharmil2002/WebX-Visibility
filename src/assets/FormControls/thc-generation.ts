@@ -465,7 +465,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: false
+                    disable: view ? view : update ? update : false
                 },
                 {
                     name: 'driverLno',
@@ -486,7 +486,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: false
+                    disable: view ? view : update ? update : false
                 },
                 {
                     name: 'driverLexd',
@@ -507,7 +507,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: false
+                    disable: view ? view : update ? update : false
                 },
                 {
                     name: 'driverMno',
@@ -528,7 +528,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: false
+                    disable: view ? view : update ? update : false
                 },
                 {
                     name: "ArrivalDate",
@@ -548,6 +548,7 @@ export class thcControl {
                         },
                     ],
                     additionalData: {
+                        minDate: maxDate,
                         metaData: "ArrivalInfo"
                     },
                 },
@@ -974,7 +975,7 @@ export class thcControl {
                 functions: {
                     onOptionSelect: 'getVehicleDetail',
                 },
-                disable: view ? view : prq ? prq : update
+                disable: view ? view : update ? update : false
             },
             {
                 name: "vehSize",
@@ -986,7 +987,7 @@ export class thcControl {
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: false,
+                disable: view ? view : update ? update : false,
                 functions: {
                     onSelection: "getSize"
                 },
@@ -1042,7 +1043,7 @@ export class thcControl {
             },
             {
                 name: 'inExdt', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
-                type: 'date', value: "", generatecontrol: true, disable: false,
+                type: 'date', value: "", generatecontrol: true, disable: view ? view : update ? update : false,
                 Validations: [
                     {
                         name: "required",
@@ -1057,7 +1058,7 @@ export class thcControl {
 
             {
                 name: 'fitdt', label: "Fitness Validity Date", placeholder: "", type: 'date',
-                value: "", generatecontrol: true, disable: false,
+                value: "", generatecontrol: true, disable: view ? view : update ? update : false,
                 Validations: [
                     {
                         name: "required",

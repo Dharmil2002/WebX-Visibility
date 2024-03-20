@@ -579,6 +579,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*here the function for the bind prq data*/
   async bindPrqData() {
+    
     if (this.thcTableForm.controls["prqNo"].value.value) {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
@@ -627,6 +628,8 @@ export class ThcGenerationComponent implements OnInit {
             //vMobileNo: vehData.vndPH || '',
             // driver: vehData.drvNM || '',
             //driverPan: vehData?.pANNO || '',
+            engineNo: vehData?.eNGNO || '',
+            chassisNo: vehData?.cHNO || '',
             lcNo: vehData.dLNO || '',
             lcExpireDate: vehData.dLEXP || new Date(),
             //dmobileNo: vehData.drvPH || '',
@@ -647,6 +650,8 @@ export class ThcGenerationComponent implements OnInit {
             }
           }
           this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
+          this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
+          this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
         }
       }
 
@@ -1004,7 +1009,7 @@ export class ThcGenerationComponent implements OnInit {
   /*below function is called when any event is occure in vendor type*/
   vendorFieldChanged() {
     this.marketVendor = false;
-    const vendorType = this.thcTableForm.value.vendorType;
+    const vendorType = this.thcTableForm.getRawValue().vendorType;
     this.jsonControlArray.forEach((x) => {
       if (x.name === "vendorName") {
         x.type = vendorType === "4" ? "text" : "dropdown";
@@ -1033,13 +1038,14 @@ export class ThcGenerationComponent implements OnInit {
     }
     else {
       this.jsonControlBasicArray = this.allBasicJsonArray
-      this.thcTableForm.controls['vendorName'].setValue("");
-      this.thcTableForm.controls['panNo'].setValue("");
-      this.thcTableForm.controls['venMobNo'].setValue("");
-      this.thcTableForm.controls['brokerName'].setValue("");
-      this.thcTableForm.controls['brokerMobile'].setValue("");
+    
       /// this.thcTableForm.controls['vendorType'].setValue("");
       if (!this.prqFlag) {
+        this.thcTableForm.controls['vendorName'].setValue("");
+        this.thcTableForm.controls['panNo'].setValue("");
+        this.thcTableForm.controls['venMobNo'].setValue("");
+        this.thcTableForm.controls['brokerName'].setValue("");
+        this.thcTableForm.controls['brokerMobile'].setValue("");
         this.marketVendor = true;
       }
     }
@@ -1080,7 +1086,6 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
-    debugger
     const thcDetail = await this.thcService.getThcDetails(this.thcDetail.docNo);
     const thcMovemnetDetails = await this.thcService.getThcMovemnetDetails(this.thcDetail.docNo);
     const thcNestedDetails = thcDetail.data;
@@ -1213,7 +1218,8 @@ clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
 clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
 clearValidatorsAndUpdate(this.rakeForm, this.rakeFormData);
 clearValidatorsAndUpdate(this.rakeDetailsTableForm, this.rakeDetails);
-clearValidatorsAndUpdate(this.rakeForm, this.rakeInvoiceData);
+clearValidatorsAndUpdate(this.rakeInvoice, this.rakeInvoiceData);
+clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
 this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     // this.getShipmentDetails();
   }

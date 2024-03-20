@@ -15,16 +15,16 @@
     </form>
     <!-- End -->
     <!-- fleet Detail -->
-    <div *ngIf="marketVendor">
-      <form [formGroup]="marketVehicleTableForm">
-        <app-form-webxpress [form]="marketVehicleTableForm" [FormTitle]="'Market Vehicle'"
-          [formData]="jsonMarketVehicle" (functionCallEmitter)="functionCallHandler($event)"
+    <div  *ngIf="!isRail">
+      <form [formGroup]="VehicleTableForm">
+        <app-form-webxpress [form]="VehicleTableForm" [FormTitle]="'Vehicle Details'"
+          [formData]="jsonVehicleControl" (functionCallEmitter)="functionCallHandler($event)"
           [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
       </form>
     </div>
     <!-- Driver Detail -->
-    <div *ngIf="!marketVendor&&!isRail">
+    <div *ngIf="!isRail">
       <form [formGroup]="thcTableForm">
         <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
@@ -123,7 +123,8 @@
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-start">
           <button class="msr-3" mat-raised-button color="primary" *ngIf="!isView" (click)="createThc()"
-            [disabled]="!thcTableForm.valid"> {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
+            [disabled]="!thcTableForm.valid"
+            > {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
           <button class="msr-3" mat-raised-button color="primary" (click)="goBack('THC')">Back</button>
         </div>
       </div>

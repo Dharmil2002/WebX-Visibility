@@ -45,9 +45,9 @@
             </div>
 
             <div style="width: 100%; display: flex; flex-direction: column; margin-top: 30px;">
-                <div class="trakingBox">
+                <div class="trakingBox" *ngFor="let item of trakingData">
                     <div class="trakingCard" style="width: 18%; ">
-                        <p>
+                        <p class="font-width-600">
                             Cnote No:
                         </p>
                         <p style="font-size: 15px; padding-top: 5px; ">
@@ -56,16 +56,16 @@
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>EDD:</p>
+                            <p class="font-width-600">EDD:</p>
                             <p>03-03-2024</p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>ATD:</p>
+                            <p class="font-width-600">ATD:</p>
                             <p>NA</p>
                         </div>
                     </div>
                     <div class="trakingCard" style="width: 31%; ">
-                        <p>
+                        <p class="font-width-600">
                             Status:
                         </p>
                         <p>
@@ -73,7 +73,7 @@
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
-                        <p>
+                        <p class="font-width-600">
                             Booking Date:
                         </p>
                         <p>
@@ -81,7 +81,7 @@
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 15%; text-align: center; ">
-                        <p>
+                        <p class="font-width-600">
                             Transit Mode:
                         </p>
                         <p>
@@ -90,16 +90,16 @@
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>EWB:</p>
+                            <p class="font-width-600">EWB:</p>
                             <p></p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>Valid:</p>
+                            <p class="font-width-600">Valid:</p>
                             <p></p>
                         </div>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
-                        <p>
+                        <p class="font-width-600">
                             Movement:
                         </p>
                         <p>
@@ -107,7 +107,7 @@
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 25%; ">
-                        <p>
+                        <p class="font-width-600">
                             Consignor:
                         </p>
                         <p>
@@ -115,90 +115,7 @@
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 24%; ">
-                        <p>
-                            Consignee:
-                        </p>
-                        <p>
-                            88880025:GLOBE CHARTER
-                        </p>
-                    </div>
-                    <div class="trakingCard"
-                        style="width: 15%; display: flex; justify-content: center; align-items: center; ">
-                        <button mat-stroked-button (click)="ViewFunction('data')" color="primary">View</button>
-                    </div>
-                </div>
-
-                <div class="trakingBox">
-                    <div class="trakingCard" style="width: 18%; ">
-                        <p>
-                            Cnote No:
-                        </p>
-                        <p style="font-size: 15px; padding-top: 5px; ">
-                            100010001
-                        </p>
-                    </div>
-                    <div class="trakingCard" style="width: 18%; ">
-                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>EDD:</p>
-                            <p>03-03-2024</p>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>ATD:</p>
-                            <p>NA</p>
-                        </div>
-                    </div>
-                    <div class="trakingCard" style="width: 31%; ">
-                        <p>
-                            Status:
-                        </p>
-                        <p>
-                            In Transit | Pending for Stock Update @ DEL
-                        </p>
-                    </div>
-                    <div class="trakingCard" style="width: 18%; ">
-                        <p>
-                            Booking Date:
-                        </p>
-                        <p>
-                            Fri,01 Mar 2024 05:39:PM
-                        </p>
-                    </div>
-                    <div class="trakingCard" style="width: 15%; text-align: center; ">
-                        <p>
-                            Transit Mode:
-                        </p>
-                        <p>
-                            TBB / Road / FTL
-                        </p>
-                    </div>
-                    <div class="trakingCard" style="width: 18%; ">
-                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>EWB:</p>
-                            <p></p>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
-                            <p>Valid:</p>
-                            <p></p>
-                        </div>
-                    </div>
-                    <div class="trakingCard" style="width: 18%; ">
-                        <p>
-                            Movement:
-                        </p>
-                        <p>
-                            MUMBAI -> DEL
-                        </p>
-                    </div>
-                    <div class="trakingCard" style="width: 25%; ">
-                        <p>
-                            Consignor:
-                        </p>
-                        <p>
-                            88880025:GLOBE CHARTER
-                        </p>
-                    </div>
-                    <div class="trakingCard" style="width: 24%; ">
-                        <p>
+                        <p class="font-width-600">
                             Consignee:
                         </p>
                         <p>
@@ -275,5 +192,9 @@
     .scrollable-content {
         overflow-y: visible;
         overflow-x: visible;
+    }
+
+    .font-width-600{
+        font-weight: 600;
     }
 </style>

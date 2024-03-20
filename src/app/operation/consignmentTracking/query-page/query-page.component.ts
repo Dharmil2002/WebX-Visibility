@@ -44,11 +44,16 @@ export class QueryPageComponent implements OnInit {
   }
 
   save(event) {
-    const { Docket, start, end } = this.ConsignmentQueryForm.value;
+    // this.cnoteTableForm.controls.start.value
+    const start = this.ConsignmentQueryForm.controls.start.value
+    const end = this.ConsignmentQueryForm.controls.end.value
+    const Docket = this.ConsignmentQueryForm.controls.Docket.value
+    console.log('start' , start)
+
     const QueryJson = {
       Docket: Docket || undefined,
       start: moment(start).isValid() ? new Date(start) : undefined,
-      end: moment(end).isValid() ? new Date(end) : undefined,
+      end: moment(end).isValid() ? new Date(end): undefined,
     };
     this.Route.navigate(["Operation/ConsignmentTracking"], { state: { data: QueryJson } });
   }

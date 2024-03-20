@@ -42,34 +42,37 @@
                         <p style="font-size: 14px;">Delivered</p>
                     </div>
                 </div>
+                <div>
+                    <mat-paginator class="paginator" #paginator [pageSizeOptions]="[5,10,15,20]"></mat-paginator>
+                </div>
             </div>
 
-            <div style="width: 100%; display: flex; flex-direction: column; margin-top: 30px;">
-                <div class="trakingBox" *ngFor="let item of trakingData">
+            <div *ngIf="isTableLode" style="width: 100%; display: flex; flex-direction: column; margin-top: 30px;">
+                <div class="trakingBox" *ngFor="let item of obs | async; let i = index">
                     <div class="trakingCard" style="width: 18%; ">
                         <p class="font-width-600">
                             Cnote No:
                         </p>
-                        <p style="font-size: 15px; padding-top: 5px; ">
-                            100010001
+                        <p style="font-size: 14px; padding-top: 5px; ">
+                            {{item.dKTNO}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p class="font-width-600">EDD:</p>
-                            <p>03-03-2024</p>
+                            <p>{{item.sTSTM | date: "dd-MM-YYYY"}}</p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p class="font-width-600">ATD:</p>
-                            <p>NA</p>
+                            <p></p>
                         </div>
                     </div>
                     <div class="trakingCard" style="width: 31%; ">
                         <p class="font-width-600">
                             Status:
                         </p>
-                        <p>
-                            In Transit | Pending for Stock Update @ DEL
+                        <p style="font-size: 13px;">
+                            {{item.oPSSTS}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
@@ -77,7 +80,7 @@
                             Booking Date:
                         </p>
                         <p>
-                            Fri,01 Mar 2024 05:39:PM
+                            {{item.docketData.dKTDT | date: "dd-MM-YYYY"}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 15%; text-align: center; ">
@@ -85,7 +88,7 @@
                             Transit Mode:
                         </p>
                         <p>
-                            TBB / Road / FTL
+                            {{item.TransitMode}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
@@ -103,28 +106,28 @@
                             Movement:
                         </p>
                         <p>
-                            MUMBAI -> DEL
+                            {{item.oRGN}} -> {{item.dEST}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 25%; ">
                         <p class="font-width-600">
                             Consignor:
                         </p>
-                        <p>
-                            88880025:GLOBE CHARTER
+                        <p style="font-size: 13px;">
+                            {{item.Consignor}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 24%; ">
                         <p class="font-width-600">
                             Consignee:
                         </p>
-                        <p>
-                            88880025:GLOBE CHARTER
+                        <p style="font-size: 13px;">
+                            {{item.Consignee}}
                         </p>
                     </div>
                     <div class="trakingCard"
                         style="width: 15%; display: flex; justify-content: center; align-items: center; ">
-                        <button mat-stroked-button (click)="ViewFunction('data')" color="primary">View</button>
+                        <button mat-stroked-button (click)="ViewFunction(item)" color="primary">View</button>
                     </div>
                 </div>
             </div>
@@ -165,7 +168,7 @@
     }
 
     .trakingCard {
-        height: 60px;
+        height: 75px;
         border-bottom: 2px solid rgba(0, 0, 0, 0.2);
         border-left: 2px solid rgba(0, 0, 0, 0.2);
 

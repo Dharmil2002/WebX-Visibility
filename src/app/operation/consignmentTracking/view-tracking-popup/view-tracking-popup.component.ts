@@ -1,12 +1,13 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import moment from "moment";
 
 @Component({
   selector: "app-view-tracking-popup",
   templateUrl: "./view-tracking-popup.component.html",
 })
 export class ViewTrackingPopupComponent implements OnInit {
-  isTableLode = true;
+  isTableLode = false;
   dynamicControls = {
     add: false,
     edit: false,
@@ -21,14 +22,14 @@ export class ViewTrackingPopupComponent implements OnInit {
     Date: {
       Title: "Date",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:12%",
     },
-    Details: {
+    oPSSTS: {
       Title: "Additional Details",
-      class: "matcolumncenter",
-      Style: "min-width:30%",
+      class: "matcolumnleft",
+      Style: "min-width:25%",
     },
-    User: {
+    eVNID: {
       Title: "User",
       class: "matcolumnleft",
       Style: "min-width:10%",
@@ -36,59 +37,36 @@ export class ViewTrackingPopupComponent implements OnInit {
     EDD: {
       Title: "Entry Date",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:12%",
     },
-    CurrentLocation: {
+    lOC: {
       Title: "Current Location",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:10%",
     },
-    DocNo: {
+    dOCNO: {
       Title: "Document Number",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:20%",
     },
   };
-  staticField = ["Date", "Details", "User", "EDD", "CurrentLocation", "DocNo"];
+  staticField = ["Date", "oPSSTS", "eVNID", "EDD", "lOC", "dOCNO"];
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
-  TableData: any = [
-    {
-      Date: "Date",
-      Details: "Additional Details",
-      User: "User",
-      EDD: "Entry Date",
-      CurrentLocation: "Current Location",
-      DocNo: "Document Number",
-    },
-    {
-      Date: "Date",
-      Details: "Additional Details",
-      User: "User",
-      EDD: "Entry Date",
-      CurrentLocation: "Current Location",
-      DocNo: "Document Number",
-    },
-    {
-      Date: "Date",
-      Details: "Additional Details",
-      User: "User",
-      EDD: "Entry Date",
-      CurrentLocation: "Current Location",
-      DocNo: "Document Number",
-    },
-    {
-      Date: "Date",
-      Details: "Additional Details",
-      User: "User",
-      EDD: "Entry Date",
-      CurrentLocation: "Current Location",
-      DocNo: "Document Number",
-    },
-  ];
+  TableData: any;
   constructor(
     public dialogRef: MatDialogRef<ViewTrackingPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    console.log("data" ,this.data)
+    this.TableData = this.data?.map((x)=>{
+      return {
+        ...x,
+        Date:moment(x.eVNDT).format("DD-MM-YYYY"),
+        EDD:moment(x.eNTDT).format("DD-MM-YYYY")
+      }
+    })
+    this.isTableLode = true;
+  }
 
   ngOnInit(): void {}
 

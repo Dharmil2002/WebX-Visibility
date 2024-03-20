@@ -23,6 +23,8 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
 import { MatDialog } from "@angular/material/dialog";
 import { FreightChargeUploadComponent } from "./freight-charge-upload/freight-charge-upload.component";
+import moment from "moment";
+import { formatDate } from "src/app/Utility/date/date-utils";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -98,6 +100,16 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+    vFDT: {
+      Title: "From Date",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    vEDT: {
+      Title: "To Date",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     EditAction: {
       type: "iconClick",
       Title: "Action",
@@ -107,14 +119,14 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       iconName: "edit",
     },
   };
-  staticField = ["fROM", "tO", "rTYP", "cAP", "rT"];
+  staticField = ["fROM", "tO", "rTYP", "cAP", "rT", "vFDT", "vEDT"];
 
   //#endregion
   protected _onDestroy = new Subject<void>();
   custcontractList: any;
   data: any;
   FreightMatrixData: any;
-  initializeFormControlData: { Customer: any; ContractID: any };
+  initializeFormControlData: { MinDate: Date; MaxDate: Date };
   ServiceSelectiondata: any;
   rateTypeCode: any;
   rateTypeStatus: any;
@@ -157,10 +169,17 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     } as CurrentAccessListType;
   }
   async ngOnChanges(changes: SimpleChanges) {
-    // this.initializeFormControlData = {
-    //   Customer: changes.contractData?.currentValue?.customer ?? "",
-    //   ContractID: changes.contractData?.currentValue?.contractID ?? "",
-    // };
+    const MinDate = changes.contractData?.currentValue?.cSTARTDT ?? "";
+    const MinDateObj = MinDate ? moment(MinDate, 'DD-MM-YYYY').toDate() : null;
+
+    // Similarly for MaxDate
+    const MaxDate = changes.contractData?.currentValue?.cENDDT ?? "";
+    const MaxDateObj = MaxDate ? moment(MaxDate, 'DD-MM-YYYY').toDate() : null;
+
+    this.initializeFormControlData = {
+      MinDate: MinDateObj,
+      MaxDate: MaxDateObj
+    };
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "cust_contract",
@@ -198,6 +217,13 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     if (res.success) {
       this.tableData = res.data;
       this.tableData.sort((a, b) => (a.fCID > b.fCID ? -1 : 1));
+      this.tableData = this.tableData.map((x, index) => {
+        return {
+          ...x, // Spread the original item to retain other fields
+          vFDT: formatDate(x.vFDT || '', "dd-MM-yyyy"),
+          vEDT: formatDate(x.vEDT || '', "dd-MM-yyyy"),
+        };
+      })
       this.tableLoad = true;
       this.isLoad = false;
     }
@@ -213,6 +239,13 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       this.ContractFreightMatrixControls.getContractFreightMatrixControlControls(
         this.CurrentAccessList.productAccess
       );
+    // Update Form Values
+    this.jsonControlArrayFreightMatrix.forEach(item => {
+      if (item.name === 'ValidFromDate' || item.name === 'ValidToDate') {
+        item.additionalData.minDate = this.initializeFormControlData.MinDate
+        item.additionalData.maxDate = this.initializeFormControlData.MaxDate
+      }
+    });
     if (this.ServiceSelectiondata.loadType == "LT-0002") {
       this.jsonControlArrayFreightMatrix =
         this.jsonControlArrayFreightMatrix.filter((x) => x.name !== "capacity");
@@ -319,11 +352,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   //#region Set OriginRateOptions
   SetOptions(event) {
-    console.log(event);
-    console.log(this.PinCodeList.data);
 
     let fieldName = event.field.name;
-    console.log("fieldName", fieldName);
     const search = this.FreightMatrixForm.controls[fieldName].value;
     let data = [];
     if (search.length >= 2) {
@@ -355,15 +385,24 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   async AddNewButtonEvent(event) {
     const isUpdate = this.isUpdate;
     const formData = this.FreightMatrixForm.value;
+
     const filterCondition = (item) => {
+      const startDate = moment(item.vFDT, "DD-MM-YYYY");
+      const endDate = moment(item.vEDT, "DD-MM-YYYY");
+      const formDataStartDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
+      const formDataEndDate = moment(formData.ValidToDate, "DD-MM-YYYY");
       const commonConditions =
-        item.fROM == formData.From.name && item.tO == formData.To.name;
+        item.fROM == formData.From.name && item.tO == formData.To.name &&
+        (startDate <= formDataEndDate && endDate >= formDataStartDate) ||
+        (endDate >= formDataStartDate && startDate <= formDataEndDate);
+
 
       if (this.ServiceSelectiondata.loadType == "LT-0002") {
         return isUpdate
           ? commonConditions && item._id != this.UpdateData._id
           : commonConditions;
       } else {
+
         return isUpdate
           ? commonConditions &&
           item.cAP == formData.capacity.name &&
@@ -376,7 +415,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       Swal.fire({
         icon: "info",
         title: "info",
-        text: "Enter valid Freight Charges",
+        text: "Enter Valid Freight Charges With Unique Date Range",
         showConfirmButton: true,
       });
     } else {
@@ -403,6 +442,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
           ? this.FreightMatrixForm.value.capacity.value
           : "",
       rT: +this.FreightMatrixForm.value.Rate,
+      vFDT: this.FreightMatrixForm.value.ValidFromDate,
+      vEDT: this.FreightMatrixForm.value.ValidToDate,
       mODDT: new Date(),
       mODLOC: this.storage.branch,
       mODBY: this.storage.userName,

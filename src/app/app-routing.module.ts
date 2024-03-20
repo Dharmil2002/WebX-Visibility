@@ -54,6 +54,11 @@ const routes: Routes = [
         path: "configuration",
         loadChildren: () =>
           import("./view-print-configuration/view-print-configuration.module").then((m) => m.ViewPrintConfigurationModule)
+      },
+      {
+        path: "ControlTower",
+        loadChildren: () =>
+          import("./control-tower/control-tower.module").then((m) => m.ControlTowerModule),
       }
     ],
   },

@@ -251,10 +251,6 @@ export class AccountMasterControls {
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "Party Selection is required",
-          },
-          {
             name: "autocomplete",
           },
           {
@@ -326,7 +322,7 @@ export class AccountMasterControls {
         label: "TDS applicable",
         placeholder: "",
         type: "toggle",
-        value: "",
+        value: false,
         generatecontrol: true,
         disable: false,
         Validations: [],

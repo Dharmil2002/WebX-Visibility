@@ -761,6 +761,13 @@
       "router": "Finance/VendorPayment/Dashboard"
     },
     {
+      "title": "Finance/FAMasters/SetOpeningBalanceLedgerWise",
+      "tag": [
+        "Finance/FAMasters/SetOpeningBalanceLedgerWise"
+      ],
+      "router": "Finance/FAMasters/SetOpeningBalanceLedgerWise"
+    },
+    {
       "title": "CustomerContract/CustomerContractList",
       "tag": [
         "CustomerContract",
@@ -892,12 +899,28 @@
       "router": "Reports/General-ledger-report"
     },
     {
+      "title": "Reports/Cheque-Register-Report",
+      "tag": [
+        "ChequeRegisterReport",
+        "ChequeRegisterReport"
+      ],
+      "router": "Reports/Cheque-Register-Report"
+    },
+    {
       "title": "Reports/PRQ-Register-report",
       "tag": [
         "PRQreport",
         "PRQreport"
       ],
       "router": "Reports/PRQ-Register-report"
+    },
+    {
+      "title": "Reports/Cash-Bank-Book-Report",
+      "tag": [
+        "cashreport",
+        "cashreport"
+      ],
+      "router": "Reports/Cash-Bank-Book-Report"
     },
     {
       "title": "Reports/Voucher-Register-report",
@@ -937,7 +960,7 @@
         "Masters",
         "Container/Status/list"
       ],
-      "router":  "Masters/Container/Status/list"
+      "router": "Masters/Container/Status/list"
     },
     {
       "title": "Container Status Add",

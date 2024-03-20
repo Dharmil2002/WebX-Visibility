@@ -657,7 +657,27 @@ export const ROUTES: RouteInfo[] =
           class: "",
           groupTitle: false,
           submenu: []
-        }
+        },
+        {
+          "path": "",
+          "title": "FA Masters",
+          "moduleName": "FA Masters",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Finance/FAMasters/SetOpeningBalanceLedgerWise",
+              "title": "Set Opening Balance Ledger Wise",
+              "moduleName": "Set Opening Balance Ledger Wise",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+          ]
+        },
       ],
     },
     {
@@ -771,6 +791,24 @@ export const ROUTES: RouteInfo[] =
           "path": "Reports/General-ledger-report",
           "title": "General Ledger Report",
           "moduleName": "General Ledger Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/Dashboard",
+          "title": "Dashboard",
+          "moduleName": "Dashboard",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
+          "path": "Reports/Cheque-Register-Report",
+          "title": "Cheque Register Report",
+          "moduleName": "Cheque Register Report",
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,

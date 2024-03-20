@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="containerTableForm">
         <app-form-webxpress [form]="containerTableForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
             [FormTitle]="FormTitle" (callFunction)="functionCallHandler($event)"

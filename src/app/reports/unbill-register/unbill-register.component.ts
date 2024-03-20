@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { UnbillRegisterService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/unbill-register.service';
+import { UnbillRegisterService, convertToCSV } from 'src/app/Utility/module/reports/unbill-register.service';
 import { billRegControl } from 'src/assets/FormControls/Reports/Unbill-Register/unbill-register';
 // import { billRegControl } from 'src/assets/FormControls/Unbill-Register/unbill-register';
 import Swal from 'sweetalert2';
@@ -33,19 +36,15 @@ export class UnbillRegisterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private locationService: LocationService,
     private filter: FilterUtils,
-    private unbillRegisterService: UnbillRegisterService
+    private unbillRegisterService: UnbillRegisterService,
+    public snackBarUtilityService: SnackBarUtilityService,
   ) {
     this.initializeFormControl();
   }
 
   ngOnInit(): void {
-    const now = new Date();
-    const lastweek = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 10
-    );
-    // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
+    const now = moment().endOf('day').toDate();
+    const lastweek = moment().add(-10, 'days').startOf('day').toDate()
     this.unbillRegisTableForm.controls["start"].setValue(lastweek);
     this.unbillRegisTableForm.controls["end"].setValue(now);
     this.getDropDownList()
@@ -139,36 +138,52 @@ export class UnbillRegisterComponent implements OnInit {
   }
 
   async save() {
-    const startValue = new Date(this.unbillRegisTableForm.controls.start.value);
-    const endValue = new Date(this.unbillRegisTableForm.controls.end.value);
-    let data = await this.unbillRegisterService.getunbillRegisterReportDetail(startValue,endValue);
-    const loc = Array.isArray(this.unbillRegisTableForm.value.locHandler)
-      ? this.unbillRegisTableForm.value.locHandler.map(x => x.value)
-      : [];
-    const filteredRecords = data.filter(record => {
-      const des = loc.length === 0 || loc.includes(record.Destination); 
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const startValue = new Date(this.unbillRegisTableForm.controls.start.value);
+        const endValue = new Date(this.unbillRegisTableForm.controls.end.value);
+        const startDate = moment(startValue).startOf('day').toDate();
+        const endDate = moment(endValue).endOf('day').toDate();
+        
+        let data = await this.unbillRegisterService.getunbillRegisterReportDetail(startDate, endDate);
+        const loc = Array.isArray(this.unbillRegisTableForm.value.locHandler)
+          ? this.unbillRegisTableForm.value.locHandler.map(x => x.value)
+          : [];
+        const filteredRecords = data.filter(record => {
+          const des = loc.length === 0 || loc.includes(record.Destination);
 
-      return des
-    });
-    // const selectedData = filteredRecords;
-    if (filteredRecords.length === 0) {
-      // Display a message or take appropriate action when no records are found
-      if (filteredRecords) {
-        Swal.fire({
-          icon: "error",
-          title: "No Records Found",
-          text: "Cannot Download CSV",
-          showConfirmButton: true,
+          return des
         });
+        // const selectedData = filteredRecords;
+        if (filteredRecords.length === 0) {
+          // Display a message or take appropriate action when no records are found
+          if (filteredRecords) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          return;
+        }
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 1000);
+        // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
+        //   const { odKTDT, ...rest } = record;
+        //   return rest;
+        // });
+        exportAsExcelFile(filteredRecords, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          error.message
+        );
       }
-      return;
-    }
-    // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-    //   const { odKTDT, ...rest } = record;
-    //   return rest;
-    // });
-    exportAsExcelFile(filteredRecords, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
-   }
+    }, "Unbilled Register Report Generating Please Wait..!");
+  }
 
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call

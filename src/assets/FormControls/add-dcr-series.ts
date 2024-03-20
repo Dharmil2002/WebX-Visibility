@@ -29,7 +29,6 @@ export class AddDcrSeriesControl {
         generatecontrol: true,
         disable: false,
       },
-
       {
         name: "bookCode",
         label: "Book Code",

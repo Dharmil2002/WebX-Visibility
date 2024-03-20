@@ -343,7 +343,7 @@ export class DepartureService {
           "dOCNO": data?.tripID || "",
           "sTS":DocketStatus.Departed,
           "sTSNM":DocketStatus[DocketStatus.Departed],
-          "oPSSTS": `Departed from ${this.storage.branch} to ${next} with THC ${data.tripID} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}.`,
+          "oPSSTS": `Departed from ${this.storage.branch} to ${next} with THC ${data.tripID} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
           "eNTDT": new Date(),
           "eNTLOC": this.storage.branch,
           "eNTBY": this.storage.userName
@@ -364,7 +364,7 @@ export class DepartureService {
         update:{
         "sTS":DocketStatus.Departed,
         "sTSNM":DocketStatus[DocketStatus.Departed],
-        "oPSSTS":`Departed From ${this.storage.branch} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+        "oPSSTS":`Departed From ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
         "mODBY":this.storage.userName,
         "mODDT":new Date(),
         "mODLOC":this.storage.branch}

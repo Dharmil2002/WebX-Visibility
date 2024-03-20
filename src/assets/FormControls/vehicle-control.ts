@@ -283,14 +283,31 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'gpsDeviceId', label: 'Device Id', placeholder: '', type: 'number', value: vehicleTable.gpsDeviceId, generatecontrol: true, disable: false,
+                    name: 'gpsDeviceId', label: 'Device Id', placeholder: '', type: 'text', value: vehicleTable.gpsDeviceId, generatecontrol: true, disable: false,
+                    Validations: [
+                        // {
+                        //     name: "pattern",
+                        //     message: "Please Enter Min 1 & Max. 30 Character",
+                        //     pattern: '.{1,30}',
+                        // }
+                    ]
+                },
+                {
+                    name: 'gpsProvider',
+                    label: "GPS Provider",
+                    placeholder: "Select GPS Provider",
+                    type: 'dropdown',
+                    value: vehicleTable.gpsProvider,
+                    generatecontrol: true,
+                    disable: false,
                     Validations: [
                         {
-                            name: "pattern",
-                            message: "Please Enter Min 1 & Max. 30 Character",
-                            pattern: '.{1,30}',
+                            name: "autocomplete",
                         }
-                    ]
+                    ],
+                    additionalData: {
+                        showNameAndValue: true
+                    },
                 },
                 {
                     name: 'isActive',
@@ -352,6 +369,10 @@ export class VehicleControls {
                 },
                 {
                     name: 'vendorTypeCode', label: '', placeholder: '', type: 'text', value: '', Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'gpsProviderCode', label: '', placeholder: '', type: 'text', value: '', Validations: [],
                     generatecontrol: false, disable: false
                 },
             ]

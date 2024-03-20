@@ -377,6 +377,13 @@ export class AddDriverMasterComponent implements OnInit {
         const res = await firstValueFrom(this.masterService
           .masterPut("generic/update", req));
         if (res) {
+          //if vehicle is assign to driver then need to update vehcile status
+          if(commonBody?.vehicleNo && commonBody?.vehicleNo!=""){
+            await this.updateStatusByVehicleNo(commonBody);
+          }
+          else{
+            await this.updateStatusByDriver(commonBody);
+          }
           // Display success message
           Swal.fire({
             icon: "success",
@@ -399,6 +406,13 @@ export class AddDriverMasterComponent implements OnInit {
         };
         const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
+          
+          if(commonBody?.vehicleNo && commonBody?.vehicleNo!=""){
+            await this.updateStatusByVehicleNo(commonBody);
+          }
+          else{
+            await this.updateStatusByDriver(commonBody);
+          }
           // Display success message
           Swal.fire({
             icon: "success",
@@ -415,6 +429,137 @@ export class AddDriverMasterComponent implements OnInit {
 
   cancel() {
     this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
+  }
+  async updateStatusByVehicleNo(data: any) {
+
+
+    /*Remove from old vehicle*/
+    let reqD = {
+      companyCode: this.companyCode,
+      collectionName: "vehicle_status",
+      filter: { driverCD: data.manualDriverCode },
+    };
+    //get Vehicle status
+    let vehStatsD = await firstValueFrom(
+      this.masterService.masterPost("generic/get", reqD)
+    );
+    let vehSD=vehStatsD?.data[0]
+    const isExistsD= vehSD != null && vehSD?.vehNo;
+
+      if(isExistsD){
+        vehSD={
+          ...vehSD,
+          updateDate:new Date(),
+          updateBy: data?.mODBY || data?.eNTBY,
+          dMobNo:"",
+          driver:"",
+          driverCD: "",
+          lcExpireDate:"",
+          driverPan:"",
+          lcNo:""
+        };
+        let reqU = {
+          companyCode: this.companyCode,
+          collectionName: "vehicle_status",
+          filter: { 
+            driverCD: data.manualDriverCode },
+          update: vehSD,
+        };
+        
+        const res = await firstValueFrom(
+          this.masterService.masterMongoPut("generic/update", reqU)
+        );
+      }
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "vehicle_status",
+      filter: { vehNo: data.vehicleNo },
+    };
+    //get Vehicle status
+    let vehStats = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    let vehS=vehStats?.data[0]
+    const isExists = vehS != null && vehS?.vehNo;
+    //only update if exists it will be store in vehicle Status
+    if (isExists) {
+      vehS={
+        ...vehS,
+        updateDate:new Date(),
+        updateBy: data?.mODBY || data?.eNTBY,
+        dMobNo:data.telno,
+        driver:data.driverName,
+        driverCD: data.manualDriverCode,
+        lcExpireDate:data.valdityDt,
+        driverPan:"",
+        lcNo:data.licenseNo
+      }
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "vehicle_status",
+        filter: { 
+          vehNo: data.vehicleNo },
+        update: vehS,
+      };
+      
+      const res = await firstValueFrom(
+        this.masterService.masterMongoPut("generic/update", req)
+      );
+    }
+  }
+  async updateStatusByDriver(data: any) {
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "vehicle_status",
+      filter: { driverCD: data.manualDriverCode },
+    };
+    //get Vehicle status
+    let vehStats = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    let vehS=vehStats?.data[0]
+    const isExists = vehS != null && vehS?.vehNo;
+    //only update if exists
+    if (isExists) {
+      if(data?.vehicleNo && data?.vehicleNo!=''){
+        vehS={
+          ...vehS,
+          updateDate:new Date(),
+          updateBy: data?.mODBY || data?.eNTBY,
+          dMobNo:data.telno,
+          driver:data.driverName,
+          driverCD: data.manualDriverCode,
+          lcExpireDate:data.valdityDt,
+          driverPan:"",
+          lcNo:data.licenseNo
+        }
+      }
+      else{
+        vehS={
+          ...vehS,
+          updateDate:new Date(),
+          updateBy: data?.mODBY || data?.eNTBY,
+          dMobNo:"",
+          driver:"",
+          driverCD: "",
+          lcExpireDate:"",
+          driverPan:"",
+          lcNo:""
+        }
+      }
+      
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "vehicle_status",
+        filter: { 
+          driverCD: data.manualDriverCode },
+        update: vehS,
+      };
+      
+      const res = await firstValueFrom(
+        this.masterService.masterMongoPut("generic/update", req)
+      );
+    }
   }
 
   setStateCityData() {

@@ -14,13 +14,7 @@ import Swal from "sweetalert2";
   templateUrl: "./add-container.component.html",
 })
 export class AddContainerComponent implements OnInit {
-  breadscrums = [
-    {
-      title: "Add Container",
-      items: ["Master"],
-      active: "Add Container",
-    },
-  ];
+  breadscrums = [];
   containerFormControls: any;
   isUpdate = false;
   jsonControlArray: any;
@@ -47,6 +41,15 @@ export class AddContainerComponent implements OnInit {
       this.isUpdate = true;
       this.FormTitle = "Edit Account";
     }
+    this.breadscrums = [
+      {
+        generatecontrol: true,
+        toggle: this.isUpdate ? this.UpdateData.isActive : false,
+        title: "Add Container",
+        items: ["Master"],
+        active: "Add Container",
+      },
+    ];
   }
 
   ngOnInit(): void {
@@ -217,16 +220,15 @@ export class AddContainerComponent implements OnInit {
         companyCode: this.CompanyCode,
         collectionName: "container_detail_master",
         filter: {},
+        sorting: {cNCD:-1}
       };
       const TableData = await firstValueFrom(
-        this.masterService.masterPost("generic/get", tableReq)
+        this.masterService.masterPost("generic/findLastOne", tableReq)
       );
       const index =
-        TableData.data.length === 0
-          ? 1
-          : parseInt(
-              TableData.data[TableData.data.length - 1].cNCD.substring(4)
-            ) + 1;
+        TableData.data.cNCD
+          ? parseInt(TableData.data.cNCD.substring(4)) + 1
+          : 1;
       const containercode = `CON-${
         index <= 9 ? "00" : index >= 9 && index <= 99 ? "0" : ""
       }${index}`;
@@ -247,7 +249,6 @@ export class AddContainerComponent implements OnInit {
       update: this.isUpdate ? body : undefined,
       data: this.isUpdate ? undefined : body,
     };
-    console.log("body", body);
     const res = this.isUpdate
       ? await firstValueFrom(
           this.masterService.masterPut("generic/update", req)
@@ -278,5 +279,9 @@ export class AddContainerComponent implements OnInit {
 
   cancel() {
     this.Route.navigateByUrl("/Masters/ContainerMaster/ListContainer");
+  }
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.containerTableForm.controls["isActive"].setValue(event);
   }
 }

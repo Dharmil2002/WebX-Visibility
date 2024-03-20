@@ -11,11 +11,26 @@ export class VendorWiseOutService {
           private masterServices: MasterService,
           private storage: StorageService
      ) { }
-
+     getISODateOrNull(date) {
+          if (isNaN(date.getTime())) {
+               return ''; // Return empty string if date is invalid
+          } else {
+               return date.toISOString(); // Convert to ISO format if date is valid
+          }
+     }
      async getvendorWiseOutReportDetail(ASonDateValue, start, end, locations, vendors, reportbasis) {
-          //   Extract vendor names and status names from the request object
-          const vendorNames = vendors ? vendors.map(x => x.vCD) || [] : [];
+          // Extract vendor names and status names from the request object
+          const vendorNames = vendors ? vendors.map(x => x.vNM) || [] : [];
           const locCodes = locations ? locations.map(x => x.locCode) || [] : [];
+          let ASonDateValueValid = true;
+          let dtmrequest = {}
+          if (ASonDateValue == "Invalid Date") {
+               ASonDateValueValid = false;
+               dtmrequest = { D$lte: this.getISODateOrNull(end) }
+          }
+          else {
+               dtmrequest = { D$lte: this.getISODateOrNull(ASonDateValue) }
+          }
 
           let matchQuery = {
                'D$and': [
@@ -24,6 +39,7 @@ export class VendorWiseOutService {
                     {
                          'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
                     },
+
                     ...(vendorNames.length > 0 ? [{ 'vND.nM': { 'D$in': vendorNames } }] : []), // Vendor names condition
                     ...(locCodes.length > 0 ? [{ eNTLOC: { 'D$in': locCodes } }] : []), // Location code condition
                     ...(reportbasis ? [{ 'bSTAT': parseInt(reportbasis) }] : []),
@@ -81,7 +97,7 @@ export class VendorWiseOutService {
                                                             },
                                                        },
                                                        {
-                                                            dTM: { D$lte: ASonDateValue }
+                                                            dTM: dtmrequest
                                                        },
                                                        {
                                                             cNL: {
@@ -132,7 +148,7 @@ export class VendorWiseOutService {
                                         D$max: [
                                              0,
                                              {
-                                                  D$subtract: ["$bALAMT", "$totalPayable"],
+                                                  D$subtract: ["$totalPayable", "$bALAMT"],
                                              },
                                         ],
                                    },
@@ -166,7 +182,7 @@ export class VendorWiseOutService {
                                         D$sum: {
                                              D$cond: {
                                                   if: {
-                                                       D$lte: ["$age", 15],
+                                                       D$lte: ["$age", 30],
                                                   },
                                                   then: "$pendingAmt",
                                                   else: 0,
@@ -179,10 +195,10 @@ export class VendorWiseOutService {
                                                   if: {
                                                        D$and: [
                                                             {
-                                                                 D$gt: ["$age", 16],
+                                                                 D$gt: ["$age", 31],
                                                             },
                                                             {
-                                                                 D$lte: ["$age", 30],
+                                                                 D$lte: ["$age", 60],
                                                             },
                                                        ],
                                                   },
@@ -197,10 +213,10 @@ export class VendorWiseOutService {
                                                   if: {
                                                        D$and: [
                                                             {
-                                                                 D$gt: ["$age", 30],
+                                                                 D$gt: ["$age", 61],
                                                             },
                                                             {
-                                                                 D$lte: ["$age", 45],
+                                                                 D$lte: ["$age", 90],
                                                             },
                                                        ],
                                                   },
@@ -215,10 +231,10 @@ export class VendorWiseOutService {
                                                   if: {
                                                        D$and: [
                                                             {
-                                                                 D$gt: ["$age", 46],
+                                                                 D$gt: ["$age", 91],
                                                             },
                                                             {
-                                                                 D$lte: ["$age", 60],
+                                                                 D$lte: ["$age", 120],
                                                             },
                                                        ],
                                                   },
@@ -233,10 +249,10 @@ export class VendorWiseOutService {
                                                   if: {
                                                        D$and: [
                                                             {
-                                                                 D$gt: ["$age", 61],
+                                                                 D$gt: ["$age", 121],
                                                             },
                                                             {
-                                                                 D$lte: ["$age", 75],
+                                                                 D$lte: ["$age", 150],
                                                             },
                                                        ],
                                                   },
@@ -251,10 +267,10 @@ export class VendorWiseOutService {
                                                   if: {
                                                        D$and: [
                                                             {
-                                                                 D$gt: ["$age", 75],
+                                                                 D$gt: ["$age", 151],
                                                             },
                                                             {
-                                                                 D$lte: ["$age", 90],
+                                                                 D$lte: ["$age", 180],
                                                             },
                                                        ],
                                                   },
@@ -267,7 +283,7 @@ export class VendorWiseOutService {
                                         D$sum: {
                                              D$cond: {
                                                   if: {
-                                                       D$gte: ["$age", 365],
+                                                       D$gte: ["$age", 180],
                                                   },
                                                   then: "$pendingAmt",
                                                   else: 0,

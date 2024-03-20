@@ -43,7 +43,7 @@ export class DeliveryService {
         "dOCNO":data.tripId,
         "sTS":data.statusCd,
         "sTSNM": DocketStatus[data.statusCd],
-        "oPSSTS":`Delivered to ${item.person} on ${moment(item.dateTime).format("DD MMM YYYY @ hh:mm A")}${item.reason ? `, reason: ${item.reason}` : ''}`,
+        "oPSSTS":`Delivered to ${item.person} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}${item.reason ? `, reason: ${item.reason}` : ''}`,
         "eNTLOC": this.storage.branch,
         "eNTBY": this.storage.userName
       }
@@ -54,6 +54,7 @@ export class DeliveryService {
     data['mODLOC']=this.storage.branch;
     const details = {
       formData: data,
+      timeZone: this.storage.timeZone,
       shipmentdata: shipment,
       evnData:evnData
     }

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractFreightMatrixControl {
   private ContractFreightMatrixControlArray: FormControls[];
@@ -148,6 +149,47 @@ export class ContractFreightMatrixControl {
             message: "Please enter a valid Rate EX. (100000.00)",
           },
         ],
+      },
+      {
+        name: "ValidFromDate",
+        label: "Valid From Date",
+        placeholder: "Valid From Date",
+        type: "date",
+        value: isUpdate ? moment(UpdateData.vFDT, 'DD-MM-YYYY').toDate() : "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [{
+          name: "required",
+          message: "Valid From Date is required",
+        },],
+        additionalData: {
+          minDate: new Date(),
+          maxDate: new Date()
+
+        },
+        functions: {
+          // onDate: "onContractStartDateChanged",
+        },
+      },
+      {
+        name: "ValidToDate",
+        label: "Valid To Date",
+        placeholder: "Valid To Date",
+        type: "date",
+        value: isUpdate ? moment(UpdateData.vEDT, 'DD-MM-YYYY').toDate() : "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [{
+          name: "required",
+          message: "Valid To Date is required",
+        },],
+        additionalData: {
+          minDate: new Date(),
+          maxDate: new Date()
+        },
+        functions: {
+          // onDate: "onContractStartDateChanged",
+        },
       },
     ];
   }

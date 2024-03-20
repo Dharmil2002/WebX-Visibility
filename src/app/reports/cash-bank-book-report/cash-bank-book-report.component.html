@@ -1,0 +1,13 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="cashbankbookForm">
+        <app-form-webxpress [form]="cashbankbookForm" [FormTitle]="'Cash-Bank Book Report'"
+            [formData]="jsoncashbankbookArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Submit'">
+        </app-form-webxpress>
+    </form>
+    
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="DetailHeader"
+        [tableData]="tableData" [metaData]="METADATA" [menuItems]="menuItems" [staticField]="staticField"
+        [Link]="linkArray"  (functionCallEmitter)="functionCallHandler($event)">
+    </app-generic-table-v2>
+</app-common-wrapper-webxpress>

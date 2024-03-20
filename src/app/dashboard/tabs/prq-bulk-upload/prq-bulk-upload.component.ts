@@ -132,7 +132,7 @@ export class PrqBulkUploadComponent implements OnInit {
             Validations: [
               { Required: true },
               { dateLimit: true },
-              { MaxValue:1}
+              { range:1}
             ],
           },
           {
@@ -159,7 +159,6 @@ export class PrqBulkUploadComponent implements OnInit {
           {
             ItemsName: "TruckCapacity",
             Validations: [
-              { Required: true },
               {
                 TakeFromList: mergevehicleTypeData
               },
@@ -218,7 +217,7 @@ export class PrqBulkUploadComponent implements OnInit {
             Validations: [
               { Required: true },
               { Numeric: true },
-              { MinValue: 0 },
+              { MinValue: 1 },
             ],
           },
           {
@@ -229,9 +228,7 @@ export class PrqBulkUploadComponent implements OnInit {
             ItemsName: "OrderDateTime",
             Validations: [
               { Required: true },
-              { Numeric: true },
-              { MinValue: 0 },
-              { CompareMinMaxValue: true },
+              { range: 1 },
             ],
           },
           {

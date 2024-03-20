@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators, } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
@@ -14,6 +14,7 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { RouteLocationService } from "src/app/Utility/module/masters/route-location/route-location.service";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
 @Component({
   selector: "app-add-vehicle-master",
   templateUrl: "./add-vehicle-master.component.html",
@@ -79,7 +80,8 @@ export class AddVehicleMasterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private objRouteLocationService: RouteLocationService,
-    private generalService: GeneralService
+    private generalService: GeneralService,
+    private hawkeyeUtilityService: HawkeyeUtilityService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
@@ -173,6 +175,12 @@ export class AddVehicleMasterComponent implements OnInit {
         this.location = data.name;
         this.locationStatus = data.additionalData.showNameAndValue;
       }
+      if (data.name === "gpsProvider") {
+        // Set category-related variables
+        this.gpsProvider = data.name;
+        this.gpsProviderStatus = data.additionalData.showNameAndValue;
+        this.getGpsProvider();
+      }
       if (data.name === "vendorType") {
         // Set category-related variables
         this.vendorType = data.name;
@@ -210,7 +218,40 @@ export class AddVehicleMasterComponent implements OnInit {
       // Handle error, show message, or log as needed
     }
   }
+  async getGpsProvider() {
+    const Body = {
+      companyCode: this.companyCode,
+      collectionName: "customer_gpsprovider_mapping",
+      filter: {},
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", Body)
+    );
 
+    if (res.success && res.data.length > 0) {
+      const gpsProviderData = res.data.map((x) => {
+        return {
+          name: x.pNM,
+          value: x.pID,
+        };
+      });
+      //console.log("VendorTypeData", VendorTypeData);
+      if (this.isUpdate) {
+        const element = gpsProviderData.find(
+          (x) => x.name == this.vehicleTable.gpsProvider
+        );
+        this.vehicleTableForm.controls.gpsProvider.setValue(element);
+        //this.vendorFieldChanged()
+      }
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        gpsProviderData,
+        this.gpsProvider,
+        this.gpsProviderStatus
+      );
+    }
+  }
   async getVendorType() {
     const Body = {
       companyCode: this.companyCode,
@@ -234,7 +275,7 @@ export class AddVehicleMasterComponent implements OnInit {
           (x) => x.name == this.vehicleTable.vendorType
         );
         this.vehicleTableForm.controls.vendorType.setValue(element);
-        this.vendorFieldChanged()
+        this.vendorFieldChanged();
       }
       this.filter.Filter(
         this.jsonControlVehicleArray,
@@ -268,7 +309,12 @@ export class AddVehicleMasterComponent implements OnInit {
     } else {
       this.vehicleTableForm
         .get("capacity")
-        .setValue((parseFloat(this.vehicleTableForm.value.gvw) - parseFloat(this.vehicleTableForm.value.unldWt)).toFixed(2));
+        .setValue(
+          (
+            parseFloat(this.vehicleTableForm.value.gvw) -
+            parseFloat(this.vehicleTableForm.value.unldWt)
+          ).toFixed(2)
+        );
     }
   }
   //#endregion
@@ -297,16 +343,24 @@ export class AddVehicleMasterComponent implements OnInit {
         filter: {},
         collectionName: "vehicleType_detail",
       };
-
+      let gpsProviderReq = {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "customer_gpsprovider_mapping",
+      };
       const vehTypeRes = await firstValueFrom(
         this.masterService.masterPost("generic/get", vehTypeReq)
       );
       const generalMasterResponse = await firstValueFrom(
         this.masterService.masterPost("generic/get", generalReqBody)
       );
+      const gpsProviderRes = await firstValueFrom(
+        this.masterService.masterPost("generic/get", gpsProviderReq)
+      );
       const mergedData = {
         vehTypeData: vehTypeRes?.data,
         fltType: generalMasterResponse.data,
+        gpsProvider: gpsProviderRes?.data,
       };
 
       this.allData = mergedData;
@@ -314,8 +368,13 @@ export class AddVehicleMasterComponent implements OnInit {
         name: element.vehicleTypeName.toString(),
         value: element.vehicleTypeCode.toString(),
       }));
+      const gspProviderDet = mergedData.gpsProvider?.map((e) => ({
+        name: e.pNM.toString(),
+        value: e.pID.toString(),
+      }));
 
       // let routeDet = [];
+      this.routeDet =
       this.routeDet = await this.objRouteLocationService.getRouteLocationDetail();
 
       const FTLtype = mergedData.fltType
@@ -327,7 +386,7 @@ export class AddVehicleMasterComponent implements OnInit {
         });
 
       this.vehTypeDet = vehTypeDet;
-
+      this.gpsProviderDetail = gspProviderDet;
       this.filter.Filter(
         this.jsonControlVehicleArray,
         this.vehicleTableForm,
@@ -335,7 +394,13 @@ export class AddVehicleMasterComponent implements OnInit {
         this.vehicleType,
         this.vehicleTypeStatus
       );
-
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        this.gpsProviderDetail,
+        this.gpsProvider,
+        this.gpsProviderStatus
+      );
       this.filter.Filter(
         this.jsonControlVehicleArray,
         this.vehicleTableForm,
@@ -420,7 +485,7 @@ export class AddVehicleMasterComponent implements OnInit {
         text: "Vendor name not found please select another vendor type",
         showConfirmButton: true,
       });
-      this.vehicleTableForm.controls.vendorType.setValue("")
+      this.vehicleTableForm.controls.vendorType.setValue("");
     }
   }
   //#region
@@ -554,10 +619,14 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.controls["vendorTypeCode"].setValue(
       formValue.vendorType.value
     );
+    this.vehicleTableForm.controls["gpsProviderCode"].setValue(
+      formValue.gpsProvider?.value || 0
+    );
     const controlNames = [
       "vehicleType",
       "vendorType",
       "vendorName",
+      "gpsProvider",
       "route",
       "ftlTypeDesc",
     ];
@@ -603,6 +672,17 @@ export class AddVehicleMasterComponent implements OnInit {
       );
       if (res) {
         // Display success message
+        const ctReq = {
+          action: "UploadVehicle",
+          reqBody: {
+            companyCode: this.companyCode,
+            vehicleDet: data,
+          },
+        };
+        await this.updateStatus(data);
+        if(data?.gpsDeviceEnabled && data?.gpsDeviceId && data?.gpsDeviceId!="" && data?.gpsProvider && data?.gpsProvider!=""){
+          this.hawkeyeUtilityService.pushToCTCommon(ctReq);
+        }
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -627,6 +707,17 @@ export class AddVehicleMasterComponent implements OnInit {
         this.masterService.masterPost("generic/create", req)
       );
       if (res) {
+        const ctReq = {
+          action: "UploadVehicle",
+          reqBody: {
+            companyCode: this.companyCode,
+            vehicleDet: data,
+          },
+        };
+        await this.updateStatus(data);
+        if(data?.gpsDeviceEnabled && data?.gpsDeviceId && data?.gpsDeviceId!="" && data?.gpsProvider && data?.gpsProvider!=""){
+          this.hawkeyeUtilityService.pushToCTCommon(ctReq);
+        }
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -639,15 +730,99 @@ export class AddVehicleMasterComponent implements OnInit {
   }
   //#endregion
 
+  //#region Update Vehicle Status
+  async updateStatus(data: any) {
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "vehicle_status",
+      filter: { vehNo: data.vehicleNo },
+    };
+    let vehStats = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    let vehS=vehStats?.data[0]
+    const isUpdates = vehS != null && vehS?.vehNo;
+    if(!vehS){
+      vehS={}
+    }
+    vehS={
+      ...vehS,
+      route:data.route,
+      updateDate: new Date(),
+      updateBy:data?.mODBY || data?.eNTBY,
+      capacity:data.capacity,
+      vendor:data.vendorName,
+      vendorCode:data.vendorCode,
+      vendorType:data.vendorType,
+      vendorTypeCode:data.vendorTypeCode
+    }
+    //update 
+    if (isUpdates) {
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "vehicle_status",
+        filter: { 
+          vehNo: data.vehicleNo },
+        update: vehS,
+      };
+      
+      const res = await firstValueFrom(
+        this.masterService.masterMongoPut("generic/update", req)
+      );
+    }
+    //add
+    else {
+      vehS={
+        ...vehS,
+        _id:data.vehicleNo,
+        vehNo:data.vehicleNo,
+        currentLocation:localStorage.getItem("Branch"),
+        status:"Available",
+        tripId:"",
+        dMobNo:"",
+        driver:"",
+        driverCD:"",
+        FromCity:"",
+        ToCity:"",
+        lcExpireDate:"",
+        lcNo:"",
+        driverPan:"",
+        entryDate:new Date(),
+        entryBy:data?.eNTBY || data?.mODBY
+      };
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "vehicle_status",
+        data: vehS,
+      };
+      const res = await firstValueFrom(
+        this.masterService.masterPost("generic/create", req)
+      );
+    }
+  }
+  //#endregion Update Vehicle Status
   //#region
   enableGpsProvider($event) {
     this.jsonControlVehicleArray.forEach((data) => {
-      if (data.name === "gpsProvider") {
-        data.disable = !$event.eventArgs.checked; // Toggle the disable property based on checked value
-        // Update the form control's validation status
-        this.vehicleTableForm.controls.gpsProvider.updateValueAndValidity();
-      }
+      // if (data.name === "gpsProvider") {
+      //   data.disable = !$event.eventArgs.checked; // Toggle the disable property based on checked value
+      //   // Update the form control's validation status
+      //   //this.vehicleTableForm.controls.gpsProvider.updateValueAndValidity();
+      // }
     });
+    if ($event.eventArgs.checked) {
+      this.vehicleTableForm.controls["gpsDeviceId"].setValidators([
+        Validators.required,
+      ]);
+      this.vehicleTableForm.controls["gpsProvider"].setValidators([
+        Validators.required,
+      ]);
+    } else {
+      this.vehicleTableForm.controls["gpsDeviceId"].clearValidators();
+      this.vehicleTableForm.controls["gpsProvider"].clearValidators();
+    }
+    this.vehicleTableForm.controls.gpsProvider.updateValueAndValidity();
+    this.vehicleTableForm.controls.gpsDeviceId.updateValueAndValidity();
   }
   //#endregion
 

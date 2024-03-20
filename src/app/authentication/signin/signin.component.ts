@@ -77,6 +77,7 @@ export class SigninComponent
             const companyDetail=await this.authService.getCompanyDetail();
             this.storageService.setItem("companyLogo",companyDetail.company_Image);
             this.storageService.setItem("company_Code",companyDetail.company_Code);
+            this.storageService.setItem("timeZone",companyDetail?.timeZone||"");
             this.router.navigate(["/dashboard/Index"]);
             }
             else{

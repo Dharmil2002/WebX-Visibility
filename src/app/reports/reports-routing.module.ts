@@ -12,9 +12,14 @@ import { VendorOutstandingReportComponent } from './vendor-outstanding-report/ve
 import { GeneralLedgerReportComponent } from './general-ledger-report/general-ledger-report.component';
 import { PrqRegisterReportComponent } from './prq-register-report/prq-register-report.component';
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
+import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
+import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 
 
 const routes: Routes = [
+  { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
   { path: "Voucher-Register-report", component: VoucherRegisterReportComponent },
   { path: "PRQ-Register-report", component: PrqRegisterReportComponent },
   { path: "job-query", component: JobQueryPageComponent },
@@ -27,6 +32,9 @@ const routes: Routes = [
   { path: "customer-outstanding-report", component: CustomerOutstandingReportComponent },
   { path: "vendor-wise-outstanding-report", component: VendorOutstandingReportComponent },
   { path: "General-ledger-report", component: GeneralLedgerReportComponent },
+  { path: "Cheque-Register-Report", component: ChequeRegisterComponent },
+  { path: "Dashboard", component: DashboardComponent },
+  { path: "ControlTower", component: ControlTowerDashboardComponent },
 ];
 
 @NgModule({

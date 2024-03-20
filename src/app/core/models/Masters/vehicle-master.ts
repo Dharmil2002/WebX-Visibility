@@ -41,6 +41,8 @@ export class vehicleModel {
   id: any;
   controllBranch: any;
   vendorTypeCode: number
+  gpsProviderCode:any;
+
   constructor(vehicleModel) {
     this.id = vehicleModel._id || this.getRandomID();
     this.vehicleType = vehicleModel.vehicleType || '';

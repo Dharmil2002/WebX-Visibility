@@ -24,7 +24,7 @@
       </form>
     </div>
     <!-- Driver Detail -->
-    <div *ngIf="!marketVendor">
+    <div *ngIf="!marketVendor&&!isRail">
       <form [formGroup]="thcTableForm">
         <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
@@ -43,12 +43,14 @@
       </form>
     </div>
     <!-- End -->
+    <div *ngIf="!isRail">
     <form [formGroup]="thcTableForm">
       <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Vehicle Loading Detail'"
         [formData]="jsonControlVehLoadArray" (functionCallEmitter)="functionCallHandler($event)"
         [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
+    </div>
     <!-- End -->
 
     <!-- Mark Arrival Detail -->
@@ -67,6 +69,20 @@
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
+    <div *ngIf="isRail">
+      <form [formGroup]="rakeDetailsTableForm">
+        <app-form-webxpress [form]="rakeDetailsTableForm" [formData]="rakeDetails"
+          (callFunction)="functionCallHandler($event)" [EventButton]="isRail==true?EventButtonRake:null"[FormTitle]="'Rake Details'"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+      </form>
+      <app-generic-table-v2 *ngIf="!rrLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.rakeHeader"
+        [tableData]="tableRakeData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+        [menuItems]="rakeMenuItems" [staticField]="definition.rakeStaticField" [Link]="linkArray" [height]="height"
+        [width]="width" [maxWidth]="maxWidth" [TableStyle]="TableStyle" (menuItemClicked)="handleMenuItemClick($event)"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+      </app-generic-table-v2>
+    </div>
     <app-generic-table-v2 *ngIf="((!tableLoad&&!addThc) && !DocketsIsEmpty)" [dynamicControls]="dynamicControls"
       [columnHeader]="columnHeader" [tableData]="tableData" [metaData]="metaData" [disbleCheckbox]="disbleCheckbox"
       [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height"
@@ -75,6 +91,7 @@
       [uploadedFiles]="uploadedFiles" [EventButton]="isUpdate !== true ? EventButton : null"
       (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)">
     </app-generic-table-v2>
+
     <div class="row">
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-start">

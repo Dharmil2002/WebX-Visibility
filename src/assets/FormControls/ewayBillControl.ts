@@ -1,4 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 
 export class EwayBillControls {
@@ -11,7 +12,9 @@ export class EwayBillControls {
   private totalSummaryControlArray: FormControls[];
   private ewayBillControlArray: FormControls[];
   private EWayDetailControlArray: FormControls[];
-  constructor() {
+  constructor(
+    private generalService: GeneralService
+  ) {
     this.docketFields = [
       {
         name: "docketNumber",
@@ -1131,9 +1134,9 @@ export class EwayBillControls {
           {
             name: "pattern",
 
-            message: "Please Enter only numeric Max length 12.",
+            message: "Please Enter only numeric length 12.",
 
-            pattern: "^[0-9]{1,12}$",
+            pattern: "^[0-9]{12}$",
 
           }
 
@@ -1296,30 +1299,87 @@ export class EwayBillControls {
   }
 
   getDocketFieldControls() {
-    return this.docketFields;
+    return this.docketFields.filter((x) => x.visible === true);
   }
   getConsignorFieldControls() {
-    return this.consignorFields;
+    return this.consignorFields.filter((x) => x.visible === true);
   }
   getConsigneeFieldControls() {
-    return this.consigneeFields;
+    return this.consigneeFields.filter((x) => x.visible === true);;
   }
   getAppointmentFieldControls() {
-    return this.appointmentControlArray;
+    return this.appointmentControlArray.filter((x) => x.visible === true);;
   }
   getContainerFieldControls() {
-    return this.containerControlArray;
+    return this.containerControlArray.filter((x) => x.visible === true);;
   }
   getEwayBillFormControls() {
-    return this.EWayDetailControlArray;
+    return this.EWayDetailControlArray.filter((x) => x.visible === true);;
   }
   getContractFieldControls() {
-    return this.contractControlArray;
+    return this.contractControlArray.filter((x) => x.visible === true);;
   }
   getTotalSummaryFieldControls() {
-    return this.totalSummaryControlArray;
+    return this.totalSummaryControlArray.filter((x) => x.visible === true);;
   }
   getEwayBillFieldControls() {
-    return this.ewayBillControlArray;
+    return this.ewayBillControlArray.filter((x) => x.visible === true);;
+  }
+  
+  async applyFieldRules(companyCode) {
+    var data = await this.generalService.getData("field_rules", { cID: companyCode, Mode: "LTL", Class: { "D$in": ["EwayBillControls"] } });    
+    if(data != null && data.length > 0){
+      data.map(f => {
+        if(f.Caption) {
+          f.Caption = f.Caption.replace(/{{Docket}}/g, DocCalledAs.Docket);
+        }
+        if(f["Place Holder"]) { 
+          f["Place Holder"] = f["Place Holder"].replace(/{{Docket}}/g, DocCalledAs.Docket); 
+        }
+        this.configureControl(f);
+      });
+    }
+  }
+
+  configureControl(field: any) { 
+    var c = this[field.FormControl].find((x) => x.name === field.Field);
+    if(!c)
+      return;
+
+    c.label = field.Caption;
+    c.placeholder = field["Place Holder"];
+    c.generatecontrol = field.Visible;
+    c.disable = field.ReadOnly;  
+    c.visible = field.Visible;   
+    
+    if(field.IsSystemGenerated) {
+      c.value = "Computerized";
+    }
+    if(field.Required === true) {
+      var r = c.Validations.find(x=>x.name=="required");
+      if(!r) {
+        c.Validations.push({name:"required",message:`${field.Caption} is required.` });
+      }
+      else {
+        r.message = `${field.Caption} is required.`;
+      }
+    }
+    else {
+      var r = c.Validations.find(x=>x.name=="required");
+      if(r) {
+        c.Validations.splice(c.Validations.indexOf(r),1);
+      }
+    }
+
+    if(field["Custom Validation"]) { 
+      var r = c.Validations.find(x=>x.name=="pattern");
+      if(!r) {
+        c.Validations.push({name:"pattern",message: field["Custom Validation Message"], pattern: field["Custom Validation"]});
+      }
+      else {
+        r.message = field["Custom Validation Message"];
+        r.pattern = field["Custom Validation"];
+      }
+    }
   }
 }

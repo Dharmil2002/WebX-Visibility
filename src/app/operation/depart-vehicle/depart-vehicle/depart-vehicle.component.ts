@@ -20,6 +20,8 @@ import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
+import { THCTrackingComponent } from "src/app/control-tower/thctracking/thctracking.component";
+import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
 
 
 @Component({
@@ -124,7 +126,8 @@ export class DepartVehicleComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private thcService: ThcService,
     private _operationService: OperationService,
-    private departureService:DepartureService
+    private departureService:DepartureService,
+    private hawkeyeUtilityService: HawkeyeUtilityService
   ) {
     // if (data) {
     //   this.tripData = data
@@ -398,7 +401,113 @@ export class DepartVehicleComponent implements OnInit {
 
   async addDepartData(departData) {
        await this.departureService.getFieldDepartureMapping(departData,this.shipmentData);
+       this.askTracking(departData);
+      //this.goBack('Departures');
+  }
+
+  async askTracking(departData){
+    //get trip details
+    let filter= {
+      //tHC:'TH/DELB/2425/000046'
+      tHC:departData.tripID
+    }
+    //Get Trip data
+    let tripDet= await this.departureService.fetchData('thc_summary_ltl',filter);
+    //if trip is updated && need ask if user need to track trip
+    if(tripDet?.length>0 && tripDet[0]?.oPSST== 1 && tripDet[0]?.oRGN===this.orgBranch){
+      await this.openVehicleTracking(tripDet);
+    }
+    else{
+      if(tripDet?.length>0){
+        await this.pushDeptCT(tripDet[0]);
+        this.goBack('Departures');
+      }
       this.goBack('Departures');
+    }
+  }
+  async pushDeptCT(tripDet){
+
+    let filter= {
+      // vehicleNo:'MH05AK8475'
+      vehicleNo:tripDet.vEHNO 
+    }
+    let vehicleDet=await this.departureService.fetchData('vehicle_detail',filter);
+    if(vehicleDet?.length>0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId!="" ){
+      const reqArrivalDeparture={
+        action:"TripArrivalDepartureUpdate",
+        reqBody:{
+          cid:this.companyCode,
+          EventType:'D',
+          loc:localStorage.getItem("Branch") || "",
+          tripId:tripDet.tHC
+        }
+      }
+      this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+    }
+
+  }
+  async openVehicleTracking(tripDet){
+    let filter= {
+      // vehicleNo:'MH05AK8475'
+      vehicleNo:tripDet[0].vEHNO 
+    }
+    let vehicleDet=await this.departureService.fetchData('vehicle_detail',filter);
+    if(vehicleDet?.length>0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId!="" ){
+      //ask for tracking
+      Swal.fire({
+        icon: "question",
+        title: "Tracking",
+        text: `Do you want vehicle tracking?`,
+        confirmButtonText: "Yes, track it!",
+        showConfirmButton: true,
+        showCancelButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const req={
+            action:"PushTrip",
+            reqBody:{
+              companyCode: this.companyCode,
+              branch:localStorage.getItem("Branch") || "",
+              tripId:tripDet[0]?.tHC,
+              vehicleNo:vehicleDet[0]?.vehicleNo
+            }
+          };
+          this.hawkeyeUtilityService.pushToCTCommon(req);
+          this.goBack('Departures');
+
+          // const dialogref = this.dialog.open(THCTrackingComponent, {
+          //   width: "100vw",
+          //   height: "100vw",
+          //   maxWidth: "232vw",
+          //   data: vehicleDet[0],
+          // });
+          // dialogref.afterClosed().subscribe((result) => {
+          //   if(result && result!=""){
+          //     if(result?.gpsDeviceEnabled ==true && result?.gpsDeviceId!=""){
+          //       const req={
+          //         companyCode: this.companyCode,
+          //         branch:localStorage.getItem("Branch") || "",
+          //         tripId:"TH/DELB/2425/000046",
+          //         vehicleNo:result.vehicleNo
+          //       }
+          //       this.departureService.pushTripToCT(req);
+          //       this.goBack('Departures');
+          //     }
+          //     else{
+          //       this.goBack('Departures');
+          //     }
+          //   }
+          // });
+        }
+        else
+        {
+          this.goBack('Departures');
+        }
+      });
+    }
+    else{
+      this.goBack('Departures');
+    }
   }
   updateTrip() {
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);

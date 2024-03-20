@@ -10,6 +10,7 @@ let minDate = yesterday; // Now, maxDate holds the date for yesterday at the end
 export class thcControl {
     private thcControlArray: FormControls[];
     private marketVehicle: FormControls[];
+    private rakeDetails:FormControls[];
     constructor(update: boolean, view: boolean, prq: boolean) {
 
         this.thcControlArray =
@@ -140,6 +141,24 @@ export class thcControl {
                     },
                 },
                 {
+                    name: 'via', label: "Via", placeholder: "Multiselect via", type: 'multiselect',
+                    value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    Validations: [
+                    ],
+                    functions: {
+                        onModel:"getCityDetail",
+                        onSelect:"onSelectViaLocation"
+                    },
+                    additionalData: {
+                        isIndeterminate: false,
+                        isChecked: false,
+                        support: "viaControlHandler",
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                       
+                    },
+                },
+                {
                     name: 'route',
                     label: 'Route',
                     placeholder: '',
@@ -226,7 +245,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : update,
+                    disable: view ? view  : update,
                     Validations: [
                         {
                             name: "required",
@@ -280,6 +299,9 @@ export class thcControl {
                         name: "required",
                         message: "Transport Mode is required",
                     }],
+                    functions: {
+                        onSelection: "transModeChanged"
+                    },
                     additionalData: {
                         showNameAndValue: false,
                         metaData: "Basic"
@@ -318,6 +340,28 @@ export class thcControl {
                     functions: {
                         onChange: 'onchangeIsEmptyFlag'
                     },
+                },
+                {
+                    name: "viaControlHandler",
+                    label: "Multi Via Location",
+                    placeholder: "Multi Via Location",
+                    type: "",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: false,
+                    disable: false,
+                    Validations: [
+    
+                    ],
+                    functions: {
+                        onToggleAll: 'toggleSelectAll',
+                    },
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    }
                 },
                 {
                     name: 'driverName',
@@ -1132,6 +1176,36 @@ export class thcControl {
                 generatecontrol: false, disable: false
             },
         ]
+        this.rakeDetails = [{
+            name: "rrNo",
+            label: "RR No",
+            placeholder: "Enter RR No",
+            type: "text",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+                {
+                    name: "required",
+                    message: "RR No is required",
+                }
+            ],
+            additionalData: {
+                showNameAndValue: true,
+                metaData: "rake"
+            },
+        },
+        {
+            name: 'rrDate', label: 'RR Date', placeholder: 'RR Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
+            generatecontrol: true, disable: false, Validations: [  {
+                name: "required",
+                message: "RR Date is required",
+            }],
+            additionalData: {
+                maxDate: new Date(),
+                metaData: "rake"
+              },
+        }]
     }
     getThcFormControls() {
         return this.thcControlArray;
@@ -1139,5 +1213,8 @@ export class thcControl {
     getMarketVehicle() {
         return this.marketVehicle
     }
-
+  
+    getRakeDetailsControls() {
+        return this.rakeDetails;
+    }
 }

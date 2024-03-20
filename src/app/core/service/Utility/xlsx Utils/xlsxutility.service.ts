@@ -25,17 +25,17 @@ export class xlsxutilityService {
             errors.push(`${rule.ItemsName} is required.`);
           }
           if ("dateLimit" in validation && value) {
-            const { MaxValue } = rule.Validations.find((x) => x.MaxValue);
+            const { range } = rule.Validations.find((x) => x.range);
             const currentDate = new Date();
             const oneMonthAgo = new Date(currentDate);
-            oneMonthAgo.setMonth(currentDate.getMonth() - parseInt(MaxValue));
+            oneMonthAgo.setMonth(currentDate.getMonth() - parseInt(range));
             const oneDay = new Date(currentDate);
             oneDay.setHours(currentDate.getHours() + 1);
 
             if (!value) {
               errors.push(`${rule.ItemsName} is required.`);
             } else {
-              const enteredDate = new Date(value);
+              const enteredDate = value;
               if (enteredDate < oneMonthAgo || enteredDate > currentDate) {
                 errors.push(
                   `${rule.ItemsName} must be within the past or current.`

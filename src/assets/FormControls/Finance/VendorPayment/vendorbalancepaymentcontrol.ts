@@ -227,7 +227,7 @@ export class VendorBalancePaymentControl {
         disable: true,
         additionalData: {
           metaData: "Basic",
-          label: "CGS Amount ₹",
+          label: "CGST Amount ₹",
           fieldName: "CGSTAmount",
           disable: true,
         },

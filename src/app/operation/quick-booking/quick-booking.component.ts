@@ -16,6 +16,8 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import Swal from "sweetalert2";
+import { firstValueFrom } from "rxjs";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 
 @Component({
   selector: "app-quick-booking",
@@ -65,6 +67,7 @@ export class QuickBookingComponent implements OnInit {
     private vehicleService:VehicleService
   ) {
     this.initializeFormControl();
+    
   }
 
   ngOnInit(): void {
@@ -74,16 +77,15 @@ export class QuickBookingComponent implements OnInit {
 
   initializeFormControl() {
     // Create an instance of QuickBookingControls to get form controls for different sections
-    this.docketControls = new QuickBookingControls();
-    // Get form controls for Quick Booking section
-    this.jsonControlDocketArray = this.docketControls.getDocketFieldControls();
-    this.commonDropDownMapping();
-    this.getDataFromGeneralMaster();
-    // Create the form group using the form builder and the form controls array
-    this.quickDocketTableForm = formGroupBuilder(this.fb, [
-      this.jsonControlDocketArray,
-    ]);
-    
+    this.docketControls = new QuickBookingControls(this.generalService);    
+    this.docketControls.applyFieldRules(this.companyCode).then(() => {
+        // Get form controls for Quick Booking section
+        this.jsonControlDocketArray = this.docketControls.getDocketFieldControls();
+        this.commonDropDownMapping();
+        this.getDataFromGeneralMaster();
+        // Create the form group using the form builder and the form controls array
+        this.quickDocketTableForm = formGroupBuilder(this.fb, [ this.jsonControlDocketArray ]);
+    });
   }
 
   async getDataFromGeneralMaster() {

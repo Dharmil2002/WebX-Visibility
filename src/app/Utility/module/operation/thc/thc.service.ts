@@ -14,7 +14,7 @@ export class ThcService {
         private storage: StorageService
     ) { }
 
-    async getShipmentFiltered(prqNo = null, fromCity = null, toCity = null, fromDate = null, toDate = null, containersWise = false) {
+    async getShipmentFiltered(prqNo = null, fromCity = null, toCity = null, stockCity = "", fromDate = null, toDate = null, containersWise = false) {
 
         let matchQuery = {
             'D$and': [
@@ -22,8 +22,9 @@ export class ThcService {
                  ...( fromDate ?  [{ 'dKTDT': { 'D$gte': fromDate } }] : []) ,
                  ...( toDate ?  [{ 'dKTDT': { 'D$lte': toDate } }] : []) ,
                  ...( ( prqNo && prqNo != "" ) ? [{ 'pRQNO': prqNo }] : []) ,
-                 ...( ( fromCity && fromCity != "" ) ? [{ 'cCT': fromCity }] : []) ,
-                 ...( ( toCity && toCity != "" ) ? [{ 'tCT': toCity }] : []) ,
+                 ...( ( stockCity && stockCity != "" ) ? [{ 'cCT': stockCity }] : []) ,
+                 ...( ( fromCity && fromCity != "" ) ? [{ 'oCT': fromCity }] : []) ,
+                 ...( ( toCity && toCity != "" ) ? [{ 'dCT': toCity }] : []) ,
                  ...( containersWise ? [{ 'cNO': { 'D$nin': ["", null] } }] : [{ 'cNO': { 'D$in': ["", null] } }] ) ,
             ],
        };

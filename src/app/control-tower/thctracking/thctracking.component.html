@@ -1,0 +1,38 @@
+<div
+  mat-dialog-title
+  style="
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 0px;
+    align-items: center;
+  "
+>
+  <h3>GPS Details</h3>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<form [formGroup]="VehicleDetailsForm">
+  <app-form-webxpress
+    [form]="VehicleDetailsForm"
+    [FormTitle]="'Tracking Data'"
+    [formData]="jsonControlArray"
+    (functionCallEmitter)="functionCallHandler($event)"
+    (callFunction)="functionCallHandler($event)"
+  >
+  </app-form-webxpress>
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+      <div class="example-button-row d-flex justify-content-end">
+        <button
+          class="msr-3"
+          mat-raised-button
+          color="primary"
+          (click)="submit()"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

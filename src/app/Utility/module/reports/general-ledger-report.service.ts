@@ -177,10 +177,10 @@ export class GeneralLedgerReportService {
   }
   //#endregion
   //#region to account list
-  async getAccountDetail() {
+  async getAccountDetail(filter = {}) {
     try {
       const companyCode = this.storage.companyCode;
-      const req = { companyCode, collectionName: 'account_detail', filter: {} };
+      const req = { companyCode, collectionName: 'account_detail', filter: filter };
 
       const response = await firstValueFrom(this.masterService.masterPost('generic/get', req));
       const accountData = response?.data || [];

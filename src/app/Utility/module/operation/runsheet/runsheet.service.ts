@@ -180,6 +180,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for the field mapping to Create runSheet*/
     async drsFieldMapping(data, tableData) {
+        
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "vendor_detail",
@@ -424,6 +425,7 @@ export class RunSheetService {
             collectionName: "drs_headers",
             branch: this.storage.branch,
             finYear: financialYear,
+            timeZone: this.storage.timeZone,
             data: data
         }
         const res = await firstValueFrom(this.operations.operationMongoPost("operation/drs/create", req));
@@ -515,7 +517,7 @@ export class RunSheetService {
                 dOCNO:formData?.Runsheet||"",
                 sTS: DocketStatus.Out_For_Delivery,
                 sTSNM: DocketStatus[DocketStatus.Out_For_Delivery].replace(/_/g, " "),
-                oPSSTS:`DRS generated ${formData?.Runsheet} at ${this.storage.branch} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+                oPSSTS:`DRS generated ${formData?.Runsheet} at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
                 eNTDT: new Date(),
                 eNTLOC: this.storage.branch,
                 eNTBY: this.storage.userName,
@@ -529,6 +531,7 @@ export class RunSheetService {
             companyCode: this.storage.companyCode,
             branch: this.storage.branch,
             data: {
+                 timeZone: this.storage.timeZone,
                  formData: formData,
                  shipmentdata: shipmentdata,
                  scanPackage: scanPackage,

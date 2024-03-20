@@ -288,7 +288,7 @@ export class DepartureControl {
                 name: 'DeptartureTime',
                 label: 'Enter Departure Time',
                 placeholder: '',
-                type: 'date',
+                type: "datetimerpicker",
                 value: '',
                 generatecontrol: true,
                 disable: false,

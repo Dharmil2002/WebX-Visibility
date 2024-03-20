@@ -32,7 +32,9 @@ export class StorageService {
   get companyLogo(): string {
     return this.getItem("companyLogo");
   }
-
+  get timeZone(): string {
+    return this.getItem("companyLogo");
+  }
 
   setItem(key: string, value: any, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;

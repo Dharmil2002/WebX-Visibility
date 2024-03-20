@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="chequeRegisterForm">
+        <app-form-webxpress [form]="chequeRegisterForm" [FormTitle]="'Cheque Register Report'"
+            [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Download'">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

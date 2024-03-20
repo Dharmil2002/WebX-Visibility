@@ -803,6 +803,13 @@
       "router": "Masters/AccountMaster/AddTds"
     },
     {
+      "title": "Reports/AccountReport/ProfitAndLoss",
+      "tag": [
+        "Reports/AccountReport/ProfitAndLoss"
+      ],
+      "router": "Reports/AccountReport/ProfitAndLoss"
+    },
+    {
       "title": "Reports/Job-Register Report",
       "tag": [
         "job-query",

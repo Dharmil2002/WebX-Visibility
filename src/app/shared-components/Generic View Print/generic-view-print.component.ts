@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Renderer2 } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, Renderer2 } from "@angular/core";
 //import { FieldMapping, HtmlTemplate, JsonData } from "./InvoiceTemplate";
 
 @Component({
@@ -16,10 +16,10 @@ export class GenericViewPrintComponent implements OnInit {
   @Input() HtmlTemplate: any;
   @Input() JsonData: any;
   @Input() FieldMapping: any[];
-
+  @Input() EventButton;
   @Input() barcode6: boolean = false;
-  @Input() barcode6Details : any = {};
-
+  @Input() barcode6Details: any = {};
+  @Output() functionCallEmitter = new EventEmitter();
 
   constructor(private renderer: Renderer2) {
     this.renderer.setStyle(document.querySelector('nav.navbar'), 'display', 'none'); // Hide Navbar
@@ -104,5 +104,8 @@ export class GenericViewPrintComponent implements OnInit {
     }
 
     return value;
+  }
+  functionHandle(name, element) {
+    this.functionCallEmitter.emit({ functionName: name, data: element })
   }
 }

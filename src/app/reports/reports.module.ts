@@ -54,6 +54,9 @@ import { PrqRegisterReportComponent } from './prq-register-report/prq-register-r
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
+import { ProfitAndLossCriteriaComponent } from './Account Report/Components/profit-and-loss-criteria/profit-and-loss-criteria.component';
+import { ProfitAndLossViewComponent } from './Account Report/Components/profit-and-loss-view/profit-and-loss-view.component';
+import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/profit-and-loss-view-details/profit-and-loss-view-details.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -113,7 +116,10 @@ import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-b
     GeneralLedgerReportComponent,
     VoucherRegisterReportComponent,
     ChequeRegisterComponent,
-    CashBankBookReportComponent
+    CashBankBookReportComponent,
+    ProfitAndLossCriteriaComponent,
+    ProfitAndLossViewComponent,
+    ProfitAndLossViewDetailsComponent
   ],
   exports:[],
 

@@ -96,11 +96,7 @@ export enum DcrEvents {
 }
 
 export enum DcrAction {
-  Allocated = 1,
-  //Reallocated = 2,
-  Assigned = 2,
-  // Splitted = 5,
-  // Declared_Void = 6,
-  // Deallocated = 7,
-  // Cancelled = 9
+  Allocation = 1,
+  Assgine = 2,
+  Reallocation = 4,
 }

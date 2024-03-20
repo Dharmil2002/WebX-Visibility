@@ -131,7 +131,7 @@ export class ActiveSeriesComponent implements OnInit {
         if (res) {
           // Sort the data based on updatedDate in descending order
           const sortedData = res.data.sort((a, b) => {
-            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
+            return new Date(b.mODDT).getTime() - new Date(a.mODDT).getTime();
           });
           const dataWithMappedTypes = sortedData.map((obj, index) => {
             const typeName = this.documentWithType.find(type => type.value === obj.tYP)?.name || obj.tYP;
@@ -142,12 +142,7 @@ export class ActiveSeriesComponent implements OnInit {
               eNTDT: formatDocketDate(obj.eNTDT)
             };
           });
-
           // Extract the updatedDate from the first element (latest record)
-          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
-
-          // Use latestUpdatedDate as needed
-
           this.tableData = dataWithMappedTypes;
           this.csv = this.tableData;
           this.tableLoad = false;

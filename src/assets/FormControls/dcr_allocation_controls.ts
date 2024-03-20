@@ -27,7 +27,7 @@ export class DcrAllocationForm {
         },
     },
       {
-        name: "location",
+        name: "allocation",
         label: "Location",
         placeholder: "select proper options",
         type: "dropdown", // Change to "text" if location is free text input
@@ -43,7 +43,7 @@ export class DcrAllocationForm {
         // Additional properties can be added.
         additionalData: {
             showNameAndValue: true,
-          },
+          }
       },
       {
         name: "assignTo",

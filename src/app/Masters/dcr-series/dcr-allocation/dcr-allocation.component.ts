@@ -9,7 +9,6 @@ import {
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { CustomerDetail, userDetail, vendorDetail } from "./dcr-apiUtility";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
 import { DCRModel } from "src/app/core/models/dcrallocation";
@@ -22,10 +21,10 @@ import {
   nextKeyCodeByN,
   splitSeries,
 } from "src/app/Utility/commonFunction/stringFunctions";
-import { DcrAllocationForm } from "src/assets/FormControls/dcr_allocation_controls";
 import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { VendorService } from "src/app/Utility/module/masters/vendor-master/vendor.service";
+import { DcrAllocationForm } from "src/assets/FormControls/dcr_allocation_controls";
 @Component({
   selector: "app-dcr-allocation",
   templateUrl: "./dcr-allocation.component.html",
@@ -71,7 +70,6 @@ export class DcrAllocationComponent implements OnInit {
     private locationService: LocationService,
     private vendorService: VendorService
   ) {
-    debugger;
     this.DCRTable = new DCRModel();
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.DCRTable = route.getCurrentNavigation().extras.state.data.columnData;
@@ -124,53 +122,12 @@ export class DcrAllocationComponent implements OnInit {
     const { from, noOfPages } = this.DCRTableForm.value;
     const toCode = nextKeyCodeByN(from, parseInt(noOfPages) - 1);
     this.DCRTableForm.controls.to.setValue(toCode);
-
-    // this.isSeriesExists();
     this.isSeriesValid();
   }
   //#endregion
 
   //#region isSeriesExists()
-  // async isSeriesExists(): Promise<boolean> {
-  //   const book = this.DCRTable.oBOOK;
-  //   const from = this.DCRTableForm.value.from;
-  //   const to = this.DCRTableForm.value.to;
-
-  //     // this.DCRTableForm.controls.allocateTo.setValue("");
-  //     let filter = {}
-  //     if(!to){
-  //       filter = {
-  //         cID: this.storage.companyCode,
-  //         oBOOK: book,
-  //         D$or: [
-  //           { fROM: { D$lte: from }, tO: { D$gte: to } }, // Check if the value is within any range
-  //         ]
-  //       };
-  //     }
-  //     const req = {
-  //       companyCode: this.companyCode,
-  //       collectionName: "dcr_header",
-  //       filter: filter
-  //     };
-  //     const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req) );
-  //     const foundItem = res?.data || null;
-  //     if (!foundItem) {
-  //       this.DCRTableForm.controls["from"].setValue("");
-  //       this.DCRTableForm.controls["to"].setValue("");
-  //       this.DCRTableForm.controls["noOfPages"].setValue("");
-  //       let s = from + (to ? " - "+ to : "");
-  //       Swal.fire({
-  //         title: "error",
-  //         text: `Series [${s}] Out of Range book ${foundItem.oBOOK}.! Please try with another.`,
-  //         icon: "error",
-  //         showConfirmButton: true,
-  //       });
-  //       return false;
-  //     }
-  // }
-  //#endregion
   async isSeriesValid() {
-    debugger;
     const splitFrom = this.DCRTableForm.value.from;
     const splitTo = this.DCRTableForm.value.to;
 
@@ -181,7 +138,6 @@ export class DcrAllocationComponent implements OnInit {
         splitFrom,
         splitTo
       );
-      console.log(this.splitSeries);
       this.bookData = await this.dcrService.getDCR({
         cID: this.storage.companyCode,
         tYP: this.DCRTable.tYP,
@@ -196,9 +152,11 @@ export class DcrAllocationComponent implements OnInit {
       });
     }
   }
+  //#endregion
 
   //#region handleChange
   async handleChange() {
+    const jsonControlCustomerArray = this.jsonControlCustomerArray;
     const value = this.DCRTableForm.get("AllocateTo").value;
     let filterFunction;
     //  const name =["AllocateTo","location","assignTo","noOfPages","name","from","to"]
@@ -206,15 +164,12 @@ export class DcrAllocationComponent implements OnInit {
       case "L":
         filterFunction = (x) =>
           x.name === "AllocateTo" ||
-          x.name === "location" ||
+          x.name === "allocation" ||
           x.name === "assignTo" ||
           x.name === "noOfPages" ||
           x.name === "name" ||
           x.name === "from" ||
           x.name === "to";
-
-        this.locationService.locationFromApi();
-
         let req = {
           companyCode: this.companyCode,
           collectionName: "location_detail",
@@ -233,20 +188,24 @@ export class DcrAllocationComponent implements OnInit {
               this.jsonControlCustomerArray,
               this.DCRTableForm,
               locationdetails,
-              "location",
+              "allocation",
               true
             );
           }
+        this.jsonControlCustomerArray.forEach((element) => {
+          if (element.name == "allocation") {
+            element.label = "Location";
+          }
+        });
         } catch (error) {
           console.error("Error fetching location details:", error);
           // Handle errors here
         }
-        this.resetForm();
         break;
       case "C":
         filterFunction = (x) =>
-          // x.name !== "location" &&
-          x.name !== "assignTo" && x.name !== "name" && x.name !== "noOfPages";
+          // x.name !== "location" && x.name !== "noOfPages"
+          x.name !== "assignTo" && x.name !== "name";
         let req1 = {
           companyCode: this.companyCode,
           collectionName: "customer_detail",
@@ -265,9 +224,14 @@ export class DcrAllocationComponent implements OnInit {
               this.jsonControlCustomerArray,
               this.DCRTableForm,
               customerdetails,
-              "location",
+              "allocation",
               true
             );
+            this.jsonControlCustomerArray.forEach((element) => {
+              if (element.name == "allocation") {
+                element.label = "Customer";
+              }
+            });
           }
         } catch (error) {
           console.error("Error fetching customer details:", error);
@@ -276,15 +240,17 @@ export class DcrAllocationComponent implements OnInit {
         // this.clearControlValidators(this.DCRTableForm.get("location"));
         this.clearControlValidators(this.DCRTableForm.get("assignTo"));
         this.clearControlValidators(this.DCRTableForm.get("name"));
-        this.clearControlValidators(this.DCRTableForm.get("noOfPages"));
-        this.resetForm();
+        // this.clearControlValidators(this.DCRTableForm.get("noOfPages"));
+        //this.resetForm();
         break;
     }
     this.jsonControlCustomerArray =
       this.originalJsonControlCustomerArray.filter(filterFunction);
   }
   //#endregion
-
+  async  getAlloction($event){
+    const event=$event
+  }
   async getCustomer(event) {
     await this.customerService.getCustomerForAutoComplete(
       this.DCRTableForm,
@@ -295,12 +261,68 @@ export class DcrAllocationComponent implements OnInit {
   }
 
   /*here i  created a Function for the destination*/
-  // async getLocations(event) {
-  //   if (this.DCRTableForm.controls.location.value.length > 2) {
+  async getLocations(event) {
+    if (this.DCRTableForm.controls.allocation.value.length > 2) {
+      const destinationMapping = await this.locationService.locationFromApi({
+        locCode: {
+          D$regex: `^${this.DCRTableForm.controls.allocation.value}`,
+          D$options: "i",
+        },
+      });
+      this.jsonControlCustomerArray.forEach((element) => {
+        if (element.name == "allocation") {
+          element.label = "Location";
+        }
+      });
+      this.filter.Filter(
+        this.jsonControlCustomerArray,
+        this.DCRTableForm,
+        destinationMapping,
+        "allocation",
+        true
+      );
+    }
+  }
+
+  // async getCustomer(event) {
+  //   await this.customerService.getCustomerForAutoComplete(
+  //     this.DCRTableForm,
+  //     this.jsonControlCustomerArray,
+  //     event.field.name,
+  //     true
+  //   );
+
+  //   // Add the functionality from getLocations
+  //   if (event.field.name === "allocation" && this.DCRTableForm.controls.allocation.value.length > 2) {
   //     const destinationMapping = await this.locationService.locationFromApi({
-  //       locCode: { 'D$regex': `^${this.DCRTableForm.controls.destination.value}`, 'D$options': 'i' },
+  //       locCode: {
+  //         D$regex: `^${this.DCRTableForm.controls.allocation.value}`,
+  //         D$options: "i",
+  //       },
   //     });
-  //     this.filter.Filter(this.jsonControlDocketArray, this.quickDocketTableForm, destinationMapping, this.destination, this.destinationStatus);
+
+  //     // Update label to "Location" for the element with name "allocation"
+  //     this.jsonControlCustomerArray.forEach((element) => {
+  //       if (element.name === "allocation") {
+  //         element.label = "Location";
+  //       }
+  //     });
+
+  //     // Update label to "Customer" for the element with name "allocation"
+  //     this.jsonControlCustomerArray.forEach((element) => {
+  //       if (element.name === "allocation") {
+  //         element.label = "Customer";
+  //       }
+  //     });
+
+  //     // Apply the filter
+  //     this.filter.Filter(
+  //       this.jsonControlCustomerArray,
+  //       this.DCRTableForm,
+  //       destinationMapping,
+  //       "allocation",
+  //       true
+  //     );
   //   }
   // }
 
@@ -310,7 +332,7 @@ export class DcrAllocationComponent implements OnInit {
     switch (value) {
       case "E":
         this.DCRTableForm.controls["name"].setValue("");
-        const userdetais = await userDetail(this.masterService);
+        const userdetais = await this.dcrService.userDetail(this.masterService);
         this.filter.Filter(
           this.jsonControlCustomerArray,
           this.DCRTableForm,
@@ -321,7 +343,7 @@ export class DcrAllocationComponent implements OnInit {
         break;
       case "B":
         this.DCRTableForm.controls["name"].setValue("");
-        const vendordetails = await vendorDetail(this.masterService);
+        const vendordetails = await this.dcrService.vendorDetail(this.masterService);
         this.filter.Filter(
           this.jsonControlCustomerArray,
           this.DCRTableForm,
@@ -332,7 +354,7 @@ export class DcrAllocationComponent implements OnInit {
         break;
       case "C":
         this.DCRTableForm.controls["name"].setValue("");
-        const customerdetails = await CustomerDetail(this.masterService);
+        const customerdetails = await this.dcrService.CustomerDetail(this.masterService);
         this.filter.Filter(
           this.jsonControlCustomerArray,
           this.DCRTableForm,
@@ -362,90 +384,75 @@ export class DcrAllocationComponent implements OnInit {
 
   //#region Save
   async save() {
-    if (this.DCRTableForm.get("AllocateTo").value === "L") {
-      this.DCRTableForm.controls["location"].setValue(
-        this.DCRTableForm.value.location
-      );
-      this.DCRTableForm.controls["name"].setValue(this.DCRTableForm.value.name);
-    }
-    if (this.DCRTableForm.get("AllocateTo").value === "C") {
-      this.DCRTableForm.controls["name"].setValue(this.DCRTableForm.value.name);
-    }
-
+    const formData = this.DCRTableForm.value;
     const aLOCTONM = this.allocateTo.find(
-      (x) => x.value == this.DCRTableForm.value?.AllocateTo
-    );
-    const aLONM = this.assignTo.find(
-      (x) => x.value == this.DCRTableForm.value?.assignTo
+      (x) => x.value == formData?.AllocateTo
     );
 
-    const splitFrom = this.DCRTableForm.value.from;
-    const splitTo = this.DCRTableForm.value.to;
+    const aSNTO = this.assignTo.find((x) => x.value == formData?.assignTo);
+
+    const splitFrom = formData.from;
+    const splitTo = formData.to;
 
     let seriesData: any[] = [];
 
     //Check Series is split or not
-    if (this.splitSeries.length > 1) {
-      this.splitSeries.forEach((m) => {
-        var ns = { ...this.DCRTable };
+    this.splitSeries.forEach((m) => {
+      var ns = { ...this.DCRTable };
 
-        if (m.from == splitFrom) {
-          ns.aLOTO = this.DCRTableForm.value?.AllocateTo || ""; //L: Location, C: Customer
-          ns.aLOTONM = aLOCTONM?.name || "";
-          ns.aLOCD = this.DCRTableForm.value?.location.value || "";
-          ns.aLONM = this.DCRTableForm.value?.location.name || "";
-          ns.aSNTO = this.DCRTableForm.value?.assignTo || "";
-          ns.aSNTONM = aLONM?.name || ""; //E: Location, B: BA, C: Customer
-          ns.aSNCD = this.DCRTableForm.value?.name.value || "";
-          ns.aSNNM = this.DCRTableForm.value?.name.name || "";
-          ns.sTS = ns.aSNTO == "" ? DcrEvents.Allocated : DcrEvents.Assigned;
-          ns.sTSN =
-            ns.aSNTO == ""
-              ? DcrEvents[DcrEvents.Allocated]
-              : DcrEvents[DcrEvents.Assigned];
+      if (m.to != ns.tO || m.from != ns.fROM) {
+        //Series is splitted
+        ns.fROM = m.from;
+        ns.tO = m.to;
+        ns.pAGES = m.itemCount;
+        ns.oBOOK = ns.bOOK;
+      }
 
-          if (m.to != ns.tO) {
-            //Series is splitted
-            ns.tO = m.to;
-            ns.pAGES = m.itemCount;
-            ns.oBOOK = ns.bOOK;
-          }
-          if (this.DCRTable.fROM == m.from) {
-            ns.mODBY = this.storage.userName;
-            ns.mODDT = new Date();
-            ns.mODLOC = this.storage.branch;
-          }
-        } else {
-          //New Series from book
+      if (m.from == splitFrom) {
+        ns.aLOTO = this.DCRTableForm.value?.AllocateTo || ""; //L: Location, C: Customer
+        ns.aLOTONM = aLOCTONM?.name || "";
+        ns.aLOCD = this.DCRTableForm.value?.allocation?.value || "";
+        ns.aLONM = this.DCRTableForm.value?.allocation?.name || "";
+        ns.aSNTO = aSNTO?.value || "";
+        ns.aSNTONM = aSNTO?.name || ""; //E: Location, B: BA, C: Customer
+        ns.aSNCD = this.DCRTableForm.value?.name?.value || "";
+        ns.aSNNM = this.DCRTableForm.value?.name?.name || "";
+        ns.sTS = ns.aSNTO == "" ? DcrEvents.Allocated : DcrEvents.Assigned;
+        ns.sTSN =
+          ns.aSNTO == ""
+            ? DcrEvents[DcrEvents.Allocated]
+            : DcrEvents[DcrEvents.Assigned];
 
-          if (m.to != ns.tO) {
-            //Series is splitted
-            ns.tO = m.to;
-            ns.pAGES = m.itemCount;
-            ns.oBOOK = ns.bOOK;
-          }
-
-          if (ns.fROM == m.from) {
-            ns.mODBY = this.storage.userName;
-            ns.mODDT = new Date();
-            ns.mODLOC = this.storage.branch;
-          } else {
-            ns.eNTBY = this.storage.userName;
-            ns.eNTDT = new Date();
-            ns.eNTLOC = this.storage.branch;
-
-            delete ns.mODBY;
-            delete ns.mODDT;
-            delete ns.mODLOC;
-          }
-          seriesData.push(ns);
+        if (this.DCRTable.fROM == m.from) {
+          ns.mODBY = this.storage.userName;
+          ns.mODDT = new Date();
+          ns.mODLOC = this.storage.branch;
         }
-      });
-    }
+      } else {
+        //New Series from book
 
-    seriesData.forEach((s) => {
-      if (this.bookData.length > 1 && s.fROM != this.DCRTable.fROM) {
-        s.bOOK = `${s.bOOK}-${this.bookData.length - 1}`;
+        if (this.DCRTable.fROM == m.from) {
+          ns.mODBY = this.storage.userName;
+          ns.mODDT = new Date();
+          ns.mODLOC = this.storage.branch;
+        } else {
+          ns.eNTBY = this.storage.userName;
+          ns.eNTDT = new Date();
+          ns.eNTLOC = this.storage.branch;
+
+          delete ns.mODBY;
+          delete ns.mODDT;
+          delete ns.mODLOC;
+        }
+      }
+      delete ns.action;
+      seriesData.push(ns);
+    });
+
+    seriesData.forEach(async (s, i) => {
+      if (s.fROM != this.DCRTable.fROM) {
+        const bookNo = this.bookData.length - 1 + (i + 1);
+        s.bOOK = `${s.bOOK}-${bookNo}`;
         s._id = `${s.cID}-${s.tYP}-${s.bOOK}`;
       }
 
@@ -456,12 +463,34 @@ export class DcrAllocationComponent implements OnInit {
           filter: { _id: s._id },
           update: s,
         };
-        console.log("Update", req);
+        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+            didClose: () => {
+              // This function will be called when the modal is fully closed and destroyed
+              this.route.navigateByUrl(
+                "/Masters/DCRManagement"
+              );
+            }
+          });
+        }
 
         const isSplit =
           s.fROM != this.DCRTable.fROM || s.tO != this.DCRTable.tO;
-        var history = this.getHistoryDate(s, true, isSplit);
-        console.log(history);
+        const isStatusChanged = s.sTS != this.DCRTable.sTS;
+
+        let history = this.getHistoryDate(s, true, isSplit, isStatusChanged);
+         let reqhistory = {
+          companyCode: parseInt(localStorage.getItem("companyCode")),
+          collectionName: "dcr_history",
+          data: history,
+        };
+        await firstValueFrom(this.masterService.masterPost("generic/create", reqhistory));
       } else {
         let req = {
           companyCode: parseInt(localStorage.getItem("companyCode")),
@@ -469,43 +498,48 @@ export class DcrAllocationComponent implements OnInit {
           data: s,
         };
 
-        console.log("Add", req);
-
-        var history = this.getHistoryDate(s, false);
-        console.log(history);
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+            didClose: () => {
+              // This function will be called when the modal is fully closed and destroyed
+              this.route.navigateByUrl(
+                "/Masters/DCRManagement"
+              );
+            }
+          });
+        }
+        let history = this.getHistoryDate(s, false, false, true);
+        let reqhistory = {
+          companyCode: parseInt(localStorage.getItem("companyCode")),
+          collectionName: "dcr_history",
+          data: history,
+        };
+        await firstValueFrom(this.masterService.masterPost("generic/create", reqhistory));
       }
     });
-
-    // const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
-    // if (res) {
-    //   const resHis = await firstValueFrom(this.masterService.masterPost("generic/create", reqHis));
-    //   // Display success message
-    //   Swal.fire({
-    //     icon: "success",
-    //     title: "Successful",
-    //     text: res.message,
-    //     showConfirmButton: true,
-    //     didClose: () => {
-    //       // This function will be called when the modal is fully closed and destroyed
-    //       this.route.navigateByUrl(
-    //         "/Masters/DCRManagement"
-    //       );
-    //     }
-    //   });
-    //}
     this.DCRTableForm.reset();
   }
 
   //#endregion
 
-  getHistoryDate(dcr, singleStatus = false, isSplit = false) {
-    const tm = moment();
+  //#region getHistoryDate
+  getHistoryDate(
+    dcr,
+    singleStatus = false,
+    isSplit = false,
+    isStatusChanged = false
+  ) {
+    const tm = moment().format("YYDDMM-HHmmss");
     const history = [];
 
     const commonProps = {
-      _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${dcr.sTS}-${tm.format(
-        "YYDDMM-HHmmss"
-      )}`,
+      _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${dcr.sTS}-${tm}`,
       cID: dcr.cID,
       tYP: dcr.tYP,
       bOOK: dcr.bOOK,
@@ -514,19 +548,22 @@ export class DcrAllocationComponent implements OnInit {
       tO: dcr?.tO || "",
       pAGES: dcr?.pAGES || 0,
       eNTBY: this.storage.userName,
-      eNTDT: tm,
+      eNTDT: moment(tm, "YYDDMM-HHmmss").toDate(),
       eNTLOC: this.storage.branch,
     };
 
     if (isSplit) {
       const slp = {
         ...commonProps,
-        _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Splitted}-${tm
+        _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Splitted}-${moment(
+          tm,
+          "YYDDMM-HHmmss"
+        )
           .add(-1, "seconds")
           .format("YYDDMM-HHmmss")}`,
         sTS: DcrEvents.Splitted,
         sTSN: DcrEvents[DcrEvents.Splitted],
-        eNTDT: tm.add(-1, "seconds"),
+        eNTDT: moment(tm, "YYDDMM-HHmmss").add(-1, "seconds").toDate(),
       };
       history.push(slp);
     }
@@ -538,17 +575,20 @@ export class DcrAllocationComponent implements OnInit {
           sTS: DcrEvents.Added,
           sTSN: DcrEvents[DcrEvents.Added],
         };
-        history.push(hAdd);
+        if (isStatusChanged) history.push(hAdd);
         break;
       case DcrEvents.Allocated:
         const hAdd1 = {
           ...commonProps,
-          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Added}-${tm
+          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Added}-${moment(
+            tm,
+            "YYDDMM-HHmmss"
+          )
             .add(-1, "seconds")
             .format("YYDDMM-HHmmss")}`,
           sTS: DcrEvents.Added,
           sTSN: DcrEvents[DcrEvents.Added],
-          eNTDT: tm.add(-1, "seconds"),
+          eNTDT: moment(tm, "YYDDMM-HHmmss").add(-1, "seconds").toDate(),
         };
         if (!singleStatus) history.push(hAdd1);
 
@@ -561,23 +601,28 @@ export class DcrAllocationComponent implements OnInit {
           aLOCD: dcr.aLOCD,
           aLONM: dcr.aLONM,
         };
-        history.push(hAlo);
+        if (isStatusChanged) history.push(hAlo);
         break;
       case DcrEvents.Assigned:
         const hAdd2 = {
           ...commonProps,
-          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Added}-${tm
+          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Added}-${moment(
+            tm,
+            "YYDDMM-HHmmss"
+          )
             .add(-2, "seconds")
             .format("YYDDMM-HHmmss")}`,
           sTS: DcrEvents.Added,
           sTSN: DcrEvents[DcrEvents.Added],
-          eNTDT: tm.add(-2, "seconds"),
+          eNTDT: moment(tm, "YYDDMM-HHmmss").add(-2, "seconds").toDate(),
         };
         if (!singleStatus) history.push(hAdd2);
 
         const hAlo1 = {
           ...commonProps,
-          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${DcrEvents.Allocated}-${tm
+          _id: `${dcr.cID}-${dcr.tYP}-${dcr.bOOK}-${
+            DcrEvents.Allocated
+          }-${moment(tm, "YYDDMM-HHmmss")
             .add(-1, "seconds")
             .format("YYDDMM-HHmmss")}`,
           sTS: DcrEvents.Allocated,
@@ -586,7 +631,7 @@ export class DcrAllocationComponent implements OnInit {
           aLOTONM: dcr.aLOTONM,
           aLOCD: dcr.aLOCD,
           aLONM: dcr.aLONM,
-          eNTDT: tm.add(-1, "seconds"),
+          eNTDT: moment(tm, "YYDDMM-HHmmss").add(-1, "seconds").toDate(),
         };
         if (!singleStatus) history.push(hAlo1);
 
@@ -603,11 +648,12 @@ export class DcrAllocationComponent implements OnInit {
           aSNCD: dcr.aSNCD,
           aSNNM: dcr.aSNNM,
         };
-        history.push(hAsgn);
+        if (isStatusChanged) history.push(hAsgn);
         break;
     }
     return history;
   }
+  //#endregion
 
   //#region cancel
   cancel() {

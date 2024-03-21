@@ -121,11 +121,11 @@ import { ControlTowerDashboardComponent } from './control-tower-dashboard/contro
     CashBankBookReportComponent,
     ProfitAndLossCriteriaComponent,
     ProfitAndLossViewComponent,
-    ProfitAndLossViewDetailsComponent
+    ProfitAndLossViewDetailsComponent,
     DashboardComponent,
     ControlTowerDashboardComponent
   ],
-  exports:[],
+  exports: [],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService]
 })

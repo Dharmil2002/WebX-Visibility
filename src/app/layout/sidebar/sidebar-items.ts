@@ -817,6 +817,15 @@ export const ROUTES: RouteInfo[] =
           "submenu": []
         },
         {
+          "path": "Reports/Dashboard",
+          "title": "Dashboard",
+          "moduleName": "Dashboard",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
           "path": "Reports/Cheque-Register-Report",
           "title": "Cheque Register Report",
           "moduleName": "Cheque Register Report",

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { filter } from 'rxjs/operators';
 @Injectable({
      providedIn: 'root'
 })
@@ -16,9 +17,23 @@ export class AccountReportService {
                collectionName: "account_detail",
                filters: [
                     {
-                         "D$match": {
-                              "mRPNM": { "D$in": ["INCOME", "EXPENSE",] }
-                         },
+                         'D$match': {
+                              'D$or': [
+                                   {
+                                        'mATCD': {
+                                             'D$in': [
+                                                  'MCT-0003', 'MCT-0005'
+                                             ]
+                                        }
+                                   }, {
+                                        'gRPCD': {
+                                             'D$in': [
+                                                  'AST005', 'LIA004'
+                                             ]
+                                        }
+                                   }
+                              ]
+                         }
                     },
                     {
                          "D$lookup": {
@@ -134,7 +149,10 @@ export class AccountReportService {
           try {
                const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
                if (res.data && res.data.length > 0) {
-                    let reportData = res.data.sort((a, b) => {
+                    let ASSETAndLiabilities = res.data.filter(item => ['ASSET', 'LIABILITY'].includes(item.MainCategory));
+                    let OthersData = res.data.filter(item => !['ASSET', 'LIABILITY'].includes(item.MainCategory));
+
+                    let reportData = OthersData.sort((a, b) => {
                          if (a.MainCategory < b.MainCategory) return 1;
                          if (a.MainCategory > b.MainCategory) return -1;
                          return 0;
@@ -145,6 +163,7 @@ export class AccountReportService {
                               MainCategory: `${index + 1}. ${entry.MainCategory}`,
                               MainCategoryWithoutIndex: entry.MainCategory,
                               SubCategory: 'Total',
+                              SubCategoryWithoutIndex: '',
                               TotalAmountCurrentFinYear: (entry.Details.reduce((acc, item) => acc + item.TotalCredit, 0) - entry.Details.reduce((acc, item) => acc + item.TotalDebit, 0)).toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: '-',
@@ -159,6 +178,7 @@ export class AccountReportService {
                               MainCategory: '',
                               MainCategoryWithoutIndex: '',
                               SubCategory: `[${index + 1}.${subindex + 1}] ${subCategory.SubCategory}`,
+                              SubCategoryWithoutIndex: subCategory.SubCategory,
                               TotalAmountCurrentFinYear: (subCategory.TotalCredit - subCategory.TotalDebit).toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: subCategory.bSSCH,
@@ -169,7 +189,7 @@ export class AccountReportService {
                     });
 
 
-                    return NewTableList;
+                    return { "MainData": NewTableList, "TaxDetails": ASSETAndLiabilities };
                }
           } catch (error) {
                console.error("Error:", error);

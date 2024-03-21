@@ -47,9 +47,10 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
 
     const dataArray = [newdata, ...result];
     this.JsonData = {
-      "CompanyIMG": "https://webxblob.blob.core.windows.net/newtms/logo/webxpress-logo.png",
+      "CompanyIMG": JsonData.CompanyIMG,
       "finYear": finYear,
       "reportdate": "As on Date " + JsonData.EndDate,
+      "EndDate": JsonData.EndDate,
       "Schedule": "Schedule III Compliant",
       "AccountDetails": dataArray
     }
@@ -109,12 +110,12 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
             </div>
             <div class="title" style="width: 75%; border: 1px solid black; ">
                 <div style="padding: 5px; font-weight: 700; border-bottom: 1px solid black; display: flex; justify-content: space-between;">
-    <span style="padding: 5px; font-weight: 500;">Profit and Loss Statement</span>
-    <span style="padding: 5px; font-weight: 500;">Financial Year [finYear]</span>
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;">Profit and Loss Statement</span>
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;">Financial Year [finYear]</span>
 </div>
-  <div style="padding: 5px; font-weight: 700; border-bottom: 1px solid black; display: flex; justify-content: space-between;">
-    <span style="padding: 5px; font-weight: 500;"> [reportdate]</span>
-    <span style="padding: 5px; font-weight: 500;">   [Schedule]</span>
+  <div style="padding: 5px; font-weight: 700; border-bottom: 0px solid black; display: flex; justify-content: space-between;">
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;"> [reportdate]</span>
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;">   [Schedule]</span>
 </div>
 
                 
@@ -147,8 +148,8 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
                     <td class="px-1" style="border: 1px solid black;">[AccountDetails.Notes]</td>
                     <td class="px-1" style="border: 1px solid black;">[AccountDetails.SubCategory]</td>
                      <td class="px-1" style="border: 1px solid black;">[AccountDetails.AccountName]</td>
-                    <td class="px-1" style="border: 1px solid black;text-align: center;">[AccountDetails.AmountCurrentFinYear]</td>
-                    <td class="px-1" style="border: 1px solid black; text-align: center;">[AccountDetails.AmountLastFinYear]</td>
+                    <td class="px-1" style="border: 1px solid black;text-align: right;">[AccountDetails.AmountCurrentFinYear]</td>
+                    <td class="px-1" style="border: 1px solid black; text-align: right;">[AccountDetails.AmountLastFinYear]</td>
                 </tr>
             </table>
         </div>

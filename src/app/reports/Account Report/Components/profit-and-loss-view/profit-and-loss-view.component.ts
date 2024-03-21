@@ -89,12 +89,12 @@ export class ProfitAndLossViewComponent implements OnInit {
             </div>
             <div class="title" style="width: 75%; border: 1px solid black; ">
                 <div style="padding: 5px; font-weight: 700; border-bottom: 1px solid black; display: flex; justify-content: space-between;">
-    <span style="padding: 5px; font-weight: 500;">Profit and Loss Statement</span>
-    <span style="padding: 5px; font-weight: 500;">Financial Year [finYear]</span>
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;">Profit and Loss Statement</span>
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;">Financial Year [finYear]</span>
 </div>
-  <div style="padding: 5px; font-weight: 700; border-bottom: 1px solid black; display: flex; justify-content: space-between;">
-    <span style="padding: 5px; font-weight: 500;"> [reportdate]</span>
-    <span style="padding: 5px; font-weight: 500;">   [Schedule]</span>
+  <div style="padding: 5px; font-weight: 700; border-bottom: 0px solid black; display: flex; justify-content: space-between;">
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;"> [reportdate]</span>
+    <span style="padding: 5px; font-weight: bold;font-size: 15px;">   [Schedule]</span>
 </div>
 
                 
@@ -129,8 +129,8 @@ export class ProfitAndLossViewComponent implements OnInit {
                     <td class="px-1" style="border: 1px solid black;text-align: center;"> 
                      <a href="/#/Reports/AccountReport/ProfitAndLossviewdetails?notes=[ProfitAndLossDetails.SubCategory]"  target="_blank">[ProfitAndLossDetails.Notes] </a>
                      </td>
-                    <td class="px-1" style="border: 1px solid black;text-align: center;">[ProfitAndLossDetails.TotalAmountCurrentFinYear]</td>
-                    <td class="px-1" style="border: 1px solid black; text-align: center;">[ProfitAndLossDetails.TotalAmountLastFinYear]</td>
+                    <td class="px-1" style="border: 1px solid black;text-align: right;">[ProfitAndLossDetails.TotalAmountCurrentFinYear]</td>
+                    <td class="px-1" style="border: 1px solid black; text-align: right;">[ProfitAndLossDetails.TotalAmountLastFinYear]</td>
                 </tr>
             </table>
         </div>
@@ -203,7 +203,7 @@ export class ProfitAndLossViewComponent implements OnInit {
       "Notes": "Note No",
       "SubCategory": "Particular",
       "AccountName": "Descriptions",
-      "AmountCurrentFinYear": "Amount As on As on Date" + this.JsonData.reportdate,
+      "AmountCurrentFinYear": "Amount As on " + this.JsonData.EndDate,
       "AmountLastFinYear": "Amount As on 31 Mar 23"
 
     }

@@ -180,8 +180,8 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         }
         this.EndDate = moment(endDate).format("DD MMM YY");
 
-        const data = await this.accountReportService.ProfitLossStatement(this.reqBody);
-        if (data.length == 0) {
+        const Result = await this.accountReportService.ProfitLossStatement(this.reqBody);
+        if (Result.MainData == 0) {
           this.snackBarUtilityService.ShowCommonSwal(
             "error",
             "No Records Found"
@@ -189,29 +189,123 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           return;
         }
 
-        // Push Others Data In data
-        const income = data.find(x => x.MainCategoryWithoutIndex === "INCOME")?.TotalAmountCurrentFinYear ?? 0;
-        const expense = data.find(x => x.MainCategoryWithoutIndex === "Expense")?.TotalAmountCurrentFinYear ?? 0;
+        // Find Exceptional Items
+        const exceptionalItems = Result.MainData.find(item => item && item.SubCategoryWithoutIndex === 'Exceptional Items');
+        const extraordinaryItems = Result.MainData.find(item => item && item.SubCategoryWithoutIndex === 'Extraordinary items');
+
+        const UpdatedData = Result.MainData.filter(item => {
+          if (!item || typeof item.SubCategoryWithoutIndex === 'undefined') {
+            return false;
+          }
+          return item.SubCategoryWithoutIndex !== 'Extraordinary items' && item.SubCategoryWithoutIndex !== 'Exceptional Items';
+        });
+
+        // Push 3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]
+        const income = UpdatedData.find(x => x.MainCategoryWithoutIndex === "INCOME")?.TotalAmountCurrentFinYear ?? 0;
+        const expense = UpdatedData.find(x => x.MainCategoryWithoutIndex === "Expense")?.TotalAmountCurrentFinYear ?? 0;
         const TotalProfitAndLoss = income - expense;
 
 
         const TotalAmountLastFinYear = 0;
-        data.push({
+        UpdatedData.push({
           "MainCategory": "3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]",
           "SubCategory": "-",
           "TotalAmountCurrentFinYear": TotalProfitAndLoss.toFixed(2),
           "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
           "Notes": '-'
         });
+        // Push 4. Exceptional Items 
+        if (exceptionalItems) {
+          UpdatedData.push({
+            "MainCategory": "4. Exceptional Items",
+            "SubCategory": "[4.1] Exceptional Items",
+            "TotalAmountCurrentFinYear": exceptionalItems.TotalAmountCurrentFinYear,
+            "TotalAmountLastFinYear": exceptionalItems.TotalAmountLastFinYear,
+            "Notes": exceptionalItems.Notes,
+            "AccountDetails": exceptionalItems.AccountDetails
+          });
+        }
+        // Push 5. Profit / [Loss] before Extraordinary items and Tax [3+4]		 
+        if (exceptionalItems) {
+          UpdatedData.push({
+            "MainCategory": "5. Profit / [Loss] before Extraordinary items and Tax [3-4]		",
+            "SubCategory": "-",
+            "TotalAmountCurrentFinYear": (TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear).toFixed(2),
+            "TotalAmountLastFinYear": (TotalAmountLastFinYear - exceptionalItems.TotalAmountLastFinYear).toFixed(2),
+            "Notes": "-"
+          });
+        }
+        // Push 6. Extraordinary items
+        if (extraordinaryItems) {
+          UpdatedData.push({
+            "MainCategory": "6. Extraordinary items",
+            "SubCategory": "[6.1] Extraordinary items",
+            "TotalAmountCurrentFinYear": extraordinaryItems.TotalAmountCurrentFinYear,
+            "TotalAmountLastFinYear": extraordinaryItems.TotalAmountLastFinYear,
+            "Notes": extraordinaryItems.Notes,
+            "AccountDetails": extraordinaryItems.AccountDetails
+          });
+        }
+        // Push 7. Profit / (Loss) before tax [5 - 6]		
+        if (extraordinaryItems) {
+          UpdatedData.push({
+            "MainCategory": "7. Profit / (Loss) before tax [5 - 6]",
+            "SubCategory": "-",
+            "TotalAmountCurrentFinYear": ((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear).toFixed(2),
+            "TotalAmountLastFinYear": ((TotalAmountLastFinYear - exceptionalItems.TotalAmountLastFinYear) - extraordinaryItems.TotalAmountLastFinYear).toFixed(2),
+            "Notes": "-"
+          });
+        }
+        if (Result.TaxDetails) {
+
+          const TotalAmounts = Result.TaxDetails.reduce((acc, item) => {
+            item.Details.forEach(detail => {
+              acc.TotalCredit += detail.TotalCredit;
+              acc.TotalDebit += detail.TotalDebit;
+            });
+            return acc;
+          }, { TotalCredit: 0, TotalDebit: 0 });
+
+          UpdatedData.push({
+            "MainCategory": "8. Tax Expense",
+            "SubCategory": "[8.1] Current Tax Expense for Current year",
+            "TotalAmountCurrentFinYear": (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit).toFixed(2),
+            "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
+            "Notes": ""
+          });
+          UpdatedData.push({
+            "MainCategory": "",
+            "SubCategory": "[8.2] Current Tax Expense for Related to Previous year",
+            "TotalAmountCurrentFinYear": TotalAmountLastFinYear.toFixed(2),
+            "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
+            "Notes": ""
+          });
+          UpdatedData.push({
+            "MainCategory": "",
+            "SubCategory": "[8.3] Net current Tax Expense ",
+            "TotalAmountCurrentFinYear": (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit).toFixed(2),
+            "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
+            "Notes": ""
+          });
+
+          UpdatedData.push({
+            "MainCategory": "9. Profit And loss for the year [7-8]",
+            "SubCategory": "-",
+            "TotalAmountCurrentFinYear": (((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear) - (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit)).toFixed(2),
+            "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
+            "Notes": ""
+          });
+        }
+
 
         const RequestData = {
-          "CompanyIMG": "https://webxblob.blob.core.windows.net/newtms/logo/webxpress-logo.png",
+          "CompanyIMG": this.storage.companyLogo,
           "finYear": finYear,
           "reportdate": "As on Date " + this.EndDate,
           "StartDate": moment(startDate).format("DD MMM YY"),
           "EndDate": this.EndDate,
           "Schedule": "Schedule III Compliant",
-          "ProfitAndLossDetails": data
+          "ProfitAndLossDetails": UpdatedData
         }
         this.accountReportService.setData(RequestData);
         window.open('/#/Reports/AccountReport/ProfitAndLossview', '_blank');

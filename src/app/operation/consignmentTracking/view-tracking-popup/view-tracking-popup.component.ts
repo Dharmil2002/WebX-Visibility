@@ -61,8 +61,8 @@ export class ViewTrackingPopupComponent implements OnInit {
     this.TableData = this.data?.map((x)=>{
       return {
         ...x,
-        Date:moment(x.eVNDT).format("DD-MM-YYYY"),
-        EDD:moment(x.eNTDT).format("DD-MM-YYYY")
+        Date:moment(x.eVNDT).format("DD-MM-YYYY hh:mm"),
+        EDD:moment(x.eNTDT).format("DD-MM-YYYY hh:mm")
       }
     })
     this.isTableLode = true;

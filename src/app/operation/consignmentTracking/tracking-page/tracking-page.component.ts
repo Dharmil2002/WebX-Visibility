@@ -1,14 +1,16 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from "@angular/core";
-import { FormGroup, FormControl } from "@angular/forms";
+import { FormGroup, FormControl, UntypedFormBuilder } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CustomeDatePickerComponent } from "src/app/shared/components/custome-date-picker/custome-date-picker.component";
 import { ViewTrackingPopupComponent } from "../view-tracking-popup/view-tracking-popup.component";
 import { Observable, firstValueFrom } from "rxjs";
-import { PipeLine } from "./tracking-query";
+import { GetTrakingDataPipeLine } from "./tracking-query";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
+import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+
 
 @Component({
   selector: "app-tracking-page",
@@ -37,23 +39,72 @@ export class TrackingPageComponent implements OnInit {
   dataSource: MatTableDataSource<any>;
   TableData: any;
   isTableLode: boolean = false;
+  TotalDocket: number = 0;
+  BookedDocket: number = 0;
+  InTransitDocket: number = 0;
+  OFDDocket: number = 0;
+  DeliveredDocket: number = 0;
+
+  formData = [
+    {
+      name: "StartDate",
+      label: "SelectDateRange",
+      placeholder: "Select Date",
+      type: "daterangpicker",
+      value: "",
+      filterOptions: "",
+      autocomplete: "",
+      displaywith: "",
+      generatecontrol: true,
+      disable: false,
+      Validations: [],
+      additionalData: {
+        support: "EndDate",
+      },
+    },
+    {
+      name: "EndDate",
+      label: "",
+      placeholder: "Select Data Range",
+      type: "",
+      value: "",
+      filterOptions: "",
+      autocomplete: "",
+      generatecontrol: false,
+      disable: true,
+      Validations: [
+        {
+          name: "Select Data Range",
+        },
+        {
+          name: "required",
+          message: "StartDateRange is Required...!",
+        },
+      ],
+    },
+  ]
+  Form: any;
+  searchText:any;
   constructor(
     private Route: Router,
     private masterService: MasterService,
     public dialog: MatDialog,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private fb: UntypedFormBuilder
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.QueryData = this.Route.getCurrentNavigation().extras?.state.data;
       console.log("this.QueryData", this.QueryData);
       if (this.QueryData.Docket) {
-        this.getTrackingDocket({
+        const Query = {
           D$match: {
             dKTNO: this.QueryData.Docket,
           },
-        });
+        };
+        this.getTrackingDocket(Query);
+        this.GetCardData(Query);
       } else if (this.QueryData.start && this.QueryData.end) {
-        this.getTrackingDocket({
+        const Query = {
           D$match: {
             D$and: [
               {
@@ -68,14 +119,16 @@ export class TrackingPageComponent implements OnInit {
               },
             ],
           },
-        });
+        };
+        this.getTrackingDocket(Query);
+        this.GetCardData(Query);
       } else {
         this.Route.navigate(["Operation/ConsignmentFilter"]);
       }
-    }
-    else {
+    } else {
       this.Route.navigateByUrl("Operation/ConsignmentQuery");
     }
+    this.initializeFormControl()
   }
 
   ngOnInit(): void {
@@ -93,12 +146,55 @@ export class TrackingPageComponent implements OnInit {
     }
   }
 
-  async getTrackingDocket(QueryFilter) {
-    console.log("this.Mode", this.Mode);
+  initializeFormControl() {
+    // Build the form group using formGroupBuilder function and the values of accordionData
+    this.Form = formGroupBuilder(this.fb, [
+      this.formData,
+    ]);
+    this.Form.controls["StartDate"].setValue(this.QueryData.start || new Date())
+    this.Form.controls["EndDate"].setValue(this.QueryData.end || new Date())
+  }
 
+  async GetCardData(QueryFilter) {
     const req = {
-      companyCode: 10065,
-      collectionName: "docket_ops_det_ltl",
+      companyCode: this.CompanyCode,
+      collectionName: this.Mode == "FTL"?"docket_ops_det":"docket_ops_det_ltl",
+      filters: [
+        { ...QueryFilter },
+        {
+          D$group: {
+            _id: "$sTSNM",
+            Count: {
+              D$sum: 1,
+            },
+          },
+        },
+      ],
+    };
+
+    const res = await firstValueFrom(
+      this.masterService.masterMongoPost("generic/query", req)
+    );
+    if (res.success) {
+      res.data?.map((x)=> {
+        if(x._id == "Booked"){
+          this.BookedDocket = x.Count
+        }else if(x._id == "InTransit"){
+          this.InTransitDocket = x.Count
+        }else if(x._id == "OFD"){
+          this.OFDDocket = x.Count
+        }else if(x._id == "Delivered"){
+          this.DeliveredDocket = x.Count
+        }
+      })
+    }
+  }
+
+  async getTrackingDocket(QueryFilter) {
+    const PipeLine = GetTrakingDataPipeLine()
+    const req = {
+      companyCode: this.CompanyCode,
+      collectionName: this.Mode == "FTL"?"docket_ops_det":"docket_ops_det_ltl",
       filters: [{ ...QueryFilter }, ...PipeLine],
     };
 
@@ -108,6 +204,7 @@ export class TrackingPageComponent implements OnInit {
     if (res.success) {
       console.log("res", res);
       this.TableData = res.data;
+      this.TotalDocket = res.data.length
       this.isTableLode = true;
       this.dataSource = new MatTableDataSource<any>(this.TableData);
       this.ngOnInit();
@@ -121,12 +218,19 @@ export class TrackingPageComponent implements OnInit {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
       data: eventData?.DocketTrackingData,
       width: "1200px",
-      height:"100%",
+      height: "100%",
       disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       console.log("The dialog was closed");
     });
+  }
+
+  SearchData(searchText){
+    // const filterPipe = new CustomFilterPipe();
+    // const filteredArr = filterPipe.transform(this.TableData, searchText);
+    // this.dataSource = new MatTableDataSource<any>(filteredArr);
+    // this.ngOnInit();
   }
 }

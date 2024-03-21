@@ -1,45 +1,65 @@
 <div class="Consignment_Tracking">
-
     <app-common-wrapper-webxpress [breadscrums]="breadscrums">
         <div class="m-0" style="width: 100%; background-color: white; padding: 10px;">
             <div style="width: 100%; display: flex; justify-content: space-between;">
-                <div style="width: 30%;">
-                    <mat-form-field class="datepickercss" style="width: 100%" appearance="outline">
-                        <mat-label class="fontbold">date range</mat-label>
-                        <mat-date-range-input [rangePicker]="picker">
-                            <input matStartDate formControlName="StartDate" placeholder="Start date" />
-                            <input matEndDate formControlName="EndDate" placeholder="End date" />
-                        </mat-date-range-input>
-                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-date-range-picker #picker [calendarHeaderComponent]="CustomeDatePickerComponent"
-                            [touchUi]="isTouchUIActivated"></mat-date-range-picker>
-                    </mat-form-field>
+                <div style="width: 40%; display: flex; align-items: center;">
+                    <div style="width: 80%;">
+                        <form class="register-form " style="margin-right: 20px;" [formGroup]="Form">
+                            <div style="width: 100%;" *ngFor="let formItem of formData">
+                                <mat-form-field class="datepickercss" *ngIf="formItem.generatecontrol===true"
+                                    style="width: 100%" appearance="outline">
+                                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                                    <mat-date-range-input [rangePicker]="picker">
+                                        <input matStartDate [formControlName]="formItem.name"
+                                            placeholder="Start date" />
+                                        <input matEndDate [formControlName]="formItem.additionalData.support"
+                                            placeholder="End date" />
+                                    </mat-date-range-input>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-date-range-picker #picker
+                                        [calendarHeaderComponent]="CustomeDatePickerComponent"
+                                        [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                                </mat-form-field>
+                            </div>
+                        </form>
+                    </div>
+                    <div style="width: 20%; display: flex; align-items: center; justify-content: center;">
+                        <button style="margin-top: 8px;" mat-raised-button (click)="ExportFunction()"
+                            color="primary">Export</button>
+                    </div>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    <button mat-raised-button (click)="ExportFunction()" color="primary">Export</button>
+                <div class="px-2" style="width: 30%; display: flex; align-items: center;">
+                    <form class="example-form">
+                        <mat-form-field  class="example-full-width" appearance="outline">
+                            <mat-label style="font-weight: bold;">Search</mat-label>
+                            <input matInput placeholder="Search Text" (ngModelChange)="SearchData($event)" [(ngModel)]="searchText">
+                        </mat-form-field>
+                    </form>
                 </div>
             </div>
             <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px;">
                 <div class="cardBox">
                     <div class="card" style="z-index: 10; ">
-                        <p style="font-size: 16px; font-weight: bolder;">1</p>
-                        <p style="font-size: 14px;">Total Results</p>
+                        <p class="cardCount" style="color: salmon;">{{TotalDocket}}</p>
+                        <p class="cardtitle">Total Results</p>
                     </div>
                     <div class="card" style="z-index: 9; ">
-                        <p style="font-size: 16px; font-weight: bolder;">0</p>
-                        <p style="font-size: 14px;">Booked</p>
+                        <p class="cardCount" style="color: lightseagreen;">{{BookedDocket}}</p>
+                        <p class="cardtitle">Booked</p>
                     </div>
                     <div class="card" style="z-index: 8; ">
-                        <p style="font-size: 16px; font-weight: bolder;">1</p>
-                        <p style="font-size: 14px;"> In Transit</p>
+                        <p class="cardCount" style="color: rgb(91, 196, 91);">{{InTransitDocket}}
+                        </p>
+                        <p class="cardtitle"> In Transit</p>
                     </div>
                     <div class="card" style="z-index: 7; ">
-                        <p style="font-size: 16px; font-weight: bolder;">0</p>
-                        <p style="font-size: 14px;">OFD</p>
+                        <p class="cardCount" style="color: rgb(74, 168, 199);">{{OFDDocket}}</p>
+                        <p class="cardtitle">OFD</p>
                     </div>
                     <div class="card" style="z-index: 6; ">
-                        <p style="font-size: 16px; font-weight: bolder;">0</p>
-                        <p style="font-size: 14px;">Delivered</p>
+                        <p class="cardCount" style="color: rgb(123, 140, 161);">{{DeliveredDocket}}
+                        </p>
+                        <p class="cardtitle">Delivered</p>
                     </div>
                 </div>
                 <div>
@@ -167,6 +187,17 @@
         text-align: center;
     }
 
+    .card .cardtitle {
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.7);
+        font-size: 14px;
+    }
+
+    .card .cardCount {
+        font-size: 18px;
+        font-weight: bolder;
+    }
+
     .trakingCard {
         height: 75px;
         border-bottom: 2px solid rgba(0, 0, 0, 0.2);
@@ -197,7 +228,7 @@
         overflow-x: visible;
     }
 
-    .font-width-600{
+    .font-width-600 {
         font-weight: 600;
     }
 </style>

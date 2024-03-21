@@ -2,7 +2,7 @@
     <form [formGroup]="ConsignmentQueryForm">
         <app-form-webxpress [form]="ConsignmentQueryForm" [formData]="jsonControlConsignmentQueryArray"
            [showSaveAndCancelButton]="true" [FormTitle]="'Query Page'"
-            (callFunction)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [submit]="'Get Tracking'"
            (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
      </form>

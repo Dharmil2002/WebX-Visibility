@@ -10,7 +10,10 @@ import { GetTrakingDataPipeLine } from "./tracking-query";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
-
+import { CustomFilterPipe } from "src/app/Utility/Custom Pipe/FilterPipe";
+import moment from "moment";
+import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-tracking-page",
@@ -44,7 +47,19 @@ export class TrackingPageComponent implements OnInit {
   InTransitDocket: number = 0;
   OFDDocket: number = 0;
   DeliveredDocket: number = 0;
-
+  headerForCsv = {
+    CnoteNo: "Cnote No",
+    EDD: "EDD",
+    ATD: "ATD",
+    Status: "Status",
+    docketDate: "Booking Date",
+    TransitMode: "Transit Mode",
+    EWB: "EWB",
+    Valid: "Valid",
+    Movement: "Movement",
+    Consignor: "Consignor",
+    Consignee: "Consignee",
+  };
   formData = [
     {
       name: "StartDate",
@@ -56,7 +71,7 @@ export class TrackingPageComponent implements OnInit {
       autocomplete: "",
       displaywith: "",
       generatecontrol: true,
-      disable: false,
+      disable: true,
       Validations: [],
       additionalData: {
         support: "EndDate",
@@ -82,9 +97,11 @@ export class TrackingPageComponent implements OnInit {
         },
       ],
     },
-  ]
+  ];
   Form: any;
-  searchText:any;
+  searchText: any;
+  csvFileName: any;
+  csvHeaders: {};
   constructor(
     private Route: Router,
     private masterService: MasterService,
@@ -123,12 +140,12 @@ export class TrackingPageComponent implements OnInit {
         this.getTrackingDocket(Query);
         this.GetCardData(Query);
       } else {
-        this.Route.navigate(["Operation/ConsignmentFilter"]);
+        this.Route.navigate(["Operation/ConsignmentQuery"]);
       }
     } else {
       this.Route.navigateByUrl("Operation/ConsignmentQuery");
     }
-    this.initializeFormControl()
+    this.initializeFormControl();
   }
 
   ngOnInit(): void {
@@ -148,17 +165,18 @@ export class TrackingPageComponent implements OnInit {
 
   initializeFormControl() {
     // Build the form group using formGroupBuilder function and the values of accordionData
-    this.Form = formGroupBuilder(this.fb, [
-      this.formData,
-    ]);
-    this.Form.controls["StartDate"].setValue(this.QueryData.start || new Date())
-    this.Form.controls["EndDate"].setValue(this.QueryData.end || new Date())
+    this.Form = formGroupBuilder(this.fb, [this.formData]);
+    this.Form.controls["StartDate"].setValue(
+      this.QueryData.start || new Date()
+    );
+    this.Form.controls["EndDate"].setValue(this.QueryData.end || new Date());
   }
 
   async GetCardData(QueryFilter) {
     const req = {
       companyCode: this.CompanyCode,
-      collectionName: this.Mode == "FTL"?"docket_ops_det":"docket_ops_det_ltl",
+      collectionName:
+        this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
       filters: [
         { ...QueryFilter },
         {
@@ -176,25 +194,26 @@ export class TrackingPageComponent implements OnInit {
       this.masterService.masterMongoPost("generic/query", req)
     );
     if (res.success) {
-      res.data?.map((x)=> {
-        if(x._id == "Booked"){
-          this.BookedDocket = x.Count
-        }else if(x._id == "InTransit"){
-          this.InTransitDocket = x.Count
-        }else if(x._id == "OFD"){
-          this.OFDDocket = x.Count
-        }else if(x._id == "Delivered"){
-          this.DeliveredDocket = x.Count
+      res.data?.map((x) => {
+        if (x._id == "Booked") {
+          this.BookedDocket = x.Count;
+        } else if (x._id == "InTransit") {
+          this.InTransitDocket = x.Count;
+        } else if (x._id == "OFD") {
+          this.OFDDocket = x.Count;
+        } else if (x._id == "Delivered") {
+          this.DeliveredDocket = x.Count;
         }
-      })
+      });
     }
   }
 
   async getTrackingDocket(QueryFilter) {
-    const PipeLine = GetTrakingDataPipeLine()
+    const PipeLine = GetTrakingDataPipeLine();
     const req = {
       companyCode: this.CompanyCode,
-      collectionName: this.Mode == "FTL"?"docket_ops_det":"docket_ops_det_ltl",
+      collectionName:
+        this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
       filters: [{ ...QueryFilter }, ...PipeLine],
     };
 
@@ -202,17 +221,49 @@ export class TrackingPageComponent implements OnInit {
       this.masterService.masterMongoPost("generic/query", req)
     );
     if (res.success) {
-      console.log("res", res);
-      this.TableData = res.data;
-      this.TotalDocket = res.data.length
-      this.isTableLode = true;
-      this.dataSource = new MatTableDataSource<any>(this.TableData);
-      this.ngOnInit();
+      if (res.data.length) {
+        this.TableData = res.data;
+        this.TotalDocket = res.data.length;
+        this.isTableLode = true;
+        this.dataSource = new MatTableDataSource<any>(this.TableData);
+        this.ngOnInit();
+      } else {
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Docket Not Found!",
+          showConfirmButton: true,
+        });
+        this.Route.navigateByUrl("Operation/ConsignmentQuery");
+      }
+    } else {
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Docket Not Found!",
+        showConfirmButton: true,
+      });
+      this.Route.navigateByUrl("Operation/ConsignmentQuery");
     }
   }
 
   ExportFunction() {
-    console.log("range", this.range);
+    const csvData = this.TableData.map((x) => {
+      return {
+        CnoteNo: x.dKTNO,
+        EDD: moment(new Date(x.sTSTM)).format("DD-MM-YYYY"),
+        ATD: "",
+        Status: x.oPSSTS,
+        docketDate: moment(new Date(x.docketData.dKTDT)).format("DD-MM-YYYY"),
+        TransitMode: x.TransitMode,
+        EWB: "",
+        Valid: "",
+        Movement: x.oRGN && x.dEST ? `${x.oRGN} -> ${x.dEST}` : "",
+        Consignor: x.Consignor,
+        Consignee: x.Consignee,
+      };
+    });
+    this.ExportToCsv(csvData);
   }
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
@@ -227,10 +278,36 @@ export class TrackingPageComponent implements OnInit {
     });
   }
 
-  SearchData(searchText){
-    // const filterPipe = new CustomFilterPipe();
-    // const filteredArr = filterPipe.transform(this.TableData, searchText);
-    // this.dataSource = new MatTableDataSource<any>(filteredArr);
-    // this.ngOnInit();
+  SearchData(searchText) {
+    const filterPipe = new CustomFilterPipe();
+    const filteredArr = filterPipe.transform(this.TableData, searchText);
+    this.dataSource = new MatTableDataSource<any>(filteredArr);
+    this.ngOnInit();
+  }
+
+  ExportToCsv(jsonCsv) {
+    this.csvFileName = this.QueryData.Docket
+      ? `DocTracking ${this.QueryData.Docket}`
+      : `DocTracking ${moment(new Date(this.QueryData.start)).format(
+          "DD_MM_YYYY"
+        )} To ${moment(new Date(this.QueryData.end)).format("DD_MM_YYYY")}`;
+    const formattedData = [
+      Object.values(this.headerForCsv),
+      ...jsonCsv.map((row) => {
+        return Object.keys(this.headerForCsv).map((col) => {
+          let value =
+            col.toLowerCase().includes("date") ||
+            col.toLowerCase().includes("dob") ||
+            col.toLowerCase().includes("dt")
+              ? moment(new Date(row[col])).format("DD-MM-YYYY") ===
+                "Invalid date"
+                ? row[col]
+                : moment(new Date(row[col])).format("DD-MM-YYYY")
+              : row[col];
+          return value;
+        });
+      }),
+    ];
+    CsvDataServiceService.exportToCsv(this.csvFileName, formattedData);
   }
 }

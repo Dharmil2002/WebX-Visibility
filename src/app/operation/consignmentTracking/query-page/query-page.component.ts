@@ -42,6 +42,7 @@ export class QueryPageComponent implements OnInit {
       console.log("failed");
     }
   }
+  
 
   save(event) {
     // this.cnoteTableForm.controls.start.value
@@ -56,5 +57,8 @@ export class QueryPageComponent implements OnInit {
       end: moment(end).isValid() ? new Date(end): undefined,
     };
     this.Route.navigate(["Operation/ConsignmentTracking"], { state: { data: QueryJson } });
+  }
+  cancel() {
+    this.ngOnInit()
   }
 }

@@ -39,18 +39,18 @@ export class ViewTrackingPopupComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:12%",
     },
-    lOC: {
+    Location: {
       Title: "Current Location",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    dOCNO: {
+    DocNo: {
       Title: "Document Number",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
   };
-  staticField = ["Date", "oPSSTS", "eVNID", "EDD", "lOC", "dOCNO"];
+  staticField = ["Date", "oPSSTS", "eVNID", "EDD", "Location", "DocNo"];
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
   TableData: any;
   constructor(
@@ -62,7 +62,9 @@ export class ViewTrackingPopupComponent implements OnInit {
       return {
         ...x,
         Date:moment(x.eVNDT).format("DD-MM-YYYY hh:mm"),
-        EDD:moment(x.eNTDT).format("DD-MM-YYYY hh:mm")
+        EDD:moment(x.eNTDT).format("DD-MM-YYYY hh:mm"),
+        Location: x.lOC || x.eNTLOC,
+        DocNo:x.dOCNO || x.dKTNO
       }
     })
     this.isTableLode = true;

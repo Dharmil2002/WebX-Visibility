@@ -1,5 +1,5 @@
 <div class="Consignment_Tracking">
-    <app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="'Operation/ConsignmentQuery'">
         <div class="m-0" style="width: 100%; background-color: white; padding: 10px;">
             <div style="width: 100%; display: flex; justify-content: space-between;">
                 <div style="width: 40%; display: flex; align-items: center;">
@@ -29,12 +29,10 @@
                     </div>
                 </div>
                 <div class="px-2" style="width: 30%; display: flex; align-items: center;">
-                    <form class="example-form">
                         <mat-form-field  class="example-full-width" appearance="outline">
                             <mat-label style="font-weight: bold;">Search</mat-label>
                             <input matInput placeholder="Search Text" (ngModelChange)="SearchData($event)" [(ngModel)]="searchText">
                         </mat-form-field>
-                    </form>
                 </div>
             </div>
             <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px;">
@@ -87,15 +85,15 @@
                             <p></p>
                         </div>
                     </div>
-                    <div class="trakingCard" style="width: 31%; ">
+                    <div class="trakingCard" style="width: 35%; ">
                         <p class="font-width-600">
                             Status:
                         </p>
-                        <p style="font-size: 13px;">
+                        <p >
                             {{item.oPSSTS}}
                         </p>
                     </div>
-                    <div class="trakingCard" style="width: 18%; ">
+                    <div class="trakingCard" style="width: 14%; ">
                         <p class="font-width-600">
                             Booking Date:
                         </p>

@@ -26,6 +26,7 @@ import { InvoiceModel } from "src/app/Models/dyanamic-form/dyanmic.form.model";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
 
 @Component({
@@ -122,7 +123,7 @@ export class DepartVehicleComponent implements OnInit {
   vehicleDetail: any;
   listDocket = [];
   next: string;
-  products: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
+  products:AutoComplete[];
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(
@@ -441,7 +442,6 @@ export class DepartVehicleComponent implements OnInit {
   async askTracking(departData) {
     //get trip details
     let filter = {
-      //tHC:'TH/DELB/2425/000046'
       tHC: departData.tripID
     }
     //Get Trip data
@@ -456,9 +456,7 @@ export class DepartVehicleComponent implements OnInit {
   }
   
   async pushDeptCT(tripDet){
-
     let filter= {
-      // vehicleNo:'MH05AK8475'
       vehicleNo:tripDet.vEHNO 
     }
     let vehicleDet=await this.departureService.fetchData('vehicle_detail',filter);
@@ -478,7 +476,6 @@ export class DepartVehicleComponent implements OnInit {
   }
   async openVehicleTracking(tripDet){
     let filter= {
-      // vehicleNo:'MH05AK8475'
       vehicleNo: tripDet[0].vEHNO
     }
     let vehicleDet = await this.departureService.fetchData('vehicle_detail', filter);

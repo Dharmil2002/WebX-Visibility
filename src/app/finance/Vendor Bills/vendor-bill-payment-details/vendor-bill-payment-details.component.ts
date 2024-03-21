@@ -541,7 +541,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherDataRequestModel.tcsRate = undefined;
         this.VoucherDataRequestModel.tcsAmount = undefined;
 
-        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+        this.VoucherDataRequestModel.GrossAmount = NetPayable;
         this.VoucherDataRequestModel.netPayable = NetPayable;
         this.VoucherDataRequestModel.roundOff = 0;
         this.VoucherDataRequestModel.voucherCanceled = false;
@@ -549,6 +549,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
         this.VoucherDataRequestModel.refNo = PaymenDetails?.ChequeOrRefNo || "";
         this.VoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
+        this.VoucherDataRequestModel.accountCode = PaymenDetails?.Bank?.value || "";
         this.VoucherDataRequestModel.date = PaymenDetails.Date;
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 
@@ -581,7 +582,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-          this.GenerateVendorBills(res?.data?.mainData?.ops[0].vNO, PaymenDetails)
+          this.GenerateVendorBills(res?.data?.mainData?.ops[0].vNO, PaymenDetails);
 
           Swal.fire({
             icon: "success",
@@ -620,6 +621,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       paymentAmount: this.TotalPendingAmount,
       branch: this.storage.branch,
       user: this.storage.userName,
+
       BillList: this.tableData.filter((x) => x.isSelected == true).map((item) => {
         return {
           billNo: item.billNo,

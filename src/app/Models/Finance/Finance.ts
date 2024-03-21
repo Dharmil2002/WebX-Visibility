@@ -49,6 +49,7 @@ export class VoucherDataRequestModel {
   paymentMode: string
   refNo: string
   accountName: string
+  accountCode: string
   date: string
   scanSupportingDocument: string
   mANNUM: string

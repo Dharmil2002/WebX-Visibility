@@ -492,6 +492,7 @@ export class AdvancePaymentsComponent implements OnInit {
             this.PaymentSummaryFilterForm.value.ChequeOrRefNo;
           this.VoucherDataRequestModel.accountName =
             this.PaymentSummaryFilterForm.value.Bank.name;
+          this.VoucherDataRequestModel.accountCode = this.PaymentSummaryFilterForm.value?.Bank.value;
           this.VoucherDataRequestModel.date =
             this.PaymentSummaryFilterForm.value.Date;
           this.VoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument

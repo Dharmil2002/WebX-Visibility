@@ -329,6 +329,7 @@ export class JournalVoucherCreationComponent implements OnInit {
           this.VoucherDataRequestModel.paymentMode = undefined;
           this.VoucherDataRequestModel.refNo = undefined;
           this.VoucherDataRequestModel.accountName = undefined;
+          this.VoucherDataRequestModel.accountCode = undefined;
           this.VoucherDataRequestModel.date = undefined;
           this.VoucherDataRequestModel.scanSupportingDocument = "";
 

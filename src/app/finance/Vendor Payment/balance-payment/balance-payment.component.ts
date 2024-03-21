@@ -888,17 +888,17 @@ export class BalancePaymentComponent implements OnInit {
                 cGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
                 sGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
                 aMT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0,
-
               },
-            }, BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
+            },
+            BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
               return {
                 cID: this.companyCode,
                 bILLNO: "",
                 tRIPNO: x.THC,
                 tTYP: "THC",
+                tMOD: "FTL",
                 aDVAMT: x.Advance,
                 bALAMT: x.BalancePending,
-                pENDBALAMT: generateVoucher == true ? 0 : x.BalancePending,
                 tHCAMT: x.THCamount,
                 eNTDT: new Date(),
                 eNTLOC: this.storage.branch,
@@ -1008,18 +1008,16 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherDataRequestModel.roundOff = RoundOffAmount;
         this.VoucherDataRequestModel.voucherCanceled = false;
 
-        this.VoucherDataRequestModel.paymentMode =
-          PaymenDetails.PaymentMode;
-        this.VoucherDataRequestModel.refNo =
-          PaymenDetails?.ChequeOrRefNo || "";
-        this.VoucherDataRequestModel.accountName =
-          PaymenDetails?.Bank?.name || "";
-        this.VoucherDataRequestModel.date =
-          PaymenDetails.Date;
+        this.VoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
+        this.VoucherDataRequestModel.refNo = PaymenDetails?.ChequeOrRefNo || "";
+        this.VoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
+        this.VoucherDataRequestModel.accountCode = PaymenDetails?.Bank?.value || "";
+        this.VoucherDataRequestModel.date = PaymenDetails.Date;
         this.VoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
         this.VoucherDataRequestModel.transactionNumber = BillNo;
         const companyCode = this.companyCode;
         const CurrentBranchCode = this.storage.branch;
+
         var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
           return {
             companyCode: companyCode,
@@ -1050,6 +1048,7 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
+
           this.vendbillpayment(BillNo, res?.data?.mainData?.ops[0].vNO, PaymenDetails)
 
           Swal.fire({
@@ -1080,39 +1079,40 @@ export class BalancePaymentComponent implements OnInit {
   }
   // step 5 create vend_bill_payment collection
   vendbillpayment(BillNo, voucherno, PaymenDetails) {
-    this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
 
-      const vendbillpayment: Vendbillpayment = {
-        _id: this.companyCode + "-" + BillNo + "-" + voucherno + "-" + item.THC,
-        cID: this.companyCode,
-        bILLNO: BillNo,
-        vUCHNO: voucherno,
-        lOC: this.storage.branch,
-        dTM: PaymenDetails.Date,
-        bILLAMT: item.Advance,
-        pAYAMT: item.BalancePending,
-        pENDBALAMT: 0,
-        aMT: item.THCamount,
-        mOD: PaymenDetails.PaymentMode,
-        bANK: PaymenDetails?.Bank?.name || "",
-        tRNO: PaymenDetails?.ChequeOrRefNo || "",
-        eNTDT: new Date(),
-        eNTLOC: this.storage.branch,
-        eNTBY: this.storage.userName,
-      };
+    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+    const vendbillpayment: Vendbillpayment = {
+      _id: this.companyCode + "-" + BillNo + "-" + voucherno,
+      cID: this.companyCode,
+      bILLNO: BillNo,
+      vUCHNO: voucherno,
+      lOC: this.storage.branch,
+      dTM: PaymenDetails.Date,
+      bILLAMT: NetPayable,
+      pAYAMT: NetPayable,
+      pENDBALAMT: 0,
+      aMT: NetPayable,
+      mOD: PaymenDetails.PaymentMode,
+      bANK: PaymenDetails?.Bank?.name || "",
+      tRNO: PaymenDetails?.ChequeOrRefNo || "",
+      tDT: PaymenDetails.Date,
+      eNTDT: new Date(),
+      eNTLOC: this.storage.branch,
+      eNTBY: this.storage.userName,
+    };
 
-      const RequestData = {
-        companyCode: this.companyCode,
-        collectionName: "vend_bill_payment",
-        data: vendbillpayment,
-      };
+    const RequestData = {
+      companyCode: this.companyCode,
+      collectionName: "vend_bill_payment",
+      data: vendbillpayment,
+    };
 
-      firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
+    firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
 
-      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-        .finally(() => {
-        });
-    })
+    }).catch((error) => {
+      this.snackBarUtilityService.ShowCommonSwal("error", error);
+    });
+
     Swal.fire({
       icon: "success",
       title: "Vendor Bill Payment Generated Successfully",

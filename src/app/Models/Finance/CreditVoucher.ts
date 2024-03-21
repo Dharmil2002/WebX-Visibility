@@ -30,6 +30,7 @@ export class CreditVoucherDataRequestModel {
     paymentMode: string
     refNo: string
     accountName: string
+    accountCode: string
     date: string
     mANNUM: string
     mREFNUM: string

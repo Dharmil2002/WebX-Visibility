@@ -299,7 +299,6 @@ export class ThcGenerationComponent implements OnInit {
     private objImageHandling: ImageHandling,
     private definition: RakeEntryModel
   ) {
-    debugger
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
 
@@ -1911,6 +1910,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   async createThc() {
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
     const contAmt = parseInt(this.chargeForm.get('contAmt').value);
+    if(this)
     if ((vendorTypevalue == 2 || vendorTypevalue == 4) && contAmt <= 0) {
       Swal.fire({
         icon: 'error',

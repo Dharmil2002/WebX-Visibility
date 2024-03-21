@@ -168,7 +168,7 @@ export class thcControl {
                     },
                 },
                 {
-                    name: 'via', label: "Via", placeholder: "Multiselect via", type: view||update ?'text':'multiselect',
+                    name: 'via', label: "Via", placeholder: "Multiselect via", type: view ||update ?'text':'multiselect',
                     value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: view ? view :update?update:false,
                     Validations: [
                     ],

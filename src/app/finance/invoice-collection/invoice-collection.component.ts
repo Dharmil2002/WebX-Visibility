@@ -360,8 +360,8 @@ export class InvoiceCollectionComponent implements OnInit {
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillCollection,
           this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillCollection],
-          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher,
-          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher],
+          this.VoucherDataRequestModel.voucherCode = VoucherType.CreditVoucher,
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.CreditVoucher],
           this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -420,8 +420,8 @@ export class InvoiceCollectionComponent implements OnInit {
                 branch: this.storage.branch,
                 transCode: VoucherInstanceType.BillCollection,
                 transType: VoucherInstanceType[VoucherInstanceType.BillCollection],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
+                voucherCode: VoucherType.CreditVoucher,
+                voucherType: VoucherType[VoucherType.CreditVoucher],
                 docType: "Voucher",
                 partyType: "Customer",
                 docNo: mRNO,
@@ -518,8 +518,8 @@ export class InvoiceCollectionComponent implements OnInit {
       voucherNo: "",
       transCode: VoucherInstanceType.BillCollection,
       transType: VoucherInstanceType[VoucherInstanceType.BillCollection],
-      voucherCode: VoucherType.JournalVoucher,
-      voucherType: VoucherType[VoucherType.JournalVoucher],
+      voucherCode: VoucherType.CreditVoucher,
+      voucherType: VoucherType[VoucherType.CreditVoucher],
       transDate: new Date(),
       finYear: financialYear,
       branch: this.storage.branch,
@@ -534,17 +534,17 @@ export class InvoiceCollectionComponent implements OnInit {
       GSTAmount: GstAmount,//credit,
       Total: debit + credit,
       TDSApplicable: false,
-      narration: `When Customer Bill freight is Finalized : ${mRNO}`,
+      narration: `When Customer Bill freight is Collected : ${mRNO}`,
     });
 
     const response = [
-      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, NetPayable, 0),
+      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, 0, NetPayable),
     ];
 
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {
       const CashAccount = this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value;
-      response.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, PaymentAmount));
+      response.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", PaymentAmount, 0));
     }
     if (PaymentMode == "Cheque") {
       const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
@@ -559,7 +559,7 @@ export class InvoiceCollectionComponent implements OnInit {
           value: AccountDetails?.aCCD
         }
       }
-      response.push(createVoucher(Leadgerdata.value, Leadgerdata.name, "ASSET", 0, PaymentAmount));
+      response.push(createVoucher(Leadgerdata.value, Leadgerdata.name, "ASSET", PaymentAmount, 0));
     }
 
 

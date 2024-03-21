@@ -689,6 +689,26 @@ export const ROUTES: RouteInfo[] =
       groupTitle: false,
       submenu: [
         {
+          "path": "",
+          "title": "Account Report",
+          "moduleName": "Account Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Reports/AccountReport/ProfitAndLoss",
+              "title": "Profit & Loss Statement",
+              "moduleName": "Profit & Loss Statement",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+          ]
+        },
+        {
           "path": "Reports/job-query",
           "title": "Job Register Report",
           "moduleName": "Job Register Report",

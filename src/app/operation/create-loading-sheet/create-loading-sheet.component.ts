@@ -21,6 +21,7 @@ import { firstValueFrom } from "rxjs";
 import { LoadingSheetService } from "src/app/Utility/module/operation/loadingSheet/loadingsheet-service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -113,8 +114,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   departFlag: boolean = false;
   alldocket: any;
   isUpdate: boolean = false;
-  vehicleSize: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
-  products: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
+  vehicleSize:AutoComplete[];
+  products:AutoComplete[];
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,

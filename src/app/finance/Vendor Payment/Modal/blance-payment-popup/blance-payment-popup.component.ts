@@ -108,6 +108,11 @@ export class BlancePaymentPopupComponent implements OnInit {
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
 
+        const ChequeOrRefDate =
+          this.VendorBalancePaymentFilterForm.get("Date");
+        ChequeOrRefDate.setValidators([Validators.required]);
+        ChequeOrRefDate.updateValueAndValidity();
+
         const CashAccount =
           this.VendorBalancePaymentFilterForm.get("CashAccount");
         CashAccount.setValue("");

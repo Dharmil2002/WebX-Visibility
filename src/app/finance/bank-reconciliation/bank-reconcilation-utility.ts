@@ -3,16 +3,30 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 
 export async function getbankreconcilationList(masterService, request) {
 
+    let matchQuery = {
+        'D$and': [
+            {
+                "pMD": { "D$in": ["RTGS/UTR", "Cheque"] },
+            },
+            {
+                "bRC": localStorage.getItem('Branch'),
+            }, ...(request.fromDate ? [{ 'tTDT': { 'D$gte': request.fromDate } }] : []), ...(request.toDate ? [{ 'tTDT': { 'D$lt': request.toDate } }] : []),
+            ...(request.bank ? [{ 'aNM': request.bank }] : []),
+        ],
+    };
+
+    // {
+    //     "D$match": {
+    //         "pMD": { "D$in": ["RTGS/UTR", "Cheque"] },
+    //         "bRC": localStorage.getItem('Branch'),
+    //             },
+    // },
     const RequestBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "voucher_trans",
         "filters": [
-            {
-                "D$match": {
-                    "pMD": { "D$in": ["RTGS/UTR", "Cheque"] },
-                    "bRC": localStorage.getItem('Branch'),
-                },
-            },
+            { D$match: matchQuery },
+
             {
                 "D$project": {
                     "_id": 0,
@@ -57,4 +71,22 @@ export async function getbankreconcilationList(masterService, request) {
         console.error("An error occurred:", error);
         return null;
     }
+}
+export async function GetBankDropDown(masterService) {
+    try {
+        const companyCode = parseInt(localStorage.getItem('companyCode'));
+        const filter = {
+            companyCode: companyCode,
+        };
+        const req = { companyCode, collectionName: 'Bank_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x.Bankname, value: x.Accountnumber, ...x
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
 }

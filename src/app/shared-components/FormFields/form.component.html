@@ -422,7 +422,7 @@
                     <mat-label class="fontbold">{{formItem.label}}</mat-label>
                     <input matInput [owlDateTimeTrigger]="datetimepicker" [owlDateTime]="datetimepicker"
                       [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
-                      [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
+                      [max]="formItem.additionalData?.maxDate" (dateTimeChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
           , eventArgs: $event})" [formControlName]="formItem.name">
                     <owl-date-time #datetimepicker></owl-date-time>
                     <mat-datepicker-toggle matSuffix [for]="datetimepicker"></mat-datepicker-toggle>

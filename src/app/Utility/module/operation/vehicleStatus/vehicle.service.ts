@@ -330,6 +330,13 @@ export class VehicleStatusService {
       return res;
     }
   }
-
-
+  async getVehicleData(filter={}) { 
+      const req={
+        companyCode:this.storage.companyCode,
+        collectionName:"vehicle_status",
+        filter:filter
+      }
+      const res= await firstValueFrom(this.operation.operationMongoPost('generic/get',req));
+      return res.data;
+   }
 }

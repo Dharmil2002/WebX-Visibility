@@ -50,6 +50,8 @@ export class LoadingSheetService {
       "vEHNO": data?.vehicle.value || "",
       "vTYP": data?.vehicleTypeCode || "",
       "vTYPNM": data?.vehicleType || "",
+      "tMODE":data?.transMode||"",
+      "tMODENM":data?.transModeName||"",
       // "vND": {
       //   "tY":"",
       //   "tYNM":"",
@@ -84,8 +86,6 @@ export class LoadingSheetService {
       "bALAMT": 0,
       "aDPAYAT": "",
       "bLPAYAT": "",
-      "tMODE": "",
-      "tMODENM": "",
       "iSBILLED": false,
       "bILLNO": "",
       // "dRV": {

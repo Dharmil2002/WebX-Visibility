@@ -1257,11 +1257,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const bParty = this.model.consignmentTableForm.value.billingParty;
       const cSGE = this.model.consignmentTableForm.value.consigneeName;
       const cSGN = this.model.consignmentTableForm.value.consignorName;
-      docketDetails["deliveryAddress"] = this.model.consignmentTableForm.controls['deliveryAddress']?.value.name || this.model.consignmentTableForm.controls['pAddress'].value
-      docketDetails["deliveryAddressCode"] = this.model.consignmentTableForm.controls['deliveryAddress']?.value.value || "A8888";
-      docketDetails["pAddress"] = this.model.consignmentTableForm.controls['pAddress']?.value.name || this.model.consignmentTableForm.controls['pAddress'].value
-      docketDetails["pAddressCode"] = this.model.consignmentTableForm.controls['pAddress']?.value.value || "A8888";
-      docketDetails["cnoAddress"] = this.model.consignmentTableForm.controls['cnoAddress']?.value.name;
+      docketDetails["deliveryAddress"] = this.model.consignmentTableForm.controls['deliveryAddress'].value?.name || this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["deliveryAddressCode"] = this.model.consignmentTableForm.controls['deliveryAddress'].value?.value || "A8888";
+      docketDetails["pAddress"] = this.model.consignmentTableForm.controls['pAddress'].value?.name || this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["pAddressCode"] = this.model.consignmentTableForm.controls['pAddress'].value?.value || "A8888";
+      docketDetails["cnoAddress"] = this.model.consignmentTableForm.controls['cnoAddress'].value?.name;
       docketDetails["cnogst"] = this.model.consignmentTableForm.controls['cnogst']?.value;
       docketDetails["cneAddress"] = this.model.consignmentTableForm.controls['cneAddress']?.value.name;
       docketDetails["cnegst"] = this.model.consignmentTableForm.controls['cnegst']?.value;

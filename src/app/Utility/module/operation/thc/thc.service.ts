@@ -247,4 +247,15 @@ export class ThcService {
         let nestedDetail = await firstValueFrom(this.operationService.operationPost("generic/getOne", reqBody));
         return nestedDetail;
     }
+    /*get Charges are come from product Charged master*/
+  async getCharges(filter = {}) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "product_charges_detail",
+      filter: filter
+    };
+    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+    return res.data;
+  }
+  /*end*/
 }

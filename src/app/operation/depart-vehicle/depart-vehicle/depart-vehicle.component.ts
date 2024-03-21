@@ -13,7 +13,7 @@ import {
 } from "src/assets/FormControls/departVehicle";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
-import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { getNextLocation, setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail, updateTracking } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
@@ -22,6 +22,10 @@ import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunc
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
 import { THCTrackingComponent } from "src/app/control-tower/thctracking/thctracking.component";
 import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
+import { InvoiceModel } from "src/app/Models/dyanamic-form/dyanmic.form.model";
+import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 
 @Component({
@@ -118,6 +122,7 @@ export class DepartVehicleComponent implements OnInit {
   vehicleDetail: any;
   listDocket = [];
   next: string;
+  products: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(
@@ -126,12 +131,11 @@ export class DepartVehicleComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private thcService: ThcService,
     private _operationService: OperationService,
-    private departureService:DepartureService,
-    private hawkeyeUtilityService: HawkeyeUtilityService
+    private generalService: GeneralService,
+    private departureService: DepartureService,
+    private hawkeyeUtilityService: HawkeyeUtilityService,
+    private storage:StorageService
   ) {
-    // if (data) {
-    //   this.tripData = data
-    // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
 
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -139,10 +143,16 @@ export class DepartVehicleComponent implements OnInit {
     this.IntializeFormControl();
     this.autoBindData();
     this.fetchShipmentData();
-    this.vehicleDetails();
+    this.generalMaster();
     // this.autoBindData()
   }
-
+  async generalMaster() {
+    this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    const product=["Road","Express"];
+    this.products = this.products.filter((x) => product.includes(x.name));  
+    setGeneralMasterData(this.jsonControlArray,this.products, "transMode");
+    this.vehicleDetails();
+  }
   async autoBindData() {
     // Map of control names to their corresponding data keys
     const loadingSheetFormControlsMap = {
@@ -165,7 +175,7 @@ export class DepartVehicleComponent implements OnInit {
     const loadingLocationFormControl = this.loadingSheetTableForm.controls["LoadingLocation"];
     const loadingLocationValue = localStorage.getItem("Branch") || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
-   
+
 
   }
 
@@ -179,7 +189,7 @@ export class DepartVehicleComponent implements OnInit {
       const reqVeh = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
-        filter: {vehicleNo: this.tripData.VehicleNo}
+        filter: { vehicleNo: this.tripData.VehicleNo }
       };
       // Execute parallel API calls
       const [res, resVeh, thcDetails] = await Promise.all([
@@ -206,19 +216,25 @@ export class DepartVehicleComponent implements OnInit {
         this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(data?.cft || 0); // Assuming you meant cft here for consistency
         // THC Details handling
         if (thcDetails) {
-      
+
           const { data: thcData } = thcDetails;
+          if(thcData?.tMODE){
+          this.loadingSheetTableForm.controls['transMode'].setValue(`${thcData?.tMODE}`);
+          }
+          else{
+            const products=this.products.find((x)=>x.name=="Road");
+            this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
+          }
           this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(thcData?.lOADED.wT || 0);
           this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(thcData?.lOADED.vOL || 0);
           this.loadingSheetTableForm.controls['WeightUtilization'].setValue(thcData?.uTI.wT || 0);
           this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(thcData?.uTI.vOL || 0);
-          this.advanceTableForm.controls['ContractAmt'].setValue(thcData?.cHG.cTAMT || 0);
-          this.advanceTableForm.controls['OtherChrge'].setValue(thcData?.cHG.oAMT || 0);
-          this.advanceTableForm.controls['Loading'].setValue(thcData?.cHG.lOADING || 0);
-          this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
-          this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
-          this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
-          this.advanceTableForm.controls['TotalTripAmt'].setValue(thcData?.cHG.tOTAMT || 0);
+
+          // this.advanceTableForm.controls['OtherChrge'].setValue(thcData?.cHG.oAMT || 0);
+          // this.advanceTableForm.controls['Loading'].setValue(thcData?.cHG.lOADING || 0);
+          // this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
+          // this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
+          // this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
           this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
           this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
           this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
@@ -226,7 +242,13 @@ export class DepartVehicleComponent implements OnInit {
           this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
           this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
           this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
-
+          if(thcData.cHG && thcData.cHG.length>0){
+            this.getAutoFillCharges(thcData.cHG,thcData);
+          }
+          else{
+            this.getCharges(thcData?.tMODENM||"Road");
+          }
+          
         }
       }
     } catch (error) {
@@ -234,7 +256,7 @@ export class DepartVehicleComponent implements OnInit {
       // Handle error appropriately
     }
   }
-  
+
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
     this.jsonControlArray =
@@ -294,35 +316,35 @@ export class DepartVehicleComponent implements OnInit {
       const headersRequest = {
         companyCode: this.companyCode,
         collectionName: "mf_headers_ltl",
-        filter: { tHC: this.tripData.TripID,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}],}
+        filter: { tHC: this.tripData.TripID, "D$or": [{ iSDEL: { "D$exists": false } }, { iSDEL: "" }], }
       };
-      
+
       const headersResponse = await firstValueFrom(this._operationService.operationMongoPost("generic/get", headersRequest));
-      
+
       if (headersResponse.data.length === 0) {
         return; // Early return if no data found
       }
-      
+
       // Extract manifest numbers (MFNO) from response
       const manifestNumbers = headersResponse.data.map(header => header.mFNO);
-      
+
       // Prepare request for manifest details
       const detailsRequest = {
         companyCode: this.companyCode,
         collectionName: "mf_details_ltl",
-        filter: { mFNO: { "D$in": manifestNumbers },"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]}
+        filter: { mFNO: { "D$in": manifestNumbers }, "D$or": [{ iSDEL: { "D$exists": false } }, { iSDEL: "" }] }
       };
-      
+
       const detailsResponse = await firstValueFrom(this._operationService.operationMongoPost("generic/get", detailsRequest));
       this.shipmentData = detailsResponse.data;
-      
+
       // Process manifest table data
       this.menifestTableData = headersResponse.data.map(header => {
-        const totalWeight = detailsResponse.data.reduce((total, detail) => 
+        const totalWeight = detailsResponse.data.reduce((total, detail) =>
           detail.mFNO === header.mFNO ? total + detail.lDWT : total, 0);
-        const totalVolume = detailsResponse.data.reduce((total, detail) => 
+        const totalVolume = detailsResponse.data.reduce((total, detail) =>
           detail.mFNO === header.mFNO ? total + detail.lDVOL : total, 0);
-        
+
         return {
           leg: header.leg || "",
           manifest: header.mFNO || '',
@@ -400,31 +422,39 @@ export class DepartVehicleComponent implements OnInit {
 
 
   async addDepartData(departData) {
-       await this.departureService.getFieldDepartureMapping(departData,this.shipmentData);
-       this.askTracking(departData);
-      //this.goBack('Departures');
+    let charges = []
+    this.advanceControlArray.filter((x) => x.hasOwnProperty("id")).forEach(element => {
+      let json = {
+        cHGID: element.name,
+        cHGNM: element.placeholder,
+        aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.advanceTableForm.controls[element.name].value || 0) : (this.advanceTableForm.controls[element.name].value || 0),
+        oPS: element?.additionalData.metaData || "",
+      }
+      charges.push(json);
+    });
+    departData['cHG'] = charges
+    await this.departureService.getFieldDepartureMapping(departData, this.shipmentData);
+    this.askTracking(departData);
+    //this.goBack('Departures');
   }
 
-  async askTracking(departData){
+  async askTracking(departData) {
     //get trip details
-    let filter= {
+    let filter = {
       //tHC:'TH/DELB/2425/000046'
-      tHC:departData.tripID
+      tHC: departData.tripID
     }
     //Get Trip data
-    let tripDet= await this.departureService.fetchData('thc_summary_ltl',filter);
+    let tripDet = await this.departureService.fetchData('thc_summary_ltl', filter);
     //if trip is updated && need ask if user need to track trip
-    if(tripDet?.length>0 && tripDet[0]?.oPSST== 1 && tripDet[0]?.oRGN===this.orgBranch){
+    if (tripDet?.length > 0 && tripDet[0]?.oPSST == 1 && tripDet[0]?.oRGN === this.orgBranch) {
       await this.openVehicleTracking(tripDet);
     }
-    else{
-      if(tripDet?.length>0){
-        await this.pushDeptCT(tripDet[0]);
-        this.goBack('Departures');
-      }
+    else {
       this.goBack('Departures');
     }
   }
+  
   async pushDeptCT(tripDet){
 
     let filter= {
@@ -449,10 +479,10 @@ export class DepartVehicleComponent implements OnInit {
   async openVehicleTracking(tripDet){
     let filter= {
       // vehicleNo:'MH05AK8475'
-      vehicleNo:tripDet[0].vEHNO 
+      vehicleNo: tripDet[0].vEHNO
     }
-    let vehicleDet=await this.departureService.fetchData('vehicle_detail',filter);
-    if(vehicleDet?.length>0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId!="" ){
+    let vehicleDet = await this.departureService.fetchData('vehicle_detail', filter);
+    if (vehicleDet?.length > 0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId != "") {
       //ask for tracking
       Swal.fire({
         icon: "question",
@@ -463,13 +493,13 @@ export class DepartVehicleComponent implements OnInit {
         showCancelButton: true,
       }).then((result) => {
         if (result.isConfirmed) {
-          const req={
-            action:"PushTrip",
-            reqBody:{
+          const req = {
+            action: "PushTrip",
+            reqBody: {
               companyCode: this.companyCode,
-              branch:localStorage.getItem("Branch") || "",
-              tripId:tripDet[0]?.tHC,
-              vehicleNo:vehicleDet[0]?.vehicleNo
+              branch: localStorage.getItem("Branch") || "",
+              tripId: tripDet[0]?.tHC,
+              vehicleNo: vehicleDet[0]?.vehicleNo
             }
           };
           this.hawkeyeUtilityService.pushToCTCommon(req);
@@ -499,15 +529,108 @@ export class DepartVehicleComponent implements OnInit {
           //   }
           // });
         }
-        else
-        {
+        else {
           this.goBack('Departures');
         }
       });
     }
-    else{
+    else {
       this.goBack('Departures');
     }
+  }
+  async getCharges(prod) {
+    this.advanceControlArray = this.advanceControlArray.filter((x) => !x.hasOwnProperty('id'));
+    const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod },);
+    if (result && result.length > 0) {
+      const invoiceList = [];
+      result.forEach((element, index) => {
+        if (element) {
+          const invoice: InvoiceModel = {
+            id: index + 1,
+            name: element.cHACD || '',
+            label: `${element.sELCHA}(${element.aDD_DEDU})`,
+            placeholder: element.sELCHA || '',
+            type: 'text',
+            value: '0.00',
+            filterOptions: '',
+            displaywith: '',
+            generatecontrol: true,
+            disable: false,
+            Validations: [],
+            additionalData: {
+              showNameAndValue: false,
+              metaData: element.aDD_DEDU
+            },
+            functions: {
+              onChange: 'calucatedCharges',
+            },
+          };
+
+          invoiceList.push(invoice);
+        }
+      });
+      const chargeControl = [...invoiceList, ...this.advanceControlArray]
+      this.advanceControlArray = chargeControl;
+      this.advanceTableForm = formGroupBuilder(this.fb, [chargeControl]);
+    }
+  }
+  /*below code is for getting a Chages from Charge Master*/
+  async getAutoFillCharges(charges,thcData) {
+
+    if (charges && charges.length > 0) {
+      const invoiceList = [];
+
+      charges.forEach((element, index) => {
+        if (element) {
+          const invoice: InvoiceModel = {
+            id: index + 1,
+            name: element.cHGID || '',
+            label: `${element.cHGNM}(${element.oPS})`,
+            placeholder: element.cHGNM || '',
+            type: 'text',
+            value: `${Math.abs(element.aMT)}`,
+            filterOptions: '',
+            displaywith: '',
+            generatecontrol: true,
+            disable: true,
+            Validations: [],
+            additionalData: {
+              showNameAndValue: false,
+            },
+            functions: {
+              onChange: 'calucatedCharges',
+            },
+          };
+
+          invoiceList.push(invoice);
+        }
+      });
+      const chargeControl = [...invoiceList, ...this.advanceControlArray]
+      this.advanceControlArray = chargeControl;
+      this.advanceTableForm= formGroupBuilder(this.fb, [chargeControl]);
+      this.advanceTableForm.controls['ContractAmt'].setValue(thcData?.cONTAMT || 0);
+      this.advanceTableForm.controls['TotalTripAmt'].setValue(thcData?.tOTAMT || 0);
+    }
+  }
+  /*End*/
+  calucatedCharges() {
+
+    let total = 0;
+    const dyanmicCal = this.advanceControlArray.filter((x) => x.hasOwnProperty("id"));
+    const chargeMapping = dyanmicCal.map((x) => { return { name: x.name, operation: x.additionalData.metaData } });
+    total = chargeMapping.reduce((acc, curr) => {
+      const value = ConvertToNumber(this.advanceTableForm.controls[curr.name].value, 2);
+      if (curr.operation === "+") {
+        return acc + value;
+      } else if (curr.operation === "-") {
+        return acc - value;
+      } else {
+        return acc; // In case of an unknown operation
+      }
+    }, 0);
+    const totalAmt = ConvertToNumber(total, 2) + ConvertToNumber(this.advanceTableForm.controls["ContractAmt"].value, 2);
+    this.advanceTableForm.controls['TotalTripAmt'].setValue(totalAmt);
+    // Now set this calculated percentageValue to advAmt
   }
   updateTrip() {
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
@@ -629,8 +752,6 @@ export class DepartVehicleComponent implements OnInit {
 
   onCalculateTotal(): void {
     // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm
-    calculateTotal(this.advanceTableForm);
-
     // Step 2: Calculate the total advances and set TotalAdv in the balanceTableForm
     calculateTotalAdvances(this.balanceTableForm);
 

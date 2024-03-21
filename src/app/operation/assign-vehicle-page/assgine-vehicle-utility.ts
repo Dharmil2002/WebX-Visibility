@@ -185,3 +185,4 @@ export async function bindMarketVehicle(vehicledata: any) {
     }
     return marketVehicle;
 }
+/*end*/

@@ -97,76 +97,10 @@ export class AdvanceControl {
                 generatecontrol: true,
                 disable: false,
                 functions:{
-                    onModel:'onCalculateTotal'
+                    onModel:'calucatedCharges'
                 }
             },
-            {
-                name: 'OtherChrge',
-                label: 'Other Charges(₹)',
-                placeholder: '',
-                type: 'number',
-                value:0,
-                Validations: [],
-                generatecontrol: true, disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-            {
-                name: "Loading",
-                label: "Loading(₹)",
-                placeholder: '',
-                type: "number",
-                value: 0,
-                Validations: [],
-                generatecontrol: true, disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-
-            {
-                name: 'Unloading',
-                label: 'Unloading(₹)',
-                placeholder: '',
-                type: 'number',
-                value: 0,
-                Validations: [],
-                generatecontrol: true,
-                disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-
-            {
-                name: "Enroute",
-                label: "Enroute(₹)",
-                placeholder: '',
-                type: "number",
-                value:0,
-                Validations: [],
-                generatecontrol: true,
-                disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-
-            {
-                name: 'Misc',
-                label: 'Misc(₹)',
-                placeholder: '',
-                type: 'number',
-                value: 0,
-                Validations: [],
-                generatecontrol: true,
-                disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-            {
+         {
                 name: 'TotalTripAmt',
                 label: 'Total Trip Amount(₹)',
                 placeholder: '',
@@ -175,7 +109,7 @@ export class AdvanceControl {
                 Validations: [],
                 generatecontrol: true,
                 disable: true
-            },
+            }
         ];
     }
     getAdvanceFormControls() {

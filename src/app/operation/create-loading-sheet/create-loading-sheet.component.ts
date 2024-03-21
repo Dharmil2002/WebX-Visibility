@@ -16,10 +16,11 @@ import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue
 import { getLoadingSheetDetail } from "../depart-vehicle/depart-vehicle/depart-common";
 import Swal from "sweetalert2";
 import { runningNumber } from "src/app/Utility/date/date-utils";
-import { aggregateData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { aggregateData, setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { firstValueFrom } from "rxjs";
 import { LoadingSheetService } from "src/app/Utility/module/operation/loadingSheet/loadingsheet-service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -112,6 +113,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   departFlag: boolean = false;
   alldocket: any;
   isUpdate: boolean = false;
+  vehicleSize: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
+  products: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -121,6 +124,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private storage: StorageService,
+    private generalService: GeneralService,
     private loadingSheetService: LoadingSheetService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -150,8 +154,17 @@ export class CreateLoadingSheetComponent implements OnInit {
 
     // Initialize form controls
     this.IntializeFormControl();
-
+    this.generalMaster();
     // Auto-bind data
+  
+  }
+  async generalMaster() {
+    this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    const product=["Road","Express"];
+    this.products = this.products.filter((x) => product.includes(x.name));  
+    setGeneralMasterData(this.jsonControlArray,this.products, "transMode");
+    const products=this.products.find((x)=>x.name=="Road");
+    this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
     this.autoBindData();
   }
 
@@ -375,7 +388,10 @@ export class CreateLoadingSheetComponent implements OnInit {
       });
     }
     else {
-      const tripData = await this.loadingSheetService.tripFieldMapping(lsForm, shipment);
+      let lsData=lsForm
+      lsData['transMode'] = this.products.find((x) => x.value == lsForm.transMode)?.value ?? '';
+      lsData['transModeName'] = this.products.find((x) => x.name == "Road")?.name ?? '';
+      const tripData = await this.loadingSheetService.tripFieldMapping(lsData, shipment);
       const lsDetails = await this.loadingSheetService.createLoadingSheet(tripData);
       this.tableData.forEach((ls) => {
         const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);

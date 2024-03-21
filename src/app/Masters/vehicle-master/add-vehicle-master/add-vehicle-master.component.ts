@@ -229,7 +229,6 @@ export class AddVehicleMasterComponent implements OnInit {
     );
 
     if (res.success && res.data.length > 0) {
-      console.log(this.vehicleTable.gpsProvider);
       const gpsProviderData = res.data.map((x) => {
         return {
           name: x.pNM,
@@ -682,7 +681,7 @@ export class AddVehicleMasterComponent implements OnInit {
         };
         await this.updateStatus(data);
         if(data?.gpsDeviceEnabled && data?.gpsDeviceId && data?.gpsDeviceId!="" && data?.gpsProvider && data?.gpsProvider!=""){
-          await this.hawkeyeUtilityService.pushToCTCommon(ctReq);
+          this.hawkeyeUtilityService.pushToCTCommon(ctReq);
         }
         Swal.fire({
           icon: "success",
@@ -717,7 +716,7 @@ export class AddVehicleMasterComponent implements OnInit {
         };
         await this.updateStatus(data);
         if(data?.gpsDeviceEnabled && data?.gpsDeviceId && data?.gpsDeviceId!="" && data?.gpsProvider && data?.gpsProvider!=""){
-          await this.hawkeyeUtilityService.pushToCTCommon(ctReq);
+          this.hawkeyeUtilityService.pushToCTCommon(ctReq);
         }
         Swal.fire({
           icon: "success",

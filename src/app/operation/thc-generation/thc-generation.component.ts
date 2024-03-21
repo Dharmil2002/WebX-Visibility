@@ -45,6 +45,7 @@ import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { clearValidatorsAndUpdate, getValueOrDefault } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
+import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
 
 @Component({
   selector: "app-thc-generation",
@@ -297,7 +298,8 @@ export class ThcGenerationComponent implements OnInit {
     private generalService: GeneralService,
     private prqService: PrqService,
     private objImageHandling: ImageHandling,
-    private definition: RakeEntryModel
+    private definition: RakeEntryModel,
+    private hawkeyeUtilityService: HawkeyeUtilityService
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -824,7 +826,198 @@ export class ThcGenerationComponent implements OnInit {
       this.fillRakeDetails(data);
     }
     if (data.label.label === "EditInvoice") {
-      this.fillInvoiceDetails(data);
+    this.isSubmit = true;
+    if (this.isUpdate && this.hasBlankFields()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Incomplete Update: Please fill in all required fields before updating.',
+      });
+      return;
+    }
+
+    const docket = selectedDkt;
+    const formControlNames = [
+      "prqNo",
+      "advPdAt",
+      "balAmtAt",
+      "fromCity",
+      "toCity",
+      "vehicle",
+      "vendorType"
+    ];
+
+    formControlNames.forEach(controlName => {
+      const controlValue = this.thcTableForm.get(controlName).value?.value || this.thcTableForm.get(controlName).value;
+      this.thcTableForm.get(controlName).setValue(controlValue);
+    });
+
+    const vendorType = this.thcTableForm.get('vendorType').value;
+    const isMarket = vendorType === "4";
+    this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
+
+    if (isMarket) {
+      const vehicleData = {
+        vID: this.thcTableForm.value.vehicle,
+        vndNM: this.thcTableForm.value.vendorName?.name || "",
+        vndPH: this.marketVehicleTableForm.value.vMobileNo,
+        pANNO: this.marketVehicleTableForm.value.driverPan,
+        wTCAP: this.marketVehicleTableForm.value.vehicleSize,
+        drvNM: this.marketVehicleTableForm.value.driver,
+        drvPH: this.marketVehicleTableForm.value.dmobileNo,
+        dLNO: this.marketVehicleTableForm.value.lcNo,
+        dLEXP: this.marketVehicleTableForm.value.lcExpireDate,
+        iNCEXP: this.marketVehicleTableForm.value.insuranceExpiryDate || new Date(),
+        fITDT: this.marketVehicleTableForm.value.fitnessValidityDate || new Date(),
+        vSPNM: this.marketVehicleTableForm.value?.SupplierName || "",
+        vSPPH: this.marketVehicleTableForm.value?.ContactNumber || "",
+      };
+
+      this.thcTableForm.get('insuranceExpiryDate').setValue(this.marketVehicleTableForm.value?.insuranceExpiryDate || new Date());
+      this.thcTableForm.get('fitnessValidityDate').setValue(this.marketVehicleTableForm.value?.fitnessValidityDate || new Date());
+
+      await this.markerVehicleService.SaveVehicleData(vehicleData);
+    }
+    
+    const destinationMapping = await this.locationService.locationFromApi({ locCity: this.thcTableForm.controls['toCity'].value });
+    this.thcTableForm.controls['closingBranch'].setValue(destinationMapping[0]?.value || "");
+    if (this.isUpdate) {
+      const podDetails = typeof (docket) == "object" ? docket : ""
+      this.thcTableForm.removeControl("docket");
+      this.thcTableForm.get("podDetail").setValue(podDetails);
+      const newARR = {
+        ...this.thcDetailGlobal.thcDetails.aRR,
+        "aCTDT": this.thcTableForm.get("ArrivalDate").value,
+        "sEALNO": this.thcTableForm.get("ArrivalSealNo").value,
+        "kM": this.thcTableForm.get("Arrivalendkm").value,
+        "aCRBY": this.thcTableForm.get("Arrivalremarks").value,
+        "aRBY": this.thcTableForm.get("ArrivalBy").value,
+      };
+
+      const requestBody = {
+        "oPSST": 2,
+        "oPSSTNM": "Arrived",
+        "aRR": newARR,
+      };
+
+      const data=this.thcTableForm.getRawValue();
+      const res = await showConfirmationDialogThc(
+        requestBody,
+        this.thcTableForm.get("tripId").value,
+        this.operationService,
+        podDetails,
+        this.thcTableForm.get("vehicle").value,
+        this.currentLocation,
+        this.DocketsContainersWise,
+        data.prqNo
+      );
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Update Successfuly",
+          text: `THC Number is ${this.thcTableForm.get("tripId").value}`,
+          showConfirmButton: true,
+        });
+        const reqArrivalDeparture={
+          action:"TripArrivalDepartureUpdateFTL",
+          reqBody:{
+            cid:this.companyCode,
+            EventType:'A',
+            loc:localStorage.getItem("Branch") || "",
+            tripId:this.thcTableForm.get("tripId").value
+          }
+        }
+        this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+        this.goBack("THC");
+      }
+    } else {
+      //this.thcTableForm.get("docket").setValue(docket.map(x => x.docketNumber));
+
+      if (this.prqFlag || this.directPrq) {
+        if (this.thcTableForm.get("prqNo").value) {
+          const prqData = { prqNo: this.thcTableForm.get("prqNo").value };
+          const update = {
+            sTS: 7,
+            sTSNM: 'THC Generated'
+          }
+          await this.consigmentUtility.updatePrq(prqData, update);
+        }
+      }
+
+      // for (const element of docket) {
+      //   await this.docketService.updateDocket(element.docketNumber, { "status": "1" });
+      // }
+
+      const tHCGenerationRequst = await this.GenerateTHCgenerationRequestBody();
+      if (tHCGenerationRequst) {
+        const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
+        // this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
+        if (resThc) {
+          if(!isMarket && resThc.data?.mainData?.ops[0]?.docNo!=""){
+            await Swal.fire({
+              icon: "question",
+              title: "Tracking",
+              text: `Do you want vehicle tracking?`,
+              confirmButtonText: "Yes, track it!",
+              showConfirmButton: true,
+              showCancelButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                debugger
+                const req={
+                  action:"PushTripFTL",
+                  reqBody:{
+                    companyCode: this.companyCode,
+                    branch:localStorage.getItem("Branch") || "",
+                    tripId:resThc.data?.mainData?.ops[0]?.docNo,
+                    vehicleNo:resThc.data?.mainData?.ops[0]?.vEHNO
+                  }
+                };
+                this.hawkeyeUtilityService.pushToCTCommon(req);
+                this.goBack('THC');
+      
+                // const dialogref = this.dialog.open(THCTrackingComponent, {
+                //   width: "100vw",
+                //   height: "100vw",
+                //   maxWidth: "232vw",
+                //   data: vehicleDet[0],
+                // });
+                // dialogref.afterClosed().subscribe((result) => {
+                //   if(result && result!=""){
+                //     if(result?.gpsDeviceEnabled ==true && result?.gpsDeviceId!=""){
+                //       const req={
+                //         companyCode: this.companyCode,
+                //         branch:localStorage.getItem("Branch") || "",
+                //         tripId:"TH/DELB/2425/000046",
+                //         vehicleNo:result.vehicleNo
+                //       }
+                //       this.departureService.pushTripToCT(req);
+                //       this.goBack('Departures');
+                //     }
+                //     else{
+                //       this.goBack('Departures');
+                //     }
+                //   }
+                // });
+              }
+              else
+              {
+                this.goBack('THC');
+              }
+            });
+          }
+          Swal.fire({
+            icon: "success",
+            title: "THC Generated Successfully",
+            text: `THC Number is ${resThc.data?.mainData?.ops[0].docNo}`,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.goBack("THC");
+            }
+          });
+        }
+      }
     }
   }
   /*End*/

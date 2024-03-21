@@ -17,6 +17,7 @@ import { extractUniqueValues } from 'src/app/Utility/commonFunction/arrayCommonF
 import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { HawkeyeUtilityService } from 'src/app/Utility/module/hawkeye/hawkeye-utility.service';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -50,7 +51,8 @@ export class MarkArrivalComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private Route: Router,
     private arrivalService:ArrivalVehicleService,
-    private _operationService: OperationService) {
+    private _operationService: OperationService,
+    private hawkeyeUtilityService: HawkeyeUtilityService) {
     this.MarkArrivalTable = item;
   }
   jsonControlArray: any;
@@ -152,11 +154,36 @@ export class MarkArrivalComponent implements OnInit {
         tripDetails.tHC="",
         tripDetails.cLOC= this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
         tripDetails.nXTLOC= ""
+        if(stCode==7){
+          
+          const reqArrivalDeparture={
+            action:"TripArrivalDepartureUpdate",
+            reqBody:{
+              cid:this.companyCode,
+              EventType:'A',
+              loc:this.currentBranch,
+              tripId:this.MarkArrivalTableForm.value?.TripID
+            }
+          }
+          this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+        }
       }
       else{
         tripDetails.cLOC=this.storage.branch,
         tripDetails.nXTLOC= next || ""
       }
+    }
+    if(stCode==5||stCode==6){
+      const reqArrivalDeparture={
+        action:"TripArrivalDepartureUpdate",
+        reqBody:{
+          cid:this.companyCode,
+          EventType:'A',
+          loc:this.currentBranch,
+          tripId:this.MarkArrivalTableForm.value?.TripID
+        }
+      }
+      this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
     }
     const reqBody = {
       "companyCode": this.companyCode,

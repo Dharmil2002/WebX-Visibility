@@ -169,6 +169,14 @@
       "router": "Masters/CustomerMaster/AddCustomerMaster"
     },
     {
+      "title": "DCRManagement",
+      "tag": [
+        "DCRManagement",
+        "DCRManagement"
+      ],
+      "router": "Masters/DCRManagement"
+    },
+    {
       "title": "Menu/MenuAccessRights",
       "tag": [
         "MenuAccessRights",
@@ -753,6 +761,13 @@
       "router": "Finance/VendorPayment/Dashboard"
     },
     {
+      "title": "Finance/FAMasters/SetOpeningBalanceLedgerWise",
+      "tag": [
+        "Finance/FAMasters/SetOpeningBalanceLedgerWise"
+      ],
+      "router": "Finance/FAMasters/SetOpeningBalanceLedgerWise"
+    },
+    {
       "title": "CustomerContract/CustomerContractList",
       "tag": [
         "CustomerContract",
@@ -794,6 +809,13 @@
         "TdsMasterAdd"
       ],
       "router": "Masters/AccountMaster/AddTds"
+    },
+    {
+      "title": "Reports/AccountReport/ProfitAndLoss",
+      "tag": [
+        "Reports/AccountReport/ProfitAndLoss"
+      ],
+      "router": "Reports/AccountReport/ProfitAndLoss"
     },
     {
       "title": "Reports/Job-Register Report",

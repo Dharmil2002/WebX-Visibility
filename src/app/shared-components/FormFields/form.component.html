@@ -113,7 +113,13 @@
                     <!-- error  -->
                     <mat-error *ngFor="let error of formItem.Validations">
                       <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error.message}}
+
+                        <!-- made change by Harshad to display custom message set on runtime -->
+                        {{ error.name == 'pattern' && form.get(formItem.name).getError('pattern').message
+                          ? form.get(formItem.name).getError('pattern').message
+                          : error.message
+                        }}
+
                       </ng-container>
                     </mat-error>
 

@@ -8,11 +8,13 @@ export class PrqEntryControls {
 currentDate = new Date();
    // Calculate the date one month ago
 oneMonthAgo = new Date();
+afterOneMt= new Date();
 oneday: Date;
   private fieldMapping: FormControls[];
   // Constructor for initializing form controls.
   constructor(prqDetail: prqDetail, isUpdate,rules) {
       this.oneMonthAgo.setMonth(this.currentDate.getMonth() - parseInt(rules.prqBackDate));
+      this.afterOneMt.setMonth(this.currentDate.getMonth() + parseInt(rules.prqFutureDate));
       this.oneday = new Date(this.currentDate);
       this.oneday.setHours(this.currentDate.getHours() + 1);
     this.fieldMapping = [
@@ -80,7 +82,7 @@ oneday: Date;
         },
         additionalData: {
            minDate: isUpdate ? "" :this.oneMonthAgo,
-           maxDate: isUpdate ? "" :this.oneday,
+           maxDate: isUpdate ? "" :this.afterOneMt,
           // maxDate: new Date(new Date().getMonth()-1, new Date().getDate()),
         },
       },

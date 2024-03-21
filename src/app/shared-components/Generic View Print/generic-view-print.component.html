@@ -13,9 +13,19 @@
     <div class=" card">
         <div class="body">
             <div class="col col-lg-2 mb-1">
-                <button mat-raised-button color="primary" [useExistingCss]="true" ngxPrint printSectionId="print" ><i
+                <button mat-raised-button color="primary" [useExistingCss]="true" ngxPrint printSectionId="print"><i
                         class="fas fa-print msr-2"></i>Print</button>
+
+                <span *ngIf="EventButton">
+                    <button mat-stroked-button style="margin-left:10px; " color="primary"
+                        (click)="functionHandle(EventButton.functionName , {})">
+                        <mat-icon *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
+                        {{EventButton.name}}
+                    </button>
+                </span>
+
             </div>
+
             <div id="print">
                 <table *ngIf="barcode6" class="mt-3">
                     <tr>
@@ -26,7 +36,7 @@
                         </td>
                     </tr>
                 </table>
-                <div  id="TemplateData" class="page-break">
+                <div id="TemplateData" class="page-break">
                     <!-- view print code -->
                 </div>
             </div>

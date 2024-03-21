@@ -318,6 +318,8 @@ export class ThcGenerationComponent implements OnInit {
           this.staticField.push('cNO', 'receiveBy', 'arrivalTime', 'remarks');
           this.isView = true;
           this.isSubmit = true;
+        	this.EventButtonRake=null
+	        this.EventButtonInvoice=null
           delete this.columnHeader.actionsItems;
           break;
         case 'update':
@@ -326,6 +328,8 @@ export class ThcGenerationComponent implements OnInit {
           this.isSubmit = true;
           this.isUpdate = true;
           this.isArrivedInfo = true
+          this.EventButtonRake=null
+	        this.EventButtonInvoice=null
           break;
         case 'addthc':
           this.addThc = true;
@@ -1086,6 +1090,13 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
+    // Refactored calls using the new function
+clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
+clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
+clearValidatorsAndUpdate(this.rakeForm, this.rakeFormData);
+clearValidatorsAndUpdate(this.rakeDetailsTableForm, this.rakeDetails);
+clearValidatorsAndUpdate(this.rakeInvoice, this.rakeInvoiceData);
+clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
     const thcDetail = await this.thcService.getThcDetails(this.thcDetail.docNo);
     const thcMovemnetDetails = await this.thcService.getThcMovemnetDetails(this.thcDetail.docNo);
     const thcNestedDetails = thcDetail.data;
@@ -1145,6 +1156,7 @@ export class ThcGenerationComponent implements OnInit {
     //  const closingBranch = this.locationData.find((x) => x.value === this.thcDetail?.closingBranch);
   
     this.thcTableForm.controls["tripDate"].disable();
+    this.thcTableForm.controls["etaDate"].disable();
     //this.thcTableForm.controls["closingBranch"].setValue(closingBranch);
     this.thcTableForm.controls["fromCity"].setValue({ name: thcNestedDetails?.thcDetails.fCT || "", value: thcNestedDetails?.thcDetails.fCT || "" });
     this.thcTableForm.controls["toCity"].setValue({ name: thcNestedDetails?.thcDetails.tCT || "", value: thcNestedDetails?.thcDetails.tCT || "" });
@@ -1154,19 +1166,31 @@ export class ThcGenerationComponent implements OnInit {
     this.VehicleTableForm.controls["engineNo"].setValue(thcNestedDetails?.thcDetails.eNGNO)
     this.VehicleTableForm.controls["chasisNo"].setValue(thcNestedDetails?.thcDetails.cHASNO),
     this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
-    const via=thcNestedDetails?.thcDetails.vIA?.map((x) =>{return{name:x,value:x}})||"";
-    this.thcTableForm.controls["viaControlHandler"].setValue(via);
+   if(thcNestedDetails?.thcDetails.vIA){
+    const via =thcNestedDetails?.thcDetails.vIA.join(",");
+    this.thcTableForm.controls["via"].setValue(via);
+   }
     this.VehicleTableForm.controls["inExdt"].setValue(thcNestedDetails?.thcDetails.iNSEXDT)
     this.VehicleTableForm.controls["fitdt"].setValue(thcNestedDetails?.thcDetails.fITDT)
     this.thcTableForm.controls["driverLexd"].disable(thcNestedDetails?.thcDetails.eNGNO);
     this.thcTableForm.controls["vendorType"].setValue(`${thcNestedDetails?.thcDetails.vND?.tY}`);
-    this.thcTableForm.controls["containerwise"].setValue(thcNestedDetails.shipment?.[0].cNO ? true : false);
+    const hasShipment = thcNestedDetails.shipment?.length > 0;
+    const hasCNO = !!thcNestedDetails.shipment?.[0]?.cNO;
+    this.thcTableForm.controls["containerwise"].setValue(hasShipment && hasCNO);
     if (this.addThc) {
       this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);
     }
+    if(thcNestedDetails?.thcDetails.vND?.tY==4){
+      this.jsonControlBasicArray = this.allBasicJsonArray
+      this.thcTableForm.controls['brokerName'].setValue(thcNestedDetails?.thcDetails.bRKNM||"");
+      this.thcTableForm.controls['brokerMobile'].setValue(thcNestedDetails?.thcDetails.bRKMOB||"");
+      this.thcTableForm.controls['tdsUpload'].setValue(thcNestedDetails?.thcDetails.tDSDOC||"");
+
+    }
     if (this.isView || this.isUpdate) {
       this.thcTableForm.controls["containerwise"].disable();
+      this.thcTableForm.controls["IsEmpty"].disable();
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];
@@ -1213,13 +1237,7 @@ export class ThcGenerationComponent implements OnInit {
       
     }
    }
-// Refactored calls using the new function
-clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
-clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
-clearValidatorsAndUpdate(this.rakeForm, this.rakeFormData);
-clearValidatorsAndUpdate(this.rakeDetailsTableForm, this.rakeDetails);
-clearValidatorsAndUpdate(this.rakeInvoice, this.rakeInvoiceData);
-clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
+
 this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     // this.getShipmentDetails();
   }
@@ -1262,7 +1280,11 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*End*/
   //#region to preview image
   openImageDialog(control) {
-    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    
+    let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    if(this.isUpdate||this.isView){
+      file=this.thcTableForm.controls[control.imageName].value;
+    }
     this.dialog.open(ImagePreviewComponent, {
       data: { imageUrl: file },
       width: '30%',
@@ -1740,12 +1762,12 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     this.tableRakeInvoice.push(json);
     this.rrInvoice = false;
     const fieldsToClear = [
-      'invNum',
-      'invDate',
+      'invNo',
+      'invDt',
       'invAmt'
     ];
     fieldsToClear.forEach(field => {
-      this.rakeDetailsTableForm.controls[field].setValue("");
+      this.rakeInvoice.controls[field].setValue("");
     });
   }
   /*End*/
@@ -1803,6 +1825,13 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       const chargeControl = [...invoiceList, ...this.chargeJsonControl]
       this.chargeJsonControl = chargeControl;
       this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
+      const chargeFilter = [
+        { name: this.advanceName, data: this.locationData, status: this.advanceStatus },
+        { name: this.balanceName, data: this.locationData, status: this.balanceStatus },
+      ]
+      chargeFilter.forEach(({ name, data, status }) => {
+        this.filter.Filter(this.chargeJsonControl,this.chargeForm,data,name,status);
+      });
       const location=this.locationData.find(x=>x.value==this.branchCode);
       this.chargeForm.controls['advPdAt'].setValue(location)
       this.isCharge = true;
@@ -1823,11 +1852,11 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
               label: `${element.cHGNM}(${element.oPS})`,
               placeholder: element.cHGNM || '',
               type: 'text',
-              value:element.aMT,
+              value:`${Math.abs(element.aMT)}`,
               filterOptions: '',
               displaywith: '',
               generatecontrol: true,
-              disable: false,
+              disable: true,
               Validations: [],
               additionalData: {
                 showNameAndValue: false,
@@ -1851,6 +1880,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
         this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
         this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
         this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
+        this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
       }
     }
     /*End*/

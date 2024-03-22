@@ -277,6 +277,8 @@ export class ThcGenerationComponent implements OnInit {
   isCharge: boolean;
   allBasicJsonArray: any;
   vehicleSize: AutoComplete[];
+  isLoadRail: boolean;
+  isLoadInvoice: boolean;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -821,10 +823,10 @@ export class ThcGenerationComponent implements OnInit {
 
       });
     }
-    if (data.label.label === "EditRake") {
+    if (data.label.label === "EditRake" || data.label.label === "RemoveRake") {
       this.fillRakeDetails(data);
     }
-    if (data.label.label === "EditInvoice") {
+    if (data.label.label === "EditInvoice" || data.label.label === "RemoveInvoice") {
       this.fillInvoiceDetails(data);
     }
   }
@@ -1668,6 +1670,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*below code is for the Push RR Data into Table*/
   async addRakeData() {
     this.rrLoad = true;
+    this.isLoadRail=true;
     const tableData = this.tableRakeData;
     if (tableData.length > 0) {
       const exist = tableData.find(
@@ -1682,9 +1685,12 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
           text: "Please avoid duplicate entering RR NO.",
           showConfirmButton: true,
         });
+       ;
         this.rrLoad = false;
+        this.isLoadRail=false
         return false;
       }
+    
     }
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
@@ -1699,6 +1705,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     };
     this.tableRakeData.push(json);
     this.rrLoad = false;
+    this.isLoadRail=false
     const fieldsToClear = [
       'rrNo',
       'rrDate'
@@ -1707,13 +1714,12 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       this.rakeDetailsTableForm.controls[field].setValue("");
     });
 
-
   }
   /*End*/
   /*Below function is for Edit and remove RR Data*/
   fillRakeDetails(data) {
     this.rrLoad = true;
-    if (data.label.label === "Remove") {
+    if (data.label.label === "RemoveRake") {
       this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);
     } else {
       this.rakeDetailsTableForm.controls['rrNo'].setValue(data.data['rrNo']);
@@ -1729,6 +1735,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*below code is for the add Rake Invoice*/
   async addRakeInvoice() {
     this.rrInvoice = true;
+    this.isLoadInvoice=true;
     const tableData = this.tableRakeInvoice;
     if (tableData.length > 0) {
       const exist = tableData.find(
@@ -1744,6 +1751,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
           showConfirmButton: true,
         });
         this.rrInvoice = false;
+        this.isLoadInvoice=false;
         return false;
       }
     }
@@ -1761,6 +1769,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     };
     this.tableRakeInvoice.push(json);
     this.rrInvoice = false;
+    this.isLoadInvoice=false;
     const fieldsToClear = [
       'invNo',
       'invDt',
@@ -1774,8 +1783,9 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*below code is for the Edit and remove for the rake details*/
   fillInvoiceDetails(data) {
     this.rrInvoice = true;
-    if (data.label.label === "Remove") {
+    if (data.label.label === "RemoveInvoice") {
       this.tableRakeInvoice = this.tableRakeInvoice.filter(x => x.invNum !== data.data.invNum);
+      this.rrInvoice = false;
     } else {
       this.rakeInvoice.controls['invNo'].setValue(data.data['invNum']);
       this.rakeInvoice.controls['invDt'].setValue(
@@ -2081,7 +2091,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
               showCancelButton: true,
             }).then((result) => {
               if (result.isConfirmed) {
-                debugger
+                
                 const req={
                   action:"PushTripFTL",
                   reqBody:{

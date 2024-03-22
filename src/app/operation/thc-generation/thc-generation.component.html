@@ -71,10 +71,16 @@
     <div *ngIf="isRail">
       <form [formGroup]="rakeDetailsTableForm">
         <app-form-webxpress [form]="rakeDetailsTableForm" [formData]="rakeDetails"
-          (callFunction)="functionCallHandler($event)" [EventButton]="isRail==true?EventButtonRake:null"[FormTitle]="'RR Details'"
+          (callFunction)="functionCallHandler($event)" [EventButton]="rakeDetailsTableForm.valid==true?EventButtonRake:null"[FormTitle]="'RR Details'"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
       </form>
+      <div *ngIf="isLoadRail" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
       <app-generic-table-v2 *ngIf="!rrLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.rakeHeader"
         [tableData]="tableRakeData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
         [menuItems]="rakeMenuItems" [staticField]="definition.rakeStaticField" [Link]="linkArray" [height]="height"
@@ -85,10 +91,16 @@
     <div *ngIf="isRail">
       <form [formGroup]="rakeInvoice">
         <app-form-webxpress [form]="rakeInvoice" [formData]="rakeInvoiceData"
-          (callFunction)="functionCallHandler($event)" [EventButton]="isRail==true?EventButtonInvoice:null"[FormTitle]="'Rake Invoice'"
+          (callFunction)="functionCallHandler($event)" [EventButton]="rakeInvoice.valid==true?EventButtonInvoice:null"[FormTitle]="'Rake Invoice'"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
       </form>
+      <div *ngIf="isLoadInvoice" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
       <app-generic-table-v2 *ngIf="!rrInvoice" [dynamicControls]="dynamicControls" [columnHeader]="definition.invDetails"
         [tableData]="tableRakeInvoice" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
         [menuItems]="rakeInvoiceItems" [staticField]="definition.staticInvField" [Link]="linkArray" [height]="height"
@@ -102,6 +114,7 @@
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
       </form>
+
     <div *ngIf="!isRail">
       <form [formGroup]="thcTableForm">
         <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Vehicle Loading Detail'"

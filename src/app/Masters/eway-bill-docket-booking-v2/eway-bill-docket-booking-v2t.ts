@@ -739,7 +739,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
 
   calculateInvoiceTotal() {
-    debugger
     calculateInvoiceTotalCommon(this.tableData, this.contractForm);
   }
   async checkInvoiceExist(data){

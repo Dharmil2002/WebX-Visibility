@@ -816,4 +816,23 @@ export const ROUTES: RouteInfo[] =
         },
       ],
     },
+    {
+      path: "",
+      title: "Control Panel",
+      moduleName: "Control Panel",
+      icon: "git-pull-request",
+      class: "menu-toggle",
+      groupTitle: false,
+      submenu: [
+        {
+          "path": "ControlPanel/gps-rule",
+          "title": "GPS Rule",
+          "moduleName": "GPS Rule",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        }
+      ],
+    },
   ]

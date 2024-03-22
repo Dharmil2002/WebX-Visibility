@@ -1894,6 +1894,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       }
     }
     /*End*/
+    
   /*Calucate Charges*/
   calucatedCharges() {
     let total = 0;

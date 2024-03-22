@@ -513,7 +513,7 @@ export class thcControl {
                     name: 'driverMno',
                     label: 'Driver Mobile No',
                     placeholder: '',
-                    type: 'number',
+                    type: 'mobile-number',
                     value: '',
                     Validations: [
                         {

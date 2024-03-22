@@ -151,6 +151,21 @@ export class ContractFreightMatrixControl {
         ],
       },
       {
+        name: "TransitDays",
+        label: "Transit Days",
+        placeholder: "Transit Days",
+        type: "number",
+        value: isUpdate ? UpdateData.tRDYS : "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Transit Days is required",
+          }
+        ],
+      },
+      {
         name: "ValidFromDate",
         label: "Valid From Date",
         placeholder: "Valid From Date",

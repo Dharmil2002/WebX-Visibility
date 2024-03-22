@@ -1834,6 +1834,11 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       });
       const chargeControl = [...invoiceList, ...this.chargeJsonControl]
       this.chargeJsonControl = chargeControl;
+      chargeControl.sort((a, b) => {
+        if (a.name == "contAmt") return -1;
+        if (b.name == "contAmt") return 1;
+        return 0;
+      });
       this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
       const chargeFilter = [
         { name: this.advanceName, data: this.locationData, status: this.advanceStatus },
@@ -1881,6 +1886,11 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
         });
         const chargeControl = [...invoiceList, ...this.chargeJsonControl]
         this.chargeJsonControl = chargeControl;
+        chargeControl.sort((a, b) => {
+          if (a.name == "contAmt") return -1;
+          if (b.name == "contAmt") return 1;
+          return 0;
+        });
         this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
         this.isCharge = true;
         const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);

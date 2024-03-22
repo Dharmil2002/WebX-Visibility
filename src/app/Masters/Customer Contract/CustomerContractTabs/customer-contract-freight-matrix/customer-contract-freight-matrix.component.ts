@@ -100,6 +100,11 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+    tRDYS: {
+      Title: "Transit Days",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     vFDT: {
       Title: "From Date",
       class: "matcolumncenter",
@@ -119,7 +124,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       iconName: "edit",
     },
   };
-  staticField = ["fROM", "tO", "rTYP", "cAP", "rT", "vFDT", "vEDT"];
+  staticField = ["fROM", "tO", "rTYP", "cAP", "rT", "tRDYS", "vFDT", "vEDT"];
 
   //#endregion
   protected _onDestroy = new Subject<void>();
@@ -442,6 +447,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
           ? this.FreightMatrixForm.value.capacity.value
           : "",
       rT: +this.FreightMatrixForm.value.Rate,
+      tRDYS: +this.FreightMatrixForm.value.TransitDays,
       vFDT: this.FreightMatrixForm.value.ValidFromDate,
       vEDT: this.FreightMatrixForm.value.ValidToDate,
       mODDT: new Date(),
@@ -525,6 +531,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         data.data?.capacity || ""
       );
       this.FreightMatrixForm.controls["Rate"].setValue(data.data?.Rate || "");
+      this.FreightMatrixForm.controls["TransitDays"].setValue(data.data?.TransitDays || "");
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }

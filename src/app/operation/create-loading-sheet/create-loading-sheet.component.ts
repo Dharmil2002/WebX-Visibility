@@ -21,6 +21,7 @@ import { firstValueFrom } from "rxjs";
 import { LoadingSheetService } from "src/app/Utility/module/operation/loadingSheet/loadingsheet-service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -113,8 +114,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   departFlag: boolean = false;
   alldocket: any;
   isUpdate: boolean = false;
-  vehicleSize: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
-  products: import("d:/new TMS/WebXTMS-Web/src/app/Models/drop-down/dropdown").AutoComplete[];
+  vehicleSize: AutoComplete[];
+  products: AutoComplete[];
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -156,14 +157,14 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.IntializeFormControl();
     this.generalMaster();
     // Auto-bind data
-  
+
   }
   async generalMaster() {
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
-    const product=["Road","Express"];
-    this.products = this.products.filter((x) => product.includes(x.name));  
-    setGeneralMasterData(this.jsonControlArray,this.products, "transMode");
-    const products=this.products.find((x)=>x.name=="Road");
+    const product = ["Road", "Express"];
+    this.products = this.products.filter((x) => product.includes(x.name));
+    setGeneralMasterData(this.jsonControlArray, this.products, "transMode");
+    const products = this.products.find((x) => x.name == "Road");
     this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
     this.autoBindData();
   }
@@ -304,10 +305,9 @@ export class CreateLoadingSheetComponent implements OnInit {
       // Update route details if shipment is not being updated
     }
     const [orgn, ...nextLocs] = this.tripData?.RouteandSchedule.split(":")[1].split("-");
-   
+
     const res = await this.loadingSheetService.getDocketsForLoadingSheet(nextLocs);
-    if (res.data.length > 0) 
-    {
+    if (res.data.length > 0) {
       this.shipmentData = res.data.map((x) => {
         x.pKGS = parseInt(x.pKGS || 0);
         x.aCTWT = parseFloat(x.aCTWT || 0);
@@ -332,7 +332,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       { field: 'leg', calculate: item => { return `${item.curLoc}-${item.destLoc}` } }
     ];
 
-    if(this.shipmentData && this.shipmentData.length > 0) {
+    if (this.shipmentData && this.shipmentData.length > 0) {
       let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn, true);
       let dockets = [];
       aggData = aggData.map((l: any) => {
@@ -341,7 +341,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         dockets.push(...docs);
         return l;
       });
-   
+
 
       //Here i user cnoteDetails varible to used in updateDocketDetails() method
       this._cnoteService.setShipingData(dockets);
@@ -388,7 +388,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       });
     }
     else {
-      let lsData=lsForm
+      let lsData = lsForm
       lsData['transMode'] = this.products.find((x) => x.value == lsForm.transMode)?.value ?? '';
       lsData['transModeName'] = this.products.find((x) => x.name == "Road")?.name ?? '';
       const tripData = await this.loadingSheetService.tripFieldMapping(lsData, shipment);

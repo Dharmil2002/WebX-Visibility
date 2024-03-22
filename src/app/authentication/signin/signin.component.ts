@@ -5,6 +5,13 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
 import { StorageService } from "src/app/core/service/storage.service";
+import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
+import { firstValueFrom } from "rxjs";
+import { sortArrayByFields } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { MenuData } from "src/app/layout/sidebar/sidebar.metadata";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
+import { mn } from "date-fns/locale";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Component({
   selector: "app-signin",
@@ -24,12 +31,16 @@ export class SigninComponent
   hide = true;
   Menulist: any;
   logingLogo: string;
+  DocCalledAs: DocCalledAsModel;
+
   constructor(
     private formBuilder: UntypedFormBuilder,
     private router: Router,
     private authService: AuthService,
     private sanitizer: DomSanitizer,
-    private storageService: StorageService
+    private storage: StorageService,
+    private menuService: MenuService,
+    private controlPanel: ControlPanelService
   ) {
     super();
   }
@@ -58,7 +69,7 @@ export class SigninComponent
     // );
   }
 
-  onSubmit() {
+  async onSubmit() {
     this.Islogin = true;
     this.submitted = true;
     this.error = "";
@@ -68,16 +79,26 @@ export class SigninComponent
       return;
     } else {
      
-      this.subs.sink = this.authService.login(this.loginForm.value).subscribe(
-        async (res) => {
-          if (res) {
+      try {
+            debugger;    
+      const res = await firstValueFrom(this.authService.login(this.loginForm.value));
+        if (res) {
             const token = this.authService.currentUserValue.tokens.access.token;
             if (token) {
             this.Islogin = true;
             const companyDetail=await this.authService.getCompanyDetail();
-            this.storageService.setItem("companyLogo",companyDetail.company_Image);
-            this.storageService.setItem("company_Code",companyDetail.company_Code);
-            this.storageService.setItem("timeZone",companyDetail?.timeZone||"");
+            this.storage.setItem("companyLogo",companyDetail.company_Image);
+            this.storage.setItem("company_Code",companyDetail.company_Code);
+            this.storage.setItem("timeZone",companyDetail?.timeZone||"");
+            //Need to be retrived from User Master
+            this.storage.setItem("Mode", "FTL");
+
+            await this.controlPanel.getDocumentNames(companyDetail.companyCode);
+            this.DocCalledAs = this.controlPanel.DocCalledAs;
+            await this.getMenuList();
+
+            this.setMenuToBind("FTL");
+
             this.router.navigate(["/dashboard/Index"]);
             }
             else{
@@ -88,13 +109,11 @@ export class SigninComponent
             this.error = "Something Is Wrong";
             this.Islogin = false;
           }
-        },
-        (error) => {
+        } catch (error) {
           this.error = "Invalid username or password. Please check your credentials and try again.";
-          this.Islogin = false;
-          this.submitted = false;
+            this.Islogin = false;
+            this.submitted = false;
         }
-      );
     }
     // 
     // this.submitted=true;
@@ -110,5 +129,49 @@ export class SigninComponent
     // this.router.navigate(["/dashboard/Index"]);
     // }
   }
+
+  setMenuToBind(mode) {
+    let menu = JSON.parse( this.storage.menu);
+    let menuItems = menu.filter((x) => !x.MenuGroup || x.MenuGroup == mode.toUpperCase() || x.MenuGroup == "" || x.MenuGroup == "ALL");
+
+    let menuData = this.menuService.buildHierarchy(menuItems);
+    let root = menuData.find((x) => x.MenuLevel == 1);
+    this.storage.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
+
+    const searchData = menu.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
+      const p = menu.find((y) => y.MenuId == x.ParentId);      
+      const d = {
+        title: `${p?.MenuName}/${x.MenuName}`,  
+        tag: x.MenuName.split(" "),
+        router: x.MenuLink
+      };
+
+      return d;
+    });
+
+    this.storage.setItem("searchData", JSON.stringify(searchData || []));
+  }
+  
+    //#region to get User Data
+    async getMenuList() {
+      var res: any = await firstValueFrom(this.menuService.getMenuData({
+        IsActive: true,
+        Type: { D$in: ["None", "Menu"] },
+      }));
+      if (res) {
+        let menuData = res.data.map((x) => {
+          x.MenuName = x.MenuName.replace(/{{Docket}}/g, this.DocCalledAs.Docket)
+                                  .replace(/{{THC}}/g, this.DocCalledAs.THC)
+                                  .replace(/{{MF}}/g, this.DocCalledAs.MF)
+                                  .replace(/{{LS}}/g, this.DocCalledAs.LS)
+                                  .replace(/{{DRS}}/g, this.DocCalledAs.DRS);
+          return x;
+        });
+        this.storage.setItem("menu", JSON.stringify(menuData));
+      }
+    }
+  
+    
+    //#endregion
 
 }

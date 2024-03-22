@@ -22,6 +22,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { VirtualLoginComponent } from "../virtual-login/virtual-login.component";
 import { StorageService } from "src/app/core/service/storage.service";
 import { SearchComponent } from "./search/search.component";
+import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
 const document: any = window.document;
 
 @Component({
@@ -66,6 +67,7 @@ export class HeaderComponent
     private authService: AuthService,
     private router: Router,
     private storage: StorageService,
+    private menuService: MenuService,
     public languageService: LanguageService,
     private breakpointObserver: BreakpointObserver
   ) {
@@ -77,7 +79,7 @@ export class HeaderComponent
           this.callSidemenuCollapse();
         }
       });
-    this.bindMenu();
+      this.bindMenu();
   }
 
   listLang = [
@@ -242,18 +244,43 @@ export class HeaderComponent
   }
 
   menuModeDetail(option: string) {
-    localStorage.setItem("Mode", option);
+    this.storage.setItem("Mode", option);
+
+    this.setMenuToBind(option);
+    
     //location.reload();
     this.router.navigate(['/']);
     this.isDropdownOpen = false; // Close the dropdown when an option is selected
     // Add any other logic you need here when a menu item is selected
   }
 
+  setMenuToBind(mode) {
+    let menu = JSON.parse( this.storage.menu);
+    let menuItems = menu.filter((x) => !x.MenuGroup || x.MenuGroup == mode.toUpperCase() || x.MenuGroup == "" || x.MenuGroup == "ALL");
+
+    let menuData = this.menuService.buildHierarchy(menuItems);
+    let root = menuData.find((x) => x.MenuLevel == 1);
+    this.storage.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
+
+    const searchData = menu.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
+      const p = menu.find((y) => y.MenuId == x.ParentId);      
+      const d = {
+        title: `${p?.MenuName}/${x.MenuName}`,  
+        tag: x.MenuName.split(" "),
+        router: x.MenuLink
+      };
+
+      return d;
+    });
+
+    this.storage.setItem("searchData", JSON.stringify(searchData || []));
+  }
+
   openSearchPopup(): void {
     const dialogRef = this.dialogModel.open(SearchComponent, {
       width: '500px',
       position: { top: '70px' },
-      data: { allOptions: this.allOptions, searchQuery: this.searchQuery }
+      data: { allOptions:  this.allOptions, searchQuery: this.searchQuery }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -300,11 +327,13 @@ export class HeaderComponent
   navigateToPage() {
     this.goBack('0');
   }
-  async bindMenu() {
-    this.searchData = await searchbilling(this.masterService);
+  async bindMenu() {    
+    this.searchData = JSON.parse(this.storage.getItem("searchData"));
+
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
   }
+
   goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }

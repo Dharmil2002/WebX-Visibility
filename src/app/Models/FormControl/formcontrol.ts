@@ -23,7 +23,7 @@ export class FormControls {
         {
             this.generatecontrol = FormControlcc.generatecontrol || false;
             this.disable = FormControlcc.disable || false;
-            this.visible = FormControlcc.visible || FormControlcc.generatecontrol || true;
+            this.visible = FormControlcc.visible || true;
         }
     }
 }

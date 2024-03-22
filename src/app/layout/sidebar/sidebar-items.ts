@@ -817,6 +817,15 @@ export const ROUTES: RouteInfo[] =
           "submenu": []
         },
         {
+          "path": "Reports/Cash-Bank-Book-Report",
+          "title": "Cash-Bank Book Report",
+          "moduleName": "Cash-Bank Book Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
           "path": "Reports/Dashboard",
           "title": "Dashboard",
           "moduleName": "Dashboard",

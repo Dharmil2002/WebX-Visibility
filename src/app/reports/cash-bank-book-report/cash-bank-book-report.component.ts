@@ -181,21 +181,21 @@ export class CashBankBookReportComponent implements OnInit {
     data.data['acCode'] = Array.isArray(this.cashbankbookForm.value.accountHandler)
       ? this.cashbankbookForm.value.accountHandler.map(x => x.value)
       : []
+    const Amt = this.cashbankbookForm.controls.Amtrange.value.split("-") || 0;
+    const startAmt = Amt[0];
+    const endAmt = Amt[1];
+    data.data['startAmt'] = startAmt;
+    data.data['endAmt'] = endAmt;
     // Retrieve data from service;
     const res = await this.cashbankbookReportService.getCashBankBook(data);
     // Format debit and credit fields
     const formattedResults = res.map((x) => {
-      x.debit = x.debit == 0 ? "0.00" : x.debit
-      x.credit = x.credit == 0 ? "0.00" : x.credit
+      x.debit = x.debit == 0 ? 0.00 : x.debit
+      x.credit = x.credit == 0 ? 0.00 : x.credit
       return x
     });
-
-    // const filteredRecordsWithoutKeys = formattedResults.map((record) => {
-    //   const { rNO, dT, month, ...rest } = record;
-    //   return rest;
-    // });
     // Filter unnecessary fields
-    const filteredRecordsWithoutKeys = formattedResults.map(({ rNO, dT, month, ...rest }) => rest);
+    const filteredRecordsWithoutKeys = formattedResults.map(({ rNO, dT, month, pMD, ...rest }) => rest);
     // Generate and download the CSV file
     exportAsExcelFile(filteredRecordsWithoutKeys, `Cash-Bank-Book_Report-${timeString}`, this.DetCSVHeader);
   }
@@ -274,15 +274,15 @@ export class CashBankBookReportComponent implements OnInit {
         const startAmt = Amt[0];
         const endAmt = Amt[1];
         //  Check if endAmt is less than startAmt
-        if (endAmt < startAmt) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid Amount Range",
-            text: "End Amount cannot be less than Start Amount",
-            showConfirmButton: true,
-          });
-          return; // Stop execution further
-        }
+        // if (endAmt < startAmt) {
+        //   Swal.fire({
+        //     icon: "error",
+        //     title: "Invalid Amount Range",
+        //     text: "End Amount cannot be less than Start Amount",
+        //     showConfirmButton: true,
+        //   });
+        //   return; // Stop execution further
+        // }
 
         const accountCode = Array.isArray(this.cashbankbookForm.value.accountHandler)
           ? this.cashbankbookForm.value.accountHandler.map(x => x.value)

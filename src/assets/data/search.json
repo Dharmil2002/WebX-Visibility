@@ -980,6 +980,13 @@
         "Container/Status/Add"
       ],
       "router": "Masters/Container/Status/Add"
+    },
+    {
+      "title": "ConsignmentFilter",
+      "tag": [
+        "Consignment Filter"
+      ],
+      "router": "Operation/ConsignmentQuery"
     }
   ]
 }

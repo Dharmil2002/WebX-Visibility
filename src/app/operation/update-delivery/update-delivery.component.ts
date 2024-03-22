@@ -171,6 +171,7 @@ export class UpdateDeliveryComponent implements OnInit {
         maxWidth:"232vw"
       });
       dialogref.afterClosed().subscribe((result) => {
+        
         if (result) {
           this.tableload=true;
            this.tableData.map((x)=>{
@@ -187,7 +188,7 @@ export class UpdateDeliveryComponent implements OnInit {
               x.codDodPaid=result?.codDodPaid||"0.00",
               x.dDateTime=moment.utc(result.DTTM).format("DD/MM/YYYY HH:MM:SS");
               x.deliveryPartial=result.deliveryPartial||"",
-              x.pod= result.pod||"",
+              x.pod= result.upload||"",
               x.ltReason=result.ltReason||"",
               x.reason=result?.deliveryPartial||result?.ltReason||"",
               x.startKm=result?.startKm||0,

@@ -63,8 +63,7 @@ export class FormComponent {
   //   this.formData=changes.formData.currentValue
   //   }
   constructor(private rootFormGroup: FormGroupDirective) {
-    this.form = this.rootFormGroup.control; // get parent form control
-
+    this.form = this.rootFormGroup.control; // get parent form control    
     // some data we want , for date fiels, that are required most of the time.
     this.minDate = new Date("01 Jan 1900");
     const today = new Date();

@@ -302,7 +302,7 @@ export class thcControl {
                     Validations: [
                         {
                             "name": "pattern",
-                            "pattern": "^[A-Za-z]{1,15}$",
+                            "pattern": "^[A-Za-z ]{1,15}$",
                             "message": "Please enter up to 15 alphabetical characters only"
                         }
                     ],
@@ -513,7 +513,7 @@ export class thcControl {
                     name: 'driverMno',
                     label: 'Driver Mobile No',
                     placeholder: '',
-                    type: 'number',
+                    type: 'mobile-number',
                     value: '',
                     Validations: [
                         {
@@ -1324,7 +1324,7 @@ export class thcControl {
         },
         {
             name: 'advPdAt',
-            label: 'Advance Paid At',
+            label: 'Advance Payable At',
             placeholder: '',
             type: 'dropdown',
             value: '',
@@ -1357,7 +1357,7 @@ export class thcControl {
         },
         {
             name: 'balAmtAt',
-            label: 'Balance Paid At',
+            label: 'Balance Payable At',
             placeholder: '',
             type: 'dropdown',
             value: '',

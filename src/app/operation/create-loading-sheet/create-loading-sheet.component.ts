@@ -30,7 +30,7 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 /* Business logic separation is pending in this code. 
 Currently, all flows are working together without proper separation.
  The separation will be implemented by Dhaval Patel.
-  So, no need to worry about it for now. */
+  So, no need to worry about it for now.*/
 export class CreateLoadingSheetComponent implements OnInit {
   tableload = true;
   addAndEditPath: string;
@@ -114,8 +114,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   departFlag: boolean = false;
   alldocket: any;
   isUpdate: boolean = false;
-  vehicleSize: AutoComplete[];
-  products: AutoComplete[];
+  vehicleSize:AutoComplete[];
+  products:AutoComplete[];
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,

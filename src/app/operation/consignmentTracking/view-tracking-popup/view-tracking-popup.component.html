@@ -1,0 +1,17 @@
+<div style="width: 100%;">
+    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+        <p class="p-0 m-0" style=" font-size: 22px;">
+            View Tracking
+        </p>
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div >
+        <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="TableData" (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'Tracking List'"
+        [staticField]="staticField">
+    </app-generic-table-v2>
+</div>
+
+</div>

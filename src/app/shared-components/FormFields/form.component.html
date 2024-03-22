@@ -49,7 +49,7 @@
             <form class="register-form " style="margin-right: 20px;" *ngIf="formData" [formGroup]="form">
               <div class="row">
                 <div *ngFor="let formItem of formData"  
-                    [ngStyle]="formItem.visible ? FieldStyle : {'display': 'none'}" 
+                    [ngStyle]="(formItem.visible ?? true) ? FieldStyle : {'display': 'none'}" 
                     [ngClass]="className">        
                     
                     <!--textbox (input) controls---------------------------------------------------------->

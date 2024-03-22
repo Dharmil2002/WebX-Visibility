@@ -2,7 +2,6 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 
-
 export class BaseControl {
     constructor(
         public generalService: GeneralService,
@@ -19,10 +18,18 @@ export class BaseControl {
         if(data != null && data.length > 0){
             data.map(f => {
             if(f.Caption) {
-                f.Caption = f.Caption.replace(/{{Docket}}/g, DocCalledAs.Docket);
+                f.Caption = f.Caption.replace(/{{Docket}}/g, DocCalledAs.Docket)
+                                    .replace(/{{THC}}/g, DocCalledAs.THC)
+                                    .replace(/{{MF}}/g, DocCalledAs.MF)
+                                    .replace(/{{LS}}/g, DocCalledAs.LS)
+                                    .replace(/{{DRS}}/g, DocCalledAs.DRS);
             }
             if(f["Place Holder"]) { 
-                f["Place Holder"] = f["Place Holder"].replace(/{{Docket}}/g, DocCalledAs.Docket); 
+                f["Place Holder"] = f["Place Holder"].replace(/{{Docket}}/g, DocCalledAs.Docket)
+                                                    .replace(/{{THC}}/g, DocCalledAs.THC)
+                                                    .replace(/{{MF}}/g, DocCalledAs.MF)
+                                                    .replace(/{{LS}}/g, DocCalledAs.LS)
+                                                    .replace(/{{DRS}}/g, DocCalledAs.DRS);
             }
             this.configureControl(f);
             });

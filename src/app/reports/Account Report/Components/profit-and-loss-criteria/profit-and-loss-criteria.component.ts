@@ -193,13 +193,15 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         const exceptionalItems = Result.MainData.find(item => item && item.SubCategoryWithoutIndex === 'Exceptional Items');
         const extraordinaryItems = Result.MainData.find(item => item && item.SubCategoryWithoutIndex === 'Extraordinary items');
 
-        const UpdatedData = Result.MainData.filter(item => {
+        let UpdatedData = Result.MainData.filter(item => {
           if (!item || typeof item.SubCategoryWithoutIndex === 'undefined') {
             return false;
           }
           return item.SubCategoryWithoutIndex !== 'Extraordinary items' && item.SubCategoryWithoutIndex !== 'Exceptional Items';
         });
 
+        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear);
+        UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear = (UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear - TotalOfexceptionalItemsAndextraordinaryItems).toFixed(2);
         // Push 3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]
         const income = UpdatedData.find(x => x.MainCategoryWithoutIndex === "INCOME")?.TotalAmountCurrentFinYear ?? 0;
         const expense = UpdatedData.find(x => x.MainCategoryWithoutIndex === "Expense")?.TotalAmountCurrentFinYear ?? 0;
@@ -209,10 +211,10 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         const TotalAmountLastFinYear = 0;
         UpdatedData.push({
           "MainCategory": "3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]",
-          "SubCategory": "-",
+          "SubCategory": "",
           "TotalAmountCurrentFinYear": TotalProfitAndLoss.toFixed(2),
           "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
-          "Notes": '-'
+          "Notes": ''
         });
         // Push 4. Exceptional Items 
         if (exceptionalItems) {
@@ -229,10 +231,10 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         if (exceptionalItems) {
           UpdatedData.push({
             "MainCategory": "5. Profit / [Loss] before Extraordinary items and Tax [3-4]		",
-            "SubCategory": "-",
+            "SubCategory": "",
             "TotalAmountCurrentFinYear": (TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear).toFixed(2),
             "TotalAmountLastFinYear": (TotalAmountLastFinYear - exceptionalItems.TotalAmountLastFinYear).toFixed(2),
-            "Notes": "-"
+            "Notes": ""
           });
         }
         // Push 6. Extraordinary items
@@ -250,10 +252,10 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         if (extraordinaryItems) {
           UpdatedData.push({
             "MainCategory": "7. Profit / (Loss) before tax [5 - 6]",
-            "SubCategory": "-",
+            "SubCategory": "",
             "TotalAmountCurrentFinYear": ((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear).toFixed(2),
             "TotalAmountLastFinYear": ((TotalAmountLastFinYear - exceptionalItems.TotalAmountLastFinYear) - extraordinaryItems.TotalAmountLastFinYear).toFixed(2),
-            "Notes": "-"
+            "Notes": ""
           });
         }
         if (Result.TaxDetails) {
@@ -290,7 +292,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
 
           UpdatedData.push({
             "MainCategory": "9. Profit And loss for the year [7-8]",
-            "SubCategory": "-",
+            "SubCategory": "",
             "TotalAmountCurrentFinYear": (((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear) - (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit)).toFixed(2),
             "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
             "Notes": ""

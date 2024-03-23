@@ -166,7 +166,7 @@ export class AccountReportService {
                               SubCategoryWithoutIndex: '',
                               TotalAmountCurrentFinYear: (entry.Details.reduce((acc, item) => acc + item.TotalCredit, 0) - entry.Details.reduce((acc, item) => acc + item.TotalDebit, 0)).toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
-                              Notes: '-',
+                              Notes: '',
                               AccountDetails: '',
                          };
                          entry.Details.sort((a, b) => {

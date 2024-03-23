@@ -336,7 +336,18 @@ export class InvoiceCollectionComponent implements OnInit {
       });
       return;
     }
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
 
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
+      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      if (AccountDetails != undefined) {
+        this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").setValue(AccountDetails)
+      } else {
+        this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
+        return;
+      }
+    }
     const data = await this.invoiceService.getCollectionJson(this.DebitVoucherTaxationPaymentDetailsForm.value, this.tableData, this.DebitVoucherTaxationPaymentSummaryForm.value);
     const res = await this.invoiceService.saveCollection(data);
     if (res) {
@@ -345,6 +356,7 @@ export class InvoiceCollectionComponent implements OnInit {
   }
   // Account Posting When  When Bill Has been Collected	
   async AccountPosting(data, mRNO) {
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
     this.snackBarUtilityService.commonToast(async () => {
       try {
         const TotalAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
@@ -397,11 +409,11 @@ export class InvoiceCollectionComponent implements OnInit {
         this.VoucherDataRequestModel.roundOff = +(TotalAmount - PaymentAmount);
         this.VoucherDataRequestModel.voucherCanceled = false
         this.VoucherDataRequestModel.transactionNumber = mRNO,
-          this.VoucherDataRequestModel.paymentMode = "";
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName = "";
-         this.VoucherDataRequestModel.accountCode = "";
-        this.VoucherDataRequestModel.date = "";
+          this.VoucherDataRequestModel.paymentMode = PaymentMode,
+          this.VoucherDataRequestModel.refNo = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("ChequeOrRefNo").value : "";
+        this.VoucherDataRequestModel.accountName = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANM : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.name;
+        this.VoucherDataRequestModel.accountCode = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANCD : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.value;
+        this.VoucherDataRequestModel.date = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Date").value : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         var VoucherlineitemList = this.GetVouchersLedgers(data, mRNO);
 
@@ -547,20 +559,9 @@ export class InvoiceCollectionComponent implements OnInit {
       const CashAccount = this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value;
       response.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", PaymentAmount, 0));
     }
-    if (PaymentMode == "Cheque") {
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
-      let Leadgerdata = {
-        name: "",
-        value: ""
-      }
-      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
-      if (AccountDetails != undefined) {
-        Leadgerdata = {
-          name: AccountDetails?.aCNM,
-          value: AccountDetails?.aCCD
-        }
-      }
-      response.push(createVoucher(Leadgerdata.value, Leadgerdata.name, "ASSET", PaymentAmount, 0));
+      response.push(createVoucher(BankDetails.value, BankDetails.name, "ASSET", PaymentAmount, 0));
     }
 
 

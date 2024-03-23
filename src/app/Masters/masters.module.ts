@@ -373,6 +373,7 @@ import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.
     DcrAllocationComponent,
     DcrManagementComponent,
     ActiveSeriesComponent
+
   ],
 
   providers: [

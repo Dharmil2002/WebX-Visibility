@@ -97,7 +97,6 @@ import { MenuAccessRightComponent } from './Admin/MenuAccessRight/menu-access-ri
 import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocation.component';
 import { DcrManagementComponent } from './dcr-series/dcr-management/dcr-management.component';
 
-
 const routes: Routes = [
   { path: "ViewPrint", component: ViewPrintComponent },
   { path: "TenantMaster/TenantMasterList", component: TenantListComponent },

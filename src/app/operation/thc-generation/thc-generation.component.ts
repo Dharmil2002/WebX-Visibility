@@ -1412,7 +1412,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*End*/
   /*below code is for the */
   GenerateTHCgenerationRequestBody() {
-    
+        
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
     const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
@@ -1907,6 +1907,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     
   /*Calucate Charges*/
   calucatedCharges() {
+    
     let total = 0;
     const vendorAdvance = this.thcTableForm.controls['vendorName'].value?.vendorAdvance||0;
     const dyanmicCal = this.chargeJsonControl.filter((x) => x.hasOwnProperty("id"));
@@ -1922,11 +1923,13 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       }
     }, 0);
     const totalAmt = ConvertToNumber(total, 2) + ConvertToNumber(this.chargeForm.controls["contAmt"].value, 2);
-    this.chargeForm.controls["balAmt"].setValue(totalAmt);
     this.chargeForm.controls['totAmt'].setValue(totalAmt);
     let percentageValue = (totalAmt * vendorAdvance) / 100;
     // Now set this calculated percentageValue to advAmt
     this.chargeForm.controls['advAmt'].setValue(percentageValue);
+    const advAmt=parseFloat(this.chargeForm.controls['advAmt']?.value||0);
+    this.chargeForm.controls["balAmt"].setValue(totalAmt-advAmt);
+
   }
   /*Below function is Called when the We click on Create THC*/
   async createThc() {

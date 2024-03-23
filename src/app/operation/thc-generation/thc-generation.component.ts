@@ -1424,6 +1424,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     this.tHCGenerationModel.branch = this.storage.branch;
     this.tHCGenerationModel.docType = "TH";
     this.tHCGenerationModel.finYear = financialYear;
+    this.tHCGenerationModel.timeZone=this.storage.timeZone
     //#endregion
     //#region THC Summary
     this.thcsummaryData.companyCode = this.storage.companyCode;
@@ -1506,7 +1507,6 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     });
     this.thcsummaryData.cHG = charges
     this.thcsummaryData.totAmt = ConvertToNumber(getValueOrDefault(this.chargeForm, "totAmt", "0.00"));
-
     //New Added By Harikesh
     this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value || "";
     this.thcsummaryData.tMODENM = this.products.find(item => item.value == this.thcTableForm.controls['transMode']?.value)?.name || "";

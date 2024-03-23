@@ -7,6 +7,7 @@ export class THCGenerationModel {
   mfdetailsList: MfdetailsList[]
   docType: string
   branch: string
+  timeZone:string
   finYear: string
 }
 

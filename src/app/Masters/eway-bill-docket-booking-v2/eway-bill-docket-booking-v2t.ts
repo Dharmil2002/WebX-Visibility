@@ -582,7 +582,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
      let docketDetails={}
      docketDetails=res?.docketsDetails||{};
      docketDetails['invoiceDetails']=res?.invoiceDetails||[];
-     
+     docketDetails['docketFin']=res?.docketFin||[];
     //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
       delete docketDetails['_id'];
@@ -597,7 +597,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         },
       };
       const resUpdate= await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
-      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails);
+      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails,res.docketFin);
       if(resUpdate){
         this.Addseries();
       }

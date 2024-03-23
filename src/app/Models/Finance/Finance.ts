@@ -49,6 +49,7 @@ export class VoucherDataRequestModel {
   paymentMode: string
   refNo: string
   accountName: string
+  accountCode: string
   date: string
   scanSupportingDocument: string
   mANNUM: string
@@ -115,6 +116,7 @@ export enum VoucherInstanceType {
   AdvancePayment = 8,
   BalancePayment = 9,
   DeliveryMR = 10,
+  VendorBillPayment = 11,
 }
 
 export const ledgerInfo = {

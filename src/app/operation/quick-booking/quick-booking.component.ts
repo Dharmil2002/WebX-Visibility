@@ -17,7 +17,8 @@ import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/ve
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
-import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Component({
   selector: "app-quick-booking",
@@ -45,6 +46,7 @@ export class QuickBookingComponent implements OnInit {
   vehicleStatus: boolean;
   /*it's breadScrums to used in html you must delcare here */
   userName = localStorage.getItem("Username");
+  DocCalledAs: DocCalledAsModel
   breadScrums = [
     {
       title: "CNote Quick Booking",
@@ -64,10 +66,18 @@ export class QuickBookingComponent implements OnInit {
     private locationService: LocationService,
     private storage: StorageService,
     private pinCodeService: PinCodeService,
-    private vehicleService:VehicleService
-  ) {
-    this.initializeFormControl();
-    
+    private vehicleService:VehicleService,
+    private controlPanel: ControlPanelService
+  ) {    
+    this.DocCalledAs = controlPanel.DocCalledAs;
+    this.breadScrums = [
+      {
+        title: `${this.DocCalledAs.Docket} Quick Booking`,
+        items: ["Quick Booking"],
+        active: `${this.DocCalledAs.Docket} Quick Booking`,
+      }
+    ]
+    this.initializeFormControl();    
   }
 
   ngOnInit(): void {

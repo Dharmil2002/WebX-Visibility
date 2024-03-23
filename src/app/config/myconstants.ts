@@ -15,7 +15,8 @@ export const Collections = {
     route_headers: 'route_schedules_headers',
     trip_Route_Schedule: 'trip_Route_Schedule',
     route_details: 'route_schedules_details',
-    thc_summary_ltl: 'thc_summary_ltl'
+    thc_summary_ltl: 'thc_summary_ltl',
+    Doccument_names: 'doc_names',
 };
 
 export const GenericActions = {

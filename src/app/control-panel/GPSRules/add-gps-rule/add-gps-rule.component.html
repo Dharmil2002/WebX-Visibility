@@ -1,0 +1,13 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+  <form [formGroup]="AddGpsRuleTableForm">
+    <app-form-webxpress
+      [form]="AddGpsRuleTableForm"
+      [formData]="jsonControlArray"
+      [showSaveAndCancelButton]="isShow"
+      [FormTitle]="'Add API Configuration'"
+      (callFunction)="functionCallHandler($event)"
+      (functionCallEmitter)="functionCallHandler($event)"
+    >
+    </app-form-webxpress>
+  </form>
+</app-common-wrapper-webxpress>

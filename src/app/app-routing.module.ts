@@ -59,6 +59,11 @@ const routes: Routes = [
         path: "ControlTower",
         loadChildren: () =>
           import("./control-tower/control-tower.module").then((m) => m.ControlTowerModule),
+      },
+      {
+        path: "ControlPanel",
+        loadChildren: () =>
+          import("./control-panel/control-panel.module").then((m) => m.ControlPanelModule),
       }
     ],
   },

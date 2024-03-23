@@ -21,7 +21,7 @@ import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { Vendbillpayment } from "src/app/Models/Finance/VendorPayment";
-import { VoucherDataRequestModel, VoucherRequestModel, } from "src/app/Models/Finance/Finance";
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo, } from "src/app/Models/Finance/Finance";
 import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
@@ -516,9 +516,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherRequestModel.branch = this.storage.branch;
         this.VoucherRequestModel.finYear = financialYear;
 
-        // this.VoucherDataRequestModel.companyCode = this.companyCode;
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.VendorBillPayment;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.VendorBillPayment];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transType = "VendorBillPayment";
         this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -538,7 +541,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherDataRequestModel.tcsRate = undefined;
         this.VoucherDataRequestModel.tcsAmount = undefined;
 
-        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+        this.VoucherDataRequestModel.GrossAmount = NetPayable;
         this.VoucherDataRequestModel.netPayable = NetPayable;
         this.VoucherDataRequestModel.roundOff = 0;
         this.VoucherDataRequestModel.voucherCanceled = false;
@@ -546,6 +549,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
         this.VoucherDataRequestModel.refNo = PaymenDetails?.ChequeOrRefNo || "";
         this.VoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
+        this.VoucherDataRequestModel.accountCode = PaymenDetails?.Bank?.value || "";
         this.VoucherDataRequestModel.date = PaymenDetails.Date;
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 
@@ -553,19 +557,23 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           return {
             companyCode: this.storage.companyCode,
             voucherNo: "",
-            transType: "VendorBillPayment",
+            transCode: VoucherInstanceType.VendorBillPayment,
+            transType: VoucherInstanceType[VoucherInstanceType.VendorBillPayment],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
             transDate: new Date(),
             finYear: financialYear,
             branch: this.storage.branch,
-            accCode: "VBP",
-            accName: "VBP",
+            accCode: ledgerInfo['Unbilled debtors'].LeadgerCode,
+            accName: ledgerInfo['Unbilled debtors'].LeadgerName,
+            accCategory: ledgerInfo['Unbilled debtors'].LeadgerCategory,
             debit: parseFloat(item.pendingAmount).toFixed(2),
             credit: 0,
             GSTRate: 0,
             GSTAmount: 0,
             Total: parseFloat(item.pendingAmount).toFixed(2),
             TDSApplicable: false,
-            narration: "",
+            narration: "when Vendor Bill Payment against Bill No " + item.billNo,
           };
         });
 
@@ -574,7 +582,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-          this.GenerateVendorBills(res?.data?.mainData?.ops[0].vNO, PaymenDetails)
+          this.GenerateVendorBills(res?.data?.mainData?.ops[0].vNO, PaymenDetails);
 
           Swal.fire({
             icon: "success",
@@ -613,6 +621,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       paymentAmount: this.TotalPendingAmount,
       branch: this.storage.branch,
       user: this.storage.userName,
+
       BillList: this.tableData.filter((x) => x.isSelected == true).map((item) => {
         return {
           billNo: item.billNo,

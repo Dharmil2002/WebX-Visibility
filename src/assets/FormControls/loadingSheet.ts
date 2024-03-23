@@ -48,6 +48,28 @@ export class loadingControl {
                 additionalData: {}
             },
             {
+                name: "transMode",
+                label: "Transport Mode",
+                placeholder: "Transport Mode",
+                type: "Staticdropdown",
+                value: [],
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable:false,
+                Validations: [{
+                    name: "required",
+                    message: "Transport Mode is required",
+                }],
+                functions: {
+                },
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "Basic"
+                },
+            },
+            {
                 name: "tripID",
                 label: "Trip ID",
                 placeholder: '',

@@ -77,15 +77,14 @@ export class VendorWiseOutService {
                                                   86400000,
                                              ],
                                         },
-                                   },
-                                   paidAmount: { D$subtract: ["$bALAMT", "$bALPBAMT"] }
+                                   }
                               },
                          },
                          {
                               D$lookup: {
                                    from: "vend_bill_payment",
                                    let: {
-                                        bILLNO: "$bILLNO"
+                                        docNo: "$docNo",
                                    },
                                    pipeline: [
                                         {
@@ -93,7 +92,7 @@ export class VendorWiseOutService {
                                                   D$and: [
                                                        {
                                                             D$expr: {
-                                                                 D$eq: ["$docNo", "$$bILLNO"],
+                                                                 D$eq: ["$bILLNO", "$$docNo"],
                                                             },
                                                        },
                                                        {
@@ -137,7 +136,7 @@ export class VendorWiseOutService {
                                              else: 0,
                                         },
                                    },
-                                   totalPayable: {
+                                   paidAmount: {
                                         D$sum: "$billpay.aMT",
                                    },
                               },
@@ -148,7 +147,7 @@ export class VendorWiseOutService {
                                         D$max: [
                                              0,
                                              {
-                                                  D$subtract: ["$totalPayable", "$bALAMT"],
+                                                  D$subtract: ["$bALAMT", "$paidAmount"],
                                              },
                                         ],
                                    },

@@ -36,6 +36,18 @@ export class StorageService {
     return this.getItem("companyLogo");
   }
 
+  get menu(): string {
+    return this.getItem("menu");
+  }
+
+  get menuToBind(): string {
+    return this.getItem("menuToBind");
+  }
+
+  get docCallAs(): string {
+    return this.getItem("docCallAs");
+  }
+
   setItem(key: string, value: any, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;
     this.storage.setItem(key, value);

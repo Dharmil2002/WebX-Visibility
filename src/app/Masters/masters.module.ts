@@ -176,6 +176,10 @@ import { AddContainerStatusComponent } from "./container-status-update/add-conta
 import { AddressService } from "../Utility/module/masters/Address/address.service";
 import { FreightChargeUploadComponent } from './Customer Contract/CustomerContractTabs/customer-contract-freight-matrix/freight-charge-upload/freight-charge-upload.component';
 import { MenuAccessRightComponent } from "./Admin/MenuAccessRight/menu-access-right/menu-access-right.component";
+import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocation.component';
+import { DcrManagementComponent } from "./dcr-series/dcr-management/dcr-management.component";
+import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.component";
+
 @NgModule({
   imports: [
     CommonModule,
@@ -366,6 +370,10 @@ import { MenuAccessRightComponent } from "./Admin/MenuAccessRight/menu-access-ri
     AddContainerStatusComponent,
     FreightChargeUploadComponent,
     MenuAccessRightComponent,
+    DcrAllocationComponent,
+    DcrManagementComponent,
+    ActiveSeriesComponent
+
   ],
 
   providers: [

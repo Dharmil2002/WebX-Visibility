@@ -231,7 +231,9 @@ export class ContraVoucherCreationComponent implements OnInit {
                 const ledgerData = {
                   name: accountDetails?.aCNM,
                   value: accountDetails?.aCCD,
-                  mRPNM: accountDetails?.mRPNM
+                  mRPNM: accountDetails?.mRPNM,
+                  bANM: accountDetails?.bANM,
+                  bANCD: accountDetails?.bANCD,
                 };
 
                 form.get(accountCodeControl).setValue(ledgerData);
@@ -252,6 +254,10 @@ export class ContraVoucherCreationComponent implements OnInit {
           }
 
 
+          const BankForm = form.get("FromPaymentMode").value === "Bank" ? form.get("FromAccountCode") : form.get("ToAccountCode");
+          const Bank = BankForm.value;
+          const RefField = form.get("FromPaymentMode").value === "Bank" ? form.get("FromChequeOrRefNo") : form.get("ToChequeOrRefNo");
+          const DateField = form.get("FromPaymentMode").value === "Bank" ? form.get("FromDate") : form.get("ToDate");
 
           const totalPaymentAmount = FromCreditAmount + FromDebitAmount;
 
@@ -301,10 +307,11 @@ export class ContraVoucherCreationComponent implements OnInit {
           this.VoucherDataRequestModel.roundOff = 0;
           this.VoucherDataRequestModel.voucherCanceled = false;
 
-          this.VoucherDataRequestModel.paymentMode = undefined;
-          this.VoucherDataRequestModel.refNo = undefined;
-          this.VoucherDataRequestModel.accountName = undefined;
-          this.VoucherDataRequestModel.date = undefined;
+          this.VoucherDataRequestModel.paymentMode = "Bank";
+          this.VoucherDataRequestModel.refNo = RefField.value;
+          this.VoucherDataRequestModel.accountName = Bank?.bANM;
+          this.VoucherDataRequestModel.accountCode = Bank?.bANCD;
+          this.VoucherDataRequestModel.date = DateField.value;
           this.VoucherDataRequestModel.scanSupportingDocument = "";
 
           this.VoucherDataRequestModel.mANNUM =

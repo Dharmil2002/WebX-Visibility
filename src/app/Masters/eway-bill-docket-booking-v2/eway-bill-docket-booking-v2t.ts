@@ -20,21 +20,17 @@ import { LocationService } from "src/app/Utility/module/masters/location/locatio
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear} from "src/app/Utility/date/date-utils";
-import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { MatStepper } from "@angular/material/stepper";
 import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 @Component({
   selector: "app-eway-example",
   templateUrl: "./eway-bill-docket-booking-v2.html",
 })
 export class EwayBillDocketBookingV2Component implements OnInit {
-  breadscrums = [
-    {
-      title: `${DocCalledAs.Docket} Generation`,
-      items: ["Masters"],
-      active: `${DocCalledAs.Docket} Generation`,
-    },
-  ];
+  DocCalledAs : DocCalledAsModel;
+  breadscrums = [];
   ewayBillTab: EwayBillControls; // a example of model , whose form we have to display
   docketControlArray: FormControls[]; // array to hold form controls
   consignorControlArray: FormControls[]; // array to hold form controls
@@ -218,9 +214,20 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private _NavigationService: NavigationService,
     private customerService:CustomerService,
     private storage:StorageService,
-    private addressService:AddressService
+    private addressService:AddressService,
+    private controlPanel:ControlPanelService
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
+    this.DocCalledAs = controlPanel.DocCalledAs;
+    
+    this.breadscrums = [
+      {
+        title: `${this.DocCalledAs.Docket} Generation`,
+        items: ["Masters"],
+        active: `${this.DocCalledAs.Docket} Generation`,
+      },
+    ];
+
     if (navigationState != null) {
       this.quickdocketDetaildata = navigationState.columnData || navigationState;
 
@@ -229,6 +236,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       } else {
         this.quickDocket = true;
       }
+      
     }
 
     this.ewayBillTab = new EwayBillControls(this.generalService);
@@ -284,7 +292,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
       // Set up data for tabs and contracts
       this.tabData = {
-        [`${DocCalledAs.Docket} Details`]: this.docketControlArray,
+        [`${this.DocCalledAs.Docket} Details`]: this.docketControlArray,
         "Consignor Details": this.consignorControlArray,
         "Consignee Details": this.consigneeControlArray,
         "Appointment Based Delivery": this.appointmentControlArray
@@ -574,7 +582,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
      let docketDetails={}
      docketDetails=res?.docketsDetails||{};
      docketDetails['invoiceDetails']=res?.invoiceDetails||[];
-     
+     docketDetails['docketFin']=res?.docketFin||[];
     //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
       delete docketDetails['_id'];
@@ -589,7 +597,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         },
       };
       const resUpdate= await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
-      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails);
+      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails,res.docketFin);
       if(resUpdate){
         this.Addseries();
       }
@@ -739,7 +747,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
 
   calculateInvoiceTotal() {
-    debugger
     calculateInvoiceTotalCommon(this.tableData, this.contractForm);
   }
   async checkInvoiceExist(data){

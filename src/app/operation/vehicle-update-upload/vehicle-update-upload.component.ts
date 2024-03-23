@@ -44,7 +44,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "Leg": "Leg",
   };
   centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'loaded', 'Pending'];
-
+  columnWidths = {
+    'Shipment': 'min-width:20%',
+    'Suffix': 'min-width:1%'
+  };
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -60,6 +63,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT"
   }
+
   shipmentStatus: string = 'Loaded';
   //declaring breadscrum
   breadscrums = [

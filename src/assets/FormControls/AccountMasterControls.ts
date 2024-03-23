@@ -251,10 +251,6 @@ export class AccountMasterControls {
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "Party Selection is required",
-          },
-          {
             name: "autocomplete",
           },
           {

@@ -1,30 +1,14 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <form [formGroup]="addDcrTableForm">
-        <app-form-webxpress [form]="addDcrTableForm" [formData]="jsonControlArray" [FormTitle]="'DCR Series'"
-            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
-        [disabled]="!addDcrTableForm.valid" (click)="addData()">
-        <mat-icon>add</mat-icon>
-        Add New
-    </button>
-    <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-        [staticField]="staticField" [Link]="linkArray" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-        (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-    </app-generic-table-v2>
-    <button type="button" [disabled]="!isLoad" mat-raised-button color="primary" (click)="saveData()">
-        <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
-        <ng-template #saveButton>Save</ng-template>
-    </button>&nbsp;&nbsp;
-    <button type="button" mat-raised-button (click)="cancel()">
-        Cancel
-    </button>
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+  <form [formGroup]="addDcrTableForm">
+    <app-form-webxpress [form]="addDcrTableForm" [formData]="jsonControlArray" [FormTitle]="'DCR Series'"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <button type="button" mat-raised-button color="primary" (click)="saveData()" [disabled]="!addDcrTableForm.valid">
+   Save
+  </button>&nbsp;&nbsp;
+  <button type="button" mat-raised-button color="primary" *ngIf="addDcrTableForm.valid" (click)="allocate()">
+    Allocate
+  </button>
 </app-common-wrapper-webxpress>

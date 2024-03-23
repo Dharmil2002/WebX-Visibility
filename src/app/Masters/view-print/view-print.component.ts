@@ -77,6 +77,7 @@ export class ViewPrintComponent implements OnInit {
   //   window.open(url, '', 'width=1000,height=800');
   // }
   async save() {
+    
     // Function to display error message
     const showError = (errorMessage) => {
       Swal.fire({

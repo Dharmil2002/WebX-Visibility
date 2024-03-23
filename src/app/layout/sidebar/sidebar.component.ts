@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { ROUTES } from './sidebar-items';
 import { AuthService } from 'src/app/core/service/auth.service';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { MenuData } from './sidebar.metadata';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,7 +20,7 @@ import { AuthService } from 'src/app/core/service/auth.service';
   styleUrls: ['./sidebar.component.sass']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-  public sidebarItems: any[];
+  public sidebarItems: MenuData[];
   level1Menu = '';
   level2Menu = '';
   level3Menu = '';
@@ -34,6 +36,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     public elementRef: ElementRef,
     private authService: AuthService,
+    private storageService: StorageService,
     private router: Router
   ) {
     this.routerObj = this.router.events.subscribe((event) => {
@@ -89,7 +92,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // if (this.authService.currentUserValue) {
     // }
-    this.sidebarItems = ROUTES.filter((sidebarItem) => sidebarItem);
+    this.sidebarItems = JSON.parse(this.storageService.menuToBind);
     this.userName = localStorage.getItem('UserName');
     this.initLeftSidebar();
     this.bodyTag = this.document.body;

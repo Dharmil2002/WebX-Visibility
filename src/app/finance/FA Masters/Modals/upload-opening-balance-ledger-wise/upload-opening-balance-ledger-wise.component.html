@@ -1,0 +1,10 @@
+<app-generic-bulk-upload [title]="'Upload Ledger Wise Opening Balance'" [downloadFunction]="Download"
+    [fileName]="'Ledger Wise Opening Balance Upload'" (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="fileUploadForm">
+            <div class="col">
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

@@ -94,6 +94,8 @@ import { ProductListComponent } from './shard-product/product-list/product-list.
 import { AddContainerStatusComponent } from './container-status-update/add-container-status/add-container-status.component';
 import { ContainerStatusListComponent } from './container-status-update/container-status-list/container-status-list.component';
 import { MenuAccessRightComponent } from './Admin/MenuAccessRight/menu-access-right/menu-access-right.component';
+import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocation.component';
+import { DcrManagementComponent } from './dcr-series/dcr-management/dcr-management.component';
 
 const routes: Routes = [
   { path: "ViewPrint", component: ViewPrintComponent },
@@ -206,7 +208,8 @@ const routes: Routes = [
   { path: "Container/Status/list", component: ContainerStatusListComponent },
   { path: "shardProduct/shardProductList", component: ProductListComponent },
 
-
+  { path: "AddDCR/DCRAllocation",component: DcrAllocationComponent},
+  {path: "DCRManagement", component: DcrManagementComponent}
 ];
 
 @NgModule({

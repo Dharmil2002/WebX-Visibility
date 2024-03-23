@@ -103,7 +103,7 @@ export class DepartureService {
         "oPSSTNM": "In Transit",
         "fINST": 0,
         "fINSTNM": "",
-        "cONTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
+        "cONTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
         "aDVPENAMT": 0,
         "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
         "cAP": {
@@ -116,15 +116,8 @@ export class DepartureService {
           "vOL": data?.VolumeUtilization,
           "vWT": 0
         },    
-        "cHG": {
-          "cTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
-          "oAMT": ConvertToNumber(data?.OtherChrge || 0, 2),
-          "lOADING": ConvertToNumber(data?.Loading || 0, 2),
-          "uNLOADING": ConvertToNumber(data?.Unloading || 0, 2),
-          "eNROUTE": ConvertToNumber(data?.Enroute || 0, 2),
-          "mISC": ConvertToNumber(data?.Misc || 0, 2),
-          "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2)
-        },
+        "cHG":data?.cHG||0,
+        "tOTAMT":ConvertToNumber(data?.TotalTripAmt||0,2),
         "aDV": {
           "aAMT": ConvertToNumber(data?.Advance || 0, 2),
           "pCASH": ConvertToNumber(data?.PaidByCash || 0, 2),
@@ -136,8 +129,6 @@ export class DepartureService {
         "bALAMT": data?.BalanceAmt || 0,
         "aDPAYAT": "",
         "bLPAYAT": "",
-        "tMODE": "",
-        "tMODENM": "",
         "iSBILLED": false,
         "bILLNO": "",
         "dRV": {

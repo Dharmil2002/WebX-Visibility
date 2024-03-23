@@ -8,6 +8,7 @@ import { GenericTableComponent } from 'src/app/shared-components/Generic Table/g
 import { UpdateShipmentDeliveryControl } from 'src/assets/FormControls/update.delivery';
 import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
 import Swal from 'sweetalert2';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 @Component({
   selector: 'app-update-delivery-modal',
   templateUrl: './update-delivery-modal.component.html'
@@ -107,18 +108,27 @@ export class UpdateDeliveryModalComponent implements OnInit {
     this.dialogRef.close()
   }
 
-   getFilePod(data) {
-    this.imageData =  this.objImageHandling.uploadFile(data.eventArgs, "pod", this.
+   async getFilePod(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "pod", this.
     deliveryForm, this.imageData, "Delivery", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
 
   }
+  openImageDialog(control) {
+    
+    let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
   async save() {
-    const pod = this.imageData?.Upload || ""
-    this.deliveryForm.controls['pod'].setValue(pod);
     this.deliveryForm.controls['deliveryPartial'].setValue(this.deliveryForm.controls['deliveryPartial'].value?.name||"");
     this.deliveryForm.controls['ltReason'].setValue(this.deliveryForm.controls['ltReason'].value?.name||"");
+    let deliveryData=this.deliveryForm.getRawValue();
+    deliveryData['upload']=this.imageData?.pod
     // await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);
-    this.dialogRef.close(this.deliveryForm.value)
+    this.dialogRef.close(deliveryData)
   }
 
 }

@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';
-import { ViewPrintComponent } from '../view-print/view-print.component';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { setFormControlValue } from 'src/app/Utility/commonFunction/setFormValue/setFormValue';

@@ -314,6 +314,10 @@ export class DocketService {
             "cnogst": data.cSGNGST,
             "cneAddress": data.cSGEADD,
             "cnegst": data.cSGEGST,
+            "inboundNumber": data.iNBNUM,
+            "shipment": data.sHIP,
+            "rfqNo": data.rFQNO,
+            "podDoNumber": data.pODONUM,
             "vehicleDetail": null,
             "invoiceDetails": [],
             "containerDetail": []
@@ -394,6 +398,10 @@ export class DocketService {
             gSTAMT: docket["gstAmount"],
             gSTCHAMT: docket["gstChargedAmount"],
             tOTAMT: docket["totalAmount"],
+            iNBNUM:docket["inboundNumber"],
+            shipment:docket["sHIP"],
+            rFQNO:docket["rfqNo"],
+            pODONUM:docket["podDoNumber"],
             mODBY: this.storage.userName,
             mODDT: new Date(),
             mODLOC: this.storage.branch,
@@ -432,6 +440,7 @@ export class DocketService {
             }
 
             // Insert new data
+            if(data){
             const insertRequest = {
                 companyCode: this.storage.companyCode,
                 collectionName: collectionName,
@@ -440,6 +449,7 @@ export class DocketService {
             const insertResponse = await firstValueFrom(this.operation.operationMongoPost('generic/create', insertRequest));
 
             return insertResponse.data;
+        }
         } catch (error) {
             // Handle errors (you can also log them or throw them depending on your error handling strategy)
             Swal.fire({

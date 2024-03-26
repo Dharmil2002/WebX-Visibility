@@ -1,0 +1,63 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
+    <div *ngIf="basicFormControls">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Basic Detail'"
+            [formData]="basicFormControls" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="customeControlArray">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm"
+            [formData]="customeControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="consignorControlArray">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignor Details'"
+            [formData]="consignorControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div  *ngIf="consigneeControlArray">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignee Details'"
+            [formData]="consigneeControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="invoiceControlArray">
+    <form [formGroup]="invoiceForm">
+        <app-form-webxpress [form]="invoiceForm" [FormTitle]="'Invoice Details'"
+            [formData]="invoiceControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="freightControlArray">
+    <form [formGroup]="freightForm">
+        <app-form-webxpress [form]="freightForm" [FormTitle]="'Freight Details'"
+            [formData]="freightControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div class="row paddingdiv">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+      <div class="example-button-row d-flex justify-content-start">
+        <!-- <div *ngIf="isSubmit">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </div> -->
+        <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
+        <button class="msr-3" mat-raised-button color="primary">Generate Docket</button>
+        <button class="msr-3" mat-raised-button color="primary">Back</button>
+      </div>
+    </div>
+  </div>
+</app-common-wrapper-webxpress>

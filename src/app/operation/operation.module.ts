@@ -75,6 +75,7 @@ import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-
 import { QueryPageComponent } from './consignmentTracking/query-page/query-page.component';
 import { TrackingPageComponent } from './consignmentTracking/tracking-page/tracking-page.component';
 import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-popup/view-tracking-popup.component';
+import { ConsignmentLTLEntryFormComponent } from './consignment-ltl-entry-form/consignment-ltl-entry-form.component';
 
 @NgModule({
   declarations: [
@@ -129,7 +130,8 @@ import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-
     UpdateDeliveryModalComponent,
     QueryPageComponent,
     TrackingPageComponent,
-    ViewTrackingPopupComponent    
+    ViewTrackingPopupComponent,
+    ConsignmentLTLEntryFormComponent    
   ],
   imports: [
     CommonModule,

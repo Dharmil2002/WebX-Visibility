@@ -37,6 +37,7 @@ import { ConsignmentFilterComponent } from "./consignment-filter/consignment-fil
 import { UpdateDeliveryComponent } from "./update-delivery/update-delivery.component";
 import { QueryPageComponent } from "./consignmentTracking/query-page/query-page.component";
 import { TrackingPageComponent } from "./consignmentTracking/tracking-page/tracking-page.component";
+import { ConsignmentLTLEntryFormComponent } from "./consignment-ltl-entry-form/consignment-ltl-entry-form.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -187,6 +188,10 @@ const routes: Routes = [
     path: "ConsignmentTracking",
     component: TrackingPageComponent
   },
+  {
+    path: "ConsignmentEntryLTL",
+    component: ConsignmentLTLEntryFormComponent
+  }
   
 ]
 

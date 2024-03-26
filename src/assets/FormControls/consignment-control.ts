@@ -162,6 +162,39 @@ export class ConsignmentControl {
           metaData: "Basic"
         },
       },
+
+      {
+        name: "destination",
+        label: "Destination",
+        placeholder: "Destination",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        functions: {
+          onModel: "getDestination",
+          onOptionSelect: 'setCity'
+      },
+        Validations: [
+          {
+            name: "required",
+            message: "Destination is required",
+          }, {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          }
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
+      },
       {
         name: "toCity",
         label: "To City",
@@ -190,34 +223,6 @@ export class ConsignmentControl {
           onModel: "getPincodeDetail",
           onOptionSelect: 'getLocBasedOnCity'
         },
-        additionalData: {
-          showNameAndValue: false,
-          metaData: "Basic"
-        },
-      },
-      {
-        name: "destination",
-        label: "Destination",
-        placeholder: "Destination",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Destination is required",
-          }, {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          }
-        ],
         additionalData: {
           showNameAndValue: false,
           metaData: "Basic"
@@ -386,20 +391,6 @@ export class ConsignmentControl {
           metaData: "Basic",
         },
       },
-      // {
-      //   name: 'rake_no', label: 'Rake', placeholder: 'Rake No', type: 'text',
-      //   value: docketDetail.rake_no, Validations: [], generatecontrol: true, disable: false,
-      //   additionalData: {
-      //     metaData: "Basic",
-      //   },
-      // },
-      // {
-      //   name: 'issuing_from', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
-      //   value: [], Validations: [], generatecontrol: true, disable: false,
-      //   additionalData: {
-      //     metaData: "Basic",
-      //   },
-      // },
       {
         name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No', type: "dropdown",
         value: docketDetail.vehicleNo,
@@ -417,17 +408,48 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'test',
-        label: '',
-        placeholder: '',
-        type: '',
-        value: '',
-        Validations: [],
-        generatecontrol: true, disable: false,
+        name: 'shipment', label: 'Shipment No', placeholder: 'Shipment No', type: 'text',
+        value: docketDetail.shipment, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
-          metaData: "Basic"
-        }
+          metaData: "Basic",
+        },
       },
+      {
+        name: 'inboundNumber', label: 'Inbound Number', placeholder: 'Inbound Number', type: 'text',
+        value: docketDetail.inboundNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'podDoNumber', label: 'PO/DO Number', placeholder: 'PO/DO Number', type: 'text',
+        value: docketDetail.inboundNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'rfqNo', label: 'RFQ No', placeholder: 'RFQ No', type: 'text',
+        value: docketDetail.rfqNo, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      // {
+      //   name: 'rake_no', label: 'Rake', placeholder: 'Rake No', type: 'text',
+      //   value: docketDetail.rake_no, Validations: [], generatecontrol: true, disable: false,
+      //   additionalData: {
+      //     metaData: "Basic",
+      //   },
+      // },
+      // {
+      //   name: 'issuing_from', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
+      //   value: [], Validations: [], generatecontrol: true, disable: false,
+      //   additionalData: {
+      //     metaData: "Basic",
+      //   },
+      // },
+
       {
         name: "cnbp",
         label: " Consignor same as Billing Party",
@@ -495,7 +517,6 @@ export class ConsignmentControl {
           metaData: "consignor",
         },
       },
-
       {
         name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
         value: docketDetail.ccontactNumber, Validations: [], generatecontrol: true, disable: false,
@@ -1161,7 +1182,6 @@ export class ConsignmentControl {
   getContainerDetail() {
     return this.containordetail
   }
-
   getInvoiceDetail() {
     return this.invoiceDetail
   }
@@ -1189,7 +1209,6 @@ export class FreightControl {
         },
         generatecontrol: true, disable: false
       },
-
       {
         name: 'freightRatetype', label: 'Freight Rate type', placeholder: 'Freight Rate type', type: 'Staticdropdown',
         value: [], Validations: [],
@@ -1225,8 +1244,17 @@ export class FreightControl {
         },
       },
       {
-        name: 'rcm', label: 'RCM', placeholder: 'RCM', type: 'text',
-        value: docketDetail.rcm, Validations: [], generatecontrol: true, disable: false
+        name: 'rcm', label: 'RCM', placeholder: 'RCM', type: 'Staticdropdown',
+        value: [
+        {
+          name: "Yes",
+          value: "Y"
+        },
+        {
+          name: "No",
+          value: "N"
+        }
+        ], Validations: [], generatecontrol: true, disable: false
       },
       {
         name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',

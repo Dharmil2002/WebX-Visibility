@@ -46,7 +46,7 @@ import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   breadscrums = [
     {
-      title: "Eway Bill",
+      title:"Consignment Entry",
       items: ["Operation"],
       active: "ConsignmentForm",
     },
@@ -65,7 +65,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   marketVendor: boolean;
   ccbp: boolean = true;
   addFlag: boolean = true;
-  ewayBill: boolean = true;
+  ewayBill: boolean = false;
   prqFlag: boolean;
   jsonControlArray: any;
   NonFreightjsonControlArray: any;
@@ -425,7 +425,20 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.filter.Filter(this.jsonControlArrayBasic, this.model.consignmentTableForm, prqDetail, this.model.prqNo, this.model.prqNoStatus);
     this.AddressDetails();
   }
-
+  /*get pincode detail*/
+  async getDestination() {
+    const destinationMapping = await this.locationService.locationFromApi(
+      {locCode: { 'D$regex': `^${this.model.consignmentTableForm.get("destination")?.value}`, 'D$options': 'i' } }
+    );
+    this.filter.Filter(this.model.allformControl, this.model.consignmentTableForm, destinationMapping, this.model.destination, this.model.destinationStatus);
+  }
+  /*end */
+ /*below code is for the set city value*/
+ setCity(){
+  const dest=this.model.consignmentTableForm.get("destination")?.value;
+  this.model.consignmentTableForm.get("toCity")?.setValue({name:dest.locCity,value:dest.locCity});
+ }
+ /*End*/
   /* below function was the call when */
   async getLocBasedOnCity() {
 
@@ -1256,7 +1269,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const bParty = this.model.consignmentTableForm.value.billingParty;
       const cSGE = this.model.consignmentTableForm.value.consigneeName;
       const cSGN = this.model.consignmentTableForm.value.consignorName;
-      docketDetails["deliveryAddress"] = this.model.consignmentTableForm.controls['deliveryAddress'].value?.name || this.model.consignmentTableForm.controls['pAddress'].value
+      docketDetails["deliveryAddress"] = this.model.consignmentTableForm.controls['deliveryAddress'].value?.name || this.model.consignmentTableForm.controls['deliveryAddress'].value
       docketDetails["deliveryAddressCode"] = this.model.consignmentTableForm.controls['deliveryAddress'].value?.value || "A8888";
       docketDetails["pAddress"] = this.model.consignmentTableForm.controls['pAddress'].value?.name || this.model.consignmentTableForm.controls['pAddress'].value
       docketDetails["pAddressCode"] = this.model.consignmentTableForm.controls['pAddress'].value?.value || "A8888";
@@ -1910,6 +1923,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //Contract Invoked Section
   InvockedContract() {
+    debugger
     const paymentBasesName = this.paymentBases.find(x => x.value == this.model.consignmentTableForm.value.payType).name;
     const TransMode = this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name;
     let containerCode;
@@ -1971,7 +1985,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           this.model.NonFreightTableForm = formGroupBuilder(this.fb, [
             this.NonFreightjsonControlArray
           ]);
-
+          this.model.consignmentTableForm.controls['tran_day'].setValue(res[0].FreightChargeMatrixDetails?.tRDYS||0);
           this.model.FreightTableForm.controls["freight_rate"].setValue(res[0].FreightChargeMatrixDetails?.rT);
           this.model.FreightTableForm.controls["freightRatetype"].setValue(res[0].FreightChargeMatrixDetails?.rTYPCD);
           this.calculateFreight();

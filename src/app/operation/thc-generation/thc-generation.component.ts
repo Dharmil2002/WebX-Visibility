@@ -286,7 +286,6 @@ export class ThcGenerationComponent implements OnInit {
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
-    private docketService: DocketService,
     private vehicleStatusService: VehicleStatusService,
     private vendorService: VendorService,
     private driverService: DriverService,

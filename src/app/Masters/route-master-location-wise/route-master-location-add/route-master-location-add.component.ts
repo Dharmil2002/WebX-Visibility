@@ -311,6 +311,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
 
   //#region 
   async save() {
+    debugger
     const lastRt = await this.getListId();    
     const lastCode = lastRt?.routeId || "R0000";
     if (this.isUpdate) {
@@ -377,7 +378,10 @@ export class RouteMasterLocationAddComponent implements OnInit {
       routeMasterLocWise['mODDT']= new Date();
       routeMasterLocWise['mODLOC']=this.storage.branch;
       routeMasterLocWise['mODBY']=this.storage.userName;
-      
+      delete routeMasterLocWise['_id'];
+      delete routeMasterLocWise['id'];
+      delete Body['_id'];
+      delete Body['id'];
       let req = {
         companyCode: this.companyCode,
         collectionName: "routeMasterLocWise",
@@ -388,7 +392,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
         companyCode: this.companyCode,
         collectionName: "trip_Route_Schedule",
         filter: { rUTCD:  this.routeMasterLocationForm.value.routeId },
-        update: Body,
+        update: routeMasterLocWise,
       };
       const res= await firstValueFrom(this.masterService.masterPut("generic/update", req));
       await firstValueFrom(this.masterService.masterPut("generic/update", reqloc));

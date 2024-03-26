@@ -99,4 +99,6 @@ export enum DcrAction {
   Allocation = 1,
   Assgine = 2,
   Reallocation = 4,
+  Split = 5,
+  Void = 6,
 }

@@ -57,6 +57,7 @@ export class DCRService {
     );
   }
   async userDetail(masterService) {
+
     return this.fetchData(
       masterService,
       "user_master",
@@ -72,6 +73,15 @@ export class DCRService {
       (x) => x.vendorType === 3,
       "vendorName",
       "vendorCode"
+    );
+  }
+  async LocationDetail(masterService) {
+    return this.fetchData(
+      masterService,
+      "location_detail",
+      () => true,
+      "locCode",
+      "locName"
     );
   }
 }

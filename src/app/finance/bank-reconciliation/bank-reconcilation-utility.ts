@@ -40,7 +40,8 @@ export async function getbankreconcilationList(masterService, request) {
                     "rNO": 1,
                     "aNM": 1,
                     "dT": 1,
-                    "nAR": 1
+                    "nAR": 1,
+                    "pRE": 1,
                 }
             },
         ]
@@ -61,8 +62,11 @@ export async function getbankreconcilationList(masterService, request) {
                 chequeNumber: x.rNO,
                 voucherDate: formatDate(x.tTDT, "dd-MMM-yy HH:mm a"),
                 party: ((x?.pCODE ?? "") && x?.pNAME ? x.pCODE + " - " + x.pNAME : x?.pCODE ?? x?.pNAME ?? ""),
-                amount: x.nNETP,
+                amount: (x.nNETP).toFixed(2),
                 VoucherType: x.vTYPNM,
+                VoucherFor: x.pRE,
+                ClearanceDate: formatDate(x.dT, "dd-MMM-yy HH:mm a"),
+                Comments: x.nAR,
                 OthersData: x
             })) ?? null;
         }

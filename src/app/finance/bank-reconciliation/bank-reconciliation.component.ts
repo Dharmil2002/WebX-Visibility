@@ -18,7 +18,8 @@ export class BankReconciliationComponent implements OnInit {
   BankTableForm: UntypedFormGroup;
   BankFormControls: bankReconciliationControl;
   jsonControlArray: any;
-  KPICountData: { count: any; title: string; class: string }[];
+  VendorKPIData: { count: any; title: string; class: string }[];
+  CustomerKPIData: { count: any; title: string; class: string }[];
   router: any;
 
   dynamicControls = {
@@ -27,18 +28,13 @@ export class BankReconciliationComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-    voucherNo: {
-      Title: "Voucher No",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    VoucherType: {
-      Title: "Voucher Type",
-      class: "matcolumncenter",
-      Style: "",
-    },
     chequeNumber: {
       Title: "Cheque Number",
+      class: "matcolumncenter",
+      Style: "",
+    },
+    voucherNo: {
+      Title: "Voucher No",
       class: "matcolumncenter",
       Style: "",
     },
@@ -57,7 +53,16 @@ export class BankReconciliationComponent implements OnInit {
       class: "matcolumncenter",
       Style: "",
     },
-
+    ClearanceDate: {
+      Title: "Clearance Date",
+      class: "matcolumncenter",
+      Style: "",
+    },
+    Comments: {
+      Title: "Comments",
+      class: "matcolumncenter",
+      Style: "",
+    },
   };
   EventButton = {
     functionName: "openFilterDialog",
@@ -65,9 +70,10 @@ export class BankReconciliationComponent implements OnInit {
     iconName: "filter_alt",
   };
 
-  tableData = [];
+  CustomerTableData = [];
+  VendorTableData = [];
   AccountsBanksList: any;
-  staticField = ["chequeNumber", "voucherNo", "voucherDate", "party", "amount", "VoucherType"];
+  staticField = ["chequeNumber", "voucherNo", "voucherDate", "party", "amount", "ClearanceDate", "Comments"];
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
@@ -121,19 +127,28 @@ export class BankReconciliationComponent implements OnInit {
   }
   async getVoucherList(Request) {
     await getbankreconcilationList(this.masterService, Request).then((data) => {
-      this.tableData = data;
+      this.CustomerTableData = data.filter(x => x.VoucherFor === 'Customer');
+      this.VendorTableData = data.filter(x => x.VoucherFor === 'Vendor');
       this.tableLoad = false;
-      const amount = calculateTotalField(this.tableData, 'amount');
-      this.KPICountData = [
+      const CustomerAmt = calculateTotalField(this.CustomerTableData, 'amount');
+      const VendorAmt = calculateTotalField(this.VendorTableData, 'amount');
+      this.CustomerKPIData = [
         {
-          count: amount,
+          count: CustomerAmt.toFixed(2),
+          title: "Total Transaction Amount",
+          class: `color-Grape-light`,
+        }
+      ]
+      this.VendorKPIData = [
+        {
+          count: VendorAmt.toFixed(2),
           title: "Total Transaction Amount",
           class: `color-Grape-light`,
         }
       ]
     });
 
-    // this.tableData = detail.map((x) => {
+    // this.CustomerTableData = detail.map((x) => {
     //   const formattedDate = this.datePipe.transform(x.tTDT, 'dd-MMM-yy HH:mm a');
     //   const createdDate = this.datePipe.transform(x.eNTDT, 'dd-MMM-yy HH:mm a');
     //   return {

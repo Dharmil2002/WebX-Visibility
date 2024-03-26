@@ -13,17 +13,22 @@
   </div>
 </form>
 
-<!-- <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-  [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-  [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-  [addAndEditPath]="addAndEditPath" [DisplayAddNewButton]="false" [boxData]="this.KPICountData">
-</app-generic-table-v2> -->
+
 <div class="paddingdiv">
   <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-    [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-    [menuItems]="menuItems" [FormTitle]="'Bank Reconcilations'" [staticField]="staticField"
+    [tableData]="CustomerTableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="menuItems" [FormTitle]="'Bank Reconcilations - Customer'" [staticField]="staticField"
     (dialogClosed)="reloadData()" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
-    [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" [boxData]="this.KPICountData"
+    [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" [boxData]="this.CustomerKPIData"
+    [EventButton]="">
+  </app-generic-table-v2>
+</div>
+<div class="paddingdiv">
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="VendorTableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="menuItems" [FormTitle]="'Bank Reconcilations - Vendor'" [staticField]="staticField"
+    (dialogClosed)="reloadData()" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
+    [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" [boxData]="this.VendorKPIData"
     [EventButton]="">
   </app-generic-table-v2>
 </div>

@@ -311,7 +311,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
 
   //#region 
   async save() {
-    debugger
+    
     const lastRt = await this.getListId();    
     const lastCode = lastRt?.routeId || "R0000";
     if (this.isUpdate) {

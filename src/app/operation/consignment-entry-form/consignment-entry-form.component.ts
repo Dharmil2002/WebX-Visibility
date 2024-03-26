@@ -34,7 +34,6 @@ import { CustomerService } from "src/app/Utility/module/masters/customer/custome
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
-import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 @Component({
@@ -92,6 +91,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   VoucherDataRequestModel = new VoucherDataRequestModel();
 
   InvoiceDetailsList: { count: any; title: string; class: string }[];
+  matrials: AutoComplete[];
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -158,7 +158,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
     // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
-
+    this.matrials = await this.generalService.getGeneralMasterData("PROD");
     // Find the form control with the name 'packaging_type'
     this.setGeneralMasterData(this.model.allformControl, this.packagingTypes, "packaging_type");
     this.setGeneralMasterData(this.model.allformControl, this.paymentBases, "payType");
@@ -173,7 +173,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setGeneralMasterData(this.jsonControlArray, rateType, "freightRatetype");
     const prodCode = this.products.find((x) => x.name == "Road")?.value || "";
     this.model.consignmentTableForm.controls["transMode"].setValue(prodCode);
-
+    this.filter.Filter(this.jsonInvoiceDetail,this.model.invoiceTableForm,this.matrials,"materialName",false);
   }
 
   setGeneralMasterData(controls: any[], data: AutoComplete[], controlName: string) {
@@ -825,7 +825,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
-        materialName: this.model.invoiceTableForm.value.materialName,
+        materialName: this.model.invoiceTableForm.value.materialName?.name||"",
         actualWeight: this.model.invoiceTableForm.value.actualWeight,
         chargedWeight: this.model.invoiceTableForm.value.chargedWeight,
         invoice: true,
@@ -938,6 +938,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   async autofillDropDown() {
 
     const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail);
+
     this.model.docketDetail.invoiceDetails = await this.docketService.getDocketByDocNO(docketDetails.docketNumber, "docket_invoices");
     this.model.docketDetail.containerDetail = await this.docketService.getDocketByDocNO(docketDetails.docketNumber, "docket_containers");
 
@@ -989,6 +990,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.consignmentTableForm.controls["cnegst"].setValue(docketDetails.cnegst);
     // Bind table data after form update.
     this.bindTableData();
+    this.model.FreightTableForm.controls["rcm"].setValue(docketDetails?.rcm||"");
   }
   async AddressDetails() {
     const billingParty = this.model.consignmentTableForm.controls["billingParty"]?.value.value || "";
@@ -1851,7 +1853,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       invoiceNo: "invoiceNo",
       invoiceAmount: "invoiceAmount",
       noofPkts: "noofPkts",
-      materialName: "materialName",
       actualWeight: "actualWeight",
       chargedWeight: "chargedWeight"
     };
@@ -1861,7 +1862,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       // Set form control value to the data property if available, otherwise set it to an empty string
       this.model.invoiceTableForm.controls[field].setValue(data.data?.[formFields[field]] || "");
     });
-
+    this.model.invoiceTableForm.controls['materialName'].setValue({name:data.data['materialName'],value:data.data['materialName']})
     // Filter the invoiceData to exclude the entry with the provided data ID
     this.model.invoiceData = this.model.invoiceData.filter(x => x.id !== data.data.id);
   }

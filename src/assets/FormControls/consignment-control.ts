@@ -902,7 +902,7 @@ export class ConsignmentControl {
         name: "materialName",
         label: "Material Name",
         placeholder: "Material Name",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",

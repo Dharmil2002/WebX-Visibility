@@ -11,7 +11,7 @@ export class ChequeRegister {
                 type: 'Staticdropdown',
                 value: [
                     { value: "ChequeDate", name: "Cheque  Date" },
-                    { value: "EntryDate ", name: "Entry Date " },
+                    { value: "EntryDate", name: "Entry Date " },
                 ],
                 Validations: [],
                 generatecontrol: true, disable: false

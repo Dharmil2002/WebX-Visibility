@@ -49,7 +49,7 @@ export class LocationService {
     }
   }
   //#region to get location data
-  async getLocationList(): Promise<any[] | null> {
+  async getLocationList(nameWithCode = false): Promise<any[] | null> {
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
@@ -65,7 +65,7 @@ export class LocationService {
       const filterMap = res?.data.filter((item) => item.activeFlag) // Filter based on the activeFlag property
         .map((location) => ({
           value: location.locCode,
-          name: location.locName,
+          name: nameWithCode ? `${location.locCode} : ${location.locName}`: location.locName,
         }));
 
       // Sort the mapped data in ascending order by location name

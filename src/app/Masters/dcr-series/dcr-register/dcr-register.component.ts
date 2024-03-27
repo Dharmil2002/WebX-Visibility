@@ -5,6 +5,7 @@ import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { timeString } from "src/app/Utility/date/date-utils";
 
 @Component({
   selector: "app-dcr-register",
@@ -22,6 +23,8 @@ export class DcrRegisterComponent implements OnInit {
   dCRRegisterjsonControlArray: any;
   dCRRegisterTableForm: UntypedFormGroup;
   DcrRegisterFormControl: DcrRegisterControl;
+  allColumnFilter:any;
+  filterColumn: boolean = true;
   submit = "Save";
   linkArray = [];
   tableData: any[];
@@ -39,352 +42,192 @@ export class DcrRegisterComponent implements OnInit {
 
   //#region headerForCsv
   headerForCsv = {
-    "jobNo": "Job No",
-    "jobDate": "Job Date",
-    "cNoteNumber": "Consignment Note Number",
-    "cNoteDate": "Consignment Note Date",
-    "containerNumber": "Container Number",
-    "billingParty": "Billing Party",
-    "bookingFrom": "Booking From",
-    "toCity": "Destination",
-    "pkgs": "Pkgs",
-    "weight": "Gross Weight",
-    "transportMode": "Job Mode",
-    "jobType": "Job Type",
-    "chargWt": "Charged Weight",
-    "DespatchQty": "Despatch Qty",
-    "despatchWt": "Despatched Weight",
-    "poNumber": "PO Number",
-    "totalChaAmt": "CHA Amount",
-    "voucherAmt": "Voucher Amount",
-    "vendorBillAmt": "Vendor Bill Amount",
-    "customerBillAmt": "Customer Bill Amount",
-    "status": "Current Status",
-    "noof20ftRf": "Swap Bodies",
-    "noof40ftRf": "40 ft Reefer",
-    "noof40ftHCR": "40 ft High Cube Reefer",
-    "noof20ftOT": "20 ft Open Top",
-    "noof40ftOT": "40 ft Open Top",
-    "noof20ftFR": "20 ft Flat Rack",
-    "noof40ftFR": "40 ft Flat Rack",
-    "noof20ftPf": "20 ft Platform",
-    "noof40ftPf": "40 ft Platform",
-    "noof20ftTk": "20 ft Tank",
-    "noof20ftSO": "20 ft Side Open",
-    "noof40ftSO": "40 ft Side Open",
-    "noof20ftI": "20 ft Insulated",
-    "noof20ftH": "20 ft Hardtop",
-    "noof40ftH": "40 ft Hardtop",
-    "noof20ftV": "20 ft Ventilated",
-    "noof20ftT": "20 ft Tunnel",
-    "noof40ftT": "40 ft Tunnel",
-    "noofBul": "Bulktainers",
-    "noofSB": "Swap Bodies",
-    "noof20ftStd": "20 ft Standard",
-    "noof40ftStd": "40 ft Standard",
-    "noof40ftHC": "40 ft High Cube",
-    "noof45ftHC": "45 ft High Cube",
-    "totalNoofcontainer": "Total No of Container",
+    "Book Code" : "bOOK",
+    "Series From" : "fROM",
+    "Series To" : "tO",
+    "Total pages" : "pAGES",
+    "PagesUsed" : "uSED",
+    "Pages Voided" : "vOID",
+    "Allotted to" : "aLOTONM",
+    "Customer name" : "aLOTONM",
+    "Branch code" : "aLOCD",
+    "Name of branch" : "aLONM",
+    "Assigned to" : "aSNTONM",
+    "Name" : "aSNNM",
+    "DCR Added date" : "eNTDT",
+    "Added by" : "eNTBY",
+    "Added at location" : "eNTLOC",
+    "Assignment date" : "eNTDT",
+    "Assigned by" : "mODBY",
+    "Assigned at location" : "mODLOC",
+    "Reallocated" : "rALLOCA",
+    "Reallocation date" : "rALLDT",
+    "Reallocated by" : "rALLBY",
+    "Reallocation location" : "rALLOC",
   }
   //#endregion
 
   //#region  columnHeader
     columnHeader = {
-      jobNo: {
-        Title: "Job No",
+      bOOK: {
+        Title: "Book Code",
         class: "matcolumncenter",
         Style: "min-width:200px",
       },
-      jobDate: {
-        Title: "Job Date",
+      fROM: {
+        Title: "Series From",
         class: "matcolumncenter",
         Style: "min-width:120px",
       },
-      cNoteNumber: {
-        Title: "Consignment Note Number",
+      tO: {
+        Title: "Series To",
         class: "matcolumncenter",
         Style: "min-width:350px",
       },
-      cNoteDate: {
-        Title: "Consignment Note Date",
+      pAGES: {
+        Title: "Total pages",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      containerNumber: {
-        Title: "Container Number",
+      uSED: {
+        Title: "PagesUsed",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      billingParty: {
-        Title: "Billing Party",
+      vOID: {
+        Title: "Pages Voided",
         class: "matcolumncenter",
         Style: "min-width:180px",
       },
-      bookingFrom: {
-        Title: "Booking From",
+      aLOTONM: {
+        Title: "Allotted to",
         class: "matcolumncenter",
         Style: "min-width:145px",
       },
-      toCity: {
-        Title: "Destination",
+      aCUSTNM: {
+        Title: "Customer name",
         class: "matcolumncenter",
         Style: "min-width:130px",
       },
-      pkgs: {
-        Title: "Pkgs",
+      aLOCD: {
+        Title: "Branch code",
         class: "matcolumncenter",
         Style: "max-width:70px",
       },
-      weight: {
-        Title: "Gross Weight",
+      aLONM: {
+        Title: "Name of branch",
         class: "matcolumncenter",
         Style: "max-width:70px",
       },
-      transportMode: {
-        Title: "Job Mode",
+      aSNTONM: {
+        Title: "Assigned to",
         class: "matcolumncenter",
         Style: "max-width:70px",
       },
-      noof20ftStd: {
-        Title: "No of 20 ft Standard",
+      aSNNM: {
+        Title: "Name",
         class: "matcolumncenter",
         Style: "min-width:150px",
       },
-      noof40ftStd: {
-        Title: "No of 40 ft Standard",
+      eNTDT: {
+        Title: "DCR Added date",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof40ftHC: {
-        Title: "No of 40 ft High Cube",
+      eNTBY: {
+        Title: "Added by",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof45ftHC: {
-        Title: "No of 45 ft High Cube",
+      eNTLOC: {
+        Title: "Added at location",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof20ftRf: {
-        Title: "No of 20 ft Reefer",
+      mODDT: {
+        Title: "Assignment date",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof40ftRf: {
-        Title: "No of 40 ft Reefer",
+      mODBY: {
+        Title: "Assigned by",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof40ftHCR: {
-        Title: "No of 40 ft High Cube Reefer",
+      mODLOC: {
+        Title: "Assigned at location",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof20ftOT: {
-        Title: "No of 20 ft Open Top",
+      rALLOCA: {
+        Title: "Reallocated",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof40ftOT: {
-        Title: "No of 40 ft Open Top",
+      rALLDT: {
+        Title: "Reallocation date",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof20ftFR: {
-        Title: "No of 20 ft Flat Rack",
+      rALLBY: {
+        Title: "Reallocated by",
         class: "matcolumncenter",
         Style: "max-width:150px",
       },
-      noof40ftFR: {
-        Title: "No of 40 ft Flat Rack",
+      rALLOC: {
+        Title: "Reallocation location",
         class: "matcolumncenter",
         Style: "max-width:150px",
-      },
-      noof20ftPf: {
-        Title: "No of 20 ft Platform",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof40ftPf: {
-        Title: "No of 40 ft Platform",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof20ftTk: {
-        Title: "No of 20 ft Tank",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof20ftSO: {
-        Title: "No of 20 ft Side Open",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof40ftSO: {
-        Title: "No of 40 ft Side Open",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof20ftI: {
-        Title: "No of 20 ft Insulated",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof20ftH: {
-        Title: "No of 20 ft Hardtop",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof40ftH: {
-        Title: "No of 40 ft Hardtop",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof20ftV: {
-        Title: "No of 20 ft Ventilated",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof20ftT: {
-        Title: "No of 20 ft Tunnel",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noof40ftT: {
-        Title: "No of 40 ft Tunnel",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noofBul: {
-        Title: "No of Bulktainers",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      noofSB: {
-        Title: "No of Swap Bodies",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      totalNoofcontainer: {
-        Title: "Total No of Container",
-        class: "matcolumncenter",
-        Style: "max-width:150px",
-      },
-      jobType: {
-        Title: "Job Type",
-        class: "matcolumncenter",
-        Style: "max-width:70px",
-      },
-      chargWt: {
-        Title: "Charged Weight",
-        class: "matcolumncenter",
-        Style: "max-width:100px",
-      },
-      DespatchQty: {
-        Title: "Despatch Qty",
-        class: "matcolumncenter",
-        Style: "max-width:100px",
-      },
-      despatchWt: {
-        Title: "Despatched Weight",
-        class: "matcolumncenter",
-        Style: "max-width:100px",
-      },
-      poNumber: {
-        Title: "PO Number",
-        class: "matcolumncenter",
-        Style: "max-width:90px",
-      },
-      totalChaAmt: {
-        Title: "CHA Amount",
-        class: "matcolumncenter",
-        Style: "max-width:90px",
-      },
-      voucherAmt: {
-        Title: "Voucher Amount",
-        class: "matcolumncenter",
-        Style: "max-width:90px",
-      },
-      vendorBillAmt: {
-        Title: "Vendor Bill Amount",
-        class: "matcolumncenter",
-        Style: "max-width:90px",
-      },
-      customerBillAmt: {
-        Title: "Customer Bill Amount",
-        class: "matcolumncenter",
-        Style: "max-width:90px",
-      },
-      status: {
-        Title: "Current Status",
-        class: "matcolumncenter",
-        Style: "min-width:100px",
       },
     };
     //#endregion
 
   //#region staticField
   staticField = [
-    "noof20ftRf",
-    "noof20ftStd",
-    "noof40ftStd",
-    "noof40ftHC",
-    "noof45ftHC",
-    "noof40ftRf",
-    "noof40ftHCR",
-    "noof20ftOT",
-    "noof40ftOT",
-    "noof20ftFR",
-    "noof40ftFR",
-    "noof20ftPf",
-    "noof40ftPf",
-    "noof20ftTk",
-    "noof20ftSO",
-    "noof40ftSO",
-    "noof20ftI",
-    "noof20ftH",
-    "noof40ftH",
-    "noof20ftV",
-    "noof20ftT",
-    "noof40ftT",
-    "noofBul",
-    "noofSB",
-    "jobNo",
-    "jobDate",
-    "cNoteNumber",
-    "cNoteDate",
-    "containerNumber",
-    "billingParty",
-    "bookingFrom",
-    "toCity",
-    "pkgs",
-    "weight",
-    "transportMode",
-    "totalNoofcontainer",
-    "jobType",
-    "chargWt",
-    "DespatchQty",
-    "despatchWt",
-    "poNumber",
-    "totalChaAmt",
-    "voucherAmt",
-    "vendorBillAmt",
-    "customerBillAmt",
-    "status",
+    "bOOK",
+    "fROM",
+    "tO",
+    "pAGES",
+    "uSED",
+    "vOID",
+    "aLOTONM",
+    "aLOTONM",
+    "aLOCD",
+    "aLONM",
+    "aSNTONM",
+    "aSNNM",
+    "eNTDT",
+    "eNTBY",
+    "eNTLOC",
+    "eNTDT",
+    "mODBY",
+    "mODLOC",
+    "rALLOCA",
+    "rALLDT",
+    "rALLBY",
+    "rALLOC",
   ];
   //#endregion
 
+  //#region CSV Header
+  CSVHeader = {
+
+  }
+  //#endregion
 
   constructor(
     private fb: UntypedFormBuilder,
     private dcrService: DCRService,
     private masterService: MasterService,
     private filter: FilterUtils
-  ) {}
+  ) {
+    this.allColumnFilter = this.columnHeader;
+  }
 
-  
+
   ngOnInit(): void {
     this.initializeFormControl();
+    this.csvFileName = `DCR-Register-Report-${timeString}.csv`;
   }
 
   //#region to Initialize form control
@@ -464,6 +307,12 @@ export class DcrRegisterComponent implements OnInit {
   //#endregion
 
   //#region  Save Details
-  save() {}
+  async save() {
+    
+
+    const startValue = new Date(this.dCRRegisterTableForm.controls.start.value);
+    const endValue = new Date(this.dCRRegisterTableForm.controls.end.value);
+    let data = await this.dcrService.getDCRregisterReportDetail(startValue,endValue);
+  }
   //#endregion
 }

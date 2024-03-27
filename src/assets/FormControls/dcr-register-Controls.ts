@@ -5,14 +5,20 @@ export class DcrRegisterControl {
   constructor() {
     this.DcrRegisterArray = [
       {
-        name: "date",
-        label: "Date",
-        placeholder: "select Date",
-        type: "date",
+        name: "start",
+        label: "SelectDateRange",
+        placeholder: "Select Date",
+        type: "daterangpicker",
         value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+            support: "end",
+        },
       },
       {
         name: "aCUST",
@@ -23,10 +29,6 @@ export class DcrRegisterControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Customer is required..",
-          },
           {
             name: "autocomplete",
           },
@@ -49,10 +51,6 @@ export class DcrRegisterControl {
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "Allocation location is required..",
-          },
-          {
             name: "autocomplete",
           },
           {
@@ -73,10 +71,6 @@ export class DcrRegisterControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Employee is required..",
-          },
           {
             name: "autocomplete",
           },
@@ -99,10 +93,6 @@ export class DcrRegisterControl {
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "Business Associate is required..",
-          },
-          {
             name: "autocomplete",
           },
           {
@@ -124,10 +114,6 @@ export class DcrRegisterControl {
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "Status is required..",
-          },
-          {
             name: "autocomplete",
           },
           {
@@ -147,12 +133,7 @@ export class DcrRegisterControl {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Book code Name is required",
-          },
-        ],
+        Validations: [],
       },
       {
         name: "sRICENO",
@@ -162,13 +143,28 @@ export class DcrRegisterControl {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Search by number Name is required",
-          },
-        ],
+        Validations: [],
       },
+      {
+        name: "end",
+        label: "",
+        placeholder: "Select Data Range",
+        type: "",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: [
+            {
+                name: "Select Data Range",
+            },
+            {
+                name: "required",
+                message: "StartDateRange is Required...!",
+            },
+        ],
+    },
     ];
   }
   getDcrRegisterFormControls() {

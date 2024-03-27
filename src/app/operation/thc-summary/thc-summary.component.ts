@@ -33,7 +33,7 @@ export class ThcSummaryComponent implements OnInit {
     createOn: {
       Title: "Created Date",
       class: "matcolumncenter",
-      Style: "min-width:125px",
+      Style: "min-width:140px",
     },
     docNo: {
       Title: "THC No",
@@ -47,15 +47,20 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
+    dEST:{
+      Title: "Destination",
+      class: "matcolumncenter",
+      Style: "min-width:130px",
+    },
     vEHNO: {
       Title: "Vehicle No",
       class: "matcolumncenter",
-      Style: "max-width:130px",
+      Style: "min-width:150px",
     },
     loadedKg: {
       Title: "Loaded Kg",
       class: "matcolumncenter",
-      Style: "min-width:100px",
+      Style: "min-width:130px",
     },
     statusAction: {
       Title: "Status",
@@ -72,6 +77,7 @@ export class ThcSummaryComponent implements OnInit {
   //#endregion
   staticField = [
     "rUTNM",
+    "dEST",
     "vEHNO",
     "loadedKg",
     "statusAction",

@@ -57,7 +57,8 @@ export class SigninComponent
     //Redirect if user already logged in
     if (this.authService.currentUserValue) {
       this.Islogin = true;
-      this.router.navigate(["/dashboard/Index"]);
+      //this.router.navigate(["/dashboard/Index"]);
+      this.router.navigate(["/dashboard/home"]);
     }
   }
   get f() {
@@ -79,27 +80,25 @@ export class SigninComponent
       return;
     } else {
      
-      try {
-            debugger;    
+      try {      
       const res = await firstValueFrom(this.authService.login(this.loginForm.value));
         if (res) {
             const token = this.authService.currentUserValue.tokens.access.token;
             if (token) {
-            this.Islogin = true;
-            const companyDetail=await this.authService.getCompanyDetail();
-            this.storage.setItem("companyLogo",companyDetail.company_Image);
-            this.storage.setItem("company_Code",companyDetail.company_Code);
-            this.storage.setItem("timeZone",companyDetail?.timeZone||"");
-            //Need to be retrived from User Master
-            this.storage.setItem("Mode", "FTL");
+              this.Islogin = true;
+              const companyDetail = await this.authService.getCompanyDetail();
+              await this.controlPanel.getDocumentNames(companyDetail.companyCode);
+              this.DocCalledAs = this.controlPanel.DocCalledAs;
+              await this.getMenuList();
 
-            await this.controlPanel.getDocumentNames(companyDetail.companyCode);
-            this.DocCalledAs = this.controlPanel.DocCalledAs;
-            await this.getMenuList();
-
-            this.setMenuToBind("FTL");
-
-            this.router.navigate(["/dashboard/Index"]);
+              this.storage.setItem("companyLogo",companyDetail.company_Image);
+              this.storage.setItem("company_Code",companyDetail.company_Code);
+              this.storage.setItem("timeZone",companyDetail?.timeZone||"");
+              //Need to be retrived from User Master
+              this.storage.setItem("Mode", "FTL");
+              
+              this.setMenuToBind("FTL");
+              this.router.navigate(["/dashboard/home"]);
             }
             else{
               this.Islogin = false;
@@ -138,7 +137,7 @@ export class SigninComponent
     let root = menuData.find((x) => x.MenuLevel == 1);
     this.storage.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
 
-    const searchData = menu.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
+    const searchData = menuItems.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
       const p = menu.find((y) => y.MenuId == x.ParentId);      
       const d = {
         title: `${p?.MenuName}/${x.MenuName}`,  

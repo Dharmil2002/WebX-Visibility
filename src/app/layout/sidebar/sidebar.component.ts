@@ -13,6 +13,8 @@ import { ROUTES } from './sidebar-items';
 import { AuthService } from 'src/app/core/service/auth.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { MenuData } from './sidebar.metadata';
+import { Subscription } from 'rxjs';
+import { MenuService } from 'src/app/core/service/menu-access/menu.serrvice';
 
 @Component({
   selector: 'app-sidebar',
@@ -31,12 +33,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
   headerHeight = 60;
   routerObj = null;
   userName: string;
+  storageSub: Subscription = new Subscription();
+  
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
     public elementRef: ElementRef,
     private authService: AuthService,
     private storageService: StorageService,
+    private menuService: MenuService,
     private router: Router
   ) {
     this.routerObj = this.router.events.subscribe((event) => {
@@ -93,12 +98,46 @@ export class SidebarComponent implements OnInit, OnDestroy {
     // if (this.authService.currentUserValue) {
     // }
     this.sidebarItems = JSON.parse(this.storageService.menuToBind);
+
+    this.storageSub = this.storageService.watchStorage("Mode").subscribe((data: string | null) => {            
+      if(data){
+        this.setMenuToBind(data);
+        this.sidebarItems = JSON.parse(this.storageService.menuToBind);
+      }
+    });
     this.userName = localStorage.getItem('UserName');
     this.initLeftSidebar();
     this.bodyTag = this.document.body;
   }
+
+  setMenuToBind(mode) {
+    if(mode) {
+      let menu = JSON.parse( this.storageService.menu);
+      let menuItems = menu.filter((x) => !x.MenuGroup || x.MenuGroup == mode.toUpperCase() || x.MenuGroup == "" || x.MenuGroup == "ALL");
+
+      let menuData = this.menuService.buildHierarchy(menuItems);
+      let root = menuData.find((x) => x.MenuLevel == 1);
+      this.storageService.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
+
+      const searchData = menuItems.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
+        const p = menu.find((y) => y.MenuId == x.ParentId);      
+        const d = {
+          title: `${p?.MenuName}/${x.MenuName}`,  
+          tag: x.MenuName.split(" "),
+          router: x.MenuLink
+        };
+
+        return d;
+      });
+
+      this.storageService.setItem("searchData", JSON.stringify(searchData || []));
+      this.storageService.setItem('searchResults', '[]');
+    }
+  }
+
   ngOnDestroy() {
     this.routerObj.unsubscribe();
+    this.storageSub.unsubscribe();
   }
   initLeftSidebar() {
     const _this = this;

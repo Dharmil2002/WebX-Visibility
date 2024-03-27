@@ -41,8 +41,7 @@ export class ControlPanelService {
     };
 
     const res = await firstValueFrom(this.http.post<any>(`${environment.APIBaseURL}${GenericActions.GetOne}`, req));
-    let config =  res.data;
-    debugger;
+    let config =  res.data;    
     this.docCalledAs = { ...this.docCalledAs, ...config };
     this.storage.setItem("DocNames", JSON.stringify(this.docCalledAs));
   }

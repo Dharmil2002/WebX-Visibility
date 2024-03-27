@@ -23,6 +23,7 @@ import { VirtualLoginComponent } from "../virtual-login/virtual-login.component"
 import { StorageService } from "src/app/core/service/storage.service";
 import { SearchComponent } from "./search/search.component";
 import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
+import { Subscription } from "rxjs";
 const document: any = window.document;
 
 @Component({
@@ -55,6 +56,8 @@ export class HeaderComponent
   searchData: any;
   logo: string;
   companyCd: string;
+  storageSub: Subscription = new Subscription();
+  storageSearch: Subscription = new Subscription();
 
   constructor(
     private dialogModel: MatDialog,
@@ -106,10 +109,30 @@ export class HeaderComponent
     this.config = this.configService.configData;
     this.logo = this.storage.companyLogo;
     this.companyCd = this.storage.companyCd;
-    this.Mode = localStorage.getItem("Import");
+    this.CurrentMode = this.storage.mode;
+    this.bindMenu();
+
+    this.storageSub = this.storage.watchStorage("Mode").subscribe((data: string | null) => {      
+      this.CurrentMode = data; 
+    });
+
+    this.storageSearch = this.storage.watchStorage("searchData").subscribe((data: string | null) => {     
+      this.bindMenu(data);
+    });
+    
     this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
     this.getCurrentFinancialYear();
   }
+
+  ngOnDestroy() {
+    if (this.storageSub) {
+      this.storageSub.unsubscribe();
+    }
+    if(this.storageSearch) {
+      this.storageSearch.unsubscribe();
+    }
+  }
+
   ngAfterViewInit() {
     // set theme on startup
     if (localStorage.getItem("theme")) {
@@ -158,7 +181,6 @@ export class HeaderComponent
       }
     }
   }
-
 
   callFullscreen() {
     if (
@@ -246,7 +268,7 @@ export class HeaderComponent
   menuModeDetail(option: string) {
     this.storage.setItem("Mode", option);
 
-    this.setMenuToBind(option);
+    //this.setMenuToBind(option);
     
     //location.reload();
     this.router.navigate(['/']);
@@ -325,13 +347,20 @@ export class HeaderComponent
     }
   }
   navigateToPage() {
-    this.goBack('0');
+    this.router.navigate(['/dashboard/home']);
   }
-  async bindMenu() {    
-    this.searchData = JSON.parse(this.storage.getItem("searchData"));
+
+  async bindMenu(data = null) {        
+    if(data) {
+      this.searchData = JSON.parse(data);
+    }
+    else {
+      this.searchData = JSON.parse(this.storage.getItem("searchData"));
+    }
 
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
+    console.log(searchDetail);
   }
 
   goBack(tabIndex: string): void {

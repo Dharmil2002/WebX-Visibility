@@ -47,6 +47,11 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
+    dEST:{
+      Title: "Destination",
+      class: "matcolumncenter",
+      Style: "max-width:130px",
+    },
     vEHNO: {
       Title: "Vehicle No",
       class: "matcolumncenter",
@@ -72,6 +77,7 @@ export class ThcSummaryComponent implements OnInit {
   //#endregion
   staticField = [
     "rUTNM",
+    "dEST",
     "vEHNO",
     "loadedKg",
     "statusAction",

@@ -258,4 +258,34 @@ export class ThcService {
     return res.data;
   }
   /*end*/
+  async getChargesV2(filter,productFilter){
+    const devShardReq={
+      companyCode: this.storage.companyCode,
+      filter:filter,
+      collectionName: "charges",
+    }
+    const devShardRes = await firstValueFrom(this.operationService.operationMongoPost("generic/get", devShardReq));
+    const TenantShardreq = {
+        companyCode: this.storage.companyCode,
+        collectionName: "product_charges_detail",
+        filter: productFilter
+      };
+      const TenantShardres = await firstValueFrom(this.operationService.operationPost("generic/get", TenantShardreq));
+      
+      if(TenantShardres.success){
+        const retArry=TenantShardres.data.map(r=>{
+            let ch= devShardRes.data.find(f=> f.cHCD===r.cHACD);
+            if(ch){
+                return r
+            }
+        }).filter(Boolean);;
+        //console.log(retArry)
+        return retArry
+      }
+    
+    //console.log('null');
+    return null
+  }
+  /*end*/
+
 }

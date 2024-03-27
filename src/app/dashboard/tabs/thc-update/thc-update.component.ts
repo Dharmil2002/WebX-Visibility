@@ -7,6 +7,8 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { ThcUpdate } from 'src/app/core/models/operations/thc/thc-update';
 import Swal from 'sweetalert2';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-thc-update',
@@ -34,7 +36,9 @@ export class ThcUpdateComponent implements OnInit {
     private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog,
-    private objImageHandling: ImageHandling
+    private objImageHandling: ImageHandling,
+    private docketService: DocketService,
+    private storage:StorageService
   ) {
     this.thcDetail = item;
   }
@@ -65,17 +69,21 @@ export class ThcUpdateComponent implements OnInit {
     this.jsonControlArray = thcFormControls.getThcFormControls();
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.thcTableForm.controls['shipment'].setValue(this.thcDetail.docNo);
+    this.getConsgineDetails();
   }
-
   cancel() {
     this.dialogRef.close()
   }
 
   async getFilePod(data) {
-
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
       thcTableForm, this.imageData, "ThcUpdate", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
-
+  }
+  async getConsgineDetails() {
+    const dockets=await this.docketService.getdocketOne({cID:this.storage.companyCode,docNo:this.thcDetail.docNo});
+    if(dockets){
+      this.thcTableForm.controls['receivedBy'].setValue(dockets.cSGNNM);
+    }
   }
   async save() {
     const pod = this.imageData?.Upload || ""

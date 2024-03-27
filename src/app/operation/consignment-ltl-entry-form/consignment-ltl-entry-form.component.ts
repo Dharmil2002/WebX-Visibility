@@ -7,6 +7,9 @@ import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommon
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
+import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
+import { PrqService } from 'src/app/Utility/module/operation/prq/prq.service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
@@ -31,6 +34,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   customeControlArray:FormControls[];
   invoiceControlArray:FormControls[];
   freightControlArray:FormControls[];
+  prqNoDetail: any[];
   paymentType:AutoComplete[];
   svcType: AutoComplete[];
   riskType: AutoComplete[];
@@ -39,13 +43,18 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   consignmentForm:UntypedFormGroup;
   invoiceForm:UntypedFormGroup;
   freightForm:UntypedFormGroup;
+  deliveryType: AutoComplete[];
+  wtUnits: AutoComplete[];
   constructor(
     private controlPanel:ControlPanelService,
+    private prqService: PrqService,
     private route: Router,
     private generalService: GeneralService,
     private storage:StorageService,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private pinCodeService: PinCodeService,
+    private locationService: LocationService
   ) { 
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -185,15 +194,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   async getDataFromGeneralMaster() {
     this.paymentType = await this.generalService.getGeneralMasterData("PAYTYP");
-    this.svcType = await this.generalService.getGeneralMasterData("BUSVERT");
     this.riskType = await this.generalService.getGeneralMasterData("RSKTYP");
     this.pkgsType = await this.generalService.getGeneralMasterData("PKGS");
+    this.deliveryType = await this.generalService.getGeneralMasterData("PKPDL");
+    this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
     this.tranType = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
     setGeneralMasterData(this.allFormControls, this.paymentType, "payType");
-    setGeneralMasterData(this.allFormControls, this.svcType, "svcType");
-    setGeneralMasterData(this.allFormControls, this.riskType, "rskty");
+    setGeneralMasterData(this.allFormControls, this.riskType, "risk");
     setGeneralMasterData(this.allFormControls, this.pkgsType, "pkgsType");
-    setGeneralMasterData(this.allFormControls, this.tranType, "tranType");
+    setGeneralMasterData(this.allFormControls, this.tranType, "transMode");
+    setGeneralMasterData(this.allFormControls, this.wtUnits, "weight_in");
+    setGeneralMasterData(this.allFormControls, this.deliveryType, "delivery_type");
   }
     //#region functionCallHandler
     functionCallHandler($event) {
@@ -213,4 +224,51 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
     //#endregion
+  /*below function is call when the prq based data we required*/
+  async getPrqDetail(){
+    const prqNo = await this.prqService.getPrqForBooking(
+      this.storage.branch,
+      this.consignmentForm.value.billingParty.value,
+      this.consignmentForm.get("payType")?.value
+    );
+    this.prqNoDetail = prqNo.allPrqDetail;
+
+    const prqDetail = prqNo.allPrqDetail.map((x) => ({
+      name: x.prqNo,
+      value: x.prqNo,
+    }));
+
+    this.filter.Filter(this.allFormControls, this.consignmentForm, prqDetail,"prqNo",false);
+  }
+  /*End*/
+  /*pincode based city*/
+  async getPincodeDetail(event) {
+    await this.pinCodeService.getCity(
+      this.consignmentForm,
+      this.allFormControls,
+      event.field.name,
+      false
+    );
+  }
+  /*end*/
+  /*below is function for the get Pincode Based on city*/
+  async getPinCodeBasedOnCity(event) {
+    const fieldName=event.field.name=="fromCity"?"fromPinCode":"toPinCode"
+    const pincode = await this.pinCodeService.pinCodeDetail({CT:event.eventArgs.option.value.value});
+    if(pincode.length>0){
+      const pincodeMapping=pincode.map((x) => ({
+        name: `${x.PIN}`,
+        value: `${x.PIN}`
+      }));
+      this.filter.Filter(this.allFormControls,this.consignmentForm,pincodeMapping,fieldName,false);
+    }
+  }
+  /*End*/
+  /*below function is for the get city based on pincode*/
+  async getDestinationBasedOnPincode(event) {
+     const locations = await this.locationService.locationFromApi({D$or:[{locPincode:parseInt(event.eventArgs.option.value.value),mappedPinCode:{D$in:[parseInt(event.eventArgs.option.value.value)]}}]});
+     this.filter.Filter(this.allFormControls,this.consignmentForm,locations,"destination",true);
+  }
+   
+  /*End*/
 }

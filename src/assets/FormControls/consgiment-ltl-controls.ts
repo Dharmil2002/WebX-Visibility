@@ -33,7 +33,7 @@ export class ConsignmentLtl extends BaseControl {
                 name: "docketDate",
                 label: `${DocCalledAs.Docket} Date`,
                 placeholder: `${DocCalledAs.Docket} Date`,
-                type: "date",
+                type: "datetimerpicker",
                 value: new Date(),
                 filterOptions: "",
                 autocomplete: "",
@@ -53,17 +53,29 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "prqNo",
-                label: "Prq NO",
+                label: "Prq No",
                 placeholder: "Prq NO",
-                type: "text",
+                type: "dropdown",
                 value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                      name: "invalidAutocompleteObject",
+                      message: "Choose proper value",
+                    },
+                    {
+                      name: "autocomplete",
+                    },
+                  ],
+                functions: {
+                    onOptionSelect: 'prqSelection'
+                  },
               additionalData:{
+                     showNameAndValue: false,
                     metaData: "Basic"
                 }
             },
@@ -154,7 +166,8 @@ export class ConsignmentLtl extends BaseControl {
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
                 functions: {
-                    onModel: "getCityDetail"
+                    onModel: "getPincodeDetail",
+                    onOptionSelect: 'getPinCodeBasedOnCity'
                 },
                 additionalData: {
                     metaData: "Basic",
@@ -181,7 +194,7 @@ export class ConsignmentLtl extends BaseControl {
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
                 functions: {
-                    onModel: "getCityDetail"
+                    
                 },
                 additionalData: {
                     metaData: "Basic",
@@ -208,7 +221,8 @@ export class ConsignmentLtl extends BaseControl {
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
                 functions: {
-                    onModel: "getCityDetail"
+                    onModel: "getPincodeDetail",
+                    onOptionSelect: 'getPinCodeBasedOnCity'
                 },
                 additionalData: {
                     metaData: "Basic",
@@ -235,7 +249,7 @@ export class ConsignmentLtl extends BaseControl {
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
                 functions: {
-                    onModel: "getCityDetail"
+                    onOptionSelect: 'getDestinationBasedOnPincode'
                 },
                 additionalData: {
                     metaData: "Basic",
@@ -290,7 +304,7 @@ export class ConsignmentLtl extends BaseControl {
                 },
             },
             {
-                name: 'packaging_type', label: 'Packaging Type', placeholder: 'Packaging Type', type: 'Staticdropdown',
+                name: 'pkgsType', label: 'Packaging Type', placeholder: 'Packaging Type', type: 'Staticdropdown',
                 value: [], Validations: [], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "Basic",
@@ -397,7 +411,7 @@ export class ConsignmentLtl extends BaseControl {
             },
 
             {
-                name: 'weight_in', label: 'Weight In', placeholder: 'Weight In', type: 'Staticdropdown',
+                name: 'weight_in', label: 'Size In', placeholder: 'Size In', type: 'Staticdropdown',
                 value: [], Validations: [], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "custom",
@@ -952,14 +966,16 @@ export class ConsignmentLtl extends BaseControl {
                 label: "RCM",
                 placeholder: "RCM",
                 type: "Staticdropdown",
-                value: [],
+                value: [
+                    {name:"Yes",value:"Y"},
+                    {name:"No",value:"N"}
+                ],
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
                 functions: {
-                    onSelection: "disableSize"
                 },
                 Validations: [],
                 additionalData: {

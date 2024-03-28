@@ -2248,18 +2248,15 @@ export class ThcGenerationComponent implements OnInit {
     if (UnloadingDate > arrivalDate) {
       let timeDiff = Math.abs(UnloadingDate.getTime() - arrivalDate.getTime());
       if (timeDiff > 0) {
-        timeDiff = Math.abs(timeDiff);
-        this.thcTableForm.controls['DetentionDays'].setValue(this.getTimeInWord(timeDiff));
+        // Convert milliseconds to days and use Math.floor() to get the difference in full days
+        const dayDifference = parseFloat((timeDiff / (1000 * 3600 * 24)).toFixed(2));///Math.floor(timeDiff / (1000 * 3600 * 24));
+        // Assuming getTimeInWord() is a method that formats the day difference into a string
+        this.thcTableForm.controls['DetentionDays'].setValue(dayDifference);
       }
     } else {
       this.thcTableForm.controls['DetentionDays'].setValue("");
     }
-  }
-  getTimeInWord(timeDiff) {
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${days}d ${hours}h ${minutes}m`;
+    
   }
   ArrivalDateChange() {
     const etaDate = new Date(this.thcTableForm.controls['etaDate'].value)
@@ -2268,11 +2265,9 @@ export class ThcGenerationComponent implements OnInit {
     if (arrivalDate < etaDate) {
       prefix = "- "
     }
-    let timeDiff = Math.abs(arrivalDate.getTime() - etaDate.getTime());
-    if (timeDiff > 0) {
-      timeDiff = Math.abs(timeDiff);
-      this.thcTableForm.controls['DelayDays'].setValue(`${prefix}${this.getTimeInWord(timeDiff)}`);
-    }
+    let timeDiff =arrivalDate.getTime() - etaDate.getTime();
+    let dayDifference = parseFloat((timeDiff / (1000 * 3600 * 24)).toFixed(2));;
+      this.thcTableForm.controls['DelayDays'].setValue(dayDifference);
     this.jsonControlArrivalArray.forEach((x) => {
       if (x.name == "UnloadingDate") {
         x.additionalData.minDate = arrivalDate;

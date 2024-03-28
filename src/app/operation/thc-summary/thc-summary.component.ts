@@ -131,16 +131,8 @@ export class ThcSummaryComponent implements OnInit {
       }
       return item;
     });
-
     // Sort the PRQ list by pickupDate in descending order
-    thcDetail.sort((a, b) => {
-      const dateA: Date | any = new Date(a.eNTDT);
-      const dateB: Date | any = new Date(b.eNTDT);
-      return dateB - dateA; // Sort in descending order
-    });
-
-    this.tableData = thcDetail;
-
+    this.tableData = thcDetail.reverse();
     this.tableLoad = false;
   }
 

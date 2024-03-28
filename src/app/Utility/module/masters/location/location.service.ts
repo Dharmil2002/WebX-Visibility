@@ -10,13 +10,13 @@ export class LocationService {
 
   // This async function retrieves location data from an API using the masterService.
   async locationFromApi(filter = {}) {
+    filter = { ...filter, activeFlag: true }; // Add activeFlag filter to the request
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "location_detail",
       filter: filter, // You can specify additional filters here if needed
     };
-
     try {
       // Make an asynchronous request to the API using masterMongoPost method
       const res = await firstValueFrom(this.masterService
@@ -54,7 +54,7 @@ export class LocationService {
     const reqBody = {
       companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
       collectionName: 'location_detail',
-      filter: {},
+      filter: {activeFlag: true },
     };
 
     try {

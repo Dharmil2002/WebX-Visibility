@@ -137,7 +137,7 @@ export class VendorWiseOutService {
                                         },
                                    },
                                    paidAmount: {
-                                        D$sum: "$billpay.aMT",
+                                        D$sum: "$billpay.aMT", 
                                    },
                               },
                          },

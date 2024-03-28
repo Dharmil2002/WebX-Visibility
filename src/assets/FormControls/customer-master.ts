@@ -48,8 +48,8 @@ export class customerControl {
           },
           {
             name: "pattern",
-            message: "Please Enter only text of length 3 to 30 alphanumeric",
-            pattern: "^[a-zA-Z 0-9]{3,200}$",
+            message: "Please Enter only text of length 3 to 30 characters",
+            pattern: "^[a-zA-Z ]{3,200}$",
           },
         ],
         functions: {

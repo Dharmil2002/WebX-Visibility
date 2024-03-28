@@ -95,6 +95,7 @@ export class Vendbillpayment {
   aMT?: number;
   mOD?: string;
   bANK?: string;
+  bANKCD?: string;
   tRNO?: string;
   tDT?: Date;
   // bY?: string;

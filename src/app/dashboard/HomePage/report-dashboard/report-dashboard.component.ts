@@ -25,6 +25,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
   ReportData: any;
   DashboardData: any;
   menuData: any = [];
+  selectedCategory: string = "All";
   // ReportData = ReportData;
 
   reportObs: Observable<any>;
@@ -44,6 +45,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     this.ReportData = res.reports;
     this.menuData = res.menu;
     this.DashboardData = res.dashboards;
+    this.selectedCategory = this.menuData[0].title;
 
     this.reportDataSource = new MatTableDataSource<any>(this.ReportData);
     this.dashboardDataSource = new MatTableDataSource<any>(this.DashboardData);
@@ -60,11 +62,12 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     let catData = menuItems.map((x) => {
       const d = {
           title: x.SubCategory,
-          category: x.Category || "Report"
+          category: x.Category || "Report",
+          selected :false
       };
       return d;
     });
-    catData.unshift({ title: "All", category: "All" });
+    catData.unshift({ title: "All", category: "All", selected: true});
     
     let reportData = menuItems.filter(f => f.Category == "Reports").map((x) => {
       const d = {
@@ -72,7 +75,9 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
           title: x.MenuName,
           category: x.SubCategory || "",
           type: x.Category,
-          route: x.MenuLink
+          route: x.MenuLink,
+          bgColor: x.Color || "#1a3e84",
+          color: x.TextColor || "#ffffff"
       };
       return d;
     });
@@ -123,9 +128,10 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
   onCategoryChange(event) {
     const selectedChip = event.value;
     this.Category = selectedChip;
+    this.filterReports(null);
   }
 
-  filterReports(subCategory) {
+  filterReports(event) {   
     // Determine the data source and data based on the category
     let dataSource, data;
     if (this.Category === "Reports") {
@@ -137,11 +143,11 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     }
   
     // Filter the data if necessary
-    if (subCategory === "All") {
+    if (this.selectedCategory === "All") {
       this[dataSource] = new MatTableDataSource<any>(data);
     } else {
       const filterPipe = new CustomFilterPipe();
-      const filteredData = filterPipe.transform(data, subCategory);
+      const filteredData = filterPipe.transform(data, this.selectedCategory);
       this[dataSource] = new MatTableDataSource<any>(filteredData);
     }
   

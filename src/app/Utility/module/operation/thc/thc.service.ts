@@ -287,5 +287,16 @@ export class ThcService {
     return null
   }
   /*end*/
+  /*below function is for the update a shipment*/
+  async updateVehicle(data,filter={}) {
+    const req={
+        companyCode:this.storage.companyCode,
+        collectionName:"vehicle_status",
+        filter:filter,
+        update:data
+    }
+    return await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update,req));
+  }
+  /*end*/
 
 }

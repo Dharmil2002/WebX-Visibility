@@ -114,69 +114,69 @@ export class ThcGenerationComponent implements OnInit {
     checkBoxRequired: {
       Title: "Select",
       class: "matcolumncenter",
-      Style: "max-width:8%",
+      Style: "min-width:80px",
     },
     bPARTYNM: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:15%",
+      Style: "min-width:150px",
     },
     docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "min-width:20%",
+      Style: "min-width:190px",
     },
     cNO: {
       Title: "Container Id",
       class: "matcolumnleft",
-      Style: "min-width:10%",
+      Style: "min-width:100px",
     },
     fCT: {
       Title: "From City",
       class: "matcolumncenter",
-      Style: "min-width:12%",
+      Style: "min-width:100px",
     },
     tCT: {
       Title: "To City",
       class: "matcolumncenter",
-      Style: "min-width:12%",
+      Style: "min-width:100px",
     },
     aCTWT: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
-      Style: "min-width:8%",
+      Style: "min-width:100px",
     },
     pKGS: {
       Title: "No of Packets ",
       class: "matcolumncenter",
-      Style: "max-width:10%",
+      Style: "min-width:100px",
     },
     pod: {
       Title: "Pod",
       type: 'view',
       functionName: 'view',
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:50px",
     },
     receiveBy: {
       Title: "Receive By",
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
     },
     arrivalTime: {
       Title: "Arrival Time",
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
     },
     remarks: {
       Title: "Remarks",
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
     },
     actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:80px",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
   };
   //#endregion
@@ -1905,7 +1905,7 @@ export class ThcGenerationComponent implements OnInit {
           invoiceList.push(invoice);
         }
       });
-      if (delCharge && delCharge.length > 0) {
+      if (!this.isView && delCharge && delCharge.length > 0) {
         delCharge.forEach((element, index) => {
           if (element) {
             const invoice: InvoiceModel = {
@@ -1989,6 +1989,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is Called when the We click on Create THC*/
   async createThc() {
+     
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
     const contAmt = parseInt(this.chargeForm.get('contAmt').value);
     if (this)
@@ -2117,7 +2118,9 @@ export class ThcGenerationComponent implements OnInit {
         "oPSST": 2,
         "oPSSTNM": "Arrived",
         "aRR": newARR,
-        "cHG": charges
+        "cHG": charges,
+        "bALAMT": this.chargeForm.get("balAmt").value,
+        "tOTAMT": this.chargeForm.get("totAmt").value
       };
 
       const data = this.thcTableForm.getRawValue();
@@ -2131,6 +2134,9 @@ export class ThcGenerationComponent implements OnInit {
         this.DocketsContainersWise,
         data.prqNo
       );
+      if (this.thcDetailGlobal.thcDetails.tMODENM == "Road") {
+        await this.thcService.updateVehicle({tripId:"",status:"Available",route:""},{vehNo:this.thcDetailGlobal.thcDetails.vEHNO})
+      }
       if (res) {
         Swal.fire({
           icon: "success",
@@ -2163,15 +2169,18 @@ export class ThcGenerationComponent implements OnInit {
           await this.consigmentUtility.updatePrq(prqData, update);
         }
       }
-
-      // for (const element of docket) {
-      //   await this.docketService.updateDocket(element.docketNumber, { "status": "1" });
-      // }
-
       const tHCGenerationRequst = await this.GenerateTHCgenerationRequestBody();
       if (tHCGenerationRequst) {
         const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
         // this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
+        if (this.thcsummaryData.tMODENM == "Road") {
+          await this.thcService.updateVehicle({
+            vehNo: this.thcsummaryData.vehicle,
+            tripId:resThc.data?.mainData?.ops[0].docNo,
+            status:"In Transit",
+            route:this.thcsummaryData.route,
+          },{vehNo:this.thcsummaryData.vehicle})
+        }
         if (resThc) {
           if (!isMarket && resThc.data?.mainData?.ops[0]?.docNo != "") {
             await Swal.fire({
@@ -2243,36 +2252,44 @@ export class ThcGenerationComponent implements OnInit {
   /*End*/
   /*Called when unloading date change and update detention and delay days*/
   UpdateDays() {
+    // Convert the input values to Dates
     const UnloadingDate = new Date(this.thcTableForm.controls['UnloadingDate'].value);
     const arrivalDate = new Date(this.thcTableForm.controls['ArrivalDate'].value);
-    if (UnloadingDate > arrivalDate) {
-      let timeDiff = Math.abs(UnloadingDate.getTime() - arrivalDate.getTime());
-      if (timeDiff > 0) {
-        // Convert milliseconds to days and use Math.floor() to get the difference in full days
-        const dayDifference = parseFloat((timeDiff / (1000 * 3600 * 24)).toFixed(2));///Math.floor(timeDiff / (1000 * 3600 * 24));
-        // Assuming getTimeInWord() is a method that formats the day difference into a string
-        this.thcTableForm.controls['DetentionDays'].setValue(dayDifference);
-      }
-    } else {
-      this.thcTableForm.controls['DetentionDays'].setValue("");
-    }
-    
+
+    const adjustedUnloadingDate = new Date(UnloadingDate.setHours(0, 0, 0, 0));
+    const adjustedArrivalDate = new Date(arrivalDate.setHours(0, 0, 0, 0));
+    // Explicitly use .getTime() to ensure the operation is between numbers
+    let timeDiff = adjustedUnloadingDate.getTime() - adjustedArrivalDate.getTime();
+
+    // Convert milliseconds to days
+    let dayDifference = Math.round(timeDiff / (1000 * 3600 * 24));
+
+    // Set the calculated day difference to the form control
+    this.thcTableForm.controls['DetentionDays'].setValue(dayDifference);
   }
+
   ArrivalDateChange() {
-    const etaDate = new Date(this.thcTableForm.controls['etaDate'].value)
-    const arrivalDate = new Date(this.thcTableForm.controls['ArrivalDate'].value);
-    let prefix = "";
-    if (arrivalDate < etaDate) {
-      prefix = "- "
-    }
-    let timeDiff =arrivalDate.getTime() - etaDate.getTime();
-    let dayDifference = parseFloat((timeDiff / (1000 * 3600 * 24)).toFixed(2));;
-      this.thcTableForm.controls['DelayDays'].setValue(dayDifference);
+    const etaDateValue = this.thcTableForm.controls['etaDate'].value;
+    const arrivalDateValue = this.thcTableForm.controls['ArrivalDate'].value;
+    // Convert to Date objects and reset time to 00:00:00
+    const etaDate = new Date(new Date(etaDateValue).setHours(0, 0, 0, 0));
+    const arrivalDate = new Date(new Date(arrivalDateValue).setHours(0, 0, 0, 0));
+    // Explicitly call getTime() for both dates and calculate the difference
+    let timeDiff = arrivalDate.getTime() - etaDate.getTime();
+    // Convert the difference to days
+    let dayDifference = timeDiff / (1000 * 3600 * 24);
+    // Round the result to avoid decimal places since we're dealing with whole days
+    dayDifference = Math.round(dayDifference);
+    // Set the calculated days to the form control
+    this.thcTableForm.controls['DelayDays'].setValue(dayDifference);
+    // Additional logic remains the same
     this.jsonControlArrivalArray.forEach((x) => {
       if (x.name == "UnloadingDate") {
         x.additionalData.minDate = arrivalDate;
       }
     });
+    this.thcTableForm.controls['UnloadingDate'].setValue("");
+    this.thcTableForm.controls['DetentionDays'].setValue(0);
   }
   /*below code is for the Calculate Delivery Charges*/
   getChangesOnDelCharge() {

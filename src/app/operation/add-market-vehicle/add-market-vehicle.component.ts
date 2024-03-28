@@ -84,7 +84,7 @@ export class AddMarketVehicleComponent implements OnInit {
       iNCEXP: this.marketVehicleTableForm.value.insuranceExpiryDate,
       fITDT: this.marketVehicleTableForm.value.fitnessValidityDate,
       eNGNO: this.marketVehicleTableForm.value.engineNo,
-      cHASNO: this.marketVehicleTableForm.value.chasisNo,
+      cHNO: this.marketVehicleTableForm.value.chasisNo,
       vEHCNAMT: this.marketVehicleTableForm.value.vehContAmt,
       mRGAMT: this.marketVehicleTableForm.value.margAMT,
       rDPRT: this.marketVehicleTableForm.value.roadPrt,
@@ -121,7 +121,7 @@ export class AddMarketVehicleComponent implements OnInit {
       this.marketVehicleTableForm.controls['roadPrt'].setValue(vehData.rDPRT ?? '');
       this.marketVehicleTableForm.controls['uploadSupport'].setValue(vehData.sDOC ?? '');
       this.marketVehicleTableForm.controls['engineNo'].setValue(vehData.eNGNO ?? '');
-      this.marketVehicleTableForm.controls['chasisNo'].setValue(vehData.cHASNO ?? '');
+      this.marketVehicleTableForm.controls['chasisNo'].setValue(vehData.cHNO ?? '');
       this.marketVehicleTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
       this.marketVehicleTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
       this.marketVehicleTableForm.controls['ETA'].setValue(vehData.ETA ?? '');

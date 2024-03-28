@@ -209,10 +209,6 @@ export class marketVehicleControls {
         name: 'chasisNo', label: "Chassis Number", placeholder: "Chassis Number", type: 'text',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Chassis Number is required",
-          },
         ],
       },
       {

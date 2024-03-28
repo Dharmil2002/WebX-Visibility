@@ -34,7 +34,7 @@ export class marketVehicleControls {
       },
       {
         name: "vehicleSize",
-        label: "Vehicle Size (MT)",
+        label: "Vehicle Capacity(MT)",
         placeholder: "Vehicle Size",
         type: "text",
         value: [
@@ -51,7 +51,7 @@ export class marketVehicleControls {
         Validations: [
           {
             name: "required",
-            message: "Vehicle Size is required",
+            message: "Vehicle Capacity is required",
           },
         ],
         functions: {
@@ -79,25 +79,30 @@ export class marketVehicleControls {
             name: "required",
             message: "Vendor Mobile is required",
           },
+          {
+            "name": "pattern",
+            "pattern": "^[0-9]{10}$",
+            "message": "Please enter a valid 10-digit mobile number"
+          }
         ],
       },
       {
-        name: 'driver', label: "Driver", placeholder: "Driver", type: 'text',
+        name: 'driver', label: "Driver Name", placeholder: "Driver Name", type: 'text',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
-            message: "Driver is required",
+            message: "Driver Name is required",
           },
         ],
       },
       {
-        name: 'driverPan', label: "Pan No", placeholder: "Pan No", type: 'government-id',
+        name: 'venPan', label: "Vendor Pan No", placeholder: "Vendor Pan No", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
-            message: "Pan No is required",
+            message: "Vendor Pan No is required",
           },
           {
             name: "pattern",
@@ -137,13 +142,18 @@ export class marketVehicleControls {
       },
       
       {
-        name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'mobile-number',
+        name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type:'mobile-number',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
             message: "Driver is required",
           },
+          {
+            "name": "pattern",
+            "pattern": "^[0-9]{10}$",
+            "message": "Please enter a valid 10-digit mobile number"
+          }
         ],
       },
       {
@@ -188,6 +198,58 @@ export class marketVehicleControls {
           minDate: new Date(), // Set the minimum date to the current date
           maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
         }
+      },
+      {
+        name: 'engineNo', label: "Engine Number", placeholder: "Engine Number", type: 'text',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+      },
+      {
+        name: 'chasisNo', label: "Chassis Number", placeholder: "Chassis Number", type: 'text',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Chassis Number is required",
+          },
+        ],
+      },
+      {
+        name: 'vehContAmt', label: "Vehicle Contract Amount", placeholder: "Vehicle Contract Amount", type: 'number',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+        functions:{
+          onChange: "calculateContractAmount"
+        }
+      },
+      {
+        name: 'margAMT', label: "Margin Amount", placeholder: "Margin Amount", type: 'text',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+        Validations: [
+        ],
+      },
+      {
+        name: 'roadPrt', label: "Road Permit", placeholder: "Road Permit", type: 'date',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+        additionalData: {
+          minDate: new Date()
+        },
+      },
+      {
+        name:'uploadSupport',label: "Upload Supporting",placeholder: "Road Permit", type: 'file',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        functions: {
+          onChange: 'getFilePod'
+      },
+      additionalData: {
+        isFileSelected: true
+      },
+        Validations: [
+        ],
       },
       {
         name: 'vendCode',

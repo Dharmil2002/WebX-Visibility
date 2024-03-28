@@ -288,9 +288,15 @@ export class CustomerMasterAddComponent implements OnInit {
               value: parseInt(x.PIN),
             };
           });
-
-          this.getPinCodeDropdown();
-          this.getGSTPinCodeDropdown();
+          if(!this.isUpdate){
+            this.getPinCodeDropdown();
+          }
+          else{
+            const SelectPincode = this.pinCodeData.find(
+              (x) => x.name == this.customerTable.PinCode
+            );
+            this.customerTableForm.controls["PinCode"].setValue(SelectPincode);
+          }
         }
       },
       error: (err) => { },
@@ -372,12 +378,7 @@ export class CustomerMasterAddComponent implements OnInit {
     );
   }
   getPinCodeDropdown() {
-    if (this.isUpdate) {
-      const SelectPincode = this.pinCodeData.find(
-        (x) => x.name == this.customerTable.PinCode
-      );
-      this.customerTableForm.controls["PinCode"].setValue(SelectPincode);
-    }
+
     const pincodeValue = this.customerTableForm.controls["PinCode"].value;
     // Check if pincodeValue is a valid number and has at least 3 characters
     if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
@@ -385,13 +386,11 @@ export class CustomerMasterAddComponent implements OnInit {
       const exactPincodeMatch = this.pinCodeData.find(
         (element) => element.name === pincodeValue
       );
-
       if (!exactPincodeMatch) {
         // Filter pincodeDet for partial matches
         const filteredPincodeDet = this.pinCodeData.filter((element) =>
           element.name.includes(pincodeValue)
         );
-
         if (filteredPincodeDet.length === 0) {
           // Show a popup indicating no data found for the given pincode
           Swal.fire({

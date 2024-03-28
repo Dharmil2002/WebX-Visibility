@@ -547,6 +547,9 @@ export class thcControl {
                             message: "Arrival Date is required",
                         },
                     ],
+                    functions: {
+                        onDate: "ArrivalDateChange"
+                    },
                     additionalData: {
                         minDate: maxDate,
                         metaData: "ArrivalInfo"
@@ -567,6 +570,7 @@ export class thcControl {
                     additionalData: {
                         metaData: "ArrivalInfo"
                     },
+                    
                     generatecontrol: true, disable: false
                 },
                 {
@@ -610,6 +614,77 @@ export class thcControl {
                         metaData: "ArrivalInfo"
                     },
                     generatecontrol: true, disable: true
+                },
+                {
+                    name: "UnloadingDate",
+                    label: 'Unloading Date',
+                    placeholder: 'Unloading Date',
+                    type: "datetimerpicker",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Unloading Date is required",
+                        },
+                    ],
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "ArrivalInfo"
+                    },
+                    functions: {
+                        onDate: "UpdateDays"
+                    },
+                },
+                {
+                    name: "DelayDays",
+                    label: 'Delay Days',
+                    placeholder: 'Delay Days',
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Delay Days is required",
+                        },
+                    ],
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "ArrivalInfo"
+                    },
+                    functions: {},
+                },
+                {
+                    name: "DetentionDays",
+                    label: 'Detention Days',
+                    placeholder: 'Detention Days',
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Detention Days is required",
+                        },
+                    ],
+                    functions: {},
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "ArrivalInfo"
+                    },
                 },
                 {
                     name: 'capacity',

@@ -119,7 +119,6 @@ export class THCAmountsDetailComponent implements OnInit {
     const AllCharges = await this.getChargesByOperator();
     const addCharges = AllCharges.filter((x) => x.ChargType == "+");
     const lessCharges = AllCharges.filter((x) => x.ChargType == "-");
-    console.log(lessCharges)
 
     if (addCharges && lessCharges) {
 

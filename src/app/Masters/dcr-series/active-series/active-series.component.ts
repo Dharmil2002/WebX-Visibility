@@ -23,29 +23,19 @@ export class ActiveSeriesComponent implements OnInit {
   filterColumn: boolean = true;
   allColumnFilter: any;
   toggleArray = []
-  menuItems = [
-    { label: "Allocation", route: "/Masters/AddDCR/DCRAllocation",status: "1" },
-    { label: "Assgine", route: "/Masters/AddDCR/DCRAllocation", status: "2" },
-    { label: "Reallocation", route: "/Masters/AddDCR/DCRAllocation", status: "2" },
-    { label: "Split", route: "/Masters/AddDCR/DCRAllocation", status: "2" },
-    { label: "Reallocation", route: "/Masters/AddDCR/DCRAllocation", status: "4" },
-    // { label: "Void", route: null, tabIndex: 1, status: "4" },
-
-    // { label: "Create THC", route: "/Operation/thc-create" },
-  ]
+  menuItems = []
   METADATA = {
     // checkBoxRequired: true,
     // selectAllorRenderedData: false,
     // noColumnSort: ["checkBoxRequired"],
   };
-  linkArray = [{ Row: "action", Path: "/Masters/AddDCR/DCRAllocation" }]; //
+  linkArray = [{ Row: "action", Path: "/Masters/AddDCR/DCRAllocation" }];
   csv: any[];
   addAndEditPath: string;
   companyCode = parseInt(localStorage.getItem("companyCode"));
   tableData: any;
   documentWithType: any[] = [];
   jsonUrl = '../../../assets/data/state-countryDropdown.json'
-  menuItemflag: boolean = true;
   columnHeader = {
     tYP: {
       Title: "Document",
@@ -101,11 +91,6 @@ export class ActiveSeriesComponent implements OnInit {
       Title: "Action",
       class: "matcolumncenter",
       Style: "",//max-width:90px
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:6%",
     },
   };
 

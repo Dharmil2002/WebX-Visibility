@@ -1,44 +1,29 @@
 <section class="content">
-    <div class="container-fluid">
-        <!-- <p>report-dashboard works!</p> -->
-        <div class="row p-2" style="height: 85vh;">
-            <!-- <div class="col-12 row header" style="height: 8%;">
-                <h2 class="col-6 p-0 px-2"
-                    style="display: flex; font-weight: bolder; align-items: center; letter-spacing: 1px; color: rgba(0, 0, 0,0.6);">
-                    Analytics
-                </h2>
-                <div class="col-6" style="display: flex; align-items: center; justify-content: end;">
-                    <label for="search-input" style="display: flex; align-items: center; justify-content: center;">
-                        <mat-icon
-                            style="width: 30px; height: 30px; font-size: 30px; color: rgba(0, 0, 0, 0.6); margin-right: 10px;">search</mat-icon>
-                    </label>
-                    <input placeholder="Search Report" type="text" [(ngModel)]="searchTerm" class="SearchInput"
-                        (ngModelChange)="SearchData($event)" aria-label="Search box">
-                </div>
-            </div> -->
+    <div class="container-fluid">        
+        <div class="row">            
             <div class="col-12 row dashboardbody" style="height: 100%; ">
-                <div class="col-3" style="border-right: 1px solid rgba(0, 0, 0,0.4); height: 100%;">
-                    <div class="row" style="height: 100%;">
-                        <div class="col-12" style="height: 10%; display: flex; align-items: center;">
-                            <h3 style="letter-spacing: 1px; color: rgba(0, 0, 0,0.6); font-size: 20px;">
-                                Category
-                            </h3>
+                <div class="col-3">
+                    <div class="row">                        
+                        <div class="col-12" style="display: flex; height: 80px; align-items: center;">
+                            <!-- <mat-chip-list aria-label="Category" (optionSelected)="onCategoryChange($event)">                            
+                                <mat-chip color="primary" selected>Reports</mat-chip>
+                                <mat-chip color="primary">Dashboards</mat-chip>
+                            </mat-chip-list> -->
+                            <mat-button-toggle-group name="fontStyle" aria-label="Font Style" (change)="onCategoryChange($event)">
+                                <mat-button-toggle value="Reports" checked>Reports</mat-button-toggle>
+                                <mat-button-toggle value="Dashboards" color="primary">Dashboards</mat-button-toggle>
+                            </mat-button-toggle-group>
                         </div>
-                        <div class="col-12"
-                            style="height: 90%;margin-top: 15px; display: flex; flex-direction: column; justify-content: start;">
-                            <div class="menuCard" *ngFor="let item of menuData">{{item.title}}</div>
+                        <div class="col-12" style="display: flex; flex-direction: column; justify-content: start;">
+                            <label class="menuCard" *ngFor="let item of menuData" (click)="filterReports(item.title)">{{item.title}}</label>
                         </div>
                     </div>
                 </div>
-                <div class="col-9" style="height: 100%; ">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 0, 0,0.4); height: 10%;">
-                        <h3
-                            style="font-size: 20px; letter-spacing: 1px; padding: 0px 20px;  color: rgba(0, 0, 0,0.6); ">
-                            Reports Analytics</h3>
-                        <mat-paginator class="paginator" #paginator [pageSizeOptions]="[12]"
-                            [hidePageSize]="true"></mat-paginator>
-
+                <div *ngIf="Category == 'Reports'" class="col-9" style="border-left: 1px solid rgba(0, 0, 0,0.4); min-height: 90vh;">
+                    <div style="height: 80px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 0, 0,0.4);">
+                        <h3 style="font-size: 20px; letter-spacing: 1px; padding: 0px 20px;  color: rgba(0, 0, 0,0.6); ">
+                            Reports 
+                        </h3>                        
                         <div style="display: flex; align-items: center; justify-content: end;">
                             <label for="search-input"
                                 style="display: flex; align-items: center; justify-content: center;">
@@ -46,27 +31,52 @@
                                     style="width: 30px; height: 30px; font-size: 30px; color: rgba(0, 0, 0, 0.6); margin-right: 10px;">search</mat-icon>
                             </label>
                             <input placeholder="Search Report" type="text" [(ngModel)]="searchTerm" class="SearchInput"
-                                (ngModelChange)="SearchData($event)" aria-label="Search box">
+                                (ngModelChange)="SearchReports($event)" aria-label="Search box">
                         </div>
                     </div>
-                    <div style="margin: 10px; height: 90%;">
+                    <div class="mt-2">
                         <div class="CardBox">
-                            <div class="reportCard" *ngFor="let item of obs | async">
+                            <div class="reportCard" *ngFor="let item of reportObs | async">
                                 <div class="taxtCard" (click)="OpenReports(item)">
-                                    <div class="textbox">
+                                    <div class="textbox" >
                                         <div class="p-0 m-0 ">
-                                            <mat-icon class="p-0 m-0 "
-                                                style="font-size: 27px; width: 27px; height: 27px;">{{item.iconName}}</mat-icon>
+                                            <mat-icon class="p-0 m-0" style="font-size: 25px; width: 25px; height: 25px;">{{item.iconName}}</mat-icon>
                                         </div>
-                                        <p class="p-0 m-0 px-2" style="font-weight: bold; font-size: 15px;">
-                                            {{item.title}}
-                                        </p>
+                                        <p class="p-0 m-0 px-2 fontbold"> {{item.title}} </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <div *ngIf="Category == 'Dashboards'" class="col-9" style="border-left: 1px solid rgba(0, 0, 0,0.4); min-height: 90vh;">
+                    <div style="height: 80px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 0, 0,0.4);">
+                        <h3 style="font-size: 20px; letter-spacing: 1px; padding: 0px 20px;  color: rgba(0, 0, 0,0.6); ">
+                            Dashboards 
+                        </h3>                        
+                        <div style="display: flex; align-items: center; justify-content: end;">
+                            <label for="search-input"
+                                style="display: flex; align-items: center; justify-content: center;">
+                                <mat-icon
+                                    style="width: 30px; height: 30px; font-size: 30px; color: rgba(0, 0, 0, 0.6); margin-right: 10px;">search</mat-icon>
+                            </label>
+                            <input placeholder="Search Dashboard" type="text" [(ngModel)]="searchTerm" class="SearchInput"
+                                (ngModelChange)="SearchDashboards($event)" aria-label="Search box">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="CardBox" style="margin-top: 25px; text-align: center; align-items: center;">
+                            <div *ngFor="let item of dashboardObs | async" class="pointer col-lg-3 col-md-4 col-sm-6 col-xs-12" 
+                                  style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 20px;"
+                                  (click)="OpenDashboards(item)">
+                                <div class="card-shape" [style.background-color]="item.bgColor" style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+                                  <mat-icon style="font-size: 80px; width: 80px; height: 80px; border-radius: 50%;" [style.color]="item.color">{{item.iconName}}</mat-icon>                                  
+                                </div>
+                                <p class="fontbold" style="margin-top: 10px;"><span>{{item.title}}</span></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,6 +84,14 @@
 </section>
 
 <style>
+    .mat-button-toggle{
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .mat-button-toggle-checked {
+        background-color: #ffffff;
+    }
+
     .paginator {
         width: 33%;
         background-color: transparent;
@@ -98,6 +116,7 @@
         margin: 5px;
         padding: 10px 15px;
         background-color: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0,0.4) !important;
         font-size: 14px;
         font-weight: bold;
         letter-spacing: 1px;
@@ -105,7 +124,7 @@
         cursor: pointer;
         transform-style: preserve-3d;
         transition-duration: 0.3s;
-        color: rgba(0, 0, 0, 0.6);
+        /*color: rgba(0, 0, 0, 0.6);*/
     }
 
     .menuCard:hover {
@@ -122,7 +141,7 @@
 
     .reportCard {
         width: 33%;
-        height: 100px;
+        min-height: 80px;
         display: flex;
         justify-content: center;
         align-items: flex-start;

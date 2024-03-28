@@ -277,14 +277,14 @@ export class HeaderComponent
   }
 
   setMenuToBind(mode) {
-    let menu = JSON.parse( this.storage.menu);
+    let menu = JSON.parse( this.storage.menu);    
     let menuItems = menu.filter((x) => !x.MenuGroup || x.MenuGroup == mode.toUpperCase() || x.MenuGroup == "" || x.MenuGroup == "ALL");
-
+    
     let menuData = this.menuService.buildHierarchy(menuItems);
     let root = menuData.find((x) => x.MenuLevel == 1);
     this.storage.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
 
-    const searchData = menu.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
+    const searchData = menuItems.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
       const p = menu.find((y) => y.MenuId == x.ParentId);      
       const d = {
         title: `${p?.MenuName}/${x.MenuName}`,  

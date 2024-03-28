@@ -115,6 +115,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
       let menu = JSON.parse( this.storageService.menu);
       let menuItems = menu.filter((x) => !x.MenuGroup || x.MenuGroup == mode.toUpperCase() || x.MenuGroup == "" || x.MenuGroup == "ALL");
 
+      if(mode == "ANALYTICS") {
+        var rm = menuItems.find((x) => x.MenuID == 197);
+        if(rm) menuItems.push(rm);
+      }
+
       let menuData = this.menuService.buildHierarchy(menuItems);
       let root = menuData.find((x) => x.MenuLevel == 1);
       this.storageService.setItem("menuToBind", JSON.stringify(root.SubMenu || []));

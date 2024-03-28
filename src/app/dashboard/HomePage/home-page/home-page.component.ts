@@ -83,10 +83,10 @@ export class HomePageComponent implements OnInit {
     {
       title:"Analytics",
       iconName:"analytics",
-      mode: "Analytcs",
-      route: "",
+      mode: "",
+      route: "/dashboard/ReportDashboard",
       class: "fa fa-shipping-fast card-icon",
-      bgColor: "#fd7e14",
+      bgColor: "#1a3e84",
       color: "#ffffff"
     },
     {

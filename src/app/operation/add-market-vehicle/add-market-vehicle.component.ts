@@ -119,12 +119,12 @@ export class AddMarketVehicleComponent implements OnInit {
       this.marketVehicleTableForm.controls['vehContAmt'].setValue(vehData.vEHCNAMT ?? '');
       this.marketVehicleTableForm.controls['margAMT'].setValue(vehData.mRGAMT ?? '');
       this.marketVehicleTableForm.controls['roadPrt'].setValue(vehData.rDPRT ?? '');
-      this.marketVehicleTableForm.controls['uploadSupport'].setValue(vehData.sDOC ?? '');
       this.marketVehicleTableForm.controls['engineNo'].setValue(vehData.eNGNO ?? '');
       this.marketVehicleTableForm.controls['chasisNo'].setValue(vehData.cHNO ?? '');
       this.marketVehicleTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
       this.marketVehicleTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
       this.marketVehicleTableForm.controls['ETA'].setValue(vehData.ETA ?? '');
+      this.marketVehicleTableForm.controls['uploadSupport'].setValue(vehData.sDOC ?? '');
     }
   }
 

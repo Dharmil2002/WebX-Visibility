@@ -18,7 +18,7 @@ export class AddMarketVehicleComponent implements OnInit {
   imageData: any = {};
   jsonControlVehicleArray: any;
   marketVehicleTableForm: UntypedFormGroup;
- 
+  className: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   companyCode = parseInt(localStorage.getItem("companyCode"));
   breadScrums = [
     {

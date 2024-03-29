@@ -35,6 +35,7 @@ export class AddMarketVehicleComponent implements OnInit {
       @Inject(MAT_DIALOG_DATA) public item: any,
       private fb: UntypedFormBuilder,
       public dialog: MatDialog,
+      private storage: StorageService,
       private markerVehicleService: MarkerVehicleService,
       private objImageHandling: ImageHandling) {
     if (item) {

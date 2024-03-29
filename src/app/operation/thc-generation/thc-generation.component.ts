@@ -280,6 +280,7 @@ export class ThcGenerationComponent implements OnInit {
   isLoadRail: boolean;
   isLoadInvoice: boolean;
   delChargeControl: any[];
+  marketData: any;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -660,6 +661,7 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
           this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
           this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
+          this.marketData=vehData;
         }
       }
 
@@ -1206,7 +1208,6 @@ export class ThcGenerationComponent implements OnInit {
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];
-
         if (x.tCT == this.currentLocation.locCity.toUpperCase()) {
           x.actions = ["Update"];
         }
@@ -1865,8 +1866,11 @@ export class ThcGenerationComponent implements OnInit {
         this.filter.Filter(this.chargeJsonControl, this.chargeForm, data, name, status);
       });
       const location = this.locationData.find(x => x.value == this.branchCode);
-      this.chargeForm.controls['advPdAt'].setValue(location)
+      this.chargeForm.controls['advPdAt'].setValue(location);
       this.isCharge = true;
+      if(this.prqFlag&&this.marketData){
+        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT||"0.00");
+      }
     }
   }
   /*End*/

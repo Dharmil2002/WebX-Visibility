@@ -44,7 +44,7 @@ export class FreightChargeUploadComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
-      // console.log(this.CurrentContractDetails);
+      console.log(this.CurrentContractDetails);
     });
     this.fileUploadForm = fb.group({
       singleUpload: [""],
@@ -240,7 +240,9 @@ export class FreightChargeUploadComponent implements OnInit {
           // Call the function with the specified keys
           const data = await checkForDuplicatesInFreightUpload(filteredData, this.existingData, fromKey, toKey, capacityKey, tblfromKey, tbltoKey, tblcapacityKey);
 
-          this.OpenPreview(data);
+          if (data) {
+            this.ReValidateData(data, this.existingData);
+          }
         });
 
       });
@@ -251,6 +253,93 @@ export class FreightChargeUploadComponent implements OnInit {
   Close() {
     this.dialogRef.close()
   }
+  ReValidateData(data, existingData) {
+    let validData = data.filter(x => {
+      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
+      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
+      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD/MM/YYYY');
+      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD/MM/YYYY');
+
+      return validFromDate.isSameOrAfter(contractStartDate) && validToDate.isSameOrBefore(contractEndDate);
+    });
+    const invalidData = data.filter(x => {
+      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
+      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
+      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD/MM/YYYY');
+      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD/MM/YYYY');
+
+      return validFromDate.isBefore(contractStartDate) || validToDate.isAfter(contractEndDate);
+    });
+
+    existingData = existingData || [];
+
+    // Assuming existingData is an array of objects
+    const OldData = existingData.map(element => {
+      // Transform each element and return the transformed object
+      return {
+        ...element,
+        RecordType: "existing",
+        ValidFromDate: moment(element.vFDT).format('DD/MM/YYYY'),
+        ValidToDate: moment(element.vEDT).format('DD/MM/YYYY'),
+        From: element.fROM,
+        To: element.tO,
+        Capacity: element.cAP,
+        error: []
+      };
+    });
+    validData = validData.map(element => {
+      element.RecordType = "new"
+      return element;
+    });
+    validData = OldData.concat(validData);
+
+    const previousEntries = [];
+    for (const entry of validData) {
+      if (this.isOverlapping(previousEntries, entry)) {
+        entry.error.push("Overlapping with existing data");
+      } else {
+        previousEntries.push(entry);
+      }
+    }
+    //console.log(data);
+    const FilteredData = validData.filter(x => x.RecordType === "new");
+
+    invalidData.forEach(element => {
+      element.error = ["Invalid Date Range"];
+    });
+    FilteredData.push(...invalidData);
+    this.OpenPreview(FilteredData);
+  }
+  isOverlapping(previousEntries, newEntry) {
+    const startDate2 = this.parseDate(newEntry.ValidFromDate);
+    const endDate2 = this.parseDate(newEntry.ValidToDate);
+
+    for (const entry of previousEntries) {
+      const startDate1 = this.parseDate(entry.ValidFromDate);
+      const endDate1 = this.parseDate(entry.ValidToDate);
+
+      // Check if the date ranges overlap and the locations are the same
+      if (
+        entry.From === newEntry.From &&
+        entry.To === newEntry.To &&
+        entry.Capacity === newEntry.Capacity &&
+        startDate1 <= endDate2 &&
+        endDate1 >= startDate2
+      ) {
+        return true; // Overlapping found
+      }
+    }
+    return false; // No overlapping found
+  }
+  parseDate(dateString) {
+    const parts = dateString.split('/');
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Month is 0-based in Date objects
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day);
+  }
+
+
   //#endregion
   //#region to download template file
   Download(): void {
@@ -374,6 +463,7 @@ export class FreightChargeUploadComponent implements OnInit {
 
   // function to process data and prepare request body
   processData(element, rateTypedata, capacityList, transportMode) {
+    debugger
     const processedData: any = {};
 
     const updaterateType = rateTypedata.find(item => item.name.toUpperCase() === element.RateType.toUpperCase());

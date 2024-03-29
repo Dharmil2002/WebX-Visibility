@@ -461,6 +461,7 @@ export class AdviceGenerationComponent implements OnInit {
           this.VoucherDataRequestModel.paymentMode = this.AdvicePaymentForm.value.PaymentMode?.value,
             this.VoucherDataRequestModel.refNo = this.AdvicePaymentForm.value.ChequeOrRefNo,
             this.VoucherDataRequestModel.accountName = this.AdvicePaymentForm.value?.Bank?.name;
+          this.VoucherDataRequestModel.accountCode = this.AdvicePaymentForm.value?.Bank.value;
           this.VoucherDataRequestModel.date = this.AdvicePaymentForm.value.Date
           this.VoucherDataRequestModel.scanSupportingDocument = "";
 

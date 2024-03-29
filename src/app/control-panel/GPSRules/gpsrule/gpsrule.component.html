@@ -1,0 +1,34 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <form [formGroup]="gpsRuleTableForm">
+    <app-form-webxpress
+      [form]="gpsRuleTableForm"
+      [formData]="jsonControlgpsRuleArray"
+      [FormTitle]="'GPS Rule'"
+      [submit]="'submit'"
+      (functionCallEmitter)="functionCallHandler($event)"
+      (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="true"
+    >
+    </app-form-webxpress>
+  </form>
+
+  <app-generic-table-v2
+    *ngIf="tableLoad"
+    [toggleArray]="toggleArray"
+    [dynamicControls]="dynamicControls"
+    [columnHeader]="columnHeader"
+    [tableData]="tableData"
+    (functionCallEmitter)="functionCallHandler($event)"
+    [metaData]="metaData"
+    [menuItems]="menuItems"
+    [staticField]="staticField"
+    [FormTitle]="'API Configuration'"
+    (menuItemClicked)="handleMenuItemClick($event)"
+    (onFlagChange)="changeActive($event)"
+    [menuItemFlag]="menuItemflag"
+    [addAndEditPath]="addAndEditPath"
+    [EventButton]="EventButton"
+  >
+  </app-generic-table-v2>
+  <!-- RULE TABLE -->
+</app-common-wrapper-webxpress>

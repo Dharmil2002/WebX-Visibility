@@ -314,6 +314,10 @@ export class DocketService {
             "cnogst": data.cSGNGST,
             "cneAddress": data.cSGEADD,
             "cnegst": data.cSGEGST,
+            "inboundNumber": data.iNBNUM,
+            "shipment": data.sHIP,
+            "rfqNo": data.rFQNO,
+            "podDoNumber": data.pODONUM,
             "vehicleDetail": null,
             "invoiceDetails": [],
             "containerDetail": []
@@ -394,6 +398,10 @@ export class DocketService {
             gSTAMT: docket["gstAmount"],
             gSTCHAMT: docket["gstChargedAmount"],
             tOTAMT: docket["totalAmount"],
+            iNBNUM:docket["inboundNumber"],
+            shipment:docket["sHIP"],
+            rFQNO:docket["rfqNo"],
+            pODONUM:docket["podDoNumber"],
             mODBY: this.storage.userName,
             mODDT: new Date(),
             mODLOC: this.storage.branch,
@@ -432,6 +440,7 @@ export class DocketService {
             }
 
             // Insert new data
+            if(data){
             const insertRequest = {
                 companyCode: this.storage.companyCode,
                 collectionName: collectionName,
@@ -440,6 +449,7 @@ export class DocketService {
             const insertResponse = await firstValueFrom(this.operation.operationMongoPost('generic/create', insertRequest));
 
             return insertResponse.data;
+        }
         } catch (error) {
             // Handle errors (you can also log them or throw them depending on your error handling strategy)
             Swal.fire({
@@ -739,7 +749,7 @@ export class DocketService {
     /*End*/
     /*Here the code for the docket Field Mapping*/
     async docketLTLFieldMapping(data, isUpdate = false) {
-
+      
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -865,13 +875,39 @@ export class DocketService {
         });
 
         docketField["iNVTOT"] = invoiceDetails.reduce((a, c) => a + (c.iNVAMT || 0), 0);
-      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails};
+        let docketFin = {
+            _id: `${this.storage.companyCode}-${data?.docketNumber}`,
+            cID: this.storage.companyCode,
+            dKTNO:data?.docketNumber||"",
+            pCD: data?.billingParty.value,
+            pNM:data?.billingParty.name || "",
+            bLOC: this.storage.branch,
+            cURR: "INR",
+            fRTAMT:ConvertToNumber(data?.fRTAMT || 0, 2),
+            oTHAMT:ConvertToNumber(data?.oTHAMT || 0, 2),
+            gROAMT: ConvertToNumber(data?.gROAMT || 0, 2),
+            rCM:"",
+            gSTAMT: ConvertToNumber(data?.gROAMT || 0, 2),
+            gSTCHAMT:ConvertToNumber(data?.gSTCHAMT || 0, 2),
+            cHG: "",
+            nFCHG:0,
+            tOTAMT:ConvertToNumber(docketField['iNVTOT'] || 0, 2),
+            sTS:DocketStatus.Booked,
+            sTSNM:DocketStatus[DocketStatus.Booked],
+            sTSTM: new Date(),
+            isBILLED: false,
+            bILLNO: "",
+            eNTDT: new Date(),
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName,
+          }
+      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails,"docketFin":docketFin};
    }
    /*End*/
 
     /*End*/
     /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
-    async operationsFieldMapping(data, invoiceDetails = []) {
+    async operationsFieldMapping(data, invoiceDetails = [],docketFin) {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
@@ -931,7 +967,16 @@ export class DocketService {
             data: evnData
         };
         await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
+        if(docketFin){
+        let reqfin = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_fin_det_ltl",
+            data: docketFin
+        };
+        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
+        }
         return true
+       
     }
     /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
@@ -1020,5 +1065,14 @@ export class DocketService {
         }
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
+    }
+    async getdocketOne(filter){
+        const req={
+            companyCode:this.storage.companyCode,
+            collectionName:"dockets",
+            filter:filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
+        return res.data
     }
 }

@@ -15,16 +15,16 @@
     </form>
     <!-- End -->
     <!-- fleet Detail -->
-    <div *ngIf="marketVendor">
-      <form [formGroup]="marketVehicleTableForm">
-        <app-form-webxpress [form]="marketVehicleTableForm" [FormTitle]="'Market Vehicle'"
-          [formData]="jsonMarketVehicle" (functionCallEmitter)="functionCallHandler($event)"
+    <div  *ngIf="!isRail">
+      <form [formGroup]="VehicleTableForm">
+        <app-form-webxpress [form]="VehicleTableForm" [FormTitle]="'Vehicle Details'"
+          [formData]="jsonVehicleControl" (functionCallEmitter)="functionCallHandler($event)"
           [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
       </form>
     </div>
     <!-- Driver Detail -->
-    <div *ngIf="!marketVendor&&!isRail">
+    <div *ngIf="!isRail">
       <form [formGroup]="thcTableForm">
         <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
@@ -36,20 +36,11 @@
     <!-- Docket Detail -->
     <div *ngIf="addThc">
       <form [formGroup]="thcTableForm">
-        <app-form-webxpress [form]="thcTableForm" [FormTitle]="' Docket Detail'" [formData]="jsonControlDocketArray"
+        <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Docket Detail'" [formData]="jsonControlDocketArray"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
           (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
       </form>
-    </div>
-    <!-- End -->
-    <div *ngIf="!isRail">
-    <form [formGroup]="thcTableForm">
-      <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Vehicle Loading Detail'"
-        [formData]="jsonControlVehLoadArray" (functionCallEmitter)="functionCallHandler($event)"
-        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
-      </app-form-webxpress>
-    </form>
     </div>
     <!-- End -->
 
@@ -70,12 +61,26 @@
       </div>
     </div>
     <div *ngIf="isRail">
-      <form [formGroup]="rakeDetailsTableForm">
-        <app-form-webxpress [form]="rakeDetailsTableForm" [formData]="rakeDetails"
-          (callFunction)="functionCallHandler($event)" [EventButton]="isRail==true?EventButtonRake:null"[FormTitle]="'Rake Details'"
+      <form [formGroup]="rakeForm">
+        <app-form-webxpress [form]="rakeForm" [formData]="rakeFormData"
+          (callFunction)="functionCallHandler($event)"[FormTitle]="'Rake Details'"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
       </form>
+      </div>
+    <div *ngIf="isRail">
+      <form [formGroup]="rakeDetailsTableForm">
+        <app-form-webxpress [form]="rakeDetailsTableForm" [formData]="rakeDetails"
+          (callFunction)="functionCallHandler($event)" [EventButton]="rakeDetailsTableForm.valid==true?EventButtonRake:null"[FormTitle]="'RR Details'"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+      </form>
+      <div *ngIf="isLoadRail" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
       <app-generic-table-v2 *ngIf="!rrLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.rakeHeader"
         [tableData]="tableRakeData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
         [menuItems]="rakeMenuItems" [staticField]="definition.rakeStaticField" [Link]="linkArray" [height]="height"
@@ -83,6 +88,41 @@
         [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
       </app-generic-table-v2>
     </div>
+    <div *ngIf="isRail">
+      <form [formGroup]="rakeInvoice">
+        <app-form-webxpress [form]="rakeInvoice" [formData]="rakeInvoiceData"
+          (callFunction)="functionCallHandler($event)" [EventButton]="rakeInvoice.valid==true?EventButtonInvoice:null"[FormTitle]="'Rake Invoice'"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+      </form>
+      <div *ngIf="isLoadInvoice" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <app-generic-table-v2 *ngIf="!rrInvoice" [dynamicControls]="dynamicControls" [columnHeader]="definition.invDetails"
+        [tableData]="tableRakeInvoice" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+        [menuItems]="rakeInvoiceItems" [staticField]="definition.staticInvField" [Link]="linkArray" [height]="height"
+        [width]="width" [maxWidth]="maxWidth" [TableStyle]="TableStyle" (menuItemClicked)="handleMenuItemClick($event)"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+      </app-generic-table-v2>
+    </div>
+      <form [formGroup]="chargeForm">
+        <app-form-webxpress [form]="chargeForm" [formData]="chargeJsonControl"
+          (callFunction)="functionCallHandler($event)" [FormTitle]="'Charges'"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+      </form>
+
+    <div *ngIf="!isRail">
+      <form [formGroup]="thcTableForm">
+        <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Vehicle Loading Detail'"
+          [formData]="jsonControlVehLoadArray" (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+      </div>
     <app-generic-table-v2 *ngIf="((!tableLoad&&!addThc) && !DocketsIsEmpty)" [dynamicControls]="dynamicControls"
       [columnHeader]="columnHeader" [tableData]="tableData" [metaData]="metaData" [disbleCheckbox]="disbleCheckbox"
       [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height"
@@ -96,7 +136,8 @@
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-start">
           <button class="msr-3" mat-raised-button color="primary" *ngIf="!isView" (click)="createThc()"
-            [disabled]="!thcTableForm.valid"> {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
+           [disabled]="!thcTableForm.valid || (isRail && !rakeForm.valid)"
+            > {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
           <button class="msr-3" mat-raised-button color="primary" (click)="goBack('THC')">Back</button>
         </div>
       </div>

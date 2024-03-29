@@ -1,4 +1,5 @@
 export const rules=
 {
-  prqBackDate:1
+  prqBackDate:1,
+  prqFutureDate:1
 }

@@ -838,6 +838,7 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
         this.VoucherDataRequestModel.refNo = this.DebitVoucherTaxationPaymentDetailsForm.value.ChequeOrRefNo;
         this.VoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
+        this.VoucherDataRequestModel.accountCode = this.DebitVoucherTaxationPaymentDetailsForm.value?.Bank.value;
         this.VoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
         this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
 

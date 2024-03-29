@@ -1,8 +1,9 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { BaseControl } from "./base-control";
 
-export class EwayBillControls {
+export class EwayBillControls extends BaseControl {
   private docketFields: FormControls[];
   private consignorFields: FormControls[];
   private consigneeFields: FormControls[];
@@ -13,8 +14,10 @@ export class EwayBillControls {
   private ewayBillControlArray: FormControls[];
   private EWayDetailControlArray: FormControls[];
   constructor(
-    private generalService: GeneralService
+    generalService: GeneralService
   ) {
+    super(generalService, "LTL", ["EwayBillControls"]);
+
     this.docketFields = [
       {
         name: "docketNumber",
@@ -1299,87 +1302,30 @@ export class EwayBillControls {
   }
 
   getDocketFieldControls() {
-    return this.docketFields.filter((x) => x.visible === true);
+    return this.docketFields;
   }
   getConsignorFieldControls() {
-    return this.consignorFields.filter((x) => x.visible === true);
+    return this.consignorFields;
   }
   getConsigneeFieldControls() {
-    return this.consigneeFields.filter((x) => x.visible === true);;
+    return this.consigneeFields;
   }
   getAppointmentFieldControls() {
-    return this.appointmentControlArray.filter((x) => x.visible === true);;
+    return this.appointmentControlArray;
   }
   getContainerFieldControls() {
-    return this.containerControlArray.filter((x) => x.visible === true);;
+    return this.containerControlArray;
   }
   getEwayBillFormControls() {
-    return this.EWayDetailControlArray.filter((x) => x.visible === true);;
+    return this.EWayDetailControlArray;
   }
   getContractFieldControls() {
-    return this.contractControlArray.filter((x) => x.visible === true);;
+    return this.contractControlArray;
   }
   getTotalSummaryFieldControls() {
-    return this.totalSummaryControlArray.filter((x) => x.visible === true);;
+    return this.totalSummaryControlArray;
   }
   getEwayBillFieldControls() {
-    return this.ewayBillControlArray.filter((x) => x.visible === true);;
-  }
-  
-  async applyFieldRules(companyCode) {
-    var data = await this.generalService.getData("field_rules", { cID: companyCode, Mode: "LTL", Class: { "D$in": ["EwayBillControls"] } });    
-    if(data != null && data.length > 0){
-      data.map(f => {
-        if(f.Caption) {
-          f.Caption = f.Caption.replace(/{{Docket}}/g, DocCalledAs.Docket);
-        }
-        if(f["Place Holder"]) { 
-          f["Place Holder"] = f["Place Holder"].replace(/{{Docket}}/g, DocCalledAs.Docket); 
-        }
-        this.configureControl(f);
-      });
-    }
-  }
-
-  configureControl(field: any) { 
-    var c = this[field.FormControl].find((x) => x.name === field.Field);
-    if(!c)
-      return;
-
-    c.label = field.Caption;
-    c.placeholder = field["Place Holder"];
-    c.generatecontrol = field.Visible;
-    c.disable = field.ReadOnly;  
-    c.visible = field.Visible;   
-    
-    if(field.IsSystemGenerated) {
-      c.value = "Computerized";
-    }
-    if(field.Required === true) {
-      var r = c.Validations.find(x=>x.name=="required");
-      if(!r) {
-        c.Validations.push({name:"required",message:`${field.Caption} is required.` });
-      }
-      else {
-        r.message = `${field.Caption} is required.`;
-      }
-    }
-    else {
-      var r = c.Validations.find(x=>x.name=="required");
-      if(r) {
-        c.Validations.splice(c.Validations.indexOf(r),1);
-      }
-    }
-
-    if(field["Custom Validation"]) { 
-      var r = c.Validations.find(x=>x.name=="pattern");
-      if(!r) {
-        c.Validations.push({name:"pattern",message: field["Custom Validation Message"], pattern: field["Custom Validation"]});
-      }
-      else {
-        r.message = field["Custom Validation Message"];
-        r.pattern = field["Custom Validation"];
-      }
-    }
+    return this.ewayBillControlArray;;
   }
 }

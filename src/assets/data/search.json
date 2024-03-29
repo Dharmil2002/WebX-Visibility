@@ -169,6 +169,14 @@
       "router": "Masters/CustomerMaster/AddCustomerMaster"
     },
     {
+      "title": "DCRManagement",
+      "tag": [
+        "DCRManagement",
+        "DCRManagement"
+      ],
+      "router": "Masters/DCRManagement"
+    },
+    {
       "title": "Menu/MenuAccessRights",
       "tag": [
         "MenuAccessRights",
@@ -803,6 +811,13 @@
       "router": "Masters/AccountMaster/AddTds"
     },
     {
+      "title": "Reports/AccountReport/ProfitAndLoss",
+      "tag": [
+        "Reports/AccountReport/ProfitAndLoss"
+      ],
+      "router": "Reports/AccountReport/ProfitAndLoss"
+    },
+    {
       "title": "Reports/Job-Register Report",
       "tag": [
         "job-query",
@@ -965,6 +980,13 @@
         "Container/Status/Add"
       ],
       "router": "Masters/Container/Status/Add"
+    },
+    {
+      "title": "ConsignmentFilter",
+      "tag": [
+        "Consignment Filter"
+      ],
+      "router": "Operation/ConsignmentQuery"
     }
   ]
 }

@@ -40,8 +40,8 @@ export class VendorWiseOutService {
                          'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
                     },
 
-                    ...(vendorNames.length > 0 ? [{ 'vND.nM': { 'D$in': vendorNames } }] : []), // Vendor names condition
-                    ...(locCodes.length > 0 ? [{ eNTLOC: { 'D$in': locCodes } }] : []), // Location code condition
+                    ...(vendorNames.length > 0 ? [{ D$expr: { D$in: ["$vND.nM", vendorNames] } }] : []), // Vendor names condition
+                    ...(locCodes.length > 0 ? [{ D$expr: { D$in: ["$eNTLOC", locCodes] } }] : []), // Location code condition
                     ...(reportbasis ? [{ 'bSTAT': parseInt(reportbasis) }] : []),
                ],
           };
@@ -77,15 +77,14 @@ export class VendorWiseOutService {
                                                   86400000,
                                              ],
                                         },
-                                   },
-                                   paidAmount: { D$subtract: ["$bALAMT", "$bALPBAMT"] }
+                                   }
                               },
                          },
                          {
                               D$lookup: {
                                    from: "vend_bill_payment",
                                    let: {
-                                        bILLNO: "$bILLNO"
+                                        docNo: "$docNo",
                                    },
                                    pipeline: [
                                         {
@@ -93,7 +92,7 @@ export class VendorWiseOutService {
                                                   D$and: [
                                                        {
                                                             D$expr: {
-                                                                 D$eq: ["$docNo", "$$bILLNO"],
+                                                                 D$eq: ["$bILLNO", "$$docNo"],
                                                             },
                                                        },
                                                        {
@@ -137,8 +136,8 @@ export class VendorWiseOutService {
                                              else: 0,
                                         },
                                    },
-                                   totalPayable: {
-                                        D$sum: "$billpay.aMT",
+                                   paidAmount: {
+                                        D$sum: "$billpay.aMT", 
                                    },
                               },
                          },
@@ -148,7 +147,7 @@ export class VendorWiseOutService {
                                         D$max: [
                                              0,
                                              {
-                                                  D$subtract: ["$totalPayable", "$bALAMT"],
+                                                  D$subtract: ["$bALAMT", "$paidAmount"],
                                              },
                                         ],
                                    },

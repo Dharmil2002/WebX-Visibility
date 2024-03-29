@@ -64,4 +64,3 @@ function formatDate(dateString: string | null): string {
   }
 }
 
-// Example usage:

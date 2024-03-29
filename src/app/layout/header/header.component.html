@@ -59,13 +59,15 @@
         </li>
         <!-- #END# Full Screen Button -->
         <li>
-          <button mat-icon-button [matMenuTriggerFor]="menu">
+          <p style="color: white; cursor: pointer;" matTooltip="Mode" matTooltipPosition="above"
+              matTooltipClass="tooltip"> {{ CurrentMode }}</p>
+          <!-- <button mat-icon-button [matMenuTriggerFor]="menu">
             <p style="color: white; cursor: pointer;" matTooltip="Mode" matTooltipPosition="above"
               matTooltipClass="tooltip"> {{ CurrentMode }}</p>
           </button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item *ngFor="let item of menuItems" (click)="menuModeDetail(item)">{{ item }}</button>
-          </mat-menu>
+          </mat-menu> -->
         </li>
 
         <!-- #START# Notifications-->

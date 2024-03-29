@@ -214,10 +214,10 @@ export class UploadLocationComponent implements OnInit {
               }
             }
 
-            if (element.PinCode) {
-              const city = this.pincodeList.find(x => x.PIN === element.PinCode);
+            const city = this.pincodeList.find(x => x.PIN === element.PinCode);
+            if (city) {
               element.City = city.CT;
-
+              
               const state = this.zonelist.find(x => x.ST === city?.ST);
               element.State = state.STNM
               element.Zone = state.ZN;

@@ -913,6 +913,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
         this.VoucherDataRequestModel.refNo = this.PaymentSummaryFilterForm.value?.ChequeOrRefNo;
         this.VoucherDataRequestModel.accountName = this.PaymentSummaryFilterForm.value?.Bank.name;
+        this.VoucherDataRequestModel.accountCode = this.PaymentSummaryFilterForm.value?.Bank.value;
         this.VoucherDataRequestModel.date = this.PaymentSummaryFilterForm.value?.Date;
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 

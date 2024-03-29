@@ -49,6 +49,7 @@ export class VoucherDataRequestModel {
   paymentMode: string
   refNo: string
   accountName: string
+  accountCode: string
   date: string
   scanSupportingDocument: string
   mANNUM: string
@@ -115,6 +116,7 @@ export enum VoucherInstanceType {
   AdvancePayment = 8,
   BalancePayment = 9,
   DeliveryMR = 10,
+  VendorBillPayment = 11,
 }
 
 export const ledgerInfo = {
@@ -157,6 +159,41 @@ export const ledgerInfo = {
     "LeadgerCode": "AST002002",
     "LeadgerName": "Billed debtors",
     "LeadgerCategory": "ASSET"
+  },
+  "Contract Charges": {
+    "LeadgerCode": "EXP001003",
+    "LeadgerName": "Contract Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Other Charges": {
+    "LeadgerCode": "EXP001009",
+    "LeadgerName": "Other Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Loading Charge": {
+    "LeadgerCode": "EXP001011",
+    "LeadgerName": "Loading Charge",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Unloading Charges": {
+    "LeadgerCode": "EXP001011",
+    "LeadgerName": "Unloading Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Enroute Charges": {
+    "LeadgerCode": "EXP001007",
+    "LeadgerName": "Enroute Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Miscellaneous Charges": {
+    "LeadgerCode": "EXP001009",
+    "LeadgerName": "Miscellaneous Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Billed creditors": {
+    "LeadgerCode": "LIA001002",
+    "LeadgerName": "Billed creditors",
+    "LeadgerCategory": "EXPENSE"
   },
 
 };

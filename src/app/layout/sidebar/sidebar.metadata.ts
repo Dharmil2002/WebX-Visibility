@@ -19,3 +19,18 @@ export class RouteInfoNew {
   groupTitle: boolean;
   submenu: RouteInfoNew[];
 }
+
+export interface MenuData {
+  _id: number;
+  MenuId: number;
+  MenuPath: string;
+  MenuName: string;
+  MenuLevel: number;
+  ParentId?: number;
+  MenuGroup?: string
+  Type?: string;
+  HasLink?: boolean;
+  IsActive: boolean;
+  GroupTitle?: boolean;
+  SubMenu?: MenuData[];
+}

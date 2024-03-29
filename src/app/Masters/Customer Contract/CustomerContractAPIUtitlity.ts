@@ -140,7 +140,7 @@ export async function checkForDuplicatesInFreightUpload(data, tableData, flfromK
 
   // Extract values from tableData using provided keys and create unique key
   tableData.forEach(tableEntry => {
-    const key = `${tableEntry[tblfromKey]}-${tableEntry[tbltoKey]}-${tableEntry[tblcapacityKey]}-${tableEntry['vFDT']}-${tableEntry['vEDT']}`;
+    const key = `${tableEntry[tblfromKey]}-${tableEntry[tbltoKey]}-${tableEntry[tblcapacityKey]}`;
     uniqueEntries.add(key);
   });
 
@@ -153,7 +153,7 @@ export async function checkForDuplicatesInFreightUpload(data, tableData, flfromK
     entry.error = entry.error || [];
 
     // Create a key based on the specified Route, Capacity, FromDate, and EndDate keys
-    const key = `${entry[flfromKey]}-${entry[fltoKey]}-${entry[flcapacityKey]}-${entry['ValidFromDate']}-${entry['ValidToDate']}`;
+    const key = `${entry[flfromKey]}-${entry[fltoKey]}-${entry[flcapacityKey]}`;
 
     // Check if the key is already in the set (duplicate entry)
     if (uniqueEntries.has(key)) {
@@ -164,16 +164,16 @@ export async function checkForDuplicatesInFreightUpload(data, tableData, flfromK
       uniqueEntries.add(key);
     }
 
-    // Check if the from date and end date exist between records
-    dataWithoutErrors.forEach(otherEntry => {
-      if (
-        otherEntry !== entry && // Ensure we're not comparing the same entry
-        otherEntry['ValidFromDate'] <= entry['ValidToDate'] && // Check if other entry's from date is before or equal to this entry's end date
-        otherEntry['ValidToDate'] >= entry['ValidFromDate'] // Check if other entry's end date is after or equal to this entry's from date
-      ) {
-        entry.error.push(`Conflict with another entry`);
-      }
-    });
+    // // Check if the from date and end date exist between records
+    // dataWithoutErrors.forEach(otherEntry => {
+    //   if (
+    //     otherEntry !== entry && // Ensure we're not comparing the same entry
+    //     otherEntry['ValidFromDate'] <= entry['ValidToDate'] && // Check if other entry's from date is before or equal to this entry's end date
+    //     otherEntry['ValidToDate'] >= entry['ValidFromDate'] // Check if other entry's end date is after or equal to this entry's from date
+    //   ) {
+    //     entry.error.push(`Conflict with another entry`);
+    //   }
+    // });
   });
 
   // Filter out objects with errors

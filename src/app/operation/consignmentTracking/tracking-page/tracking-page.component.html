@@ -1,0 +1,232 @@
+<div class="Consignment_Tracking">
+    <app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="'Operation/ConsignmentQuery'">
+        <div class="m-0" style="width: 100%; background-color: white; padding: 10px;">
+            <div style="width: 100%; display: flex; justify-content: space-between;">
+                <div style="width: 40%; display: flex; align-items: center;">
+                    <div style="width: 80%;">
+                        <form class="register-form " style="margin-right: 20px;" [formGroup]="Form">
+                            <div style="width: 100%;" *ngFor="let formItem of formData">
+                                <mat-form-field class="datepickercss" *ngIf="formItem.generatecontrol===true"
+                                    style="width: 100%" appearance="outline">
+                                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                                    <mat-date-range-input [rangePicker]="picker">
+                                        <input matStartDate [formControlName]="formItem.name"
+                                            placeholder="Start date" />
+                                        <input matEndDate [formControlName]="formItem.additionalData.support"
+                                            placeholder="End date" />
+                                    </mat-date-range-input>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-date-range-picker #picker
+                                        [calendarHeaderComponent]="CustomeDatePickerComponent"
+                                        [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                                </mat-form-field>
+                            </div>
+                        </form>
+                    </div>
+                    <div style="width: 20%; display: flex; align-items: center; justify-content: center;">
+                        <button style="margin-top: 8px;" mat-raised-button (click)="ExportFunction()"
+                            color="primary">Export</button>
+                    </div>
+                </div>
+                <div class="px-2" style="width: 30%; display: flex; align-items: center;">
+                        <mat-form-field  class="example-full-width" appearance="outline">
+                            <mat-label style="font-weight: bold;">Search</mat-label>
+                            <input matInput placeholder="Search Text" (ngModelChange)="SearchData($event)" [(ngModel)]="searchText">
+                        </mat-form-field>
+                </div>
+            </div>
+            <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px;">
+                <div class="cardBox">
+                    <div class="card" style="z-index: 10; ">
+                        <p class="cardCount" style="color: salmon;">{{TotalDocket}}</p>
+                        <p class="cardtitle">Total Results</p>
+                    </div>
+                    <div class="card" style="z-index: 9; ">
+                        <p class="cardCount" style="color: lightseagreen;">{{BookedDocket}}</p>
+                        <p class="cardtitle">Booked</p>
+                    </div>
+                    <div class="card" style="z-index: 8; ">
+                        <p class="cardCount" style="color: rgb(91, 196, 91);">{{InTransitDocket}}
+                        </p>
+                        <p class="cardtitle"> In Transit</p>
+                    </div>
+                    <div class="card" style="z-index: 7; ">
+                        <p class="cardCount" style="color: rgb(74, 168, 199);">{{OFDDocket}}</p>
+                        <p class="cardtitle">OFD</p>
+                    </div>
+                    <div class="card" style="z-index: 6; ">
+                        <p class="cardCount" style="color: rgb(123, 140, 161);">{{DeliveredDocket}}
+                        </p>
+                        <p class="cardtitle">Delivered</p>
+                    </div>
+                </div>
+                <div>
+                    <mat-paginator class="paginator" #paginator [pageSizeOptions]="[5,10,15,20]"></mat-paginator>
+                </div>
+            </div>
+
+            <div *ngIf="isTableLode" style="width: 100%; display: flex; flex-direction: column; margin-top: 30px;">
+                <div class="trakingBox" *ngFor="let item of obs | async; let i = index">
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p class="font-width-600">
+                            Cnote No:
+                        </p>
+                        <p style="font-size: 14px; padding-top: 5px; ">
+                            {{item.dKTNO}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p class="font-width-600">EDD:</p>
+                            <p>{{item.sTSTM | date: "dd-MM-YYYY"}}</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p class="font-width-600">ATD:</p>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 35%; ">
+                        <p class="font-width-600">
+                            Status:
+                        </p>
+                        <p >
+                            {{item.oPSSTS}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 14%; ">
+                        <p class="font-width-600">
+                            Booking Date:
+                        </p>
+                        <p>
+                            {{item.docketData.dKTDT | date: "dd-MM-YYYY"}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 15%; text-align: center; ">
+                        <p class="font-width-600">
+                            Transit Mode:
+                        </p>
+                        <p>
+                            {{item.TransitMode}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p class="font-width-600">EWB:</p>
+                            <p></p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p class="font-width-600">Valid:</p>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p class="font-width-600">
+                            Movement:
+                        </p>
+                        <p>
+                            {{item.oRGN}} -> {{item.dEST}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 25%; ">
+                        <p class="font-width-600">
+                            Consignor:
+                        </p>
+                        <p style="font-size: 13px;">
+                            {{item.Consignor}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 24%; ">
+                        <p class="font-width-600">
+                            Consignee:
+                        </p>
+                        <p style="font-size: 13px;">
+                            {{item.Consignee}}
+                        </p>
+                    </div>
+                    <div class="trakingCard"
+                        style="width: 15%; display: flex; justify-content: center; align-items: center; ">
+                        <button mat-stroked-button (click)="ViewFunction(item)" color="primary">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </app-common-wrapper-webxpress>
+</div>
+
+
+<style>
+    p,
+    div {
+        margin: 0;
+        padding: 0;
+    }
+
+    .datepicker {
+        display: flex;
+    }
+
+    .cardBox {
+        width: 60%;
+        display: flex;
+        height: 70px;
+        box-sizing: border-box;
+    }
+
+    .cardBox .card {
+        width: 20%;
+        border-radius: 5px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .card p {
+        text-align: center;
+    }
+
+    .card .cardtitle {
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.7);
+        font-size: 14px;
+    }
+
+    .card .cardCount {
+        font-size: 18px;
+        font-weight: bolder;
+    }
+
+    .trakingCard {
+        height: 75px;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        border-left: 2px solid rgba(0, 0, 0, 0.2);
+
+    }
+
+    .trakingBox {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 2px solid rgba(0, 0, 0, 0.2);
+        border-right: 2px solid rgba(0, 0, 0, 0.2);
+        color: rgb(26, 25, 25);
+        margin: 10px 0px;
+    }
+
+    .trakingCard p {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        padding: 0px 5px;
+        padding-top: 5px;
+    }
+
+    .scrollable-content {
+        overflow-y: visible;
+        overflow-x: visible;
+    }
+
+    .font-width-600 {
+        font-weight: 600;
+    }
+</style>

@@ -36,6 +36,10 @@ export async function getVendorDetails(masterService) {
         name: obj?.vendorName || "",
         value: obj?.vendorCode || "",
         type: obj?.vendorType || "",
+        mob:obj?.vendorPhoneNo||"",
+        panNo:obj?.panNo||"",
+        emailId:obj?.emailId||"",
+        vendorAdvance:obj?.vendorAdvance||0,
       }));
 
     return vendorDetail;

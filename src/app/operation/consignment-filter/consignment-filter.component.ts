@@ -64,14 +64,6 @@ export class ConsignmentFilterComponent implements OnInit {
         name: "Operation Tracking",
         value: "1",
       },
-      {
-        name: "Summary Tracking",
-        value: "2",
-      },
-      {
-        name: "POD Tracking",
-        value: "3",
-      },
     ];
     this.filter.Filter(
       this.jsonControlArray,
@@ -94,19 +86,7 @@ export class ConsignmentFilterComponent implements OnInit {
         end: end,
       };
       this.Route.navigate(["Operation/ConsignmentOperation"], { state: { data: sendData } });
-    } else if (this.ConsignmentFilterForm.value.DocumentType.value == "2") {
-      const sendData = {
-        DocNo: DocketNumber,
-      };
-      this.Route.navigate(["Operation/ConsignmentSummary"], { state: { data: sendData } });
-    } else if (this.ConsignmentFilterForm.value.DocumentType.value == "3") {
-      const sendData = {
-        DocNo: DocketNumber,
-        start: start,
-        end: end,
-      };
-      this.Route.navigate(["Operation/ConsignmentPOD"], { state: { data: sendData } });
-    } 
+    }  
   }
 
   functionCallHandler($event) {

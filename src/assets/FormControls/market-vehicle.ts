@@ -160,10 +160,6 @@ export class marketVehicleControls {
         name: 'ETA', label: "ETA", placeholder: "ETA", type: 'datetimerpicker',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "ETA   is required",
-          },
         ],
         additionalData: {
           maxDate:maxDate,

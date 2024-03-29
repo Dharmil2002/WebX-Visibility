@@ -100,6 +100,8 @@ export class AddMarketVehicleComponent implements OnInit {
     const vehCntAmt= parseFloat(this.marketVehicleTableForm.controls['vehContAmt']?.value||0);
     if(vehCntAmt>contractAmt){
       Swal.fire('Alert','Vehicle contract amount should not be greater than contract amount','warning');
+      this.marketVehicleTableForm.controls['vehContAmt'].setValue(0);
+      this.marketVehicleTableForm.controls['margAMT'].setValue(0);
       return false; 
     }
     const total=contractAmt-vehCntAmt

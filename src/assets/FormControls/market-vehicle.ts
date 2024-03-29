@@ -162,7 +162,6 @@ export class marketVehicleControls {
         Validations: [
         ],
         additionalData: {
-          maxDate:maxDate,
           minDate:minDate
         },
       },

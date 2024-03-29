@@ -280,6 +280,7 @@ export class ThcGenerationComponent implements OnInit {
   isLoadRail: boolean;
   isLoadInvoice: boolean;
   delChargeControl: any[];
+  balanceAmount: any;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -1957,6 +1958,7 @@ export class ThcGenerationComponent implements OnInit {
       this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
       this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
       this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
+      this.balanceAmount=thcNestedDetails?.thcDetails.bALAMT 
     }
 
   }
@@ -2293,6 +2295,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*below code is for the Calculate Delivery Charges*/
   getChangesOnDelCharge() {
+    
     let total = 0;
     const chargeMapping = this.delChargeControl.map((x) => { return { name: x.name, operation: x.additionalData.metaData } });
     total = chargeMapping.reduce((acc, curr) => {
@@ -2305,9 +2308,7 @@ export class ThcGenerationComponent implements OnInit {
         return acc; // In case of an unknown operation
       }
     }, 0);
-    const totalAmt = ConvertToNumber(total, 2) + ConvertToNumber(this.chargeForm.controls["contAmt"].value, 2);
-    this.chargeForm.controls['totAmt'].setValue(totalAmt);
-    const advAmt = parseFloat(this.chargeForm.controls['advAmt']?.value || 0);
-    this.chargeForm.controls["balAmt"].setValue(totalAmt - advAmt);
+    const balance=parseFloat(this.balanceAmount)-Math.abs(total);
+    this.chargeForm.controls["balAmt"].setValue(balance);
   }
 }

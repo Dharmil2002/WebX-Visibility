@@ -1924,7 +1924,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //Contract Invoked Section
   InvockedContract() {
-    debugger
+    
     const paymentBasesName = this.paymentBases.find(x => x.value == this.model.consignmentTableForm.value.payType).name;
     const TransMode = this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name;
     let containerCode;

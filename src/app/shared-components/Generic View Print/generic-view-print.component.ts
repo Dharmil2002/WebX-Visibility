@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, Renderer2 } from "@angular/core";
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, Renderer2 } from "@angular/core";
 //import { FieldMapping, HtmlTemplate, JsonData } from "./InvoiceTemplate";
 
 @Component({
@@ -107,5 +107,35 @@ export class GenericViewPrintComponent implements OnInit {
   }
   functionHandle(name, element) {
     this.functionCallEmitter.emit({ functionName: name, data: element })
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    // Check if the Ctrl (or Command on Mac) key is pressed and the P key is pressed
+    if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+      event.preventDefault(); // Prevent the default browser print dialog
+      this.printLandscapePage(); // Call your print function
+    }
+  }
+  printLandscapePage() {
+    const body = document.querySelector('body');
+    if (body) {
+      body.classList.add('landscape'); // Apply landscape orientation
+      window.print(); // Trigger print
+      body.classList.remove('landscape'); // Revert to normal orientation
+    } else {
+      alert('Content not found for printing.');
+    }
+  }
+  setLandscapeOrientation() {
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        @page {
+          size: landscape;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 }

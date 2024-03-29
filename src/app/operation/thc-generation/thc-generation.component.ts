@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
-import { calculateTotal, vendorTypeList } from "./thc-utlity";
+import { calculateTotal} from "./thc-utlity";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -68,6 +68,7 @@ export class ThcGenerationComponent implements OnInit {
   isRail: boolean = false;
   rrLoad: boolean = true;
   rrInvoice: boolean = true;
+  marketData: any;
   // End Code Of Harikesh
   //FormGrop
   thcDetailGlobal: any;
@@ -658,9 +659,11 @@ export class ThcGenerationComponent implements OnInit {
               // }
             }
           }
-          this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
-          this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
-          this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
+          this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM);
+          this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH);
+          this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO);
+          this.marketData=vehData;
+	 
         }
       }
 
@@ -1868,6 +1871,9 @@ export class ThcGenerationComponent implements OnInit {
       const location = this.locationData.find(x => x.value == this.branchCode);
       this.chargeForm.controls['advPdAt'].setValue(location)
       this.isCharge = true;
+      if(this.prqFlag&&this.marketData){
+        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT||"0.00");
+      }
     }
   }
   /*End*/
@@ -2295,7 +2301,6 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*below code is for the Calculate Delivery Charges*/
   getChangesOnDelCharge() {
-    
     let total = 0;
     const chargeMapping = this.delChargeControl.map((x) => { return { name: x.name, operation: x.additionalData.metaData } });
     total = chargeMapping.reduce((acc, curr) => {
@@ -2308,7 +2313,7 @@ export class ThcGenerationComponent implements OnInit {
         return acc; // In case of an unknown operation
       }
     }, 0);
-    const balance=parseFloat(this.balanceAmount)-Math.abs(total);
+    const balance=parseFloat(this.balanceAmount)-Math.abs(total)
     this.chargeForm.controls["balAmt"].setValue(balance);
   }
 }

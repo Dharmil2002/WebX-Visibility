@@ -41,7 +41,8 @@ export class CommonViewPrintComponent implements OnInit {
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
-      templateName: this.templateBody.templateName,
+      docType: this.templateBody.templateName,
+      partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
     };
     const Res = await this.masterService

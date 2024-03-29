@@ -6,18 +6,16 @@ export class DcrRegisterControl {
     this.DcrRegisterArray = [
       {
         name: "start",
-        label: "SelectDateRange",
-        placeholder: "Select Date",
+        label: "Select Date Range",
+        placeholder: "Select Date Range",
         type: "daterangpicker",
         value: "",
-        filterOptions: "",
-        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
         additionalData: {
-            support: "end",
+             support: "end",
         },
       },
       {
@@ -155,16 +153,8 @@ export class DcrRegisterControl {
         autocomplete: "",
         generatecontrol: false,
         disable: true,
-        Validations: [
-            {
-                name: "Select Data Range",
-            },
-            {
-                name: "required",
-                message: "StartDateRange is Required...!",
-            },
-        ],
-    },
+        Validations: [],
+      }
     ];
   }
   getDcrRegisterFormControls() {

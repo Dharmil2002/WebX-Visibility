@@ -56,6 +56,7 @@ import { ChequeRegisterComponent } from './cheque-register/cheque-register.compo
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
+import { StockReportComponent } from './stock-report/stock-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -117,7 +118,8 @@ import { ControlTowerDashboardComponent } from './control-tower-dashboard/contro
     ChequeRegisterComponent,
     CashBankBookReportComponent,
     DashboardComponent,
-    ControlTowerDashboardComponent
+    ControlTowerDashboardComponent,
+    StockReportComponent
   ],
   exports:[],
 

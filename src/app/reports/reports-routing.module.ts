@@ -16,6 +16,7 @@ import { ChequeRegisterComponent } from './cheque-register/cheque-register.compo
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
+import { StockReportComponent } from './stock-report/stock-report.component';
 
 
 const routes: Routes = [
@@ -34,7 +35,9 @@ const routes: Routes = [
   { path: "General-ledger-report", component: GeneralLedgerReportComponent },
   { path: "Cheque-Register-Report", component: ChequeRegisterComponent },
   { path: "Dashboard", component: DashboardComponent },
-  { path: "ControlTower", component: ControlTowerDashboardComponent },
+  { path: "ControlTower", component: ControlTowerDashboardComponent }, 
+  { path: "Stock-Report", component: StockReportComponent }
+ 
 ];
 
 @NgModule({

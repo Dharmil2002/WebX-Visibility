@@ -3,6 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
 import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
@@ -12,6 +13,7 @@ import { StockReportService } from 'src/app/Utility/module/reports/stock-report.
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { StockReport } from 'src/assets/FormControls/Reports/stock-report-controls/stock-report';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-stock-report',
@@ -99,6 +101,27 @@ export class StockReportComponent implements OnInit {
     GoneForDeliveryGSTCharged: "GoneForDelivery GSTCharged",
     GoneForDeliveryDocketTotal: "GoneForDelivery DocketTotal"
   }
+  tableLoad = true;
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  DetailHeader = {
+  }
+  linkArray = [];
+
+  METADATA = {
+    checkBoxRequired: true,
+    noColumnSort: ["checkBoxRequired"],
+  };
+  staticField = [
+    // "openbal",
+    "dr",
+    "cr",
+    "bal",
+    "openingBalance"
+  ];
   constructor(private masterService: MasterService,
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -107,6 +130,8 @@ export class StockReportComponent implements OnInit {
     private generalService: GeneralService,
     private stockReportService: StockReportService,
     private generalLedgerReportService: GeneralLedgerReportService,
+    private snackBarUtilityService: SnackBarUtilityService,
+
   ) { }
 
   ngOnInit(): void {
@@ -183,37 +208,64 @@ export class StockReportComponent implements OnInit {
   //#endregion
   //#region to export csv file
   async save() {
-    const startValue = new Date(this.stockReportForm.controls.start.value);
-    const endValue = new Date(this.stockReportForm.controls.end.value);
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const startValue = new Date(this.stockReportForm.controls.start.value);
+        const endValue = new Date(this.stockReportForm.controls.end.value);
 
-    const startDate = moment(startValue).startOf('day').toDate();
-    const endDate = moment(endValue).endOf('day').toDate();
+        const startDate = moment(startValue).startOf('day').toDate();
+        const endDate = moment(endValue).endOf('day').toDate();
 
-    const paybasisList = Array.isArray(this.stockReportForm.value.paybasisHandler)
-      ? this.stockReportForm.value.paybasisHandler.map(x => x.value)
-      : [];
+        const paybasisList = Array.isArray(this.stockReportForm.value.paybasisHandler)
+          ? this.stockReportForm.value.paybasisHandler.map(x => x.value)
+          : [];
 
-    const modeList = Array.isArray(this.stockReportForm.value.modeHandler)
-      ? this.stockReportForm.value.modeHandler.map(x => x.value)
-      : [];
+        const modeList = Array.isArray(this.stockReportForm.value.modeHandler)
+          ? this.stockReportForm.value.modeHandler.map(x => x.value)
+          : [];
 
-    const BookingType = this.stockReportForm.value.BookingType;
-    const dateType = this.stockReportForm.value.DateType;
-    const locationType = this.stockReportForm.value.LocationType;
-    const stockType = Array.isArray(this.stockReportForm.value.StockType) ? '' : this.stockReportForm.value.StockType;
-    const formatType = this.stockReportForm.value.FormatType;
-    const fromLocation = this.stockReportForm.value.fromLocation.value;
-    const toLocation = this.stockReportForm.value.toLocation.value;
-    const cumulativeLocation = await this.generalLedgerReportService.GetReportingLocationsList(this.storage.branch);
-    cumulativeLocation.push(this.storage.branch);
+        const BookingType = this.stockReportForm.value.BookingType;
+        const dateType = this.stockReportForm.value.DateType;
+        const locationType = this.stockReportForm.value.LocationType;
+        const stockType = Array.isArray(this.stockReportForm.value.StockType) ? '' : this.stockReportForm.value.StockType;
+        const formatType = this.stockReportForm.value.FormatType;
+        const fromLocation = this.stockReportForm.value.fromLocation.value;
+        const toLocation = this.stockReportForm.value.toLocation.value;
+        const cumulativeLocation = await this.generalLedgerReportService.GetReportingLocationsList(this.storage.branch);
+        cumulativeLocation.push(this.storage.branch);
 
-    const requestbody = { startDate, endDate, modeList, paybasisList, BookingType, stockType, dateType, locationType, formatType, fromLocation, toLocation,cumulativeLocation }
-    // console.log(requestbody);
-    console.log(requestbody);
-    const data = await this.stockReportService.getStockData(requestbody);
-    console.log(data);
+        const requestbody = { startDate, endDate, modeList, paybasisList, BookingType, stockType, dateType, locationType, formatType, fromLocation, toLocation, cumulativeLocation }
+        // console.log(requestbody);
+        console.log(requestbody);
+        const data = await this.stockReportService.getStockData(requestbody);
+        console.log(data);
 
 
+        if (!data || (Array.isArray(data) && data.length === 0)) {
+
+          Swal.fire({
+            icon: "error",
+            title: "No Records Found",
+            text: "Cannot Download CSV",
+            showConfirmButton: true,
+          });
+
+          return;
+        }
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 1000);
+        //this.tableData = data
+        this.tableLoad = false
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          "No Records Found"
+        );
+      }
+    }, "Stock Report Generating Please Wait..!");
   }
+
   //#endregion
 }

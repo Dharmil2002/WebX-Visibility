@@ -343,6 +343,7 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
+                functions: { onChange: "getVolControls" },
                 Validations: [
                 ],
                 additionalData: {

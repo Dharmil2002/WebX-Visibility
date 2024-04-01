@@ -49,7 +49,6 @@ export class QueryPageComponent implements OnInit {
     const start = this.ConsignmentQueryForm.controls.start.value
     const end = this.ConsignmentQueryForm.controls.end.value
     const Docket = this.ConsignmentQueryForm.controls.Docket.value
-    console.log('start' , start)
 
     const QueryJson = {
       Docket: Docket || undefined,

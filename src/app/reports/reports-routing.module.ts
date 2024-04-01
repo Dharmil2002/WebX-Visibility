@@ -36,8 +36,7 @@ const routes: Routes = [
   { path: "Cheque-Register-Report", component: ChequeRegisterComponent },
   { path: "Dashboard", component: DashboardComponent },
   { path: "ControlTower", component: ControlTowerDashboardComponent }, 
-  { path: "Stock-Report", component: StockReportComponent }
- 
+  { path: "stock-report", component: StockReportComponent } 
 ];
 
 @NgModule({

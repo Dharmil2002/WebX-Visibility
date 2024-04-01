@@ -6,8 +6,8 @@
         </app-form-webxpress>
     </form>
 
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="DetailHeader"
-        [tableData]="tableData" [metaData]="METADATA" [staticField]="staticField" [Link]="linkArray"
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="summaryHeader"
+        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray"
         (functionCallEmitter)="functionCallHandler($event)">
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

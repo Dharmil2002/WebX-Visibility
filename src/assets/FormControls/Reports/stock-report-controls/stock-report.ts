@@ -36,12 +36,12 @@ export class StockReport {
                 placeholder: '',
                 type: 'Staticdropdown',
                 value: [
-
-                    { value: "Booking", name: "Booking Stock" },
-                    { value: "Delivery", name: "Delivery Stock" },
-                    { value: "InTransit", name: "In Transit Stock" },
-                    { value: "Transhipment", name: "Transhipment Stock" },
-                    { value: "GoneforDelivery", name: "Gone for Delivery" },
+                    { value: "0", name: "All Stock"},
+                    { value: "1", name: "Booking Stock" },
+                    { value: "2", name: "Delivery Stock" },
+                    { value: "3", name: "In Transit Stock" },
+                    { value: "4", name: "Transhipment Stock" },
+                    { value: "5", name: "Gone for Delivery" },
                 ],
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -52,8 +52,8 @@ export class StockReport {
                 placeholder: '',
                 type: 'Staticdropdown',
                 value: [
-                    { value: "OriginLocation", name: "Origin Location" },
-                    { value: "CurrentLocation", name: "Current Location" }
+                    { value: "CurrentLocation", name: "Stock Location" },
+                    { value: "OriginLocation", name: "Origin Location" }
                 ],
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -160,7 +160,7 @@ export class StockReport {
             //     generatecontrol: true, disable: false
             // },
             {
-                name: 'FormatType',
+                name: 'ReportType',
                 label: ' ',
                 placeholder: '',
                 type: 'radiobutton',

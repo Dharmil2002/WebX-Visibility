@@ -89,6 +89,17 @@ export class xlsxutilityService {
             );
             validationObservables.push(validationObservable);
           }
+          if ("TakeFromArrayList" in validation && value) {
+            const valueItems = String(value).split(',').map(item => item.trim().toLowerCase());
+            const invalidItems = valueItems.filter(item => !validation.TakeFromArrayList.some(listItem =>
+              String(listItem).toLowerCase() === item
+            ));
+
+            if (invalidItems.length > 0) {
+              errors.push(`${rule.ItemsName} (${invalidItems.join(', ')}) is not in the allowed list.`);
+            }
+          }
+
         }
         if (errors.length > 0) {
           break; // Exit the loop if errors are found

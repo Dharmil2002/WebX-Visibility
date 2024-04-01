@@ -179,6 +179,7 @@ import { MenuAccessRightComponent } from "./Admin/MenuAccessRight/menu-access-ri
 import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocation.component';
 import { DcrManagementComponent } from "./dcr-series/dcr-management/dcr-management.component";
 import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.component";
+import { CustomerMasterUploadComponent } from './customer-master/customer-master-upload/customer-master-upload.component';
 
 @NgModule({
   imports: [
@@ -372,7 +373,8 @@ import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.
     MenuAccessRightComponent,
     DcrAllocationComponent,
     DcrManagementComponent,
-    ActiveSeriesComponent
+    ActiveSeriesComponent,
+    CustomerMasterUploadComponent
 
   ],
 

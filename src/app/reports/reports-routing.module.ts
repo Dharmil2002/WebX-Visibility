@@ -21,6 +21,9 @@ import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/p
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
+import { TrialBalanceCriteriaComponent } from './Account Report/Components/TrialBalance/trial-balance-criteria/trial-balance-criteria.component';
+import { TrialBalanceViewComponent } from './Account Report/Components/TrialBalance/trial-balance-view/trial-balance-view.component';
+import { TrialBalanceViewDetailsComponent } from './Account Report/Components/TrialBalance/trial-balance-view-details/trial-balance-view-details.component';
 
 
 const routes: Routes = [
@@ -43,6 +46,9 @@ const routes: Routes = [
   { path: "AccountReport/ProfitAndLossviewdetails", component: ProfitAndLossViewDetailsComponent },
   { path: "Dashboard", component: DashboardComponent },
   { path: "ControlTower", component: ControlTowerDashboardComponent },
+  { path: "AccountReport/TrialBalance", component: TrialBalanceCriteriaComponent },
+  { path: "AccountReport/TrialBalanceview", component: TrialBalanceViewComponent },
+  { path: "AccountReport/TrialBalanceviewdetails", component: TrialBalanceViewDetailsComponent },
 
 ];
 

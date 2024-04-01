@@ -6,7 +6,6 @@ import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Cus
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { StockReportService } from 'src/app/Utility/module/reports/stock-report.service';
@@ -101,6 +100,8 @@ export class StockReportComponent implements OnInit {
     GoneForDeliveryGSTCharged: "GoneForDelivery GSTCharged",
     GoneForDeliveryDocketTotal: "GoneForDelivery DocketTotal"
   }
+  submit = 'Download';
+
   tableLoad = true;
   dynamicControls = {
     add: false,
@@ -127,7 +128,6 @@ export class StockReportComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private locationService: LocationService,
     private storage: StorageService,
-    private generalService: GeneralService,
     private stockReportService: StockReportService,
     private generalLedgerReportService: GeneralLedgerReportService,
     private snackBarUtilityService: SnackBarUtilityService,
@@ -154,6 +154,7 @@ export class StockReportComponent implements OnInit {
     this.stockReportForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.stockReportForm.controls['DateType'].setValue('BookingDate');
     this.stockReportForm.controls['LocationType'].setValue('OriginLocation');
+    this.stockReportForm.controls["FormatType"].setValue('Register');
   }
   //#endregion
   async getDropdownData() {
@@ -164,15 +165,12 @@ export class StockReportComponent implements OnInit {
 
     // Fetch branch list asynchronously
     const locationList = await this.locationService.locationFromApi();
-    const fromReportingOfficeList = await this.generalService.getGeneralMasterData("HRCHY");
-    // console.log(fromReportingOfficeList);
-
+ 
     // Filter issuing bank dropdown
     this.filter.Filter(this.jsonControlArray, this.stockReportForm, paybasisList, "paybasis", false);
     this.filter.Filter(this.jsonControlArray, this.stockReportForm, modeList, "mode", false);
     this.filter.Filter(this.jsonControlArray, this.stockReportForm, locationList, "toLocation", false);
     this.filter.Filter(this.jsonControlArray, this.stockReportForm, locationList, "fromLocation", false);
-    this.stockReportForm.controls["FormatType"].setValue('Register');
 
   }
 

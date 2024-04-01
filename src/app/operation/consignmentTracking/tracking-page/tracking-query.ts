@@ -1,9 +1,9 @@
-export const GetTrakingDataPipeLine = ()=>{
+export const GetTrakingDataPipeLine = () => {
   const Mode = localStorage.getItem("Mode");
-  if(Mode == "FTL"){
+  if (Mode == "FTL") {
     return [
       {
-       D$lookup: {
+        D$lookup: {
           from: "dockets",
           localField: "dKTNO",
           foreignField: "dKTNO",
@@ -11,32 +11,28 @@ export const GetTrakingDataPipeLine = ()=>{
         },
       },
       {
-       D$unwind: "$docketData",
+        D$unwind: "$docketData",
       },
       {
-       D$addFields: {
+        D$addFields: {
           TransitMode: {
-           D$concat: [
-              "$docketData.pAYTYPNM",
-              " / ",
-              "$docketData.tRNMODNM",
-              " / ",
-              "$docketData.mODNM",
-            ],
+            Party: "$docketData.pAYTYPNM",
+            Mod: "$docketData.tRNMODNM",
+            Servis: "$docketData.mODNM",
           },
           Consignee: {
-           D$concat: [
+            D$concat: [
               {
-               D$toString: "$docketData.cSGECD",
+                D$toString: "$docketData.cSGECD",
               },
               " : ",
               "$docketData.cSGENM",
             ],
           },
           Consignor: {
-           D$concat: [
+            D$concat: [
               {
-               D$toString: "$docketData.cSGNCD",
+                D$toString: "$docketData.cSGNCD",
               },
               " : ",
               "$docketData.cSGNNM",
@@ -45,16 +41,15 @@ export const GetTrakingDataPipeLine = ()=>{
         },
       },
       {
-       D$lookup: {
+        D$lookup: {
           from: "docket_events",
           localField: "dKTNO",
           foreignField: "dKTNO",
           as: "DocketTrackingData",
         },
       },
-    ]
-    
-  }else{
+    ];
+  } else {
     return [
       {
         D$lookup: {
@@ -70,13 +65,9 @@ export const GetTrakingDataPipeLine = ()=>{
       {
         D$addFields: {
           TransitMode: {
-            D$concat: [
-              "$docketData.pAYTYPNM",
-              " / ",
-              "$docketData.tRNMODNM",
-              " / ",
-              "$docketData.sVCTYPN",
-            ],
+            Party: "$docketData.pAYTYPNM",
+            Mod: "$docketData.tRNMODNM",
+            Servis: "$docketData.sVCTYPN",
           },
           Consignee: {
             D$concat: [
@@ -106,7 +97,6 @@ export const GetTrakingDataPipeLine = ()=>{
           as: "DocketTrackingData",
         },
       },
-    ]
+    ];
   }
-
-}
+};

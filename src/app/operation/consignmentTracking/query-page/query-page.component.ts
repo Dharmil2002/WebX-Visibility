@@ -12,7 +12,7 @@ import { Router } from "@angular/router";
 export class QueryPageComponent implements OnInit {
   breadscrums = [
     {
-      title: "Consignment Query Page",
+      title: "Tracking Query",
       items: ["Home"],
       active: "Consignment Tracking",
     },

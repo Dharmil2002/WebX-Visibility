@@ -24,49 +24,71 @@ export class ViewTrackingPopupComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:12%",
     },
-    oPSSTS: {
+    AdditionalDetails: {
       Title: "Additional Details",
       class: "matcolumnleft",
       Style: "min-width:25%",
     },
-    eVNID: {
-      Title: "User",
+
+    Event: {
+      Title: "Event",
       class: "matcolumnleft",
-      Style: "min-width:10%",
+      Style: "min-width:15%",
     },
     EDD: {
       Title: "Entry Date",
       class: "matcolumncenter",
-      Style: "min-width:12%",
+      Style: "min-width:10%",
     },
     Location: {
       Title: "Current Location",
-      class: "matcolumncenter",
-      Style: "min-width:10%",
+      class: "matcolumnleft",
+      Style: "min-width:7%",
     },
     DocNo: {
       Title: "Document Number",
-      class: "matcolumncenter",
-      Style: "min-width:20%",
+      class: "matcolumnleft",
+      Style: "min-width:15%",
+    },
+    eNTBY: {
+      Title: "User",
+      class: "matcolumnleft",
+      Style: "min-width:5%",
     },
   };
-  staticField = ["Date", "oPSSTS", "eVNID", "EDD", "Location", "DocNo"];
+  staticField = [
+    "Date",
+    "AdditionalDetails",
+    "eNTBY",
+    "EDD",
+    "Event",
+    "Location",
+    "DocNo",
+  ];
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
   TableData: any;
   constructor(
     public dialogRef: MatDialogRef<ViewTrackingPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    console.log("data" ,this.data)
-    this.TableData = this.data?.map((x)=>{
-      return {
-        ...x,
-        Date:moment(x.eVNDT).format("DD-MM-YYYY hh:mm"),
-        EDD:moment(x.eNTDT).format("DD-MM-YYYY hh:mm"),
-        Location: x.lOC || x.eNTLOC,
-        DocNo:x.dOCNO || x.dKTNO
-      }
-    })
+    const sortByDate = (a, b) => {
+      return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
+    };
+    this.TableData = this.data
+      ?.map((x) => {
+        return {
+          ...x,
+          Date: moment(x.eVNDT).format("DD-MM-YYYY hh:mm"),
+          EDD: moment(x.eNTDT).format("DD-MM-YYYY hh:mm"),
+          Location: x.lOC || x.eNTLOC,
+          DocNo: x.dOCNO || x.dKTNO,
+          AdditionalDetails: x.oPSSTS || x.oPSTS,
+          Event: x.eVNID + " : " + x.eVNDES,
+        };
+      })
+      .sort(sortByDate);
+
+    
     this.isTableLode = true;
   }
 

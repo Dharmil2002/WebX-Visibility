@@ -28,25 +28,58 @@ export class TrackingPageComponent implements OnInit {
     },
   ];
   Mode = localStorage.getItem("Mode");
-  range = new FormGroup({
-    StartDate: new FormControl<Date | null>(null),
-    EndDate: new FormControl<Date | null>(null),
-  });
   QueryData: any;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   isTouchUIActivated = false;
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
-  trakingData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   obs: Observable<any>;
   dataSource: MatTableDataSource<any>;
   TableData: any;
   isTableLode: boolean = false;
+  daterangedisabled: boolean = true;
+  selectedIndex = 0
   TotalDocket: number = 0;
   BookedDocket: number = 0;
   InTransitDocket: number = 0;
   OFDDocket: number = 0;
   DeliveredDocket: number = 0;
+  CountCard = [
+    {
+      title: "Total Results",
+      count: 0,
+      Color: "salmon",
+      _id:0
+    },
+    {
+      title: "Booked",
+      count: 0,
+      Color: "lightseagreen",
+      _id:1
+
+    },
+    {
+      title: "InTransit",
+      count:  0,
+      Color: "rgb(91, 196, 91)",
+      _id:4
+
+    },
+    {
+      title: "OFD",
+      count: 0,
+      Color: "rgb(74, 168, 199)",
+      _id:0
+
+    },
+    {
+      title: "Delivered",
+      count: 0,
+      Color: "rgb(123, 140, 161)",
+      _id:3
+
+    },
+  ];
   headerForCsv = {
     CnoteNo: "Cnote No",
     EDD: "EDD",
@@ -63,7 +96,7 @@ export class TrackingPageComponent implements OnInit {
   formData = [
     {
       name: "StartDate",
-      label: "SelectDateRange",
+      label: "Select Date Range Search",
       placeholder: "Select Date",
       type: "daterangpicker",
       value: "",
@@ -111,7 +144,6 @@ export class TrackingPageComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.QueryData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.QueryData", this.QueryData);
       if (this.QueryData.Docket) {
         const Query = {
           D$match: {
@@ -181,7 +213,7 @@ export class TrackingPageComponent implements OnInit {
         { ...QueryFilter },
         {
           D$group: {
-            _id: "$sTSNM",
+            _id: "$sTS",
             Count: {
               D$sum: 1,
             },
@@ -195,14 +227,30 @@ export class TrackingPageComponent implements OnInit {
     );
     if (res.success) {
       res.data?.map((x) => {
-        if (x._id == "Booked") {
-          this.BookedDocket = x.Count;
-        } else if (x._id == "InTransit") {
-          this.InTransitDocket = x.Count;
+        if (x._id == 1) {
+         this.CountCard.forEach((t)=> {
+          if(t.title == "Booked"){
+            t.count = x.Count
+          }
+         })
+        } else if (x._id == 4) {
+          this.CountCard.forEach((t)=> {
+            if(t.title == "InTransit"){
+              t.count = x.Count
+            } 
+           })
         } else if (x._id == "OFD") {
-          this.OFDDocket = x.Count;
-        } else if (x._id == "Delivered") {
-          this.DeliveredDocket = x.Count;
+          this.CountCard.forEach((t)=> {
+            if(t.title == "OFD"){
+              t.count = x.Count
+            }
+           })
+        } else if (x._id == 3) {
+          this.CountCard.forEach((t)=> {
+            if(t.title == "Delivered"){
+              t.count = x.Count
+            }
+           })
         }
       });
     }
@@ -222,8 +270,12 @@ export class TrackingPageComponent implements OnInit {
     );
     if (res.success) {
       if (res.data.length) {
-        this.TableData = res.data;
-        this.TotalDocket = res.data.length;
+        this.TableData = res.data.sort((a, b) => new Date(b.sTSTM).getTime() - new Date(a.sTSTM).getTime());
+        this.CountCard.forEach((t)=> {
+          if(t.title == "Total Results"){
+            t.count = res.data.length
+          } 
+         })
         this.isTableLode = true;
         this.dataSource = new MatTableDataSource<any>(this.TableData);
         this.ngOnInit();
@@ -268,13 +320,12 @@ export class TrackingPageComponent implements OnInit {
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
       data: eventData?.DocketTrackingData,
-      width: "1200px",
+      width: "1400px",
       height: "100%",
       disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log("The dialog was closed");
     });
   }
 
@@ -309,5 +360,16 @@ export class TrackingPageComponent implements OnInit {
       }),
     ];
     CsvDataServiceService.exportToCsv(this.csvFileName, formattedData);
+  }
+
+  SetCountCard(item , index){
+  this.selectedIndex = index
+  if(item.title == "Total Results"){
+    this.dataSource = new MatTableDataSource<any>(this.TableData);
+    this.ngOnInit();
+  }else{
+    this.dataSource = new MatTableDataSource<any>(this.TableData.filter((x)=> x.sTS == item._id));
+    this.ngOnInit();
+  }
   }
 }

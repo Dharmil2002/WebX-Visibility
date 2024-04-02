@@ -3,9 +3,6 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
-import { AddressService } from 'src/app/Utility/module/masters/Address/address.service';
-import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
-import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { customerModel } from 'src/app/core/models/Masters/customerMaster';
@@ -35,12 +32,10 @@ export class CustomerMasterUploadComponent implements OnInit {
     private dialog: MatDialog,
     private masterService: MasterService,
     private dialogRef: MatDialogRef<CustomerMasterUploadComponent>,
-    private objGeneralService: GeneralService,
     private objState: StateService,
     private objPinCodeService: PinCodeService,
-    private objLocationService: LocationService,
     private storage: StorageService,
-    private objAddressService: AddressService) {
+  ) {
     this.customerUploadForm = fb.group({
       singleUpload: [""],
     });
@@ -104,7 +99,7 @@ export class CustomerMasterUploadComponent implements OnInit {
             ItemsName: "CustomerName",
             Validations: [
               { Required: true },
-              { pattern: "^[a-zA-Z 0-9]{3,200}$" },
+              { Pattern: "^[a-zA-Z 0-9]{3,200}$" },
               {
                 Exists: this.existingData.map((name) => {
                   return name.customerName;
@@ -138,23 +133,26 @@ export class CustomerMasterUploadComponent implements OnInit {
           {
             ItemsName: "CustomerEmailID",
             Validations: [
-              { pattern: "^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$" }
+              { Pattern: "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
             ],
           },
           {
             ItemsName: "CustomerMobileNo",
             Validations: [
-              { pattern: "^[\d{10}]$" }
+              { Numeric: true },
+              { Pattern: "^[1-9][0-9]{9}$" }
             ],
           },
           {
             ItemsName: "ERPCode",
             Validations: [
-              { pattern: "^[a-zA-Z0-9]{4,100}$" },
+              { Pattern: "^[a-zA-Z0-9]{4,100}$" },
               {
-                Exists: this.existingData.map((item) => {
-                  return item.ERPcode;
-                })
+                Exists: this.existingData
+                  .filter(item => item.ERPcode !== null && item.ERPcode !== "" && item.ERPcode !== undefined)
+                  .map((item) => {
+                    return item.ERPcode;
+                  })
               },
               { DuplicateFromList: true }
             ],
@@ -162,17 +160,19 @@ export class CustomerMasterUploadComponent implements OnInit {
           {
             ItemsName: "PANNo",
             Validations: [
-              { pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" }
+              { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" }
             ],
           },
           {
             ItemsName: "CINNo",
             Validations: [
-              { pattern: "^[a-zA-Z0-9]{4,100}$" },
+              { Pattern: "^[a-zA-Z0-9]{4,100}$" },
               {
-                Exists: this.existingData.map((item) => {
-                  return item.CINnumber;
-                })
+                Exists: this.existingData
+                  .filter(item => item.CINnumber !== null && item.CINnumber !== "" && item.CINnumber !== undefined)
+                  .map((item) => {
+                    return item.CINnumber;
+                  })
               },
               { DuplicateFromList: true }
             ],
@@ -181,7 +181,7 @@ export class CustomerMasterUploadComponent implements OnInit {
             ItemsName: "RegisteredAddress",
             Validations: [
               { Required: true },
-              { pattern: "^.{4,500}$" }
+              { Pattern: "^.{4,500}$" }
             ],
           },
           {
@@ -198,7 +198,7 @@ export class CustomerMasterUploadComponent implements OnInit {
           {
             ItemsName: "MSMENo",
             Validations: [
-              { pattern: "^[a-zA-Z0-9]{4,100}$" }
+              { Pattern: "^[a-zA-Z0-9]{4,100}$" }
             ],
           },
           {
@@ -234,7 +234,6 @@ export class CustomerMasterUploadComponent implements OnInit {
             }
             return element;
           }));
-          console.log(filteredData);
 
           this.OpenPreview(filteredData);
         } catch (error) {
@@ -298,18 +297,6 @@ export class CustomerMasterUploadComponent implements OnInit {
 
     try {
 
-      let req = {
-        companyCode: this.storage.companyCode,
-        collectionName: "customer_detail",
-        filter: {},
-        sorting: {
-          customerCode: -1
-        }
-      }
-      const customer = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req))
-      const rescustomer = customer?.data;
-      const lastcustomerCode = rescustomer.customerCode || "CUST00000";
-      const customerCode = nextKeyCode(lastcustomerCode);
       // Array to store processed location data
       const uploadData: customerModel[] = [];
 
@@ -317,7 +304,7 @@ export class CustomerMasterUploadComponent implements OnInit {
       data.forEach(element => {
 
         // Call the processData function to transform a single location element
-        const processedData = this.processData(element);
+        const processedData = this.processData(element, this.customerGrpList, this.CustomerCategoryList, this.locationList);
         //console.log(processedData);
 
         // Add the processed data to the locationData array
@@ -326,24 +313,24 @@ export class CustomerMasterUploadComponent implements OnInit {
 
 
       // Format the final data with additional information
-      const formattedData = this.formatContractData(uploadData, customerCode);
+      const formattedData = await this.formatCustomerData(uploadData);
       console.log(formattedData);
-      const request = {
-        companyCode: this.storage.companyCode,
-        collectionName: "customer_detail",
-        data: uploadData,
-      };
+      // const request = {
+      //   companyCode: this.storage.companyCode,
+      //   collectionName: "customer_detail",
+      //   data: uploadData,
+      // };
 
-      const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
-      if (response) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Valid customer Data Uploaded",
-          showConfirmButton: true,
-        });
-      }
+      // const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
+      // if (response) {
+      //   // Display success message
+      //   Swal.fire({
+      //     icon: "success",
+      //     title: "Success",
+      //     text: "Valid customer Data Uploaded",
+      //     showConfirmButton: true,
+      //   });
+      // }
 
     } catch (error) {
       console.error("Error during saving customer data:", error);
@@ -357,46 +344,49 @@ export class CustomerMasterUploadComponent implements OnInit {
       });
     }
   }
-  // Function to format contract data
-  formatContractData(processedData, customerCode) {
-    console.log(`processedData=${processedData}`, `customerCode=${customerCode}`);
 
-    return processedData.map((item, index) => {
-      const formattedItem = {
-        ...item,
-        _id: `${this.storage.companyCode}-${customerCode + index}`,
-        customerCode: customerCode
-      };
-
-      return formattedItem;
-    });
-  }
   // Function to process a single location element
-  processData(element) {
+  processData(element, customerGrpList, CustomerCategoryList, locationList) {
+
+    const updateCustomerGrpList = customerGrpList.find(item => item.name === element.CustomerGroup);
+    const updateCustomerCategory = CustomerCategoryList.find(item => item.name === element.CustomerCategory);
+
+    let customerLocations: string[];
+
+    // Check if element.CustomerLocation contains a comma
+    if (element.CustomerLocation.includes(',')) {
+      // If it contains a comma, split into an array of locations
+      customerLocations = element.CustomerLocation.split(',').map(location => location.trim());
+    } else {
+      // If it doesn't contain a comma, treat it as a single location
+      customerLocations = [element.CustomerLocation.trim()];
+    }
+
+    // Find the matching locations in locationList
+    const updateLocationList = locationList.filter(item => customerLocations.includes(item.name));
+
+    console.log(updateCustomerGrpList, updateCustomerCategory, updateLocationList);
 
     // Create a new customerModel instance to store processed data
     const processedData = new customerModel({});
 
     // Set basic properties
     processedData.companyCode = this.storage.companyCode;
-    processedData.customerGroup = element.CustomerGroup;
+    processedData.customerGroup = updateCustomerGrpList.name || '';
     processedData.customerName = element.CustomerName.toUpperCase();
-    // processedData.customerCode = customerCode;
-    processedData.CustomerCategory = element.CustomerCategory;
-    processedData.customerLocations = element.CustomerLocation ?
-      Array.isArray(element.CustomerLocation)
-        ? element.CustomerLocation
-        : element.CustomerLocation.split(',').map(pinCode => pinCode)
-      : [];
+    processedData.CustomerCategory = updateCustomerCategory.name || '';
+    processedData.customerLocations = updateLocationList.map((x) => {
+      return x.name;
+    }) || [];
     processedData.Customer_Emails = element.CustomerEmailID;
-    processedData.customer_mobile = element.CustomerMobileNo;
+    processedData.customer_mobile = parseInt(element.CustomerMobileNo);
     processedData.RegisteredAddress = element.RegisteredAddress;
-    processedData.PinCode = element.PinCode;
+    processedData.PinCode = parseInt(element.PinCode);
     processedData.city = element.City;
     processedData.state = element.State;
     processedData.Country = element.Country;
-    processedData.BlackListed = element.BlackListed === 'true' ? true : false;
-    processedData.activeFlag = element.Active === 'true' ? true : false;
+    processedData.BlackListed = element.BlackListed === 'Y' ? true : false;
+    processedData.activeFlag = element.Active === 'Y' ? true : false;
     processedData.ERPcode = element.ERPCode;
     processedData.TANNumber = element.TANNo;
     processedData.PANnumber = element.PANNo;
@@ -406,6 +396,59 @@ export class CustomerMasterUploadComponent implements OnInit {
     // Return the processed data
     return processedData;
   }
+  // Function to format contract data
+  async formatCustomerData(processedData: any[]) {
+    try {
+      // Get the last customer code from the database outside the forEach loop
+      let lastCustomerCode = await this.getLastCustomerCode();
+
+      const formattedData: any[] = [];
+      // Sequentially process each item in processedData using forEach
+      processedData.forEach((item) => {
+        // Calculate the new customer code using nextKeyCode function
+        const newCustomerCode = nextKeyCode(lastCustomerCode);
+        // Update the last customer code for the next iteration
+        lastCustomerCode = newCustomerCode;
+
+        const formattedItem = {
+          ...item,
+          customerCode: newCustomerCode,
+          _id: `${this.storage.companyCode}-${newCustomerCode}`,
+        };
+
+        formattedData.push(formattedItem);
+      });
+
+      return formattedData;
+    } catch (error) {
+      // Handle any errors that occur during processing
+      console.error('Error in formatCustomerData:', error);
+      throw error; // Propagate the error
+    }
+  }
+  // Function to get last customer code
+  async getLastCustomerCode(): Promise<string> {
+    try {
+      // Construct the request object for fetching the last customer code
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "customer_detail",
+        filter: {},
+        sorting: { customerCode: -1 }
+      };
+
+      // Make an API call to fetch the last customer code
+      const customer = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
+
+      // Extract and return the last customer code or use a default value if not available
+      return customer?.data?.customerCode || "CUST00000";
+    } catch (error) {
+      // Handle any errors that occur during API call or processing
+      console.error('Error in getLastCustomerCode:', error);
+      throw error; // Propagate the error
+    }
+  }
+
   //#endregion
   //#region to download template file
   Download(): void {
@@ -420,7 +463,7 @@ export class CustomerMasterUploadComponent implements OnInit {
     this.dialogRef.close()
   }
   //#endregion
-  //#region to ocation list for location dropdown
+  //#region to location list for location dropdown
   async getLocationList() {
     const request = {
       companyCode: this.storage.companyCode,

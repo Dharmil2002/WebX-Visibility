@@ -125,17 +125,19 @@ export class xlsxutilityService {
 
       // Iterate through each duplicate rule
       duplicateRules.forEach((duplicateRule) => {
-        const existingLocations = new Set();
+        const existingData = new Set();
 
         // Iterate through filteredDataWithoutErrors to find duplicates in the specified field
         filteredDataWithoutErrors.forEach((item) => {
           const fieldValue = item[duplicateRule.ItemsName];
 
-          if (existingLocations.has(fieldValue)) {
-            item.error = item.error || [];
-            item.error.push(`Duplicate Entry.`);
-          } else {
-            existingLocations.add(fieldValue);
+          if (fieldValue) {
+            if (existingData.has(fieldValue)) {
+              item.error = item.error || [];
+              item.error.push(`Duplicate Entry.`);
+            } else {
+              existingData.add(fieldValue);
+            }
           }
         });
       });

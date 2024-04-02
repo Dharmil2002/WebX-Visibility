@@ -24,6 +24,7 @@ export class GenericTableV2Component
   // properties declaration to receive data from parent component
   @Input() dataSource: MatTableDataSource<any>;
   @Input() tableData;
+  @Input() columnGroup;
   @Input() csvData;
   @Input() columnHeader = [];
   @Input() TableStyle;
@@ -91,6 +92,7 @@ export class GenericTableV2Component
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
+    this.columnGroup = changes.columnGroup?.currentValue ?? this.columnGroup;
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
@@ -414,8 +416,8 @@ export class GenericTableV2Component
   Delete(element) {
     this.DeleteFunction.emit({ element })
   }
-  functionHandle(name, element) {
-    this.functionCallEmitter.emit({ functionName: name, data: element })
+  functionHandle(name, element, columnData = null, value = null) {
+    this.functionCallEmitter.emit({ functionName: name, data: element, columnData: columnData, value: value})
   }
   OnChangeToggle(event) {
     let context = { event };

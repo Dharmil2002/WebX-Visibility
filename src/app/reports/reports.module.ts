@@ -59,6 +59,7 @@ import { ProfitAndLossViewComponent } from './Account Report/Components/profit-a
 import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/profit-and-loss-view-details/profit-and-loss-view-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
+import { StockReportComponent } from './stock-report/stock-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -123,7 +124,8 @@ import { ControlTowerDashboardComponent } from './control-tower-dashboard/contro
     ProfitAndLossViewComponent,
     ProfitAndLossViewDetailsComponent,
     DashboardComponent,
-    ControlTowerDashboardComponent
+    ControlTowerDashboardComponent,
+    StockReportComponent
   ],
   exports: [],
 

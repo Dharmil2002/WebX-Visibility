@@ -1006,7 +1006,7 @@ export class ConsignmentLtl extends BaseControl {
                 }
             },
             {
-                name: 'gstTotAmt', label: 'GST Total Amount(₹)', placeholder: 'Total Amount', type: 'text',
+                name:'totAmt',label:'Grand Total Amount(₹)', placeholder: 'Grand Total Amount', type: 'number',
                 value:0.00, Validations: [],
                 additionalData: {
                     metaData: "freightDetails"

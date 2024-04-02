@@ -1066,4 +1066,154 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
+    async consgimentFieldMapping(data,isUpdate = false) {
+        let docketField = {
+            "_id": data?.id || "",
+            "cID": this.storage.companyCode,
+            "docNo": data?.docketNumber || "",
+            "dKTNO": data?.docketNumber || "",
+            "pRQNO":data?.prqNo||"",
+            "dKTDT": ConvertToDate(data?.docketDate),
+            "pAYTYP": data?.payType || "",
+            "pAYTYPNM": data?.payTypeName || "",
+            "bPARTY": data?.billingParty.value || "",
+            "bPARTYNM": data?.billingParty.name || "",
+            "cLOC": this.storage.branch || "",
+            "oRGN": data?.origin || "",
+            "fCT": data?.fromCity?.value.value || "",
+            "fPIN":data?.fromPinCode?.value.value||"",
+            "dEST": data?.destination?.value.value || "",
+            "tCT": data?.toCity?.value.value || "",
+            "tPIN": data?.toPinCode?.value.value || "",
+            "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
+            "pKGS": parseInt(data?.totalChargedNoOfpkg || 0),
+            "aCTWT": ConvertToNumber(data?.actualwt || 0, 3),
+            "cHRWT": ConvertToNumber(data?.chrgwt || 0, 3),
+            "iSCOM": true,
+            "cFTRATO": parseFloat(data?.cft_ratio || 0),
+            "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
+            "cSGE": {
+                "cD": data?.consignorName?.value || "",
+                "nM": data?.consignorName?.name || "",
+                "cT":data?.fromCity?.value.value || "",
+                "pIN":data?.fromPinCode?.value.value || "",
+                "aDD": data.cnoAddress?.name || data.cnoAddress,
+                "aDDCD": data.cnoAddress?.value || "A8888",
+                "gST": data?.cnogst || "",
+                "mOB": data?.ccontactNumber || "",
+                "aLMOB": data?.calternateContactNo || "",
+            },
+            "cSGN": {
+                "cD": data?.consigneeName?.value || "",
+                "nM": data?.consigneeName?.name || "",
+                "cT": data?.toCity?.value.value || "",
+                "pIN":data?.toPinCode?.value.value || "",
+                "aDD": data?.cneAddress?.name || data.cneAddress,
+                "aDDCD": data.cneAddress?.value || "A8888",
+                "gST": data?.cnegst||"",
+                "mOB": data?.cncontactNumber || "",
+                "aLMOB": data?.cnalternateContactNo || "",
+            },
+            "eDD": ConvertToDate(data?.edd),
+            "iSVOL": data?.f_vol || false,
+            "iSLOCAL": data?.local || false,
+            "iSODA": data?.oda || false,
+            "fRTRT": ConvertToNumber(data?.fRTRT || 0, 2),
+            "fRTRTY": data?.fRTRTY || "",
+            "fRTRTYN": data?.fRTRTY || "",
+            "fRTAMT": ConvertToNumber(data?.fRTAMT || 0, 2),
+            "oTHAMT": ConvertToNumber(data?.oTHAMT || 0, 2),
+            "gROAMT": ConvertToNumber(data?.gROAMT || 0, 2),
+            "rCM": data?.rCM || "",
+            "gSTAMT": ConvertToNumber(data?.gSTAMT || 0, 2),
+            "gSTCHAMT": ConvertToNumber(data?.gSTCHAMT || 0, 2),
+            "tOTAMT": ConvertToNumber(data?.tOTAMT || 0, 2),
+            "pKGTYN": data?.pkgsTypeName || "",
+            "pKGTY": data?.pkgsType || "",
+            "rSKTY": data?.rskty || "",//need to verfied field name risk
+            "rSKTYN": data?.rsktyName || "",
+            //"sVCTYP": data?.svcType || "",
+            //"sVCTYPN": data?.svcTypeName || "",
+            "dELTYPE": data?.delivery_type || "",
+            "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
+            "iNVTOT": ConvertToNumber(data?.totAmt || 0, 2),
+            "pARTQTY": parseInt(data?.totalPartQuantity || 0),
+            "tRNMOD": data?.tranType || "",//check value transMode
+            "tRNMODNM": data?.tranTypeName || "",//check value transMode
+            "eNTBY": this.storage.userName,
+            "eNTDT": new Date(),
+            "eNTLOC": this.storage.branch,
+            "oSTS": DocketStatus.Booked,
+            "oSTSN": DocketStatus[DocketStatus.Booked],
+            "fSTS": DocketFinStatus.Pending,
+            "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
+            "cONTRACT": "",
+        };
+
+        let invoiceDetails = data.invoiceDetails.map((element) => {
+            let l = ConvertToNumber(element?.length || 0, 3);
+            let b = ConvertToNumber(element?.breadth || 0, 3);
+            let h = ConvertToNumber(element?.height || 0, 3);
+
+            const invoiceJson = {
+                "_id": isUpdate ? `${this.storage.companyCode}-${data?.docketNumber}-${element?.INVNO}` : "",
+                "cID": this.storage.companyCode,
+                "dKTNO": isUpdate ? data?.docketNumber : "",
+                "iNVNO": element?.invoiceNo || "",
+                "iNVDT": ConvertToDate(element?.invoiceDate),
+                "vOL": {
+                    "uNIT": "FT",
+                    "l": roundToNumber(l, 3),
+                    "b": roundToNumber(b, 3),
+                    "h": roundToNumber(h, 3),
+                    "cU": roundToNumber(l * b * h, 3),
+                },
+                "iNVAMT": ConvertToNumber(element?.invoiceAmount || 0, 2),
+                "cURR": "INR",
+                "pKGS": parseInt(element?.noOfPackage || 0),
+                "cFTWT": ConvertToNumber(element?.cubWT || 0, 2),
+                "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),
+                "cHRWT": ConvertToNumber(element?.chargedWeight || 0, 2),
+                "mTNM": element?.materialName || "",
+                "hSN": element?.HSN_CODE || "",
+                "hSNNM": element?.HSN_CODE || "",
+                "eWBNO": data?.ewayBillNo || "",
+                "eWBDT": ConvertToDate(element?.billDate),
+                "eXPDT": ConvertToDate(data?.expiryDate),
+                "eNTBY": this.storage.userName,
+                "eNTDT": new Date(),
+                "eNTLOC": this.storage.branch,
+            }
+            return invoiceJson;
+        });
+
+        docketField["iNVTOT"] = invoiceDetails.reduce((a, c) => a + (c.invoiceAmount || 0), 0);
+        let docketFin = {
+            _id: `${this.storage.companyCode}-${data?.docketNumber}`,
+            cID: this.storage.companyCode,
+            dKTNO:data?.docketNumber||"",
+            pCD: data?.billingParty.value,
+            pNM:data?.billingParty.name || "",
+            bLOC: this.storage.branch,
+            cURR: "INR",
+            fRTAMT:ConvertToNumber(data?.freight_amount || 0, 2),
+            oTHAMT:ConvertToNumber(data?.otherAmount || 0, 2),
+            gROAMT: ConvertToNumber(data?.subTot || 0, 2),
+            rCM:"",
+            gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
+            gSTCHAMT:ConvertToNumber(data?.gstChargedAmount || 0, 2),
+            cHG: "",
+            nFCHG:0,
+            tOTAMT:ConvertToNumber(docketField['iNVTOT'] || 0, 2),
+            sTS:DocketStatus.Booked,
+            sTSNM:DocketStatus[DocketStatus.Booked],
+            sTSTM: new Date(),
+            isBILLED: false,
+            bILLNO: "",
+            eNTDT: new Date(),
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName,
+          }
+      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails,"docketFin":docketFin};
+    }
 }

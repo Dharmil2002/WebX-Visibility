@@ -189,7 +189,7 @@ const routes: Routes = [
     component: TrackingPageComponent
   },
   {
-    path: "ConsignmentEntryLTL",
+    path: "consignment-entry-ltl",
     component: ConsignmentLTLEntryFormComponent
   }
   

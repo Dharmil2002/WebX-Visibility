@@ -20,6 +20,7 @@ import { ConsignmentChargesComponent } from './consignment-charges/consignment-c
 import { ConsignmentOtherInfoComponent } from './consignment-other-info/consignment-other-info.component';
 import { AddressService } from 'src/app/Utility/module/masters/Address/address.service';
 import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -79,6 +80,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private customerService: CustomerService,
     private addressService:AddressService,
     private vehicleStatusService: VehicleStatusService,
+    private docketService:DocketService,
     public dialog: MatDialog
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -111,7 +113,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.backPath = "/dashboard/Index?tab=6";
   }
   /*below function is for intailize the form controls */
   initializeFormControl() {
@@ -488,7 +490,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
  
   prqSelection() {
-    debugger
     this.prqData = this.prqNoDetail.find(
       (x) => x.prqNo == this.consignmentForm.controls["prqNo"].value.value
     );
@@ -540,5 +541,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     callback();
   }
-
+save(){
+  debugger
+  const data={...this.consignmentForm.value,...this.invoiceForm.value,...this.freightForm.value}
+  console.log(data);
+}
 }

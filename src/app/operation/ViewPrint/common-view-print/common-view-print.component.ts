@@ -6,6 +6,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
   selector: 'app-common-view-print',
   templateUrl: './common-view-print.component.html'
 })
+
 export class CommonViewPrintComponent implements OnInit {
   showView = false;
   HtmlTemplate;

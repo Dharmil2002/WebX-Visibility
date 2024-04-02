@@ -334,7 +334,7 @@ export class CustomerMasterUploadComponent implements OnInit {
       }
 
     } catch (error) {
-      console.error("Error during saving customer data:", error);
+      console.error("Error during saving customer data", error);
 
       // Display error message
       Swal.fire({

@@ -14,6 +14,6 @@
        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls"
        [columnHeader]="columnHeader" [tableData]="csv" [menuItems]="menuItems" [staticField]="staticField"
        [Link]="linkArray" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [metaData]="metaData"[filterColumn]="filterColumn"
-       [allColumnFilter]="allColumnFilter" [addAndEditPath]="addAndEditPath">
+       [allColumnFilter]="allColumnFilter" [addAndEditPath]="addAndEditPath" (menuItemClicked)="handleMenuItemClick($event)">
        </app-generic-table-v2>
   </div>

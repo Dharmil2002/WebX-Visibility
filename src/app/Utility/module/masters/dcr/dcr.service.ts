@@ -12,7 +12,7 @@ export class DCRService {
   constructor(
     private operation: OperationService,
     private storage: StorageService,
-    private masterServices: MasterService,
+    private masterServices: MasterService
   ) {}
   async getDCR(filter = {}) {
     const req = {
@@ -86,94 +86,146 @@ export class DCRService {
       "locName"
     );
   }
-  async getDCRregisterReportDetail( ) {
-    debugger
-    // const startValue = start;
-    // const endValue = end;
+  //   async getDCRregisterReportDetail( ) {
+  //     debugger
+  //     // const startValue = start;
+  //     // const endValue = end;
+  //     const reqBody = {
+  //         companyCode: this.storage.companyCode,
+  //         collectionName: "dcr_header",
+  //         filter: {
+  //             cID: this.storage.companyCode,
+  //         }
+  //     }
+  //     const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+  //     reqBody.collectionName = "dcr_history"
+  //     const resjobdetails = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
+  //     // reqBody.collectionName = "dcr_history"
+
+  //     let jobList = [];
+  //     jobList = { ...res.data,...resjobdetails.data};
+
+  //     // res.data.map((element) => {
+  //     //     const docketsDet = resdockets.data ? resdockets.data.filter((entry) => entry.jOBNO === element?.jID) : null;
+  //     //     const docketsDetVen = resdockets.data ? resdockets.data.find((entry) => entry.jOBNO === element?.jID) : null;
+  //     //     const jobchallansDet = resjobchallans.data ? resjobchallans.data.filter((entry) => entry.jID === element?.jID) : null;
+  //     //     const chaheaderDet = reschaheader.data ? reschaheader.data.find((entry) => entry.jID === element?.jID) : null;
+  //     //     const chaDet = reschadetails.data ? reschadetails.data.find((entry) => entry.cHAID === chaheaderDet?.cHAID) : null;
+  //     //     const docOpsDet = resdocketops.data ? resdocketops.data.find((entry) => entry.dKTNO === docketsDetVen?.dKTNO) : null;
+  //     //     const vendorBillDet = resvendBill.data ? resvendBill.data.find((entry) => entry.tRIPNO === docOpsDet?.tHC) : null;
+  //     //     const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.cUST.nM === docketsDetVen?.bPARTYNM) : null;
+
+  //     //     const containerNumbers = jobchallansDet ? jobchallansDet.map(entry => entry.cNNO).join(', ') : "";
+  //     //     const docketsNumbers = docketsDet ? docketsDet.map(entry => entry.dKTNO).join(', ') : "";
+  //     //     const actualweight = docketsDet ? docketsDet.map(entry => entry.aCTWT).join(', ') : "";
+  //     //     const docketDates = docketsDet ? docketsDet.map(entry => entry.dKTDT).join(', ') : "";
+  //     //     const JobMode = docketsDet ? docketsDet.map(entry => entry.mODNM).join(', ') : "";
+  //     //     const charWeight = docketsDet ? docketsDet.map(entry => entry.cHRWT).join(', ') : "";
+  //     //     // let jobData = {
+  //     //     //     "jobNo": element?.jID || '',
+  //     //     //     "jobDate": formatDocketDate(element?.jDT || new Date()),
+  //     //     //     "cNoteNumber": docketsNumbers,
+  //     //     //     "cNoteDate": formatDocketDate(docketDates ? docketDates.split(', ')[0] : new Date()),
+  //     //     //     "containerNumber": containerNumbers,
+  //     //     //     "billingParty": element?.bPARTYNM || '',
+  //     //     //     "bookingFrom": element?.fCT || "",
+  //     //     //     "toCity": element?.tCT || "",
+  //     //     //     "pkgs": element?.pKGS || "",
+  //     //     //     "weight": actualweight,
+  //     //     //     "jobMode": element?.tMODENM || "",
+  //     //     //     "noof20ftStd": jobchallansDet ? countContainers(jobchallansDet, "20 ft Standard") : 0,
+  //     //     //     "noof40ftStd": jobchallansDet ? countContainers(jobchallansDet, "40 ft Standard") : 0,
+  //     //     //     "noof45ftHC": jobchallansDet ? countContainers(jobchallansDet, "45 ft High Cube") : 0,
+  //     //     //     "noof20ftRf": jobchallansDet ? countContainers(jobchallansDet, "20 ft Reefer") : 0,
+  //     //     //     "noof40ftRf": jobchallansDet ? countContainers(jobchallansDet, "40 ft Reefer") : 0,
+  //     //     //     "noof40ftHCR": jobchallansDet ? countContainers(jobchallansDet, "40 ft High Cube Reefer") : 0,
+  //     //     //     "noof20ftOT": jobchallansDet ? countContainers(jobchallansDet, "20 ft Open Top") : 0,
+  //     //     //     "noof40ftOT": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Open Top") : 0,
+  //     //     //     "noof20ftFR": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Flat Rack") : 0,
+  //     //     //     "noof40ftFR": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Flat Rack") : 0,
+  //     //     //     "noof20ftPf": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Platform") : 0,
+  //     //     //     "noof40ftPf": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Platform") : 0,
+  //     //     //     "noof20ftTk": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Tank") : 0,
+  //     //     //     "noof20ftSO": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Side Open") : 0,
+  //     //     //     "noof40ftSO": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Side Open") : 0,
+  //     //     //     "noof20ftI": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Insulated") : 0,
+  //     //     //     "noof20ftH": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Hardtop") : 0,
+  //     //     //     "noof40ftH": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Hardtop") : 0,
+  //     //     //     "noof20ftV": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Ventilated") : 0,
+  //     //     //     "noof20ftT": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Tunnel") : 0,
+  //     //     //     "noof40ftT": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Tunnel") : 0,
+  //     //     //     "noofBul": jobchallansDet > 0 ? countContainers(jobchallansDet, "Bulktainers") : 0,
+  //     //     //     "noofSB": jobchallansDet > 0 ? countContainers(jobchallansDet, "Swap Bodies") : 0,
+  //     //     //     "totalNoofcontainer": jobchallansDet ? jobchallansDet.length : 0,
+  //     //     //     "jobType": JobMode,
+  //     //     //     "chargWt": charWeight,
+  //     //     //     "DespatchQty": '0',
+  //     //     //     "despatchWt": '0',
+  //     //     //     "poNumber": element?.pONO || "",
+  //     //     //     "totalChaAmt": chaDet?.tOTAMT || '0.00',
+  //     //     //     "voucherAmt": '0.00',
+  //     //     //     "vendorBillAmt": vendorBillDet?.tHCAMT || '0.00',
+  //     //     //     "customerBillAmt": custBillDet?.aMT || '0.00',
+  //     //     //     "status": element?.sTSNM || '',
+  //     //     //     "jobLocation": element?.lOC || "",
+  //     //     // }
+  //     //     // Push the modified job data to the array
+  //     //     // jobList.push(jobData)
+  //     // });
+  //     return jobList
+  // }
+  async getDCRregisterReportDetail(start, end) {
+    debugger;
+    let matchQuery = {
+      D$and: [
+        { eNTDT: { D$gte: start } }, // Convert start date to ISO format
+        { eNTDT: { D$lte: end } }, // Bill date less than or equal to end date
+        {
+          D$or: [{ cNL: false }, { cNL: { D$exists: false } }],
+        },
+      ],
+    };
+
     const reqBody = {
-        companyCode: this.storage.companyCode,
-        collectionName: "dcr_header",
-        filter: {
-            cID: this.storage.companyCode,
-        }
-    }
-    const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-    reqBody.collectionName = "dcr_history"
-    const resjobdetails = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-    // reqBody.collectionName = "dcr_history"
-
-    let jobList = [];
-    jobList = { ...res.data,...resjobdetails.data};
-
-    // res.data.map((element) => {
-    //     const docketsDet = resdockets.data ? resdockets.data.filter((entry) => entry.jOBNO === element?.jID) : null;
-    //     const docketsDetVen = resdockets.data ? resdockets.data.find((entry) => entry.jOBNO === element?.jID) : null;
-    //     const jobchallansDet = resjobchallans.data ? resjobchallans.data.filter((entry) => entry.jID === element?.jID) : null;
-    //     const chaheaderDet = reschaheader.data ? reschaheader.data.find((entry) => entry.jID === element?.jID) : null;
-    //     const chaDet = reschadetails.data ? reschadetails.data.find((entry) => entry.cHAID === chaheaderDet?.cHAID) : null;
-    //     const docOpsDet = resdocketops.data ? resdocketops.data.find((entry) => entry.dKTNO === docketsDetVen?.dKTNO) : null;
-    //     const vendorBillDet = resvendBill.data ? resvendBill.data.find((entry) => entry.tRIPNO === docOpsDet?.tHC) : null;
-    //     const custBillDet = rescustBill.data ? rescustBill.data.find((entry) => entry.cUST.nM === docketsDetVen?.bPARTYNM) : null;
-
-    //     const containerNumbers = jobchallansDet ? jobchallansDet.map(entry => entry.cNNO).join(', ') : "";
-    //     const docketsNumbers = docketsDet ? docketsDet.map(entry => entry.dKTNO).join(', ') : "";
-    //     const actualweight = docketsDet ? docketsDet.map(entry => entry.aCTWT).join(', ') : "";
-    //     const docketDates = docketsDet ? docketsDet.map(entry => entry.dKTDT).join(', ') : "";
-    //     const JobMode = docketsDet ? docketsDet.map(entry => entry.mODNM).join(', ') : "";
-    //     const charWeight = docketsDet ? docketsDet.map(entry => entry.cHRWT).join(', ') : "";
-    //     // let jobData = {
-    //     //     "jobNo": element?.jID || '',
-    //     //     "jobDate": formatDocketDate(element?.jDT || new Date()),
-    //     //     "cNoteNumber": docketsNumbers,
-    //     //     "cNoteDate": formatDocketDate(docketDates ? docketDates.split(', ')[0] : new Date()),
-    //     //     "containerNumber": containerNumbers,
-    //     //     "billingParty": element?.bPARTYNM || '',
-    //     //     "bookingFrom": element?.fCT || "",
-    //     //     "toCity": element?.tCT || "",
-    //     //     "pkgs": element?.pKGS || "",
-    //     //     "weight": actualweight,
-    //     //     "jobMode": element?.tMODENM || "",
-    //     //     "noof20ftStd": jobchallansDet ? countContainers(jobchallansDet, "20 ft Standard") : 0,
-    //     //     "noof40ftStd": jobchallansDet ? countContainers(jobchallansDet, "40 ft Standard") : 0,
-    //     //     "noof45ftHC": jobchallansDet ? countContainers(jobchallansDet, "45 ft High Cube") : 0,
-    //     //     "noof20ftRf": jobchallansDet ? countContainers(jobchallansDet, "20 ft Reefer") : 0,
-    //     //     "noof40ftRf": jobchallansDet ? countContainers(jobchallansDet, "40 ft Reefer") : 0,
-    //     //     "noof40ftHCR": jobchallansDet ? countContainers(jobchallansDet, "40 ft High Cube Reefer") : 0,
-    //     //     "noof20ftOT": jobchallansDet ? countContainers(jobchallansDet, "20 ft Open Top") : 0,
-    //     //     "noof40ftOT": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Open Top") : 0,
-    //     //     "noof20ftFR": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Flat Rack") : 0,
-    //     //     "noof40ftFR": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Flat Rack") : 0,
-    //     //     "noof20ftPf": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Platform") : 0,
-    //     //     "noof40ftPf": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Platform") : 0,
-    //     //     "noof20ftTk": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Tank") : 0,
-    //     //     "noof20ftSO": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Side Open") : 0,
-    //     //     "noof40ftSO": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Side Open") : 0,
-    //     //     "noof20ftI": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Insulated") : 0,
-    //     //     "noof20ftH": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Hardtop") : 0,
-    //     //     "noof40ftH": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Hardtop") : 0,
-    //     //     "noof20ftV": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Ventilated") : 0,
-    //     //     "noof20ftT": jobchallansDet > 0 ? countContainers(jobchallansDet, "20 ft Tunnel") : 0,
-    //     //     "noof40ftT": jobchallansDet > 0 ? countContainers(jobchallansDet, "40 ft Tunnel") : 0,
-    //     //     "noofBul": jobchallansDet > 0 ? countContainers(jobchallansDet, "Bulktainers") : 0,
-    //     //     "noofSB": jobchallansDet > 0 ? countContainers(jobchallansDet, "Swap Bodies") : 0,
-    //     //     "totalNoofcontainer": jobchallansDet ? jobchallansDet.length : 0,
-    //     //     "jobType": JobMode,
-    //     //     "chargWt": charWeight,
-    //     //     "DespatchQty": '0',
-    //     //     "despatchWt": '0',
-    //     //     "poNumber": element?.pONO || "",
-    //     //     "totalChaAmt": chaDet?.tOTAMT || '0.00',
-    //     //     "voucherAmt": '0.00',
-    //     //     "vendorBillAmt": vendorBillDet?.tHCAMT || '0.00',
-    //     //     "customerBillAmt": custBillDet?.aMT || '0.00',
-    //     //     "status": element?.sTSNM || '',
-    //     //     "jobLocation": element?.lOC || "",
-    //     // }
-    //     // Push the modified job data to the array
-    //     // jobList.push(jobData)
-    // });
-    return jobList
-}
+      companyCode: this.storage.companyCode,
+      collectionName: "dcr_header",
+      filters: [
+        {
+          D$match: matchQuery,
+        },
+        {
+          D$project: {
+            bOOK: "$bOOK",
+            fROM: "$fROM",
+            tO: "$tO",
+            pAGES: "$pAGES",
+            uSED: "$uSED",
+            vOID: "$vOID",
+            aLOTONM: "$aLOTONM",
+            aCUSTNM : "$aCUSTNM",
+            aLOCD: "$aLOCD",
+            aLONM: "$aLONM",
+            aSNTONM: "$aSNTONM",
+            aSNNM: "$aSNNM",
+            eNTDT: "$eNTDT",
+            eNTBY: "$eNTBY",
+            eNTLOC: "$eNTLOC",
+            mODDT: "$mODDT",
+            mODBY: "$mODBY",
+            mODLOC: "$mODLOC",
+            rALLDT : "$rALLDT",
+            rALLOCA : "$rALLOCA",
+            rALLBY : "$rALLBY",
+            rALLOC : "$rALLOC",
+          }
+        },
+      ],
+    };
+    const res = await firstValueFrom(
+      this.masterServices.masterMongoPost("generic/query", reqBody)
+    );
+    return res.data;
+  }
 }
 
 export function convertToCSV(
@@ -210,4 +262,3 @@ export function convertToCSV(
 
   return header + rows.join("");
 }
-

@@ -106,22 +106,20 @@ export class DcrRegisterControl {
         name: "sTS",
         label: "Status",
         placeholder: "Select Status",
-        type: "dropdown",
-        value: "",
+        type: "Staticdropdown",
+        value: [
+          { value: 1, name: "Added" },
+          { value: 2, name: "Allocated" },
+          { value: 3, name: "Reallocated" },
+          { value: 4, name: "Assigned" },
+          { value: 5, name: "Splitted" },
+          { value: 6, name: "Declared_Void" },
+          { value: 7, name: "Deallocated" },
+          { value: 9, name: "Cancelled" },
+        ],
+        Validations: [],
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
       },
       {
         name: "bCODE",

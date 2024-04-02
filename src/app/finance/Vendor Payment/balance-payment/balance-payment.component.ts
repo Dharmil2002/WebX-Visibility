@@ -28,6 +28,7 @@ import {
   VoucherInstanceType,
   VoucherRequestModel,
   VoucherType,
+  ledgerInfo,
 } from "src/app/Models/Finance/Finance";
 import {
   Vendbilldetails,
@@ -166,6 +167,7 @@ export class BalancePaymentComponent implements OnInit {
   DebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
   jsonControlDebitVoucherTaxationPaymentSummaryArray: any;
 
+  ModifiedTHCList = [];
   constructor(
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -177,30 +179,7 @@ export class BalancePaymentComponent implements OnInit {
     private storage: StorageService,
     private route: Router // public dialog: MatDialog
   ) {
-    // this.BillPaymentData = {
-    //   "vendor": "8888 : Krupesh",
-    //   "_id": "10065-VB/MUMB/2324/000015",
-    //   "vnCode": 8888,
-    //   "vnName": "Krupesh",
-    //   "billType": "Vendor Bill",
-    //   "billNo": "VB/MUMB/2324/000015",
-    //   "Date": "28/12/2023",
-    //   "TotalTHCAmount": 5000,
-    //   "AdvancePayedAmount": 1000,
-    //   "billAmount": 4000,
-    //   "pendingAmount": 4000,
-    //   "paymentAmount": 4000,
-    //   "Status": "Awaiting Approval",
-    //   "StatusCode": 1,
-    //   "vPan": "CASPJ2345J",
-    //   "actions": [
-    //     "Approve Bill",
-    //     "Hold Payment",
-    //     "Cancel Bill",
-    //     "Modify"
-    //   ],
-    //   "isSelected": false
-    // }
+
     this.BillPaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.IsModifyAction = this.route.getCurrentNavigation()?.extras?.state?.Type == "Modify" ? true : false;
     if (this.BillPaymentData) {
@@ -369,7 +348,7 @@ export class BalancePaymentComponent implements OnInit {
     );
 
 
-    const Data = GetAdvanceBillPaymentData.map((x, index) => {
+    const Data = GetAdvanceBillPaymentData.filter(item => item.AdvancePending == 0).map((x, index) => {
       return {
         GenerationDate: x.GenerationDate,
         VehicleNumber: x.VehicleNumber,
@@ -377,7 +356,8 @@ export class BalancePaymentComponent implements OnInit {
         BalancePending: x.OthersData.bALAMT,
         THC: x.THC,
         THCamount: x.THCamount,
-        OthersData: x,
+        THCContraAmount: x.THCContraAmount,
+        OthersData: x.OthersData,
         isSelected: false,
       };
     });
@@ -394,7 +374,8 @@ export class BalancePaymentComponent implements OnInit {
           BalancePending: x.OthersData.bALAMT,
           THC: x.THC,
           THCamount: x.THCamount,
-          OthersData: x,
+          THCContraAmount: x.THCContraAmount,
+          OthersData: x.OthersData,
           isSelected: true,
         }
       });
@@ -634,7 +615,16 @@ export class BalancePaymentComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         if (result.success) {
+          const THCValueToCheck = event?.data.THC;
+
+          const indexToRemove = this.ModifiedTHCList.findIndex(item => item.THC === THCValueToCheck);
+
+          // If the THC value exists in the array, remove the object
+          if (indexToRemove == -1) {
+            this.ModifiedTHCList.push(event?.data);
+          }
           this.GetBalancePaymentList();
+          console.log(this.ModifiedTHCList)
         }
       }
     });
@@ -822,7 +812,7 @@ export class BalancePaymentComponent implements OnInit {
     });
   }
   // Step 2 Create Vendor Bill in vend_bill_summary Collection And vend_bill_det collection and update thc_summary
-  BookVendorBill(PaymenDetails, generateVoucher, IsUpdate) {
+  BookVendorBill(PaymenDetails, generateDebitVoucher, IsUpdate) {
     if (this.tableData.filter(x => x.isSelected).length == 0) {
       this.snackBarUtilityService.ShowCommonSwal(
         "info",
@@ -850,9 +840,9 @@ export class BalancePaymentComponent implements OnInit {
               aDVAMT: this.AdvanceTotal,
               bALAMT: NetPayable,
               rOUNOFFAMT: RoundOffAmount,
-              bALPBAMT: generateVoucher == true ? 0 : NetPayable,
-              bSTAT: generateVoucher == true ? 4 : 1,
-              bSTATNM: generateVoucher == true ? "Paid" : "Awaiting Approval",
+              bALPBAMT: generateDebitVoucher == true ? 0 : NetPayable,
+              bSTAT: generateDebitVoucher == true ? 3 : 1,
+              bSTATNM: generateDebitVoucher == true ? "Paid" : "Awaiting Approval",
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
@@ -888,17 +878,17 @@ export class BalancePaymentComponent implements OnInit {
                 cGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
                 sGST: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
                 aMT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0,
-
               },
-            }, BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
+            },
+            BillDetails: this.tableData.filter((x) => x.isSelected == true).map((x) => {
               return {
                 cID: this.companyCode,
                 bILLNO: "",
                 tRIPNO: x.THC,
                 tTYP: "THC",
+                tMOD: "FTL",
                 aDVAMT: x.Advance,
                 bALAMT: x.BalancePending,
-                pENDBALAMT: generateVoucher == true ? 0 : x.BalancePending,
                 tHCAMT: x.THCamount,
                 eNTDT: new Date(),
                 eNTLOC: this.storage.branch,
@@ -909,24 +899,7 @@ export class BalancePaymentComponent implements OnInit {
           await
             firstValueFrom(this.voucherServicesService
               .FinancePost(`finance/bill/vendor/${IsUpdate ? 'update' : 'create'}`, vendorBillEntry)).then((res: any) => {
-                if (generateVoucher) {
-                  this.SubmitVoucherData(PaymenDetails, res?.data.data.ops[0].docNo)
-                } else {
-                  Swal.fire({
-                    icon: "success",
-                    title: `Bill ${IsUpdate ? 'Updated' : 'Generated'} Successfully`,
-                    text: "Bill No: " + res?.data.data.ops[0].docNo,
-                    showConfirmButton: true,
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      Swal.hideLoading();
-                      setTimeout(() => {
-                        Swal.close();
-                        this.RedirectToTHCPayment()
-                      }, 1000);
-                    }
-                  });
-                }
+                this.SubmitJournalVoucherData(PaymenDetails, res?.data.data.ops[0].docNo, generateDebitVoucher)
               }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
               .finally(() => {
 
@@ -939,19 +912,10 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   //setep 3 Creating voucher_trans And voucher_trans_details And voucher_trans_document collection 
-  SubmitVoucherData(PaymenDetails, BillNo) {
-    this.snackBarUtilityService.commonToast(async () => {
+  SubmitJournalVoucherData(PaymenDetails, BillNo, generateDebitVoucher) {
+    this.snackBarUtilityService.commonToast(() => {
       try {
-        if (!PaymenDetails) {
-          return this.snackBarUtilityService.ShowCommonSwal("error", "Please Fill Payment Details");
-        }
 
-        // const PaymentAmount = parseFloat(
-        //   this.THCamount.toFixed(2)
-        // );
-        // const NetPayable = parseFloat(
-        //   this.THCamount.toFixed(2)
-        // );
         const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
         const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
         const RoundOffAmount = NetPayable - PaymentAmount;
@@ -961,7 +925,6 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherRequestModel.branch = this.storage.branch;
         this.VoucherRequestModel.finYear = financialYear;
 
-        // this.VoucherDataRequestModel.companyCode = this.companyCode;
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.BalancePayment;
         this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BalancePayment];
@@ -970,23 +933,174 @@ export class BalancePaymentComponent implements OnInit {
 
         this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch =
-          this.storage.branch;
+        this.VoucherDataRequestModel.branch = this.storage.branch;
         this.VoucherDataRequestModel.finYear = financialYear;
 
-        this.VoucherDataRequestModel.accLocation =
-          this.storage.branch;
+        this.VoucherDataRequestModel.accLocation = this.tableData[0].OthersData?.cLOC || this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode =
-          this.tableData[0].OthersData?.vendorCode;
-        this.VoucherDataRequestModel.partyName =
-          this.tableData[0].OthersData?.vendorName;
-        this.VoucherDataRequestModel.partyState =
-          this.VendorDetails?.vendorState;
+        this.VoucherDataRequestModel.partyCode = this.tableData[0].OthersData?.vND?.cD || "";
+        this.VoucherDataRequestModel.partyName = this.tableData[0].OthersData?.vND?.nM || "";
+        this.VoucherDataRequestModel.partyState = this.VendorDetails?.vendorState;
         this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo =
-          this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
+        this.VoucherDataRequestModel.panNo = this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
+        this.VoucherDataRequestModel.tdsSectionCode = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value : "";
+        this.VoucherDataRequestModel.tdsSectionName = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name : ""
+        this.VoucherDataRequestModel.tdsRate = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? +this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0;
+        this.VoucherDataRequestModel.tdsAmount = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? +this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = undefined;
+        this.VoucherDataRequestModel.tcsSectionName = undefined
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0;
+        this.VoucherDataRequestModel.SGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0;
+        this.VoucherDataRequestModel.CGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0;
+        this.VoucherDataRequestModel.UGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0;
+        this.VoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0;
+
+        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+        this.VoucherDataRequestModel.netPayable = NetPayable;
+        this.VoucherDataRequestModel.roundOff = RoundOffAmount;
+        this.VoucherDataRequestModel.voucherCanceled = false;
+
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.accountCode = "";
+        this.VoucherDataRequestModel.date = ""
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        this.VoucherDataRequestModel.transactionNumber = BillNo;
+        const SelectedData = this.tableData.filter((x) => x.isSelected == true);
+        const voucherlineItems = this.GetJournalVoucherLedgers(SelectedData, BillNo, PaymentAmount, NetPayable, RoundOffAmount);
+
+        this.VoucherRequestModel.details = voucherlineItems;
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+        firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
+
+          let reqBody = {
+            companyCode: this.storage.companyCode,
+            voucherNo: res?.data?.mainData?.ops[0].vNO,
+            transDate: Date(),
+            finYear: financialYear,
+            branch: this.tableData[0].OthersData?.cLOC || this.storage.branch,
+            transCode: VoucherInstanceType.BalancePayment,
+            transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
+            docType: "Voucher",
+            partyType: "Vendor",
+            docNo: BillNo,
+            partyCode: "" + this.tableData[0].OthersData?.vND?.cD || "",
+            partyName: this.tableData[0].OthersData?.vND?.nM || "",
+            entryBy: this.storage.userName,
+            entryDate: Date(),
+            debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.debit,
+                "narration": item.narration ?? ""
+              };
+            }),
+            credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.credit,
+                "narration": item.narration ?? ""
+              };
+            }),
+          };
+          firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then((res: any) => {
+            if (res) {
+              if (generateDebitVoucher) {
+                this.SubmitDebitVoucherData(PaymenDetails, BillNo, reqBody.voucherNo)
+              } else {
+
+                Swal.fire({
+                  icon: "success",
+                  title: "Voucher And Bill Generated Successfully",
+                  text: "Bill No: " + BillNo + " Voucher No: " + reqBody.voucherNo,
+                  showConfirmButton: true,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    Swal.hideLoading();
+                    setTimeout(() => {
+                      Swal.close();
+                      this.RedirectToTHCPayment()
+                    }, 1000);
+                  }
+                });
+              }
+            } else {
+              this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Do Account Posting..!");
+            }
+          });
+        }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+          .finally(() => {
+          });
+
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          "Fail To Submit Data..!"
+        );
+      }
+    }, "Advance Payment Voucher Generating..!");
+  }
+  //setep 4 Creating voucher_trans And voucher_trans_details And voucher_trans_document collection 
+  SubmitDebitVoucherData(PaymenDetails, BillNo, voucherNo) {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        if (!PaymenDetails) {
+          return this.snackBarUtilityService.ShowCommonSwal("error", "Please Fill Payment Details");
+        }
+        const PaymentMode = PaymenDetails.PaymentMode;
+        if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+          const BankDetails = PaymenDetails.Bank;
+          const AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", this.storage.branch)
+          const AccountDetails = AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+          if (AccountDetails != undefined) {
+            PaymenDetails.Bank = AccountDetails;
+          } else {
+            this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
+            return;
+          }
+        }
+
+        const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+        const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+        const RoundOffAmount = NetPayable - PaymentAmount;
+
+        this.VoucherRequestModel.companyCode = this.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear;
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BalancePayment;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BalancePayment];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.DebitVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
+
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear;
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Vendor";
+        this.VoucherDataRequestModel.partyCode = this.tableData[0].OthersData?.vND?.cD || "";
+        this.VoucherDataRequestModel.partyName = this.tableData[0].OthersData?.vND?.nM || "";
+        this.VoucherDataRequestModel.partyState = this.VendorDetails?.vendorState;
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
         this.VoucherDataRequestModel.tdsSectionCode = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value : "";
         this.VoucherDataRequestModel.tdsSectionName = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name : ""
         this.VoucherDataRequestModel.tdsRate = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? +this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0;
@@ -1003,67 +1117,67 @@ export class BalancePaymentComponent implements OnInit {
           this.VoucherDataRequestModel.UGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0,
           this.VoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0;
 
-        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+        this.VoucherDataRequestModel.GrossAmount = NetPayable;
         this.VoucherDataRequestModel.netPayable = NetPayable;
         this.VoucherDataRequestModel.roundOff = RoundOffAmount;
         this.VoucherDataRequestModel.voucherCanceled = false;
 
-        this.VoucherDataRequestModel.paymentMode =
-          PaymenDetails.PaymentMode;
-        this.VoucherDataRequestModel.refNo =
-          PaymenDetails?.ChequeOrRefNo || "";
-        this.VoucherDataRequestModel.accountName =
-          PaymenDetails?.Bank?.name || "";
-        this.VoucherDataRequestModel.date =
-          PaymenDetails.Date;
-        this.VoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
+        this.VoucherDataRequestModel.paymentMode = PaymentMode;
+        this.VoucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "";
+        this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name;
+        this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value;
+        this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = BillNo;
-        const companyCode = this.companyCode;
-        const CurrentBranchCode = this.storage.branch;
-        var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
-          return {
-            companyCode: companyCode,
-            voucherNo: "",
-            transCode: VoucherInstanceType.BalancePayment,
-            transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
-            voucherCode: VoucherType.JournalVoucher,
-            voucherType: VoucherType[VoucherType.JournalVoucher],
-            transDate: new Date(),
-            finYear: financialYear,
-            branch: CurrentBranchCode,
-            accCode: "TEST",
-            accName: "TEST",
-            sacCode: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString(),
-            sacName: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name.toString(),
-            debit: parseFloat(item.THCamount).toFixed(2),
-            credit: 0,
-            GSTRate: 0,
-            GSTAmount: 0,
-            Total: parseFloat(item.THCamount).toFixed(2),
-            TDSApplicable: false,
-            narration: "when THC Payment done for " + item.THC + " against Bill No " + BillNo,
-          };
-        });
 
-        this.VoucherRequestModel.details = VoucherlineitemList;
+        const voucherlineItems = this.GetDebitVoucherLedgers(NetPayable, BillNo, PaymenDetails);
+
+        this.VoucherRequestModel.details = voucherlineItems;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-          this.vendbillpayment(BillNo, res?.data?.mainData?.ops[0].vNO, PaymenDetails)
 
-          Swal.fire({
-            icon: "success",
-            title: "Voucher Created Successfully",
-            text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-            showConfirmButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Swal.hideLoading();
-              setTimeout(() => {
-                Swal.close();
-                this.RedirectToTHCPayment()
-              }, 1000);
+
+          let reqBody = {
+            companyCode: this.storage.companyCode,
+            voucherNo: res?.data?.mainData?.ops[0].vNO,
+            transDate: Date(),
+            finYear: financialYear,
+            branch: this.storage.branch,
+            transCode: VoucherInstanceType.BalancePayment,
+            transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
+            docType: "Voucher",
+            partyType: "Vendor",
+            docNo: BillNo,
+            partyCode: "" + this.tableData[0].OthersData?.vND?.cD || "",
+            partyName: this.tableData[0].OthersData?.vND?.nM || "",
+            entryBy: this.storage.userName,
+            entryDate: Date(),
+            debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.debit,
+                "narration": item.narration ?? ""
+              };
+            }),
+            credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.credit,
+                "narration": item.narration ?? ""
+              };
+            }),
+          };
+          firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then((res: any) => {
+            if (res) {
+              this.DoVendorBillPayment(BillNo, reqBody.voucherNo, PaymenDetails)
             }
           });
         }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
@@ -1078,41 +1192,45 @@ export class BalancePaymentComponent implements OnInit {
       }
     }, "Advance Payment Voucher Generating..!");
   }
+
   // step 5 create vend_bill_payment collection
-  vendbillpayment(BillNo, voucherno, PaymenDetails) {
-    this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
+  DoVendorBillPayment(BillNo, voucherno, PaymenDetails) {
 
-      const vendbillpayment: Vendbillpayment = {
-        _id: this.companyCode + "-" + BillNo + "-" + voucherno + "-" + item.THC,
-        cID: this.companyCode,
-        bILLNO: BillNo,
-        vUCHNO: voucherno,
-        lOC: this.storage.branch,
-        dTM: PaymenDetails.Date,
-        bILLAMT: item.Advance,
-        pAYAMT: item.BalancePending,
-        pENDBALAMT: 0,
-        aMT: item.THCamount,
-        mOD: PaymenDetails.PaymentMode,
-        bANK: PaymenDetails?.Bank?.name || "",
-        tRNO: PaymenDetails?.ChequeOrRefNo || "",
-        eNTDT: new Date(),
-        eNTLOC: this.storage.branch,
-        eNTBY: this.storage.userName,
-      };
+    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+    const PaymentMode = PaymenDetails.PaymentMode;
+    const vendbillpayment: Vendbillpayment = {
+      _id: this.companyCode + "-" + BillNo + "-" + voucherno,
+      cID: this.companyCode,
+      bILLNO: BillNo,
+      vUCHNO: voucherno,
+      lOC: this.storage.branch,
+      dTM: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "",
+      bILLAMT: NetPayable,
+      pAYAMT: NetPayable,
+      pENDBALAMT: 0,
+      aMT: NetPayable,
+      mOD: PaymentMode,
+      bANK: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name,
+      bANKCD: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value,
+      tRNO: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "",
+      tDT: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "",
+      eNTDT: new Date(),
+      eNTLOC: this.storage.branch,
+      eNTBY: this.storage.userName,
+    };
 
-      const RequestData = {
-        companyCode: this.companyCode,
-        collectionName: "vend_bill_payment",
-        data: vendbillpayment,
-      };
+    const RequestData = {
+      companyCode: this.companyCode,
+      collectionName: "vend_bill_payment",
+      data: vendbillpayment,
+    };
 
-      firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
+    firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
 
-      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-        .finally(() => {
-        });
-    })
+    }).catch((error) => {
+      this.snackBarUtilityService.ShowCommonSwal("error", error);
+    });
+
     Swal.fire({
       icon: "success",
       title: "Vendor Bill Payment Generated Successfully",
@@ -1130,5 +1248,193 @@ export class BalancePaymentComponent implements OnInit {
   }
   //#endregion
 
+  GetJournalVoucherLedgers(SelectedData, BillNo, PaymentAmount, NetPayable, RoundOffAmount) {
 
+    const createVoucher = (accCode, accName, accCategory, debit, credit, THC, BillNo, sacCode = "", sacName = "") => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.BalancePayment,
+      transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: SelectedData.OthersData?.cLOC || this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: sacCode,
+      sacName: sacName,
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Vendor Bill Generated For : ${THC}  Against Bill No : ${BillNo}`
+    });
+
+    const Result = [];
+
+    SelectedData.forEach((DataItem) => {
+
+      let OtherChargePositiveAmt = 0;
+      let OtherChargeNegativeAmt = 0;
+      const ModifiedData = this.ModifiedTHCList.find(x => x.THC === DataItem.THC)
+      if (ModifiedData) {
+        const DiffrenceResult = this.findDifference(ModifiedData.OthersData.cHG, DataItem?.OthersData?.cHG);
+        console.log(DiffrenceResult);
+        DiffrenceResult.forEach((item) => {
+          if (item.oPS == "+") {
+            const GetLeadgerInfo = ledgerInfo[item.cHGNM];
+            if (item.aMT.oldValue < item.aMT.newValue) {
+              if (GetLeadgerInfo) {
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, +(Math.abs(item.aMT.difference)), 0, DataItem.THC, BillNo));
+              }
+              else {
+                OtherChargePositiveAmt += +(Math.abs(item.aMT.difference));
+              }
+            }
+            if (item.aMT.oldValue > item.aMT.newValue) {
+              if (GetLeadgerInfo) {
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, 0, +(Math.abs(item.aMT.difference)), DataItem.THC, BillNo));
+              }
+              else {
+                OtherChargeNegativeAmt += +(Math.abs(item.aMT.difference));
+              }
+            }
+          } else {
+            const GetLeadgerInfo = ledgerInfo[item.cHGNM];
+            if (item.aMT.oldValue < item.aMT.newValue) {
+              if (GetLeadgerInfo) {
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, 0, +(Math.abs(item.aMT.difference)), DataItem.THC, BillNo));
+              }
+              else {
+                OtherChargeNegativeAmt += +(Math.abs(item.aMT.difference));
+              }
+            }
+            if (item.aMT.oldValue > item.aMT.newValue) {
+              if (GetLeadgerInfo) {
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, +(Math.abs(item.aMT.difference)), 0, DataItem.THC, BillNo));
+              }
+              else {
+                OtherChargePositiveAmt += +(Math.abs(item.aMT.difference));
+              }
+            }
+          }
+        });
+      }
+
+      if (OtherChargePositiveAmt != 0) {
+        Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, OtherChargePositiveAmt, 0, DataItem.THC, BillNo));
+      }
+      if (OtherChargeNegativeAmt != 0) {
+        Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, 0, OtherChargeNegativeAmt, DataItem.THC, BillNo));
+      }
+
+      // Push TDS Sectiond Data
+      if (this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted) {
+        Result.push(createVoucher(this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value, this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name, "LIABILITY", 0, +this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount, DataItem.THC, BillNo));
+      }
+      if (RoundOffAmount != 0) {
+        Result.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, ledgerInfo['Round off Amount'].LeadgerCategory, RoundOffAmount > 0 ? RoundOffAmount : 0, RoundOffAmount < 0 ? RoundOffAmount : 0, DataItem.THC, BillNo));
+      }
+      // Push GST Data
+      if (this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount != 0) {
+        if (this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount != 0) {
+          Result.push(createVoucher(ledgerInfo['IGST'].LeadgerCode, ledgerInfo['IGST'].LeadgerName, ledgerInfo['IGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+        } else if (this.VendorBalancePaymentFilterForm.value.CGSTAmount != 0 && this.VendorBalancePaymentFilterForm.value.SGSTAmount != 0) {
+          Result.push(createVoucher(ledgerInfo['CGST'].LeadgerCode, ledgerInfo['CGST'].LeadgerName, ledgerInfo['CGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['SGST'].LeadgerCode, ledgerInfo['SGST'].LeadgerName, ledgerInfo['SGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+        } else if (this.VendorBalancePaymentFilterForm.value.UGSTAmount != 0) {
+          Result.push(createVoucher(ledgerInfo['UGST'].LeadgerCode, ledgerInfo['UGST'].LeadgerName, ledgerInfo['UGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+        }
+      }
+    });
+    const TotalDebit = Result.reduce((a, b) => a + parseFloat(b.debit), 0);
+    const TotalCredit = Result.reduce((a, b) => a + parseFloat(b.credit), 0);
+
+    let difference = TotalDebit - TotalCredit;
+
+    Result.push(createVoucher(
+      ledgerInfo['Billed creditors'].LeadgerCode,
+      ledgerInfo['Billed creditors'].LeadgerName,
+      ledgerInfo['Billed creditors'].LeadgerCategory,
+      difference > 0 ? 0 : Math.abs(difference),
+      difference < 0 ? 0 : Math.abs(difference),
+      "",
+      BillNo
+    ));
+
+    return Result;
+  }
+  GetDebitVoucherLedgers(NetPayable, BillNo, paymentData) {
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit, BillNo) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.BalancePayment,
+      transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Vendor bill payment has been issued : ${BillNo}`
+    });
+
+    const Result = [];
+
+
+
+    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, NetPayable, 0, BillNo));
+    const PaymentMode = paymentData.PaymentMode;
+    if (PaymentMode == "Cash") {
+      const CashAccount = paymentData.CashAccount;
+      Result.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, NetPayable, BillNo));
+    }
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = paymentData.Bank;
+      Result.push(createVoucher(BankDetails.value, BankDetails.name, "ASSET", 0, NetPayable, BillNo));
+    }
+    return Result;
+  }
+  // Function to find the difference between two arrays of objects
+  findDifference(first, second) {
+    const difference = [];
+
+    first.forEach((item, index) => {
+      const diffItem = {};
+      for (const key in item) {
+        if (item.hasOwnProperty(key) && (key === "cHGID" || key === "cHGNM" || key === "oPS" || key === "aMT")) {
+          if (item[key] !== second[index][key]) {
+            diffItem[key] = {
+              oldValue: item[key],
+              newValue: second[index][key],
+              difference: second[index][key] - item[key]
+            };
+          }
+        }
+      }
+      if (Object.keys(diffItem).length !== 0) {
+        difference.push({
+          ...item,
+          ...diffItem
+        });
+      }
+    });
+
+    return difference;
+  }
 }

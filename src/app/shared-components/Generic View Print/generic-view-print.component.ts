@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Renderer2 } from "@angular/core";
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, Renderer2 } from "@angular/core";
 //import { FieldMapping, HtmlTemplate, JsonData } from "./InvoiceTemplate";
 
 @Component({
@@ -16,10 +16,10 @@ export class GenericViewPrintComponent implements OnInit {
   @Input() HtmlTemplate: any;
   @Input() JsonData: any;
   @Input() FieldMapping: any[];
-
+  @Input() EventButton;
   @Input() barcode6: boolean = false;
-  @Input() barcode6Details : any = {};
-
+  @Input() barcode6Details: any = {};
+  @Output() functionCallEmitter = new EventEmitter();
 
   constructor(private renderer: Renderer2) {
     this.renderer.setStyle(document.querySelector('nav.navbar'), 'display', 'none'); // Hide Navbar
@@ -104,5 +104,38 @@ export class GenericViewPrintComponent implements OnInit {
     }
 
     return value;
+  }
+  functionHandle(name, element) {
+    this.functionCallEmitter.emit({ functionName: name, data: element })
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    // Check if the Ctrl (or Command on Mac) key is pressed and the P key is pressed
+    if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+      event.preventDefault(); // Prevent the default browser print dialog
+      this.printLandscapePage(); // Call your print function
+    }
+  }
+  printLandscapePage() {
+    const body = document.querySelector('body');
+    if (body) {
+      body.classList.add('landscape'); // Apply landscape orientation
+      window.print(); // Trigger print
+      body.classList.remove('landscape'); // Revert to normal orientation
+    } else {
+      alert('Content not found for printing.');
+    }
+  }
+  setLandscapeOrientation() {
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        @page {
+          size: landscape;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 }

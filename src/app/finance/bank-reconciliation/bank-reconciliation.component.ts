@@ -3,9 +3,10 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 import { bankReconciliationControl } from 'src/assets/FormControls/bank-reconciliation-control';
-import { getbankreconcilationList } from './bank-reconcilation-utility';
+import { GetBankDropDown, getbankreconcilationList } from './bank-reconcilation-utility';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { DatePipe } from '@angular/common';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 
 @Component({
   selector: 'app-bank-reconciliation',
@@ -17,7 +18,8 @@ export class BankReconciliationComponent implements OnInit {
   BankTableForm: UntypedFormGroup;
   BankFormControls: bankReconciliationControl;
   jsonControlArray: any;
-  KPICountData: { count: any; title: string; class: string }[];
+  VendorKPIData: { count: any; title: string; class: string }[];
+  CustomerKPIData: { count: any; title: string; class: string }[];
   router: any;
 
   dynamicControls = {
@@ -26,18 +28,13 @@ export class BankReconciliationComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-    voucherNo: {
-      Title: "Voucher No",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    VoucherType: {
-      Title: "Voucher Type",
-      class: "matcolumncenter",
-      Style: "",
-    },
     chequeNumber: {
       Title: "Cheque Number",
+      class: "matcolumncenter",
+      Style: "",
+    },
+    voucherNo: {
+      Title: "Voucher No",
       class: "matcolumncenter",
       Style: "",
     },
@@ -56,7 +53,16 @@ export class BankReconciliationComponent implements OnInit {
       class: "matcolumncenter",
       Style: "",
     },
-
+    ClearanceDate: {
+      Title: "Clearance Date",
+      class: "matcolumncenter",
+      Style: "",
+    },
+    Comments: {
+      Title: "Comments",
+      class: "matcolumncenter",
+      Style: "",
+    },
   };
   EventButton = {
     functionName: "openFilterDialog",
@@ -64,11 +70,13 @@ export class BankReconciliationComponent implements OnInit {
     iconName: "filter_alt",
   };
 
-  tableData = [];
-
-  staticField = ["chequeNumber", "voucherNo", "voucherDate", "party", "amount", "VoucherType"];
+  CustomerTableData = [];
+  VendorTableData = [];
+  AccountsBanksList: any;
+  staticField = ["chequeNumber", "voucherNo", "voucherDate", "party", "amount", "ClearanceDate", "Comments"];
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
+    private filter: FilterUtils,
     private datePipe: DatePipe,) {
     this.tableLoad = false;
 
@@ -76,19 +84,36 @@ export class BankReconciliationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //  this.initializeFormControl()
-    this.getVoucherList()
+    this.initializeFormControl()
+    this.getVoucherList('')
   }
   reloadData() {
+    console.log(this.BankTableForm.value)
+    const Request = {
+      bank: this.BankTableForm.value?.bank?.Bankname ?? '',
+    }
+    this.getVoucherList(Request)
+  }
+  async GetDropDownData() {
+    this.AccountsBanksList = await GetBankDropDown(this.masterService)
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.BankTableForm,
+      this.AccountsBanksList,
+      "bank",
+      false
+    );
+  }
+  initializeFormControl() {
+    this.BankFormControls = new bankReconciliationControl();
+    // Get form controls for job Entry form section
+    this.jsonControlArray = this.BankFormControls.getHandOverArrayControls();
+    // Build the form group using formGroupBuilder function
+    this.BankTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+
+    this.GetDropDownData()
 
   }
-  // initializeFormControl() {
-  //   this.BankFormControls = new bankReconciliationControl();
-  //   // Get form controls for job Entry form section
-  //   this.jsonControlArray = this.BankFormControls.getHandOverArrayControls();
-  //   // Build the form group using formGroupBuilder function
-  //   this.BankTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-  // }
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
 
@@ -100,21 +125,30 @@ export class BankReconciliationComponent implements OnInit {
       console.log("failed");
     }
   }
-  async getVoucherList() {
-    await getbankreconcilationList(this.masterService, '').then((data) => {
-      this.tableData = data;
+  async getVoucherList(Request) {
+    await getbankreconcilationList(this.masterService, Request).then((data) => {
+      this.CustomerTableData = data.filter(x => x.VoucherFor === 'Customer');
+      this.VendorTableData = data.filter(x => x.VoucherFor === 'Vendor');
       this.tableLoad = false;
-      const amount = calculateTotalField(this.tableData, 'amount');
-      this.KPICountData = [
+      const CustomerAmt = calculateTotalField(this.CustomerTableData, 'amount');
+      const VendorAmt = calculateTotalField(this.VendorTableData, 'amount');
+      this.CustomerKPIData = [
         {
-          count: amount,
+          count: CustomerAmt.toFixed(2),
+          title: "Total Transaction Amount",
+          class: `color-Grape-light`,
+        }
+      ]
+      this.VendorKPIData = [
+        {
+          count: VendorAmt.toFixed(2),
           title: "Total Transaction Amount",
           class: `color-Grape-light`,
         }
       ]
     });
 
-    // this.tableData = detail.map((x) => {
+    // this.CustomerTableData = detail.map((x) => {
     //   const formattedDate = this.datePipe.transform(x.tTDT, 'dd-MMM-yy HH:mm a');
     //   const createdDate = this.datePipe.transform(x.eNTDT, 'dd-MMM-yy HH:mm a');
     //   return {

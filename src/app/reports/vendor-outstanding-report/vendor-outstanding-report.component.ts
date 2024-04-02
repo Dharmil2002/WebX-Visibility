@@ -140,30 +140,55 @@ export class VendorOutstandingReportComponent implements OnInit {
   }
 
   async getDropDownList() {
-    const locationList = await this.locationService.getLocationList();
+    const locationList = await this.locationService.getLocationList(true);
+    const aggregationPipeline  = [
+      {
+        D$group: {
+          _id: {
+            vendorcode: "$vND.cD",
+            name: "$vND.nM",
+          },
+        },
+      },
+      {
+        D$project: {
+          _id: 0,
+          vendorcode: "$_id.vendorcode",
+          name: "$_id.name",
+        },
+      },
+    ]
     // const vendorType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "VENDTYPE" }, "codeDesc", "codeId");
     let venNameReq = {
       "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "vendor_detail"
     };
-    const venNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", venNameReq));
-    const mergedData = {
-      venNameData: venNameRes?.data,
+    let venQuery = {
+      "companyCode": this.storage.companyCode,
+      "filters":aggregationPipeline,
+      "collectionName": "vend_bill_summary"
     };
-    this.allData = mergedData;
-    const venNameDet = mergedData.venNameData
+    const venNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", venNameReq));
+    const vendorSummary = await firstValueFrom(this.masterServices.masterMongoPost("generic/query",venQuery));
+    const mapData=vendorSummary.data.map((x)=>
+    {return {
+      value:x.vendorcode,
+      name:x.name
+    }}
+    )
+    const venNameDet =venNameRes.data 
       .map(element => ({
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),
       }));
-    this.vendorDetailList = venNameDet;
-
-    this.venNameDet = venNameDet;
+    const filter=[...mapData,...venNameDet]
+    this.vendorDetailList = filter;
+    this.venNameDet = filter;
     this.filter.Filter(
       this.jsonVendWiseOutFormArray,
       this.VendWiseOutTableForm,
-      venNameDet,
+      filter,
       this.vendorName,
       this.vendorStatus
     );

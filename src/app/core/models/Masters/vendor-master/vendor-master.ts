@@ -16,6 +16,7 @@ export class VendorDetail {
     cinNumber: string = '';
     msmeNumber: string = '';
     msmeScan: string = '';
+    vendorAdvance: number = 0; // Set a default value (e.g., 0)
     isActive: boolean = false; // Set a default value (e.g., false)
     isBlackListed: boolean = false; // Set a default value (e.g., false)
     entryDate: string = '';

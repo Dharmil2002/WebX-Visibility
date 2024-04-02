@@ -336,7 +336,18 @@ export class InvoiceCollectionComponent implements OnInit {
       });
       return;
     }
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
 
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
+      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      if (AccountDetails != undefined) {
+        this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").setValue(AccountDetails)
+      } else {
+        this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
+        return;
+      }
+    }
     const data = await this.invoiceService.getCollectionJson(this.DebitVoucherTaxationPaymentDetailsForm.value, this.tableData, this.DebitVoucherTaxationPaymentSummaryForm.value);
     const res = await this.invoiceService.saveCollection(data);
     if (res) {
@@ -345,6 +356,7 @@ export class InvoiceCollectionComponent implements OnInit {
   }
   // Account Posting When  When Bill Has been Collected	
   async AccountPosting(data, mRNO) {
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
     this.snackBarUtilityService.commonToast(async () => {
       try {
         const TotalAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
@@ -360,8 +372,8 @@ export class InvoiceCollectionComponent implements OnInit {
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillCollection,
           this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillCollection],
-          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher,
-          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher],
+          this.VoucherDataRequestModel.voucherCode = VoucherType.CreditVoucher,
+          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.CreditVoucher],
           this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
@@ -397,10 +409,11 @@ export class InvoiceCollectionComponent implements OnInit {
         this.VoucherDataRequestModel.roundOff = +(TotalAmount - PaymentAmount);
         this.VoucherDataRequestModel.voucherCanceled = false
         this.VoucherDataRequestModel.transactionNumber = mRNO,
-          this.VoucherDataRequestModel.paymentMode = "";
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName = "";
-        this.VoucherDataRequestModel.date = "";
+          this.VoucherDataRequestModel.paymentMode = PaymentMode,
+          this.VoucherDataRequestModel.refNo = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("ChequeOrRefNo").value : "";
+        this.VoucherDataRequestModel.accountName = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANM : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.name;
+        this.VoucherDataRequestModel.accountCode = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANCD : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.value;
+        this.VoucherDataRequestModel.date = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Date").value : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         var VoucherlineitemList = this.GetVouchersLedgers(data, mRNO);
 
@@ -420,8 +433,8 @@ export class InvoiceCollectionComponent implements OnInit {
                 branch: this.storage.branch,
                 transCode: VoucherInstanceType.BillCollection,
                 transType: VoucherInstanceType[VoucherInstanceType.BillCollection],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
+                voucherCode: VoucherType.CreditVoucher,
+                voucherType: VoucherType[VoucherType.CreditVoucher],
                 docType: "Voucher",
                 partyType: "Customer",
                 docNo: mRNO,
@@ -518,8 +531,8 @@ export class InvoiceCollectionComponent implements OnInit {
       voucherNo: "",
       transCode: VoucherInstanceType.BillCollection,
       transType: VoucherInstanceType[VoucherInstanceType.BillCollection],
-      voucherCode: VoucherType.JournalVoucher,
-      voucherType: VoucherType[VoucherType.JournalVoucher],
+      voucherCode: VoucherType.CreditVoucher,
+      voucherType: VoucherType[VoucherType.CreditVoucher],
       transDate: new Date(),
       finYear: financialYear,
       branch: this.storage.branch,
@@ -534,32 +547,21 @@ export class InvoiceCollectionComponent implements OnInit {
       GSTAmount: GstAmount,//credit,
       Total: debit + credit,
       TDSApplicable: false,
-      narration: `When Customer Bill freight is Finalized : ${mRNO}`,
+      narration: `When Customer Bill freight is Collected : ${mRNO}`,
     });
 
     const response = [
-      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, NetPayable, 0),
+      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, 0, NetPayable),
     ];
 
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {
       const CashAccount = this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value;
-      response.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, PaymentAmount));
+      response.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", PaymentAmount, 0));
     }
-    if (PaymentMode == "Cheque") {
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
-      let Leadgerdata = {
-        name: "",
-        value: ""
-      }
-      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
-      if (AccountDetails != undefined) {
-        Leadgerdata = {
-          name: AccountDetails?.aCNM,
-          value: AccountDetails?.aCCD
-        }
-      }
-      response.push(createVoucher(Leadgerdata.value, Leadgerdata.name, "ASSET", 0, PaymentAmount));
+      response.push(createVoucher(BankDetails.value, BankDetails.name, "ASSET", PaymentAmount, 0));
     }
 
 

@@ -1,26 +1,34 @@
-<!-- <form [formGroup]="BankTableForm">
-  <app-form-webxpress [form]="BankTableForm" [formData]="jsonControlArray"
-    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-  </app-form-webxpress>
-</form> -->
-<!-- <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-  [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-  [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-  [addAndEditPath]="addAndEditPath" [DisplayAddNewButton]="false" [boxData]="this.KPICountData">
-</app-generic-table-v2> -->
+<form [formGroup]="BankTableForm">
+  <div class="paddingdiv">
+    <app-form-webxpress [form]="BankTableForm" [formData]="jsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </div>
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+      <div class="example-button-row  d-flex justify-content-end">
+        <button class="msr-3" mat-raised-button color="primary" (click)="reloadData()">Submit</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
 <div class="paddingdiv">
   <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-    [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-    [menuItems]="menuItems" [FormTitle]="'Bank Reconcilations'" [staticField]="staticField"
+    [tableData]="CustomerTableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="menuItems" [FormTitle]="'Bank Reconcilations - Customer'" [staticField]="staticField"
     (dialogClosed)="reloadData()" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
-    [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" [boxData]="this.KPICountData"
+    [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" [boxData]="this.CustomerKPIData"
     [EventButton]="">
   </app-generic-table-v2>
 </div>
-<!-- <div class="row">
-  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-    <div class="example-button-row  d-flex justify-content-end">
-      <button class="msr-3" mat-raised-button color="primary" (click)="save()">Save</button>
-    </div>
-  </div>
-</div> -->
+<div class="paddingdiv">
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="VendorTableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="menuItems" [FormTitle]="'Bank Reconcilations - Vendor'" [staticField]="staticField"
+    (dialogClosed)="reloadData()" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
+    [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" [boxData]="this.VendorKPIData"
+    [EventButton]="">
+  </app-generic-table-v2>
+</div>

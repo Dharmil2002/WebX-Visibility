@@ -80,7 +80,7 @@ export class ManageRunsheetComponent
     noColumnSort: ["checkBoxRequired"],
   };
   columnWidths = {
-    'RunSheet': 'min-width:15%'
+    'RunSheet': 'min-width:19%'
   };
   //#endregion
   //#region declaring Csv File's Header as key and value Pair

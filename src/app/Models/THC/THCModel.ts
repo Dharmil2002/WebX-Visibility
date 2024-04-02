@@ -7,6 +7,7 @@ export class THCGenerationModel {
   mfdetailsList: MfdetailsList[]
   docType: string
   branch: string
+  timeZone:string
   finYear: string
 }
 
@@ -70,15 +71,35 @@ export class thcsummaryData {
   // cNDT?: Date
   // cNBY?: string
   // cNRES?: string
-  rakeDetailsList?:rakeDetails[];
+  rakeDetailsList?:rakeDetails;
   eNTDT: Date
   eNTLOC: string
   eNTBY: string
+  /*new field added for WT-279*/
+  venMobNo:string;
+  brokerName:string;
+  brokerMobile:string;
+  vehSize:string;
+  vehSizeName:string;
+  tdsUpload:string;
+  etaDate:Date;
+  engineNo:string;
+  chasisNo:string;
+  inExdt:Date;
+  fitdt:Date;
+  cHG:cHG[];
+  totAmt:number;
   // mODDT?: Date
   // mODLOC?: string
   // mODBY?: string  
 }
-
+/* below model is for the Store charge which is come for the charge master */
+export class cHG{
+  cHGID:string;
+  cHGNM:string;
+  aMT:string;
+}
+/* End */
 export class ThcmovementDetails {
   cID: number
   fLOC: string
@@ -196,6 +217,19 @@ export class MfdetailsList {
   // mODBY?: string
 }
 export class rakeDetails{
-  rRNO:string
-  rRDT:Date
+  nO:string
+  dT:Date
+  fNRNO:string
+  cONT:number
+  rR?:rR[]
+  iNV?:iNV[]
+}
+export class rR{
+  nO:string;
+  dT:Date;
+}
+export class iNV{
+  nO:string;
+  dT:string;
+  aMT:string;
 }

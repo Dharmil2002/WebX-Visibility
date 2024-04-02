@@ -104,8 +104,37 @@ export class ViewPrintComponent implements OnInit {
     }
 
     // Form is complete, proceed with generating URL
+    const BillingViewArray = [
+      {
+        name: "Dabour View-Print",
+        partyCode:"CUST00014",
+        viewName:"CustomerBill"
+      },
+      {
+        name: "Godrej View-Print",
+        partyCode:"CONSRAJT23",
+        viewName:"CustomerBill"
+      },
+      {
+        name: "Adani View-Print",
+        partyCode:"CUST00018",
+        viewName:"CustomerBill"
+      },
+      {
+        name: "AsianPaint View-Print",
+        partyCode:"CONSRAJT22",
+        viewName:"CustomerBill"
+      },
+      {
+        name: "Polycab View-Print",
+        partyCode:"CONSRAJT20",
+        viewName:"CustomerBill"
+      },
+    ];
+    const FindBillView = BillingViewArray.find((x) => x.name == viewType.name)
     const req = {
-      templateName: viewType.name,
+      templateName: FindBillView?.viewName || viewType.name,
+      partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
@@ -122,5 +151,4 @@ export class ViewPrintComponent implements OnInit {
       console.log("failed");
     }
   }
-
 }

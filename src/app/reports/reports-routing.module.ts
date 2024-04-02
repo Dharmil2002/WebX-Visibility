@@ -14,6 +14,11 @@ import { PrqRegisterReportComponent } from './prq-register-report/prq-register-r
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
+
+import { ProfitAndLossCriteriaComponent } from './Account Report/Components/profit-and-loss-criteria/profit-and-loss-criteria.component';
+import { ProfitAndLossViewComponent } from './Account Report/Components/profit-and-loss-view/profit-and-loss-view.component';
+import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/profit-and-loss-view-details/profit-and-loss-view-details.component';
+
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 import { StockReportComponent } from './stock-report/stock-report.component';
@@ -34,9 +39,13 @@ const routes: Routes = [
   { path: "vendor-wise-outstanding-report", component: VendorOutstandingReportComponent },
   { path: "General-ledger-report", component: GeneralLedgerReportComponent },
   { path: "Cheque-Register-Report", component: ChequeRegisterComponent },
+  { path: "AccountReport/ProfitAndLoss", component: ProfitAndLossCriteriaComponent },
+  { path: "AccountReport/ProfitAndLossview", component: ProfitAndLossViewComponent },
+  { path: "AccountReport/ProfitAndLossviewdetails", component: ProfitAndLossViewDetailsComponent },
   { path: "Dashboard", component: DashboardComponent },
   { path: "ControlTower", component: ControlTowerDashboardComponent }, 
   { path: "stock-report", component: StockReportComponent } 
+
 ];
 
 @NgModule({

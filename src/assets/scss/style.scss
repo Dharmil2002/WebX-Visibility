@@ -639,3 +639,26 @@ a {
 .blur-effect {
   filter: blur(5px); /* Adjust the pixel value for more or less blur */
 }
+/* Landscape orientation */
+@media print {
+  @page {
+    size: landscape;
+  }
+ 
+  .landscape {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vw;
+    page-break-after: always;
+    /* Add this to ensure content fits properly in landscape mode */
+  }
+ 
+  .portrait {
+    /* Portrait-specific styles */
+    transform: none;
+    width: auto;
+    height: auto;
+  }
+ 
+}

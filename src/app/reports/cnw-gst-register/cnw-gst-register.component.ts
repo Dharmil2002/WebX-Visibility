@@ -288,7 +288,7 @@ export class CnwGstRegisterComponent implements OnInit {
       const { tCT, fCT, oRGN, dEST, cSGNNM, ...rest } = record;
       return rest;
     });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);
+    // exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);
   }
 
   toggleSelectAll(argData: any) {

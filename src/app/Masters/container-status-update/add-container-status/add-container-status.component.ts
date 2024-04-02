@@ -70,7 +70,7 @@ export class AddContainerStatusComponent implements OnInit {
     const containerNoValue = cNID.value;
     // Reset form values
     [cNTYPNM, vNTYP, vNTYPNM].forEach(control => control.setValue(''));
-  
+
     try {
       const exists = await this.containerMasterService.getContainerStatus({ "cNID": containerNoValue.value });
       if (exists?.data && Object.keys(exists.data).length > 0) {

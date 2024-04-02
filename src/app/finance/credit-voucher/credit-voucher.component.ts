@@ -312,11 +312,11 @@ export class CreditVoucherComponent implements OnInit {
           "DepositBank",
           false
         );
-       
+
         const depositBank = this.creditVoucherPaymentDetailsForm.get('DepositBank');
         depositBank.setValidators([Validators.required, autocompleteObjectValidator()]);
         depositBank.updateValueAndValidity();
-      
+
         const ChequeOrRefNo = this.creditVoucherPaymentDetailsForm.get('ChequeOrRefNo');
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
@@ -533,6 +533,7 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.paymentMode = this.creditVoucherPaymentDetailsForm.value.ReceiptMode;
         this.creditVoucherDataRequestModel.refNo = this.creditVoucherPaymentDetailsForm.value.ChequeOrRefNo;
         this.creditVoucherDataRequestModel.accountName = this.creditVoucherPaymentDetailsForm.value.DepositBank.name;
+        this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
 
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {

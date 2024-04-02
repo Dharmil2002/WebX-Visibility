@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
@@ -77,9 +78,16 @@ export class RouteMasterLocationWiseComponent implements OnInit {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "routeMasterLocWise",
       filter: { _id: id },
-      update: det
+      update: {isActive: det.isActive}
     };
-    const res = await this.masterService.masterPut("generic/update", req).toPromise()
+    let reqTrip = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "trip_Route_Schedule",
+      filter: { rUTCD: id },
+      update: {iSACT: det.isActive}
+    };
+    const res =  await firstValueFrom(this.masterService.masterPut("generic/update", req));
+    await firstValueFrom(this.masterService.masterPut("generic/update", reqTrip));
     if (res) {
       // Display success message
       Swal.fire({

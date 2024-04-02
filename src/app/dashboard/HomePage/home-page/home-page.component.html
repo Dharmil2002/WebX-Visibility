@@ -1,0 +1,130 @@
+<section class="content">
+    <div class="container-fluid">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="row search" style="width: 100%;">
+                <div class="col-12 container-fluid">
+                    <ul class="flex-row-custom justify-content-center" style="padding-top: 10px;">
+                        <!-- <li class="w-lg-10 w-md-15 w-sm-100" style="padding: 0px 10px; ">
+                            <div class="flex-row-center"
+                                style="height: 100%; font-size: 1.2rem; font-weight: bold;">
+                                Module
+                            </div>
+                        </li> -->
+                        <li class="search-bar w-lg-50 w-md-75 w-sm-100" style="position: relative;">
+                            <input type="text" style="width: 100%;" class="form-control custom-input"
+                                placeholder="Search" [(ngModel)]="searchQuery" (input)="onSearchInput()" />
+                            <ul class="google-autocomplete-list" *ngIf="showAutocomplete"
+                                style="position: absolute; z-index: 10;">
+                                <li *ngFor="let option of autocompleteOptions" style="margin: 5px 0px;"
+                                    (click)="selectOption(option)" class="google-autocomplete-item">
+                                    {{ option.name }}
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row my-lg-5 my-md-3 my-md-1 my-xl-5">
+                <div *ngFor="let item of cardList" class="col-md-4 col-xl-3 custom-icon icon-pedding"
+                    (click)="onAppClick($event, item)">                    
+                    <div class=" pointer card-shape" [style.background-color]="item.bgColor">
+                      <div class="card-block iconcolor">
+                        <h6 class="m-b-20"></h6>
+                        <h2 class="text-right">
+                          <!-- <i class="fa fa-shipping-fast card-icon"></i><span></span> -->
+                          <mat-icon style="font-size: 80px; width: 80px; height: 80px;" [style.color]="item.color">{{item.iconName}}</mat-icon>
+                        </h2>
+                      </div>
+                    </div>
+                    <p class="fontbold" style="font-size: large;"><span>{{item.title}}</span></p>
+                  </div>
+            </div>            
+        </div>
+    </div>
+</section>
+
+<style>
+    .flex-column-center {
+        display: flex;
+        flex-direction: column;
+        /* justify-content: center; */
+        align-items: center;
+    }
+
+    .flex-row-center {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cricle-card {
+        width: 120px;
+        height: 120px;
+        background-color: rgb(219, 219, 219);
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .card-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: rgb(100, 100, 100);
+        cursor: pointer;
+    }
+
+
+
+    @media (min-width: 576px) {
+
+        /* CUSTOM WIDTHS */
+        .flex-row-custom {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .w-sm-100 {
+            width: 100% !important;
+        }
+
+        .w-sm-100 {
+            width: 100% !important;
+        }
+    }
+
+    /* MD breakpoint*/
+    @media (min-width: 600px) {
+
+        /* CUSTOM WIDTHS */
+        .flex-row-custom {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .w-md-75 {
+            width: 75% !important;
+        }
+
+        .w-md-15 {
+            width: 15% !important;
+        }
+    }
+
+    /* LG breakpoint */
+    @media (min-width: 992px) {
+
+        /* CUSTOM WIDTHS */
+        .flex-row-custom {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .w-lg-10 {
+            width: 10% !important;
+        }
+
+        .w-lg-50 {
+            width: 50% !important;
+        }
+    }
+</style>

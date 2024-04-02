@@ -4,7 +4,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { Subject, firstValueFrom } from "rxjs";
+import { Observable, Subject, firstValueFrom, forkJoin, throwError, timer } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -26,6 +26,7 @@ import {
   VoucherInstanceType,
   VoucherRequestModel,
   VoucherType,
+  ledgerInfo,
 } from "src/app/Models/Finance/Finance";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
@@ -34,6 +35,8 @@ import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { VendorsVehicleDetailComponent } from "../Modal/vendors-vehicle-detail/vendors-vehicle-detail.component";
 import { BeneficiaryDetailComponent } from "../../Vendor Bills/beneficiary-detail/beneficiary-detail.component";
+import { catchError, concatMap, filter, finalize, mergeMap, switchMap } from 'rxjs/operators';
+import { GetBankDetailFromApi } from "../../Debit Voucher/debitvoucherAPIUtitlity";
 @Component({
   selector: "app-advance-payments",
   templateUrl: "./advance-payments.component.html",
@@ -110,7 +113,7 @@ export class AdvancePaymentsComponent implements OnInit {
   tableData;
   AllLocationsList: any;
   isTableLode = false;
-
+  AccountsBanksList: any;
   vendorPaymentControl: VendorPaymentControl;
   protected _onDestroy = new Subject<void>();
 
@@ -350,11 +353,13 @@ export class AdvancePaymentsComponent implements OnInit {
       this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name;
     switch (PaymentMode) {
       case "Cheque":
-        const responseFromAPIBank = await GetAccountDetailFromApi(
-          this.masterService,
-          "BANK",
-          Accountinglocation
-        );
+        // const responseFromAPIBank = await GetAccountDetailFromApi(
+        //   this.masterService,
+        //   "BANK",
+        //   Accountinglocation
+        // );
+        this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
         this.filter.Filter(
           this.jsonControlPaymentSummaryFilterArray,
           this.PaymentSummaryFilterForm,
@@ -417,166 +422,40 @@ export class AdvancePaymentsComponent implements OnInit {
         break;
     }
   }
-  Submit() {
-    if (this.tableData.filter(x => x.isSelected).length == 0) {
-      this.snackBarUtilityService.ShowCommonSwal(
-        "info",
-        "Please Select Atleast One THC"
-      );
-    } else {
-      this.snackBarUtilityService.commonToast(async () => {
-        try {
 
-          const GrossAmount = parseFloat(
-            this.PayableSummaryFilterForm.get("TotalTHCAmount").value
-          );
-          const NetPayable = parseFloat(
-            this.PayableSummaryFilterForm.get("BalancePayable").value
-          );
 
-          this.VoucherRequestModel.companyCode = this.companyCode;
-          this.VoucherRequestModel.docType = "VR";
-          this.VoucherRequestModel.branch =
-            this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name;
-          this.VoucherRequestModel.finYear = financialYear;
+  UpdateTHCAmount(inputData) {
+    const outputData = {};
 
-          // this.VoucherDataRequestModel.companyCode = this.companyCode;
-          this.VoucherDataRequestModel.voucherNo = "";
-          this.VoucherDataRequestModel.transCode = VoucherInstanceType.AdvancePayment;
-          this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.AdvancePayment];
-          this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-          this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
-
-          this.VoucherDataRequestModel.transDate = new Date();
-          this.VoucherDataRequestModel.docType = "VR";
-          this.VoucherDataRequestModel.branch =
-            this.storage.branch;
-          this.VoucherDataRequestModel.finYear = financialYear;
-
-          this.VoucherDataRequestModel.accLocation =
-            this.storage.branch;
-          this.VoucherDataRequestModel.preperedFor = "Vendor";
-          this.VoucherDataRequestModel.partyCode = `${this.PaymentData?.VendorInfo?.cD || ""}`;
-          this.VoucherDataRequestModel.partyName = this.PaymentData?.VendorInfo?.nM;
-          this.VoucherDataRequestModel.partyState =
-            this.VendorDetails?.vendorState;
-          this.VoucherDataRequestModel.entryBy = this.storage.userName;
-          this.VoucherDataRequestModel.entryDate = new Date();
-          this.VoucherDataRequestModel.panNo =
-            this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
-
-          this.VoucherDataRequestModel.tdsSectionCode = undefined
-          this.VoucherDataRequestModel.tdsSectionName = undefined
-          this.VoucherDataRequestModel.tdsRate = 0;
-          this.VoucherDataRequestModel.tdsAmount = 0;
-          this.VoucherDataRequestModel.tdsAtlineitem = false;
-          this.VoucherDataRequestModel.tcsSectionCode = undefined
-          this.VoucherDataRequestModel.tcsSectionName = undefined
-          this.VoucherDataRequestModel.tcsRate = 0;
-          this.VoucherDataRequestModel.tcsAmount = 0;
-
-          this.VoucherDataRequestModel.IGST = 0;
-          this.VoucherDataRequestModel.SGST = 0;
-          this.VoucherDataRequestModel.CGST = 0;
-          this.VoucherDataRequestModel.UGST = 0;
-          this.VoucherDataRequestModel.GSTTotal = 0;
-
-          this.VoucherDataRequestModel.GrossAmount = GrossAmount;
-          this.VoucherDataRequestModel.netPayable = NetPayable;
-          this.VoucherDataRequestModel.roundOff = 0;
-          this.VoucherDataRequestModel.voucherCanceled = false;
-
-          this.VoucherDataRequestModel.paymentMode =
-            this.PaymentSummaryFilterForm.value.PaymentMode;
-          this.VoucherDataRequestModel.refNo =
-            this.PaymentSummaryFilterForm.value.ChequeOrRefNo;
-          this.VoucherDataRequestModel.accountName =
-            this.PaymentSummaryFilterForm.value.Bank.name;
-          this.VoucherDataRequestModel.date =
-            this.PaymentSummaryFilterForm.value.Date;
-          this.VoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-
-          const companyCode = this.companyCode;
-          const CurrentBranchCode = this.storage.branch;
-          var VoucherlineitemList = this.tableData.map(function (item) {
-            return {
-              companyCode: companyCode,
-              voucherNo: "",
-              transCode: VoucherInstanceType.AdvancePayment,
-              transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
-              voucherCode: VoucherType.JournalVoucher,
-              voucherType: VoucherType[VoucherType.JournalVoucher],
-              transDate: new Date(),
-              finYear: financialYear,
-              branch: CurrentBranchCode,
-              accCode: "TEST",
-              accName: "TEST",
-              sacCode: "TEST",
-              sacName: "TEST",
-              debit: parseFloat(item.THCamount).toFixed(2),
-              credit: 0,
-              GSTRate: 0,
-              GSTAmount: 0,
-              Total: parseFloat(item.THCamount).toFixed(2),
-              TDSApplicable: false,
-              narration: "",
-            };
-          });
-
-          this.VoucherRequestModel.details = VoucherlineitemList;
-          this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-          this.VoucherRequestModel.debitAgainstDocumentList = [];
-
-          firstValueFrom(this.voucherServicesService
-            .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-              if (res.success) {
-                this.UpdateTHCAmount(res?.data?.mainData?.ops[0].vNO);
-              }
-            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-            .finally(() => {
-
-            });
-
-        } catch (error) {
-          this.snackBarUtilityService.ShowCommonSwal(
-            "error",
-            error.message
-          );
-        }
-      }, "Advance Payment Voucher Generating..!");
-    }
-  }
-
-  UpdateTHCAmount(vno) {
-    const isSelectedData = this.tableData.filter((x) => x.isSelected);
-    console.log("isSelectedData", isSelectedData);
-    isSelectedData.forEach((x) => {
-      const UpdateAmount = x?.UpdateAmount
-      let commonBody;
-
-      if (UpdateAmount != undefined) {
-        commonBody = {
-          aDVPENAMT: x.Advance,
-          bALAMT: x.THCamount - x.Advance,
-          cONTAMT: x.THCamount,
-        }
-        commonBody["addedCharges"] = this.convertFieldsToNumbers(UpdateAmount.THCAmountsADDForm)
-        commonBody["deductedCharges"] = this.convertFieldsToNumbers(UpdateAmount.THCAmountsLESSForm)
+    inputData.forEach(item => {
+      if (!outputData[item.THCNo]) {
+        outputData[item.THCNo] = [item.VoucherNo];
       } else {
-        commonBody = {
-          aDVPENAMT: 0,
-          aDVVUCH: [vno],
-          mODDT: new Date(),
-          mODLOC: this.storage.branch,
-          mODBY: this.storage.userName,
-        }
+        outputData[item.THCNo].push(item.VoucherNo);
+      }
+    });
+
+    const ResultList = Object.keys(outputData).map(key => ({
+      THCNo: key,
+      VoucherNo: outputData[key]
+    }));
+
+    const isSelectedData = ResultList;
+    isSelectedData.forEach((x) => {
+      let commonBody;
+      commonBody = {
+        aDVPENAMT: 0,
+        aDVVUCH: x.VoucherNo,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch,
+        mODBY: this.storage.userName,
       }
       const reqBody = {
         companyCode: this.companyCode,
         collectionName: "thc_summary",
         filter: {
           cID: this.storage.companyCode,
-          docNo: x.THC
+          docNo: x.THCNo
         },
         update: commonBody,
       };
@@ -585,7 +464,7 @@ export class AdvancePaymentsComponent implements OnInit {
           Swal.fire({
             icon: "success",
             title: "Voucher Created Successfully And THC Updated Successfully",
-            text: "Voucher No: " + vno,
+            text: "Voucher No: " + x.VoucherNo.toLocaleString(),
             showConfirmButton: true,
           }).then((result) => {
             if (result.isConfirmed) {
@@ -690,5 +569,411 @@ export class AdvancePaymentsComponent implements OnInit {
   vehiclesregisteredview(event) {
 
     this.getVendorsVehicles(true);
+  }
+
+
+
+  Submit() {
+    const selectedData = this.tableData.filter(item => item.isSelected);
+
+    if (selectedData.length === 0) {
+      this.snackBarUtilityService.ShowCommonSwal("info", "Please Select Atleast One THC");
+      return;
+    }
+
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const JornalRequests = selectedData.map((data, index) =>
+          timer(index * 1000).pipe(concatMap(() => this.createJournalRequest(data)))
+        );
+
+        const DebitRequests = selectedData.map((data, index) =>
+          timer(index * 1000).pipe(concatMap(() => this.createDebitRequest(data)))
+        );
+
+        const AllRequests = [...JornalRequests, ...DebitRequests];
+
+        forkJoin(AllRequests).subscribe((results: any[]) => {
+          const Response = [];
+          results.forEach((item) => {
+            const ResultObject = {
+              THCNo: item.data.ops[0].docNo,
+              VoucherNo: item.data.ops[0].vNO
+            }
+            Response.push(ResultObject);
+          });
+          this.UpdateTHCAmount(Response);
+
+        }, error => {
+          this.snackBarUtilityService.ShowCommonSwal("error", error);
+          Swal.hideLoading();
+          setTimeout(() => {
+            Swal.close();
+          }, 2000);
+        });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 2000);
+      }
+    }, "Advance Payment Voucher Generating..!");
+  }
+  createJournalRequest(data: any): Observable<any> {
+    // Construct the voucher request payload
+    const voucherRequest = {
+      companyCode: this.companyCode,
+      docType: "VR",
+      branch: this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name,
+      finYear: financialYear,
+      details: [],
+      debitAgainstDocumentList: [],
+      data: {
+        transCode: VoucherInstanceType.AdvancePayment,
+        transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+        voucherCode: VoucherType.JournalVoucher,
+        voucherType: VoucherType[VoucherType.JournalVoucher],
+        transDate: new Date(),
+        docType: "VR",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        accLocation: this.storage.branch,
+        preperedFor: "Vendor",
+        partyCode: data?.OthersData?.vND?.cD || "",
+        partyName: data?.OthersData?.vND?.nM,
+        partyState: this.VendorDetails?.vendorState || "",
+        entryBy: this.storage.userName,
+        entryDate: new Date(),
+        panNo: this.PaymentHeaderFilterForm.get("VendorPANNumber").value,
+        tdsSectionCode: undefined,
+        tdsSectionName: undefined,
+        tdsRate: 0,
+        tdsAmount: 0,
+        tdsAtlineitem: false,
+        tcsSectionCode: undefined,
+        tcsSectionName: undefined,
+        tcsRate: 0,
+        tcsAmount: 0,
+        IGST: 0,
+        SGST: 0,
+        CGST: 0,
+        UGST: 0,
+        GSTTotal: 0,
+        GrossAmount: parseFloat(data?.THCamount),
+        netPayable: parseFloat(data?.THCamount),
+        roundOff: 0,
+        voucherCanceled: false,
+        paymentMode: "",
+        refNo: "",
+        accountName: "",
+        accountCode: "",
+        date: "",
+        scanSupportingDocument: "",
+        transactionNumber: data?.THC
+      }
+    };
+
+    // Retrieve voucher line items
+    const voucherlineItems = this.GetJournalVoucherLedgers(data);
+    voucherRequest.details = voucherlineItems;
+
+    // Validate debit and credit amounts
+    if (voucherlineItems.reduce((acc, item) => acc + parseFloat(item.debit), 0) != voucherlineItems.reduce((acc, item) => acc + parseFloat(item.credit), 0)) {
+      this.snackBarUtilityService.ShowCommonSwal("error", "Debit and Credit Amount Should be Equal");
+      // Return an observable with an error
+      return;
+    }
+
+    // Create and return an observable representing the HTTP request
+    return this.voucherServicesService.FinancePost("fin/account/voucherentry", voucherRequest).pipe(
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while creating voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      }),
+      mergeMap((res: any) => {
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          voucherNo: res?.data?.mainData?.ops[0].vNO,
+          transDate: Date(),
+          finYear: financialYear,
+          branch: this.storage.branch,
+          transCode: VoucherInstanceType.AdvancePayment,
+          transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          docType: "Voucher",
+          partyType: "Vendor",
+          docNo: data.THC,
+          partyCode: "" + data?.OthersData?.vND?.cD || "",
+          partyName: data?.OthersData?.vND?.nM || "",
+          entryBy: this.storage.userName,
+          entryDate: Date(),
+          debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.debit,
+              "narration": item.narration ?? ""
+            };
+          }),
+          credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.credit,
+              "narration": item.narration ?? ""
+            };
+          }),
+        };
+
+        return this.voucherServicesService.FinancePost("fin/account/posting", reqBody);
+      }),
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while posting voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      })
+    );
+  }
+  createDebitRequest(data: any): Observable<any> {
+    // Construct the voucher request payload
+    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
+      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      if (AccountDetails != undefined) {
+        this.PaymentSummaryFilterForm.get("Bank").setValue(AccountDetails)
+      } else {
+        this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
+        return;
+      }
+    }
+    const voucherRequest = {
+      companyCode: this.companyCode,
+      docType: "VR",
+      branch: this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name,
+      finYear: financialYear,
+      details: [],
+      debitAgainstDocumentList: [],
+      data: {
+        transCode: VoucherInstanceType.AdvancePayment,
+        transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+        voucherCode: VoucherType.DebitVoucher,
+        voucherType: VoucherType[VoucherType.DebitVoucher],
+        transDate: new Date(),
+        docType: "VR",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        accLocation: this.storage.branch,
+        preperedFor: "Vendor",
+        partyCode: data?.OthersData?.vND?.cD || "",
+        partyName: data?.OthersData?.vND?.nM,
+        partyState: this.VendorDetails?.vendorState || "",
+        entryBy: this.storage.userName,
+        entryDate: new Date(),
+        panNo: this.PaymentHeaderFilterForm.get("VendorPANNumber").value,
+        tdsSectionCode: undefined,
+        tdsSectionName: undefined,
+        tdsRate: 0,
+        tdsAmount: 0,
+        tdsAtlineitem: false,
+        tcsSectionCode: undefined,
+        tcsSectionName: undefined,
+        tcsRate: 0,
+        tcsAmount: 0,
+        IGST: 0,
+        SGST: 0,
+        CGST: 0,
+        UGST: 0,
+        GSTTotal: 0,
+        GrossAmount: parseFloat(data?.THCamount),
+        netPayable: parseFloat(data?.THCamount),
+        roundOff: 0,
+        voucherCanceled: false,
+        paymentMode: PaymentMode,
+        refNo: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("ChequeOrRefNo").value : "",
+        accountName: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("Bank").value?.bANM : this.PaymentSummaryFilterForm.get("CashAccount").value?.name,
+        accountCode: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("Bank").value?.bANCD : this.PaymentSummaryFilterForm.get("CashAccount").value?.value,
+        date: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("Date").value : "",
+        scanSupportingDocument: "",
+        transactionNumber: data?.THC
+      }
+    };
+
+    // Retrieve voucher line items
+    const voucherlineItems = this.GetDebitVoucherLedgers(data);
+    voucherRequest.details = voucherlineItems;
+
+    // Validate debit and credit amounts
+    if (voucherlineItems.reduce((acc, item) => acc + parseFloat(item.debit), 0) != voucherlineItems.reduce((acc, item) => acc + parseFloat(item.credit), 0)) {
+      this.snackBarUtilityService.ShowCommonSwal("error", "Debit and Credit Amount Should be Equal");
+      // Return an observable with an error
+      return;
+    }
+
+    // Create and return an observable representing the HTTP request
+    return this.voucherServicesService.FinancePost("fin/account/voucherentry", voucherRequest).pipe(
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while creating voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      }),
+      mergeMap((res: any) => {
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          voucherNo: res?.data?.mainData?.ops[0].vNO,
+          transDate: Date(),
+          finYear: financialYear,
+          branch: this.storage.branch,
+          transCode: VoucherInstanceType.AdvancePayment,
+          transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+          voucherCode: VoucherType.DebitVoucher,
+          voucherType: VoucherType[VoucherType.DebitVoucher],
+          docType: "Voucher",
+          partyType: "Vendor",
+          docNo: data.THC,
+          partyCode: "" + data?.OthersData?.vND?.cD || "",
+          partyName: data?.OthersData?.vND?.nM || "",
+          entryBy: this.storage.userName,
+          entryDate: Date(),
+          debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.debit,
+              "narration": item.narration ?? ""
+            };
+          }),
+          credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.credit,
+              "narration": item.narration ?? ""
+            };
+          }),
+        };
+
+        return this.voucherServicesService.FinancePost("fin/account/posting", reqBody);
+      }),
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while posting voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      })
+    );
+  }
+  GetDebitVoucherLedgers(SelectedData) {
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit, THCNo) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.AdvancePayment,
+      transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+      voucherCode: VoucherType.DebitVoucher,
+      voucherType: VoucherType[VoucherType.DebitVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Advance Paid against THC NO : ${THCNo}`,
+    });
+
+    const Result = [];
+
+    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+
+    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+    if (PaymentMode == "Cash") {
+      const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;
+      Result.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, parseFloat(SelectedData.Advance), SelectedData.THC));
+    }
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
+      Result.push(createVoucher(BankDetails.value, BankDetails.name, "ASSET", 0, parseFloat(SelectedData.Advance), SelectedData.THC));
+    }
+
+    return Result;
+  }
+  GetJournalVoucherLedgers(SelectedData) {
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit, THCNo) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.AdvancePayment,
+      transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Expense Booked against THC NO : ${THCNo}`,
+    });
+
+    const Result = [];
+
+    let OtherChargePositiveAmt = 0;
+    let OtherChargeNegativeAmt = 0;
+    const AllCharges: any[] = SelectedData?.OthersData?.cHG;
+    AllCharges.forEach((item) => {
+      if (item.aMT != 0) {
+        if (item.oPS == "+") {
+          const GetLeadgerInfo = ledgerInfo[item.cHGNM];
+          if (GetLeadgerInfo) {
+            Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, +item.aMT, 0, SelectedData.THC));
+          } else {
+            OtherChargePositiveAmt += parseFloat(item.aMT);
+          }
+        } else {
+          const GetLeadgerInfo = ledgerInfo[item.cHGNM];
+          if (GetLeadgerInfo) {
+            Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, 0, (+item.aMT * -1), SelectedData.THC));
+          } else {
+            OtherChargeNegativeAmt += (parseFloat(item.aMT) * -1);
+          }
+        }
+      }
+    });
+
+    if (OtherChargePositiveAmt != 0) {
+      Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, OtherChargePositiveAmt, 0, SelectedData.THC));
+    }
+    if (OtherChargeNegativeAmt != 0) {
+      Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, 0, OtherChargeNegativeAmt, SelectedData.THC));
+    }
+    Result.push(createVoucher(ledgerInfo['Contract Charges'].LeadgerCode, ledgerInfo['Contract Charges'].LeadgerName, ledgerInfo['Contract Charges'].LeadgerCategory, parseFloat(SelectedData.THCContraAmount), 0, SelectedData.THC));
+    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, 0, parseFloat(SelectedData.THCamount), SelectedData.THC));
+    return Result;
   }
 }

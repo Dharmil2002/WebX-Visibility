@@ -68,12 +68,13 @@ import { BillApprovalComponent } from "./pending-billing/bill-approval/bill-appr
 import { JobViewPrintComponent } from './job-view-print/job-view-print.component';
 import { HandedOverUploadComponent } from './handed-over/handed-over-upload/handed-over-upload.component';
 import { ConsignmentOperationComponent } from './consignment-operation/consignment-operation.component';
-import { ConsingmentSummaryComponent } from './consingment-summary/consingment-summary.component';
 import { ConsignmentFilterComponent } from './consignment-filter/consignment-filter.component';
-import { ConsignmentPodComponent } from './consignment-pod/consignment-pod.component';
 import { UpdateDeliveryComponent } from './update-delivery/update-delivery.component';
 import { DocketFiltersComponent } from "./thc-generation/filters/docket-filters/docket-filters.component";
 import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-modal/update-delivery-modal.component";
+import { QueryPageComponent } from './consignmentTracking/query-page/query-page.component';
+import { TrackingPageComponent } from './consignmentTracking/tracking-page/tracking-page.component';
+import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-popup/view-tracking-popup.component';
 
 @NgModule({
   declarations: [
@@ -122,12 +123,13 @@ import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-
     JobViewPrintComponent,
     HandedOverUploadComponent,
     ConsignmentOperationComponent,
-    ConsingmentSummaryComponent,
     ConsignmentFilterComponent,
-    ConsignmentPodComponent,
     UpdateDeliveryComponent,
     DocketFiltersComponent,
-    UpdateDeliveryModalComponent    
+    UpdateDeliveryModalComponent,
+    QueryPageComponent,
+    TrackingPageComponent,
+    ViewTrackingPopupComponent    
   ],
   imports: [
     CommonModule,

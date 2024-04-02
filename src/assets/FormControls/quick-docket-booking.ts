@@ -1,13 +1,16 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { BaseControl } from "./base-control";
 
 /* here i create class for the bind controls in formGrop */
-export class QuickBookingControls {
+export class QuickBookingControls extends BaseControl {
   private fieldMapping: FormControls[];
   constructor(
-    private generalService: GeneralService
+    generalService: GeneralService
   ) {
+    super(generalService, "LTL", ["QuickBookingControls"]);
+    
     this.fieldMapping = [
       {
         name: "docketNumber",
@@ -292,62 +295,6 @@ export class QuickBookingControls {
     ];
   }
   getDocketFieldControls() {
-    return this.fieldMapping.filter((x) => x.visible === true);
-  }
-
-  async applyFieldRules(companyCode) {
-    var data = await this.generalService.getData("field_rules", { cID: companyCode, Mode: "LTL", Class: { "D$in": ["QuickBookingControls"] } });    
-    if(data != null && data.length > 0){
-      data.map(f => {
-        if(f.Caption) {
-          f.Caption = f.Caption.replace(/{{Docket}}/g, DocCalledAs.Docket);
-        }
-        if(f["Place Holder"]) { 
-          f["Place Holder"] = f["Place Holder"].replace(/{{Docket}}/g, DocCalledAs.Docket); 
-        }
-        this.configureControl(f);
-      });
-    }
-  }
-
-  configureControl(field: any) { 
-    var c = this[field.FormControl].find((x) => x.name === field.Field);
-    if(!c)
-      return;
-
-    c.label = field.Caption;
-    c.placeholder = field["Place Holder"];
-    c.visible = field.Visible;
-    c.disable = field.ReadOnly;     
-    
-    if(field.IsSystemGenerated) {
-      c.value = "Computerized";
-    }
-    if(field.Required === true) {
-      var r = c.Validations.find(x=>x.name=="required");
-      if(!r) {
-        c.Validations.push({name:"required",message:`${field.Caption} is required.` });
-      }
-      else {
-        r.message = `${field.Caption} is required.`;
-      }
-    }
-    else {
-      var r = c.Validations.find(x=>x.name=="required");
-      if(r) {
-        c.Validations.splice(c.Validations.indexOf(r),1);
-      }
-    }
-
-    if(field["Custom Validation"]) { 
-      var r = c.Validations.find(x=>x.name=="pattern");
-      if(!r) {
-        c.Validations.push({name:"pattern",message: field["Custom Validation Message"], pattern: field["Custom Validation"]});
-      }
-      else {
-        r.message = field["Custom Validation Message"];
-        r.pattern = field["Custom Validation"];
-      }
-    }
+    return this.fieldMapping;
   }
 }

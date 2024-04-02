@@ -18,6 +18,7 @@ import { CustomFilterPipe } from "src/app/Utility/Custom Pipe/FilterPipe";
 import moment from "moment";
 import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
 import Swal from "sweetalert2";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Component({
   selector: "app-tracking-page",
@@ -52,31 +53,31 @@ export class TrackingPageComponent implements OnInit {
     {
       title: "Total Results",
       count: 0,
-      Color: "salmon",
+      Color: "rgb(123, 140, 161)",
       _id: 0,
     },
     {
       title: "Booked",
       count: 0,
-      Color: "lightseagreen",
+      Color: "#e82",
       _id: 1,
     },
     {
       title: "InTransit",
       count: 0,
-      Color: "rgb(91, 196, 91)",
+      Color: "rgb(74, 168, 199)",
       _id: 4,
     },
     {
       title: "OFD",
       count: 0,
-      Color: "rgb(74, 168, 199)",
+      Color: "lightseagreen",
       _id: null,
     },
     {
       title: "Delivered",
       count: 0,
-      Color: "rgb(123, 140, 161)",
+      Color: "rgb(91, 196, 91)",
       _id: 3,
     },
   ];
@@ -86,20 +87,30 @@ export class TrackingPageComponent implements OnInit {
   searchText: any;
   csvFileName: any;
   csvHeaders: {};
+  DocCalledAs: any;
   constructor(
     private Route: Router,
     private masterService: MasterService,
     public dialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
+    private controlPanel: ControlPanelService
   ) {
+    this.DocCalledAs = this.controlPanel.DocCalledAs;
+    this.breadscrums = [
+      {
+        title: `Tracking`,
+        items: ["Home"],
+        active: `${this.DocCalledAs.Docket} Tracking`,
+      },
+    ];
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.QueryData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log('this.QueryData' ,this.QueryData)
+      console.log("this.QueryData", this.QueryData);
       if (this.QueryData.Docket) {
         const Query = {
           D$match: {
-            dKTNO: { D$in: this.QueryData.Docket},
+            dKTNO: { D$in: this.QueryData.Docket },
           },
         };
         this.getTrackingDocket(Query);
@@ -165,7 +176,7 @@ export class TrackingPageComponent implements OnInit {
         { ...QueryFilter },
         {
           D$group: {
-            _id: "$sTS",
+            _id: "$sTSNM",
             Count: {
               D$sum: 1,
             },
@@ -179,16 +190,16 @@ export class TrackingPageComponent implements OnInit {
     );
     if (res.success) {
       res.data?.map((x) => {
-        if (x._id == 1) {
+        if (x._id == "Booked") {
           this.CountCard.forEach((t) => {
             if (t.title == "Booked") {
               t.count = x.Count;
             }
           });
-        } else if (x._id == 4) {
+        } else if (x._id == "Departed" || x._id == "Arrived") {
           this.CountCard.forEach((t) => {
             if (t.title == "InTransit") {
-              t.count = x.Count;
+              t.count = x.Count + t.count;
             }
           });
         } else if (x._id == "OFD") {
@@ -197,7 +208,7 @@ export class TrackingPageComponent implements OnInit {
               t.count = x.Count;
             }
           });
-        } else if (x._id == 3) {
+        } else if (x._id == "Delivered") {
           this.CountCard.forEach((t) => {
             if (t.title == "Delivered") {
               t.count = x.Count;
@@ -254,7 +265,7 @@ export class TrackingPageComponent implements OnInit {
   }
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
-      data: eventData?.DocketTrackingData,
+      data: { TrackingList: eventData?.DocketTrackingData , DokNo: eventData.dKTNO},
       width: "1400px",
       height: "100%",
       disableClose: true,
@@ -275,7 +286,11 @@ export class TrackingPageComponent implements OnInit {
       this.ngOnInit();
     } else {
       this.dataSource = new MatTableDataSource<any>(
-        this.TableData.filter((x) => x.sTS == item._id)
+        this.TableData.filter((x) =>
+          item.title == "InTransit"
+            ? x.sTSNM == "Departed" || x.sTSNM == "Arrived"
+            : x.sTSNM == item.title
+        )
       );
       this.ngOnInit();
     }

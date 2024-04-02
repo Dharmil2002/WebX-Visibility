@@ -67,6 +67,7 @@ export class ViewTrackingPopupComponent implements OnInit {
   ];
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
   TableData: any;
+  FormTitle:any
   constructor(
     public dialogRef: MatDialogRef<ViewTrackingPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -74,7 +75,8 @@ export class ViewTrackingPopupComponent implements OnInit {
     const sortByDate = (a, b) => {
       return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
     };
-    this.TableData = this.data
+    this.FormTitle = this.data.DokNo?this.data.DokNo:'C-Not Tracking List'
+    this.TableData = this.data.TrackingList
       ?.map((x) => {
         return {
           ...x,

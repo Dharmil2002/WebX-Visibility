@@ -1,0 +1,13 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="stockReportForm">
+        <app-form-webxpress [form]="stockReportForm" [FormTitle]="'Stock Report'" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+            [showSaveButton]="true" [submit]="'Submit'">
+        </app-form-webxpress>
+    </form>
+
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="summaryHeader"
+        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray" [columnGroup]="summaryGroup"
+        (functionCallEmitter)="functionCallHandler($event)">
+    </app-generic-table-v2>
+</app-common-wrapper-webxpress>

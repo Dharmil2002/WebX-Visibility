@@ -98,7 +98,6 @@ import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocati
 import { DcrManagementComponent } from './dcr-series/dcr-management/dcr-management.component';
 import { DcrRegisterComponent } from './dcr-series/dcr-register/dcr-register.component';
 
-
 const routes: Routes = [
   { path: "ViewPrint", component: ViewPrintComponent },
   { path: "TenantMaster/TenantMasterList", component: TenantListComponent },

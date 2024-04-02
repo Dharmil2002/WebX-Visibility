@@ -14,7 +14,7 @@ import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/gener
 import { exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { GetAccountDetailFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
+import { GetAccountDetailFromApi, GetBankDetailFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
 import { ChequeRegister } from 'src/assets/FormControls/Reports/Cheque-Register/cheque-register';
 import Swal from 'sweetalert2';
 
@@ -142,7 +142,7 @@ export class ChequeRegisterComponent implements OnInit {
         }
 
         const bank = Array.isArray(this.chequeRegisterForm.value.issuingBankHandler)
-          ? this.chequeRegisterForm.value.issuingBankHandler.map(x => x.value)
+          ? this.chequeRegisterForm.value.issuingBankHandler.map(x => x.name)
           : [];
 
         const branch = ReportingBranches;
@@ -209,7 +209,7 @@ export class ChequeRegisterComponent implements OnInit {
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
-          "Fail To Submit Data..!"
+          "No Records Found!"
         );
       }
     }, "Cheque Register Report Generating Please Wait..!");
@@ -219,8 +219,8 @@ export class ChequeRegisterComponent implements OnInit {
   async getDropdownlist() {
     try {
       // Fetch bank list asynchronously
-      const bankList = await GetAccountDetailFromApi(this.masterService, "BANK", '');
-
+      // const bankList = await GetAccountDetailFromApi(this.masterService, "BANK", '');
+      const bankList = await GetBankDetailFromApi(this.masterService, this.storage.branch)
       // Filter issuing bank dropdown
       this.filter.Filter(this.jsonControlArray, this.chequeRegisterForm, bankList, "issuingBank", false);
 

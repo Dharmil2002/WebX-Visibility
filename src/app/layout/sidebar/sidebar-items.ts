@@ -513,7 +513,7 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       },
       {
-        path: "Operation/ConsignmentFilter",
+        path: "Operation/ConsignmentQuery",
         title: "Consignment Tracking",
         moduleName: "Consignment Tracking",
         icon: "star",
@@ -817,6 +817,15 @@ export const ROUTES: RouteInfo[] =
           "submenu": []
         },
         {
+          "path": "Reports/Cash-Bank-Book-Report",
+          "title": "Cash-Bank Book Report",
+          "moduleName": "Cash-Bank Book Report",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        },
+        {
           "path": "Reports/Dashboard",
           "title": "Dashboard",
           "moduleName": "Dashboard",
@@ -834,6 +843,25 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": []
         },
+      ],
+    },
+    {
+      path: "",
+      title: "Control Panel",
+      moduleName: "Control Panel",
+      icon: "git-pull-request",
+      class: "menu-toggle",
+      groupTitle: false,
+      submenu: [
+        {
+          "path": "ControlPanel/gps-rule",
+          "title": "GPS Rule",
+          "moduleName": "GPS Rule",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": []
+        }
       ],
     },
   ]

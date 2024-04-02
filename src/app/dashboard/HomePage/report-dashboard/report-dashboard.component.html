@@ -1,0 +1,232 @@
+<section class="content">
+    <div class="container-fluid">        
+        <div class="row">            
+            <div class="col-12 row dashboardbody" style="height: 100%; ">
+                <div class="col-3">
+                    <div class="row">                        
+                        <div class="col-12" style="display: flex; height: 80px; align-items: center;">
+                            <!-- <mat-chip-list aria-label="Category" (optionSelected)="onCategoryChange($event)">                            
+                                <mat-chip color="primary" selected>Reports</mat-chip>
+                                <mat-chip color="primary">Dashboards</mat-chip>
+                            </mat-chip-list> -->
+                            <mat-button-toggle-group name="category" aria-label="Category" (change)="onCategoryChange($event)">
+                                <mat-button-toggle value="Reports" checked>
+                                    <mat-icon>receipt</mat-icon>
+                                    Reports
+                                </mat-button-toggle>
+                                <mat-button-toggle value="Dashboards" color="primary">
+                                    <mat-icon>pie_chart</mat-icon>
+                                    Dashboards
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </div>
+                        <div class="col-12" style="display: flex; flex-direction: column; justify-content: start;">
+                            <!-- <label class="menuCard" *ngFor="let item of menuData" (click)="filterReports(item.title)">{{item.title}}</label> -->
+                            <mat-button-toggle-group [(ngModel)]="selectedCategory" name="subCategory" aria-label="SubCategory" class="vertical-toggle-group" (change)="filterReports($event)">                                
+                                <ng-container *ngFor="let item of menuData">
+                                    <mat-button-toggle *ngIf="item.title" [value]="item.title">
+                                        {{item.title}}
+                                    </mat-button-toggle>
+                                </ng-container>
+                            </mat-button-toggle-group>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="Category == 'Reports'" class="col-9" style="border-left: 1px solid rgba(0, 0, 0,0.4); min-height: 90vh;">
+                    <div style="height: 80px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 0, 0,0.4);">
+                        <h4 class="page-title" style="letter-spacing: 1px; padding: 0px 20px;">
+                            Reports 
+                        </h4>                        
+                        <div style="display: flex; align-items: center; justify-content: end;">
+                            <label for="search-input"
+                                style="display: flex; align-items: center; justify-content: center;">
+                                <mat-icon
+                                    style="width: 30px; height: 30px; font-size: 30px; color: rgba(0, 0, 0, 0.6); margin-right: 10px;">search</mat-icon>
+                            </label>
+                            <input placeholder="Search Report" type="text" [(ngModel)]="searchTerm" class="SearchInput"
+                                (ngModelChange)="SearchReports($event)" aria-label="Search box">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="CardBox">
+                            <div class="reportCard" *ngFor="let item of reportObs | async">
+                                <div class="taxtCard" (click)="OpenReports(item)">
+                                    <div class="textbox" >
+                                        <div class="p-0 m-0 ">
+                                            <mat-icon class="p-0 m-0" style="font-size: 25px; width: 25px; height: 25px;">{{item.iconName}}</mat-icon>
+                                        </div>
+                                        <p class="p-0 m-0 px-2 fontbold"> {{item.title}} </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="Category == 'Dashboards'" class="col-9" style="border-left: 1px solid rgba(0, 0, 0,0.4); min-height: 90vh;">
+                    <div style="height: 80px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 0, 0,0.4);">
+                        <h4 class="page-title" style="letter-spacing: 1px; padding: 0px 20px;">
+                            Dashboards 
+                        </h4>                        
+                        <div style="display: flex; align-items: center; justify-content: end;">
+                            <label for="search-input"
+                                   style="display: flex; align-items: center; justify-content: center;">
+                                <mat-icon style="width: 30px; height: 30px; font-size: 30px; color: rgba(0, 0, 0, 0.6); margin-right: 10px;">search</mat-icon>
+                            </label>
+                            <input placeholder="Search Dashboard" type="text" [(ngModel)]="searchTerm" class="SearchInput"
+                                (ngModelChange)="SearchDashboards($event)" aria-label="Search box">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="CardBox" style="margin-top: 25px; text-align: center; align-items: center;">
+                            <div *ngFor="let item of dashboardObs | async" class="pointer col-lg-3 col-md-4 col-sm-6 col-xs-12" 
+                                  style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 20px;"
+                                  (click)="OpenDashboards(item)">
+                                <div class="card-shape" [style.background-color]="item.bgColor" style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+                                  <mat-icon style="font-size: 80px; width: 80px; height: 80px; border-radius: 50%;" [style.color]="item.color">{{item.iconName}}</mat-icon>                                  
+                                </div>
+                                <p class="fontbold" style="margin-top: 10px;"><span>{{item.title}}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .vertical-toggle-group {
+        display: flex;
+        flex-direction: column;        
+        border: 0;
+    }
+
+    .vertical-toggle-group mat-button-toggle {
+        border: 1px solid rgba(0, 0, 0,0.4);
+        border-radius: 4px;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition-duration: 0.3s;
+        text-align: left!important;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0px; 
+    }
+
+    .vertical-toggle-group mat-button-toggle:hover {
+        background-color: white;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .vertical-toggle-group mat-button-toggle:not(:last-child) {
+        margin-bottom: 10px; 
+    }
+
+    .vertical-toggle-group mat-button-toggle ::ng-deep span{ 
+        text-align: left; 
+        width: 100%;      
+    }
+
+    /* mat-button-toggle  {
+        display: flex;
+        align-items: center;
+    } */
+
+    mat-icon {
+        margin-right: 8px; 
+    }
+    
+    .mat-button-toggle{
+        background-color: rgba(0, 0, 0, 0.05);    
+        font-weight: 500;    
+    }
+
+    .mat-button-toggle-checked{
+        background-color: #1a3e84;
+        color: white;
+    } 
+    .mat-button-toggle-checked:hover{
+        background-color: #166cc2!important;
+    } 
+
+
+    .paginator {
+        width: 33%;
+        background-color: transparent;
+        height: 55px;
+        display: flex;
+        justify-content: center;
+        color: rgb(32, 32, 32);
+        font-size: 14px;
+    }
+
+    .SearchInput {
+        outline: none;
+        padding: 5px 10px;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        background: white;
+        border-radius: 5px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 15px;
+    }
+
+    .menuCard {
+        margin: 5px;
+        padding: 10px 15px;
+        background-color: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0,0.4) !important;
+        font-size: 14px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        border-radius: 5px;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition-duration: 0.3s;
+        /*color: rgba(0, 0, 0, 0.6);*/
+    }
+
+    .menuCard:hover {
+        background-color: white;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+        margin-left: 20px;
+        color: rgba(0, 0, 0, 0.8)
+    }
+
+    .CardBox {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .reportCard {
+        width: 33%;
+        min-height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .taxtCard {
+        width: 100%;
+        height: 60%;
+        margin: 0px;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition-duration: 0.3s;
+        margin-top: 15px;
+    }
+
+    .reportCard:hover .taxtCard {
+        margin-top: 10px;
+        background-color: white;
+        box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .textbox {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+</style>

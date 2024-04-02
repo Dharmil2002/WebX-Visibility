@@ -374,8 +374,7 @@ import { DcrRegisterComponent } from './dcr-series/dcr-register/dcr-register.com
     DcrAllocationComponent,
     DcrManagementComponent,
     ActiveSeriesComponent,
-    DcrRegisterComponent
-  ],
+    DcrRegisterComponent],
 
   providers: [
     DatePipe,

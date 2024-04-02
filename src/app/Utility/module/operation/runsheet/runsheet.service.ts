@@ -517,7 +517,7 @@ export class RunSheetService {
                 dOCNO:formData?.Runsheet||"",
                 sTS: DocketStatus.Out_For_Delivery,
                 sTSNM: DocketStatus[DocketStatus.Out_For_Delivery].replace(/_/g, " "),
-                oPSSTS:`DRS generated ${formData?.Runsheet} at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                oPSSTS:`Out For Delivery with DRS ${formData?.Runsheet} from ${this.storage.branch} since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
                 eNTDT: new Date(),
                 eNTLOC: this.storage.branch,
                 eNTBY: this.storage.userName,

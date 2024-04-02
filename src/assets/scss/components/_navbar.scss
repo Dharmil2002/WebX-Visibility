@@ -69,6 +69,7 @@
   }
 
   .header-icon {
+    color: #fff;
     vertical-align: top !important;
     .feather {
       height: 20px;
@@ -435,7 +436,7 @@
 
 nav.navbar {
   min-height: 60px;
-  background-color: #03a9f3;
+  background-color: #2F7EC0;
 }
 
 @each $key, $val in $colors {

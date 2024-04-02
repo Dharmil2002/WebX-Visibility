@@ -100,6 +100,7 @@ export class DeliveryMrResponseModalComponent implements OnInit {
    * Navigates to the "Delivery" tab using the Router.
    */
   navigateToDeliveryTab(): void {
+    localStorage.setItem('deliveryMRIndex', '2')
     this.navigateWithTabIndex('Delivery');
   }
 

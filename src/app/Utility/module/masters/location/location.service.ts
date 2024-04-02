@@ -10,13 +10,13 @@ export class LocationService {
 
   // This async function retrieves location data from an API using the masterService.
   async locationFromApi(filter = {}) {
+    filter = { ...filter, activeFlag: true }; // Add activeFlag filter to the request
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "location_detail",
       filter: filter, // You can specify additional filters here if needed
     };
-
     try {
       // Make an asynchronous request to the API using masterMongoPost method
       const res = await firstValueFrom(this.masterService
@@ -49,12 +49,12 @@ export class LocationService {
     }
   }
   //#region to get location data
-  async getLocationList(): Promise<any[] | null> {
+  async getLocationList(nameWithCode = false): Promise<any[] | null> {
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
       collectionName: 'location_detail',
-      filter: {},
+      filter: {activeFlag: true },
     };
 
     try {
@@ -65,7 +65,7 @@ export class LocationService {
       const filterMap = res?.data.filter((item) => item.activeFlag) // Filter based on the activeFlag property
         .map((location) => ({
           value: location.locCode,
-          name: location.locName,
+          name: nameWithCode ? `${location.locCode} : ${location.locName}`: location.locName,
         }));
 
       // Sort the mapped data in ascending order by location name
@@ -77,4 +77,28 @@ export class LocationService {
     }
   }
   //#endregion
+
+  async getLocation(filter): Promise<any | null> {
+    const reqBody = {
+      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      collectionName: 'location_detail',
+      filter: filter
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/getOne', reqBody));    
+    return res.data;
+  }
+
+  async findAllDescendants(reportLoc): Promise<any[] | null> {
+    const reqBody = {
+      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      collectionName: 'location_detail',
+      filter: { reportLoc: reportLoc, activeFlag: true },
+      fields: { parent: "reportLoc", id: "locCode" },
+      project: { "reportLoc": 1, "locCode": 1, "activeFlag": 1 }
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/descendants', reqBody));    
+    return res.data;
+  }
 }

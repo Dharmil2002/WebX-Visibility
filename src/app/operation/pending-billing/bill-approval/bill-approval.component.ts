@@ -199,6 +199,7 @@ export class BillApprovalComponent implements OnInit {
         this.VoucherDataRequestModel.paymentMode = "";
         this.VoucherDataRequestModel.refNo = "";
         this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.accountCode = "";
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         var VoucherlineitemList = this.GetVouchersLedgers(data);

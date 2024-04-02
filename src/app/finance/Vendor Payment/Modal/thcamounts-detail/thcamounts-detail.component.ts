@@ -69,7 +69,6 @@ export class THCAmountsDetailComponent implements OnInit {
     );
     if (res.success) {
       this.THCsummary = res.data[0];
-      console.log("this.THCsummary", this.THCsummary);
       this.initializeFormControl();
     }
   }
@@ -117,58 +116,60 @@ export class THCAmountsDetailComponent implements OnInit {
     this.isLessForm = false;
     this.isAddForm = false;
 
-    // Fetch charges with the specified operator "+" (add charges)
-    const addCharges = await this.getChargesByOperator("+");
+    const AllCharges = await this.getChargesByOperator();
+    const addCharges = AllCharges.filter((x) => x.ChargType == "+");
+    const lessCharges = AllCharges.filter((x) => x.ChargType == "-");
 
-    // Fetch charges with the specified operator "-" (less charges)
-    const lessCharges = await this.getChargesByOperator("-");
+    if (addCharges && lessCharges) {
 
-    // Modify the array for add charges by inserting the fetched charges at the appropriate position
-    const modifiedAddCharges = [
-      ...this.THCAmountsADDArray.slice(0, 1),
-      ...addCharges,
-      ...this.THCAmountsADDArray.slice(1),
-    ];
+      // Modify the array for add charges by inserting the fetched charges at the appropriate position
+      const modifiedAddCharges = [
+        ...this.THCAmountsADDArray.slice(0, 1),
+        ...addCharges,
+        ...this.THCAmountsADDArray.slice(1),
+      ];
 
-    // Update the add and less charge arrays with copies of the modified arrays
-    this.THCAmountsADDArray = modifiedAddCharges.map((x) => ({ ...x }));
-    this.THCAmountsLESSArray = lessCharges.map((x) => ({ ...x }));
+      // Update the add and less charge arrays with copies of the modified arrays
+      this.THCAmountsADDArray = modifiedAddCharges.map((x) => ({ ...x }));
+      this.THCAmountsLESSArray = lessCharges.map((x) => ({ ...x }));
 
-    // Build form groups for add and less charges
-    this.THCAmountsADDForm = formGroupBuilder(this.fb, [
-      this.THCAmountsADDArray,
-    ]);
-    this.THCAmountsLESSForm = formGroupBuilder(this.fb, [
-      this.THCAmountsLESSArray,
-    ]);
-    if (Array.isArray(this.THCsummary.cRGLST)) {
-      this.THCsummary.cRGLST.forEach((x) => {
-        if (x.cRGTYP == "+") {
-          this.THCAmountsADDForm.controls[x.cRGNM]?.setValue(x.cRGAMT);
-        } else {
-          this.THCAmountsLESSForm.controls[x.cRGNM]?.setValue(x.cRGAMT);
-        }
-      });
+      // Build form groups for add and less charges
+      this.THCAmountsADDForm = formGroupBuilder(this.fb, [
+        this.THCAmountsADDArray,
+      ]);
+      this.THCAmountsLESSForm = formGroupBuilder(this.fb, [
+        this.THCAmountsLESSArray,
+      ]);
+      if (Array.isArray(this.THCsummary.cHG)) {
+        this.THCsummary.cHG.forEach((x) => {
+          if (x.oPS == "+") {
+            this.THCAmountsADDForm.controls[x.cHGID]?.setValue(x.aMT);
+          } else {
+            this.THCAmountsLESSForm.controls[x.cHGID]?.setValue(x.aMT * -1);
+          }
+        });
+      }
+      this.isAddForm = true;
+      this.isLessForm = lessCharges.length > 0;
+      this.OnChangePlusAmounts("");
     }
-    this.isAddForm = true;
-    this.isLessForm = lessCharges.length > 0;
-    this.OnChangePlusAmounts("");
   }
 
   // Fetch charges based on the specified operator (+ or -)
-  async getChargesByOperator(operator) {
+  async getChargesByOperator() {
     // Helper function to filter and map charges based on the specified operator
-    const filterCharges = (charges, operator) =>
+    const filterCharges = (charges) =>
       charges
-        .filter((x) => x.cHBHV === operator)
+        // .filter((x) => x.aDD_DEDU === operator)
         .map((x) => ({
-          name: x.cHNM.replaceAll(/\s/g, ""),
-          label: x.cHNM,
-          placeholder: x.cHNM,
+          name: x.cHACD.replaceAll(/\s/g, ""),
+          label: x.sELCHA,
+          placeholder: x.sELCHA,
           type: "number",
           value: 0.0,
           generatecontrol: true,
           disable: false,
+          ChargType: x.aDD_DEDU,
           Validations: [
             {
               name: "pattern",
@@ -183,11 +184,19 @@ export class THCAmountsDetailComponent implements OnInit {
         }));
 
     // Request parameters to fetch charges from the server
+
     const req = {
       companyCode: this.companyCode,
-      collectionName: "charges",
+      collectionName: "product_charges_detail",
       filter: {
-        cHTY: 'V'
+        "cHACAT": {
+          "D$in": [
+            "V",
+            "B"
+          ]
+        },
+        pRNM: this.THCsummary?.tMODENM,
+
       },
     };
 
@@ -195,12 +204,11 @@ export class THCAmountsDetailComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-    console.log("res", res);
     // Check if the request was successful and data is available
     if (res.success && res.data.length > 0) {
       this.ChargesData = res.data;
       // Filter and map charges based on the specified operator
-      return filterCharges(res.data, operator);
+      return filterCharges(res.data);
     }
     // Return an empty array if no charges are found
     return [];
@@ -208,7 +216,7 @@ export class THCAmountsDetailComponent implements OnInit {
 
   OnChangePlusAmounts(event) {
     this.THCAmountsADDForm.get("ContractAmount").setValue(
-      this.THCData?.THCamount
+      this.THCData?.THCContraAmount
     );
     let AddTHCTotal = 0;
     let LessAmount = 0;
@@ -263,27 +271,27 @@ export class THCAmountsDetailComponent implements OnInit {
   async submit() {
     const Charges = [];
     this.ChargesData.forEach((x) => {
-      const FieldName = x.cHNM.replaceAll(/\s/g, "");
+      const FieldName = x.cHACD.replaceAll(/\s/g, "");
       const Amount = parseInt(
-        x.cHBHV == "+"
+        x.aDD_DEDU == "+"
           ? this.THCAmountsADDForm.value[FieldName]
-          : this.THCAmountsLESSForm.value[FieldName]
+          : -1 * this.THCAmountsLESSForm.value[FieldName]
       );
       Charges.push({
-        cRGCD: x.cHCD,
-        cRGNM: x.cHNM,
-        cRGTYP: x.cHBHV,
-        cRGAMT: Amount,
+        cHGID: x.cHACD,
+        cHGNM: x.sELCHA,
+        oPS: x.aDD_DEDU,
+        aMT: Amount,
       });
     });
     const commonBody = {
-      cRGLST: Charges,
+      cHG: Charges,
       aDVPENAMT: this.THCAmountsForm.value.Advance,
       bALAMT: this.THCAmountsForm.value.Balance,
       bLPAYAT: this.THCAmountsForm.value.BalanceLocation.name,
       aDPAYAT: this.THCAmountsForm.value.AdvanceLocation.name,
+      tOTAMT: this.THCAmountsADDForm.value.THCTotal,
     };
-    console.log("commonBody", commonBody);
     const req = {
       companyCode: this.companyCode,
       collectionName: "thc_summary",

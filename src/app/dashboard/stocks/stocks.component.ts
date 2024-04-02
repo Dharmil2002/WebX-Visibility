@@ -3,8 +3,9 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import Swal from "sweetalert2";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { StorageService } from "src/app/core/service/storage.service";
-import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { DocketStatus } from "src/app/Models/docStatus";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Component({
   selector: "app-stocks",
@@ -23,6 +24,8 @@ export class StocksComponent
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
   companyCode: number = parseInt(localStorage.getItem("companyCode"));
   menuItemflag: boolean = false;
+  DocCalledAs: DocCalledAsModel;
+
   breadscrums = [
     {
       title: "Docket Stock",
@@ -51,94 +54,37 @@ export class StocksComponent
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
-  columnHeader = {
-    no: {
-      Title: DocCalledAs.Docket,
-      class: "matcolumnleft",
-      Style: "min-width:15%",
-    },
-    date: {
-      Title: `${DocCalledAs.Docket} Date`,
-      class: "matcolumnleft",
-      Style: "min-width:125px",
-    },
-    paymentType: {
-      Title: "Pay Type",
-      class: "matcolumnleft",
-      Style: "min-width:15px",
-    },
-    contractParty: {
-      Title:"Contract Party",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
-    },
-    orgdest: {
-      Title:"Org-Dest",
-      class: "matcolumnleft",
-      Style: "min-width:80px",
-    },
-    noofPackages: {
-      Title: "Pkgs",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
-    actualWeight: {
-      Title: "Actual Weight",
-      class: "matcolumncenter",
-      Style: "min-width:145px",
-    },
-    chargedWeight: {
-      Title: "Charged Weight",
-      class: "matcolumncenter",
-      Style: "min-width:155px",
-    },
-    status: {
-      Title: "Status",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-    Action: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-  };
+  columnHeader = {};
   //#endregion
   //#region declaring Csv File's Header as key and value Pair
-  headerForCsv = {
-    no: DocCalledAs.Docket,
-    date: `${DocCalledAs.Docket} Date`,
-    paymentType: "Payment Type",
-    contractParty: "Contract Party",
-    orgdest: "Origin-Destination",
-    fromCityToCity: "From City-To City",
-    noofPackages: "No of Packages",
-    actualWeight: "Actual Weight",
-    chargedWeight: "Charged Weight",
-    status: "Status",
-    //"Action": "Action"
-  };
+  headerForCsv = {};
 
-  staticField = [
-    "no",
-    "date",
-    "paymentType",
-    "contractParty",
-    "orgdest",
-    "noofPackages",
-    "actualWeight",
-    "chargedWeight",
-    "status"
-  ];
+  staticField = [];
+
   boxData: { count: any; title: any; class: string }[];
   branch = localStorage.getItem("Branch");
   // declararing properties
   constructor(
   private docketService:DocketService,
-  private storage:StorageService
+  private storage:StorageService,
+  private controlPanel:ControlPanelService
   ) {
     super();
     this.addAndEditPath = "Operation/QuickCreateDocket";
+    this.DocCalledAs = controlPanel.DocCalledAs;
+
+    this.breadscrums = [
+      {
+        title: `${this.DocCalledAs.Docket} Stock`,
+        items: ["Dashboard"],
+        active: `${this.DocCalledAs.Docket} Stock`,
+      },
+    ];
+
+    const config = this.getControlConfig();
+    this.columnHeader = config.columnHeader;
+    this.headerForCsv = config.headerForCsv;
+    this.staticField = config.staticField;
   }
   ngOnInit(): void {
     this.getDocketDetails();
@@ -165,5 +111,87 @@ export class StocksComponent
       this.tableData =[];
       this.tableload = false;
     }
+  }
+
+  getControlConfig() {
+    return {
+    columnHeader: {
+      no: {
+        Title: this.DocCalledAs.Docket,
+        class: "matcolumnleft",
+        Style: "min-width:15%",
+      },
+      date: {
+        Title: `${this.DocCalledAs.Docket} Date`,
+        class: "matcolumnleft",
+        Style: "min-width:125px",
+      },
+      paymentType: {
+        Title: "Pay Type",
+        class: "matcolumnleft",
+        Style: "min-width:15px",
+      },
+      contractParty: {
+        Title:"Contract Party",
+        class: "matcolumnleft",
+        Style: "min-width:200px",
+      },
+      orgdest: {
+        Title:"Org-Dest",
+        class: "matcolumnleft",
+        Style: "min-width:80px",
+      },
+      noofPackages: {
+        Title: "Pkgs",
+        class: "matcolumncenter",
+        Style: "max-width:70px",
+      },
+      actualWeight: {
+        Title: "Actual Weight",
+        class: "matcolumncenter",
+        Style: "min-width:145px",
+      },
+      chargedWeight: {
+        Title: "Charged Weight",
+        class: "matcolumncenter",
+        Style: "min-width:155px",
+      },
+      status: {
+        Title: "Status",
+        class: "matcolumnleft",
+        Style: "min-width:100px",
+      },
+      Action: {
+        Title: "Action",
+        class: "matcolumnleft",
+        Style: "min-width:100px",
+      },
+    } ,
+ 
+    headerForCsv: {
+      no: this.DocCalledAs.Docket,
+      date: `${this.DocCalledAs.Docket} Date`,
+      paymentType: "Payment Type",
+      contractParty: "Contract Party",
+      orgdest: "Origin-Destination",
+      fromCityToCity: "From City-To City",
+      noofPackages: "No of Packages",
+      actualWeight: "Actual Weight",
+      chargedWeight: "Charged Weight",
+      status: "Status",
+      //"Action": "Action"
+    }, 
+    staticField: [
+      "no",
+      "date",
+      "paymentType",
+      "contractParty",
+      "orgdest",
+      "noofPackages",
+      "actualWeight",
+      "chargedWeight",
+      "status"
+    ]
+  };
   }
 }

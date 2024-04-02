@@ -245,3 +245,39 @@ export function prepareReportData(data: any[], fieldMapping: any[]) {
   });
   return result;
 }
+
+
+export function sortArrayByFields(items, fields) {
+  return items.sort((a, b) => {
+    for (let field of fields) {
+      let fieldName = field;
+      let order = 'asc'; // Default sorting order is ascending
+
+      // Check if field is an object with name and order properties
+      if (typeof field === 'object' && field !== null) {
+        fieldName = field.name;
+        order = field.order || 'asc'; // Use provided order, defaulting to 'asc' if not specified
+      }
+
+      let valA = a[fieldName];
+      let valB = b[fieldName];
+
+      // Numeric comparison
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        if (valA !== valB) {
+          return (order === 'asc' ? 1 : -1) * (valA - valB);
+        }
+      } 
+      // String comparison
+      else if (typeof valA === 'string' && typeof valB === 'string') {
+        let comparison = valA.localeCompare(valB);
+        if (comparison !== 0) {
+          return (order === 'asc' ? 1 : -1) * comparison;
+        }
+      }
+      // Add else if blocks here for other data types if necessary
+    }
+    // If all specified fields are equal, maintain original order
+    return 0;
+  });
+}

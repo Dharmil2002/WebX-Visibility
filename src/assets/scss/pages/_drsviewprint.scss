@@ -236,3 +236,67 @@
     }
   }
 }
+
+.DabourView {
+  .DabourCustomTable,
+  th,
+  td {
+    border: 1px solid black;
+    border-collapse: collapse;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &:first-child {
+      tr {
+        td,
+        th {
+          border-top: none;
+        }
+      }
+    }
+  }
+}
+
+.Godrejview {
+  .GodrejCustomTable,
+  th,
+  td {
+    border: 1px solid black;
+    border-collapse: collapse;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &:first-child {
+      tr {
+        td,
+        th {
+          border-top: none;
+        }
+      }
+    }
+  }
+
+  .viewfooter {
+    div {
+      display: flex;
+      align-items: end;
+      width: 70%;
+      justify-content: center;
+      height: 40px;
+      border: 1px solid black;
+      border-left: none;
+    }
+  }
+}

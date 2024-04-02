@@ -8,7 +8,7 @@
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [metaData]="metaData" (functionCallEmitter)="functionCallHandler($event)" (selectAllClicked)="onSelectAllClicked($event)"
         [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [boxData]="boxData" [height]="height"
-        [width]="width" [maxWidth]="maxWidth">
+        [width]="width"  [maxWidth]="maxWidth">
     </app-generic-table-v2>
     <div class="row" *ngIf="!tableload">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">

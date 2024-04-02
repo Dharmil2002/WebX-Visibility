@@ -48,67 +48,69 @@
           <div *ngIf="isExpanded" [@fadeInOut]="isExpanded">
             <form class="register-form " style="margin-right: 20px;" *ngIf="formData" [formGroup]="form">
               <div class="row">
-                <div *ngFor="let formItem of formData" [style]="FieldStyle" [ngClass]=className>
+                <div *ngFor="let formItem of formData"  
+                    [ngStyle]="(formItem.visible ?? true) ? FieldStyle : {'display': 'none'}" 
+                    [ngClass]="className">        
+                    
+                    <!--textbox (input) controls---------------------------------------------------------->
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password' ||formItem.type=='mobile-number'||formItem.type=='government-id') && formItem.generatecontrol===true ">
 
-                  <!--textbox (input) controls---------------------------------------------------------->
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password' ||formItem.type=='mobile-number'||formItem.type=='government-id') && formItem.generatecontrol===true ">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <!-- password block -->
+                      <ng-container *ngIf="formItem.type=='password';else elseBlock">
+                        <input matInput [type]="formItem.additionalData.inputType" formControlName={{formItem.name}}
+                          placeholder={{formItem.placeholder}} [readonly]="formItem.disable" autocomplete="off" (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange,
+                            eventArgs: $event })" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
+                            eventArgs: $event })" (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel ,
+                            eventArgs: $event})">
+                      </ng-container>
+                      <mat-icon matSuffix *ngIf="formItem.type=='password'" (click)="togglePasswordInputType(formItem)">
+                        {{formItem.additionalData?.showPassword ?'visibility' : 'visibility_off' }}
+                      </mat-icon>
 
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <!-- password block -->
-                    <ng-container *ngIf="formItem.type=='password';else elseBlock">
-                      <input matInput [type]="formItem.additionalData.inputType" formControlName={{formItem.name}}
-                        placeholder={{formItem.placeholder}} [readonly]="formItem.disable" autocomplete="off" (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange,
-                          eventArgs: $event })" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
-                          eventArgs: $event })" (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel ,
-                           eventArgs: $event})">
-                    </ng-container>
-                    <mat-icon matSuffix *ngIf="formItem.type=='password'" (click)="togglePasswordInputType(formItem)">
-                      {{formItem.additionalData?.showPassword ?'visibility' : 'visibility_off' }}
-                    </mat-icon>
-
-                    <ng-template #elseBlock>
-                      <!-- text and number type input ----------------------------------------------------------->
-                      <ng-container
-                        *ngIf="(formItem.type === 'government-id' || formItem.type=='text'|| formItem.type=='number'||formItem.type=='mobile-number') ; else textInput">
-                        <ng-container *ngIf="(formItem.type=='text'|| formItem.type=='number')">
+                      <ng-template #elseBlock>
+                        <!-- text and number type input ----------------------------------------------------------->
+                        <ng-container
+                          *ngIf="(formItem.type === 'government-id' || formItem.type=='text'|| formItem.type=='number'||formItem.type=='mobile-number') ; else textInput">
+                          <ng-container *ngIf="(formItem.type=='text'|| formItem.type=='number')">
+                            <input matInput type="{{formItem.type}}" formControlName={{formItem.name}}
+                              [readonly]="formItem.disable" placeholder={{formItem.placeholder}}
+                              suffix={{formItem.suffix}} mask="{{formItem.mask}}" autocomplete="off"
+                              (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                              (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
+                              (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
+                              (keypress)="functionCalled({field :formItem , functionName:formItem.functions?.keypress, eventArgs: $event })">
+                          </ng-container>
+                          <ng-container *ngIf="(formItem.type=='mobile-number')">
+                            <input matInput type="{{'number'}}" formControlName={{formItem.name}}
+                              [readonly]="formItem.disable" appdecimalrangevalidator placeholder={{formItem.placeholder}}
+                              suffix={{formItem.suffix}} mask="{{formItem.mask}}" autocomplete="off"
+                              (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                              (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
+                              (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
+                              [MinValue]="0" [MaxAllowed]="0"
+                              [MaxValue]="formItem.type === 'mobile-number' ? formItem.maxlength ? formItem.maxlength: 10 : formItem?.maxlength">
+                          </ng-container>
+                          <ng-container *ngIf="formItem.type === 'government-id';">
+                            <input matInput formControlName="{{formItem.name}}" [readonly]="formItem.disable"
+                              type="{{formItem.type == 'government-id'? 'text' :formItem.type}}"
+                              placeholder="{{formItem.placeholder}}" [ngModel]="form.get(formItem.name).value | uppercase"
+                              (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                              (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
+                              (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+                          </ng-container>
+                        </ng-container>
+                        <!-- rest of the input types ... ---------------------------------------------------------->
+                        <ng-template #textInput>
                           <input matInput type="{{formItem.type}}" formControlName={{formItem.name}}
-                            [readonly]="formItem.disable" placeholder={{formItem.placeholder}}
-                            suffix={{formItem.suffix}} mask="{{formItem.mask}}" autocomplete="off"
-                            (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                            (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
-                            (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
-                            (keypress)="functionCalled({field :formItem , functionName:formItem.functions?.keypress, eventArgs: $event })">
-                        </ng-container>
-                        <ng-container *ngIf="(formItem.type=='mobile-number')">
-                          <input matInput type="{{'number'}}" formControlName={{formItem.name}}
-                            [readonly]="formItem.disable" appdecimalrangevalidator placeholder={{formItem.placeholder}}
-                            suffix={{formItem.suffix}} mask="{{formItem.mask}}" autocomplete="off"
-                            (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                            (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
-                            (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
-                            [MinValue]="0" [MaxAllowed]="0"
-                            [MaxValue]="formItem.type === 'mobile-number' ? formItem.maxlength ? formItem.maxlength: 10 : formItem?.maxlength">
-                        </ng-container>
-                        <ng-container *ngIf="formItem.type === 'government-id';">
-                          <input matInput formControlName="{{formItem.name}}" [readonly]="formItem.disable"
-                            type="{{formItem.type == 'government-id'? 'text' :formItem.type}}"
-                            placeholder="{{formItem.placeholder}}" [ngModel]="form.get(formItem.name).value | uppercase"
+                            [readonly]="formItem.disable" placeholder={{formItem.placeholder}} suffix={{formItem.suffix}}
+                            mask="{{formItem.mask}}"
                             (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
                             (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
                             (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
-                        </ng-container>
-                      </ng-container>
-                      <!-- rest of the input types ... ---------------------------------------------------------->
-                      <ng-template #textInput>
-                        <input matInput type="{{formItem.type}}" formControlName={{formItem.name}}
-                          [readonly]="formItem.disable" placeholder={{formItem.placeholder}} suffix={{formItem.suffix}}
-                          mask="{{formItem.mask}}"
-                          (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                          (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
-                          (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+                        </ng-template>
                       </ng-template>
-                    </ng-template>
 
                     <!-- error  -->
                     <mat-error *ngFor="let error of formItem.Validations">
@@ -123,332 +125,330 @@
                       </ng-container>
                     </mat-error>
 
-                  </mat-form-field>
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="formItem.type=='textarea'&& formItem.generatecontrol===true">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <textarea matInput formControlName="{{formItem.name}}" [readonly]="formItem.disable"
-                      placeholder="{{formItem.placeholder}}" autocomplete="off" cdkTextareaAutosize
-                      cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" cdkAutosizeAutogrow
-                      (change)="functionCalled({field: formItem, functionName: formItem.functions?.onChange, eventArgs: $event})"
-                      (click)="functionCalled({field: formItem, functionName: formItem.functions?.onClick, eventArgs: $event})"
-                      (ngModelChange)="functionCalled({field: formItem, functionName: formItem.functions?.onModel, eventArgs: $event})">
-      </textarea>
-                  </mat-form-field>
-                  <!--toggles---------------------------------------------------------->
-                  <mat-slide-toggle *ngIf="formItem.type=='toggle' && formItem.generatecontrol===true" color="primary"
-                    (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                    formControlName={{formItem.name}}><span
-                      class="togglefontbold">{{formItem.label}}</span></mat-slide-toggle>
-
-                  <!--Datepicker---------------------------------------------------------->
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="formItem.type=='date' && formItem.generatecontrol===true">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName={{formItem.name}}
-                      [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
-                      [disabled]="formItem.disable" [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
-                , eventArgs: $event})">
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-
-                    <!-- error  -->
-                    <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error?.message}}
-                      </ng-container>
-                    </mat-error>
-                  </mat-form-field>
-
-                  <!-- Static Dropdown Down Field -->
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="(formItem.type=='Staticdropdown') && formItem.generatecontrol===true">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <mat-select formControlName={{formItem.name}}
-                      [multiple]="(formItem.additionalData?.multiple||false)" (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
-                    eventArgs: $event })" [disabled]="formItem.disable">
-                      <mat-option *ngFor="let optValue of formItem.value" [value]="optValue.value">
-                        {{optValue.name}}</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-
-                  <!-- Days time Field -->
-                  <div class="row" *ngIf="(formItem.type == 'dayhour') && formItem.generatecontrol === true">
-                    <div class="col-6">
-                      <mat-form-field appearance="outline" style="width: 100%;">
-                        <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                        <input matInput type="number" formControlName="{{formItem.name}}"
-                          placeholder="{{formItem.label}}"
-                          (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                          [readonly]="formItem.disable">
-                      </mat-form-field>
-                    </div>
-                    <div class="col-6">
-                      <mat-form-field appearance="outline" style="width: 100%;">
-                        <mat-label class="fontbold">{{formItem.additionalData.label}}</mat-label>
-                        <input matInput type="number" formControlName="{{formItem.additionalData.fieldName}}"
-                          placeholder="{{formItem.additionalData.label}}" [readonly]="formItem.additionalData.disable">
-                      </mat-form-field>
-                    </div>
-                  </div>
-
-                  <!-- Download Icon -->
-                  <div style="margin-top: 28px!important;" class="example-full-width" appearance="outline"
-                    *ngIf="formItem.type=='Icon' && formItem.generatecontrol===true">
-                    <mat-label>{{formItem.label}}</mat-label>
-                    <i [class]="fafIconData"></i>
-                    <mat-icon style="position: absolute!important;" aria-hidden="false"
-                      aria-label="Default Chart Of Account" [fontIcon]="Icondata" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
-                    eventArgs: $event })"></mat-icon>
-                  </div>
-
-                  <!--autocomplete dropdown ---------------------------------------------------------->
-                  <mat-form-field class="example-full-width" appearance="outline" style="width: 100%;"
-                    *ngIf="formItem.type=='dropdown' && formItem.generatecontrol===true">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
-                      formControlName={{formItem.name}} [readonly]="formItem.disable"
-                      (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"
+                    </mat-form-field>
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="formItem.type=='textarea'&& formItem.generatecontrol===true">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <textarea matInput formControlName="{{formItem.name}}" [readonly]="formItem.disable"
+                        placeholder="{{formItem.placeholder}}" autocomplete="off" cdkTextareaAutosize
+                        cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" cdkAutosizeAutogrow
+                        (change)="functionCalled({field: formItem, functionName: formItem.functions?.onChange, eventArgs: $event})"
+                        (click)="functionCalled({field: formItem, functionName: formItem.functions?.onClick, eventArgs: $event})"
+                        (ngModelChange)="functionCalled({field: formItem, functionName: formItem.functions?.onModel, eventArgs: $event})">
+                      </textarea>
+                    </mat-form-field>
+                    <!--toggles---------------------------------------------------------->
+                    <mat-slide-toggle *ngIf="formItem.type=='toggle' && formItem.generatecontrol===true" color="primary"
                       (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                      >
-                    <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="formItem.displaywith"
-                      (optionSelected)="functionCalled( {field :formItem , functionName:formItem.functions?.onOptionSelect, eventArgs: $event })">
-                      <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
-                        <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
-                          {{item.value}} : {{ item.name }}
+                      formControlName={{formItem.name}}><span
+                        class="togglefontbold">{{formItem.label}}</span></mat-slide-toggle>
+
+                    <!--Datepicker---------------------------------------------------------->
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="formItem.type=='date' && formItem.generatecontrol===true">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <input matInput [matDatepicker]="picker" formControlName={{formItem.name}}
+                        [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
+                        [disabled]="formItem.disable" [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
+                  , eventArgs: $event})">
+                      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-datepicker #picker></mat-datepicker>
+
+                      <!-- error  -->
+                      <mat-error *ngFor="let error of formItem.Validations">
+                        <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                          {{error?.message}}
                         </ng-container>
-                        <ng-template #showName>
-                          {{ item.name }}
-                        </ng-template>
-                        <ng-container *ngIf="formItem.additionalData.timeZone">
-                          {{"(UTC" +item.baseUTCOffset + ")" + item.timezoneName}}
-                        </ng-container>
-                      </mat-option>
-                    </mat-autocomplete>
+                      </mat-error>
+                    </mat-form-field>
 
-                    <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error?.message}}
-                      </ng-container>
-                    </mat-error>
-                  </mat-form-field>
+                    <!-- Static Dropdown Down Field -->
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="(formItem.type=='Staticdropdown') && formItem.generatecontrol===true">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <mat-select formControlName={{formItem.name}}
+                        [multiple]="(formItem.additionalData?.multiple||false)" (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
+                      eventArgs: $event })" [disabled]="formItem.disable">
+                        <mat-option *ngFor="let optValue of formItem.value" [value]="optValue.value">
+                          {{optValue.name}}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
 
-                  <!-- multiselect Dropdown ---------------------------------------------------------->
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
-                      [multiple]="true" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
-                          eventArgs: $event })" #singleSelect
-                      (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
-                      <mat-option>
-                        <ngx-mat-select-search formControlName={{formItem.name}}
-                          placeholderLabel={{formItem.placeholder}} noEntriesFoundLabel="'no matching found'"
-                          [showToggleAllCheckbox]="true" toggleAllCheckboxTooltipMessage="Select / Unselect All"
-                          [toggleAllCheckboxIndeterminate]="formItem.additionalData.isIndeterminate"
-                          [toggleAllCheckboxChecked]="formItem.additionalData.isChecked"
-                          (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})"
-                          (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
-                          <mat-icon ngxMatSelectSearchClear>delete</mat-icon>
-                        </ngx-mat-select-search>
-                      </mat-option>
-                      <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
-                        <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
-                          {{item.value}} : {{ item.name }}
-                        </ng-container>
-                        <ng-template #showName>
-                          {{ item.name }}
-                        </ng-template>
-                      </mat-option>
-                    </mat-select>
-                    <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error?.message}}
-                      </ng-container>
-                    </mat-error>
+                    <!-- Days time Field -->
+                    <div class="row" *ngIf="(formItem.type == 'dayhour') && formItem.generatecontrol === true">
+                      <div class="col-6">
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                          <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                          <input matInput type="number" formControlName="{{formItem.name}}"
+                            placeholder="{{formItem.label}}"
+                            (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                            [readonly]="formItem.disable">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-6">
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                          <mat-label class="fontbold">{{formItem.additionalData.label}}</mat-label>
+                          <input matInput type="number" formControlName="{{formItem.additionalData.fieldName}}"
+                            placeholder="{{formItem.additionalData.label}}" [readonly]="formItem.additionalData.disable">
+                        </mat-form-field>
+                      </div>
+                    </div>
 
-                  </mat-form-field>
+                    <!-- Download Icon -->
+                    <div style="margin-top: 28px!important;" class="example-full-width" appearance="outline"
+                      *ngIf="formItem.type=='Icon' && formItem.generatecontrol===true">
+                      <mat-label>{{formItem.label}}</mat-label>
+                      <i [class]="fafIconData"></i>
+                      <mat-icon style="position: absolute!important;" aria-hidden="false"
+                        aria-label="Default Chart Of Account" [fontIcon]="Icondata" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
+                      eventArgs: $event })"></mat-icon>
+                    </div>
 
-
-                  <!-- single select -->
-                  <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
-                    *ngIf="formItem.type=='select' && formItem.generatecontrol===true">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <mat-select placeholder="{{formItem.label}}" formControlName={{formItem.additionalData.support}}
-                      (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
-                      <mat-option>
-                        <ngx-mat-select-search placeholderLabel="Find..." noEntriesFoundLabel="'no matching bank found'"
-                          formControlName={{formItem.name}}
-                          (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"></ngx-mat-select-search>
-                      </mat-option>
-                      <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
-                        <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
-                          {{ item.name }}: {{ item.name }}
-                        </ng-container>
-                        <ng-template #showName>
-                          {{ item.name }}
-                        </ng-template>
-
-                      </mat-option>
-                    </mat-select>
-                    <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error?.message}}
-                      </ng-container>
-                    </mat-error>
-                  </mat-form-field>
-                  <!--  -->
-
-                  <!--Checkbox-->
-                  <ng-container *ngIf="formItem.type === 'checkbox'">
-                    <ng-container *ngIf="formItem.generatecontrol">
-                      <mat-checkbox class="example-full-width" [formControlName]="formItem.name"
+                    <!--autocomplete dropdown ---------------------------------------------------------->
+                    <mat-form-field class="example-full-width" appearance="outline" style="width: 100%;"
+                      *ngIf="formItem.type=='dropdown' && formItem.generatecontrol===true">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
+                        formControlName={{formItem.name}} [readonly]="formItem.disable"
+                        (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"
                         (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                        style=" margin: auto 5px; margin-top: 15px;">
-                        {{formItem.label}}
-                      </mat-checkbox>
-                    </ng-container>
-                  </ng-container>
-                  <!--Radio Button-->
-                  <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-                    <mat-label><b style="margin-left: 12px;"> {{formItem.label}}</b></mat-label>&nbsp;
-                    <mat-radio-group [formControlName]="formItem.name"
-                      (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
-                      <mat-radio-button style=" margin: auto 5px; margin-top: 15px;"
-                        *ngFor="let option of formItem.value" [value]="option.value">
-                        {{ option.name }}
-                      </mat-radio-button>
-                    </mat-radio-group>
-                  </ng-container>
-                  <!--file-->
-                  <mat-form-field appearance="outline" class="example-full-width"
-                    *ngIf="formItem.type === 'file' && formItem.generatecontrol">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <input matInput style="cursor:pointer" [formControlName]="formItem.name" readonly="true"
-                      (click)="fileInput.click()" class="example-full-width"
-                      [multiple]="formItem.additionalData?.multiple || false">
-                    <button mat-icon-button matSuffix class="example-full-width" type="button">
-                      <ng-container *ngIf="formItem.additionalData?.isFileSelected; else eyeIcon">
-                        <mat-icon (click)="fileInput.click()">attach_file</mat-icon>
-                      </ng-container>
-                      <ng-template #eyeIcon>
-                        <app-feather-icons [icon]="'eye'" style="cursor: pointer" [class]="'tbl-fav-edit'"
-                          (click)="openImageDialog('openImageDialog', formItem.name)"></app-feather-icons>
-                      </ng-template>
-                    </button>
-                    <input hidden class="example-full-width" style="cursor:pointer" [formControlName]='formItem.name'
-                      (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event.target.files })"
-                      #fileInput type="file" [multiple]="(formItem.additionalData?.multiple||false)">
-                  </mat-form-field>
+                        >
+                      <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="formItem.displaywith"
+                        (optionSelected)="functionCalled( {field :formItem , functionName:formItem.functions?.onOptionSelect, eventArgs: $event })">
+                        <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
+                          <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
+                            {{item.value}} : {{ item.name }}
+                          </ng-container>
+                          <ng-template #showName>
+                            {{ item.name }}
+                          </ng-template>
+                          <ng-container *ngIf="formItem.additionalData.timeZone">
+                            {{"(UTC" +item.baseUTCOffset + ")" + item.timezoneName}}
+                          </ng-container>
+                        </mat-option>
+                      </mat-autocomplete>
 
-                  <ng-container *ngIf="formItem.generatecontrol && formItem.type==='link' && formItem.value">
-                    <br />
-                    <a style="margin-left:-145px;" download>
+                      <mat-error *ngFor="let error of formItem.Validations">
+                        <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                          {{error?.message}}
+                        </ng-container>
+                      </mat-error>
+                    </mat-form-field>
+
+                    <!-- multiselect Dropdown ---------------------------------------------------------->
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
+                        [multiple]="true" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
+                            eventArgs: $event })" #singleSelect
+                        (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
+                        <mat-option>
+                          <ngx-mat-select-search formControlName={{formItem.name}}
+                            placeholderLabel={{formItem.placeholder}} noEntriesFoundLabel="'no matching found'"
+                            [showToggleAllCheckbox]="true" toggleAllCheckboxTooltipMessage="Select / Unselect All"
+                            [toggleAllCheckboxIndeterminate]="formItem.additionalData.isIndeterminate"
+                            [toggleAllCheckboxChecked]="formItem.additionalData.isChecked"
+                            (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})"
+                            (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
+                            <mat-icon ngxMatSelectSearchClear>delete</mat-icon>
+                          </ngx-mat-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
+                          <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
+                            {{item.value}} : {{ item.name }}
+                          </ng-container>
+                          <ng-template #showName>
+                            {{ item.name }}
+                          </ng-template>
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngFor="let error of formItem.Validations">
+                        <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                          {{error?.message}}
+                        </ng-container>
+                      </mat-error>
+
+                    </mat-form-field>
+
+
+                    <!-- single select -->
+                    <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
+                      *ngIf="formItem.type=='select' && formItem.generatecontrol===true">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <mat-select placeholder="{{formItem.label}}" formControlName={{formItem.additionalData.support}}
+                        (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
+                        <mat-option>
+                          <ngx-mat-select-search placeholderLabel="Find..." noEntriesFoundLabel="'no matching bank found'"
+                            formControlName={{formItem.name}}
+                            (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"></ngx-mat-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
+                          <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
+                            {{ item.name }}: {{ item.name }}
+                          </ng-container>
+                          <ng-template #showName>
+                            {{ item.name }}
+                          </ng-template>
+
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngFor="let error of formItem.Validations">
+                        <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                          {{error?.message}}
+                        </ng-container>
+                      </mat-error>
+                    </mat-form-field>
+                    <!--  -->
+
+                    <!--Checkbox-->
+                    <ng-container *ngIf="formItem.type === 'checkbox'">
+                      <ng-container *ngIf="formItem.generatecontrol">
+                        <mat-checkbox class="example-full-width" [formControlName]="formItem.name"
+                          (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                          style=" margin: auto 5px; margin-top: 15px;">
+                          {{formItem.label}}
+                        </mat-checkbox>
+                      </ng-container>
+                    </ng-container>
+                    <!--Radio Button-->
+                    <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
+                      <mat-label><b style="margin-left: 12px;"> {{formItem.label}}</b></mat-label>&nbsp;
+                      <mat-radio-group [formControlName]="formItem.name"
+                        (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
+                        <mat-radio-button style=" margin: auto 5px; margin-top: 15px;"
+                          *ngFor="let option of formItem.value" [value]="option.value">
+                          {{ option.name }}
+                        </mat-radio-button>
+                      </mat-radio-group>
+                    </ng-container>
+                    <!--file-->
+                    <mat-form-field appearance="outline" class="example-full-width"
+                      *ngIf="formItem.type === 'file' && formItem.generatecontrol">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <input matInput style="cursor:pointer" [formControlName]="formItem.name" readonly="true"
+                        (click)="fileInput.click()" class="example-full-width"
+                        [multiple]="formItem.additionalData?.multiple || false">
+                      <button mat-icon-button matSuffix class="example-full-width" type="button">
+                        <ng-container *ngIf="formItem.additionalData?.isFileSelected; else eyeIcon">
+                          <mat-icon (click)="fileInput.click()">attach_file</mat-icon>
+                        </ng-container>
+                        <ng-template #eyeIcon>
+                          <app-feather-icons [icon]="'eye'" style="cursor: pointer" [class]="'tbl-fav-edit'"
+                            (click)="openImageDialog('openImageDialog', formItem.name)"></app-feather-icons>
+                        </ng-template>
+                      </button>
+                      <input hidden class="example-full-width" style="cursor:pointer" [formControlName]='formItem.name'
+                        (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event.target.files })"
+                        #fileInput type="file" [multiple]="(formItem.additionalData?.multiple||false)">
+                    </mat-form-field>
+
+                    <ng-container *ngIf="formItem.generatecontrol && formItem.type==='link' && formItem.value">
+                      <br />
+                      <a style="margin-left:-145px;" download>
+                        <button mat-stroked-button (click)="download(formItem.value)">
+                          <mat-icon>book-open</mat-icon>
+                          {{formItem.label}}
+                        </button>
+                      </a>
+                    </ng-container>
+                    <div *ngIf="formItem.type === 'filelink' && formItem.generatecontrol"
+                      style="margin-top: 20px;padding-left: 3%;">
                       <button mat-stroked-button (click)="download(formItem.value)">
                         <mat-icon>book-open</mat-icon>
                         {{formItem.label}}
                       </button>
-                    </a>
-                  </ng-container>
-                  <div *ngIf="formItem.type === 'filelink' && formItem.generatecontrol"
-                    style="margin-top: 20px;padding-left: 3%;">
-                    <button mat-stroked-button (click)="download(formItem.value)">
-                      <mat-icon>book-open</mat-icon>
-                      {{formItem.label}}
-                    </button>
-                  </div>
-                  <div *ngIf="formItem.type === 'showhidebutton' && formItem.generatecontrol"
-                    style="margin-top: 20px;padding-left: 3%;">
-                    <button mat-stroked-button (click)="showhidebuttonclick()">
-                      <mat-icon>book-open</mat-icon>
-                      {{formItem.label}}
-                    </button>
-                  </div>
-                  <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="(formItem.type=='time') && formItem.generatecontrol">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <input matInput [owlDateTimeTrigger]="timepicker" [formControlName]="formItem.name"
-                      [owlDateTime]="timepicker">
-                    <mat-icon matSuffix [owlDateTimeTrigger]="timepicker" class="date-icon">schedule</mat-icon>
-                    <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
-                    <!-- error  -->
-                    <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error.message}}
-                      </ng-container>
-                    </mat-error>
-                  </mat-form-field>
-                  <!-- OR -->
-                  <div style="text-align: center; padding-top: 21px;" *ngIf="formItem.type=='OR'">
-                    <span class="label l-bg-purple shadow-style">{{formItem?.label || 'OR'}}</span>
-                  </div>
-
-                  <div *ngIf="formItem.type === 'button' && formItem.generatecontrol"
-                    style="margin-top: 20px; display: flex; align-items: center; justify-content: center;">
-                    <button mat-stroked-button [disable]="formItem.disable"
-                      (click)="buttonClick(formItem.functions?.onClick)">
-                      <mat-icon>{{formItem.additionalData.buttonIcon}}</mat-icon>
-                      {{formItem.label}}
-                    </button>
-                  </div>
-
-                  <div *ngIf="formItem.type === 'textwithbutton' && formItem.generatecontrol">
-                    <mat-form-field appearance="outline" style="width: 100%;">
-                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                      <input matInput type="text" [formControlName]="formItem.name"
-                        placeholder="{{formItem.placeholder}}" [readonly]="formItem.disable">
-                      <button mat-icon-button style="color: rgb(2, 166, 242);background-color: rgba(2, 166, 242, 0.12);"
-                        matSuffix class="example-full-width" type="button">
-                        <ng-container>
-                          <mat-icon
-                            (click)="buttonClick(formItem.additionalData?.functionName)">{{formItem.additionalData.buttonIcon}}</mat-icon>
-                        </ng-container>
+                    </div>
+                    <div *ngIf="formItem.type === 'showhidebutton' && formItem.generatecontrol"
+                      style="margin-top: 20px;padding-left: 3%;">
+                      <button mat-stroked-button (click)="showhidebuttonclick()">
+                        <mat-icon>book-open</mat-icon>
+                        {{formItem.label}}
                       </button>
+                    </div>
+                    <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="(formItem.type=='time') && formItem.generatecontrol">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <input matInput [owlDateTimeTrigger]="timepicker" [formControlName]="formItem.name"
+                        [owlDateTime]="timepicker">
+                      <mat-icon matSuffix [owlDateTimeTrigger]="timepicker" class="date-icon">schedule</mat-icon>
+                      <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
+                      <!-- error  -->
                       <mat-error *ngFor="let error of formItem.Validations">
                         <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
                           {{error.message}}
                         </ng-container>
                       </mat-error>
                     </mat-form-field>
-                  </div>
+                    <!-- OR -->
+                    <div style="text-align: center; padding-top: 21px;" *ngIf="formItem.type=='OR'">
+                      <span class="label l-bg-purple shadow-style">{{formItem?.label || 'OR'}}</span>
+                    </div>
 
+                    <div *ngIf="formItem.type === 'button' && formItem.generatecontrol"
+                      style="margin-top: 20px; display: flex; align-items: center; justify-content: center;">
+                      <button mat-stroked-button [disable]="formItem.disable"
+                        (click)="buttonClick(formItem.functions?.onClick)">
+                        <mat-icon>{{formItem.additionalData.buttonIcon}}</mat-icon>
+                        {{formItem.label}}
+                      </button>
+                    </div>
 
+                    <div *ngIf="formItem.type === 'textwithbutton' && formItem.generatecontrol">
+                      <mat-form-field appearance="outline" style="width: 100%;">
+                        <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                        <input matInput type="text" [formControlName]="formItem.name"
+                          placeholder="{{formItem.placeholder}}" [readonly]="formItem.disable">
+                        <button mat-icon-button style="color: rgb(2, 166, 242);background-color: rgba(2, 166, 242, 0.12);"
+                          matSuffix class="example-full-width" type="button">
+                          <ng-container>
+                            <mat-icon
+                              (click)="buttonClick(formItem.additionalData?.functionName)">{{formItem.additionalData.buttonIcon}}</mat-icon>
+                          </ng-container>
+                        </button>
+                        <mat-error *ngFor="let error of formItem.Validations">
+                          <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                            {{error.message}}
+                          </ng-container>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
 
-                  <!--textbox (input) Date Timer Picker controls---------------------------------------------------------->
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    *ngIf="(formItem.type=='datetimerpicker')">
+                    <!--textbox (input) Date Timer Picker controls---------------------------------------------------------->
+                    <mat-form-field class="example-full-width" appearance="outline"
+                      *ngIf="(formItem.type=='datetimerpicker')">
 
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <input matInput [owlDateTimeTrigger]="datetimepicker" [owlDateTime]="datetimepicker"
-                      [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
-                      [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
-          , eventArgs: $event})" [formControlName]="formItem.name">
-                    <owl-date-time #datetimepicker></owl-date-time>
-                    <mat-datepicker-toggle matSuffix [for]="datetimepicker"></mat-datepicker-toggle>
-                    <!-- error  -->
-                    <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
-                        {{error.message}}
-                      </ng-container>
-                    </mat-error>
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <input matInput [owlDateTimeTrigger]="datetimepicker" [owlDateTime]="datetimepicker"
+                        [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
+                        [max]="formItem.additionalData?.maxDate" (dateTimeChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
+            , eventArgs: $event})" [formControlName]="formItem.name">
+                      <owl-date-time #datetimepicker></owl-date-time>
+                      <mat-datepicker-toggle matSuffix [for]="datetimepicker"></mat-datepicker-toggle>
+                      <!-- error  -->
+                      <mat-error *ngFor="let error of formItem.Validations">
+                        <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                          {{error.message}}
+                        </ng-container>
+                      </mat-error>
 
-                  </mat-form-field>
-                  <!---End-->
+                    </mat-form-field>
+                    <!---End-->
 
-                  <!--Date Picker-->
-                  <mat-form-field class="datepickercss" style="width: 100%" *ngIf="(formItem.type=='daterangpicker')"
-                    appearance="outline">
-                    <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                    <mat-date-range-input [rangePicker]="picker">
-                      <input matStartDate [formControlName]="formItem.name" placeholder="Start date" />
-                      <input matEndDate [formControlName]="formItem.additionalData.support" placeholder="End date" />
-                    </mat-date-range-input>
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-date-range-picker #picker [calendarHeaderComponent]="CustomeDatePickerComponent"
-                      [touchUi]="isTouchUIActivated"></mat-date-range-picker>
-                  </mat-form-field>
-                  <!--End-->
+                    <!--Date Picker-->
+                    <mat-form-field class="datepickercss" style="width: 100%" *ngIf="(formItem.type=='daterangpicker')"
+                      appearance="outline">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <mat-date-range-input [rangePicker]="picker">
+                        <input matStartDate [formControlName]="formItem.name" placeholder="Start date" />
+                        <input matEndDate [formControlName]="formItem.additionalData.support" placeholder="End date" />
+                      </mat-date-range-input>
+                      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-date-range-picker #picker [calendarHeaderComponent]="CustomeDatePickerComponent"
+                        [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                    </mat-form-field>
+                    <!--End-->
                 </div>
               </div>
               <ng-container *ngIf="showSaveAndCancelButton">

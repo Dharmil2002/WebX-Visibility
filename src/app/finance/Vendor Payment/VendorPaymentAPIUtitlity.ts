@@ -21,9 +21,9 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
         const resAdvanceresult = result.map((x, index) => ({
             SrNo: index + 1,
             Vendor: x._id || "",
-            THCamount: x.tHCAMT || 0,
-            AdvancePending: x.aDVAMT || 0,
-            BalanceUnbilled: x.bALAMT || 0,
+            THCamount: (x.tHCAMT || 0).toFixed(2),
+            AdvancePending: (x.aDVAMT || 0).toFixed(2),
+            BalanceUnbilled: (x.bALAMT || 0).toFixed(2),
             VendorInfo: x.vND,
         })) ?? null;
 
@@ -52,9 +52,10 @@ export async function GetAdvancePaymentListFromApi(masterService, Filters) {
             THC: x.docNo,
             GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(), "dd-MM-yy"),
             VehicleNumber: x.vEHNO,
-            THCamount: x.cONTAMT,
-            Advance: x.aDVAMT,
-            AdvancePending: x.aDVPENAMT,
+            THCamount: (x.tOTAMT || 0).toFixed(2),
+            THCContraAmount: (x.cONTAMT || 0).toFixed(2),
+            Advance: (x.aDVAMT || 0).toFixed(2),
+            AdvancePending: (x.aDVPENAMT || 0).toFixed(2),
             OthersData: x
         })) ?? null;
         return result
@@ -185,7 +186,8 @@ export async function GetTHCListBasdedOnBillNumberFromApi(masterService, BillNum
                 THC: x.docNo,
                 GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(), "dd-MM-yy"),
                 VehicleNumber: x.vEHNO,
-                THCamount: x.cONTAMT,
+                THCamount: x.tOTAMT,
+                THCContraAmount: (x.cONTAMT || 0).toFixed(2),
                 Advance: x.aDVAMT,
                 AdvancePending: x.aDVPENAMT,
                 OthersData: x

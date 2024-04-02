@@ -81,7 +81,7 @@ export class ProfitAndLossViewComponent implements OnInit {
 
     ];
     this.HtmlTemplate = `<div>
-    <div id="print" style="width: 900px; margin: 30px auto; box-sizing: border-box; padding: 10px; font-size: 12px;">
+    <div id="print" style="width: 1000px; margin: 30px auto; box-sizing: border-box; padding: 10px; font-size: 12px;">
         <div style="display: flex;">
          <div
                 style="width: 25%; display: flex; flex-direction: column; border: 1px solid black; justify-content: space-between;">
@@ -106,25 +106,25 @@ export class ProfitAndLossViewComponent implements OnInit {
             <table style="width: 100%;">
                 <tr>
                     <td class="px-1"
-                        style="font-weight: bold; width: 20%;font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold; width: 30%;font-size: 14px; text-align: center; border: 1px solid black;">
                         Particulars</td>
                     <td class="px-1"
-                        style="font-weight: bold;  width:20%; font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold;  width:25%; font-size: 14px; text-align: center; border: 1px solid black;">
                         Description</td>
                     <td class="px-1"
-                        style="font-weight: bold;  width: 20%; font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold;  width: 15%; font-size: 14px; text-align: center; border: 1px solid black;">
                         Note No</td>
                     <td class="px-1"
-                        style="font-weight: bold;  width: 20%; font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold;  width: 15%; font-size: 14px; text-align: center; border: 1px solid black;">
                         Amount As on [EndDate]</td>
                     <td class="px-1"
-                        style="font-weight: bold;   width: 20%;font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold;   width: 15%;font-size: 14px; text-align: center; border: 1px solid black;">
                         Amount As on 31 Mar 23
                     </td>
                    
                 </tr>
                 <tr data-row="ProfitAndLossDetails">
-                    <td class="px-1" style="border: 1px solid black;text-align: center;">[ProfitAndLossDetails.MainCategory]</td>
+                    <td class="px-1" style="border: 1px solid black;font-weight: bold;text-align: center;">[ProfitAndLossDetails.MainCategory]</td>
                     <td class="px-1" style="border: 1px solid black;">[ProfitAndLossDetails.SubCategory]</td>
                     <td class="px-1" style="border: 1px solid black;text-align: center;"> 
                      <a href="/#/Reports/AccountReport/ProfitAndLossviewdetails?notes=[ProfitAndLossDetails.SubCategory]"  target="_blank">[ProfitAndLossDetails.Notes] </a>

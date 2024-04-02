@@ -1,0 +1,256 @@
+<div class="Consignment_Tracking">
+    <app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="'Operation/ConsignmentQuery'">
+        <div class="m-0" style="width: 100%;  padding: 10px;">
+            <div class="m-0 p-3" style="background-color: white; padding-bottom: 20px;">
+                <div style="background-color: white; width: 100%; display: flex; justify-content: space-between;">
+                    <div class="px-2" style="width: 30%; display: flex; align-items: center;">
+                        <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label style="font-weight: bold;">Search</mat-label>
+                            <input matInput placeholder="Search Text" (ngModelChange)="SearchData($event)"
+                                [(ngModel)]="searchText">
+                        </mat-form-field>
+                    </div>
+                    <div style="width: 30%; display: flex; align-items: center;">
+                        <div style="width: 80%;">
+                            <form class="register-form " style="margin-right: 20px;" [formGroup]="Form">
+                                <div style="width: 100%;" *ngFor="let formItem of formData">
+                                    <mat-form-field class="datepickercss" *ngIf="formItem.generatecontrol===true"
+                                        style="width: 100%; color: black" appearance="outline">
+                                        <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                                        <mat-date-range-input style="color: red; outline: none;"
+                                            [disabled]='daterangedisabled' [rangePicker]="picker">
+                                            <input matStartDate [formControlName]="formItem.name"
+                                                placeholder="Start date" />
+                                            <input matEndDate [formControlName]="formItem.additionalData.support"
+                                                placeholder="End date" />
+                                        </mat-date-range-input>
+                                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <mat-date-range-picker #picker
+                                            [calendarHeaderComponent]="CustomeDatePickerComponent"
+                                            [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                                    </mat-form-field>
+                                </div>
+                            </form>
+                        </div>
+                        <div
+                            style="width: 20%; height: 100%; display: flex; align-items: flex-end; justify-content: center;">
+                            <button style="margin-bottom: 8px;" mat-raised-button (click)="ExportFunction()"
+                                color="primary">Export</button>
+                        </div>
+                    </div>
+
+                </div>
+                <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px;">
+                    <div class="cardBox">
+                        <div *ngFor="let item of CountCard; let i = index" (click)="SetCountCard(item,i)"
+                            [class]="selectedIndex === i?'active card':'card'"
+                            [style.z-index]="selectedIndex === i?'10':CountCard.length - i"
+                            [style.background-color]="selectedIndex === i?item.Color:'transparent'">
+                            <p class="cardCount" [style.color]="selectedIndex === i?'white':item.Color">{{item.count}}
+                            </p>
+                            <p class="cardtitle"><span [style.color]="selectedIndex === i?'white':'rgba(0,0,0,0.6)'">
+                                    {{item.title}}</span> </p>
+                        </div>
+                    </div>
+                    <div>
+                        <mat-paginator class="paginator" #paginator [pageSizeOptions]="[5,10,15,20]"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="isTableLode" style="width: 100%; display: flex; flex-direction: column; margin-top: 30px; ">
+                <div class="trakingBox" *ngFor="let item of obs | async; let i = index">
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Cnote No:
+                        </p>
+                        <p (click)="OpenDocketView(item.dKTNO)" class="Cnotlink font-width-600"
+                            style="font-size: 14px; padding-top: 5px; color: #0794e1;">
+                            {{item.dKTNO}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>EDD:</p>
+                            <p class="font-width-600" style="color: red;">{{item.sTSTM | date: "dd-MM-YYYY"}}</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>ATD:</p>
+                            <p class="font-width-600"></p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 35%; ">
+                        <p>
+                            Status:
+                        </p>
+                        <p class="font-width-600">
+                            <span *ngIf="item.sTSNM" style="color: #e82;">
+                                {{item.sTSNM}} :
+                            </span>
+                            {{item.oPSSTS}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 14%; ">
+                        <p>
+                            Booking Date:
+                        </p>
+                        <p class="font-width-600" style="display: flex; align-items: center; color: rgb(0, 146, 0);">
+                            <mat-icon *ngIf="item.docketData.dKTDT"
+                                style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color: rgb(0, 146, 0);"
+                                fontIcon="verified"></mat-icon>
+                            {{item.docketData.dKTDT | date: "dd-MM-YYYY"}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 15%; text-align: center; ">
+                        <p>
+                            Transit Mode:
+                        </p>
+                        <p class="font-width-600">
+                            {{item.TransitMode.Party}}
+                            {{item.TransitMode.Party&&item.TransitMode.Mod?' / ':''}}
+                            {{item.TransitMode.Mod}}
+                            {{item.TransitMode.Mod&&item.TransitMode.Servis?' / ':''}}
+                            {{item.TransitMode.Servis}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>EWB:</p>
+                            <p class="font-width-600"></p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>Valid:</p>
+                            <p class="font-width-600"></p>
+                        </div>
+                    </div>
+                    <div class="trakingCard" style="width: 18%; ">
+                        <p>
+                            Movement:
+                        </p>
+                        <p class="font-width-600" style="display: flex; align-items: center;">
+                            {{item.oRGN}} <mat-icon *ngIf="item.oRGN && item.dEST" style="color: rgba(0,0,0,0.3);"
+                                fontIcon="arrow_forward"></mat-icon> {{item.dEST}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 25%; ">
+                        <p>
+                            Consignor:
+                        </p>
+                        <p class="font-width-600" style="font-size: 14px;">
+                            {{item.Consignor}}
+                        </p>
+                    </div>
+                    <div class="trakingCard" style="width: 24%; ">
+                        <p>
+                            Consignee:
+                        </p>
+                        <p class="font-width-600" style="font-size: 14px;">
+                            {{item.Consignee}}
+                        </p>
+                    </div>
+                    <div class="trakingCard"
+                        style="width: 15%; display: flex; justify-content: center; align-items: center; ">
+                        <button mat-stroked-button (click)="ViewFunction(item)" color="primary">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </app-common-wrapper-webxpress>
+</div>
+
+
+<style>
+    p,
+    div {
+        margin: 0;
+        padding: 0;
+    }
+
+    .datepicker {
+        display: flex;
+    }
+
+    .cardBox {
+        width: 60%;
+        display: flex;
+        box-sizing: border-box;
+    }
+
+    .cardBox .card {
+        width: 20%;
+        height: 70px;
+        border-radius: 5px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
+        cursor: pointer;
+    }
+
+    .card p {
+        text-align: center;
+    }
+
+    .card .cardtitle {
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.7);
+        font-size: 14px;
+    }
+
+    .card .cardtitle span {
+        padding: 0px 5px;
+        padding-bottom: 5px;
+        border-bottom-width: 2px;
+    }
+
+    .card .cardCount {
+        font-size: 18px;
+        font-weight: bolder;
+    }
+
+    .trakingCard {
+        min-height: 75px;
+        border-bottom: 1px solid #a0a0a040;
+        border-left: 1px solid #a0a0a040;
+        background-color: white;
+    }
+
+    .trakingBox {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 1px solid #a0a0a040;
+        border-right: 1px solid #a0a0a040;
+        color: rgb(26, 25, 25);
+        margin: 10px 0px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .trakingCard p {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        padding: 0px 5px;
+        padding-top: 5px;
+    }
+
+    .scrollable-content {
+        overflow-y: visible;
+        overflow-x: visible;
+    }
+
+    .font-width-600 {
+        font-weight: 600;
+    }
+
+    .Cnotlink {
+        cursor: pointer;
+    }
+
+    .Cnotlink:hover {
+        text-decoration: underline;
+    }
+</style>

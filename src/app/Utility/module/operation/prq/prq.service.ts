@@ -9,6 +9,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import { updatePrqStatus } from "src/app/operation/prq-entry-page/prq-utitlity";
 import Swal from "sweetalert2";
+import { GeneralService } from "../../masters/general-master/general-master.service";
 
 @Injectable({
   providedIn: "root",
@@ -35,7 +36,8 @@ export class PrqService {
   constructor(
     private masterService: MasterService,
     private operation: OperationService,
-    private storage: StorageService
+    private storage: StorageService,
+    private objGeneralService: GeneralService
   ) {}
 
   //here the function for add prq Detail
@@ -127,14 +129,16 @@ export class PrqService {
 
     if (confirmationResult.isConfirmed) {
       if (status == "5") {
+        const rejectionData = await this.objGeneralService.getGeneralMasterData("PRQRES");
+        const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
         Swal.fire({
           title: "Reason For Rejection?",
-          html: '<input id="swal-input1" class="swal2-input">',
+          html: `<select id="swal-select1" class="swal2-select">${options}</select>`,
           focusConfirm: false,
           showCancelButton: true,
           cancelButtonText: "Cancel",
           preConfirm: () => {
-            return (document.getElementById("swal-input1") as HTMLInputElement)
+            return (document.getElementById("swal-select1") as HTMLInputElement)
               .value;
           },
         }).then(async (result) => {

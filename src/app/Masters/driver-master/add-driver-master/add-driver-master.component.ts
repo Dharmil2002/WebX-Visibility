@@ -600,25 +600,27 @@ export class AddDriverMasterComponent implements OnInit {
 
   //#region
   async checkLicenseNumberExist() {
-    const licenseExists = this.allData.driverData.some(
-      (res) =>
-        res._id === this.DriverTableForm.value._id ||
-        res.licenseNo === this.DriverTableForm.value.licenseNo
-    );
-    if (licenseExists) {
-      // Show the popup indicating that the state already exists
-      Swal.fire({
-        text: "License Number already exists! Please try with another",
-        title: 'Error',
-        icon: "error",
-        showConfirmButton: true,
-      });
-      this.DriverTableForm.controls["licenseNo"].reset();
+    const licenseNo = this.DriverTableForm.value.licenseNo
+    try {
+      const request = {
+        companyCode: this.companyCode,
+        collectionName: 'driver_detail',
+        filter: { "licenseNo": licenseNo },
+      };
+      const res = await this.masterService.masterPost('generic/get', request).toPromise();
+      if (res.data.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `This ${licenseNo} Number already added! Please try with another!`,
+          showConfirmButton: true,
+        });
+        this.DriverTableForm.controls['licenseNo'].setValue('');
+        return;
+      }
+    } catch (error) {
+      console.error('An error occurred while checking for unique vehicles:', error);
     }
-    error: (err: any) => {
-      // Handle error if required
-      console.error(err);
-    };
   }
   //#endregion
 

@@ -21,7 +21,7 @@ export class xlsxutilityService {
       for (const rule of rules) {
         const value = item[rule.ItemsName];
         for (const validation of rule.Validations) {
-          if ("Required" in validation && validation.Required && !value) {
+          if ("Required" in validation && validation.Required && !value.trim()) {
             errors.push(`${rule.ItemsName} is required.`);
           }
           if ("dateLimit" in validation && value) {

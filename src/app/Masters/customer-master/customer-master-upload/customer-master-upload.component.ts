@@ -99,7 +99,7 @@ export class CustomerMasterUploadComponent implements OnInit {
             ItemsName: "CustomerName",
             Validations: [
               { Required: true },
-              { Pattern: "^[a-zA-Z 0-9]{3,200}$" },
+              { Pattern: "^[a-zA-Z0-9& ]{3,200}$" },
               {
                 Exists: this.existingData.map((name) => {
                   return name.customerName;
@@ -314,23 +314,24 @@ export class CustomerMasterUploadComponent implements OnInit {
 
       // Format the final data with additional information
       const formattedData = await this.formatCustomerData(uploadData);
-      console.log(formattedData);
-      // const request = {
-      //   companyCode: this.storage.companyCode,
-      //   collectionName: "customer_detail",
-      //   data: uploadData,
-      // };
+      // console.log(formattedData);
 
-      // const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
-      // if (response) {
-      //   // Display success message
-      //   Swal.fire({
-      //     icon: "success",
-      //     title: "Success",
-      //     text: "Valid customer Data Uploaded",
-      //     showConfirmButton: true,
-      //   });
-      // }
+      const request = {
+        companyCode: this.storage.companyCode,
+        collectionName: "customer_detail",
+        data: formattedData,
+      };
+
+      const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
+      if (response) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Valid customer Data Uploaded",
+          showConfirmButton: true,
+        });
+      }
 
     } catch (error) {
       console.error("Error during saving customer data:", error);
@@ -347,25 +348,23 @@ export class CustomerMasterUploadComponent implements OnInit {
 
   // Function to process a single location element
   processData(element, customerGrpList, CustomerCategoryList, locationList) {
-
-    const updateCustomerGrpList = customerGrpList.find(item => item.name === element.CustomerGroup);
-    const updateCustomerCategory = CustomerCategoryList.find(item => item.name === element.CustomerCategory);
+    debugger
+    const updateCustomerGrpList = customerGrpList.find(item => item.name.toLowerCase() === element.CustomerGroup.toLowerCase());
+    const updateCustomerCategory = CustomerCategoryList.find(item => item.name.toLowerCase() === element.CustomerCategory.toLowerCase());
 
     let customerLocations: string[];
 
     // Check if element.CustomerLocation contains a comma
     if (element.CustomerLocation.includes(',')) {
       // If it contains a comma, split into an array of locations
-      customerLocations = element.CustomerLocation.split(',').map(location => location.trim());
+      customerLocations = element.CustomerLocation.split(',').map(location => location.trim().toUpperCase());
     } else {
       // If it doesn't contain a comma, treat it as a single location
       customerLocations = [element.CustomerLocation.trim()];
     }
 
     // Find the matching locations in locationList
-    const updateLocationList = locationList.filter(item => customerLocations.includes(item.name));
-
-    console.log(updateCustomerGrpList, updateCustomerCategory, updateLocationList);
+    const updateLocationList = locationList.filter(item => customerLocations.includes(item.name.toUpperCase()));
 
     // Create a new customerModel instance to store processed data
     const processedData = new customerModel({});
@@ -385,12 +384,13 @@ export class CustomerMasterUploadComponent implements OnInit {
     processedData.city = element.City;
     processedData.state = element.State;
     processedData.Country = element.Country;
-    processedData.BlackListed = element.BlackListed === 'Y' ? true : false;
-    processedData.activeFlag = element.Active === 'Y' ? true : false;
+    processedData.BlackListed = element.BlackListed === 'Y'; // Convert 'Y' to true, else false;
+    processedData.activeFlag = element.Active === 'Y';
     processedData.ERPcode = element.ERPCode;
     processedData.TANNumber = element.TANNo;
     processedData.PANnumber = element.PANNo;
     processedData.CINnumber = element.CINNo;
+    processedData.MSMENumber = element.MSMENo;
     processedData.updatedBy = this.storage.userName;
 
     // Return the processed data

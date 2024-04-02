@@ -218,35 +218,66 @@ export class AccountReportService {
                const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
                if (res.data && res.data.length > 0) {
                     let OthersData = res.data;
-                    let reportData = OthersData.sort((a, b) => {
-                         if (a.MainCategory < b.MainCategory) return 1;
-                         if (a.MainCategory > b.MainCategory) return -1;
-                         return 0;
-                    });
-                    const mainCategoryEncountered = {};
 
-                    const mappedData = reportData.flatMap((item, index) =>
-                         item.Details.flatMap((detail, detailIndex) =>
-                              detail.AccountDetails.map((account, accountIndex) => {
-                                   let mainCategory = '';
-                                   if (!mainCategoryEncountered[item.MainCategory]) {
-                                        mainCategory = item.MainCategory;
-                                        mainCategoryEncountered[item.MainCategory] = true;
-                                   }
-                                   return {
-                                        MainCategory: mainCategory,
-                                        BalanceCategoryName: detail.BalanceCategoryName,
-                                        GroupName: detail.GroupCode + ":" + detail.GroupName,
-                                        Description: account.AccountCode + ":" + account.AccountName,
-                                        Debit: (account.Debit).toFixed(2),
-                                        Credit: (account.Credit).toFixed(2),
-                                   };
-                              })
-                         )
-                    );
+                    let mappedData: any;
+                    let SortedData: any;
+                    switch (request.ReportType) {
+                         case "G":
+                              SortedData = OthersData.sort((a, b) => {
+                                   if (a.MainCategory < b.MainCategory) return 1;
+                                   if (a.MainCategory > b.MainCategory) return -1;
+                                   return 0;
+                              });
+                              const mainCategoryEncountered = {};
+                              mappedData = SortedData.flatMap((item, index) =>
+                                   item.Details.flatMap((detail, detailIndex) =>
+                                        detail.AccountDetails.map((account, accountIndex) => {
+                                             let mainCategory = '';
+                                             if (!mainCategoryEncountered[item.MainCategory]) {
+                                                  mainCategory = item.MainCategory;
+                                                  mainCategoryEncountered[item.MainCategory] = true;
+                                             }
+                                             return {
+                                                  MainCategory: mainCategory,
+                                                  BalanceCategoryName: detail.BalanceCategoryName,
+                                                  GroupName: detail.GroupCode + ":" + detail.GroupName,
+                                                  Description: account.AccountCode + ":" + account.AccountName,
+                                                  Debit: (account.Debit).toFixed(2),
+                                                  Credit: (account.Credit).toFixed(2),
+                                             };
+                                        })
+                                   )
+                              );
 
+                              return mappedData
+                         case "L":
+                              mappedData = OthersData.flatMap((item, index) =>
+                                   item.Details.flatMap((detail, detailIndex) =>
+                                        detail.AccountDetails.map((account, accountIndex) => {
+                                             return {
+                                                  LocationWise: item.LocationWise,
+                                                  MainCategory: item.MainCategory,
+                                                  GroupName: detail.GroupCode + ":" + detail.GroupName,
+                                                  Description: account.AccountCode + ":" + account.AccountName,
+                                                  Debit: (account.Debit).toFixed(2),
+                                                  Credit: (account.Credit).toFixed(2),
+                                             };
+                                        })
+                                   )
+                              );
+                              return mappedData.sort((a, b) => {
+                                   // Sort by LocationWise ascending
+                                   if (a.LocationWise < b.LocationWise) return -1;
+                                   if (a.LocationWise > b.LocationWise) return 1;
 
-                    return mappedData
+                                   // If LocationWise is the same, sort by MainCategory ascending
+                                   if (a.MainCategory < b.MainCategory) return -1;
+                                   if (a.MainCategory > b.MainCategory) return 1;
+
+                                   return 0;
+                              });
+                              break;
+                    }
                }
           } catch (error) {
                console.error("Error:", error);
@@ -368,6 +399,121 @@ export class AccountReportService {
                               'D$project': {
                                    '_id': 0,
                                    'MainCategory': '$_id',
+                                   'Details': 1
+                              }
+                         }
+                    ]
+               case "L":
+                    return [
+                         {
+                              "D$lookup": {
+                                   "from": "acc_trans_" + request.FinanceYear,
+                                   "let": { "aCCCD": "$aCCD" },
+                                   "pipeline": [
+                                        {
+                                             "D$match": {
+                                                  "D$expr": {
+                                                       "D$and": [
+                                                            {
+                                                                 "D$eq": [
+                                                                      "$aCCCD",
+                                                                      "$$aCCCD"
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 "D$in": [
+                                                                      "$lOC",
+                                                                      request.branch
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 '$gte': [
+                                                                      '$vDT', request.startdate
+                                                                 ]
+                                                            }, {
+                                                                 '$lte': [
+                                                                      '$vDT', request.enddate
+                                                                 ]
+                                                            }
+
+                                                       ]
+                                                  }
+                                             }
+                                        }
+                                   ],
+                                   "as": "transactions"
+                              }
+                         },
+                         {
+                              "D$unwind": "$transactions"
+                         },
+                         {
+                              "D$match": {
+                                   "transactions": { "D$ne": [] } // Filter out documents where there are no transactions
+                              }
+                         },
+
+                         {
+                              'D$group': {
+                                   '_id': {
+                                        'LocationWise': '$transactions.lOC',
+                                        'MainCategory': '$mRPNM',
+                                        'GroupCode': '$gRPCD',
+                                        'GroupName': '$gRPNM',
+                                        'AccountCode': '$aCCD',
+                                        'AccountName': '$aCNM'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$transactions.cR'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$transactions.dR'
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'LocationWise': '$_id.LocationWise',
+                                        'MainCategory': '$_id.MainCategory',
+                                        'GroupCode': '$_id.GroupCode',
+                                        'GroupName': '$_id.GroupName'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$TotalCredit'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$TotalDebit'
+                                   },
+                                   'AccountDetails': {
+                                        'D$push': {
+                                             'AccountCode': '$_id.AccountCode',
+                                             'AccountName': '$_id.AccountName',
+                                             'Credit': '$TotalCredit',
+                                             'Debit': '$TotalDebit'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'LocationWise': '$_id.LocationWise',
+                                        'MainCategory': '$_id.MainCategory'
+                                   },
+                                   'Details': {
+                                        'D$push': {
+                                             'GroupCode': '$_id.GroupCode',
+                                             'GroupName': '$_id.GroupName',
+                                             'TotalCredit': '$TotalCredit',
+                                             'TotalDebit': '$TotalDebit',
+                                             'AccountDetails': '$AccountDetails'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$project': {
+                                   '_id': 0,
+                                   'MainCategory': '$_id.MainCategory',
+                                   'LocationWise': '$_id.LocationWise',
                                    'Details': 1
                               }
                          }

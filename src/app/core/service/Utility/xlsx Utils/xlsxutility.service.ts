@@ -21,7 +21,7 @@ export class xlsxutilityService {
       for (const rule of rules) {
         const value = item[rule.ItemsName];
         for (const validation of rule.Validations) {
-          if ("Required" in validation && validation.Required && !value) {
+          if ("Required" in validation && validation.Required && !value.trim()) {
             errors.push(`${rule.ItemsName} is required.`);
           }
           if ("dateLimit" in validation && value) {
@@ -89,6 +89,17 @@ export class xlsxutilityService {
             );
             validationObservables.push(validationObservable);
           }
+          if ("TakeFromArrayList" in validation && value) {
+            const valueItems = String(value).split(',').map(item => item.trim().toLowerCase());
+            const invalidItems = valueItems.filter(item => !validation.TakeFromArrayList.some(listItem =>
+              String(listItem).toLowerCase() === item
+            ));
+
+            if (invalidItems.length > 0) {
+              errors.push(`${rule.ItemsName} (${invalidItems.join(', ')}) is not in the allowed list.`);
+            }
+          }
+
         }
         if (errors.length > 0) {
           break; // Exit the loop if errors are found
@@ -114,17 +125,19 @@ export class xlsxutilityService {
 
       // Iterate through each duplicate rule
       duplicateRules.forEach((duplicateRule) => {
-        const existingLocations = new Set();
+        const existingData = new Set();
 
         // Iterate through filteredDataWithoutErrors to find duplicates in the specified field
         filteredDataWithoutErrors.forEach((item) => {
           const fieldValue = item[duplicateRule.ItemsName];
 
-          if (existingLocations.has(fieldValue)) {
-            item.error = item.error || [];
-            item.error.push(`Duplicate Entry.`);
-          } else {
-            existingLocations.add(fieldValue);
+          if (fieldValue) {
+            if (existingData.has(fieldValue)) {
+              item.error = item.error || [];
+              item.error.push(`Duplicate Entry.`);
+            } else {
+              existingData.add(fieldValue);
+            }
           }
         });
       });

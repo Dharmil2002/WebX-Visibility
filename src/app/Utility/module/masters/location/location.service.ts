@@ -78,6 +78,17 @@ export class LocationService {
   }
   //#endregion
 
+  async getLocation(filter): Promise<any | null> {
+    const reqBody = {
+      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      collectionName: 'location_detail',
+      filter: filter
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/getOne', reqBody));    
+    return res.data;
+  }
+
   async findAllDescendants(reportLoc): Promise<any[] | null> {
     const reqBody = {
       companyCode: localStorage.getItem('companyCode'), // Get company code from local storage

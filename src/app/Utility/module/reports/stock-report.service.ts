@@ -44,6 +44,7 @@ export class StockReportService {
           then: 5,
         },
     */
+   debugger;
     const matchQuery = {
       'D$and': [{ sTS: { D$nin: [10,13] } },
       (data.dateType === 'BookingDate') ? {
@@ -129,28 +130,31 @@ export class StockReportService {
               D$ifNull: ["$tHCdetails.nXTLOC", ""],
             },
             PackagesNo: {
-              D$ifNull: ["$pKGS", ""],
+              D$ifNull: ["$pKGS", 0],
             },
             ActualWeight: {
-              D$ifNull: ["$aCTWT", ""],
+              D$ifNull: ["$aCTWT", 0],
             },
             ChargedWeight: {
-              D$ifNull: ["$cHRWT", ""],
+              D$ifNull: ["$cHRWT", 0],
             },
             Freight: {
-              D$ifNull: ["$details.fRTAMT", ""],
+              D$ifNull: ["$details.fRTAMT", 0],
             },
             SubTotal: {
-              D$ifNull: ["$details.gROAMT", ""],
+              D$ifNull: ["$details.gROAMT", 0],
             },
             GSTCharged: {
-              D$ifNull: ["$details.gSTCHAMT", ""],
+              D$ifNull: ["$details.gSTCHAMT", 0],
             },
             CnoteTotal: {
-              D$ifNull: ["$details.tOTAMT", ""],
+              D$ifNull: ["$details.tOTAMT", 0],
             },
             StockType: {
-              D$ifNull: ["$StockType", ""],
+              D$ifNull: ["$StockType", 0],
+            },
+            StockTypeId: {
+              D$ifNull: ["$StockTypeId", 0],
             },
             FromCity: {
               D$ifNull: ["$details.fCT", ""],
@@ -179,13 +183,12 @@ export class StockReportService {
     }
 
     try {
-      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
-      console.log(res);
+      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));      
       res.data.forEach(item => {
         item.CDate = item.CDate ? moment(item.CDate).format('DD MMM YY') : '';
         item.ArrivedDate = item.ArrivedDate ? moment(item.ArrivedDate).format('DD MMM YY') : '';
       });
-      return res.data;
+      return res.data.filter(item => item.StockTypeId > 0);
     } catch (error) {
       console.error('Error fetching stock data:', error);
       return [];
@@ -293,9 +296,8 @@ export class StockReportService {
     }
 
     try {
-      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
-      console.log(res);     
-      return res.data;
+      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));        
+      return res.data.filter(item => item.StockTypeId > 0);
     } catch (error) {
       console.error('Error fetching stock data:', error);
       return [];
@@ -306,7 +308,7 @@ export class StockReportService {
 
   getStockTypeQuery(data) {
     var stockTypeQuery = [];
-    switch (data.stockType) {
+    switch (data.stockType.toString()) {
       case '1':
         stockTypeQuery.push({
           D$or: [
@@ -316,8 +318,7 @@ export class StockReportService {
             {
               D$and: [
                 { sTS: { D$in: [2, 3] } } ,
-                { cLOC: { D$eq: "$oRGN" } } ,
-              ],
+                { $expr: { D$eq: ["$cLOC", "$oRGN" ] } }              ],
             },
           ]
         });
@@ -334,14 +335,14 @@ export class StockReportService {
             {
               D$and: [
                 { sTS: { D$eq: 5 } } ,
-                { cLOC: { D$ne: "$dEST" } } ,
+                { $expr: { D$ne: ["$cLOC", "$dEST" ] } }
               ]
             },
             {
               D$and: [
                 { sTS: { D$in: [2, 3] } } ,
-                { cLOC: { D$ne: "$oRGN" } } ,
-                { cLOC: { D$ne: "$dEST" } } ,
+                { $expr: { D$ne: ["$cLOC", "$oRGN" ] } },
+                { $expr: { D$ne: ["$cLOC", "$dEST" ] } }
               ],
             }
           ]
@@ -353,7 +354,7 @@ export class StockReportService {
             {
               D$and: [
                 { sTS: { D$eq: 5 } } ,
-                { cLOC: { D$eq: "$dEST" } } ,
+                { $expr: { D$eq: ["$cLOC", "$dEST" ] } }
               ]
             },
             {

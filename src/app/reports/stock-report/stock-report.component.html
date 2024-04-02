@@ -7,7 +7,7 @@
     </form>
 
     <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="summaryHeader"
-        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray"
+        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray" [columnGroup]="summaryGroup"
         (functionCallEmitter)="functionCallHandler($event)">
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

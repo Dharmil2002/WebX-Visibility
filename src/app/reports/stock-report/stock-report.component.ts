@@ -15,6 +15,8 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { StockReport } from 'src/assets/FormControls/Reports/stock-report-controls/stock-report';
 import Swal from 'sweetalert2';
 import _ from 'lodash';
+import { columnHeader } from 'src/app/Masters/customer-master/customer-master-list/customer-utlity';
+import { fi } from 'date-fns/locale';
 
 @Component({
   selector: 'app-stock-report',
@@ -105,6 +107,7 @@ export class StockReportComponent implements OnInit {
     GoneForDeliveryDocketTotal: "GoneForDelivery DocketTotal"
   }
 
+  summaryGroup: any[] = [];
   staticField: string[] = ["loc","StockType","Dockets","Packages","ActWeight","ChgWeight","Freight","OtherAmt","SubTotal","GST","Total"]
   summaryHeader: any = {
     "loc": {
@@ -168,6 +171,8 @@ export class StockReportComponent implements OnInit {
   }
   linkArray = [];
 
+  locations: any[] = [];
+  cumulativeLocation: string[] = [];
 
   constructor(private masterService: MasterService,
     private filter: FilterUtils,
@@ -241,7 +246,6 @@ export class StockReportComponent implements OnInit {
     );
     this.jsonControlArray[index].filterOptions
       .pipe(take(1), takeUntil(this._onDestroy))
-
       .subscribe((val) => {
         this.stockReportForm.controls[autocompleteSupport].patchValue(
           isSelectAll ? val : []
@@ -276,11 +280,18 @@ export class StockReportComponent implements OnInit {
         const formatType = this.stockReportForm.value.FormatType;
         const fromLocation = this.stockReportForm.value.fromLocation.value;
         const toLocation = this.stockReportForm.value.toLocation.value;
-        const locations = await this.locationService.findAllDescendants(this.storage.branch);
-        const cumulativeLocation = locations.filter(f => f.activeFlag == true).map(x => x.locCode);
-        if(cumulativeLocation.length == 0){ cumulativeLocation.push(this.storage.branch) };
+        this.locations = await this.locationService.findAllDescendants(this.storage.branch);
         
-        this.filterData = { startDate, endDate, modeList, paybasisList, BookingType, stockType, dateType, locationType, formatType, fromLocation, toLocation, cumulativeLocation }
+        this.cumulativeLocation = this.locations.filter(f => f.activeFlag == true).map(x => x.locCode);
+        if(this.cumulativeLocation.length == 0){ this.cumulativeLocation.push(this.storage.branch) };
+
+
+        const lc =  await this.locationService.getLocation({ companyCode: this.storage.companyCode, locCode: this.storage.branch });
+        const rlc = await this.locationService.getLocation({ companyCode: this.storage.companyCode, locCode: lc.reportLoc });        
+        this.locations.push(lc);
+        this.locations.push(rlc);
+        
+        this.filterData = { startDate, endDate, modeList, paybasisList, BookingType, stockType, dateType, locationType, formatType, fromLocation, toLocation, cumulativeLocation: this.cumulativeLocation }
         
         // console.log(requestbody);
         console.log( this.filterData);
@@ -294,12 +305,12 @@ export class StockReportComponent implements OnInit {
           // this.tableLoad = false;
           // console.log(data);
 
-          var pivot = await this.pivotData(data, locations);
+          var pivot = await this.pivotData(data, this.locations);
           this.staticField = pivot.staticFields;
           this.summaryHeader = pivot.config;
           this.summaryData = pivot.data;
-          this.tableLoad = false;
-          console.log(pivot);
+          this.summaryGroup = pivot.columnGroup;
+          this.tableLoad = false;          
         }
         
         Swal.hideLoading();
@@ -326,6 +337,7 @@ export class StockReportComponent implements OnInit {
         }
 
       } catch (error) {
+        console.log(error);
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
           "No Records Found"
@@ -335,8 +347,35 @@ export class StockReportComponent implements OnInit {
   }
   //#endregion
 
-  async downloadcsv($event, StockType) {
-    console.log(StockType, $event);
+  async downloadcsv(event) {
+    if(event.value && event.value > 0) {
+      const data = event.data;
+      const columnData = event.columnData;
+
+      var filter = { ...this.filterData };
+
+      filter.stockType = columnData.StockTypeId;
+      filter.cumulativeLocation = [ data.LocationCode ];
+
+      console.log(filter);
+      let result = await this.stockReportService.getStockData(filter); 
+
+      if (!result || (Array.isArray(result) && result.length === 0)) {
+
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+
+      setTimeout(() => {
+        Swal.close();
+      }, 1000);
+  
+      this.exportService.exportAsCSV(result, `Stock Register-${data.LocationCode}-${columnData.StockType}-${moment().format("YYYYMMDD-HHmmss")}`, this.detailCSVHeader);
+    }
   }
 
   async pivotData(data, locations) {
@@ -349,35 +388,49 @@ export class StockReportComponent implements OnInit {
         .uniqBy('StockType') // or 'StockTypeId' if it should be unique by ID
         .sortBy('StockTypeId')
         .value();
-
+      
+      let columnGroup = [{
+        Name: "Location",
+        class: "matcolumnleft",
+        ColSpan: 2
+      }];
       let displayJson = {};
       let staticFields = ["Location","ReportLocation"];
       displayJson["Location"] = {
           Title: "Location",
           class: "matcolumnleft",
-          type: "Label",
-          Style: "min-width: 250px",
+          Style: "min-width: 250px"
       };
 
       displayJson["ReportLocation"] = {
           Title: "Reporting Location",
           class: "matcolumnleft",
-          type: "Label",
-          Style: "min-width: 250px",
+          Style: "min-width: 250px"
       };
 
       allStockTypes
       .map(type => {
+        columnGroup.push({ 
+          Name: type.StockType, 
+          class: "matcolumnright",
+          ColSpan: 8
+        });
         var fields = ['Count','Packages','Actual_Weight','Charged_Weight','Freight','Subtotal','GST_Charged','Docket_Total'];
         fields.map(field => {
-          staticFields.push(type.StockType + '_' + field.replace(/_/g, ''));
+          
           displayJson[type.StockType + '_' + field.replace(/_/g, '')] = {
               Title: type.StockType.replace(/_/g, ' ') + ' ' + field.replace(/_/g, ' '),
               class: "matcolumnright",
-              //type: "Link",
-              //functionName: `downloadcsv`,
               Style: "min-width: 100px",
-          };      
+              columnData: type
+          };
+          if(field == "Count") {
+            displayJson[type.StockType + '_' + field.replace(/_/g, '')]["type"] = "Link";
+            displayJson[type.StockType + '_' + field.replace(/_/g, '')]["functionName"] = "downloadcsv";
+          }
+          else {
+            staticFields.push(type.StockType + '_' + field.replace(/_/g, ''));
+          }
         });
       });
 
@@ -408,7 +461,7 @@ export class StockReportComponent implements OnInit {
           const typeKey = item.StockType.replace(' Stock', '').replace(/ /g, '_');
           
           // Increment the counts and sums
-          aggregates[typeKey + '_Count'] += item.Dockets || 0;
+          aggregates[typeKey + '_Count'] += parseInt(item.Dockets || 0) || 0;
           aggregates[typeKey + '_Packages'] += item.Packages || 0;
           aggregates[typeKey + '_ActualWeight'] += item.ActWeight || 0;
           aggregates[typeKey + '_ChargedWeight'] += item.ChgWeight || 0;
@@ -423,6 +476,7 @@ export class StockReportComponent implements OnInit {
         const rep = locations.find(f => f.locCode == loc.reportLoc);
 
         return { 
+          LocationCode: loc.locCode,
           Location: `${loc.locCode} : ${loc.locName}`,
           ReportLocation : `${rep.locCode} : ${rep.locName}`,          
           ...aggregates
@@ -430,7 +484,7 @@ export class StockReportComponent implements OnInit {
       })
       .value();
 
-      return { staticFields, config: displayJson, data: pivotData };
+      return { staticFields, config: displayJson, data: pivotData, columnGroup };
 
       /*
        // Step 1: Group by 'salesperson' and 'region'

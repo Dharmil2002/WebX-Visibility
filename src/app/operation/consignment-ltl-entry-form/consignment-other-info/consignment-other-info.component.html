@@ -1,0 +1,6 @@
+    <form [formGroup]="otherInfoForm">
+        <app-form-webxpress [form]="otherInfoForm" [formData]="otherControls"
+          (callFunction)="functionCallHandler($event)" [FormTitle]="'Other Charges'"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+      </form>

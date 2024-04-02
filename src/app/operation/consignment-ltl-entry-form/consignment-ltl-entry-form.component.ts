@@ -6,7 +6,7 @@ import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
 import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { autocompleteValidator, formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
@@ -16,6 +16,10 @@ import { ControlPanelService } from 'src/app/core/service/control-panel/control-
 import { StorageService } from 'src/app/core/service/storage.service';
 import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
 import { ConsignmentLtl } from 'src/assets/FormControls/consgiment-ltl-controls';
+import { ConsignmentChargesComponent } from './consignment-charges/consignment-charges.component';
+import { ConsignmentOtherInfoComponent } from './consignment-other-info/consignment-other-info.component';
+import { AddressService } from 'src/app/Utility/module/masters/Address/address.service';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -49,17 +53,19 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   wtUnits: AutoComplete[];
   pinCodeLoc: any;
   allInvoiceControls: FormControls[];
-  EventButton = {
-    functionName: "ViewCharge",
-    name: "Other Freight Charges",
+  addNewTitle: string = "Other Freight Charges";
+  // EventButton = {
+  //   functionName: "ViewCharge",
+  //   name: "Other Freight Charges",
+  //   iconName: "add",
+  // };
+  MatButton = {
+    functionName: "viewInfo",
+    name: "Other Info",
     iconName: "add",
   };
- MatButton= {
-  functionName: "ViewCharge",
-  name: "Other Info",
-  iconName: "add",
-};
   rateTypes: AutoComplete[];
+  prqData: any;
   constructor(
     private controlPanel: ControlPanelService,
     private prqService: PrqService,
@@ -71,6 +77,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private customerService: CustomerService,
+    private addressService:AddressService,
+    private vehicleStatusService: VehicleStatusService,
     public dialog: MatDialog
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -129,7 +137,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     // Set initial values for the form controls
     this.bindQuickdocketData();
     this.commonDropDownMapping();
-
   }
   /*end*/
 
@@ -247,16 +254,16 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   //#endregion
   /*below function is call when the prq based data we required*/
   async getPrqDetail() {
-    const prqNo = await this.prqService.getPrqForBooking(
-      this.storage.branch,
-      this.consignmentForm.value.billingParty.value,
-      this.consignmentForm.get("payType")?.value
-    );
-    this.prqNoDetail = prqNo.allPrqDetail;
-
+    const filter= {
+      cID:this.storage.companyCode,
+      bRCD: this.storage.branch,
+      pRQNO: { 'D$regex': `^${this.consignmentForm.controls.prqNo.value}`, 'D$options': 'i' },
+     }
+    const prqNo = await this.prqService.getPrqDetail(filter);
+    this.prqNoDetail = prqNo.tableData;
     const prqDetail = prqNo.allPrqDetail.map((x) => ({
-      name: x.prqNo,
-      value: x.prqNo,
+      name: x.pRQNO,
+      value: x.pRQNO
     }));
 
     this.filter.Filter(this.allFormControls, this.consignmentForm, prqDetail, "prqNo", false);
@@ -334,42 +341,204 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async onAutoBillingBased(event) {
     const { name } = event.field;
     const value = this.consignmentForm.controls[name].value;
-    const customer=this.consignmentForm.controls["billingParty"].value?.otherdetails||"";
-      switch (name) {
-        case "cnebp":
-          this.consignmentForm.controls["consigneeName"].setValue(value?{name:customer?.customerName||"",value:customer?.customerCode||""}:"");
-          this.consignmentForm.controls["cncontactNumber"].setValue(value?customer?.customer_mobile||'':"");
-          this.consignmentForm.controls["cneAddress"].setValue(value?{name:customer?.RegisteredAddress||"",value:"A888"}:"");
-          this.consignmentForm.controls["cnegst"].setValue(value?customer?.GSTdetails[0].gstNo||"":"");
-          break;
-        case "cnbp":
-          this.consignmentForm.controls["consignorName"].setValue(value?{name:customer?.customerName||"",value:customer?.customerCode||""}:"");
-          this.consignmentForm.controls["ccontactNumber"].setValue(value?customer?.customer_mobile||'':"");
-          this.consignmentForm.controls["calternateContactNo"].setValue("");
-          this.consignmentForm.controls["cnoAddress"].setValue(value?{name:customer?.RegisteredAddress||"",value:"A888"}:"");
-          this.consignmentForm.controls["cnogst"].setValue(value?customer?.GSTdetails[0].gstNo||"":"");
-          break;
-      }
+    const customer = this.consignmentForm.controls["billingParty"].value?.otherdetails || "";
+    switch (name) {
+      case "cnebp":
+        this.consignmentForm.controls["consigneeName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
+        this.consignmentForm.controls["cncontactNumber"].setValue(value ? customer?.customer_mobile || '' : "");
+        this.consignmentForm.controls["cneAddress"].setValue(value ? { name: customer?.RegisteredAddress || "", value: "A888" } : "");
+        this.consignmentForm.controls["cnegst"].setValue(value ? customer?.GSTdetails[0].gstNo || "" : "");
+        break;
+      case "cnbp":
+        this.consignmentForm.controls["consignorName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
+        this.consignmentForm.controls["ccontactNumber"].setValue(value ? customer?.customer_mobile || '' : "");
+        this.consignmentForm.controls["calternateContactNo"].setValue("");
+        this.consignmentForm.controls["cnoAddress"].setValue(value ? { name: customer?.RegisteredAddress || "", value: "A888" } : "");
+        this.consignmentForm.controls["cnogst"].setValue(value ? customer?.GSTdetails[0].gstNo || "" : "");
+        break;
+    }
   }
   /*End*/
   /*below function is volumetric function*/
   getVolControls(event) {
     const volumeValue = this.consignmentForm.controls['f_vol'].value;
     // Use a ternary operator for concise conditional assignment.
-    this.invoiceControlArray = volumeValue 
-        ? this.allInvoiceControls 
-        : this.allInvoiceControls.filter(control => control.additionalData.metaData === "invoiceDetail");
-}
-  /*End*/
-  ViewCharge(){ 
-      // const dialogref = this.dialog.open(PrqListComponent, {
-      //   width: "100vw",
-      //   height: "100vw",
-      //   maxWidth: "232vw",
-      //   data: prqDetail,
-      // });
-      // dialogref.afterClosed().subscribe((result) => {
-      // });
-   
+    this.invoiceControlArray = volumeValue
+      ? this.allInvoiceControls
+      : this.allInvoiceControls.filter(control => control.additionalData.metaData === "invoiceDetail");
   }
+  /*End*/
+  ViewCharge() {
+    let data = this.consignmentForm.value;
+    data['paymentTypeName'] = this.paymentType.find((x) => x.value == data.payType).name;
+    data['transModeName'] = this.tranType.find((x) => x.value == data.transMode).name;
+    const dialogref = this.dialog.open(ConsignmentChargesComponent, {
+      width: "100vw",
+      height: "100vw",
+      maxWidth: "232vw",
+      data: data
+    });
+    dialogref.afterClosed().subscribe((result) => {
+    });
+  }
+  viewInfo() {
+    let data = this.consignmentForm.value;
+    const dialogref = this.dialog.open(ConsignmentOtherInfoComponent, {
+      width: "100vw",
+      height: "100vw",
+      maxWidth: "232vw",
+      data: data
+    });
+    dialogref.afterClosed().subscribe((result) => {
+    });
+  }
+  /*below function call when Consgine or Consginor would be walkin*/
+  walkin(event) {
+    const { name } = event.field;
+    const value = this.consignmentForm.controls[name].value;
+
+    // Mapping of field names to control names and their related controls array.
+    const fieldMappings = {
+      cnWinCsgn: { controlName: 'consignorName', controlArray: 'consignorControlArray' },
+      cnWinCsgne: { controlName: 'consigneeName', controlArray: 'consignorControlArray' } // Assuming 'consignorControlArray' was a typo and you have a 'consigneeControlArray'.
+    };
+
+    const mapping = fieldMappings[name];
+    if (mapping) {
+      // Update control type
+      this[mapping.controlArray].forEach((element) => {
+        if (element.name === mapping.controlName) {
+          element.type = "text";
+        }
+      });
+
+      // Update validators based on value
+      const control = this.consignmentForm.controls[mapping.controlName];
+      if (value) {
+        control.clearValidators();
+        control.setValue("");
+      } else {
+        control.setValidators([autocompleteValidator()]);
+        control.setValue("");
+      }
+      control.updateValueAndValidity();
+    }
+  }
+  /*End*/
+  async AddressDetails() {
+    const billingParty = this.consignmentForm.controls["billingParty"]?.value.value || "";
+    const fromCity = this.consignmentForm.controls["fromCity"]?.value.value || "";
+    const toCity = this.consignmentForm.controls["toCity"]?.value.value || "";
+    const filter = [
+      {
+        D$match: {
+          cityName: fromCity,
+          activeFlag: true,
+          customer: {
+            D$elemMatch: {
+              code: billingParty,
+            },
+          },
+        },
+      },
+    ]
+    const picUpres = await this.addressService.getAddress(filter);
+    const filterAddress = [
+      {
+        D$match: {
+          cityName: toCity,
+          activeFlag: true,
+          customer: {
+            D$elemMatch: {
+              code: billingParty,
+            },
+          },
+        },
+      },
+    ]
+    const address = await this.addressService.getAddress(filterAddress);
+    this.filter.Filter(
+      this.allFormControls,
+      this.consignmentForm,
+      picUpres,
+      "pAddress",
+      false
+    );
+    this.filter.Filter(
+      this.allFormControls,
+      this.consignmentForm,
+      address,
+      "deliveryAddress",
+      false
+    );
+    this.filter.Filter(
+      this.allFormControls,
+      this.consignmentForm,
+      picUpres,
+      "cnoAddress",
+      false
+    );
+    this.filter.Filter(
+      this.allFormControls,
+      this.consignmentForm,
+      address,
+      "cneAddress",
+      false
+    );
+  }
+ 
+  prqSelection() {
+    debugger
+    this.prqData = this.prqNoDetail.find(
+      (x) => x.prqNo == this.consignmentForm.controls["prqNo"].value.value
+    );
+   this.prqDetail();
+  }
+  async prqDetail() {
+    let billingParty = { name: this.prqData?.billingParty, value: this.prqData?.billingPartyCode };
+    //await this.customerService.getCustomerByCodeOrName(undefined, this.prqData?.billingParty);
+    this.setFormValue(this.consignmentForm, "fromCity", this.prqData, true, "fromCity", "fromCity");
+    this.setFormValue(this.consignmentForm, "toCity", this.prqData, true, "toCity", "toCity");
+    this.setFormValue(this.consignmentForm, "billingParty", billingParty);
+    this.setFormValue(this.consignmentForm, "payType", this.prqData?.payTypeCode);
+    this.setFormValue(this.consignmentForm, "docketDate", this.prqData?.pickupDate);
+    this.setFormValue(this.consignmentForm, "cnebp", false);
+    this.setFormValue(this.consignmentForm, "cnbp", true);
+
+    // Done By Harikesh 
+    const autoBillingConfigs = [
+      { name: "cnbp", checked: true },
+      { name: "cnebp", checked: false }
+    ];
+
+    autoBillingConfigs.forEach(config => {
+      const autoBillingData = {
+        eventArgs: { checked: config.checked },
+        field: { name: config.name }
+      };
+      this.onAutoBillingBased(autoBillingData);
+    });
+    const prodCode = this.tranType.find((x) => x.name == "Road")?.value || "";
+    this.setFormValue(this.consignmentForm, "transMode", prodCode);
+  }
+  setFormValue(
+    formGroup: UntypedFormGroup,
+    controlId: string,
+    value: any,
+    isNameValue: boolean = false,
+    valueField: string = "",
+    nameField: string = "",
+    callback: () => void = () => { }
+  ) {
+    if (isNameValue) {
+      formGroup.controls[controlId].setValue({
+        name: value[nameField] ?? "",
+        value: value[valueField] ?? "",
+      });
+    } else {
+      formGroup.controls[controlId].setValue(value);
+    }
+    callback();
+  }
+
 }

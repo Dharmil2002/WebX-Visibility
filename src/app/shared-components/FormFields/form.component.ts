@@ -28,7 +28,7 @@ import { CustomeDatePickerComponent } from "src/app/shared/components/custome-da
 export class FormComponent {
   @Input() formData;
   @Input() FieldStyle = "";
-
+  @Input() addNewTitle = "Add New";
   @Input() form!: UntypedFormGroup;
   locationIsupdate: boolean;
   minDate: Date;

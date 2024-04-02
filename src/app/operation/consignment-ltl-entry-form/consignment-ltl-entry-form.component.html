@@ -43,7 +43,13 @@
     <form [formGroup]="freightForm">
         <app-form-webxpress [form]="freightForm" [FormTitle]="'Freight Details'"
             [formData]="freightControlArray" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false"  [EventButton]="EventButton" [MatButton]="MatButton" (callFunction)="functionCallHandler($event)">
+            [showSaveAndCancelButton]="false" 
+            [addNewTitle]="addNewTitle"
+            [DisplayAddNewButton]=true
+            [EventButton]="EventButton"
+            [MatButton]="MatButton"
+            (AddNewButtonEvent)="ViewCharge()"
+            (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </div>

@@ -1,0 +1,8 @@
+<div *ngIf="chargeControls">
+<form [formGroup]="chargeForm">
+    <app-form-webxpress [form]="chargeForm" [formData]="chargeControls"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Other Charges'"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+    </app-form-webxpress>
+  </form>
+</div>

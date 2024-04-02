@@ -7,6 +7,7 @@ export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
     private freightDetails:FormControls[];
+    private otherCharges:FormControls[];
     constructor(public generalService: GeneralService) {
         super(generalService, "LTL", ["Consignment"]);
         this.docketFields = [
@@ -72,6 +73,7 @@ export class ConsignmentLtl extends BaseControl {
                     },
                   ],
                 functions: {
+                    onModel: "getPrqDetail",
                     onOptionSelect: 'prqSelection'
                   },
               additionalData:{
@@ -352,7 +354,7 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "cnbp",
-                label: " Consignor same as Billing Party",
+                label: "Consignor same as Billing Party",
                 placeholder: "",
                 type: "toggle",
                 value: false,
@@ -366,14 +368,14 @@ export class ConsignmentLtl extends BaseControl {
                 }
             },
             {
-                name: "cnwin",
+                name: "cnWinCsgn",
                 label: "walk in",
                 placeholder: "",
                 type: "toggle",
                 value: false,
                 generatecontrol: true,
                 disable: false,
-                functions: { onChange: "onAutoBillingBased" },
+                functions: { onChange:"walkin"},
                 Validations: [],
                 additionalData: {
                     showNameAndValue: true,
@@ -396,14 +398,14 @@ export class ConsignmentLtl extends BaseControl {
                 }
             },
             {
-                name: "cnewin",
+                name: "cnWinCsgne",
                 label: "walk in",
                 placeholder: "",
                 type: "toggle",
                 value: false,
                 generatecontrol: true,
                 disable: false,
-                functions: { onChange: "onAutoBillingBased" },
+                functions: { onChange: "walkin" },
                 Validations: [],
                 additionalData: {
                     showNameAndValue: true,
@@ -428,7 +430,8 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-
+                    { name: "autocomplete" },
+                    { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
                 functions: {
                     onModel: "getCustomer",
@@ -438,6 +441,7 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: true,
                     metaData: "consignor",
                 },
+                
             },
             {
                 name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
@@ -507,7 +511,8 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-
+                    { name: "autocomplete" },
+                    { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
                 functions: {
                     onModel: "getCustomer",
@@ -1008,6 +1013,135 @@ export class ConsignmentLtl extends BaseControl {
                 }, generatecontrol: true, disable: true
             }
         ]
+        this.otherCharges = [
+            {
+                name: 'cust_ref_no', label: 'Customer Ref No.', placeholder: 'Customer Ref No.', type: 'text',
+                value: "", Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'cod', label: 'COD', placeholder: 'COD', type: 'number',
+                value: "", Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'orderNo', label: 'Order No./PO No.', placeholder: 'Customer Ref No.', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'dod', label: 'DOD', placeholder: 'DOD', type: 'number',
+                value: "", Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'riskType', label: 'Risk Type', placeholder: 'Risk Type', type: 'Staticdropdown',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'invoiceAttech', label: 'Invoice Attachment', placeholder: 'Invoice Attachment', type: 'file',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'policyNo', label: 'Policy No.', placeholder: 'Policy No.', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'supplyPlant', label: 'Supply Plant', placeholder: 'Supply Plant', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'policyDate', label: 'Policy Date', placeholder: 'Policy Date', type: 'date',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'local', label: 'Local GCN', placeholder: 'Local GCN', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'invoiceCompany', label: 'Insurance Company', placeholder: 'Insurance Company', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'busAssociate', label: 'Business Associates', placeholder: 'Business Associates', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'remarks', label: 'Remarks', placeholder: 'Remarks', type: 'text',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+        ]
     }
     getInvoiceDetail() {
         return this.invoiceDetail
@@ -1017,5 +1151,8 @@ export class ConsignmentLtl extends BaseControl {
     }
     getDocketFieldControls() {
         return this.docketFields;
+    }
+    getOtherDetails() {
+        return this.otherCharges
     }
 }

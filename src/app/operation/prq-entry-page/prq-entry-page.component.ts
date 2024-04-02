@@ -647,6 +647,6 @@ export class PrqEntryPageComponent implements OnInit {
           text: `Something went wrong! ${err.message}`,
           showConfirmButton: false,
         });
-      });
+      });   
   }
 }

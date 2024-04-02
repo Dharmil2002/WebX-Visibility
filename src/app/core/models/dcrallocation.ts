@@ -6,6 +6,8 @@ export class DCRModel {
   from: string;
   to: string;
   noOfPages: number;
+  aLOCD:string;
+  aLONM:string;
   constructor(allocationData?: DCRModel) {
     // this.allocateTo = allocationData?.allocateTo || "";
     this.location = allocationData?.location || "";
@@ -15,5 +17,7 @@ export class DCRModel {
     this.from = allocationData?.from || "";
     this.to = allocationData?.to || "";
     this.noOfPages = allocationData?.noOfPages;
+    this.aLOCD="";
+    this.aLONM="";
   }
 }

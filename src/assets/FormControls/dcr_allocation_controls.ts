@@ -31,7 +31,7 @@ export class DcrAllocationForm {
         label: "Location",
         placeholder: "select proper options",
         type: "dropdown", // Change to "text" if location is free text input
-        value:allocationData?.location, // Set default value
+        value:{name:allocationData?.aLONM,value:allocationData?.aLOCD}, // Set default value
         generatecontrol: true,
         disable: false,
         Validations: [

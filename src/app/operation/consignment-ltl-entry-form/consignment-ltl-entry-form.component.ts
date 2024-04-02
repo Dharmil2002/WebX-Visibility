@@ -54,12 +54,106 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   wtUnits: AutoComplete[];
   pinCodeLoc: any;
   allInvoiceControls: FormControls[];
+  tableLoadIn:boolean=true;
   addNewTitle: string = "Other Freight Charges";
-  // EventButton = {
-  //   functionName: "ViewCharge",
-  //   name: "Other Freight Charges",
-  //   iconName: "add",
-  // };
+  columnInvoice = {
+    ewayBillNo: {
+      Title: "Eway Bill Number",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    expiryDate: {
+      Title: "Eway Bill Date",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    ewayBillDate: {
+      Title: "Eway Bill Expiry Date",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    invoiceNumber: {
+      Title: "Invoice Number",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    invDt: {
+      Title: "Invoice Date",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    cftRation: {
+      Title: "CFT Ratio",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    length: {
+      Title: "Length",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    breadth: {
+      Title: "Breadth",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    height: {
+      Title: "Height",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    invoiceAmount: {
+      Title: "Invoice Amount",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    cubicWeight: {
+      Title: "Cubic Weight",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    noOfpkg: {
+      Title: "No of Package",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    materialName: {
+      Title: "Material Name",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    actualWeight: {
+      Title: "Actual Weight (Kg)",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    chargedWeight: {
+      Title: "Charged Weight (MT)",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    materialDensity: {
+      Title: "Material Density",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
+  };
+  staticFieldInvoice=[
+    'ewayBillNo',
+    'expiryDate',
+    'ewayBillDate',
+    'invoiceNumber',
+    'invDt',
+    'cftRation',
+    'cftRation',
+
+  ]
+  tableData=[];
   MatButton = {
     functionName: "viewInfo",
     name: "Other Info",

@@ -39,6 +39,14 @@
         </app-form-webxpress>
     </form>
 </div>
+<app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls"
+[columnHeader]="columnInvoice" [tableData]="tableData"
+(selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+[staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width"
+[maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+(menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
+[showHeader]=false [FormTitle]="'Invoice Details'" [TitleBoxData]="this.InvoiceDetailsList">
+</app-generic-table-v2>
 <div *ngIf="freightControlArray">
     <form [formGroup]="freightForm">
         <app-form-webxpress [form]="freightForm" [FormTitle]="'Freight Details'"

@@ -922,6 +922,14 @@
       "router": "Reports/PRQ-Register-report"
     },
     {
+      "title": "Reports/Stock-Report",
+      "tag": [
+        "StockReport",
+        "StockReport"
+      ],
+      "router": "Reports/Stock-Report"
+    },
+    {
       "title": "Reports/Cash-Bank-Book-Report",
       "tag": [
         "cashreport",

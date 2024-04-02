@@ -4,6 +4,8 @@ import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { UntypedFormBuilder } from "@angular/forms";
 import moment from "moment";
 import { Router } from "@angular/router";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+
 
 @Component({
   selector: "app-query-page",
@@ -19,7 +21,10 @@ export class QueryPageComponent implements OnInit {
   ];
   jsonControlConsignmentQueryArray: any;
   ConsignmentQueryForm: any;
-  constructor(private fb: UntypedFormBuilder,private Route: Router,) {}
+  DocTypeStatus: any;
+  DocTypeCode: any;
+    
+    constructor(private fb: UntypedFormBuilder, private Route: Router, private filter: FilterUtils,) {}
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -32,6 +37,24 @@ export class QueryPageComponent implements OnInit {
     this.ConsignmentQueryForm = formGroupBuilder(this.fb, [
       this.jsonControlConsignmentQueryArray,
     ]);
+    this.bindDropdown();
+  }
+  bindDropdown() {
+    this.jsonControlConsignmentQueryArray.forEach((data) => {
+      if (data.name === "DocType") {
+        this.DocTypeCode = data.name;
+        this.DocTypeStatus = data.additionalData.showNameAndValue;
+        const DocTypedata = [{ name: "CNote Tracking", value: "CNote" }];
+
+        this.filter.Filter(
+          this.jsonControlConsignmentQueryArray,
+          this.ConsignmentQueryForm,
+          DocTypedata,
+          this.DocTypeCode,
+          this.DocTypeStatus
+        );
+      }
+    });
   }
 
   functionCallHandler($event) {
@@ -42,22 +65,31 @@ export class QueryPageComponent implements OnInit {
       console.log("failed");
     }
   }
-  
 
   save(event) {
     // this.cnoteTableForm.controls.start.value
-    const start = this.ConsignmentQueryForm.controls.start.value
-    const end = this.ConsignmentQueryForm.controls.end.value
-    const Docket = this.ConsignmentQueryForm.controls.Docket.value
+    const start = this.ConsignmentQueryForm.controls.start.value;
+    const end = this.ConsignmentQueryForm.controls.end.value;
+    const Docket = this.ConsignmentQueryForm.controls.Docket.value;
 
     const QueryJson = {
-      Docket: Docket || undefined,
+      Docket: Docket ? Docket.replaceAll(/\s/g, "").split(",") : undefined,
       start: moment(start).isValid() ? new Date(start) : undefined,
-      end: moment(end).isValid() ? new Date(end): undefined,
+      end: moment(end).isValid() ? new Date(end) : undefined,
     };
-    this.Route.navigate(["Operation/ConsignmentTracking"], { state: { data: QueryJson } });
+    var url;
+    switch(this.ConsignmentQueryForm.value.DocType.value) {
+      case "CNote":
+        url = "Operation/ConsignmentTracking"
+        break;
+      default:
+        // code block
+    }
+    this.Route.navigate([url], {
+      state: { data: QueryJson },
+    });
   }
   cancel() {
-    this.ngOnInit()
+    this.ngOnInit();
   }
 }

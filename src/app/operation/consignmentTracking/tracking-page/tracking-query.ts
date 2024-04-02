@@ -100,3 +100,56 @@ export const GetTrakingDataPipeLine = () => {
     ];
   }
 };
+
+export const formArray = [
+  {
+    name: "StartDate",
+    label: "Select Date Range Search",
+    placeholder: "Select Date",
+    type: "daterangpicker",
+    value: "",
+    filterOptions: "",
+    autocomplete: "",
+    displaywith: "",
+    generatecontrol: true,
+    disable: true,
+    Validations: [],
+    additionalData: {
+      support: "EndDate",
+    },
+  },
+  {
+    name: "EndDate",
+    label: "",
+    placeholder: "Select Data Range",
+    type: "",
+    value: "",
+    filterOptions: "",
+    autocomplete: "",
+    generatecontrol: false,
+    disable: true,
+    Validations: [
+      {
+        name: "Select Data Range",
+      },
+      {
+        name: "required",
+        message: "StartDateRange is Required...!",
+      },
+    ],
+  },
+]
+
+export const headerForCsv = {
+  CnoteNo: "Cnote No",
+  EDD: "EDD",
+  ATD: "ATD",
+  Status: "Status",
+  docketDate: "Booking Date",
+  TransitMode: "Transit Mode",
+  EWB: "EWB",
+  Valid: "Valid",
+  Movement: "Movement",
+  Consignor: "Consignor",
+  Consignee: "Consignee",
+}

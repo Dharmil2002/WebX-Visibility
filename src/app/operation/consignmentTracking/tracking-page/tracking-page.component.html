@@ -42,11 +42,14 @@
                 </div>
                 <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px;">
                     <div class="cardBox">
-                        <div *ngFor="let item of CountCard; let i = index" (click)="SetCountCard(item,i)" [class]="selectedIndex === i?'active card':'card'"
-                            [style.z-index]="selectedIndex === i?'10':CountCard.length - i" [style.background-color]="selectedIndex === i?item.Color:'transparent'">
-                            <p class="cardCount" [style.color]="selectedIndex === i?'white':item.Color">{{item.count}}</p>
-                            <p class="cardtitle"><span 
-                                    [style.color]="selectedIndex === i?'white':'rgba(0,0,0,0.6)'"> {{item.title}}</span> </p>
+                        <div *ngFor="let item of CountCard; let i = index" (click)="SetCountCard(item,i)"
+                            [class]="selectedIndex === i?'active card':'card'"
+                            [style.z-index]="selectedIndex === i?'10':CountCard.length - i"
+                            [style.background-color]="selectedIndex === i?item.Color:'transparent'">
+                            <p class="cardCount" [style.color]="selectedIndex === i?'white':item.Color">{{item.count}}
+                            </p>
+                            <p class="cardtitle"><span [style.color]="selectedIndex === i?'white':'rgba(0,0,0,0.6)'">
+                                    {{item.title}}</span> </p>
                         </div>
                     </div>
                     <div>
@@ -61,14 +64,15 @@
                         <p>
                             Cnote No:
                         </p>
-                        <p (click)="OpenDocketView(item.dKTNO)"  class="Cnotlink font-width-600" style="font-size: 14px; padding-top: 5px; color: #0794e1;">
+                        <p (click)="OpenDocketView(item.dKTNO)" class="Cnotlink font-width-600"
+                            style="font-size: 14px; padding-top: 5px; color: #0794e1;">
                             {{item.dKTNO}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>EDD:</p>
-                            <p class="font-width-600">{{item.sTSTM | date: "dd-MM-YYYY"}}</p>
+                            <p class="font-width-600" style="color: red;">{{item.sTSTM | date: "dd-MM-YYYY"}}</p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>ATD:</p>
@@ -90,8 +94,10 @@
                         <p>
                             Booking Date:
                         </p>
-                        <p class="font-width-600"  style="display: flex; align-items: center; color: rgb(0, 146, 0);">
-                            <mat-icon *ngIf="item.docketData.dKTDT" style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color: rgb(0, 146, 0);" fontIcon="verified"></mat-icon>
+                        <p class="font-width-600" style="display: flex; align-items: center; color: rgb(0, 146, 0);">
+                            <mat-icon *ngIf="item.docketData.dKTDT"
+                                style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color: rgb(0, 146, 0);"
+                                fontIcon="verified"></mat-icon>
                             {{item.docketData.dKTDT | date: "dd-MM-YYYY"}}
                         </p>
                     </div>
@@ -122,7 +128,8 @@
                             Movement:
                         </p>
                         <p class="font-width-600" style="display: flex; align-items: center;">
-                            {{item.oRGN}} <mat-icon *ngIf="item.oRGN && item.dEST" style="color: rgba(0,0,0,0.3);" fontIcon="arrow_forward"></mat-icon> {{item.dEST}}
+                            {{item.oRGN}} <mat-icon *ngIf="item.oRGN && item.dEST" style="color: rgba(0,0,0,0.3);"
+                                fontIcon="arrow_forward"></mat-icon> {{item.dEST}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 25%; ">
@@ -238,10 +245,12 @@
     .font-width-600 {
         font-weight: 600;
     }
-    .Cnotlink{
+
+    .Cnotlink {
         cursor: pointer;
     }
-    .Cnotlink:hover{
+
+    .Cnotlink:hover {
         text-decoration: underline;
     }
 </style>

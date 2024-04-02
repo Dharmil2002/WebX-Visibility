@@ -6,7 +6,11 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CustomeDatePickerComponent } from "src/app/shared/components/custome-date-picker/custome-date-picker.component";
 import { ViewTrackingPopupComponent } from "../view-tracking-popup/view-tracking-popup.component";
 import { Observable, firstValueFrom } from "rxjs";
-import { GetTrakingDataPipeLine } from "./tracking-query";
+import {
+  GetTrakingDataPipeLine,
+  formArray,
+  headerForCsv,
+} from "./tracking-query";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
@@ -67,7 +71,7 @@ export class TrackingPageComponent implements OnInit {
       title: "OFD",
       count: 0,
       Color: "rgb(74, 168, 199)",
-      _id: 0,
+      _id: null,
     },
     {
       title: "Delivered",
@@ -76,57 +80,8 @@ export class TrackingPageComponent implements OnInit {
       _id: 3,
     },
   ];
-  headerForCsv = {
-    CnoteNo: "Cnote No",
-    EDD: "EDD",
-    ATD: "ATD",
-    Status: "Status",
-    docketDate: "Booking Date",
-    TransitMode: "Transit Mode",
-    EWB: "EWB",
-    Valid: "Valid",
-    Movement: "Movement",
-    Consignor: "Consignor",
-    Consignee: "Consignee",
-  };
-  formData = [
-    {
-      name: "StartDate",
-      label: "Select Date Range Search",
-      placeholder: "Select Date",
-      type: "daterangpicker",
-      value: "",
-      filterOptions: "",
-      autocomplete: "",
-      displaywith: "",
-      generatecontrol: true,
-      disable: true,
-      Validations: [],
-      additionalData: {
-        support: "EndDate",
-      },
-    },
-    {
-      name: "EndDate",
-      label: "",
-      placeholder: "Select Data Range",
-      type: "",
-      value: "",
-      filterOptions: "",
-      autocomplete: "",
-      generatecontrol: false,
-      disable: true,
-      Validations: [
-        {
-          name: "Select Data Range",
-        },
-        {
-          name: "required",
-          message: "StartDateRange is Required...!",
-        },
-      ],
-    },
-  ];
+  headerForCsv = headerForCsv;
+  formData = formArray;
   Form: any;
   searchText: any;
   csvFileName: any;
@@ -140,10 +95,11 @@ export class TrackingPageComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.QueryData = this.Route.getCurrentNavigation().extras?.state.data;
+      console.log('this.QueryData' ,this.QueryData)
       if (this.QueryData.Docket) {
         const Query = {
           D$match: {
-            dKTNO: this.QueryData.Docket,
+            dKTNO: { D$in: this.QueryData.Docket},
           },
         };
         this.getTrackingDocket(Query);
@@ -296,25 +252,6 @@ export class TrackingPageComponent implements OnInit {
       this.Route.navigateByUrl("Operation/ConsignmentQuery");
     }
   }
-
-  ExportFunction() {
-    const csvData = this.TableData.map((x) => {
-      return {
-        CnoteNo: x.dKTNO,
-        EDD: moment(new Date(x.sTSTM)).format("DD-MM-YYYY"),
-        ATD: "",
-        Status: x.oPSSTS,
-        docketDate: moment(new Date(x.docketData.dKTDT)).format("DD-MM-YYYY"),
-        TransitMode: x.TransitMode,
-        EWB: "",
-        Valid: "",
-        Movement: x.oRGN && x.dEST ? `${x.oRGN} -> ${x.dEST}` : "",
-        Consignor: x.Consignor,
-        Consignee: x.Consignee,
-      };
-    });
-    this.ExportToCsv(csvData);
-  }
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
       data: eventData?.DocketTrackingData,
@@ -325,12 +262,52 @@ export class TrackingPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {});
   }
-
   SearchData(searchText) {
     const filterPipe = new CustomFilterPipe();
     const filteredArr = filterPipe.transform(this.TableData, searchText);
     this.dataSource = new MatTableDataSource<any>(filteredArr);
     this.ngOnInit();
+  }
+  SetCountCard(item, index) {
+    this.selectedIndex = index;
+    if (item.title == "Total Results") {
+      this.dataSource = new MatTableDataSource<any>(this.TableData);
+      this.ngOnInit();
+    } else {
+      this.dataSource = new MatTableDataSource<any>(
+        this.TableData.filter((x) => x.sTS == item._id)
+      );
+      this.ngOnInit();
+    }
+  }
+  OpenDocketView(DockNo) {
+    const req = {
+      templateName: "Docket View-Print",
+      DocNo: DockNo,
+    };
+    const url = `${
+      window.location.origin
+    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, "", "width=1000,height=800");
+  }
+
+  ExportFunction() {
+    const csvData = this.TableData.map((x) => {
+      return {
+        CnoteNo: x.dKTNO,
+        EDD: moment(new Date(x.sTSTM)).format("DD-MM-YYYY"),
+        ATD: "",
+        Status: x.oPSSTS,
+        docketDate: moment(new Date(x.docketData.dKTDT)).format("DD-MM-YYYY"),
+        TransitMode: `${x.TransitMode.Servis} / ${x.TransitMode.Mod} / ${x.TransitMode.Servis} `,
+        EWB: "",
+        Valid: "",
+        Movement: x.oRGN && x.dEST ? `${x.oRGN} -> ${x.dEST}` : "",
+        Consignor: x.Consignor,
+        Consignee: x.Consignee,
+      };
+    });
+    this.ExportToCsv(csvData);
   }
 
   ExportToCsv(jsonCsv) {
@@ -357,27 +334,5 @@ export class TrackingPageComponent implements OnInit {
       }),
     ];
     CsvDataServiceService.exportToCsv(this.csvFileName, formattedData);
-  }
-
-  SetCountCard(item, index) {
-    this.selectedIndex = index;
-    if (item.title == "Total Results") {
-      this.dataSource = new MatTableDataSource<any>(this.TableData);
-      this.ngOnInit();
-    } else {
-      this.dataSource = new MatTableDataSource<any>(
-        this.TableData.filter((x) => x.sTS == item._id)
-      );
-      this.ngOnInit();
-    }
-  }
-
-  OpenDocketView(DockNo){
-    const req = {
-      templateName: "Docket View-Print",
-      DocNo: DockNo,
-    };
-    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
-    window.open(url, '', 'width=1000,height=800');
   }
 }

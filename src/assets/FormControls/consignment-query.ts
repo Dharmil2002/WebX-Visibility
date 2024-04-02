@@ -5,6 +5,52 @@ export class ConsignmentqueryControls {
   constructor() {
     this.ConsignmentqueryArray = [
       {
+        name: "DocType",
+        label: "Document Type",
+        placeholder: "Document Type",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Bank name is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
+      {
+        name: "or",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "or",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
         name: "Docket",
         label: "Cnote No.",
         placeholder: "Enter Cnote No.",

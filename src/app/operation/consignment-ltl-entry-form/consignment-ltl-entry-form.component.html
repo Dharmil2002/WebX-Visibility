@@ -34,7 +34,7 @@
 <div *ngIf="invoiceControlArray">
     <form [formGroup]="invoiceForm">
         <app-form-webxpress [form]="invoiceForm" [FormTitle]="'Invoice Details'"
-            [formData]="invoiceControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [formData]="invoiceControlArray"  [EventButton]="EventButton" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
@@ -45,7 +45,7 @@
 [staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width"
 [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
 (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
-[showHeader]=false [FormTitle]="'Invoice Details'" [TitleBoxData]="this.InvoiceDetailsList">
+[showHeader]=false [FormTitle]="'Invoice Details'">
 </app-generic-table-v2>
 <div *ngIf="freightControlArray">
     <form [formGroup]="freightForm">
@@ -54,7 +54,6 @@
             [showSaveAndCancelButton]="false" 
             [addNewTitle]="addNewTitle"
             [DisplayAddNewButton]=true
-            [EventButton]="EventButton"
             [MatButton]="MatButton"
             (AddNewButtonEvent)="ViewCharge()"
             (callFunction)="functionCallHandler($event)">

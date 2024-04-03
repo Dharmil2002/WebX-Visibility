@@ -21,6 +21,8 @@ import { ConsignmentOtherInfoComponent } from './consignment-other-info/consignm
 import { AddressService } from 'src/app/Utility/module/masters/Address/address.service';
 import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import moment from 'moment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -33,6 +35,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   prqFlag: boolean;
   quickDocket: boolean;
   backPath: string;
+  linkArray=[];
   consigmentControls: ConsignmentLtl;
   allFormControls: FormControls[];
   basicFormControls: FormControls[];
@@ -55,6 +58,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   pinCodeLoc: any;
   allInvoiceControls: FormControls[];
   tableLoadIn:boolean=true;
+  menuItemflag=true;
+  menuItems = [{ label: "Edit" }, { label: "Remove" }];
+  InvoiceDetailsList: { count: any; title: string; class: string }[];
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
   addNewTitle: string = "Other Freight Charges";
   columnInvoice = {
     ewayBillNo: {
@@ -62,12 +73,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
-    expiryDate: {
+    ewayBillDate: {
       Title: "Eway Bill Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
-    ewayBillDate: {
+    expiryDate: {
       Title: "Eway Bill Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
@@ -107,12 +118,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    cubicWeight: {
+    cubWT: {
       Title: "Cubic Weight",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    noOfpkg: {
+    noOfPackage: {
       Title: "No of Package",
       class: "matcolumncenter",
       Style: "min-width:2px",
@@ -150,13 +161,27 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     'invoiceNumber',
     'invDt',
     'cftRation',
-    'cftRation',
-
+    'length',
+    'breadth',
+    'height',
+    'cubWT',
+    'noOfPackage',
+    'materialName',
+    'actualWeight',
+    'chargedWeight',
+    'invoiceAmount',
+    'materialDensity',
   ]
+
   tableData=[];
   MatButton = {
     functionName: "viewInfo",
     name: "Other Info",
+    iconName: "add",
+  };
+  EventButton = {
+    functionName: "AddNewInvoice",
+    name: "Add Invoice",
     iconName: "add",
   };
   rateTypes: AutoComplete[];
@@ -599,13 +624,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.setFormValue(this.consignmentForm, "docketDate", this.prqData?.pickupDate);
     this.setFormValue(this.consignmentForm, "cnebp", false);
     this.setFormValue(this.consignmentForm, "cnbp", true);
-
     // Done By Harikesh 
     const autoBillingConfigs = [
       { name: "cnbp", checked: true },
       { name: "cnebp", checked: false }
     ];
-
     autoBillingConfigs.forEach(config => {
       const autoBillingData = {
         eventArgs: { checked: config.checked },
@@ -635,8 +658,120 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     callback();
   }
-save(){
-  debugger
+  /*below the code is for AddNewInvoice*/
+  AddNewInvoice(){
+    const invoice=this.invoiceForm.value;
+    const req={
+      'ewayBillNo':invoice.ewayBillNo,
+      'expiryDate':moment(invoice.expiryDate).format("DD-MM-YYYY HH:MM"),
+      'oExpiryDate':invoice.expiryDate,
+      'ewayBillDate':moment(invoice.billDate).format("DD-MM-YYYY HH:MM"),
+      'oEwayBillDate':moment(invoice.ewayBillDate).format("DD-MM-YYYY HH:MM"),
+      'invoiceNumber':invoice.invoiceNo,
+      'oInvDt':invoice.invoiceDate,
+      'invDt':moment(invoice.invoiceDate).format("DD-MM-YYYY HH:MM"),
+      'cftRation':invoice.cftRatio,
+      'length':invoice.length,
+      'breadth':invoice.breadth,
+      'height':invoice.height,
+      'cubWT':invoice.cubWT,
+      'noOfPackage':invoice.noOfPackage,
+      'materialName':invoice.materialName,
+      'actualWeight':invoice.actualWeight,
+      'chargedWeight':invoice.chargedWeight,
+      "invoiceAmount":invoice.invoiceAmount,
+      'materialDensity':invoice.materialDensity,
+      'actions':["Edit", "Remove"]
+    }
+    this.tableData.push(req);
+    this.tableLoadIn=false;
+  }
+  /*below functions for autofill and remove invoice*/
+  handleMenuItemClick(data) {
+      this.fillInvoice(data);
+  }
+    fillInvoice(data: any) {
+      if (data.label.label === "Remove") {
+       this.tableData =this.tableData.filter((x) => x.id !== data.data.id);
+      } else {
+        const atLeastOneValuePresent = Object.keys(this.invoiceForm.controls)
+          .some(key => {
+            const control =this.invoiceControlArray.get(key);
+            return control && (control.value !== null && control.value !== undefined && control.value !== '');
+          });
+  
+        if (atLeastOneValuePresent) {
+          Swal.fire({
+            title: 'Are you sure?',
+            text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, proceed!',
+            cancelButtonText: 'No, cancel'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.fillInvoiceDetails(data)
+            }
+          });
+        }
+        else {
+          this.fillInvoiceDetails(data)
+        }
+      }
+      this.SetInvoiceData();
+    }
+  /*End*/
+
+   /*AutoFiill Invoice data*/
+   fillInvoiceDetails(data) {
+     // Define a mapping of form control names to their respective keys in the incoming data
+     const formFields = {
+       ewayBillNo: "ewayBillNo",
+       expiryDate: "expiryDateO",
+       invoiceNo: "invoiceNo",
+       invoiceAmount: "invoiceAmount",
+       noofPkts: "noofPkts",
+       actualWeight: "actualWeight",
+       chargedWeight: "chargedWeight"
+     };
+
+     // Loop through the defined form fields and set their values from the incoming data
+     Object.keys(formFields).forEach(field => {
+       // Set form control value to the data property if available, otherwise set it to an empty string
+       this.invoiceForm.controls[field].setValue(data.data?.[formFields[field]] || "");
+     });
+     this.invoiceForm.controls['materialName'].setValue({name:data.data['materialName'],value:data.data['materialName']})
+     // Filter the invoiceData to exclude the entry with the provided data ID
+     this.tableData = this.tableData.filter(x => x.id !== data.data.id);
+   }
+   /*End*/
+   SetInvoiceData() {
+    this.InvoiceDetailsList = [
+      {
+        count: this.tableData.reduce((acc, invoiceAmount) => parseFloat(acc) + parseFloat(invoiceAmount['invoiceAmount']), 0),
+        title: "Invoice Amount",
+        class: `color-Ocean-danger`,
+      },
+      {
+        count: this.tableData.reduce((acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noofPkts']), 0),
+        title: "No of Pkts",
+        class: `color-Success-light`,
+      },
+      {
+        count: this.tableData.reduce((acc, actualWeight) => parseFloat(acc) + parseFloat(actualWeight['actualWeight']), 0),
+        title: "Actual Weight",
+        class: `color-Success-light`,
+      },
+      {
+        count: this.tableData.reduce((acc, chargedWeight) => parseFloat(acc) + parseFloat(chargedWeight['chargedWeight']), 0),
+        title: "Charged weight",
+        class: `color-Success-light`,
+      }
+    ]
+  }
+  save(){
   const data={...this.consignmentForm.value,...this.invoiceForm.value,...this.freightForm.value}
   console.log(data);
 }

@@ -1063,6 +1063,15 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
+    async checkPrLrNoExistLTL(filter) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets",
+            filter: filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
+        return res.data.length > 0 ? true : false;
+    }
     async getdocketOne(filter){
         const req={
             companyCode:this.storage.companyCode,

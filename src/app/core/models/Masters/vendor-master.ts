@@ -1,3 +1,5 @@
+import { finYear } from "src/app/Utility/date/date-utils";
+
 export class VendorMaster {
   vendorCode: string;
   vendorName: any;
@@ -15,6 +17,7 @@ export class VendorMaster {
   vendorAdvance: any;
   validUpto: any;
   vendorType: string;
+  vendorTypeName: string;
   city: string;
   upiId: string;
   uCC: string;
@@ -57,6 +60,7 @@ export class VendorMaster {
   isGSTregistered: boolean;
   otherdetails: any;
   vendorManager: string;
+  companyCode: number;
   constructor(VendorMaster) {
     {
       this.vendorCode = VendorMaster.vendorCode || "System Genrated";
@@ -81,7 +85,7 @@ export class VendorMaster {
       this.lowTDSLimit = VendorMaster.lowTDSLimit || "";
       this.effectiveFrom = VendorMaster.effectiveFrom || "";
       this.dateofFilling = VendorMaster.dateofFilling || "";
-      this.financialYear = VendorMaster.financialYear || "";
+      this.financialYear = VendorMaster.financialYear || finYear;
       this.vendorAdvance = VendorMaster.vendorAdvance || "";
       this.validUpto = VendorMaster.validUpto || "";
       this.vendorType = VendorMaster.vendorType || "";
@@ -115,6 +119,8 @@ export class VendorMaster {
       this.gstPincode = VendorMaster.gstPincode || "";
       this.otherdetails = VendorMaster.otherdetails || "";
       this.vendorManager = VendorMaster.vendorManager || "";
+      this.companyCode = VendorMaster.companyCode || parseInt(localStorage.getItem("companyCode"));
+
     }
   }
 }

@@ -281,7 +281,6 @@ export class ThcGenerationComponent implements OnInit {
   isLoadRail: boolean;
   isLoadInvoice: boolean;
   delChargeControl: any[];
-  marketData: any;
   balanceAmount: any;
   constructor(
     private fb: UntypedFormBuilder,

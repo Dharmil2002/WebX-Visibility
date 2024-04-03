@@ -117,8 +117,8 @@ export class DocketListComponent implements OnInit {
 
   async getShipmentDetail() {
     /*below the method to get docket Detail using service*/
-    const shipmentList = await this.thcService.getShipment(false);
-    this.tableData = await this.docketService.processShipmentList(shipmentList, this.orgBranch)
+    const shipmentList = await this.docketService.getDocketsDetails();
+    this.tableData = await this.docketService.processShipmentList(shipmentList)
     this.tableLoad = false;
     /*end*/
   }

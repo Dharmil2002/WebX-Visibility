@@ -116,13 +116,15 @@ export class ThcSummaryComponent implements OnInit {
       D$or: [
         { fCT: locData.locCity },
         { tCT: locData.locCity },
+        {vIA:{"D$in": [locData.locCity]}}
       ],
       oPSST: { D$in: [1, 2] }
     };
 
     let thcList = await this.thcService.getThcDetail(filter);
     const thcDetail = thcList.data.map((item) => {
-      const action = item.tCT.toLowerCase() === locData.locCity.toLowerCase();
+      const action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
+      (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
       if (item.eNTDT) {
         item.createOn = moment(item.eNTDT).format('DD-MM-YY HH:mm');
         item.statusAction = item?.oPSSTNM

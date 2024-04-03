@@ -46,7 +46,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
             "update": {
                 "sTS": sts,
                 "sTSNM": stsnm,
-                "oPSTS": opsts,
+                "oPSSTS": opsts,
                 "rMRK": element.remarks,
                 "pOD": element.pod,
                 "aRVTM": element.arrivalTime,

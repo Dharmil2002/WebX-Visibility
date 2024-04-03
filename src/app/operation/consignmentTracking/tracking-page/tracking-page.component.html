@@ -85,7 +85,7 @@
                         </p>
                         <p class="font-width-600">
                             <span *ngIf="item.sTSNM"
-                                [style.color]="item.sTSNM=='Booked'?'#e82':item.sTSNM=='Arrived'||item.sTSNM=='Departed'?'rgb(74, 168, 199)':item.sTSNM=='OFD'?'lightseagreen':item.sTSNM=='Delivered'?'rgb(91, 196, 91)':'rgb(123, 140, 161)'">
+                                [style.color]="item.GroupColor || rgb(123, 140, 161)">
                                 {{item.sTSNM}} :
                             </span>
                             {{item.oPSSTS}}
@@ -129,8 +129,8 @@
                             Movement:
                         </p>
                         <p class="font-width-600" style="display: flex; align-items: center;">
-                            {{item.oRGN}} <mat-icon *ngIf="item.oRGN && item.dEST" style="color: rgba(0,0,0,0.3);"
-                                fontIcon="arrow_forward"></mat-icon> {{item.dEST}}
+                            {{item.MoveFrom}} <mat-icon *ngIf="item.MoveFrom && item.MoveTo" style="color: rgba(0,0,0,0.3);"
+                                fontIcon="arrow_forward"></mat-icon> {{item.MoveTo}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 25%; ">

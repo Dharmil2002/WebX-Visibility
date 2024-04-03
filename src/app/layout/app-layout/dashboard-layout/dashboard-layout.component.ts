@@ -20,9 +20,12 @@ export class DashboardLayoutComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    var selectedBgColor = "blue";
+    const selectedBgColor = "blue";    
     this.renderer.addClass(this.document.body, "theme-" + selectedBgColor);
     localStorage.setItem("choose_skin", "theme-" + selectedBgColor);
     localStorage.setItem("choose_skin_active", selectedBgColor);
+    localStorage.setItem("menuOption", "menu_dark");
+    localStorage.setItem("choose_logoheader", "logo-black");
+    
   }
 }

@@ -368,10 +368,14 @@ export class ProductChargesComponent implements OnInit {
   }
 
   async handleSelectCharges() {
+    
     if (this.isUpdate) {
       if (this.customerTableForm.value.SelectCharges.name == this.UpdatedData.sELCHA) {
         return;
       }
+    }
+    else{
+      this.customerTableForm.controls['ChargesCode'].setValue(this.customerTableForm.value.SelectCharges.value)
     }
 
     const req = {

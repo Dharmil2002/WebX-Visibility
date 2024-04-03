@@ -23,7 +23,6 @@ export class ActiveSeriesComponent implements OnInit {
   filterColumn: boolean = true;
   allColumnFilter: any;
   toggleArray = []
-  menuItems = []
   METADATA = {
     // checkBoxRequired: true,
     // selectAllorRenderedData: false,
@@ -87,15 +86,29 @@ export class ActiveSeriesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "",//max-width:90px
     },
-    action: {
+    actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
       Style: "",//max-width:90px
     },
   };
-
   staticField = [ "tYP", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
+  menuItemflag: boolean = true;
+  menuItems = [
+    { label: "Allocate", route:"/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "1" },
+    { label: "Split", route: "/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "4" },
+    { label: "Reallocate", route: "/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "4" },
+    { label: "Assign", route: "/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "4" },
+    { label: "Void", route: "/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "4" }
+  ];
 
+  statusActions = {
+    "1": ["Allocate","Split"],
+    "2":["Assign","Reallocate","Split"],
+    "3": ["Assign","Reallocate","Split"],
+    "4": ["Reallocate","Void"],
+    default: [""],
+  };
   constructor(private Route: Router,
     private masterService: MasterService,
     private http: HttpClient) { }
@@ -138,7 +151,7 @@ export class ActiveSeriesComponent implements OnInit {
             return {
               ...obj,
               tYP: typeName,// Replace document type with its name
-              action: DcrAction[obj.sTS].replace("_", " "),
+              actions: this.statusActions[`${obj.sTS}`] || this.statusActions.default,
               eNTDT: formatDocketDate(obj.eNTDT)
             };
           });
@@ -148,7 +161,15 @@ export class ActiveSeriesComponent implements OnInit {
           this.tableLoad = false;
         }
   }
-
+  async handleMenuItemClick(data) {
+    if(data.label.route){
+    this.Route.navigate([data.label.route], {
+      state: {
+        data: {data:data.data,label:data.label.label},
+      },
+    });
+  }
+  }
   // AddNew(){
   //   this.Route.navigateByUrl("/Masters/AccountMaster/AddAccountGroup");
   // }

@@ -7,12 +7,13 @@ import {
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { Observable } from "rxjs";
+import { Observable, firstValueFrom } from "rxjs";
 import { CustomFilterPipe } from "src/app/Utility/Custom Pipe/FilterPipe";
 import { StorageService } from "src/app/core/service/storage.service";
 import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
 import { Router } from "@angular/router";
 import { extractUniqueValues } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Component({
   selector: "app-report-dashboard",
@@ -38,10 +39,11 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private storage: StorageService,
     private menuService: MenuService,
+    private masterService: MasterService,
     private router: Router) {}
 
-  ngOnInit(): void {
-    const res = this.GetReports();
+  async ngOnInit(): Promise<void> {
+    const res = await this.GetReports();
     this.ReportData = res.reports;
     this.menuData = res.menu;
     this.DashboardData = res.dashboards;
@@ -55,7 +57,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     this.dashboardObs = this.dashboardDataSource.connect();
   }
 
-  GetReports() {
+  async GetReports() {
     let menu = JSON.parse( this.storage.menu);
     let menuItems = menu.filter((x) => x.MenuGroup == "ANALYTICS" && x.HasLink);
 
@@ -68,7 +70,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
       return d;
     });
     catData.unshift({ title: "All", category: "All", selected: true});
-    
+ 
     let reportData = menuItems.filter(f => f.Category == "Reports").map((x) => {
       const d = {
           iconName: x.Icon || "sticky_note_2",
@@ -90,10 +92,27 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
           type: x.Category,
           route: x.MenuLink,
           bgColor: x.Color || "#1a3e84",
-          color: x.TextColor || "#ffffff"
+          color: x.TextColor || "#ffffff",
+          data: []
       };
       return d;
     });
+
+    var ctData = await this.getConfig();
+    console.log(ctData);
+    if (ctData) {
+      const c = {
+          iconName:  "map",
+          title: ctData.title,
+          category: "Operation",
+          type: "Dashboards",
+          route: ctData.link,
+          bgColor: "#6bc0dd",
+          color: "#3c414d",
+          data: []
+      };
+      dashboardData.unshift(c);
+    }
 
     let menuData = catData.reduce((acc, current) => {
       if (!acc.find(item => item.title === current.title)) {
@@ -103,6 +122,30 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     }, []);
 
     return  { reports: reportData, menu: menuData, dashboards: dashboardData};
+  }
+
+  async getConfig() {
+    
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dashboard_config",
+      filter: { cID: this.storage.companyCode, lTYP: "Login" },
+    };
+
+    let dashConfig = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+    if (dashConfig?.data?.length > 0) {
+      let LoginLink = dashConfig?.data?.find((f) => f?.lTYP == "Login");
+      if (LoginLink?.link && LoginLink?.link != "") {
+        let link = `${LoginLink.link}&CustomerId=${LoginLink.lCD}&VirtualLocation=${this.storage.branch}`;
+        const data = {
+          link: link,
+          icon: `/assets/images/dashboard/${LoginLink.icon}`,
+          title: LoginLink.title,
+        };
+        return data;
+      }
+    }
+    return null;
   }
 
   ngOnDestroy() {
@@ -121,8 +164,11 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
   }
 
   OpenDashboards(event) {
-    //this.router.navigate([event.route]);
-    window.open(`/#${event.route}`, '_blank');  
+    if(event.route.startsWith("http")){
+      window.open(event.route);  
+    } else {
+      window.open(`/#${event.route}`, '_blank');  
+    }
   }
 
   onCategoryChange(event) {

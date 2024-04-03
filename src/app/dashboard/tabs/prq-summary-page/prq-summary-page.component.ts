@@ -36,6 +36,15 @@ export class PrqSummaryPageComponent implements OnInit {
   addAndEditPath: string;
   tableData: any[];
   linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
+  menuItems = [
+    { label: "Confirm", route: null, tabIndex: 6, status: "1" },
+    { label: "Reject", route: null, tabIndex: 6, status: "5" },
+    { label: "Assign Vehicle", route: "/Operation/AssignVehicle" },
+    { label: "Add Docket", route: "/Operation/ConsignmentEntry" },
+    { label: "Modify", route: "/Operation/PRQEntry" },
+    { label: "Create THC", route: "/Operation/thc-create" },
+  ];
+
   boxData: { count: number; title: string; class: string }[];
   allPrq: any;
   constructor(

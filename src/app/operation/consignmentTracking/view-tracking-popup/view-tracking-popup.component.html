@@ -7,11 +7,10 @@
             <mat-icon>close</mat-icon>
         </button>
     </div>
-    <div >
+    <div>
         <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="TableData" (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'Tracking List'"
-        [staticField]="staticField">
-    </app-generic-table-v2>
-</div>
-
+            [tableData]="TableData" (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="FormTitle"
+            [staticField]="staticField">
+        </app-generic-table-v2>
+    </div>
 </div>

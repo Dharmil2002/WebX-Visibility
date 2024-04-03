@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
+import { CustomerMasterUploadComponent } from '../customer-master-upload/customer-master-upload.component';
 @Component({
   selector: 'app-customer-master-list',
   templateUrl: './customer-master-list.component.html',
@@ -22,30 +24,30 @@ export class CustomerMasterListComponent implements OnInit {
   };
 
   headerForCsv = {
-  "companyCode": "companyCode",
-  "updatedDate": "Created Date",
-  "customerCode": "Customer Code",
-  "customerGroup": "Customer Group",
-  "customerName": "Customer Name",
-  "CustomerCategory": "Customer Category",
-  "customerLocations": "Customer Locations",
-  "Customer_Emails": "Customer E-mails",
-  "ERPcode": "ERP code",
-  "PANnumber": "PAN No",
-  "CINnumber": "CIN number",
-  "RegisteredAddress":"Registered Address",
-  "PinCode": "Pin Code",
-  "city": "City",
-  "state": "State",
-  "Country": "Country",
-  "MSMENumber":"MSME Number",
-  "gstNo": "GST Number",
-  "gstState":"GST State",
-  "gstPinCode":"GST Pin Code",
-  "gstCity":"GST City",
-  "gstAddres": "GST Address",
-  "BlackListed": "Black Listed",
-  "activeFlag":"Active Status",
+    "companyCode": "companyCode",
+    "updatedDate": "Created Date",
+    "customerCode": "Customer Code",
+    "customerGroup": "Customer Group",
+    "customerName": "Customer Name",
+    "CustomerCategory": "Customer Category",
+    "customerLocations": "Customer Locations",
+    "Customer_Emails": "Customer E-mails",
+    "ERPcode": "ERP code",
+    "PANnumber": "PAN No",
+    "CINnumber": "CIN number",
+    "RegisteredAddress": "Registered Address",
+    "PinCode": "Pin Code",
+    "city": "City",
+    "state": "State",
+    "Country": "Country",
+    "MSMENumber": "MSME Number",
+    "gstNo": "GST Number",
+    "gstState": "GST State",
+    "gstPinCode": "GST Pin Code",
+    "gstCity": "GST City",
+    "gstAddres": "GST Address",
+    "BlackListed": "Black Listed",
+    "activeFlag": "Active Status",
   }
 
   breadScrums = [
@@ -65,7 +67,10 @@ export class CustomerMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
-  constructor(private masterService: MasterService) {
+  uploadComponent = CustomerMasterUploadComponent;
+  constructor(private masterService: MasterService,
+    private dialog: MatDialog,
+  ) {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
 
@@ -138,4 +143,15 @@ export class CustomerMasterListComponent implements OnInit {
       }
     });
   }
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getCustomerDetails();
+    });
+  }
+  //#endregion
 }

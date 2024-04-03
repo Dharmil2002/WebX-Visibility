@@ -20,7 +20,6 @@ import Swal from 'sweetalert2';
 })
 export class UploadLocationComponent implements OnInit {
   fileUploadForm: UntypedFormGroup;
-  CurrentContractDetails: any;
   routeList: any[];
   rateTypeDropDown: any;
   mergedCapacity: any[];

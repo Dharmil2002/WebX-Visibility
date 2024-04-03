@@ -696,7 +696,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       } else {
         const atLeastOneValuePresent = Object.keys(this.invoiceForm.controls)
           .some(key => {
-            const control =this.invoiceControlArray.get(key);
+            const control =this.invoiceForm.get(key);
             return control && (control.value !== null && control.value !== undefined && control.value !== '');
           });
   

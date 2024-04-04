@@ -36,7 +36,7 @@ export class ActiveSeriesComponent implements OnInit {
   documentWithType: any[] = [];
   jsonUrl = '../../../assets/data/state-countryDropdown.json'
   columnHeader = {
-    tYP: {
+    tYPNM: {
       Title: "Document",
       class: "matcolumncenter",
       Style: "",//min-width:15%
@@ -92,7 +92,7 @@ export class ActiveSeriesComponent implements OnInit {
       Style: "",//max-width:90px
     },
   };
-  staticField = [ "tYP", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
+  staticField = [ "tYPNM", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
   menuItemflag: boolean = true;
   menuItems = [
     { label: "Allocate", route:"/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "1" },
@@ -150,7 +150,7 @@ export class ActiveSeriesComponent implements OnInit {
             const typeName = this.documentWithType.find(type => type.value === obj.tYP)?.name || obj.tYP;
             return {
               ...obj,
-              tYP: typeName,// Replace document type with its name
+              tYPNM: typeName,// Replace document type with its name
               actions: this.statusActions[`${obj.sTS}`] || this.statusActions.default,
               eNTDT: formatDocketDate(obj.eNTDT)
             };

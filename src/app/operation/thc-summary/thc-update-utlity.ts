@@ -46,7 +46,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
             "update": {
                 "sTS": sts,
                 "sTSNM": stsnm,
-                "oPSTS": opsts,
+                "oPSSTS": opsts,
                 "rMRK": element.remarks,
                 "pOD": element.pod,
                 "aRVTM": element.arrivalTime,
@@ -65,7 +65,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
             "companyCode": localStorage.getItem('companyCode'),
             "collectionName": "docket_events",
             "data": {
-                "_id": `${localStorage.getItem('companyCode')}-${element.docNo}-${element.sFX}-${element.cNO}-${eventId}-${element.arrivalTime}`,
+                "_id": `${localStorage.getItem('companyCode')}-${element.docNo}-${element.sFX}-${element.cNO}-${eventId}-${moment(element?.arrivalTime||new Date()).format('YYYYMMDD-HHmmss')}`,
                 "cID": localStorage.getItem('companyCode'),
                 "dKTNO": element.docNo,
                 "sFX": element.sFX || 0,
@@ -77,7 +77,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "eVNSRC": "THC Arrival",
                 "nLOC": null,
                 "dOCTY": "",
-                "dOCNO": "",
+                "dOCNO":tripId,
                 "eTA": null,
                 "sTS": sts,
                 "sTSNM": stsnm,

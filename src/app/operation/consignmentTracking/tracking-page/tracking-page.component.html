@@ -72,7 +72,7 @@
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>EDD:</p>
-                            <p class="font-width-600" style="color: red;">{{item.sTSTM | date: "dd-MM-YYYY"}}</p>
+                            <p class="font-width-600" style="color: red;">{{item.sTSTM | date: "dd-MMM-YYYY"}}</p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>ATD:</p>
@@ -84,7 +84,8 @@
                             Status:
                         </p>
                         <p class="font-width-600">
-                            <span *ngIf="item.sTSNM" style="color: #e82;">
+                            <span *ngIf="item.sTSNM"
+                                [style.color]="item.GroupColor || rgb(123, 140, 161)">
                                 {{item.sTSNM}} :
                             </span>
                             {{item.oPSSTS}}
@@ -98,7 +99,7 @@
                             <mat-icon *ngIf="item.docketData.dKTDT"
                                 style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color: rgb(0, 146, 0);"
                                 fontIcon="verified"></mat-icon>
-                            {{item.docketData.dKTDT | date: "dd-MM-YYYY"}}
+                            {{item.docketData.dKTDT | date: "dd-MMM-YYYY"}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 15%; text-align: center; ">
@@ -128,8 +129,8 @@
                             Movement:
                         </p>
                         <p class="font-width-600" style="display: flex; align-items: center;">
-                            {{item.oRGN}} <mat-icon *ngIf="item.oRGN && item.dEST" style="color: rgba(0,0,0,0.3);"
-                                fontIcon="arrow_forward"></mat-icon> {{item.dEST}}
+                            {{item.MoveFrom}} <mat-icon *ngIf="item.MoveFrom && item.MoveTo" style="color: rgba(0,0,0,0.3);"
+                                fontIcon="arrow_forward"></mat-icon> {{item.MoveTo}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 25%; ">

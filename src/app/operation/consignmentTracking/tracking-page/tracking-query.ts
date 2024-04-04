@@ -23,7 +23,7 @@ export const GetTrakingDataPipeLine = () => {
           Consignee: {
             D$concat: [
               {
-                D$toString: "$docketData.cSGECD",
+                D$ifNull: [ { D$toString: "$docketData.cSGECD" }, ""],
               },
               " : ",
               "$docketData.cSGENM",
@@ -32,7 +32,7 @@ export const GetTrakingDataPipeLine = () => {
           Consignor: {
             D$concat: [
               {
-                D$toString: "$docketData.cSGNCD",
+                D$ifNull: [ { D$toString: "$docketData.cSGNCD" }, ""],
               },
               " : ",
               "$docketData.cSGNNM",
@@ -48,6 +48,44 @@ export const GetTrakingDataPipeLine = () => {
           as: "DocketTrackingData",
         },
       },
+      {
+        D$addFields: {
+          MoveFrom: "$docketData.fCT",
+          MoveTo: "$docketData.tCT",
+          GroupId: {
+            D$switch: {
+              branches: [
+                {
+                  case: {
+                    D$in: ["$sTS", [1]],
+                  },
+                  then: 1,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [2]],
+                  },
+                  then: 2,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [4]],
+                  },
+                  then: 3,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [3]],
+                  },
+                  then: 5,
+                },
+              ],
+              default: 0,
+            },
+          },
+        },
+      },
+      
     ];
   } else {
     return [
@@ -72,7 +110,7 @@ export const GetTrakingDataPipeLine = () => {
           Consignee: {
             D$concat: [
               {
-                D$toString: "$docketData.cSGE.cD",
+                D$ifNull: [ { D$toString: "$docketData.cSGE.cD" }, ""],
               },
               " : ",
               "$docketData.cSGE.nM",
@@ -81,7 +119,7 @@ export const GetTrakingDataPipeLine = () => {
           Consignor: {
             D$concat: [
               {
-                D$toString: "$docketData.cSGN.cD",
+                D$ifNull: [ { D$toString: "$docketData.cSGN.cD" }, ""],
               },
               " : ",
               "$docketData.cSGN.nM",
@@ -95,6 +133,110 @@ export const GetTrakingDataPipeLine = () => {
           localField: "dKTNO",
           foreignField: "dKTNO",
           as: "DocketTrackingData",
+        },
+      },
+      {
+        D$addFields: {
+          MoveFrom: "$docketData.oRGN",
+          MoveTo: "$docketData.dEST",
+          GroupId: {
+            D$switch: {
+              branches: [
+                {
+                  case: {
+                    D$in: ["$sTS", [0, 1]],
+                  },
+                  then: 1,
+                },
+                {
+                  case: {
+                    D$and: [
+                      {
+                        D$in: ["$sTS", [2, 3]],
+                      },
+                      {
+                        D$eq: ["$cLOC", "$oRGN"],
+                      },
+                    ],
+                  },
+                  then: 1,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [4]],
+                  },
+                  then: 2,
+                },
+                {
+                  case: {
+                    D$and: [
+                      {
+                        D$in: ["$sTS", [5]],
+                      },
+                      {
+                        D$ne: ["$cLOC", "$dEST"],
+                      },
+                    ],
+                  },
+                  then: 3,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [6]],
+                  },
+                  then: 3,
+                },
+                {
+                  case: {
+                    D$and: [
+                      {
+                        D$in: ["$sTS", [2, 3]],
+                      },
+                      {
+                        D$ne: ["$cLOC", "$oRG"],
+                      },
+                      {
+                        D$ne: ["$cLOC", "$dEST"],
+                      },
+                    ],
+                  },
+                  then: 3,
+                },
+                {
+                  case: {
+                    D$and: [
+                      {
+                        D$in: ["$sTS", [5]],
+                      },
+                      {
+                        D$eq: ["$cLOC", "$dEST"],
+                      },
+                    ],
+                  },
+                  then: 3,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [7, 8, 11]],
+                  },
+                  then: 3,
+                },
+                {
+                  case: {
+                    D$eq: ["$sTS", 9],
+                  },
+                  then: 4,
+                },
+                {
+                  case: {
+                    D$in: ["$sTS", [10, 13]],
+                  },
+                  then: 5,
+                },
+              ],
+              default: 0,
+            },
+          },
         },
       },
     ];

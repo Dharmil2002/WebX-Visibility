@@ -15,7 +15,7 @@
                             formControlName="Branch">
                         <mat-autocomplete #autobranch="matAutocomplete" [displayWith]="displayBranch">
                             <mat-option *ngFor="let option of filteredBranch | async" [value]="option">
-                                {{ option.locCode }}
+                                {{ option.location }}
                             </mat-option>
                         </mat-autocomplete>
                     </mat-form-field>

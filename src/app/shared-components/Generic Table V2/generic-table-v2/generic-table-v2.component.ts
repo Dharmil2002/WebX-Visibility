@@ -62,11 +62,14 @@ export class GenericTableV2Component
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
   @Input() showHeader: boolean = true;
+  @Input() showPaginator: boolean = true;
   @Input() DisplayAddNewButton: boolean = false;
   @Input() DisplaySaveButton: boolean = false;
   @Input() DisplayCheckbox: boolean = false;
   @Input() staticField = [];
   @Input() allColumnFilter = [];
+  @Input() pageSize = 10;
+  @Input() pageSizeOptions = [5, 10, 25, 100];
   @Input() onFlagChangeGetAll: boolean = false;
   triggered: boolean = false;
   objectKeys = Object.keys;
@@ -109,6 +112,7 @@ export class GenericTableV2Component
     private genericService: GenericService,
   ) {
     super();
+    this.showPaginator = this.showHeader;
   }
 
   ngOnInit() {
@@ -134,7 +138,10 @@ export class GenericTableV2Component
   ngAfterViewInit() {
     this.loadData();
     this.dataSource = new MatTableDataSource<any>(this.tableData);
-    this.dataSource.paginator = this.paginator;
+
+    if(this.showPaginator){
+      this.dataSource.paginator = this.paginator;
+    }
     this.dataSource.sort = this.sort;
   }
 
@@ -162,7 +169,9 @@ export class GenericTableV2Component
   loadData() {
     this.dataSource = new MatTableDataSource(this.tableData);
     this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+   if(this.showPaginator){
+      this.dataSource.paginator = this.paginator;
+    }
     if (this.filter) {
       this.subs.sink = fromEvent(this.filter.nativeElement, "keyup").subscribe(
         () => {

@@ -5,6 +5,8 @@ import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
+import { MatDialog } from "@angular/material/dialog";
+import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-master-upload.component";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -78,10 +80,12 @@ export class VendorMasterListComponent implements OnInit {
   linkArray = []
   addAndEditPath: string;
   viewComponent: any;
+  uploadComponent = VendorMasterUploadComponent
   constructor(
     private masterService: MasterService,
-    private storage:StorageService
-    ) {
+    private storage: StorageService,
+    private dialog: MatDialog
+  ) {
     this.addAndEditPath = "/Masters/VendorMaster/AddVendorMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -94,7 +98,7 @@ export class VendorMasterListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vendor_detail",
-      "filter": {companyCode:this.storage.companyCode}
+      "filter": { companyCode: this.storage.companyCode }
     }
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res) {
@@ -146,4 +150,15 @@ export class VendorMasterListComponent implements OnInit {
       this.getVendorDetails();
     }
   }
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getVendorDetails();
+    });
+  }
+  //#endregion
 }

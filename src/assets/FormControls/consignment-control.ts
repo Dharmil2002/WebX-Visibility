@@ -331,6 +331,7 @@ export class ConsignmentControl {
       {
         name: 'pr_lr_no', label: 'PR LR No', placeholder: 'Printed LR No ', type: 'text',
         value: docketDetail.pr_lr_no, Validations: [], generatecontrol: true, disable: false,
+        functions: { onChange: "checkPrLR" },
         additionalData: {
           metaData: "Basic",
         },

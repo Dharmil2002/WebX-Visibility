@@ -12,6 +12,7 @@ import { MenuData } from "src/app/layout/sidebar/sidebar.metadata";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { mn } from "date-fns/locale";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 
 @Component({
   selector: "app-signin",
@@ -40,7 +41,8 @@ export class SigninComponent
     private sanitizer: DomSanitizer,
     private storage: StorageService,
     private menuService: MenuService,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private locationService: LocationService
   ) {
     super();
   }
@@ -87,10 +89,12 @@ export class SigninComponent
             if (token) {
               this.Islogin = true;
               const companyDetail = await this.authService.getCompanyDetail();
+              
               await this.controlPanel.getDocumentNames(companyDetail.companyCode);
               this.DocCalledAs = this.controlPanel.DocCalledAs;
               await this.getMenuList();
 
+              //userLocations
               this.storage.setItem("companyLogo",companyDetail.company_Image);
               this.storage.setItem("company_Code",companyDetail.company_Code);
               this.storage.setItem("timeZone",companyDetail?.timeZone||"");

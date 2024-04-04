@@ -5,7 +5,7 @@ import { UntypedFormBuilder } from "@angular/forms";
 import moment from "moment";
 import { Router } from "@angular/router";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Component({
   selector: "app-query-page",
@@ -23,8 +23,23 @@ export class QueryPageComponent implements OnInit {
   ConsignmentQueryForm: any;
   DocTypeStatus: any;
   DocTypeCode: any;
-    
-    constructor(private fb: UntypedFormBuilder, private Route: Router, private filter: FilterUtils,) {}
+  DocCalledAs: any;
+
+  constructor(
+    private fb: UntypedFormBuilder,
+    private Route: Router,
+    private filter: FilterUtils,
+    private controlPanel: ControlPanelService
+  ) {
+    this.DocCalledAs = this.controlPanel.DocCalledAs;
+    this.breadscrums = [
+      {
+        title: `${this.DocCalledAs.Docket} Tracking`,
+        items: ["Home"],
+        active: `${this.DocCalledAs.Docket} Tracking`,
+      }
+    ]
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -78,12 +93,12 @@ export class QueryPageComponent implements OnInit {
       end: moment(end).isValid() ? new Date(end) : undefined,
     };
     var url;
-    switch(this.ConsignmentQueryForm.value.DocType.value) {
+    switch (this.ConsignmentQueryForm.value.DocType.value) {
       case "CNote":
-        url = "Operation/ConsignmentTracking"
+        url = "Operation/ConsignmentTracking";
         break;
       default:
-        // code block
+      // code block
     }
     this.Route.navigate([url], {
       state: { data: QueryJson },

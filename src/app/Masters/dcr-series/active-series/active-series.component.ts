@@ -126,11 +126,17 @@ export class ActiveSeriesComponent implements OnInit {
     this.getDCRDetails();
   }
 
-  loadDocumentWithType() {
-    this.http.get<any>(this.jsonUrl).subscribe(
-      data => this.documentWithType = data.documentTypeDropDown,
-      error => console.error('Error loading documentWithType:', error)
-    );
+
+  async loadDocumentWithType() {
+    try {
+      const data = await firstValueFrom(this.http.get<any>(this.jsonUrl));
+      if (data && data.documentTypeDropDown) {
+        this.documentWithType = data.documentTypeDropDown;
+      }
+    } catch (error) {
+      console.error('Error loading documentWithType:', error);
+      // Handle errors here
+    }
   }
 
   async getDCRDetails() {

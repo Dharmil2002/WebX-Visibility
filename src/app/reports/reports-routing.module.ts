@@ -22,6 +22,7 @@ import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/p
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 import { StockReportComponent } from './stock-report/stock-report.component';
+import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
 
 
 const routes: Routes = [
@@ -43,8 +44,9 @@ const routes: Routes = [
   { path: "AccountReport/ProfitAndLossview", component: ProfitAndLossViewComponent },
   { path: "AccountReport/ProfitAndLossviewdetails", component: ProfitAndLossViewDetailsComponent },
   { path: "Dashboard", component: DashboardComponent },
-  { path: "ControlTower", component: ControlTowerDashboardComponent }, 
-  { path: "stock-report", component: StockReportComponent } 
+  { path: "ControlTower", component: ControlTowerDashboardComponent },
+  { path: "stock-report", component: StockReportComponent },
+  { path: "DCRRegister", component: DcrRegisterComponent }
 
 ];
 

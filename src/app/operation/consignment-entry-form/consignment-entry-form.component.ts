@@ -358,7 +358,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }
     callback();
   }
-
   async bindDataFromDropdown() {
 
     const locDetails = await this.locationService.locationFromApi({ locCode: this.storage.branch });
@@ -408,7 +407,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.prqFlag && await this.prqDetail();
 
   }
-
   async getPrqDetails() {
     const prqNo = await this.prqService.getPrqForBooking(
       this.storage.branch,

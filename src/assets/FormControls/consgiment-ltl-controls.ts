@@ -722,8 +722,8 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "breadth",
-                label: "breadth",
-                placeholder: "breadth",
+                label: "Breadth",
+                placeholder: "Breadth",
                 type: "number",
                 value: "",
                 filterOptions: "",
@@ -742,8 +742,8 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "height",
-                label: "height",
-                placeholder: "height",
+                label: "Height",
+                placeholder: "Height",
                 type: "number",
                 value: "",
                 filterOptions: "",

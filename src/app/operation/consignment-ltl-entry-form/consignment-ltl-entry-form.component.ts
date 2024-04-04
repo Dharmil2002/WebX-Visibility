@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
@@ -35,7 +35,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   prqFlag: boolean;
   quickDocket: boolean;
   backPath: string;
-  linkArray=[];
+  linkArray = [];
   consigmentControls: ConsignmentLtl;
   allFormControls: FormControls[];
   basicFormControls: FormControls[];
@@ -57,8 +57,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   wtUnits: AutoComplete[];
   pinCodeLoc: any;
   allInvoiceControls: FormControls[];
-  tableLoadIn:boolean=true;
-  menuItemflag=true;
+  tableLoadIn: boolean = true;
+  menuItemflag = true;
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
   InvoiceDetailsList: { count: any; title: string; class: string }[];
   dynamicControls = {
@@ -154,7 +154,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       Style: "max-width:150px",
     },
   };
-  staticFieldInvoice=[
+  staticFieldInvoice = [
     'ewayBillNo',
     'expiryDate',
     'ewayBillDate',
@@ -173,7 +173,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     'materialDensity',
   ]
 
-  tableData=[];
+  tableData = [];
   MatButton = {
     functionName: "viewInfo",
     name: "Other Info",
@@ -186,6 +186,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   };
   rateTypes: AutoComplete[];
   prqData: any;
+  loadIn: boolean=false;
   constructor(
     private controlPanel: ControlPanelService,
     private prqService: PrqService,
@@ -197,9 +198,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private customerService: CustomerService,
-    private addressService:AddressService,
+    private addressService: AddressService,
     private vehicleStatusService: VehicleStatusService,
-    private docketService:DocketService,
+    private docketService: DocketService,
     public dialog: MatDialog
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -375,11 +376,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   //#endregion
   /*below function is call when the prq based data we required*/
   async getPrqDetail() {
-    const filter= {
-      cID:this.storage.companyCode,
+    const filter = {
+      cID: this.storage.companyCode,
       bRCD: this.storage.branch,
       pRQNO: { 'D$regex': `^${this.consignmentForm.controls.prqNo.value}`, 'D$options': 'i' },
-     }
+    }
     const prqNo = await this.prqService.getPrqDetail(filter);
     this.prqNoDetail = prqNo.tableData;
     const prqDetail = prqNo.allPrqDetail.map((x) => ({
@@ -483,10 +484,21 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*below function is volumetric function*/
   getVolControls(event) {
     const volumeValue = this.consignmentForm.controls['f_vol'].value;
+    const controls=[ 
+      "cftRatio",
+      "length",
+      "breadth",
+      "height"
+    ]
+    controls.forEach(control => {
+      this.consignmentForm.controls[control].setValidators([Validators.required]);
+      this.consignmentForm.controls[control].updateValueAndValidity();
+    });
     // Use a ternary operator for concise conditional assignment.
     this.invoiceControlArray = volumeValue
       ? this.allInvoiceControls
       : this.allInvoiceControls.filter(control => control.additionalData.metaData === "invoiceDetail");
+      
   }
   /*End*/
   ViewCharge() {
@@ -607,12 +619,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       false
     );
   }
- 
+
   prqSelection() {
     this.prqData = this.prqNoDetail.find(
       (x) => x.prqNo == this.consignmentForm.controls["prqNo"].value.value
     );
-   this.prqDetail();
+    this.prqDetail();
   }
   async prqDetail() {
     let billingParty = { name: this.prqData?.billingParty, value: this.prqData?.billingPartyCode };
@@ -659,95 +671,116 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     callback();
   }
   /*below the code is for AddNewInvoice*/
-  AddNewInvoice(){
-    const invoice=this.invoiceForm.value;
-    const req={
-      'ewayBillNo':invoice.ewayBillNo,
-      'expiryDate':moment(invoice.expiryDate).format("DD-MM-YYYY HH:MM"),
-      'oExpiryDate':invoice.expiryDate,
-      'ewayBillDate':moment(invoice.billDate).format("DD-MM-YYYY HH:MM"),
-      'oEwayBillDate':moment(invoice.ewayBillDate).format("DD-MM-YYYY HH:MM"),
-      'invoiceNumber':invoice.invoiceNo,
-      'oInvDt':invoice.invoiceDate,
-      'invDt':moment(invoice.invoiceDate).format("DD-MM-YYYY HH:MM"),
-      'cftRation':invoice.cftRatio,
-      'length':invoice.length,
-      'breadth':invoice.breadth,
-      'height':invoice.height,
-      'cubWT':invoice.cubWT,
-      'noOfPackage':invoice.noOfPackage,
-      'materialName':invoice.materialName,
-      'actualWeight':invoice.actualWeight,
-      'chargedWeight':invoice.chargedWeight,
-      "invoiceAmount":invoice.invoiceAmount,
-      'materialDensity':invoice.materialDensity,
-      'actions':["Edit", "Remove"]
+  async AddNewInvoice() {
+    this.loadIn=true;
+    this.tableLoadIn=true;
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const invoice = this.invoiceForm.value;
+    const req = {
+      'ewayBillNo': invoice.ewayBillNo,
+      'expiryDate': moment(invoice.expiryDate).format("DD-MM-YYYY HH:MM"),
+      'oExpiryDate': invoice.expiryDate,
+      'ewayBillDate': moment(invoice.billDate).format("DD-MM-YYYY HH:MM"),
+      'oEwayBillDate':invoice.billDate,
+      'invoiceNumber': invoice.invoiceNo,
+      'oInvDt': invoice.invoiceDate,
+      'invDt': moment(invoice.invoiceDate).format("DD-MM-YYYY HH:MM"),
+      'cftRation': invoice.cftRatio,
+      'length': invoice.length,
+      'breadth': invoice.breadth,
+      'height': invoice.height,
+      'cubWT': invoice.cubWT,
+      'noOfPackage': invoice.noOfPackage,
+      'materialName': invoice.materialName,
+      'actualWeight': invoice.actualWeight,
+      'chargedWeight': invoice.chargedWeight,
+      "invoiceAmount": invoice.invoiceAmount,
+      'materialDensity': invoice.materialDensity,
+      'actions': ["Edit", "Remove"]
     }
     this.tableData.push(req);
-    this.tableLoadIn=false;
+    this.tableLoadIn = false;
+    this.loadIn=false;
+    this.SetInvoiceData();
+    this.invoiceForm.reset();
   }
   /*below functions for autofill and remove invoice*/
   handleMenuItemClick(data) {
-      this.fillInvoice(data);
+    this.fillInvoice(data);
   }
-    fillInvoice(data: any) {
-      if (data.label.label === "Remove") {
-       this.tableData =this.tableData.filter((x) => x.id !== data.data.id);
-      } else {
-        const atLeastOneValuePresent = Object.keys(this.invoiceForm.controls)
-          .some(key => {
-            const control =this.invoiceForm.get(key);
-            return control && (control.value !== null && control.value !== undefined && control.value !== '');
-          });
-  
-        if (atLeastOneValuePresent) {
-          Swal.fire({
-            title: 'Are you sure?',
-            text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, proceed!',
-            cancelButtonText: 'No, cancel'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.fillInvoiceDetails(data)
-            }
-          });
-        }
-        else {
-          this.fillInvoiceDetails(data)
-        }
+  fillInvoice(data: any) {
+    debugger
+    if (data.label.label === "Remove") {
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    } else {
+      const atLeastOneValuePresent = Object.keys(this.invoiceForm.controls)
+        .some(key => {
+          const control = this.invoiceForm.get(key);
+          return control && (control.value !== null && control.value !== undefined && control.value !== '');
+        });
+
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, proceed!',
+          cancelButtonText: 'No, cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.fillInvoiceDetails(data)
+          }
+        });
       }
-      this.SetInvoiceData();
+      else {
+        this.fillInvoiceDetails(data)
+      }
     }
+    this.SetInvoiceData();
+  }
   /*End*/
 
-   /*AutoFiill Invoice data*/
-   fillInvoiceDetails(data) {
-     // Define a mapping of form control names to their respective keys in the incoming data
-     const formFields = {
-       ewayBillNo: "ewayBillNo",
-       expiryDate: "expiryDateO",
-       invoiceNo: "invoiceNo",
-       invoiceAmount: "invoiceAmount",
-       noofPkts: "noofPkts",
-       actualWeight: "actualWeight",
-       chargedWeight: "chargedWeight"
-     };
-
-     // Loop through the defined form fields and set their values from the incoming data
-     Object.keys(formFields).forEach(field => {
-       // Set form control value to the data property if available, otherwise set it to an empty string
-       this.invoiceForm.controls[field].setValue(data.data?.[formFields[field]] || "");
-     });
-     this.invoiceForm.controls['materialName'].setValue({name:data.data['materialName'],value:data.data['materialName']})
-     // Filter the invoiceData to exclude the entry with the provided data ID
-     this.tableData = this.tableData.filter(x => x.id !== data.data.id);
-   }
-   /*End*/
-   SetInvoiceData() {
+  /*AutoFiill Invoice data*/
+  fillInvoiceDetails(data) {
+    debugger
+    // Define a mapping of form control names to their respective keys in the incoming data
+    const formFields = {
+      'ewayBillNo':'ewayBillNo',
+      'expiryDate':'oExpiryDate',
+      'billDate':'oEwayBillDate',
+      'invoiceNo':'invoiceNumber',
+      'invoiceDate':'oInvDt',
+      'cftRatio':'cftRation',
+      'length':'length',
+      'breadth':'breadth',
+      'height':'height',
+      'cubWT':'cubWT',
+      'noOfPackage':'noOfPackage',
+      'materialName':'materialName',
+      'actualWeight':'actualWeight',
+      'chargedWeight':'chargedWeight',
+      'invoiceAmount':"invoiceAmount",
+      'materialDensity':'materialDensity',
+      
+    };
+    // Loop through the defined form fields and set their values from the incoming data
+    Object.keys(formFields).forEach(field => {
+      // Set form control value to the data property if available, otherwise set it to an empty string
+      this.invoiceForm.controls[field].setValue(data.data?.[formFields[field]] || "");
+    });
+    //this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
+    // Filter the invoiceData to exclude the entry with the provided data ID
+    this.tableData = this.tableData.filter(x => x.id !== data.data.id);
+  }
+  /*End*/
+  SetInvoiceData() {
     this.InvoiceDetailsList = [
       {
         count: this.tableData.reduce((acc, invoiceAmount) => parseFloat(acc) + parseFloat(invoiceAmount['invoiceAmount']), 0),
@@ -755,7 +788,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         class: `color-Ocean-danger`,
       },
       {
-        count: this.tableData.reduce((acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noofPkts']), 0),
+        count: this.tableData.reduce((acc, noofPkts) => parseFloat(acc) + parseFloat(noofPkts['noOfPackage']), 0),
         title: "No of Pkts",
         class: `color-Success-light`,
       },
@@ -771,8 +804,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     ]
   }
-  save(){
-  const data={...this.consignmentForm.value,...this.invoiceForm.value,...this.freightForm.value}
-  console.log(data);
-}
+  save() {
+    const data = { ...this.consignmentForm.value, ...this.invoiceForm.value, ...this.freightForm.value }
+    console.log(data);
+  }
 }

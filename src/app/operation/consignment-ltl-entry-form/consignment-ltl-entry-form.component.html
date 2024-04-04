@@ -31,6 +31,7 @@
         </app-form-webxpress>
     </form>
 </div>
+
 <div *ngIf="invoiceControlArray">
     <form [formGroup]="invoiceForm">
         <app-form-webxpress [form]="invoiceForm" [FormTitle]="'Invoice Details'"
@@ -39,6 +40,13 @@
         </app-form-webxpress>
     </form>
 </div>
+
+<div *ngIf="loadIn" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
 <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls"
 [columnHeader]="columnInvoice" [tableData]="tableData"
 (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"

@@ -16,7 +16,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 })
 export class VirtualLoginComponent implements OnInit {
 
-  userLocations = localStorage.getItem("userLocations");
+  userLocations = localStorage.getItem("loginLocations");
   VitualLoginForm: UntypedFormGroup;
   BranchDropdown: BranchDropdown[];
   filteredBranch: Observable<BranchDropdown[]>;
@@ -39,11 +39,13 @@ export class VirtualLoginComponent implements OnInit {
     });
   }
 
-  GetBranchDetails() {
-    let location = []
-    location.push(this.userLocations.split(','));
-    this.BranchDropdown = location[0].map((x) => { return { locCode: x, location: x, CountryId: 0 } })
-    this.BranchFilter()
+  async GetBranchDetails() {
+    let location = [];
+    if(this.userLocations && this.userLocations != "") {
+      location = JSON.parse(this.userLocations);
+      this.BranchDropdown = location.map((x) => { return { locCode: x.locCode, locName: x.locName, location: `${x.locCode} : ${x.locName}`, CountryId: 0 } })
+      this.BranchFilter()
+    }
   }
 
   BranchFilter() {
@@ -58,8 +60,8 @@ export class VirtualLoginComponent implements OnInit {
     );
   }
 
-  _filterBranch(Country: string): BranchDropdown[] {
-    const filterValue = Country.toLowerCase();
+  _filterBranch(term: string): BranchDropdown[] {
+    const filterValue = term.toLowerCase();
 
     return this.BranchDropdown.filter(
       (option) => option.location.toLowerCase().includes(filterValue)

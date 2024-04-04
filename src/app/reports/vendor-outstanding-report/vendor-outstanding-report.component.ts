@@ -117,6 +117,7 @@ export class VendorOutstandingReportComponent implements OnInit {
 
   CSVHeader = {
     "vendor": "Vendor",
+    "msmeRegistered" : "msmeRegistered",
     "loc": "Location",
     "openingBal": "Opening Balance",
     "totalBill": "Total Bill",
@@ -177,7 +178,7 @@ export class VendorOutstandingReportComponent implements OnInit {
       name:x.name
     }}
     )
-    const venNameDet =venNameRes.data 
+    const venNameDet =venNameRes.data
       .map(element => ({
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),

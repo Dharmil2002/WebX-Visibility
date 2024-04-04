@@ -60,6 +60,7 @@ import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/p
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 import { StockReportComponent } from './stock-report/stock-report.component';
+import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -125,7 +126,8 @@ import { StockReportComponent } from './stock-report/stock-report.component';
     ProfitAndLossViewDetailsComponent,
     DashboardComponent,
     ControlTowerDashboardComponent,
-    StockReportComponent
+    StockReportComponent,
+    DcrRegisterComponent
   ],
   exports: [],
 

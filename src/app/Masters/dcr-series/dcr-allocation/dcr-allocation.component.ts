@@ -458,6 +458,9 @@ export class DcrAllocationComponent implements OnInit {
         ns.rALLOCA= true,
         ns.rALLBY= this.storage.userName
         ns.rALLOC=this.storage.branch
+        ns.mODBY = this.storage.userName;
+        ns.mODDT = new Date();
+        ns.mODLOC = this.storage.branch;
       }
       seriesData.push(ns);
     });

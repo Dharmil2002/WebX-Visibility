@@ -375,7 +375,6 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
     DcrAllocationComponent,
     DcrManagementComponent,
     ActiveSeriesComponent,
-    DcrRegisterComponent,
     CustomerMasterUploadComponent,
     VendorMasterUploadComponent 
   ],

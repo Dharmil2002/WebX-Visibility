@@ -23,6 +23,7 @@ import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleSt
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import moment from 'moment';
 import Swal from 'sweetalert2';
+import { ConsigmentLtlModel } from 'src/app/Models/consigment-ltl/consigment-ltl';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -67,93 +68,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     csv: false,
   };
   addNewTitle: string = "Other Freight Charges";
-  columnInvoice = {
-    ewayBillNo: {
-      Title: "Eway Bill Number",
-      class: "matcolumncenter",
-      Style: "min-width:80px",
-    },
-    ewayBillDate: {
-      Title: "Eway Bill Date",
-      class: "matcolumncenter",
-      Style: "min-width:80px",
-    },
-    expiryDate: {
-      Title: "Eway Bill Expiry Date",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    invoiceNumber: {
-      Title: "Invoice Number",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    invDt: {
-      Title: "Invoice Date",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    cftRation: {
-      Title: "CFT Ratio",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    length: {
-      Title: "Length",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    breadth: {
-      Title: "Breadth",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    height: {
-      Title: "Height",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    invoiceAmount: {
-      Title: "Invoice Amount",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    cubWT: {
-      Title: "Cubic Weight",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    noOfPackage: {
-      Title: "No of Package",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    materialName: {
-      Title: "Material Name",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    actualWeight: {
-      Title: "Actual Weight (Kg)",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    chargedWeight: {
-      Title: "Charged Weight (MT)",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    materialDensity: {
-      Title: "Material Density",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-  };
+  columnInvoice={}
   staticFieldInvoice = [
     'ewayBillNo',
     'expiryDate',
@@ -190,6 +105,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   constructor(
     private controlPanel: ControlPanelService,
     private prqService: PrqService,
+    private consigmentLtlModel:ConsigmentLtlModel,
     private route: Router,
     private generalService: GeneralService,
     private storage: StorageService,
@@ -259,6 +175,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     // Set initial values for the form controls
     this.bindQuickdocketData();
     this.commonDropDownMapping();
+    this.getVolControls();
+    this.invoiceForm.controls['materialName'].setValue("");
   }
   /*end*/
 
@@ -482,7 +400,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*End*/
   /*below function is volumetric function*/
-  getVolControls(event) {
+  getVolControls() {
     const volumeValue = this.consignmentForm.controls['f_vol'].value;
     const controls=[ 
       "cftRatio",
@@ -490,14 +408,26 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "breadth",
       "height"
     ]
+
+  if(volumeValue){
+    this.columnInvoice=this.consigmentLtlModel.columnVolInvoice;
     controls.forEach(control => {
-      this.consignmentForm.controls[control].setValidators([Validators.required]);
-      this.consignmentForm.controls[control].updateValueAndValidity();
+    this.invoiceForm.controls[control].setValidators([Validators.required]);
+    this.invoiceForm.controls[control].updateValueAndValidity();
+  });
+  }
+  else{
+    this.columnInvoice=this.consigmentLtlModel.columnInvoice;
+    controls.forEach(control => {
+      this.invoiceForm.controls[control].clearValidators();
+      this.invoiceForm.controls[control].updateValueAndValidity();
     });
+  }
     // Use a ternary operator for concise conditional assignment.
     this.invoiceControlArray = volumeValue
       ? this.allInvoiceControls
       : this.allInvoiceControls.filter(control => control.additionalData.metaData === "invoiceDetail");
+      
       
   }
   /*End*/
@@ -713,7 +643,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.fillInvoice(data);
   }
   fillInvoice(data: any) {
-    debugger
+
     if (data.label.label === "Remove") {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     } else {
@@ -749,7 +679,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   /*AutoFiill Invoice data*/
   fillInvoiceDetails(data) {
-    debugger
+  
     // Define a mapping of form control names to their respective keys in the incoming data
     const formFields = {
       'ewayBillNo':'ewayBillNo',
@@ -804,8 +734,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     ]
   }
-  save() {
-    const data = { ...this.consignmentForm.value, ...this.invoiceForm.value, ...this.freightForm.value }
-    console.log(data);
+  async save() {
+  debugger
+    const data = { ...this.consignmentForm.value, ...this.freightForm.value }
+    const tableData=this.tableData
+    data['payTypeName']= this.paymentType.find((x)=>x.value==data.payType).name;
+    data['freightRatetypeNm']= this.paymentType.find((x)=>x.value==data.freightRatetype).name;
+    data['pkgsTypeName']= this.pkgsType.find((x)=>x.value==data.pkgsType).name;
+    data['rsktyName']= this.riskType.find((x)=>x.value==data.rskty).name;
+    data['tranType']= this.tranType.find((x)=>x.value==data.rskty).name;
+    data['delivery_typeNm']= this.deliveryType.find((x)=>x.value==data.delivery_type).name;
+    const fieldMapping=this.docketService.consgimentFieldMapping(data,tableData);
+    console.log(fieldMapping);
   }
 }

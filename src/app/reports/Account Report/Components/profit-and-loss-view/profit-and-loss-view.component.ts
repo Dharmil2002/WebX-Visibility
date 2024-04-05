@@ -106,13 +106,13 @@ export class ProfitAndLossViewComponent implements OnInit {
             <table style="width: 100%;">
                 <tr>
                     <td class="px-1"
-                        style="font-weight: bold; width: 30%;font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold; width: 30%;font-size: 14px; text-align: left; border: 1px solid black;">
                         Particulars</td>
                     <td class="px-1"
-                        style="font-weight: bold;  width:25%; font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold;  width:25%; font-size: 14px; text-align: left; border: 1px solid black;">
                         Description</td>
                     <td class="px-1"
-                        style="font-weight: bold;  width: 15%; font-size: 14px; text-align: center; border: 1px solid black;">
+                        style="font-weight: bold;  width: 15%; font-size: 14px; text-align: left; border: 1px solid black;">
                         Note No</td>
                     <td class="px-1"
                         style="font-weight: bold;  width: 15%; font-size: 14px; text-align: center; border: 1px solid black;">
@@ -124,9 +124,9 @@ export class ProfitAndLossViewComponent implements OnInit {
                    
                 </tr>
                 <tr data-row="ProfitAndLossDetails">
-                    <td class="px-1" style="border: 1px solid black;font-weight: bold;text-align: center;">[ProfitAndLossDetails.MainCategory]</td>
-                    <td class="px-1" style="border: 1px solid black;">[ProfitAndLossDetails.SubCategory]</td>
-                    <td class="px-1" style="border: 1px solid black;text-align: center;"> 
+                    <td class="px-1" style="border: 1px solid black;font-weight: bold;text-align: left;">[ProfitAndLossDetails.MainCategory]</td>
+                    <td class="px-1" style="border: 1px solid black;text-align: left;">[ProfitAndLossDetails.SubCategory]</td>
+                    <td class="px-1" style="border: 1px solid black;text-align: left;">
                      <a href="/#/Reports/AccountReport/ProfitAndLossviewdetails?notes=[ProfitAndLossDetails.SubCategory]"  target="_blank">[ProfitAndLossDetails.Notes] </a>
                      </td>
                     <td class="px-1" style="border: 1px solid black;text-align: right;">[ProfitAndLossDetails.TotalAmountCurrentFinYear]</td>

@@ -29,7 +29,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
       active: "Trial Balance Report",
     },
   ];
-  ;
+  protected _onDestroy = new Subject<void>();
   TrialBalanceForm: UntypedFormGroup;
   jsonproftandlossArray: any;
   TrialBalanceFormControl: TrialBalanceReport;
@@ -50,6 +50,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
     startdate: Date;
     enddate: Date;
     branch: string[];
+    accountCode: string[];
   };
   EndDate: any = moment().format("DD MMM YY");
   financYrName: any;
@@ -150,10 +151,10 @@ export class TrialBalanceCriteriaComponent implements OnInit {
         value: "E",
         name: "Employee Wise",
       },
-      {
-        value: "D",
-        name: "Driver Wise",
-      },
+      // {
+      //   value: "D",
+      //   name: "Driver Wise",
+      // },
 
     ]);
 
@@ -169,6 +170,21 @@ export class TrialBalanceCriteriaComponent implements OnInit {
       // we have to handle , if function not exists.
       console.log("failed");
     }
+  }
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonproftandlossArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonproftandlossArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.TrialBalanceForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
   }
 
   async save() {
@@ -189,12 +205,43 @@ export class TrialBalanceCriteriaComponent implements OnInit {
         }
 
         this.reqBody = {
-          startdate, enddate, branch, ReportType: this.TrialBalanceForm.value.ReportType.value, FinanceYear: this.TrialBalanceForm.value.Fyear.value
+          startdate,
+          enddate,
+          branch,
+          ReportType: this.TrialBalanceForm.value.ReportType.value,
+          FinanceYear: this.TrialBalanceForm.value.Fyear.value,
+          accountCode: this.TrialBalanceForm.value.accountHandler != '' ? this.TrialBalanceForm.value.accountHandler.map(x => x.value) : []
 
         }
-        this.EndDate = moment(endDate).format("DD MMM YY");
+        const Result: any[] = await this.accountReportService.GetTrialBalanceStatement(this.reqBody);
+        const MatchFilter = {
+          'D$match': {
+            'aCCD': {
+              'D$in': Result.map(x => x.AccountCode)
+            },
+            'bRCD': {
+              'D$in': this.reqBody.branch
+            }
+          }
+        }
+        const OpeningBalanceResult: any[] = await this.accountReportService.GetOpeningBalance(this.reqBody, MatchFilter);
+        Result.forEach(x => {
+          if (x.AccountCode == OpeningBalanceResult.find(y => y.AccountCode == x.AccountCode)?.AccountCode) {
+            x.OpeningDebit = parseFloat(OpeningBalanceResult.find(y => y.AccountCode == x.AccountCode)?.DebitAmount).toFixed(2);
+            x.OpeningCredit = parseFloat(OpeningBalanceResult.find(y => y.AccountCode == x.AccountCode)?.CreditAmount).toFixed(2);
+            x.ClosingDebit = (parseFloat(x.OpeningDebit) - parseFloat(x.TransactionDebit)).toFixed(2);
+            x.ClosingCredit = (parseFloat(x.OpeningCredit) - parseFloat(x.TransactionCredit)).toFixed(2);
+            x.BalanceAmount = (parseFloat(x.ClosingCredit) - parseFloat(x.ClosingDebit)).toFixed(2);
+          }
+        });
+        Result.filter(item => item.MainCategory == "Total").forEach(x => {
+          x.OpeningDebit = Result.filter(item => item.MainCategory == x.Category).reduce((total, item) => total + parseFloat(item.OpeningDebit), 0).toFixed(2);
+          x.OpeningCredit = Result.filter(item => item.MainCategory == x.Category).reduce((total, item) => total + parseFloat(item.OpeningCredit), 0).toFixed(2);
+          x.ClosingDebit = (parseFloat(x.OpeningDebit) - parseFloat(x.TransactionDebit)).toFixed(2);
+          x.ClosingCredit = (parseFloat(x.OpeningCredit) - parseFloat(x.TransactionCredit)).toFixed(2);
+          x.BalanceAmount = (parseFloat(x.ClosingCredit) - parseFloat(x.ClosingDebit)).toFixed(2);
+        });
 
-        const Result = await this.accountReportService.GetTrialBalanceStatement(this.reqBody);
         const RequestData = {
           "Logo": this.storage.companyLogo,
           "Title": "TRIAL BALANCE STATEMENT",

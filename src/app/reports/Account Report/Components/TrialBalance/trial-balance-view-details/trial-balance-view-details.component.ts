@@ -30,7 +30,27 @@ export class TrialBalanceViewDetailsComponent implements OnInit {
     const RequestData = JSON.parse(this.accountReportService.getDataForTrialBalance("TrialBalanceRequest"));
 
     RequestData["AccountCode"] = this.ParamRequest.split(":")[0];
-    const Result = await this.accountReportService.GetTrialBalanceDetailsStatement(RequestData);
+
+    const MatchFilter = {
+      'D$match': {
+        'aCCCD': RequestData.AccountCode,
+        'lOC': {
+          'D$in': RequestData.branch
+        },
+        'vDT': {
+          'D$gte': RequestData.startdate,
+          'D$lte': RequestData.enddate
+        }
+      }
+    }
+    // switch (RequestData.ReportType) {
+    //   case "C":
+    //     MatchFilter['D$match']['cUST'] = {
+    //       'D$in': RequestData.branch
+    //     }
+    //     break;
+    // }
+    const Result = await this.accountReportService.GetTrialBalanceDetailsStatement(RequestData, MatchFilter);
     this.JsonData = {
       "Data": Result
     }

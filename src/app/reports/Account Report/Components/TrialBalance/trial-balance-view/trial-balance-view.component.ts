@@ -4,6 +4,7 @@ import { timeString } from 'src/app/Utility/date/date-utils';
 import { map } from 'rxjs/operators';
 import { exportAsExcelFile, exportAsExcelFileV2 } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { Router } from '@angular/router';
+import { GetCSVDataBasedOnReportType, GetCSVHeadersBasedOnReportType, GetHTMLBasedOnReportType } from '../TrialBalanceUtitlity';
 
 @Component({
   selector: 'app-trial-balance-view',
@@ -14,6 +15,7 @@ export class TrialBalanceViewComponent implements OnInit {
   showView = true;
   FieldMapping: any;
   JsonData;
+  RequestBody;
   EventButton = {
     functionName: "Download",
     name: "Download",
@@ -26,7 +28,7 @@ export class TrialBalanceViewComponent implements OnInit {
   ngOnInit(): void {
 
     this.JsonData = JSON.parse(this.accountReportService.getDataForTrialBalance("TrialBalanceData"))
-    const RequestBody = JSON.parse(this.accountReportService.getDataForTrialBalance("TrialBalanceRequest"))
+    this.RequestBody = JSON.parse(this.accountReportService.getDataForTrialBalance("TrialBalanceRequest"))
 
     if (!this.JsonData) {
       this.router.navigate(["/Reports/AccountReport/TrialBalance"]);
@@ -63,40 +65,72 @@ export class TrialBalanceViewComponent implements OnInit {
         Value: 'Data.[#].Description',
       },
       {
-        Key: '[Data.Debit]',
-        Value: 'Data.[#].Debit',
+        Key: '[Data.TransactionCredit]',
+        Value: 'Data.[#].TransactionCredit',
       },
 
       {
-        Key: '[Data.Credit]',
-        Value: 'Data.[#].Credit',
+        Key: '[Data.TransactionDebit]',
+        Value: 'Data.[#].TransactionDebit',
+      },
+      {
+        Key: '[Data.ClosingCredit]',
+        Value: 'Data.[#].ClosingCredit',
+      },
+
+      {
+        Key: '[Data.ClosingDebit]',
+        Value: 'Data.[#].ClosingDebit',
+      },
+      {
+        Key: '[Data.OpeningCredit]',
+        Value: 'Data.[#].OpeningCredit',
+      },
+
+      {
+        Key: '[Data.OpeningDebit]',
+        Value: 'Data.[#].OpeningDebit',
+      },
+      {
+        Key: '[Data.BalanceAmount]',
+        Value: 'Data.[#].BalanceAmount',
       },
     ];
-    if (RequestBody) {
-      switch (RequestBody.ReportType) {
+    if (this.RequestBody) {
+      switch (this.RequestBody.ReportType) {
         case "G":
-          this.FieldMapping.push({
-            Key: '[Data.MainCategory]',
-            Value: 'Data.[#].MainCategory',
-          })
           this.RenderHTMLData('G');
           break;
         case "L":
-          this.FieldMapping.push({
-            Key: '[Data.MainCategory]',
-            Value: 'Data.[#].MainCategory',
-          })
           this.FieldMapping.push({
             Key: '[Data.LocationWise]',
             Value: 'Data.[#].LocationWise',
           })
           this.RenderHTMLData('L');
           break;
-
+        case "C":
+          this.FieldMapping.push({
+            Key: '[Data.PartyDetails]',
+            Value: 'Data.[#].PartyDetails',
+          })
+          this.RenderHTMLData('C');
+          break;
+        case "V":
+          this.FieldMapping.push({
+            Key: '[Data.PartyDetails]',
+            Value: 'Data.[#].PartyDetails',
+          })
+          this.RenderHTMLData('V');
+          break;
+        case "E":
+          this.FieldMapping.push({
+            Key: '[Data.EmployeeWise]',
+            Value: 'Data.[#].EmployeeWise',
+          });
+          this.RenderHTMLData('E');
+          break;
       }
-
     }
-
   }
 
   functionCallHandler($event) {
@@ -110,262 +144,15 @@ export class TrialBalanceViewComponent implements OnInit {
     }
   }
   Download() {
-    const CSVHeader = {
-      "MainCategory": "Main Category",
-      "BalanceCategoryName": "Balance Category",
-      "GroupName": "Account Group Name",
-      "Description": "Description Wise",
-      "OpeningDebit": "Opening	Debit",
-      "OpeningCredit": "Opening	Credit",
-      "TransactionDebit": "Transaction	Debit",
-      "TransactionCredit": "Transaction	Credit",
-      "ClosingDebit": "Closing	Debit",
-      "ClosingCredit": "Closing	Credit",
-      "BalanceAmount": "Balance Amount",
-    }
-
-    const Result = this.JsonData.Data.map((item) => {
-      return {
-        "MainCategory": item["MainCategory"],
-        "BalanceCategoryName": item["BalanceCategoryName"],
-        "GroupName": item["GroupName"],
-        "Description": item["Description"],
-        "OpeningDebit": item["Debit"],
-        "OpeningCredit": item["Credit"],
-        "TransactionDebit": 0,
-        "TransactionCredit": 0,
-        "ClosingDebit": 0,
-        "ClosingCredit": 0,
-        "BalanceAmount": 0,
-      }
-    });
-
+    const CSVHeader: any = GetCSVHeadersBasedOnReportType(this.RequestBody.ReportType)
+    const Result: any = GetCSVDataBasedOnReportType(this.RequestBody.ReportType, this.JsonData);
     exportAsExcelFile(Result, `TrialBalance_Report-${timeString}`, CSVHeader);
   }
 
 
   RenderHTMLData(ReportType) {
 
-
-    let HtmlTemplateBody
-
-    switch (ReportType) {
-      case "G":
-        HtmlTemplateBody = ` <div style="margin: 10px 0px;">
-            <table style="width: 100%;">
-                <tr>
-                    <td class="px-1"
-                        style="font-weight: bold; font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;   font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-
-                    <td colspan="2" class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Opening
-                    </td>
-                    <td colspan="2" class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Transaction
-
-                    </td>
-                    <td colspan="2" class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Closing
-
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="px-1"
-                        style="font-weight: bold; ;font-size: 14px; text-align: center; border: 1px solid black;">
-                        Main Category</td>
-                    <td class="px-1"
-                        style="font-weight: bold;   font-size: 14px; text-align: left; border: 1px solid black;">
-                        Balance Category</td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: left; border: 1px solid black;">
-                        Account Group Name</td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: left; border: 1px solid black;">
-                        Description Wise</td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Debit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Credit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Debit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Credit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Debit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Credit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Balance Amount
-                    </td>
-
-                </tr>
-                <tr data-row="Data">
-                    <td class="px-1" style="border: 1px solid black;font-weight: bold;text-align: center;">
-                        [Data.MainCategory]</td>
-                    <td class="px-1" style="border: 1px solid black;text-align: left;">[Data.BalanceCategoryName]</td>
-                   
-                    <td class="px-1" style="border: 1px solid black;text-align: left;">[Data.GroupName]
-                    </td>
-                    <td class="px-1" style="border: 1px solid black;text-align: left;">
-                        <a href="/#/Reports/AccountReport/TrialBalanceviewdetails?notes=[Data.Description]"
-                            target="_blank">[Data.Description] </a>
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">[Data.Debit]
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">[Data.Credit]
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                </tr>
-            </table>
-        </div>`
-        break;
-      case "L":
-        HtmlTemplateBody = ` <div style="margin: 10px 0px;">
-            <table style="width: 100%;">
-                <tr>
-                    <td class="px-1"
-                        style="font-weight: bold; font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;   font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-
-                    <td colspan="2" class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Opening
-                    </td>
-                    <td colspan="2" class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Transaction
-
-                    </td>
-                    <td colspan="2" class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Closing
-
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="px-1"
-                        style="font-weight: bold; ;font-size: 14px; text-align: center; border: 1px solid black;">
-                        Location</td>
-                    <td class="px-1"
-                        style="font-weight: bold;   font-size: 14px; text-align: left; border: 1px solid black;">
-                        Main Category</td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: left; border: 1px solid black;">
-                        Account Group Name</td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: left; border: 1px solid black;">
-                        Description Wise</td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Debit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Credit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Debit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Credit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Debit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Credit
-                    </td>
-                    <td class="px-1"
-                        style="font-weight: bold;  font-size: 14px; text-align: center; border: 1px solid black;">
-                        Balance Amount
-                    </td>
-
-                </tr>
-                <tr data-row="Data">
-                    <td class="px-1" style="border: 1px solid black;font-weight: bold;text-align: center;">
-                        [Data.LocationWise]</td>
-                    <td class="px-1" style="border: 1px solid black;text-align: left;">[Data.MainCategory]</td>
-                   
-                    <td class="px-1" style="border: 1px solid black;text-align: left;">[Data.GroupName]
-                    </td>
-                    <td class="px-1" style="border: 1px solid black;text-align: left;">
-                        <a href="/#/Reports/AccountReport/TrialBalanceviewdetails?notes=[Data.Description]"
-                            target="_blank">[Data.Description] </a>
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">[Data.Debit]
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">[Data.Credit]
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                    <td class="px-1" style="border: 1px solid black; text-align: right;">0
-                    </td>
-                </tr>
-            </table>
-        </div>`
-        break;
-    }
-
+    let HtmlTemplateBody: any = GetHTMLBasedOnReportType(ReportType)
 
 
     this.HtmlTemplate = `<div>

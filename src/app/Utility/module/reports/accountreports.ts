@@ -59,11 +59,11 @@ export class AccountReportService {
                                                             ]
                                                        },
                                                        {
-                                                            '$gte': [
+                                                            'D$gte': [
                                                                  '$vDT', request.startdate
                                                             ]
                                                        }, {
-                                                            '$lte': [
+                                                            'D$lte': [
                                                                  '$vDT', request.enddate
                                                             ]
                                                        }
@@ -209,11 +209,22 @@ export class AccountReportService {
 
      async GetTrialBalanceStatement(request) {
 
-          const reqBody = {
+          const reqBody: {
+               companyCode: number;
+               collectionName: string;
+               filters: any[]; // Explicitly declare filters as an array
+          } = {
                companyCode: this.storage.companyCode,
                collectionName: "account_detail",
                filters: this.GetTypeWiseFilter(request)
           };
+          let matchQuery = {
+               'D$match': { 'aCCD': { 'D$in': request.accountCode } }
+          };
+          // Insert matchQuery at position 0
+          if (request.accountCode.length > 0) {
+               reqBody.filters.splice(0, 0, matchQuery);
+          }
           try {
                const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
                if (res.data && res.data.length > 0) {
@@ -228,28 +239,63 @@ export class AccountReportService {
                                    if (a.MainCategory > b.MainCategory) return -1;
                                    return 0;
                               });
-                              const mainCategoryEncountered = {};
-                              mappedData = SortedData.flatMap((item, index) =>
-                                   item.Details.flatMap((detail, detailIndex) =>
-                                        detail.AccountDetails.map((account, accountIndex) => {
-                                             let mainCategory = '';
-                                             if (!mainCategoryEncountered[item.MainCategory]) {
-                                                  mainCategory = item.MainCategory;
-                                                  mainCategoryEncountered[item.MainCategory] = true;
-                                             }
-                                             return {
-                                                  MainCategory: mainCategory,
-                                                  BalanceCategoryName: detail.BalanceCategoryName,
-                                                  GroupName: detail.GroupCode + ":" + detail.GroupName,
-                                                  Description: account.AccountCode + ":" + account.AccountName,
-                                                  Debit: (account.Debit).toFixed(2),
-                                                  Credit: (account.Credit).toFixed(2),
-                                             };
-                                        })
-                                   )
-                              );
+                              const totalRows = {};
 
-                              return mappedData
+                              const processedData = SortedData.flatMap(item => {
+                                   const mainCategory = item.MainCategory;
+
+                                   // Process details for the current MainCategory
+                                   const detailsWithTotal = item.Details.flatMap(detail => {
+                                        const accountDetails = detail.AccountDetails.map(account => ({
+                                             MainCategory: mainCategory,
+                                             BalanceCategoryName: detail.BalanceCategoryName,
+                                             GroupName: detail.GroupCode + ":" + detail.GroupName,
+                                             Description: account.AccountCode + ":" + account.AccountName,
+                                             TransactionDebit: parseFloat(account.Debit).toFixed(2),
+                                             TransactionCredit: parseFloat(account.Credit).toFixed(2),
+                                             OpeningDebit: 0,
+                                             OpeningCredit: 0,
+                                             ClosingDebit: 0,
+                                             ClosingCredit: 0,
+                                             BalanceAmount: 0,
+                                             AccountCode: account.AccountCode
+                                        }));
+
+                                        if (!totalRows[mainCategory]) {
+                                             totalRows[mainCategory] = {
+                                                  Category: mainCategory,
+                                                  MainCategory: "Total",
+                                                  BalanceCategoryName: "",
+                                                  GroupName: "",
+                                                  Description: "",
+                                                  TransactionDebit: 0,
+                                                  TransactionCredit: 0,
+                                                  OpeningDebit: 0,
+                                                  OpeningCredit: 0,
+                                                  ClosingDebit: 0,
+                                                  ClosingCredit: 0,
+                                                  BalanceAmount: 0,
+                                             };
+                                        }
+
+                                        // Convert to number before adding
+                                        totalRows[mainCategory].TransactionDebit = (parseFloat(totalRows[mainCategory].TransactionDebit) + parseFloat(detail.AccountDetails.reduce((total, account) => total + parseFloat(account.Debit), 0))).toFixed(2);
+                                        totalRows[mainCategory].TransactionCredit = (parseFloat(totalRows[mainCategory].TransactionCredit) + parseFloat(detail.AccountDetails.reduce((total, account) => total + parseFloat(account.Credit), 0))).toFixed(2);
+
+                                        return accountDetails;
+                                   });
+
+                                   // Add total row for the current MainCategory immediately after its data
+                                   const totalRow = totalRows[mainCategory];
+                                   if (totalRow) {
+                                        return [...detailsWithTotal, totalRow];
+                                   } else {
+                                        return detailsWithTotal;
+                                   }
+                              });
+
+
+                              return processedData
                          case "L":
                               mappedData = OthersData.flatMap((item, index) =>
                                    item.Details.flatMap((detail, detailIndex) =>
@@ -259,8 +305,14 @@ export class AccountReportService {
                                                   MainCategory: item.MainCategory,
                                                   GroupName: detail.GroupCode + ":" + detail.GroupName,
                                                   Description: account.AccountCode + ":" + account.AccountName,
-                                                  Debit: (account.Debit).toFixed(2),
-                                                  Credit: (account.Credit).toFixed(2),
+                                                  TransactionDebit: (account.Debit).toFixed(2),
+                                                  TransactionCredit: (account.Credit).toFixed(2),
+                                                  OpeningDebit: 0,
+                                                  OpeningCredit: 0,
+                                                  ClosingDebit: 0,
+                                                  ClosingCredit: 0,
+                                                  BalanceAmount: 0,
+                                                  AccountCode: account.AccountCode
                                              };
                                         })
                                    )
@@ -271,6 +323,105 @@ export class AccountReportService {
                                    if (a.LocationWise > b.LocationWise) return 1;
 
                                    // If LocationWise is the same, sort by MainCategory ascending
+                                   if (a.MainCategory < b.MainCategory) return -1;
+                                   if (a.MainCategory > b.MainCategory) return 1;
+
+                                   return 0;
+                              });
+                              break;
+                         case "C":
+                              mappedData = OthersData.flatMap((item, index) =>
+                                   item.Details.flatMap((detail, detailIndex) =>
+                                        detail.AccountDetails.map((account, accountIndex) => {
+                                             return {
+                                                  PartyDetails: item.PartyDetails,
+                                                  MainCategory: item.MainCategory,
+                                                  GroupName: detail.GroupCode + ":" + detail.GroupName,
+                                                  Description: account.AccountCode + ":" + account.AccountName,
+                                                  TransactionDebit: (account.Debit).toFixed(2),
+                                                  TransactionCredit: (account.Credit).toFixed(2),
+                                                  OpeningDebit: 0,
+                                                  OpeningCredit: 0,
+                                                  ClosingDebit: 0,
+                                                  ClosingCredit: 0,
+                                                  BalanceAmount: 0,
+                                                  AccountCode: account.AccountCode
+                                             };
+                                        })
+                                   )
+                              );
+                              return mappedData.sort((a, b) => {
+                                   // Sort by PartyDetails ascending
+                                   if (a.PartyDetails < b.PartyDetails) return -1;
+                                   if (a.PartyDetails > b.PartyDetails) return 1;
+
+                                   // If PartyDetails is the same, sort by MainCategory ascending
+                                   if (a.MainCategory < b.MainCategory) return -1;
+                                   if (a.MainCategory > b.MainCategory) return 1;
+
+                                   return 0;
+                              });
+                              break;
+                         case "V":
+                              mappedData = OthersData.flatMap((item, index) =>
+                                   item.Details.flatMap((detail, detailIndex) =>
+                                        detail.AccountDetails.map((account, accountIndex) => {
+                                             return {
+                                                  PartyDetails: item.PartyDetails,
+                                                  MainCategory: item.MainCategory,
+                                                  GroupName: detail.GroupCode + ":" + detail.GroupName,
+                                                  Description: account.AccountCode + ":" + account.AccountName,
+                                                  TransactionDebit: (account.Debit).toFixed(2),
+                                                  TransactionCredit: (account.Credit).toFixed(2),
+                                                  OpeningDebit: 0,
+                                                  OpeningCredit: 0,
+                                                  ClosingDebit: 0,
+                                                  ClosingCredit: 0,
+                                                  BalanceAmount: 0,
+                                                  AccountCode: account.AccountCode
+                                             };
+                                        })
+                                   )
+                              );
+                              return mappedData.sort((a, b) => {
+                                   // Sort by PartyDetails ascending
+                                   if (a.PartyDetails < b.PartyDetails) return -1;
+                                   if (a.PartyDetails > b.PartyDetails) return 1;
+
+                                   // If PartyDetails is the same, sort by MainCategory ascending
+                                   if (a.MainCategory < b.MainCategory) return -1;
+                                   if (a.MainCategory > b.MainCategory) return 1;
+
+                                   return 0;
+                              });
+                              break;
+                         case "E":
+                              mappedData = OthersData.flatMap((item, index) =>
+                                   item.Details.flatMap((detail, detailIndex) =>
+                                        detail.AccountDetails.map((account, accountIndex) => {
+                                             return {
+                                                  EmployeeWise: item.EmployeeWise,
+                                                  MainCategory: item.MainCategory,
+                                                  GroupName: detail.GroupCode + ":" + detail.GroupName,
+                                                  Description: account.AccountCode + ":" + account.AccountName,
+                                                  TransactionDebit: (account.Debit).toFixed(2),
+                                                  TransactionCredit: (account.Credit).toFixed(2),
+                                                  OpeningDebit: 0,
+                                                  OpeningCredit: 0,
+                                                  ClosingDebit: 0,
+                                                  ClosingCredit: 0,
+                                                  BalanceAmount: 0,
+                                                  AccountCode: account.AccountCode
+                                             };
+                                        })
+                                   )
+                              );
+                              return mappedData.sort((a, b) => {
+                                   // Sort by EmployeeWise ascending
+                                   if (a.EmployeeWise < b.EmployeeWise) return -1;
+                                   if (a.EmployeeWise > b.EmployeeWise) return 1;
+
+                                   // If EmployeeWise is the same, sort by MainCategory ascending
                                    if (a.MainCategory < b.MainCategory) return -1;
                                    if (a.MainCategory > b.MainCategory) return 1;
 
@@ -312,11 +463,11 @@ export class AccountReportService {
                                                                  ]
                                                             },
                                                             {
-                                                                 '$gte': [
+                                                                 'D$gte': [
                                                                       '$vDT', request.startdate
                                                                  ]
                                                             }, {
-                                                                 '$lte': [
+                                                                 'D$lte': [
                                                                       '$vDT', request.enddate
                                                                  ]
                                                             }
@@ -427,7 +578,7 @@ export class AccountReportService {
                                                                  ]
                                                             },
                                                             {
-                                                                 '$gte': [
+                                                                 'D$gte': [
                                                                       '$vDT', request.startdate
                                                                  ]
                                                             }, {
@@ -518,6 +669,377 @@ export class AccountReportService {
                               }
                          }
                     ]
+               case "V":
+                    return [
+                         {
+                              "D$lookup": {
+                                   "from": "acc_trans_" + request.FinanceYear,
+                                   "let": { "aCCCD": "$aCCD" },
+                                   "pipeline": [
+                                        {
+                                             "D$match": {
+                                                  "D$expr": {
+                                                       "D$and": [
+                                                            {
+                                                                 "D$eq": [
+                                                                      "$aCCCD",
+                                                                      "$$aCCCD"
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 "D$in": [
+                                                                      "$lOC",
+                                                                      request.branch
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 'D$gte': [
+                                                                      '$vDT', request.startdate
+                                                                 ]
+                                                            }, {
+                                                                 'D$lte': [
+                                                                      '$vDT', request.enddate
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY', 'Vendor'
+                                                                 ]
+                                                            }
+
+                                                       ]
+                                                  }
+                                             }
+                                        }
+                                   ],
+                                   "as": "transactions"
+                              }
+                         },
+                         {
+                              "D$unwind": "$transactions"
+                         },
+                         {
+                              "D$match": {
+                                   "transactions": { "D$ne": [] } // Filter out documents where there are no transactions
+                              }
+                         },
+
+                         {
+                              'D$group': {
+                                   '_id': {
+                                        'MainCategory': '$mRPNM',
+                                        'PartyDetails': {
+                                             'D$concat': [
+                                                  {
+                                                       'D$toString': '$transactions.pARTYCD'
+                                                  }, ':', {
+                                                       'D$toString': '$transactions.pARTYNM'
+                                                  }
+                                             ]
+                                        },
+                                        'GroupCode': '$gRPCD',
+                                        'GroupName': '$gRPNM',
+                                        'AccountCode': '$aCCD',
+                                        'AccountName': '$aCNM'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$transactions.cR'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$transactions.dR'
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'PartyDetails': '$_id.PartyDetails',
+                                        'MainCategory': '$_id.MainCategory',
+                                        'GroupCode': '$_id.GroupCode',
+                                        'GroupName': '$_id.GroupName'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$TotalCredit'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$TotalDebit'
+                                   },
+                                   'AccountDetails': {
+                                        'D$push': {
+                                             'AccountCode': '$_id.AccountCode',
+                                             'AccountName': '$_id.AccountName',
+                                             'Credit': '$TotalCredit',
+                                             'Debit': '$TotalDebit'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'PartyDetails': '$_id.PartyDetails',
+                                        'MainCategory': '$_id.MainCategory'
+                                   },
+                                   'Details': {
+                                        'D$push': {
+                                             'GroupCode': '$_id.GroupCode',
+                                             'GroupName': '$_id.GroupName',
+                                             'TotalCredit': '$TotalCredit',
+                                             'TotalDebit': '$TotalDebit',
+                                             'AccountDetails': '$AccountDetails'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$project': {
+                                   '_id': 0,
+                                   'MainCategory': '$_id.MainCategory',
+                                   'PartyDetails': '$_id.PartyDetails',
+                                   'Details': 1
+                              }
+                         }
+                    ]
+               case "C":
+                    return [
+                         {
+                              "D$lookup": {
+                                   "from": "acc_trans_" + request.FinanceYear,
+                                   "let": { "aCCCD": "$aCCD" },
+                                   "pipeline": [
+                                        {
+                                             "D$match": {
+                                                  "D$expr": {
+                                                       "D$and": [
+                                                            {
+                                                                 "D$eq": [
+                                                                      "$aCCCD",
+                                                                      "$$aCCCD"
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 "D$in": [
+                                                                      "$lOC",
+                                                                      request.branch
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 'D$gte': [
+                                                                      '$vDT', request.startdate
+                                                                 ]
+                                                            }, {
+                                                                 'D$lte': [
+                                                                      '$vDT', request.enddate
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY', 'Customer'
+                                                                 ]
+                                                            }
+
+                                                       ]
+                                                  }
+                                             }
+                                        }
+                                   ],
+                                   "as": "transactions"
+                              }
+                         },
+                         {
+                              "D$unwind": "$transactions"
+                         },
+                         {
+                              "D$match": {
+                                   "transactions": { "D$ne": [] } // Filter out documents where there are no transactions
+                              }
+                         },
+
+                         {
+                              'D$group': {
+                                   '_id': {
+                                        'MainCategory': '$mRPNM',
+                                        'PartyDetails': {
+                                             'D$concat': [
+                                                  {
+                                                       'D$toString': '$transactions.pARTYCD'
+                                                  }, ':', {
+                                                       'D$toString': '$transactions.pARTYNM'
+                                                  }
+                                             ]
+                                        },
+                                        'GroupCode': '$gRPCD',
+                                        'GroupName': '$gRPNM',
+                                        'AccountCode': '$aCCD',
+                                        'AccountName': '$aCNM'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$transactions.cR'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$transactions.dR'
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'PartyDetails': '$_id.PartyDetails',
+                                        'MainCategory': '$_id.MainCategory',
+                                        'GroupCode': '$_id.GroupCode',
+                                        'GroupName': '$_id.GroupName'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$TotalCredit'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$TotalDebit'
+                                   },
+                                   'AccountDetails': {
+                                        'D$push': {
+                                             'AccountCode': '$_id.AccountCode',
+                                             'AccountName': '$_id.AccountName',
+                                             'Credit': '$TotalCredit',
+                                             'Debit': '$TotalDebit'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'PartyDetails': '$_id.PartyDetails',
+                                        'MainCategory': '$_id.MainCategory'
+                                   },
+                                   'Details': {
+                                        'D$push': {
+                                             'GroupCode': '$_id.GroupCode',
+                                             'GroupName': '$_id.GroupName',
+                                             'TotalCredit': '$TotalCredit',
+                                             'TotalDebit': '$TotalDebit',
+                                             'AccountDetails': '$AccountDetails'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$project': {
+                                   '_id': 0,
+                                   'MainCategory': '$_id.MainCategory',
+                                   'PartyDetails': '$_id.PartyDetails',
+                                   'Details': 1
+                              }
+                         }
+                    ]
+               case "E":
+                    return [
+                         {
+                              "D$lookup": {
+                                   "from": "acc_trans_" + request.FinanceYear,
+                                   "let": { "aCCCD": "$aCCD" },
+                                   "pipeline": [
+                                        {
+                                             "D$match": {
+                                                  "D$expr": {
+                                                       "D$and": [
+                                                            {
+                                                                 "D$eq": [
+                                                                      "$aCCCD",
+                                                                      "$$aCCCD"
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 "D$in": [
+                                                                      "$lOC",
+                                                                      request.branch
+                                                                 ]
+                                                            },
+                                                            {
+                                                                 'D$gte': [
+                                                                      '$vDT', request.startdate
+                                                                 ]
+                                                            }, {
+                                                                 'D$lte': [
+                                                                      '$vDT', request.enddate
+                                                                 ]
+                                                            },
+
+                                                       ]
+                                                  }
+                                             }
+                                        }
+                                   ],
+                                   "as": "transactions"
+                              }
+                         },
+                         {
+                              "D$unwind": "$transactions"
+                         },
+                         {
+                              "D$match": {
+                                   "transactions": { "D$ne": [] } // Filter out documents where there are no transactions
+                              }
+                         },
+
+                         {
+                              'D$group': {
+                                   '_id': {
+                                        'MainCategory': '$mRPNM',
+                                        'EmployeeWise': '$transactions.eNTBY',
+                                        'GroupCode': '$gRPCD',
+                                        'GroupName': '$gRPNM',
+                                        'AccountCode': '$aCCD',
+                                        'AccountName': '$aCNM'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$transactions.cR'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$transactions.dR'
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'EmployeeWise': '$_id.EmployeeWise',
+                                        'MainCategory': '$_id.MainCategory',
+                                        'GroupCode': '$_id.GroupCode',
+                                        'GroupName': '$_id.GroupName'
+                                   },
+                                   'TotalCredit': {
+                                        'D$sum': '$TotalCredit'
+                                   },
+                                   'TotalDebit': {
+                                        'D$sum': '$TotalDebit'
+                                   },
+                                   'AccountDetails': {
+                                        'D$push': {
+                                             'AccountCode': '$_id.AccountCode',
+                                             'AccountName': '$_id.AccountName',
+                                             'Credit': '$TotalCredit',
+                                             'Debit': '$TotalDebit'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$group': {
+                                   '_id': {
+                                        'EmployeeWise': '$_id.EmployeeWise',
+                                        'MainCategory': '$_id.MainCategory'
+                                   },
+                                   'Details': {
+                                        'D$push': {
+                                             'GroupCode': '$_id.GroupCode',
+                                             'GroupName': '$_id.GroupName',
+                                             'TotalCredit': '$TotalCredit',
+                                             'TotalDebit': '$TotalDebit',
+                                             'AccountDetails': '$AccountDetails'
+                                        }
+                                   }
+                              }
+                         }, {
+                              'D$project': {
+                                   '_id': 0,
+                                   'MainCategory': '$_id.MainCategory',
+                                   'EmployeeWise': '$_id.EmployeeWise',
+                                   'Details': 1
+                              }
+                         }
+                    ]
           }
 
      }
@@ -529,24 +1051,13 @@ export class AccountReportService {
      getDataForTrialBalance(key) {
           return this.storage.getItem(key);
      }
-     async GetTrialBalanceDetailsStatement(request) {
+     async GetTrialBalanceDetailsStatement(request, matchFilter) {
 
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "acc_trans_" + request.FinanceYear,
-               filters: [
-                    {
-                         'D$match': {
-                              'aCCCD': request.AccountCode,
-                              'lOC': {
-                                   'D$in': request.branch
-                              },
-                              // 'vDT': {
-                              //      '$gte': request.startdate,
-                              //      '$lte': request.enddate
-                              // }
-                         }
-                    }, {
+               filters: [matchFilter
+                    , {
                          'D$project': {
                               '_id': 0,
                               'vDT': 1,
@@ -592,6 +1103,35 @@ export class AccountReportService {
 
 
                     return modifiedReportData
+               }
+               return []
+          } catch (error) {
+               console.error("Error:", error);
+               throw error;
+          }
+     }
+     async GetOpeningBalance(request, matchFilter) {
+
+          const reqBody = {
+               companyCode: this.storage.companyCode,
+               collectionName: "acc_opening_" + request.FinanceYear,
+               filters: [matchFilter
+                    , {
+                         'D$project': {
+                              '_id': 0,
+                              'AccountCode': '$aCCD',
+                              'AccountName': '$aCNM',
+                              'BranchName': '$bRCD',
+                              'CreditAmount': '$cAMT',
+                              'DebitAmount': '$dAMT'
+                         }
+                    }
+               ]
+          };
+          try {
+               const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
+               if (res.data && res.data.length > 0) {
+                    return res.data
                }
                return []
           } catch (error) {

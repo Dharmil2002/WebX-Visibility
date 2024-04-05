@@ -47,6 +47,9 @@ export class TrialBalanceReport {
                     ],
                     additionalData: {
                          support: "end",
+                         minDate: new Date(), // Set the minimum date to the current date
+                         maxDate: new Date() // Allow selection of dates in the current year and future years
+
                     },
                },
                {
@@ -146,6 +149,10 @@ export class TrialBalanceReport {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
+                    additionalData: {
+                         minDate: new Date(), // Set the minimum date to the current date
+                         maxDate: new Date()
+                    },
                },
                {
                     name: 'accountHandler',

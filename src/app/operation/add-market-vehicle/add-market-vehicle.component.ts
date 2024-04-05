@@ -18,7 +18,7 @@ export class AddMarketVehicleComponent implements OnInit {
   imageData: any = {};
   jsonControlVehicleArray: any;
   marketVehicleTableForm: UntypedFormGroup;
- 
+  className: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   companyCode = parseInt(localStorage.getItem("companyCode"));
   breadScrums = [
     {
@@ -35,6 +35,7 @@ export class AddMarketVehicleComponent implements OnInit {
       @Inject(MAT_DIALOG_DATA) public item: any,
       private fb: UntypedFormBuilder,
       public dialog: MatDialog,
+      private storage: StorageService,
       private markerVehicleService: MarkerVehicleService,
       private objImageHandling: ImageHandling) {
     if (item) {
@@ -100,6 +101,8 @@ export class AddMarketVehicleComponent implements OnInit {
     const vehCntAmt= parseFloat(this.marketVehicleTableForm.controls['vehContAmt']?.value||0);
     if(vehCntAmt>contractAmt){
       Swal.fire('Alert','Vehicle contract amount should not be greater than contract amount','warning');
+      this.marketVehicleTableForm.controls['vehContAmt'].setValue(0);
+      this.marketVehicleTableForm.controls['margAMT'].setValue(0);
       return false; 
     }
     const total=contractAmt-vehCntAmt

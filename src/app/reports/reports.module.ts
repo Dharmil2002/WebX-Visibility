@@ -62,6 +62,8 @@ import { ControlTowerDashboardComponent } from './control-tower-dashboard/contro
 import { TrialBalanceCriteriaComponent } from './Account Report/Components/TrialBalance/trial-balance-criteria/trial-balance-criteria.component';
 import { TrialBalanceViewComponent } from './Account Report/Components/TrialBalance/trial-balance-view/trial-balance-view.component';
 import { TrialBalanceViewDetailsComponent } from './Account Report/Components/TrialBalance/trial-balance-view-details/trial-balance-view-details.component';
+import { StockReportComponent } from './stock-report/stock-report.component';
+import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -130,6 +132,8 @@ import { TrialBalanceViewDetailsComponent } from './Account Report/Components/Tr
     TrialBalanceCriteriaComponent,
     TrialBalanceViewComponent,
     TrialBalanceViewDetailsComponent
+    StockReportComponent,
+    DcrRegisterComponent
   ],
   exports: [],
 

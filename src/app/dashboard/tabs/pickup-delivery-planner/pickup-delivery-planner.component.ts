@@ -1,15 +1,28 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 @Component({
   selector: 'app-pickup-delivery-planner',
-  templateUrl:'./pickup-delivery-planner.component.html',
+  templateUrl: './pickup-delivery-planner.component.html',
 })
-export class PickupDeliveryPlannerComponent implements OnInit {
+export class PickupDeliveryPlannerComponent implements AfterViewInit {
+
   @ViewChild('myTabGroup') myTabGroup: MatTabGroup;
   GetSelectedIndex(Index: number) {
     this.myTabGroup.selectedIndex = Index;
   }
-  ngOnInit() {
-      this.GetSelectedIndex(1)
+
+  // After the view is initialized, set the initial tab based on stored index
+  ngAfterViewInit(): void {
+    // Get the stored index from localStorage and parse it as a number
+    const storedIndex = +localStorage.getItem('deliveryMRIndex');
+
+    // Remove the stored index from localStorage
+    localStorage.removeItem('deliveryMRIndex');
+
+    // Determine the selected index based on the stored index or default to 0 if NaN
+    const selectedIndex = isNaN(storedIndex) ? 0 : storedIndex;
+
+    // Set the selected tab index
+    this.GetSelectedIndex(selectedIndex);
   }
 }

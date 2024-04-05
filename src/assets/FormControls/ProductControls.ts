@@ -78,7 +78,7 @@ export class ProductControls {
           },
         ],
         generatecontrol: true,
-        disable:isUpdate?true:false,
+        disable:true,
         functions: {
           onChange: "handleChargesCode",
         },

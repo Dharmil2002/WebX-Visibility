@@ -34,8 +34,11 @@ export class MarkerVehicleService {
 
     data['cID'] = this.storage.companyCode;
     data['_id'] = `${this.storage.companyCode}-${data.vID}`;
-    
+  
     if (vehData && vehData.vID == data.vID) {
+      data['mODDT']=new Date();
+      data['mODBY']=this.storage.userName;
+      data['mODLOC']=this.storage.branch;
       request["filter"] = { _id: data._id };
       request["update"] = data;
       const res = await firstValueFrom(
@@ -43,6 +46,9 @@ export class MarkerVehicleService {
       );
       return res;
     } else {
+      data['eNTDT']=new Date();
+      data['eNTBY']=this.storage.userName;
+      data['eNTLOC']=this.storage.branch;
       request["data"] = data;
       const res = await firstValueFrom(
         this.operation.operationMongoPost(GenericActions.Create, request)

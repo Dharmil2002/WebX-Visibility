@@ -434,7 +434,6 @@ export class AddLocationMasterComponent implements OnInit {
   //#endregion
 
   setReportLevelData(event) {
-
     if (this.isUpdate) {
       const reportLevel = this.hierachy.find(
         (x) => x.value == this.locationTable.reportLevel
@@ -461,14 +460,18 @@ export class AddLocationMasterComponent implements OnInit {
         }
       });
     }
-
-    this.filter.Filter(
-      this.jsonControlLocationArray,
-      this.locationTableForm,
-      this.hierachy,
-      this.reportLoc,
-      this.reportLocStatus
-    );
+    if(this.locationTableForm.controls.locLevel.value.value) {
+      const reportLevel = this.hierachy.filter(
+        (x) => parseInt(x.value)< parseInt(this.locationTableForm.controls.locLevel.value.value)
+      );
+      this.filter.Filter(
+        this.jsonControlLocationArray,
+        this.locationTableForm,
+        reportLevel,
+        this.reportLoc,
+        this.reportLocStatus
+      );
+    }
 
     this.CheckHQTR(this.locationTableForm.value.locLevel.value);
   }

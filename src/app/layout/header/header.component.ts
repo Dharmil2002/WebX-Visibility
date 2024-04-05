@@ -360,7 +360,6 @@ export class HeaderComponent
 
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
-    console.log(searchDetail);
   }
 
   goBack(tabIndex: string): void {

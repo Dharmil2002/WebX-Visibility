@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
-import { calculateTotal, vendorTypeList } from "./thc-utlity";
+import { calculateTotal} from "./thc-utlity";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -68,6 +68,7 @@ export class ThcGenerationComponent implements OnInit {
   isRail: boolean = false;
   rrLoad: boolean = true;
   rrInvoice: boolean = true;
+  marketData: any;
   // End Code Of Harikesh
   //FormGrop
   thcDetailGlobal: any;
@@ -280,6 +281,7 @@ export class ThcGenerationComponent implements OnInit {
   isLoadRail: boolean;
   isLoadInvoice: boolean;
   delChargeControl: any[];
+  balanceAmount: any;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -660,6 +662,7 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
           this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
           this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
+          this.marketData=vehData;
         }
       }
 
@@ -1206,7 +1209,6 @@ export class ThcGenerationComponent implements OnInit {
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];
-
         if (x.tCT == this.currentLocation.locCity.toUpperCase()) {
           x.actions = ["Update"];
         }
@@ -1865,8 +1867,11 @@ export class ThcGenerationComponent implements OnInit {
         this.filter.Filter(this.chargeJsonControl, this.chargeForm, data, name, status);
       });
       const location = this.locationData.find(x => x.value == this.branchCode);
-      this.chargeForm.controls['advPdAt'].setValue(location)
+      this.chargeForm.controls['advPdAt'].setValue(location);
       this.isCharge = true;
+      if(this.prqFlag&&this.marketData){
+        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT||"0.00");
+      }
     }
   }
   /*End*/
@@ -1957,6 +1962,7 @@ export class ThcGenerationComponent implements OnInit {
       this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
       this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
       this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
+      this.balanceAmount=thcNestedDetails?.thcDetails.bALAMT 
     }
 
   }
@@ -2305,9 +2311,7 @@ export class ThcGenerationComponent implements OnInit {
         return acc; // In case of an unknown operation
       }
     }, 0);
-    const totalAmt = ConvertToNumber(total, 2) + ConvertToNumber(this.chargeForm.controls["contAmt"].value, 2);
-    this.chargeForm.controls['totAmt'].setValue(totalAmt);
-    const advAmt = parseFloat(this.chargeForm.controls['advAmt']?.value || 0);
-    this.chargeForm.controls["balAmt"].setValue(totalAmt - advAmt);
+    const balance=parseFloat(this.balanceAmount)-Math.abs(total)
+    this.chargeForm.controls["balAmt"].setValue(balance);
   }
 }

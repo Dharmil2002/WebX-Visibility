@@ -77,4 +77,39 @@ export class LocationService {
     }
   }
   //#endregion
+
+  async getLocation(filter): Promise<any | null> {
+    const reqBody = {
+      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      collectionName: 'location_detail',
+      filter: filter
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/getOne', reqBody));    
+    return res.data;
+  }
+
+  async getLocations(filter): Promise<any | null> {
+    const reqBody = {
+      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      collectionName: 'location_detail',
+      filter: filter
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/get', reqBody));    
+    return res?.data || [];
+  }
+
+  async findAllDescendants(reportLoc): Promise<any[] | null> {
+    const reqBody = {
+      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      collectionName: 'location_detail',
+      filter: { reportLoc: reportLoc, activeFlag: true },
+      fields: { parent: "reportLoc", id: "locCode" },
+      project: { "reportLoc": 1, "locCode": 1, "activeFlag": 1 }
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/descendants', reqBody));    
+    return res.data;
+  }
 }

@@ -24,7 +24,7 @@
                           <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                           Delivery MR Generation
                       </ng-template>
-                      <app-delivery-mr-generation-list
+                      <app-delivery-mr-generation-list *ngIf="myTabGroup.selectedIndex== 2" 
                           (CurrentIndex)="GetSelectedIndex($event)"></app-delivery-mr-generation-list>
                   </mat-tab>
               </mat-tab-group>

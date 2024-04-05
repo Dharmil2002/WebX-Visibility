@@ -16,6 +16,7 @@ import { environment } from "src/environments/environment";
 import { map, share } from "rxjs/operators";
 import { APICacheService } from "./API-cache.service";
 import { StorageService } from "./storage.service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 
 @Injectable({
   providedIn: "root",
@@ -28,7 +29,8 @@ export class AuthService {
     private http: HttpClient,
     private _jwt: JwtHelperService,
     private _APICacheService: APICacheService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private locationService: LocationService
   ) {
     this.currentUserSubject = new BehaviorSubject<User>(
       JSON.parse(localStorage.getItem("currentUser"))
@@ -71,20 +73,36 @@ export class AuthService {
       .pipe(
         map(async (user: any) => {
           if (user.tokens) {
-            let userdetails = this._jwt.decodeToken(user.tokens.access.token);
+            let userdetails = this._jwt.decodeToken(user.tokens.access.token);            
+            localStorage.setItem("companyCode", user.usr.companyCode);
+            this.storageService.setItem("UserName", user.usr.userId);
+            this.storageService.setItem("Name", user.usr.name);
             this.storageService.setItem("currentUser", JSON.stringify(user));
-            this.storageService.setItem("UserName", user.usr.name);
-            this.storageService.setItem("Branch", user.usr.branchCode);
             this.storageService.setItem("companyCode", user.usr.companyCode);
-            this.storageService.setItem("Mode", "Export");
-            //localStorage.setItem("company_Name", "Velocity");
-            this.storageService.setItem("CurrentBranchCode", user.usr.multiLocation[0]);
-            this.storageService.setItem("userLocations", user.usr.multiLocation);
+            this.storageService.setItem("currentBranch", user.usr.branchCode);
             this.storageService.setItem("token", user.tokens.access.token);
             this.storageService.setItem("refreshToken", user.tokens.refresh.token);
             this.storageService.setItem("role", user.usr.role);
-            localStorage.setItem("Mode", "Export");
-            localStorage.setItem("companyCode", user.usr.companyCode);
+
+            this.storageService.setItem("Mode", "FTL");
+            //localStorage.setItem("company_Name", "Velocity");            
+            //this.storageService.setItem("userLocations", user.usr.multiLocation);
+
+            const locations = user.usr?.multiLocation || [];
+            var locRes =  await this.locationService.getLocations({ locCode: { D$in: locations}, activeFlag: true });
+            if(locRes && locRes.length > 0){      
+              this.storageService.setItem("userLocations", locRes.map((x) => x.locCode).join(","));
+              this.storageService.setItem("loginLocations", JSON.stringify(locRes.map((x) => { return { locCode: x.locCode, locName: x.locName }; })));
+
+              const b = locRes.find((x) => x.locCode == user.usr.branchCode);
+              if(b) {
+                this.storageService.setItem("Branch", user.usr.branchCode);
+              }
+              else {
+                this.storageService.setItem("Branch", locRes[0].locCode);
+              }
+            }
+
             this.currentUserSubject.next(user);
             return user;
           }

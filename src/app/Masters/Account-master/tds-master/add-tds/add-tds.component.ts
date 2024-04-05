@@ -7,6 +7,7 @@ import { AccountTdsControls } from "src/assets/FormControls/Account/account-tds-
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-add-tds",
@@ -20,7 +21,7 @@ export class AddTdsComponent implements OnInit {
       active: "Account",
     },
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   UpdateData: any;
   isUpdate: boolean = false;
   FormTitle: string = "Add TDS";
@@ -30,8 +31,10 @@ export class AddTdsComponent implements OnInit {
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
@@ -63,7 +66,7 @@ export class AddTdsComponent implements OnInit {
 
       // Create a request object with the filter criteria
       const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.CompanyCode,
         collectionName: "tds_detail",
         filter: { [fieldName]: fieldValue },
       };
@@ -165,7 +168,7 @@ export class AddTdsComponent implements OnInit {
         _id: index,
         TDScode: index,
         TDSsection: this.TdsForm.value.TDSsection,
-        eNTBY: localStorage.getItem("UserName"),
+        eNTBY: this.storage.userName,
         eNTDT: new Date(),
         companyCode: this.CompanyCode,
         ...commonBody,

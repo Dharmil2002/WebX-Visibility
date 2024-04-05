@@ -228,7 +228,7 @@ export class BillApprovalComponent implements OnInit {
                 docNo: data.bILLNO,
                 partyCode: data?.cUST?.cD || "",
                 partyName: data?.cUST?.nM || "",
-                entryBy: localStorage.getItem("UserName"),
+                entryBy: this.storage.userName,
                 entryDate: Date(),
                 debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
                   return {

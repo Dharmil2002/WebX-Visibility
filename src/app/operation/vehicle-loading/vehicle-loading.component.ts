@@ -18,8 +18,8 @@ export class VehicleLoadingComponent implements OnInit {
   vehicleLoadingTableForm: UntypedFormGroup; // Declaration of UntypedFormGroup for vehicle loading table
   tripData: any; // Declaration of tripData variable
   jsonControlArray: any; // Declaration of jsonControlArray variable
-  orgBranch: string = localStorage.getItem("Branch"); // Retrieve value from localStorage for orgBranch
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  orgBranch: string = ""; // Retrieve value from localStorage for orgBranch
+  companyCode: number = 0;
   // Declaring breadscrum
   breadscrums = [
     {
@@ -133,6 +133,10 @@ export class VehicleLoadingComponent implements OnInit {
     private fb: UntypedFormBuilder,// Injecting UntypedFormBuilder
     private storage: StorageService
   ) {
+    
+    this.orgBranch = this.storage.branch;
+    this.companyCode = this.storage.companyCode;
+
     // Check if there is data in the state passed through navigation
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       // Retrieve the data from the state

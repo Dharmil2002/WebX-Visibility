@@ -1,14 +1,15 @@
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class ContainerService {
 
-  constructor(private masterService: MasterService) { }
-  companyCode = localStorage.getItem("companyCode")
+  constructor(private masterService: MasterService, private storage: StorageService) { }
+  companyCode = this.storage.companyCode;
   // This async function retrieves container data from an API using the masterService.
   async containerFromApi() {
 

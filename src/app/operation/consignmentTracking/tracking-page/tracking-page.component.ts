@@ -19,6 +19,7 @@ import moment from "moment";
 import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
 import Swal from "sweetalert2";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-tracking-page",
@@ -32,11 +33,11 @@ export class TrackingPageComponent implements OnInit {
       active: "Consignment Tracking",
     },
   ];
-  Mode = localStorage.getItem("Mode");
+  Mode = "";
   QueryData: any;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   isTouchUIActivated = false;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   obs: Observable<any>;
   dataSource: MatTableDataSource<any>;
@@ -102,8 +103,11 @@ export class TrackingPageComponent implements OnInit {
     public dialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
     private fb: UntypedFormBuilder,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
+    this.Mode = this.storage.mode;
     this.DocCalledAs = this.controlPanel.DocCalledAs;
     this.breadscrums = [
       {

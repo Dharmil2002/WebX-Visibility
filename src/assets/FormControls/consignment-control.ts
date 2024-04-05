@@ -1,5 +1,8 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
+import * as StorageService from "src/app/core/service/storage.service";
+
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -116,7 +119,7 @@ export class ConsignmentControl {
         label: "Origin",
         placeholder: "Origin",
         type: "text",
-        value: localStorage.getItem("Branch"),
+        value: StorageService.getItem(StoreKeys.Branch),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -657,7 +660,7 @@ export class ConsignmentControl {
         label: 'Company Code',
         placeholder: 'Company Code',
         type: 'text',
-        value: localStorage.getItem("companyCode"),
+        value: StorageService.getItem(StoreKeys.CompanyCode),
         Validations: [],
         generatecontrol: false, disable: false,
         additionalData: {
@@ -1137,7 +1140,7 @@ export class ConsignmentControl {
       },
       {
         name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
-        value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+        value: StorageService.getItem(StoreKeys.CompanyCode), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
         Validations: [
         ],
       },
@@ -1152,7 +1155,7 @@ export class ConsignmentControl {
         label: 'Entry By',
         placeholder: 'Entry By',
         type: 'text',
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false, disable: false
       },
@@ -1277,7 +1280,7 @@ export class FreightControl {
         label: 'Company Code',
         placeholder: 'Company Code',
         type: 'text',
-        value: localStorage.getItem("companyCode"),
+        value: StorageService.getItem(StoreKeys.CompanyCode),
         Validations: [],
         generatecontrol: false, disable: false
       },

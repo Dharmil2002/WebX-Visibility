@@ -72,7 +72,7 @@ export class ThcGenerationComponent implements OnInit {
   // End Code Of Harikesh
   //FormGrop
   thcDetailGlobal: any;
-  companyCode = localStorage.getItem("companyCode");
+  companyCode = 0;
   thcTableForm: UntypedFormGroup;
   VehicleTableForm: UntypedFormGroup;
   rakeDetailsTableForm: UntypedFormGroup;
@@ -307,7 +307,7 @@ export class ThcGenerationComponent implements OnInit {
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
-
+    this.companyCode = this.storage.companyCode;
     this.orgBranch = storage.branch;
     this.branchCode = storage.branch;
 
@@ -2155,7 +2155,7 @@ export class ThcGenerationComponent implements OnInit {
           reqBody: {
             cid: this.companyCode,
             EventType: 'A',
-            loc: localStorage.getItem("Branch") || "",
+            loc: this.storage.branch || "",
             tripId: this.thcTableForm.get("tripId").value
           }
         }
@@ -2203,7 +2203,7 @@ export class ThcGenerationComponent implements OnInit {
                   action: "PushTripFTL",
                   reqBody: {
                     companyCode: this.companyCode,
-                    branch: localStorage.getItem("Branch") || "",
+                    branch: this.storage.branch || "",
                     tripId: resThc.data?.mainData?.ops[0]?.docNo,
                     vehicleNo: resThc.data?.mainData?.ops[0]?.vEHNO
                   }
@@ -2222,7 +2222,7 @@ export class ThcGenerationComponent implements OnInit {
                 //     if(result?.gpsDeviceEnabled ==true && result?.gpsDeviceId!=""){
                 //       const req={
                 //         companyCode: this.companyCode,
-                //         branch:localStorage.getItem("Branch") || "",
+                //         branch:localstorage.getItem(StoreKeys.Branch) || "",
                 //         tripId:"TH/DELB/2425/000046",
                 //         vehicleNo:result.vehicleNo
                 //       }

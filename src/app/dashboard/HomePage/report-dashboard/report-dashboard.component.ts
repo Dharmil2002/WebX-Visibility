@@ -68,7 +68,8 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
           selected :false
       };
       return d;
-    });
+    }).sort((a, b) => a.title.localeCompare(b.title));
+    
     catData.unshift({ title: "All", category: "All", selected: true});
  
     let reportData = menuItems.filter(f => f.Category == "Reports").map((x) => {
@@ -121,7 +122,10 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
       return acc;
     }, []);
 
-    return  { reports: reportData, menu: menuData, dashboards: dashboardData};
+    return  { 
+      reports: reportData.sort((a, b) => a.title.localeCompare(b.title)), 
+      menu: menuData, 
+      dashboards: dashboardData.sort((a, b) => a.title.localeCompare(b.title))};
   }
 
   async getConfig() {

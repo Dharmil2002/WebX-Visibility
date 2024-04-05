@@ -5,6 +5,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-city-location-master',
@@ -16,7 +17,7 @@ export class CityLocationMappingMaster implements OnInit {
     tableLoad = false;
     tableData1: any = [];
     data: [] | any;
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     cityLocationTableForm: any;
     isUpdate: any;
     cityLocationFormControl: CityLocationMappingControl;
@@ -47,7 +48,8 @@ export class CityLocationMappingMaster implements OnInit {
         search: true
     };
 
-    constructor(private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
+    constructor(private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) {
+        this.companyCode = this.storage.companyCode;
     }
 
     // Displayed columns location City configuration
@@ -459,7 +461,7 @@ export class CityLocationMappingMaster implements OnInit {
                 showLoaderOnConfirm: true,
                 preConfirm: (Remarks) => {
                     var request = {
-                        companyCode: localStorage.getItem("CompanyCode"),
+                        companyCode: this.storage.companyCode,
                         id: row.id,
                     };
                     if (row.id == 0) {

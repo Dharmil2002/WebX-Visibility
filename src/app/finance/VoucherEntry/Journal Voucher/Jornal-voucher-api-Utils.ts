@@ -1,7 +1,10 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export async function customerFromApi(masterService) {
-    const branch = localStorage.getItem("Branch");
+    const branch = StorageService.getItem(StoreKeys.Branch);
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "customer_detail",
         filter: {}
     }
@@ -16,7 +19,7 @@ export async function customerFromApi(masterService) {
 }
 export async function vendorFromApi(masterService) {
     let req = {
-        "companyCode": localStorage.getItem('companyCode'),
+        "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
         "collectionName": "vendor_detail",
         "filter": {}
     }
@@ -31,9 +34,9 @@ export async function vendorFromApi(masterService) {
     }
 }
 export async function UsersFromApi(masterService) {
-    const branch = localStorage.getItem("Branch");
+    const branch = StorageService.getItem(StoreKeys.Branch);
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "user_master",
         filter: {}
     }
@@ -48,7 +51,7 @@ export async function UsersFromApi(masterService) {
 }
 export async function DriversFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "driver_detail",
         filter: {}
     }
@@ -63,7 +66,7 @@ export async function DriversFromApi(masterService) {
 }
 export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem(StoreKeys.CompanyCode);
         const filter = { vendorCode };
         const req = { companyCode, collectionName: 'vendor_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
@@ -78,7 +81,7 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
 }
 export async function GetSingleCustomerDetailsFromApi(masterService, customerCode) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem(StoreKeys.CompanyCode);
         const filter = { customerCode };
         const req = { companyCode, collectionName: 'customer_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();

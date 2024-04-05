@@ -1,17 +1,18 @@
 import { Injectable } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class CityService {
-  constructor(private masterService: MasterService) {}
+  constructor(private masterService: MasterService, private storage: StorageService) {}
 
 // This async function retrieves city data from an API using the masterService.
 async getCity() {
     // Prepare the request body with necessary parameters
     const req = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "city_detail",
       filter: {}, // You can specify additional filters here if needed
     };

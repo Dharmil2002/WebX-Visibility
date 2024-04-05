@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class DCRControl {
     dcrControlArray: FormControls[];
@@ -394,7 +396,7 @@ export class DCRControl {
                     label: 'Entry By',
                     placeholder: 'Entry By',
                     type: 'text',
-                    value: localStorage.getItem("UserName"),
+                    value: StorageService.getItem(StoreKeys.UserId),
                     Validations: [],
                     generatecontrol: false, disable: false
                 },

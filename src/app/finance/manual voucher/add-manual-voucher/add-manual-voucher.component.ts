@@ -7,6 +7,8 @@ import { addVoucherDetail, updateVoucher } from './manual-utlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 
 @Component({
   selector: 'app-add-manual-voucher',
@@ -30,7 +32,8 @@ export class AddManualVoucherComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private router:Router,
     private _NavigationService: NavigationService,
-    private masterService:MasterService
+    private masterService:MasterService,
+    private storageService:StorageService
     ) {
       if (this.router.getCurrentNavigation()?.extras?.state != null) {
         this.voucherDetail = router.getCurrentNavigation().extras.state.data;
@@ -86,7 +89,7 @@ export class AddManualVoucherComponent implements OnInit {
     }
 
     else{
-    const dynamicValue = localStorage.getItem("Branch");
+    const dynamicValue = this.storageService.getItem(StoreKeys.Branch);
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(7, "0");
     const voucherNo = `VR/${dynamicValue}/${paddedNumber}`;

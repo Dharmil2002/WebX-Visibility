@@ -42,7 +42,7 @@ export class PrqEntryPageComponent implements OnInit {
   toCityStatus: boolean; //it's used in getCity() for binding ToCity
   customer: string; //it's used in customerDetails() for binding billingParty
   billingPartytatus: boolean; //it's used in customerDetails() for binding billingParty
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   fleetSize: string;
   fleetSizeStatus: boolean;
   ftlType: string;
@@ -75,7 +75,7 @@ export class PrqEntryPageComponent implements OnInit {
   customerList: any;
   allFormGrop: FormControls[];
   resContainer: any;
-  branchCode = localStorage.getItem("Branch");
+  branchCode = "";
   paymentBase: any;
   vehicleType: any;
   AddressStatus: any;
@@ -96,6 +96,9 @@ export class PrqEntryPageComponent implements OnInit {
     private generalService: GeneralService,
     private masterService: MasterService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.branchCode = this.storage.branch;
+
     this.prqDetail = new prqDetail({});
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.prqDetail = router.getCurrentNavigation().extras.state.data;
@@ -462,7 +465,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
   async bindDataFromDropdown() {
     this.resContainer = await this.containerService.containerFromApi();
-    let locList = localStorage.getItem('userLocations');
+    let locList = this.storage.getItem('userLocations');
     let locations = locList.split(",")
     this.filter.Filter(
       this.jsonControlPrqArray,

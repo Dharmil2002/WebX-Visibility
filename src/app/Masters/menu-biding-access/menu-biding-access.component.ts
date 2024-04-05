@@ -4,6 +4,8 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { menuAccesDropdown } from 'src/app/Models/Comman Model/CommonModel';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { StoreKeys } from 'src/app/config/myconstants';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { MenuAccessControl } from 'src/assets/FormControls/menu-access-mode';
 
 @Component({
@@ -15,7 +17,10 @@ export class MenuBidingAccessComponent implements OnInit {
   menuAccessFormControls: MenuAccessControl;
   filteredMenu: Observable<menuAccesDropdown[]>;
   jsonControlArray: any;
-  constructor(public fb: FormBuilder, public dialogRef: MatDialogRef<MenuBidingAccessComponent>,) {
+  constructor(
+    public fb: FormBuilder,     
+    public dialogRef: MatDialogRef<MenuBidingAccessComponent>,
+    private storageService: StorageService) {
     
     this.initializeFormControl();
   }
@@ -46,7 +51,7 @@ functionCallHandler($event) {
   }
 }
   save() {
-     localStorage.setItem("Mode",this.menuAccessFrom.value.Mode);
+    this.storageService.setItem(StoreKeys.Mode,this.menuAccessFrom.value.Mode);
     location.reload();
   }
 

@@ -8,6 +8,7 @@ import { ProductServicesComponent } from "../../product-master/product-services/
 import { ShardProductAddComponent } from "../shard-product-add/shard-product-add.component";
 import { ShardProductChargesComponent } from "../shard-product-charges/shard-product-charges.component";
 import { ShardProductServicesComponent } from "../shard-product-services/shard-product-services.component";
+import { StorageService } from "src/app/core/service/storage.service";
 // import { AddShardProductComponent } from '../add-shard-product/add-shard-product.component';
 
 @Component({
@@ -74,7 +75,7 @@ export class ProductListComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
   staticField = ["SrNo", "ProductID", "ProductName"];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   productNameList: any = [];
   tableData: any;
   isTableLode = false;
@@ -82,8 +83,11 @@ export class ProductListComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
-    private masterService: MasterService
-  ) {}
+    private masterService: MasterService,
+    private storage: StorageService
+  ) {
+    this.companyCode = this.storage.companyCode;
+  }
   ngOnInit() {
     this.getProductDetails();
   }

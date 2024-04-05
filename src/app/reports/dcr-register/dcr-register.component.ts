@@ -9,6 +9,7 @@ import { timeString } from "src/app/Utility/date/date-utils";
 import moment from "moment";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-dcr-register",
@@ -29,7 +30,7 @@ export class DcrRegisterComponent implements OnInit {
   allColumnFilter: any;
   csvFileName: string;
   filterColumn: boolean = true;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   submit = "Save";
   linkArray = [];
   tableData: any[];
@@ -240,8 +241,10 @@ export class DcrRegisterComponent implements OnInit {
     private dcrService: DCRService,
     private masterService: MasterService,
     private filter: FilterUtils,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     // this.allColumnFilter = this.CSVHeader;
   }
 

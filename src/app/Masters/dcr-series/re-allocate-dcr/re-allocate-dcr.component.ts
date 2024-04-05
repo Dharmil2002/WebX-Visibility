@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-re-allocate-dcr',
@@ -36,7 +37,8 @@ export class ReAllocateDcrComponent implements OnInit {
   newPerson: any;
   newPersonStatus: any;
   id: string;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, public dialog: MatDialog, private fb: UntypedFormBuilder,
+   private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) {
   }
 
   ngOnInit(): void {
@@ -92,7 +94,7 @@ export class ReAllocateDcrComponent implements OnInit {
   }
   reAlloc() {
     let getReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "dcr"
     }
@@ -121,7 +123,7 @@ export class ReAllocateDcrComponent implements OnInit {
             }
           }
           let req = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
+            companyCode: this.storage.companyCode,
             collectionName: "dcr",
             data: {
               "documentType": this.data.documentType,
@@ -132,7 +134,7 @@ export class ReAllocateDcrComponent implements OnInit {
               "allotTo": this.dcrReallocateForm.value.newLocation.value,
               "type": this.dcrReallocateForm.value.newCategory.value,
               "allocateTo": this.dcrReallocateForm.value.newPerson.value,
-              "entryBy": localStorage.getItem("UserName"),
+              "entryBy": this.storage.userName,
               "entryDate": new Date().toISOString(),
               "_id": this.id,
               "action": "Re-Allocate"
@@ -163,25 +165,25 @@ export class ReAllocateDcrComponent implements OnInit {
   getAllMastersData() {
     // Prepare the requests for different collections
     let locationReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "location_detail"
     };
 
     let userReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "user_master"
     };
 
     let vendorReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "vendor_detail"
     };
 
     let customerReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "customer_detail"
     };

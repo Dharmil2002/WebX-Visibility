@@ -1,6 +1,7 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: 'app-trip-route-master-list',
@@ -55,8 +56,9 @@ export class TripRouteMasterListComponent implements OnInit {
   menuItems = [];
   addAndEditPath: string;
   viewComponent: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  constructor(private masterService: MasterService) {
+  companyCode: any = 0;
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/TripRouteMaster/TripRouteMasterAdd";//setting Path to add data
   }
   ngOnInit(): void {

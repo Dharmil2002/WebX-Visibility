@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
-
+import * as StorageService from "src/app/core/service/storage.service";
+import { StoreKeys } from "src/app/config/myconstants";
 /**
  * Retrieves the list of vendor contracts from the API.
  * @param {MasterService} masterService - The service used to communicate with the API.
@@ -9,7 +10,7 @@ export async function getContractList(masterService, filterFieldName?: string, f
     try {
         // Prepare request to fetch existing vendor contracts
         const request = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
+            companyCode: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
             collectionName: "vendor_contract",
             filter: { [filterFieldName]: filterId }
         };
@@ -55,7 +56,7 @@ export async function GetContractBasedOnVendorAndProduct(masterService, vendorID
 
     // Construct the request object with necessary parameters.
     let req = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "vendor_contract",
         filter: filter,
     };
@@ -100,7 +101,7 @@ export async function GetContractBasedOnVendorAndProduct(masterService, vendorID
 export async function removeData(masterService, id, collectionName) {
     // Construct the request object
     const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
         collectionName: collectionName,
         filter: { _id: id },
     };

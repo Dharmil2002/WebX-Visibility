@@ -2,6 +2,8 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
+import * as StorageService from "src/app/core/service/storage.service";
+import { StoreKeys } from "src/app/config/myconstants";
 
 export class EwayBillControls extends BaseControl {
   private docketFields: FormControls[];
@@ -837,7 +839,7 @@ export class EwayBillControls extends BaseControl {
         label: "Booking Branch",
         placeholder: "Booking Branch",
         type: "text",
-        value: localStorage.getItem("Branch"),
+        value: StorageService.getItem(StoreKeys.Branch),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",

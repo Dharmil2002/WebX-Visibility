@@ -16,7 +16,7 @@ import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
   templateUrl: "./add-user-master.component.html",
 })
 export class AddUserMasterComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   password: any;
   jsonControlUserArray: any;
   userTableForm: UntypedFormGroup;
@@ -68,6 +68,7 @@ export class AddUserMasterComponent implements OnInit {
     private storage: StorageService,
 
   ) {
+    this.companyCode = this.storage.companyCode;
     const extrasState = this.route.getCurrentNavigation()?.extras?.state;
     this.isUpdate = false;
     this.action = extrasState ? "edit" : "add";

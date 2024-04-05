@@ -8,6 +8,7 @@ import { getDocketFromApiDetail } from './docket-tracking-utlity';
 import Swal from 'sweetalert2';
 import { formatDate } from 'src/app/Utility/date/date-utils';
 import moment from 'moment';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-docket-tracking',
@@ -33,9 +34,9 @@ export class DocketTrackingComponent implements OnInit {
     edit: false,
     csv: true
   }
-  orgBranch: string = localStorage.getItem("Branch");
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  userName = localStorage.getItem("Username");
+  orgBranch = "";
+  companyCode = 0;
+  userName = "";
   columnHeader = {
     eNTDT:"Date",
     eVNID: "Transaction Number",
@@ -65,7 +66,12 @@ export class DocketTrackingComponent implements OnInit {
   ];
   constructor(
     private fb: UntypedFormBuilder,
-    private operationService: OperationService) {
+    private operationService: OperationService,
+    private storage: StorageService) {
+      this.companyCode = this.storage.companyCode;
+      this.userName = this.storage.userName;
+      this.orgBranch = this.storage.branch;
+
     this.initializeFormControl();
   }
 

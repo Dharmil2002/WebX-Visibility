@@ -10,6 +10,7 @@ import { ReAllocateDcrComponent } from '../re-allocate-dcr/re-allocate-dcr.compo
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-dcr-detail-page',
@@ -54,7 +55,10 @@ export class DcrDetailPageComponent implements OnInit {
   docData: any;
   allData: any[];
   locdet: any;
-  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, public dialog: MatDialog) {
+  constructor(private fb: UntypedFormBuilder, private route: Router, 
+    private masterService: MasterService, private storage: StorageService,
+    public dialog: MatDialog) {
+
     if (this.route.getCurrentNavigation()?.extras != null) {
       this.type = this.route.getCurrentNavigation().extras?.state?.additionalData;
       this.data = this.route.getCurrentNavigation().extras?.state?.data;
@@ -86,7 +90,7 @@ export class DcrDetailPageComponent implements OnInit {
     this.dcrDetailForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   bindData() {
-    const companyCode = parseInt(localStorage.getItem("companyCode"));
+    const companyCode = this.storage.companyCode;
     // Helper function to generate request object
     function generateRequest(collectionName) {
       return {
@@ -209,7 +213,7 @@ export class DcrDetailPageComponent implements OnInit {
   }
   getDcrHistoryData() {
     let req = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "dcr"
     }

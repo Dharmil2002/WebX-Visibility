@@ -103,10 +103,11 @@ export class AdviceAcknowledgeComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
   staticField = ["SrNo", "docNo", "eNTDT", "rBRANCH", "eNTLOC", "aMT", "sTNM"];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   isTableLode = true;
   constructor(private matDialog: MatDialog,
     public StorageService: StorageService, private router: Router, private masterService: MasterService,) {
+      this.companyCode = StorageService.companyCode;
     this.RequestData.StartDate.setDate(new Date().getDate() - 30);
   }
 
@@ -115,7 +116,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
   }
   async GetAdviceData() {
     const RequestBody = {
-      "companyCode": localStorage.getItem('companyCode'),
+      "companyCode": this.StorageService.getItem('companyCode'),
       "collectionName": "advice_details",
       "filter": {
         "D$and": [

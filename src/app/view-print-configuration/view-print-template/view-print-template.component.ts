@@ -18,7 +18,7 @@ export class ViewPrintTemplateComponent implements OnInit {
   allData: {
     companyData: any;
   };
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   isUpdate = false;
   breadScrums = [
     {
@@ -55,6 +55,7 @@ export class ViewPrintTemplateComponent implements OnInit {
     private storage: StorageService,
     private renderer: Renderer2, private elementRef: ElementRef
   ) {
+    this.companyCode = this.storage.companyCode;
     this.initializeFormControl();
     this.queryTableForm.controls["vTYPE"].setValue;
   }

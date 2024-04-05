@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { AccountMasterControls } from "src/assets/FormControls/AccountMasterControls";
 
 @Component({
@@ -27,15 +28,18 @@ export class AccountListFilterComponent implements OnInit {
   MainCategoryStatus: any;
   TableData: any;
   TableLoad = false;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storageService: StorageService,
     public dialogRef: MatDialogRef<AccountListFilterComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    this.CompanyCode = this.storageService.companyCode;
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();

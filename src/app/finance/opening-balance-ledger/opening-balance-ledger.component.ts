@@ -6,6 +6,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { openingbalanceControls } from "src/assets/FormControls/Finance/opening balance/openingbalanceControls";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { GetLocationDetailFromApi } from "../Debit Voucher/debitvoucherAPIUtitlity";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-opening-balance-ledger",
@@ -27,13 +28,15 @@ export class OpeningBalanceLedgerComponent implements OnInit {
   AccountCategoryStatus: any;
   AccountCodeCode: any;
   AccountCodeStatus: any;
-  CompanyCode: any = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode: any = 0;
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-
-  ) { }
+    private storageService: StorageService
+  ) { 
+    this.CompanyCode = this.storageService.companyCode;
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();

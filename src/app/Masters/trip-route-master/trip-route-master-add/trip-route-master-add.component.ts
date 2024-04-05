@@ -8,6 +8,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { forkJoin, map } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { TripRouteControl } from 'src/assets/FormControls/trip-route-master';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-trip-route-master-add',
   templateUrl: './trip-route-master-add.component.html'
@@ -31,7 +32,7 @@ export class TripRouteMasterAddComponent implements OnInit {
   action: string;
   data: any;
   isUpdate: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -96,7 +97,8 @@ export class TripRouteMasterAddComponent implements OnInit {
   updateRoute: any;
   routeMode: any;
   routeModeStatus: any;
-  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
+  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
@@ -156,7 +158,7 @@ export class TripRouteMasterAddComponent implements OnInit {
 
   save() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       filter: {},
       "collectionName": "trip_route_details"
     }
@@ -194,7 +196,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             transitTime: this.tableData.map((item) => parseInt(item.transitTime)),
             stoppageTime: this.tableData.map((item) => parseInt(item.stoppageTime)),
             onw_ret: this.tableData.map((item) => item.onw_ret),
-            entryBy: localStorage.getItem('Username'),
+            entryBy: this.storage.userName,
             entryDate: new Date()
           };
 
@@ -203,7 +205,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             // Remove the "id" field from the form controls
             delete transformedData._id;
             let req = {
-              companyCode: parseInt(localStorage.getItem("companyCode")),
+              companyCode: this.storage.companyCode,
               collectionName: "trip_route_details",
               filter: { tripRouteId:this.tripRouteTableForm.value.tripRouteId},
               update: transformedData
@@ -224,7 +226,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             });
           } else {
             let req = {
-              companyCode: parseInt(localStorage.getItem("companyCode")),
+              companyCode: this.storage.companyCode,
               collectionName: "trip_route_details",
               data: transformedData
             };
@@ -291,7 +293,7 @@ export class TripRouteMasterAddComponent implements OnInit {
         showLoaderOnConfirm: true,
         preConfirm: (Remarks) => {
           var request = {
-            companyCode: localStorage.getItem("CompanyCode"),
+            companyCode: this.storage.companyCode,
             id: row.id,
           };
           if (row.id == 0) {
@@ -358,13 +360,13 @@ export class TripRouteMasterAddComponent implements OnInit {
   getAllMastersData() {
     // Prepare the requests for different collections
     let locationReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       filter: {},
       "collectionName": "location_detail"
     };
 
     let cityReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       filter: {},
       "collectionName": "city_detail"
     };

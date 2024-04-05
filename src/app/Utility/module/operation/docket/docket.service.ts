@@ -90,7 +90,7 @@ export class DocketService {
 
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "dockets",
             filter: { "docNo": filter },
             update: data
@@ -103,7 +103,7 @@ export class DocketService {
     async updateDocketSuffix(filter, data) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "docket_operation_details",
             filter: filter,
             update: data
@@ -156,7 +156,7 @@ export class DocketService {
 
     async getDocket() {
         const req = {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.companyCode,
             "filter": { origin: this.storage.branch },
             "collectionName": "docket_temp"
         }
@@ -166,7 +166,7 @@ export class DocketService {
     }
     async getDockets(filter) {
         const req = {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.companyCode,
             "filter": filter,
             "collectionName": "dockets"
         }
@@ -178,7 +178,7 @@ export class DocketService {
     async addDktDetail(data) {
 
         const req = {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.companyCode,
             "collectionName": "docket_operation_details",
             "data": data
         }
@@ -528,7 +528,7 @@ export class DocketService {
                 }
                 // Prepare the pincodeBody with the companyCode and the determined filter
                 const cityBody = {
-                    companyCode: localStorage.getItem("companyCode"),
+                    companyCode: this.storage.companyCode,
                     collectionName: "dockets",
                     filter,
                 };
@@ -573,7 +573,7 @@ export class DocketService {
         try {
             // Prepare the pincodeBody with the companyCode and the determined filter
             const cityBody = {
-                companyCode: localStorage.getItem("companyCode"),
+                companyCode: this.storage.companyCode,
                 collectionName: "docket_containers",
                 filter: filter
             };

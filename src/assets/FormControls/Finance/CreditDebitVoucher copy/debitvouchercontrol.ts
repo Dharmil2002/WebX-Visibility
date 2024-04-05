@@ -1,4 +1,5 @@
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class DebitVoucherControl {
   DebitVoucherSummaryArray: FormControls[];
@@ -42,7 +43,7 @@ export class DebitVoucherControl {
         label: "Entry Location",
         placeholder: "Entry Location",
         type: "text",
-        value: localStorage.getItem('Branch'),
+        value: StorageService.getItem('Branch'),
         generatecontrol: true,
         disable: true,
         Validations: [],
@@ -235,7 +236,7 @@ export class DebitVoucherControl {
         label: "Prepared by",
         placeholder: "Prepared by",
         type: "text",
-        value: localStorage.getItem('UserName'),
+        value: StorageService.getItem('UserName'),
         generatecontrol: true,
         disable: true,
         Validations: [],

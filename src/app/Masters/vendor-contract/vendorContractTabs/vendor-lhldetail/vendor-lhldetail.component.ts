@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
 import { LongHaulLaneBulkUploadComponent } from './long-haul-lane-bulk-upload/long-haul-lane-bulk-upload.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-lhldetail',
@@ -67,14 +68,16 @@ export class VendorLHLDetailComponent implements OnInit {
     { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   CurrentContractDetails: any;
   uploadComponent = LongHaulLaneBulkUploadComponent;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

@@ -1,13 +1,15 @@
-const branch = localStorage.getItem("Branch");
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 // This function adds a job detail to a MongoDB collection using a master service.
 export async function addJobDetail(jobDetail, masterService, financialYear) {
 
   // Prepare the request body with company code, collection name, and job detail data.
   let reqBody = {
-    companyCode: localStorage.getItem("companyCode"),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "job_detail",
     docType: "JOB",
-    branch: localStorage.getItem("Branch"),
+    branch: StorageService.getItem(StoreKeys.Branch),
     finYear: financialYear,
     data: jobDetail,
     party: jobDetail.billingParty.toUpperCase()
@@ -23,9 +25,9 @@ export async function addJobDetail(jobDetail, masterService, financialYear) {
 export async function getVendorDetails(masterService) {
   // Prepare the request object with company code, collection name, and an empty filter.
   let req = {
-    "companyCode": parseInt(localStorage.getItem("companyCode")),
+    "companyCode": parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
     "collectionName": "vendor_detail",
-    "filter": { isActive: true, vendorLocation: { "D$in": [branch] } }
+    "filter": { isActive: true, vendorLocation: { "D$in": [StorageService.getItem(StoreKeys.Branch)] } }
   }
   // Send a POST request to retrieve vendor details from the MongoDB collection.
   const res = await masterService.masterPost("generic/get", req).toPromise()
@@ -50,14 +52,14 @@ export async function getVendorDetails(masterService) {
 export async function getVendorsForAutoComplete(masterService, vendor, vendorType) {
   // Prepare the request object with company code, collection name, and an empty filter.
   let req = {
-    "companyCode": parseInt(localStorage.getItem("companyCode")),
+    "companyCode": parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
     "collectionName": "vendor_detail",
     "filter": {
       'D$or': [
         { 'vendorName': { 'D$regex': `^${vendor}`, 'D$options': 'i' } },
         { 'vendorCode': { 'D$regex': `^${vendor}`, 'D$options': 'i' } }
       ],
-      'vendorLocation': { 'D$elemMatch': { 'D$eq': branch } },
+      'vendorLocation': { 'D$elemMatch': { 'D$eq': StorageService.getItem(StoreKeys.Branch) } },
       'isActive': true,
       'vendorType': vendorType
     }
@@ -78,7 +80,7 @@ export async function getVendorsForAutoComplete(masterService, vendor, vendorTyp
 // This function gets the next sequential number, formats it, and updates it in localStorage.
 export function getNextNumber() {
   // Get the current number from localStorage
-  let currentNum = parseInt(localStorage.getItem('sequenceNumber'));
+  let currentNum = parseInt(StorageService.getItem('sequenceNumber'));
 
   // If the number doesn't exist in localStorage, initialize it to 1
   if (!currentNum) {
@@ -91,7 +93,7 @@ export function getNextNumber() {
   const formattedNumber = currentNum.toString().padStart(4, '0');
 
   // Store the new number in localStorage
-  localStorage.setItem('sequenceNumber', currentNum.toString());
+  this.storageService.setItem('sequenceNumber', currentNum.toString());
 
   // Return the formatted number
   return formattedNumber;

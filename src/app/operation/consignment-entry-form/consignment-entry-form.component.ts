@@ -2313,7 +2313,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   //               docNo: DocketNo,
   //               partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
   //               partyName: this.model.consignmentTableForm.value?.billingParty?.name,
-  //               entryBy: localStorage.getItem("UserName"),
+  //               entryBy: localstorage.getItem(StoreKeys.UserId),
   //               entryDate: Date(),
   //               debit: [{
   //                 "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,

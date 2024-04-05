@@ -70,7 +70,7 @@ export class AccountGroupComponent implements OnInit {
   CategoryCodeStatus: any;
   GroupCodeTypeCode: string;
   GroupCodeTypeStatus: any;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   GroupCodeTableData: any;
   SelectAccountCategory: any;
   SelectAccountCategoryData: any;
@@ -92,7 +92,9 @@ export class AccountGroupComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private storage: StorageService
-  ) {}
+  ) {
+    this.CompanyCode = this.storage.companyCode;
+  }
 
   ngOnInit(): void {
     this.getCategoryCode();

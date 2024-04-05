@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-driver-master',
   templateUrl: './driver-master.component.html',
 })
 export class DriverMasterComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
@@ -43,7 +44,8 @@ export class DriverMasterComponent implements OnInit {
   addAndEditPath: string;
   csvFileName: string;
   tableData: any;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
   }
 
@@ -89,7 +91,7 @@ export class DriverMasterComponent implements OnInit {
     // Remove the "id" field from the form controls
     delete det._id;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "driver_detail",
       filter: { _id: id },
       update: det

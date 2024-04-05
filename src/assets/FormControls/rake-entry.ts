@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class RakeEntryControl {
     rakeEntryArray: FormControls[];
@@ -227,7 +229,7 @@ export class RakeEntryControl {
                 label: "branch",
                 placeholder: "branch",
                 type: "",
-                value:localStorage.getItem("Branch"),
+                value:StorageService.getItem(StoreKeys.Branch),
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -312,7 +314,7 @@ export class RakeEntryControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem('Username'),
+                value: StorageService.getItem('Username'),
                 Validations: [],
                 generatecontrol: false, disable: true
             },
@@ -376,7 +378,7 @@ export class RakeEntryControl {
                 label: 'Company Code',
                 placeholder: 'Company Code',
                 type: 'text',
-                value: localStorage.getItem("companyCode"),
+                value: StorageService.getItem(StoreKeys.CompanyCode),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

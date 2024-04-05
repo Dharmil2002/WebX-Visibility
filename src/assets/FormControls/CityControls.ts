@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { CityMaster } from "src/app/core/models/Masters/City Master/City Master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class CityControl {
   CityControlArray: FormControls[];
@@ -102,7 +104,7 @@ export class CityControl {
               generatecontrol: false,
               disable: false
             },
-      { name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: parseInt(localStorage.getItem("companyCode")), Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
+      { name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)), Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
       { name: 'entryBy', label: 'EntryBy', placeholder: 'EntryBy', type: 'text', value: CityTable.entryBy, Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
     ]
   }

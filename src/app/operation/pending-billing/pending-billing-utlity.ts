@@ -1,8 +1,11 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export async function pendingbilling(masterService) {
   const req = {
-    companyCode: localStorage.getItem('companyCode'),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "dockets_bill_details",
-    filter: {oRG:localStorage.getItem("Branch"),pAYBAS:"TBB",bILED:0}
+    filter: {oRG:StorageService.getItem(StoreKeys.Branch),pAYBAS:"TBB",bILED:0}
   }
   const res = await masterService.masterPost("generic/get", req).toPromise();
   const shipment = res.data;

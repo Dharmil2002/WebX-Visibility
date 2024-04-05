@@ -58,6 +58,8 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
 import { locationEntitySearch } from "./Utility/locationEntitySearch";
 import { SearchComponent } from "./layout/header/search/search.component";
+import * as StorageService from 'src/app/core/service/storage.service';
+import { StoreKeys } from "./config/myconstants";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -115,12 +117,12 @@ export function createTranslateLoader(http: HttpClient): any {
     NgMultiSelectDropDownModule.forRoot(),
     SharedModule,
     JwtModule.forRoot({
-      config: {
-        tokenGetter: (request) => {
-          return localStorage.getItem("token");
-        },
-        disallowedRoutes: [environment.AuthAPIGetway + "RefreshToken"],
-      },
+       config: {
+         tokenGetter: (request) => {
+           return StorageService.getItem(StoreKeys.Token);
+         },
+         disallowedRoutes: [environment.AuthAPIGetway + "RefreshToken"],
+       },
     }),
     MsalModule
   ],

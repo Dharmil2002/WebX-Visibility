@@ -15,6 +15,7 @@ import { RouteLocationService } from "src/app/Utility/module/masters/route-locat
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: "app-add-vehicle-master",
   templateUrl: "./add-vehicle-master.component.html",
@@ -28,7 +29,7 @@ export class AddVehicleMasterComponent implements OnInit {
     toggle: boolean;
   }[];
   action: string;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   isUpdate = false;
   vehicleTable: vehicleModel;
   vehicleTableForm: UntypedFormGroup;
@@ -81,8 +82,10 @@ export class AddVehicleMasterComponent implements OnInit {
     private filter: FilterUtils,
     private objRouteLocationService: RouteLocationService,
     private generalService: GeneralService,
-    private hawkeyeUtilityService: HawkeyeUtilityService
+    private hawkeyeUtilityService: HawkeyeUtilityService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
       console.log(this.vehicleTable);
@@ -659,7 +662,7 @@ export class AddVehicleMasterComponent implements OnInit {
       data["mODDT"] = new Date();
       data["mODBY"] = this.vehicleTableForm.value.eNTBY;
       delete data.eNTBY;
-      data["mODLOC"] = localStorage.getItem("Branch");
+      data["mODLOC"] = this.storage.branch;
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
@@ -696,7 +699,7 @@ export class AddVehicleMasterComponent implements OnInit {
       // this.vehicleTableForm.controls["_id"].setValue(randomNumber);
       data._id = randomNumber;
       data["eNTDT"] = new Date();
-      data["eNTLOC"] = localStorage.getItem("Branch");
+      data["eNTLOC"] = this.storage.branch;
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
@@ -776,7 +779,7 @@ export class AddVehicleMasterComponent implements OnInit {
         ...vehS,
         _id:data.vehicleNo,
         vehNo:data.vehicleNo,
-        currentLocation:localStorage.getItem("Branch"),
+        currentLocation:this.storage.branch,
         status:"Available",
         tripId:"",
         dMobNo:"",

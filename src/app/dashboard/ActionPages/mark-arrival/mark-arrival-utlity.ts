@@ -39,9 +39,9 @@ export async function updateTracking(companyCode, operationService, docketDetail
             dktNo: docketDetails?.dktNo || '',
             vehNo: docketDetails?.vehNo || '',
             route: docketDetails?.route || '',
-            event: "Vehicle Arrival at " + " " + localStorage.getItem('Branch'),
+            event: "Vehicle Arrival at " + " " + this.storageService.getItem('Branch'),
             orgn: docketDetails?.orgn || '',
-            loc: localStorage.getItem('Branch') || '',
+            loc: this.storageService.getItem('Branch') || '',
             dest: docketDetails?.dest || '',
             lsno: docketDetails?.lsno || '',
             mfno: docketDetails?.mfno || '',
@@ -49,7 +49,7 @@ export async function updateTracking(companyCode, operationService, docketDetail
             dlSt: '',
             dlTm: '',
             evnCd: '',
-            upBy: localStorage.getItem('Username') || '',
+            upBy: this.storageService.getItem('Username') || '',
             upDt: new Date().toUTCString(),
         };
 

@@ -1,15 +1,19 @@
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { Injectable } from '@angular/core';
+import { StorageService } from "src/app/core/service/storage.service";
+
 
 @Injectable({
     providedIn: 'root',
 })
 // Define a class for image handling
 export class ImageHandling {
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
 
-    constructor(private masterService: MasterService,) { }
+    constructor(private masterService: MasterService, private storage: StorageService) {
+        this.companyCode = this.storage.companyCode;
+     }
 
     //#region to handle file selection
     async uploadFile(event, controlName, formControl, imageData, masterName, documentGroup, jsonControl, allowedformates?: string[]) {

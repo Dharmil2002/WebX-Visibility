@@ -15,7 +15,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 })
 export class AddVehicletypeMasterComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   action: string;
   isUpdate = false;
   vehicleTypeTableData: VehicleTypeMaster;
@@ -51,6 +51,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private storage: StorageService,
   ) {
+    this.companyCode = this.storage.companyCode;
     const navigationState = this.route.getCurrentNavigation()?.extras?.state;
     if (navigationState != null) {
       this.action = 'edit';

@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { vehicleModel } from "src/app/core/models/Masters/vehicle-master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class VehicleControls {
     private vehicleDetailsControl: FormControls[];
@@ -352,11 +354,11 @@ export class VehicleControls {
                     generatecontrol: false, disable: false
                 },
                 {
-                    name: 'companyCode', label: 'companyCode', placeholder: '', type: 'text', value: localStorage.getItem("companyCode"), generatecontrol: false, disable: false,
+                    name: 'companyCode', label: 'companyCode', placeholder: '', type: 'text', value: StorageService.getItem(StoreKeys.CompanyCode), generatecontrol: false, disable: false,
                     Validations: []
                 },
                 {
-                    name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
+                    name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: StorageService.getItem(StoreKeys.UserId), Validations: [],
                     generatecontrol: false, disable: false
                 },
                 {

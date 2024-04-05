@@ -1,8 +1,10 @@
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from 'src/app/core/service/storage.service';
 
 export async function getGeneric(masterService, collectionName) {
     let req = {
-        "companyCode": localStorage.getItem("companyCode"),
+        "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
         "filter": {},
         "collectionName": collectionName
     }
@@ -76,7 +78,7 @@ export async function rakeFieldMapping(data) {
             BillingParty: Array.from(uniqueBillingPartySet).length,
             CNNo: Array.from(uniqueCNNoSet).length, // Count of unique CNNo values
             JobNo: Array.from(uniqueJobNoSet).length, // Count of unique jobNo values
-            CurrentStatus: "At " + localStorage.getItem("Branch"),
+            CurrentStatus: "At " + StorageService.getItem(StoreKeys.Branch),
             actions: ["Diverted For Export","Delivered","Updated"]
         };
     });

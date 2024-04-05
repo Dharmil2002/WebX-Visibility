@@ -12,6 +12,7 @@ import { retryWhen, catchError, timeout, mergeMap, switchMap, tap } from 'rxjs/o
 import { Router } from "@angular/router";
 import { FailedApiServiceService } from "../service/api-tracking-service/failed-api-service.service";
 import { GeolocationService } from "../service/geo-service/geolocation.service";
+import { StorageService } from "../service/storage.service";
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {  
@@ -21,7 +22,8 @@ export class ErrorInterceptor implements HttpInterceptor {
   constructor(    
     private failedApiService: FailedApiServiceService,
     private geoLocationService: GeolocationService,
-    private router: Router
+    private router: Router,
+    private storageService: StorageService
   ) { }
 
   intercept(
@@ -60,7 +62,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               error: error, // Include error information
               source:request.body.collectionName,
               createdOn: new Date().toUTCString(),
-              createdBy: localStorage.getItem("Username") || 'Unknown', // Provide a default value
+              createdBy: this.storageService.userName|| 'Unknown', // Provide a default value
               createdAt:Location, 
               attempts: 0
             });

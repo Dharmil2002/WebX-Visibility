@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { CustomerGstControl } from 'src/assets/FormControls/customer-gst-control';
 import { generateCustomerGstCode } from './customer-gst-utility';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-customer-gst-add',
@@ -105,14 +106,16 @@ export class CustomerGstAddComponent implements OnInit {
   customerDetail: any;
   custName: any;
   transformedData: any[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   customerNoExists: any;
   constructor(
     private fb: UntypedFormBuilder,
     private route: Router,
     private masterService: MasterService,
     private filter: FilterUtils,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     const navigationState = this.masterService.getCustomer();
     this.custName = navigationState.data;
     if (navigationState.additionalData && navigationState.additionalData[0] != null) {
@@ -167,7 +170,7 @@ export class CustomerGstAddComponent implements OnInit {
   }
   async getCustomerMasterDetail() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customer_detail",
       filter: {}
     };
@@ -189,7 +192,7 @@ export class CustomerGstAddComponent implements OnInit {
   }
   // Function to fetch all master details like states, cities, etc.
   async getAllMasterDetails() {
-    const companyCode = parseInt(localStorage.getItem("companyCode"));
+    const companyCode = this.storage.companyCode;
     const requests = [
       { collectionName: "state_detail", filter: {} },
       { collectionName: "city_detail", filter: {} },
@@ -326,7 +329,7 @@ export class CustomerGstAddComponent implements OnInit {
       return;
     }
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customers_gst_details",
       filter: {}
     }
@@ -353,7 +356,7 @@ export class CustomerGstAddComponent implements OnInit {
         location: this.tableData.map((item) => item.location),
         pincode: this.tableData.map((item) => item.pincode),
         address: this.tableData.map((item) => item.address),
-        entryBy: localStorage.getItem('Username'),
+        entryBy: this.storage.userName,
         entryDate: new Date().toISOString()
       };
       if (this.isUpdate) {
@@ -361,7 +364,7 @@ export class CustomerGstAddComponent implements OnInit {
         // Remove the "id" field from the form controls
         delete transformedData._id;
         let req = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           collectionName: "customers_gst_details",
           filter: { _id: id },
           update: transformedData
@@ -379,7 +382,7 @@ export class CustomerGstAddComponent implements OnInit {
         }
       } else {
         let req = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           collectionName: "customers_gst_details",
           data: transformedData
         };
@@ -439,7 +442,7 @@ export class CustomerGstAddComponent implements OnInit {
         showLoaderOnConfirm: true,
         preConfirm: (Remarks) => {
           var request = {
-            companyCode: localStorage.getItem("CompanyCode"),
+            companyCode: this.storage.companyCode,
             id: row.id,
           };
           if (row.id == 0) {

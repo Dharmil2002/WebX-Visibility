@@ -5,6 +5,7 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { VendorPaymentControl } from 'src/assets/FormControls/Finance/VendorPayment/vendorpaymentcontrol';
 
 interface DropdownItem {
@@ -32,6 +33,7 @@ export class ThcPaymentFilterComponent implements OnInit {
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
+    private storageService: StorageService,
     public dialogRef: MatDialogRef<ThcPaymentFilterComponent>,
     @Inject(MAT_DIALOG_DATA) public objResult: any
   ) { }
@@ -54,7 +56,7 @@ export class ThcPaymentFilterComponent implements OnInit {
 
   async getLocationsDropdown(): Promise<void> {
     const body = {
-      companyCode: localStorage.getItem('companyCode'),
+      companyCode: this.storageService.getItem('companyCode'),
       collectionName: 'vendor_detail',
       filter: {},
     };

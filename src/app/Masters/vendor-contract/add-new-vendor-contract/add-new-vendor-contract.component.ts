@@ -17,13 +17,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { fromEvent } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-add-new-vendor-contract',
   templateUrl: './add-new-vendor-contract.component.html'
 })
 export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   VendorBasicInformationControls: AddContractProfile;
   jsonControlArray: any;
   vendorContractForm: UntypedFormGroup;
@@ -51,8 +52,10 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
     private objVendorService: VendorService,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storage: StorageService
   ) {
     super();
+    this.companyCode = this.storage.companyCode;
     this.breadscrums = [
       {
         title: 'Add New Vendor Contract',
@@ -138,7 +141,7 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
             "pDTNM": this.vendorContractForm.value.PDTID.name,
             "cNSDT": this.vendorContractForm.value.CNSDT,
             "eNDDT": this.vendorContractForm.value.ENDDT,
-            "eNTLOC": localStorage.getItem("Branch"),
+            "eNTLOC": this.storage.branch,
             "eNTDT": new Date(),
             "eNTBY": this.vendorContractForm.value.ENBY
           }

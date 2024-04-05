@@ -8,6 +8,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { vendorBillFilterControl } from 'src/assets/FormControls/Finance/Vendor Bill Payment/vendorBillFilter';
 import { billType, status } from '../../../VendorStaticData';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-bill-filter',
@@ -24,13 +25,16 @@ export class VendorBillFilterComponent implements OnInit {
   jsonControlArray: any;
   VendorBillFilterForm: UntypedFormGroup
   protected _onDestroy = new Subject<void>()
-  companyCode = localStorage.getItem('companyCode')
+  companyCode = 0;
   submit = "Filter"
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
+    private storageService: StorageService,
     public dialogRef: MatDialogRef<VendorBillFilterComponent>,
-    @Inject(MAT_DIALOG_DATA) public objResult: any) { }
+    @Inject(MAT_DIALOG_DATA) public objResult: any) { 
+      this.companyCode = this.storageService.companyCode;
+    }
 
   ngOnInit(): void {
     this.initializeFormControl();

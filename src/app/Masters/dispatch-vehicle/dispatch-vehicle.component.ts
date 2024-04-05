@@ -6,6 +6,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { disPatchControl } from './dispatch';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { Subject, take, takeUntil } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-dispatch-vehicle',
   templateUrl: './dispatch-vehicle.component.html'
@@ -37,7 +38,7 @@ export class DispatchVehicleComponent implements OnInit {
   jsonControlchild: FormControls[];
   disPatchdata: any;
   vehicledata: any;
-  constructor(private http: HttpClient, private fb: UntypedFormBuilder, private filter: FilterUtils) {
+  constructor(private http: HttpClient, private fb: UntypedFormBuilder, private filter: FilterUtils, private storage: StorageService) {
     this.InitializeFormControl();
   }
 
@@ -90,7 +91,7 @@ export class DispatchVehicleComponent implements OnInit {
 
     });
     try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
+      this.companyCode = this.storage.companyCode;
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }
@@ -131,7 +132,7 @@ export class DispatchVehicleComponent implements OnInit {
 
     });
     try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
+      this.companyCode = this.storage.companyCode;
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }

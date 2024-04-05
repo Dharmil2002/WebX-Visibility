@@ -5,6 +5,7 @@ import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { AccountBankControls } from "src/assets/FormControls/Account/account-bank-controls";
 import { AccountTdsControls } from "src/assets/FormControls/Account/account-tds-controls";
 import Swal from "sweetalert2";
@@ -31,15 +32,17 @@ export class AddBankComponent implements OnInit {
   ApplicationLocationsCode: any;
   ApplicationLocationsStatus: any;
   protected _onDestroy = new Subject<void>();
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   AccountTypeCode: any;
   AccountTypeStatus: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storageService: StorageService
   ) {
+    this.CompanyCode = this.storageService.companyCode;  
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
@@ -92,7 +95,7 @@ export class AddBankComponent implements OnInit {
 
       // Create a request object with the filter criteria
       const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storageService.companyCode,
         collectionName: "Bank_detail",
         filter: { [fieldName]: fieldValue },
       };
@@ -304,7 +307,7 @@ export class AddBankComponent implements OnInit {
       const body = {
         _id: `${this.CompanyCode}-${bankcode}`,
         Bankcode: bankcode,
-        entryBy: localStorage.getItem("UserName"),
+        entryBy: this.storageService.userName,
         entryDate: new Date(),
         companyCode: this.CompanyCode,
         ...commonBody,

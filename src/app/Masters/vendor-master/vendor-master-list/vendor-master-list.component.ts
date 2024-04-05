@@ -14,7 +14,7 @@ import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-mast
 export class VendorMasterListComponent implements OnInit {
   data: [] | any;
   csv: any[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any =0;
   csvFileName: string;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   // Define column headers for the table
@@ -86,6 +86,7 @@ export class VendorMasterListComponent implements OnInit {
     private storage: StorageService,
     private dialog: MatDialog
   ) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/VendorMaster/AddVendorMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -130,10 +131,10 @@ export class VendorMasterListComponent implements OnInit {
     delete det.eNTDT;
     delete det.vendorType;
     det['mODDT'] = new Date()
-    det['mODBY'] = localStorage.getItem("UserName")
-    det['mODLOC'] = localStorage.getItem("Branch")
+    det['mODBY'] = this.storage.userName
+    det['mODLOC'] = this.storage.branch
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "vendor_detail",
       filter: { vendorCode: vendorCode },
       update: det

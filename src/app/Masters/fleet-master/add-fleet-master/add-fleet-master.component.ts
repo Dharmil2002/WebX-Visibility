@@ -9,6 +9,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { fleetModel } from 'src/app/core/models/Masters/fleetMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { SessionService } from 'src/app/core/service/session.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { FleetControls } from 'src/assets/FormControls/fleet-control';
 import Swal from 'sweetalert2';
@@ -42,16 +43,15 @@ export class AddFleetMasterComponent implements OnInit {
   companyCode: number;
 
   constructor(
-    private sessionService: SessionService,
     private filter: FilterUtils,
     private route: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private dialog: MatDialog,
-    private objImageHandling: ImageHandling
-
+    private objImageHandling: ImageHandling,
+    private storage: StorageService
   ) {
-    this.companyCode = this.sessionService.getCompanyCode();
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.fleetTableData = route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
@@ -236,13 +236,13 @@ export class AddFleetMasterComponent implements OnInit {
       engineNo: this.fleetTableForm.value.engineNo,
       activeFlag: this.fleetTableForm.value.activeFlag,
       _id: this.fleetTableForm.value.vehicleNo.name,
-      cID: localStorage.getItem("companyCode"),
-      eNTBY: localStorage.getItem("UserName"),
+      cID: this.storage.companyCode,
+      eNTBY: this.storage.userName,
       eNTDT: new Date(),
-      eNTLOC: localStorage.getItem("Branch"),
+      eNTLOC: this.storage.branch,
       mODDT: new Date(),
-      mODBY: localStorage.getItem("UserName"),
-      mODLOC: localStorage.getItem("Branch"),
+      mODBY: this.storage.userName,
+      mODLOC: this.storage.branch,
     }
 
     // const controls = this.fleetTableForm;

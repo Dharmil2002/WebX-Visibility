@@ -1,5 +1,5 @@
 import { debug } from "console";
-
+import * as StorageService from 'src/app/core/service/storage.service';
    /**
  * Updates tracking information for a docket.
  * @param {string} companyCode - The company code.
@@ -17,9 +17,9 @@ export async function updateTracking(companyCode, operationService,data,dktNo) {
       dktNo:dktNo || '',
       vehNo: docketDetails[lastArray]?.vehNo || '',
       route: docketDetails[lastArray]?.route || '',
-      event:"Menifest Generated At" +" "+localStorage.getItem('Branch'),
+      event:"Menifest Generated At" +" "+StorageService.getItem('Branch'),
       orgn: docketDetails[lastArray]?.orgn || '',
-      loc: localStorage.getItem('Branch') || '',
+      loc: StorageService.getItem('Branch') || '',
       dest: docketDetails[lastArray]?.dest || '',
       lsno: docketDetails[lastArray]?.lsNo || '',
       mfno:data?.mfNo||"",
@@ -27,7 +27,7 @@ export async function updateTracking(companyCode, operationService,data,dktNo) {
       dlSt: '',
       dlTm: '',
       evnCd: '',
-      upBy: localStorage.getItem('Username') || '',
+      upBy: StorageService.getItem('Username') || '',
       upDt: new Date().toUTCString(),
     };
 

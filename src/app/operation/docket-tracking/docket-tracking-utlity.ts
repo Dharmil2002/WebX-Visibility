@@ -1,3 +1,4 @@
+import * as StorageService from 'src/app/core/service/storage.service';
 /**
  * Retrieves loading sheet details for a specific trip and vehicle.
  * @param {number} companyCode - The company code.
@@ -8,7 +9,7 @@
 export async function getDocketFromApiDetail(
     companyCode,docketNo, operationService
 ) {
-    const Mode = localStorage.getItem('Mode')
+    const Mode = StorageService.getItem('Mode')
     const reqBody = {
         companyCode: companyCode,
         collectionName: Mode=="FTL"?"docket_events":"docket_events_ltl",

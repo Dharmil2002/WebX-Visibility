@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: "app-add-container-master",
   templateUrl: "./add-container-master.component.html",
@@ -21,7 +22,7 @@ export class AddContainerMasterComponent implements OnInit {
     generatecontrol: true;
     toggle: boolean;
   }[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   containerTabledata: any;
   containerTableForm: UntypedFormGroup;
   containerFormControls: ContainerControl;
@@ -50,8 +51,10 @@ export class AddContainerMasterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private containerService: ContainerService
+    private containerService: ContainerService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
 

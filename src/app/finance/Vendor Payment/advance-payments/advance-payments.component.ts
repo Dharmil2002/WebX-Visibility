@@ -109,7 +109,7 @@ export class AdvancePaymentsComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
   staticField = ["GenerationDate", "VehicleNumber", "Advance"];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   tableData;
   AllLocationsList: any;
   isTableLode = false;
@@ -145,7 +145,7 @@ export class AdvancePaymentsComponent implements OnInit {
     private storage: StorageService,
   ) {
     // Retrieve the passed data from the state
-
+    this.companyCode = this.storage.companyCode;
     this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
 
     if (this.PaymentData) {

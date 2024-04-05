@@ -7,6 +7,7 @@ import { FilterBillingComponent } from './filter-billing/filter-billing.componen
 import { ShipmentEditBillingComponent } from './shipment-edit-billing/shipment-edit-billing.component';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { GenericService } from 'src/app/core/service/generic-services/generic-services';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-pending-billing',
@@ -35,8 +36,8 @@ export class PendingBillingComponent implements OnInit {
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   public filteredMultiLocation: ReplaySubject<menuAccesDropdown[]> =
     new ReplaySubject<menuAccesDropdown[]>(1);
-  orgBranch: string = localStorage.getItem("Branch");
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  orgBranch: string = "";
+  companyCode: number = 0;
   dynamicControls = {
     add: false,
     edit: false,
@@ -92,9 +93,11 @@ export class PendingBillingComponent implements OnInit {
   constructor(
     private invoiceService: InvoiceServiceService,
     private matDialog: MatDialog,
-    private genericService: GenericService
+    private genericService: GenericService,
+    private storage: StorageService
   ) {
-
+    this.companyCode = this.storage.companyCode;
+    this.orgBranch = this.storage.branch;
     this.getFilterData();
 
   }

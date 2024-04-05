@@ -11,6 +11,7 @@ import { AddProductComponent } from "../../product-master/add-product/add-produc
 import { ProductShardControls } from "src/assets/FormControls/ProductShardControls";
 import { firstValueFrom } from "rxjs";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-shard-product-add",
@@ -23,7 +24,7 @@ export class ShardProductAddComponent implements OnInit {
   customerTableForm: any;
   ProductNameCode: string;
   ProductNameStatus: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   tableData: any[];
   ProductNameData: any[];
   isCompany: boolean;
@@ -36,8 +37,11 @@ export class ShardProductAddComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storage: StorageService,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    this.companyCode = this.storage.companyCode;
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -70,7 +74,7 @@ export class ShardProductAddComponent implements OnInit {
       product_name: this.ProductShardTableForm.value.ProductName,
       product_id: code,
       updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
+      updatedBy: this.storage.userName,
     };
     const req = {
       companyCode: this.companyCode,

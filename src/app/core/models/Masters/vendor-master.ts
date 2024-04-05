@@ -119,7 +119,7 @@ export class VendorMaster {
       this.gstPincode = VendorMaster.gstPincode || "";
       this.otherdetails = VendorMaster.otherdetails || "";
       this.vendorManager = VendorMaster.vendorManager || "";
-      this.companyCode = VendorMaster.companyCode || parseInt(localStorage.getItem("companyCode"));
+      this.companyCode = VendorMaster.companyCode || 0;
 
     }
   }

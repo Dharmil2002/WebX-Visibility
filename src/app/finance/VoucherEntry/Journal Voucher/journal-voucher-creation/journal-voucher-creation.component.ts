@@ -204,7 +204,7 @@ export class JournalVoucherCreationComponent implements OnInit {
   }
   async BindLedger(BindLedger) {
     const account_groupReqBody = {
-      companyCode: localStorage.getItem('companyCode'),
+      companyCode: this.storage.companyCode,
       collectionName: "account_detail",
       filter: {
         pARTNM: BindLedger,
@@ -391,11 +391,11 @@ export class JournalVoucherCreationComponent implements OnInit {
                   };
                 })
                 let reqBody = {
-                  companyCode: localStorage.getItem("companyCode"),
+                  companyCode: this.storage.companyCode,
                   voucherNo: res?.data?.mainData?.ops[0].vNO,
                   transDate: Date(),
                   finYear: financialYear,
-                  branch: localStorage.getItem("Branch"),
+                  branch: this.storage.branch,
                   transCode: VoucherInstanceType.JournalVoucherCreation,
                   transType: VoucherInstanceType[VoucherInstanceType.JournalVoucherCreation],
                   voucherCode: VoucherType.JournalVoucher,
@@ -403,9 +403,9 @@ export class JournalVoucherCreationComponent implements OnInit {
                   docType: "Voucher",
                   partyType: this.JournalVoucherSummaryForm.value.Preparedfor,
                   docNo: "",
-                  partyCode: this.JournalVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                  partyCode: this.JournalVoucherSummaryForm.value.PartyName?.value ?? "V8888",
                   partyName: this.JournalVoucherSummaryForm.value.PartyName?.name ?? this.JournalVoucherSummaryForm.value.PartyName,
-                  entryBy: localStorage.getItem("UserName"),
+                  entryBy: this.storage.userName,
                   entryDate: Date(),
                   debit: DebitData,
                   credit: CreditData,

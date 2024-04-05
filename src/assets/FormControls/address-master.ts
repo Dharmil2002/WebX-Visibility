@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { AddressMaster } from "src/app/core/models/Masters/address-master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class AddressControl {
   addressControlArray: FormControls[];
@@ -213,7 +215,7 @@ export class AddressControl {
         label: "Company Code",
         placeholder: "Company Code",
         type: "",
-        value: parseInt(localStorage.getItem("companyCode")),
+        value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
         Validations: [],
         generatecontrol: false,
         disable: false,

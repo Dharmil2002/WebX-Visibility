@@ -10,13 +10,14 @@ import { VendorTableData } from './VendorStaticData';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getContractList } from '../vendorContractApiUtility';
 import moment from 'moment';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-contract-list',
   templateUrl: './vendor-contract-list.component.html'
 })
 export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   breadscrums = [
     {
       title: "Vendor Contract",
@@ -43,9 +44,10 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild("filter", { static: true }) filter: ElementRef;
   constructor(private router: Router, private encryptionService: EncryptionService,
-    private masterService: MasterService,
+    private masterService: MasterService, private storage: StorageService
   ) {
     super();
+    this.companyCode = this.storage.companyCode;
     this.columnKeys.push('status')
     this.columnKeys.push('actions')
   }

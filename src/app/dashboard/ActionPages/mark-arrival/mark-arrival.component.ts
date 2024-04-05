@@ -18,6 +18,7 @@ import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { HawkeyeUtilityService } from 'src/app/Utility/module/hawkeye/hawkeye-utility.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -32,8 +33,8 @@ export class MarkArrivalComponent implements OnInit {
   arrivalData: any;
   departature: any;
   latereason: any;
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
-  currentBranch: string = localStorage.getItem("Branch");
+  companyCode: number = 0;
+  currentBranch: string = "";
   latereasonlist: any;
   latereasonlistStatus: any;
   sealdet: any;
@@ -57,6 +58,9 @@ export class MarkArrivalComponent implements OnInit {
   }
   jsonControlArray: any;
   IntializeFormControl() {
+
+    this.companyCode = parseInt(this.storage.getItem(StoreKeys.CompanyCode));
+    this.currentBranch = this.storage.getItem(StoreKeys.Branch);
 
     const MarkArrivalFormControls = new MarkArrivalControl();
     this.jsonControlArray = MarkArrivalFormControls.getMarkArrivalsertFormControls();

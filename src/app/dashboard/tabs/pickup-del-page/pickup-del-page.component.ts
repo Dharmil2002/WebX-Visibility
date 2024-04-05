@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { RunSheetService } from 'src/app/Utility/module/operation/runsheet/runsheet.service';
 import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 @Component({
@@ -96,7 +97,7 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
     this.IscheckBoxRequired = true;
     this.drillDownPath = 'example/drillDown'
     try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
+      this.companyCode = parseInt(this.storage.getItem(StoreKeys.CompanyCode));
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }

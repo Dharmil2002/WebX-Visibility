@@ -46,8 +46,24 @@ export class ConsignmentOtherInfoComponent implements OnInit {
       console.log("failed");
     }
   }
+  
   save(){
-    this.dialogRef.close(this.otherInfoForm.value);
+    const req={
+      "cSTRFNO":this.otherInfoForm.value.cSTRFNO,
+      "cOD":this.otherInfoForm.value.cOD,
+      "oRDNO":this.otherInfoForm.value.oRDNO,
+      "dOD":this.otherInfoForm.value.dOD,
+      "iNVATT":this.otherInfoForm.value.invoiceAttech,
+      "pOLNO":this.otherInfoForm.value.policyNo,
+      "sPPNT":this.otherInfoForm.value.supplyPlant,
+      "pLCDT":this.otherInfoForm.value.policyDate,
+      "lOC":this.otherInfoForm.value.local,
+      "iNSCMP":this.otherInfoForm.value.invoiceCompany,
+      "BUSASS":this.otherInfoForm.value.busAssociate,
+      "rEMK":this.otherInfoForm.value.remarks
+  }
+  
+    this.dialogRef.close(req);
   }
   cancel(){
     this.dialogRef.close(null)

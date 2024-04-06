@@ -119,7 +119,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.model.docketDetail = new DocketDetail({});
     if (navigationState != null) {
-
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -1922,7 +1921,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //Contract Invoked Section
   InvockedContract() {
-    debugger
+    
     const paymentBasesName = this.paymentBases.find(x => x.value == this.model.consignmentTableForm.value.payType).name;
     const TransMode = this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name;
     let containerCode;
@@ -1942,12 +1941,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "to": this.model.consignmentTableForm.value.toCity.value,
       "capacity": containerCode
     }
-
-    // let reqBody = {
-    //   "companyCode": 10065, "customerCode": "CUST00022",
-    //   "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9
-    // }
-
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
       .then(async (res: any) => {
         if (res.length == 1) {

@@ -86,7 +86,17 @@ export class ConsignmentChargesComponent implements OnInit {
       }
     }
     save(){
-      this.dialogRef.close(this.chargeForm.value);
+      let charges=[];
+      this.chargeControls.filter((x) => x.hasOwnProperty("id")).forEach(element => {
+        let json = {
+          cHGID: element.name,
+          cHGNM: element.placeholder,
+          aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.chargeForm.controls[element.name].value || 0) : (this.chargeForm.controls[element.name].value || 0),
+          oPS:element?.additionalData.metaData||"",
+        }
+        charges.push(json);
+      });
+      this.dialogRef.close(charges);
     }
     cancel(){
       this.dialogRef.close(null);

@@ -18,6 +18,46 @@ import { DocketFinStatus, DocketStatus } from "src/app/Models/docStatus";
 })
 export class DocketService {
     vehicleDetail: any;
+     RateTypeCalculation = [{
+        "codeId": "RTTYP-0004",
+        "codeDesc": "% of Freight",
+        "calculationRatio": 1000
+      },
+      {
+        "codeId": "RTTYP-0005",
+        "codeDesc": "Per Kg",
+        "calculationRatio": 1000
+      },
+      {
+        "codeId": "RTTYP-0003",
+        "codeDesc": "Per Km",
+        "calculationRatio": 1000
+      },
+      {
+        "codeId": "RTTYP-0006",
+        "codeDesc": "Per Pkg",
+        "calculationRatio": 1000
+      },
+      {
+        "codeId": "RTTYP-0001",
+        "codeDesc": "Flat",
+        "calculationRatio": 1000
+      },
+      {
+        "codeId": "RTTYP-0002",
+        "codeDesc": "Per Ton",
+        "calculationRatio": 1
+      },
+      {
+        "codeId": "RTTYP-0007",
+        "codeDesc": "Per Container",
+        "calculationRatio": 1
+      },
+      {
+        "codeId": "RTTYP-0008",
+        "codeDesc": "Per Litre",
+        "calculationRatio": 1000
+      }]
     // Define a mapping object
     statusMapping = {
         default: {
@@ -911,6 +951,7 @@ export class DocketService {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
+            dKTDT: ConvertToDate(data?.dKTDT),
             oRGN: data?.oRGN || "",
             dEST: data?.dEST || "",
             cLOC: data?.oRGN || "",
@@ -1066,8 +1107,7 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data,invoiceData=[],isUpdate = false) {
-        debugger
+    async consgimentFieldMapping(data,invoiceData=[],isUpdate = false,otherData) {
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -1087,9 +1127,9 @@ export class DocketService {
             "tCT": data?.toCity?.value || "",
             "tPIN": data?.toPinCode?.value || "",
             "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
-            "pKGS": parseInt(data?.totalChargedNoOfpkg || 0),
-            "aCTWT": ConvertToNumber(data?.actualwt || 0, 3),
-            "cHRWT": ConvertToNumber(data?.chrgwt || 0, 3),
+            "pKGS":invoiceData.length>0?parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)):0,
+            "aCTWT":invoiceData.length>0?parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)):0,
+            "cHRWT":invoiceData.length>0?parseFloat(invoiceData.reduce((c, a) => c + a.chargedWeight, 0)):0,
             "iSCOM": true,
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
@@ -1116,6 +1156,7 @@ export class DocketService {
                 "aLMOB": data?.cnalternateContactNo || "",
             },
             "eDD": ConvertToDate(data?.edd),
+            "wTIN": data?.weight_in||"",
             "iSVOL": data?.f_vol || false,
             "iSLOCAL": data?.local || false,
             "iSODA": data?.oda || false,
@@ -1124,15 +1165,19 @@ export class DocketService {
             "fRTRTYN": data?.freightRatetype || "",
             "fRTAMT": ConvertToNumber(data?.freight_amount || 0, 2),
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
-            "gROAMT": ConvertToNumber(data?.gROAMT||0, 2),
+            "gROAMT": ConvertToNumber(data?.grossAmount||0, 2),
             "rCM": data?.rcm || "",
             "gSTAMT": ConvertToNumber(data?.gstAmount||0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
             "tOTAMT": ConvertToNumber(data?.tOTAMT || 0, 2),
             "pKGTYN": data?.pkgsTypeName || "",
             "pKGTY": data?.pkgsType || "",
-            "rSKTY": data?.rskty || "",//need to verfied field name risk
+            "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
+            "wLCN":data?.cnWinCsgn||"",
+            "wLCNE":data?.cnWinCsgne||"",
+            "iSCEBP":data?.cnebp||"",        
+            "iSCNBP":data?.cnbp||"",
             "dELTYPE": data?.delivery_type || "",
             "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
             "iNVTOT": ConvertToNumber(data?.totAmt || 0, 2),
@@ -1145,6 +1190,7 @@ export class DocketService {
             "oSTS": DocketStatus.Booked,
             "oSTSN": DocketStatus[DocketStatus.Booked],
             "fSTS": DocketFinStatus.Pending,
+            "oTHINF":otherData?otherData.otherInfo:'',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
             "cONTRACT": "",
         };
@@ -1197,11 +1243,11 @@ export class DocketService {
             cURR: "INR",
             fRTAMT:ConvertToNumber(data?.freight_amount || 0, 2),
             oTHAMT:ConvertToNumber(data?.otherAmount || 0, 2),
-            gROAMT: ConvertToNumber(data?.subTot || 0, 2),
-            rCM:"",
+            gROAMT: ConvertToNumber(data?.grossAmount || 0, 2),
+            rCM:data.rcm,
             gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
             gSTCHAMT:ConvertToNumber(data?.gstChargedAmount || 0, 2),
-            cHG: "",
+            cHG:otherData?otherData.otherCharges:'',
             nFCHG:0,
             tOTAMT:ConvertToNumber(docketField['iNVTOT'] || 0, 2),
             sTS:DocketStatus.Booked,
@@ -1214,5 +1260,77 @@ export class DocketService {
             eNTBY: this.storage.userName,
           }
       return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails,"docketFin":docketFin};
+    }
+    async operationsLtlFieldMapping(data, invoiceDetails = [],docketFin) {
+        const ops = {
+            dKTNO: data?.dKTNO || "",
+            sFX: 0,
+            dKTDT:data?.dKTDT||null,
+            oRGN: data?.oRGN || "",
+            dEST: data?.dEST || "",
+            cLOC: data?.oRGN || "",
+            pKGS: parseInt(data?.pKGS || 0),
+            aCTWT: ConvertToNumber(data?.aCTWT || 0, 3),
+            cHRWT: ConvertToNumber(data?.cHRWT || 0, 3),
+            cFTTOT: ConvertToNumber(data?.cFTTOT || 0, 3),
+            vEHNO: data?.vEHNO || "",
+            sTS: DocketStatus.Booked,
+            sTSNM: DocketStatus[DocketStatus.Booked],
+            sTSTM: ConvertToDate(data?.dKTDT),
+            oPSSTS:`Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+            iSDEL: false,
+            mODDT: data?.eNTDT,
+            mODLOC: data?.eNTLOC || "",
+            mODBY: data?.eNTBY || ""
+        }
+        //Prepare Event Data
+        let evnData = {
+            _id: `${this.storage.companyCode}-${data.dKTNO}-0-EVN0001-${moment(data?.eNTDT).format('YYYYMMDDHHmmss')}`,
+            cID: this.storage.companyCode,
+            dKTNO: data?.dKTNO || "",
+            sFX: 0,
+            lOC: this.storage.branch,
+            eVNID: 'EVN0001',
+            eVNDES: 'Booking',
+            eVNDT: new Date(),
+            eVNSRC: 'Quick Completion',
+            dOCTY: 'CN',
+            dOCNO: data?.dKTNO || "",
+            sTS: DocketStatus.Booked,
+            sTSNM: DocketStatus[DocketStatus.Booked],
+            oPSSTS: `Booked at ${data?.oRGN} on ${moment(data?.dKTDT).format("DD MMM YYYY @ hh:mm A")}`,
+            eNTDT: data?.eNTDT,
+            eNTLOC: data?.eNTLOC || "",
+            eNTBY: data?.eNTBY || ""
+        };
+        let reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filter: { dKTNO: data?.dKTNO },
+            update: ops
+        };
+        await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
+        let reqinvoice = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_invoices_ltl",
+            data: invoiceDetails
+        };
+        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqinvoice));
+        let reqEvent = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_events_ltl",
+            data: evnData
+        };
+        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
+        if(docketFin){
+        let reqfin = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_fin_det_ltl",
+            data: docketFin
+        };
+        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
+        }
+        return true
+       
     }
 }

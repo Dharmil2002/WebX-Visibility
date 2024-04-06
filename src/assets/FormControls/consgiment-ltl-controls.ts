@@ -958,7 +958,7 @@ export class ConsignmentLtl extends BaseControl {
                  disable: false
             },
             {
-                name: 'subTot', label: 'Sub Total Amount(₹)', placeholder: 'Gross Amount', type: 'mobile-number',
+                name: 'grossAmount', label: 'Gross Amount(₹)', placeholder: 'Gross Amount', type: 'mobile-number',
                 value: 0.00, Validations: [], generatecontrol: true, disable: true,
                 additionalData: {
                     metaData: "freightDetails"

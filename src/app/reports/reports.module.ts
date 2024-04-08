@@ -131,7 +131,7 @@ import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
     ControlTowerDashboardComponent,
     TrialBalanceCriteriaComponent,
     TrialBalanceViewComponent,
-    TrialBalanceViewDetailsComponent
+    TrialBalanceViewDetailsComponent,
     StockReportComponent,
     DcrRegisterComponent
   ],

@@ -15,36 +15,6 @@ export class StockReportService {
   //#region to get cheque register report data as per the query
   async getStockData(data) {
 
-   
-    /*
-    
-        {
-          case: {
-            $and: [
-              {
-                $in: ["$sTS", [5]],
-              },
-              {
-                $eq: ["$cLOC", "$dEST"],
-              },
-            ],
-          },
-          then: 4,
-        },
-        {
-          case: {
-            $in: ["$sTS", [7, 8, 11]],
-          },
-          then: 4,
-        },
-        {
-          case: {
-            $eq: ["$sTS", 9],
-          },
-          then: 5,
-        },
-    */
-   debugger;
     const matchQuery = {
       'D$and': [{ sTS: { D$nin: [10,13] } },
       (data.dateType === 'BookingDate') ? {
@@ -68,8 +38,8 @@ export class StockReportService {
       ...(data.fromLocation ? [{ 'oRGN': { 'D$eq': data.fromLocation } }] : []),
       ...(data.toLocation ? [{ 'dEST': { 'D$eq': data.toLocation } }] : []),
       ...(data.stockType ? this.getStockTypeQuery(data) : []),
-      ...(data.modeList.length > 0 ? [{ 'D$expr': { '$details.tRNMOD': { 'D$in': data.modeList } } }] : []),
-      ...(data.paybasisList.length > 0 ? [{ 'D$expr': { '$details.pAYTYP': { 'D$in': data.paybasisList } } }] : [])
+      ...(data.modeList.length > 0 ? [{ 'D$expr': { D$in:["$details.tRNMOD", data.modeList]} }] : []),
+      ...(data.paybasisList.length > 0 ? [{ 'D$expr': { D$in:["$details.pAYTYP", data.paybasisList]} }] : [])
       ]
     };
     const reqBody = {
@@ -221,9 +191,9 @@ export class StockReportService {
       data.locationType === 'OriginLocation' ? { 'oRGN': { 'D$in': data.cumulativeLocation } } : { 'cLOC': { 'D$in': data.cumulativeLocation } },
       ...(data.fromLocation ? [{ 'oRGN': { 'D$eq': data.fromLocation } }] : []),
       ...(data.toLocation ? [{ 'dEST': { 'D$eq': data.toLocation } }] : []),
-      ...(data.stockType ? this.getStockTypeQuery(data) : []),
-      ...(data.modeList.length > 0 ? [{ 'D$expr': { '$details.tRNMOD': { 'D$in': data.modeList } } }] : []),
-      ...(data.paybasisList.length > 0 ? [{ 'D$expr': { '$details.pAYTYP': { 'D$in': data.paybasisList } } }] : [])
+      ...(data.stockType ? this.getStockTypeQuery(data) : []),      
+      ...(data.modeList.length > 0 ? [{ 'D$expr': { D$in:["$details.tRNMOD", data.modeList]} }] : []),
+      ...(data.paybasisList.length > 0 ? [{ 'D$expr': { D$in:["$details.pAYTYP", data.paybasisList]} }] : [])
       ]
     };
     const reqBody = {

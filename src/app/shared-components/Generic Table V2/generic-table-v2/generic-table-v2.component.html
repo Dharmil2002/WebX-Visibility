@@ -180,7 +180,7 @@
                                         </p>
                                     </ng-container>
                                     <ng-container *ngIf="staticField.includes(tableData)">
-                                        {{element[tableData]}}
+                                        {{formatData(element[tableData], tableData )}}
                                     </ng-container>
                                     <ng-container *ngFor="let toggle of toggleArray">
                                         <mat-slide-toggle *ngIf="tableData==toggle" color="primary"

@@ -13,51 +13,52 @@ import moment from "moment";
 import { roundNumber } from "src/app/Utility/commonfunction";
 import { ConvertToDate, ConvertToNumber, isValidDate, roundToNumber } from "src/app/Utility/commonFunction/common";
 import { DocketFinStatus, DocketStatus } from "src/app/Models/docStatus";
+import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
 @Injectable({
     providedIn: "root",
 })
 export class DocketService {
     vehicleDetail: any;
-     RateTypeCalculation = [{
+    RateTypeCalculation = [{
         "codeId": "RTTYP-0004",
         "codeDesc": "% of Freight",
         "calculationRatio": 1000
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0005",
         "codeDesc": "Per Kg",
         "calculationRatio": 1000
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0003",
         "codeDesc": "Per Km",
         "calculationRatio": 1000
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0006",
         "codeDesc": "Per Pkg",
         "calculationRatio": 1000
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0001",
         "codeDesc": "Flat",
         "calculationRatio": 1000
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0002",
         "codeDesc": "Per Ton",
         "calculationRatio": 1
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0007",
         "codeDesc": "Per Container",
         "calculationRatio": 1
-      },
-      {
+    },
+    {
         "codeId": "RTTYP-0008",
         "codeDesc": "Per Litre",
         "calculationRatio": 1000
-      }]
+    }]
     // Define a mapping object
     statusMapping = {
         default: {
@@ -123,7 +124,8 @@ export class DocketService {
         private operation: OperationService,
         private storage: StorageService,
         private filter: FilterUtils,
-        private navService: NavigationService
+        private navService: NavigationService,
+        private geoLocationService: GeolocationService
     ) { }
 
     async updateDocket(data, filter) {
@@ -438,10 +440,10 @@ export class DocketService {
             gSTAMT: docket["gstAmount"],
             gSTCHAMT: docket["gstChargedAmount"],
             tOTAMT: docket["totalAmount"],
-            iNBNUM:docket["inboundNumber"],
-            shipment:docket["sHIP"],
-            rFQNO:docket["rfqNo"],
-            pODONUM:docket["podDoNumber"],
+            iNBNUM: docket["inboundNumber"],
+            shipment: docket["sHIP"],
+            rFQNO: docket["rfqNo"],
+            pODONUM: docket["podDoNumber"],
             mODBY: this.storage.userName,
             mODDT: new Date(),
             mODLOC: this.storage.branch,
@@ -480,16 +482,16 @@ export class DocketService {
             }
 
             // Insert new data
-            if(data){
-            const insertRequest = {
-                companyCode: this.storage.companyCode,
-                collectionName: collectionName,
-                data: data
-            };
-            const insertResponse = await firstValueFrom(this.operation.operationMongoPost('generic/create', insertRequest));
+            if (data) {
+                const insertRequest = {
+                    companyCode: this.storage.companyCode,
+                    collectionName: collectionName,
+                    data: data
+                };
+                const insertResponse = await firstValueFrom(this.operation.operationMongoPost('generic/create', insertRequest));
 
-            return insertResponse.data;
-        }
+                return insertResponse.data;
+            }
         } catch (error) {
             // Handle errors (you can also log them or throw them depending on your error handling strategy)
             Swal.fire({
@@ -789,7 +791,7 @@ export class DocketService {
     /*End*/
     /*Here the code for the docket Field Mapping*/
     async docketLTLFieldMapping(data, isUpdate = false) {
-      
+
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -918,36 +920,36 @@ export class DocketService {
         let docketFin = {
             _id: `${this.storage.companyCode}-${data?.docketNumber}`,
             cID: this.storage.companyCode,
-            dKTNO:data?.docketNumber||"",
+            dKTNO: data?.docketNumber || "",
             pCD: data?.billingParty.value,
-            pNM:data?.billingParty.name || "",
+            pNM: data?.billingParty.name || "",
             bLOC: this.storage.branch,
             cURR: "INR",
-            fRTAMT:ConvertToNumber(data?.fRTAMT || 0, 2),
-            oTHAMT:ConvertToNumber(data?.oTHAMT || 0, 2),
+            fRTAMT: ConvertToNumber(data?.fRTAMT || 0, 2),
+            oTHAMT: ConvertToNumber(data?.oTHAMT || 0, 2),
             gROAMT: ConvertToNumber(data?.gROAMT || 0, 2),
-            rCM:"",
+            rCM: "",
             gSTAMT: ConvertToNumber(data?.gROAMT || 0, 2),
-            gSTCHAMT:ConvertToNumber(data?.gSTCHAMT || 0, 2),
+            gSTCHAMT: ConvertToNumber(data?.gSTCHAMT || 0, 2),
             cHG: "",
-            nFCHG:0,
-            tOTAMT:ConvertToNumber(docketField['iNVTOT'] || 0, 2),
-            sTS:DocketStatus.Booked,
-            sTSNM:DocketStatus[DocketStatus.Booked],
+            nFCHG: 0,
+            tOTAMT: ConvertToNumber(docketField['iNVTOT'] || 0, 2),
+            sTS: DocketStatus.Booked,
+            sTSNM: DocketStatus[DocketStatus.Booked],
             sTSTM: new Date(),
             isBILLED: false,
             bILLNO: "",
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName,
-          }
-      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails,"docketFin":docketFin};
-   }
-   /*End*/
+        }
+        return { "docketsDetails": docketField, "invoiceDetails": invoiceDetails, "docketFin": docketFin };
+    }
+    /*End*/
 
     /*End*/
     /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
-    async operationsFieldMapping(data, invoiceDetails = [],docketFin) {
+    async operationsFieldMapping(data, invoiceDetails = [], docketFin) {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
@@ -963,7 +965,7 @@ export class DocketService {
             sTS: DocketStatus.Booked,
             sTSNM: DocketStatus[DocketStatus.Booked],
             sTSTM: ConvertToDate(data?.dKTDT),
-            oPSSTS:`Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+            oPSSTS: `Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
             iSDEL: false,
             mODDT: data?.eNTDT,
             mODLOC: data?.eNTLOC || "",
@@ -1008,16 +1010,16 @@ export class DocketService {
             data: evnData
         };
         await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
-        if(docketFin){
-        let reqfin = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_fin_det_ltl",
-            data: docketFin
-        };
-        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
+        if (docketFin) {
+            let reqfin = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_fin_det_ltl",
+                data: docketFin
+            };
+            await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
         }
         return true
-       
+
     }
     /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
@@ -1107,13 +1109,13 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data,invoiceData=[],isUpdate = false,otherData) {
+    async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData) {
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
             "docNo": data?.docketNumber || "",
             "dKTNO": data?.docketNumber || "",
-            "pRQNO":data?.prqNo||"",
+            "pRQNO": data?.prqNo || "",
             "dKTDT": ConvertToDate(data?.docketDate),
             "pAYTYP": data?.payType || "",
             "pAYTYPNM": data?.payTypeName || "",
@@ -1122,22 +1124,22 @@ export class DocketService {
             "cLOC": this.storage.branch || "",
             "oRGN": data?.origin || "",
             "fCT": data?.fromCity?.value || "",
-            "fPIN":data?.fromPinCode?.value||"",
+            "fPIN": data?.fromPinCode?.value || "",
             "dEST": data?.destination?.value || "",
             "tCT": data?.toCity?.value || "",
             "tPIN": data?.toPinCode?.value || "",
             "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
-            "pKGS":invoiceData.length>0?parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)):0,
-            "aCTWT":invoiceData.length>0?parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)):0,
-            "cHRWT":invoiceData.length>0?parseFloat(invoiceData.reduce((c, a) => c + a.chargedWeight, 0)):0,
+            "pKGS": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)) : 0,
+            "aCTWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)) : 0,
+            "cHRWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.chargedWeight, 0)) : 0,
             "iSCOM": true,
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
-            "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
+            "cFTTOT":invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
             "cSGE": {
                 "cD": data?.consignorName?.value || "",
                 "nM": data?.consignorName?.name || "",
-                "cT":data?.fromCity?.value || "",
-                "pIN":data?.fromPinCode?.value || "",
+                "cT": data?.fromCity?.value || "",
+                "pIN": data?.fromPinCode?.value || "",
                 "aDD": data.cnoAddress?.name || data.cnoAddress,
                 "aDDCD": data.cnoAddress?.value || "A8888",
                 "gST": data?.cnogst || "",
@@ -1148,15 +1150,15 @@ export class DocketService {
                 "cD": data?.consigneeName?.value || "",
                 "nM": data?.consigneeName?.name || "",
                 "cT": data?.toCity?.value || "",
-                "pIN":data?.toPinCode?.value || "",
+                "pIN": data?.toPinCode?.value || "",
                 "aDD": data?.cneAddress?.name || data.cneAddress,
                 "aDDCD": data.cneAddress?.value || "A8888",
-                "gST": data?.cnegst||"",
+                "gST": data?.cnegst || "",
                 "mOB": data?.cncontactNumber || "",
                 "aLMOB": data?.cnalternateContactNo || "",
             },
             "eDD": ConvertToDate(data?.edd),
-            "wTIN": data?.weight_in||"",
+            "wTIN": data?.weight_in || "",
             "iSVOL": data?.f_vol || false,
             "iSLOCAL": data?.local || false,
             "iSODA": data?.oda || false,
@@ -1165,19 +1167,19 @@ export class DocketService {
             "fRTRTYN": data?.freightRatetype || "",
             "fRTAMT": ConvertToNumber(data?.freight_amount || 0, 2),
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
-            "gROAMT": ConvertToNumber(data?.grossAmount||0, 2),
+            "gROAMT": ConvertToNumber(data?.grossAmount || 0, 2),
             "rCM": data?.rcm || "",
-            "gSTAMT": ConvertToNumber(data?.gstAmount||0, 2),
+            "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
             "tOTAMT": ConvertToNumber(data?.tOTAMT || 0, 2),
             "pKGTYN": data?.pkgsTypeName || "",
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
-            "wLCN":data?.cnWinCsgn||"",
-            "wLCNE":data?.cnWinCsgne||"",
-            "iSCEBP":data?.cnebp||"",        
-            "iSCNBP":data?.cnbp||"",
+            "wLCN": data?.cnWinCsgn || "",
+            "wLCNE": data?.cnWinCsgne || "",
+            "iSCEBP": data?.cnebp || "",
+            "iSCNBP": data?.cnbp || "",
             "dELTYPE": data?.delivery_type || "",
             "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
             "iNVTOT": ConvertToNumber(data?.totAmt || 0, 2),
@@ -1190,7 +1192,7 @@ export class DocketService {
             "oSTS": DocketStatus.Booked,
             "oSTSN": DocketStatus[DocketStatus.Booked],
             "fSTS": DocketFinStatus.Pending,
-            "oTHINF":otherData?otherData.otherInfo:'',
+            "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
             "cONTRACT": "",
         };
@@ -1215,8 +1217,8 @@ export class DocketService {
                 },
                 "iNVAMT": ConvertToNumber(element?.invoiceAmount || 0, 2),
                 "cURR": "INR",
-                "cUBWT":ConvertToNumber(element?.cubWT||0,2),
-                "mATDN":element?.materialDensity||"",
+                "cUBWT": ConvertToNumber(element?.cubWT || 0, 2),
+                "mATDN": element?.materialDensity || "",
                 "pKGS": parseInt(element?.noOfPackage || 0),
                 "cFTWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),
@@ -1236,36 +1238,36 @@ export class DocketService {
         let docketFin = {
             _id: `${this.storage.companyCode}-${data?.docketNumber}`,
             cID: this.storage.companyCode,
-            dKTNO:data?.docketNumber||"",
+            dKTNO: data?.docketNumber || "",
             pCD: data?.billingParty.value,
-            pNM:data?.billingParty.name || "",
+            pNM: data?.billingParty.name || "",
             bLOC: this.storage.branch,
             cURR: "INR",
-            fRTAMT:ConvertToNumber(data?.freight_amount || 0, 2),
-            oTHAMT:ConvertToNumber(data?.otherAmount || 0, 2),
+            fRTAMT: ConvertToNumber(data?.freight_amount || 0, 2),
+            oTHAMT: ConvertToNumber(data?.otherAmount || 0, 2),
             gROAMT: ConvertToNumber(data?.grossAmount || 0, 2),
-            rCM:data.rcm,
+            rCM: data.rcm,
             gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
-            gSTCHAMT:ConvertToNumber(data?.gstChargedAmount || 0, 2),
-            cHG:otherData?otherData.otherCharges:'',
-            nFCHG:0,
-            tOTAMT:ConvertToNumber(docketField['iNVTOT'] || 0, 2),
-            sTS:DocketStatus.Booked,
-            sTSNM:DocketStatus[DocketStatus.Booked],
+            gSTCHAMT: ConvertToNumber(data?.gstChargedAmount || 0, 2),
+            cHG: otherData ? otherData.otherCharges : '',
+            nFCHG: 0,
+            tOTAMT: ConvertToNumber(docketField['iNVTOT'] || 0, 2),
+            sTS: DocketStatus.Booked,
+            sTSNM: DocketStatus[DocketStatus.Booked],
             sTSTM: new Date(),
             isBILLED: false,
             bILLNO: "",
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName,
-          }
-      return {"docketsDetails":docketField,"invoiceDetails":invoiceDetails,"docketFin":docketFin};
+        }
+        return { "docketsDetails": docketField, "invoiceDetails": invoiceDetails, "docketFin": docketFin };
     }
-    async operationsLtlFieldMapping(data, invoiceDetails = [],docketFin) {
+    async operationsLtlFieldMapping(data, invoiceDetails = [], docketFin) {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
-            dKTDT:data?.dKTDT||null,
+            dKTDT: data?.dKTDT || null,
             oRGN: data?.oRGN || "",
             dEST: data?.dEST || "",
             cLOC: data?.oRGN || "",
@@ -1277,7 +1279,7 @@ export class DocketService {
             sTS: DocketStatus.Booked,
             sTSNM: DocketStatus[DocketStatus.Booked],
             sTSTM: ConvertToDate(data?.dKTDT),
-            oPSSTS:`Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+            oPSSTS: `Booked at ${data?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
             iSDEL: false,
             mODDT: data?.eNTDT,
             mODLOC: data?.eNTLOC || "",
@@ -1322,15 +1324,81 @@ export class DocketService {
             data: evnData
         };
         await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
-        if(docketFin){
-        let reqfin = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_fin_det_ltl",
-            data: docketFin
-        };
-        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
+        if (docketFin) {
+            let reqfin = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_fin_det_ltl",
+                data: docketFin
+            };
+            await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
         }
         return true
-       
+
+    }
+    async walkinFieldMapping(data, isCsgn, isCsgne) {
+        let req={};
+        // let id = {
+        //     type: "Feature",
+        //     geometry: {
+        //         type: "Point",
+        //         coordinates: [Location.longitude, Location.latitude]
+        //     },
+        //     properties: {
+        //         description: "A descriptive label or additional data"
+        //     }
+        // }
+        let walkingData = {};
+        req['companyCode']=this.storage.companyCode;
+        req['collectionName']="walkin_customers";
+        if (isCsgn) {
+            walkingData = {
+                "cID": this.storage.companyCode,
+                "cUSTCD": "C8888",
+                "cUSTNM": data?.cUSTNM,
+                "cUSTPH": data?.cUSTPH,
+                "aLTPH": data?.aLTPH,
+                "aDD": data?.aDD || "",
+                "gSTNO": data?.gSTNO || "",
+                "lOC": this.storage.branch,
+                "eNTBY": this.storage.userName,
+                "eNTDT": new Date(),
+                "eNTLOC": this.storage.branch
+            }
+            req['data']=walkingData;
+            req['filter']={cUSTNM:data?.cUSTNM};
+        }
+        else if (isCsgne) {
+            walkingData = {
+                "cID": this.storage.companyCode,
+                "cUSTCD": "C8888",
+                "cUSTNM":data?.cUSTNM,
+                "cUSTPH": data?.cUSTPH,
+                "aLTPH": data?.aLTPH,
+                "aDD": data?.aDD || "",
+                "gSTNO": data?.gSTNO || "",
+                "lOC": this.storage.branch,
+                "eNTBY": this.storage.userName,
+                "eNTDT": new Date(),
+                "eNTLOC": this.storage.branch
+            }
+            req['filter']={cUSTNM:data?.cUSTNM}
+            req['data']=walkingData;
+        }
+        const getWalking = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
+        if (getWalking.data.length > 0) {
+            delete walkingData['eNTBY'];
+            delete walkingData['eNTDT'];
+            delete walkingData['eNTLOC'];
+            walkingData["mODBY"]=this.storage.userName,
+            walkingData["mODDT"]=new Date(),
+            walkingData["mODLOC"]= this.storage.branch
+          await firstValueFrom(this.operation.operationMongoPut('generic/update', req))
+          return true
+        }
+         else{
+            await firstValueFrom(this.operation.operationMongoPost('generic/create', req));
+            return true
+         }
+        // }
     }
 }

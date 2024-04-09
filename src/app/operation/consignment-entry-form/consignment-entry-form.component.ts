@@ -1787,6 +1787,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*End*/
   //validation for the Actual weight not greater then actual weight
   calculateValidation() {
+    
     const chargedWeight = parseFloat(
       this.model.invoiceTableForm.controls["chargedWeight"]?.value || 0
     );
@@ -1799,6 +1800,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         title: "Error",
         text: "Actual weight cannot be greater than Charge weight.",
       });
+      this.model.invoiceTableForm.controls["actualWeight"]?.setValue("")
       return false;
     }
     return true;
@@ -1894,7 +1896,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.invoiceData = [];
     this.model.tableData = [];
   }
+  //validation for the Actual weight not greater then actual weight
 
+  /*pincode based city*/
   SetInvoiceData() {
     this.InvoiceDetailsList = [
       {

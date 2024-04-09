@@ -245,7 +245,7 @@ export class QuickBookingControls extends BaseControl {
           }
         ],
         functions: {
-          keypress: "intigerOnly",
+          keypress: "integerOnly",
         },
       },
       {

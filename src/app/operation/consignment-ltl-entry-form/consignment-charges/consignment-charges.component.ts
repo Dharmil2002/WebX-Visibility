@@ -15,6 +15,7 @@ export class ConsignmentChargesComponent implements OnInit {
   chargeForm: UntypedFormGroup;
   chargeControls: FormControls[];
   chargeData:any;
+  isEdit:boolean=false;
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
@@ -22,8 +23,13 @@ export class ConsignmentChargesComponent implements OnInit {
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog
   ) {
-    if (item) {
+    debugger;
+    if (item.length>0) {
        this.chargeData = item;
+       this.isEdit=true;
+    }
+    else{
+      this.chargeData = item;
     }
    }
 
@@ -35,7 +41,9 @@ export class ConsignmentChargesComponent implements OnInit {
   }
     // /*below code is for getting a Chages from Charge Master*/
     async getCharges() {
-      const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": this.chargeData.transModeName},);
+      if(!this.isEdit){
+
+      const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": this.chargeData.transModeName},);
       if (result && result.length > 0) {
         const invoiceList = [];
         result.forEach((element, index) => {
@@ -66,6 +74,41 @@ export class ConsignmentChargesComponent implements OnInit {
         });
         this.chargeControls = invoiceList;
         this.chargeForm = formGroupBuilder(this.fb, [this.chargeControls]);
+      }
+      }
+      else{
+        if (this.chargeData &&  this.chargeData.length > 0) {
+          const invoiceList = [];
+          this.chargeData.forEach((element, index) => {
+            if (element) {
+              const invoice: InvoiceModel = {
+                id: index + 1,
+                name: element.cHGID || '',
+                label: `${element.cHGNM}(${element.oPS})`,
+                placeholder:element.cHGNM || '',
+                type: 'text',
+                value:`${Math.abs(element.aMT)}`,
+                filterOptions: '',
+                displaywith: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                additionalData: {
+                  showNameAndValue: false,
+                  metaData:element.oPS
+                },
+                functions: {
+                  onChange: 'calucatedCharges',
+                },
+              };
+    
+              invoiceList.push(invoice);
+            }
+          });
+          
+          this.chargeControls = invoiceList;
+          this.chargeForm = formGroupBuilder(this.fb, [this.chargeControls]);
+        }
       }
     }
     /*End*/

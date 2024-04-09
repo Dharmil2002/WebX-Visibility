@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { ConsignmentLtl } from 'src/assets/FormControls/consgiment-ltl-controls';
 
 @Component({
@@ -14,11 +16,20 @@ import { ConsignmentLtl } from 'src/assets/FormControls/consgiment-ltl-controls'
 export class ConsignmentOtherInfoComponent implements OnInit {
   otherInfoForm: UntypedFormGroup;
   otherControls:FormControls[];
+  otherChargeData: any;
+  imageData: any = {};
   constructor(
+    @Inject(MAT_DIALOG_DATA) public item: any,
     private generalService: GeneralService,
     private fb: UntypedFormBuilder,
+    public dialog: MatDialog,
     public dialogRef: MatDialogRef<GenericTableComponent>,
-    ) { }
+    private objImageHandling: ImageHandling
+    ) { 
+     if(item){
+      this.otherChargeData=item
+     }      
+    }
 
   ngOnInit(): void {
     this.initializeFormControls()
@@ -28,6 +39,7 @@ export class ConsignmentOtherInfoComponent implements OnInit {
     const controls = new ConsignmentLtl(this.generalService);
     this.otherControls = controls.getOtherDetails()
     this.otherInfoForm = formGroupBuilder(this.fb, [this.otherControls]);
+    this.autofillData();
   }
   /*End*/
   functionCallHandler($event) {
@@ -48,22 +60,57 @@ export class ConsignmentOtherInfoComponent implements OnInit {
   }
   
   save(){
+    let doc
+    if(this.imageData?.invoiceAttech){
+      doc=this.imageData.invoiceAttech;
+    }
+    else{
+      doc=this.otherInfoForm.controls['invoiceAttech'].value;
+    }
     const req={
-      "cSTRFNO":this.otherInfoForm.value.cSTRFNO,
-      "cOD":this.otherInfoForm.value.cOD,
-      "oRDNO":this.otherInfoForm.value.oRDNO,
-      "dOD":this.otherInfoForm.value.dOD,
-      "iNVATT":this.otherInfoForm.value.invoiceAttech,
+      "cSTRFNO":this.otherInfoForm.value.cust_ref_no,
+      "cOD":this.otherInfoForm.value.cod,
+      "oRDNO":this.otherInfoForm.value.orderNo,
+      "dOD":this.otherInfoForm.value.dod,
+      "iNVATT":this.imageData?.invoiceAttech||"",
       "pOLNO":this.otherInfoForm.value.policyNo,
       "sPPNT":this.otherInfoForm.value.supplyPlant,
       "pLCDT":this.otherInfoForm.value.policyDate,
-      "lOC":this.otherInfoForm.value.local,
+      "lOCAL":this.otherInfoForm.value.local,
       "iNSCMP":this.otherInfoForm.value.invoiceCompany,
       "BUSASS":this.otherInfoForm.value.busAssociate,
       "rEMK":this.otherInfoForm.value.remarks
   }
   
     this.dialogRef.close(req);
+  }
+  autofillData(){
+    if(this.otherChargeData){
+    this.otherInfoForm.controls['cust_ref_no'].setValue(this.otherChargeData?.cSTRFNO||"");
+    this.otherInfoForm.controls['cod'].setValue(this.otherChargeData?.cOD||false);
+    this.otherInfoForm.controls['orderNo'].setValue(this.otherChargeData?.oRDNO||"");
+    this.otherInfoForm.controls['dod'].setValue(this.otherChargeData?.dOD||false);
+    this.otherInfoForm.controls['policyNo'].setValue(this.otherChargeData?.pOLNO||"");
+    this.otherInfoForm.controls['supplyPlant'].setValue(this.otherChargeData?.sPPNT||"");
+    this.otherInfoForm.controls['policyDate'].setValue(this.otherChargeData?.pLCDT||"");
+    this.otherInfoForm.controls['local'].setValue(this.otherChargeData?.lOCAL||false);
+    this.otherInfoForm.controls['invoiceCompany'].setValue(this.otherChargeData?.iNSCMP||"");
+    this.otherInfoForm.controls['busAssociate'].setValue(this.otherChargeData?.BUSASS||"");
+    this.otherInfoForm.controls['remarks'].setValue(this.otherChargeData?.rEMK||'');
+    this.otherInfoForm.controls['invoiceAttech'].setValue(this.otherChargeData?.iNVATT||0);
+    }
+  }
+  async getFileInvoice(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "invoiceAttech", this.
+    otherInfoForm, this.imageData, "Docket", 'Operations', this.otherControls, ["jpeg", "png", "jpg", "pdf"]);
+  }
+  openImageDialog(control) {
+    let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
   }
   cancel(){
     this.dialogRef.close(null)

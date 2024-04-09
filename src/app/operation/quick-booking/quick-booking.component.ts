@@ -120,8 +120,7 @@ export class QuickBookingComponent implements OnInit {
     }
   }
 
-  intigerOnly(event): boolean {    
-    console.log(event);
+  integerOnly(event): boolean {    
     const charCode = event.eventArgs.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
       event.eventArgs.preventDefault();

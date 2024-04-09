@@ -396,7 +396,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   
   async bindQuickdocketData() {
-    
     if (this.quickDocket) {
           this.DocketDetails=this.quickdocketDetaildata?.docketsDetails||{};
           const contract=this.contractForm.value;

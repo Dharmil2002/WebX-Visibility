@@ -177,4 +177,51 @@ export class CustomerService {
       return null; // Return null to indicate an error occurred
     }
   }
+  async getWalkForAutoComplete(form, jsondata, controlName, codeStatus) {
+    try {
+      const cValue = form.controls[controlName].value;
+
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (cValue.length >= 3) {
+        const filter = { cUSTNM: { 'D$regex': `^${cValue}`, 'D$options': 'i' } }
+
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: localStorage.getItem("companyCode"),
+          collectionName: "walkin_customers",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+
+        // Extract the cityCodeData from the response
+        const codeData = cResponse.data.map((x) => { return { name: x.cUSTNM, value: x.cUSTCD, otherdetails: x } });
+
+        // Filter cityCodeData for partial matches
+        if (codeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          console.log(`No data found for Customer ${cValue}`);
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for Customer ${cValue}`,
+          //   showConfirmButton: true,
+          // });
+        } else {
+          // Call the filter function with the filtered data
+          this.filter.Filter(
+            jsondata,
+            form,
+            codeData,
+            controlName,
+            codeStatus
+          );
+        }
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+      console.error("Error fetching data:", error);
+    }
+  }
 }

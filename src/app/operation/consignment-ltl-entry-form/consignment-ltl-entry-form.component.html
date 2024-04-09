@@ -52,7 +52,7 @@
 (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
 [staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width"
 [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-(menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
+(menuItemClicked)="handleMenuItemClick($event)" [TitleBoxData]="this.InvoiceDetailsList" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
 [showHeader]=false [FormTitle]="'Invoice Details'">
 </app-generic-table-v2>
 <div *ngIf="NonFreightLoaded">
@@ -78,7 +78,7 @@
         </app-form-webxpress>
     </form>
 </div>
-<div class="row paddingdiv">
+<div class="row paddingdiv" *ngIf="basicFormControls">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
       <div class="example-button-row d-flex justify-content-start">
         <!-- <div *ngIf="isSubmit">

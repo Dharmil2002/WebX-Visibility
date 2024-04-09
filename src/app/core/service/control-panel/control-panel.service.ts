@@ -23,7 +23,7 @@ export class ControlPanelService {
   constructor(private http: HttpClient, private storage: StorageService) { 
     this.docCalledAs = {
       cID: 0,
-      Docket: "CNote",
+      Docket: "GCN",
       THC: "Trip",
       LS: "Loadingsheet",
       MF: "Menifest",

@@ -416,6 +416,9 @@ export class ConsignmentLtl extends BaseControl {
             {
                 name: 'weight_in', label: 'Size In', placeholder: 'Size In', type: 'Staticdropdown',
                 value: [], Validations: [], generatecontrol: true, disable: false,
+                functions:{
+                    onSelection:"unitChange"
+                },
                 additionalData: {
                     metaData: "custom",
                 },
@@ -697,6 +700,9 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: false,
                     metaData: "volumetric"
                 },
+                functions:{
+                    "onChange":"calucateCft"
+                },
                 generatecontrol: true,
                 disable: false,
             },
@@ -713,6 +719,9 @@ export class ConsignmentLtl extends BaseControl {
                     name: "required",
                     message: "Length is required",
                 }],
+                functions:{
+                    "onChange":"calucateCft"
+                },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "volumetric"
@@ -733,6 +742,9 @@ export class ConsignmentLtl extends BaseControl {
                     name: "required",
                     message: "breadth is required",
                 }],
+                functions:{
+                    "onChange":"calucateCft"
+                },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "volumetric"
@@ -753,6 +765,9 @@ export class ConsignmentLtl extends BaseControl {
                     name: "required",
                     message: "breadth is required",
                 }],
+                functions:{
+                    "onChange":"calucateCft"
+                },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "volumetric"
@@ -777,6 +792,9 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
                 },
+                functions: {
+                    onModel: "preventNegative"
+                  },
                 generatecontrol: true,
                 disable: false,
             },
@@ -797,8 +815,31 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
                 },
+                functions: {
+                    onModel: "preventNegative"
+                  },
                 generatecontrol: true,
                 disable: false,
+            },
+            {
+                name: "cft",
+                label: "CFT Total",
+                placeholder: "CFT Total",
+                type: "text",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [],
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "volumetric"
+                },
+                functions: {
+                    onModel: ""
+                  },
+                generatecontrol: true,
+                disable: true
             },
             {
                 name: "noOfPackage",
@@ -813,6 +854,10 @@ export class ConsignmentLtl extends BaseControl {
                     name: "required",
                     message: "No of Package is required",
                 }],
+                functions: {
+                    keypress: "integerOnly",
+                    onChange:"calucateCft"
+                  },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
@@ -820,11 +865,12 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
             },
+            
             {
                 name: "materialName",
                 label: "Material Name",
                 placeholder: "Material Name",
-                type: "text",
+                type: "dropdown",
                 value: "",
                 filterOptions: "",
                 autocomplete: "",
@@ -857,6 +903,9 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
                 },
+                functions: {
+                    onModel: "preventNegative"
+                  },
                 generatecontrol: true,
                 disable: false,
             },
@@ -877,6 +926,9 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
                 },
+                functions: {
+                    onModel: "preventNegative"
+                  },
                 generatecontrol: true,
                 disable: false,
             },
@@ -917,7 +969,8 @@ export class ConsignmentLtl extends BaseControl {
                     metaData: "freightDetails"
                 },
                 functions: {
-                    onModel: "calculateFreight"
+                    onModel: "preventNegative",
+                    onChange: "calculateFreight"
                 },
                 generatecontrol: true, disable: false
             },
@@ -940,6 +993,7 @@ export class ConsignmentLtl extends BaseControl {
                 }
                 ],
                 functions: {
+                    onModel: "preventNegative",
                     onChange: "calculateFreight"
                 },
                 additionalData: {
@@ -950,6 +1004,7 @@ export class ConsignmentLtl extends BaseControl {
             {
                 name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'mobile-number',
                 value: 0.00, Validations: [], generatecontrol: true, functions: {
+                    onModel: "preventNegative",
                     onChange: "calculateFreight"
                 },
                 additionalData: {
@@ -964,6 +1019,7 @@ export class ConsignmentLtl extends BaseControl {
                     metaData: "freightDetails"
                 },
                 functions: {
+                    onModel: "preventNegative",
                     onChange: "calculateFreight"
                 },
             },
@@ -991,7 +1047,12 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
-                value:0.00, Validations: [],  additionalData: {
+                value:0.00, Validations: [],  
+                functions: {
+                    onModel: "preventNegative",
+                    onChange: "calculateFreight"
+                },
+                additionalData: {
                     metaData: "freightDetails"
                 },generatecontrol: true, disable: false
             },
@@ -1002,6 +1063,7 @@ export class ConsignmentLtl extends BaseControl {
                     metaData: "freightDetails"
                 }, generatecontrol: true, disable: false,
                 functions: {
+                    onModel: "preventNegative",
                     onChange: "calculateFreight"
                 }
             },
@@ -1024,35 +1086,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'cod', label: 'COD', placeholder: 'COD', type: 'number',
-                value: "", Validations: [],
-                additionalData: {
-                },
-                functions: {
-                },
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'orderNo', label: 'Order No./PO No.', placeholder: 'Customer Ref No.', type: 'text',
-                value: "", 
-                Validations: [],
-                additionalData: {
-                },
-                functions: {
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'dod', label: 'DOD', placeholder: 'DOD', type: 'number',
-                value: "", Validations: [],
-                additionalData: {
-                },
-                functions: {
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'riskType', label: 'Risk Type', placeholder: 'Risk Type', type: 'Staticdropdown',
                 value: "", 
                 Validations: [],
                 additionalData: {
@@ -1065,9 +1099,11 @@ export class ConsignmentLtl extends BaseControl {
                 name: 'invoiceAttech', label: 'Invoice Attachment', placeholder: 'Invoice Attachment', type: 'file',
                 value: "", 
                 Validations: [],
-                additionalData: {
+                additionalData:{
+                    isFileSelected:false
                 },
                 functions: {
+                    onChange: 'getFileInvoice',
                 },
                 generatecontrol: true, disable: false
             },
@@ -1101,16 +1137,7 @@ export class ConsignmentLtl extends BaseControl {
                 },
                 generatecontrol: true, disable: false
             },
-            {
-                name: 'local', label: 'Local GCN', placeholder: 'Local GCN', type: 'text',
-                value: "", 
-                Validations: [],
-                additionalData: {
-                },
-                functions: {
-                },
-                generatecontrol: true, disable: false
-            },
+            
             {
                 name: 'invoiceCompany', label: 'Insurance Company', placeholder: 'Insurance Company', type: 'text',
                 value: "", 
@@ -1129,12 +1156,40 @@ export class ConsignmentLtl extends BaseControl {
                 },
                 functions: {
                 },
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
             },
             {
                 name: 'remarks', label: 'Remarks', placeholder: 'Remarks', type: 'text',
                 value: "", 
                 Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'local', label: 'Local GCN', placeholder: 'Local GCN', type: 'toggle',
+                value: "", 
+                Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'cod', label: 'COD', placeholder: 'COD', type: 'toggle',
+                value: "", Validations: [],
+                additionalData: {
+                },
+                functions: {
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'dod', label: 'DOD', placeholder: 'DOD', type: 'toggle',
+                value: "", Validations: [],
                 additionalData: {
                 },
                 functions: {

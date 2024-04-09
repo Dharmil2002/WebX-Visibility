@@ -350,7 +350,6 @@ export class PrqService {
 
     return prqDetail;
   }
-
   async getAllPrqDetail() {
     const reqBody = {
       companyCode: this.storage.companyCode, // Get company code from local storage
@@ -522,5 +521,43 @@ export class PrqService {
   // This function retrieves the assigned vehicle details.
   getAssigneVehicleDetail() {
     return this.vehicleDetail;
+  }
+  /*below function is getting a data from prq*/
+  async getPrqDetail(filter={}) {
+    const reqBody = {
+      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      collectionName: "prq_summary",
+      filter:filter,
+    };
+
+    // Make an asynchronous request to the API using masterMongoPost method
+    const res = await firstValueFrom(
+      this.masterService.masterMongoPost("generic/get", reqBody)
+    );
+
+    let prqList = [];
+    const prqDetails = res.data;
+    // Map and transform the PRQ data
+    prqDetails.map((element, index) => {
+      let prqDataItem = this.preparePrqDetailObject(element, index);
+      prqList.push(prqDataItem);
+    });
+
+    // Sort the PRQ list by pickupDate in descending order
+    const sortedData = prqList.sort((a, b) => {
+      const dateA: Date | any = new Date(a.createDateOrg);
+      const dateB: Date | any = new Date(b.createDateOrg);
+
+      // Compare the date objects
+      return dateB - dateA; // Sort in descending order
+    });
+
+    // Create an object with sorted PRQ data and all PRQ details
+    const prqDetail = {
+      tableData: sortedData,
+      allPrqDetail: res.data,
+    };
+
+    return prqDetail;
   }
 }

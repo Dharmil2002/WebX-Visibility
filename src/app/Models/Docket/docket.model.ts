@@ -11,18 +11,15 @@ import { DocketDetail } from "src/app/core/models/operations/consignment/consgim
 
 export class DocketEntryModel implements IFieldDefinition {
   constructor() { }
-
   public consignmentTableForm: UntypedFormGroup;
   public containerTableForm: UntypedFormGroup;
   public FreightTableForm: UntypedFormGroup;
   public NonFreightTableForm: UntypedFormGroup;
   public invoiceTableForm: UntypedFormGroup;
   public ewayBillTableForm: UntypedFormGroup;
-
   public ConsignmentFormControls: ConsignmentControl;
   public FreightFromControl: FreightControl;
   public jsonMarketVehicle: FormControls[];
-
   public fromCity: string;
   public fromCityStatus: any;
   public customer: string;
@@ -39,14 +36,11 @@ export class DocketEntryModel implements IFieldDefinition {
   public prqNoStatus: boolean;
   public containerType: string;
   public containerTypeStatus: boolean;
-
   public docketDetail: DocketDetail;
   public tableData: any = [];
   public invoiceData: any = [];
   public tableData1: any;
-
   public vendorDetail: any;
-
   public previewResult: any;
   public vehicleNo: any;
   public vehicleNoStatus: any;

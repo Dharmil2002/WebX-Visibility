@@ -1,5 +1,5 @@
 export const DocCalledAs = {
-    Docket:  "CNote",
+    Docket:  "GCN",
     THC:  "Trip",
     LS:  "Loadingsheet",
     MF:  "Menifest",

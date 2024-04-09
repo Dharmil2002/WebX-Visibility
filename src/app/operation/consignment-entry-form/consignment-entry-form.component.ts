@@ -119,7 +119,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.model.docketDetail = new DocketDetail({});
     if (navigationState != null) {
-
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -358,7 +357,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }
     callback();
   }
-
   async bindDataFromDropdown() {
 
     const locDetails = await this.locationService.locationFromApi({ locCode: this.storage.branch });
@@ -408,7 +406,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.prqFlag && await this.prqDetail();
 
   }
-
   async getPrqDetails() {
     const prqNo = await this.prqService.getPrqForBooking(
       this.storage.branch,
@@ -1824,6 +1821,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*End*/
   //validation for the Actual weight not greater then actual weight
   calculateValidation() {
+    
     const chargedWeight = parseFloat(
       this.model.invoiceTableForm.controls["chargedWeight"]?.value || 0
     );
@@ -1836,6 +1834,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         title: "Error",
         text: "Actual weight cannot be greater than Charge weight.",
       });
+      this.model.invoiceTableForm.controls["actualWeight"]?.setValue("")
       return false;
     }
     return true;
@@ -1931,7 +1930,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.invoiceData = [];
     this.model.tableData = [];
   }
+  //validation for the Actual weight not greater then actual weight
 
+  /*pincode based city*/
   SetInvoiceData() {
     this.InvoiceDetailsList = [
       {
@@ -1978,12 +1979,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "to": this.model.consignmentTableForm.value.toCity.value,
       "capacity": containerCode
     }
-
-    // let reqBody = {
-    //   "companyCode": 10065, "customerCode": "CUST00022",
-    //   "contractDate": "2024-02-12T09:06:22.424Z", "productName": "Road", "basis": "TBB", "from": "MUMBAI", "to": "DELHI", "capacity": 9
-    // }
-
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
       .then(async (res: any) => {
         if (res.length == 1) {

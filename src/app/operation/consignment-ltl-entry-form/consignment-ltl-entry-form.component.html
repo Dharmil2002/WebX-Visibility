@@ -1,0 +1,100 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
+    <div *ngIf="basicFormControls">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Basic Detail'"
+            [formData]="basicFormControls" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="customeControlArray">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm"
+            [formData]="customeControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="consignorControlArray">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignor Details'"
+            [formData]="consignorControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div  *ngIf="consigneeControlArray">
+    <form [formGroup]="consignmentForm">
+        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignee Details'"
+            [formData]="consigneeControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+
+<div *ngIf="invoiceControlArray">
+    <form [formGroup]="invoiceForm">
+        <app-form-webxpress [form]="invoiceForm" [FormTitle]="'Invoice Details'"
+            [formData]="invoiceControlArray"  [EventButton]="EventButton" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+
+<div *ngIf="loadIn" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+<app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls"
+[columnHeader]="columnInvoice" [tableData]="tableData"
+(selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+[staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width"
+[maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+(menuItemClicked)="handleMenuItemClick($event)" [TitleBoxData]="this.InvoiceDetailsList" [addFlag]="addFlag" (addEmitter)="addPopUp($event)"
+[showHeader]=false [FormTitle]="'Invoice Details'">
+</app-generic-table-v2>
+<div *ngIf="NonFreightLoaded">
+
+
+    <form [formGroup]="NonFreightTableForm">
+      <app-form-webxpress [form]="NonFreightTableForm" [FormTitle]="'Non Freight Details'"
+        [formData]="NonFreightjsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+  </div>
+<div *ngIf="freightControlArray">
+    <form [formGroup]="freightForm">
+        <app-form-webxpress [form]="freightForm" [FormTitle]="'Freight Details'"
+            [formData]="freightControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" 
+            [addNewTitle]="addNewTitle"
+            [DisplayAddNewButton]=true
+            [MatButton]="MatButton"
+            (AddNewButtonEvent)="ViewCharge()"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>
+<div class="row paddingdiv" *ngIf="basicFormControls">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+      <div class="example-button-row d-flex justify-content-start">
+        <!-- <div *ngIf="isSubmit">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </div> -->
+        <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
+        <button class="msr-3" mat-raised-button color="primary"(click)="save()">Generate Docket</button>
+        <button class="msr-3" mat-raised-button color="primary">Back</button>
+        <button class="msr-3" [disabled]="!this.consignmentForm.value?.billingParty ||
+        !this.consignmentForm.value?.docketDate ||
+        !this.consignmentForm.value?.toCity ||
+        !this.consignmentForm.value?.payType ||
+        !this.consignmentForm.value?.transMode" (click)="InvockedContract()" mat-raised-button
+        color="primary">Invoked</button>
+      </div>
+    </div>
+  </div>
+</app-common-wrapper-webxpress>

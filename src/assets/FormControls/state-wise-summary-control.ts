@@ -1,4 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 export class StateWiseSummaryControl {
   stateWiseSummaryArray: FormControls[];
   invoiceSummaryArray: FormControls[];
@@ -105,7 +108,7 @@ export class StateWiseSummaryControl {
         label: "Generation Office",
         placeholder: "Generation Office",
         type: "text",
-        value:localStorage.getItem("Branch"),
+        value: StorageService.getItem(StoreKeys.Branch),
         generatecontrol: true,
         disable: true,
         Validations: [],

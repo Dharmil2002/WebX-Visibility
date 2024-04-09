@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
 import Swal from "sweetalert2";
 import { getArrayAfterMatch } from 'src/app/Utility/commonfunction';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-loadingsheet',
   templateUrl: './loadingsheet.component.html'
@@ -19,7 +20,7 @@ export class LoadingsheetComponent {
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
   formGrop: FormGroup;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
 
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < (column name) : Column name you want to display on table > 
@@ -66,12 +67,12 @@ export class LoadingsheetComponent {
   dataDetails: any;
   docketNestedDetails: any;
   dayName: any;
-  constructor(private Route: Router, private fb: UntypedFormBuilder, private ICnoteService: CnoteService) {
+  constructor(private Route: Router, private fb: UntypedFormBuilder, private ICnoteService: CnoteService, private storage: StorageService) {
     // super();
+    this.orgBranch = this.storage.branch;
     this.IscheckBoxRequired = true;
     this.formGrop = this.createUserForm()
     this.addAndEditPath = '/Masters/Docket/LoadingSheetDetails'
-
   }
   ngOnInit(): void {
     this.index = 0;
@@ -85,7 +86,7 @@ export class LoadingsheetComponent {
   }
   createUserForm(): UntypedFormGroup {
     return this.fb.group({
-      companyCode: [parseInt(localStorage.getItem("companyCode"))],
+      companyCode: [this.storage.companyCode],
       ruteCode: [''],
       RouteSchedule: ['']
 
@@ -106,7 +107,7 @@ export class LoadingsheetComponent {
     try {
       // Creates the request object to be sent to the API endpoint
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
       };
 
       // Makes the API call to fetch the Consignor City
@@ -132,7 +133,7 @@ export class LoadingsheetComponent {
     try {
       // Creates the request object to be sent to the API endpoint
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         ruteCode: this.formGrop.value?.ruteCode.Value || ''
       };
 
@@ -200,7 +201,7 @@ export class LoadingsheetComponent {
     try {
       // Creates the request object to be sent to the API endpoint
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         rutCd: routeRlocation || [],
         ORGNCD: this.orgBranch.trim()
       };

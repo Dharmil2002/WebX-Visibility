@@ -209,7 +209,7 @@ const routes: Routes = [
   { path: "shardProduct/shardProductList", component: ProductListComponent },
 
   { path: "AddDCR/DCRAllocation",component: DcrAllocationComponent},
-  {path: "DCRManagement", component: DcrManagementComponent}
+  {path: "DCRManagement", component: DcrManagementComponent},
 ];
 
 @NgModule({

@@ -615,6 +615,40 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     }
   }
+  async checkPrLR(){
+    if (this.model.consignmentTableForm.controls['pr_lr_no'].value) {
+      // First, we determine if the `pr_lr_no` value can be considered an integer
+      const prLrNoValue = this.model.consignmentTableForm.controls['pr_lr_no'].value;
+      const numericPrLrNo = Number(prLrNoValue); // Convert to number to check if it's an integer
+      let query;
+
+      if (Number.isInteger(numericPrLrNo)) {
+        // If prLrNoValue is an integer, construct a query to search by that integer value
+        query = {
+          cID: this.storage.companyCode,
+          'pRLR': numericPrLrNo
+        };
+      } else {
+        // If prLrNoValue is not an integer, use the original query with $or condition
+        query = {
+          cID: this.storage.companyCode,
+          'pRLR': { 'D$regex': `${prLrNoValue}`, 'D$options': "i" }  // Fallback to regex match
+        };
+      }
+      // Now, use the constructed query in your service call
+      const res = await this.docketService.checkPrLrNoExistLTL(query);
+
+      if(res){
+        Swal.fire({
+          icon: 'info',
+          title: 'PR LR No. is Exists',
+          text: `PR LR No. ${this.model.consignmentTableForm.controls['pr_lr_no'].value} already exists.`
+        });
+        this.model.consignmentTableForm.controls['pr_lr_no'].setValue('');
+      }
+    }
+    
+  }
   async SetConsignorAndConsigneeAddressDetails(CustomerName, customerType) {
     const billingParty = CustomerName
     const fromCity = this.model.consignmentTableForm.controls["fromCity"]?.value.value || "";
@@ -2274,7 +2308,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   //               docNo: DocketNo,
   //               partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
   //               partyName: this.model.consignmentTableForm.value?.billingParty?.name,
-  //               entryBy: localStorage.getItem("UserName"),
+  //               entryBy: localstorage.getItem(StoreKeys.UserId),
   //               entryDate: Date(),
   //               debit: [{
   //                 "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,

@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { AccountGroupControls } from "src/assets/FormControls/Account/account-group-controls";
 import Swal from "sweetalert2";
 
@@ -18,7 +19,7 @@ export class AddGroupComponent implements OnInit {
   FormTitle: string = "Add Account Group";
   jsonControlArray: any;
   GroupForm: any;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   FirstUpdate = false;
   AcGroupCatCode: any;
   AcGroupCatStatus: any;
@@ -31,8 +32,10 @@ export class AddGroupComponent implements OnInit {
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
@@ -170,9 +173,9 @@ export class AddGroupComponent implements OnInit {
       BalanceSheetCode: this.GroupForm.value.BalanceSheet.value,
       GroupName: this.GroupForm.value.GroupName,
       activeFlag: this.GroupForm.value.activeFlag,
-      mODBY: localStorage.getItem("UserName"),
+      mODBY: this.storage.userName,
       mODDT: new Date(),
-      mODLOC: localStorage.getItem("Branch"),
+      mODLOC: this.storage.branch,
     };
     if (this.isUpdate) {
       const req = {
@@ -197,9 +200,9 @@ export class AddGroupComponent implements OnInit {
             : tabledata.data[tabledata.data.length - 1].Groupcode + 1,
         cID: this.CompanyCode,
         activeFlag: this.GroupForm.value.activeFlag,
-        eNTBY: localStorage.getItem("UserName"),
+        eNTBY: this.storage.userName,
         eNTDT: new Date(),
-        eNTLOC: localStorage.getItem("Branch"),
+        eNTLOC: this.storage.branch,
         ...commonBody,
       };
       const req = {

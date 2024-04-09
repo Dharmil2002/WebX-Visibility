@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -7,7 +8,7 @@ import Swal from 'sweetalert2';
   templateUrl: './customer-group-list.component.html',
 })
 export class CustomerGroupListComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
@@ -38,7 +39,8 @@ export class CustomerGroupListComponent implements OnInit {
   }
   addAndEditPath: string;
   csvFileName: string;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/CustomerGroupMaster/AddCustomerGroupMaster";
   }
   ngOnInit(): void {
@@ -75,7 +77,7 @@ export class CustomerGroupListComponent implements OnInit {
     delete det._id;
     delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customerGroup_detail",
       filter: { _id: id },
       update: det

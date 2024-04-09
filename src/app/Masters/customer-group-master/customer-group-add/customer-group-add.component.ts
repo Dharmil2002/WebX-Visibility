@@ -7,6 +7,7 @@ import { CustomerGroupControl } from "src/assets/FormControls/customer-group-mas
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { firstValueFrom } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: 'app-customer-group-add',
@@ -14,7 +15,7 @@ import { firstValueFrom } from "rxjs";
 })
 export class CustomerGroupAddComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any;}[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   action: string;
   isUpdate = false;
   groupTabledata: CustomerGroupMaster;
@@ -28,8 +29,9 @@ export class CustomerGroupAddComponent implements OnInit {
   }
 
   constructor(private Route: Router, private fb: UntypedFormBuilder,
-    private masterService: MasterService
+    private masterService: MasterService, private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'

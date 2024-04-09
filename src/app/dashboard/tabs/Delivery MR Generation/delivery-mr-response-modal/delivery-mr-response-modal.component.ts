@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-delivery-mr-response-modal',
@@ -8,7 +9,7 @@ import { Router } from '@angular/router';
 export class DeliveryMrResponseModalComponent implements OnInit {
   tableData: [] | any;
   tableload = true; // flag , indicates if data is still loading or not , used to show loading animation
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  companyCode: number =0;
   menuItemflag: boolean = false;
   METADATA = {
     checkBoxRequired: true,
@@ -56,10 +57,12 @@ export class DeliveryMrResponseModalComponent implements OnInit {
   backPath: any;
   constructor(
     private router: Router,
+    private storageService: StorageService,
     //private dialogRef: MatDialogRef<DeliveryMrResponseModalComponent>,
     // @Inject(MAT_DIALOG_DATA)
     // private objResult: any,
   ) {
+    this.companyCode = this.storageService.companyCode;
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
       console.log(data);
@@ -100,6 +103,7 @@ export class DeliveryMrResponseModalComponent implements OnInit {
    * Navigates to the "Delivery" tab using the Router.
    */
   navigateToDeliveryTab(): void {
+    this.storageService.setItem('deliveryMRIndex', '2')
     this.navigateWithTabIndex('Delivery');
   }
 

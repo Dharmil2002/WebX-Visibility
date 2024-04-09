@@ -1,6 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { StoreKeys } from "src/app/config/myconstants";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
+import { StorageService } from "src/app/core/service/storage.service";
 import { searchbilling } from "src/app/dashboard/docket-dashboard/dashboard-utlity";
 
 @Component({
@@ -16,48 +19,96 @@ export class HomePageComponent implements OnInit {
   isNavbarCollapsed = true;
   cardList = [
     {
-      title:"Procurement",
-      iconName:"event_note",
+      title:"Full Truck Operations",
+      iconName:"local_shipping",
+      mode: "FTL",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "rgb(153, 19, 19)",
+      color: "#ffffff"
+    },
+    {
+      title:"Express Movement",
+      iconName:"airport_shuttle",
+      mode: "LTL",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#e6a838",
+      color: "#ffffff"
     },
     {
       title:"Export Operations",
       iconName:"flight_takeoff",
-    },
-    {
-      title:"Express Operations",
-      iconName:"local_shipping",
+      mode: "Export",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#b61865",
+      color: "#ffffff"
     },
     {
       title:"Import Operations",
       iconName:"flight_land",
+      mode: "Import",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#b61865",
+      color: "#ffffff"
     },
     {
       title:"Billing",
       iconName:"receipt_long",
+      mode: "Billing​",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#00bdeb",
+      color: "#ffffff"
     },
     {
-      title:"Payments",
+      title:"Accounts",
       iconName:"payments",
+      mode: "Accounts",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#00ac5f",
+      color: "#ffffff"
     },
     {
       title:"Purchase",
       iconName:"shop_two",
+      mode: "",
+      route: "",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#fd7e14",
+      color: "#ffffff"
     },
     {
-      title:"Masters",
-      iconName:"info",
+      title:"Analytics",
+      iconName:"analytics",
+      mode: "",
+      route: "/dashboard/ReportDashboard",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#1a3e84",
+      color: "#ffffff"
+    },
+    {
+      title:"Admin Portal",
+      iconName:"settings",
+      mode: "",
+      route: "/ControlPanel/gps-rule",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#222222",
+      color: "#ffffff"
     },
   ];
-  constructor(private router: Router, private masterService: MasterService) {
+  constructor(private router: Router, private masterService: MasterService, private menuService: MenuService, private storage: StorageService) {       
     this.bindMenu();
   }
 
   ngOnInit(): void {}
   async bindMenu() {
-    this.searchData = await searchbilling(this.masterService);
-    const searchDetail = this.searchData.map((x) => {
-      return { name: x.title, value: x.router };
-    });
+    
+    this.searchData = JSON.parse(this.storage.getItem(StoreKeys.SearchData) || "[]");   
+    const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
   }
 
@@ -77,5 +128,17 @@ export class HomePageComponent implements OnInit {
     this.router.navigateByUrl(option.value);
     this.searchQuery = "";
     this.showAutocomplete = false;
+  }
+
+  onAppClick(event: MouseEvent, data: any){
+    if(data.mode) {
+      //this.setMenuToBind(data.mode);      
+      this.storage.setItem(StoreKeys.Mode, data.mode);
+      this.bindMenu();
+      this.router.navigate(['/dashboard/Index']);
+    }
+    else if(data.route) {
+      this.router.navigate([data.route]);
+    }
   }
 }

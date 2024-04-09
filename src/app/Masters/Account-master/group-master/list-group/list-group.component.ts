@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-list-group",
@@ -62,9 +63,11 @@ export class ListGroupComponent implements OnInit {
     "BalanceSheetName",
     "GroupName",
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   TableData: any ;
-  constructor(private Route: Router, private masterService: MasterService) {}
+  constructor(private Route: Router, private masterService: MasterService, private storage: StorageService) {
+    this.CompanyCode = this.storage.companyCode;
+  }
 
   ngOnInit(): void {
     this.getTableData()

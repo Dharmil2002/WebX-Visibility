@@ -1,5 +1,7 @@
 import { FormGroup } from "@angular/forms";
 import { WebxConvert } from "src/app/Utility/commonfunction";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export async function getPincode(companyCode, masterService) {
   const req = {
@@ -71,16 +73,16 @@ export async function addTracking(companyCode, operationService, data) {
     dktNo: data?.docketNumber || '',
     vehNo: "",
     route: "",
-    event: "Booked At" + " " + localStorage.getItem("Branch"),
+    event: "Booked At" + " " + StorageService.getItem(StoreKeys.Branch),
     orgn: data?.orgLoc || '',
-    loc: localStorage.getItem("Branch"),
+    loc: StorageService.getItem(StoreKeys.Branch),
     dest: data.destination.trim(),
     lsno: "",
     mfno: "",
     dlSt: "",
     dlTm: "",
     evnCd: "",
-    upBy: localStorage.getItem("UserName"),
+    upBy: StorageService.getItem(StoreKeys.UserId),
     upDt: new Date()
   }
 

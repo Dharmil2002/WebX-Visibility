@@ -1,3 +1,6 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export interface Shipment {
     Shipment: number;
     Origin: string;
@@ -31,8 +34,8 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, oper
                 ? {
                     tripId: "",
                     route: "",
-                    currentLocation:localStorage.getItem("Branch"),
-                    updateBy: localStorage.getItem("Username"),
+                    currentLocation: StorageService.getItem(StoreKeys.Branch),
+                    updateBy: StorageService.getItem(StoreKeys.UserId),
                     updateDate: new Date().toISOString()
                   }
                 : {})

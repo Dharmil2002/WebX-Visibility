@@ -1,23 +1,28 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-common-view-print',
   templateUrl: './common-view-print.component.html'
 })
+
 export class CommonViewPrintComponent implements OnInit {
   showView = false;
   HtmlTemplate;
   FieldMapping: any;
-  companyCode = localStorage.getItem("companyCode");
+  companyCode = 0;
   JsonData;
   templateBody: any;
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
+    
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
       "display",
@@ -30,9 +35,9 @@ export class CommonViewPrintComponent implements OnInit {
     ); //Hide Sidebars
 
     this.router.queryParams.subscribe((params) => {
-      this.templateBody = JSON.parse(params["templateBody"]) ;
+      this.templateBody = JSON.parse(params["templateBody"]);
     }); //Get Parameters
-   }
+  }
 
   ngOnInit(): void {
     this.GetviewPrint() // Template Data
@@ -41,7 +46,8 @@ export class CommonViewPrintComponent implements OnInit {
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
-      templateName: this.templateBody.templateName,
+      docType: this.templateBody.templateName,
+      partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
     };
     const Res = await this.masterService

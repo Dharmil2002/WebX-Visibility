@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 import { IFieldDefinition } from "../../Interface/IFieldDefinition.interface";
+import * as StorageService from 'src/app/core/service/storage.service';
+import { StoreKeys } from "src/app/config/myconstants";
 
 @Injectable({
   providedIn: "root",
@@ -128,9 +130,9 @@ export class prqUpload {
     eNTLOC:string;
     eNTBY: string;
     constructor() {
-      this.eNTBY = localStorage.getItem("UserName");
-      this.eNTLOC = localStorage.getItem("Branch");
+      this.eNTBY = StorageService.getItem(StoreKeys.UserId);
+      this.eNTLOC = StorageService.getItem(StoreKeys.Branch);
       this.eNTDT = new Date();
-      this.cID = parseInt(localStorage.getItem("companyCode"));
+      this.cID = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
     }
 }

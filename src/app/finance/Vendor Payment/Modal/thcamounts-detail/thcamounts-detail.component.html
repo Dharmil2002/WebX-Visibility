@@ -5,7 +5,7 @@
     </button>
 </div>
 <div class="body" style="max-height: 420px;">
-    <div class="col-12" style="padding: 0px;">
+    <div class="col-12" style="padding: 0px;" *ngIf="THCAmountsDetailsArray">
         <form [formGroup]="THCAmountsDetailsForm">
             <app-form-webxpress [form]="THCAmountsDetailsForm" [FormTitle]="'Vendor ' + BillPaymentData.Vendor"
                 [formData]="THCAmountsDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
@@ -15,7 +15,7 @@
         </form>
     </div>
     <div class="row">
-        <div class="col-6" *ngIf="isAddForm">
+        <div class="col-6" *ngIf="isAddForm && THCAmountsADDArray">
             <form [formGroup]=" THCAmountsADDForm">
                 <app-form-webxpress [form]="THCAmountsADDForm" [FormTitle]="'THC Amounts ADD (+)'"
                     [formData]="THCAmountsADDArray" (functionCallEmitter)="functionCallHandler($event)"
@@ -24,7 +24,7 @@
                 </app-form-webxpress>
             </form>
         </div>
-        <div class="col-6" *ngIf="isLessForm">
+        <div class="col-6" *ngIf="isLessForm && THCAmountsLESSArray">
             <form [formGroup]="THCAmountsLESSForm">
                 <app-form-webxpress [form]="THCAmountsLESSForm" [formData]="THCAmountsLESSArray"
                     (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'THC Amounts LESS (-)'"
@@ -34,7 +34,7 @@
             </form>
         </div>
     </div>
-    <form [formGroup]="THCAmountsForm">
+    <form *ngIf="THCAmountsForm" [formGroup]="THCAmountsForm">
         <app-form-webxpress [form]="THCAmountsForm" [formData]="THCAmountsArray"
             (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="''"
             [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"

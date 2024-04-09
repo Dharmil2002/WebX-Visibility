@@ -311,7 +311,7 @@ export class InvoiceServiceService {
   async updateShipments(shipment: string) {
     const data = { bILED: true, mODDT: new Date(), mODLOC: this.storage.branch, mODBY: this.storage.userName }
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "dockets_bill_details",
       filter: { "dKTNO": shipment },
       update: data

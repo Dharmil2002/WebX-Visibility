@@ -98,7 +98,7 @@ export class SetOpeningBalanceLedgerWiseComponent implements OnInit {
   menuItemflag = true;
 
   staticField = ['aCCD', 'aCNM', 'dAMT', 'cAMT',]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
 
   menuItems = [
     { label: 'Modify' },
@@ -120,6 +120,7 @@ export class SetOpeningBalanceLedgerWiseComponent implements OnInit {
     public StorageService: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService) {
+      this.companyCode = this.storage.companyCode;
   }
 
   ngOnInit(): void {

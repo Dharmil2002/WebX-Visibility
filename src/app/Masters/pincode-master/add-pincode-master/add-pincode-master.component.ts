@@ -8,6 +8,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { PincodeControl } from "src/assets/FormControls/pincodeMaster";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-add-pincode-master',
@@ -32,7 +33,7 @@ export class AddPinCodeMasterComponent implements OnInit {
     cityname: any;
     pincatList: any;
     updateCity: any;
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     state: any;
     city: any;
     cityRes: any;
@@ -48,7 +49,8 @@ export class AddPinCodeMasterComponent implements OnInit {
     }
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, private fb: UntypedFormBuilder,
-         private filter: FilterUtils,  private masterService: MasterService) {
+         private filter: FilterUtils,  private masterService: MasterService, private storage: StorageService) {
+            this.companyCode = this.storage.companyCode;
         if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
             this.data = this.route.getCurrentNavigation().extras.state.data;
             this.action = 'edit';

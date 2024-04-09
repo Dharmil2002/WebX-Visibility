@@ -67,7 +67,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   extraData: any;
   vehicleType: any;
   vehicleTypeStatus: any;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
   shipmentData: any;
   tableData: any[];
   columnHeader = {
@@ -101,14 +101,14 @@ export class CreateLoadingSheetComponent implements OnInit {
   getloadingFormData: any;
   legWiseData: any;
   updatedShipment: any[] = [];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   packagesScan: any;
   vehicleNoControlName: any;
   vehicleControlStatus: any;
   loadingSheetNo: any;
   docketApiRes: any;
   cnoteDetails: any;
-  userName = localStorage.getItem("Username");
+  userName = "";
   lsDetails: any;
   NoDocket: boolean;
   departFlag: boolean = false;
@@ -128,6 +128,10 @@ export class CreateLoadingSheetComponent implements OnInit {
     private generalService: GeneralService,
     private loadingSheetService: LoadingSheetService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.orgBranch = this.storage.branch;
+    this.userName = this.storage.userName;  
+
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       // Retrieve tripData and shippingData from the navigation state
       this.tripData =
@@ -210,7 +214,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     // Set the value of 'LoadingLocation' form control with the value retrieved from localStorage for 'Branch'
     setFormControlValue(
       this.loadingSheetTableForm.controls["LoadingLocation"],
-      localStorage.getItem("Branch"),
+      this.storage.branch,
       ""
     );
 

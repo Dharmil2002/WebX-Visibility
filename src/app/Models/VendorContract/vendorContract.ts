@@ -1,3 +1,6 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export class vendorContractUpload {
     _id: string;
     cID: number;
@@ -15,8 +18,8 @@ export class vendorContractUpload {
     eNTLOC: string;
     eNTDT: Date;
     constructor() {
-        this.eNTBY = localStorage.getItem("UserName");
-        this.eNTLOC = localStorage.getItem("Branch");
+        this.eNTBY = StorageService.getItem(StoreKeys.UserId);
+        this.eNTLOC = StorageService.getItem(StoreKeys.Branch);
         this.eNTDT = new Date();
     }
 
@@ -41,8 +44,8 @@ export class LastMileDelivery {
     eNTLOC: string;
     eNTDT: Date;
     constructor() {
-        this.eNTBY = localStorage.getItem("UserName");
-        this.eNTLOC = localStorage.getItem("Branch");
+        this.eNTBY = StorageService.getItem(StoreKeys.UserId);
+        this.eNTLOC = StorageService.getItem(StoreKeys.Branch);
         this.eNTDT = new Date();
     }
 }
@@ -68,8 +71,8 @@ export class BusinessAssociate {
     eNTLOC: string;
     eNTDT: Date;
     constructor() {
-        this.eNTBY = localStorage.getItem("UserName");
-        this.eNTLOC = localStorage.getItem("Branch");
+        this.eNTBY = StorageService.getItem(StoreKeys.UserId);
+        this.eNTLOC = StorageService.getItem(StoreKeys.Branch);
         this.eNTDT = new Date();
     }
 }

@@ -4,12 +4,13 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { GeneralMaster } from "src/app/Models/general-master/general-master";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Injectable({
     providedIn: "root",
 })
 export class GeneralService {
-    constructor(private masterService: MasterService) { }
+    constructor(private masterService: MasterService, private storage: StorageService) { }
 /**
  * Asynchronously fetches general master data based on the provided codeType.
  *
@@ -20,7 +21,7 @@ async getGeneralMasterData(codeType): Promise<AutoComplete[]> {
     
     // Construct the request body with the companyCode, collectionName, and filter.
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         collectionName: "General_master",
         filter: { codeType: codeType, activeFlag: true }
     };
@@ -38,7 +39,7 @@ async getGeneralMasterData(codeType): Promise<AutoComplete[]> {
 async getDataForAutoComplete(containerName, filter, nameField, valueField ): Promise<AutoComplete[]> {
     // Construct the request body with the companyCode, collectionName, and filter.
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         collectionName: containerName,
         filter: filter
     };
@@ -53,7 +54,7 @@ async getDataForAutoComplete(containerName, filter, nameField, valueField ): Pro
 async getDataForMultiAutoComplete(containerName, filter, nameField, valueField ): Promise<AutoComplateCommon[]> {
     // Construct the request body with the companyCode, collectionName, and filter.
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         collectionName: containerName,
         filter: filter
     };
@@ -69,7 +70,7 @@ async getDataForMultiAutoComplete(containerName, filter, nameField, valueField )
 async getData(containerName, filter) {
     // Construct the request body with the companyCode, collectionName, and filter.
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         collectionName: containerName,
         filter: filter
     };

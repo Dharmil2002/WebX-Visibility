@@ -7,6 +7,7 @@ import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AccountMasterControls } from "src/assets/FormControls/AccountMasterControls";
 import { AccountListFilterComponent } from "../account-list-filter/account-list-filter.component";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-account-master",
@@ -68,15 +69,18 @@ export class AccountMasterComponent implements OnInit {
   ];
   TableData: any;
   isTableLode = false;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   FilterData: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storageService: StorageService,
     public dialog: MatDialog
-  ) {}
+  ) {
+    this.CompanyCode = this.storageService.companyCode;
+  }
 
   ngOnInit(): void {
     this.GetTableData({});

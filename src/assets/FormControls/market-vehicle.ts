@@ -1,4 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -34,7 +37,7 @@ export class marketVehicleControls {
       },
       {
         name: "vehicleSize",
-        label: "Vehicle Size (MT)",
+        label: "Vehicle Capacity(MT)",
         placeholder: "Vehicle Size",
         type: "text",
         value: [
@@ -51,7 +54,7 @@ export class marketVehicleControls {
         Validations: [
           {
             name: "required",
-            message: "Vehicle Size is required",
+            message: "Vehicle Capacity is required",
           },
         ],
         functions: {
@@ -79,25 +82,30 @@ export class marketVehicleControls {
             name: "required",
             message: "Vendor Mobile is required",
           },
+          {
+            "name": "pattern",
+            "pattern": "^[0-9]{10}$",
+            "message": "Please enter a valid 10-digit mobile number"
+          }
         ],
       },
       {
-        name: 'driver', label: "Driver", placeholder: "Driver", type: 'text',
+        name: 'driver', label: "Driver Name", placeholder: "Driver Name", type: 'text',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
-            message: "Driver is required",
+            message: "Driver Name is required",
           },
         ],
       },
       {
-        name: 'driverPan', label: "Pan No", placeholder: "Pan No", type: 'government-id',
+        name: 'venPan', label: "Vendor Pan No", placeholder: "Vendor Pan No", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
-            message: "Pan No is required",
+            message: "Vendor Pan No is required",
           },
           {
             name: "pattern",
@@ -137,26 +145,26 @@ export class marketVehicleControls {
       },
       
       {
-        name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'mobile-number',
+        name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type:'mobile-number',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
             message: "Driver is required",
           },
+          {
+            "name": "pattern",
+            "pattern": "^[0-9]{10}$",
+            "message": "Please enter a valid 10-digit mobile number"
+          }
         ],
       },
       {
         name: 'ETA', label: "ETA", placeholder: "ETA", type: 'datetimerpicker',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "ETA   is required",
-          },
         ],
         additionalData: {
-          maxDate:maxDate,
           minDate:minDate
         },
       },
@@ -190,6 +198,54 @@ export class marketVehicleControls {
         }
       },
       {
+        name: 'engineNo', label: "Engine Number", placeholder: "Engine Number", type: 'text',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+      },
+      {
+        name: 'chasisNo', label: "Chassis Number", placeholder: "Chassis Number", type: 'text',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+      },
+      {
+        name: 'vehContAmt', label: "Vehicle Contract Amount", placeholder: "Vehicle Contract Amount", type: 'number',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+        functions:{
+          onChange: "calculateContractAmount"
+        }
+      },
+      {
+        name: 'margAMT', label: "Margin Amount", placeholder: "Margin Amount", type: 'text',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+        Validations: [
+        ],
+      },
+      {
+        name: 'roadPrt', label: "Road Permit", placeholder: "Road Permit", type: 'date',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        Validations: [
+        ],
+        additionalData: {
+          minDate: new Date()
+        },
+      },
+      {
+        name:'uploadSupport',label: "Upload Supporting",placeholder: "Road Permit", type: 'file',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        functions: {
+          onChange: 'getFilePod'
+      },
+      additionalData: {
+        isFileSelected: true
+      },
+        Validations: [
+        ],
+      },
+      {
         name: 'vendCode',
         label: 'vendCode',
         placeholder: 'vendCode',
@@ -209,7 +265,7 @@ export class marketVehicleControls {
       },
       {
         name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
-        value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+        value: StorageService.getItem(StoreKeys.CompanyCode), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
         Validations: [
         ],
       },
@@ -224,7 +280,7 @@ export class marketVehicleControls {
         label: 'Entry By',
         placeholder: 'Entry By',
         type: 'text',
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false, disable: false
       },

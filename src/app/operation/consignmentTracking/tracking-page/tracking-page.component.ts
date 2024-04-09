@@ -6,7 +6,11 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CustomeDatePickerComponent } from "src/app/shared/components/custome-date-picker/custome-date-picker.component";
 import { ViewTrackingPopupComponent } from "../view-tracking-popup/view-tracking-popup.component";
 import { Observable, firstValueFrom } from "rxjs";
-import { GetTrakingDataPipeLine } from "./tracking-query";
+import {
+  GetTrakingDataPipeLine,
+  formArray,
+  headerForCsv,
+} from "./tracking-query";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
@@ -14,6 +18,8 @@ import { CustomFilterPipe } from "src/app/Utility/Custom Pipe/FilterPipe";
 import moment from "moment";
 import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
 import Swal from "sweetalert2";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-tracking-page",
@@ -27,99 +33,100 @@ export class TrackingPageComponent implements OnInit {
       active: "Consignment Tracking",
     },
   ];
-  Mode = localStorage.getItem("Mode");
-  range = new FormGroup({
-    StartDate: new FormControl<Date | null>(null),
-    EndDate: new FormControl<Date | null>(null),
-  });
+  Mode = "";
   QueryData: any;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   isTouchUIActivated = false;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
-  trakingData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  CompanyCode = 0;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   obs: Observable<any>;
   dataSource: MatTableDataSource<any>;
   TableData: any;
   isTableLode: boolean = false;
+  daterangedisabled: boolean = true;
+  selectedIndex = 0;
   TotalDocket: number = 0;
   BookedDocket: number = 0;
   InTransitDocket: number = 0;
   OFDDocket: number = 0;
   DeliveredDocket: number = 0;
-  headerForCsv = {
-    CnoteNo: "Cnote No",
-    EDD: "EDD",
-    ATD: "ATD",
-    Status: "Status",
-    docketDate: "Booking Date",
-    TransitMode: "Transit Mode",
-    EWB: "EWB",
-    Valid: "Valid",
-    Movement: "Movement",
-    Consignor: "Consignor",
-    Consignee: "Consignee",
-  };
-  formData = [
+  CountCard = [
     {
-      name: "StartDate",
-      label: "SelectDateRange",
-      placeholder: "Select Date",
-      type: "daterangpicker",
-      value: "",
-      filterOptions: "",
-      autocomplete: "",
-      displaywith: "",
-      generatecontrol: true,
-      disable: true,
-      Validations: [],
-      additionalData: {
-        support: "EndDate",
-      },
+      title: "Total Results",
+      count: 0,
+      Color: "rgb(123, 140, 161)",
+      groupId: 0,
+      _id: 0,
     },
     {
-      name: "EndDate",
-      label: "",
-      placeholder: "Select Data Range",
-      type: "",
-      value: "",
-      filterOptions: "",
-      autocomplete: "",
-      generatecontrol: false,
-      disable: true,
-      Validations: [
-        {
-          name: "Select Data Range",
-        },
-        {
-          name: "required",
-          message: "StartDateRange is Required...!",
-        },
-      ],
+      title: "Booked",
+      count: 0,
+      Color: "#ffb463",  
+      groupId: 1
+    },
+    {
+      title: "InTransit",
+      count: 0,
+      Color: "#6777ef",
+      groupId: 2
+    },
+    {
+      title: "In Stock",
+      count: 0,
+      Color: "#5783c7",
+      groupId: 3
+    },
+    {
+      title: "OFD",
+      count: 0,
+      Color: "lightseagreen",
+      groupId: 4
+    },
+    {
+      title: "Delivered",
+      count: 0,
+      Color: "#4caf50",
+      groupId: 5
     },
   ];
+  headerForCsv = headerForCsv;
+  formData = formArray;
   Form: any;
   searchText: any;
   csvFileName: any;
   csvHeaders: {};
+  DocCalledAs: any;
+  trackingData: any[] = [];
   constructor(
     private Route: Router,
     private masterService: MasterService,
     public dialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
+    private controlPanel: ControlPanelService,
+    private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
+    this.Mode = this.storage.mode;
+    this.DocCalledAs = this.controlPanel.DocCalledAs;
+    this.breadscrums = [
+      {
+        title: `Tracking`,
+        items: ["Home"],
+        active: `${this.DocCalledAs.Docket} Tracking`,
+      },
+    ];
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.QueryData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.QueryData", this.QueryData);
       if (this.QueryData.Docket) {
         const Query = {
           D$match: {
-            dKTNO: this.QueryData.Docket,
+            dKTNO: { D$in: this.QueryData.Docket },
           },
         };
-        this.getTrackingDocket(Query);
-        this.GetCardData(Query);
+        this.getTrackingDocket(Query).then(() => { 
+          this.GetCardData();
+        });
       } else if (this.QueryData.start && this.QueryData.end) {
         const Query = {
           D$match: {
@@ -137,8 +144,9 @@ export class TrackingPageComponent implements OnInit {
             ],
           },
         };
-        this.getTrackingDocket(Query);
-        this.GetCardData(Query);
+        this.getTrackingDocket(Query).then(() => { 
+          this.GetCardData();
+        });
       } else {
         this.Route.navigate(["Operation/ConsignmentQuery"]);
       }
@@ -172,40 +180,14 @@ export class TrackingPageComponent implements OnInit {
     this.Form.controls["EndDate"].setValue(this.QueryData.end || new Date());
   }
 
-  async GetCardData(QueryFilter) {
-    const req = {
-      companyCode: this.CompanyCode,
-      collectionName:
-        this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
-      filters: [
-        { ...QueryFilter },
-        {
-          D$group: {
-            _id: "$sTSNM",
-            Count: {
-              D$sum: 1,
-            },
-          },
-        },
-      ],
-    };
-
-    const res = await firstValueFrom(
-      this.masterService.masterMongoPost("generic/query", req)
-    );
-    if (res.success) {
-      res.data?.map((x) => {
-        if (x._id == "Booked") {
-          this.BookedDocket = x.Count;
-        } else if (x._id == "InTransit") {
-          this.InTransitDocket = x.Count;
-        } else if (x._id == "OFD") {
-          this.OFDDocket = x.Count;
-        } else if (x._id == "Delivered") {
-          this.DeliveredDocket = x.Count;
-        }
-      });
-    }
+  async GetCardData() {
+    this.CountCard.forEach((t) => {
+      if(t.groupId == 0) {
+        t.count = this.trackingData?.length || 0;
+      } else {
+        t.count = this.trackingData?.filter((x) => x.GroupId == t.groupId)?.length || 0;
+      }
+    });
   }
 
   async getTrackingDocket(QueryFilter) {
@@ -216,14 +198,25 @@ export class TrackingPageComponent implements OnInit {
         this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
       filters: [{ ...QueryFilter }, ...PipeLine],
     };
-
+    
     const res = await firstValueFrom(
       this.masterService.masterMongoPost("generic/query", req)
     );
     if (res.success) {
-      if (res.data.length) {
-        this.TableData = res.data;
-        this.TotalDocket = res.data.length;
+      if (res.data && res.data.length) {
+        this.trackingData = res.data;
+        this.trackingData.forEach((x) => {
+          x["GroupColor"] = this.CountCard.find((t) => t.groupId == x.GroupId)?.Color;
+        }); 
+
+        this.trackingData = this.trackingData.sort(
+          (a, b) => new Date(b.sTSTM).getTime() - new Date(a.sTSTM).getTime()
+        );
+
+        
+
+        this.TableData = this.trackingData;
+        
         this.isTableLode = true;
         this.dataSource = new MatTableDataSource<any>(this.TableData);
         this.ngOnInit();
@@ -246,6 +239,46 @@ export class TrackingPageComponent implements OnInit {
       this.Route.navigateByUrl("Operation/ConsignmentQuery");
     }
   }
+  ViewFunction(eventData) {
+    const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
+      data: { TrackingList: eventData?.DocketTrackingData , DokNo: eventData.dKTNO},
+      width: "95%",
+      //height: "90%",
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {});
+  }
+  SearchData(searchText) {
+    const filterPipe = new CustomFilterPipe();
+    const filteredArr = filterPipe.transform(this.TableData, searchText);
+    this.dataSource = new MatTableDataSource<any>(filteredArr);
+    this.ngOnInit();
+  }
+  SetCountCard(item, index) {
+    this.selectedIndex = index;
+    if (item.title == "Total Results") {
+      this.dataSource = new MatTableDataSource<any>(this.TableData);
+      this.ngOnInit();
+    } else {
+      this.dataSource = new MatTableDataSource<any>(
+        this.TableData.filter((x) =>
+          item.groupId == x.GroupId || item.groupId == 0
+        )
+      );
+      this.ngOnInit();
+    }
+  }
+  OpenDocketView(DockNo) {
+    const req = {
+      templateName: "Docket View-Print",
+      DocNo: DockNo,
+    };
+    const url = `${
+      window.location.origin
+    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, "", "width=1000,height=800");
+  }
 
   ExportFunction() {
     const csvData = this.TableData.map((x) => {
@@ -255,7 +288,7 @@ export class TrackingPageComponent implements OnInit {
         ATD: "",
         Status: x.oPSSTS,
         docketDate: moment(new Date(x.docketData.dKTDT)).format("DD-MM-YYYY"),
-        TransitMode: x.TransitMode,
+        TransitMode: `${x.TransitMode.Servis} / ${x.TransitMode.Mod} / ${x.TransitMode.Servis} `,
         EWB: "",
         Valid: "",
         Movement: x.oRGN && x.dEST ? `${x.oRGN} -> ${x.dEST}` : "",
@@ -264,25 +297,6 @@ export class TrackingPageComponent implements OnInit {
       };
     });
     this.ExportToCsv(csvData);
-  }
-  ViewFunction(eventData) {
-    const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
-      data: eventData?.DocketTrackingData,
-      width: "1200px",
-      height: "100%",
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log("The dialog was closed");
-    });
-  }
-
-  SearchData(searchText) {
-    const filterPipe = new CustomFilterPipe();
-    const filteredArr = filterPipe.transform(this.TableData, searchText);
-    this.dataSource = new MatTableDataSource<any>(filteredArr);
-    this.ngOnInit();
   }
 
   ExportToCsv(jsonCsv) {

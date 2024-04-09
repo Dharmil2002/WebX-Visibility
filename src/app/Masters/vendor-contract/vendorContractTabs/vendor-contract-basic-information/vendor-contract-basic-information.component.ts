@@ -10,6 +10,7 @@ import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/i
 import { AddContractProfile } from 'src/assets/FormControls/VendorContractControls/add-contract-profile';
 import Swal from 'sweetalert2';
 import { GetContractBasedOnVendorAndProduct } from '../../vendorContractApiUtility';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-contract-basic-information',
@@ -17,7 +18,7 @@ import { GetContractBasedOnVendorAndProduct } from '../../vendorContractApiUtili
 })
 export class VendorContractBasicInformationComponent implements OnInit {
   @Input() contractData: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   ProductsForm: UntypedFormGroup;
   jsonControlArrayProductsForm: any;
   className = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
@@ -50,9 +51,9 @@ export class VendorContractBasicInformationComponent implements OnInit {
     private dialog: MatDialog,
     private route: Router,
     private masterService: MasterService,
-
+    private storage: StorageService
   ) {
-
+    this.companyCode = this.storage.companyCode;
   }
 
   ngOnInit(): void {
@@ -143,7 +144,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
       const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
       data.cNSCN = file;
       data.pNDYS = parseInt(this.ProductsForm.value.pNDYS)
-      data.mODLOC = localStorage.getItem("Branch")
+      data.mODLOC = this.storage.branch
       // Prepare request body using object destructuring
       const reqBody = {
         companyCode: this.companyCode,

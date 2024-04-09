@@ -1,0 +1,14 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+  <form [formGroup]="dCRRegisterTableForm">
+    <app-form-webxpress [form]="dCRRegisterTableForm" [formData]="dCRRegisterjsonControlArray" [FormTitle]="'DCR Register'"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="true">
+    </app-form-webxpress>
+  </form>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="DetailHeader"
+        [tableData]="tableData" [metaData]="METADATA" [menuItems]="menuItems" [staticField]="staticField"
+        [Link]="linkArray"  (functionCallEmitter)="functionCallHandler($event)"
+        [csvFileName]="csvFileName" [csvHeaders]="headerForCsv">
+  </app-generic-table-v2>
+
+</app-common-wrapper-webxpress>

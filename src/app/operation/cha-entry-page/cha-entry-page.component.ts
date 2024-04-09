@@ -14,6 +14,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { isEmptyForm } from "src/app/Utility/Form Utilities/filter-utils";
 import { ChaService } from "src/app/Utility/module/operation/cha-entry/cha-entry-service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: 'app-cha-entry-page',
@@ -21,7 +22,7 @@ import { ChaService } from "src/app/Utility/module/operation/cha-entry/cha-entry
   providers: [FilterUtils],
 })
 export class ChaEntryPageComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   billingParty: any;
   billingPartyStatus: any;
   fleetSize: any;
@@ -78,8 +79,10 @@ export class ChaEntryPageComponent implements OnInit {
     private chaService:ChaService,
     private generalService: GeneralService,
     private customerService: CustomerService,
-    private model: ChaEntryModel
+    private model: ChaEntryModel,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;  
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       
       this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;

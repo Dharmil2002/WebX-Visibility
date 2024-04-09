@@ -26,6 +26,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { GenerateVendorBill } from '../../../Models/Finance/VendorPayment';
+import { GetBankDetailFromApi } from "../../Debit Voucher/debitvoucherAPIUtitlity";
 
 @Component({
   selector: "app-vendor-bill-payment-details",
@@ -103,7 +104,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   staticField = ["paymentAmount", "TotalTHCAmount", "debitNote", "Date", "AdvancePayedAmount", "pendingAmount", "billNo"];
   summaryStaticField = ["amt", "institute", "ref", "paymentMethod"];
   documentSaticField = ["docNo", "document", "date"];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   isTableLode = false;
   vendorBillPaymentControl: vendorBillPaymentControl;
   jsonVendorBillPaymentArray: any;
@@ -164,74 +165,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
 
   ) {
-    // this.billData =
-    //   [
-    //     {
-    //       "vendor": "8888 : Krupesh",
-    //       "_id": "10065-VB/MUMB/2324/000009",
-    //       "vnCode": 8888,
-    //       "vnName": "Krupesh",
-    //       "billType": "Vendor Bill",
-    //       "billNo": "VB/MUMB/2324/000009",
-    //       "Date": "26/12/2023",
-    //       "TotalTHCAmount": 10000,
-    //       "AdvancePayedAmount": 2000,
-    //       "billAmount": 8000,
-    //       "pendingAmount": 1000,
-    //       "paymentAmount": 1000,
-    //       "Status": "Partially Paid",
-    //       "StatusCode": 4,
-    //       "vPan": "CASPJ2345J",
-    //       "actions": ['Modify Bill Amount'],
-    //       "isSelected": true
-    //     },
-    //     {
-    //       "vendor": "8888 : Krupesh",
-    //       "_id": "10065-VB/MUMB/2324/000012",
-    //       "vnCode": 8888,
-    //       "vnName": "Krupesh",
-    //       "billType": "Vendor Bill",
-    //       "billNo": "VB/MUMB/2324/000012",
-    //       "Date": "27/12/2023",
-    //       "TotalTHCAmount": 10000,
-    //       "AdvancePayedAmount": 2000,
-    //       "billAmount": 8000,
-    //       "pendingAmount": 8000,
-    //       "paymentAmount": 8000,
-    //       "Status": "Approved",
-    //       "StatusCode": 2,
-    //       "vPan": "CASPJ2345J",
-    //       "actions": [
-    //         "Bill Payment",
-    //         "Cancel Bill"
-    //       ],
-    //       "isSelected": true
-    //     },
-    //     {
-    //       "vendor": "8888 : Krupesh",
-    //       "_id": "10065-VB/MUMB/2324/000013",
-    //       "vnCode": 8888,
-    //       "vnName": "Krupesh",
-    //       "billType": "Vendor Bill",
-    //       "billNo": "VB/MUMB/2324/000013",
-    //       "Date": "27/12/2023",
-    //       "TotalTHCAmount": 5000,
-    //       "AdvancePayedAmount": 1000,
-    //       "billAmount": 4000,
-    //       "pendingAmount": 4000,
-    //       "paymentAmount": 4000,
-    //       "Status": "Approved",
-    //       "StatusCode": 2,
-    //       "vPan": "CASPJ2345J",
-    //       "actions": [
-    //         "Bill Payment",
-    //         "Cancel Bill"
-    //       ],
-    //       "isSelected": true
-    //     }
-    //   ]
+    this.companyCode = this.storage.companyCode;
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
-    console.log("this.billData", this.billData);
   }
 
   ngOnInit(): void {
@@ -240,7 +175,6 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.vendor = this.billData[0]?.vendor;
       this.initializeVendorBillPayment();
       this.getBillDetail(this.billData);
-      //  this.getBillPayment();
     } else {
       this.RedirectToVendorBillPayment()
     }
@@ -367,11 +301,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
     switch (PaymentMode) {
       case "Cheque":
-        const responseFromAPIBank = await GetAccountDetailFromApi(
-          this.masterService,
-          "BANK",
-          Accountinglocation
-        );
+        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
+
         this.filter.Filter(
           this.jsonPaymentSummaryArray,
           this.PaymentSummaryFilterForm,
@@ -503,7 +434,18 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         if (!PaymenDetails) {
           return this.snackBarUtilityService.ShowCommonSwal("error", "Please Fill Payment Details");
         }
-
+        const PaymentMode = PaymenDetails.PaymentMode;
+        if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+          const BankDetails = PaymenDetails.Bank;
+          const AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", this.storage.branch)
+          const AccountDetails = AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+          if (AccountDetails != undefined) {
+            PaymenDetails.Bank = AccountDetails;
+          } else {
+            this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
+            return;
+          }
+        }
         const PaymentAmount = parseFloat(
           this.TotalBillAmount.toFixed(2)
         );
@@ -518,8 +460,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.VendorBillPayment;
         this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.VendorBillPayment];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.DebitVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
 
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transDate = new Date();
@@ -547,57 +489,76 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherDataRequestModel.voucherCanceled = false;
 
         this.VoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
-        this.VoucherDataRequestModel.refNo = PaymenDetails?.ChequeOrRefNo || "";
-        this.VoucherDataRequestModel.accountName = PaymenDetails?.Bank?.name || "";
-        this.VoucherDataRequestModel.accountCode = PaymenDetails?.Bank?.value || "";
-        this.VoucherDataRequestModel.date = PaymenDetails.Date;
+        this.VoucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "";
+        this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name;
+        this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value;
+        this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 
-        var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
-          return {
-            companyCode: this.storage.companyCode,
-            voucherNo: "",
-            transCode: VoucherInstanceType.VendorBillPayment,
-            transType: VoucherInstanceType[VoucherInstanceType.VendorBillPayment],
-            voucherCode: VoucherType.JournalVoucher,
-            voucherType: VoucherType[VoucherType.JournalVoucher],
-            transDate: new Date(),
-            finYear: financialYear,
-            branch: this.storage.branch,
-            accCode: ledgerInfo['Unbilled debtors'].LeadgerCode,
-            accName: ledgerInfo['Unbilled debtors'].LeadgerName,
-            accCategory: ledgerInfo['Unbilled debtors'].LeadgerCategory,
-            debit: parseFloat(item.pendingAmount).toFixed(2),
-            credit: 0,
-            GSTRate: 0,
-            GSTAmount: 0,
-            Total: parseFloat(item.pendingAmount).toFixed(2),
-            TDSApplicable: false,
-            narration: "when Vendor Bill Payment against Bill No " + item.billNo,
-          };
-        });
+        var VoucherlineitemList = this.GetDebitVoucherLedgers(NetPayable, BillNo, PaymenDetails);
 
         this.VoucherRequestModel.details = VoucherlineitemList;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-          this.GenerateVendorBills(res?.data?.mainData?.ops[0].vNO, PaymenDetails);
 
-          Swal.fire({
-            icon: "success",
-            title: "Voucher Created Successfully",
-            text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-            showConfirmButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Swal.hideLoading();
-              setTimeout(() => {
-                Swal.close();
-                this.RedirectToVendorBillPayment()
-              }, 2000);
+          let reqBody = {
+            companyCode: this.storage.companyCode,
+            voucherNo: res?.data?.mainData?.ops[0].vNO,
+            transDate: Date(),
+            finYear: financialYear,
+            branch: this.storage.branch,
+            transCode: VoucherInstanceType.VendorBillPayment,
+            transType: VoucherInstanceType[VoucherInstanceType.VendorBillPayment],
+            voucherCode: VoucherType.DebitVoucher,
+            voucherType: VoucherType[VoucherType.DebitVoucher],
+            docType: "Voucher",
+            partyType: "Vendor",
+            docNo: BillNo,
+            partyCode: "" + this.billData[0]?.vnCode ? this.billData[0]?.vnCode.toString() : '',
+            partyName: this.billData[0]?.vnName ? this.billData[0]?.vnName : '',
+            entryBy: this.storage.userName,
+            entryDate: Date(),
+            debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.debit,
+                "narration": item.narration ?? ""
+              };
+            }),
+            credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.credit,
+                "narration": item.narration ?? ""
+              };
+            }),
+          };
+          firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then((res: any) => {
+            if (res) {
+              this.GenerateVendorBills(reqBody.voucherNo, PaymenDetails);
+              Swal.fire({
+                icon: "success",
+                title: "Voucher Created Successfully",
+                text: "Voucher No: " + reqBody.voucherNo,
+                showConfirmButton: true,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.hideLoading();
+                  setTimeout(() => {
+                    Swal.close();
+                    this.RedirectToVendorBillPayment()
+                  }, 2000);
+                }
+              });
             }
           });
+
         }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
           .finally(() => {
           });
@@ -611,13 +572,14 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }, "Advance Payment Voucher Generating..!");
   }
   GenerateVendorBills(voucherno, PaymenDetails) {
+    const PaymentMode = PaymenDetails.PaymentMode;
     const GenerateVendorBill: GenerateVendorBill = {
       companyCode: this.companyCode,
       VocuherNo: voucherno,
-      paymentMode: PaymenDetails.PaymentMode,
-      refNo: PaymenDetails?.ChequeOrRefNo || "",
-      accountName: PaymenDetails?.Bank?.name || "",
-      date: PaymenDetails.Date,
+      paymentMode: PaymentMode,
+      refNo: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "",
+      accountName: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name,
+      date: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "",
       paymentAmount: this.TotalPendingAmount,
       branch: this.storage.branch,
       user: this.storage.userName,
@@ -698,6 +660,47 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       }
     }
   }
+  GetDebitVoucherLedgers(NetPayable, BillNo, paymentData) {
 
+    const createVoucher = (accCode, accName, accCategory, debit, credit, BillNo) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.VendorBillPayment,
+      transType: VoucherInstanceType[VoucherInstanceType.VendorBillPayment],
+      voucherCode: VoucherType.DebitVoucher,
+      voucherType: VoucherType[VoucherType.DebitVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Vendor bill payment has been issued : ${BillNo}`
+    });
+
+    const Result = [];
+
+
+
+    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, NetPayable, 0, BillNo));
+    const PaymentMode = paymentData.PaymentMode;
+    if (PaymentMode == "Cash") {
+      const CashAccount = paymentData.CashAccount;
+      Result.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, NetPayable, BillNo));
+    }
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = paymentData.Bank;
+      Result.push(createVoucher(BankDetails.value, BankDetails.name, "ASSET", 0, NetPayable, BillNo));
+    }
+    return Result;
+  }
 
 }

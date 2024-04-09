@@ -1,5 +1,7 @@
 import Swal from "sweetalert2";
-const companyCode=localStorage.getItem("companyCode");
+import * as StorageService from 'src/app/core/service/storage.service';
+import { StoreKeys } from "src/app/config/myconstants";
+
 /**
  * Handles the selection of a file and validates its format.
  *
@@ -47,7 +49,7 @@ export function handleFileSelection(data, formControlName, allowedFormats, vendo
 
 export async function  getVendorDetails(masterService) {
     let req = {
-      "companyCode": companyCode,
+      "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
       "collectionName": "vendor_detail",
       "filter": {}
     }

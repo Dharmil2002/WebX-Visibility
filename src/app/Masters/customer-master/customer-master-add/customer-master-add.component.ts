@@ -18,6 +18,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-customer-master-add",
@@ -26,7 +27,7 @@ import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 export class CustomerMasterAddComponent implements OnInit {
   customerTableForm: UntypedFormGroup;
   GSTcustomerTableForm: UntypedFormGroup;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   //#region Variable declaration
   error: string;
   isUpdate = false;
@@ -130,8 +131,10 @@ export class CustomerMasterAddComponent implements OnInit {
     private objPinCodeService: PinCodeService,
     private objState: StateService,
     private dialog: MatDialog,
-    private objImageHandling: ImageHandling
+    private objImageHandling: ImageHandling,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
@@ -272,7 +275,7 @@ export class CustomerMasterAddComponent implements OnInit {
       }
     });
   }
-  getPinCode() {
+ getPinCode() {
     let req = {
       companyCode: this.companyCode,
       collectionName: "pincode_master",
@@ -288,9 +291,15 @@ export class CustomerMasterAddComponent implements OnInit {
               value: parseInt(x.PIN),
             };
           });
-
-          this.getPinCodeDropdown();
-          this.getGSTPinCodeDropdown();
+          if(!this.isUpdate){
+            this.getPinCodeDropdown();
+          }
+          else{
+            const SelectPincode = this.pinCodeData.find(
+              (x) => x.name == this.customerTable.PinCode
+            );
+            this.customerTableForm.controls["PinCode"].setValue(SelectPincode);
+          }
         }
       },
       error: (err) => { },
@@ -372,12 +381,6 @@ export class CustomerMasterAddComponent implements OnInit {
     );
   }
   getPinCodeDropdown() {
-    if (this.isUpdate) {
-      const SelectPincode = this.pinCodeData.find(
-        (x) => x.name == this.customerTable.PinCode
-      );
-      this.customerTableForm.controls["PinCode"].setValue(SelectPincode);
-    }
     const pincodeValue = this.customerTableForm.controls["PinCode"].value;
     // Check if pincodeValue is a valid number and has at least 3 characters
     if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
@@ -733,9 +736,9 @@ export class CustomerMasterAddComponent implements OnInit {
         BlackListed: this.customerTableForm.value.BlackListed,
         _id: `${this.companyCode}-${customerCode}`,
         customerCode: this.isUpdate ? this.customerTable.customerCode : `${customerCode}`,
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         updatedDate: new Date(),
-        updatedBy: localStorage.getItem("UserName"),
+        updatedBy: this.storage.userName,
         GSTdetails: this.tableData.map((x) => {
           return {
             gstAddres: x.gstAddres,
@@ -897,7 +900,7 @@ export class CustomerMasterAddComponent implements OnInit {
 
       // Create a request object with the filter criteria
       const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "customer_detail",
         filter: { [fieldName]: fieldValue },
       };

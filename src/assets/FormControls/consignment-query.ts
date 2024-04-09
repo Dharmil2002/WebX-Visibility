@@ -4,52 +4,52 @@ export class ConsignmentqueryControls {
   ConsignmentqueryArray: FormControls[];
   constructor() {
     this.ConsignmentqueryArray = [
-    //   {
-    //     name: "DocumentType",
-    //     label: "Document Type",
-    //     placeholder: "Select Document Type",
-    //     type: "dropdown",
-    //     value: "",
-    //     generatecontrol: true,
-    //     disable: false,
-    //     Validations: [
-    //       {
-    //         name: "required",
-    //         message: "Document Type  is required",
-    //       },
-    //       {
-    //         name: "autocomplete",
-    //       },
-    //       {
-    //         name: "invalidAutocomplete",
-    //         message: "Choose proper value",
-    //       },
-    //     ],
-    //     additionalData: {
-    //       showNameAndValue: false,
-    //     },
-    //     functions: {},
-    //   },
-    //   {
-    //     name: "or",
-    //     label: "",
-    //     placeholder: "",
-    //     type: "",
-    //     value: "",
-    //     generatecontrol: true,
-    //     disable: true,
-    //     Validations: [],
-    //   },
-    //   {
-    //     name: "or",
-    //     label: "",
-    //     placeholder: "",
-    //     type: "",
-    //     value: "",
-    //     generatecontrol: true,
-    //     disable: true,
-    //     Validations: [],
-    //   },
+      {
+        name: "DocType",
+        label: "Document Type",
+        placeholder: "Document Type",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Bank name is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
+      {
+        name: "or",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "or",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
       {
         name: "Docket",
         label: "Cnote No.",
@@ -113,7 +113,7 @@ export class ConsignmentqueryControls {
       },
       {
         name: "start",
-        label: "Select Date Rang",
+        label: "Select Date Range",
         placeholder: "",
         type: "daterangpicker",
         value: "",

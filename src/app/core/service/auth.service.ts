@@ -16,11 +16,14 @@ import { environment } from "src/environments/environment";
 import { map, share } from "rxjs/operators";
 import { APICacheService } from "./API-cache.service";
 import { StorageService } from "./storage.service";
+import { StoreKeys } from "src/app/config/myconstants";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
+ 
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
 
@@ -28,10 +31,11 @@ export class AuthService {
     private http: HttpClient,
     private _jwt: JwtHelperService,
     private _APICacheService: APICacheService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private locationService: LocationService
   ) {
     this.currentUserSubject = new BehaviorSubject<User>(
-      JSON.parse(localStorage.getItem("currentUser"))
+      JSON.parse(this.storageService.getItem(StoreKeys.CurrentUser))
     );
     this.currentUser = this.currentUserSubject.asObservable();
   }
@@ -52,6 +56,20 @@ export class AuthService {
   public get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
+
+  public get isTokenExpired(): boolean {
+    let isExpired = true;
+    const accessToken = this.storageService.token;
+    const refreshToken = this.storageService.refreshToken;
+    if(accessToken && accessToken != "") {
+      isExpired = this._jwt.isTokenExpired(accessToken);
+      if(refreshToken && refreshToken != "") {
+        isExpired = isExpired && this._jwt.isTokenExpired(refreshToken);      
+      }
+    }    
+    return isExpired;
+  }
+
   async getCompany() {
     const req={
       companyCode: this.storageService.companyCode,
@@ -71,20 +89,38 @@ export class AuthService {
       .pipe(
         map(async (user: any) => {
           if (user.tokens) {
-            let userdetails = this._jwt.decodeToken(user.tokens.access.token);
-            this.storageService.setItem("currentUser", JSON.stringify(user));
-            this.storageService.setItem("UserName", user.usr.name);
-            this.storageService.setItem("Branch", user.usr.branchCode);
-            this.storageService.setItem("companyCode", user.usr.companyCode);
-            this.storageService.setItem("Mode", "Export");
-            //localStorage.setItem("company_Name", "Velocity");
-            this.storageService.setItem("CurrentBranchCode", user.usr.multiLocation[0]);
-            this.storageService.setItem("userLocations", user.usr.multiLocation);
-            this.storageService.setItem("token", user.tokens.access.token);
-            this.storageService.setItem("refreshToken", user.tokens.refresh.token);
-            this.storageService.setItem("role", user.usr.role);
-            localStorage.setItem("Mode", "Export");
-            localStorage.setItem("companyCode", user.usr.companyCode);
+           
+            let userdetails = this._jwt.decodeToken(user.tokens.access.token);   
+            this.storageService.setItem(StoreKeys.CompanyCode, user.usr.companyCode.toString());              
+            this.storageService.setItem(StoreKeys.UserId, user.usr.userId);
+            this.storageService.setItem(StoreKeys.UserName, user.usr.name);
+            this.storageService.setItem(StoreKeys.CurrentUser, JSON.stringify(user));
+            this.storageService.setItem(StoreKeys.CurrentBranch, user.usr.branchCode);
+            this.storageService.setItem(StoreKeys.Token, user.tokens.access.token);
+            this.storageService.setItem(StoreKeys.RefreshToken, user.tokens.refresh.token);
+            this.storageService.setItem(StoreKeys.Role, user.usr.role);
+            this.storageService.setItem(StoreKeys.Mode, "FTL");
+            //localStorage.setItem("company_Name", "Velocity");            
+            //this.storageService.setItem("userLocations", user.usr.multiLocation);
+
+            const locations = user.usr?.multiLocation || [];
+            var locRes =  await this.locationService.getLocations(
+              { locCode: { D$in: locations}, activeFlag: true },
+              { locCode: 1, locName: 1 }
+              );
+            if(locRes && locRes.length > 0){      
+              this.storageService.setItem(StoreKeys.UserLocations, locRes.map((x) => x.locCode).join(","));
+              this.storageService.setItem(StoreKeys.LoginLocations, JSON.stringify(locRes.map((x) => { return { locCode: x.locCode, locName: x.locName }; })));
+
+              const b = locRes.find((x) => x.locCode == user.usr.branchCode);
+              if(b) {
+                this.storageService.setItem(StoreKeys.Branch, user.usr.branchCode);
+              }
+              else {
+                this.storageService.setItem(StoreKeys.Branch, locRes[0].locCode);
+              }
+            }
+
             this.currentUserSubject.next(user);
             return user;
           }
@@ -95,7 +131,7 @@ export class AuthService {
   refreshtoken() {
 
     let request = {
-      "refreshToken": this.storageService.getItem('refreshToken')
+      "refreshToken": this.storageService.getItem(StoreKeys.RefreshToken)
     }
     return this.http
       .post<any>(
@@ -108,8 +144,8 @@ export class AuthService {
           resetOnComplete: () => timer(1000),
         }),
         map((res) => {
-          this.storageService.setItem("token", res.access.token);
-          this.storageService.setItem("refreshToken", res.refresh.token);
+          this.storageService.setItem(StoreKeys.Token, res.access.token);
+          this.storageService.setItem(StoreKeys.RefreshToken, res.refresh.token);
           return res;
         })
       );
@@ -123,7 +159,7 @@ export class AuthService {
 
   logout() {
     // remove user from local storage to log user out
-    localStorage.clear();
+    this.storageService.clear();
     this.currentUserSubject.next(null);
     return of({ success: false });
   }

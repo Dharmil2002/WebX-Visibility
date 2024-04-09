@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
-import { calculateTotal, vendorTypeList } from "./thc-utlity";
+import { calculateTotal} from "./thc-utlity";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -30,7 +30,7 @@ import { MarkerVehicleService } from "src/app/Utility/module/operation/market-ve
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ShipmentEditComponent } from "../shipment-edit/shipment-edit.component";
-import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel, ThcmovementDetails, UNload, UTi, iNV, rR,rakeDetails, thcsummaryData } from '../../Models/THC/THCModel';
+import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel, ThcmovementDetails, UNload, UTi, iNV, rR, rakeDetails, thcsummaryData } from '../../Models/THC/THCModel';
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
@@ -68,10 +68,11 @@ export class ThcGenerationComponent implements OnInit {
   isRail: boolean = false;
   rrLoad: boolean = true;
   rrInvoice: boolean = true;
+  marketData: any;
   // End Code Of Harikesh
   //FormGrop
   thcDetailGlobal: any;
-  companyCode = localStorage.getItem("companyCode");
+  companyCode = 0;
   thcTableForm: UntypedFormGroup;
   VehicleTableForm: UntypedFormGroup;
   rakeDetailsTableForm: UntypedFormGroup;
@@ -114,69 +115,69 @@ export class ThcGenerationComponent implements OnInit {
     checkBoxRequired: {
       Title: "Select",
       class: "matcolumncenter",
-      Style: "max-width:8%",
+      Style: "min-width:80px",
     },
     bPARTYNM: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:15%",
+      Style: "min-width:150px",
     },
     docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "min-width:20%",
+      Style: "min-width:190px",
     },
     cNO: {
       Title: "Container Id",
       class: "matcolumnleft",
-      Style: "min-width:10%",
+      Style: "min-width:100px",
     },
     fCT: {
       Title: "From City",
       class: "matcolumncenter",
-      Style: "min-width:12%",
+      Style: "min-width:100px",
     },
     tCT: {
       Title: "To City",
       class: "matcolumncenter",
-      Style: "min-width:12%",
+      Style: "min-width:100px",
     },
     aCTWT: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
-      Style: "min-width:8%",
+      Style: "min-width:100px",
     },
     pKGS: {
       Title: "No of Packets ",
       class: "matcolumncenter",
-      Style: "max-width:10%",
+      Style: "min-width:100px",
     },
     pod: {
       Title: "Pod",
       type: 'view',
       functionName: 'view',
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:50px",
     },
     receiveBy: {
       Title: "Receive By",
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
     },
     arrivalTime: {
       Title: "Arrival Time",
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
     },
     remarks: {
       Title: "Remarks",
-      class: "matcolumnleft",
-      Style: "max-width:160px",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
     },
     actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:80px",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
   };
   //#endregion
@@ -279,6 +280,8 @@ export class ThcGenerationComponent implements OnInit {
   vehicleSize: AutoComplete[];
   isLoadRail: boolean;
   isLoadInvoice: boolean;
+  delChargeControl: any[];
+  balanceAmount: any;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -286,6 +289,7 @@ export class ThcGenerationComponent implements OnInit {
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
+    private docketService: DocketService,
     private vehicleStatusService: VehicleStatusService,
     private vendorService: VendorService,
     private driverService: DriverService,
@@ -303,7 +307,7 @@ export class ThcGenerationComponent implements OnInit {
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
-
+    this.companyCode = this.storage.companyCode;
     this.orgBranch = storage.branch;
     this.branchCode = storage.branch;
 
@@ -319,8 +323,8 @@ export class ThcGenerationComponent implements OnInit {
           this.staticField.push('cNO', 'receiveBy', 'arrivalTime', 'remarks');
           this.isView = true;
           this.isSubmit = true;
-        	this.EventButtonRake=null
-	        this.EventButtonInvoice=null
+          this.EventButtonRake = null
+          this.EventButtonInvoice = null
           delete this.columnHeader.actionsItems;
           break;
         case 'update':
@@ -329,8 +333,10 @@ export class ThcGenerationComponent implements OnInit {
           this.isSubmit = true;
           this.isUpdate = true;
           this.isArrivedInfo = true
-          this.EventButtonRake=null
-	        this.EventButtonInvoice=null
+          this.EventButtonRake = null
+          this.EventButtonInvoice = null
+          this.breadscrums[0].active = "THC Update";
+          this.breadscrums[0].title = "THC Update";
           break;
         case 'addthc':
           this.addThc = true;
@@ -417,10 +423,8 @@ export class ThcGenerationComponent implements OnInit {
     this.rakeDetailsTableForm = formGroupBuilder(this.fb, [this.rakeDetails]);
     this.VehicleTableForm = formGroupBuilder(this.fb, [this.jsonVehicleControl]);
     this.jsonControlBasicArray = this.allBasicJsonArray.filter((x) => !this.market.includes(x.name));
-    
     this.getGeneralMasterData();
     this.getDropDownDetail();
-
     //this.DocketFilterData.cCT = this.thcTableForm.controls['fromCity'].value?.value || ''
   }
   /*End*/
@@ -486,7 +490,8 @@ export class ThcGenerationComponent implements OnInit {
 
     const field = $event.field; //what is use of this variable
     const functionName = $event.functionName;
-
+    console.log(field);
+    console.log(functionName);
     try {
       this[functionName]($event);
     } catch (error) {
@@ -505,7 +510,7 @@ export class ThcGenerationComponent implements OnInit {
       value: x.locCode,
       name: x.locName,
     }));
-    const location=this.locationData.find(x=>x.value==this.branchCode);
+    const location = this.locationData.find(x => x.value == this.branchCode);
     this.chargeForm.controls['advPdAt'].setValue(location)
     const filterFields = [
       { name: this.prqName, data: this.prqlist, status: this.prqNoStatus },
@@ -584,7 +589,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*here the function for the bind prq data*/
   async bindPrqData() {
-    
+
     if (this.thcTableForm.controls["prqNo"].value.value) {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
@@ -612,7 +617,7 @@ export class ThcGenerationComponent implements OnInit {
       }
       this.VehicleTableForm.controls['vehicle'].setValue({ name: this.prqDetail?.vEHNO, value: this.prqDetail?.vEHNO })
       this.VehicleTableForm.controls['vehSize'].setValue(`${this.prqDetail?.size}`);
-      const vendor=this.vendorDetail.find(x=>x.value==this.prqDetail?.vNDCD);
+      const vendor = this.vendorDetail.find(x => x.value == this.prqDetail?.vNDCD);
       this.thcTableForm.controls['vendorName'].setValue(vendor)
       this.thcTableForm.controls['panNo'].setValue(vendor?.panNo || "");
       this.thcTableForm.controls['venMobNo'].setValue(vendor?.mob || "");
@@ -657,6 +662,7 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
           this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
           this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
+          this.marketData=vehData;
         }
       }
 
@@ -665,7 +671,7 @@ export class ThcGenerationComponent implements OnInit {
     if (!this.isView && !this.isUpdate) {
       this.vendorFieldChanged();
     }
-   this.transModeChanged();
+    this.transModeChanged();
   }
   /*End*/
   async prqNoChangedEvent(event) {
@@ -1043,7 +1049,7 @@ export class ThcGenerationComponent implements OnInit {
     }
     else {
       this.jsonControlBasicArray = this.allBasicJsonArray
-    
+
       /// this.thcTableForm.controls['vendorType'].setValue("");
       if (!this.prqFlag) {
         this.thcTableForm.controls['vendorName'].setValue("");
@@ -1092,23 +1098,23 @@ export class ThcGenerationComponent implements OnInit {
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
     // Refactored calls using the new function
-clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
-clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
-clearValidatorsAndUpdate(this.rakeForm, this.rakeFormData);
-clearValidatorsAndUpdate(this.rakeDetailsTableForm, this.rakeDetails);
-clearValidatorsAndUpdate(this.rakeInvoice, this.rakeInvoiceData);
-clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
+    clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
+    clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
+    clearValidatorsAndUpdate(this.rakeForm, this.rakeFormData);
+    clearValidatorsAndUpdate(this.rakeDetailsTableForm, this.rakeDetails);
+    clearValidatorsAndUpdate(this.rakeInvoice, this.rakeInvoiceData);
+    clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
     const thcDetail = await this.thcService.getThcDetails(this.thcDetail.docNo);
     const thcMovemnetDetails = await this.thcService.getThcMovemnetDetails(this.thcDetail.docNo);
     const thcNestedDetails = thcDetail.data;
-  
+
     this.thcDetailGlobal = thcNestedDetails;
- 
+
     let propertiesToSet = [
 
       { Key: 'route', Name: 'rUTNM' },
       { Key: 'tripDate', Name: 'eNTDT' },
-      {Key:'etaDate',Name:'eTADT'},
+      { Key: 'etaDate', Name: 'eTADT' },
       { Key: 'tripId', Name: 'docNo' },
       { Key: 'capacity', Name: 'cAP.wT' },
       { Key: 'weightUtilization', Name: 'uTI.wT' },
@@ -1129,6 +1135,14 @@ clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
         nestedValues || ""
       );
     });
+    let tripDate = getValueOrDefault(this.thcTableForm, "tripDate")
+    if (tripDate && this.isArrivedInfo) {
+      this.jsonControlArrivalArray.forEach((x) => {
+        if (x.name == "ArrivalDate" || x.name == "UnloadingDate") {
+          x.additionalData.minDate = tripDate;
+        }
+      });
+    }
     const chargeDropdown = [
       { Key: 'advPdAt', Name: 'aDPAYAT' },
       { Key: 'balAmtAt', Name: 'bLPAYAT' },
@@ -1155,7 +1169,7 @@ clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
     }
 
     //  const closingBranch = this.locationData.find((x) => x.value === this.thcDetail?.closingBranch);
-  
+
     this.thcTableForm.controls["tripDate"].disable();
     this.thcTableForm.controls["etaDate"].disable();
     //this.thcTableForm.controls["closingBranch"].setValue(closingBranch);
@@ -1166,11 +1180,11 @@ clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
     this.thcTableForm.controls["venMobNo"].setValue(thcNestedDetails?.thcDetails.vND?.mNO);
     this.VehicleTableForm.controls["engineNo"].setValue(thcNestedDetails?.thcDetails.eNGNO)
     this.VehicleTableForm.controls["chasisNo"].setValue(thcNestedDetails?.thcDetails.cHASNO),
-    this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
-   if(thcNestedDetails?.thcDetails.vIA){
-    const via =thcNestedDetails?.thcDetails.vIA.join(",");
-    this.thcTableForm.controls["via"].setValue(via);
-   }
+      this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
+    if (thcNestedDetails?.thcDetails.vIA) {
+      const via = thcNestedDetails?.thcDetails.vIA.join(",");
+      this.thcTableForm.controls["via"].setValue(via);
+    }
     this.VehicleTableForm.controls["inExdt"].setValue(thcNestedDetails?.thcDetails.iNSEXDT)
     this.VehicleTableForm.controls["fitdt"].setValue(thcNestedDetails?.thcDetails.fITDT)
     this.thcTableForm.controls["driverLexd"].disable(thcNestedDetails?.thcDetails.eNGNO);
@@ -1182,11 +1196,11 @@ clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
       this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);
     }
-    if(thcNestedDetails?.thcDetails.vND?.tY==4){
+    if (thcNestedDetails?.thcDetails.vND?.tY == 4) {
       this.jsonControlBasicArray = this.allBasicJsonArray
-      this.thcTableForm.controls['brokerName'].setValue(thcNestedDetails?.thcDetails.bRKNM||"");
-      this.thcTableForm.controls['brokerMobile'].setValue(thcNestedDetails?.thcDetails.bRKMOB||"");
-      this.thcTableForm.controls['tdsUpload'].setValue(thcNestedDetails?.thcDetails.tDSDOC||"");
+      this.thcTableForm.controls['brokerName'].setValue(thcNestedDetails?.thcDetails.bRKNM || "");
+      this.thcTableForm.controls['brokerMobile'].setValue(thcNestedDetails?.thcDetails.bRKMOB || "");
+      this.thcTableForm.controls['tdsUpload'].setValue(thcNestedDetails?.thcDetails.tDSDOC || "");
 
     }
     if (this.isView || this.isUpdate) {
@@ -1195,7 +1209,6 @@ clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];
-
         if (x.tCT == this.currentLocation.locCity.toUpperCase()) {
           x.actions = ["Update"];
         }
@@ -1205,45 +1218,49 @@ clearValidatorsAndUpdate(this.VehicleTableForm, this.jsonVehicleControl);
         return x; // Make sure to return x to update the original object in the 'tableData' array.
       });
     }
-    if(thcDetail.data.thcDetails.tMODENM=="Rail"){
-      this.isRail=true;
-      this.rakeForm.controls['rakeNumber'].setValue(thcDetail.data.thcDetails.rAKE.nO||"");
+    if (thcDetail.data.thcDetails.tMODENM == "Rail") {
+      this.isRail = true;
+      if (this.isArrivedInfo) {
+        clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlArrivalArray);
+        this.isArrivedInfo = false;
+      }
+      this.rakeForm.controls['rakeNumber'].setValue(thcDetail.data.thcDetails.rAKE.nO || "");
       this.rakeForm.controls['rakeDate'].setValue(thcDetail.data.thcDetails.rAKE.dT);
       this.rakeForm.controls['fnrNo'].setValue(thcDetail.data.thcDetails.rAKE.fNRNO);
-      this.rakeForm.controls['noOfContrainer'].setValue(thcDetail.data.thcDetails.rAKE?.cONT||"");
-      if(thcDetail.data.thcDetails.rAKE.iNV){
-          const invoiceData=thcDetail.data.thcDetails.rAKE.iNV.map(element => {
-              return{
-                invNum:element.nO,
-                invDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
-                orrInvDt:element.dT,
-                invAmt:element.aMT,
-                actions:[]
-              }
-          });
-          this.tableRakeInvoice=invoiceData;
-          this.rrInvoice=false
-      }
-      if(thcDetail.data.thcDetails.rAKE.rR){
-        const invoiceData=thcDetail.data.thcDetails.rAKE.rR.map(element => {
-            return{
-              rrNo:element.nO,
-              rrDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
-              orrDate: element.dT,
-              actions:[]
-            }
+      this.rakeForm.controls['noOfContrainer'].setValue(thcDetail.data.thcDetails.rAKE?.cONT || "");
+      if (thcDetail.data.thcDetails.rAKE.iNV) {
+        const invoiceData = thcDetail.data.thcDetails.rAKE.iNV.map(element => {
+          return {
+            invNum: element.nO,
+            invDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
+            orrInvDt: element.dT,
+            invAmt: element.aMT,
+            actions: []
+          }
         });
-        this.tableRakeData=invoiceData;
-        this.rrLoad=false
-      
-    }
-   }
+        this.tableRakeInvoice = invoiceData;
+        this.rrInvoice = false
+      }
+      if (thcDetail.data.thcDetails.rAKE.rR) {
+        const invoiceData = thcDetail.data.thcDetails.rAKE.rR.map(element => {
+          return {
+            rrNo: element.nO,
+            rrDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
+            orrDate: element.dT,
+            actions: []
+          }
+        });
+        this.tableRakeData = invoiceData;
+        this.rrLoad = false
 
-this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
+      }
+    }
+
+    this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG, thcNestedDetails)
     // this.getShipmentDetails();
   }
   /*End*/
-  
+
   async getCityDetail(event) {
     const formdata = this.thcTableForm.value
     const { additionalData, type, name } = event.field;
@@ -1281,10 +1298,10 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*End*/
   //#region to preview image
   openImageDialog(control) {
-    
+
     let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
-    if(this.isUpdate||this.isView){
-      file=this.thcTableForm.controls[control.imageName].value;
+    if (this.isUpdate || this.isView) {
+      file = this.thcTableForm.controls[control.imageName].value;
     }
     this.dialog.open(ImagePreviewComponent, {
       data: { imageUrl: file },
@@ -1346,7 +1363,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
 
   /*below function called when the tranMode Dropdown has any event occur*/
   transModeChanged() {
-    
+
     const transMode = this.thcTableForm.getRawValue().transMode;
     const transModeDetail = this.products.find((x) => x.value == transMode);
     const roadControl = ['vehicle']
@@ -1386,7 +1403,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       });
       this.isRail = false
     }
-    this.getCharges(transModeDetail.name);
+    this.getCharges(transModeDetail.name, transModeDetail.value);
     this.vendorFieldChanged();
   }
   /*End*/
@@ -1411,7 +1428,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*End*/
   /*below code is for the */
   GenerateTHCgenerationRequestBody() {
-        
+
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
     const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
@@ -1423,7 +1440,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     this.tHCGenerationModel.branch = this.storage.branch;
     this.tHCGenerationModel.docType = "TH";
     this.tHCGenerationModel.finYear = financialYear;
-    this.tHCGenerationModel.timeZone=this.storage.timeZone
+    this.tHCGenerationModel.timeZone = this.storage.timeZone
     //#endregion
     //#region THC Summary
     this.thcsummaryData.companyCode = this.storage.companyCode;
@@ -1500,7 +1517,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
         cHGID: element.name,
         cHGNM: element.placeholder,
         aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.chargeForm.controls[element.name].value || 0) : (this.chargeForm.controls[element.name].value || 0),
-        oPS:element?.additionalData.metaData||"",
+        oPS: element?.additionalData.metaData || "",
       }
       charges.push(json);
     });
@@ -1637,7 +1654,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       //#endregion
       this.mfdetailsList.push(mfdetailsList);
     });
-    const rakeDetailData=new rakeDetails();
+    const rakeDetailData = new rakeDetails();
     if (this.tableRakeData.length > 0) {
       this.tableRakeData.forEach(element => {
         this.rakeData.push({ nO: element.rrNo, dT: element.orrDate });
@@ -1656,7 +1673,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       rakeDetailData.fNRNO = getValueOrDefault(this.rakeForm, "fnrNo", null);
       rakeDetailData.cONT = getValueOrDefault(this.rakeForm, "noOfContrainer", null);
     }
-    this.thcsummaryData.rakeDetailsList=rakeDetailData;
+    this.thcsummaryData.rakeDetailsList = rakeDetailData;
     this.tHCGenerationModel.data = this.thcsummaryData;
     this.tHCGenerationModel.mfdetailsList = this.mfdetailsList;
     this.tHCGenerationModel.mfheaderDetails = this.mfheaderDetails;
@@ -1669,7 +1686,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*below code is for the Push RR Data into Table*/
   async addRakeData() {
     this.rrLoad = true;
-    this.isLoadRail=true;
+    this.isLoadRail = true;
     const tableData = this.tableRakeData;
     if (tableData.length > 0) {
       const exist = tableData.find(
@@ -1684,12 +1701,12 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
           text: "Please avoid duplicate entering RR NO.",
           showConfirmButton: true,
         });
-       ;
+        ;
         this.rrLoad = false;
-        this.isLoadRail=false
+        this.isLoadRail = false
         return false;
       }
-    
+
     }
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
@@ -1704,7 +1721,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     };
     this.tableRakeData.push(json);
     this.rrLoad = false;
-    this.isLoadRail=false
+    this.isLoadRail = false
     const fieldsToClear = [
       'rrNo',
       'rrDate'
@@ -1734,7 +1751,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   /*below code is for the add Rake Invoice*/
   async addRakeInvoice() {
     this.rrInvoice = true;
-    this.isLoadInvoice=true;
+    this.isLoadInvoice = true;
     const tableData = this.tableRakeInvoice;
     if (tableData.length > 0) {
       const exist = tableData.find(
@@ -1750,7 +1767,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
           showConfirmButton: true,
         });
         this.rrInvoice = false;
-        this.isLoadInvoice=false;
+        this.isLoadInvoice = false;
         return false;
       }
     }
@@ -1768,7 +1785,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     };
     this.tableRakeInvoice.push(json);
     this.rrInvoice = false;
-    this.isLoadInvoice=false;
+    this.isLoadInvoice = false;
     const fieldsToClear = [
       'invNo',
       'invDt',
@@ -1799,9 +1816,12 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
   }
   /*End*/
   /*below code is for getting a Chages from Charge Master*/
-  async getCharges(prod) {
+  async getCharges(prodNm, prdcd) {
     this.chargeJsonControl = this.chargeJsonControl.filter((x) => !x.hasOwnProperty('id'));
-    const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod },);
+    //const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm },);
+    const filter = { "pRNm": prodNm, aCTV: true, cHBTY: "Booking" }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm }
+    const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
 
@@ -1811,7 +1831,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
             id: index + 1,
             name: element.cHACD || '',
             label: `${element.sELCHA}(${element.aDD_DEDU})`,
-            placeholder:element.sELCHA || '',
+            placeholder: element.sELCHA || '',
             type: 'text',
             value: '0.00',
             filterOptions: '',
@@ -1844,71 +1864,114 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
         { name: this.balanceName, data: this.locationData, status: this.balanceStatus },
       ]
       chargeFilter.forEach(({ name, data, status }) => {
-        this.filter.Filter(this.chargeJsonControl,this.chargeForm,data,name,status);
+        this.filter.Filter(this.chargeJsonControl, this.chargeForm, data, name, status);
       });
-      const location=this.locationData.find(x=>x.value==this.branchCode);
-      this.chargeForm.controls['advPdAt'].setValue(location)
+      const location = this.locationData.find(x => x.value == this.branchCode);
+      this.chargeForm.controls['advPdAt'].setValue(location);
       this.isCharge = true;
+      if(this.prqFlag&&this.marketData){
+        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT||"0.00");
+      }
     }
   }
   /*End*/
-    /*below code is for getting a Chages from Charge Master*/
-    async getAutoFillCharges(charges,thcNestedDetails) {
+  /*below code is for getting a Chages from Charge Master*/
+  async getAutoFillCharges(charges, thcNestedDetails) {
+    const product = thcNestedDetails?.thcDetails?.tMODENM || "";
+    const filter = { "pRNm": product, aCTV: true, cHBTY: "Delivery" }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product }
+    const delCharge = await this.thcService.getChargesV2(filter, productFilter);
+    if (charges && charges.length > 0) {
+      const invoiceList = [];
+      const delChargeList = []
+      charges.forEach((element, index) => {
+        if (element) {
+          const invoice: InvoiceModel = {
+            id: index + 1,
+            name: element.cHGID || '',
+            label: `${element.cHGNM}(${element.oPS})`,
+            placeholder: element.cHGNM || '',
+            type: 'text',
+            value: `${Math.abs(element.aMT)}`,
+            filterOptions: '',
+            displaywith: '',
+            generatecontrol: true,
+            disable: true,
+            Validations: [],
+            additionalData: {
+              showNameAndValue: false,
+              metaData: element.oPS
+            },
+            functions: {
+              onChange: 'calucatedCharges',
+            },
+          };
 
-      if (charges && charges.length > 0) {
-        const invoiceList = [];
-  
-        charges.forEach((element, index) => {
+          invoiceList.push(invoice);
+        }
+      });
+      if (!this.isView && delCharge && delCharge.length > 0) {
+        delCharge.forEach((element, index) => {
           if (element) {
             const invoice: InvoiceModel = {
               id: index + 1,
-              name: element.cHGID || '',
-              label: `${element.cHGNM}(${element.oPS})`,
-              placeholder: element.cHGNM || '',
+              name: element.cHACD || '',
+              label: `${element.sELCHA}(${element.aDD_DEDU})`,
+              placeholder: element.sELCHA || '',
               type: 'text',
-              value:`${Math.abs(element.aMT)}`,
+              value: "0",
               filterOptions: '',
               displaywith: '',
               generatecontrol: true,
-              disable: true,
+              disable: false,
               Validations: [],
               additionalData: {
                 showNameAndValue: false,
+                metaData: element.aDD_DEDU
               },
               functions: {
-                onChange: 'calucatedCharges',
+                onChange: 'getChangesOnDelCharge',
               },
             };
-  
-            invoiceList.push(invoice);
+
+            delChargeList.push(invoice);
           }
         });
-        const chargeControl = [...invoiceList, ...this.chargeJsonControl]
-        this.chargeJsonControl = chargeControl;
-        chargeControl.sort((a, b) => {
-          if (a.name == "contAmt") return -1;
-          if (b.name == "contAmt") return 1;
-          return 0;
-        });
-        this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
-        this.isCharge = true;
-        const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
-        const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
-        this.chargeForm.controls["advPdAt"].setValue(location);
-        this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
-        this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
-        this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
-        this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
-        this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
       }
+      // Directly concatenate, spreading null/undefined has no effect
+      let chargeControl = [
+        ...(invoiceList || []),
+        ...(delChargeList || []),
+        ...this.chargeJsonControl
+      ];
+
+      this.chargeJsonControl = chargeControl;
+      this.delChargeControl = delChargeList;
+      chargeControl.sort((a, b) => {
+        if (a.name == "contAmt") return -1;
+        if (b.name == "contAmt") return 1;
+        return 0;
+      });
+      this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
+      this.isCharge = true;
+      const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
+      const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
+      this.chargeForm.controls["advPdAt"].setValue(location);
+      this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
+      this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
+      this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
+      this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
+      this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
+      this.balanceAmount=thcNestedDetails?.thcDetails.bALAMT 
     }
-    /*End*/
-    
+
+  }
+  /*End*/
+
   /*Calucate Charges*/
   calucatedCharges() {
-    
     let total = 0;
-    const vendorAdvance = this.thcTableForm.controls['vendorName'].value?.vendorAdvance||0;
+    const vendorAdvance = this.thcTableForm.controls['vendorName'].value?.vendorAdvance || 0;
     const dyanmicCal = this.chargeJsonControl.filter((x) => x.hasOwnProperty("id"));
     const chargeMapping = dyanmicCal.map((x) => { return { name: x.name, operation: x.additionalData.metaData } });
     total = chargeMapping.reduce((acc, curr) => {
@@ -1926,24 +1989,25 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     let percentageValue = (totalAmt * vendorAdvance) / 100;
     // Now set this calculated percentageValue to advAmt
     this.chargeForm.controls['advAmt'].setValue(percentageValue);
-    const advAmt=parseFloat(this.chargeForm.controls['advAmt']?.value||0);
-    this.chargeForm.controls["balAmt"].setValue(totalAmt-advAmt);
+    const advAmt = parseFloat(this.chargeForm.controls['advAmt']?.value || 0);
+    this.chargeForm.controls["balAmt"].setValue(totalAmt - advAmt);
 
   }
   /*Below function is Called when the We click on Create THC*/
   async createThc() {
+     
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
     const contAmt = parseInt(this.chargeForm.get('contAmt').value);
-    if(this)
-    if ((vendorTypevalue == 2 || vendorTypevalue == 4) && contAmt <= 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'error',
-        text: 'Contract amount must be greater than zero for Attached and Market vendor types.',
-        showConfirmButton: true,
-      });
-      return false;
-    }
+    if (this)
+      if ((vendorTypevalue == 2 || vendorTypevalue == 4) && contAmt <= 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'error',
+          text: 'Contract amount must be greater than zero for Attached and Market vendor types.',
+          showConfirmButton: true,
+        });
+        return false;
+      }
     if (this.DocketsContainersWise) {
 
       if (this.tableData.filter(x => x.isSelected).length > 1) {
@@ -2026,19 +2090,43 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
       const podDetails = typeof (docket) == "object" ? docket : ""
       this.thcTableForm.removeControl("docket");
       this.thcTableForm.get("podDetail").setValue(podDetails);
-      const newARR = {
-        ...this.thcDetailGlobal.thcDetails.aRR,
-        "aCTDT": this.thcTableForm.get("ArrivalDate").value,
-        "sEALNO": this.thcTableForm.get("ArrivalSealNo").value,
-        "kM": this.thcTableForm.get("Arrivalendkm").value,
-        "aCRBY": this.thcTableForm.get("Arrivalremarks").value,
-        "aRBY": this.thcTableForm.get("ArrivalBy").value,
-      };
-
+      const charges = [];
+      this.chargeJsonControl.filter((x) => x.hasOwnProperty("id")).forEach(element => {
+        let json = {
+          cHGID: element.name,
+          cHGNM: element.placeholder,
+          aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.chargeForm.controls[element.name].value || 0) : (this.chargeForm.controls[element.name].value || 0),
+          oPS: element?.additionalData.metaData || "",
+        }
+        charges.push(json);
+      });
+      let newARR = {}
+      if (newARR) {
+        newARR = {
+          ...this.thcDetailGlobal.thcDetails.aRR,
+          "aCTDT": this.thcTableForm.get("ArrivalDate").value,
+          "sEALNO": this.thcTableForm.get("ArrivalSealNo").value,
+          "kM": this.thcTableForm.get("Arrivalendkm").value,
+          "aCRBY": this.thcTableForm.get("Arrivalremarks").value,
+          "aRBY": this.thcTableForm.get("ArrivalBy").value,
+          "uNLDDT": this.thcTableForm.get("UnloadingDate").value,
+          "dELDY": this.thcTableForm.get("DelayDays").value,
+          "dETDY": this.thcTableForm.get("DetentionDays").value
+        };
+      }
+      else {
+        newARR = {
+          "aRBY": this.storage.userName,
+          "aCTDT": new Date()
+        }
+      }
       const requestBody = {
         "oPSST": 2,
         "oPSSTNM": "Arrived",
         "aRR": newARR,
+        "cHG": charges,
+        "bALAMT": this.chargeForm.get("balAmt").value,
+        "tOTAMT": this.chargeForm.get("totAmt").value
       };
 
       const data = this.thcTableForm.getRawValue();
@@ -2052,6 +2140,9 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
         this.DocketsContainersWise,
         data.prqNo
       );
+      if (this.thcDetailGlobal.thcDetails.tMODENM == "Road") {
+        await this.thcService.updateVehicle({tripId:"",status:"Available",route:""},{vehNo:this.thcDetailGlobal.thcDetails.vEHNO})
+      }
       if (res) {
         Swal.fire({
           icon: "success",
@@ -2059,13 +2150,13 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
           text: `THC Number is ${this.thcTableForm.get("tripId").value}`,
           showConfirmButton: true,
         });
-        const reqArrivalDeparture={
-          action:"TripArrivalDepartureUpdateFTL",
-          reqBody:{
-            cid:this.companyCode,
-            EventType:'A',
-            loc:localStorage.getItem("Branch") || "",
-            tripId:this.thcTableForm.get("tripId").value
+        const reqArrivalDeparture = {
+          action: "TripArrivalDepartureUpdateFTL",
+          reqBody: {
+            cid: this.companyCode,
+            EventType: 'A',
+            loc: this.storage.branch || "",
+            tripId: this.thcTableForm.get("tripId").value
           }
         }
         this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
@@ -2084,17 +2175,20 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
           await this.consigmentUtility.updatePrq(prqData, update);
         }
       }
-
-      // for (const element of docket) {
-      //   await this.docketService.updateDocket(element.docketNumber, { "status": "1" });
-      // }
-
       const tHCGenerationRequst = await this.GenerateTHCgenerationRequestBody();
       if (tHCGenerationRequst) {
         const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
         // this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
+        if (this.thcsummaryData.tMODENM == "Road") {
+          await this.thcService.updateVehicle({
+            vehNo: this.thcsummaryData.vehicle,
+            tripId:resThc.data?.mainData?.ops[0].docNo,
+            status:"In Transit",
+            route:this.thcsummaryData.route,
+          },{vehNo:this.thcsummaryData.vehicle})
+        }
         if (resThc) {
-          if(!isMarket && resThc.data?.mainData?.ops[0]?.docNo!=""){
+          if (!isMarket && resThc.data?.mainData?.ops[0]?.docNo != "") {
             await Swal.fire({
               icon: "question",
               title: "Tracking",
@@ -2104,19 +2198,19 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
               showCancelButton: true,
             }).then((result) => {
               if (result.isConfirmed) {
-                
-                const req={
-                  action:"PushTripFTL",
-                  reqBody:{
+
+                const req = {
+                  action: "PushTripFTL",
+                  reqBody: {
                     companyCode: this.companyCode,
-                    branch:localStorage.getItem("Branch") || "",
-                    tripId:resThc.data?.mainData?.ops[0]?.docNo,
-                    vehicleNo:resThc.data?.mainData?.ops[0]?.vEHNO
+                    branch: this.storage.branch || "",
+                    tripId: resThc.data?.mainData?.ops[0]?.docNo,
+                    vehicleNo: resThc.data?.mainData?.ops[0]?.vEHNO
                   }
                 };
                 this.hawkeyeUtilityService.pushToCTCommon(req);
                 this.goBack('THC');
-      
+
                 // const dialogref = this.dialog.open(THCTrackingComponent, {
                 //   width: "100vw",
                 //   height: "100vw",
@@ -2128,7 +2222,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
                 //     if(result?.gpsDeviceEnabled ==true && result?.gpsDeviceId!=""){
                 //       const req={
                 //         companyCode: this.companyCode,
-                //         branch:localStorage.getItem("Branch") || "",
+                //         branch:localstorage.getItem(StoreKeys.Branch) || "",
                 //         tripId:"TH/DELB/2425/000046",
                 //         vehicleNo:result.vehicleNo
                 //       }
@@ -2141,8 +2235,7 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
                 //   }
                 // });
               }
-              else
-              {
+              else {
                 this.goBack('THC');
               }
             });
@@ -2163,4 +2256,62 @@ this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG,thcNestedDetails)
     /*End*/
   }
   /*End*/
+  /*Called when unloading date change and update detention and delay days*/
+  UpdateDays() {
+    // Convert the input values to Dates
+    const UnloadingDate = new Date(this.thcTableForm.controls['UnloadingDate'].value);
+    const arrivalDate = new Date(this.thcTableForm.controls['ArrivalDate'].value);
+
+    const adjustedUnloadingDate = new Date(UnloadingDate.setHours(0, 0, 0, 0));
+    const adjustedArrivalDate = new Date(arrivalDate.setHours(0, 0, 0, 0));
+    // Explicitly use .getTime() to ensure the operation is between numbers
+    let timeDiff = adjustedUnloadingDate.getTime() - adjustedArrivalDate.getTime();
+
+    // Convert milliseconds to days
+    let dayDifference = Math.round(timeDiff / (1000 * 3600 * 24));
+
+    // Set the calculated day difference to the form control
+    this.thcTableForm.controls['DetentionDays'].setValue(dayDifference);
+  }
+
+  ArrivalDateChange() {
+    const etaDateValue = this.thcTableForm.controls['etaDate'].value;
+    const arrivalDateValue = this.thcTableForm.controls['ArrivalDate'].value;
+    // Convert to Date objects and reset time to 00:00:00
+    const etaDate = new Date(new Date(etaDateValue).setHours(0, 0, 0, 0));
+    const arrivalDate = new Date(new Date(arrivalDateValue).setHours(0, 0, 0, 0));
+    // Explicitly call getTime() for both dates and calculate the difference
+    let timeDiff = arrivalDate.getTime() - etaDate.getTime();
+    // Convert the difference to days
+    let dayDifference = timeDiff / (1000 * 3600 * 24);
+    // Round the result to avoid decimal places since we're dealing with whole days
+    dayDifference = Math.round(dayDifference);
+    // Set the calculated days to the form control
+    this.thcTableForm.controls['DelayDays'].setValue(dayDifference);
+    // Additional logic remains the same
+    this.jsonControlArrivalArray.forEach((x) => {
+      if (x.name == "UnloadingDate") {
+        x.additionalData.minDate = arrivalDate;
+      }
+    });
+    this.thcTableForm.controls['UnloadingDate'].setValue("");
+    this.thcTableForm.controls['DetentionDays'].setValue(0);
+  }
+  /*below code is for the Calculate Delivery Charges*/
+  getChangesOnDelCharge() {
+    let total = 0;
+    const chargeMapping = this.delChargeControl.map((x) => { return { name: x.name, operation: x.additionalData.metaData } });
+    total = chargeMapping.reduce((acc, curr) => {
+      const value = ConvertToNumber(this.chargeForm.controls[curr.name].value, 2);
+      if (curr.operation === "+") {
+        return acc + value;
+      } else if (curr.operation === "-") {
+        return acc - value;
+      } else {
+        return acc; // In case of an unknown operation
+      }
+    }, 0);
+    const balance=parseFloat(this.balanceAmount)-Math.abs(total)
+    this.chargeForm.controls["balAmt"].setValue(balance);
+  }
 }

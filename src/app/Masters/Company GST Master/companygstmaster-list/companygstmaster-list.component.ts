@@ -6,6 +6,7 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-companygstmaster-list",
@@ -150,7 +151,8 @@ export class CompanygstmasterListComponent
   constructor(
     private masterService: MasterService,
     private fb: UntypedFormBuilder,
-    private router: Router
+    private router: Router,
+    private storage: StorageService
   ) {
     super();
   }
@@ -187,9 +189,9 @@ export class CompanygstmasterListComponent
   }
   async getCompanyGstDetails() {
     const Body = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "company_master",
-      filter: { companyCode: parseInt(localStorage.getItem("companyCode")) },
+      filter: { companyCode: this.storage.companyCode },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", Body)
@@ -206,9 +208,9 @@ export class CompanygstmasterListComponent
 
   async GetTableData() {
     const Body = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customers_gst_details",
-      filter: { companyCode: parseInt(localStorage.getItem("companyCode")) },
+      filter: { companyCode: this.storage.companyCode },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", Body)

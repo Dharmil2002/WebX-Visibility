@@ -7,6 +7,7 @@ import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { DocketStatus } from "src/app/Models/docStatus";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
+
 @Component({
   selector: "app-stocks",
   templateUrl: "./stocks.component.html",
@@ -22,7 +23,7 @@ export class StocksComponent
   drillDownPath: string;
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  companyCode: number = 0;
   menuItemflag: boolean = false;
   DocCalledAs: DocCalledAsModel;
 
@@ -62,7 +63,7 @@ export class StocksComponent
   staticField = [];
 
   boxData: { count: any; title: any; class: string }[];
-  branch = localStorage.getItem("Branch");
+  branch = "";
   // declararing properties
   constructor(
   private docketService:DocketService,
@@ -70,6 +71,8 @@ export class StocksComponent
   private controlPanel:ControlPanelService
   ) {
     super();
+    this.companyCode = this.storage.companyCode;
+    this.branch = this.storage.branch;
     this.addAndEditPath = "Operation/QuickCreateDocket";
     this.DocCalledAs = controlPanel.DocCalledAs;
 

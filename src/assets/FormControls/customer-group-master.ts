@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { CustomerGroupMaster } from "src/app/core/models/Masters/customer-group-master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class CustomerGroupControl {
   customerGroupControlArray: FormControls[];
@@ -81,7 +83,7 @@ export class CustomerGroupControl {
         label: "Company Code",
         placeholder: "Company Code",
         type: "",
-        value: parseInt(localStorage.getItem("companyCode")),
+        value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
         Validations: [],
         generatecontrol: false,
         disable: false,

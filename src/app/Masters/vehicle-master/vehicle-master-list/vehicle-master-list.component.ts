@@ -3,6 +3,7 @@ import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -49,7 +50,7 @@ export class VehicleMasterListComponent implements OnInit {
     addAndEditPath: string;
     csvFileName: string;
     tableData: any;
-    constructor(private masterService: MasterService,) {
+    constructor(private masterService: MasterService, private storage: StorageService) {        
         this.addAndEditPath = "/Masters/VehicleMaster/AddVehicle";
     }
     ngOnInit(): void {
@@ -60,7 +61,7 @@ export class VehicleMasterListComponent implements OnInit {
     async getVehicleDetails() {
         // Prepare the request  
         let req = {
-            "companyCode": parseInt(localStorage.getItem("companyCode")),
+            "companyCode": this.storage.companyCode,
             "collectionName": "vehicle_detail",
             "filter": {}
         }
@@ -95,10 +96,10 @@ export class VehicleMasterListComponent implements OnInit {
         delete det._id;
         delete det.eNTDT;
         det['mODDT'] = new Date()
-        det['mODBY'] = localStorage.getItem("UserName")
-        det['mODLOC'] = localStorage.getItem("Branch")
+        det['mODBY'] = this.storage.userName
+        det['mODLOC'] = this.storage.branch
         let req = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
+            companyCode: this.storage.companyCode,
             collectionName: "vehicle_detail",
             filter: { _id: id },
             update: det

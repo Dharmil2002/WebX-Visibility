@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: "app-departure-dashboard-page",
   templateUrl: "./departure-dashboard-page.component.html",
@@ -19,8 +20,8 @@ export class DepartureDashboardPageComponent
   menuItemflag: boolean = true;
   departure: any;
   @Input() arrivaldeparture: any;
-  orgBranch: string = localStorage.getItem("Branch");
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  orgBranch: string = "";
+  companyCode: number = 0;
   breadscrums = [
     {
       title: "Departure Details",
@@ -129,9 +130,12 @@ export class DepartureDashboardPageComponent
 
   constructor(
     private CnoteService: CnoteService,
-    private departureService: DepartureService
+    private departureService: DepartureService,
+    private storage: StorageService
   ) {
     super();
+    this.companyCode = this.storage.companyCode;
+    this.orgBranch = this.storage.branch;
     this.loadingSheetData = this.CnoteService.getLsData();
     this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "departureData.csv";

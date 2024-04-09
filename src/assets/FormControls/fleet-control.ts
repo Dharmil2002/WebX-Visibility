@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { fleetModel } from "src/app/core/models/Masters/fleetMaster";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class FleetControls {
     private fleetDetailsControl: FormControls[];
@@ -247,7 +249,7 @@ export class FleetControls {
                 label: ' ',
                 placeholder: ' ',
                 type: 'date',
-                value: localStorage.getItem("companyCode"), // Set the value to the current date
+                value: StorageService.getItem(StoreKeys.CompanyCode), // Set the value to the current date
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -260,7 +262,7 @@ export class FleetControls {
                 label: "",
                 placeholder: "",
                 type: "text",
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,
@@ -283,7 +285,7 @@ export class FleetControls {
                 label: ' ',
                 placeholder: ' ',
                 type: 'date',
-                value: localStorage.getItem("Branch"), // Set the value to the current date
+                value: StorageService.getItem(StoreKeys.Branch), // Set the value to the current date
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -309,7 +311,7 @@ export class FleetControls {
                 label: "",
                 placeholder: "",
                 type: "text",
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,
@@ -319,7 +321,7 @@ export class FleetControls {
                 label: ' ',
                 placeholder: ' ',
                 type: 'date',
-                value: localStorage.getItem("Branch"), // Set the value to the current date
+                value: StorageService.getItem(StoreKeys.Branch), // Set the value to the current date
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -333,7 +335,7 @@ export class FleetControls {
             //     label: "Company Code",
             //     placeholder: "Company Code",
             //     type: "",
-            //     value: parseInt(localStorage.getItem("companyCode")),
+            //     value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
             //     Validations: [],
             //     generatecontrol: false,
             //     disable: false,
@@ -356,7 +358,7 @@ export class FleetControls {
             //     label: "Update By",
             //     placeholder: "Update By",
             //     type: "text",
-            //     value: localStorage.getItem("UserName"),
+            //     value: StorageService.getItem(StoreKeys.UserId),
             //     Validations: [],
             //     generatecontrol: false,
             //     disable: false,
@@ -366,7 +368,7 @@ export class FleetControls {
             //     label: "",
             //     placeholder: "Update By",
             //     type: "text",
-            //     value: localStorage.getItem("UserName"),
+            //     value: StorageService.getItem(StoreKeys.UserId),
             //     Validations: [],
             //     generatecontrol: false,
             //     disable: false,

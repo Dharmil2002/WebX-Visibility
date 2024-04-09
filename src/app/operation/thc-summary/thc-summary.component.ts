@@ -33,7 +33,7 @@ export class ThcSummaryComponent implements OnInit {
     createOn: {
       Title: "Created Date",
       class: "matcolumncenter",
-      Style: "min-width:125px",
+      Style: "min-width:140px",
     },
     docNo: {
       Title: "THC No",
@@ -47,15 +47,20 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
+    dEST:{
+      Title: "Destination",
+      class: "matcolumncenter",
+      Style: "min-width:130px",
+    },
     vEHNO: {
       Title: "Vehicle No",
       class: "matcolumncenter",
-      Style: "max-width:130px",
+      Style: "min-width:150px",
     },
     loadedKg: {
       Title: "Loaded Kg",
       class: "matcolumncenter",
-      Style: "min-width:100px",
+      Style: "min-width:130px",
     },
     statusAction: {
       Title: "Status",
@@ -72,6 +77,7 @@ export class ThcSummaryComponent implements OnInit {
   //#endregion
   staticField = [
     "rUTNM",
+    "dEST",
     "vEHNO",
     "loadedKg",
     "statusAction",
@@ -110,13 +116,15 @@ export class ThcSummaryComponent implements OnInit {
       D$or: [
         { fCT: locData.locCity },
         { tCT: locData.locCity },
+        {vIA:{"D$in": [locData.locCity]}}
       ],
       oPSST: { D$in: [1, 2] }
     };
 
     let thcList = await this.thcService.getThcDetail(filter);
     const thcDetail = thcList.data.map((item) => {
-      const action = item.tCT.toLowerCase() === locData.locCity.toLowerCase();
+      const action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
+      (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
       if (item.eNTDT) {
         item.createOn = moment(item.eNTDT).format('DD-MM-YY HH:mm');
         item.statusAction = item?.oPSSTNM
@@ -125,16 +133,8 @@ export class ThcSummaryComponent implements OnInit {
       }
       return item;
     });
-
     // Sort the PRQ list by pickupDate in descending order
-    thcDetail.sort((a, b) => {
-      const dateA: Date | any = new Date(a.eNTDT);
-      const dateB: Date | any = new Date(b.eNTDT);
-      return dateB - dateA; // Sort in descending order
-    });
-
-    this.tableData = thcDetail;
-
+    this.tableData = thcDetail.reverse();
     this.tableLoad = false;
   }
 

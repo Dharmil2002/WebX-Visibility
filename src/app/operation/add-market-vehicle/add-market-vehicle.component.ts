@@ -1,10 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MarkerVehicleService } from 'src/app/Utility/module/operation/market-vehicle/marker-vehicle.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { marketVehicleControls } from 'src/assets/FormControls/market-vehicle';
 import Swal from 'sweetalert2';
 
@@ -13,11 +15,11 @@ import Swal from 'sweetalert2';
   templateUrl: './add-market-vehicle.component.html'
 })
 export class AddMarketVehicleComponent implements OnInit {
-
+  imageData: any = {};
   jsonControlVehicleArray: any;
   marketVehicleTableForm: UntypedFormGroup;
- 
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  className: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
+  companyCode = 0;
   breadScrums = [
     {
       title: "Add Vehicle details",
@@ -32,8 +34,12 @@ export class AddMarketVehicleComponent implements OnInit {
       public dialogRef: MatDialogRef<GenericTableComponent>,
       @Inject(MAT_DIALOG_DATA) public item: any,
       private fb: UntypedFormBuilder,
+      public dialog: MatDialog,
+      private storage: StorageService,
       private markerVehicleService: MarkerVehicleService,
-      private storage: StorageService) {
+      private objImageHandling: ImageHandling) {
+
+    this.companyCode = this.storage.companyCode;
     if (item) {
       this.prqDetail = item
     }
@@ -43,7 +49,6 @@ export class AddMarketVehicleComponent implements OnInit {
 
   ngOnInit(): void {
     this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize || this.prqDetail?.containerSize || "")
-    
   }
 
   functionCallHandler($event) {
@@ -66,41 +71,65 @@ export class AddMarketVehicleComponent implements OnInit {
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleArray]);
   }
   async save() {
-
-    var data = {
+    const uploadSupport = this.imageData?.uploadSupport || ""
+    const data = {
       vID: this.marketVehicleTableForm.value.vehicelNo,
       vndNM: this.marketVehicleTableForm.value.vendor,
       vndCD: this.marketVehicleTableForm.value.vendor,
       vndPH: this.marketVehicleTableForm.value.vMobileNo,
-      pANNO: this.marketVehicleTableForm.value.driverPan,
+      pANNO: this.marketVehicleTableForm.value.venPan,
       wTCAP: this.marketVehicleTableForm.value.vehicleSize,
       drvNM: this.marketVehicleTableForm.value.driver,
+      ETA: this.marketVehicleTableForm.value.ETA,
       drvPH: this.marketVehicleTableForm.value.dmobileNo,
       dLNO: this.marketVehicleTableForm.value.lcNo,
       dLEXP: this.marketVehicleTableForm.value.lcExpireDate,
       iNCEXP: this.marketVehicleTableForm.value.insuranceExpiryDate,
-      fITDT: this.marketVehicleTableForm.value.fitnessValidityDate
+      fITDT: this.marketVehicleTableForm.value.fitnessValidityDate,
+      eNGNO: this.marketVehicleTableForm.value.engineNo,
+      cHNO: this.marketVehicleTableForm.value.chasisNo,
+      vEHCNAMT: this.marketVehicleTableForm.value.vehContAmt,
+      mRGAMT: this.marketVehicleTableForm.value.margAMT,
+      rDPRT: this.marketVehicleTableForm.value.roadPrt,
+      sDOC:uploadSupport
     };
-
-    var res = await this.markerVehicleService.SaveVehicleData(data);
+    const res = await this.markerVehicleService.SaveVehicleData(data);
     if (res) {
       this.dialogRef.close(this.marketVehicleTableForm.value);
     }
   }
-
+  calculateContractAmount() {
+    const contractAmt= parseFloat(this.prqDetail?.contractAmt || 0);
+    const vehCntAmt= parseFloat(this.marketVehicleTableForm.controls['vehContAmt']?.value||0);
+    if(vehCntAmt>contractAmt){
+      Swal.fire('Alert','Vehicle contract amount should not be greater than contract amount','warning');
+      this.marketVehicleTableForm.controls['vehContAmt'].setValue(0);
+      this.marketVehicleTableForm.controls['margAMT'].setValue(0);
+      return false; 
+    }
+    const total=contractAmt-vehCntAmt
+    this.marketVehicleTableForm.controls['margAMT'].setValue(total.toFixed(2));
+  }
   async onVehicleNoChange() {
-    var vehData = await this.markerVehicleService.GetVehicleData(this.marketVehicleTableForm.value.vehicelNo);
+    const vehData = await this.markerVehicleService.GetVehicleData(this.marketVehicleTableForm.value.vehicelNo);
     if (vehData) {
       //this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP);
       this.marketVehicleTableForm.controls['vendor'].setValue(vehData.vndNM ?? '');
       this.marketVehicleTableForm.controls['vMobileNo'].setValue(vehData.vndPH ?? '');
       this.marketVehicleTableForm.controls['driver'].setValue(vehData.drvNM ?? '');
-      this.marketVehicleTableForm.controls['driverPan'].setValue(vehData.pANNO ?? '');
+      this.marketVehicleTableForm.controls['venPan'].setValue(vehData.pANNO ?? '');
       this.marketVehicleTableForm.controls['lcNo'].setValue(vehData.dLNO ?? '');
       this.marketVehicleTableForm.controls['lcExpireDate'].setValue(vehData.dLEXP ?? new Date());
       this.marketVehicleTableForm.controls['dmobileNo'].setValue(vehData.drvPH ?? '');
+      this.marketVehicleTableForm.controls['vehContAmt'].setValue(vehData.vEHCNAMT ?? '');
+      this.marketVehicleTableForm.controls['margAMT'].setValue(vehData.mRGAMT ?? '');
+      this.marketVehicleTableForm.controls['roadPrt'].setValue(vehData.rDPRT ?? '');
+      this.marketVehicleTableForm.controls['engineNo'].setValue(vehData.eNGNO ?? '');
+      this.marketVehicleTableForm.controls['chasisNo'].setValue(vehData.cHNO ?? '');
       this.marketVehicleTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
       this.marketVehicleTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
+      this.marketVehicleTableForm.controls['ETA'].setValue(vehData.ETA ?? '');
+      this.marketVehicleTableForm.controls['uploadSupport'].setValue(vehData.sDOC ?? '');
     }
   }
 
@@ -123,5 +152,16 @@ export class AddMarketVehicleComponent implements OnInit {
   }
   closeDialog() {
     this.dialogRef.close();
+  }
+  async getFilePod(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadSupport",this.marketVehicleTableForm,this.imageData,"Market Vehicle",'Masters',this.jsonControlVehicleArray, ["jpeg", "png", "jpg", "pdf"]);
+  }
+  openImageDialog(control) {
+    let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
   }
 }

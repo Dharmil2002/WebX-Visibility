@@ -8,6 +8,8 @@ import { DatePipe } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, UntypedFormGroup } from '@angular/forms';
 import { PodCodControl } from 'src/assets/FormControls/pod-cod-control';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 @Component({
   selector: 'app-pod-cod-dashboard-page',
   templateUrl: './pod-cod-dashboard-page.component.html'
@@ -155,7 +157,7 @@ export class PodCodDashboardPageComponent extends UnsubscribeOnDestroyAdapter im
   podCodForm: UntypedFormGroup;
   pod: boolean;
   // declararing properties
-  constructor(private fb: FormBuilder, private operationService: OperationService, private datePipe: DatePipe) {
+  constructor(private fb: FormBuilder, private operationService: OperationService, private datePipe: DatePipe, private storage: StorageService) {
     super();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
@@ -178,7 +180,7 @@ export class PodCodDashboardPageComponent extends UnsubscribeOnDestroyAdapter im
     this.getArrivalDetails();
 
     try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
+      this.companyCode = parseInt(this.storage.getItem(StoreKeys.CompanyCode));
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }

@@ -6,6 +6,8 @@ import {
   OnInit,
   Renderer2,
 } from "@angular/core";
+import { StoreKeys } from "src/app/config/myconstants";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-dashboard-layout",
@@ -16,13 +18,16 @@ export class DashboardLayoutComponent implements OnInit {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     public elementRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private storageService: StorageService
   ) {}
 
   ngOnInit(): void {
-    var selectedBgColor = "blue";
+    const selectedBgColor = "blue";    
     this.renderer.addClass(this.document.body, "theme-" + selectedBgColor);
-    localStorage.setItem("choose_skin", "theme-" + selectedBgColor);
-    localStorage.setItem("choose_skin_active", selectedBgColor);
+    this.storageService.setItem(StoreKeys.Choose_Skin, "theme-" + selectedBgColor);
+    this.storageService.setItem(StoreKeys.Choose_Skin_Active, selectedBgColor);
+    this.storageService.setItem(StoreKeys.MenuOption, "menu_dark");
+    this.storageService.setItem(StoreKeys.Choose_LogoHeader, "logo-black");
   }
 }

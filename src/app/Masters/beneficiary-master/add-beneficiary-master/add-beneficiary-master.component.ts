@@ -18,7 +18,7 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: './add-beneficiary-master.component.html'
 })
 export class AddBeneficiaryMasterComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   jsonHeaderControl: any
   jsonDetailControl: any
   beneficiaryHeaderForm: UntypedFormGroup
@@ -127,6 +127,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     private dialog: MatDialog,
     private storage: StorageService,
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.beneficiaryTabledata = this.route.getCurrentNavigation().extras.state.data;
       // console.log(this.beneficiaryTabledata);   

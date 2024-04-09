@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -13,7 +14,7 @@ export class AddressMasterListComponent implements OnInit {
   menuItemflag: boolean = false;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = []
   columnHeader = {
     eNTDT: {
@@ -74,7 +75,8 @@ export class AddressMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/AddressMaster/AddAddressMaster";
   }
   ngOnInit(): void {

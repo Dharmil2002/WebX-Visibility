@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { ProductServicesComponent } from '../../product-master/product-services/product-services.component';
 import { ProductShardControls } from 'src/assets/FormControls/ProductShardControls';
 import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-shard-product-services',
@@ -55,7 +56,7 @@ export class ShardProductServicesComponent implements OnInit {
   ServicesTypeList: any;
   jsonControlArray: any[];
   customerTableForm: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   ServicesNameCode: string;
   ServicesNameStatus: any;
   ServicesTypeCode: string;
@@ -78,8 +79,10 @@ export class ShardProductServicesComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storage: StorageService,
     public dialogRef: MatDialogRef<ProductServicesComponent>
   ) {
+    this.companyCode = this.storage.companyCode;
     this.ProductId = data.element.ProductID;
     this.ProductName = data.element.ProductName;
   }
@@ -148,7 +151,7 @@ export class ShardProductServicesComponent implements OnInit {
     const Body = {
       sERNM: this.customerTableForm.value.ServicesName,
       mODDT: new Date(),
-      mODBY: localStorage.getItem("UserName"),
+      mODBY: this.storage.userName,
     };
     if (!this.isUpdate) {
       let Tablereq = {

@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class VendorAssociateControls {
   VendorAssociateArray: FormControls[];
@@ -230,7 +232,7 @@ export class VendorAssociateControls {
         label: "",
         placeholder: "",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -240,7 +242,7 @@ export class VendorAssociateControls {
         label: "",
         placeholder: "",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,

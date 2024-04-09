@@ -40,9 +40,9 @@ export class vendOutControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "1", name: "Vendor Invoice Generation" },
-                         { value: "2", name: "Vendor Invoice Finalization" },
-                         { value: "3", name: "Vendor Invoice Payment" },
+                         { value: "1", name: "Generation" },
+                         { value: "2", name: "Finalization" },
+                         { value: "4", name: "Payment" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -61,7 +61,7 @@ export class vendOutControl {
                {
                     name: 'loc',
                     label: 'Location',
-                    placeholder: 'From Location',
+                    placeholder: '',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],
@@ -93,7 +93,7 @@ export class vendOutControl {
                {
                     name: 'vennmcd',
                     label: 'Vendor Name & Code',
-                    placeholder: 'From Location',
+                    placeholder: '',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],

@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import moment from "moment";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -55,10 +56,12 @@ export class ConsignmentOperationComponent implements OnInit {
     },
   };
   staticField = ["Date", "Activity", "eVNID", "Event", "CumulativeDays"];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   TableData: any = [];
   DocData: any;
-  constructor(private Route: Router, private masterService: MasterService) {
+  constructor(private Route: Router, private masterService: MasterService, private storage: StorageService) {
+    this.CompanyCode = this.storage.companyCode;
+
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.DocData = this.Route.getCurrentNavigation().extras?.state.data;
       // console.log('this.DocData' ,this.DocData)
@@ -83,7 +86,7 @@ export class ConsignmentOperationComponent implements OnInit {
   }
 
   async getTableData(filter) {
-    const Mode = localStorage.getItem("Mode");
+    const Mode = this.storage.mode;
     const req = {
       companyCode: this.CompanyCode,
       collectionName: Mode == "FTL" ? "docket_events" : "docket_events_ltl",

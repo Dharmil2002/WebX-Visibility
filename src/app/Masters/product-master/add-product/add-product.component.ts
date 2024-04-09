@@ -16,6 +16,7 @@ import { FormControls } from "src/app/core/models/FormControl/formcontrol";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-add-product",
@@ -37,7 +38,7 @@ export class AddProductComponent implements OnInit {
   customerTableForm: any;
   ProductNameCode: string;
   ProductNameStatus: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   tableData: any[];
   ProductNameData: any[];
   constructor(
@@ -45,8 +46,11 @@ export class AddProductComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storage: StorageService,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    this.companyCode = this.storage.companyCode;
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -125,7 +129,7 @@ export class AddProductComponent implements OnInit {
       ProductID: this.customerTableForm.value.ProductID,
       companyCode: this.companyCode,
       updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
+      updatedBy: this.storage.userName,
     };
     req = {
       companyCode: this.companyCode,

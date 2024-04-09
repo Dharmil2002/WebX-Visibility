@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 
@@ -28,7 +29,7 @@ export class TrackDcrSeriesComponent implements OnInit {
   docTypeStatus: any;
   data: any;
 
-  constructor(private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils, private router: Router) { }
+  constructor(private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils, private router: Router, private storage: StorageService) { }
 
   ngOnInit(): void {
     this.intializeFormControls();
@@ -82,7 +83,7 @@ export class TrackDcrSeriesComponent implements OnInit {
       return; // Stop execution if documentNumber is null or empty
     }
     let req = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "dcr"
     }

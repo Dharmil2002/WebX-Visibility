@@ -40,8 +40,8 @@ export class VendorWiseOutService {
                          'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
                     },
 
-                    ...(vendorNames.length > 0 ? [{ 'vND.nM': { 'D$in': vendorNames } }] : []), // Vendor names condition
-                    ...(locCodes.length > 0 ? [{ eNTLOC: { 'D$in': locCodes } }] : []), // Location code condition
+                    ...(vendorNames.length > 0 ? [{ D$expr: { D$in: ["$vND.nM", vendorNames] } }] : []), // Vendor names condition
+                    ...(locCodes.length > 0 ? [{ D$expr: { D$in: ["$eNTLOC", locCodes] } }] : []), // Location code condition
                     ...(reportbasis ? [{ 'bSTAT': parseInt(reportbasis) }] : []),
                ],
           };
@@ -137,7 +137,7 @@ export class VendorWiseOutService {
                                         },
                                    },
                                    paidAmount: {
-                                        D$sum: "$billpay.aMT",
+                                        D$sum: "$billpay.aMT", 
                                    },
                               },
                          },

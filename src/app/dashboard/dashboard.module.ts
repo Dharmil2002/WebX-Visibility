@@ -28,6 +28,8 @@ import { ArrivalDashboardPageComponent } from './tabs/arrival-dashboard-page/arr
 import { SharedComponentsModule } from "../shared-components/shared-components.module";
 import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.component';
 import { UpdateStockComponent } from './ActionPages/update-stock/update-stock.component';
 import { DepartureDashboardPageComponent } from "./tabs/departure-dashboard-page/departure-dashboard-page.component";
@@ -60,6 +62,7 @@ import { DeliveryMrResponseModalComponent } from './tabs/Delivery MR Generation/
 import { PrqBulkUploadComponent } from './tabs/prq-bulk-upload/prq-bulk-upload.component';
 import { HomePageComponent } from "./HomePage/home-page/home-page.component";
 import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-dashboard.component";
+
 @NgModule({
   declarations: [
     DocketDashboardComponent,
@@ -102,7 +105,7 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     chartjsModule,
     MatMenuModule,
     MatIconModule,
-    MatButtonModule,
+    MatButtonModule,    
     MatSnackBarModule,
     PerfectScrollbarModule,
     NgApexchartsModule,
@@ -122,7 +125,9 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     MatProgressSpinnerModule,
     MatTabsModule,
     SharedComponentsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatChipsModule,
+    MatButtonToggleModule
   ],
   providers: [SnackBarUtilityService, DatePipe, utilityService, FilterUtils]
 })

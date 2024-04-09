@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
+import { CustomerMasterUploadComponent } from '../customer-master-upload/customer-master-upload.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-customer-master-list',
   templateUrl: './customer-master-list.component.html',
@@ -10,7 +13,7 @@ export class CustomerMasterListComponent implements OnInit {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = []
   columnHeader = {
     "updatedDate": "Created Date",
@@ -22,30 +25,30 @@ export class CustomerMasterListComponent implements OnInit {
   };
 
   headerForCsv = {
-  "companyCode": "companyCode",
-  "updatedDate": "Created Date",
-  "customerCode": "Customer Code",
-  "customerGroup": "Customer Group",
-  "customerName": "Customer Name",
-  "CustomerCategory": "Customer Category",
-  "customerLocations": "Customer Locations",
-  "Customer_Emails": "Customer E-mails",
-  "ERPcode": "ERP code",
-  "PANnumber": "PAN No",
-  "CINnumber": "CIN number",
-  "RegisteredAddress":"Registered Address",
-  "PinCode": "Pin Code",
-  "city": "City",
-  "state": "State",
-  "Country": "Country",
-  "MSMENumber":"MSME Number",
-  "gstNo": "GST Number",
-  "gstState":"GST State",
-  "gstPinCode":"GST Pin Code",
-  "gstCity":"GST City",
-  "gstAddres": "GST Address",
-  "BlackListed": "Black Listed",
-  "activeFlag":"Active Status",
+    "companyCode": "companyCode",
+    "updatedDate": "Created Date",
+    "customerCode": "Customer Code",
+    "customerGroup": "Customer Group",
+    "customerName": "Customer Name",
+    "CustomerCategory": "Customer Category",
+    "customerLocations": "Customer Locations",
+    "Customer_Emails": "Customer E-mails",
+    "ERPcode": "ERP code",
+    "PANnumber": "PAN No",
+    "CINnumber": "CIN number",
+    "RegisteredAddress": "Registered Address",
+    "PinCode": "Pin Code",
+    "city": "City",
+    "state": "State",
+    "Country": "Country",
+    "MSMENumber": "MSME Number",
+    "gstNo": "GST Number",
+    "gstState": "GST State",
+    "gstPinCode": "GST Pin Code",
+    "gstCity": "GST City",
+    "gstAddres": "GST Address",
+    "BlackListed": "Black Listed",
+    "activeFlag": "Active Status",
   }
 
   breadScrums = [
@@ -65,7 +68,12 @@ export class CustomerMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
-  constructor(private masterService: MasterService) {
+  uploadComponent = CustomerMasterUploadComponent;
+  constructor(private masterService: MasterService,
+    private dialog: MatDialog,
+    private storage: StorageService
+  ) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
 
@@ -118,7 +126,7 @@ export class CustomerMasterListComponent implements OnInit {
     delete det._id;
     // delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customer_detail",
       filter: { _id: id },
       update: det
@@ -138,4 +146,15 @@ export class CustomerMasterListComponent implements OnInit {
       }
     });
   }
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getCustomerDetails();
+    });
+  }
+  //#endregion
 }

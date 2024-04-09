@@ -1,6 +1,8 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { finYear } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
 import { VendorMaster } from "src/app/core/models/Masters/vendor-master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class VendorControl {
   vendorControlArray: FormControls[];
@@ -460,7 +462,7 @@ export class VendorControl {
         label: "Company Code",
         placeholder: "Company Code",
         type: "text",
-        value: parseInt(localStorage.getItem("companyCode")),
+        value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -493,7 +495,7 @@ export class VendorControl {
         label: "Entry By",
         placeholder: "Entry By",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,

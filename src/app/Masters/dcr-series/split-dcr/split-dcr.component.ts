@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-split-dcr',
   templateUrl: './split-dcr.component.html'
@@ -36,7 +37,7 @@ export class SplitDcrComponent implements OnInit {
   newCategoryStatus: any;
   newPerson: any;
   newPersonStatus: any;
-  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
+  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = this.route.getCurrentNavigation()?.extras.state.data;
     }
@@ -140,7 +141,7 @@ export class SplitDcrComponent implements OnInit {
     this.dcrSplitForm.controls["_id"].setValue(this.dcrSplitForm.value.bookCode);
     this.dcrSplitForm.controls["action"].setValue('Split');
     let getReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "dcr"
     }
@@ -170,7 +171,7 @@ export class SplitDcrComponent implements OnInit {
 
           }
           let req = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
+            companyCode: this.storage.companyCode,
             collectionName: "dcr",
             data: this.dcrSplitForm.value
           };
@@ -196,25 +197,25 @@ export class SplitDcrComponent implements OnInit {
   getAllMastersData() {
     // Prepare the requests for different collections
     let locationReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "location_detail"
     };
 
     let userReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "user_master"
     };
 
     let vendorReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "vendor_detail"
     };
 
     let customerReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "customer_detail"
     };

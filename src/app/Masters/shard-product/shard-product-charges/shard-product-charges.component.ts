@@ -76,7 +76,7 @@ export class ShardProductChargesComponent implements OnInit {
   SelectChargesStatus: any;
   ChargesBehaviourCode: string;
   ChargesBehaviourStatus: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   ChargesData: any[] = [];
   UpdatedData: any;
   isUpdate: boolean = false;
@@ -89,6 +89,7 @@ export class ShardProductChargesComponent implements OnInit {
     public dialogRef: MatDialogRef<ShardProductChargesComponent>,
     private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.ProductId = data.element.ProductID;
     this.ProductName = data.element.ProductName;
   }
@@ -145,7 +146,7 @@ export class ShardProductChargesComponent implements OnInit {
       cHTY: this.TableForm.value.ChargesType,
       cHBTY: this.TableForm.value.ChargesBooktype,
       mODDT: new Date(),
-      mODBY: localStorage.getItem("UserName"),
+      mODBY: this.storage.userName,
       aCTV: true,
     };
 

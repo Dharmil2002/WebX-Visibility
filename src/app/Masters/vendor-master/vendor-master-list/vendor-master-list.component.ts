@@ -5,6 +5,8 @@ import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
+import { MatDialog } from "@angular/material/dialog";
+import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-master-upload.component";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -12,7 +14,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 export class VendorMasterListComponent implements OnInit {
   data: [] | any;
   csv: any[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any =0;
   csvFileName: string;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   // Define column headers for the table
@@ -78,10 +80,13 @@ export class VendorMasterListComponent implements OnInit {
   linkArray = []
   addAndEditPath: string;
   viewComponent: any;
+  uploadComponent = VendorMasterUploadComponent
   constructor(
     private masterService: MasterService,
-    private storage:StorageService
-    ) {
+    private storage: StorageService,
+    private dialog: MatDialog
+  ) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/VendorMaster/AddVendorMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -94,7 +99,7 @@ export class VendorMasterListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vendor_detail",
-      "filter": {companyCode:this.storage.companyCode}
+      "filter": { companyCode: this.storage.companyCode }
     }
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res) {
@@ -126,10 +131,10 @@ export class VendorMasterListComponent implements OnInit {
     delete det.eNTDT;
     delete det.vendorType;
     det['mODDT'] = new Date()
-    det['mODBY'] = localStorage.getItem("UserName")
-    det['mODLOC'] = localStorage.getItem("Branch")
+    det['mODBY'] = this.storage.userName
+    det['mODLOC'] = this.storage.branch
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "vendor_detail",
       filter: { vendorCode: vendorCode },
       update: det
@@ -146,4 +151,15 @@ export class VendorMasterListComponent implements OnInit {
       this.getVendorDetails();
     }
   }
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getVendorDetails();
+    });
+  }
+  //#endregion
 }

@@ -31,7 +31,7 @@ import { DcrAllocationForm } from "src/assets/FormControls/dcr_allocation_contro
 })
 export class DcrAllocationComponent implements OnInit {
   DCRTableForm: UntypedFormGroup;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   DCRTable: any;
   DCRFormControls: DcrAllocationForm;
   jsonControlCustomerArray: any;
@@ -57,7 +57,7 @@ export class DcrAllocationComponent implements OnInit {
     },
   ];
   splitSeries: SeriesRange[];
-
+  action:any;
   //#region constructor
   constructor(
     private fb: UntypedFormBuilder,
@@ -70,9 +70,12 @@ export class DcrAllocationComponent implements OnInit {
     private locationService: LocationService,
     private vendorService: VendorService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.DCRTable = new DCRModel();
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.DCRTable = route.getCurrentNavigation().extras.state.data.columnData;
+      const dcrTable = route.getCurrentNavigation().extras.state.data?.columnData||route.getCurrentNavigation().extras.state.data;
+      this.DCRTable=dcrTable.data;
+      this.action=dcrTable.label
     }
     this.initializeFormControl();
   }
@@ -395,11 +398,15 @@ export class DcrAllocationComponent implements OnInit {
     const splitTo = formData.to;
 
     let seriesData: any[] = [];
-
+    delete this.DCRTable.eNTDT;
+    delete this.DCRTable.eNTBY;
+    delete this.DCRTable.eNTLOC;
+    if(!this.splitSeries){
+      await this.isSeriesValid();
+    }
     //Check Series is split or not
     this.splitSeries.forEach((m) => {
       var ns = { ...this.DCRTable };
-
       if (m.to != ns.tO || m.from != ns.fROM) {
         //Series is splitted
         ns.fROM = m.from;
@@ -407,7 +414,6 @@ export class DcrAllocationComponent implements OnInit {
         ns.pAGES = m.itemCount;
         ns.oBOOK = ns.bOOK;
       }
-
       if (m.from == splitFrom) {
         ns.aLOTO = this.DCRTableForm.value?.AllocateTo || ""; //L: Location, C: Customer
         ns.aLOTONM = aLOCTONM?.name || "";
@@ -417,8 +423,8 @@ export class DcrAllocationComponent implements OnInit {
         ns.aSNTONM = aSNTO?.name || ""; //E: Location, B: BA, C: Customer
         ns.aSNCD = this.DCRTableForm.value?.name?.value || "";
         ns.aSNNM = this.DCRTableForm.value?.name?.name || "";
-        ns.sTS = ns.aSNTO == "" ? DcrEvents.Allocated : DcrEvents.Assigned;
-        ns.sTSN =
+        ns.sTS = this.action=="Reallocate"?DcrEvents.Reallocated:ns.aSNTO == "" ? DcrEvents.Allocated : DcrEvents.Assigned;
+        ns.sTSN =this.action=="Reallocate"?DcrEvents[DcrEvents.Reallocated]:
           ns.aSNTO == ""
             ? DcrEvents[DcrEvents.Allocated]
             : DcrEvents[DcrEvents.Assigned];
@@ -446,10 +452,20 @@ export class DcrAllocationComponent implements OnInit {
         }
       }
       delete ns.action;
+      delete ns.actions;
+      if(this.action=="Reallocate"){
+        ns.rALLDT= new Date(),
+        ns.rALLOCA= true,
+        ns.rALLBY= this.storage.userName
+        ns.rALLOC=this.storage.branch
+        ns.mODBY = this.storage.userName;
+        ns.mODDT = new Date();
+        ns.mODLOC = this.storage.branch;
+      }
       seriesData.push(ns);
     });
 
-    seriesData.forEach(async (s, i) => {
+     seriesData.forEach(async (s, i) => {
       if (s.fROM != this.DCRTable.fROM) {
         const bookNo = this.bookData.length - 1 + (i + 1);
         s.bOOK = `${s.bOOK}-${bookNo}`;
@@ -458,7 +474,7 @@ export class DcrAllocationComponent implements OnInit {
 
       if (s.bOOK == this.DCRTable.bOOK) {
         let req = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           collectionName: "dcr_header",
           filter: { _id: s._id },
           update: s,
@@ -486,14 +502,14 @@ export class DcrAllocationComponent implements OnInit {
 
         let history = this.getHistoryDate(s, true, isSplit, isStatusChanged);
          let reqhistory = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           collectionName: "dcr_history",
           data: history,
         };
         await firstValueFrom(this.masterService.masterPost("generic/create", reqhistory));
       } else {
         let req = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           collectionName: "dcr_header",
           data: s,
         };
@@ -516,7 +532,7 @@ export class DcrAllocationComponent implements OnInit {
         }
         let history = this.getHistoryDate(s, false, false, true);
         let reqhistory = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           collectionName: "dcr_history",
           data: history,
         };

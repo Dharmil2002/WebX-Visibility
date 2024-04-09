@@ -23,6 +23,8 @@ import { VirtualLoginComponent } from "../virtual-login/virtual-login.component"
 import { StorageService } from "src/app/core/service/storage.service";
 import { SearchComponent } from "./search/search.component";
 import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
+import { StoreKeys } from "src/app/config/myconstants";
+import { Subscription } from "rxjs";
 const document: any = window.document;
 
 @Component({
@@ -39,7 +41,7 @@ export class HeaderComponent
   isNavbarShow = true;
   flagvalue;
   BaseTimeZone;
-  CurrentMode = localStorage.getItem('Mode');
+  CurrentMode = "";
   FinancialYear: string;
   countryName;
   langStoreValue: string;
@@ -55,6 +57,8 @@ export class HeaderComponent
   searchData: any;
   logo: string;
   companyCd: string;
+  storageSub: Subscription = new Subscription();
+  storageSearch: Subscription = new Subscription();
 
   constructor(
     private dialogModel: MatDialog,
@@ -72,6 +76,7 @@ export class HeaderComponent
     private breakpointObserver: BreakpointObserver
   ) {
     super();
+    this.Mode = this.storage.mode;
     this.breakpointObserver
       .observe(["(max-width: 768px)"])
       .subscribe((result: BreakpointState) => {
@@ -106,23 +111,43 @@ export class HeaderComponent
     this.config = this.configService.configData;
     this.logo = this.storage.companyLogo;
     this.companyCd = this.storage.companyCd;
-    this.Mode = localStorage.getItem("Import");
-    this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
+    this.CurrentMode = this.storage.mode;
+    this.bindMenu();
+
+    this.storageSub = this.storage.watchStorage(StoreKeys.Mode).subscribe((data: string | null) => {      
+      this.CurrentMode = this.storage.mode; 
+    });
+
+    this.storageSearch = this.storage.watchStorage(StoreKeys.SearchData).subscribe((data: string | null) => {     
+      this.bindMenu(this.storage.getItem(StoreKeys.SearchData));
+    });
+    
+    this.convertTimeFromUtc(new Date(),  this.storage.timeZone || 'Asia/Kolkata');
     this.getCurrentFinancialYear();
   }
+
+  ngOnDestroy() {
+    if (this.storageSub) {
+      this.storageSub.unsubscribe();
+    }
+    if(this.storageSearch) {
+      this.storageSearch.unsubscribe();
+    }
+  }
+
   ngAfterViewInit() {
     // set theme on startup
-    if (localStorage.getItem("theme")) {
+    if (this.storage.getItem(StoreKeys.Theme)) {
       this.renderer.removeClass(this.document.body, this.config.layout.variant);
-      this.renderer.addClass(this.document.body, localStorage.getItem("theme"));
+      this.renderer.addClass(this.document.body, this.storage.getItem(StoreKeys.Theme));
     } else {
       this.renderer.addClass(this.document.body, this.config.layout.variant);
     }
 
-    if (localStorage.getItem("menuOption")) {
+    if (this.storage.getItem(StoreKeys.MenuOption)) {
       this.renderer.addClass(
         this.document.body,
-        localStorage.getItem("menuOption")
+        this.storage.getItem(StoreKeys.MenuOption)
       );
     } else {
       this.renderer.addClass(
@@ -131,10 +156,10 @@ export class HeaderComponent
       );
     }
 
-    if (localStorage.getItem("choose_logoheader")) {
+    if (this.storage.getItem(StoreKeys.Choose_LogoHeader)) {
       this.renderer.addClass(
         this.document.body,
-        localStorage.getItem("choose_logoheader")
+        this.storage.getItem(StoreKeys.Choose_LogoHeader)
       );
     } else {
       this.renderer.addClass(
@@ -143,8 +168,8 @@ export class HeaderComponent
       );
     }
 
-    if (localStorage.getItem("sidebar_status")) {
-      if (localStorage.getItem("sidebar_status") === "close") {
+    if (this.storage.getItem(StoreKeys.Sidebar_Status)) {
+      if (this.storage.getItem(StoreKeys.Sidebar_Status) === "close") {
         this.renderer.addClass(this.document.body, "side-closed");
         this.renderer.addClass(this.document.body, "submenu-closed");
       } else {
@@ -158,7 +183,6 @@ export class HeaderComponent
       }
     }
   }
-
 
   callFullscreen() {
     if (
@@ -221,10 +245,10 @@ export class HeaderComponent
     });
   }
   get CurrentLocation(): any {
-    return localStorage.getItem('Branch');
+    return this.storage.branch;
   }
   get CompanyLogo(): any {
-    return localStorage.getItem('company_Logo');
+    return this.storage.companyLogo;
   }
 
   convertTimeFromUtc(utcDate: Date, timeZone: string = ''): Date {
@@ -236,7 +260,7 @@ export class HeaderComponent
   getCurrentFinancialYear() {
     const thisYear = (new Date()).getFullYear();
     const lastYear = thisYear + 1;
-    this.FinancialYear = `${thisYear}-${lastYear}`;
+    this.FinancialYear = `${thisYear}-${lastYear.toString().slice(-2)}`;
   }
 
   toggleDropdown() {
@@ -246,7 +270,7 @@ export class HeaderComponent
   menuModeDetail(option: string) {
     this.storage.setItem("Mode", option);
 
-    this.setMenuToBind(option);
+    //this.setMenuToBind(option);
     
     //location.reload();
     this.router.navigate(['/']);
@@ -255,14 +279,14 @@ export class HeaderComponent
   }
 
   setMenuToBind(mode) {
-    let menu = JSON.parse( this.storage.menu);
+    let menu = JSON.parse( this.storage.menu);    
     let menuItems = menu.filter((x) => !x.MenuGroup || x.MenuGroup == mode.toUpperCase() || x.MenuGroup == "" || x.MenuGroup == "ALL");
-
+    
     let menuData = this.menuService.buildHierarchy(menuItems);
     let root = menuData.find((x) => x.MenuLevel == 1);
-    this.storage.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
+    this.storage.setItem(StoreKeys.MenuToBind, JSON.stringify(root.SubMenu || []));
 
-    const searchData = menu.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
+    const searchData = menuItems.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
       const p = menu.find((y) => y.MenuId == x.ParentId);      
       const d = {
         title: `${p?.MenuName}/${x.MenuName}`,  
@@ -273,7 +297,7 @@ export class HeaderComponent
       return d;
     });
 
-    this.storage.setItem("searchData", JSON.stringify(searchData || []));
+    this.storage.setItem(StoreKeys.SearchData, JSON.stringify(searchData || []));
   }
 
   openSearchPopup(): void {
@@ -325,12 +349,18 @@ export class HeaderComponent
     }
   }
   navigateToPage() {
-    this.goBack('0');
+    this.router.navigate(['/dashboard/home']);
   }
-  async bindMenu() {    
-    this.searchData = JSON.parse(this.storage.getItem("searchData"));
 
-    const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
+  async bindMenu(data = null) {        
+    if(data) {
+      this.searchData = JSON.parse(data);
+    }
+    else if (this.storage.getItem(StoreKeys.SearchData)) {
+      this.searchData = JSON.parse(this.storage.getItem(StoreKeys.SearchData));
+    }
+
+    const searchDetail = this.searchData?.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
   }
 

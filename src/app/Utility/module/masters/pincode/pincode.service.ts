@@ -1,23 +1,27 @@
 import { Injectable } from "@angular/core";
+import { cp } from "fs";
 import { firstValueFrom } from "rxjs";
 import { filterAndUnique } from "src/app/Utility/Form Utilities/filter-utils";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: "root",
 })
 export class PinCodeService {
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   constructor(private masterService: MasterService,
-    private filter: FilterUtils) {
-
+    private storage: StorageService,
+    private filter: FilterUtils
+  ) {
+    this.companyCode = this.storage.companyCode;
   }
   async pinCodeDetail(filter = {}) {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "pincode_master",
       filter: filter,
     };
@@ -107,7 +111,7 @@ export class PinCodeService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode: this.storage.companyCode,
           collectionName: "pincode_master",
           filter,
         };
@@ -149,7 +153,7 @@ export class PinCodeService {
   }
   async getCityDetails(filter = {}) {
     const cityBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "pincode_master",
       filter: filter,
     };
@@ -177,7 +181,7 @@ export class PinCodeService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode: this.storage.companyCode,
           collectionName: "pincode_master",
           filter,
         };
@@ -216,7 +220,7 @@ export class PinCodeService {
       if (value.length >= 3) {
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode: this.storage.companyCode,
           collectionName: "pincode_master",
           filter,
         };
@@ -249,7 +253,7 @@ export class PinCodeService {
       if (value.length >= 3) {
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode: this.storage.companyCode,
           collectionName: "state_master",
           filter,
         };

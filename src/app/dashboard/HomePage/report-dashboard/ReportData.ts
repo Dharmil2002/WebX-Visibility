@@ -1,27 +1,27 @@
 export const menuData = [
   {
     title: "All",
-    functionName: "",
+    category: "",
   },
   {
     title: "Order Status",
-    functionName: "",
+    category: "StatusDocket",
   },
   {
     title: "Delivery Performance",
-    functionName: "",
+    category: "",
   },
   {
     title: "POD Analytics",
-    functionName: "",
+    category: "",
   },
   {
     title: "LSP Performance",
-    functionName: "",
+    category: "",
   },
   {
     title: "Utilities",
-    functionName: "",
+    category: "",
   },
   
 ];
@@ -31,162 +31,194 @@ export const ReportData = [
     {
       iconName: "event_note",
       title: "Status of Docket",
-      functionName: "StatusDocket",
+      category: "StatusDocket",
+      type: "Report"
     },
     {
       iconName: "history",
       title: "Panding Bookings",
-      functionName: "StatusDocket",
+      category: "StatusDocket",
+      type: "Report"
     },
     {
       iconName: "sync",
       title: "Flow of Orders",
-      functionName: "StatusDocket",
+      category: "StatusDocket",
+      type: "Report"
     },
     {
-      iconName: "local_shipping",
+      iconName: "sticky_note_2",
       title: "Panding Deliveries",
-      functionName: "StatusDocket",
+      category: "StatusDocket",
+      type: "Report"
     },
     
     {
       title: "Invoice Listing",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Pending Bookings V1",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "DCRDetailReport",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Freight Calculation Report",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "ending DeliveriesStatus Discrepancy",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LAPP Order Report",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Pending Bookings V2",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Delay Docket Report",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "EDD VS ADD",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP Wise EDD Summary",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "EDD Calculation Report",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "POD Audit",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "POD Availability",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Reverse Pickups",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Return Operations",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Reverse Summary Report",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Delay Register Report",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP Performances",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP Order Trend",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP API Status",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP Service Status",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Order Status by LSP",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP Selector Performance",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Usage Monitoring",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Performance of Status POD APIs",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Billing Register",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "Billing Register Upload Date Wise",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
     {
       title: "LSP Freight Audit Summary",
-      iconName: "local_shipping",
-      functionName:""
+      iconName: "sticky_note_2",
+      category:"",
+      type: "Report"
     },
   ];

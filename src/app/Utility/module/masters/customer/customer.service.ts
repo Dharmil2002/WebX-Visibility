@@ -2,19 +2,20 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: "root",
 })
 export class CustomerService {
-  constructor(private masterService: MasterService, private filter: FilterUtils) { }
+  constructor(private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) { }
 
   // This async function retrieves customer data from an API using the masterService.
   async customerFromApi() {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "customer_detail",
       filter: {}, // You can specify additional filters here if needed
     };
@@ -50,7 +51,7 @@ export class CustomerService {
       if (!filter) return undefined;
 
       const cityBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         collectionName: "customer_detail",
         filter,
       };
@@ -83,7 +84,7 @@ export class CustomerService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode: this.storage.companyCode,
           collectionName: "customer_detail",
           filter,
         };
@@ -124,7 +125,7 @@ export class CustomerService {
   async customerFromFilter(filter = {}, flag = false) {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "customer_detail",
       filter: filter, // You can specify additional filters here if needed
     };
@@ -156,7 +157,7 @@ export class CustomerService {
   async customerGroupFilter(groupName) {
 
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "customerGroup_detail",
       filter: {
         activeFlag: true,

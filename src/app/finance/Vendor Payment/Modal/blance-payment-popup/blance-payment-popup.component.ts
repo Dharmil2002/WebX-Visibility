@@ -10,6 +10,7 @@ import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/Ven
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { GetAccountDetailFromApi } from "../../VendorPaymentAPIUtitlity";
+import { GetBankDetailFromApi } from "src/app/finance/Debit Voucher/debitvoucherAPIUtitlity";
 
 @Component({
   selector: "app-blance-payment-popup",
@@ -84,11 +85,7 @@ export class BlancePaymentPopupComponent implements OnInit {
       this.VendorBalancePaymentFilterForm.value.Accountinglocation?.name;
     switch (PaymentMode) {
       case "Cheque":
-        const responseFromAPIBank = await GetAccountDetailFromApi(
-          this.masterService,
-          "BANK",
-          Accountinglocation
-        );
+        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
         this.filter.Filter(
           this.jsonControlVendorBalancePaymentFilterArray,
           this.VendorBalancePaymentFilterForm,

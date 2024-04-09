@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-state-master-list',
@@ -12,7 +13,7 @@ export class StateMasterListComponent implements OnInit {
     csv: any[];
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     columnHeader =
         {
             "srNo": "Sr No",
@@ -58,7 +59,8 @@ export class StateMasterListComponent implements OnInit {
     addAndEditPath: string;
     csvFileName: string;
 
-    constructor(private masterService: MasterService) {
+    constructor(private masterService: MasterService, private storage: StorageService) {
+        this.companyCode = this.storage.companyCode;
         this.addAndEditPath = "/Masters/StateMaster/AddState";
     }
 

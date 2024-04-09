@@ -8,13 +8,14 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Subject, take, takeUntil } from 'rxjs';
 import { FilterControl } from 'src/assets/FormControls/filter.controls';
 import { customerFromApi, stateFromApi } from './filter-utlity';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-filter-billing',
   templateUrl: './filter-billing.component.html'
 })
 export class FilterBillingComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   jsonFilterArray: any;
   filterTableForm: UntypedFormGroup;
   filterControls: FilterControl;
@@ -36,8 +37,10 @@ export class FilterBillingComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storage: StorageService,
     public dialogRef: MatDialogRef<FilterBillingComponent>
   ) {
+    this.companyCode = this.storage.companyCode;
     this.initializeFormControl();
     this.bindDropdown();
   }

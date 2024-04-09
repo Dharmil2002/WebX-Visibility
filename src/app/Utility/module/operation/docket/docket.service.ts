@@ -132,7 +132,7 @@ export class DocketService {
 
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "dockets",
             filter: { "docNo": filter },
             update: data
@@ -145,7 +145,7 @@ export class DocketService {
     async updateDocketSuffix(filter, data) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "docket_operation_details",
             filter: filter,
             update: data
@@ -170,11 +170,9 @@ export class DocketService {
 
     /* below the function  was generated for the mapping of data */
     // Define a common service function
-    async processShipmentList(shipmentList, orgBranch) {
+    async processShipmentList(shipmentList) {
 
         const res = shipmentList.map((x) => {
-            if (x.oRGN === orgBranch || (x.dEST == orgBranch && x.status == "2")) {
-
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
                 const statusInfo = this.statusMapping[x.oSTS] || this.statusMapping.default;
                 x.ftCity = `${x.fCT}-${x.tCT}`;
@@ -184,7 +182,6 @@ export class DocketService {
                 x.billingParty = `${x.bPARTY}:${x.bPARTYNM}`//x.billingParty || "";
                 x.createOn = formatDocketDate(x?.eNTDT || new Date())
                 return x;
-            }
             return null;
         }).filter((x) => x !== null);
         // Sort the PRQ list by pickupDate in descending order
@@ -201,7 +198,7 @@ export class DocketService {
 
     async getDocket() {
         const req = {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.companyCode,
             "filter": { origin: this.storage.branch },
             "collectionName": "docket_temp"
         }
@@ -211,7 +208,7 @@ export class DocketService {
     }
     async getDockets(filter) {
         const req = {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.companyCode,
             "filter": filter,
             "collectionName": "dockets"
         }
@@ -223,7 +220,7 @@ export class DocketService {
     async addDktDetail(data) {
 
         const req = {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.companyCode,
             "collectionName": "docket_operation_details",
             "data": data
         }
@@ -573,7 +570,7 @@ export class DocketService {
                 }
                 // Prepare the pincodeBody with the companyCode and the determined filter
                 const cityBody = {
-                    companyCode: localStorage.getItem("companyCode"),
+                    companyCode: this.storage.companyCode,
                     collectionName: "dockets",
                     filter,
                 };
@@ -618,7 +615,7 @@ export class DocketService {
         try {
             // Prepare the pincodeBody with the companyCode and the determined filter
             const cityBody = {
-                companyCode: localStorage.getItem("companyCode"),
+                companyCode: this.storage.companyCode,
                 collectionName: "docket_containers",
                 filter: filter
             };
@@ -1400,5 +1397,68 @@ export class DocketService {
             return true
          }
         // }
+    async checkPrLrNoExistLTL(filter) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets",
+            filter: filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
+        return res.data.length > 0 ? true : false;
+    }
+    async getdocketOne(filter){
+        const req={
+            companyCode:this.storage.companyCode,
+            collectionName:"dockets",
+            filter:filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
+        return res.data
+    }
+    async getDocketsDetails() {
+        let matches = { 
+            "D$or":[
+                {oRGN:this.storage.branch},
+                {cLOC:this.storage.branch},
+                {dEST:this.storage.branch,oSTS:"3"}
+              ]
+          };
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets",
+            filters: [
+                {
+                  D$lookup: {
+                    from: "docket_ops_det",
+                    localField: "dKTNO",
+                    foreignField: "dKTNO",
+                    as: "docketsOPs",
+                  },
+                },
+                {
+                  D$unwind: {
+                    path: "$docketsOPs",
+                    preserveNullAndEmptyArrays: false,
+                  },
+                },
+                {
+                  D$addFields: {
+                    cLoc: "$docketsOPs.cLOC",
+                  },
+                },
+                {
+                    D$match: {
+                        D$or:
+                            [{oRGN:this.storage.branch},
+                            {cLoc:this.storage.branch},
+                            {dEST:this.storage.branch,oSTS: "3"}]
+                    }
+                }
+              ]
+
+        }
+        // Send request and handle response
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
+        return res.data;
     }
 }

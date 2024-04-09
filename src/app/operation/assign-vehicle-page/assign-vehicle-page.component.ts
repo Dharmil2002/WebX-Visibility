@@ -14,14 +14,15 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
 import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-assign-vehicle-page",
   templateUrl: "./assign-vehicle-page.component.html",
 })
 export class AssignVehiclePageComponent implements OnInit {
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  branchCode = localStorage.getItem("Branch");
+  companyCode = 0;
+  branchCode = "";
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   addFlag = true;
   dynamicControls = {
@@ -53,9 +54,12 @@ export class AssignVehiclePageComponent implements OnInit {
     public dialog: MatDialog,
     private _assignVehiclePageMethods: AssignVehiclePageMethods,
     private vehicleStatusService: VehicleStatusService,
-    private markerVehicleService: MarkerVehicleService
+    private markerVehicleService: MarkerVehicleService,
+    private storage: StorageService
   ) {
-
+    this.companyCode = this.storage.companyCode;
+    this.branchCode = this.storage.branch;
+    
     this.staticField.pop();
 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {

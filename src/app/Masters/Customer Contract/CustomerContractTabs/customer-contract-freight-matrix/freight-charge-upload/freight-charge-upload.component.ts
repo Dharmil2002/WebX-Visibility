@@ -53,7 +53,7 @@ export class FreightChargeUploadComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "cust_contract",
       filter: { docNo: this.CurrentContractDetails.cONID },
     };

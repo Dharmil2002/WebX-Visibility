@@ -24,7 +24,7 @@ import { StorageService } from "src/app/core/service/storage.service";
   templateUrl: "./add-vendor-master.component.html",
 })
 export class AddVendorMasterComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   action: string;
   isUpdate = false;
   vendorTabledata: VendorMaster;
@@ -147,6 +147,8 @@ export class AddVendorMasterComponent implements OnInit {
     private storage: StorageService,
     private tdsMasterService: TdsMasterService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.vendorTabledata.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata =
         this.route.getCurrentNavigation().extras.state.data;
@@ -190,6 +192,7 @@ export class AddVendorMasterComponent implements OnInit {
 
     if (this.action !== "edit") {
       this.vendorTabledata = new VendorMaster({});
+      this.vendorTabledata.companyCode = this.storage.companyCode;
     }
     this.initializeFormControl();
   }
@@ -626,7 +629,7 @@ export class AddVendorMasterComponent implements OnInit {
       delete data["eNTBY"];
       delete data["eNTLOC"];
       delete data["eNTDT"];
-      data["mODLOC"] = localStorage.getItem("Branch");
+      data["mODLOC"] = this.storage.branch;
       let req = {
         companyCode: this.companyCode,
         collectionName: "vendor_detail",
@@ -665,7 +668,7 @@ export class AddVendorMasterComponent implements OnInit {
         data["vendorCode"] = this.newVendorCode;
         data["_id"] = `${this.companyCode}-${this.newVendorCode}`;
         data["eNTDT"] = new Date();
-        data["eNTLOC"] = localStorage.getItem("Branch");
+        data["eNTLOC"] = this.storage.branch;
         const newData = this.tableData.map((x) => {
           const { actions, id, ...rest } = x;
           return rest;
@@ -836,7 +839,7 @@ export class AddVendorMasterComponent implements OnInit {
       const filterLowercase = { [fieldName]: fieldValue.toLowerCase() };
       // Create a request object with the filter criteria
       const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "vendor_detail",
         filter: { ...filterUppercase, ...filterLowercase },
       };

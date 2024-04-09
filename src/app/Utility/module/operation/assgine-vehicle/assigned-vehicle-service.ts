@@ -2,12 +2,14 @@ import { Injectable } from "@angular/core";
 import Swal from "sweetalert2";
 import { VehicleStatusService } from "../vehicleStatus/vehicle.service";
 import { updatePrqStatus } from "src/app/operation/prq-entry-page/prq-utitlity";
+import { StorageService } from "src/app/core/service/storage.service";
 @Injectable({
   providedIn: "root",
 })
 export class AssignedVehicleService {
   constructor(
     private vehicleStatusService: VehicleStatusService,
+    private storage: StorageService
   ) {
   }
   async showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item, market) {
@@ -28,7 +30,7 @@ export class AssignedVehicleService {
       prqDetail.vendorType = item.vendorType;
 
       let updateData = {
-          cID: prqDetail.cID || localStorage.getItem('companyCode'),
+          cID: prqDetail.cID || this.storage.companyCode,
           pRQNO: prqDetail.prqNo || prqDetail.pRQNO,
           sTS: "2",
           sTSNM: "Awaiting For Docket",

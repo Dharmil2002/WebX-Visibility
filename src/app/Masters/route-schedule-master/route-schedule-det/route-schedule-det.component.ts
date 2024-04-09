@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { forkJoin, map } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-route-schedule-det',
@@ -11,7 +12,7 @@ export class RouteScheduleDetComponent implements OnInit {
   tableLoad: boolean;
   weekDay: any;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private masterService: MasterService,) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private masterService: MasterService, private storage: StorageService) { }
   // Define column headers for the table
   columnHeader =
     {
@@ -49,19 +50,19 @@ export class RouteScheduleDetComponent implements OnInit {
   getRouteData() {
     // Create the requests to fetch data
     const vehicleReq = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       type: "masters",
       collection: "vehicle_detail",
     };
 
     const vendorReq = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       type: "masters",
       collection: "vendor_detail",
     };
 
     const vehicleTypeReq = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       type: "masters",
       collection: "vehicleType_detail",
     };

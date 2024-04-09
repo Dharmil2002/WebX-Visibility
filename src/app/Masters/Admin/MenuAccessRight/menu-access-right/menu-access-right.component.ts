@@ -11,6 +11,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
+import { StorageService } from "src/app/core/service/storage.service";
 import { TreeViewComponent } from "src/app/shared-components/tree-view/tree-view.component";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { menuAccesRightControl } from "src/assets/FormControls/MenuAccessRightControl";
@@ -26,7 +27,7 @@ export class MenuAccessRightComponent
 {
   @ViewChild(TreeViewComponent) treeViewComponent: TreeViewComponent;
   displayProgressSpinner: boolean;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   error: any;
   data: any;
   isUpdate = false;
@@ -54,8 +55,10 @@ export class MenuAccessRightComponent
     private masterService: MasterService,
     private menuService: MenuService,
     private router: Router,
+    private storage: StorageService
   ) {
     super();
+    this.companyCode = this.storage.companyCode;
     this.initializeFormControl();
   }
 
@@ -212,7 +215,7 @@ export class MenuAccessRightComponent
     const checkedValue = event.map((item) => item.id); // Get the checked value skipping the first item
     var jdata = {
       _id: `${this.companyCode}-${this.MenuAccessTableForm.value.Users.value}`,
-      cID: parseInt(localStorage.getItem("companyCode")),
+      cID: this.storage.companyCode,
       uSRID: this.MenuAccessTableForm.value.Users.value,
       uSRNM: this.MenuAccessTableForm.value.Users.name,
       mEST:
@@ -221,9 +224,9 @@ export class MenuAccessRightComponent
         checkedValue != undefined
           ? checkedValue
           : [],
-      eNTBY: localStorage.getItem("UserName"),
+      eNTBY: this.storage.userName,
       eNTDT: new Date(),
-      eNTLOC: localStorage.getItem("Branch"),
+      eNTLOC: this.storage.branch,
     };
     if (this.isUpdate) {
       let uSRID = jdata["uSRID"];
@@ -233,7 +236,7 @@ export class MenuAccessRightComponent
       delete jdata["eNTBY"];
       delete jdata["eNTLOC"];
       delete jdata["eNTDT"];
-      jdata["mODLOC"] = localStorage.getItem("Branch");
+      jdata["mODLOC"] = this.storage.branch;
       let req = {
         companyCode: this.companyCode,
         collectionName: "role_Access",

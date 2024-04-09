@@ -1,4 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -547,6 +550,9 @@ export class thcControl {
                             message: "Arrival Date is required",
                         },
                     ],
+                    functions: {
+                        onDate: "ArrivalDateChange"
+                    },
                     additionalData: {
                         minDate: maxDate,
                         metaData: "ArrivalInfo"
@@ -567,6 +573,7 @@ export class thcControl {
                     additionalData: {
                         metaData: "ArrivalInfo"
                     },
+                    
                     generatecontrol: true, disable: false
                 },
                 {
@@ -604,12 +611,83 @@ export class thcControl {
                     label: 'Arrival By',
                     placeholder: 'Arrival By',
                     type: 'text',
-                    value: localStorage.getItem("UserName"),
+                    value: StorageService.getItem(StoreKeys.UserId),
                     Validations: [],
                     additionalData: {
                         metaData: "ArrivalInfo"
                     },
                     generatecontrol: true, disable: true
+                },
+                {
+                    name: "UnloadingDate",
+                    label: 'Unloading Date',
+                    placeholder: 'Unloading Date',
+                    type: "datetimerpicker",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Unloading Date is required",
+                        },
+                    ],
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "ArrivalInfo"
+                    },
+                    functions: {
+                        onDate: "UpdateDays"
+                    },
+                },
+                {
+                    name: "DelayDays",
+                    label: 'Delay Days',
+                    placeholder: 'Delay Days',
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Delay Days is required",
+                        },
+                    ],
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "ArrivalInfo"
+                    },
+                    functions: {},
+                },
+                {
+                    name: "DetentionDays",
+                    label: 'Detention Days',
+                    placeholder: 'Detention Days',
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Detention Days is required",
+                        },
+                    ],
+                    functions: {},
+                    additionalData: {
+                        minDate: maxDate,
+                        metaData: "ArrivalInfo"
+                    },
                 },
                 {
                     name: 'capacity',
@@ -737,7 +815,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: localStorage.getItem("companyCode"),
+                    value: StorageService.getItem(StoreKeys.CompanyCode),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
@@ -751,7 +829,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: localStorage.getItem("UserName"),
+                    value: StorageService.getItem(StoreKeys.UserId),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
@@ -765,7 +843,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: localStorage.getItem("Branch"),
+                    value: StorageService.getItem(StoreKeys.Branch),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
@@ -1087,7 +1165,7 @@ export class thcControl {
             },
             {
                 name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
-                value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+                value: StorageService.getItem(StoreKeys.CompanyCode), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
                 Validations: [
                 ],
             },
@@ -1102,7 +1180,7 @@ export class thcControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

@@ -14,6 +14,7 @@ import { HolidayControl } from "src/assets/FormControls/holiday-master";
 import { Router } from "@angular/router";
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { DatePipe } from '@angular/common';
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: 'app-add-edit-holiday-master',
@@ -28,7 +29,7 @@ import { DatePipe } from '@angular/common';
 export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   holidayMasterForm: UntypedFormGroup;
   holidayMasterControls: HolidayControl;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   holidayEditData: Holiday;
   addForm: any;
   showDateWise = true;
@@ -62,8 +63,10 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
 
 
   constructor(public dialogRef: MatDialogRef<AddEditHolidayComponent>, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any,
-    private filter: FilterUtils, private route: Router, private masterService: MasterService, private datePipe: DatePipe) {
+    private filter: FilterUtils, private route: Router, private masterService: MasterService, private datePipe: DatePipe,
+    private storage: StorageService) {
     super();
+    this.companyCode = this.storage.companyCode;
     if (item?._id) {
       this.isUpdate = true;
       this.holidayEditData = new Holiday(item);
@@ -218,7 +221,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
         type: "DAY",
         holidayNote: '',
         isActive: '',
-        entryBy: localStorage.getItem('Username'),
+        entryBy: this.storage.userName,
         entryDate: new Date().toISOString(),
       }
     };
@@ -288,7 +291,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
         type: "DATE",
         holidayNote: holidayNote,
         isActive: this.holidayDateWiseForm.controls.isActive.value,
-        entryBy: localStorage.getItem('Username'),
+        entryBy: this.storage.userName,
         entryDate: new Date().toISOString(),
       }
     };

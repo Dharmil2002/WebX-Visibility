@@ -30,7 +30,7 @@ export class AddDcrSeriesComponent
   implements OnInit
 {
   @Input() data: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   // Breadcrumbs
   breadScrums = [
     {
@@ -74,6 +74,7 @@ export class AddDcrSeriesComponent
     private router: Router
   ) {
     super();
+    this.companyCode = this.storage.companyCode;
     this.initializeFormControl();
   }
 
@@ -117,7 +118,7 @@ export class AddDcrSeriesComponent
     };
 
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "dcr_header",
       data: dcr,
     };
@@ -137,7 +138,7 @@ export class AddDcrSeriesComponent
     };
 
     let reqHis = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "dcr_history",
       data: dcrHistory,
     };

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-beneficiary-master-list',
   templateUrl: './beneficiary-master-list.component.html'
 })
 export class BeneficiaryMasterListComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   addAndEditPath: string;
   tableData: any = [];
   tableLoad = true;
@@ -39,8 +40,8 @@ export class BeneficiaryMasterListComponent implements OnInit {
     'beneficiary': 'Name',
   };
   toggleArray = [""];
-  constructor(private masterService: MasterService) {
-
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
   }
 
   ngOnInit(): void {

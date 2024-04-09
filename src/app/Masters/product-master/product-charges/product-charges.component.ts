@@ -95,7 +95,7 @@ export class ProductChargesComponent implements OnInit {
   SelectChargesStatus: any;
   ChargesBehaviourCode: string;
   ChargesBehaviourStatus: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   ChargesData: any[] = [];
   UpdatedData: any;
   isUpdate: boolean = false;
@@ -107,6 +107,7 @@ export class ProductChargesComponent implements OnInit {
     public dialogRef: MatDialogRef<ProductChargesComponent>,
     private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.ProductId = data.element.ProductID;
     this.ProductName = data.element.ProductName;
   }

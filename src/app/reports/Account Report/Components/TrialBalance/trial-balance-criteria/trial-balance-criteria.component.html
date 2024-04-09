@@ -1,0 +1,11 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="TrialBalanceForm">
+        <app-form-webxpress [form]="TrialBalanceForm" [FormTitle]="'Trial Balance Report'"
+            [formData]="jsonproftandlossArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveButton]="TrialBalanceForm.valid==true ? true : false"
+            [submit]="'Submit'">
+        </app-form-webxpress>
+    </form>
+
+
+</app-common-wrapper-webxpress>

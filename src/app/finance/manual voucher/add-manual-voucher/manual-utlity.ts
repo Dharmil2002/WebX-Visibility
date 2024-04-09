@@ -1,3 +1,6 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 /**
  * Adds an invoice detail to the database.
  *
@@ -9,7 +12,7 @@ export async function addVoucherDetail(masterService, data) {
     try {
         // Prepare the request data
         const reqData = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: StorageService.getItem(StoreKeys.CompanyCode),
             collectionName: "voucher_detail",
             data: data,
         };
@@ -28,7 +31,7 @@ export async function addVoucherDetail(masterService, data) {
 
 export async function updateVoucher(masterService,data) {
     const reqBody = {
-        "companyCode": localStorage.getItem('companyCode'),
+        "companyCode": StorageService.getItem('companyCode'),
         "collectionName": "voucher_detail",
         "filter": { _id: data.voucherNo},
         "update": data

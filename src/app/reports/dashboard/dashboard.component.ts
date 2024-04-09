@@ -3,6 +3,7 @@ import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-dashboard",
@@ -17,10 +18,12 @@ export class DashboardComponent implements OnInit {
       active: "Dashboard",
     },
   ];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  branchCode = localStorage.getItem("Branch");
+  companyCode: any = 0;
+  branchCode = "";
   boxData: any = [];
-  constructor(private masterService: MasterService, private router: Router) {
+  constructor(private masterService: MasterService, private router: Router, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
+    this.branchCode = this.storage.branch;
     this.getConfig();
   }
 

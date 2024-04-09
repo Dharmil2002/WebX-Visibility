@@ -15,6 +15,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { MenuData } from './sidebar.metadata';
 import { Subscription } from 'rxjs';
 import { MenuService } from 'src/app/core/service/menu-access/menu.serrvice';
+import { StoreKeys } from 'src/app/config/myconstants';
 
 @Component({
   selector: 'app-sidebar',
@@ -99,13 +100,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     // }
     this.sidebarItems = JSON.parse(this.storageService.menuToBind);
 
-    this.storageSub = this.storageService.watchStorage("Mode").subscribe((data: string | null) => {            
-      if(data){
-        this.setMenuToBind(data);
+    this.storageSub = this.storageService.watchStorage(StoreKeys.Mode).subscribe((data: string | null) => {            
+      if(this.storageService.mode){
+        this.setMenuToBind(this.storageService.mode);
         this.sidebarItems = JSON.parse(this.storageService.menuToBind);
       }
     });
-    this.userName = localStorage.getItem('UserName');
+    this.userName = this.storageService.loginName;
     this.initLeftSidebar();
     this.bodyTag = this.document.body;
   }
@@ -122,7 +123,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
       let menuData = this.menuService.buildHierarchy(menuItems);
       let root = menuData.find((x) => x.MenuLevel == 1);
-      this.storageService.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
+      this.storageService.setItem(StoreKeys.MenuToBind, JSON.stringify(root.SubMenu || []));
 
       const searchData = menuItems.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
         const p = menu.find((y) => y.MenuId == x.ParentId);      
@@ -135,8 +136,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
         return d;
       });
 
-      this.storageService.setItem("searchData", JSON.stringify(searchData || []));
-      this.storageService.setItem('searchResults', '[]');
+      this.storageService.setItem(StoreKeys.SearchData, JSON.stringify(searchData || []));
+      this.storageService.setItem(StoreKeys.SearchResults, '[]');
     }
   }
 

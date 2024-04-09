@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class AdviceGenerationControl {
   AdviceGenerationArray: FormControls[];
@@ -85,7 +87,7 @@ export class AdviceGenerationControl {
         label: "Advice Generation Location",
         placeholder: "Advice Generation Location",
         type: "text",
-        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.eNTLOC : localStorage.getItem("Branch"),
+        value: Type === "Modify" || Type === "Acknowledge" || Type === "View" ? FormValues?.eNTLOC : StorageService.getItem(StoreKeys.Branch),
         generatecontrol: true,
         disable: Type == "Acknowledge" || Type === "View" ? true : false,
         Validations: [

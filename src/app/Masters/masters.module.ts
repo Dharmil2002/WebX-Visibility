@@ -179,9 +179,9 @@ import { MenuAccessRightComponent } from "./Admin/MenuAccessRight/menu-access-ri
 import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocation.component';
 import { DcrManagementComponent } from "./dcr-series/dcr-management/dcr-management.component";
 import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.component";
-import { DcrRegisterComponent } from './dcr-series/dcr-register/dcr-register.component';
 import { CustomerMasterUploadComponent } from './customer-master/customer-master-upload/customer-master-upload.component';
 import { DriverMasterUploadComponent } from './driver-master/driver-master-upload/driver-master-upload.component';
+import { VendorMasterUploadComponent } from './vendor-master/vendor-master-upload/vendor-master-upload.component';
 
 @NgModule({
   imports: [
@@ -376,9 +376,10 @@ import { DriverMasterUploadComponent } from './driver-master/driver-master-uploa
     DcrAllocationComponent,
     DcrManagementComponent,
     ActiveSeriesComponent,
-    DcrRegisterComponent,
     CustomerMasterUploadComponent,
-    DriverMasterUploadComponent 
+    DriverMasterUploadComponent ,
+    CustomerMasterUploadComponent,
+    VendorMasterUploadComponent
   ],
   providers: [
     DatePipe,

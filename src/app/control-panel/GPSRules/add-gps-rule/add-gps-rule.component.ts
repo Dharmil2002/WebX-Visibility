@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { AddGpsRuleControls } from "src/assets/FormControls/ControlPanel/AddGpsRuleControls";
 import Swal from "sweetalert2";
 
@@ -23,9 +24,9 @@ export class AddGpsRuleComponent implements OnInit {
   prevPageData: any;
   backPath = "/ControlPanel/gps-rule";
   isView = false;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  branch = localStorage.getItem("Branch");
-  user = localStorage.getItem("UserName");
+  companyCode: any = 0;
+  branch = "";
+  user = "";
   AddGpsRuleTableForm: UntypedFormGroup;
   addGpsRuleControls: AddGpsRuleControls;
   jsonControlArray: any;
@@ -33,8 +34,13 @@ export class AddGpsRuleComponent implements OnInit {
   constructor(
     private route: Router,
     private fb: UntypedFormBuilder,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storageService: StorageService
   ) {
+    this.companyCode = this.storageService.companyCode;
+    this.branch = this.storageService.branch;
+    this.user = this.storageService.userName;
+
     const navigationState = this.route.getCurrentNavigation()?.extras?.state;
     this.prevPageData = navigationState?.data;
     if (this.prevPageData?.command == "View") {

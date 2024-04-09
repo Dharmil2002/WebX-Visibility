@@ -19,6 +19,7 @@ import moment from "moment";
 import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
 import Swal from "sweetalert2";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-tracking-page",
@@ -32,11 +33,11 @@ export class TrackingPageComponent implements OnInit {
       active: "Consignment Tracking",
     },
   ];
-  Mode = localStorage.getItem("Mode");
+  Mode = "";
   QueryData: any;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   isTouchUIActivated = false;
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   obs: Observable<any>;
   dataSource: MatTableDataSource<any>;
@@ -54,31 +55,38 @@ export class TrackingPageComponent implements OnInit {
       title: "Total Results",
       count: 0,
       Color: "rgb(123, 140, 161)",
+      groupId: 0,
       _id: 0,
     },
     {
       title: "Booked",
       count: 0,
-      Color: "#e82",
-      _id: 1,
+      Color: "#ffb463",  
+      groupId: 1
     },
     {
       title: "InTransit",
       count: 0,
-      Color: "rgb(74, 168, 199)",
-      _id: 4,
+      Color: "#6777ef",
+      groupId: 2
+    },
+    {
+      title: "In Stock",
+      count: 0,
+      Color: "#5783c7",
+      groupId: 3
     },
     {
       title: "OFD",
       count: 0,
       Color: "lightseagreen",
-      _id: null,
+      groupId: 4
     },
     {
       title: "Delivered",
       count: 0,
-      Color: "rgb(91, 196, 91)",
-      _id: 3,
+      Color: "#4caf50",
+      groupId: 5
     },
   ];
   headerForCsv = headerForCsv;
@@ -88,14 +96,18 @@ export class TrackingPageComponent implements OnInit {
   csvFileName: any;
   csvHeaders: {};
   DocCalledAs: any;
+  trackingData: any[] = [];
   constructor(
     private Route: Router,
     private masterService: MasterService,
     public dialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
     private fb: UntypedFormBuilder,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
+    this.Mode = this.storage.mode;
     this.DocCalledAs = this.controlPanel.DocCalledAs;
     this.breadscrums = [
       {
@@ -106,15 +118,15 @@ export class TrackingPageComponent implements OnInit {
     ];
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.QueryData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.QueryData", this.QueryData);
       if (this.QueryData.Docket) {
         const Query = {
           D$match: {
             dKTNO: { D$in: this.QueryData.Docket },
           },
         };
-        this.getTrackingDocket(Query);
-        this.GetCardData(Query);
+        this.getTrackingDocket(Query).then(() => { 
+          this.GetCardData();
+        });
       } else if (this.QueryData.start && this.QueryData.end) {
         const Query = {
           D$match: {
@@ -132,8 +144,9 @@ export class TrackingPageComponent implements OnInit {
             ],
           },
         };
-        this.getTrackingDocket(Query);
-        this.GetCardData(Query);
+        this.getTrackingDocket(Query).then(() => { 
+          this.GetCardData();
+        });
       } else {
         this.Route.navigate(["Operation/ConsignmentQuery"]);
       }
@@ -167,56 +180,14 @@ export class TrackingPageComponent implements OnInit {
     this.Form.controls["EndDate"].setValue(this.QueryData.end || new Date());
   }
 
-  async GetCardData(QueryFilter) {
-    const req = {
-      companyCode: this.CompanyCode,
-      collectionName:
-        this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
-      filters: [
-        { ...QueryFilter },
-        {
-          D$group: {
-            _id: "$sTSNM",
-            Count: {
-              D$sum: 1,
-            },
-          },
-        },
-      ],
-    };
-
-    const res = await firstValueFrom(
-      this.masterService.masterMongoPost("generic/query", req)
-    );
-    if (res.success) {
-      res.data?.map((x) => {
-        if (x._id == "Booked") {
-          this.CountCard.forEach((t) => {
-            if (t.title == "Booked") {
-              t.count = x.Count;
-            }
-          });
-        } else if (x._id == "Departed" || x._id == "Arrived") {
-          this.CountCard.forEach((t) => {
-            if (t.title == "InTransit") {
-              t.count = x.Count + t.count;
-            }
-          });
-        } else if (x._id == "OFD") {
-          this.CountCard.forEach((t) => {
-            if (t.title == "OFD") {
-              t.count = x.Count;
-            }
-          });
-        } else if (x._id == "Delivered") {
-          this.CountCard.forEach((t) => {
-            if (t.title == "Delivered") {
-              t.count = x.Count;
-            }
-          });
-        }
-      });
-    }
+  async GetCardData() {
+    this.CountCard.forEach((t) => {
+      if(t.groupId == 0) {
+        t.count = this.trackingData?.length || 0;
+      } else {
+        t.count = this.trackingData?.filter((x) => x.GroupId == t.groupId)?.length || 0;
+      }
+    });
   }
 
   async getTrackingDocket(QueryFilter) {
@@ -227,20 +198,25 @@ export class TrackingPageComponent implements OnInit {
         this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
       filters: [{ ...QueryFilter }, ...PipeLine],
     };
-
+    
     const res = await firstValueFrom(
       this.masterService.masterMongoPost("generic/query", req)
     );
     if (res.success) {
-      if (res.data.length) {
-        this.TableData = res.data.sort(
+      if (res.data && res.data.length) {
+        this.trackingData = res.data;
+        this.trackingData.forEach((x) => {
+          x["GroupColor"] = this.CountCard.find((t) => t.groupId == x.GroupId)?.Color;
+        }); 
+
+        this.trackingData = this.trackingData.sort(
           (a, b) => new Date(b.sTSTM).getTime() - new Date(a.sTSTM).getTime()
         );
-        this.CountCard.forEach((t) => {
-          if (t.title == "Total Results") {
-            t.count = res.data.length;
-          }
-        });
+
+        
+
+        this.TableData = this.trackingData;
+        
         this.isTableLode = true;
         this.dataSource = new MatTableDataSource<any>(this.TableData);
         this.ngOnInit();
@@ -266,8 +242,8 @@ export class TrackingPageComponent implements OnInit {
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
       data: { TrackingList: eventData?.DocketTrackingData , DokNo: eventData.dKTNO},
-      width: "1400px",
-      height: "100%",
+      width: "95%",
+      //height: "90%",
       disableClose: true,
     });
 
@@ -287,9 +263,7 @@ export class TrackingPageComponent implements OnInit {
     } else {
       this.dataSource = new MatTableDataSource<any>(
         this.TableData.filter((x) =>
-          item.title == "InTransit"
-            ? x.sTSNM == "Departed" || x.sTSNM == "Arrived"
-            : x.sTSNM == item.title
+          item.groupId == x.GroupId || item.groupId == 0
         )
       );
       this.ngOnInit();

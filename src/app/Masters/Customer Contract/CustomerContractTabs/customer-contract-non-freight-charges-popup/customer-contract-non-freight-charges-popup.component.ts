@@ -82,7 +82,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   tableData: any;
   PinCodeList: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   StateList: any;
   EventButton = {
     functionName: "Save",
@@ -105,6 +105,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     public dialogRef: MatDialogRef<CustomerContractNonFreightChargesPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    this.companyCode = this.storage.companyCode;
     this.ChargesData = data;
     this.getTableData();
     console.log("ChargesData", this.ChargesData);
@@ -160,7 +161,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   }
   async getrateTypeDropdown() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "cust_contract",
       filter: { docNo: this.ChargesData.cONID },
     };
@@ -238,7 +239,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       nFCID: this.ChargesData.nFCID,
     }
     let Tablereq = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "cust_contract_non_freight_charge_matrix_details",
       filter: TableFilter,
     };
@@ -271,7 +272,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     };
     if (!this.isUpdate) {
       let datareq = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "cust_contract_non_freight_charge_matrix_details",
         filter: {},
       };

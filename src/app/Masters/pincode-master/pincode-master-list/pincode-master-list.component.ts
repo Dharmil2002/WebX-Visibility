@@ -8,6 +8,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-pincode-master-list',
@@ -37,7 +38,7 @@ export class PincodeMasterListComponent implements OnInit {
     city: any;
     pincodeList: any[] = [];
 
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     columnHeader =
         {
             "srNo": "Sr No",
@@ -86,7 +87,9 @@ export class PincodeMasterListComponent implements OnInit {
         this.getPinocdeList();
     }
 
-    constructor(private operationService: OperationService, public ObjSnackBarUtility: SnackBarUtilityService, private fb: UntypedFormBuilder, private filter: FilterUtils, private masterService: MasterService) {
+    constructor(private operationService: OperationService, public ObjSnackBarUtility: SnackBarUtilityService, private fb: UntypedFormBuilder, 
+        private filter: FilterUtils, private masterService: MasterService, private storage: StorageService) {
+        this.companyCode = this.storage.companyCode;
         this.intializeFormControl()
     }
 

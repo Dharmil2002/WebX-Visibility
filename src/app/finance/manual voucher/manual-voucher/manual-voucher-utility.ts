@@ -1,11 +1,12 @@
+import * as StorageService from 'src/app/core/service/storage.service';
 
 export async function manualvoucharDetail(masterService) {
     const req = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem('companyCode'),
         collectionName: "voucher_trans",
-        filter: { bRC: localStorage.getItem('Branch') }
+        filter: { bRC: StorageService.getItem('Branch') }
     }
-    if (localStorage.getItem('Branch') == 'HQTR') {
+    if (StorageService.getItem('Branch') == 'HQTR') {
         delete req.filter.bRC;
     }
     const res = await masterService.masterPost("generic/get", req).toPromise();

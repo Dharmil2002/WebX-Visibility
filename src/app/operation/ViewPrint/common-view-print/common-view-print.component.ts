@@ -1,6 +1,7 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-common-view-print',
@@ -11,14 +12,17 @@ export class CommonViewPrintComponent implements OnInit {
   showView = false;
   HtmlTemplate;
   FieldMapping: any;
-  companyCode = localStorage.getItem("companyCode");
+  companyCode = 0;
   JsonData;
   templateBody: any;
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
+    
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
       "display",

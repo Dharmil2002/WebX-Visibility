@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-docket-list',
@@ -13,7 +14,7 @@ export class DocketListComponent implements OnInit {
     allColumnFilter:any;
     tableData: any;
     tableLoad: boolean;
-    orgBranch: string = localStorage.getItem("Branch");
+    orgBranch: string = "";
    /* column header is for the changes css or title in the table*/
   columnHeader = {
     createOn: {
@@ -106,8 +107,10 @@ export class DocketListComponent implements OnInit {
   constructor(
     private router: Router,
     private docketService: DocketService,
-    private thcService: ThcService
+    private thcService: ThcService,
+    private storage: StorageService
   ) {
+    this.orgBranch = this.storage.branch;
     this.getShipmentDetail();
     this.allColumnFilter = this.columnHeader
   }

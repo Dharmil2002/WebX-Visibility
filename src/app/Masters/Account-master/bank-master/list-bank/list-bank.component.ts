@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-list-bank',
@@ -62,9 +63,11 @@ export class ListBankComponent implements OnInit {
     "IFSCcode",
     "SWIFTcode",
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   TableData: any = [];
-  constructor(private Route: Router, private masterService: MasterService) {}
+  constructor(private Route: Router, private masterService: MasterService, private storage: StorageService) {
+    this.CompanyCode = this.storage.companyCode;
+  }
 
   async ngOnInit() {
     const req = {

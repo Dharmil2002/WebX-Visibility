@@ -1,4 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -262,7 +265,7 @@ export class marketVehicleControls {
       },
       {
         name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
-        value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+        value: StorageService.getItem(StoreKeys.CompanyCode), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
         Validations: [
         ],
       },
@@ -277,7 +280,7 @@ export class marketVehicleControls {
         label: 'Entry By',
         placeholder: 'Entry By',
         type: 'text',
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false, disable: false
       },

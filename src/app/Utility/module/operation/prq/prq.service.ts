@@ -15,7 +15,7 @@ import { GeneralService } from "../../masters/general-master/general-master.serv
   providedIn: "root",
 })
 export class PrqService {
-  branchCode = localStorage.getItem("Branch");
+  branchCode = "";
   vehicleDetail: any;
   statusActions = {
     "0": ["Confirm", "Reject", "Modify"],
@@ -38,7 +38,9 @@ export class PrqService {
     private operation: OperationService,
     private storage: StorageService,
     private objGeneralService: GeneralService
-  ) {}
+  ) {
+    this.branchCode = this.storage.branch;
+  }
 
   //here the function for add prq Detail
   /**
@@ -49,8 +51,8 @@ export class PrqService {
    */
   async addPrqData(prqData) {
     // Retrieve the company code and branch from localStorage
-    const companyCode = localStorage.getItem("companyCode");
-    const branch = localStorage.getItem("Branch");
+    const companyCode = this.storage.companyCode;
+    const branch = this.storage.branch;
 
     // Ensure prqData is not undefined and set party to uppercase if it exists
     prqData = prqData || {};
@@ -99,10 +101,10 @@ export class PrqService {
     }
 
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "prq_summary",
       filter: {
-        cID: localStorage.getItem("companyCode"),
+        cID: this.storage.companyCode,
         pRQNO: prqData.pRQNO || prqData.prqNo || "",
       },
       update: {
@@ -150,7 +152,7 @@ export class PrqService {
             delete prqDetail.actions;
             var model = {
               //...this.preparePrqDataModel({...prqDetail})
-              cID: localStorage.getItem("companyCode"),
+              cID: this.storage.companyCode,
               pRQNO: prqDetail.prqNo || prqDetail.docNo || "",
               sTS: prqDetail.statusCode,
               sTSNM: prqDetail.status,
@@ -190,7 +192,7 @@ export class PrqService {
 
         var model = {
           //...this.preparePrqDataModel({...prqDetail})
-          cID: localStorage.getItem("companyCode"),
+          cID: this.storage.companyCode,
           pRQNO: prqDetail.prqNo || prqDetail.docNo || "",
           sTS: prqDetail.statusCode,
           sTSNM: prqDetail.status,
@@ -230,8 +232,8 @@ export class PrqService {
               FromCity: arrivalData.fromCity,
               ToCity: arrivalData.toCity,
               distance: arrivalData.distance,
-              currentLocation: localStorage.getItem("Branch"),
-              updateBy: localStorage.getItem("UserName"),
+              currentLocation: this.storage.branch,
+              updateBy: this.storage.userName,
               updateDate: new Date().toISOString(),
             }
           : {}),
@@ -258,7 +260,7 @@ export class PrqService {
   // This async function retrieves PRQ (Purchase Request) detail data from an API using the masterService.
   async getPrqDetailFromApi() {
     const reqBarnch = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "location_detail",
       filter: {locCode:this.branchCode},
     }
@@ -270,7 +272,7 @@ export class PrqService {
     }
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
       filter: barnchCode && barnchCode == 1?{}:{ bRCD: this.branchCode },
     };
@@ -312,7 +314,7 @@ export class PrqService {
   async getPrqForBooking(barnch, billingParty, payType) {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
       filter: {
         bRCD: barnch,
@@ -351,7 +353,7 @@ export class PrqService {
 
   async getAllPrqDetail() {
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
       filter: { bRCD: this.branchCode },
     };
@@ -390,10 +392,10 @@ export class PrqService {
     const startDate = moment(new Date()).add(-15, "days").toDate();
     const endDate = new Date();
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
       filter: {
-        cID: localStorage.getItem("companyCode"),
+        cID: this.storage.companyCode,
         bRCD: this.branchCode,
         bPARTY: billingParty,
         pICKDT: {

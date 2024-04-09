@@ -9,6 +9,7 @@ import { VehicleStatusControls } from 'src/assets/FormControls/vehicle-status';
 import { addVehicleStatusData, getLocationDetail, getVehicleStatusFromApi, getvehicleDetail } from '../vehicle-status-utility';
 import Swal from 'sweetalert2';
 import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-add-vehicle-status-update',
@@ -17,7 +18,7 @@ import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleSt
 export class AddVehicleStatusUpdateComponent implements OnInit {
   jsonControlVehicleArray: any;
   vehicleStatusTableForm: UntypedFormGroup;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   breadScrums = [
     {
       title: "Add Vehicle details",
@@ -37,10 +38,10 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private _operationService: OperationService,
     private filter: FilterUtils,
-    private vehicleStatusService: VehicleStatusService
-
+    private vehicleStatusService: VehicleStatusService,
+    private storage: StorageService
   ) {
-
+    this.companyCode = this.storage.companyCode;
     this.initializeFormControl()
   }
 

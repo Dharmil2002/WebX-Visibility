@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -82,12 +83,15 @@ export class ListTdsComponent implements OnInit {
     "Thresholdlimit",
     "RateForOthers"
   ];
-  CompanyCode = parseInt(localStorage.getItem('companyCode'))
+  CompanyCode = 0;
   TableData: any;
   constructor(
     private Route: Router,
     private masterService: MasterService,
-  ) {}
+    private storage: StorageService
+  ) {
+    this.CompanyCode = this.storage.companyCode;
+  }
 
   ngOnInit(): void {
     this.getTableData()

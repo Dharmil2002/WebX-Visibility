@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { Employee } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-eway-bill-details',
@@ -37,13 +38,13 @@ export class EwayBillDetailsComponent implements OnInit {
     "hour": 1,
     "minute": 30,
     }
-  constructor(private fb: UntypedFormBuilder,private Route: Router, private ICnoteService: CnoteService) {
+  constructor(private fb: UntypedFormBuilder,private Route: Router, private ICnoteService: CnoteService, private storage: StorageService) {
     this.EwayBill = this.createUserForm()
     //this.getGenaralMaster();
   }
   createUserForm(): UntypedFormGroup {
     return this.fb.group({
-      companyCode: [parseInt(localStorage.getItem("companyCode"))],
+      companyCode: [this.storage.companyCode],
       EWBNo: [''],
       SVCTYP: [''],
       PayBasis: ['']
@@ -55,7 +56,7 @@ export class EwayBillDetailsComponent implements OnInit {
   getGenaralMaster() {
     ;
       let reqBody = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         ddArray: ['SVCTYP']
       }
       this.ICnoteService.cnoteNewPost('services/GetcommonActiveGeneralMasterCodeListByTenantId', reqBody).subscribe({
@@ -111,7 +112,7 @@ export class EwayBillDetailsComponent implements OnInit {
 
   GetContractDetail() {
     let reqBody = {
-      companyCode: parseInt(localStorage.getItem('companyCode')),
+      companyCode: this.storage.companyCode,
       PAYBAS: this.EwayBill.value.PayBasis,
       CONTRACTID: this.contractNo
     }

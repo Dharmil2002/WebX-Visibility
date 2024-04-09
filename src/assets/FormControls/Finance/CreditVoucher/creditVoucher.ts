@@ -1,4 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class CreditVoucherControl {
     creditVoucherSummaryArray: FormControls[];
@@ -36,7 +37,7 @@ export class CreditVoucherControl {
                 label: "Entry Location",
                 placeholder: "Entry Location",
                 type: "text",
-                value: localStorage.getItem('Branch'),
+                value: StorageService.getItem('Branch'),
                 generatecontrol: true,
                 disable: true,
                 Validations: [],
@@ -147,7 +148,7 @@ export class CreditVoucherControl {
                 label: "Prepared by",
                 placeholder: "Prepared by",
                 type: "text",
-                value: localStorage.getItem('UserName'),
+                value: StorageService.getItem('UserName'),
                 generatecontrol: true,
                 disable: true,
                 Validations: [],

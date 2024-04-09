@@ -9,6 +9,7 @@ import { timeString } from "src/app/Utility/date/date-utils";
 import moment from "moment";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-dcr-register",
@@ -29,7 +30,7 @@ export class DcrRegisterComponent implements OnInit {
   allColumnFilter: any;
   csvFileName: string;
   filterColumn: boolean = true;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   submit = "Save";
   linkArray = [];
   tableData: any[];
@@ -77,133 +78,133 @@ export class DcrRegisterComponent implements OnInit {
       id: 1,
       Title: "Book Code",
       class: "matcolumncenter",
-      Style: "min-width:200px",
+      Style: "", //min-width:200px
     },
     fROM: {
       id: 2,
       Title: "Series From",
       class: "matcolumncenter",
-      Style: "min-width:120px",
+      Style: "",//min-width:120px
     },
     tO: {
       id: 3,
       Title: "Series To",
       class: "matcolumncenter",
-      Style: "min-width:350px",
+      Style: "",//min-width:350px
     },
     pAGES: {
       id: 4,
       Title: "Total pages",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     uSED: {
       id: 5,
       Title: "PagesUsed",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     vOID: {
       id: 6,
       Title: "Pages Voided",
       class: "matcolumncenter",
-      Style: "min-width:180px",
+      Style: "",//min-width:180px
     },
     aLOTONM: {
       id: 7,
       Title: "Allotted to",
       class: "matcolumncenter",
-      Style: "min-width:145px",
+      Style: "",//min-width:145px
     },
     aCUSTNM: {
       id: 8,
       Title: "Customer name",
       class: "matcolumncenter",
-      Style: "min-width:130px",
+      Style: "",//min-width:130px
     },
     aLOCD: {
       id: 9,
       Title: "Branch code",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "",//max-width:70px"
     },
     aLONM: {
       id: 10,
       Title: "Name of branch",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "",//max-width:70px
     },
     aSNTONM: {
       id: 11,
       Title: "Assigned to",
       class: "matcolumncenter",
-      Style: "max-width:70px",
+      Style: "" //max-width:70px"
     },
     aSNNM: {
       id: 12,
       Title: "Name",
       class: "matcolumncenter",
-      Style: "min-width:150px",
+      Style: "",//min-width:150px
     },
     eNTDT: {
       id: 13,
       Title: "DCR Added date",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     eNTBY: {
       id: 14,
       Title: "Added by",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     eNTLOC: {
       id: 15,
       Title: "Added at location",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     mODDT: {
       id: 16,
       Title: "Assignment date",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     mODBY: {
       id: 17,
       Title: "Assigned by",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     mODLOC: {
       id: 18,
       Title: "Assigned at location",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     rALLOCA: {
       id: 19,
       Title: "Reallocated",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     rALLDT: {
       id: 20,
       Title: "Reallocation date",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     rALLBY: {
       id: 21,
       Title: "Reallocated by",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
     rALLOC: {
       id: 22,
       Title: "Reallocation location",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "",//max-width:150px
     },
   };
   //#endregion
@@ -240,8 +241,10 @@ export class DcrRegisterComponent implements OnInit {
     private dcrService: DCRService,
     private masterService: MasterService,
     private filter: FilterUtils,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     // this.allColumnFilter = this.CSVHeader;
   }
 
@@ -334,6 +337,7 @@ export class DcrRegisterComponent implements OnInit {
 
   //#region  Save Details
   async save() {
+    const form=this.dCRRegisterTableForm.value;
     try {
       const startDate = new Date(
         this.dCRRegisterTableForm.controls.start.value
@@ -341,11 +345,34 @@ export class DcrRegisterComponent implements OnInit {
       const endDate = new Date(this.dCRRegisterTableForm.controls.end.value);
       const startValue = moment(startDate).startOf("day").toDate();
       const endValue = moment(endDate).endOf("day").toDate();
+      const cust = this.dCRRegisterTableForm.value.aCUST.value;
+      const loc = this.dCRRegisterTableForm.value.aLOC.name;
+      const emp = this.dCRRegisterTableForm.value.aEMP.value;
+      const busiAss = this.dCRRegisterTableForm.value.aBUSAS.value;
+      const sTS = this.dCRRegisterTableForm.value.sTS;
+      const isValidNumber = typeof sTS === 'number' && !isNaN(sTS);
+      const sTSCode = isValidNumber ? sTS : undefined;
+      const bCODE = this.dCRRegisterTableForm.value.bCODE;
+      const isValidString = typeof bCODE === 'string';
+      const bCodeValue = isValidString ? bCODE : undefined;
+      const series=form.sRICENO;
       let data = await this.dcrService.getDCRregisterReportDetail(
         startValue,
-        endValue
+        endValue,
+        ( cust ? [cust] : []),
+        ( loc ? [loc] : []),
+        ( emp ? [emp] : []),
+        ( busiAss ? [busiAss] : []),
+        sTSCode,
+        bCodeValue || "",
+        series || ""
       );
-
+       let tableData=data.map((x)=>{
+        x.aCUSTNM=x.aLOTO=="C"?x.aLONM:""
+        x.aLOCD=x.aLOTO!="C"?x.aLOCD:""
+        x.aLONM=x.aLOTO!="C"?x.aLONM:""
+        return x
+      })
       if (data.length === 0) {
         Swal.fire({
           icon: "info",
@@ -353,7 +380,7 @@ export class DcrRegisterComponent implements OnInit {
           text: "No data available for the selected date range.",
         });
       } else {
-        this.tableData = data;
+        this.tableData = tableData;
       }
     } catch (error) {
       console.error("Error fetching data:", error);

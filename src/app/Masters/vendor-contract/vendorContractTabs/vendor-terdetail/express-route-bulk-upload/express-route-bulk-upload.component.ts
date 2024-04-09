@@ -14,6 +14,7 @@ import { EncryptionService } from 'src/app/core/service/encryptionService.servic
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import Swal from 'sweetalert2';
 import { checkForDuplicatesInBulkUpload } from '../../../vendorContractApiUtility';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-express-route-bulk-upload',
@@ -21,7 +22,7 @@ import { checkForDuplicatesInBulkUpload } from '../../../vendorContractApiUtilit
 })
 export class ExpressRouteBulkUploadComponent implements OnInit {
 
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   fileUploadForm: UntypedFormGroup;
   CurrentContractDetails: any;
   routeList: any[];
@@ -40,8 +41,10 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
     private objRouteLocationService: RouteLocationService,
     private objContainerService: ContainerService,
     private dialogRef: MatDialogRef<ExpressRouteBulkUploadComponent>,
-    private objGeneralService: GeneralService
+    private objGeneralService: GeneralService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;  
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

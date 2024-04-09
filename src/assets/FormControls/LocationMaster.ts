@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { LocationMaster } from "src/app/core/models/Masters/LocationMaster";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class LocationControl {
   LocationDetailControl: FormControls[];
@@ -482,7 +484,7 @@ export class LocationControl {
         label: "Company Code",
         placeholder: "Company Code",
         type: "text",
-        value: parseInt(localStorage.getItem("companyCode")),
+        value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
         Validations: [],
         generatecontrol: false,
         disable: false,

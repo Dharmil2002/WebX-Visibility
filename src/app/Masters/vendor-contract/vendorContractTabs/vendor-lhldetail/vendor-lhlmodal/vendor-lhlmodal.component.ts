@@ -11,6 +11,7 @@ import { RouteLocationService } from 'src/app/Utility/module/masters/route-locat
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { TERCharges } from 'src/assets/FormControls/VendorContractControls/standard-charges';
 import Swal from 'sweetalert2';
 
@@ -39,14 +40,14 @@ export class VendorLHLModalComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private sessionService: SessionService,
+    private storage: StorageService,
     private objRouteLocationService: RouteLocationService,
     private objContainerService: ContainerService,
     public dialogRef: MatDialogRef<VendorLHLModalComponent>,
     private objGeneralService: GeneralService,
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
-    this.companyCode = this.sessionService.getCompanyCode();
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
@@ -140,7 +141,7 @@ export class VendorLHLModalComponent implements OnInit {
       rT: parseFloat(this.TLHLForm.value.rate),
       mIN: parseFloat(this.TLHLForm.value.min),
       mAX: parseFloat(this.TLHLForm.value.max),
-      mODLOC: localStorage.getItem("Branch"),
+      mODLOC: this.storage.branch,
       mODDT: new Date(),
       mODBY: this.TLHLForm.value.ENBY,
     };
@@ -174,7 +175,7 @@ export class VendorLHLModalComponent implements OnInit {
       mIN: parseFloat(this.TLHLForm.value.min),
       mAX: parseFloat(this.TLHLForm.value.max),
       eNTBY: this.TLHLForm.value.ENBY,
-      eNTLOC: localStorage.getItem("Branch"),
+      eNTLOC: this.storage.branch,
       eNTDT: new Date(),
     };
   }
@@ -211,7 +212,6 @@ export class VendorLHLModalComponent implements OnInit {
       this.TLHLForm.controls['min'].setValue(this.objResult.Details.mIN);
       this.TLHLForm.controls['max'].setValue(this.objResult.Details.mAX);
       this.submit = 'Update';
-
     }
   }
   //#endregion

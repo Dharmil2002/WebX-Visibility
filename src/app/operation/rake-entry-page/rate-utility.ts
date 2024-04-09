@@ -1,6 +1,8 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
-const branch=localStorage.getItem("Branch") 
+import * as StorageService from 'src/app/core/service/storage.service';
+import { StoreKeys } from "src/app/config/myconstants";
+
 export function renameKeys(originalObject, keyNameMapping) {
     const modifiedObject = {};
 
@@ -16,19 +18,19 @@ export function renameKeys(originalObject, keyNameMapping) {
 
 export async function vendorDetailFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "vendor_detail",
         filter: {}
     }
     const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-    const filteredData = res.data.filter(x => x.vendorLocation.includes(branch));
+    const filteredData = res.data.filter(x => x.vendorLocation.includes(StorageService.getItem(StoreKeys.Branch)));
     return filteredData;
 
 }
 export async function addRakeEntry(data, masterService) {
     
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "rake_detail",
         data: data
     }
@@ -38,7 +40,7 @@ export async function addRakeEntry(data, masterService) {
 }
 export async function genericGet(masterService, collectionName) {
     let req = {
-        "companyCode": localStorage.getItem("companyCode"),
+        "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
         "filter": {},
         "collectionName": collectionName
     }

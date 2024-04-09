@@ -1,6 +1,8 @@
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export async function stateFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem('companyCode'),
         collectionName: "state_detail",
         filter:{}
     }
@@ -16,7 +18,7 @@ export async function stateFromApi(masterService) {
 
 export async function customerFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem('companyCode'),
         collectionName: "customer_detail",
         filter:{}
     }

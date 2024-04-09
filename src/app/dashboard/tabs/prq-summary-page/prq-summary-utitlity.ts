@@ -1,8 +1,11 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 export async function getPrqDetailFromApi(masterServices) {
-    const branch = localStorage.getItem("Branch");
+    const branch = StorageService.getItem(StoreKeys.Branch);
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "prq_detail",
         filter: {}
     }

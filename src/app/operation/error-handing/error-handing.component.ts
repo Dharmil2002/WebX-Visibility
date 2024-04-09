@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { sendRequest } from './outbox-utility';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { ErrorHandlingViewComponent } from './error-handling-view/error-handling-view.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-error-handing',
@@ -13,8 +14,8 @@ import { ErrorHandlingViewComponent } from './error-handling-view/error-handling
 })
 export class ErrorHandingComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  branchCode = localStorage.getItem("Branch");
+  companyCode = 0;
+  branchCode = "";
   addAndEditPath: string = '';
   data: [] | any;
   height = '50%';
@@ -67,8 +68,12 @@ export class ErrorHandingComponent implements OnInit {
   constructor(
     private failedApiService: FailedApiServiceService,
     private masterService: MasterService,
-    private service: utilityService
+    private service: utilityService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.branchCode = this.storage.branch;
+    
     this.getIssueDetail()
   }
 

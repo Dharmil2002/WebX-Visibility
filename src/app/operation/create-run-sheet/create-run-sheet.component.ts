@@ -13,6 +13,7 @@ import { VehicleTypeService } from 'src/app/Utility/module/masters/vehicle-type/
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -26,7 +27,7 @@ export class CreateRunSheetComponent implements OnInit {
   runsheetData: any;
   backPath: string;
   //declaring breadscrum
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
   breadscrums = [
     {
       title: "Create Run Sheet",
@@ -47,8 +48,11 @@ export class CreateRunSheetComponent implements OnInit {
     private filter: FilterUtils,
     private generalService:GeneralService,
     private vehicleTypeService: VehicleTypeService,
-    public snackBarUtilityService: SnackBarUtilityService
+    public snackBarUtilityService: SnackBarUtilityService,
+    private storage: StorageService
   ) {
+    this.orgBranch = this.storage.branch;
+
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.RunSheetTable = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
@@ -109,7 +113,7 @@ export class CreateRunSheetComponent implements OnInit {
       Style: "max-width:90px",
     },
   };
-  branch = localStorage.getItem("Branch");
+  branch = this.storage.branch;
 
   staticField = [
     "documentId",

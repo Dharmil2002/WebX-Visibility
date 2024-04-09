@@ -66,7 +66,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCity: string;
   fromCityStatus: any;
   ewayData: any;
-  userName = localStorage.getItem("Username");
+  userName = "";
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -187,8 +187,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   destination: any;
   destinationStatus: boolean;
   quickDocket: boolean;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  branch = localStorage.getItem("Branch");
+  companyCode = 0;
+  branch = "";
   dockNo: string;
   DocketDetails: any;
   vehicleNo: string;
@@ -212,6 +212,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private customerService:CustomerService,
     private storage:StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.userName = this.storage.userName;
+    this.branch = this.storage.branch;
+
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
       this.quickdocketDetaildata = navigationState.columnData || navigationState;
@@ -253,7 +257,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
   // Initialize form control
   initializeFormControl() {
-    this.ewayBillTab = new EwayBillControls();
+    this.ewayBillTab = new EwayBillControls(this.generalService);
     // Get control arrays for different sections
     this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
     this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
@@ -561,7 +565,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         },
       };
       const resUpdate= await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
-      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails);
+      await this.docketService.operationsFieldMapping(res.docketsDetails,res.invoiceDetails, null);
       if(resUpdate){
         this.Addseries();
       }
@@ -674,7 +678,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         showLoaderOnConfirm: true,
         preConfirm: (Remarks) => {
           var Request = {
-            CompanyCode: localStorage.getItem("CompanyCode"),
+            CompanyCode: this.storage.companyCode,
             ID: row.id,
           };
           if (row.id == 0) {

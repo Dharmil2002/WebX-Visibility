@@ -8,6 +8,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-product-services",
@@ -48,7 +49,7 @@ export class ProductServicesComponent implements OnInit {
   ServicesTypeList: any;
   jsonControlArray: any[];
   customerTableForm: any;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   ServicesNameCode: string;
   ServicesNameStatus: any;
   ServicesTypeCode: string;
@@ -65,8 +66,10 @@ export class ProductServicesComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private storage: StorageService,
     public dialogRef: MatDialogRef<ProductServicesComponent>
   ) {
+    this.companyCode = this.storage.companyCode;
     this.ProductId = data.element.ProductID;
     this.ProductName = data.element.ProductName;
   }
@@ -205,7 +208,7 @@ export class ProductServicesComponent implements OnInit {
       ServicesCode: this.customerTableForm.value.ServicesCode,
       companyCode: this.companyCode,
       updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
+      updatedBy: this.storage.userName,
     };
     let req = {
       companyCode: this.companyCode,

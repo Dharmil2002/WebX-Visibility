@@ -1,5 +1,5 @@
 export class customerModel {
-   customerGroup: string;
+  customerGroup: string;
   customerName: string;
   CustomerCategory: string;
   customerLocations: any;

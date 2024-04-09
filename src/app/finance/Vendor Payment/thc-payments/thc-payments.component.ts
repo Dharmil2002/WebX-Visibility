@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { GetTHCListFromApi } from "../VendorPaymentAPIUtitlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-thc-payments",
@@ -78,9 +79,10 @@ export class ThcPaymentsComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
   staticField = ["SrNo", "Vendor", "THCamount"];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   isTableLode = true;
-  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) {
+  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService, private storageService: StorageService) {
+    this.companyCode = this.storageService.companyCode;
     this.RequestData.StartDate.setDate(new Date().getDate() - 30);
   }
 

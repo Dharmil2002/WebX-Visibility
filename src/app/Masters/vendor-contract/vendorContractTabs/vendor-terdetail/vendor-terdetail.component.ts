@@ -7,6 +7,7 @@ import { EncryptionService } from 'src/app/core/service/encryptionService.servic
 import { removeData } from '../../vendorContractApiUtility';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
 import { ExpressRouteBulkUploadComponent } from './express-route-bulk-upload/express-route-bulk-upload.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -70,7 +71,7 @@ export class VendorTERDetailComponent implements OnInit {
     { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   CurrentContractDetails: any;
   isLoad: boolean;
   excelDataList: any;
@@ -81,8 +82,9 @@ export class VendorTERDetailComponent implements OnInit {
     private dialog: MatDialog,
     private masterService: MasterService,
     public xlsxUtils: xlsxutilityService,
-
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

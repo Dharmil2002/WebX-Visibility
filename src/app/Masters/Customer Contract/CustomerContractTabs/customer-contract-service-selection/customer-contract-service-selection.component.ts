@@ -1073,11 +1073,10 @@ export class CustomerContractServiceSelectionComponent
     }
     contractDetails["sERVSELEC"] = Array.from(selectedServicesSet);
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.value;
-    contractDetails["rTYP"] =
-      this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.value);
+    contractDetails["rTYP"] = this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.value);
     (contractDetails["mODDT"] = new Date()),
-      (contractDetails["mODBY"] = localStorage.getItem("UserName"));
-    contractDetails["mODLOC"] = localStorage.getItem("CurrentBranchCode");
+    (contractDetails["mODBY"] = this.storage.userName);
+    contractDetails["mODLOC"] = this.storage.branch;
 
     const reqBody = {
       companyCode: this.companyCode,

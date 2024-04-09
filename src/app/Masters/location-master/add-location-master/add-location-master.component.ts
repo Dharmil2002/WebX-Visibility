@@ -30,7 +30,7 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 })
 export class AddLocationMasterComponent implements OnInit {
   locationTableForm: UntypedFormGroup;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   private unsubscribe$: Subject<void> = new Subject<void>();
   protected _onDestroy = new Subject<void>();
   mappedPincode: string;
@@ -101,6 +101,7 @@ export class AddLocationMasterComponent implements OnInit {
     private storage: StorageService,
     private generalService: GeneralService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
       this.locationTable = {

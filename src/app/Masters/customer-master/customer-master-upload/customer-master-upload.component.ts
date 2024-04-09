@@ -292,7 +292,7 @@ export class CustomerMasterUploadComponent implements OnInit {
     }
   }
   //#endregion
-  //#region to process and save location data
+  //#region to process and save data
   async save(data) {
 
     try {
@@ -346,9 +346,9 @@ export class CustomerMasterUploadComponent implements OnInit {
     }
   }
 
-  // Function to process a single location element
+  // Function to process a single element
   processData(element, customerGrpList, CustomerCategoryList, locationList) {
-    debugger
+
     const updateCustomerGrpList = customerGrpList.find(item => item.name.toLowerCase() === element.CustomerGroup.toLowerCase());
     const updateCustomerCategory = CustomerCategoryList.find(item => item.name.toLowerCase() === element.CustomerCategory.toLowerCase());
 
@@ -396,7 +396,7 @@ export class CustomerMasterUploadComponent implements OnInit {
     // Return the processed data
     return processedData;
   }
-  // Function to format contract data
+  // Function to format data
   async formatCustomerData(processedData: any[]) {
     try {
       // Get the last customer code from the database outside the forEach loop

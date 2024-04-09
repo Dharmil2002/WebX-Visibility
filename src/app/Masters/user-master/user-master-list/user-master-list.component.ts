@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 @Component({
     selector: 'app-user-master-list',
@@ -10,7 +11,7 @@ import Swal from "sweetalert2";
 
 export class UserMasterListComponent implements OnInit {
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     addAndEditPath: string;
     csvFileName: string;
     toggleArray = ["isActive"];
@@ -62,7 +63,9 @@ export class UserMasterListComponent implements OnInit {
         this.addAndEditPath = "/Masters/UserMaster/AddUser";
         this.getUserDetails();
     }
-    constructor(private masterService: MasterService,) { }
+    constructor(private masterService: MasterService, private storage: StorageService) {
+        this.companyCode = this.storage.companyCode;
+     }
     //#region to get user list
     async getUserDetails() {
         try {
@@ -110,10 +113,10 @@ export class UserMasterListComponent implements OnInit {
         delete det._id;
         delete det.eNTDT
         det['mODDT'] = new Date()
-        det['mODBY'] = localStorage.getItem("UserName")
-        det['mODLOC'] = localStorage.getItem("Branch")
+        det['mODBY'] = this.storage.userName
+        det['mODLOC'] = this.storage.branch
         let req = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
+            companyCode: this.storage.companyCode,
             collectionName: "user_master",
             filter: { _id: id, },
             update: det

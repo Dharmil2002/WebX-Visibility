@@ -12,6 +12,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { THCAmountsControl } from "src/assets/FormControls/Finance/VendorPayment/tHCAmountsControls";
 import { GetLocationDetailFromApi } from "../../VendorPaymentAPIUtitlity";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-thcamounts-detail",
@@ -30,7 +31,7 @@ export class THCAmountsDetailComponent implements OnInit {
   THCData;
   Type: any;
   isLessForm = false;
-  companyCode: any = localStorage.getItem("companyCode");
+  companyCode: any = 0;
   isAddForm: boolean = false;
   UpdateAmount: any;
   ChargesData: any;
@@ -42,10 +43,13 @@ export class THCAmountsDetailComponent implements OnInit {
     private masterService: MasterService,
     private dialog: MatDialog,
     private filter: FilterUtils,
+    private storageService: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
     public dialogRef: MatDialogRef<THCAmountsDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public objResult: any
-  ) { }
+  ) { 
+    this.companyCode = this.storageService.companyCode;
+  }
 
   ngOnInit() {
     console.log("objResult", this.objResult);

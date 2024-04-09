@@ -8,6 +8,7 @@ import { searchControls } from 'src/assets/FormControls/search';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { processProperties } from 'src/app/Masters/processUtility';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-docket-dashboard',
@@ -34,12 +35,12 @@ export class DocketDashboardComponent implements OnInit {
   searchStatus:boolean;
 
 
-  constructor(private router: Router,private masterService: MasterService, private filter: FilterUtils,private fb: UntypedFormBuilder) {
+  constructor(private router: Router,private masterService: MasterService, private filter: FilterUtils,private fb: UntypedFormBuilder, private storage: StorageService) {
     this.docket=true
    }
 
   async ngOnInit(): Promise<void> {
-    this.ewayBillDetail=localStorage.getItem("EwayBillDetail");
+    this.ewayBillDetail=this.storage.getItem("EwayBillDetail");
     this.initializeFormControl();
   }
   initializeFormControl() {

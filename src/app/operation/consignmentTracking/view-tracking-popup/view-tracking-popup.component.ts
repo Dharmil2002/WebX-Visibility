@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import moment from "moment";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-view-tracking-popup",
@@ -11,12 +12,21 @@ export class ViewTrackingPopupComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: false,
+    csv: true,
   };
   EventButton = {
     functionName: "AddNew",
     name: "Add TDS",
     iconName: "add",
+  };
+  csvHeader = {
+    Date:  "Date",
+    AdditionalDetails: "Additional Details",
+    Event: "Event",
+    Location: "Current Location",
+    DocNo: "Document Number",
+    eNTDT: "Entry Date",
+    eNTBY: "User"
   };
   columnHeader = {
     Date: {
@@ -34,12 +44,7 @@ export class ViewTrackingPopupComponent implements OnInit {
       Title: "Event",
       class: "matcolumnleft",
       Style: "min-width:15%",
-    },
-    EDD: {
-      Title: "Entry Date",
-      class: "matcolumncenter",
-      Style: "min-width:10%",
-    },
+    },   
     Location: {
       Title: "Current Location",
       class: "matcolumnleft",
@@ -49,6 +54,11 @@ export class ViewTrackingPopupComponent implements OnInit {
       Title: "Document Number",
       class: "matcolumnleft",
       Style: "min-width:15%",
+    },
+    eNTDT: {
+      Title: "Entry Date",
+      class: "matcolumncenter",
+      Style: "min-width:10%",
     },
     eNTBY: {
       Title: "User",
@@ -60,18 +70,20 @@ export class ViewTrackingPopupComponent implements OnInit {
     "Date",
     "AdditionalDetails",
     "eNTBY",
-    "EDD",
+    "eNTDT",
     "Event",
     "Location",
     "DocNo",
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   TableData: any;
   FormTitle:any
   constructor(
+    private storage: StorageService,
     public dialogRef: MatDialogRef<ViewTrackingPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    this.CompanyCode = this.storage.companyCode;
     const sortByDate = (a, b) => {
       return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
     };
@@ -81,11 +93,11 @@ export class ViewTrackingPopupComponent implements OnInit {
         return {
           ...x,
           Date: moment(x.eVNDT).format("DD-MM-YYYY hh:mm"),
-          EDD: moment(x.eNTDT).format("DD-MM-YYYY hh:mm"),
+          eNTDT: moment(x.eNTDT).format("DD-MM-YYYY hh:mm"),
           Location: x.lOC || x.eNTLOC,
           DocNo: x.dOCNO || x.dKTNO,
           AdditionalDetails: x.oPSSTS || x.oPSTS,
-          Event: x.eVNID + " : " + x.eVNDES,
+          Event: x.eVNDES,
         };
       })
       .sort(sortByDate);

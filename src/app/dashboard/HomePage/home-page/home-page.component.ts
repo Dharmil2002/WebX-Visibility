@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { StoreKeys } from "src/app/config/myconstants";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
 import { StorageService } from "src/app/core/service/storage.service";
@@ -106,7 +107,7 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {}
   async bindMenu() {
     
-    this.searchData = JSON.parse(this.storage.getItem("searchData") || "[]");   
+    this.searchData = JSON.parse(this.storage.getItem(StoreKeys.SearchData) || "[]");   
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
   }
@@ -132,7 +133,7 @@ export class HomePageComponent implements OnInit {
   onAppClick(event: MouseEvent, data: any){
     if(data.mode) {
       //this.setMenuToBind(data.mode);      
-      this.storage.setItem("Mode", data.mode);
+      this.storage.setItem(StoreKeys.Mode, data.mode);
       this.bindMenu();
       this.router.navigate(['/dashboard/Index']);
     }

@@ -17,7 +17,7 @@ export class LocationMasterComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   linkArray = []
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   columnHeader = {
     'eNTDT': 'Created Date',
     'locCode': 'Code',
@@ -86,6 +86,7 @@ export class LocationMasterComponent implements OnInit {
     private dialog: MatDialog,
     private objGeneralService: GeneralService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
     this.csvFileName = "Location Details";
     this.centerAlignedData = ["locPincode"]
@@ -161,11 +162,11 @@ export class LocationMasterComponent implements OnInit {
     delete det.reportingto;
     delete det.locHirarchay;
     det['mODDT'] = new Date()
-    det['mODBY'] = localStorage.getItem("UserName")
-    det['mODLOC'] = localStorage.getItem("Branch")
+    det['mODBY'] = this.storage.userName
+    det['mODLOC'] = this.storage.branch
 
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "location_detail",
       filter: { companyCode: this.companyCode, locCode: locCode },
       update: det

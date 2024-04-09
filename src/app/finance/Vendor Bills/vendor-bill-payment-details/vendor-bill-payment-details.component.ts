@@ -104,7 +104,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   staticField = ["paymentAmount", "TotalTHCAmount", "debitNote", "Date", "AdvancePayedAmount", "pendingAmount", "billNo"];
   summaryStaticField = ["amt", "institute", "ref", "paymentMethod"];
   documentSaticField = ["docNo", "document", "date"];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   isTableLode = false;
   vendorBillPaymentControl: vendorBillPaymentControl;
   jsonVendorBillPaymentArray: any;
@@ -165,6 +165,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
 
   ) {
+    this.companyCode = this.storage.companyCode;
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
   }
 

@@ -30,9 +30,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
   jsonscanControlArray: any;
   shipments = [];
   scanPackage: string = '';
-  currentBranch: string = localStorage.getItem("Branch") || '';
-  companyCode: number = parseInt(localStorage.getItem('companyCode'));
-  userName: string = localStorage.getItem('Username');
+  currentBranch: string = '';
+  companyCode: number = 0;
+  userName: string = '';
   columnHeader = {
     "Shipment": "Shipment",
     "Suffix": "Suffix",
@@ -109,6 +109,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
     private operationService: OperationService,
     private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.currentBranch = this.storage.branch;
+    this.userName = this.storage.userName;
     if (item.LoadingSheet) {
 
       this.shipmentStatus = 'Loaded'

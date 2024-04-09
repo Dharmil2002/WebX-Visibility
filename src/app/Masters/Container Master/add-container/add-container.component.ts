@@ -26,7 +26,7 @@ export class AddContainerComponent implements OnInit {
   VendorTypeStatus: any;
   VendorName: any;
   VendorNameStatus: any;
-  CompanyCode = localStorage.getItem("companyCode");
+  CompanyCode: any = 0;
   UpdateData: any;
   FormTitle: string = "Add Container";
   constructor(
@@ -36,6 +36,7 @@ export class AddContainerComponent implements OnInit {
     private filter: FilterUtils,
     private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;

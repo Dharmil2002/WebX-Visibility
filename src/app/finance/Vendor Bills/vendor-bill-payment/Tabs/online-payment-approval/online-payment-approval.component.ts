@@ -4,13 +4,15 @@ import Swal from 'sweetalert2';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 
 @Component({
   selector: 'app-online-payment-approval',
   templateUrl: './online-payment-approval.component.html'
 })
 export class OnlinePaymentApprovalComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
 
   tableLoad = true; // flag , indicates if data is still loaded or not , used to show loading animation
   METADATA = {
@@ -90,7 +92,9 @@ export class OnlinePaymentApprovalComponent implements OnInit {
   staticField = ['Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor', 'billNo']
   constructor(private objVendorBillService: VendorBillService,
     private masterService: MasterService,
-    private route: Router) {
+    private route: Router,
+    private storage: StorageService) {
+      this.companyCode = this.storage.companyCode;
     this.filterRequest.startdate.setDate(new Date().getDate() - 30);
     this.getVendorBill();
   }
@@ -178,8 +182,8 @@ export class OnlinePaymentApprovalComponent implements OnInit {
       bSTATNM: status,
       bSTAT: bSTAT,
       mODDT: new Date(),
-      mODBY: localStorage.getItem("UserName"),
-      mODLOC: localStorage.getItem("Branch")
+      mODBY: this.storage.getItem(StoreKeys.UserId),
+      mODLOC: this.storage.getItem(StoreKeys.Branch)
     };
   }
   //#endregion

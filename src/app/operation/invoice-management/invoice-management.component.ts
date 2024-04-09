@@ -18,8 +18,8 @@ export class InvoiceManagementComponent implements OnInit {
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
   menuItemflag: boolean = true;
-  orgBranch: string = localStorage.getItem("Branch");
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  orgBranch: string = "";
+  companyCode: number = 0;
   linkArray = [
     { Row: "pendCol", Path: "Finance/InvoiceCollection" },
     { Row: "penAp", Path: "Finance/bill-approval" },
@@ -102,6 +102,9 @@ export class InvoiceManagementComponent implements OnInit {
     private matDialog: MatDialog,
     private genericService: GenericService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.orgBranch = this.storage.branch;
+    
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
       end: new FormControl(),    // Create a form control for end date

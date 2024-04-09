@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class JobControl {
     jobControlArray: FormControls[];
@@ -237,7 +239,7 @@ export class JobControl {
             },
             {
                 name: 'jobLocation', label: "Job Location", placeholder: "Select Job Location", type: 'text',
-                value: localStorage.getItem('Branch'), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+                value: StorageService.getItem('Branch'), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [],
                 additionalData: {
                     showNameAndValue: false,
@@ -291,7 +293,7 @@ export class JobControl {
                 label: "companyCode",
                 placeholder: "company Code",
                 type: "",
-                value: localStorage.getItem("companyCode"),
+                value: StorageService.getItem(StoreKeys.CompanyCode),
                 generatecontrol: false,
                 disable: false,
                 additionalData: {
@@ -322,7 +324,7 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobTableControls"
                 },
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -538,7 +540,7 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobTableControls"
                 },
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 generatecontrol: false,
                 disable: false,
                 Validations: [

@@ -1,10 +1,11 @@
 import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import * as StorageService from 'src/app/core/service/storage.service';
 
 export async function GetTHCListFromApi(masterService, RequestBody) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
-        branch: localStorage.getItem('Branch'),
+        companyCode: StorageService.getItem('companyCode'),
+        branch: StorageService.getItem('Branch'),
         startdate: RequestBody.StartDate,
         enddate: RequestBody.EndDate,
         vendorNames: RequestBody.vendorListWithKeys,
@@ -38,8 +39,8 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
 export async function GetAdvancePaymentListFromApi(masterService, Filters) {
     try {
         const reqBody = {
-            companyCode: localStorage.getItem('companyCode'),
-            branch: localStorage.getItem('Branch'),
+            companyCode: StorageService.getItem('companyCode'),
+            branch: StorageService.getItem('Branch'),
             startdate: Filters.StartDate,
             enddate: Filters.EndDate,
             PaymentType: Filters.PaymentType,
@@ -68,7 +69,7 @@ export async function GetAdvancePaymentListFromApi(masterService, Filters) {
 
 export async function GetLocationDetailFromApi(masterService) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
         const filter = {};
         const req = { companyCode, collectionName: 'location_detail', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
@@ -86,7 +87,7 @@ export async function GetLocationDetailFromApi(masterService) {
 
 export async function GetAccountDetailFromApi(masterService, AccountCategoryName, AccountingLocations) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
         const filter = {
             iSSYS: true,
             cATNM: AccountCategoryName,
@@ -106,7 +107,7 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
 }
 export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
         const filter = { vendorCode: vendorCode };
         const req = { companyCode, collectionName: 'vendor_detail', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
@@ -121,7 +122,7 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
 }
 export async function GetStateListFromAPI(masterService) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
         const filter = {};
         const req = { companyCode, collectionName: 'state_master', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
@@ -175,7 +176,7 @@ function mergeJsonLists(list1, list2) {
 }
 export async function GetTHCListBasdedOnBillNumberFromApi(masterService, BillNumber) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
         const filter = { bILLNO: BillNumber };
         const req = { companyCode, collectionName: 'thc_summary', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
@@ -204,7 +205,7 @@ export async function GetTHCListBasdedOnBillNumberFromApi(masterService, BillNum
 
 export async function GetSingleVendorBillDetailsFromApi(masterService, bILLNO) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
         const filter = { docNo: bILLNO };
         const req = { companyCode, collectionName: 'vend_bill_summary', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));

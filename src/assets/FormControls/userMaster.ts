@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { UserMaster } from "src/app/core/models/Masters/User Master/user-master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class UserControl {
   UserControlArray: FormControls[];
@@ -437,7 +439,7 @@ export class UserControl {
         label: "companyCode",
         placeholder: "",
         type: "",
-        value:localStorage.getItem("companyCode"),
+        value: StorageService.getItem(StoreKeys.CompanyCode),
         generatecontrol: false,
         disable: false,
         Validations: [],

@@ -44,7 +44,7 @@ export class AddAccountComponent implements OnInit {
     functionName: "addNewAccountGroup",
     name: "Show Account Group",
   };
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   CompanyName: any;
   TableData: any;
   UpdateData: any;
@@ -77,6 +77,7 @@ export class AddAccountComponent implements OnInit {
     public dialog: MatDialog,
     private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;

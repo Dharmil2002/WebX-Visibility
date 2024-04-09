@@ -5,9 +5,12 @@
             [showSaveButton]="true" [submit]="'Submit'">
         </app-form-webxpress>
     </form>
-
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="summaryHeader"
-        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray" [columnGroup]="summaryGroup"
+    <!-- [csvHeaders]="summaryCSVHeader"  -->
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" 
+        [columnHeader]="summaryHeader" 
+        [csvFileName]="'Stock Summary'"
+        [columnGroup]="summaryGroup"
+        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray" 
         (functionCallEmitter)="functionCallHandler($event)">
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

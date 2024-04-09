@@ -2,6 +2,7 @@ import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { RouteScheduleDetComponent } from "../route-schedule-det/route-schedule-det.component";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: 'app-route-schedule-master-list',
   templateUrl: './route-schedule-master-list.component.html'
@@ -56,8 +57,9 @@ export class RouteScheduleMasterListComponent implements OnInit {
   menuItems = [{ label: 'scheduleCode', componentDetails: RouteScheduleDetComponent }];
   addAndEditPath: string;
   viewComponent: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  constructor(private masterService: MasterService) {
+  companyCode: any = 0;
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/RouteScheduleMaster/AddRouteScheduleMaster";//setting Path to add data
   }
   ngOnInit(): void {

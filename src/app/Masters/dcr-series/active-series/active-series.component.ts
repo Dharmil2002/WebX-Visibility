@@ -6,6 +6,7 @@ import { DcrAction } from 'src/app/Models/docStatus';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { createShipDataObject } from 'src/app/Utility/commonFunction/dashboard/dashboard';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-active-series',
@@ -31,12 +32,12 @@ export class ActiveSeriesComponent implements OnInit {
   linkArray = [{ Row: "action", Path: "/Masters/AddDCR/DCRAllocation" }];
   csv: any[];
   addAndEditPath: string;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   tableData: any;
   documentWithType: any[] = [];
   jsonUrl = '../../../assets/data/state-countryDropdown.json'
   columnHeader = {
-    tYP: {
+    tYPNM: {
       Title: "Document",
       class: "matcolumncenter",
       Style: "",//min-width:15%
@@ -92,7 +93,7 @@ export class ActiveSeriesComponent implements OnInit {
       Style: "",//max-width:90px
     },
   };
-  staticField = [ "tYP", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
+  staticField = [ "tYPNM", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
   menuItemflag: boolean = true;
   menuItems = [
     { label: "Allocate", route:"/Masters/AddDCR/DCRAllocation", tabIndex: 6, status: "1" },
@@ -111,7 +112,9 @@ export class ActiveSeriesComponent implements OnInit {
   };
   constructor(private Route: Router,
     private masterService: MasterService,
-    private http: HttpClient) { }
+    private http: HttpClient, private storage: StorageService) { 
+      this.companyCode = this.storage.companyCode;
+    }
 
   ngOnInit(): void {
     const shipData = [
@@ -126,11 +129,17 @@ export class ActiveSeriesComponent implements OnInit {
     this.getDCRDetails();
   }
 
-  loadDocumentWithType() {
-    this.http.get<any>(this.jsonUrl).subscribe(
-      data => this.documentWithType = data.documentTypeDropDown,
-      error => console.error('Error loading documentWithType:', error)
-    );
+
+  async loadDocumentWithType() {
+    try {
+      const data = await firstValueFrom(this.http.get<any>(this.jsonUrl));
+      if (data && data.documentTypeDropDown) {
+        this.documentWithType = data.documentTypeDropDown;
+      }
+    } catch (error) {
+      console.error('Error loading documentWithType:', error);
+      // Handle errors here
+    }
   }
 
   async getDCRDetails() {
@@ -150,7 +159,7 @@ export class ActiveSeriesComponent implements OnInit {
             const typeName = this.documentWithType.find(type => type.value === obj.tYP)?.name || obj.tYP;
             return {
               ...obj,
-              tYP: typeName,// Replace document type with its name
+              tYPNM: typeName,// Replace document type with its name
               actions: this.statusActions[`${obj.sTS}`] || this.statusActions.default,
               eNTDT: formatDocketDate(obj.eNTDT)
             };

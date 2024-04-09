@@ -20,7 +20,7 @@ export class VehicleService {
     async getVehicleNestedDetail(filter = {}) {
         // Constructing the request object with necessary parameters
         const req = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "fleet_master",
             filter: filter,
         };
@@ -31,7 +31,7 @@ export class VehicleService {
     }
     async addMarketVehicle(data?:vehicleMarket) {
         const req = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "markets_vehicles",
             data: data,
         };
@@ -40,7 +40,7 @@ export class VehicleService {
     }
     async getMarketVehicledata(filter={}){
         const req = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: this.storage.companyCode,
             collectionName: "markets_vehicles",
             filter: filter,
         };

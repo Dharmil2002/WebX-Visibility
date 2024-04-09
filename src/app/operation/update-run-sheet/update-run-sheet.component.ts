@@ -18,7 +18,7 @@ export class UpdateRunSheetComponent implements OnInit {
   jsonUrl = '../../../assets/data/create-runsheet-data.json'
   tableload = true;
   csv: any[];
-  branch = localStorage.getItem("Branch");
+  branch = "";
   data: [] | any;
   tripData: any;
   scanPackage: string;
@@ -91,6 +91,7 @@ export class UpdateRunSheetComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private navigationService: NavigationService
   ) {
+    this.branch = this.storage.branch;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
       if (this.Route.getCurrentNavigation()?.extras?.state.data.columnData.oPSST == 2) {

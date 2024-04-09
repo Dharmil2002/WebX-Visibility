@@ -560,7 +560,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to get dropdown's data
   async getTDSData() {
-    const filter = { locCode: localStorage.getItem('Branch') }
+    const filter = { locCode: this.storage.getItem('Branch') }
     const stateList = await this.objLocationService.locationFromApi(filter);
     this.billingForm.get("Stateofbooking").setValue(stateList?.[0]?.state);
     let Accountinglocation = this.billingForm.value.Stateofbooking

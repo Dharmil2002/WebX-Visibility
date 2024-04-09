@@ -9,6 +9,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { TenantModel } from "src/app/core/models/Masters/Tenant Master/tenant-mater";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { TenantControl } from "src/assets/FormControls/tenantControl";
 import Swal from "sweetalert2";
@@ -72,10 +73,10 @@ export class AddTenantComponent implements OnInit {
     private filter: FilterUtils,
     private route: Router,
     private objImageHandling: ImageHandling,
-    private sessionService: SessionService,
+    private storage: StorageService,
     private matDialog: MatDialog,
   ) {
-    this.companyCode = this.sessionService.getCompanyCode();
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.TenantTab = route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
@@ -343,7 +344,7 @@ export class AddTenantComponent implements OnInit {
 
       // Create a request object with the filter criteria
       const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "tenants_detail",
         filter: { [fieldName]: fieldValue },
       };

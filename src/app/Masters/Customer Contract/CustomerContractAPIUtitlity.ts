@@ -1,8 +1,11 @@
 import { filter } from "rxjs/operators";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 export async function customerFromApi(masterService) {
-  const branch = localStorage.getItem("Branch");
+  const branch = StorageService.getItem(StoreKeys.Branch);
   const reqBody = {
-    companyCode: localStorage.getItem("companyCode"),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "customer_detail",
     filter: {},
   };
@@ -27,7 +30,7 @@ export async function customerFromApi(masterService) {
 }
 export async function PayBasisdetailFromApi(masterService, filterType?) {
   const reqBody = {
-    companyCode: localStorage.getItem("companyCode"),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "General_master",
     filter: { codeType: filterType, activeFlag: true },
   };
@@ -52,7 +55,7 @@ export async function PayBasisdetailFromApi(masterService, filterType?) {
 
 export async function productdetailFromApi(masterService) {
   let req = {
-    companyCode: localStorage.getItem("companyCode"),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "product_detail",
     filter: {},
   };
@@ -70,7 +73,7 @@ export async function productdetailFromApi(masterService) {
 }
 export async function GetContractListFromApi(masterService) {
   let req = {
-    companyCode: localStorage.getItem("companyCode"),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "cust_contract",
     filter: {},
   };
@@ -101,7 +104,7 @@ export async function GetContractBasedOnCustomerAndProductListFromApi(masterServ
   }
 
   let req = {
-    companyCode: localStorage.getItem("companyCode"),
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "cust_contract",
     filter: filter,
   };

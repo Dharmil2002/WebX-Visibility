@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { Collections, GenericActions } from 'src/app/config/myconstants';
 import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
 import { StorageService } from '../storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 import { firstValueFrom } from 'rxjs';
 import { debug } from 'console';
 
@@ -29,7 +30,7 @@ export class ControlPanelService {
       MF: "Menifest",
       DRS: "Delivery Run Sheet",
     };
-    this.storage.setItem("DocNames", JSON.stringify(this.docCalledAs));
+    this.storage.setItem(StoreKeys.DocCallAs, JSON.stringify(this.docCalledAs));
   }
 
 
@@ -43,11 +44,13 @@ export class ControlPanelService {
     const res = await firstValueFrom(this.http.post<any>(`${environment.APIBaseURL}${GenericActions.GetOne}`, req));
     let config =  res.data;    
     this.docCalledAs = { ...this.docCalledAs, ...config };
-    this.storage.setItem("DocNames", JSON.stringify(this.docCalledAs));
+    
+    this.storage.setItem(StoreKeys.DocCallAs, JSON.stringify(this.docCalledAs));
   }
 
   get DocCalledAs() {
-    const data = this.storage.getItem("DocNames");
+    
+    const data = this.storage.getItem(StoreKeys.DocCallAs);
     return JSON.parse(data);
   }
 }

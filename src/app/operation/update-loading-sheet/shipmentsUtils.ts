@@ -1,6 +1,8 @@
 import { extractUniqueValues } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { runningNumber } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 // This utility function groups shipments by leg
 export function groupShipmentsByLeg(shipingTableData) {
@@ -48,9 +50,9 @@ export async function updateTracking(companyCode, operationService, dktNo,tripId
       dktNo: docketDetails[lastArray]?.dktNo || '',
       vehNo: docketDetails[lastArray]?.vehNo || '',
       route: docketDetails[lastArray]?.route || '',
-      event: "UnLoaded At" + " " + localStorage.getItem("Branch"),
+      event: "UnLoaded At" + " " + StorageService.getItem(StoreKeys.Branch),
       orgn: docketDetails[lastArray]?.orgn || '',
-      loc: localStorage.getItem('Branch') || '',
+      loc: StorageService.getItem(StoreKeys.Branch) || '',
       dest: docketDetails[lastArray]?.dest || '',
       lsno: docketDetails[lastArray]?.lsNo || '',
       mfno: docketDetails[lastArray]?.mfNo || "",
@@ -58,7 +60,7 @@ export async function updateTracking(companyCode, operationService, dktNo,tripId
       dlSt: '',
       dlTm: '',
       evnCd: '',
-      upBy: localStorage.getItem('Username') || '',
+      upBy: StorageService.getItem(StoreKeys.UserId) || '',
       upDt: new Date().toUTCString(),
     };
 

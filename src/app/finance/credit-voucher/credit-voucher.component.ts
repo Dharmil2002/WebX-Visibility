@@ -19,6 +19,7 @@ import { CreditVoucherDataRequestModel, CreditVoucherRequestModel } from 'src/ap
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import Swal from 'sweetalert2';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { StoreKeys } from 'src/app/config/myconstants';
 @Component({
   selector: 'app-credit-voucher',
   templateUrl: './credit-voucher.component.html'
@@ -538,7 +539,7 @@ export class CreditVoucherComponent implements OnInit {
 
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
             "voucherNo": "",
             "transCode": VoucherInstanceType.CreditVoucherCreation,
             "transType": VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
@@ -546,7 +547,7 @@ export class CreditVoucherComponent implements OnInit {
             "voucherType": VoucherType[VoucherType.CreditVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": localStorage.getItem("Branch"),
+            "branch": this.storage.getItem(StoreKeys.Branch),
             "accCode": item.Ledgercode,
             "accName": item.Ledgername,
             "accCategory": item.SubLedger,
@@ -599,7 +600,7 @@ export class CreditVoucherComponent implements OnInit {
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transDate: Date(),
                 finYear: financialYear,
-                branch: localStorage.getItem("Branch"),
+                branch: this.storage.getItem(StoreKeys.Branch),
                 transCode: VoucherInstanceType.CreditVoucherCreation,
                 transType: VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
                 voucherCode: VoucherType.CreditVoucher,
@@ -609,7 +610,7 @@ export class CreditVoucherComponent implements OnInit {
                 docNo: "",
                 partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
-                entryBy: localStorage.getItem("UserName"),
+                entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
                 debit: DebitData,
                 credit: CreditData,

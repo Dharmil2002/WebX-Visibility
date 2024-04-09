@@ -1,11 +1,11 @@
 import { firstValueFrom } from "rxjs";
 import { financialYear, formatDate } from "src/app/Utility/date/date-utils";
-
+import * as StorageService from 'src/app/core/service/storage.service';
 
 
 export async function GetLedgerWiseOpeningBalanceList(masterService, filter) {
     try {
-        const companyCode = localStorage.getItem('companyCode');
+        const companyCode = StorageService.getItem('companyCode');
 
         const req = {
             companyCode, collectionName: `acc_opening_${financialYear}`, filter

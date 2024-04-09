@@ -12,6 +12,8 @@ import { MenuData } from "src/app/layout/sidebar/sidebar.metadata";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { mn } from "date-fns/locale";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { StoreKeys } from "src/app/config/myconstants";
 
 @Component({
   selector: "app-signin",
@@ -40,7 +42,8 @@ export class SigninComponent
     private sanitizer: DomSanitizer,
     private storage: StorageService,
     private menuService: MenuService,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private locationService: LocationService
   ) {
     super();
   }
@@ -55,7 +58,7 @@ export class SigninComponent
     });
 
     //Redirect if user already logged in
-    if (this.authService.currentUserValue) {
+    if (this.authService.currentUserValue && !this.authService.isTokenExpired) {
       this.Islogin = true;
       //this.router.navigate(["/dashboard/Index"]);
       this.router.navigate(["/dashboard/home"]);
@@ -83,19 +86,23 @@ export class SigninComponent
       try {      
       const res = await firstValueFrom(this.authService.login(this.loginForm.value));
         if (res) {
+          
             const token = this.authService.currentUserValue.tokens.access.token;
             if (token) {
+             
               this.Islogin = true;
               const companyDetail = await this.authService.getCompanyDetail();
+              
               await this.controlPanel.getDocumentNames(companyDetail.companyCode);
               this.DocCalledAs = this.controlPanel.DocCalledAs;
               await this.getMenuList();
 
-              this.storage.setItem("companyLogo",companyDetail.company_Image);
-              this.storage.setItem("company_Code",companyDetail.company_Code);
-              this.storage.setItem("timeZone",companyDetail?.timeZone||"");
+              //userLocations
+              this.storage.setItem(StoreKeys.CompanyLogo, companyDetail.company_Image);
+              this.storage.setItem(StoreKeys.CompanyAlias, companyDetail.company_Code);
+              this.storage.setItem(StoreKeys.TimeZone, companyDetail?.timeZone||"");
               //Need to be retrived from User Master
-              this.storage.setItem("Mode", "FTL");
+              this.storage.setItem(StoreKeys.Mode, "FTL");
               
               this.setMenuToBind("FTL");
               this.router.navigate(["/dashboard/home"]);
@@ -135,7 +142,7 @@ export class SigninComponent
 
     let menuData = this.menuService.buildHierarchy(menuItems);
     let root = menuData.find((x) => x.MenuLevel == 1);
-    this.storage.setItem("menuToBind", JSON.stringify(root.SubMenu || []));
+    this.storage.setItem(StoreKeys.MenuToBind, JSON.stringify(root.SubMenu || []));
 
     const searchData = menuItems.filter((x) => x.MenuLevel != 1 && x.HasLink).map((x) => {
       const p = menu.find((y) => y.MenuId == x.ParentId);      
@@ -148,7 +155,7 @@ export class SigninComponent
       return d;
     });
 
-    this.storage.setItem("searchData", JSON.stringify(searchData || []));
+    this.storage.setItem(StoreKeys.SearchData, JSON.stringify(searchData || []));
   }
   
     //#region to get User Data
@@ -166,7 +173,7 @@ export class SigninComponent
                                   .replace(/{{DRS}}/g, this.DocCalledAs.DRS);
           return x;
         });
-        this.storage.setItem("menu", JSON.stringify(menuData));
+        this.storage.setItem(StoreKeys.Menu, JSON.stringify(menuData));
       }
     }
   

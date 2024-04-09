@@ -20,6 +20,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import moment from 'moment';
+import { StorageService } from 'src/app/core/service/storage.service';
 interface CurrentAccessListType {
   productAccess: string[];
 }
@@ -86,12 +87,12 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
     public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService,
     private customerContractService: CustomerContractService,
-    private sessionService: SessionService) {
+    private storage: StorageService) {
     super();
     this.columnKeys.push('status')
     this.columnKeys.push('actions')
 
-    this.companyCode = this.sessionService.getCompanyCode()
+    this.companyCode = this.storage.companyCode;
     this.CurrentAccessList = {
       productAccess: ['Customer', 'ContractID', 'Product', 'PayBasis', 'ContractStartDate', 'Expirydate']
     } as CurrentAccessListType;
@@ -226,7 +227,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
 
             this.customerContractRequestModel.companyCode = this.companyCode;
             this.customerContractRequestModel.docType = "CON";
-            this.customerContractRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+            this.customerContractRequestModel.branch = this.storage.branch;
             this.customerContractRequestModel.finYear = financialYear
 
             this.customerContractDataRequestModel.companyCode = this.companyCode;
@@ -242,7 +243,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
             this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
             this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
             this.customerContractDataRequestModel.entryDate = new Date().toString()
-            this.customerContractDataRequestModel.entryBy = localStorage.getItem("UserName")
+            this.customerContractDataRequestModel.entryBy = this.storage.userName;
             this.customerContractDataRequestModel.updateDate = ""
             this.customerContractDataRequestModel.updateBy = ""
 
@@ -322,14 +323,14 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
 
           this.customerContractRequestModel.companyCode = this.companyCode;
           this.customerContractRequestModel.docType = "CON";
-          this.customerContractRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+          this.customerContractRequestModel.branch = this.storage.branch;
           this.customerContractRequestModel.finYear = financialYear
 
 
           this.customerContractDataRequestModel.companyCode = this.companyCode;
           this.customerContractDataRequestModel.contractID = "";
           this.customerContractDataRequestModel.docType = "CON";
-          this.customerContractDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+          this.customerContractDataRequestModel.branch = this.storage.branch;
           this.customerContractDataRequestModel.finYear = financialYear
           this.customerContractDataRequestModel.customerId = this.ContractForm.value?.Customer?.value
           this.customerContractDataRequestModel.customerName = this.ContractForm.value?.Customer?.name
@@ -339,8 +340,8 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
           this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
           this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
           this.customerContractDataRequestModel.entryDate = new Date().toString()
-          this.customerContractDataRequestModel.entryBy = localStorage.getItem("UserName")
-          this.customerContractDataRequestModel.entryLocation = localStorage.getItem("CurrentBranchCode")
+          this.customerContractDataRequestModel.entryBy = this.storage.userName;
+          this.customerContractDataRequestModel.entryLocation = this.storage.branch;
           this.customerContractDataRequestModel.updateDate = ""
           this.customerContractDataRequestModel.updateBy = ""
           this.customerContractDataRequestModel.updateLocation = ""

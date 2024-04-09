@@ -4,7 +4,9 @@ import { Router } from "@angular/router";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+import { StoreKeys } from "src/app/config/myconstants";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { AccountControls } from "src/assets/FormControls/Account/account-controls";
 import Swal from "sweetalert2";
 
@@ -35,15 +37,17 @@ export class AddaccountComponent implements OnInit {
   AcLedgerStatus: any;
   TDSsectionCode: string;
   TDSsectionStatus: any;
-  CompanyCode: any = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode: any = 0;
   FirstUpdate: any = false;
   AlljsonControlArray: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.CompanyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
@@ -292,7 +296,7 @@ export class AddaccountComponent implements OnInit {
           tabledata.data.length === 0
             ? 1
             : tabledata.data[tabledata.data.length - 1].AcLedgerCode + 1,
-        entryBy: localStorage.getItem("UserName"),
+        entryBy: this.storage.getItem(StoreKeys.UserId),
         entryDate: new Date(),
         companyCode: this.CompanyCode,
         ...commonBody,

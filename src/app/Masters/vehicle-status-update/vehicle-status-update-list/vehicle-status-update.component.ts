@@ -3,6 +3,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { getVehicleDashboardDetails, getVehicleStatusFromApi } from '../vehicle-status-utility';
 import { formatDate } from 'src/app/Utility/date/date-utils';
 import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vehicle-status-update',
@@ -10,8 +11,8 @@ import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utl
 })
 export class VehicleStatusUpdateComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  branchCode = localStorage.getItem("Branch");
+  companyCode = 0;
+  branchCode = "";
   addAndEditPath: string = 'Masters/Vehicle/Status/Add';
   data: [] | any;
   uploadComponent: any;
@@ -72,8 +73,10 @@ export class VehicleStatusUpdateComponent implements OnInit {
   };
   boxData: any;
   constructor(
-    private _operationService: OperationService
+    private _operationService: OperationService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.fetchVehicleStatus();
   }
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -46,7 +47,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   }
   addAndEditPath: string;
   csvFileName: string;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
     this.addAndEditPath = "/Masters/RouteLocationWise/RouteAdd";
     this.csvFileName = "Route Master Location Details"  //setting csv file Name so file will be saved as per this name
   }
@@ -55,7 +56,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   }
   getRouteDetails() {
     let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         "filter": {},
         "collectionName": "routeMasterLocWise"
     };
@@ -75,13 +76,13 @@ export class RouteMasterLocationWiseComponent implements OnInit {
     delete det._id;
     // delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "routeMasterLocWise",
       filter: { _id: id },
       update: {isActive: det.isActive}
     };
     let reqTrip = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "trip_Route_Schedule",
       filter: { rUTCD: id },
       update: {iSACT: det.isActive}

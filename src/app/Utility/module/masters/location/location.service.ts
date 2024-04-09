@@ -1,19 +1,20 @@
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class LocationService {
-  constructor(private masterService: MasterService) { }
+  constructor(private masterService: MasterService, private storage: StorageService) { }
 
   // This async function retrieves location data from an API using the masterService.
   async locationFromApi(filter = {}) {
     filter = { ...filter, activeFlag: true }; // Add activeFlag filter to the request
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "location_detail",
       filter: filter, // You can specify additional filters here if needed
     };
@@ -52,7 +53,7 @@ export class LocationService {
   async getLocationList(nameWithCode = false): Promise<any[] | null> {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: 'location_detail',
       filter: {activeFlag: true },
     };
@@ -80,7 +81,7 @@ export class LocationService {
 
   async getLocation(filter): Promise<any | null> {
     const reqBody = {
-      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: 'location_detail',
       filter: filter
     };
@@ -89,9 +90,30 @@ export class LocationService {
     return res.data;
   }
 
+  async getLocations(filter, project = null): Promise<any | null> {
+
+    let filters= [];
+    filters.push({ 
+      D$match: filter
+    });
+
+    if(project) {
+      filters.push({ 'D$project': project });
+    }
+
+    const reqBody = {
+      companyCode: this.storage.companyCode, // Get company code from local storage
+      collectionName: 'location_detail',
+      filters: filters
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));    
+    return res?.data || [];
+  }
+
   async findAllDescendants(reportLoc): Promise<any[] | null> {
     const reqBody = {
-      companyCode: localStorage.getItem('companyCode'), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: 'location_detail',
       filter: { reportLoc: reportLoc, activeFlag: true },
       fields: { parent: "reportLoc", id: "locCode" },

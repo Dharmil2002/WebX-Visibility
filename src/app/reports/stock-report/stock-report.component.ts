@@ -14,7 +14,8 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { StockReport } from 'src/assets/FormControls/Reports/stock-report-controls/stock-report';
 import Swal from 'sweetalert2';
-import _ from 'lodash';
+import _, { forEach } from 'lodash';
+import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 
 @Component({
   selector: 'app-stock-report',
@@ -59,50 +60,6 @@ export class StockReportComponent implements OnInit {
     PackageType: "PackageType",
     PickupDelivery: "PickupDelivery",
     DocketStatus: "DocketStatus",
-  }
-
-  summaryCSVHeader = {
-    ReportLocationName: "Report Location Name",
-    ReportBranchName: "Report Branch Name",
-    BookingCount: "Booking Count",
-    BookingPackgesNo: "Booking PackgesNo",
-    BookingActualWeight: "Booking ActualWeight",
-    BookingChargedWeight: "Booking ChargedWeight",
-    BookingFreight: "Booking Freight",
-    BookingSubtotal: "Booking Subtotal",
-    BookingGSTCharged: "Booking GSTCharged",
-    BookingDocketTotal: "Booking DocketTotal",
-    DeliveryCount: "Delivery Count",
-    DeliveryPackgesNo: "Delivery PackgesNo",
-    DeliveryActualWeight: "Delivery ActualWeight",
-    DeliveryChargedWeight: "Delivery ChargedWeight",
-    DeliveryFreight: "Delivery Freight",
-    DeliveryGSTCharged: "Delivery GSTCharged",
-    DeliveryDocketTotal: "Delivery DocketTotal",
-    InTransitCount: "InTransit Count",
-    InTransitPackgesNo: "InTransit PackgesNo",
-    InTransitActualWeight: "InTransit ActualWeight",
-    InTransitChargedWeight: "InTransit ChargedWeight",
-    InTransitFreight: "InTransit Freight",
-    InTransitSubtotal: "InTransit Subtotal",
-    InTransitGSTCharged: "InTransit GSTCharged",
-    InTransitDocketTotal: "	InTransit DocketTotal",
-    TransCount: "Trans Count",
-    TransPackgesNo: "Trans PackgesNo",
-    TransActualWeight: "Trans ActualWeight",
-    TransChargedWeight: "Trans ChargedWeight",
-    TransFreight: "Trans Freight",
-    TransSubtotal: "Trans Subtotal",
-    TransGSTCharged: "Trans GSTCharged",
-    TransDocketTotal: "Trans DocketTotal",
-    GoneForDeliveryCount: "GoneForDelivery Count",
-    GoneForDeliveryPackgesNo: "GoneForDelivery PackgesNo",
-    GoneForDeliveryActualWeight: "GoneForDelivery ActualWeight",
-    GoneForDeliveryChargedWeight: "GoneForDelivery ChargedWeight",
-    GoneForDeliveryFreight: "GoneForDelivery Freight",
-    GoneForDeliverySubtotal: "GoneForDelivery Subtotal",
-    GoneForDeliveryGSTCharged: "GoneForDelivery GSTCharged",
-    GoneForDeliveryDocketTotal: "GoneForDelivery DocketTotal"
   }
 
   summaryGroup: any[] = [];
@@ -163,7 +120,7 @@ export class StockReportComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: false,
+    csv: true,
   };
   DetailHeader = {
   }
@@ -299,35 +256,36 @@ export class StockReportComponent implements OnInit {
         }
         else {
           data = await this.stockReportService.getStockSummary(this.filterData);
+
+          Swal.hideLoading();
+         
+          if (!data || (Array.isArray(data) && data.length === 0)) {
+
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+  
+            return;
+          }
+
+          setTimeout(() => {
+            Swal.close();
+          }, 1000);
+
           // this.summaryData = data;
           // this.tableLoad = false;
           // console.log(data);
 
-          var pivot = await this.pivotData(data, this.locations);
+          var pivot = await this.pivotData({ data, locations: this.locations });
           this.staticField = pivot.staticFields;
-          this.summaryHeader = pivot.config;
+          this.summaryHeader = pivot.config.display;
           this.summaryData = pivot.data;
           this.summaryGroup = pivot.columnGroup;
           this.tableLoad = false;
         }
-
-        Swal.hideLoading();
-
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-
-          Swal.fire({
-            icon: "error",
-            title: "No Records Found",
-            text: "Cannot Download CSV",
-            showConfirmButton: true,
-          });
-
-          return;
-        }
-
-        setTimeout(() => {
-          Swal.close();
-        }, 1000);
 
         if (reportType == 'Register') {
           // Export the record to Excel
@@ -352,8 +310,11 @@ export class StockReportComponent implements OnInit {
 
       var filter = { ...this.filterData };
 
-      filter.stockType = columnData.StockTypeId;
-      filter.cumulativeLocation = [data.LocationCode];
+      if(columnData.StockTypeId)
+        filter.stockType = columnData.StockTypeId;
+      
+      if(data.LocationCode && data.LocationCode != "")
+        filter.cumulativeLocation = [data.LocationCode];
 
       console.log(filter);
       let result = await this.stockReportService.getStockData(filter);
@@ -376,24 +337,43 @@ export class StockReportComponent implements OnInit {
     }
   }
 
-  async pivotData(data, locations) {
-    // Step 1: Create a master list of all unique stock types      
+  /**
+   * Generates a pivot table data based on the provided data and locations.
+   * 
+   * @param data - The array of data to be pivoted.
+   * @param locations - The array of locations.
+   * @returns A promise that resolves to an object containing the static fields, configuration, data, and column groups of the pivot table.
+   */
+  async pivotData({ data, locations }: { data: any[]; locations: any[]; }): Promise<any> {
+    const fields = [
+      { "caption": "Count", "field": "Count", "decimal": 0, "datafield": "Dockets" },
+      { "caption": "Packages", "field": "Packages", "decimal": 0, "datafield": "Packages" },
+      { "caption": "Actual Weight", "field": "Actual_Weight", "decimal": 2, "datafield": "ActWeight" },
+      { "caption": "Charged Weight", "field": "Charged_Weight", "decimal": 2, "datafield": "ChgWeight" },
+      { "caption": "Freight", "field": "Freight", "decimal": 2, "datafield": "Freight" },
+      { "caption": "Subtotal", "field": "Subtotal", "decimal": 2, "datafield": "SubTotal" },
+      { "caption": "GST Charged", "field": "GST_Charged", "decimal": 2, "datafield": "GST" },
+      { "caption": "Docket Total", "field": "Docket_Total", "decimal": 2, "datafield": "Total" }
+    ];
+
     const allStockTypes = _(data)
       .map(item => ({
         StockType: item.StockType.replace(' Stock', '').replace(/ /g, '_'),
         StockTypeId: item.StockTypeId
       }))
-      .uniqBy('StockType') // or 'StockTypeId' if it should be unique by ID
+      .uniqBy('StockType')
       .sortBy('StockTypeId')
       .value();
 
-    let columnGroup = [{
+    const columnGroup = [{
       Name: "Location",
       class: "matcolumnleft",
       ColSpan: 2
     }];
-    let displayJson = {};
-    let staticFields = ["Location", "ReportLocation"];
+
+    const displayJson = {};
+    const staticFields = ["Location", "ReportLocation"];
+
     displayJson["Location"] = {
       Title: "Location",
       class: "matcolumnleft",
@@ -406,109 +386,94 @@ export class StockReportComponent implements OnInit {
       Style: "min-width: 250px"
     };
 
-    allStockTypes
-      .map(type => {
-        columnGroup.push({
-          Name: type.StockType,
-          class: "matcolumnright",
-          ColSpan: 8
-        });
-        var fields = ['Count', 'Packages', 'Actual_Weight', 'Charged_Weight', 'Freight', 'Subtotal', 'GST_Charged', 'Docket_Total'];
-        fields.map(field => {
-
-          displayJson[type.StockType + '_' + field.replace(/_/g, '')] = {
-            Title: type.StockType.replace(/_/g, ' ') + ' ' + field.replace(/_/g, ' '),
-            class: "matcolumnright",
-            Style: "min-width: 100px",
-            columnData: type
-          };
-          if (field == "Count") {
-            displayJson[type.StockType + '_' + field.replace(/_/g, '')]["type"] = "Link";
-            displayJson[type.StockType + '_' + field.replace(/_/g, '')]["functionName"] = "downloadcsv";
-          }
-          else {
-            staticFields.push(type.StockType + '_' + field.replace(/_/g, ''));
-          }
-        });
-      });
-
-    // Step 2: Define a function to initialize aggregates with all stock types
-    const initializeAggregates = (stockTypes) => {
-      return stockTypes.reduce((acc, type) => {
-        acc[type.StockType + '_Count'] = 0;
-        acc[type.StockType + '_Packages'] = 0;
-        acc[type.StockType + '_ActualWeight'] = 0;
-        acc[type.StockType + '_ChargedWeight'] = 0;
-        acc[type.StockType + '_Freight'] = 0;
-        acc[type.StockType + '_Subtotal'] = 0;
-        acc[type.StockType + '_GSTCharged'] = 0;
-        acc[type.StockType + '_DocketTotal'] = 0;
+    const initializeAggregates = (stockTypes = null, isTotal = false) => {
+      if (stockTypes) {
+        return stockTypes.reduce((acc: { [x: string]: number; }, type: { StockType: string; }) => {
+          fields.forEach(f => { acc[type.StockType + '_' + f.field] = 0; });
+          return acc;
+        }, {});
+      } else if (isTotal) {
+        const acc = {};
+        fields.map(f => { acc['Total_' + f.field] = 0; });
         return acc;
-      }, {});
+      }
     };
 
-    // Step 3: Use the master list to ensure each location has all stock types
     const pivotData = _.chain(data)
-      .groupBy('loc') // Group by location
-      .map((items, locKey) => { // Process each group
-        // Initialize the aggregate object with all stock types from the master list
+      .groupBy('loc')
+      .map((items, locKey) => {
         const aggregates = initializeAggregates(allStockTypes);
+        let rowTotals = initializeAggregates(null, true);
 
-        // Process each item
         _.forEach(items, item => {
           const typeKey = item.StockType.replace(' Stock', '').replace(/ /g, '_');
 
-          // Increment the counts and sums
-          aggregates[typeKey + '_Count'] += parseInt(item.Dockets || 0) || 0;
-          aggregates[typeKey + '_Packages'] += item.Packages || 0;
-          aggregates[typeKey + '_ActualWeight'] += item.ActWeight || 0;
-          aggregates[typeKey + '_ChargedWeight'] += item.ChgWeight || 0;
-          aggregates[typeKey + '_Freight'] += item.Freight || 0;
-          aggregates[typeKey + '_Subtotal'] += item.SubTotal || 0;
-          aggregates[typeKey + '_GSTCharged'] += item.GST || 0;
-          aggregates[typeKey + '_DocketTotal'] += item.Total || 0;
+          fields.forEach(f => {
+            aggregates[typeKey + '_' + f.field] += ConvertToNumber(item[f.datafield] ?? 0, f.decimal);
+          });
+
+          fields.forEach(f => {
+            rowTotals['Total_' + f.field] += ConvertToNumber(item[f.datafield] ?? 0, f.decimal);
+          });
         });
 
-        // Return the aggregated data for the location
         const loc = locations.find(f => f.locCode == locKey);
         const rep = locations.find(f => f.locCode == loc.reportLoc);
 
         return {
           LocationCode: loc.locCode,
           Location: `${loc.locCode} : ${loc.locName}`,
-          ReportLocation: `${rep.locCode} : ${rep.locName}`,
-          ...aggregates
+          ReportLocation: rep ? `${rep.locCode} : ${rep.locName}` : "",
+          ...aggregates,
+          ...rowTotals
         };
       })
       .value();
 
-    return { staticFields, config: displayJson, data: pivotData, columnGroup };
+    allStockTypes.push({ StockType: 'Total', StockTypeId: 0 });
 
-    /*
-     // Step 1: Group by 'salesperson' and 'region'
-        const groupedData = _.groupBy(data, item => item.loc);
-        // Step 2: Map each group to aggregate data
-        const pivotData = _.map(groupedData, (items, key) => {
-          // Extracting 'salesperson' and 'region' from the key
-          
-          // Aggregating data
-          const stockTypes = _.groupBy(items, 'StockType');
-          const aggregates = _.mapValues(stockTypes, stockItems => {                  
-            return {
-              Type: stockItems[0].StockType.replace(' Stock', '').replace(/ /g, '_'),
-              Count: stockItems.length,
-              PackgesNo: _.sumBy(stockItems, 'Packages'),
-              ActualWeight: _.sumBy(stockItems, 'ActWeight'),
-              ChargedWeight: _.sumBy(stockItems, 'ChgWeight'),
-              Freight: _.sumBy(stockItems, 'Freight'),
-              Subtotal: _.sumBy(stockItems, 'SubTotal'),
-              GSTCharged: _.sumBy(stockItems, 'GST'),
-              DocketTotal: _.sumBy(stockItems, 'Total'),
-            };
-          });
+    allStockTypes.map(type => {
+      columnGroup.push({
+        Name: type.StockType,
+        class: "matcolumnright",
+        ColSpan: 8
+      });
 
-          return { location: key, stock: aggregates };
-        });
-    */
+      fields.map(f => {
+        displayJson[`${type.StockType}_${f.field}`] = {
+          Title: `${type.StockType.replace(/_/g, ' ')} ${f.caption}`,
+          class: "matcolumnright",
+          Style: "min-width: 100px",
+          datatype: "number",
+          decimalPlaces: f.decimal,
+          columnData: type
+        };
+
+        if (f.field == "Count") {
+          displayJson[`${type.StockType}_${f.field}`]["type"] = "Link";
+          displayJson[`${type.StockType}_${f.field}`]["functionName"] = "downloadcsv";
+        } else {
+          staticFields.push(type.StockType + '_' + f.field);
+        }
+      });
+    });
+
+    const columns = initializeAggregates(allStockTypes);
+    _.sortBy(pivotData, ['Location']);
+
+    _.each(pivotData, row => {
+      _.forEach(Object.keys(columns), column => {
+        columns[column] += row[column] || 0;
+      });
+    });
+
+    pivotData.push({
+      LocationCode: "",
+      Location: "Total",
+      ReportLocation: "",
+      ...columns
+    });
+
+    return { staticFields, config: { display: displayJson }, data: pivotData, columnGroup };
   }
 }

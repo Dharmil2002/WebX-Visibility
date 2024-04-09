@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { ViewPrintComponent } from '../view-print/view-print.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-loding-sheet-generate-success',
   templateUrl: './loding-sheet-generate-success.component.html'
@@ -16,7 +17,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   drillDownPath: string
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
-  companyCode: number;
+  companyCode: number = 0;
   dynamicControls = {
     add: false,
     edit: false,
@@ -24,7 +25,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   }
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
     //declaring breadscrum
     breadscrums = [
       {
@@ -74,8 +75,16 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     // selectAllorRenderedData : false,
     noColumnSort: ['checkBoxRequired']
   }
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,private CnoteService: CnoteService,public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,public Route:Router) {
-  
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private CnoteService: CnoteService,
+    private storage: StorageService,
+    public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,
+    public Route:Router 
+  ) {  
+    this.companyCode = this.storage.companyCode;
+    this.orgBranch = this.storage.branch;
+    
     console.log('this.data',this.data)
     this.csv=this.data;
     Swal.fire({

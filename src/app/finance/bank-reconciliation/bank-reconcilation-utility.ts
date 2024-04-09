@@ -1,5 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export async function getbankreconcilationList(masterService, request) {
 
@@ -9,7 +10,7 @@ export async function getbankreconcilationList(masterService, request) {
                 "pMD": { "D$in": ["RTGS/UTR", "Cheque"] },
             },
             {
-                "bRC": localStorage.getItem('Branch'),
+                "bRC": StorageService.getItem('Branch'),
             }, ...(request.fromDate ? [{ 'tTDT': { 'D$gte': request.fromDate } }] : []), ...(request.toDate ? [{ 'tTDT': { 'D$lt': request.toDate } }] : []),
             ...(request.bank ? [{ 'aNM': request.bank }] : []),
         ],
@@ -22,7 +23,7 @@ export async function getbankreconcilationList(masterService, request) {
     //             },
     // },
     const RequestBody = {
-        "companyCode": localStorage.getItem('companyCode'),
+        "companyCode": StorageService.getItem('companyCode'),
         "collectionName": "voucher_trans",
         "filters": [
             { D$match: matchQuery },
@@ -78,7 +79,7 @@ export async function getbankreconcilationList(masterService, request) {
 }
 export async function GetBankDropDown(masterService) {
     try {
-        const companyCode = parseInt(localStorage.getItem('companyCode'));
+        const companyCode = parseInt(StorageService.getItem('companyCode'));
         const filter = {
             companyCode: companyCode,
         };

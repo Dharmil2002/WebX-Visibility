@@ -8,6 +8,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { DatePipe } from "@angular/common";
 import { CompanyGSTControl } from "src/assets/FormControls/CompanyGSTMaster";
 import { firstValueFrom } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: "app-companygstmaster-add",
   templateUrl: "./companygstmaster-add.component.html",
@@ -63,7 +64,8 @@ export class CompanygstmasterAddComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private route: Router,
     private masterService: MasterService,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private storage: StorageService
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state;
 
@@ -150,9 +152,9 @@ export class CompanygstmasterAddComponent implements OnInit {
   // get
   async getCompanyMasterDetail() {
     const Body = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "company_master",
-      filter: { companyCode: parseInt(localStorage.getItem("companyCode")) },
+      filter: { companyCode: this.storage.companyCode },
     };
 
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
@@ -166,7 +168,7 @@ export class CompanygstmasterAddComponent implements OnInit {
   }
   async getCityMasterDetails() {
     const Body = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "city_detail",
       filter: { state: this.companyGstTableForm.value.state.name },
     };
@@ -195,7 +197,7 @@ export class CompanygstmasterAddComponent implements OnInit {
   async getStateMasterDetails() {
     this.companyGstTableForm.controls["city"].setValue("");
     const Body = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "state_detail",
       filter: {},
     };
@@ -223,9 +225,9 @@ export class CompanygstmasterAddComponent implements OnInit {
   }
   async ValidGSTNumber(){
     const Body = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customers_gst_details",
-      filter: {companyCode: parseInt(localStorage.getItem("companyCode")) ,gstInNumber:this.companyGstTableForm.value.gstInNumber},
+      filter: {companyCode: this.storage.companyCode ,gstInNumber:this.companyGstTableForm.value.gstInNumber},
     };
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body)) 
     if(res.success && res.data.length > 0){
@@ -259,17 +261,17 @@ export class CompanygstmasterAddComponent implements OnInit {
       isActive: this.companyGstTableForm.value.isActive,
     };
     if (!this.isUpdate) {
-      Body["_id"] = `${localStorage.getItem("companyCode")}-${
+      Body["_id"] = `${this.storage.companyCode}-${
         this.companyGstTableForm.value.gstInNumber
       }`;
       Body["CompanyName"] = this.companyGstTableForm.value.CompanyName;
-      Body["entryBy"] = localStorage.getItem("Username");
+      Body["entryBy"] = this.storage.userName;
       Body["entryDate"] = new Date().toISOString();
-      Body["companyCode"] = parseInt(localStorage.getItem("companyCode"));
+      Body["companyCode"] = this.storage.companyCode;
     }
 
     const req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customers_gst_details",
       data: this.isUpdate ? undefined : Body,
       filter: this.isUpdate

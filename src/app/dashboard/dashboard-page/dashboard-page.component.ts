@@ -2,13 +2,14 @@ import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnInit
 import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuAccessService } from 'src/app/core/service/menu-access/menu-access.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent implements OnInit {
   @ViewChild('myTabGroup') tabGroup!: MatTabGroup;
-  mode: string = localStorage.getItem("Mode");
+  mode: string = "";
   breadscrums = [
     {
       title: "Network Logistics Management",
@@ -120,8 +121,9 @@ export class DashboardPageComponent implements OnInit {
   constructor(private changeDetectorRef: ChangeDetectorRef,
     private activeRoute: ActivatedRoute,
     private Route: Router,
-    private _menuAccessService: MenuAccessService
-  ) {
+    private _menuAccessService: MenuAccessService,
+    private storageService: StorageService) {
+    this.mode = this.storageService.mode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
 
     }

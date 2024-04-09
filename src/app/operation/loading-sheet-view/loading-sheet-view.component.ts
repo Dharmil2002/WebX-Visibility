@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-loading-sheet-view',
@@ -37,7 +38,7 @@ Currently, all flows are working together without proper separation.
   toggleArray = []
   IscheckBoxRequired: boolean;
   menuItemflag: boolean;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   menuItems = [
   ];
   columnHeader = {
@@ -79,10 +80,11 @@ Currently, all flows are working together without proper separation.
   //#endregion
 
   constructor(
+    private storage: StorageService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any
   ) {
-     
+     this.companyCode = this.storage.companyCode;
     if (item) {
       this.loadingSheet = item;
       this.IscheckBoxRequired = true;

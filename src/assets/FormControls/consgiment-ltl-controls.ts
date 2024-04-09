@@ -300,7 +300,11 @@ export class ConsignmentLtl extends BaseControl {
                 functions: {
                     onSelection: "disableSize"
                 },
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Transport Mode is required",
+                    }],
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "Basic"
@@ -315,7 +319,11 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'risk', label: 'Risk', placeholder: 'Risk', type: 'Staticdropdown',
-                value: [], Validations: [], generatecontrol: true, disable: false,
+                value: [],   Validations: [
+                    {
+                        name: "required",
+                        message: "Risk is required",
+                    }], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "Basic",
                 },
@@ -598,6 +606,9 @@ export class ConsignmentLtl extends BaseControl {
                     name: "required",
                     message: "Eway Bill No is required",
                 }],
+                functions:{
+                    "onChange":"checkInvoiceExist"
+                },
                 additionalData: {
                     metaData: "invoiceDetail"
                 },

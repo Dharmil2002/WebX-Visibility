@@ -545,10 +545,6 @@ export class thcControl {
                     generatecontrol: true,
                     disable: view ? view : update,
                     Validations: [
-                        {
-                            name: "required",
-                            message: "Arrival Date is required",
-                        },
                     ],
                     functions: {
                         onDate: "ArrivalDateChange"
@@ -565,10 +561,6 @@ export class thcControl {
                     type: 'number',
                     value: "",
                     Validations: [
-                        {
-                            name: "required",
-                            message: "Arrival Seal No is required",
-                        },
                     ],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -583,8 +575,6 @@ export class thcControl {
                     type: 'number',
                     value: "",
                     Validations: [{
-                        name: "required",
-                        message: "Arrival End KM is required",
                     },],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -598,8 +588,6 @@ export class thcControl {
                     type: 'text',
                     value: "",
                     Validations: [{
-                        name: "required",
-                        message: "Arrival Remarks is required",
                     },],
                     additionalData: {
                         metaData: "ArrivalInfo"

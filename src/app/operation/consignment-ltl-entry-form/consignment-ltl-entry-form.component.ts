@@ -234,7 +234,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   //End
   async bindQuickdocketData() {
-
     if (this.quickDocket) {
       this.DocketDetails = this.quickdocketDetaildata?.docketsDetails || {};
       this.consignmentForm.controls["payType"].setValue(this.DocketDetails?.pAYTYP || "");
@@ -264,9 +263,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.invoiceForm.controls["noOfPackage"].setValue(this.DocketDetails?.noOfPackage || "");
       this.invoiceForm.controls["actualWeight"].setValue(this.DocketDetails?.actualWeight || "");
       this.invoiceForm.controls["chargedWeight"].setValue(this.DocketDetails?.chargedWeight || "");
-      this.tableData[0].NO_PKGS = this.DocketDetails?.pKGS || "";
-      this.tableData[0].ACT_WT = this.DocketDetails?.aCTWT || "";
-      this.DocketDetails?.cHRWT
       let event={field:{name:"fromCity"},eventArgs:{option:{value:{value:this.DocketDetails?.fCT}}}};
       event.field.name='fromCity'
       event.eventArgs.option.value.value=this.DocketDetails?.fCT
@@ -349,7 +345,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*end*/
   /*below is function for the get Pincode Based on city*/
   async getPinCodeBasedOnCity(event) {
-    debugger
+ 
     const fieldName = event.field.name == "fromCity" ? "fromPinCode" : "toPinCode"
     const pincode = await this.pinCodeService.pinCodeDetail({ CT: event.eventArgs.option.value.value });
     if (pincode.length > 0) {
@@ -1317,7 +1313,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*Emd*/
   GenerateFixedChargesControls(data) {
-    debugger
     return data
       .filter((x) => x.cBT === "Fixed")
       .map((x) => ({

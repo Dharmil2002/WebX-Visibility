@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
-import { calculateTotal} from "./thc-utlity";
+import { calculateTotal } from "./thc-utlity";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -662,7 +662,7 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
           this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
           this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
-          this.marketData=vehData;
+          this.marketData = vehData;
         }
       }
 
@@ -1869,8 +1869,8 @@ export class ThcGenerationComponent implements OnInit {
       const location = this.locationData.find(x => x.value == this.branchCode);
       this.chargeForm.controls['advPdAt'].setValue(location);
       this.isCharge = true;
-      if(this.prqFlag&&this.marketData){
-        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT||"0.00");
+      if (this.prqFlag && this.marketData) {
+        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT || "0.00");
       }
     }
   }
@@ -1962,7 +1962,7 @@ export class ThcGenerationComponent implements OnInit {
       this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
       this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
       this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
-      this.balanceAmount=thcNestedDetails?.thcDetails.bALAMT 
+      this.balanceAmount = thcNestedDetails?.thcDetails.bALAMT
     }
 
   }
@@ -1995,14 +1995,14 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is Called when the We click on Create THC*/
   async createThc() {
-     
+    debugger
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
     const contAmt = parseInt(this.chargeForm.get('contAmt').value);
     if (this)
       if ((vendorTypevalue == 2 || vendorTypevalue == 4) && contAmt <= 0) {
         Swal.fire({
           icon: 'error',
-          title: 'error',
+          title: 'error', 
           text: 'Contract amount must be greater than zero for Attached and Market vendor types.',
           showConfirmButton: true,
         });
@@ -2020,7 +2020,7 @@ export class ThcGenerationComponent implements OnInit {
         return false;
       }
     }
-    const selectedDkt = this.isUpdate ? this.tableData : this.selectedData ? this.selectedData : [];
+    const selectedDkt = this.isUpdate ? this.tableData.filter((x)=>x.isSelected) : this.selectedData ? this.selectedData : [];
     if ((selectedDkt.length === 0 && !this.isUpdate) && !this.DocketsIsEmpty) {
       Swal.fire({
         icon: 'info',
@@ -2120,13 +2120,31 @@ export class ThcGenerationComponent implements OnInit {
           "aCTDT": new Date()
         }
       }
+      const branch = this.storage.branch;
+      // Fetch location details asynchronously
+      const locData = await this.thcService.getLocationDetail(branch);
+      // Determine if the destination has been arrived at
+      const toCityValue=this.thcTableForm.getRawValue();
+      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase();
+      if(!isArrivedDel){
+        if(this.tableData.length==podDetails.length){
+          Swal.fire({
+            icon: "error",
+            title: 'Oops...',
+            text: `You can not update all docket in this location`,
+            showConfirmButton: true,
+          });
+          return false
+        }
+      }
+      // Prepare the request body with appropriate values based on the destination status
       const requestBody = {
-        "oPSST": 2,
-        "oPSSTNM": "Arrived",
-        "aRR": newARR,
-        "cHG": charges,
-        "bALAMT": this.chargeForm.get("balAmt").value,
-        "tOTAMT": this.chargeForm.get("totAmt").value
+        oPSST: isArrivedDel ? 2 : 3,
+        oPSSTNM: isArrivedDel ? "Arrived At Destination" : "Arrived",
+        aRR: newARR,
+        cHG: charges,
+        bALAMT: this.chargeForm.get("balAmt").value,
+        tOTAMT: this.chargeForm.get("totAmt").value
       };
 
       const data = this.thcTableForm.getRawValue();
@@ -2141,7 +2159,7 @@ export class ThcGenerationComponent implements OnInit {
         data.prqNo
       );
       if (this.thcDetailGlobal.thcDetails.tMODENM == "Road") {
-        await this.thcService.updateVehicle({tripId:"",status:"Available",route:""},{vehNo:this.thcDetailGlobal.thcDetails.vEHNO})
+        await this.thcService.updateVehicle({ tripId: "", status: "Available", route: "" }, { vehNo: this.thcDetailGlobal.thcDetails.vEHNO })
       }
       if (res) {
         Swal.fire({
@@ -2182,10 +2200,10 @@ export class ThcGenerationComponent implements OnInit {
         if (this.thcsummaryData.tMODENM == "Road") {
           await this.thcService.updateVehicle({
             vehNo: this.thcsummaryData.vehicle,
-            tripId:resThc.data?.mainData?.ops[0].docNo,
-            status:"In Transit",
-            route:this.thcsummaryData.route,
-          },{vehNo:this.thcsummaryData.vehicle})
+            tripId: resThc.data?.mainData?.ops[0].docNo,
+            status: "In Transit",
+            route: this.thcsummaryData.route,
+          }, { vehNo: this.thcsummaryData.vehicle })
         }
         if (resThc) {
           if (!isMarket && resThc.data?.mainData?.ops[0]?.docNo != "") {
@@ -2311,7 +2329,7 @@ export class ThcGenerationComponent implements OnInit {
         return acc; // In case of an unknown operation
       }
     }, 0);
-    const balance=parseFloat(this.balanceAmount)-Math.abs(total)
+    const balance = parseFloat(this.balanceAmount) - Math.abs(total)
     this.chargeForm.controls["balAmt"].setValue(balance);
   }
 }

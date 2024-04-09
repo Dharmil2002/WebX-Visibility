@@ -4,6 +4,8 @@ import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunc
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { MatDialog } from '@angular/material/dialog';
+import { DriverMasterUploadComponent } from './driver-master-upload/driver-master-upload.component';
 @Component({
   selector: 'app-driver-master',
   templateUrl: './driver-master.component.html',
@@ -14,6 +16,7 @@ export class DriverMasterComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   linkArray = []
+  uploadComponent = DriverMasterUploadComponent;
   columnHeader = {
     "eNTDT": "Created Date",
     'manualDriverCode': 'Driver Code',
@@ -44,7 +47,7 @@ export class DriverMasterComponent implements OnInit {
   addAndEditPath: string;
   csvFileName: string;
   tableData: any;
-  constructor(private masterService: MasterService, private storage: StorageService) {
+  constructor(private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
   }
@@ -109,6 +112,16 @@ export class DriverMasterComponent implements OnInit {
           this.getDriverDetails();
         }
       }
+    });
+  }
+
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getDriverDetails();
     });
   }
 }

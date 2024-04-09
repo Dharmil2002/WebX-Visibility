@@ -1,0 +1,13 @@
+<app-generic-bulk-upload 
+    [title]="'Driver Bulk Upload'" 
+    [downloadFunction]="Download" 
+    [fileName]="'Driver Upload'"
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="driverUploadForm">
+            <div class="col">
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

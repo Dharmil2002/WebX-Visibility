@@ -13,7 +13,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
-import { ProfitAndLossReport } from '../../../../../assets/FormControls/Reports/Account Reports/ProfitAndLossReport';
+import { ProfitAndLossReport } from '../../../../../../assets/FormControls/Reports/Account Reports/ProfitAndLossReport';
 import { Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 @Component({

@@ -54,9 +54,9 @@ import { PrqRegisterReportComponent } from './prq-register-report/prq-register-r
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
-import { ProfitAndLossCriteriaComponent } from './Account Report/Components/profit-and-loss-criteria/profit-and-loss-criteria.component';
-import { ProfitAndLossViewComponent } from './Account Report/Components/profit-and-loss-view/profit-and-loss-view.component';
-import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/profit-and-loss-view-details/profit-and-loss-view-details.component';
+import { ProfitAndLossCriteriaComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-criteria/profit-and-loss-criteria.component';
+import { ProfitAndLossViewComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view/profit-and-loss-view.component';
+import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details/profit-and-loss-view-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 import { TrialBalanceCriteriaComponent } from './Account Report/Components/TrialBalance/trial-balance-criteria/trial-balance-criteria.component';

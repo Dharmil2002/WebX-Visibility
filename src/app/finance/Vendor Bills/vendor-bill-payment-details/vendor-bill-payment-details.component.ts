@@ -427,7 +427,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   // Creating voucher_trans And voucher_trans_details And voucher_trans_document collection 
   save() {
     const PaymenDetails = this.PaymentSummaryFilterForm.value
-    const BillNo = this.billData.billNo
+    const BillNoList = this.billData.map(item => item.billNo)
+    const BillNo = BillNoList.join(",")
     this.snackBarUtilityService.commonToast(async () => {
       try {
         if (!PaymenDetails) {
@@ -445,11 +446,9 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
             return;
           }
         }
-        const PaymentAmount = parseFloat(
-          this.TotalBillAmount.toFixed(2)
-        );
+
         const NetPayable = parseFloat(
-          this.TotalPendingAmount.toFixed(2)
+          this.TotalPaymentAmount.toFixed(2)
         );
 
         this.VoucherRequestModel.companyCode = this.companyCode;
@@ -693,7 +692,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     const PaymentMode = paymentData.PaymentMode;
     if (PaymentMode == "Cash") {
       const CashAccount = paymentData.CashAccount;
-      Result.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, NetPayable, BillNo));
+      Result.push(createVoucher(CashAccount.aCCD, CashAccount.aCNM, "ASSET", 0, NetPayable, BillNo));
     }
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = paymentData.Bank;

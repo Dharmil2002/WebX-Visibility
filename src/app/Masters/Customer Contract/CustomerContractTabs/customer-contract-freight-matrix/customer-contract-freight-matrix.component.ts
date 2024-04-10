@@ -391,40 +391,61 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const isUpdate = this.isUpdate;
     const formData = this.FreightMatrixForm.value;
 
-    const filterCondition = (item) => {
-      const startDate = moment(item.vFDT, "DD-MM-YYYY");
-      const endDate = moment(item.vEDT, "DD-MM-YYYY");
-      const formDataStartDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
-      const formDataEndDate = moment(formData.ValidToDate, "DD-MM-YYYY");
-      const commonConditions =
-        item.fROM == formData.From.name && item.tO == formData.To.name &&
-        (startDate <= formDataEndDate && endDate >= formDataStartDate) ||
-        (endDate >= formDataStartDate && startDate <= formDataEndDate);
+    const startDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
+    const endDate = moment(formData.ValidToDate, "DD-MM-YYYY");
 
-
-      if (this.ServiceSelectiondata.loadType == "LT-0002") {
-        return isUpdate
-          ? commonConditions && item._id != this.UpdateData._id
-          : commonConditions;
-      } else {
-
-        return isUpdate
-          ? commonConditions &&
-          item.cAP == formData.capacity.name &&
-          item._id != this.UpdateData._id
-          : commonConditions && item.cAP == formData.capacity.name;
-      }
-    };
-    const filterData = this.tableData.filter(filterCondition);
-    if (filterData.length !== 0) {
+    if (startDate && endDate && startDate >= endDate) {
+      this.FreightMatrixForm.get('ValidFromDate').setValue("");
+      this.FreightMatrixForm.get('ValidToDate').setValue("");
       Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Enter Valid Freight Charges With Unique Date Range",
+        title: 'End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
         showConfirmButton: true,
+        confirmButtonText: "OK"
       });
+      return
     } else {
-      this.save();
+
+
+
+      const filterCondition = (item) => {
+        const startDate = moment(item.vFDT, "DD-MM-YYYY");
+        const endDate = moment(item.vEDT, "DD-MM-YYYY");
+        const formDataStartDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
+        const formDataEndDate = moment(formData.ValidToDate, "DD-MM-YYYY");
+        const commonConditions =
+          (item.fROM == formData.From.name && item.tO == formData.To.name) &&
+          ((startDate <= formDataEndDate && endDate >= formDataStartDate) ||
+            (endDate >= formDataStartDate && startDate <= formDataEndDate))
+
+
+        if (this.ServiceSelectiondata.loadType == "LT-0002") {
+          return isUpdate
+            ? commonConditions && item._id != this.UpdateData._id
+            : commonConditions;
+        } else {
+
+          return isUpdate
+            ? commonConditions &&
+            item.cAP == formData.capacity.name &&
+            item._id != this.UpdateData._id
+            : commonConditions && item.cAP == formData.capacity.name;
+        }
+      };
+      const filterData = this.tableData.filter(filterCondition);
+      if (filterData.length !== 0) {
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Enter Valid Freight Charges With Unique Date Range",
+          showConfirmButton: true,
+        });
+      } else {
+        this.save();
+      }
     }
   }
 

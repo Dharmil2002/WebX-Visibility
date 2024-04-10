@@ -86,7 +86,10 @@
           Loading...
         </div> -->
         <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
-        <button class="msr-3" mat-raised-button color="primary"(click)="save()">Generate Docket</button>
+        <button class="msr-3" mat-raised-button color="primary"
+         [disabled]="
+         !this.consignmentForm.valid || !freightForm.valid || isSubmit"
+         (click)="save()">Generate Docket</button>
         <button class="msr-3" mat-raised-button color="primary">Back</button>
         <button class="msr-3" [disabled]="!this.consignmentForm.value?.billingParty ||
         !this.consignmentForm.value?.docketDate ||

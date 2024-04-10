@@ -116,6 +116,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   otherCharges: any = [];
   DocketDetails: any;
   vehicleNo: any;
+  isSubmit: boolean = false;
   matrials: AutoComplete[];
   constructor(
     private controlPanel: ControlPanelService,
@@ -301,6 +302,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.freightForm.controls['rcm'].setValue("");
     this.consignmentForm.controls['payType'].setValue("");
     this.consignmentForm.controls['transMode'].setValue("");
+    this.consignmentForm.controls['payType'].setValue("P02");
+    const prodCode = this.tranType.find((x) => x.name == "Road")?.value || "";
+    this.consignmentForm.controls["transMode"].setValue(prodCode);
+
 
   }
   //#region functionCallHandler
@@ -1003,6 +1008,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       });
       return false
     }
+    this.isSubmit = true;
     const data = { ...this.consignmentForm.value, ...this.freightForm.value }
     const tableData = this.tableData
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';

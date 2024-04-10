@@ -449,6 +449,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Consignor Name is required",
+                    },
                     { name: "autocomplete" },
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
@@ -464,7 +468,10 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
-                value: "", Validations: [], generatecontrol: true, disable: false,
+                value: "", Validations: [  {
+                    name: "required",
+                    message: "Contact Number is required",
+                }], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "consignor",
                 }
@@ -489,7 +496,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-
+                    {
+                        name: "required",
+                        message: "Consignor Address is required",
+                    }
                 ],
                 functions: {
                 },
@@ -510,6 +520,10 @@ export class ConsignmentLtl extends BaseControl {
                         name: "pattern",
                         pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
                         message: "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+                    },
+                    {
+                        name: "required",
+                        message: "Consignor GST Number is required",
                     }
                 ],
                 functions: {
@@ -530,6 +544,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Consignee Name is required",
+                    },
                     { name: "autocomplete" },
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
@@ -544,7 +562,10 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
-                value: "", Validations: [], generatecontrol: true, disable: false,
+                value: "", Validations: [ {
+                    name: "required",
+                    message: "Contact Number is required",
+                },], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "consignee"
                 }
@@ -568,7 +589,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-
+                    {
+                        name: "required",
+                        message: "Consignee Address is required",
+                    }
                 ],
                 functions: {
                 },
@@ -589,6 +613,10 @@ export class ConsignmentLtl extends BaseControl {
                         name: "pattern",
                         pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
                         message: "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+                    },
+                    {
+                        name: "required",
+                        message: "Consignee GST Number",
                     }
                 ],
                 functions: {

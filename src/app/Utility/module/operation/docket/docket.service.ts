@@ -1179,8 +1179,8 @@ export class DocketService {
             "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
             "iNVTOT": ConvertToNumber(data?.totAmt || 0, 2),
             "pARTQTY": parseInt(data?.totalPartQuantity || 0),
-            "tRNMOD": data?.tranType || "",//check value transMode
-            "tRNMODNM": data?.tranTypeName || "",//check value transMode
+            "tRNMOD": data?.transMode || "",//check value transMode
+            "tRNMODNM": data?.transModeName || "",//check value transMode
             "eNTBY": this.storage.userName,
             "eNTDT": new Date(),
             "eNTLOC": this.storage.branch,

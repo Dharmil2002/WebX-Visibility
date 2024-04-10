@@ -1189,7 +1189,7 @@ export class DocketService {
             "fSTS": DocketFinStatus.Pending,
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
-            "cONTRACT": "",
+            "cONTRACT": data?.contract || ""
         };
 
         let invoiceDetails = invoiceData.map((element) => {

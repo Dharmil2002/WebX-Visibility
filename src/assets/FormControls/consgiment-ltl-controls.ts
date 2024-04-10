@@ -344,6 +344,13 @@ export class ConsignmentLtl extends BaseControl {
                 }
             },
             {
+                name: 'contract', label: '', placeholder: '', type: '',
+                value: "", Validations: [], generatecontrol: false, disable: false,
+                additionalData: {
+                    metaData: "Basic"
+                }
+            },
+            {
                 name: "f_vol",
                 label: "Volumetric",
                 placeholder: "Volumetric",

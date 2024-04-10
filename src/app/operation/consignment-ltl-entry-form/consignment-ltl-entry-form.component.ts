@@ -1298,14 +1298,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           this.freightForm.controls["freight_rate"].setValue(res[0].FreightChargeMatrixDetails?.rT);
           this.freightForm.controls["freightRatetype"].setValue(res[0].FreightChargeMatrixDetails?.rTYPCD);
           this.calculateFreight();
-
+           this.consignmentForm.controls['contract'].setValue(res[0]?.docNo||"")
           Swal.fire({
             icon: "success",
             title: "Contract Invoked Successfully",
             text: "ContractId: " + res[0].docNo,
             showConfirmButton: false,
           });
-
+        
         } else {
           Swal.fire({
             icon: "info",

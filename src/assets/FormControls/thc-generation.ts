@@ -305,8 +305,8 @@ export class thcControl {
                     Validations: [
                         {
                             "name": "pattern",
-                            "pattern": "^[A-Za-z ]{1,15}$",
-                            "message": "Please enter up to 15 alphabetical characters only"
+                            "pattern": "^[A-Za-z ]{1,50}$",
+                            "message": "Please enter up to 50 alphabetical characters only"
                         }
                     ],
                     functions: {},

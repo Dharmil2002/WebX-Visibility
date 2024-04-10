@@ -188,7 +188,7 @@ export class CustomerService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode:this.storage.companyCode,
           collectionName: "walkin_customers",
           filter,
         };

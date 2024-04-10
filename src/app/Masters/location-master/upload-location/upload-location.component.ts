@@ -144,7 +144,7 @@ export class UploadLocationComponent implements OnInit {
             Validations: [
               { Required: true },
               {
-                TakeFromList: this.pincodeList.map((x) => {
+                TakeFromArrayList: this.pincodeList.map((x) => {
                   return x.PIN;
                 }),
               },],
@@ -177,13 +177,13 @@ export class UploadLocationComponent implements OnInit {
           {
             ItemsName: "MappedAreaCity",
             Validations: [
-              { TakeFromList: Array.from(new Set(this.pincodeList.map((x) => x.CT))) }
+              { TakeFromArrayList: Array.from(new Set(this.pincodeList.map((x) => x.CT))) }
             ],
           },
           {
             ItemsName: "MappedAreaState",
             Validations: [
-              { TakeFromList: Array.from(new Set(this.zonelist.map((x) => x.STNM))) }
+              { TakeFromArrayList: Array.from(new Set(this.zonelist.map((x) => x.STNM))) }
             ]
           },
           {
@@ -213,10 +213,10 @@ export class UploadLocationComponent implements OnInit {
               }
             }
 
-            const city = this.pincodeList.find(x => x.PIN === element.PinCode);
+            const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
             if (city) {
               element.City = city.CT;
-              
+
               const state = this.zonelist.find(x => x.ST === city?.ST);
               element.State = state.STNM
               element.Zone = state.ZN;
@@ -229,7 +229,7 @@ export class UploadLocationComponent implements OnInit {
                 element.error.push(`${element.GSTNumber} does not belong to '${state.STNM}'. Please correct it`);
               }
 
-              const filter = { pincode: element.PinCode };
+              const filter = { pincode: parseInt(element.PinCode) };
               const addressList = await this.objAddressService.getAddressDetail(filter);
               element.Address = addressList[0]?.address ?? '';
             }
@@ -342,9 +342,61 @@ export class UploadLocationComponent implements OnInit {
     const updateLocLevel = hierachy.find(item => item.name.toUpperCase() === element.LocationHirarchay.toUpperCase());
     const updateReportLevel = hierachy.find(item => item.name.toUpperCase() === element.Reportingto.toUpperCase());
     const updateReportLoc = existingData.find(item => item.locCode.toUpperCase() === element.ReportingLocation.toUpperCase());
-    const updatePincode = pincodeList.find(item => item.PIN === element.PinCode);
+    const updatePincode = pincodeList.find(item => item.PIN === parseInt(element.PinCode));
     const updateOwnership = locOwnerShipList.find(item => item.name === element.LocationOwnership.toUpperCase());
     const updateState = zonelist.find(item => item.STNM.toUpperCase() === element.State.toUpperCase());
+
+    let MappedAreaPinCode: number[];
+
+    // Check if element.MappedAreaPinCode exists
+    if (element.MappedAreaPinCode) {
+      // Check if element.MappedAreaPinCode contains a comma
+      if (typeof element.MappedAreaPinCode === 'string' && element.MappedAreaPinCode.includes(',')) {
+        // If it contains a comma, split into an array of pin codes
+        MappedAreaPinCode = element.MappedAreaPinCode.split(',').map(x => parseInt(x.trim()));
+      } else {
+        // If it doesn't contain a comma, treat it as a single pin code
+        MappedAreaPinCode = [parseInt(element.MappedAreaPinCode)];
+      }
+
+      // Find the matching MappedAreaPinCode in PinCodeList
+      const updateMappedAreaPinCodeList = pincodeList.filter(item => MappedAreaPinCode.includes(item.PIN));
+      MappedAreaPinCode = updateMappedAreaPinCodeList.map(pin => pin.PIN);
+    }
+
+
+    let MappedAreaCities: string[];
+
+    // Check if element.MappedAreaCity contains a comma
+    if (element.MappedAreaCity) {
+      if (element.MappedAreaCity.includes(',')) {
+        // If it contains a comma, split into an array of locations
+        MappedAreaCities = element.MappedAreaCity.split(',').map(location => location.trim().toUpperCase());
+      } else {
+        // If it doesn't contain a comma, treat it as a single location
+        MappedAreaCities = [element.MappedAreaCity.trim()];
+      }
+      // Find the matching city in pincodelist
+      const updateCTList = pincodeList.filter(item => MappedAreaCities.includes(item.CT.toUpperCase()));
+      MappedAreaCities = Array.from(new Set(updateCTList.map(x => x.CT)));
+    }
+
+    let MappedAreaStates: string[];
+
+    if (element.MappedAreaState) {
+      // Check if element.MappedAreaState contains a comma
+      if (element.MappedAreaState.includes(',')) {
+        // If it contains a comma, split into an array of locations
+        MappedAreaStates = element.MappedAreaState.split(',').map(state => state.trim().toUpperCase());
+      } else {
+        // If it doesn't contain a comma, treat it as a single location
+        MappedAreaStates = [element.MappedAreaState.trim()];
+      }
+
+      // Find the matching city in pincodelist
+      const updateStateList = zonelist.filter(item => MappedAreaStates.includes(item.STNM.toUpperCase()));
+      MappedAreaStates = Array.from(new Set(updateStateList.map(x => x.STNM)));
+    }
 
     // Create a new LocationMaster instance to store processed data
     const processedData = new LocationMaster({});
@@ -398,23 +450,9 @@ export class UploadLocationComponent implements OnInit {
     // Set additional properties
     processedData.Latitude = element.Lat;
     processedData.Longitude = element.Log;
-    processedData.mappedPinCode = element.MappedAreaPinCode ?
-      Array.isArray(element.MappedAreaPinCode)
-        ? element.MappedAreaPinCode
-        : element.MappedAreaPinCode.toString().split(',').map(pinCode => parseInt(pinCode))
-      : [];
-
-    processedData.mappedCity = element.MappedAreaCity ?
-      Array.isArray(element.MappedAreaCity)
-        ? element.MappedAreaCity
-        : element.MappedAreaCity.toString().split(',').map(city => city.trim())
-      : [];
-
-    processedData.mappedState = element.MappedAreaState ?
-      Array.isArray(element.MappedAreaState)
-        ? element.MappedAreaState
-        : element.MappedAreaState.toString().split(',').map(state => state.trim())
-      : [];
+    processedData.mappedPinCode = element.MappedAreaPinCode ? MappedAreaPinCode : [];
+    processedData.mappedCity = element.MappedAreaCity ? MappedAreaCities : [];
+    processedData.mappedState = element.MappedAreaState ? MappedAreaStates : [];
 
     // Set timestamp and user information
     processedData.eNTDT = new Date();

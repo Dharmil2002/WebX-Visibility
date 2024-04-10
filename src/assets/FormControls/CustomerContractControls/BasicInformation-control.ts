@@ -133,7 +133,12 @@ export class ContractBasicInformationControl {
         value: BasicInformation.ContractStartDate,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Start Date is required"
+          },
+        ],
         additionalData: {
           // minDate: new Date(), // Set the minimum date to the current date
           maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
@@ -151,7 +156,12 @@ export class ContractBasicInformationControl {
         value: BasicInformation.Expirydate,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Expiry Date is required"
+          },
+        ],
         additionalData: {
           minDate: new Date(), // Set the minimum date to the current date
           maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years

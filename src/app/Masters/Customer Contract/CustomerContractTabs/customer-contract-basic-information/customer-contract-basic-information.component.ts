@@ -120,6 +120,8 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     const endDate = new Date(endDateString);
 
     if (startDate && endDate && startDate > endDate) {
+      this.ProductsForm.get('ContractStartDate').setValue("");
+      this.ProductsForm.get('Expirydate').setValue("");
       Swal.fire({
         title: 'Contract End date must be greater than or equal to start date.',
         toast: false,

@@ -22,10 +22,10 @@ export class VendorBillPaymentComponent implements OnInit {
       "id": "VendorBills",
       "label": "Tab 1",
     },
-    {
-      "id": "OnlinePaymentApproval",
-      "label": "Tab 2",
-    },
+    // {
+    //   "id": "OnlinePaymentApproval",
+    //   "label": "Tab 2",
+    // },
   ]
   @ViewChild('myTabGroup') tabGroup!: MatTabGroup;
   constructor(private changeDetectorRef: ChangeDetectorRef,

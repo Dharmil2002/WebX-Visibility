@@ -28,8 +28,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   data: [] | any;
   tripData: any;
   tabledata: any;
-  currentBranch: string = localStorage.getItem("Branch") || '';
-  companyCode: number = parseInt(localStorage.getItem('companyCode'));
+  currentBranch: string = '';
+  companyCode: number = 0;
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
@@ -116,7 +116,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     private storage:StorageService,
     private arrivalService: ArrivalVehicleService
   ) {
-
+    this.currentBranch = this.storage.branch;
+    this.companyCode = this.storage.companyCode;
+    
     // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
 

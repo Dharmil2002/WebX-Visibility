@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -11,7 +12,7 @@ export class ContainerMasterListComponent implements OnInit {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = []
   columnHeader =
     {
@@ -44,7 +45,8 @@ export class ContainerMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ContainerMaster/AddContainerTypeMaster";
   }
   ngOnInit(): void {
@@ -53,7 +55,7 @@ export class ContainerMasterListComponent implements OnInit {
   }
   getContainerDetails() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       "collectionName": "container_detail",
       "filter": {}
     };
@@ -94,7 +96,7 @@ export class ContainerMasterListComponent implements OnInit {
     delete det._id;
     delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "container_detail",
       filter: { _id: id },
       update: det

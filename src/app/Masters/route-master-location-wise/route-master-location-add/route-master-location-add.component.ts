@@ -17,7 +17,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
   templateUrl: './route-master-location-add.component.html'
 })
 export class RouteMasterLocationAddComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   routeMasterLocationForm: UntypedFormGroup;
   RouteDetailTableForm: UntypedFormGroup;
   jsonControlArray: any;
@@ -68,6 +68,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
    private filter: FilterUtils,
    private storage:StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
@@ -334,9 +335,9 @@ export class RouteMasterLocationAddComponent implements OnInit {
       scheduleType: this.routeMasterLocationForm.value.scheduleType,
       isActive: this.routeMasterLocationForm.value.isActive,
       routeName:routeName,
-      updatedBy: localStorage.getItem("UserName"),
+      updatedBy: this.storage.userName,
       _id: this.newRouteCode,
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       routeDetails: this.tableData.map((x) => {
         return {
           loccd: x.loccd,

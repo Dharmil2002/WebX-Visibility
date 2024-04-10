@@ -1,3 +1,5 @@
+import * as StorageService from "src/app/core/service/storage.service";
+
 type RouteLeg = string;
 
 interface Legs {
@@ -204,9 +206,9 @@ export async function updateTracking(companyCode, operationService, data) {
       dktNo: data?.dktNo|| '',
       vehNo: data?.vehNo || '',
       route: data?.route || '',
-      event: 'Loading Sheet Generated At'+" "+localStorage.getItem('Branch'),
+      event: 'Loading Sheet Generated At'+" "+ StorageService.getItem('Branch'),
       orgn: docketDetails[lastArray]?.orgn || '',
-      loc: localStorage.getItem('Branch') || '',
+      loc: StorageService.getItem('Branch') || '',
       dest: docketDetails[lastArray]?.dest || '',
       lsno: data?.lsNo || '',
       unload:false,
@@ -214,7 +216,7 @@ export async function updateTracking(companyCode, operationService, data) {
       dlSt: '',
       dlTm: '',
       evnCd: '',
-      upBy: localStorage.getItem('Username') || '',
+      upBy: StorageService.getItem('Username') || '',
       upDt: new Date()
     };
 

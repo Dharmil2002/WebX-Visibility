@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class AddContractProfile {
   AddContractProfileArray: FormControls[];
@@ -142,7 +144,7 @@ export class AddContractProfile {
         label: "",
         placeholder: "",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -292,7 +294,7 @@ export class AddContractProfile {
         label: "",
         placeholder: "",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -302,7 +304,7 @@ export class AddContractProfile {
         label: "Company Code",
         placeholder: "Company Code",
         type: "text",
-        value: parseInt(localStorage.getItem("companyCode")),
+        value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
         Validations: [],
         generatecontrol: false,
         disable: false,

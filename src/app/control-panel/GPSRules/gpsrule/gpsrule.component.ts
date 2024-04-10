@@ -7,6 +7,7 @@ import { GPSRuleControls } from "src/assets/FormControls/ControlPanel/GPSRuleCon
 import { columnHeader, staticField } from "./gpsrule-utility";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-gpsrule",
@@ -17,9 +18,9 @@ export class GPSRuleComponent implements OnInit {
   jsonControlgpsRuleArray: any;
   gpsRuleCrend: any;
   isUpdate = false;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  branch = localStorage.getItem("Branch");
-  user = localStorage.getItem("UserName");
+  companyCode: any = 0;
+  branch: string = "";
+  user: string = "";
   gpsRuleTableForm: UntypedFormGroup;
   crend: {
     user: string;
@@ -62,8 +63,13 @@ export class GPSRuleComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private router: Router
+    private router: Router,
+    private storageService: StorageService
   ) {
+    this.companyCode = this.storageService.companyCode;
+    this.branch = this.storageService.branch;
+    this.user = this.storageService.userName;
+
     this.addAndEditPath = "/ControlPanel/gps-rule/add-gps-rule";
     this.initializeFormControl();
   }

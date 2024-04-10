@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class HolidayControl {
   holidayControlArray: FormControls[];
@@ -86,7 +88,7 @@ export class HolidayControl {
         label: "Entry By",
         placeholder: "Entry By",
         type: "",
-        value: localStorage.getItem("Username"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -174,7 +176,7 @@ export class HolidayControl {
         label: "Entry By",
         placeholder: "Entry By",
         type: "",
-        value: localStorage.getItem("Username"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,

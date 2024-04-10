@@ -2,19 +2,20 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: "root",
 })
 export class CustomerService {
-  constructor(private masterService: MasterService, private filter: FilterUtils) { }
+  constructor(private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) { }
 
   // This async function retrieves customer data from an API using the masterService.
   async customerFromApi() {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "customer_detail",
       filter: {}, // You can specify additional filters here if needed
     };
@@ -50,7 +51,7 @@ export class CustomerService {
       if (!filter) return undefined;
 
       const cityBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         collectionName: "customer_detail",
         filter,
       };
@@ -83,7 +84,7 @@ export class CustomerService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode: this.storage.companyCode,
           collectionName: "customer_detail",
           filter,
         };
@@ -124,7 +125,7 @@ export class CustomerService {
   async customerFromFilter(filter = {}, flag = false) {
     // Prepare the request body with necessary parameters
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "customer_detail",
       filter: filter, // You can specify additional filters here if needed
     };
@@ -156,7 +157,7 @@ export class CustomerService {
   async customerGroupFilter(groupName) {
 
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "customerGroup_detail",
       filter: {
         activeFlag: true,
@@ -175,6 +176,53 @@ export class CustomerService {
       // Handle any errors that occur during the API request
       console.error("An error occurred:", error);
       return null; // Return null to indicate an error occurred
+    }
+  }
+  async getWalkForAutoComplete(form, jsondata, controlName, codeStatus) {
+    try {
+      const cValue = form.controls[controlName].value;
+
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (cValue.length >= 3) {
+        const filter = { cUSTNM: { 'D$regex': `^${cValue}`, 'D$options': 'i' } }
+
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: localStorage.getItem("companyCode"),
+          collectionName: "walkin_customers",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+
+        // Extract the cityCodeData from the response
+        const codeData = cResponse.data.map((x) => { return { name: x.cUSTNM, value: x.cUSTCD, otherdetails: x } });
+
+        // Filter cityCodeData for partial matches
+        if (codeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          console.log(`No data found for Customer ${cValue}`);
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for Customer ${cValue}`,
+          //   showConfirmButton: true,
+          // });
+        } else {
+          // Call the filter function with the filtered data
+          this.filter.Filter(
+            jsondata,
+            form,
+            codeData,
+            controlName,
+            codeStatus
+          );
+        }
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+      console.error("Error fetching data:", error);
     }
   }
 }

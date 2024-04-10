@@ -6,6 +6,7 @@ import { DcrAction } from 'src/app/Models/docStatus';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { createShipDataObject } from 'src/app/Utility/commonFunction/dashboard/dashboard';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-active-series',
@@ -31,7 +32,7 @@ export class ActiveSeriesComponent implements OnInit {
   linkArray = [{ Row: "action", Path: "/Masters/AddDCR/DCRAllocation" }];
   csv: any[];
   addAndEditPath: string;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   tableData: any;
   documentWithType: any[] = [];
   jsonUrl = '../../../assets/data/state-countryDropdown.json'
@@ -111,7 +112,9 @@ export class ActiveSeriesComponent implements OnInit {
   };
   constructor(private Route: Router,
     private masterService: MasterService,
-    private http: HttpClient) { }
+    private http: HttpClient, private storage: StorageService) { 
+      this.companyCode = this.storage.companyCode;
+    }
 
   ngOnInit(): void {
     const shipData = [

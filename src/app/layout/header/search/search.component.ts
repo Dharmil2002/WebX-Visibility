@@ -1,6 +1,7 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-search',
@@ -12,7 +13,10 @@ export class SearchComponent implements OnInit {
   autocompleteOptions: any[] = [];
   allOptions: any[] = [];
 
-  constructor(private router: Router, public dialogRef: MatDialogRef<SearchComponent>,
+  constructor(
+    private router: Router, 
+    public dialogRef: MatDialogRef<SearchComponent>,
+    private storageService: StorageService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
     if (data) {
       this.allOptions = data.allOptions;
@@ -39,7 +43,7 @@ export class SearchComponent implements OnInit {
     this.router.navigateByUrl(option.value);
     this.searchQuery = "";
     // Get the existing stored search results
-    const storedSearchResults = JSON.parse(localStorage.getItem('searchResults') || '[]');
+    const storedSearchResults = JSON.parse(this.storageService.getItem('searchResults') || '[]');
     // Remove the selected option if it already exists in the list
     const updatedResults = storedSearchResults.filter((result: any) => result.name !== option.name);
 
@@ -51,7 +55,7 @@ export class SearchComponent implements OnInit {
     // Add the newly selected item to the beginning of the list
     updatedResults.unshift(option);
     // Save the updated list back to local storage
-    localStorage.setItem('searchResults', JSON.stringify(updatedResults));
+    this.storageService.setItem('searchResults', JSON.stringify(updatedResults));
     this.dialogRef.close();
   }
   
@@ -60,7 +64,7 @@ export class SearchComponent implements OnInit {
   }
 
   getFromLocalstorage() {
-    const storedSearchResults = JSON.parse(localStorage.getItem('searchResults') || '[]');
+    const storedSearchResults = JSON.parse(this.storageService.getItem('searchResults') || '[]');
     this.autocompleteOptions = storedSearchResults;
   }
 

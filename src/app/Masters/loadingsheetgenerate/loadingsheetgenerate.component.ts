@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,12 +29,16 @@ export class LoadingsheetgenerateComponent implements OnInit {
     "TotalWeight": "TotalWeight",
     "TotalCFT": "TotalCFT"
   }
-  orgBranch:string=localStorage.getItem("Branch");
-  companyCode:number=parseInt(localStorage.getItem('companyCode'));
+  orgBranch:string="";
+  companyCode:number=0;
   dayName: any;
   dataDetails: any;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,public dialogRef: MatDialogRef<LoadingsheetgenerateComponent>,public Route:Router,private ICnoteService: CnoteService) {
-     let loadingList=[];
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any,public dialogRef: MatDialogRef<LoadingsheetgenerateComponent>,public Route:Router,
+  private ICnoteService: CnoteService, private storage: StorageService) {
+    this.orgBranch = this.storage.branch;
+    this.companyCode = this.storage.companyCode;
+
+    let loadingList=[];
     data.data.forEach(element => {
       let loadingSheetData={
         Docket:element.Docket,

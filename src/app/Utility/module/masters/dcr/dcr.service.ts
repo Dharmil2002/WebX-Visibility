@@ -34,7 +34,7 @@ export class DCRService {
     valueKey
   ) {
     try {
-      const companyCode = parseInt(localStorage.getItem("companyCode"));
+      const companyCode = this.storage.companyCode;
       const req = { companyCode, collectionName };
       const res = await masterService
         .masterPost("generic/get", req)

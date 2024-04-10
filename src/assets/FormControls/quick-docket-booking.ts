@@ -2,6 +2,8 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
+import * as StorageService from "src/app/core/service/storage.service";
+import { StoreKeys } from "src/app/config/myconstants";
 
 /* here i create class for the bind controls in formGrop */
 export class QuickBookingControls extends BaseControl {
@@ -104,7 +106,7 @@ export class QuickBookingControls extends BaseControl {
         label: "Origin",
         placeholder: "orgLoc",
         type: "text",
-        value: localStorage.getItem("Branch"),
+        value: StorageService.getItem(StoreKeys.Branch),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -245,7 +247,7 @@ export class QuickBookingControls extends BaseControl {
           }
         ],
         functions: {
-          keypress: "intigerOnly",
+          keypress: "integerOnly",
         },
       },
       {

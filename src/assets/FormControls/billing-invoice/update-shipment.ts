@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class UpdateShipmentsControl {
   private editShipment: FormControls[];
@@ -93,7 +95,7 @@ export class UpdateShipmentsControl {
         label: "Edit location",
         placeholder: "Edit location",
         type: "text",
-        value: localStorage.getItem("Branch"),
+        value: StorageService.getItem(StoreKeys.Branch),
         generatecontrol: true,
         disable: true,
         Validations: [],

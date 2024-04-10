@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import { MatDialog } from "@angular/material/dialog";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ActivatedRoute, Router } from "@angular/router";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-list-product",
@@ -71,15 +72,18 @@ export class ListProductComponent implements OnInit {
     noColumnSort: Object.keys(this.columnHeader),
   };
   staticField = ["SrNo", "ProductID", "ProductName"];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   productNameList: any = [];
   tableData: any;
   isTableLode = false;
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
-    private masterService: MasterService
-  ) {}
+    private masterService: MasterService,
+    private storage: StorageService
+  ) {
+    this.companyCode = this.storage.companyCode;
+  }
   ngOnInit() {
     this.getProductDetails();
   }

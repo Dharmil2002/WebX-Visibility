@@ -180,6 +180,7 @@ import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocati
 import { DcrManagementComponent } from "./dcr-series/dcr-management/dcr-management.component";
 import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.component";
 import { CustomerMasterUploadComponent } from './customer-master/customer-master-upload/customer-master-upload.component';
+import { DriverMasterUploadComponent } from './driver-master/driver-master-upload/driver-master-upload.component';
 import { VendorMasterUploadComponent } from './vendor-master/vendor-master-upload/vendor-master-upload.component';
 
 @NgModule({
@@ -376,7 +377,9 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
     DcrManagementComponent,
     ActiveSeriesComponent,
     CustomerMasterUploadComponent,
-    VendorMasterUploadComponent 
+    DriverMasterUploadComponent ,
+    CustomerMasterUploadComponent,
+    VendorMasterUploadComponent
   ],
   providers: [
     DatePipe,

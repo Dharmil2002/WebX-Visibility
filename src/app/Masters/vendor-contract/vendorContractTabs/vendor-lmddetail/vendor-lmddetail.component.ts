@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
 import { LastMileDeliveryBulkUploadComponent } from './last-mile-delivery-bulk-upload/last-mile-delivery-bulk-upload.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-lmddetail',
@@ -76,7 +77,7 @@ export class VendorLMDDetailComponent implements OnInit {
     { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRMNM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   CurrentContractDetails: any;
   uploadComponent = LastMileDeliveryBulkUploadComponent;
 
@@ -84,7 +85,9 @@ export class VendorLMDDetailComponent implements OnInit {
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

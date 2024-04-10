@@ -9,6 +9,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { xlsxutilityService } from "src/app/core/service/Utility/xlsx Utils/xlsxutility.service";
 import { EncryptionService } from "src/app/core/service/encryptionService.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import {containerFromApi, customerFromApi,locationFromApi} from "src/app/operation/prq-entry-page/prq-utitlity";
 import { XlsxPreviewPageComponent } from "src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component";
 import Swal from "sweetalert2";
@@ -18,7 +19,7 @@ import Swal from "sweetalert2";
   templateUrl: "./prq-bulk-upload.component.html",
 })
 export class PrqBulkUploadComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   IsUploaded: boolean;
   fileUploadForm: UntypedFormGroup;
   existingData: any;
@@ -43,9 +44,11 @@ export class PrqBulkUploadComponent implements OnInit {
     private encryptionService: EncryptionService,
     private route: ActivatedRoute,
     private fb: UntypedFormBuilder,
-    private objGeneralService: GeneralService
+    private objGeneralService: GeneralService,
+    private storageService: StorageService
   ) // private objprqLocationService: RouteLocationService,
   {
+    this.companyCode = this.storageService.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params["data"]; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

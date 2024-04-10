@@ -6,6 +6,7 @@ import { th } from 'date-fns/locale';
 import { Observable, map, startWith } from 'rxjs';
 import { BranchDropdown } from 'src/app/Models/Comman Model/CommonModel';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
+import { StoreKeys } from 'src/app/config/myconstants';
 import { AuthService } from 'src/app/core/service/auth.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 
@@ -16,7 +17,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 })
 export class VirtualLoginComponent implements OnInit {
 
-  userLocations = localStorage.getItem("loginLocations");
+  userLocations = "";
   VitualLoginForm: UntypedFormGroup;
   BranchDropdown: BranchDropdown[];
   filteredBranch: Observable<BranchDropdown[]>;
@@ -26,6 +27,7 @@ export class VirtualLoginComponent implements OnInit {
     public fb: FormBuilder,
     public dialogRef: MatDialogRef<AuthService>
   ) {
+    this.userLocations = this.storageService.getItem(StoreKeys.LoginLocations);
     this.VitualLoginForm = this.VitualLoginParameterForm();
   }
 
@@ -73,7 +75,7 @@ export class VirtualLoginComponent implements OnInit {
   }
 
   Onsubmit() {
-    this.storageService.setItem("Branch", this.VitualLoginForm.value.Branch.locCode);
+    this.storageService.setItem(StoreKeys.Branch, this.VitualLoginForm.value.Branch.locCode);
     this.dialogRef.close();
     location.reload();
   }

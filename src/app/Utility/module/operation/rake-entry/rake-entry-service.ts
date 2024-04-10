@@ -220,7 +220,7 @@ export class RakeEntryService {
         Weight: weight,
         BillingParty: uniqueBillingParties.size,
         billingPartyDetails: Array.from(billingPartys),
-        CurrentStatus: "At " + localStorage.getItem("Branch"),
+        CurrentStatus: "At " + this.storage.branch,
         CNNo: uniquecnNos.size,
         cnNos: Array.from(docketList),
         entryDate: element?.eNTDT ?? '',

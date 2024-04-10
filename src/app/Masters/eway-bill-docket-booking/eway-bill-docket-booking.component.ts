@@ -22,6 +22,7 @@ import {
 import { DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from "src/app/core/models/docketModel";
 import { DocketMongoDetails, InvoiceArray } from "src/app/core/models/Docketmongos";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { jsonDataServiceService } from "src/app/core/service/Utility/json-data-service.service";
 import { roundNumber, WebxConvert } from "src/app/Utility/commonfunction";
 import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
@@ -143,6 +144,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     private datePipe: DatePipe,
     private Route: Router,
     private cdr: ChangeDetectorRef,
+    private storage: StorageService,
     private IjsonDataServiceService:jsonDataServiceService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -224,7 +226,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   getRules() {
     this.ICnoteService.getNewCnoteBooking(
       "services/companyWiseRules/",
-      parseInt(localStorage.getItem("companyCode"))
+      this.storage.companyCode
     ).subscribe({
       next: (res: any) => {
         if (res) {
@@ -308,7 +310,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   }
   DocketBooking() {
     let reqbody = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
     };
     this.ICnoteService.cnoteNewPost(
       "cnotefields/GetdocketFieldUsingEwayBill",
@@ -429,7 +431,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     );
     if (this.step1.controls["FromCity"].value.length > 2) {
       const request = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         ruleValue: matchingRule.defaultvalue,
         searchText: this.step1.controls["FromCity"].value,
         docketMode: "Yes",
@@ -457,7 +459,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       if (this.step1.controls["ToCity"].value.length > 2) {
         // Build the request object with necessary data
         let req = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           ruleValue: rules.defaultvalue,
           searchText: this.step1.controls["ToCity"].value,
           docketMode: "Yes",
@@ -515,8 +517,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
         let CustomerType =
           event == "billingParty" ? "CP" : event == "CST_NM" ? "CN" : "CE";
         let req = {
-          companyCode: parseInt(localStorage.getItem("companyCode")),
-          LocCode: localStorage.getItem("Branch"),
+          companyCode: this.storage.companyCode,
+          LocCode: this.storage.branch,
           searchText: control,
           CustHierarchy: Defalutvalue.defaultvalue,
           PayBase: "p02",
@@ -560,7 +562,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         // Creates the request object to be sent to the API endpoint
         let req = {
           searchText: this.step1.controls["ConsignorCity"].value,
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           MAP_DLOC_CITY: rules.defaultvalue,
         };
 
@@ -604,7 +606,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         // Prepare the request object
         let req = {
           searchText: control,
-          companyCode: parseInt(localStorage.getItem("companyCode")),
+          companyCode: this.storage.companyCode,
           city: city.Value,
         };
 
@@ -638,7 +640,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         // Prepare the request object.
         let req = {
           searchText: this.step1.controls["ConsigneeCity"].value, // The search text entered by the user.
-          companyCode: parseInt(localStorage.getItem("companyCode")), // The company code.
+          companyCode: this.storage.companyCode, // The company code.
           MAP_DLOC_CITY: rules.defaultvalue, // The default value of the 'MAP_DLOC_CITY' rule.
         };
 
@@ -841,10 +843,10 @@ export class EwayBillDocketBookingComponent implements OnInit {
   GetDestination() {
     if (this.step2.controls["Destination"].value.length > 3) {
       let reqbody = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         map_dloc_pin: this.Rules.find((x) => x.code == "MAP_DLOC_PIN")
           .defaultvalue,
-        OriginLocation: localStorage.getItem("Branch"),
+        OriginLocation: this.storage.branch,
         loc_level: "234",
         searchText: this.step2.controls["Destination"].value,
       };
@@ -972,7 +974,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   GetInvoiceConfigurationBasedOnTransMode() {
     // Create request object
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       contractid: this.step1.controls["billingParty"].value?.ContractId || "",
       ServiceType: this.step2.controls["SVCTYP"].value,
       TransMode: this.step2.controls["TRN"].value,
@@ -1260,7 +1262,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   }
   GetLocationDetail() {
     let req = {
-      companyCode: parseInt(localStorage.getItem('companyCode')),
+      companyCode: this.storage.companyCode,
       locName: this.EwayBillDetail[0][1].Consignor.city
     }
     this.ICnoteService.cnoteNewPost("services/GetLocationDetails", req).subscribe({
@@ -1287,7 +1289,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
 
       // Create a request object with company code and city name
       var req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         City:
           this.step1.controls["ToCity"].value?.City_code == 0
             ? this.step1.controls["ToCity"].value.Value
@@ -1324,7 +1326,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   GetContractInvokeDependent() {
     try {
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         ServiceType: this.step2.controls["SVCTYP"].value,
         ContractID: this.step1.controls["billingParty"].value?.ContractId || "",
         ChargeType: "BKG",
@@ -1390,7 +1392,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   CalucateEdd() {
     this.Invoiceinit();
     let reqbody = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       EDD_TRANSIT: this.Rules.find((x) => x.code == "EDD_TRANSIT").defaultvalue,
       FLAG_CUTOFF: this.Rules.find((x) => x.code == "FLAG_CUTOFF").defaultvalue,
       EDD_NDAYS: this.Rules.find((x) => x.code == "EDD_NDAYS").defaultvalue,
@@ -1413,12 +1415,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
     });
   }
   Invoiceinit() {
-    this.RequestContractKeysDetail.companyCode = parseInt(
-      localStorage.getItem("companyCode")
-    );
-    (this.RequestContractKeysDetail.ContractKeys.CompanyCode = parseInt(
-      localStorage.getItem("companyCode")
-    )),
+    this.RequestContractKeysDetail.companyCode = this.storage.companyCode;
+    (this.RequestContractKeysDetail.ContractKeys.CompanyCode = this.storage.companyCode),
       (this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1
         ? this.BasedOn1
         : "");
@@ -1450,8 +1448,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       ? this.step2.controls["TotalChargedNoofPackages"].value
       : "0.00";
     this.RequestContractKeysDetail.ContractKeys.Quantity = 0.0;
-    this.RequestContractKeysDetail.ContractKeys.OrgnLoc =
-      localStorage.getItem("Branch");
+    this.RequestContractKeysDetail.ContractKeys.OrgnLoc = this.storage.branch;
     this.RequestContractKeysDetail.ContractKeys.PayBase = this.step2.controls[
       "PAYTYP"
     ].value
@@ -1492,10 +1489,10 @@ export class EwayBillDocketBookingComponent implements OnInit {
   DocketValidation() {
     // Create the request object with the necessary parameters
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       DocType: 'DKT',
       DocNo: this.step1.controls['DKTNO'].value,
-      LocCode: localStorage.getItem("Branch")
+      LocCode: this.storage.branch
     }
 
     try {
@@ -1576,8 +1573,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
     if (this.step2.controls['PRQ'].value.length > 1) {
       // Define request parameters
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        BranchCode: localStorage.getItem("Branch"),
+        companyCode: this.storage.companyCode,
+        BranchCode: this.storage.branch,
         SearchText: this.step2.controls['PRQ'].value
       };
       // Send POST request to retrieve PRQ vehicle request
@@ -1733,7 +1730,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     if (this.step1.controls['VEHICLE_NO'].value.length > 1) {
       // Create a request object with required parameters
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         SearchText: this.step1.controls['VEHICLE_NO'].value,
         VendorCode: "",
         VehicleType: "Toll",
@@ -1757,7 +1754,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   //GetPrqInvoiceList
   GetPrqInvoiceList() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       PrqNumber: this.step2.controls['PRQ'].value.PRQNO
     }
 
@@ -1778,7 +1775,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
 
     try {
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         ddArray: dropdown
       }
 
@@ -1977,8 +1974,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
         GstDetails.VATRate = 0.00
         GstDetails.TaxControlType = ''
         this.DocketEntity.GstDetails = GstDetails;
-        this.DocketEntity.EntryBy = localStorage.getItem('Username');
-        this.DocketEntity.CompanyCode = parseInt(localStorage.getItem("companyCode"))
+        this.DocketEntity.EntryBy = this.storage.userName;
+        this.DocketEntity.CompanyCode = this.storage.companyCode
         this.DocketEntity.IsConsigneeFromMasterOrWalkin = this.step2.controls['IsConsigneeFromMasterOrWalkin']?.value || '';
         this.DocketEntity.ConsigneeCode = '8888'//this.step1.controls['ConsigneeName']?.value.Value || ''
         // this.DocketEntity.EntryTypes = this.DocketEntity.EntryTypes;

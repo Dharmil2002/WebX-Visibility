@@ -9,6 +9,7 @@ import { PincodeLocationControl } from "src/assets/FormControls/pincodeLocationM
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-pincode-location-list',
@@ -32,7 +33,7 @@ export class PincodeLocationMappingComponent implements OnInit {
     stateData: any;
     data: [] | any;
     csv: any[];
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
 
     // Action buttons configuration
     actionObject = {
@@ -55,8 +56,10 @@ export class PincodeLocationMappingComponent implements OnInit {
     filteredData: any;
 
     constructor(public ObjSnackBarUtility: SnackBarUtilityService, private filter: FilterUtils, private route: Router,
-        private masterService: MasterService, private fb: UntypedFormBuilder) {
-        this.loadTempData('');
+        private masterService: MasterService, private fb: UntypedFormBuilder, private storage: StorageService) {
+        
+            this.companyCode = this.storage.companyCode;
+            this.loadTempData('');
     }
 
 
@@ -306,7 +309,7 @@ export class PincodeLocationMappingComponent implements OnInit {
                     pincode: this.pinLocTableForm.value.pincode?.value || '',
                     pincodeList: Array.from(pincodeSet),
                     city: this.tableData.flatMap((item) => item.city), // Use flatMap to flatten the nested arrays           
-                    entryBy: localStorage.getItem('Username'),
+                    entryBy: this.storage.userName,
                     entryDate: new Date().toISOString()
                 };
 
@@ -362,7 +365,7 @@ export class PincodeLocationMappingComponent implements OnInit {
                 showLoaderOnConfirm: true,
                 preConfirm: (Remarks) => {
                     var request = {
-                        companyCode: localStorage.getItem("CompanyCode"),
+                        companyCode: this.storage.companyCode,
                         id: row.id,
                     };
                     if (row.id == 0) {

@@ -1,6 +1,7 @@
 import { firstValueFrom } from "rxjs";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from 'src/app/core/service/storage.service';
 
-const companyCode = localStorage.getItem("companyCode");
 /**
  * Adds an invoice detail to the database.
  *
@@ -12,7 +13,7 @@ export async function addInvoiceDetail(masterService, data) {
     try {
         // Prepare the request data
         const reqData = {
-            companyCode: companyCode,
+            companyCode: StorageService.getItem(StoreKeys.CompanyCode),
             collectionName: "invoiceDetail",
             data: data,
         };
@@ -41,7 +42,7 @@ export async function UpdateDetail(masterService, data) {
     // Prepare the request data and store the promises in an array
     const updatePromises = prqIds.map(async (prqId) => {
         const req = {
-            companyCode: localStorage.getItem("companyCode"),
+            companyCode: StorageService.getItem(StoreKeys.CompanyCode),
             collectionName: "prq_detail",
             filter: {
                 _id: prqId, // Use the current PRQ ID in the filter
@@ -71,7 +72,7 @@ export async function UpdateDetail(masterService, data) {
 /* get customer Detail */
 export async function getApiCustomerDetail(masterService, data) {
     const req = {
-        companyCode: companyCode,
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "customer_detail",
         filter: {
             "customerCode": data?.billingParty[0].split("-")[0].trim() || ""
@@ -90,9 +91,9 @@ export async function getApiCustomerDetail(masterService, data) {
 /* get customer Detail */
 export async function getApiCompanyDetail(masterService) {
     const req = {
-        companyCode: companyCode,
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "company_master",
-        filter: {companyCode:companyCode}
+        filter: {companyCode:StorageService.getItem(StoreKeys.CompanyCode)}
     };
     try {
         const resCompany = await masterService.masterPost("generic/get", req).toPromise();
@@ -108,7 +109,7 @@ export async function getApiCompanyDetail(masterService) {
 export async function getLocationApiDetail(masterService) {
 
     const req = {
-        companyCode: companyCode,
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "location_detail"
     }
     try {
@@ -125,7 +126,7 @@ export async function getLocationApiDetail(masterService) {
 /*get location api Detail*/
 export async function getPrqApiDetail(masterService, billingParty) {
     const req = {
-        companyCode: companyCode,
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "prq_detail",
         filter: {
             "billingParty": billingParty
@@ -143,7 +144,7 @@ export async function getPrqApiDetail(masterService, billingParty) {
 /*get location api Detail*/
 export async function getThcDetail(masterService, billingParty) {
     const req = {
-        companyCode: companyCode,
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "trip_detail",
         filter: {
             "billingParty": billingParty
@@ -213,7 +214,7 @@ export async function getInvoiceDetail(locDetail, shipment) {
 
 export async function shipmentDetail(masterService) {
     const req = {
-        companyCode: companyCode,
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "docket_temp",
         filter: {}
     }

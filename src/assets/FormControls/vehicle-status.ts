@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { VehicleStatus } from "src/app/core/models/Masters/vehicle-status/vehicle-status";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class VehicleStatusControls {
     private vehicleStatus: FormControls[];
@@ -32,7 +34,7 @@ export class VehicleStatusControls {
             },
             {
                 name: 'currentLocation', label: "Location", placeholder: "Location", type: 'text',
-                value: localStorage.getItem("Branch"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+                value: StorageService.getItem(StoreKeys.Branch), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [],
                 additionalData: {
                     showNameAndValue: false
@@ -56,7 +58,7 @@ export class VehicleStatusControls {
                 Validations: [],
             },
             {
-                name: 'updateBy', label: 'updateBy', placeholder: '', type: '', value: localStorage.getItem("UserName"), generatecontrol: false, disable: false,
+                name: 'updateBy', label: 'updateBy', placeholder: '', type: '', value: StorageService.getItem(StoreKeys.UserId), generatecontrol: false, disable: false,
                 Validations: [],
             },
             {

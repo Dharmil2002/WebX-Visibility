@@ -1,5 +1,6 @@
 import { FormGroup } from "@angular/forms";
 import { runningNumber } from "src/app/Utility/date/date-utils";
+import * as StorageService from "src/app/core/service/storage.service";
 
 /**
  * Retrieves loading sheet details for a specific trip and vehicle.
@@ -103,7 +104,7 @@ export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
 // export async function updateTracking(companyCode, operationService,dktNo,next) {
 //     const dockData = {
 //       status:"In-Transit",
-//       upBy:localStorage.getItem("Username"),
+//       upBy:localstorage.getItem(StoreKeys.UserId),
 //       upDt:new Date().toUTCString(),
 //       evnCd:""
 //     }
@@ -143,9 +144,9 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
             dktNo: docketDetails[lastArray]?.dktNo || '',
             vehNo: docketDetails[lastArray]?.vehNo || '',
             route: docketDetails[lastArray]?.route || '',
-            event: "Departed From"+" "+localStorage.getItem('Branch'),
+            event: "Departed From"+" "+StorageService.getItem('Branch'),
             orgn: docketDetails[lastArray][lastArray]?.orgn || '',
-            loc: localStorage.getItem('Branch') || '',
+            loc: StorageService.getItem('Branch') || '',
             dest: docketDetails[lastArray][lastArray]?.dest || '',
             lsno: docketDetails[lastArray]?.lsno || '',
             mfno: docketDetails[lastArray]?.mfno || '',
@@ -153,7 +154,7 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
             dlSt: '',
             dlTm: '',
             evnCd: '',
-            upBy: localStorage.getItem('UserName') || '',
+            upBy: StorageService.getItem('UserName') || '',
             upDt: new Date(),
         };
 

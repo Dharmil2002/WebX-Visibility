@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-airport-master-list',
@@ -7,7 +8,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 })
 export class AirportMasterListComponent implements OnInit {
   data: [] | any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode")); 
+  companyCode: any = 0; 
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
@@ -36,7 +37,8 @@ export class AirportMasterListComponent implements OnInit {
   }
   addAndEditPath: string;
   tableData: any;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
   this.addAndEditPath = "/Masters/AirportMaster/AddAirportMaster";
   }
   ngOnInit(): void {

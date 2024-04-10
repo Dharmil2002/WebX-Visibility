@@ -1,4 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 export class ChaEntryControl {
     chaEntryControlArray: FormControls[];
     chaTableFormControlArray: FormControls[];
@@ -105,7 +108,7 @@ export class ChaEntryControl {
                 label: 'entryBy',
                 placeholder: 'entryBy',
                 type: '',
-                value: localStorage.getItem("Username"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

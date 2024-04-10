@@ -186,7 +186,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       MaxDate: MaxDateObj
     };
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "cust_contract",
       filter: { docNo: this.contractData.cONID },
     };
@@ -207,7 +207,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   async getTableData() {
     this.isLoad = true;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "cust_contract_freight_charge_matrix",
       filter: {
         cONID: this.contractData.cONID,
@@ -477,7 +477,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     };
     if (!this.isUpdate) {
       let datareq = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "cust_contract_freight_charge_matrix",
         filter: {},
       };

@@ -5,6 +5,7 @@ import moment from "moment";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { ConsignmentFilterControls } from "src/assets/FormControls/consignment-filter";
 
 @Component({
@@ -19,7 +20,7 @@ export class ConsignmentFilterComponent implements OnInit {
       active: "consignment",
     },
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   UpdateData: any;
   isUpdate: boolean = false;
   FormTitle: string = "Add TDS";
@@ -28,12 +29,17 @@ export class ConsignmentFilterComponent implements OnInit {
   ConsignmentFilterForm: any;
   DocumentTypeCode: any;
   DocumentTypeStatus: any;
+  
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
-  ) {}
+    private masterService: MasterService,
+    private storage: StorageService
+  ) {
+    this.CompanyCode = this.storage.companyCode;
+  }
+
   ngOnInit(): void {
     this.initializeFormControl();
   }

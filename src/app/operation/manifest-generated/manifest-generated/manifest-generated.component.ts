@@ -4,6 +4,7 @@ import {UntypedFormGroup } from '@angular/forms';
 import { CnoteService } from '../../../core/service/Masters/CnoteService/cnote.service';
 import { ViewPrintComponent } from '../../view-print/view-print.component';
 import { runningNumber } from 'src/app/Utility/date/date-utils';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-manifest-generated',
   templateUrl: './manifest-generated.component.html',
@@ -17,7 +18,7 @@ export class ManifestGeneratedComponent implements OnInit {
   tabledata: any;
   manifestgeneratedTableForm: UntypedFormGroup
   manifestControlArray: any;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
   columnHeader = {
     "hyperlink": "MF Number",
     "Leg": "Leg",
@@ -69,8 +70,10 @@ export class ManifestGeneratedComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     public dialogRef: MatDialogRef<ManifestGeneratedComponent>,
-    private cnoteService: CnoteService
+    private cnoteService: CnoteService,
+    private storage: StorageService
     ) {
+      this.orgBranch = this.storage.branch;
     if (item) {
       this.mfNo=item?.mfNo||"";
       this.menifest = item.loadingSheetData;

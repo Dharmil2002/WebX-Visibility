@@ -8,6 +8,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { RouteScheduleControl } from "src/assets/FormControls/route-schedule-control";
 import { forkJoin, map } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-add-route-schedule-master',
@@ -33,7 +34,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
   data: any;
   backPath:string;
   isUpdate: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -100,7 +101,8 @@ export class AddRouteScheduleMasterComponent implements OnInit {
   tableLoad = false;
   allData: { routeData: any; vehicleData: any; vendorData: any; vehicleTypeData: any; };
   updateRoute: any;
-  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
+  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
@@ -217,7 +219,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
       return; // Exit the function to prevent saving invalid data.
     }
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       filter: {},
       "collectionName": "route_schedule_details"
     }
@@ -256,7 +258,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             ftlType: this.tableData.map((item) => item.ftlType),
             vehicleNo: this.tableData.map((item) => item.vehicleNo),
             activeSchedule: this.tableData.map((item) => item.activeSchedule != "" ? true : false),
-            entryBy: localStorage.getItem('Username'),
+            entryBy: this.storage.userName,
             entryDate: new Date().toISOString()
           };
 
@@ -265,7 +267,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             // Remove the "id" field from the form controls
             delete transformedData._id;
             let req = {
-              companyCode: parseInt(localStorage.getItem("companyCode")),
+              companyCode: this.storage.companyCode,
               collectionName: "route_schedule_details",
               filter: { _id: id },
               update: transformedData
@@ -286,7 +288,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             });
           } else {
             let req = {
-              companyCode: parseInt(localStorage.getItem("companyCode")),
+              companyCode: this.storage.companyCode,
               collectionName: "route_schedule_details",
               data: transformedData
             };
@@ -356,7 +358,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
         showLoaderOnConfirm: true,
         preConfirm: (Remarks) => {
           var request = {
-            companyCode: localStorage.getItem("CompanyCode"),
+            companyCode: this.storage.companyCode,
             id: row.id,
           };
           if (row.id == 0) {
@@ -451,25 +453,25 @@ export class AddRouteScheduleMasterComponent implements OnInit {
   getAllMastersData() {
     // Prepare the requests for different collections
     let routeReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       filter: {},
       "collectionName": "routeMasterLocWise"
     };
 
     let vehicleReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       filter: {},
       "collectionName": "vehicle_detail"
     };
 
     let vendorReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       filter: {},
       "collectionName": "vendor_detail"
     };
 
     let vehicleTypeReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "companyCode": this.storage.companyCode,
       filter: {},
       "collectionName": "vehicleType_detail"
     };

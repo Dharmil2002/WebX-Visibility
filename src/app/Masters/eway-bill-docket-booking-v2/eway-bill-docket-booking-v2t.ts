@@ -65,7 +65,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCity: string;
   fromCityStatus: any;
   ewayData: any;
-  userName = localStorage.getItem("Username");
+  userName = '';
   @ViewChild('stepper') private myStepper: MatStepper;
   // Displayed columns configuration
   displayedColumns1 = {
@@ -190,8 +190,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   destination: any;
   destinationStatus: boolean;
   quickDocket: boolean;
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  branch = localStorage.getItem("Branch");
+  companyCode = 0;
+  branch = "";
   dockNo: string;
   DocketDetails: any;
   vehicleNo: string;
@@ -217,6 +217,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private addressService:AddressService,
     private controlPanel:ControlPanelService
   ) {
+    this.userName = this.storage.userName;
+    this.companyCode = this.storage.companyCode;
+    this.branch = this.storage.branch;
+
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.DocCalledAs = controlPanel.DocCalledAs;
     
@@ -396,7 +400,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   
   async bindQuickdocketData() {
-    
     if (this.quickDocket) {
           this.DocketDetails=this.quickdocketDetaildata?.docketsDetails||{};
           const contract=this.contractForm.value;
@@ -706,7 +709,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         showLoaderOnConfirm: true,
         preConfirm: (Remarks) => {
           var Request = {
-            CompanyCode: localStorage.getItem("CompanyCode"),
+            CompanyCode: this.storage.companyCode,
             ID: row.id,
           };
           if (row.id == 0) {

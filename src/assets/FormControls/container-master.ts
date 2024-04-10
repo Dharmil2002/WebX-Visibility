@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class ContainerControl {
     ContainerControlArray: FormControls[];
@@ -135,7 +137,7 @@ export class ContainerControl {
                 label: "Company Code",
                 placeholder: "Company Code",
                 type: "",
-                value: parseInt(localStorage.getItem("companyCode")),
+                value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,

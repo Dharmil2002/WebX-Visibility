@@ -22,7 +22,7 @@ export class ClusterMasterAddComponent implements OnInit {
     generatecontrol: boolean;
     toggle: any;
   }[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   clusterTabledata: ClusterMaster;
   clusterTableForm: UntypedFormGroup;
   clusterFormControls: ClusterControl;
@@ -50,6 +50,7 @@ export class ClusterMasterAddComponent implements OnInit {
     private storage: StorageService,
 
   ) {
+    this.companyCode= this.storage.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = "edit";

@@ -131,7 +131,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     this.tableLoad = false;
     this.isLoad = true;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "cust_contract_non_freight_charge_matrix",
       filter: { cONID: this.ContractID },
     };
@@ -259,7 +259,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     };
     if (!this.isUpdate) {
       let datareq = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "cust_contract_non_freight_charge_matrix",
         filter: {},
       };

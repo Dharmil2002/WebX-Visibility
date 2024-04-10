@@ -18,7 +18,7 @@ export class AddressService {
     try {
       // Prepare the request object
       const req = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         filter: filter,
         collectionName: "address_detail",
       };

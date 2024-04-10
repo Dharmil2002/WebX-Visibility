@@ -6,13 +6,14 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { GeneralMasterControl } from 'src/assets/FormControls/general-master';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import Swal from 'sweetalert2';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-general-master-add',
   templateUrl: './general-master-add.component.html',
 })
 export class GeneralMasterAddComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   action: string;
   isUpdate = false;
   generalTabledata: any;
@@ -27,7 +28,9 @@ export class GeneralMasterAddComponent implements OnInit {
     public dialogRef: MatDialogRef<GeneralMasterAddComponent>,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (data != null) {
       this.generalTabledata = data;
       this.isUpdate = this.data.codeId != null ? true : false;
@@ -98,7 +101,7 @@ export class GeneralMasterAddComponent implements OnInit {
       });
     } else {
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         "collectionName": "General_master",
         "filter": {}
       }

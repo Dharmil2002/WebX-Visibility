@@ -312,7 +312,7 @@ export class VendorMasterUploadComponent implements OnInit {
 
     // Create a new VendorModel instance to store processed data
     const processedData = new VendorMaster({});
-
+    
     // Set basic properties
     processedData.companyCode = this.storage.companyCode;
     processedData.vendorName = element.VendorName.toUpperCase();

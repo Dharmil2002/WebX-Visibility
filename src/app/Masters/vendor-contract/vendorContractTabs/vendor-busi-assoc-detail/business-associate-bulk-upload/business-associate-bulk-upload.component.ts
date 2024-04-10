@@ -12,6 +12,7 @@ import { EncryptionService } from 'src/app/core/service/encryptionService.servic
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import Swal from 'sweetalert2';
 import { checkForDuplicatesInBulkUpload } from '../../../vendorContractApiUtility';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-business-associate-bulk-upload',
@@ -19,7 +20,7 @@ import { checkForDuplicatesInBulkUpload } from '../../../vendorContractApiUtilit
 })
 export class BusinessAssociateBulkUploadComponent implements OnInit {
 
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   fileUploadForm: UntypedFormGroup;
   CurrentContractDetails: any;
   existingData: any;
@@ -38,8 +39,10 @@ export class BusinessAssociateBulkUploadComponent implements OnInit {
     private dialog: MatDialog,
     private masterService: MasterService,
     private objLocationService: LocationService,
+    private storage: StorageService,
     private dialogRef: MatDialogRef<BusinessAssociateBulkUploadComponent>,
   ) {
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

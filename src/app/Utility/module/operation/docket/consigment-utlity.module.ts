@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Injectable({
   providedIn: "root",
@@ -9,12 +10,13 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 export class ConsigmentUtility {
 
   constructor(
-    private operationService: OperationService
+    private operationService: OperationService,
+    private storage: StorageService
   ){}
 
   async updatePrq(data,update) {
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "prq_summary",
       filter: {
         pRQNO: data?.prqNo || data?.prqId || "", // Use the current PRQ ID in the filter
@@ -27,7 +29,7 @@ export class ConsigmentUtility {
 
   async getBillingData(filter={}){
     const req={
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "docket_fin_det",
       filter:filter,
     }
@@ -39,7 +41,7 @@ export class ConsigmentUtility {
   }
   async containorConsigmentDetail() {
     const containerReq = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "container_detail",
       filter: {},
     };

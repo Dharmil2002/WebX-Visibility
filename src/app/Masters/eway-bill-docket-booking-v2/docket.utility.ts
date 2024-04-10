@@ -71,16 +71,16 @@ export async function addTracking(companyCode, operationService, data) {
     dktNo: data?.docketNumber || '',
     vehNo: "",
     route: "",
-    event: "Booked At" + " " + localStorage.getItem("Branch"),
+    event: "Booked At" + " " + this.storage.branch,
     orgn: data?.orgLoc || '',
-    loc: localStorage.getItem("Branch"),
+    loc: this.storage.branch,
     dest: data.destination.trim(),
     lsno: "",
     mfno: "",
     dlSt: "",
     dlTm: "",
     evnCd: "",
-    upBy: localStorage.getItem("UserName"),
+    upBy: this.storage.userName,
     upDt: new Date()
   }
 

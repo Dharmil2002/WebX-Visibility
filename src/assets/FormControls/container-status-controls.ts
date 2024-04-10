@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class ContainerStatusControls {
     private containerStatus: FormControls[];
@@ -32,7 +34,7 @@ export class ContainerStatusControls {
 
             },
             {
-                name: 'oRG', label: 'Location', placeholder: '', type: 'text', value: localStorage.getItem("Branch"), generatecontrol: true, disable: true,
+                name: 'oRG', label: 'Location', placeholder: '', type: 'text', value: StorageService.getItem(StoreKeys.Branch), generatecontrol: true, disable: true,
                 Validations: [],
             },
             {
@@ -72,7 +74,7 @@ export class ContainerStatusControls {
                 Validations: []
             },
             {
-                name: 'eNTLOC', label: 'Entry Location', placeholder: '', type: '', value:localStorage.getItem("Branch"), generatecontrol: false, disable: false,
+                name: 'eNTLOC', label: 'Entry Location', placeholder: '', type: '', value:StorageService.getItem(StoreKeys.Branch), generatecontrol: false, disable: false,
                 Validations: []
             },
             {

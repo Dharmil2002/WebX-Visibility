@@ -13,6 +13,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { ModifyTableCollumnsComponent } from "../../modify-table-collumns/modify-table-collumns.component";
 import { ImagePreviewComponent } from "../../image-preview/image-preview.component";
 import { GenericService } from "src/app/core/service/generic-services/generic-services";
+import { ConvertToNumber, isValidDate, isValidNumber } from "src/app/Utility/commonFunction/common";
 
 @Component({
   selector: "app-generic-table-v2",
@@ -196,12 +197,33 @@ export class GenericTableV2Component
     }
   }
   //#region this function is called when rendering data in table and returns formatted data if required.
-  formatData(val: string, key: string) {
-    if (key === "valdity_dt" && val !== null) {
-      let dt = new Date(val);
-      return moment(dt).format("DD/MM/YYYY");
-      // return this.datePipe.transform(dt, "dd/MM/yyyy");
+  formatData(val: any, key: string) {   
+    const colDef = this.columnHeader[key];
+    if (colDef && colDef.datatype) {
+      switch (colDef.datatype) {
+        case "date":
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY") : "";
+        case "datetime":
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY HH:mm") : "";
+        case "time":
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "HH:mm") : "";
+        case "currency":
+          return ConvertToNumber(val || 0).toFixed(2);
+        case "number":
+          return ConvertToNumber(val || 0).toFixed(colDef.decimalPlaces || 0);
+        default:
+          return val;
+      }
     }
+    
+    if(val) {
+      if (typeof val === 'string' && isValidDate(val)) {
+        return moment(new Date(val)).format("DD/MM/YYYY");
+      } else if (typeof val !== 'boolean' && !isNaN(Number(val))) {
+        return Number(val);
+      }
+    }
+
     return val;
   }
   //#endregion
@@ -306,20 +328,14 @@ export class GenericTableV2Component
       // Download table data if no CSV data exists
       jsonCsv = [...this.tableData];
     }
+    var columns = this.csvHeaders ? Object.keys(this.csvHeaders) : Object.keys(this.columnHeader);
+    var headers = this.csvHeaders ? Object.values(this.csvHeaders) : Object.keys(this.columnHeader).map(m => { return this.columnHeader[m].Title; });
     const formattedData = [
-      Object.values(this.csvHeaders),
+      headers,
       ...jsonCsv.map((row) => {
-        return Object.keys(this.csvHeaders).map((col) => {
-          let value =
-            col.toLowerCase().includes("date") ||
-              col.toLowerCase().includes("dob") ||
-              col.toLowerCase().includes("dt")
-              ? moment(new Date(row[col])).format("DD-MM-YYYY") ===
-                "Invalid date"
-                ? row[col]
-                : moment(new Date(row[col])).format("DD-MM-YYYY")
-              : row[col];
-          return value;
+        return columns.map((col) => {
+          let value = row[col];
+          return this.formatData(value, col);
         });
       }),
     ];

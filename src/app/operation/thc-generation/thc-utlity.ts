@@ -1,7 +1,10 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export async function getShipment(operationService, vehicle=false) {
     // Define the request body with companyCode, collectionName, and an empty filter
     const reqBody = {
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "docket_temp",
         filter: {}
     };

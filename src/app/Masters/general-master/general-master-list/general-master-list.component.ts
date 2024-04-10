@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-general-master-list',
@@ -9,7 +10,7 @@ export class GeneralMasterListComponent implements OnInit {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = []
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = [];
   columnHeader = {
     "srNo": "Sr No",
@@ -38,14 +39,16 @@ export class GeneralMasterListComponent implements OnInit {
   }
   addAndEditPath: string;
   tableData: any[];
-  constructor(private masterService: MasterService) { }
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
+   }
   ngOnInit(): void {
     this.addAndEditPath = "/Masters/GeneralMaster/GeneralMasterCodeList";
     this.getGeneralDetails();
   }
   getGeneralDetails() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       "collectionName": "CodeTypes",
       "filter": {}
     }

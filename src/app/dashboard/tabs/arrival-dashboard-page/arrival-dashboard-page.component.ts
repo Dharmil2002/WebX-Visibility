@@ -23,7 +23,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   drillDownPath: string
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  companyCode: number = 0;
   menuItemflag: boolean = true;
   breadscrums = [
     {
@@ -100,7 +100,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   boxData: { count: any; title: any; class: string; }[];
   departureDetails: any;
   isCalled: boolean;
-  branch: string = localStorage.getItem("Branch");
+  branch: string = "";
   routeDetails: any;
   // declararing properties
   constructor(
@@ -112,6 +112,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   ) {
 
     super();
+    this.companyCode = this.storage.companyCode;
+    this.branch = this.storage.branch;
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;

@@ -21,6 +21,8 @@ import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, Vouc
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { StorageService } from 'src/app/core/service/storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 @Component({
   selector: 'app-debit-voucher',
   templateUrl: './debit-voucher.component.html',
@@ -100,15 +102,16 @@ export class DebitVoucherComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private router: Router,
     private filter: FilterUtils,
-    private sessionService: SessionService,
     private masterService: MasterService,
     private navigationService: NavigationService,
     private voucherServicesService: VoucherServicesService,
     private matDialog: MatDialog,
     private objImageHandling: ImageHandling,
+    private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
+    
   ) {
-    this.companyCode = this.sessionService.getCompanyCode()
+    this.companyCode = this.storage.companyCode;
     // this.imageData = {
     //   'driverPhoto': this.DebitVoucherTaxationPaymentDetailsForm.driverPhoto
     // }
@@ -802,7 +805,7 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
         this.VoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
         this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = localStorage.getItem("Branch");
+        this.VoucherDataRequestModel.branch = this.storage.getItem(StoreKeys.Branch);
         this.VoucherDataRequestModel.finYear = financialYear
 
         this.VoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
@@ -844,12 +847,12 @@ export class DebitVoucherComponent implements OnInit {
 
 
         const companyCode = this.companyCode;
-        const Branch = localStorage.getItem("Branch");
+        const Branch = this.storage.getItem(StoreKeys.Branch);
 
         let Accountdata = this.tableData.map(function (item) {
           return {
 
-            "companyCode": localStorage.getItem("companyCode"),
+            "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
             "voucherNo": "",
             "transCode": VoucherInstanceType.DebitVoucherCreation,
             "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
@@ -857,7 +860,7 @@ export class DebitVoucherComponent implements OnInit {
             "voucherType": VoucherType[VoucherType.DebitVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": localStorage.getItem("Branch"),
+            "branch": this.storage.getItem(StoreKeys.Branch),
             "accCode": item.LedgerHdn,
             "accName": item.Ledger,
             "accCategory": item.SubLedger,
@@ -879,7 +882,7 @@ export class DebitVoucherComponent implements OnInit {
             const creditAmount = parseFloat(item.Cr) || 0;
 
             return {
-              "companyCode": localStorage.getItem("companyCode"),
+              "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
               "voucherNo": "",
               "transCode": VoucherInstanceType.DebitVoucherCreation,
               "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
@@ -887,7 +890,7 @@ export class DebitVoucherComponent implements OnInit {
               "voucherType": VoucherType[VoucherType.DebitVoucher],
               "transDate": new Date(),
               "finYear": financialYear,
-              "branch": localStorage.getItem("Branch"),
+              "branch": this.storage.getItem(StoreKeys.Branch),
               "accCode": `${item.Ledgercode}`,
               "accName": item.Ledgername,
               "accCategory": item.SubLedger,
@@ -954,7 +957,7 @@ export class DebitVoucherComponent implements OnInit {
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transDate: Date(),
                 finYear: financialYear,
-                branch: localStorage.getItem("Branch"),
+                branch: this.storage.getItem(StoreKeys.Branch),
                 transCode: VoucherInstanceType.DebitVoucherCreation,
                 transType: VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
                 voucherCode: VoucherType.DebitVoucher,
@@ -964,7 +967,7 @@ export class DebitVoucherComponent implements OnInit {
                 docNo: "",
                 partyCode: this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,
-                entryBy: localStorage.getItem("UserName"),
+                entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
                 debit: DebitData,
                 credit: CreditData,

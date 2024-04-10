@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { GeneralMasterAddComponent } from '../general-master-add/general-master-add.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-general-master-code-list',
@@ -13,7 +14,7 @@ export class GeneralMasterCodeListComponent {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = [];
   addAndEditPath: string;
   headerCode: string;
@@ -46,7 +47,8 @@ export class GeneralMasterCodeListComponent {
   height = '300px';
   width = '600px';
   backPath: string;
-  constructor(private masterService: MasterService, private route: Router) {
+  constructor(private masterService: MasterService, private route: Router, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
     }
@@ -69,7 +71,7 @@ export class GeneralMasterCodeListComponent {
   getGeneralDetails() {
     // Assuming tableData contains the array of objects
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       "collectionName": "General_master",
       "filter": {
         "codeType": this.data?.headerCode
@@ -99,7 +101,7 @@ export class GeneralMasterCodeListComponent {
     delete det._id;
     delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       type: "masters",
       collectionName: "General_master",
       filter: { _id: id },

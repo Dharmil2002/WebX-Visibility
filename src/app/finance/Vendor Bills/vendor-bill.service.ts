@@ -2,14 +2,17 @@ import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VendorBillService {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
 
-  constructor(private masterService: MasterService) { }
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
+   }
   async getVendorBillList(filter) {
     try {
       // Make the asynchronous call to fetch data

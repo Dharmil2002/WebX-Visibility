@@ -7,6 +7,7 @@ import { menifestControl } from './menifest';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-manifest-generation',
   templateUrl: './manifest-generation.component.html',
@@ -80,7 +81,7 @@ export class ManifestGenerationComponent implements OnInit {
   loadingSheetNo: string;
   loadingSheetNoStatus: any;
   menifest: any;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
   data: any;
   toggleArray = [
   ]
@@ -92,7 +93,9 @@ export class ManifestGenerationComponent implements OnInit {
   IscheckBoxRequired: boolean;
   menifestDetails: any;
   dataDetails: any;
-  constructor(private http: HttpClient, private fb: UntypedFormBuilder, private filter: FilterUtils, private ICnoteService: CnoteService) {
+  constructor(private http: HttpClient, private fb: UntypedFormBuilder, private filter: FilterUtils, 
+    private ICnoteService: CnoteService, private storage: StorageService) {
+      this.companyCode = this.storage.companyCode;
     this.InitializeFormControl();
     this.getMeniFestDetails();
     this.csvFileName = "";
@@ -165,7 +168,7 @@ export class ManifestGenerationComponent implements OnInit {
 
     });
     try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
+      this.companyCode = this.storage.companyCode;
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }
@@ -177,7 +180,7 @@ export class ManifestGenerationComponent implements OnInit {
     try {
       // Creates the request object to be sent to the API endpoint
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         DESTCD: destCd,
         ORGNCD: this.orgBranch.trim()
       };

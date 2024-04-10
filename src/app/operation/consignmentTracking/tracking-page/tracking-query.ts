@@ -1,5 +1,8 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as StorageService from 'src/app/core/service/storage.service';
+
 export const GetTrakingDataPipeLine = () => {
-  const Mode = localStorage.getItem("Mode");
+  const Mode = StorageService.getItem(StoreKeys.Mode);
   if (Mode == "FTL") {
     return [
       {

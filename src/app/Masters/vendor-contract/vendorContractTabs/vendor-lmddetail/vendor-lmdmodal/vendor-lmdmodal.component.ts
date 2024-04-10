@@ -11,6 +11,7 @@ import { LocationService } from 'src/app/Utility/module/masters/location/locatio
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { VendorlastMileControl } from 'src/assets/FormControls/VendorContractControls/VendorlastMileControl';
 import Swal from 'sweetalert2';
 
@@ -41,13 +42,13 @@ export class VendorLMDModalComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private sessionService: SessionService,
+    private storage: StorageService,
     private objContainerService: ContainerService,
     public dialogRef: MatDialogRef<VendorLMDModalComponent>,
     private objGeneralService: GeneralService,
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
-    this.companyCode = this.sessionService.getCompanyCode();
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
@@ -159,7 +160,7 @@ export class VendorLMDModalComponent implements OnInit {
       cMTKM: parseFloat(this.TLMDForm.value.committedKm),
       aDDKM: parseFloat(this.TLMDForm.value.additionalKm),
       mAX: parseFloat(this.TLMDForm.value.maxCharges),
-      mODLOC: localStorage.getItem("Branch"),
+      mODLOC: this.storage.branch,
       mODDT: new Date(),
       mODBY: this.TLMDForm.value.uPBY,
     };
@@ -196,7 +197,7 @@ export class VendorLMDModalComponent implements OnInit {
       aDDKM: parseFloat(this.TLMDForm.value.additionalKm),
       mAX: parseFloat(this.TLMDForm.value.maxCharges),
       eNTBY: this.TLMDForm.value.eNBY,
-      eNTLOC: localStorage.getItem("Branch"),
+      eNTLOC: this.storage.branch,
       eNTDT: new Date(),
     };
   }

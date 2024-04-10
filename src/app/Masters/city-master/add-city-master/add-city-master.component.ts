@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { forkJoin } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CityControl } from "src/assets/FormControls/CityControls";
+import { StorageService } from "src/app/core/service/storage.service";
 
 
 @Component({
@@ -17,7 +18,7 @@ import { CityControl } from "src/assets/FormControls/CityControls";
 })
 
 export class AddCityMasterComponent implements OnInit {
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     stateDetails: any;
     stateStatus: any;
     zoneStatus: any;
@@ -37,9 +38,10 @@ export class AddCityMasterComponent implements OnInit {
     prevUsedCityCode: number = 0;
     stateName: any;
 
-    constructor(private route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
-        private fb: UntypedFormBuilder, private filter: FilterUtils,private masterService: MasterService,
-        ) {
+    constructor(private route: Router, @Inject(MAT_DIALOG_DATA) public data: any,private fb: UntypedFormBuilder, 
+        private filter: FilterUtils,private masterService: MasterService, private storage: StorageService) {
+        
+        this.companyCode = this.storage.companyCode;
         // Assuming "this.route" and "CityMaster" are already defined and initialized.
         // Extract data from navigation extras, if available
         const extrasState = this.route.getCurrentNavigation()?.extras?.state;

@@ -1,9 +1,11 @@
 import { debug } from 'console';
 import Swal from 'sweetalert2';
+import * as StorageService from 'src/app/core/service/storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 
 export async function addPrqData(prqData, masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem('companyCode'),
         collectionName: "prq_summary",
         data: prqData
     }
@@ -16,16 +18,16 @@ export async function updatePrqStatus(prqData, masterService) {
     delete prqData.Action
 
     const reqBody = {
-        "companyCode": localStorage.getItem('companyCode'),
+        "companyCode": StorageService.getItem('companyCode'),
         "collectionName": "prq_summary",
         "filter": { 
-            cID: prqData.cID || localStorage.getItem('companyCode'),
+            cID: prqData.cID || StorageService.getItem('companyCode'),
             pRQNO:  prqData.pRQNO || prqData.docNo || ""
         },
         "update": {
             ...prqData,
-            mODBY: localStorage.getItem('UserName'),
-            mODLOC: localStorage.getItem('Branch'),
+            mODBY: StorageService.getItem('UserName'),
+            mODLOC: StorageService.getItem('Branch'),
             mODDT: new Date()
         }
     }
@@ -72,8 +74,8 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
                     FromCity: arrivalData.fromCity,
                     ToCity: arrivalData.toCity,
                     distance: arrivalData.distance,
-                    currentLocation: localStorage.getItem("Branch"),
-                    updateBy: localStorage.getItem("UserName"),
+                    currentLocation: StorageService.getItem(StoreKeys.Branch),
+                    updateBy: StorageService.getItem(StoreKeys.UserId),
                     updateDate: new Date()
                 }
                 : {})
@@ -95,7 +97,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
 
 export async function locationFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "location_detail",
         filter: {}
     }
@@ -111,9 +113,9 @@ export async function locationFromApi(masterService) {
 
 
 export async function customerFromApi(masterService) {
-    const branch = localStorage.getItem("Branch");
+    const branch = StorageService.getItem(StoreKeys.Branch);
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "customer_detail",
         filter: {}
     }
@@ -129,7 +131,7 @@ export async function customerFromApi(masterService) {
 
 export async function containerFromApi(masterService) {
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "container_detail",
         filter: {}
     }

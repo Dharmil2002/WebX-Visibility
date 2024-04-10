@@ -1,24 +1,25 @@
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RouteLocationService {
 
-  constructor(private masterService: MasterService,) { }
+  constructor(private masterService: MasterService, private storage: StorageService) { }
   //#region to get route dropdown
   async getRouteLocationDetail(): Promise<any[]> {
     try {
       // Prepare the request object
       const request = {
         // Get the company code from local storage
-        companyCode: localStorage.getItem("companyCode"),
+        companyCode: this.storage.companyCode,
         // Specify the collection name for route master locations
         collectionName: 'routeMasterLocWise',
         // Use an empty filter
-        filter: {companyCode: parseInt(localStorage.getItem("companyCode"))}
+        filter: {companyCode: this.storage.companyCode}
       };
 
       // Send a POST request to the 'generic/get' endpoint using the masterService

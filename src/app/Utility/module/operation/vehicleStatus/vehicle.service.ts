@@ -43,8 +43,8 @@ export class VehicleStatusService {
   //       dMobNo: arrivalData.dMobNo,
   //       vMobNo: arrivalData.vMobNo,
   //       driverPan: arrivalData.driverPan,
-  //       currentLocation: localStorage.getItem("Branch"),
-  //       updateBy: localStorage.getItem("Username"),
+  //       currentLocation: this.storage.branch,
+  //       updateBy: this.storage.userName,
   //       updateDate: new Date(),
 
   //     };
@@ -55,7 +55,7 @@ export class VehicleStatusService {
   //     // Check if it's not a market update
   //     if (market) {
   //       // For non-market updates, set data and remove the filter
-  //       reqBody.companyCode = localStorage.getItem("companyCode"),
+  //       reqBody.companyCode = this.storage.companyCode,
   //         reqBody.collectionName = "vehicle_status"
   //       reqBody.data = { ...vehicleDetails };
   //       delete reqBody.filter;
@@ -63,7 +63,7 @@ export class VehicleStatusService {
   //     }
   //     else {
   //       delete reqBody.update._id;
-  //       reqBody.companyCode = localStorage.getItem("companyCode"),
+  //       reqBody.companyCode = this.storage.companyCode,
   //       reqBody.collectionName = "vehicle_status",
   //       delete reqBody.data;
   //     }
@@ -92,7 +92,7 @@ export class VehicleStatusService {
   async vehiclList(tripId: string) {
 
     const request = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "vehicle_status",
       filter: { tripId: tripId }
     }
@@ -109,7 +109,7 @@ export class VehicleStatusService {
    */
   async vehicleListFromMaster(vehicleNo: string) {
     // Get the company code from local storage
-    const companyCode = localStorage.getItem("companyCode");
+    const companyCode = this.storage.companyCode;
 
     // Create a request object to fetch vehicle details
     const vehicleRequest = {
@@ -166,7 +166,7 @@ export class VehicleStatusService {
 
   async getVehicleList(vehicleNo: string[]) {
     // Get the company code from local storage
-    const companyCode = localStorage.getItem("companyCode");
+    const companyCode = this.storage.companyCode;
     // Create a request object to fetch vehicle details
     const vehicleRequest = {
       companyCode,
@@ -189,13 +189,13 @@ export class VehicleStatusService {
 
   async getAvailableVehicles() {
     // Get the company code from local storage
-    const companyCode = localStorage.getItem("companyCode");
+    const companyCode = this.storage.companyCode;
 
     // Create a request object to fetch vehicle details
     const request = {
       companyCode,
       collectionName: "vehicle_status",
-      filter: { currentLocation: localStorage.getItem("Branch"), status: "Available" },
+      filter: { currentLocation: this.storage.branch, status: "Available" },
     };
 
     // Fetch vehicle details from the database
@@ -212,7 +212,7 @@ export class VehicleStatusService {
 
     // Fetch Vendor Types
     const gmRequest = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: 'General_master',
       filter: { codeType: 'VENDTYPE', activeFlag: true },
     };    
@@ -221,10 +221,10 @@ export class VehicleStatusService {
     // Fetch Vendors
     const vendorNames = vehicles.map(v => v.vendor);
     const vndRequest = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: 'vendor_detail',
       filter: { 
-          companyCode:  localStorage.getItem("companyCode"),
+          companyCode:  this.storage.companyCode,
           vendorName: { D$in: vendorNames }
       },
     };    
@@ -297,8 +297,8 @@ export class VehicleStatusService {
       dMobNo: arrivalData.dMobNo,
       vMobNo: arrivalData.vMobNo,
       driverPan: arrivalData.driverPan,
-      currentLocation: localStorage.getItem("Branch"),
-      updateBy: localStorage.getItem("Username"),
+      currentLocation: this.storage.branch,
+      updateBy: this.storage.userName,
       updateDate: new Date(),
 
     };

@@ -125,7 +125,7 @@ export class BalancePaymentComponent implements OnInit {
     "Advance",
     "BalancePending",
   ];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
   tableData: any;
   isTableLode = false;
   TotalAmountList: { count: any; title: string; class: string }[];
@@ -179,7 +179,7 @@ export class BalancePaymentComponent implements OnInit {
     private storage: StorageService,
     private route: Router // public dialog: MatDialog
   ) {
-
+    this.companyCode = this.storage.companyCode;
     this.BillPaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.IsModifyAction = this.route.getCurrentNavigation()?.extras?.state?.Type == "Modify" ? true : false;
     if (this.BillPaymentData) {

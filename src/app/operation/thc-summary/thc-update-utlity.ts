@@ -1,7 +1,9 @@
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
-
+import * as StorageService from 'src/app/core/service/storage.service';
+import { StoreKeys } from "src/app/config/myconstants";
+//const apiService = new ApiService();
 export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise,prqNo="") {
     const confirmationResult = await Swal.fire({
         icon: "success",
@@ -27,8 +29,8 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         let sts = (eventId == "EVN0004") ? 3 : 4;
         let stsnm = (eventId == "EVN0004") ? "Delivered" : "Arrived";
         let opsts = (eventId == "EVN0004")
-            ? `Delivered at  ${localStorage.getItem('Branch')} on ${moment().format('DD MMM YYYY @ HH:mm A')}`
-            : `Arrived at ${localStorage.getItem('Branch')} on ${moment().format('DD MMM YYYY @ HH:mm A')}`;
+            ? `Delivered at  ${StorageService.getItem(StoreKeys.Branch)} on ${moment().format('DD MMM YYYY @ HH:mm A')}`
+            : `Arrived at ${StorageService.getItem(StoreKeys.Branch)} on ${moment().format('DD MMM YYYY @ HH:mm A')}`;
 
         let filter = {
             tHC: tripId,
@@ -40,7 +42,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         }
 
         const reqBody = {
-            "companyCode": localStorage.getItem('companyCode'),
+            "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
             "collectionName": "docket_ops_det",
             "filter": filter,
             "update": {
@@ -55,22 +57,22 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "aRRPKG": element.pKGS,
                 "aRRWT": element.aCTWT,
                 "vEHNO": vehicleNo,
-                "cLOC": localStorage.getItem('Branch'),
+                "cLOC":StorageService.getItem(StoreKeys.Branch),
                 "cCT": currentLocation.locCity.toUpperCase(),
                 "tHC": ""
             }
         };
 
         const reqBodyDocketEvent = {
-            "companyCode": localStorage.getItem('companyCode'),
+            "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
             "collectionName": "docket_events",
             "data": {
-                "_id": `${localStorage.getItem('companyCode')}-${element.docNo}-${element.sFX}-${element.cNO}-${eventId}-${moment(element?.arrivalTime||new Date()).format('YYYYMMDD-HHmmss')}`,
-                "cID": localStorage.getItem('companyCode'),
+                "_id": `${StorageService.getItem(StoreKeys.CompanyCode)}-${element.docNo}-${element.sFX}-${element.cNO}-${eventId}-${moment(element?.arrivalTime||new Date()).format('YYYYMMDD-HHmmss')}`,
+                "cID": StorageService.getItem(StoreKeys.CompanyCode),
                 "dKTNO": element.docNo,
                 "sFX": element.sFX || 0,
                 "cNO": element.cNO,
-                "lOC": localStorage.getItem('Branch'),
+                "lOC": StorageService.getItem(StoreKeys.Branch),
                 "eVNID": eventId,
                 "eVNDES": (eventId == "EVN0004") ? "Delivered" : "Arrived",
                 "eVNDT": new Date(),
@@ -83,14 +85,14 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "sTSNM": stsnm,
                 "oPSTS": opsts,
                 "eNTDT": new Date(),
-                "eNTLOC": localStorage.getItem('Branch'),
-                "eNTBY": localStorage.getItem('UserName'),
+                "eNTLOC": StorageService.getItem(StoreKeys.Branch),
+                "eNTBY":  StorageService.getItem(StoreKeys.UserName),
             }
         };
 
         // Update Docket Ops Det
         const FilterRequest = {
-            "companyCode": localStorage.getItem('companyCode'),
+            "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
             "collectionName": "docket_ops_det",
             "filters": [
                 {
@@ -145,7 +147,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         if (opsDetails && opsDetails?.data && sts == 3) {
             if (opsDetails.data[0].TotalCount == opsDetails.data[0].Delivered) {
                 const reqBody = {
-                    "companyCode": localStorage.getItem('companyCode'),
+                    "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
                     "collectionName": "dockets",
                     "filter": {
                         "dKTNO": element.docNo
@@ -158,7 +160,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
 
                 await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
                 const prqReq = {
-                    "companyCode": localStorage.getItem('companyCode'),
+                    "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
                     "collectionName": "prq_summary",
                     "filter": {
                         "pRQNO":prqNo
@@ -172,7 +174,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 await firstValueFrom(operationService.operationMongoPut("generic/update", prqReq));
             } else {
                 const reqBody = {
-                    "companyCode": localStorage.getItem('companyCode'),
+                    "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
                     "collectionName": "dockets",
                     "filter": {
                         "dKTNO": element.docNo
@@ -185,7 +187,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
 
                 await firstValueFrom(operationService.operationMongoPut("generic/update", reqBody));
                 const prqReq = {
-                    "companyCode": localStorage.getItem('companyCode'),
+                    "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
                     "collectionName": "prq_summary",
                     "filter": {
                         "pRQNO":prqNo
@@ -202,7 +204,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         }
         if (sts == 4) {
             const reqBody = {
-                "companyCode": localStorage.getItem('companyCode'),
+                "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
                 "collectionName": "dockets",
                 "filter": {
                     "dKTNO": element.docNo
@@ -220,7 +222,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
     await Promise.all(updatePromises);
 
     const thcReqBody = {
-        "companyCode": localStorage.getItem('companyCode'),
+        "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
         "collectionName": "thc_summary",
         "filter": { docNo: tripId },
         "update": data

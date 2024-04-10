@@ -1,4 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
+
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -302,8 +305,8 @@ export class thcControl {
                     Validations: [
                         {
                             "name": "pattern",
-                            "pattern": "^[A-Za-z ]{1,15}$",
-                            "message": "Please enter up to 15 alphabetical characters only"
+                            "pattern": "^[A-Za-z ]{1,50}$",
+                            "message": "Please enter up to 50 alphabetical characters only"
                         }
                     ],
                     functions: {},
@@ -545,7 +548,7 @@ export class thcControl {
                         {
                             name: "required",
                             message: "Arrival Date is required",
-                        },
+                        }
                     ],
                     functions: {
                         onDate: "ArrivalDateChange"
@@ -562,10 +565,6 @@ export class thcControl {
                     type: 'number',
                     value: "",
                     Validations: [
-                        {
-                            name: "required",
-                            message: "Arrival Seal No is required",
-                        },
                     ],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -580,8 +579,6 @@ export class thcControl {
                     type: 'number',
                     value: "",
                     Validations: [{
-                        name: "required",
-                        message: "Arrival End KM is required",
                     },],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -595,8 +592,6 @@ export class thcControl {
                     type: 'text',
                     value: "",
                     Validations: [{
-                        name: "required",
-                        message: "Arrival Remarks is required",
                     },],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -608,7 +603,7 @@ export class thcControl {
                     label: 'Arrival By',
                     placeholder: 'Arrival By',
                     type: 'text',
-                    value: localStorage.getItem("UserName"),
+                    value: StorageService.getItem(StoreKeys.UserId),
                     Validations: [],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -812,7 +807,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: localStorage.getItem("companyCode"),
+                    value: StorageService.getItem(StoreKeys.CompanyCode),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
@@ -826,7 +821,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: localStorage.getItem("UserName"),
+                    value: StorageService.getItem(StoreKeys.UserId),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
@@ -840,7 +835,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: localStorage.getItem("Branch"),
+                    value: StorageService.getItem(StoreKeys.Branch),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
@@ -1162,7 +1157,7 @@ export class thcControl {
             },
             {
                 name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
-                value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+                value: StorageService.getItem(StoreKeys.CompanyCode), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
                 Validations: [
                 ],
             },
@@ -1177,7 +1172,7 @@ export class thcControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

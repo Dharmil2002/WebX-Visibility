@@ -53,17 +53,17 @@ export class JobEntryService {
   }
   async getJobDetail() {
     const req = {
-      "companyCode": localStorage.getItem("companyCode"),
+      "companyCode": this.storage.companyCode,
       "filter": {},
       "collectionName": "job_detail"
     }
 
     const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
-    return res.data.filter((x) => x.jobLocation == localStorage.getItem("Branch"));
+    return res.data.filter((x) => x.jobLocation == this.storage.branch);
   }
   async updateJob(data, status) {
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "job_detail",
       filter: {
         jobId: data?.jobId || data?.jobId || "", // Use the current PRQ ID in the filter
@@ -137,7 +137,7 @@ export class JobEntryService {
   }
   async updateJobDetails(data,filter,collectionName) {
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName:collectionName,
       filter: filter,
       update: data
@@ -147,7 +147,7 @@ export class JobEntryService {
   }
   async addDeleteJobDetails(data, filter, collectionName) {
     // Use destructuring for better readability
-    const companyCode = localStorage.getItem("companyCode");
+    const companyCode = this.storage.companyCode;
 
     // Consolidate repeated code into a single object
     const commonRequest = {
@@ -288,7 +288,7 @@ export class JobEntryService {
   async addJobDetail(jobDetail, financialYear) {
     // Prepare the request body with company code, collection name, and job detail data.
     let reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: this.storage.companyCode,
       collectionName: "job_header",
       docType: "JOB",
       branch: this.storage.branch,

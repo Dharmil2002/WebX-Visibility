@@ -5,6 +5,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-add-company',
@@ -40,8 +41,9 @@ export class AddCompanyComponent implements OnInit {
   selectedFiles: boolean;
   SelectFile: File;
   imageName: string;
-  constructor(private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils
-  ) { }
+  constructor(private fb: UntypedFormBuilder, private masterService: MasterService, 
+    private filter: FilterUtils, private storage: StorageService) {    
+   }
 
   ngOnInit(): void {
     this.getCompanyDet();
@@ -179,7 +181,7 @@ export class AddCompanyComponent implements OnInit {
 
     // Prepare the request to update company details
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "company_detail",
       filter: { _id: id },
       update: this.AddCompanyFormsValue.value
@@ -209,7 +211,7 @@ export class AddCompanyComponent implements OnInit {
   // Function to get company details from the API
   getCompanyDet() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       "collectionName": "company_detail",
       "filter": {}
     };

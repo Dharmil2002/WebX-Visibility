@@ -77,7 +77,7 @@ export class VendorBillListComponent implements OnInit {
   menuItemflag = true;
 
   staticField = ['billNo', 'Status', 'pendingAmount', 'TotalTHCAmount', 'Date', 'billType', 'vendor']
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
 
   FilterButton = {
     functionName: "filterFunction",
@@ -115,6 +115,7 @@ export class VendorBillListComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private objVendorBillService: VendorBillService,
     private masterService: MasterService) {
+    this.companyCode = this.StorageService.companyCode;
     this.filterRequest.startdate.setDate(new Date().getDate() - 30);
   }
 

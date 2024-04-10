@@ -6,6 +6,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { DyanmicControl } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { LoadingsheetgenerateComponent } from '../loadingsheetgenerate/loadingsheetgenerate.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-loading-sheet-details',
@@ -18,7 +19,7 @@ export class LoadingSheetDetailsComponent implements OnInit {
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
-  orgBranch:string=localStorage.getItem("Branch");
+  orgBranch:string="";
   BoxData:any[]
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < (column name) : Column name you want to display on table > 
@@ -85,7 +86,10 @@ classDashboard=[
   'info-box7 bg-white order-info-box7',
   'info-box7 bg-white order-info-box7',
 ]
-  constructor(private Route: Router,private ICnoteService: CnoteService, private modalService: NgbModal, private dialog: MatDialog, @Inject(PLATFORM_ID) private platformId: Object) { 
+  constructor(private Route: Router,private ICnoteService: CnoteService, 
+    private modalService: NgbModal, private storage: StorageService,
+    private dialog: MatDialog, @Inject(PLATFORM_ID) private platformId: Object) { 
+      this.orgBranch = this.storage.branch;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.loadingSheetData=this.Route.getCurrentNavigation()?.extras?.state.data.data;
       this.routeDetailsFromDropdown= this.Route.getCurrentNavigation()?.extras?.state.data.dropDownValue;
@@ -99,7 +103,7 @@ classDashboard=[
     try {
       // Creates the request object to be sent to the API endpoint
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         DESTCD:this.loadingSheetData?.Docket,
         ORGNCD:this.orgBranch.trim()
       };

@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { ClusterMaster } from "src/app/core/models/Masters/cluster-master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class ClusterControl {
     ClusterControlArray: FormControls[];
@@ -123,7 +125,7 @@ export class ClusterControl {
                 label: "Company Code",
                 placeholder: "Company Code",
                 type: "",
-                value: parseInt(localStorage.getItem("companyCode")),
+                value: parseInt(StorageService.getItem(StoreKeys.CompanyCode)),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,

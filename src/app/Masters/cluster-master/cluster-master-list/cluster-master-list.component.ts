@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -13,7 +14,7 @@ export class ClusterMasterListComponent implements OnInit {
   csv: any[];  
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = []
   columnHeader =
     {
@@ -48,7 +49,8 @@ export class ClusterMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
-  constructor(private masterService: MasterService) {
+  constructor(private masterService: MasterService, private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
   ngOnInit(): void {
@@ -91,9 +93,9 @@ export class ClusterMasterListComponent implements OnInit {
     delete det._id;
     delete det.eNTDT;
     delete det.pincode;
-    det['mODDT'] = new Date()
-    det['mODBY'] = localStorage.getItem("UserName")
-    det['mODLOC'] = localStorage.getItem("Branch")
+    det['mODDT'] = new Date();
+    det['mODBY'] = this.storage.userName;
+    det['mODLOC'] = this.storage.branch;
     let req = {
       companyCode: this.companyCode,
       collectionName: "cluster_detail",

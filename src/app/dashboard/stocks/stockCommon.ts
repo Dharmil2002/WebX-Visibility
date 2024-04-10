@@ -1,5 +1,6 @@
 import { format, isValid, parseISO } from "date-fns";
-
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 /**
  * Generates the KPI data based on the provided StockCountData.
  * @param StockCountData - The stock count data array.
@@ -79,7 +80,7 @@ export async function getDocketDetailsFromApi(
             : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo === ""
               ? "Available for manifest"
               : item.isComplete === 1 && !item?.unloading &&!item?.depart && item?.lsNo && item?.mfNo
-                ? "Ready to Depart From " + localStorage.getItem("Branch")
+                ? "Ready to Depart From " + StorageService.getItem(StoreKeys.Branch)
                 :item.isComplete === 1 && !item?.unloading &&item?.depart&&item?.lsNo && item?.mfNo
                 ? "In Transit" +" "+ `${item?.orgLoc ?? ""} : ${item?.destination?.split(":")[1] ?? ""}`
                 : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo

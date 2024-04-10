@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import moment from "moment";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-view-tracking-popup",
@@ -74,13 +75,15 @@ export class ViewTrackingPopupComponent implements OnInit {
     "Location",
     "DocNo",
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  CompanyCode = 0;
   TableData: any;
   FormTitle:any
   constructor(
+    private storage: StorageService,
     public dialogRef: MatDialogRef<ViewTrackingPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    this.CompanyCode = this.storage.companyCode;
     const sortByDate = (a, b) => {
       return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
     };

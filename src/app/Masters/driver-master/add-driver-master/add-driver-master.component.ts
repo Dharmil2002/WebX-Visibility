@@ -13,13 +13,14 @@ import { ImagePreviewComponent } from "src/app/shared-components/image-preview/i
 import { MatDialog } from "@angular/material/dialog";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { firstValueFrom } from "rxjs";
+import { StorageService } from "src/app/core/service/storage.service";
 @Component({
   selector: "app-add-driver-master",
   templateUrl: "./add-driver-master.component.html",
 })
 export class AddDriverMasterComponent implements OnInit {
   driverFormControls: DriverControls;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   DriverTableForm: UntypedFormGroup;
   DriverTable: DriverMaster;
   //#region Variable declaration
@@ -65,9 +66,10 @@ export class AddDriverMasterComponent implements OnInit {
     private masterService: MasterService,
     private objImageHandling: ImageHandling,
     private dialog: MatDialog,
-    private objPinCodeService: PinCodeService
-
+    private objPinCodeService: PinCodeService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.DriverTable = Route.getCurrentNavigation().extras.state.data;
 
@@ -320,13 +322,13 @@ export class AddDriverMasterComponent implements OnInit {
       DOBProofDocNo: this.DriverTableForm.value.DOBProofDocNo,
       activeFlag: this.DriverTableForm.value.activeFlag,
       _id: this.DriverTableForm.value.manualDriverCode,
-      cID: localStorage.getItem("companyCode"),
-      eNTBY: localStorage.getItem("UserName"),
+      cID: this.storage.companyCode,
+      eNTBY: this.storage.userName,
       eNTDT: new Date(),
-      eNTLOC: localStorage.getItem("Branch"),
+      eNTLOC: this.storage.branch,
       mODDT: new Date(),
-      mODBY: localStorage.getItem("UserName"),
-      mODLOC: localStorage.getItem("Branch"),
+      mODBY: this.storage.userName,
+      mODLOC: this.storage.branch,
     }
 
     // Define an array of control names

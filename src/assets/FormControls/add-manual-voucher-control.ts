@@ -1,4 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class AddManualVoucherControl {
   ManualVoucharArray: FormControls[];
@@ -79,7 +81,7 @@ export class AddManualVoucherControl {
         label: "",
         placeholder: "",
         type: "text",
-        value:localStorage.getItem("Username"),
+        value:StorageService.getItem(StoreKeys.UserId),
         generatecontrol: false,
         disable: false,
         Validations: []
@@ -99,7 +101,7 @@ export class AddManualVoucherControl {
         label: "",
         placeholder: "",
         type: "",
-        value:localStorage.getItem("Username"),
+        value:StorageService.getItem(StoreKeys.UserId),
         generatecontrol: false,
         disable: false,
         Validations: []

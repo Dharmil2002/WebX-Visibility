@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
 import { BusinessAssociateBulkUploadComponent } from './business-associate-bulk-upload/business-associate-bulk-upload.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-vendor-busi-assoc-detail',
@@ -77,14 +78,16 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX', "pBSNM", "lOCNM"]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   CurrentContractDetails: any;
   uploadComponent = BusinessAssociateBulkUploadComponent;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private masterService: MasterService,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method

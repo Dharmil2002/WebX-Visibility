@@ -8,6 +8,7 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from "sweetalert2";
 import { StateControl } from "src/assets/FormControls/StateControl";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-add-state-master',
@@ -27,7 +28,7 @@ export class AddStateMasterComponent implements OnInit {
     countryStatus: any;
     countrylistStatus: any;
     countrylist: any;
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     country: any;
     savedData: StateMaster;
     updateCountry: any;
@@ -38,8 +39,10 @@ export class AddStateMasterComponent implements OnInit {
     constructor(@Inject(MAT_DIALOG_DATA) public data: any,
         private route: Router, private fb: UntypedFormBuilder,
         private filter: FilterUtils,
-        private masterService: MasterService
+        private masterService: MasterService,
+        private storage: StorageService
     ) {
+        this.companyCode = this.storage.companyCode;
         const extrasState = this.route.getCurrentNavigation()?.extras?.state;
         if (extrasState) {
             this.data = extrasState.data;

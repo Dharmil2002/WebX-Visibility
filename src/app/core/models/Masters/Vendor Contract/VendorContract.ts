@@ -181,7 +181,6 @@ export class ListVendorContractCityBasedDetails {
   constructor() {
     {
       this.id = 0;
-      this.entryBy = localStorage.getItem("UserName");
     }
   }
 }
@@ -194,7 +193,6 @@ export class VendorContractCityBasedRequestModel {
   constructor() {
     {
       this.ActionType = 'CITY';
-      this.CompanyCode = localStorage.getItem("CompanyCode");
     }
   }
 

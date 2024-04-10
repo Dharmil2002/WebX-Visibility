@@ -45,7 +45,7 @@ export class DepartVehicleComponent implements OnInit {
   uploadComponent: any;
   loadingSheetData: any;
   csvFileName: string; //name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
-  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  companyCode: number = 0;
   shipData: any;
   dynamicControls = {
     add: false,
@@ -83,7 +83,7 @@ export class DepartVehicleComponent implements OnInit {
   tripData: any;
   vehicleType: any;
   vehicleTypeStatus: any;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
   shipmentData: any;
   menifestTableData: any[];
   columnHeader = {
@@ -137,6 +137,8 @@ export class DepartVehicleComponent implements OnInit {
     private hawkeyeUtilityService: HawkeyeUtilityService,
     private storage:StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
+    this.orgBranch = this.storage.branch;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
 
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -174,7 +176,7 @@ export class DepartVehicleComponent implements OnInit {
     };
     this.loadingSheetTableForm.controls["vehicle"].setValue(vehicleNo);
     const loadingLocationFormControl = this.loadingSheetTableForm.controls["LoadingLocation"];
-    const loadingLocationValue = localStorage.getItem("Branch") || "";
+    const loadingLocationValue = this.storage.branch || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
 
 
@@ -466,7 +468,7 @@ export class DepartVehicleComponent implements OnInit {
         reqBody:{
           cid:this.companyCode,
           EventType:'D',
-          loc:localStorage.getItem("Branch") || "",
+          loc: this.storage.branch || "",
           tripId:tripDet.tHC
         }
       }
@@ -494,7 +496,7 @@ export class DepartVehicleComponent implements OnInit {
             action: "PushTrip",
             reqBody: {
               companyCode: this.companyCode,
-              branch: localStorage.getItem("Branch") || "",
+              branch: this.storage.branch || "",
               tripId: tripDet[0]?.tHC,
               vehicleNo: vehicleDet[0]?.vehicleNo
             }
@@ -513,7 +515,7 @@ export class DepartVehicleComponent implements OnInit {
           //     if(result?.gpsDeviceEnabled ==true && result?.gpsDeviceId!=""){
           //       const req={
           //         companyCode: this.companyCode,
-          //         branch:localStorage.getItem("Branch") || "",
+          //         branch:localstorage.getItem(StoreKeys.Branch) || "",
           //         tripId:"TH/DELB/2425/000046",
           //         vehicleNo:result.vehicleNo
           //       }

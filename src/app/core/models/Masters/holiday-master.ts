@@ -11,7 +11,7 @@ export class Holiday
     {
         if(Holiday)
         {
-            this.CompanyCode=Holiday.CompanyCode??+localStorage.getItem("CompanyCode");
+            this.CompanyCode=Holiday.CompanyCode ?? 0;
             this.holidayDate=new Date(Holiday.holidayDate)??new Date();
             this.holidayNote=Holiday.holidayNote??"";
             this.isActive=Holiday.isActive??false;

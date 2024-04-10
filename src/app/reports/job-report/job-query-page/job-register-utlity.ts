@@ -1,9 +1,10 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export async function getJobregisterReportDetail(masterServices) {
     // Prepare the request body with company code and collection name
     const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem('companyCode'),
         collectionName: "job_detail",
         filter: {}
     }

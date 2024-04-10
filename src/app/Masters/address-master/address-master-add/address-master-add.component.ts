@@ -21,7 +21,7 @@ export class AddressMasterAddComponent implements OnInit {
     generatecontrol: true;
     toggle: boolean;
   }[];
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   addressTabledata: AddressMaster;
   addressTableForm: UntypedFormGroup;
   addressFormControls: AddressControl;
@@ -44,22 +44,6 @@ export class AddressMasterAddComponent implements OnInit {
   customerNameStatus: any;
 
   //#endregion
-
-  ngOnInit() {
-    this.getPincodeData();
-    this.backPath = "/Masters/AddressMaster/AddressMasterList";
-  }
-  functionCallHandler($event) {
-    let functionName = $event.functionName; // name of the function , we have to call
-
-    // function of this name may not exists, hence try..catch
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      // we have to handle , if function not exists.
-      console.log("failed");
-    }
-  }
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -67,6 +51,7 @@ export class AddressMasterAddComponent implements OnInit {
     private filter: FilterUtils,
     public StorageServiceI: StorageService,
   ) {
+    this.companyCode = this.StorageServiceI.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
@@ -93,6 +78,23 @@ export class AddressMasterAddComponent implements OnInit {
     ];
     this.initializeFormControl();
   }
+
+  ngOnInit() {
+    this.getPincodeData();
+    this.backPath = "/Masters/AddressMaster/AddressMasterList";
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName; // name of the function , we have to call
+
+    // function of this name may not exists, hence try..catch
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      // we have to handle , if function not exists.
+      console.log("failed");
+    }
+  }
+  
   initializeFormControl() {
     this.addressFormControls = new AddressControl(
       this.addressTabledata,

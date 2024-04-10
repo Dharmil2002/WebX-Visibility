@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FailedApiServiceService } from './failed-api-service.service';
 import { format, isValid, parseISO } from 'date-fns';
+import { StorageService } from '../storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,8 @@ import { format, isValid, parseISO } from 'date-fns';
 export class RetryAndDownloadService {
 
   constructor(private http: HttpClient,
-    private failedApiService: FailedApiServiceService) { }
+    private failedApiService: FailedApiServiceService,
+    private storageService: StorageService) { }
   async retryWithDownload(
     masterService: any,
     url: string,
@@ -38,7 +40,7 @@ export class RetryAndDownloadService {
             error: error, // Include error information
             source: sourceModule,
             createdOn: new Date().toUTCString(),
-            createdBy: localStorage.getItem("Username"),
+            createdBy: this.storageService.userName,
             createdAt: location,
             attempts: 0
           });
@@ -55,7 +57,7 @@ export class RetryAndDownloadService {
   }
 
   async downloadFailedRequests() {
-    const companyCode = localStorage.getItem("companyCode");
+    const companyCode = this.storageService.companyCode;
     let formattedDate = "";
 
     try {

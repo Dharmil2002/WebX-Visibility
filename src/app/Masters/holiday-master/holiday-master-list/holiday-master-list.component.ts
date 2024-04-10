@@ -3,6 +3,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
 import { AddEditHolidayComponent } from "../add-edit-holiday-master/add-edit-holiday.component";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
     selector: 'app-holiday-master-list',
@@ -11,7 +12,7 @@ import { AddEditHolidayComponent } from "../add-edit-holiday-master/add-edit-hol
 
 export class HolidayMasterComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
     tableLoad = true;
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     data: [] | any;
     dateWiseData: any[];
     dayWiseData: any[];
@@ -46,8 +47,9 @@ export class HolidayMasterComponent extends UnsubscribeOnDestroyAdapter implemen
     height: string;
 
 
-    constructor(private masterService: MasterService) {
+    constructor(private masterService: MasterService, private storage: StorageService) {
         super();
+        this.companyCode = this.storage.companyCode;
     }
 
     ngOnInit(): void {

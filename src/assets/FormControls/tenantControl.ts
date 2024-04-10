@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { TenantModel } from "src/app/core/models/Masters/Tenant Master/tenant-mater";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class TenantControl {
   TenantControlArray: FormControls[];
@@ -211,7 +213,7 @@ export class TenantControl {
         label: ' ',
         placeholder: ' ',
         type: 'date',
-        value: localStorage.getItem("companyCode"), // Set the value to the current date
+        value: StorageService.getItem(StoreKeys.CompanyCode), // Set the value to the current date
         filterOptions: '',
         autocomplete: '',
         displaywith: '',
@@ -224,7 +226,7 @@ export class TenantControl {
         label: "",
         placeholder: "",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -247,7 +249,7 @@ export class TenantControl {
         label: ' ',
         placeholder: ' ',
         type: 'date',
-        value: localStorage.getItem("Branch"), // Set the value to the current date
+        value: StorageService.getItem(StoreKeys.Branch), // Set the value to the current date
         filterOptions: '',
         autocomplete: '',
         displaywith: '',
@@ -273,7 +275,7 @@ export class TenantControl {
         label: "",
         placeholder: "",
         type: "text",
-        value: localStorage.getItem("UserName"),
+        value: StorageService.getItem(StoreKeys.UserId),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -283,7 +285,7 @@ export class TenantControl {
         label: ' ',
         placeholder: ' ',
         type: 'date',
-        value: localStorage.getItem("Branch"), // Set the value to the current date
+        value: StorageService.getItem(StoreKeys.Branch), // Set the value to the current date
         filterOptions: '',
         autocomplete: '',
         displaywith: '',

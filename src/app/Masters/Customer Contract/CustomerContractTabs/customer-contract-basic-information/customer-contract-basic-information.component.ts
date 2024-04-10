@@ -15,6 +15,7 @@ import { ContractBasicInformationControl } from "src/assets/FormControls/Custome
 import { GetContractBasedOnCustomerAndProductListFromApi, PayBasisdetailFromApi, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
+import { StorageService } from "src/app/core/service/storage.service";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -56,8 +57,8 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     private Route: Router,
     private masterService: MasterService,
     private filter: FilterUtils, private objImageHandling: ImageHandling,
-    private sessionService: SessionService) {
-    this.companyCode = this.sessionService.getCompanyCode()
+    private storage: StorageService) {
+    this.companyCode = this.storage.companyCode;
     this.CurrentAccessList = {
       productAccess: ['Customer', 'ContractID', 'ContractScan', 'ContractScanView',
         'Product', 'PayBasis', 'AccountManager', 'PayBasis', 'ContractStartDate', 'Expirydate', 'Pendingdays', 'CustomerPONo', 'POValiditydate', 'ContractPOScan', 'ContractPOScanView', 'UpdateHistory']
@@ -205,8 +206,8 @@ export class CustomerContractBasicInformationComponent implements OnInit {
         cPODt: this.ProductsForm.value?.POValiditydate,
         cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
         mODDT: new Date(),
-        mODBY: localStorage.getItem("UserName"),
-        mODLOC: localStorage.getItem("CurrentBranchCode")
+        mODBY: this.storage.userName,
+        mODLOC: this.storage.branch
       }
 
       const reqBody = {

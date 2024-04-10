@@ -1,3 +1,36 @@
+export const StoreKeys = {
+    CompanyCode: 'companyCode',
+    UserId: 'UserName',
+    UserName: 'Name',
+    Role: 'role',        
+    CurrentUser: 'currentUser',
+    CurrentBranch: 'currentBranch',
+    Branch: 'branch',
+    Mode: 'Mode',
+    TimeZone: 'timeZone',
+    Token: 'token',
+    RefreshToken: 'refreshToken',
+    UserLocations: 'userLocations',
+    LoginLocations: 'loginLocations',
+    CompanyLogo: 'companyLogo',
+    CompanyAlias: 'company_Code',
+
+    MenuOption: 'menuOption',
+    Menu: 'menu',
+    MenuToBind: 'menuToBind',
+    SearchData: 'searchData',
+    SearchResults: 'searchResults',
+    DocCallAs: 'docCallAs',
+    DocNames: 'DocNames',
+
+    Theme: 'theme',
+    Choose_LogoHeader: 'choose_logoheader',
+    Sidebar_Status: 'sidebar_status',
+    Choose_Skin: 'choose_skin',
+    Choose_Skin_Active:'choose_skin_active',
+    IsRtl: 'isRtl'
+}
+
 export const Collections = {
     CompanyMaster: 'company_master',
     VehicleMaster: 'vehicle_master',

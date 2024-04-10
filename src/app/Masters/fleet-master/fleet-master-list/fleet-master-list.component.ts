@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -50,8 +51,8 @@ export class FleetMasterListComponent implements OnInit {
     activeFlag: "Active Status",
   };
 
-  constructor(private sessionService: SessionService, private masterService: MasterService) {
-    this.companyCode = this.sessionService.getCompanyCode();
+  constructor(private storage: StorageService, private masterService: MasterService) {
+    this.companyCode = this.storage.companyCode;
   }
 
   ngOnInit(): void {
@@ -137,8 +138,8 @@ export class FleetMasterListComponent implements OnInit {
     delete det.eNTDT
     delete det.eNTBY
     delete det.eNTLOC
-    det['mODLOC'] = localStorage.getItem("Branch")
-    det['mODBY'] = localStorage.getItem("UserName")
+    det['mODLOC'] = this.storage.branch
+    det['mODBY'] = this.storage.userName
     det['mODDT'] = new Date()
     let req = {
       companyCode: this.companyCode,

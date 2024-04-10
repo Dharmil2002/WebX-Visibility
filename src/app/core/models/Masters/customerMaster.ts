@@ -51,7 +51,7 @@ export class customerModel {
     this.BlackListed = customerMaster.BlackListed || false;
     this.activeFlag = customerMaster.activeFlag || false;
     this.customerCode = customerMaster.customerCode || '';
-    this.companyCode = customerMaster.companyCode || parseInt(localStorage.getItem("companyCode"));
+    this.companyCode = customerMaster.companyCode || 0;
     this.updatedDate = customerMaster.updatedDate || new Date();
     this.updatedBy = customerMaster.updatedBy || '';
     this.GSTdetails = customerMaster.GSTdetails || [];

@@ -62,7 +62,7 @@ export class RakeEntryPageComponent implements OnInit {
     show = false;
     apiShow = false;
     rrLoad: boolean = true;
-    companyCode = parseInt(localStorage.getItem("companyCode"));
+    companyCode = 0;
     fromCity: string; //it's used in getCity() for the binding a fromCity
     fromCityStatus: boolean; //it's used in getCity() for binding fromCity
     toCity: string; //it's used in getCity() for binding ToCity
@@ -127,6 +127,8 @@ export class RakeEntryPageComponent implements OnInit {
         private pinCodeService:PinCodeService,
         private storage:StorageService
     ) {
+        this.companyCode = this.storage.companyCode;
+        
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
             this.backPath = "/dashboard/Index?tab=7";

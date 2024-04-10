@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import { PincodeMaster } from "src/app/core/models/Masters/PinCode Master/PinCode Master";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class PincodeControl {
     private PincodeControlArray: FormControls[];
@@ -134,7 +136,7 @@ export class PincodeControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: '',
-                value: localStorage.getItem("UserName"),
+                value: StorageService.getItem(StoreKeys.UserId),
                 Validations: [],
                 generatecontrol: false, disable: false
             },
@@ -165,7 +167,7 @@ export class PincodeControl {
                 label: 'Company Code',
                 placeholder: 'Company Code',
                 type: '',
-                value: localStorage.getItem("CompanyCode"),
+                value: StorageService.getItem(StoreKeys.CompanyCode),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

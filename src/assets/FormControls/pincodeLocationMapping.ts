@@ -1,4 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import * as StorageService from "src/app/core/service/storage.service";
 
 export class PincodeLocationControl {
     PinLocControlArray: FormControls[];
@@ -62,7 +63,7 @@ export class PincodeLocationControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem('Username'),
+                value: StorageService.getItem('Username'),
                 Validations: [],
                 generatecontrol: false, disable: true
             },

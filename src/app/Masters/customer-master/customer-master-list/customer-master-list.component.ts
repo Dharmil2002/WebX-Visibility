@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { CustomerMasterUploadComponent } from '../customer-master-upload/customer-master-upload.component';
+import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-customer-master-list',
   templateUrl: './customer-master-list.component.html',
@@ -12,7 +13,7 @@ export class CustomerMasterListComponent implements OnInit {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   linkArray = []
   columnHeader = {
     "updatedDate": "Created Date",
@@ -70,7 +71,9 @@ export class CustomerMasterListComponent implements OnInit {
   uploadComponent = CustomerMasterUploadComponent;
   constructor(private masterService: MasterService,
     private dialog: MatDialog,
+    private storage: StorageService
   ) {
+    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
 
@@ -123,7 +126,7 @@ export class CustomerMasterListComponent implements OnInit {
     delete det._id;
     // delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customer_detail",
       filter: { _id: id },
       update: det

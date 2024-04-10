@@ -53,11 +53,8 @@ import { FilterUtils } from "../Utility/dropdownFilter";
 import { FilterBillingComponent } from './pending-billing/filter-billing/filter-billing.component';
 import { ThcGenerationComponent } from './thc-generation/thc-generation.component';
 import { ThcViewComponent } from './thc-summary/thc-view/thc-view.component';
-// import { THCViewComponent } from './ViewPrint/thc-view/thc-view.component';
-// import { WESTERNCARRIERSComponent } from './ViewPrint/westerncarriers/westerncarriers.component';
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { MastersModule } from "../Masters/masters.module";
-// import { PrqViewComponent } from './ViewPrint/prq-view/prq-view.component';
 import { NgxPrintModule } from "ngx-print";
 import { ShipmentEditComponent } from './shipment-edit/shipment-edit.component';
 import { CommonViewPrintComponent } from './ViewPrint/common-view-print/common-view-print.component';
@@ -75,6 +72,9 @@ import { UpdateDeliveryModalComponent } from "./update-delivery/update-delivery-
 import { QueryPageComponent } from './consignmentTracking/query-page/query-page.component';
 import { TrackingPageComponent } from './consignmentTracking/tracking-page/tracking-page.component';
 import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-popup/view-tracking-popup.component';
+import { ConsignmentLTLEntryFormComponent } from './consignment-ltl-entry-form/consignment-ltl-entry-form.component';
+import { ConsignmentChargesComponent } from './consignment-ltl-entry-form/consignment-charges/consignment-charges.component';
+import { ConsignmentOtherInfoComponent } from './consignment-ltl-entry-form/consignment-other-info/consignment-other-info.component';
 
 @NgModule({
   declarations: [
@@ -129,7 +129,10 @@ import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-
     UpdateDeliveryModalComponent,
     QueryPageComponent,
     TrackingPageComponent,
-    ViewTrackingPopupComponent    
+    ViewTrackingPopupComponent,
+    ConsignmentLTLEntryFormComponent,
+    ConsignmentChargesComponent,
+    ConsignmentOtherInfoComponent
   ],
   imports: [
     CommonModule,

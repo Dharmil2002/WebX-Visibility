@@ -31,8 +31,8 @@ import { isEmptyForm } from "src/app/Utility/Form Utilities/filter-utils";
   providers: [FilterUtils],
 })
 export class JobEntryPageComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  branchCode = localStorage.getItem("Branch");
+  companyCode: any = 0;
+  branchCode = "";
   billingParty: any;
   tableLoad: boolean = true;
   jobTableLoad: boolean = true;
@@ -72,7 +72,7 @@ export class JobEntryPageComponent implements OnInit {
   /*Here i declare the json array which is used to displayed on job detail*/
   /*Invoice Detail*/
   columnJobDetail: any;
-  orgBranch: string = localStorage.getItem("Branch");
+  orgBranch: string = "";
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
   menuItemflag = true;
   linkArray = [];
@@ -122,7 +122,9 @@ export class JobEntryPageComponent implements OnInit {
     private generalService: GeneralService,
     private storage: StorageService
   ) {
-
+    this.companyCode = this.storage.companyCode;
+    this.branchCode = this.storage.branch;
+    this.orgBranch = this.storage.branch;
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data || "";
     if (navigationState) {
       this.jobDetails = navigationState;

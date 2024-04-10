@@ -6,6 +6,7 @@ import { CustomerGstControl } from "src/assets/FormControls/customer-gst-control
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { Router } from '@angular/router';
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: 'app-customer-gst-list',
@@ -61,7 +62,7 @@ export class CustomerGstListComponent implements OnInit {
   linkArray = [];
   addAndEditPath: string;
   viewComponent: any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  companyCode: any = 0;
   jsonControlArray: any;
   isUpdate: boolean;
   customerName: any;
@@ -71,7 +72,9 @@ export class CustomerGstListComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private router: Router) {
+    private router: Router,
+    private storage: StorageService) {
+      this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/CustomerGSTMaster/AddCustomerGSTMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -102,7 +105,7 @@ export class CustomerGstListComponent implements OnInit {
   }
   async getCustomerMasterDetail() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.storage.companyCode,
       collectionName: "customer_detail",
       filter: {}
     };

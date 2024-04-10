@@ -1,8 +1,11 @@
 import Swal from "sweetalert2";
 import { updatePrqStatus, vehicleStatusUpdate } from "../prq-entry-page/prq-utitlity";
 import { firstValueFrom } from "rxjs";
+import * as StorageService from 'src/app/core/service/storage.service';
 import { debug } from "console";
-const branch = localStorage.getItem("Branch");
+import { StoreKeys } from "src/app/config/myconstants";
+
+const branch = StorageService.getItem(StoreKeys.Branch);
 export async function showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item) {
     const confirmationResult = await Swal.fire({
         icon: "success",
@@ -18,7 +21,7 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
         delete prqDetail.actions
 
         let updateData = {
-            cID: prqDetail.cID || localStorage.getItem('companyCode'),
+            cID: prqDetail.cID || StorageService.getItem(StoreKeys.CompanyCode),
             pRQNO: prqDetail.prqNo || prqDetail.pRQNO,
             sTS: "2",
             sTSNM: "Awaiting For Docket",
@@ -26,8 +29,8 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
         }
 
         const res = await updatePrqStatus(updateData, masterService);
-        let currentBranch = localStorage.getItem("Branch") || '';
-        let companyCode = parseInt(localStorage.getItem('companyCode'));
+        let currentBranch = StorageService.getItem(StoreKeys.Branch) || '';
+        let companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
 
         const result = await vehicleStatusUpdate(currentBranch, companyCode, item, prqDetail, masterService, true);
         if (res && result) {
@@ -85,12 +88,12 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
 }
 export async function getcontainerstatusFromApi(operationService, filterdata) {
     const reqbody = {
-        companyCode: localStorage.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "container_status",
         filter: {
             sTS: 1,
             vNTYP: filterdata,
-            oRG: localStorage.getItem('Branch'),
+            oRG: StorageService.getItem('Branch'),
         }
     };
 
@@ -167,7 +170,7 @@ export async function bindMarketVehicle(vehicledata: any) {
     const marketVehicle = {
         vehNo: vehicledata?.vehicelNo || "",
         distannce: 0,
-        currentLocation: localStorage.getItem("Branch"),
+        currentLocation: StorageService.getItem(StoreKeys.Branch),
         capacity: vehicledata.vehicleSize,
         vendorType: 'Market',
         vendor: vehicledata.vendor,
@@ -180,7 +183,7 @@ export async function bindMarketVehicle(vehicledata: any) {
         eta: vehicledata?.ETA || new Date(),
         driver_info: `${vehicledata.driver}-${vehicledata.dmobileNo}`,
         vendor_info: `${vehicledata.vendor}-${vehicledata.vMobileNo}`,
-        updateBy: localStorage.getItem('UserName'),
+        updateBy: StorageService.getItem(StoreKeys.UserId),
         updateDate: new Date()
     }
     return marketVehicle;

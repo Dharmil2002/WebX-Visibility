@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -8,7 +9,7 @@ import Swal from "sweetalert2";
 })
 
 export class CityMasterListComponent implements OnInit {
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    companyCode: any = 0;
     data: [] | any;
     csv: any[];
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
@@ -48,7 +49,8 @@ export class CityMasterListComponent implements OnInit {
         edit: false,
         csv: true
     }
-    constructor(private masterService: MasterService) {
+    constructor(private masterService: MasterService, private storage: StorageService) {
+        this.companyCode = this.storage.companyCode;
         this.addAndEditPath = "/Masters/CityMaster/AddCity";
     }
 
@@ -81,7 +83,7 @@ export class CityMasterListComponent implements OnInit {
         delete det.id;
         delete det.srNo;
         let req = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
+            companyCode: this.storage.companyCode,
             type: "masters",
             collectionName: "city_detail",
             filter: {

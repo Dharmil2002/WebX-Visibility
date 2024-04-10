@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { RouterOutlet } from '@angular/router';
 import { Subject } from 'rxjs';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: "app-main-layout",
@@ -26,7 +27,8 @@ export class MainLayoutComponent implements OnInit {
   private readonly _destroying$ = new Subject<void>();
 
   constructor(private authService: MsalService,
-    private msalBroadcastService: MsalBroadcastService) { }
+    private msalBroadcastService: MsalBroadcastService,
+    private storageService: StorageService) { }
 
   ngOnInit() {
     this.msalBroadcastService.msalSubject$
@@ -77,10 +79,10 @@ export class MainLayoutComponent implements OnInit {
 
   getClaims(claims) {
     console.log(JSON.stringify(claims));
-    localStorage.setItem('extension_VLUserId', claims.extension_VLUserId);
-    localStorage.setItem('emails', claims.emails);
-    localStorage.setItem('given_name', claims.given_name);
-    localStorage.setItem('extension_CompanyCode', claims.extension_CompanyCode);
+    this.storageService.setItem('extension_VLUserId', claims.extension_VLUserId);
+    this.storageService.setItem('emails', claims.emails);
+    this.storageService.setItem('given_name', claims.given_name);
+    this.storageService.setItem('extension_CompanyCode', claims.extension_CompanyCode);
   }
 
   ngOnDestroy(): void {

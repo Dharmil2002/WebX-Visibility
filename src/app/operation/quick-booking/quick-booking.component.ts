@@ -31,7 +31,7 @@ export class QuickBookingComponent implements OnInit {
   jsonControlDocketArray: FormControls[];
 
   /*company code declare globly beacuse it's use multiple time in out code*/
-  companyCode = parseInt(localStorage.getItem("companyCode"));
+  companyCode = 0;
 
   /*here the declare varible to bind the dropdown*/
   fromCity: string; //it's used in getCity() for the binding a fromCity
@@ -45,7 +45,7 @@ export class QuickBookingComponent implements OnInit {
   vehNo: string;
   vehicleStatus: boolean;
   /*it's breadScrums to used in html you must delcare here */
-  userName = localStorage.getItem("Username");
+  userName = "";
   DocCalledAs: DocCalledAsModel
   breadScrums = [
     {
@@ -69,6 +69,8 @@ export class QuickBookingComponent implements OnInit {
     private vehicleService:VehicleService,
     private controlPanel: ControlPanelService
   ) {    
+    this.companyCode = this.storage.companyCode;
+    this.userName = this.storage.userName;
     this.DocCalledAs = controlPanel.DocCalledAs;
     this.breadScrums = [
       {
@@ -120,8 +122,7 @@ export class QuickBookingComponent implements OnInit {
     }
   }
 
-  intigerOnly(event): boolean {    
-    console.log(event);
+  integerOnly(event): boolean {    
     const charCode = event.eventArgs.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
       event.eventArgs.preventDefault();

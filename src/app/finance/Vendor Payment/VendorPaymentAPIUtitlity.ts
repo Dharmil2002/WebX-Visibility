@@ -1,11 +1,12 @@
 import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from 'src/app/core/service/storage.service';
 
 export async function GetTHCListFromApi(masterService, RequestBody) {
     const reqBody = {
         companyCode: StorageService.getItem('companyCode'),
-        branch: StorageService.getItem('Branch'),
+        branch: StorageService.getItem(StoreKeys.Branch),
         startdate: RequestBody.StartDate,
         enddate: RequestBody.EndDate,
         vendorNames: RequestBody.vendorListWithKeys,
@@ -40,7 +41,7 @@ export async function GetAdvancePaymentListFromApi(masterService, Filters) {
     try {
         const reqBody = {
             companyCode: StorageService.getItem('companyCode'),
-            branch: StorageService.getItem('Branch'),
+            branch: StorageService.getItem(StoreKeys.Branch),
             startdate: Filters.StartDate,
             enddate: Filters.EndDate,
             PaymentType: Filters.PaymentType,

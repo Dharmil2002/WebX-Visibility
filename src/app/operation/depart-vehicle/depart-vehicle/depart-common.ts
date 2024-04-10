@@ -1,5 +1,6 @@
 import { FormGroup } from "@angular/forms";
 import { runningNumber } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
 
 /**
@@ -144,9 +145,9 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
             dktNo: docketDetails[lastArray]?.dktNo || '',
             vehNo: docketDetails[lastArray]?.vehNo || '',
             route: docketDetails[lastArray]?.route || '',
-            event: "Departed From"+" "+StorageService.getItem('Branch'),
+            event: "Departed From"+" "+StorageService.getItem(StoreKeys.Branch),
             orgn: docketDetails[lastArray][lastArray]?.orgn || '',
-            loc: StorageService.getItem('Branch') || '',
+            loc: StorageService.getItem(StoreKeys.Branch) || '',
             dest: docketDetails[lastArray][lastArray]?.dest || '',
             lsno: docketDetails[lastArray]?.lsno || '',
             mfno: docketDetails[lastArray]?.mfno || '',
@@ -154,7 +155,7 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
             dlSt: '',
             dlTm: '',
             evnCd: '',
-            upBy: StorageService.getItem('UserName') || '',
+            upBy: StorageService.getItem(StoreKeys.UserId) || '',
             upDt: new Date(),
         };
 

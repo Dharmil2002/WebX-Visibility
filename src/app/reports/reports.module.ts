@@ -64,7 +64,6 @@ import { TrialBalanceViewComponent } from './Account Report/Components/TrialBala
 import { TrialBalanceViewDetailsComponent } from './Account Report/Components/TrialBalance/trial-balance-view-details/trial-balance-view-details.component';
 import { StockReportComponent } from './stock-report/stock-report.component';
 import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
-import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view/balance-sheet-view.component';
 import { BalanceSheetCriteriaComponent } from './Account Report/Components/BalanceSheet/balance-sheet-criteria/balance-sheet-criteria.component';
 @NgModule({
@@ -137,7 +136,6 @@ import { BalanceSheetCriteriaComponent } from './Account Report/Components/Balan
     TrialBalanceViewDetailsComponent,
     StockReportComponent,
     DcrRegisterComponent,
-    BalanceSheetViewDetailsComponent,
     BalanceSheetViewComponent,
     BalanceSheetCriteriaComponent
   ],

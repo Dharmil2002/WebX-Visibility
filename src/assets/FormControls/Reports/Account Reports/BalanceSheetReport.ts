@@ -4,6 +4,33 @@ export class BalanceSheetReport {
      constructor() {
           this.BalanceSheetControlArray = [
                {
+                    name: 'Fyear',
+                    label: 'Financial Year ',
+                    placeholder: 'Financial Year ',
+                    type: 'dropdown',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                         {
+                              name: "autocomplete",
+                         },
+                         {
+                              name: "invalidAutocomplete",
+                              message: "Choose proper value",
+                         },
+                         {
+                              name: "required",
+                              message: "Financial is required",
+                         },
+                    ],
+                    additionalData: {
+                         showNameAndValue: false,
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
                     name: "start",
                     label: "Select Date Range",
                     placeholder: "Select Date Range",

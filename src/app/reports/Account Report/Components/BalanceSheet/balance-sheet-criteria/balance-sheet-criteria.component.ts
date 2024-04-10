@@ -44,6 +44,8 @@ export class BalanceSheetCriteriaComponent implements OnInit {
     startdate: Date;
     enddate: Date;
     branch: string[];
+    FinanceYear: string;
+    DateType: string;
   };
   EndDate: any = moment().format("DD MMM YY");
 
@@ -98,9 +100,9 @@ export class BalanceSheetCriteriaComponent implements OnInit {
 
     const DateTypeList = [
       {
-        name: "Posting Date", value: "P"
+        name: "Posting Date", value: "vDT"
       },
-      { name: "Entry Date", value: "E" }
+      { name: "Entry Date", value: "eNTDT" }
     ]
     this.filter.Filter(
       this.jsonBalanceSheetArray,
@@ -110,6 +112,15 @@ export class BalanceSheetCriteriaComponent implements OnInit {
       false
     );
     this.BalanceSheetForm.get('dateType').setValue(DateTypeList[0]);
+
+    const financialYearlist = this.generalLedgerReportService.getFinancialYear();
+    this.filter.Filter(
+      this.jsonBalanceSheetArray,
+      this.BalanceSheetForm,
+      financialYearlist,
+      "Fyear",
+      false
+    );
   }
 
   functionCallHandler($event) {
@@ -141,18 +152,34 @@ export class BalanceSheetCriteriaComponent implements OnInit {
         }
 
         this.reqBody = {
-          startdate, enddate, branch
+          startdate,
+          enddate,
+          branch,
+          FinanceYear: this.BalanceSheetForm.value.Fyear.value,
+          DateType: this.BalanceSheetForm.value.dateType.value
+
         }
         this.EndDate = moment(endDate).format("DD MMM YY");
 
-        const Result = await this.accountReportService.ProfitLossStatement(this.reqBody);
-        if (Result.MainData == 0) {
+        const Result = await this.accountReportService.GetBalanceSheet(this.reqBody);
+        if (Result.length == 0) {
           this.snackBarUtilityService.ShowCommonSwal(
             "error",
             "No Records Found"
           );
           return;
         }
+        const RequestData = {
+          "CompanyIMG": this.storage.companyLogo,
+          "finYear": this.reqBody.FinanceYear,
+          "reportdate": "As on Date " + this.EndDate,
+          "StartDate": moment(startDate).format("DD MMM YY"),
+          "EndDate": this.EndDate,
+          "Schedule": "Schedule III Compliant",
+          "BalanceSheetDetails": Result
+        }
+        this.accountReportService.setDataForTrialBalance("BalanceSheet", RequestData);
+        window.open('/#/Reports/AccountReport/BalanceSheetview', '_blank');
 
 
 

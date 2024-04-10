@@ -768,6 +768,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   selectCheckBox(event) {
+    
     if (this.DocketsContainersWise) {
       if (event.length > 1) {
         Swal.fire({
@@ -781,7 +782,7 @@ export class ThcGenerationComponent implements OnInit {
     }
     // Assuming event is an array of objects
     // Sum all the calculated actualWeights
-    const totalActualWeight = event.reduce((acc, weight) => acc + weight.aCTWT, 0);
+    const totalActualWeight = event.reduce((acc, weight) => acc + parseFloat(weight.aCTWT), 0);
     let capacityTons = parseFloat(this.thcTableForm.controls["capacity"].value); // Get the capacity value in tons
     let loadedTons = totalActualWeight ? totalActualWeight / 1000 : 0;
     let percentage = loadedTons ? (loadedTons * 100) / capacityTons : 0;
@@ -1535,8 +1536,8 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.vehSizeName = !isRake ? vehSize.name : "";
     //#region Load
     this.LOad.dKTS = this.tableData.filter(item => item.isSelected == true).length;
-    this.LOad.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.pKGS, 0);
-    this.LOad.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
+    this.LOad.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + parseInt(item.pKGS), 0);
+    this.LOad.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + parseFloat(item.aCTWT), 0);
     this.LOad.vOL = 0;
     this.LOad.vWT = 0;
     this.LOad.sEALNO = "";
@@ -2145,7 +2146,6 @@ export class ThcGenerationComponent implements OnInit {
         bALAMT: this.chargeForm.get("balAmt").value,
         tOTAMT: this.chargeForm.get("totAmt").value
       };
-
       const data = this.thcTableForm.getRawValue();
       const res = await showConfirmationDialogThc(
         requestBody,

@@ -294,13 +294,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.matrials, "materialName", false);
     this.bindQuickdocketData();
     this.invoiceForm.controls['materialDensity'].setValue("");
-    this.invoiceForm.controls['weight_in'].setValue("");
-    //this.invoiceForm.controls['risk'].setValue("");
-    ///this.invoiceForm.controls['pkgsType'].setValue("");
-    ///this.freightForm.controls['freightRatetype'].setValue("");
-    ///this.freightForm.controls['rcm'].setValue("");
-    ///this.freightForm.controls['payType'].setValue("");
-    ///this.freightForm.controls['transMode'].setValue("");
+    this.consignmentForm.controls['weight_in'].setValue("");
+    this.consignmentForm.controls['risk'].setValue("");
+    this.consignmentForm.controls['pkgsType'].setValue("");
+    this.freightForm.controls['freightRatetype'].setValue("");
+    this.freightForm.controls['rcm'].setValue("");
+    this.consignmentForm.controls['payType'].setValue("");
+    this.consignmentForm.controls['transMode'].setValue("");
 
   }
   //#region functionCallHandler
@@ -388,9 +388,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*End*/
   /*below function is for the get a customer or consignor/consignee */
   async getCustomer(event) {
-    if (this.consignmentForm.controls['prqNo'].value || this.quickDocket) {
-      return false;
-    }
     const controlMap = new Map([
       ['billingParty', this.allFormControls],
       ['consignorName', this.consignorControlArray],
@@ -961,8 +958,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     return true;
   }
   calucateCft() {
+    debugger
     let units = ''
-    if (typeof (this.consignmentForm.controls['weight_in'].value) == "string") {
+    if(this.consignmentForm.controls['f_vol'].value){
+    if (this.consignmentForm.controls['weight_in'].value) {
       units = this.wtUnits.find((x) => x.value == this.consignmentForm.controls['weight_in'].value).name;
     }
     const length = parseFloat(this.invoiceForm.controls['length']?.value || 0.00);
@@ -992,6 +991,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         break;
 
     }
+  }
   }
   async save() {
     if (this.tableData.length == 0) {

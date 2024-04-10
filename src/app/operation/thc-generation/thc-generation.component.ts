@@ -1995,7 +1995,6 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is Called when the We click on Create THC*/
   async createThc() {
-    debugger
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
     const contAmt = parseInt(this.chargeForm.get('contAmt').value);
     if (this)

@@ -1112,7 +1112,7 @@ export class DocketService {
             "cID": this.storage.companyCode,
             "docNo": data?.docketNumber || "",
             "dKTNO": data?.docketNumber || "",
-            "pRQNO": data?.prqNo || "",
+            "pRQNO": data?.prqNo?.value || "",
             "dKTDT": ConvertToDate(data?.docketDate),
             "pAYTYP": data?.payType || "",
             "pAYTYPNM": data?.payTypeName || "",

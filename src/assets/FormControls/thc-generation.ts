@@ -545,6 +545,10 @@ export class thcControl {
                     generatecontrol: true,
                     disable: view ? view : update,
                     Validations: [
+                        {
+                            name: "required",
+                            message: "Arrival Date is required",
+                        }
                     ],
                     functions: {
                         onDate: "ArrivalDateChange"

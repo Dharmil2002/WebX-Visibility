@@ -1112,7 +1112,7 @@ export class DocketService {
             "cID": this.storage.companyCode,
             "docNo": data?.docketNumber || "",
             "dKTNO": data?.docketNumber || "",
-            "pRQNO": data?.prqNo || "",
+            "pRQNO": data?.prqNo?.value || "",
             "dKTDT": ConvertToDate(data?.docketDate),
             "pAYTYP": data?.payType || "",
             "pAYTYPNM": data?.payTypeName || "",
@@ -1157,8 +1157,6 @@ export class DocketService {
             "eDD": ConvertToDate(data?.edd),
             "wTIN": data?.weight_in || "",
             "iSVOL": data?.f_vol || false,
-            "iSLOCAL": data?.local || false,
-            "iSODA": data?.oda || false,
             "fRTRT": ConvertToNumber(data?.freight_rate || 0, 2),
             "fRTRTY": data?.freightRatetypeNm || "",
             "fRTRTYN": data?.freightRatetype || "",
@@ -1173,16 +1171,16 @@ export class DocketService {
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
-            "wLCN": data?.cnWinCsgn || "",
-            "wLCNE": data?.cnWinCsgne || "",
-            "iSCEBP": data?.cnebp || "",
-            "iSCNBP": data?.cnbp || "",
+            "wLCN": data?.cnWinCsgn ||false,
+            "wLCNE": data?.cnWinCsgne ||false,
+            "iSCEBP": data?.cnebp ||false,
+            "iSCNBP": data?.cnbp ||false,
             "dELTYPE": data?.delivery_type || "",
             "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
             "iNVTOT": ConvertToNumber(data?.totAmt || 0, 2),
             "pARTQTY": parseInt(data?.totalPartQuantity || 0),
-            "tRNMOD": data?.tranType || "",//check value transMode
-            "tRNMODNM": data?.tranTypeName || "",//check value transMode
+            "tRNMOD": data?.transMode || "",//check value transMode
+            "tRNMODNM": data?.transModeName || "",//check value transMode
             "eNTBY": this.storage.userName,
             "eNTDT": new Date(),
             "eNTLOC": this.storage.branch,
@@ -1191,7 +1189,7 @@ export class DocketService {
             "fSTS": DocketFinStatus.Pending,
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
-            "cONTRACT": "",
+            "cONTRACT": data?.contract || ""
         };
 
         let invoiceDetails = invoiceData.map((element) => {
@@ -1206,7 +1204,7 @@ export class DocketService {
                 "iNVNO": element?.invoiceNumber || "",
                 "iNVDT": ConvertToDate(element?.invDt),
                 "vOL": {
-                    "uNIT": "FT",
+                    "uNIT": "CM",
                     "l": roundToNumber(l, 3),
                     "b": roundToNumber(b, 3),
                     "h": roundToNumber(h, 3),
@@ -1221,7 +1219,7 @@ export class DocketService {
                 "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),
                 "cHRWT": ConvertToNumber(element?.chargedWeight || 0, 2),
                 "mTNM": element?.materialName || "",
-                "eWBNO": data?.ewayBillNo || "",
+                "eWBNO": element?.ewayBillNo || "",
                 "eWBDT": ConvertToDate(element?.ewayBillDate),
                 "eXPDT": ConvertToDate(data?.expiryDate),
                 "eNTBY": this.storage.userName,

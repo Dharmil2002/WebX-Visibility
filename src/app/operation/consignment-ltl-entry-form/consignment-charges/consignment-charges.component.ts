@@ -23,7 +23,6 @@ export class ConsignmentChargesComponent implements OnInit {
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog
   ) {
-    debugger;
     if (item.length>0) {
        this.chargeData = item;
        this.isEdit=true;

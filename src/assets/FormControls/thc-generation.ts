@@ -305,8 +305,8 @@ export class thcControl {
                     Validations: [
                         {
                             "name": "pattern",
-                            "pattern": "^[A-Za-z ]{1,15}$",
-                            "message": "Please enter up to 15 alphabetical characters only"
+                            "pattern": "^[A-Za-z ]{1,50}$",
+                            "message": "Please enter up to 50 alphabetical characters only"
                         }
                     ],
                     functions: {},
@@ -548,7 +548,7 @@ export class thcControl {
                         {
                             name: "required",
                             message: "Arrival Date is required",
-                        },
+                        }
                     ],
                     functions: {
                         onDate: "ArrivalDateChange"
@@ -565,10 +565,6 @@ export class thcControl {
                     type: 'number',
                     value: "",
                     Validations: [
-                        {
-                            name: "required",
-                            message: "Arrival Seal No is required",
-                        },
                     ],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -583,8 +579,6 @@ export class thcControl {
                     type: 'number',
                     value: "",
                     Validations: [{
-                        name: "required",
-                        message: "Arrival End KM is required",
                     },],
                     additionalData: {
                         metaData: "ArrivalInfo"
@@ -598,8 +592,6 @@ export class thcControl {
                     type: 'text',
                     value: "",
                     Validations: [{
-                        name: "required",
-                        message: "Arrival Remarks is required",
                     },],
                     additionalData: {
                         metaData: "ArrivalInfo"

@@ -2,7 +2,8 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
-
+import * as StorageService from "src/app/core/service/storage.service";
+import { StoreKeys } from "src/app/config/myconstants";
 export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
@@ -135,7 +136,7 @@ export class ConsignmentLtl extends BaseControl {
                 label: "Origin",
                 placeholder: "Origin",
                 type: "text",
-                value: localStorage.getItem("Branch"),
+                value: StorageService.getItem(StoreKeys.Branch),
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
@@ -299,7 +300,11 @@ export class ConsignmentLtl extends BaseControl {
                 functions: {
                     onSelection: "disableSize"
                 },
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Transport Mode is required",
+                    }],
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "Basic"
@@ -314,7 +319,11 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'risk', label: 'Risk', placeholder: 'Risk', type: 'Staticdropdown',
-                value: [], Validations: [], generatecontrol: true, disable: false,
+                value: [],   Validations: [
+                    {
+                        name: "required",
+                        message: "Risk is required",
+                    }], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "Basic",
                 },
@@ -330,6 +339,13 @@ export class ConsignmentLtl extends BaseControl {
             {
                 name: 'spIns', label: 'Special Instructions', placeholder: 'Special Instructions', type: 'text',
                 value: "", Validations: [], generatecontrol: true, disable: false,
+                additionalData: {
+                    metaData: "Basic"
+                }
+            },
+            {
+                name: 'contract', label: '', placeholder: '', type: '',
+                value: "", Validations: [], generatecontrol: false, disable: false,
                 additionalData: {
                     metaData: "Basic"
                 }
@@ -433,6 +449,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Consignor Name is required",
+                    },
                     { name: "autocomplete" },
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
@@ -448,7 +468,10 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
-                value: "", Validations: [], generatecontrol: true, disable: false,
+                value: "", Validations: [  {
+                    name: "required",
+                    message: "Contact Number is required",
+                }], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "consignor",
                 }
@@ -473,7 +496,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-
+                    {
+                        name: "required",
+                        message: "Consignor Address is required",
+                    }
                 ],
                 functions: {
                 },
@@ -494,6 +520,10 @@ export class ConsignmentLtl extends BaseControl {
                         name: "pattern",
                         pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
                         message: "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+                    },
+                    {
+                        name: "required",
+                        message: "Consignor GST Number is required",
                     }
                 ],
                 functions: {
@@ -514,6 +544,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Consignee Name is required",
+                    },
                     { name: "autocomplete" },
                     { name: "invalidAutocompleteObject", message: "Choose proper value" }
                 ],
@@ -528,7 +562,10 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'mobile-number',
-                value: "", Validations: [], generatecontrol: true, disable: false,
+                value: "", Validations: [ {
+                    name: "required",
+                    message: "Contact Number is required",
+                },], generatecontrol: true, disable: false,
                 additionalData: {
                     metaData: "consignee"
                 }
@@ -552,7 +589,10 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-
+                    {
+                        name: "required",
+                        message: "Consignee Address is required",
+                    }
                 ],
                 functions: {
                 },
@@ -573,6 +613,10 @@ export class ConsignmentLtl extends BaseControl {
                         name: "pattern",
                         pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
                         message: "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+                    },
+                    {
+                        name: "required",
+                        message: "Consignee GST Number",
                     }
                 ],
                 functions: {
@@ -597,6 +641,9 @@ export class ConsignmentLtl extends BaseControl {
                     name: "required",
                     message: "Eway Bill No is required",
                 }],
+                functions:{
+                    "onChange":"checkInvoiceExist"
+                },
                 additionalData: {
                     metaData: "invoiceDetail"
                 },

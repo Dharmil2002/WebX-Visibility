@@ -525,7 +525,7 @@ export class PrqService {
   /*below function is getting a data from prq*/
   async getPrqDetail(filter={}) {
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode:this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
       filter:filter,
     };

@@ -23,7 +23,7 @@
           *ngFor="let sidebarItem of sidebarItems" [routerLinkActive]="sidebarItem.SubMenu.length != 0 ? '' : 'active'">
           <div class="header" *ngIf="(sidebarItem.GroupTitle ?? false) === true">{{sidebarItem.MenuName | translate}}</div>
           <a 
-             [routerLink]="sidebarItem.SubMenu.length > 0 ? null : [sidebarItem.MenuLink]"
+             [routerLink]="(sidebarItem.SubMenu.length > 0 || (sidebarItem.MenuLink ?? '') =='')  ? null : [sidebarItem.MenuLink]"
             *ngIf="!(sidebarItem.GroupTitle ?? false);"
             [ngClass]="[sidebarItem.Class]" (click)="callLevel1Toggle($event, sidebarItem.MenuName)" 
             class="menu-top">
@@ -36,7 +36,7 @@
             <li [ngClass]="level2Menu === sidebarSubItem.MenuName? 'activeSub':''"
               *ngFor="let sidebarSubItem of sidebarItem.SubMenu"
               [routerLinkActive]="sidebarSubItem.SubMenu.length > 0 ? '' : 'active'">
-              <a [routerLink]="sidebarSubItem.SubMenu.length > 0 ? null : [sidebarSubItem.MenuLink]"
+              <a [routerLink]="(sidebarSubItem.SubMenu.length > 0 || (sidebarSubItem.MenuLink ?? '') =='') ? null : [sidebarSubItem.MenuLink]"
                 (click)="callLevel2Toggle($event,sidebarSubItem.MenuName)" [ngClass]="[sidebarSubItem.Class]">
                 {{sidebarSubItem.MenuName | translate}}
               </a>
@@ -45,7 +45,7 @@
                 <li *ngFor="let sidebarSubsubItem of sidebarSubItem.SubMenu"
                   [ngClass]="level3Menu === sidebarSubsubItem.MenuName? 'activeSubSub':''"
                   [routerLinkActive]="sidebarSubsubItem.SubMenu.length > 0 ? '' : 'active'">
-                  <a [routerLink]="sidebarSubsubItem.SubMenu.length > 0 ? null : [sidebarSubsubItem.MenuLink]"
+                  <a [routerLink]="(sidebarSubsubItem.SubMenu.length > 0 || (sidebarSubsubItem.MenuLink ?? '') =='') ? null : [sidebarSubsubItem.MenuLink]"
                     (click)="callLevel3Toggle($event,sidebarSubsubItem.MenuName)"
                     [ngClass]="[sidebarSubsubItem.Class]">
                     {{sidebarSubsubItem.MenuName | translate}}

@@ -106,6 +106,17 @@ export class vendOutControl {
                     },
                     generatecontrol: true, disable: false
                },
+               {
+                    name: "msmeRegistered",
+                    label: "MSME Registered",
+                    placeholder: "MSME Registered",
+                    type: "toggle",
+                    value: "",
+                    Validations: [],
+                    functions: {},
+                    generatecontrol: true,
+                    disable: false,
+               },
                // {
                //      name: 'rpttype',
                //      label: 'Report Type',

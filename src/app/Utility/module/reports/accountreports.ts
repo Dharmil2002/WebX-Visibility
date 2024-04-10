@@ -1139,4 +1139,233 @@ export class AccountReportService {
                throw error;
           }
      }
+     async GetBalanceSheet(request) {
+
+          const reqBody = {
+               companyCode: this.storage.companyCode,
+               collectionName: "account_detail",
+               filters: [
+                    {
+                         'D$match': {
+                              'mATCD': {
+                                   'D$in': [
+                                        'MCT-0001', 'MCT-0004'
+                                   ]
+                              }
+                         }
+                    },
+                    {
+                         "D$lookup": {
+                              "from": "acc_trans_" + request.FinanceYear,
+                              "let": { "aCCCD": "$aCCD" },
+                              "pipeline": [
+                                   {
+                                        "D$match": {
+                                             "D$expr": {
+                                                  "D$and": [
+                                                       {
+                                                            "D$eq": [
+                                                                 "$aCCCD",
+                                                                 "$$aCCCD"
+                                                            ]
+                                                       },
+                                                       {
+                                                            "D$in": [
+                                                                 "$lOC",
+                                                                 request.branch
+                                                            ]
+                                                       },
+                                                       {
+                                                            'D$gte': [
+                                                                 '$' + request.DateType, request.startdate
+                                                            ]
+                                                       }, {
+                                                            'D$lte': [
+                                                                 '$' + request.DateType, request.enddate
+                                                            ]
+                                                       }
+
+                                                  ]
+                                             }
+                                        }
+                                   }
+                              ],
+                              "as": "transactions"
+                         }
+                    },
+                    {
+                         "D$unwind": "$transactions"
+                    },
+                    {
+                         "D$match": {
+                              "transactions": { "D$ne": [] } // Filter out documents where there are no transactions
+                         }
+                    },
+
+                    {
+                         'D$group': {
+                              '_id': {
+                                   'MainCategory': '$mRPNM',
+                                   'GroupName': '$gRPNM',
+                                   'GroupCode': '$gRPCD',
+                                   'BalanceCategoryCode': '$bCATCD',
+                                   'BalanceCategoryName': '$bCATNM',
+                                   'BSSchedule': '$bSSCH',
+                                   'AccountCode': '$aCCD',
+                                   'AccountName': '$aCNM'
+                              },
+                              'TotalCredit': {
+                                   'D$sum': '$transactions.cR'
+                              },
+                              'TotalDebit': {
+                                   'D$sum': '$transactions.dR'
+                              }
+                         }
+                    }, {
+                         'D$group': {
+                              '_id': {
+                                   'MainCategory': '$_id.MainCategory',
+                                   'GroupName': '$_id.GroupName',
+                                   'GroupCode': '$_id.GroupCode',
+                                   'BalanceCategoryCode': '$_id.BalanceCategoryCode',
+                                   'BalanceCategoryName': '$_id.BalanceCategoryName',
+                                   'BSSchedule': '$_id.BSSchedule'
+                              },
+                              'TotalCredit': {
+                                   'D$sum': '$TotalCredit'
+                              },
+                              'TotalDebit': {
+                                   'D$sum': '$TotalDebit'
+                              },
+                              'AccountDetails': {
+                                   'D$push': {
+                                        'AccountCode': '$_id.AccountCode',
+                                        'AccountName': '$_id.AccountName',
+                                        'Credit': '$TotalCredit',
+                                        'Debit': '$TotalDebit'
+                                   }
+                              }
+                         }
+                    }, {
+                         'D$group': {
+                              '_id': '$_id.MainCategory',
+                              'Details': {
+                                   'D$push': {
+                                        'GroupName': '$_id.GroupName',
+                                        'GroupCode': '$_id.GroupCode',
+                                        'BalanceCategoryCode': '$_id.BalanceCategoryCode',
+                                        'BalanceCategoryName': '$_id.BalanceCategoryName',
+                                        'BSSchedule': '$_id.BSSchedule',
+                                        'TotalCredit': '$TotalCredit',
+                                        'TotalDebit': '$TotalDebit',
+                                        'AccountDetails': '$AccountDetails'
+                                   }
+                              }
+                         }
+                    }, {
+                         'D$project': {
+                              '_id': 0,
+                              'MainCategory': '$_id',
+                              'Details': 1
+                         }
+                    }
+               ]
+          };
+          try {
+               const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
+               if (res.data && res.data.length > 0) {
+
+                    res.data.sort((a, b) => {
+                         const scheduleA = a.Details[0].BSSchedule;
+                         const scheduleB = b.Details[0].BSSchedule;
+
+                         if (scheduleA < scheduleB) {
+                              return -1;
+                         }
+                         if (scheduleA > scheduleB) {
+                              return 1;
+                         }
+                         return 0;
+                    });
+                    const TotalAmountLastFinYear = 0.00; // Assuming this value is available
+
+                    const NewTableList = res.data.flatMap((entry, index) => {
+
+                         // Calculate total amounts for the main category
+                         const totalAmountCurrentFinYear = entry.Details.reduce((total, detail) => {
+                              return total + (detail.TotalCredit - detail.TotalDebit);
+                         }, 0);
+
+                         // Generate rows
+                         const mainRow = {
+                              MainCategory: entry.MainCategory,
+                              SubCategory: 'Total',
+                              TotalAmountCurrentFinYear: totalAmountCurrentFinYear.toFixed(2),
+                              TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
+                              Notes: '',
+                              AccountDetails: ''
+                         };
+
+                         const subCategoryRows = entry.Details.map((detail, detailIndex) => ({
+                              MainCategory: '',
+                              SubCategory: `[${index + 1}.${detailIndex + 1}] ${detail.GroupName}`,
+                              TotalAmountCurrentFinYear: (detail.TotalCredit - detail.TotalDebit).toFixed(2),
+                              TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
+                              Notes: detail.BSSchedule || '',
+                              AccountDetails: detail.AccountDetails
+                         }));
+
+                         // Collect unique BalanceCategoryName values
+                         const uniqueBalanceCategories = new Set();
+                         entry.Details.forEach(detail => uniqueBalanceCategories.add(detail.BalanceCategoryName));
+
+                         // Generate rows for unique BalanceCategoryName values
+                         const uniqueCategoryRows = [...uniqueBalanceCategories].map((balanceCategory, detailIndex) => {
+                              // Filter details based on current BalanceCategoryName
+                              const balanceCategoryDetails = entry.Details.filter(detail => detail.BalanceCategoryName === balanceCategory);
+                              // Calculate total amount for the current BalanceCategoryName
+                              const totalAmount = balanceCategoryDetails.reduce((total, detail) => total + (detail.TotalCredit - detail.TotalDebit), 0);
+
+                              return {
+                                   MainCategory: '',
+                                   SubCategory: `[${index + 1}] ${balanceCategory}`,
+                                   TotalAmountCurrentFinYear: totalAmount.toFixed(2),
+                                   TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
+                                   Notes: '',
+                                   AccountDetails: []
+                              };
+                         });
+
+                         return [mainRow, ...subCategoryRows];
+                    });
+                    return NewTableList;
+               }
+               return []
+          } catch (error) {
+               console.error("Error:", error);
+               throw error;
+          }
+     }
+     async GetTemplateForReports(filter = {}) {
+          try {
+               const req = {
+                    companyCode: this.storage.companyCode,
+                    filter: filter,
+                    collectionName: "viewprint_template",
+               };
+
+               // Fetch data from the 'docket' collection using the masterService
+               const res = await firstValueFrom(this.masterService.masterMongoPost('generic/get', req));
+
+               if (res.data && res.data.length > 0) {
+                    return res.data[0];
+               }
+               return null
+
+          } catch (error) {
+               // Display error message
+               console.error("Error:", error);
+               throw error;
+          }
+     }
 }

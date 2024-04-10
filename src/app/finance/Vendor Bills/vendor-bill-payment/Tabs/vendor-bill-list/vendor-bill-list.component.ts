@@ -105,7 +105,7 @@ export class VendorBillListComponent implements OnInit {
     companyCode: this.companyCode,
     vendorNames: [],
     StatusNames: [],
-    StatusCode: [],
+    StatusCode: [1, 2, 4, 5, 6, 7],
     startdate: new Date(),
     enddate: new Date()
   }

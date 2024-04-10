@@ -18,7 +18,7 @@ export class VendorWiseOutService {
                return date.toISOString(); // Convert to ISO format if date is valid
           }
      }
-     async getvendorWiseOutReportDetail(ASonDateValue, start, end, locations, vendors, reportbasis) {
+     async getvendorWiseOutReportDetail(msme=false, ASonDateValue, start, end, locations, vendors, reportbasis) {
           // Extract vendor names and status names from the request object
           const vendorNames = vendors ? vendors.map(x => x.vNM) || [] : [];
           const locCodes = locations ? locations.map(x => x.locCode) || [] : [];
@@ -42,7 +42,7 @@ export class VendorWiseOutService {
 
                     ...(vendorNames.length > 0 ? [{ D$expr: { D$in: ["$vND.nM", vendorNames] } }] : []), // Vendor names condition
                     ...(locCodes.length > 0 ? [{ D$expr: { D$in: ["$eNTLOC", locCodes] } }] : []), // Location code condition
-                    ...(reportbasis ? [{ 'bSTAT': parseInt(reportbasis) }] : []),
+                    ...(reportbasis ? [{ 'bSTAT': parseInt(reportbasis) }] : [])
                ],
           };
 
@@ -111,204 +111,250 @@ export class VendorWiseOutService {
                               },
                          },
                          {
-                              D$project:
+                         D$lookup: {
+                            from: "vendor_detail",
+                            let: {
+                              vendorCode: "$vND.cD",
+                            },
+                            pipeline: [
                               {
-                                   vendor: 1,
-                                   eNTLOC: 1,
-                                   bALAMT: 1,
-                                   bSTAT: 1,
-                                   age: 1,
-                                   finalized: {
-                                        D$cond: {
-                                             if: {
-                                                  D$ne: ["$bSTAT", 1],
-                                             },
-                                             then: "$bALAMT",
-                                             else: 0,
-                                        },
-                                   },
-                                   unFinalized: {
-                                        D$cond: {
-                                             if: {
-                                                  D$eq: ["$bSTAT", 1],
-                                             },
-                                             then: "$bALAMT",
-                                             else: 0,
-                                        },
-                                   },
-                                   paidAmount: {
-                                        D$sum: "$billpay.aMT", 
-                                   },
-                              },
-                         },
-                         {
-                              D$addFields: {
-                                   pendingAmt: {
-                                        D$max: [
-                                             0,
-                                             {
-                                                  D$subtract: ["$bALAMT", "$paidAmount"],
-                                             },
+                                D$match: {
+                                  D$and: [
+                                    {
+                                      D$expr: {
+                                        D$eq: [
+                                          "$vendorCode",
+                                          "$$vendorCode",
                                         ],
-                                   },
+                                      },
+                                    },
+                                    {
+                                      cNL: {
+                                        D$in: [false, null],
+                                      },
+                                    },
+                                  ],
+                                },
                               },
-                         },
-                         {
-                              D$group: {
-                                   _id: "$vendor",
-                                   vendor: {
-                                        D$first: "$vendor",
-                                   },
-                                   loc: {
-                                        D$first: "$eNTLOC",
-                                   },
-                                   openingBal: {
-                                        D$sum: 0,
-                                   },
-                                   totalBillAmt: {
-                                        D$sum: "$bALAMT",
-                                   },
-                                   paidAmt: {
-                                        D$sum: "$paidAmount",
-                                   },
-                                   finalized: {
-                                        D$sum: "$finalized",
-                                   },
-                                   unFinalized: {
-                                        D$sum: "$unFinalized",
-                                   },
-                                   "0-30": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$lte: ["$age", 30],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   "31-60": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$and: [
-                                                            {
-                                                                 D$gt: ["$age", 31],
-                                                            },
-                                                            {
-                                                                 D$lte: ["$age", 60],
-                                                            },
-                                                       ],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   "61-90": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$and: [
-                                                            {
-                                                                 D$gt: ["$age", 61],
-                                                            },
-                                                            {
-                                                                 D$lte: ["$age", 90],
-                                                            },
-                                                       ],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   "91-120": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$and: [
-                                                            {
-                                                                 D$gt: ["$age", 91],
-                                                            },
-                                                            {
-                                                                 D$lte: ["$age", 120],
-                                                            },
-                                                       ],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   "121-150": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$and: [
-                                                            {
-                                                                 D$gt: ["$age", 121],
-                                                            },
-                                                            {
-                                                                 D$lte: ["$age", 150],
-                                                            },
-                                                       ],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   "151-180": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$and: [
-                                                            {
-                                                                 D$gt: ["$age", 151],
-                                                            },
-                                                            {
-                                                                 D$lte: ["$age", 180],
-                                                            },
-                                                       ],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   ">180": {
-                                        D$sum: {
-                                             D$cond: {
-                                                  if: {
-                                                       D$gte: ["$age", 180],
-                                                  },
-                                                  then: "$pendingAmt",
-                                                  else: 0,
-                                             },
-                                        },
-                                   },
-                                   totalPayable: {
-                                        D$sum: "$pendingAmt",
-                                   },
-                                   onAccountAmt: {
-                                        D$sum: 0,
-                                   },
-                                   manualVoucher: {
-                                        D$sum: 0,
-                                   },
-                                   jVAmt: {
-                                        D$sum: 0,
-                                   },
-                                   paidAdvanceAmount: {
-                                        D$sum: 0,
-                                   },
-                                   ledgerBalance: {
-                                        D$sum: 0,
-                                   },
+                            ],
+                            as: "vendorDetals",
+                          },
+                        },
+                        {
+                          D$unwind: {
+                            path: "$vendorDetals",
+                            preserveNullAndEmptyArrays: false,
+                          },
+                        },
+                        {
+                          D$match: {
+                            D$expr: {
+                              D$eq: ["$vendorDetals.msmeRegistered", msme]
+                            }
+                          }
+                        },
+                        {
+                          D$project: {
+                            vendor: 1,
+                            iSMSRG: "$vendorDetals.msmeRegistered",
+                            eNTLOC: 1,
+                            bALAMT: 1,
+                            bSTAT: 1,
+                            age: 1,
+                            finalized: {
+                              D$cond: {
+                                if: {
+                                  D$ne: ["$bSTAT", 1],
+                                },
+                                then: "$bALAMT",
+                                else: 0,
                               },
-                         }
+                            },
+                            unFinalized: {
+                              D$cond: {
+                                if: {
+                                  D$eq: ["$bSTAT", 1],
+                                },
+                                then: "$bALAMT",
+                                else: 0,
+                              },
+                            },
+                            paidAmount: {
+                              D$sum: "$billpay.aMT",
+                            },
+                          },
+                        },
+                        {
+                          D$addFields: {
+                            pendingAmt: {
+                              D$max: [
+                                0,
+                                {
+                                  D$subtract: ["$bALAMT", "$paidAmount"],
+                                },
+                              ],
+                            },
+                          },
+                        },
+                        {
+                          D$group: {
+                            _id: "$vendor",
+                            vendor: {
+                              D$first: "$vendor",
+                            },
+                            msme: {
+                              D$first: "$iSMSRG",
+                            },
+                            loc: {
+                              D$first: "$eNTLOC",
+                            },
+                            openingBal: {
+                              D$sum: 0,
+                            },
+                            totalBillAmt: {
+                              D$sum: "$bALAMT",
+                            },
+                            paidAmt: {
+                              D$sum: "$paidAmount",
+                            },
+                            finalized: {
+                              D$sum: "$finalized",
+                            },
+                            unFinalized: {
+                              D$sum: "$unFinalized",
+                            },
+                            "0-30": {
+                              D$sum: {
+                                DOMRectList$cond: {
+                                  if: {
+                                    D$lte: ["$age", 30],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            "31-60": {
+                              D$sum: {
+                                D$cond: {
+                                  if: {
+                                    D$and: [
+                                      {
+                                        D$gt: ["$age", 31],
+                                      },
+                                      {
+                                        D$lte: ["$age", 60],
+                                      },
+                                    ],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            "61-90": {
+                              D$sum: {
+                                D$cond: {
+                                  if: {
+                                    D$and: [
+                                      {
+                                        D$gt: ["$age", 61],
+                                      },
+                                      {
+                                        D$lte: ["$age", 90],
+                                      },
+                                    ],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            "91-120": {
+                              D$sum: {
+                                D$cond: {
+                                  if: {
+                                   D$and: [
+                                      {
+                                        D$gt: ["$age", 91],
+                                      },
+                                      {
+                                        D$lte: ["$age", 120],
+                                      },
+                                    ],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            "121-150": {
+                              D$sum: {
+                                D$cond: {
+                                  if: {
+                                    D$and: [
+                                      {
+                                        D$gt: ["$age", 121],
+                                      },
+                                      {
+                                        D$lte: ["$age", 150],
+                                      },
+                                    ],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            "151-180": {
+                              D$sum: {
+                                D$cond: {
+                                  if: {
+                                    D$and: [
+                                      {
+                                        D$gt: ["$age", 151],
+                                      },
+                                      {
+                                        D$lte: ["$age", 180],
+                                      },
+                                    ],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            ">180": {
+                              D$sum: {
+                                D$cond: {
+                                  if: {
+                                    D$gte: ["$age", 180],
+                                  },
+                                  then: "$pendingAmt",
+                                  else: 0,
+                                },
+                              },
+                            },
+                            totalPayable: {
+                              D$sum: "$pendingAmt",
+                            },
+                            onAccountAmt: {
+                              D$sum: 0,
+                            },
+                            manualVoucher: {
+                              D$sum: 0,
+                            },
+                            jVAmt: {
+                              D$sum: 0,
+                            },
+                            paidAdvanceAmount: {
+                              D$sum: 0,
+                            },
+                            ledgerBalance: {
+                              D$sum: 0,
+                            },
+                          },
+                        },
                     ]
           };
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));

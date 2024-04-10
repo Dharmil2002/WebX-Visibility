@@ -831,53 +831,93 @@ export class AddVendorMasterComponent implements OnInit {
   //#endregion
 
   //#region to check if a value already exists in vendor list
-  async checkValueExists(fieldName, errorMessage,formGroup) {
+  async checkValueExists(fieldName, errorMessage) {
     try {
       // Get the field value from the form controls
-      const fieldValue = formGroup.controls[fieldName].value;
-      const filterUppercase = { [fieldName]: fieldValue.toUpperCase() };
-      const filterLowercase = { [fieldName]: fieldValue.toLowerCase() };
+      const fieldValue = this.vendorTableForm.controls[fieldName].value;
+
       // Create a request object with the filter criteria
       const req = {
         companyCode: this.storage.companyCode,
         collectionName: "vendor_detail",
-        filter: { ...filterUppercase, ...filterLowercase },
+        filter: { [fieldName]: fieldValue },
       };
+
       // Send the request to fetch user data
-      const userlist = await firstValueFrom(
-        this.masterService.masterPost("generic/get", req)
-      );
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
+
       // Check if data exists for the given filter criteria
-      if (userlist.data.length > 0) {
+      if (customerList.data.length > 0) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          text: `${errorMessage} already exists! Please try with another !`,
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
           icon: "error",
-          title: "error",
+          showCloseButton: false,
+          showCancelButton: false,
           showConfirmButton: true,
+          confirmButtonText: "OK"
         });
+
         // Reset the input field
-        formGroup.controls[fieldName].reset();
+        this.vendorTableForm.controls[fieldName].reset();
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(
-        `An error occurred while fetching ${fieldName} details:`,
-        error
-      );
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
     }
   }
 
+  async ValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.MSMETableForm.controls[fieldName].value;
+
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "vendor_detail",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
+
+      // Check if data exists for the given filter criteria
+      if (customerList.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.MSMETableForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
   // Function to check if ERP Id already exists
   async CheckPANNo() {
-    await this.checkValueExists("panNo", "PAN No",this.vendorTableForm);
+    await this.checkValueExists("panNo", "PAN No");
   }
   async CheckVendorName() {
-    await this.checkValueExists("vendorName", "Vendor Name",this.vendorTableForm);
+    await this.checkValueExists("vendorName", "Vendor Name");
   }
   async CheckCINnumber() {
-    await this.checkValueExists("cinNumber", "CIN number",this.vendorTableForm);
+    await this.checkValueExists("cinNumber", "CIN number");
   }
+  async CheckmsmeNumber() {
+    await this.ValueExists("msmeNumber", "MSME Number");
+  }
+
   //#endregion
 
   async addData() {

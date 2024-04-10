@@ -644,13 +644,12 @@ export class VendorControl {
           },
           {
             name: "pattern",
-            pattern: "^[A-Za-z0-9 ]{0,100}$",
-            message:
-              "Please enter a valid MSME Number upto 100 alphanumeric characters",
+            pattern: "^[A-Z]{5}-[A-Z]{2}-[0-9]{2}-[0-9]{7}$",
+            message: "Please enter a valid MSME Number (e.g., UDYAM-XY-07-1234567)",
           },
         ],
         functions: {
-         // onChange: "CheckmsmeNumber",
+          onChange: "CheckmsmeNumber",
         },
         generatecontrol: true,
         disable: false,

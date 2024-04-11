@@ -121,4 +121,9 @@ export function getArrayAfterMatch(arr, element) {
     }
     return arr.slice(index + 1);
   }
+
+  export function convertCmToFeet(cm) {
+    const feetPerCm = 0.0328084;  // This is the conversion factor (1 / 30.48)
+    return cm * feetPerCm;
+}
 /* End */

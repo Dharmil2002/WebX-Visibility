@@ -280,5 +280,77 @@ export class PinCodeService {
       // Handle any errors that may occur during the asynchronous operation
     }
   }
-
+  /*below is function for getting city and pincode*/
+  async getCityPincode(form, jsondata, controlName, codeStatus, isCity) {
+    try {
+      const cValue = form.controls[controlName].value;
+      let filter = {}
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (cValue.length >= 3) {
+        if (isCity) {
+          filter = { CT: { 'D$regex': `^${cValue}`, 'D$options': 'i' } }
+        }
+        else {
+          let gte = parseInt(`${cValue}00000`.slice(0, 6));
+          let lte = parseInt(`${cValue}99999`.slice(0, 6));
+           filter = { PIN: { 'D$gte': gte, 'D$lte': lte } }
+        }
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: this.storage.companyCode,
+          collectionName: "pincode_master",
+          filter,
+        };
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+        // Extract data from the response
+        let codeData = []
+        if (isCity) {
+          codeData = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
+            .map(ct => {
+              // Find the first occurrence of this ct in the original data to get its pincode
+              const originalItem = cResponse.data.find(item => item.CT === ct);
+              return {
+                name:originalItem.PIN,
+                value:ct,
+                ct:ct,
+                pincode: originalItem ? originalItem.PIN : null // include pincode here
+              };
+            });
+        }
+        else {
+          codeData = cResponse.data
+            .filter((x) => x.PIN.toString().startsWith(cValue))
+            .map((element) => ({
+              name: element.PIN.toString(),
+              value: element.CT.toString(),
+              ct:element.CT,
+              pincode: element.PIN.toString()
+            }));
+        }
+        // Filter cityCodeData for partial matches
+        if (codeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for City ${cValue}`,
+          //   showConfirmButton: true,
+          // });
+        } else {
+          // Call the filter function with the filtered data
+          this.filter.Filter(
+            jsondata,
+            form,
+            codeData,
+            controlName,
+            codeStatus
+          );
+        }
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+    }
+  }
+  /*End*/
 }

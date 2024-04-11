@@ -19,13 +19,13 @@
     <form [formGroup]="consignmentForm">
         <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignor Details'"
             [formData]="consignorControlArray" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+            [showSaveAndCancelButton]="false" [toggle]="toggleWinCsgn" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </div>
 <div  *ngIf="consigneeControlArray">
     <form [formGroup]="consignmentForm">
-        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignee Details'"
+        <app-form-webxpress [form]="consignmentForm" [toggle]="toggleWinCsgne"[FormTitle]="'Consignee Details'"
             [formData]="consigneeControlArray" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
@@ -78,7 +78,7 @@
         </app-form-webxpress>
     </form>
 </div>
-<div class="row paddingdiv" *ngIf="basicFormControls">
+<div class="row paddingdiv" *ngIf="freightControlArray">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
       <div class="example-button-row d-flex justify-content-start">
         <!-- <div *ngIf="isSubmit">

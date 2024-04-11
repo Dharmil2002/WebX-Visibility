@@ -7,6 +7,7 @@ export class VendorBillEntry {
     // companyCode: number;
     cID: number;
     docNo?: string;
+    tMOD: string;
     bDT?: Date;
     lOC?: string;
     sT?: string;
@@ -117,6 +118,7 @@ const vendorBillEntry: VendorBillEntry = {
     // companyCode: 123,
     cID: 10065,
     docNo: "VB/2024/MUMB/000001",
+    tMOD: "LTL",
     bDT: new Date("2023-12-06T12:30:00.000Z"),
     lOC: "LocationXYZ",
     sT: "StateABC",

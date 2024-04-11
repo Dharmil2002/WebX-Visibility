@@ -1,5 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
 
 export async function getbankreconcilationList(masterService, request) {
@@ -23,7 +24,7 @@ export async function getbankreconcilationList(masterService, request) {
     //             },
     // },
     const RequestBody = {
-        "companyCode": StorageService.getItem('companyCode'),
+        "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
         "collectionName": "voucher_trans",
         "filters": [
             { D$match: matchQuery },
@@ -79,7 +80,7 @@ export async function getbankreconcilationList(masterService, request) {
 }
 export async function GetBankDropDown(masterService) {
     try {
-        const companyCode = parseInt(StorageService.getItem('companyCode'));
+        const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
         const filter = {
             companyCode: companyCode,
         };

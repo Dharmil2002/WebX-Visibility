@@ -147,7 +147,6 @@ export class AdvancePaymentsComponent implements OnInit {
     // Retrieve the passed data from the state
     this.companyCode = this.storage.companyCode;
     this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
-
     if (this.PaymentData) {
       this.GetAdvancePaymentList();
     } else {
@@ -194,6 +193,7 @@ export class AdvancePaymentsComponent implements OnInit {
       StartDate: this.PaymentData?.StartDate,
       EndDate: this.PaymentData?.EndDate,
       VendorInfo: this.PaymentData?.VendorInfo,
+      Mode: this.PaymentData?.Mode
     };
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,
@@ -270,6 +270,7 @@ export class AdvancePaymentsComponent implements OnInit {
       BillPaymentData: this.PaymentData,
       THCData: event?.data,
       Type: "Advance",
+      Mode: this.PaymentData?.Mode,
     };
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
       data: RequestBody,
@@ -424,7 +425,7 @@ export class AdvancePaymentsComponent implements OnInit {
   }
 
 
-  UpdateTHCAmount(inputData) {
+  UpdateTHCAmount(inputData, Mode = "FTL") {
     const outputData = {};
 
     inputData.forEach(item => {
@@ -452,7 +453,7 @@ export class AdvancePaymentsComponent implements OnInit {
       }
       const reqBody = {
         companyCode: this.companyCode,
-        collectionName: "thc_summary",
+        collectionName: Mode === "FTL" ? 'thc_summary' : 'thc_summary_ltl',
         filter: {
           cID: this.storage.companyCode,
           docNo: x.THCNo
@@ -602,7 +603,7 @@ export class AdvancePaymentsComponent implements OnInit {
             }
             Response.push(ResultObject);
           });
-          this.UpdateTHCAmount(Response);
+          this.UpdateTHCAmount(Response, this.PaymentData?.Mode);
 
         }, error => {
           this.snackBarUtilityService.ShowCommonSwal("error", error);

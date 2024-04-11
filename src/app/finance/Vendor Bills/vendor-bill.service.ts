@@ -12,7 +12,7 @@ export class VendorBillService {
 
   constructor(private masterService: MasterService, private storage: StorageService) {
     this.companyCode = this.storage.companyCode;
-   }
+  }
   async getVendorBillList(filter) {
     try {
       // Make the asynchronous call to fetch data
@@ -36,6 +36,7 @@ export class VendorBillService {
         Status: res.bSTATNM,
         StatusCode: res.bSTAT,
         vPan: res.vND.pAN,
+        Mode: res.tMOD,
         actions:
           [
             // 'Approve Bill',

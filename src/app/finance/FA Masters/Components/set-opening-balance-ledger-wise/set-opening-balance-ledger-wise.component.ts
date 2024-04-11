@@ -120,7 +120,8 @@ export class SetOpeningBalanceLedgerWiseComponent implements OnInit {
     public StorageService: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService) {
-      this.companyCode = this.storage.companyCode;
+    this.companyCode = this.storage.companyCode;
+    this.filterRequest.cID = this.storage.companyCode;
   }
 
   ngOnInit(): void {

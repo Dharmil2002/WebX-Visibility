@@ -497,6 +497,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.invoiceForm.controls[control].setValidators([Validators.required]);
         this.invoiceForm.controls[control].updateValueAndValidity();
       });
+    this.unitChange();
     }
     else {
       this.columnInvoice = this.consigmentLtlModel.columnInvoice;
@@ -509,19 +510,19 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceControlArray = volumeValue
       ? this.allInvoiceControls
       : this.allInvoiceControls.filter(control => control.additionalData.metaData === "invoiceDetail");
-    this.unitChange();
 
   }
   /*End*/
   /*Unit Change*/
   unitChange() {
+    
     const vol = ['cft', 'cftRatio']
-      this.invoiceControlArray.filter((x) => x.additionalData.metaData == "volumetric" && !vol.includes(x.name)).forEach((x) => {
+    this.allInvoiceControls.filter((x) => x.additionalData.metaData == "volumetric" && !vol.includes(x.name)).forEach((x) => {
         x.label = `${x.placeholder} (${this.unitsName})`
       })
-      this.columnInvoice.height.Title = `${this.consigmentLtlModel.columnVolInvoice.height.Title}(${this.unitsName})`;
-      this.columnInvoice.breadth.Title = `${this.consigmentLtlModel.columnVolInvoice.breadth.Title}(${this.unitsName})`;
-      this.columnInvoice.length.Title = `${this.consigmentLtlModel.columnVolInvoice.length.Title}(${this.unitsName})`;
+      this.columnInvoice.height.Title = `${this.consigmentLtlModel.columnVolInvoice.height.lable}(${this.unitsName})`;
+      this.columnInvoice.breadth.Title = `${this.consigmentLtlModel.columnVolInvoice.breadth.lable}(${this.unitsName})`;
+      this.columnInvoice.length.Title = `${this.consigmentLtlModel.columnVolInvoice.length.lable}(${this.unitsName})`;
   }
   /*End*/
   ViewCharge() {

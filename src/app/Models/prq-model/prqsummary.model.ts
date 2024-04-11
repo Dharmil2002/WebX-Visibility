@@ -45,7 +45,7 @@ export class PrqSummaryModel implements IFieldDefinition {
     },
     createdDate: {
       Title: "Created Date",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:10%",
       datatype: "datetime",
     },

@@ -22,7 +22,7 @@ export class DocketListComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:300px",
       sticky: true
     },
     docNo: {
@@ -41,17 +41,17 @@ export class DocketListComponent implements OnInit {
     aCTWT: {
       Title: "Actual Weight(Kg)",
       class: "matcolumnright",
-      Style: "min-width:175px",
+      Style: "min-width:150px; max-width:150px",
     },
     pKGS: {
       Title: "Package Count",
       class: "matcolumnright",
-      Style: "min-width:150px",
+      Style: "min-width:100px; max-width:100px",
     },
     fRTAMT: {
       Title: "FV(₹)",
       class: "matcolumnright",
-      Style: "min-width:30px",
+      Style: "min-width:150px; max-width:150px",
     },
     //  invoiceCount: {
     //   Title: "Inv Count",

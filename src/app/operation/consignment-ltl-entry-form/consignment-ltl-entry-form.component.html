@@ -19,13 +19,13 @@
     <form [formGroup]="consignmentForm">
         <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignor Details'"
             [formData]="consignorControlArray" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+            [showSaveAndCancelButton]="false" [toggle]="toggleWinCsgn" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </div>
 <div  *ngIf="consigneeControlArray">
     <form [formGroup]="consignmentForm">
-        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignee Details'"
+        <app-form-webxpress [form]="consignmentForm" [toggle]="toggleWinCsgne"[FormTitle]="'Consignee Details'"
             [formData]="consigneeControlArray" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>

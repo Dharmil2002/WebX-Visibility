@@ -43,6 +43,7 @@ export class FormComponent {
   @Input() AddNewButton;
   @Input() EventButton;
   @Input() MatButton;
+  @Input() toggle;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
   @Input() DisplayCheckbox: boolean = false;
@@ -104,7 +105,14 @@ export class FormComponent {
     };
     this.callFunction.emit(context);
   }
-
+  TogglefunctionCalled(context) {
+    if (
+      (context.functionName !== undefined || context.functionName != null) &&
+      context.functionName?.length > 0
+    ) {
+      this.callFunction.emit(context);
+    }
+  }
   AddNew() {
     this.AddNewButtonEvent.emit();
   }

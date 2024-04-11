@@ -36,10 +36,6 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Invoice Amount",
       class: "matcolumncenter",
       Style: "min-width:2px",
-    }, cft: {
-      Title: "CFT Total",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
     },
     cubWT: {
       Title: "Cubic Weight",
@@ -138,6 +134,11 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+        cft: {
+      Title: "CFT Total",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     materialName: {
       Title: "Material Name",
       class: "matcolumncenter",
@@ -158,6 +159,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",

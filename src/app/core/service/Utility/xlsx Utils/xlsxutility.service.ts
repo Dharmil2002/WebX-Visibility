@@ -193,5 +193,13 @@ export class xlsxutilityService {
       }
     });
   }
-
+  //#region to chunk the data recursively
+  chunkArray(data, size) {
+    if (data.length <= size) {
+      return [data];
+    } else {
+      return [data.slice(0, size), ...this.chunkArray(data.slice(size), size)];
+    }
+  }
+  //#endregion
 }

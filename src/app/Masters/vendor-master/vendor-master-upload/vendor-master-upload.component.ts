@@ -20,7 +20,6 @@ import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
 })
 export class VendorMasterUploadComponent implements OnInit {
   vendorUploadForm: UntypedFormGroup;
-  existingData: any;
   pincodeList: any;
   zonelist: any;
   countryList: any;
@@ -54,7 +53,6 @@ export class VendorMasterUploadComponent implements OnInit {
     }
   }
   //#endregion
-
   //#region to select file
   selectedFile(event) {
     let fileList: FileList = event.target.files;
@@ -67,7 +65,6 @@ export class VendorMasterUploadComponent implements OnInit {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
 
         // Fetch data from various services
-        this.existingData = await this.fetchExistingData();
         this.pincodeList = await this.objPinCodeService.pinCodeDetail();
         this.vendorTypeList = await PayBasisdetailFromApi(this.masterService, "VENDTYPE");
         this.locationList = await this.locationService.locationFromApi();
@@ -80,11 +77,6 @@ export class VendorMasterUploadComponent implements OnInit {
             Validations: [
               { Required: true },
               { Pattern: "^[a-zA-Z0-9 -/]{3,150}$" },
-              {
-                Exists: this.existingData.map((x) => {
-                  return x.vendorName;
-                }),
-              },
               { DuplicateFromList: true }
             ],
           },
@@ -152,13 +144,6 @@ export class VendorMasterUploadComponent implements OnInit {
             Validations: [
               { Required: true },
               { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" },
-              {
-                Exists: this.existingData
-                  .filter(item => item.panNo !== null && item.panNo !== "" && item.panNo !== undefined)
-                  .map((item) => {
-                    return item.panNo;
-                  })
-              },
               { DuplicateFromList: true }
             ],
           },
@@ -166,13 +151,6 @@ export class VendorMasterUploadComponent implements OnInit {
             ItemsName: "CINNo",
             Validations: [
               { Pattern: "^[a-zA-Z0-9]{4,100}$" },
-              {
-                Exists: this.existingData
-                  .filter(item => item.cinNumber !== null && item.cinNumber !== "" && item.cinNumber !== undefined)
-                  .map((item) => {
-                    return item.cinNumber;
-                  })
-              },
               { DuplicateFromList: true }
             ],
           },
@@ -193,9 +171,21 @@ export class VendorMasterUploadComponent implements OnInit {
 
         try {
           const response = await firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
-
+          const existingRecord = await this.getVendorData(response);
           const filteredData = await Promise.all(response.map(async (element) => {
 
+            // Initialize the error array if it doesn't exist
+            if (!element.error) {
+              element.error = [];
+            }
+
+            const existVendorName = existingRecord.find(x => x.vendorName.toLowerCase() === element.VendorName.toLowerCase());
+            const existPanNo = existingRecord.filter(item => item.panNo !== null && item.panNo !== "" && item.panNo !== undefined).find(x => x.panNo === element.PANNo);
+            const existCINNo = existingRecord.filter(item => item.cinNumber !== null && item.cinNumber !== "" && item.cinNumber !== undefined).find(x => x.cinNumber === element.CINNo);
+
+            existVendorName ? element.error.push(`VendorName : ${element.VendorName} Already exist`) : "";
+            existPanNo ? element.error.push(`PANNo : ${element.PANNo} Already exist`) : "";
+            existCINNo ? element.error.push(`CINNo : ${element.CINNo} Already exist`) : "";
             const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
             if (city) {
               element['VendorCity'] = city.CT;
@@ -207,6 +197,8 @@ export class VendorMasterUploadComponent implements OnInit {
               element['Country'] = country.Country;
 
             }
+
+            if (element.error.length < 1) { element.error = null }
             return element;
           }));
           // console.log(filteredData);
@@ -238,50 +230,55 @@ export class VendorMasterUploadComponent implements OnInit {
   }
   //#endregion
   //#region to process and save data
-  async save(data) {
-
+  async save(data: any[]) {
     try {
+      const chunkSize = 50;
+      let successfulUploads = 0;
 
-      // Array to store processed location data
-      const uploadData: VendorMaster[] = [];
+      // Process each element in data using processData
+      const processedData = data.map(element => this.processData(element));
 
-      // Process each element in the input data
-      data.forEach(element => {
+      // Pass the processedData array to formatVendorData
+      const formattedData = await this.formatVendorData(processedData);
 
-        // Call the processData function to transform a single element
-        const processedData = this.processData(element, this.vendorTypeList, this.locationList);
-        //console.log(processedData);
+      // Chunk the formatted data recursively
+      const chunks = await this.xlsxUtils.chunkArray(formattedData, chunkSize);
+      // console.log(chunks);
 
-        // Add the processed data to the uploadData array
-        uploadData.push(processedData);
-      });
+      const sendData = async (chunks: VendorMaster[][]) => {
 
+        chunks.forEach(async chunk => {
+          const request = {
+            companyCode: this.storage.companyCode,
+            collectionName: "vendor_detail",
+            data: chunk,
+          };
+          try {
+            const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
+            if (response.success) {
 
-      // Format the final data with additional information
-      const formattedData = await this.formatVendorData(uploadData);
-      // console.log(formattedData);
+              successfulUploads++;
+            }
+          } catch (error) {
+            console.log(error);
+          }
 
-      const request = {
-        companyCode: this.storage.companyCode,
-        collectionName: "vendor_detail",
-        data: formattedData,
+          // Check if all chunks were successfully uploaded
+          if (successfulUploads === chunks.length) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Valid Vendor Data Uploaded",
+              showConfirmButton: true,
+            });
+          }
+        });
       };
 
-      const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
-      if (response) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Valid Vendor Data Uploaded",
-          showConfirmButton: true,
-        });
-      }
+      await sendData(chunks);
 
     } catch (error) {
-      console.error("Error during saving vendor data", error);
-
-      // Display error message
+      console.log(error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -291,10 +288,9 @@ export class VendorMasterUploadComponent implements OnInit {
     }
   }
 
-  // Function to process a single element
-  processData(element, vendorTypeList, locationList) {
+  processData(element) {
 
-    const updateVendortype = vendorTypeList.find(item => item.name.toLowerCase() === element.VendorType.toLowerCase());
+    const updateVendortype = this.vendorTypeList.find(item => item.name.toLowerCase() === element.VendorType.toLowerCase());
 
     let vendorLocations: string[];
 
@@ -308,11 +304,11 @@ export class VendorMasterUploadComponent implements OnInit {
     }
 
     // Find the matching locations in locationList
-    const updateLocationList = locationList.filter(item => vendorLocations.includes(item.name.toUpperCase()));
+    const updateLocationList = this.locationList.filter(item => vendorLocations.includes(item.name.toUpperCase()));
 
     // Create a new VendorModel instance to store processed data
     const processedData = new VendorMaster({});
-    
+
     // Set basic properties
     processedData.companyCode = this.storage.companyCode;
     processedData.vendorName = element.VendorName.toUpperCase();
@@ -395,15 +391,18 @@ export class VendorMasterUploadComponent implements OnInit {
       throw error; // Propagate the error
     }
   }
+
   //#endregion
   //#region to get Existing Data from collection
-  async fetchExistingData() {
+  async getVendorData(data) {
+    const vendorName = data.map((x) => x.VendorName);
+    const panNo = data.map((x) => x.PANNo);
+    const cinNumber = data.map((x) => x.CINNo);
     const request = {
       companyCode: this.storage.companyCode,
       collectionName: "vendor_detail",
-      filter: {},
+      filter: { $or: [{ vendorName: { D$in: vendorName } }, { panNo: { D$in: panNo } }, { cinNumber: { D$in: cinNumber } }] },
     };
-
     const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
     return response.data;
   }

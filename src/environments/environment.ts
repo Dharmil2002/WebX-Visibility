@@ -4,15 +4,15 @@
 
 export const environment = {
   production: false,
-  AuthAPIGetway: "http://localhost:3000/v1/auth/",
-  localNumberFormat: "en-IN",
-  APIBaseURL:"http://localhost:3000/v1/",  
-  APIBaseBetaURL:"https://cnoteentry.azurewebsites.net/api/"
-
-  // AuthAPIGetway: "https://tms-api.beta.mywebxpress.com/v1/auth/",
+  // AuthAPIGetway: "http://localhost:3000/v1/auth/",
   // localNumberFormat: "en-IN",
-  // APIBaseURL: "https://tms-api.beta.mywebxpress.com/v1/",
-  // APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
+  // APIBaseURL:"http://localhost:3000/v1/",  
+  // APIBaseBetaURL:"https://cnoteentry.azurewebsites.net/api/"
+
+  AuthAPIGetway: "https://tms-api.beta.mywebxpress.com/v1/auth/",
+  localNumberFormat: "en-IN",
+  APIBaseURL: "https://tms-api.beta.mywebxpress.com/v1/",
+  APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
 };
 
 /*

@@ -31,6 +31,7 @@ export class ListAccountComponent implements OnInit {
       Title: "Account Group Name",
       class: "matcolumncenter",
       Style: "min-width:15%",
+      sticky: true
     },
     AcGroupCategoryName: {
       Title: "Account Category",
@@ -49,11 +50,12 @@ export class ListAccountComponent implements OnInit {
     },
     EditAction: {
       type: "iconClick",
-      Title: "Action",
+      Title: "",
       class: "matcolumncenter",
-      Style: "min-width:10%",
+      Style: "min-width:80px; max-width:80px;",
       functionName: "EditFunction",
       iconName: "edit",
+      stickyEnd: true
     },
   };
   staticField = [

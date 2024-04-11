@@ -137,8 +137,8 @@
                         </div>
                     </div>
                     <!-- Generic Table -->
-                    <div class="responsive_table">
-                        <mat-table [style]="TableStyle" [dataSource]="dataSource" matSort>
+                    <div [ngClass]="stickyHeader ? ['responsive_table', 'fixHeight'] : ['responsive_table']" [style]="TableContainerStyle" >
+                        <mat-table [style]="TableStyle" [dataSource]="dataSource" matSort >
                             <!-- <ng-container [matColumnDef]="columnGroup" *ngFor="let group of columnGroup">                  
                                 <ng-container *ngIf="group.Name">
                                     <mat-header-cell *matHeaderCellDef
@@ -150,7 +150,8 @@
                                     </mat-header-cell>
                                 </ng-container>
                             </ng-container> -->
-                            <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">                               
+                            <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)"
+                            [sticky]="columnHeader[tableData].sticky" [stickyEnd]="columnHeader[tableData].stickyEnd">                               
                                 <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
                                     <mat-header-cell [style]="columnHeader[tableData].Style" *matHeaderCellDef
                                         mat-sort-header [class]="columnHeader[tableData].class">
@@ -169,7 +170,8 @@
                                     </mat-header-cell>
                                 </ng-template>
                                 <mat-cell *matCellDef="let element" [style]="columnHeader[tableData].Style"
-                                    [class]="columnHeader[tableData].class">
+                                    [class]="columnHeader[tableData].class"
+                                    [sticky]="tableData=='actions'">
                                     <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
                                         *ngIf="tableData=='checkBoxRequired'" color="primary"
                                         [(ngModel)]="element.isSelected" [disabled]="this.disbleCheckbox"
@@ -195,7 +197,10 @@
                                     <button mat-icon-button *ngIf="tableData=='actions'"
                                         [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="editCall(element)"
                                         (click)="$event.stopPropagation()" class="tbl-action-btn">
-                                        <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                                        <app-feather-icons 
+                                            [icon]="columnHeader[tableData].iconName || 'edit'"
+                                            [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]">
+                                        </app-feather-icons>
                                     </button>
                                     <mat-menu #menu="matMenu">
                                         <button mat-menu-item *ngFor="let item of menuItems"
@@ -206,8 +211,10 @@
                                     <ng-container *ngIf="tableData === 'actionsItems'">
                                         <button mat-icon-button [matMenuTriggerFor]="menuItemFlag ? actionsItems : null"
                                             (click)="$event.stopPropagation()" class="tbl-action-btn">
-                                            <app-feather-icons [icon]="'edit'"
-                                                [class]="'tbl-fav-edit'"></app-feather-icons>
+                                            <app-feather-icons 
+                                                [icon]="columnHeader[tableData].iconName || 'more-vertical'"
+                                                [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]">
+                                            </app-feather-icons>
                                         </button>
 
                                         <mat-menu #actionsItems="matMenu">
@@ -247,7 +254,7 @@
                                     </ng-container>
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'view'">
                                         <app-feather-icons [icon]="'eye'" style="cursor: pointer"
-                                            [class]="'tbl-fav-edit'"
+                                            [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]"
                                             (click)="openImageDialog(element)"></app-feather-icons>
                                     </ng-container>
 
@@ -265,12 +272,12 @@
 
                                     <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
                                         (click)="View(element)" class="tbl-action-btn">
-                                        <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                                        <app-feather-icons [icon]="columnHeader[tableData].iconName || 'eye'" [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]"></app-feather-icons>
                                     </button>
                                 </mat-cell>
                             </ng-container>
 
-                            <mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></mat-header-row>
+                            <mat-header-row *matHeaderRowDef="objectKeys(columnHeader); sticky: stickyHeader"  ></mat-header-row>
                             <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></mat-row>
                         </mat-table>
                         <div style="height: 70px;" [ngStyle]="{'display': showPaginator ? 'block' : 'none'}">
@@ -286,6 +293,11 @@
 </div>
 
 <style>
+    .fixHeight {
+        height: 400px;
+        overflow: auto;
+    }
+
     .pointer u {
         text-decoration: none !important;
         /* color: #36cbe9; */

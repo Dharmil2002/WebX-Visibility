@@ -28,16 +28,18 @@ export class ListTdsComponent implements OnInit {
     name: "Add TDS",
     iconName:'add'
   }
-  columnHeader = {
+  columnHeader = {    
     TDScode: {
       Title: "TDS code",
       class: "matcolumncenter",
       Style: "min-width:10%",
+      sticky: true,
     },
     TDSsection: {
       Title: "TDS section",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:10%",
+      sticky: true,
     },
     PaymentType: {
       Title: "Payment Type",
@@ -46,17 +48,17 @@ export class ListTdsComponent implements OnInit {
     },
     RateForHUF: {
       Title: "Rate For HUF",
-      class: "matcolumncenter",
+      class: "matcolumnright",
       Style: "min-width:10%",
     },
     Thresholdlimit: {
       Title: "Threshold Limit",
-      class: "matcolumncenter",
+      class: "matcolumnright",
       Style: "min-width:10%",
     },
     RateForOthers: {
       Title: "Rate For Others",
-      class: "matcolumncenter",
+      class: "matcolumnright",
       Style: "min-width:10%",
     },
     isActive: {
@@ -68,11 +70,12 @@ export class ListTdsComponent implements OnInit {
     },
     EditAction: {
       type: "iconClick",
-      Title: "Action",
+      Title: "",
       class: "matcolumncenter",
-      Style: "min-width:10%",
+      Style: "min-width:80px; max-width:80px;",
       functionName: "EditFunction",
       iconName: "edit",
+      stickyEnd: true,
     },
   };
   staticField = [

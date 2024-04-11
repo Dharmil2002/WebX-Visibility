@@ -30,22 +30,24 @@ export class ListBankComponent implements OnInit {
   columnHeader = {
     Bankname: {
       Title: "Bank Name",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:15%",
+      sticky: true,      
     },
     Accountnumber: {
       Title: "Account Number",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:15%",
+      sticky: true,  
     },
     IFSCcode: {
       Title: "IFSC Code",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:15%",
     },
     SWIFTcode: {
       Title: "SWIFT code",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:15%",
     },
     EditAction: {
@@ -55,6 +57,7 @@ export class ListBankComponent implements OnInit {
       Style: "min-width:10%",
       functionName: "EditFunction",
       iconName: "edit",
+      stickyEnd: true,
     },
   };
   staticField = [

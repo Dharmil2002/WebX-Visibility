@@ -883,7 +883,7 @@ export class JobEntryPageComponent implements OnInit {
           },
         ];
         this.xlsxutils
-          .validateDataWithApiCall(jsonData, validationRules)
+          .validateData(jsonData, validationRules)
           .subscribe(
             (response) => {
               this.OpenPreview(response);

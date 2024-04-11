@@ -2,6 +2,13 @@ import { UntypedFormGroup } from "@angular/forms";
 import moment from "moment";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
+export function chunkArray(data: any[], size: number): any[] {
+  if (data.length <= size) {
+    return [data];
+  } else {
+    return [data.slice(0, size), ...this.chunkArray(data.slice(size), size)];
+  }
+}
 /**
  * Removes duplicate objects from an array based on all key-value pairs.
  * @param {Array} objects - The array of objects.

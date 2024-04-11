@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { BusinessAssociate } from 'src/app/Models/VendorContract/vendorContract';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -81,9 +81,9 @@ export class BusinessAssociateBulkUploadComponent implements OnInit {
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
         this.locationList = await this.objLocationService.getLocationList();
-        this.operationList = await PayBasisdetailFromApi(this.masterService, 'OPT');
-        this.payBasisList = await PayBasisdetailFromApi(this.masterService, 'PAYTYP');
-        this.rateTypeList = await PayBasisdetailFromApi(this.masterService, 'RTTYP');
+        this.operationList = await GetGeneralMasterData(this.masterService, 'OPT');
+        this.payBasisList = await GetGeneralMasterData(this.masterService, 'PAYTYP');
+        this.rateTypeList = await GetGeneralMasterData(this.masterService, 'RTTYP');
         this.transportMode = await productdetailFromApi(this.masterService);
 
         const validationRules = [{
@@ -161,7 +161,7 @@ export class BusinessAssociateBulkUploadComponent implements OnInit {
         }
         ];
 
-        var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        var rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
         rPromise.then(async response => {
 
           // Specify the keys for Route and Capacity

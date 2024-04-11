@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import * as XLSX from 'xlsx';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -12,7 +13,7 @@ export class xlsxutilityService {
   constructor(private matDialog: MatDialog, private http: HttpClient) {
 
   }
-  validateDataWithApiCall(data: any[], rules: any[]): Observable<any[]> {
+  validateData(data: any[], rules: any[]): Observable<any[]> {
     const validatedData = JSON.parse(JSON.stringify(data));
     const validationObservables: Observable<void>[] = [];
     for (const item of validatedData) {
@@ -193,13 +194,5 @@ export class xlsxutilityService {
       }
     });
   }
-  //#region to chunk the data recursively
-  chunkArray(data, size) {
-    if (data.length <= size) {
-      return [data];
-    } else {
-      return [data.slice(0, size), ...this.chunkArray(data.slice(size), size)];
-    }
-  }
-  //#endregion
+  
 }

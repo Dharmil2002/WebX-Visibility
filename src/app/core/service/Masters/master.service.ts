@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -112,4 +112,27 @@ export class MasterService {
   getCompany() {
     return this.companyGst;
   }
+
+  async getLastId(collectionName: string, companyCode: number, cIDField: string, idField: string, prefix: string): Promise<string> {
+    const req = {
+        companyCode: companyCode,
+        collectionName: collectionName,
+        filter: { 
+          [cIDField]: companyCode,
+          [idField]: { $regex: `^${prefix}`, $options: 'i' } 
+        },
+        sorting: { [idField]: -1 },
+    };
+
+    try {
+        const response = await firstValueFrom(this.masterPost("generic/findLastOne", req));
+        // Default to `${prefix}00000` if `response.data` is falsy or doesn't contain `idField`
+        const lastId = response?.data?.[idField] ?? `${prefix}00000`;
+        return lastId;
+    } catch (error) {
+        console.error("Error fetching the last ID:", error);
+        // Return default ID if there is an error
+        return `${prefix}00000`;
+    }
+}
 }

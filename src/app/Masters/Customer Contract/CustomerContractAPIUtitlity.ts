@@ -28,7 +28,7 @@ export async function customerFromApi(masterService) {
     return null;
   }
 }
-export async function PayBasisdetailFromApi(masterService, filterType?) {
+export async function GetGeneralMasterData(masterService, filterType?) {
   const reqBody = {
     companyCode: StorageService.getItem(StoreKeys.CompanyCode),
     collectionName: "General_master",

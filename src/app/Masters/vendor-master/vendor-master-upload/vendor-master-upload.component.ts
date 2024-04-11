@@ -8,11 +8,13 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
-import { PayBasisdetailFromApi } from '../../Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData } from '../../Customer Contract/CustomerContractAPIUtitlity';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import Swal from 'sweetalert2';
 import { VendorMaster } from 'src/app/core/models/Masters/vendor-master';
-import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
+import { nextKeyCode, nextKeyCodeByN } from 'src/app/Utility/commonFunction/stringFunctions';
+import { chunkArray } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { max } from 'lodash';
 
 @Component({
   selector: 'app-vendor-master-upload',
@@ -53,6 +55,29 @@ export class VendorMasterUploadComponent implements OnInit {
     }
   }
   //#endregion
+
+  async fetchAllPincodeData(pinChunks) {
+    const promises = pinChunks.map(chunk => 
+        this.objPinCodeService.pinCodeDetail({ PIN: { D$in: chunk } })
+    );
+
+    const results = await Promise.all(promises);
+    return results.flat();  // This will merge all results into a single array
+  }
+
+  async fetchAllLocationData(locationChunks) {
+    const promises = locationChunks.map(chunk => 
+        this.locationService.getLocations({ 
+          companyCode: this.storage.companyCode,
+          locCode: { D$in: chunk },
+          activeFlag: true
+        }, { locCode: 1, locName: 1 })
+    );
+
+    const results = await Promise.all(promises);
+    return results.flat();  // This will merge all results into a single array
+  }
+
   //#region to select file
   selectedFile(event) {
     let fileList: FileList = event.target.files;
@@ -64,11 +89,17 @@ export class VendorMasterUploadComponent implements OnInit {
     if (file) {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
 
-        // Fetch data from various services
-        this.pincodeList = await this.objPinCodeService.pinCodeDetail();
-        this.vendorTypeList = await PayBasisdetailFromApi(this.masterService, "VENDTYPE");
-        this.locationList = await this.locationService.locationFromApi();
-        this.zonelist = await this.objState.getStateWithZone();
+        const pincodes = [...new Set(jsonData.map((x) => x.VendorPinCode))];
+        const locations = [...new Set(jsonData.map((x) => x.VendorLocation))];
+        const pans = [...new Set(jsonData.map((x) => x.PANNo))];
+        
+        // Fetch data from DB
+        this.vendorTypeList = await GetGeneralMasterData(this.masterService, "VENDTYPE");        
+        this.pincodeList = await this.fetchAllPincodeData(pincodes);
+        this.locationList = await this.fetchAllLocationData(locations);
+        
+        const states = [...new Set(this.pincodeList.map((x) => x.ST))];
+        this.zonelist = await this.objState.getStateWithZone({ ST: { D$in: states } });        
         this.countryList = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"));
 
         const validationRules = [
@@ -110,7 +141,7 @@ export class VendorMasterUploadComponent implements OnInit {
               { Required: true },
               {
                 TakeFromArrayList: this.locationList.map((x) => {
-                  return x.name;
+                  return x.locCode;
                 }),
               }
             ],
@@ -120,7 +151,7 @@ export class VendorMasterUploadComponent implements OnInit {
             Validations: [
               { Required: true },
               {
-                TakeFromList: this.pincodeList.map((x) => {
+                TakeFromList: this.pincodeList.map((x) => { 
                   return x.PIN;
                 }),
               }
@@ -166,48 +197,59 @@ export class VendorMasterUploadComponent implements OnInit {
               { Numeric: true },
             ],
           }
-
         ];
 
         try {
-          const response = await firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
-          const existingRecord = await this.getVendorData(response);
-          const filteredData = await Promise.all(response.map(async (element) => {
 
-            // Initialize the error array if it doesn't exist
-            if (!element.error) {
-              element.error = [];
-            }
+            const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
+            const existingRecords = await this.getVendorData(response);
+        
+            // Creating lookup tables
+            const vendorNames = new Set();
+            const panNos = new Set();
+            const cinNos = new Set();
 
-            const existVendorName = existingRecord.find(x => x.vendorName.toLowerCase() === element.VendorName.toLowerCase());
-            const existPanNo = existingRecord.filter(item => item.panNo !== null && item.panNo !== "" && item.panNo !== undefined).find(x => x.panNo === element.PANNo);
-            const existCINNo = existingRecord.filter(item => item.cinNumber !== null && item.cinNumber !== "" && item.cinNumber !== undefined).find(x => x.cinNumber === element.CINNo);
+            existingRecords.forEach(rec => {
+              if (rec.vendorName) vendorNames.add(rec.vendorName.toLowerCase());
+              if (rec.panNo && rec.panNo !== "") panNos.add(rec.panNo);
+              if (rec.cinNumber && rec.cinNumber !== "") cinNos.add(rec.cinNumber);
+            });
 
-            existVendorName ? element.error.push(`VendorName : ${element.VendorName} Already exist`) : "";
-            existPanNo ? element.error.push(`PANNo : ${element.PANNo} Already exist`) : "";
-            existCINNo ? element.error.push(`CINNo : ${element.CINNo} Already exist`) : "";
-            const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
-            if (city) {
-              element['VendorCity'] = city.CT;
-
-              const state = this.zonelist.find(x => x.ST === city?.ST);
-              element['VendorState'] = state.STNM
-
-              const country = this.countryList.find(x => x.Code.toLowerCase() === state.CNTR.toLowerCase());
-              element['Country'] = country.Country;
-
-            }
-
-            if (element.error.length < 1) { element.error = null }
-            return element;
-          }));
-          // console.log(filteredData);
-
-          this.OpenPreview(filteredData);
-        } catch (error) {
-          // Handle errors from the API call or other issues
-          console.error("Error:", error);
-        }
+            const filteredData = await Promise.all(response.map(async (element) => {
+              element.error = element.error || [];
+        
+              if (vendorNames.has(element.VendorName.toLowerCase())) {
+                element.error.push(`VendorName : ${element.VendorName} Already exists`);
+              }
+              if (panNos.has(element.PANNo)) {
+                element.error.push(`PANNo : ${element.PANNo} Already exists`);
+              }
+              if (cinNos.has(element.CINNo)) {
+                element.error.push(`CINNo : ${element.CINNo} Already exists`);
+              }
+        
+              const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
+              if (city) {
+                element['VendorCity'] = city.CT;
+                const state = this.zonelist.find(x => x.ST === city.ST);
+                if (state) {
+                  element['VendorState'] = state.STNM;
+                  const country = this.countryList.find(x => x.Code.toLowerCase() === state.CNTR.toLowerCase());
+                  if (country) {
+                    element['Country'] = country.Country;
+                  }
+                }
+              }        
+              if (element.error.length === 0) {
+                element.error = null;
+              }
+              return element;
+            }));
+        
+            this.OpenPreview(filteredData);
+          } catch (error) {
+            console.error("Error:", error);
+          }
       });
     }
   }
@@ -242,7 +284,7 @@ export class VendorMasterUploadComponent implements OnInit {
       const formattedData = await this.formatVendorData(processedData);
 
       // Chunk the formatted data recursively
-      const chunks = await this.xlsxUtils.chunkArray(formattedData, chunkSize);
+      const chunks = chunkArray(formattedData, chunkSize);
       // console.log(chunks);
 
       const sendData = async (chunks: VendorMaster[][]) => {
@@ -343,69 +385,58 @@ export class VendorMasterUploadComponent implements OnInit {
   async formatVendorData(processedData: any[]) {
     try {
       // Get the last Vendor code from the database outside the forEach loop
-      let lastVendorCode = await this.getLasVendorCode();
+      let lastVendorCode = await this.masterService.getLastId("vendor_detail", this.storage.companyCode, 'companyCode', 'vendorCode', 'V')
 
-      const formattedData: any[] = [];
       // Sequentially process each item in processedData using forEach
-      processedData.forEach((item) => {
+      processedData.forEach((item, i) => {
         // Calculate the new vendor code using nextKeyCode function
-        const newVendorCode = nextKeyCode(lastVendorCode);
-        // Update the last vendor code for the next iteration
-        lastVendorCode = newVendorCode;
-
-        const formattedItem = {
-          ...item,
-          vendorCode: newVendorCode,
-          _id: `${this.storage.companyCode}-${newVendorCode}`,
-        };
-
-        formattedData.push(formattedItem);
+        const newVendorCode = nextKeyCodeByN(lastVendorCode, (i+1));
+        item["vendorCode"] = newVendorCode;
+        item["_id"] = `${this.storage.companyCode}-${newVendorCode}`;
       });
-
-      return formattedData;
+      return processedData;
     } catch (error) {
       // Handle any errors that occur during processing
       console.error('Error in formatVendorData:', error);
       throw error; // Propagate the error
     }
   }
-  // Function to get last vendor code
-  async getLasVendorCode(): Promise<string> {
-    try {
-      // Construct the request object for fetching the last vendor code
-      const req = {
-        companyCode: this.storage.companyCode,
-        collectionName: "vendor_detail",
-        filter: {},
-        sorting: { vendorCode: -1 },
-      };
-      const Vendor = await firstValueFrom(
-        this.masterService.masterPost("generic/findLastOne", req)
-      );
-
-      // Extract and return the last Vendor code or use a default value if not available
-      return Vendor?.data?.vendorCode || "V00000";
-    } catch (error) {
-      // Handle any errors that occur during API call or processing
-      console.error('Error in getLastVendorCode:', error);
-      throw error; // Propagate the error
-    }
-  }
-
+ 
   //#endregion
   //#region to get Existing Data from collection
   async getVendorData(data) {
-    const vendorName = data.map((x) => x.VendorName);
-    const panNo = data.map((x) => x.PANNo);
-    const cinNumber = data.map((x) => x.CINNo);
-    const request = {
-      companyCode: this.storage.companyCode,
-      collectionName: "vendor_detail",
-      filter: { $or: [{ vendorName: { D$in: vendorName } }, { panNo: { D$in: panNo } }, { cinNumber: { D$in: cinNumber } }] },
-    };
-    const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
-    return response.data;
+    const vendorName = [... new Set(data.map((x) => x.VendorName))];
+    const panNo =  [... new Set(data.map((x) => x.PANNo))]; 
+    const cinNumber =  [... new Set(data.map((x) => x.CINNo))];
+
+    const venNms = chunkArray(vendorName, 25);
+    const pans = chunkArray(panNo, 25);
+    const cins = chunkArray(cinNumber, 25);
+
+    const totalChunks = max([venNms.length, pans.length, cins.length]);
+    let results = [];
+    for(let i = 0; i < totalChunks; i++) { 
+      const vc = venNms[i] || [];
+      const pc = pans[i] || [];
+      const cc = cins[i] || [];
+      
+      if(vc.length > 0 || pc.length > 0 || cc.length > 0) {
+        const request = {
+          companyCode: this.storage.companyCode,
+          collectionName: "vendor_detail",
+          filter: { $or: [
+              ...( vc.length > 0 ? [{ vendorName: { D$in: vc } }] : [] ), 
+              ...( pc.length > 0 ? [{ panNo: { D$in: pc } }] : [] ), 
+              ...( cc.length > 0 ? [{ cinNumber: { D$in: cc } }] : [] )
+          ]},
+        };
+        const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
+        results = [...results,  ...response.data];
+      }
+    }
+    return results;
   }
+
   //#endregion
   //#region to call close function
   Close() {

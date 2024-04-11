@@ -1681,7 +1681,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           },
         ];
 
-        let rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        let rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
         rPromise.then(response => {
           this.OpenPreview(response);
           this.model.containerTableForm.controls["Company_file"].setValue("");

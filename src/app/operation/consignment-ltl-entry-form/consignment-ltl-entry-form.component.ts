@@ -1037,7 +1037,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   }
   async save() {
-    debugger
     const form = { ...this.consignmentForm, ...this.freightForm }
     console.log(form);
 

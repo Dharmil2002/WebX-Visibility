@@ -282,7 +282,6 @@ export class PinCodeService {
   }
   /*below is function for getting city and pincode*/
   async getCityPincode(form, jsondata, controlName, codeStatus, isCity) {
-    debugger
     try {
       const cValue = form.controls[controlName].value;
       let filter = {}

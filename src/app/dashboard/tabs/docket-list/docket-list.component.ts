@@ -15,44 +15,43 @@ export class DocketListComponent implements OnInit {
     tableData: any;
     tableLoad: boolean;
     orgBranch: string = "";
+    TableContainerStyle = "height:500px!important";
+
    /* column header is for the changes css or title in the table*/
-  columnHeader = {
-    createOn: {
-      Title: "Created Date",
-      class: "matcolumnleft",
-      Style: "min-width:150px",
-    },
+  columnHeader = {    
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:180px",
+      Style: "min-width:300px",
+      sticky: true
     },
     docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "min-width:220px",
       type:'windowLink',
-      functionName:'OpenCnote'
+      functionName:'OpenCnote',
+      sticky: true
     },
     ftCity: {
       Title: "From-To City",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:150px",
     },
     aCTWT: {
       Title: "Actual Weight(Kg)",
-      class: "matcolumncenter",
-      Style: "min-width:175px",
+      class: "matcolumnright",
+      Style: "min-width:150px; max-width:150px",
     },
     pKGS: {
       Title: "Package Count",
-      class: "matcolumncenter",
-      Style: "min-width:150px",
+      class: "matcolumnright",
+      Style: "min-width:100px; max-width:100px",
     },
     fRTAMT: {
       Title: "FV(₹)",
-      class: "matcolumncenter",
-      Style: "min-width:30px",
+      class: "matcolumnright",
+      Style: "min-width:150px; max-width:150px",
     },
     //  invoiceCount: {
     //   Title: "Inv Count",
@@ -64,10 +63,17 @@ export class DocketListComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
+    createOn: {
+      Title: "Created Date",
+      class: "matcolumncenter",
+      Style: "min-width:150px",
+      datatype: 'datetime'
+    },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
       Style: "max-width:65px",
+      stickyEnd: true
     }
   };
   //#endregion

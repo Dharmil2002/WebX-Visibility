@@ -9,7 +9,8 @@ export function isValidNumber(value: any): boolean {
 
 export function isValidDate(value: any): boolean {
     const date = new Date(value);
-    return !isNaN(date.getTime());
+    const tm = date.getTime();
+    return !isNaN(tm) && tm > 0;
 }
 
 export function ConvertToDate(value: any): Date {

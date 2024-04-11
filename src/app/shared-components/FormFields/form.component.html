@@ -37,6 +37,12 @@
                   color="primary"
                   style="margin-top:10px;margin-bottom: 10px; margin-right:10px;">{{MatButton.name}}</button>
               </div>
+              <div *ngIf="toggle">
+                <mat-slide-toggle color="primary"
+                  (change)="TogglefunctionCalled({functionName:toggle.functionName,name:toggle.name,label:toggle.label,event:$event})"
+                formControlName={{toggle.name}}><span
+                  class="togglefontbold">{{toggle.label}}</span></mat-slide-toggle>
+              </div>
               <button type="button" (click)="toggleSection()" class="btn btn-border-radius waves-effect msl-2  mb-2"
                 style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " matTooltip="Expand Section">
                 <mat-icon>{{isExpanded ?

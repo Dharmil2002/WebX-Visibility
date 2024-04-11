@@ -1,4 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
 
 export class DebitVoucherControl {
@@ -43,7 +44,7 @@ export class DebitVoucherControl {
         label: "Entry Location",
         placeholder: "Entry Location",
         type: "text",
-        value: StorageService.getItem('Branch'),
+        value: StorageService.getItem(StoreKeys.Branch),
         generatecontrol: true,
         disable: true,
         Validations: [],
@@ -237,7 +238,7 @@ export class DebitVoucherControl {
         label: "Prepared by",
         placeholder: "Prepared by",
         type: "text",
-        value: StorageService.getItem('UserName'),
+        value: StorageService.getItem(StoreKeys.UserId),
         generatecontrol: true,
         disable: true,
         Validations: [],

@@ -1,4 +1,5 @@
 import { runningNumber } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
 
 /**
  * Retrieves loading sheet details for a specific trip and vehicle.
@@ -39,9 +40,9 @@ export async function updateTracking(companyCode, operationService, docketDetail
             dktNo: docketDetails?.dktNo || '',
             vehNo: docketDetails?.vehNo || '',
             route: docketDetails?.route || '',
-            event: "Vehicle Arrival at " + " " + this.storageService.getItem('Branch'),
+            event: "Vehicle Arrival at " + " " + this.storageService.getItem(StoreKeys.Branch),
             orgn: docketDetails?.orgn || '',
-            loc: this.storageService.getItem('Branch') || '',
+            loc: this.storageService.getItem(StoreKeys.Branch) || '',
             dest: docketDetails?.dest || '',
             lsno: docketDetails?.lsno || '',
             mfno: docketDetails?.mfno || '',

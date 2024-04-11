@@ -1,3 +1,4 @@
+import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
 
 type RouteLeg = string;
@@ -206,9 +207,9 @@ export async function updateTracking(companyCode, operationService, data) {
       dktNo: data?.dktNo|| '',
       vehNo: data?.vehNo || '',
       route: data?.route || '',
-      event: 'Loading Sheet Generated At'+" "+ StorageService.getItem('Branch'),
+      event: 'Loading Sheet Generated At'+" "+ StorageService.getItem(StoreKeys.Branch),
       orgn: docketDetails[lastArray]?.orgn || '',
-      loc: StorageService.getItem('Branch') || '',
+      loc: StorageService.getItem(StoreKeys.Branch) || '',
       dest: docketDetails[lastArray]?.dest || '',
       lsno: data?.lsNo || '',
       unload:false,

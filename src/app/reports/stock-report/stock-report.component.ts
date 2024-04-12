@@ -366,8 +366,9 @@ export class StockReportComponent implements OnInit {
       .value();
 
     const columnGroup = [{
-      Name: "Location",
-      class: "matcolumnleft",
+      Name: "LocationGroup",
+      Title: "",
+      class: "matcolumncenter",
       ColSpan: 2
     }];
 
@@ -434,14 +435,15 @@ export class StockReportComponent implements OnInit {
 
     allStockTypes.map(type => {
       columnGroup.push({
-        Name: type.StockType,
-        class: "matcolumnright",
+        Name: `${type.StockType}-Group`,
+        Title: type.StockType.replace(/_/g, ' '),
+        class: "matcolumncenter",
         ColSpan: 8
       });
 
       fields.map(f => {
         displayJson[`${type.StockType}_${f.field}`] = {
-          Title: `${type.StockType.replace(/_/g, ' ')} ${f.caption}`,
+          Title: `${f.caption}`,
           class: "matcolumnright",
           Style: "min-width: 100px",
           datatype: "number",

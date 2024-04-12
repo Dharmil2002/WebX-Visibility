@@ -95,6 +95,8 @@ export class GenericTableV2Component
   AllChack = false
   @Input() centerAligned;
   @Input() selectAllRequired;
+
+  displayedHeaders: string[];
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
@@ -104,6 +106,7 @@ export class GenericTableV2Component
     this.height = changes.height?.currentValue ?? this.height;
     this.menuItems = changes.menuItems?.currentValue ?? this.menuItems;
     this.addFlag = changes.addFlag?.currentValue ?? this.addFlag;
+    this.displayedHeaders = (changes?.columnGroup?.currentValue ?? this.columnGroup ?? []).map(g => g.Name);
     if (changes.tableData?.currentValue) {
       this.refresh();
     }

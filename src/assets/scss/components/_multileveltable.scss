@@ -132,4 +132,48 @@
       }
     }
   }
+
+  table {
+    .matcolumncenter {
+      border-right: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      justify-content: center;
+      text-align: center;
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+    .matcolumnfirst {
+      border-right: 1px solid #0000001f;
+      border-left: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      justify-content: center;      
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+    .matcolumnright {
+      border-right: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      justify-content: right;
+      text-align: right;
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+    .matcolumnleft {
+      border-right: 1px solid #0000001f;
+      border-left: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      justify-content: left;
+      text-align: left;
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+  }
 }

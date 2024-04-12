@@ -55,39 +55,33 @@ export class VendorMasterUploadComponent implements OnInit {
     }
   }
   //#endregion
-
-  // async fetchAllPincodeData(pinChunks) {
-  //   const promises = pinChunks.map(chunk =>
-  //     this.objPinCodeService.pinCodeDetail({ PIN: { D$in: pinChunks } })
-  //   );
-
-  //   const results = await Promise.all(promises);
-  //   return results.flat();  // This will merge all results into a single array
-  // }
+  //#region to fetch all pincode data
   async fetchAllPincodeData(pinChunks) {
-    const result = await this.objPinCodeService.pinCodeDetail({ PIN: { D$in: pinChunks } });
-    return result.flat();  // This will merge all results into a single array
-  }
-  // async fetchAllLocationData(locationChunks) { 
-  //   const promises = locationChunks.map(chunk =>
-  //     this.locationService.getLocations({
-  //       companyCode: this.storage.companyCode,
-  //       locCode: { D$eq: chunk },
-  //       activeFlag: true
-  //     }, { locCode: 1, locName: 1 })
-  //   );
+    const chunks = chunkArray(pinChunks, 50);
 
-  //   const results = await Promise.all(promises);
-  //   return results.flat();  // This will merge all results into a single array
-  // }
+    const promises = chunks.map(chunk =>
+      this.objPinCodeService.pinCodeDetail({ PIN: { D$in: chunk } })
+    );
+
+    const results = await Promise.all(promises);
+    return results.flat();  // This will merge all results into a single array
+  }
+  //#endregion
+  //#region to fetch all location data
   async fetchAllLocationData(locationChunks) {
-    const result = await this.locationService.getLocations({
-      companyCode: this.storage.companyCode,
-      locCode: { D$in: locationChunks },
-      activeFlag: true
-    }, { _id: 0, locCode: 1, locName: 1 })
+    const chunks = chunkArray(locationChunks, 50);
+
+    const promises = chunks.map(chunk =>
+      this.locationService.getLocations({
+        companyCode: this.storage.companyCode,
+        locCode: { D$in: chunk },
+        activeFlag: true
+      }, { _id: 0, locCode: 1, locName: 1 })
+    );
+    const result = await Promise.all(promises);
     return result.flat();  // This will merge all results into a single array
   }
+  //#endregion
   //#region to select file
   selectedFile(event) {
     let fileList: FileList = event.target.files;

@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
 
-import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -164,7 +164,7 @@ export class StockReportComponent implements OnInit {
   //#endregion
   async getDropdownData() {
 
-    const paybasisList = await PayBasisdetailFromApi(this.masterService, 'PAYTYP')
+    const paybasisList = await GetGeneralMasterData(this.masterService, 'PAYTYP')
     const modeList = await productdetailFromApi(this.masterService);
     // console.log(modeList);
 

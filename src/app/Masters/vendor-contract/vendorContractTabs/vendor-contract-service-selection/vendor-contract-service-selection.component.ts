@@ -3,7 +3,7 @@ import { SessionService } from 'src/app/core/service/session.service';
 import { ContractTypeData } from '../../vendor-contract-list/VendorStaticData';
 import { VendorContractListingService } from 'src/app/core/service/vendor-contract-listing.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
@@ -115,7 +115,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
   async getServiceData() {
 
     // Step 1: Fetch data from the API
-    const data = await PayBasisdetailFromApi(this.masterService, "VSTYP");
+    const data = await GetGeneralMasterData(this.masterService, "VSTYP");
 
     // Map ContractType and find matching service in data
     this.tableData = this.ContractType.map(contractType => {

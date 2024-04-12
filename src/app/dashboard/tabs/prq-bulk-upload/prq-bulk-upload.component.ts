@@ -246,7 +246,7 @@ export class PrqBulkUploadComponent implements OnInit {
         (async () => {
           try {
             const result = await firstValueFrom(
-              this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules)
+              this.xlsxUtils.validateData(jsonData, validationRules)
             );
             this.OpenPreview(result);
           } catch (error) {

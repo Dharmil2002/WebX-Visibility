@@ -2,7 +2,7 @@ import { Component, Inject, OnInit, SimpleChanges } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
@@ -256,9 +256,9 @@ export class VendorBusiAssocModalComponent implements OnInit {
     try {
       const [locationList, rateTypeDropDown, operationDropdown, payBasisDropdown, modeDropdown] = await Promise.all([
         this.objLocationService.getLocationList(),
-        PayBasisdetailFromApi(this.masterService, 'RTTYP'),
-        PayBasisdetailFromApi(this.masterService, 'OPT'),
-        PayBasisdetailFromApi(this.masterService, 'PAYTYP'),
+        GetGeneralMasterData(this.masterService, 'RTTYP'),
+        GetGeneralMasterData(this.masterService, 'OPT'),
+        GetGeneralMasterData(this.masterService, 'PAYTYP'),
         productdetailFromApi(this.masterService)
       ]);
 

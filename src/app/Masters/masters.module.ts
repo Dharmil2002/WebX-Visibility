@@ -76,7 +76,6 @@ import { SplitDcrComponent } from "./dcr-series/split-dcr/split-dcr.component";
 import { EwayBillDocketBookingV2Component } from "./eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t";
 import { AddVendorMasterComponent } from "./vendor-master/add-vendor-master/add-vendor-master.component";
 import { VendorMasterListComponent } from "./vendor-master/vendor-master-list/vendor-master-list.component";
-import { VendorMasterViewComponent } from "./vendor-master/vendor-master-view/vendor-master-view.component";
 import { RouteMasterLocationAddComponent } from "./route-master-location-wise/route-master-location-add/route-master-location-add.component";
 import { RouteMasterLocationWiseComponent } from "./route-master-location-wise/route-master-location-wise-list/route-master-location-wise.component";
 import { AirportMasterListComponent } from "./airport-master/airport-master-list/airport-master-list.component";
@@ -275,7 +274,6 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
     EwayBillDocketBookingV2Component,
     VendorMasterListComponent,
     AddVendorMasterComponent,
-    VendorMasterViewComponent,
     AirportMasterListComponent,
     AirportMasterAddComponent,
     RouteMasterLocationAddComponent,

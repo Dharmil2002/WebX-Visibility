@@ -18,7 +18,7 @@ import { SessionService } from "src/app/core/service/session.service";
 import Swal from "sweetalert2";
 import { ContractFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/FreightMatrix-control";
 import { Router } from "@angular/router";
-import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
 import { MatDialog } from "@angular/material/dialog";
@@ -277,7 +277,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
 
   async getRatType() {
-    const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+    const RatData = await GetGeneralMasterData(this.masterService, "RTTYP");
     const rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
       (x, index) => {
         return RatData.find((t) => t.value == x);
@@ -300,7 +300,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   async getCapacityData() {
     const containerData = await this.objContainerService.getContainerList();
-    const vehicleData = await PayBasisdetailFromApi(
+    const vehicleData = await GetGeneralMasterData(
       this.masterService,
       "VEHSIZE"
     );

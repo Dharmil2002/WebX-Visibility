@@ -7,7 +7,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { PayBasisdetailFromApi, checkForDuplicatesInFreightUpload, productdetailFromApi } from '../../../CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, checkForDuplicatesInFreightUpload, productdetailFromApi } from '../../../CustomerContractAPIUtitlity';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
@@ -78,14 +78,14 @@ export class FreightChargeUploadComponent implements OnInit {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
-        const RateData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+        const RateData = await GetGeneralMasterData(this.masterService, "RTTYP");
         this.rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
           (x, index) => {
             return RateData.find((t) => t.value == x);
           }
         );
         const containerData = await this.objContainerService.getContainerList();
-        const vehicleData = await PayBasisdetailFromApi(
+        const vehicleData = await GetGeneralMasterData(
           this.masterService,
           "VEHSIZE"
         );
@@ -190,7 +190,7 @@ export class FreightChargeUploadComponent implements OnInit {
           },
         ];
 
-        const rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
 
         rPromise.then(async response => {
 

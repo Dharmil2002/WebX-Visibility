@@ -34,9 +34,9 @@ export class QueryPageComponent implements OnInit {
     this.DocCalledAs = this.controlPanel.DocCalledAs;
     this.breadscrums = [
       {
-        title: `${this.DocCalledAs.Docket} Tracking`,
+        title: 'Document Tracking',
         items: ["Home"],
-        active: `${this.DocCalledAs.Docket} Tracking`,
+        active: 'Document Tracking',
       }
     ]
   }

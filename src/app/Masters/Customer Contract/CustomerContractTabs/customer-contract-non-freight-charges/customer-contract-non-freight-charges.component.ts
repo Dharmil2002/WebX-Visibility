@@ -21,7 +21,7 @@ import { updatePending } from "../../../../operation/update-loading-sheet/loadin
 import { MatDialog } from "@angular/material/dialog";
 import { CustomerContractNonFreightChargesPopupComponent } from "../customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component";
 import Swal from "sweetalert2";
-import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
@@ -180,7 +180,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     });
   }
   async getselectChargesDropdown() {
-    const AcGroupdata = await PayBasisdetailFromApi(this.masterService, "SCH");
+    const AcGroupdata = await GetGeneralMasterData(this.masterService, "SCH");
     console.log('AcGroupdata' ,AcGroupdata)
     this.filter.Filter(
       this.jsonControlArrayNonFreightCharges,
@@ -322,7 +322,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
 
   async FillMatrixForAll(data: any) {
-    const AcGroupdata = await PayBasisdetailFromApi(this.masterService, "SCH");
+    const AcGroupdata = await GetGeneralMasterData(this.masterService, "SCH");
     const element = AcGroupdata.find((x) => x.name == data.data?.selectCharges);
     this.NonFreightChargesForm.controls["selectCharges"].setValue(
       element || ""

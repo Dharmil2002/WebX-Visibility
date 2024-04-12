@@ -322,8 +322,8 @@ export class PinCodeService {
           codeData = cResponse.data
             .filter((x) => x.PIN.toString().startsWith(cValue))
             .map((element) => ({
-              name: element.PIN.toString(),
-              value: element.CT.toString(),
+              name: element.CT,
+              value:  element.PIN,
               ct:element.CT,
               pincode: element.PIN.toString()
             }));

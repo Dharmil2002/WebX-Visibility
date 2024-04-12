@@ -4,6 +4,7 @@ export class ClusterMaster {
     pincode: any
     tableNo: any;
     city: string;
+    clusterType: any;
     activeFlag: any;
     _id:string;
     constructor(ClusterMaster) {
@@ -13,6 +14,7 @@ export class ClusterMaster {
         this.pincode = ClusterMaster.pinCode || '';
         this.tableNo = ClusterMaster.tableNo || '';
         this.city = ClusterMaster.city || '';
+        this.clusterType = ClusterMaster.clusterType || '';
         this.activeFlag = ClusterMaster.activeFlag || false;
       }
     }

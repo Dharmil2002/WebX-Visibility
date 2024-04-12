@@ -113,26 +113,34 @@ export class MasterService {
     return this.companyGst;
   }
 
+  /**
+   * Retrieves the last ID from a collection based on the provided parameters.
+   * If the ID is not found or an error occurs, it returns a default ID with the specified prefix.
+   *
+   * @param collectionName - The name of the collection to retrieve the last ID from.
+   * @param companyCode - The company code used as a filter for the collection.
+   * @param cIDField - The field name used to filter the collection based on the company code.
+   * @param idField - The field name representing the ID in the collection.
+   * @param prefix - The prefix to be added to the default ID.
+   * @returns A Promise that resolves to the last ID or a default ID.
+   */
   async getLastId(collectionName: string, companyCode: number, cIDField: string, idField: string, prefix: string): Promise<string> {
     const req = {
-        companyCode: companyCode,
-        collectionName: collectionName,
-        filter: { 
-          [cIDField]: companyCode,
-          [idField]: { $regex: `^${prefix}`, $options: 'i' } 
-        },
-        sorting: { [idField]: -1 },
+      companyCode: companyCode,
+      collectionName: collectionName,
+      filter: { [cIDField]: companyCode },
+      sorting: { [idField]: -1 },
     };
 
     try {
-        const response = await firstValueFrom(this.masterPost("generic/findLastOne", req));
-        // Default to `${prefix}00000` if `response.data` is falsy or doesn't contain `idField`
-        const lastId = response?.data?.[idField] ?? `${prefix}00000`;
-        return lastId;
+      const response = await firstValueFrom(this.masterPost("generic/findLastOne", req));
+      // Default to `${prefix}00000` if `response.data` is falsy or doesn't contain `idField`
+      const lastId = response?.data?.[idField] ?? `${prefix}00000`;
+      return lastId;
     } catch (error) {
-        console.error("Error fetching the last ID:", error);
-        // Return default ID if there is an error
-        return `${prefix}00000`;
+      console.error("Error fetching the last ID:", error);
+      // Return default ID if there is an error
+      return `${prefix}00000`;
     }
-}
+  }
 }

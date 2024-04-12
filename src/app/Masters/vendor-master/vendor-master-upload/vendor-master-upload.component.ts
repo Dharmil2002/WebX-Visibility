@@ -12,7 +12,7 @@ import { GetGeneralMasterData } from '../../Customer Contract/CustomerContractAP
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import Swal from 'sweetalert2';
 import { VendorMaster } from 'src/app/core/models/Masters/vendor-master';
-import { nextKeyCode, nextKeyCodeByN } from 'src/app/Utility/commonFunction/stringFunctions';
+import { nextKeyCodeByN } from 'src/app/Utility/commonFunction/stringFunctions';
 import { chunkArray } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { max } from 'lodash';
 
@@ -56,28 +56,38 @@ export class VendorMasterUploadComponent implements OnInit {
   }
   //#endregion
 
+  // async fetchAllPincodeData(pinChunks) {
+  //   const promises = pinChunks.map(chunk =>
+  //     this.objPinCodeService.pinCodeDetail({ PIN: { D$in: pinChunks } })
+  //   );
+
+  //   const results = await Promise.all(promises);
+  //   return results.flat();  // This will merge all results into a single array
+  // }
   async fetchAllPincodeData(pinChunks) {
-    const promises = pinChunks.map(chunk => 
-        this.objPinCodeService.pinCodeDetail({ PIN: { D$in: chunk } })
-    );
-
-    const results = await Promise.all(promises);
-    return results.flat();  // This will merge all results into a single array
+    const result = await this.objPinCodeService.pinCodeDetail({ PIN: { D$in: pinChunks } });
+    return result.flat();  // This will merge all results into a single array
   }
+  // async fetchAllLocationData(locationChunks) { 
+  //   const promises = locationChunks.map(chunk =>
+  //     this.locationService.getLocations({
+  //       companyCode: this.storage.companyCode,
+  //       locCode: { D$eq: chunk },
+  //       activeFlag: true
+  //     }, { locCode: 1, locName: 1 })
+  //   );
 
+  //   const results = await Promise.all(promises);
+  //   return results.flat();  // This will merge all results into a single array
+  // }
   async fetchAllLocationData(locationChunks) {
-    const promises = locationChunks.map(chunk => 
-        this.locationService.getLocations({ 
-          companyCode: this.storage.companyCode,
-          locCode: { D$in: chunk },
-          activeFlag: true
-        }, { locCode: 1, locName: 1 })
-    );
-
-    const results = await Promise.all(promises);
-    return results.flat();  // This will merge all results into a single array
+    const result = await this.locationService.getLocations({
+      companyCode: this.storage.companyCode,
+      locCode: { D$in: locationChunks },
+      activeFlag: true
+    }, { _id: 0, locCode: 1, locName: 1 })
+    return result.flat();  // This will merge all results into a single array
   }
-
   //#region to select file
   selectedFile(event) {
     let fileList: FileList = event.target.files;
@@ -91,15 +101,15 @@ export class VendorMasterUploadComponent implements OnInit {
 
         const pincodes = [...new Set(jsonData.map((x) => x.VendorPinCode))];
         const locations = [...new Set(jsonData.map((x) => x.VendorLocation))];
-        const pans = [...new Set(jsonData.map((x) => x.PANNo))];
-        
+        const locationItems = String(locations).split(',').map(item => item.trim().toUpperCase());
+
         // Fetch data from DB
-        this.vendorTypeList = await GetGeneralMasterData(this.masterService, "VENDTYPE");        
+        this.vendorTypeList = await GetGeneralMasterData(this.masterService, "VENDTYPE");
         this.pincodeList = await this.fetchAllPincodeData(pincodes);
-        this.locationList = await this.fetchAllLocationData(locations);
-        
+        this.locationList = await this.fetchAllLocationData(locationItems);
+
         const states = [...new Set(this.pincodeList.map((x) => x.ST))];
-        this.zonelist = await this.objState.getStateWithZone({ ST: { D$in: states } });        
+        this.zonelist = await this.objState.getStateWithZone({ ST: { D$in: states } });
         this.countryList = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"));
 
         const validationRules = [
@@ -151,7 +161,7 @@ export class VendorMasterUploadComponent implements OnInit {
             Validations: [
               { Required: true },
               {
-                TakeFromList: this.pincodeList.map((x) => { 
+                TakeFromList: this.pincodeList.map((x) => {
                   return x.PIN;
                 }),
               }
@@ -201,55 +211,55 @@ export class VendorMasterUploadComponent implements OnInit {
 
         try {
 
-            const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
-            const existingRecords = await this.getVendorData(response);
-        
-            // Creating lookup tables
-            const vendorNames = new Set();
-            const panNos = new Set();
-            const cinNos = new Set();
+          const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
+          const existingRecords = await this.getVendorData(response);
 
-            existingRecords.forEach(rec => {
-              if (rec.vendorName) vendorNames.add(rec.vendorName.toLowerCase());
-              if (rec.panNo && rec.panNo !== "") panNos.add(rec.panNo);
-              if (rec.cinNumber && rec.cinNumber !== "") cinNos.add(rec.cinNumber);
-            });
+          // Creating lookup tables
+          const vendorNames = new Set();
+          const panNos = new Set();
+          const cinNos = new Set();
 
-            const filteredData = await Promise.all(response.map(async (element) => {
-              element.error = element.error || [];
-        
-              if (vendorNames.has(element.VendorName.toLowerCase())) {
-                element.error.push(`VendorName : ${element.VendorName} Already exists`);
-              }
-              if (panNos.has(element.PANNo)) {
-                element.error.push(`PANNo : ${element.PANNo} Already exists`);
-              }
-              if (cinNos.has(element.CINNo)) {
-                element.error.push(`CINNo : ${element.CINNo} Already exists`);
-              }
-        
-              const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
-              if (city) {
-                element['VendorCity'] = city.CT;
-                const state = this.zonelist.find(x => x.ST === city.ST);
-                if (state) {
-                  element['VendorState'] = state.STNM;
-                  const country = this.countryList.find(x => x.Code.toLowerCase() === state.CNTR.toLowerCase());
-                  if (country) {
-                    element['Country'] = country.Country;
-                  }
+          existingRecords.forEach(rec => {
+            if (rec.vendorName) vendorNames.add(rec.vendorName.toLowerCase());
+            if (rec.panNo && rec.panNo !== "") panNos.add(rec.panNo);
+            if (rec.cinNumber && rec.cinNumber !== "") cinNos.add(rec.cinNumber);
+          });
+
+          const filteredData = await Promise.all(response.map(async (element) => {
+            element.error = element.error || [];
+
+            if (vendorNames.has(element.VendorName.toLowerCase())) {
+              element.error.push(`VendorName : ${element.VendorName} Already exists`);
+            }
+            if (panNos.has(element.PANNo)) {
+              element.error.push(`PANNo : ${element.PANNo} Already exists`);
+            }
+            if (cinNos.has(element.CINNo)) {
+              element.error.push(`CINNo : ${element.CINNo} Already exists`);
+            }
+
+            const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
+            if (city) {
+              element.VendorCity = city.CT;
+              const state = this.zonelist.find(x => x.ST === city.ST);
+              if (state) {
+                element.VendorState = state.STNM;
+                const country = this.countryList.find(x => x.Code.toLowerCase() === state.CNTR.toLowerCase());
+                if (country) {
+                  element.Country = country.Country;
                 }
-              }        
-              if (element.error.length === 0) {
-                element.error = null;
               }
-              return element;
-            }));
-        
-            this.OpenPreview(filteredData);
-          } catch (error) {
-            console.error("Error:", error);
-          }
+            }
+            if (element.error.length === 0) {
+              element.error = null // set the error property null if there are no errors;
+            }
+            return element;
+          }));
+
+          this.OpenPreview(filteredData);
+        } catch (error) {
+          console.error("Error:", error);
+        }
       });
     }
   }
@@ -276,18 +286,17 @@ export class VendorMasterUploadComponent implements OnInit {
     try {
       const chunkSize = 50;
       let successfulUploads = 0;
+      const lastVendorCode = await this.masterService.getLastId("vendor_detail", this.storage.companyCode, 'companyCode', 'vendorCode', 'V')
 
       // Process each element in data using processData
-      const processedData = data.map(element => this.processData(element));
+      const processedData = data.map((element, i) => this.processData(element, lastVendorCode, i));
 
-      // Pass the processedData array to formatVendorData
-      const formattedData = await this.formatVendorData(processedData);
-
-      // Chunk the formatted data recursively
-      const chunks = chunkArray(formattedData, chunkSize);
+      // Chunk the processedData data recursively
+      const chunks = chunkArray(processedData, chunkSize);
       // console.log(chunks);
 
       const sendData = async (chunks: VendorMaster[][]) => {
+        //console.log(chunks);
 
         chunks.forEach(async chunk => {
           const request = {
@@ -330,7 +339,7 @@ export class VendorMasterUploadComponent implements OnInit {
     }
   }
 
-  processData(element) {
+  processData(element, lastVendorCode: string, i: number) {
 
     const updateVendortype = this.vendorTypeList.find(item => item.name.toLowerCase() === element.VendorType.toLowerCase());
 
@@ -346,12 +355,15 @@ export class VendorMasterUploadComponent implements OnInit {
     }
 
     // Find the matching locations in locationList
-    const updateLocationList = this.locationList.filter(item => vendorLocations.includes(item.name.toUpperCase()));
+    const updateLocationList = this.locationList.filter(item => vendorLocations.includes(item.locCode.toUpperCase()));
 
     // Create a new VendorModel instance to store processed data
     const processedData = new VendorMaster({});
 
     // Set basic properties
+    const newVendorCode = nextKeyCodeByN(lastVendorCode, (i + 1));
+    processedData.vendorCode = newVendorCode;
+    processedData._id = `${this.storage.companyCode}-${newVendorCode}`;
     processedData.companyCode = this.storage.companyCode;
     processedData.vendorName = element.VendorName.toUpperCase();
     processedData.vendorManager = element.VendorManager;
@@ -359,7 +371,7 @@ export class VendorMasterUploadComponent implements OnInit {
     processedData.vendorTypeName = updateVendortype.name || '';
     processedData.vendorAddress = element.VendorAddress;
     processedData.vendorLocation = updateLocationList.map((x) => {
-      return x.name;
+      return x.locCode;
     }) || [];
     processedData.vendorPinCode = element.VendorPinCode;
     processedData.vendorCity = element.VendorCity;
@@ -381,33 +393,12 @@ export class VendorMasterUploadComponent implements OnInit {
     // Return the processed data
     return processedData;
   }
-  // Function to format contract data
-  async formatVendorData(processedData: any[]) {
-    try {
-      // Get the last Vendor code from the database outside the forEach loop
-      let lastVendorCode = await this.masterService.getLastId("vendor_detail", this.storage.companyCode, 'companyCode', 'vendorCode', 'V')
-
-      // Sequentially process each item in processedData using forEach
-      processedData.forEach((item, i) => {
-        // Calculate the new vendor code using nextKeyCode function
-        const newVendorCode = nextKeyCodeByN(lastVendorCode, (i+1));
-        item["vendorCode"] = newVendorCode;
-        item["_id"] = `${this.storage.companyCode}-${newVendorCode}`;
-      });
-      return processedData;
-    } catch (error) {
-      // Handle any errors that occur during processing
-      console.error('Error in formatVendorData:', error);
-      throw error; // Propagate the error
-    }
-  }
- 
   //#endregion
   //#region to get Existing Data from collection
   async getVendorData(data) {
     const vendorName = [... new Set(data.map((x) => x.VendorName))];
-    const panNo =  [... new Set(data.map((x) => x.PANNo))]; 
-    const cinNumber =  [... new Set(data.map((x) => x.CINNo))];
+    const panNo = [... new Set(data.map((x) => x.PANNo))];
+    const cinNumber = [... new Set(data.map((x) => x.CINNo))];
 
     const venNms = chunkArray(vendorName, 25);
     const pans = chunkArray(panNo, 25);
@@ -415,28 +406,29 @@ export class VendorMasterUploadComponent implements OnInit {
 
     const totalChunks = max([venNms.length, pans.length, cins.length]);
     let results = [];
-    for(let i = 0; i < totalChunks; i++) { 
+    for (let i = 0; i < totalChunks; i++) {
       const vc = venNms[i] || [];
       const pc = pans[i] || [];
       const cc = cins[i] || [];
-      
-      if(vc.length > 0 || pc.length > 0 || cc.length > 0) {
+
+      if (vc.length > 0 || pc.length > 0 || cc.length > 0) {
         const request = {
           companyCode: this.storage.companyCode,
           collectionName: "vendor_detail",
-          filter: { $or: [
-              ...( vc.length > 0 ? [{ vendorName: { D$in: vc } }] : [] ), 
-              ...( pc.length > 0 ? [{ panNo: { D$in: pc } }] : [] ), 
-              ...( cc.length > 0 ? [{ cinNumber: { D$in: cc } }] : [] )
-          ]},
+          filter: {
+            $or: [
+              ...(vc.length > 0 ? [{ vendorName: { D$in: vc } }] : []),
+              ...(pc.length > 0 ? [{ panNo: { D$in: pc } }] : []),
+              ...(cc.length > 0 ? [{ cinNumber: { D$in: cc } }] : [])
+            ]
+          },
         };
         const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
-        results = [...results,  ...response.data];
+        results = [...results, ...response.data];
       }
     }
     return results;
   }
-
   //#endregion
   //#region to call close function
   Close() {

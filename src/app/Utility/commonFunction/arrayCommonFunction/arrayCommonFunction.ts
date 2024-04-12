@@ -2,11 +2,17 @@ import { UntypedFormGroup } from "@angular/forms";
 import moment from "moment";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
+/**
+ * Splits an array into smaller arrays of a specified size.
+ * @param data - The array to be split.
+ * @param size - The size of each smaller array.
+ * @returns An array of smaller arrays.
+ */
 export function chunkArray(data: any[], size: number): any[] {
   if (data.length <= size) {
     return [data];
   } else {
-    return [data.slice(0, size), ...this.chunkArray(data.slice(size), size)];
+    return [data.slice(0, size), ...chunkArray(data.slice(size), size)];
   }
 }
 /**

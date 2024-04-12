@@ -6,14 +6,14 @@ export class ThcUpdateControls {
         this.thcUpdateControlArray = [
             {
                 name: 'arrivalTime',
-                label: 'Arrival Time',
+                label: 'Arrival DateTime',
                 placeholder: '',
-                type: 'time',
+                type: 'datetimerpicker',
                 value: '',
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle No is required"
+                        message: "Arrival DateTime is required"
                     }
                 ],
                 generatecontrol: true, disable: false

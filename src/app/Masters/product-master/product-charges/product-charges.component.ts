@@ -1,15 +1,13 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { FormControl, UntypedFormBuilder, Validators } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ProductControls } from "src/assets/FormControls/ProductControls";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { firstValueFrom } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
-import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
-
 @Component({
   selector: "app-product-charges",
   templateUrl: "./product-charges.component.html",
@@ -99,6 +97,7 @@ export class ProductChargesComponent implements OnInit {
   ChargesData: any[] = [];
   UpdatedData: any;
   isUpdate: boolean = false;
+  protected _onDestroy = new Subject<void>();
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder,
@@ -120,6 +119,7 @@ export class ProductChargesComponent implements OnInit {
     this.bindDropdown();
     this.ChargesBehaviourDropdown();
     this.ChargesListDropdown();
+    this.getChargeApplicable();
   }
   initializeFormControl() {
     const customerFormControls = new ProductControls(this.isUpdate);
@@ -247,12 +247,18 @@ export class ProductChargesComponent implements OnInit {
     }
   }
   async save() {
+
+
     const Body = {
       sELCHA: this.customerTableForm.value.SelectCharges.name,
       cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
       cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
       vAR: this.customerTableForm.value.Variability,
       aDD_DEDU: this.customerTableForm.value.Add_Deduct,
+      cHAPP: this.customerTableForm.value.chargeApplicableHandler.map(x => x.value),
+      cAPTION: this.customerTableForm.value.cAPTION,
+      iSREQ: this.customerTableForm.value.iSChargeMandatory,
+      isActive: this.customerTableForm.value.isActive,
       eNTDT: new Date(),
       eNTLOC: this.storage.branch,
       eNTBY: this.storage.userName,
@@ -260,6 +266,8 @@ export class ProductChargesComponent implements OnInit {
       mODLOC: this.storage.branch,
       mODBY: this.storage.userName,
     };
+    console.log(Body);
+    
     if (!this.isUpdate) {
       Body["cHACD"] = this.customerTableForm.value.ChargesCode;
       Body[
@@ -369,20 +377,20 @@ export class ProductChargesComponent implements OnInit {
   }
 
   async handleSelectCharges() {
-    
+
     if (this.isUpdate) {
       if (this.customerTableForm.value.SelectCharges.name == this.UpdatedData.sELCHA) {
         return;
       }
     }
-    else{
+    else {
       this.customerTableForm.controls['ChargesCode'].setValue(this.customerTableForm.value.SelectCharges.value)
     }
 
     const req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
-      filter: { sELCHA: this.customerTableForm.value.SelectCharges.name , cHATY:this.selectedValue ,pRCD:this.ProductId },
+      filter: { sELCHA: this.customerTableForm.value.SelectCharges.name, cHATY: this.selectedValue, pRCD: this.ProductId },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
@@ -397,4 +405,38 @@ export class ProductChargesComponent implements OnInit {
       });
     }
   }
+  //#region to get Charge Applicable list
+  getChargeApplicable() {
+    const chargeApplicablelist = [
+      { name: "ON GCN", value: "GCN" },
+      { name: "On THC Generation", value: "THC" },
+      { name: "ON Delivery MR", value: "DeliveryMR" },]
+
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.customerTableForm,
+      chargeApplicablelist,
+      "chargeApplicable",
+      false
+    );
+  }
+  //#endregion
+  //#region handles select All feature of all multiSelect fields of one form.
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.customerTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+  //#endregion
 }

@@ -33,29 +33,31 @@ export class AccountMasterComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  columnHeader = {
+  columnHeader = {   
     aCNM: {
       Title: "Account",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:25%",
+      sticky: true
     },
     gRPNM: {
       Title: "Account Group",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:25%",
     },
     cATNM: {
       Title: "Account Category",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       Style: "min-width:25%",
     },
     EditAction:{
       type:'iconClick',
       Title: "Action",
-      class: "matcolumncenter",
-      Style: "min-width:25%",
+      class: "matcolumnleft button-primary",
+      Style: "min-width:6%",
       functionName:'EditFunction',
-      iconName:'edit'
+      iconName:'edit',
+      stickyEnd: true
     }
   };
   FilterButton = {

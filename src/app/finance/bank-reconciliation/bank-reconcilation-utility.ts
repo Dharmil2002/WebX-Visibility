@@ -11,7 +11,7 @@ export async function getbankreconcilationList(masterService, request) {
                 "pMD": { "D$in": ["RTGS/UTR", "Cheque"] },
             },
             {
-                "bRC": StorageService.getItem('Branch'),
+                "bRC": StorageService.getItem(StoreKeys.Branch),
             }, ...(request.fromDate ? [{ 'tTDT': { 'D$gte': request.fromDate } }] : []), ...(request.toDate ? [{ 'tTDT': { 'D$lt': request.toDate } }] : []),
             ...(request.bank ? [{ 'aNM': request.bank }] : []),
         ],

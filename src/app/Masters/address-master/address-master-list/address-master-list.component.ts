@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -16,16 +17,12 @@ export class AddressMasterListComponent implements OnInit {
   toggleArray = ["activeFlag"];
   companyCode: any = 0;
   linkArray = []
-  columnHeader = {
-    eNTDT: {
-      Title: "Created Date",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
+  columnHeader = {    
     addressCode: {
       Title: "Address Code",
       class: "matcolumnleft",
       Style: "max-width:150px",
+      sticky: true,
     },
     manualCode: {
       Title: "Manual Code",
@@ -42,17 +39,24 @@ export class AddressMasterListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:480px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;",
     },
+    eNTDT: {
+      Title: "Created Date",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+      datatype: "datetime",
+    },
     activeFlag: {
       type: "Activetoggle",
       Title: "Active",
       class: "matcolumncenter",
       Style: "max-width:100px",
       functionName: "ActiveFunction",
-    },
+    },    
     actions: {
-      Title: "Actions",
-      class: "matcolumnleft",
+      Title: "",
+      class: "matcolumncenter",
       Style: "max-width:100px",
+      stickyEnd: true,
     },
   };
   staticField = [
@@ -97,7 +101,7 @@ export class AddressMasterListComponent implements OnInit {
           });
           // Generate srno for each object in the array and format the eNTDT
           const dataWithFormattedDate = sortedData.map((item, index) => {
-            const formattedDate = formatDate(item.eNTDT);
+            const formattedDate = moment(item.eNTDT).format("DD-MM-YYYY HH:mm:ss");
             return {
               ...item,
               eNTDT: formattedDate,
@@ -110,13 +114,6 @@ export class AddressMasterListComponent implements OnInit {
         }
       }
     });
-    function formatDate(dateString) {
-      const formattedDate = new Date(dateString);
-      const formatDatePart = (value) => (value < 10 ? '0' : '') + value;
-      const formattedDateStr = `${formatDatePart(formattedDate.getDate())}-${formatDatePart(formattedDate.getMonth() + 1)}-${formattedDate.getFullYear()}`;
-      const formattedTimeStr = `${formatDatePart(formattedDate.getHours())}:${formatDatePart(formattedDate.getMinutes())}`;
-      return `${formattedDateStr} ${formattedTimeStr}`;
-    }
   }
 
   async ActiveFunction(event) {

@@ -28,6 +28,7 @@ export class PrqSummaryPageComponent implements OnInit {
     csv: false,
   };
   isLoad: boolean = false;
+  TableContainerStyle = "height:400px!important";
   uploadComponent = PrqBulkUploadComponent;
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >

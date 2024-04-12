@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -19,21 +21,55 @@ export class ClusterMasterListComponent implements OnInit {
   columnHeader =
     {
       // "srNo": "Sr No.",
-      "eNTDT": "Created Date",
-      "clusterCode": "Cluster Code",
-      "clusterName": "Cluster Name",
-      "pincode": "Pincode",
-      "activeFlag": "Active Status",
-      "actions": "Actions"
+      "clusterCode": {
+        Title: "Cluster Code",
+        class: "matcolumncenter",
+        Style: "min-width:150px; max-width:150px",
+        sticky: true,
+      },
+      "clusterName": {
+        Title: "Cluster Name",
+        class: "matcolumncenter",
+        Style: "min-width:200px; max-width:200px",
+        sticky: true,
+      }, 
+      "pincode": {
+        Title: "Pincode",
+        class: "matcolumncenter",
+        Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"        
+      },
+      activeFlag: {
+        type: "Activetoggle",
+        Title: "Active",
+        class: "matcolumncenter",
+        Style: "min-width:80px; max-width:80px",
+        functionName: "IsActiveFuntion",
+      },
+      "eNTDT": {
+        Title: "Created Date",
+        class: "matcolumncenter",
+        Style: "min-width:150px; max-width:150px",
+      },
+      EditAction: {
+        type: "iconClick",
+        Title: "",
+        class: "matcolumncenter",
+        Style: "min-width:80px; max-width:80px;",
+        functionName: "EditFunction",
+        iconName: "edit",
+        stickyEnd: true,
+      },
     }
   headerForCsv = {
-    // "srNo": "Sr No.",
-    "eNTDT": "Created Date",
+    // "srNo": "Sr No.",    
     "clusterCode": "Cluster Code",
     "clusterName": "Cluster Name",
     "pincode": "Pincode",
+    "eNTDT": "Created Date",
     "activeFlag": "Active Status",
   }
+  staticField = ["clusterCode","clusterName","pincode","eNTDT"];
+
   breadScrums = [
     {
       title: "Cluster Master",
@@ -49,7 +85,9 @@ export class ClusterMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
-  constructor(private masterService: MasterService, private storage: StorageService) {
+  constructor(
+    private route: Router,
+    private masterService: MasterService, private storage: StorageService) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
@@ -86,6 +124,15 @@ export class ClusterMasterListComponent implements OnInit {
     };
   }
   //#endregion
+
+  AddNew(){
+    this.route.navigateByUrl(this.addAndEditPath);
+  }
+
+  EditFunction(event){
+    this.route.navigate([this.addAndEditPath], { state: { data: event?.data } });
+  }
+
   //#region to manage flag 
   async IsActiveFuntion(det) {
     let id = det._id;
@@ -112,6 +159,14 @@ export class ClusterMasterListComponent implements OnInit {
         showConfirmButton: true,
       });
       this.getClusterDetails();
+    }
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
     }
   }
   //#endregion

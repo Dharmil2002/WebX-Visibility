@@ -29,6 +29,7 @@ export class GenericTableV2Component
   @Input() csvData;
   @Input() columnHeader = [];
   @Input() TableStyle;
+  @Input() TableContainerStyle;
   @Input() addAndEditPath;
   @Input() disbleCheckbox;
   @Input() uploadComponent;
@@ -60,6 +61,7 @@ export class GenericTableV2Component
   @Input() extraData;
   @Input() EventButton;
   @Input() FormTitle: string = "";
+  @Input() stickyHeader: boolean = false;
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
   @Input() showHeader: boolean = true;
@@ -216,14 +218,13 @@ export class GenericTableV2Component
       }
     }
     
-    if(val) {
-      if (typeof val === 'string' && isValidDate(val)) {
-        return moment(new Date(val)).format("DD/MM/YYYY");
-      } else if (typeof val !== 'boolean' && !isNaN(Number(val))) {
+    if(val) {      
+      if (typeof val !== 'boolean' && isValidNumber(val)) {
         return Number(val);
+      } else if (typeof val === 'string' && isValidDate(val)) {
+        return moment(new Date(val)).format("DD/MM/YYYY");
       }
     }
-
     return val;
   }
   //#endregion

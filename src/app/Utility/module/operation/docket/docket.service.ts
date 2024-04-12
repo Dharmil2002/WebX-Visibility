@@ -10,7 +10,7 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { format, isValid, parseISO } from "date-fns";
 import moment from "moment";
-import { roundNumber } from "src/app/Utility/commonfunction";
+import { convertCmToFeet, roundNumber } from "src/app/Utility/commonfunction";
 import { ConvertToDate, ConvertToNumber, isValidDate, roundToNumber } from "src/app/Utility/commonFunction/common";
 import { DocketFinStatus, DocketStatus } from "src/app/Models/docStatus";
 import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
@@ -180,7 +180,7 @@ export class DocketService {
                 x.actions = statusInfo.actions;
                 x.aCTWT = Number(x.aCTWT || 0).toFixed(2); // Ensure two decimal places
                 x.billingParty = `${x.bPARTY}:${x.bPARTYNM}`//x.billingParty || "";
-                x.createOn = formatDocketDate(x?.eNTDT || new Date())
+                x.createOn = x?.eNTDT
                 return x;
             return null;
         }).filter((x) => x !== null);
@@ -1120,11 +1120,11 @@ export class DocketService {
             "bPARTYNM": data?.billingParty.name || "",
             "cLOC": this.storage.branch || "",
             "oRGN": data?.origin || "",
-            "fCT": data?.fromCity?.value || "",
-            "fPIN": data?.fromPinCode?.value || "",
+            "fCT": data?.fromCity?.ct || "",
+            "fPIN": data?.fromCity?.pincode || "",
             "dEST": data?.destination?.value || "",
-            "tCT": data?.toCity?.value || "",
-            "tPIN": data?.toPinCode?.value || "",
+            "tCT": data?.toCity?.ct || "",
+            "tPIN": data?.toCity?.pincode || "",
             "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
             "pKGS": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)) : 0,
             "aCTWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)) : 0,
@@ -1136,7 +1136,7 @@ export class DocketService {
                 "cD": data?.consignorName?.value || "",
                 "nM": data?.consignorName?.name || "",
                 "cT": data?.fromCity?.value || "",
-                "pIN": data?.fromPinCode?.value || "",
+                "pIN": data?.fromCity?.pincode || "",
                 "aDD": data.cnoAddress?.name || data.cnoAddress,
                 "aDDCD": data.cnoAddress?.value || "A8888",
                 "gST": data?.cnogst || "",
@@ -1147,15 +1147,15 @@ export class DocketService {
                 "cD": data?.consigneeName?.value || "",
                 "nM": data?.consigneeName?.name || "",
                 "cT": data?.toCity?.value || "",
-                "pIN": data?.toPinCode?.value || "",
+                "pIN": data?.toCity?.pincode  || "",
                 "aDD": data?.cneAddress?.name || data.cneAddress,
                 "aDDCD": data.cneAddress?.value || "A8888",
                 "gST": data?.cnegst || "",
                 "mOB": data?.cncontactNumber || "",
                 "aLMOB": data?.cnalternateContactNo || "",
             },
-            "eDD": ConvertToDate(data?.edd),
-            "wTIN": data?.weight_in || "",
+            //"eDD": ConvertToDate(data?.edd),
+            //"wTIN": data?.weight_in || "",
             "iSVOL": data?.f_vol || false,
             "fRTRT": ConvertToNumber(data?.freight_rate || 0, 2),
             "fRTRTY": data?.freightRatetypeNm || "",
@@ -1193,10 +1193,10 @@ export class DocketService {
         };
 
         let invoiceDetails = invoiceData.map((element) => {
-            let l = ConvertToNumber(element?.length || 0, 3);
-            let b = ConvertToNumber(element?.breadth || 0, 3);
-            let h = ConvertToNumber(element?.height || 0, 3);
-
+            let l = convertCmToFeet(ConvertToNumber(element?.length || 0, 3));
+            let b = convertCmToFeet(ConvertToNumber(element?.breadth || 0, 3));
+            let h = convertCmToFeet(ConvertToNumber(element?.height || 0, 3));
+           let cubwt=ConvertToNumber(element?.cubWT||0)
             const invoiceJson = {
                 "_id": isUpdate ? `${this.storage.companyCode}-${data?.docketNumber}-${element?.INVNO}` : "",
                 "cID": this.storage.companyCode,
@@ -1204,11 +1204,11 @@ export class DocketService {
                 "iNVNO": element?.invoiceNumber || "",
                 "iNVDT": ConvertToDate(element?.invDt),
                 "vOL": {
-                    "uNIT": "CM",
+                    "uNIT": "FT",
                     "l": roundToNumber(l, 3),
                     "b": roundToNumber(b, 3),
                     "h": roundToNumber(h, 3),
-                    "cU": roundToNumber(l * b * h, 3),
+                    "cU": roundToNumber(cubwt,3),
                 },
                 "iNVAMT": ConvertToNumber(element?.invoiceAmount || 0, 2),
                 "cURR": "INR",

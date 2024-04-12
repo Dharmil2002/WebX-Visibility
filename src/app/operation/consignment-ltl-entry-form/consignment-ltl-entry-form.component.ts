@@ -1106,7 +1106,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
     data['pkgsTypeName'] = this.pkgsType.find(x => x.value == data?.pkgsType)?.name ?? '';
     data['rsktyName'] = this.riskType.find(x => x.value == data?.risk)?.name ?? '';
-    data['tranType'] = this.tranType.find(x => x.value == data?.rskty)?.name ?? '';
+    data['transModeName'] = this.tranType.find(x => x.value == data?.transMode)?.name ?? '';
     data['delivery_typeNm'] = this.deliveryType.find(x => x.value == data?.delivery_type)?.name ?? '';
     data['freightRatetypeNm'] = this.rateTypes.find(x => x.value == data?.freightRatetype)?.name ?? '';
     const otherData = { otherCharges: this.otherCharges, otherInfo: this.otherInfo }

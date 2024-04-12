@@ -1189,6 +1189,7 @@ export class DocketService {
             "eNTBY": this.storage.userName,
             "eNTDT": new Date(),
             "eNTLOC": this.storage.branch,
+            "mOD":this.storage.mode,
             "oSTS": DocketStatus.Booked,
             "oSTSN": DocketStatus[DocketStatus.Booked],
             "fSTS": DocketFinStatus.Pending,

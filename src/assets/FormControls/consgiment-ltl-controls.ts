@@ -22,7 +22,7 @@ export class ConsignmentLtl extends BaseControl {
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: true,
+                disable: false,
                 Validations: [],
                 functions: {
                     change: "DocketValidation",

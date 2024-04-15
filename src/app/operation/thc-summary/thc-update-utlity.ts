@@ -3,6 +3,7 @@ import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
 import * as StorageService from 'src/app/core/service/storage.service';
 import { StoreKeys } from "src/app/config/myconstants";
+import { timeZone } from "src/app/Utility/date/date-utils";
 //const apiService = new ApiService();
 export async function showConfirmationDialogThc(data, tripId, operationService, podDetails, vehicleNo, currentLocation, containerwise,prqNo="") {
     const confirmationResult = await Swal.fire({
@@ -29,8 +30,8 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         let sts = (eventId == "EVN0004") ? 3 : 4;
         let stsnm = (eventId == "EVN0004") ? "Delivered" : "Arrived";
         let opsts = (eventId == "EVN0004")
-            ? `Delivered at  ${StorageService.getItem(StoreKeys.Branch)} on ${moment().format('DD MMM YYYY @ HH:mm A')}`
-            : `Arrived at ${StorageService.getItem(StoreKeys.Branch)} on ${moment().format('DD MMM YYYY @ HH:mm A')}`;
+            ? `Delivered at  ${StorageService.getItem(StoreKeys.Branch)} on ${moment(new Date()).tz(timeZone).format('DD MMM YYYY @ HH:mm A')}`
+            : `Arrived at ${StorageService.getItem(StoreKeys.Branch)} on ${moment(new Date()).tz(timeZone).format('DD MMM YYYY @ HH:mm A')}`;
 
         let filter = {
             tHC: tripId,
@@ -53,12 +54,18 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "pOD": element.pod,
                 "aRVTM": element.arrivalTime,
                 "rBY": element.receiveBy,
-                "aRRDT": data.aRR.aCTDT,
-                "aRRPKG": element.pKGS,
-                "aRRWT": element.aCTWT,
-                "vEHNO": vehicleNo,
+                "aRRDT":data.aRR.aCTDT,
+                "aRRPKG":element.pKGS,
+                "aRRWT":element.aCTWT,
+                "vEHNO":vehicleNo,
                 "cLOC":StorageService.getItem(StoreKeys.Branch),
                 "cCT": currentLocation.locCity.toUpperCase(),
+                "dELPKG":sts==3?element.pKGS:0,
+                "dELWT":sts==3?element.aCTWT:0,
+                "iSDEL":sts==3?true:false,
+                "dELDT":sts==3?new Date():new Date(),
+                "dELRES":"",
+                "dELPER":StorageService.getItem(StoreKeys.UserName),
                 "tHC": ""
             }
         };
@@ -72,13 +79,13 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
                 "dKTNO": element.docNo,
                 "sFX": element.sFX || 0,
                 "cNO": element.cNO,
-                "lOC": StorageService.getItem(StoreKeys.Branch),
+                "lOC":currentLocation?.locCity||"",
                 "eVNID": eventId,
                 "eVNDES": (eventId == "EVN0004") ? "Delivered" : "Arrived",
                 "eVNDT": new Date(),
                 "eVNSRC": "THC Arrival",
                 "nLOC": null,
-                "dOCTY": "",
+                "dOCTY": "THC",
                 "dOCNO":tripId,
                 "eTA": null,
                 "sTS": sts,

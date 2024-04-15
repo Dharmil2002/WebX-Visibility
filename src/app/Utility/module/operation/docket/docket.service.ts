@@ -18,6 +18,11 @@ import { GeolocationService } from "src/app/core/service/geo-service/geolocation
     providedIn: "root",
 })
 export class DocketService {
+    paymentBaseContract={
+        "TBB": "billingParty",
+        "PAID": "consignorName",
+        "TO PAY": "consigneeName",
+    }
     vehicleDetail: any;
     RateTypeCalculation = [{
         "codeId": "RTTYP-0004",
@@ -1166,7 +1171,7 @@ export class DocketService {
             "rCM": data?.rcm || "",
             "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
-            "tOTAMT": ConvertToNumber(data?.tOTAMT || 0, 2),
+            "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
             "pKGTYN": data?.pkgsTypeName || "",
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
@@ -1184,6 +1189,7 @@ export class DocketService {
             "eNTBY": this.storage.userName,
             "eNTDT": new Date(),
             "eNTLOC": this.storage.branch,
+            "mOD":this.storage.mode,
             "oSTS": DocketStatus.Booked,
             "oSTSN": DocketStatus[DocketStatus.Booked],
             "fSTS": DocketFinStatus.Pending,
@@ -1228,7 +1234,6 @@ export class DocketService {
             }
             return invoiceJson;
         });
-
         docketField["iNVTOT"] = invoiceDetails.reduce((a, c) => a + (c.iNVAMT || 0), 0);
         let docketFin = {
             _id: `${this.storage.companyCode}-${data?.docketNumber}`,

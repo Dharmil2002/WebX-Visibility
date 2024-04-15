@@ -2,7 +2,7 @@
 <form [formGroup]="chargeForm">
     <app-form-webxpress [form]="chargeForm" [formData]="chargeControls"
       (callFunction)="functionCallHandler($event)" [FormTitle]="'Other Charges'"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+      (functionCallEmitter)="functionCallHandler($event)"  [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 '"  [showSaveAndCancelButton]="true">
     </app-form-webxpress>
   </form>
 </div>

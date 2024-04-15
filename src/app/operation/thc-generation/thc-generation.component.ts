@@ -168,6 +168,7 @@ export class ThcGenerationComponent implements OnInit {
       Title: "Arrival Time",
       class: "matcolumncenter",
       Style: "min-width:140px",
+      datatype:"datetime"
     },
     remarks: {
       Title: "Remarks",
@@ -803,7 +804,7 @@ export class ThcGenerationComponent implements OnInit {
             if (x.docNo === shipment) {
               x.remarks = remarks || "";
               x.pod = podUpload || "";
-              x.arrivalTime = arrivalTime ? formatDate(arrivalTime, 'HH:mm') : "";
+              x.arrivalTime = arrivalTime;
               x.receiveBy = receivedBy;
             }
           });
@@ -1633,6 +1634,8 @@ export class ThcGenerationComponent implements OnInit {
       mfdetailsList.sFX = res.sFX;
       mfdetailsList.cNO = res.cNO;
       mfdetailsList.oRGN = this.thcTableForm.controls['branch'].value || "";
+      mfdetailsList.fCT=this.thcTableForm.controls['fromCity'].value || "";
+      mfdetailsList.tCT=this.thcTableForm.controls['fromCity'].value || "";
       mfdetailsList.dEST = this.thcTableForm.controls['closingBranch'].value || "";
       mfdetailsList.pKGS = res.pKGS;
       mfdetailsList.wT = res.aCTWT;
@@ -2144,7 +2147,10 @@ export class ThcGenerationComponent implements OnInit {
         aRR: newARR,
         cHG: charges,
         bALAMT: this.chargeForm.get("balAmt").value,
-        tOTAMT: this.chargeForm.get("totAmt").value
+        tOTAMT: this.chargeForm.get("totAmt").value,
+        mODBY:this.storage.userName,
+        mODDT:new Date(),
+        mODLOC:this.storage.branch
       };
       const data = this.thcTableForm.getRawValue();
       const res = await showConfirmationDialogThc(

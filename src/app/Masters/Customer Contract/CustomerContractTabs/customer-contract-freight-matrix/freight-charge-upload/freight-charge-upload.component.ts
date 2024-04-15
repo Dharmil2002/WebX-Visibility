@@ -112,7 +112,7 @@ export class FreightChargeUploadComponent implements OnInit {
         );
 
         this.transportMode = await productdetailFromApi(this.masterService);
-        this.arealist = this.objlocationEntitySearch.GetMergedData(
+        this.arealist = await this.objlocationEntitySearch.GetMergedData(
           pincodeList,
           zonelist,
           "ST"

@@ -502,7 +502,9 @@ export class CustomerContractServiceSelectionComponent
       this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
-        "ST"
+        "ST",
+        this.masterService,
+        true
       );
       this.SetDefaultProductsData();
     } catch (error) {
@@ -1075,7 +1077,7 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.value;
     contractDetails["rTYP"] = this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.value);
     (contractDetails["mODDT"] = new Date()),
-    (contractDetails["mODBY"] = this.storage.userName);
+      (contractDetails["mODBY"] = this.storage.userName);
     contractDetails["mODLOC"] = this.storage.branch;
 
     const reqBody = {

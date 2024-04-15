@@ -207,7 +207,9 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
-        "ST"
+        "ST",
+        this.masterService,
+        true
       );
     } catch (error) {
       // Handle any errors that occurred during the request

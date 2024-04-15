@@ -29,7 +29,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 interface CurrentAccessListType {
   productAccess: string[];
 }
-const fieldsToSearch = ["PIN", "CT", "STNM", "ZN"];
+const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "AR"];
 @Component({
   selector: "app-customer-contract-freight-matrix",
   templateUrl: "./customer-contract-freight-matrix.component.html",
@@ -344,10 +344,12 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       this.PinCodeList = await firstValueFrom(
         this.masterService.masterPost("generic/get", pincodeReqBody)
       );
-      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
+      this.PinCodeList.data = await this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
-        "ST"
+        "ST",
+        this.masterService,
+        true
       );
     } catch (error) {
       // Handle any errors that occurred during the request

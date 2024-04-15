@@ -804,7 +804,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         'height': invoice.height,
         'cubWT': invoice?.cubWT||"",
         'noOfPackage': invoice.noOfPackage,
-        'materialName': invoice.materialName?.name || "",
+        'materialName': invoice.materialName?.name||invoice?.materialName||"",
         'actualWeight': invoice.actualWeight,
         'chargedWeight': invoice.chargedWeight,
         "invoiceAmount": invoice.invoiceAmount,

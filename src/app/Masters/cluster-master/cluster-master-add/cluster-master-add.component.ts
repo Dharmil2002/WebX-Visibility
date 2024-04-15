@@ -9,6 +9,8 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 
 @Component({
   selector: "app-cluster-master-add",
@@ -36,6 +38,8 @@ export class ClusterMasterAddComponent implements OnInit {
   newClusterCode: string;
   data: any;
   submit = "Save";
+  clusterTypeStatus: any;
+  clusterType: any;
   //#endregion
 
   ngOnInit() {
@@ -48,6 +52,7 @@ export class ClusterMasterAddComponent implements OnInit {
     private masterService: MasterService,
     private filter: FilterUtils,
     private storage: StorageService,
+    private objGeneralService: GeneralService
 
   ) {
     this.companyCode= this.storage.companyCode;
@@ -86,6 +91,7 @@ export class ClusterMasterAddComponent implements OnInit {
     this.initializeFormControl();
   }
   initializeFormControl() {
+    this.clusterTabledata.clusterType = {name:this.clusterTabledata['cLSTYPNM'],value:this.clusterTabledata['cLSTYP']};
     this.clusterFormControls = new ClusterControl(
       this.clusterTabledata,
       this.isUpdate
@@ -97,15 +103,37 @@ export class ClusterMasterAddComponent implements OnInit {
         this.pincodeList = data.name;
         this.pincodeStatus = data.additionalData.showNameAndValue;
       }
+      if (data.name === "clusterType") {
+        // Set Pincode category-related variables
+        this.clusterType = data.name;
+        this.clusterTypeStatus = data.additionalData.showNameAndValue;
+      }
     });
     this.clusterTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.getdata();
+
   }
   cancel() {
     this.Route.navigateByUrl("/Masters/ClusterMaster/ClusterMasterList");
   }
+
+  //#region
+  async getdata(){
+    const clusterTypes = await this.objGeneralService.getGeneralMasterData("CLSTYP");
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.clusterTableForm,
+      clusterTypes,
+      this.clusterType,
+      this.clusterTypeStatus
+    );
+  }
+  //#endregion
+
   //#region Pincode Dropdown
   async getPincodeData() {
     const pincodeValue = this.clusterTableForm.controls["pincode"].value;
+
 
     if (pincodeValue !== null && pincodeValue !== "") {
       let req = {
@@ -191,9 +219,12 @@ export class ClusterMasterAddComponent implements OnInit {
     if (this.isUpdate) {
       let id = this.clusterTableForm.value._id;
       this.clusterTableForm.removeControl("_id");
+      data['cLSTYP']= this.clusterTableForm.value.clusterType.value,
+      data['cLSTYPNM']= this.clusterTableForm.value.clusterType.name,
       data["mODDT"] = new Date();
       data['mODLOC'] = this.storage.branch;
       data['mODBY:'] = this.storage.userName;
+      delete data["clusterType"];
       let req = {
         companyCode: this.companyCode,
         collectionName: "cluster_detail",
@@ -236,6 +267,8 @@ export class ClusterMasterAddComponent implements OnInit {
           clusterCode: this.newClusterCode,
           clusterName: this.clusterTableForm.value.clusterName,
           pincode: this.clusterTableForm.value.pincode,
+          cLSTYP: this.clusterTableForm.value.clusterType.value,
+          cLSTYPNM: this.clusterTableForm.value.clusterType.name,
           activeFlag: this.clusterTableForm.value.activeFlag,
           _id: this.newClusterCode,
           companyCode: this.companyCode,

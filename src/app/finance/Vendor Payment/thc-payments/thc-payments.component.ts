@@ -48,15 +48,20 @@ export class ThcPaymentsComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:30%",
     },
+    Mode: {
+      Title: "Mode",
+      class: "matcolumncenter",
+      Style: "min-width:10%",
+    },
     THCamount: {
       Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
     AdvancePending: {
       Title: "Advance Pending ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
       type: "Link",
       functionName: "AdvancePendingFunction"
     },
@@ -78,7 +83,7 @@ export class ThcPaymentsComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "Vendor", "THCamount"];
+  staticField = ["SrNo", "Vendor", "Mode", "THCamount"];
   companyCode = 0;
   isTableLode = true;
   constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService, private storageService: StorageService) {

@@ -6,7 +6,7 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ContractNonFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/NonFreightMatrix-control";
-import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { StorageService } from "src/app/core/service/storage.service";
 import { firstValueFrom, map, switchMap } from "rxjs";
@@ -169,7 +169,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       this.masterService.masterPost("generic/get", req)
     );
     const SelectedData = res.data[0].rTYP;
-    const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+    const RatData = await GetGeneralMasterData(this.masterService, "RTTYP");
     const rateTypedata = SelectedData.map((x, index) => {
       return RatData.find((t) => t.value == x);
     });

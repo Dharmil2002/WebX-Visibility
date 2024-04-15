@@ -326,6 +326,7 @@ export class BalancePaymentComponent implements OnInit {
       StartDate.setDate(StartDate.getDate() - 30);
       Filters = {
         PaymentType: "Balance",
+        Mode: this.BillPaymentData?.Mode,
         StartDate: StartDate,
         EndDate: new Date(),
         VendorInfo: {
@@ -336,6 +337,7 @@ export class BalancePaymentComponent implements OnInit {
     } else {
       Filters = {
         PaymentType: "Balance",
+        Mode: this.BillPaymentData?.Mode,
         StartDate: this.BillPaymentData?.StartDate,
         EndDate: this.BillPaymentData?.EndDate,
         VendorInfo: this.BillPaymentData?.VendorInfo,
@@ -364,7 +366,8 @@ export class BalancePaymentComponent implements OnInit {
     if (this.IsModifyAction) {
       const GetBillData = await GetTHCListBasdedOnBillNumberFromApi(
         this.masterService,
-        this.BillPaymentData?.billNo
+        this.BillPaymentData?.billNo,
+        this.BillPaymentData?.Mode || 'FTL'
       );
       const MappedGetBillData = GetBillData.map((x, index) => {
         return {
@@ -602,6 +605,7 @@ export class BalancePaymentComponent implements OnInit {
       BillPaymentData: this.BillPaymentData,
       THCData: event?.data,
       Type: "balance",
+      Mode: this.BillPaymentData?.Mode,
     };
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
       data: RequestBody,
@@ -833,6 +837,7 @@ export class BalancePaymentComponent implements OnInit {
               cID: this.companyCode,
               docNo: IsUpdate ? this.BillPaymentData?.billNo : "",
               bDT: new Date(),
+              tMOD: this.BillPaymentData?.Mode || "",
               lOC: this.VendorDetails?.vendorCity,
               sT: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
               gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.VGSTNumber.value,
@@ -886,7 +891,7 @@ export class BalancePaymentComponent implements OnInit {
                 bILLNO: "",
                 tRIPNO: x.THC,
                 tTYP: "THC",
-                tMOD: "FTL",
+                tMOD: this.BillPaymentData?.Mode,
                 aDVAMT: x.Advance,
                 bALAMT: x.BalancePending,
                 tHCAMT: x.THCamount,

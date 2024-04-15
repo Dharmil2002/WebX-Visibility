@@ -12,7 +12,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ContractBasicInformationControl } from "src/assets/FormControls/CustomerContractControls/BasicInformation-control";
-import { GetContractBasedOnCustomerAndProductListFromApi, PayBasisdetailFromApi, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetContractBasedOnCustomerAndProductListFromApi, GetGeneralMasterData, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
 import { StorageService } from "src/app/core/service/storage.service";
@@ -153,7 +153,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     );
     this.ProductsForm.get("Product").setValue(this.productdetailList.find(item => item.value == this.contractData.pID))
 
-    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService, "PAYTYP")
+    const PayBasisdetailFromAPI = await GetGeneralMasterData(this.masterService, "PAYTYP")
     this.filter.Filter(
       this.jsonControlArrayProductsForm,
       this.ProductsForm,

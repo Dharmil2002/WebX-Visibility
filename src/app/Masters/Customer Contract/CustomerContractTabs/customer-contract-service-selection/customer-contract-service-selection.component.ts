@@ -22,7 +22,7 @@ import { SessionService } from "src/app/core/service/session.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { ContractServiceSelectionControl } from "src/assets/FormControls/CustomerContractControls/ServiceSelection-control";
 import Swal from "sweetalert2";
-import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 
 interface CurrentAccessListType {
@@ -353,7 +353,7 @@ export class CustomerContractServiceSelectionComponent
     this.getAllMastersData();
   }
   async BindDataFromAPI() {
-    this.LoadtypedetailFromAPI = await PayBasisdetailFromApi(
+    this.LoadtypedetailFromAPI = await GetGeneralMasterData(
       this.masterService,
       "LT"
     );
@@ -364,7 +364,7 @@ export class CustomerContractServiceSelectionComponent
       "loadType",
       false
     );
-    this.RatetypedetailFromAPI = await PayBasisdetailFromApi(
+    this.RatetypedetailFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );
@@ -375,7 +375,7 @@ export class CustomerContractServiceSelectionComponent
       "rateTypeDetails",
       false
     );
-    this.VolumetricUoMFromAPI = await PayBasisdetailFromApi(
+    this.VolumetricUoMFromAPI = await GetGeneralMasterData(
       this.masterService,
       "VolumetricUoM"
     );
@@ -386,7 +386,7 @@ export class CustomerContractServiceSelectionComponent
       "VolumetricUoM",
       false
     );
-    this.VolumetricappliedFromAPI = await PayBasisdetailFromApi(
+    this.VolumetricappliedFromAPI = await GetGeneralMasterData(
       this.masterService,
       "VA"
     );
@@ -397,7 +397,7 @@ export class CustomerContractServiceSelectionComponent
       "Volumetricapplied",
       false
     );
-    this.VolumtericcalculationFromAPI = await PayBasisdetailFromApi(
+    this.VolumtericcalculationFromAPI = await GetGeneralMasterData(
       this.masterService,
       "VMC"
     );
@@ -408,7 +408,7 @@ export class CustomerContractServiceSelectionComponent
       "Volumtericcalculation",
       false
     );
-    this.CalculateYieldonFromAPI = await PayBasisdetailFromApi(
+    this.CalculateYieldonFromAPI = await GetGeneralMasterData(
       this.masterService,
       "CYO"
     );
@@ -419,11 +419,11 @@ export class CustomerContractServiceSelectionComponent
       "CalculateYieldon",
       false
     );
-    this.CODDODRatetypeFromAPI = await PayBasisdetailFromApi(
+    this.CODDODRatetypeFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );
-    this.DemurrageRatetypeFromAPI = await PayBasisdetailFromApi(
+    this.DemurrageRatetypeFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );
@@ -434,7 +434,7 @@ export class CustomerContractServiceSelectionComponent
       "DRatetype",
       false
     );
-    this.YieldTypeFromAPI = await PayBasisdetailFromApi(
+    this.YieldTypeFromAPI = await GetGeneralMasterData(
       this.masterService,
       "YTYP"
     );
@@ -445,7 +445,7 @@ export class CustomerContractServiceSelectionComponent
       "Yieldtype",
       false
     );
-    this.FuelSurchargeSelectionFromAPI = await PayBasisdetailFromApi(
+    this.FuelSurchargeSelectionFromAPI = await GetGeneralMasterData(
       this.masterService,
       "FTYP"
     );
@@ -456,7 +456,7 @@ export class CustomerContractServiceSelectionComponent
       "FuelType",
       false
     );
-    this.FuelSurchargeFromAPI = await PayBasisdetailFromApi(
+    this.FuelSurchargeFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );
@@ -467,7 +467,7 @@ export class CustomerContractServiceSelectionComponent
       "FRateType",
       false
     );
-    this.InsuranceFromAPI = await PayBasisdetailFromApi(
+    this.InsuranceFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );
@@ -1228,7 +1228,7 @@ export class CustomerContractServiceSelectionComponent
   }
 
   async SetDefaultInsuranceCarrierRiskSelectionData() {
-    const InsuranceFromAPI = await PayBasisdetailFromApi(
+    const InsuranceFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );
@@ -1263,11 +1263,11 @@ export class CustomerContractServiceSelectionComponent
 
   async SetDefaultFuelSurchargeData() {
     this.FtableLoad = true;
-    const FuelSurchargeSelectionFromAPI = await PayBasisdetailFromApi(
+    const FuelSurchargeSelectionFromAPI = await GetGeneralMasterData(
       this.masterService,
       "FTYP"
     );
-    const FuelSurchargeFromAPI = await PayBasisdetailFromApi(
+    const FuelSurchargeFromAPI = await GetGeneralMasterData(
       this.masterService,
       "RTTYP"
     );

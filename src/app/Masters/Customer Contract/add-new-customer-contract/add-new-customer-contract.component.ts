@@ -6,7 +6,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
 import { SessionService } from 'src/app/core/service/session.service';
 import { ContractBasicInformationControl } from 'src/assets/FormControls/CustomerContractControls/BasicInformation-control';
-import { GetContractBasedOnCustomerAndProductListFromApi, PayBasisdetailFromApi, customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
+import { GetContractBasedOnCustomerAndProductListFromApi, GetGeneralMasterData, customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
@@ -128,7 +128,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
       "Product",
       false
     );
-    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService, "PAYTYP")
+    const PayBasisdetailFromAPI = await GetGeneralMasterData(this.masterService, "PAYTYP")
     this.filter.Filter(
       this.jsonControlArrayContractForm,
       this.ContractForm,

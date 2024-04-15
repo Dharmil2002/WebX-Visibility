@@ -3,7 +3,7 @@ import * as StorageService from 'src/app/core/service/storage.service';
 
 export async function manualvoucharDetail(masterService) {
     const req = {
-        companyCode: StorageService.getItem('companyCode'),
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "voucher_trans",
         filter: { bRC: StorageService.getItem(StoreKeys.Branch) }
     }

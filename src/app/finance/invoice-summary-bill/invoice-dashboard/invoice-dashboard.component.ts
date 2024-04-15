@@ -47,12 +47,14 @@ export class InvoiceDashboardComponent implements OnInit {
 
       // Fetch data from the service
       const count = await this.objInvoiceCountService.getDashboardData();
+      const ltlCount = await this.objInvoiceCountService.getDashboardDataForLTL();
 
       // Fetch count of shipments without POD
       //const emptyPodCount = await this.objInvoiceCountService.getPengPodCount(podFilter);    
 
       // Extract relevant data
       const dashboardCounts = count[0]?.dashboardCounts || {};
+      const dashboardltlCounts = ltlCount[0]?.dashboardCounts || {};
       const custBillHeaders = dashboardCounts.cust_bill_headers || [{}];
 
       // Destructure data for better readability
@@ -62,6 +64,12 @@ export class InvoiceDashboardComponent implements OnInit {
         approvedBillCount
       } = dashboardCounts;
 
+      const {
+        Unbilledcountltl,
+        Unbilled_aMTltl,
+        approvedBillCountltl
+      } = dashboardltlCounts;
+
       this.Transactions = Transactions;
       this.TransactionsMore = TransactionsMore;
 
@@ -69,16 +77,16 @@ export class InvoiceDashboardComponent implements OnInit {
       this.Transactions.Items.forEach(item => {
         switch (item.title) {
           case "Unbilled Shipments":
-            item['count'] = Unbilledcount || '0';
+            item['count'] = Unbilledcount + Unbilledcountltl || '0';
             break;
           case "Unbilled Amount":
-            item['count'] = Unbilled_aMT || '0.00';
+            item['count'] = Unbilled_aMT + Unbilled_aMTltl || '0.00';
             break;
           case "Approved For Billing":
-            item['count'] = approvedBillCount || '0';
+            item['count'] = approvedBillCount + approvedBillCountltl || '0';
             break;
           case "Pending PODs":
-            item['count'] = approvedBillCount || '0';
+            item['count'] = approvedBillCount + approvedBillCountltl || '0';
             break;
         }
       });

@@ -1,6 +1,7 @@
-<ng-container *ngIf="!tableload">
-  <ng-container *ngFor="let data of [Transactions, TransactionsMore]">
-    <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
-      [boxData]="data"></app-generic-card-with-menu-actions>
+<div class="paddingdiv"><ng-container *ngIf="!tableload">
+    <ng-container *ngFor="let data of [Transactions, TransactionsMore]">
+      <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
+        [boxData]="data"></app-generic-card-with-menu-actions>
+    </ng-container>
   </ng-container>
-</ng-container>
+</div>

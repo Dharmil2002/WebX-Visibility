@@ -29,7 +29,7 @@ export class JwtInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
 
     const excludedPaths = ['/auth/login', '/auth/refresh-tokens'];
-    const contentType = request.headers.get('Content-Type')?.toLowerCase();
+    const contentType = request.headers.get('Content-Type')?.toLowerCase()?.split(';');
 
     if (environment.production && ( contentType?.includes('application/json') || !contentType ) &&  request.body) {      
         request = request.clone({
@@ -67,8 +67,8 @@ export class JwtInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       map(event => {
-        if (event instanceof HttpResponse && event.headers.get('decrypt')) {
-          if(event.body && event.body.data) {
+        if (event instanceof HttpResponse) {         
+          if(event.body && event.body.encrypted && event.body.data) {
             const decryptedData = this.encryptionService.decrypt(event.body.data);
             const jsonData = JSON.parse(decryptedData);
             return event.clone({ body: jsonData });
@@ -86,6 +86,7 @@ export class JwtInterceptor implements HttpInterceptor {
       })
     );
   }
+
 
   private addAuthorizationHeader(
     request: HttpRequest<any>

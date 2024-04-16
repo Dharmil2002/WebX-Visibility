@@ -54,6 +54,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       Title: "GRN No.",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      sticky: true
     },
     payBasis: {
       Title: "PayBasis",
@@ -80,17 +81,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10px",
       type: "Link",
-      functionName: "getOtherCharges"
+      functionName: "addDetails"
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
       Style: "min-width:5px",
+      stickyEnd: true,
     },
   };
 
   staticField = [
-    "OtherDly",
     "totalAmount",
     "rateDifference",
     "newSubTotal",
@@ -263,71 +264,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   //#region to Add a new item to the table or edit
-  // addDetails(event) {
-  //   const request = {
-  //     List: this.tableData,
-  //     Details: event,
-  //   }
-  //   this.tableload = true;
-  //   const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
-  //     data: request,
-  //     width: "100%",
-  //     disableClose: true,
-  //     position: {
-  //       top: "20px",
-  //     },
-  //   });
-  //   dialogRef.afterClosed().subscribe(async (data) => {
-  //     console.log(data);
-  //     const delayDuration = 1000;
-  //     // Create a promise that resolves after the specified delay
-  //     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  //     // Use async/await to introduce the delay
-  //     await delay(delayDuration);
-  //     // this.otherCharges = data;
-  //     // this.calucatedCharges();
-  //     const json = {
-  //       id: data.id,
-  //       consignmentNoteNumber: data.consignmentNoteNumber,
-  //       OtherDly: this.totalMRamt.toFixed(2),
-  //       subTotal: this.filteredDocket[0].tOTAMT,
-  //       newSubTotal: parseFloat(data.newSubTotal) || 0,
-  //       rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
-  //       totalAmount: (parseFloat(data.Document || 0) +
-  //         + parseFloat(data.Insurance || 0)
-  //         + parseFloat(data["Green Tax"] || 0)
-  //         + parseFloat(data.Demurrage || 0)
-  //         + parseFloat(data.GST || 0)
-  //         + parseFloat(data.Unloading || 0)
-  //         + parseFloat(data.Freight || 0)
-  //         + parseFloat(data.Loading || 0)) - parseFloat(data.Discount || 0),
-  //       payBasis: data.payBasis,
-  //       actions: ['Edit']
-  //     };
-  //     const chargeMapping = this.otherCharges.chargeData.map((x) => { return { name: x.cHGNM, operation: x.oPS, aMT: x.aMT } });
-  //     this.totalMRamt = chargeMapping.reduce((acc, curr) => {
-  //       if (curr.operation === "+") {
-  //         return acc + parseFloat(curr.aMT);
-  //       } else if (curr.operation === "-") {
-  //         return acc - parseFloat(curr.aMT);
-  //       } else {
-  //         return acc; // In case of an unknown operation
-  //       }
-  //     }, 0);
-  //     const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
-  //     totalMrItem ? totalMrItem.count = this.totalMRamt.toFixed(2) : 0
-  //     console.log(this.totalMRamt);
-  //     console.log(json);
-  //     this.tableData = this.tableData.filter(item => item.id !== data.id);
-  //     this.tableData.unshift(json);
-  //     this.tableload = false;
-
-
-  //   });
-  // }
   addDetails(event) {
+    console.log(event);
+
     const request = {
-      List: this.tableData,
+      charges: this.otherCharges,
       Details: event,
     };
 
@@ -352,23 +293,23 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         const newData = {
           id: data.id,
           consignmentNoteNumber: data.consignmentNoteNumber,
-          OtherDly: this.calculateTotalAmount(data.chargeData),  // Calculate total amount based on charges
           subTotal: this.filteredDocket[0].tOTAMT,
           newSubTotal: parseFloat(data.newSubTotal) || 0,
           rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
+          OtherDly: this.calculateTotalAmount(data.chargeData),  // Calculate total amount based on charges
           totalAmount: this.calculateTotalAmount(data.chargeData),
           payBasis: data.payBasis,
           actions: ['Edit']
         };
+        this.tableData = this.tableData.filter(item => item.id !== data.id);
+        this.tableData.unshift(newData);
         let totalMr = 0;
         this.tableData.forEach(item => {
           totalMr += item.totalAmount;
         });
         const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
-        totalMrItem ? totalMrItem.count = this.totalMRamt.toFixed(2) : 0
-        console.log(this.totalMRamt);
-        this.tableData = this.tableData.filter(item => item.id !== data.id);
-        this.tableData.unshift(newData);
+        totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
+        console.log(totalMr);
         console.log(this.tableData);
 
         this.tableload = false;
@@ -1038,10 +979,4 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   }
   // #endregion
-  calucatedCharges() {
-
-
-
-    //this.freightForm.controls['otherAmount'].setValue(total);
-  }
 }

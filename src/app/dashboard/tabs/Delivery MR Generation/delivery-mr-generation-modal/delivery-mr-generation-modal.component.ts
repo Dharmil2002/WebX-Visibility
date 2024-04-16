@@ -25,15 +25,22 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
   allJson: any[];
   chargeList: any;
   chargeControls: InvoiceModel[];
+  chargeData: any;
+  isEdit: boolean;
   constructor(private dialogRef: MatDialogRef<DeliveryMrGenerationModalComponent>,
     private fb: UntypedFormBuilder,
     @Inject(MAT_DIALOG_DATA)
     private objResult: any,
-    private thcService: ThcService) { }
+    private thcService: ThcService) {
+    this.chargeData = this.objResult.charges;
+    this.isEdit = this.objResult.charges ? true : false;
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
     console.log(this.objResult);
+
+    console.log(this.chargeData, this.isEdit);
   }
   //#region to initialize form control
   async initializeFormControl() {
@@ -65,9 +72,6 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     formData.payBasis = this.objResult.Details.data.payBasis;
     formData.subTotal = this.objResult.Details.data.subTotal;
     clearValidatorsAndValidate(this.MrGenerationForm);
-
-    console.log(formData);
-    debugger;
 
     let chargeData = [];
 
@@ -106,9 +110,9 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
         "cHAPP": { 'D$eq': 'DeliveryMR' },
         'isActive': { 'D$eq': true }
       });
-    console.log(this.chargeList);
+    // console.log(this.chargeList);
 
-    if (this.chargeList && this.chargeList.length > 0) {
+    if (!this.isEdit && this.chargeList && this.chargeList.length > 0) {
       const invoiceList: InvoiceModel[] = [];
 
       this.chargeList.forEach((element, index) => {
@@ -133,9 +137,6 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
               metaData: element.aDD_DEDU,
               showNameAndValue: element.iSREQ
             },
-            functions: {
-              onChange: 'calucatedCharges',
-            },
           };
 
           invoiceList.push(invoice);
@@ -148,9 +149,55 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
       }));
       this.chargeControls = enable.sort((a, b) => a.name.localeCompare(b.name));
       this.allJson = [...this.jsonControlsEdit, ...this.chargeControls]
+      this.MrGenerationForm = formGroupBuilder(this.fb, [this.allJson]);
 
+    } else {
+      console.log(this.chargeData);
+
+      if (this.chargeData && this.chargeData.length > 0 && this.isEdit) {
+        const invoiceList = [];
+        this.chargeData.chargeData.
+          forEach((element, index) => {
+            if (element) {
+              const invoice: InvoiceModel = {
+                id: index + 1,
+                name: element.cHGID || '',
+                label: `${element.cHGNM}(${element.oPS})`,
+                placeholder: element.cHGNM || '',
+                type: 'text',
+                value: `${Math.abs(element.aMT)}`,
+                filterOptions: '',
+                displaywith: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: [{
+                  name: "pattern",
+                  message: "Please Enter only positive numbers with up to two decimal places",
+                  pattern: '^\\d+(\\.\\d{1,2})?$'
+                }],
+                additionalData: {
+                  showNameAndValue: element.iSREQ,
+                  metaData: element.oPS
+                },
+
+              };
+
+              invoiceList.push(invoice);
+            }
+          });
+
+        this.chargeControls = invoiceList;
+        const enable: InvoiceModel[] = invoiceList.map((x) => ({
+          ...x,
+          name: `${x.name}`,
+          disable: false
+        }));
+        console.log(this.jsonControlsEdit);
+
+        this.chargeControls = enable.sort((a, b) => a.name.localeCompare(b.name));
+        this.allJson = [...this.jsonControlsEdit, ...this.chargeControls]
+      }
     }
-    this.MrGenerationForm = formGroupBuilder(this.fb, [this.allJson]);
     this.isChagesValid = true;
 
   }

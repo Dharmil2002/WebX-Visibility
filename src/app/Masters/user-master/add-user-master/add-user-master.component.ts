@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
@@ -10,6 +10,9 @@ import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { VendorService } from "src/app/Utility/module/masters/vendor-master/vendor.service";
+import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 
 @Component({
   selector: "app-add-user-master",
@@ -66,6 +69,8 @@ export class AddUserMasterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private storage: StorageService,
+    private customerService: CustomerService,
+    private vendorService: VendorService
 
   ) {
     this.companyCode = this.storage.companyCode;
@@ -143,6 +148,7 @@ export class AddUserMasterComponent implements OnInit {
     this.jsonControlUserArray = this.UserFormControls.getFormControlsUser();
     // Build the form group using formGroupBuilder function
     this.userTableForm = formGroupBuilder(this.fb, [this.jsonControlUserArray]);
+    this.onUserTypeChange();
   }
 
   //JSON data call for Dropdown
@@ -158,7 +164,7 @@ export class AddUserMasterComponent implements OnInit {
         );
         this.userTableForm.controls.country.setValue(updateCountry);
 
-        
+
       }
       const filterParams = [
         [
@@ -219,7 +225,7 @@ export class AddUserMasterComponent implements OnInit {
       const generalReqBody = {
         companyCode: this.companyCode,
         collectionName: "General_master",
-        filter: { codeType: { "D$in": ["usertyp","USERROLE", "DIVIS"] } }
+        filter: { codeType: { "D$in": ["usertyp", "USERROLE", "DIVIS"] } }
       };
 
       const locationsResponse = await firstValueFrom(this.masterService.masterPost("generic/get", locationReq));
@@ -302,33 +308,86 @@ export class AddUserMasterComponent implements OnInit {
         this.userTableForm.controls["userType"].setValue(userType);
 
         // Patches the Div control value of UserTableForm with filter
-        if( this.userTable.multiDivisionAccess.length>0){
-        this.userTableForm.controls["division"].patchValue(
-          this.divisionList.filter((element) =>
-            this.userTable.multiDivisionAccess.includes(element.name)
-          )
-        );
+        if (this.userTable.multiDivisionAccess.length > 0) {
+          this.userTableForm.controls["division"].patchValue(
+            this.divisionList.filter((element) =>
+              this.userTable.multiDivisionAccess.includes(element.name)
+            )
+          );
         }
         const userRole = userRoleList.find(
           (x) => x.name === this.userTable.role
         );
         this.userTableForm.controls["role"].setValue(userRole);
-        if( this.userTable.multiLocation.length>0){
-        this.userTableForm.controls["userLocationscontrolHandler"].patchValue(
-          locations.filter((element) =>
-            this.userTable.multiLocation.includes(element.value)
-          )
-        );
+        if (this.userTable.multiLocation.length > 0) {
+          this.userTableForm.controls["userLocationscontrolHandler"].patchValue(
+            locations.filter((element) =>
+              this.userTable.multiLocation.includes(element.value)
+            )
+          );
         }
       }
     } catch (error) {
       console.error("Error:", error);
     }
   }
-
+  onUserTypeChange() {
+    this.userTableForm.controls["name"].setValue("");
+    this.userTableForm.controls["name"].clearValidators();
+    this.userTableForm.controls["name"].updateValueAndValidity();
+    const userType = this.userTableForm.controls["userType"].value?.name || "";
+    switch (userType) {
+      case "Employee":
+        this.jsonControlUserArray.forEach(element => {
+          if (element.name == "name") {
+            element.type = "text";
+          }
+        });
+        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9]{0,25}$")]);
+        break;
+      case "Customer":
+      case "Business associate":
+      case "Vendor":
+        this.jsonControlUserArray.forEach(element => {
+          if (element.name == "name") {
+            element.type = "dropdown";
+          }
+        });
+        this.userTableForm.controls["name"].setValidators([autocompleteObjectValidator()]);
+        break;
+      default:
+        this.jsonControlUserArray.forEach(element => {
+          if (element.name == "name") {
+            element.type = "text";
+          }
+        });
+        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9]{0,25}$")]);
+        break;
+    }
+    this.userTableForm.controls["name"].updateValueAndValidity();
+    this.getDropValue();
+  }
+  async getDropValue() {
+    const userType = this.userTableForm.controls["userType"].value?.name || "";
+    this.filter.Filter(
+      this.jsonControlUserArray,
+      this.userTableForm,
+      [],
+      'name',
+      true
+    );
+    switch (userType) {
+      case "Customer":
+        await this.customerService.getCustomerForAutoComplete(this.userTableForm, this.jsonControlUserArray, "name", true);
+        break;
+      case "Vendor":
+      case "Business associate":
+        await this.vendorService.getVendorForAutoComplete(this.userTableForm, this.jsonControlUserArray, "name", true);
+        break;
+    }
+  }
   async save() {
     this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
-    this.userTableForm.value.userType ? this.userTableForm.controls["userType"].setValue(this.userTableForm.value.userType.name) : '';
     this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
     this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
     //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
@@ -354,15 +413,22 @@ export class AddUserMasterComponent implements OnInit {
     controlsToRemove.forEach((controlName) => {
       this.userTableForm.removeControl(controlName);
     });
-    const lastUser = await this.getListId();    
-    const lastUserCode =  lastUser?.userId || "USR0000";
-    
+    const lastUser = await this.getListId();
+    const lastUserCode = lastUser?.userId || "USR0000";
+
     if (this.isUpdate) {
       this.newUserCode = this.userTable.userId;
     } else {
-      this.newUserCode = nextKeyCode(lastUserCode);
+      if (['Customer','Vendor','Business associate'].includes(this.userTableForm.value.userType.name)) {
+        this.newUserCode = this.userTableForm.controls["name"].value?.value || "";
+        this.userTableForm.controls["name"].setValue(this.userTableForm.value.name?.name||"");
+      }
+      else {
+        this.newUserCode = nextKeyCode(lastUserCode);
+      }
     }
     //generate unique userId
+    this.userTableForm.value.userType ? this.userTableForm.controls["userType"].setValue(this.userTableForm.value.userType.name) : '';
     this.userTableForm.controls["userId"].setValue(this.newUserCode);
     // Clear any errors in the form controls
     Object.values(this.userTableForm.controls).forEach((control) =>
@@ -461,7 +527,7 @@ export class AddUserMasterComponent implements OnInit {
     }
   }
   //#region to check if a value already exists in user list
-  async checkValueExists(fieldName, errorMessage, companyCode = undefined, caseSensitive= true) {
+  async checkValueExists(fieldName, errorMessage, companyCode = undefined, caseSensitive = true) {
     try {
       // Get the field value from the form controls
       const fieldValue = this.userTableForm.controls[fieldName].value.toLowerCase();
@@ -513,16 +579,16 @@ export class AddUserMasterComponent implements OnInit {
     // console.log("Toggle value :", event);
   }
   //#region to get user List
-  async getUserList(field= undefined, value= undefined, companyCode= undefined, caseSensitive= true) {
+  async getUserList(field = undefined, value = undefined, companyCode = undefined, caseSensitive = true) {
     try {
       let query = {};
-      if(companyCode) {
+      if (companyCode) {
         query["companyCode"] = companyCode;
       }
-      if(field && value) {
-        if(caseSensitive)
+      if (field && value) {
+        if (caseSensitive)
           query[field] = value;
-        else 
+        else
           query[field] = { "D$regex": `^${value}$`, "D$options": "i" };
       }
 

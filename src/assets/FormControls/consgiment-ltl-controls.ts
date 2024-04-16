@@ -10,22 +10,22 @@ export class ConsignmentLtl extends BaseControl {
     private freightDetails:FormControls[];
     private otherCharges:FormControls[];
     constructor(public generalService: GeneralService) {
-        super(generalService, "LTL", ["Consignment"]);
+        super(generalService, "LTL", ["ConsignmentLtl"]);
         this.docketFields = [
             {
                 name: "docketNumber",
                 label: `${DocCalledAs.Docket} No`,
                 placeholder: `${DocCalledAs.Docket} No`,
                 type: "text",
-                value: "Computerized",
+                value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: true,
+                disable: false,
                 Validations: [],
                 functions: {
-                    change: "DocketValidation",
+                    onChange: "docketValidation",
                 },
                 additionalData:{
                     metaData: "Basic"
@@ -45,7 +45,7 @@ export class ConsignmentLtl extends BaseControl {
                 Validations: [
                     {
                         name: "required",
-                        message: "C Note Date is required",
+                        message: `${DocCalledAs.Docket} Date required`,
                     },
                 ],
                 functions: {

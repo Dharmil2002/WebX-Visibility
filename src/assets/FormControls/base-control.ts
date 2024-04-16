@@ -37,7 +37,8 @@ export class BaseControl {
     }
 
     configureControl(field: any) { 
-        var c = this[field.FormControl].find((x) => x.name === field.Field);
+      if(field.Field){
+        let c = this[field.FormControl].filter((x)=>x.name).find((x) => x.name === field.Field);
         if(!c)
           return;
     
@@ -49,7 +50,8 @@ export class BaseControl {
         if(field.IsSystemGenerated) {
           c["value"] = "Computerized";
         }
-        if(field.Required === true) {      
+        if(field.Required === true) { 
+          console.log()     
           var r = c.Validations.find(x=>x.name=="required");
           if(!r) {
             c.Validations.push({name:"required",message:`${field.Caption} is required.` });
@@ -76,4 +78,5 @@ export class BaseControl {
           }
         }
       }
+    }
 }

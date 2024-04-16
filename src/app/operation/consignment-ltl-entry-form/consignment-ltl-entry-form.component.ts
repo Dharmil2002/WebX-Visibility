@@ -29,6 +29,10 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { ConvertToNumber, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
+import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
+import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
+import { StoreKeys } from 'src/app/config/myconstants';
+import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -78,6 +82,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   isUpdate: boolean = false;
   addNewTitle: string = "Other Freight Charges";
   columnInvoice: any;
+  dcrDetail={};
   staticFieldInvoice = [
     'ewayBillNo',
     'expiryDate',
@@ -129,6 +134,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   isSubmit: boolean = false;
   matrials: AutoComplete[];
   unitsName: string="CM";
+  rules: any[]=[];
+  alpaNumber: boolean;
+  sequence:boolean;
+  isBrachCode:boolean;
+  fyear:boolean;
+  length:number=0;
+  mseq: boolean;
+  lastDoc:string;
+  isManual: boolean;
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -147,7 +161,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private addressService: AddressService,
     private vehicleStatusService: VehicleStatusService,
     private docketService: DocketService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private dcrService:DCRService
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -173,7 +188,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     this.consigmentControls.applyFieldRules(this.storage.companyCode).then(() => {
       this.initializeFormControl();
-
+      
     });
   }
   changeInvoice() {
@@ -213,6 +228,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.bindQuickdocketData();
     this.commonDropDownMapping();
     this.getVolControls();
+    if(this.quickDocket){
+    this.getRules();
+    }
   }
   /*end*/
 
@@ -817,6 +835,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.loadIn = false;
       this.SetInvoiceData();
       this.invoiceForm.reset();
+      this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.matrials, "materialName", false);
     }
   }
   /*below functions for autofill and remove invoice*/
@@ -1073,8 +1092,215 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   
   /*end*/
-  async save() {
+  async docketValidation(){
+    const res=await this.dcrService.validateSeries(this.consignmentForm.controls['docketNumber'].value);
+    if(Object.keys(res).length>0){
+      switch(res.aSNTO){
+        case "E":
+          if(res.aSNNM){
+            if(this.storage.userName==res.aSNCD){
+             this.validateDcr();
+            }
+            else{
+              this.errorMessage();
+            }
+           
+          }
+          else{
+            if(res.aLOTO=="L"){
+              if(res.aLOCD==this.storage.branch){
+                this.validateDcr();
+              }
+              else{
+                this.errorMessage();
+              }
+            }
+          }
+          break
+        case "B":
+          if(res.aSNCD){
+            if(this.storage.userName==res.aSNCD){
+              this.validateDcr();
+            }
+            else{
+              this.errorMessage();
+            }
+          }
+          break
+          case "C":
+            debugger
+            if(res.aSNTO=="C" && res.aLOCD==this.storage.branch){
+              const billingParty=this.consignmentForm.controls['billingParty'].value?.value||"";
+              if(billingParty){
+                if(res.aSNCD==billingParty){
+                  this.validateDcr();
+                }
+                else{
+                  this.errorMessage();
+                }
+              }
+              else{
+                this.validateDcr();
+                this.consignmentForm.controls['billingParty'].setValue({name:res.aSNNM,value:res.aSNCD})
+              }
+              
+            }
+            else{
+               this.errorMessage();
+            }
+            break;
+
+        }
+       
+    }
+    else{
+      this.errorMessage();
+    }
+    this.dcrDetail=res;
     
+  }
+  /*check Dcr is use or not*/
+  async validateDcr(){
+    const res=await this.dcrService.getDCRDetail({dOCNO:this.consignmentForm.controls['docketNumber'].value});
+   
+    if(Object.keys(res).length>0){
+     
+      Swal.fire({
+        icon: 'error',
+        title:'DCR No is already used',
+        text:'DCR No is already used',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      this.consignmentForm.controls['docketNumber'].setValue("");
+   
+    }
+    else{
+      if(this.mseq){
+        const mseq=await this.dcrService.getListDcrNo(this.dcrDetail);
+        const nextCode=await nextKeyCode(mseq.dOCNO)
+        if(nextCode==this.consignmentForm.controls['docketNumber'].value){
+          Swal.fire({
+            icon: 'success',
+            title:'Valid',
+            text:' DCR number has been allocated. You may now proceed',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+          });
+        }
+        else{
+          Swal.fire({
+            icon: 'error',
+            title:'The DCR number is out of sequence',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+
+          })
+          this.consignmentForm.controls['docketNumber'].setValue("");
+        }
+      }
+      else{
+        Swal.fire({
+          icon: 'success',
+          title:'Valid',
+          text:' DCR number has been allocated. You may now proceed',
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          timer: 5000,
+          timerProgressBar: true,
+        });
+      }
+     
+    }
+  
+  }
+  /*end*/
+  async errorMessage(){
+    Swal.fire({
+      icon: 'error',
+      title:'DCR No is not valid',
+      text:'DCR No is not valid',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+      timer: 5000,
+      timerProgressBar: true,
+    });
+    this.consignmentForm.controls['docketNumber'].setValue("");
+  }
+  /*get Rules*/
+  async getRules(){
+    const filter={
+      mODULE:"CNOTE"
+    }
+    const res=await this.controlPanel.getModuleRules(filter);
+    if(res.length>0){
+      this.rules=res;
+      this.checkDocketRules();
+    }
+    
+  }
+  /*End*/
+   checkDocketRules(){
+      this.rules.forEach((x)=>{
+        switch(x.rULENM){
+          case "STYP":
+            const isManual = x.vAL === "C";
+            this.allFormControls.forEach(control => {
+                if (control.name === "docketNumber") {
+                    control.disable = isManual;
+                    this.consignmentForm.controls['docketNumber'].setValue(isManual==false?"":"Computerized");
+                }
+            });
+            this.isManual=isManual==false?true:false;
+            this.isUpdate=isManual==false?true:false;
+            break;
+          case "ELOC":
+           if(!x.vAL.includes(this.storage.branch)){
+            Swal.fire({
+              icon: "info", 
+              title: "Missing Information",
+              text: "this branch is not allowed to create docket.",
+              showConfirmButton: true,
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#d33',
+              timer: 5000,
+              timerProgressBar: true,
+            
+          });
+            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+           }
+            break;
+
+          case "NTYP":
+           this.alpaNumber=x.vAL=="AN";
+          break;
+          case "SL":
+            this.sequence=x.vAL=="S";
+            break;
+          case "BCD":
+            this.isBrachCode=x.vAL=="Y";
+            break;
+          case "YEAR":
+            this.fyear=x.vAL=="F";
+            break;
+          case "LENGTH":
+            this.length=x.vAL;
+            break;
+          case "MSEQ":
+          this.mseq=x.vAL=="Y";
+          //  this.mseq=true;
+            break;
+
+        }
+      })
+  }
+  async save() {
     if(!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit){
       this.consignmentForm.markAllAsTouched();
       this.freightForm.markAllAsTouched();
@@ -1156,7 +1382,24 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       if (resUpdate) {
         this.Addseries(reqDkt.docketsDetails.pKGS);
       }
-    } else {
+    }
+    else if(this.isManual){
+      delete docketDetails['invoiceDetails'];
+      delete docketDetails['docketFin'];
+      reqDkt.docketsDetails['_id']=`${this.storage.companyCode}-${reqDkt?.docketsDetails.dKTNO}`;
+       await this.docketService.addDcrDetails(reqDkt?.docketsDetails,this.dcrDetail);
+      let reqBody = {
+        companyCode: this.storage.companyCode,
+        collectionName: "dockets_ltl",
+        data: { ...reqDkt?.docketsDetails}
+      };
+      await this.docketService.operationsFieldMapping(reqDkt.docketsDetails, reqDkt.invoiceDetails, reqDkt.docketFin,this.isManual);
+      const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
+      if (res) {
+        this.Addseries(reqDkt.docketsDetails.pKGS);
+      }
+    }
+     else {
       let reqBody = {
         companyCode: this.storage.companyCode,
         collectionName: "dockets_ltl",
@@ -1165,6 +1408,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         finYear: financialYear,
         timeZone: this.storage.timeZone,
         data: docketDetails,
+        isManual:false,
         party: docketDetails["bPARTYNM"],
       };
       const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));

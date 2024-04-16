@@ -463,7 +463,6 @@ export class FreightChargeUploadComponent implements OnInit {
 
   // function to process data and prepare request body
   processData(element, rateTypedata, capacityList, transportMode) {
-    debugger
     const processedData: any = {};
 
     const updaterateType = rateTypedata.find(item => item.name.toUpperCase() === element.RateType.toUpperCase());

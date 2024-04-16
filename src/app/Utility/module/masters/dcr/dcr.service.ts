@@ -168,4 +168,43 @@ export class DCRService {
 
     return inputValue >= startValue && inputValue <= endValue;
   }
+  async validateSeries(number) {
+    
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dcr_header",
+      filter: {
+        tYP: "CNote", sTS: 4,
+        D$or: [
+          { fROM: { D$lte: number }, tO: { D$gte: number } }, // Check if the value is within any range
+          { fROM: number }, // Check if the value is the same as the 'from' value of any range
+          { tO: number }
+        ]
+      }
+    }
+     const res = await firstValueFrom(this.operation.operationMongoPost("generic/getOne",req));
+    return res.data;
+  }
+  async getDCRDetail(filter = {}) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dcr_documents",
+      filter: filter,
+    };
+    const res = await firstValueFrom(
+      this.operation.operationMongoPost("generic/getOne", req)
+    );
+    return res.data;
+  }
+  async getListDcrNo(data) {
+    try {
+      let query = { cID: this.storage.companyCode,bOOK:data.bOOK };
+      const req = { companyCode: this.storage.companyCode, collectionName: "dcr_documents", filter: query, sorting: { dOCNO: -1 } };
+      const response = await firstValueFrom(this.operation.operationMongoPost("generic/findLastOne", req));
+      return response?.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 }

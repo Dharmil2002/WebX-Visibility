@@ -36,6 +36,9 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
 import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -92,6 +95,16 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
   InvoiceDetailsList: { count: any; title: string; class: string }[];
   matrials: AutoComplete[];
+  rules: any[]=[];
+  alpaNumber: boolean;
+  sequence:boolean;
+  isBrachCode:boolean;
+  fyear:boolean;
+  length:number=0;
+  mseq: boolean;
+  lastDoc:string;
+  isManual: boolean;
+  dcrDetail={};
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -113,7 +126,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private storage: StorageService,
     private docketService: DocketService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private addressService: AddressService
+    private addressService: AddressService,
+    private controlPanel: ControlPanelService,
+    private dcrService:DCRService,
+    private _NavigationService: NavigationService
   ) {
     super();
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -240,6 +256,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         value: this.model.prqData?.prqNo,
       });
     }
+    this.getRules();
   }
   //#endregion
   getContainerType(event) {
@@ -867,6 +884,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.invoiceTableForm.reset();
       this.tableLoadIn = false;
       this.loadIn = false;
+      this.filter.Filter(this.jsonInvoiceDetail,this.model.invoiceTableForm,this.matrials,"materialName",false);
       this.SetInvoiceData();
     }
   }
@@ -903,7 +921,212 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }
     this.SetInvoiceData();
   }
+  /*end*/
+  async docketValidation(){
+    const res=await this.dcrService.validateSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
+    if(Object.keys(res).length>0){
+      switch(res.aSNTO){
+        case "E":
+          if(res.aSNNM){
+            if(this.storage.userName==res.aSNCD){
+             this.validateDcr();
+            }
+            else{
+              this.errorMessage();
+            }
+           
+          }
+          else{
+            if(res.aLOTO=="L"){
+              if(res.aLOCD==this.storage.branch){
+                this.validateDcr();
+              }
+              else{
+                this.errorMessage();
+              }
+            }
+          }
+          break
+        case "B":
+          if(res.aSNCD){
+            if(this.storage.userName==res.aSNCD){
+              this.validateDcr();
+            }
+            else{
+              this.errorMessage();
+            }
+          }
+          break
+          case "C":
+            if(res.aSNTO=="C" && res.aLOCD==this.storage.branch){
+              const billingParty=this.model.consignmentTableForm.controls['billingParty'].value?.value||"";
+              if(billingParty){
+                if(res.aSNCD==billingParty){
+                  this.validateDcr();
+                }
+                else{
+                  this.errorMessage();
+                }
+              }
+              else{
+                this.validateDcr();
+                this.model.consignmentTableForm.controls['billingParty'].setValue({name:res.aSNNM,value:res.aSNCD})
+              }
+              
+            }
+            else{
+               this.errorMessage();
+            }
+            break;
 
+        }
+       
+    }
+    else{
+      this.errorMessage();
+    }
+    this.dcrDetail=res;
+    
+  }
+  /*check Dcr is use or not*/
+  async validateDcr(){
+    const res=await this.dcrService.getDCRDetail({dOCNO:this.model.consignmentTableForm.controls['docketNumber'].value});
+   
+    if(Object.keys(res).length>0){
+     
+      Swal.fire({
+        icon: 'error',
+        title:'DCR No is already used',
+        text:'DCR No is already used',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      this.model.consignmentTableForm.controls['docketNumber'].setValue("");
+    }
+    else{
+      if(this.mseq){
+        const mseq=await this.dcrService.getListDcrNo(this.dcrDetail);
+        const nextCode=await nextKeyCode(mseq.dOCNO)
+        if(nextCode==this.model.consignmentTableForm.controls['docketNumber'].value){
+          Swal.fire({
+            icon: 'success',
+            title:'Valid',
+            text:' DCR number has been allocated. You may now proceed',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+          });
+        }
+        else{
+          Swal.fire({
+            icon: 'error',
+            title:'The DCR number is out of sequence',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+
+          })
+          this.model.consignmentTableForm.controls['docketNumber'].setValue("");
+        }
+      }
+      else{
+        Swal.fire({
+          icon: 'success',
+          title:'Valid',
+          text:' DCR number has been allocated. You may now proceed',
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          timer: 5000,
+          timerProgressBar: true,
+        });
+      }
+     
+    }
+  
+  }
+  /*end*/
+  async errorMessage(){
+    Swal.fire({
+      icon: 'error',
+      title:'DCR No is not valid',
+      text:'DCR No is not valid',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+      timer: 5000,
+      timerProgressBar: true,
+    });
+    this.model.consignmentTableForm.controls['docketNumber'].setValue("");
+  }
+  /*get Rules*/
+  async getRules(){
+    const filter={
+      mODULE:"CNOTE"
+    }
+    const res=await this.controlPanel.getModuleRules(filter);
+    if(res.length>0){
+      this.rules=res;
+      this.checkDocketRules();
+    }
+    
+  }
+  /*End*/
+   checkDocketRules(){
+      this.rules.forEach((x)=>{
+        switch(x.rULENM){
+          case "STYP":
+            const isManual = x.vAL === "C";
+            this.model.allformControl.forEach(control => {
+                if (control.name === "docketNumber") {
+                    control.disable = isManual;
+                   this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual==false?"":"Computerized");
+                }
+            });
+            this.isManual=isManual==false?true:false;
+            break;
+          case "ELOC":
+           if(!x.vAL.includes(this.storage.branch)){
+            Swal.fire({
+              icon: "info", 
+              title: "Missing Information",
+              text: "this branch is not allowed to create docket.",
+              showConfirmButton: true,
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#d33',
+              timer: 5000,
+              timerProgressBar: true,
+            
+          });
+            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+           }
+            break;
+
+          case "NTYP":
+           this.alpaNumber=x.vAL=="AN";
+          break;
+          case "SL":
+            this.sequence=x.vAL=="S";
+            break;
+          case "BCD":
+            this.isBrachCode=x.vAL=="Y";
+            break;
+          case "YEAR":
+            this.fyear=x.vAL=="F";
+            break;
+          case "LENGTH":
+            this.length=x.vAL;
+            break;
+          case "MSEQ":
+          this.mseq=x.vAL=="Y";
+          //  this.mseq=true;
+            break;
+
+        }
+      })
+  }
   vendorFieldChanged() {
 
     const vendorType = this.model.consignmentTableForm.value.vendorType !== undefined
@@ -1474,6 +1697,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         finYear: financialYear,
         timeZone:this.storage.timeZone,
         data: docketDetails,
+        isManual:this.isManual,
         party: docketDetails["billingPartyName"],
       };
       if (this.prqFlag) {
@@ -1486,6 +1710,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           sTSNM: "Ready For THC"
         }
         await this.consigmentUtility.updatePrq(prqData, update);
+      }
+      if(this.isManual){
+        const data={dKTNO:this.model.consignmentTableForm.controls['docketNumber'].value}
+        await this.docketService.addDcrDetails(data,this.dcrDetail)
       }
       firstValueFrom(this.operationService.operationMongoPost("operation/docket/create", reqBody))
         .then((res: any) => {

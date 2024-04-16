@@ -94,7 +94,11 @@ Declared_Void = 6,
 Deallocated = 7,
 Cancelled = 9
 }
-
+export enum dcrStatus {
+  Used=1,
+  Void=2,
+  Cancelled=9
+}
 export enum DcrAction {
 Allocation = 1,
 Assgine = 2,

@@ -181,6 +181,7 @@ import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.
 import { CustomerMasterUploadComponent } from './customer-master/customer-master-upload/customer-master-upload.component';
 import { DriverMasterUploadComponent } from './driver-master/driver-master-upload/driver-master-upload.component';
 import { VendorMasterUploadComponent } from './vendor-master/vendor-master-upload/vendor-master-upload.component';
+import { AddressMasterUploadComponent } from './address-master/address-master-upload/address-master-upload.component';
 
 @NgModule({
   imports: [
@@ -377,7 +378,8 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
     CustomerMasterUploadComponent,
     DriverMasterUploadComponent ,
     CustomerMasterUploadComponent,
-    VendorMasterUploadComponent
+    VendorMasterUploadComponent,
+    AddressMasterUploadComponent
   ],
   providers: [
     DatePipe,

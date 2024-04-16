@@ -19,6 +19,7 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { DeliveryMrOtherDetailsComponent } from '../delivery-mr-other-details/delivery-mr-other-details.component';
 
 @Component({
   selector: 'app-add-delivery-mr-generation',
@@ -50,14 +51,14 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   columnHeader = {
     consignmentNoteNumber: {
-      Title: "Consignment Note Number ",
+      Title: "GRN No.",
       class: "matcolumnleft",
-      Style: "min-width:15em",
+      Style: "min-width:15%",
     },
     payBasis: {
       Title: "PayBasis",
       class: "matcolumnleft",
-      // Style: "min-width:80px",
+      Style: "min-width:80px",
     },
     subTotal: {
       Title: "Sub Total Amount(₹)",
@@ -72,82 +73,25 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     rateDifference: {
       Title: "Rate Difference(₹)",
       class: "matcolumncenter",
-      //Style: "min-width:80px",
+      Style: "min-width:10px",
     },
-    Loading: {
-      Title: "Loading(₹)",
+    OtherDly: {
+      Title: "Other Charges(₹)",
       class: "matcolumncenter",
-      //Style: "max-width:70px",
-    },
-    Freight: {
-      Title: "Freight(₹)",
-      class: "matcolumncenter",
-      //Style: "max-width:70px",
-    },
-    Unloading: {
-      Title: "Unloading Charge(₹)",
-      class: "matcolumncenter",
-      //Style: "max-width:70px",
-    },
-    GST: {
-      Title: "GST(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    Discount: {
-      Title: "Discount(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    Demurrage: {
-      Title: "Demurrage(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    GreenTax: {
-      Title: "Green Tax(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    Insurance: {
-      Title: "Insurance(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    Document: {
-      Title: "Document(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    Multipointdelivery: {
-      Title: "Multi-point delivery(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
-    },
-    totalAmount: {
-      Title: "Total Amount(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:100px",
+      Style: "min-width:10px",
+      type: "Link",
+      functionName: "getOtherCharges"
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
-      //Style: "min-width:100px",
+      Style: "min-width:5px",
     },
   };
 
   staticField = [
+    "OtherDly",
     "totalAmount",
-    "Multipointdelivery",
-    "Document",
-    "Insurance",
-    "GreenTax",
-    "Demurrage",
-    "Discount",
-    "GST",
-    "Unloading",
-    "Freight",
-    "Loading",
     "rateDifference",
     "newSubTotal",
     "subTotal",
@@ -168,6 +112,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   headerDetails: any;
   docketNo: any;
   AlljsonControlMRArray: any;
+  otherCharges: any;
+  totalMRamt: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -182,7 +128,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
-      //console.log(data.data.no);
+      console.log(data.data);
       this.docketNo = data.data.no;
     }
   }
@@ -254,16 +200,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         id: this.tableData.length + 1,
         consignmentNoteNumber: element.dKTNO,
         totalAmount: 0,
-        Multipointdelivery: 0,
-        Document: 0,
-        Insurance: 0,
-        GreenTax: 0,
-        Demurrage: 0,
-        Discount: 0,
-        GST: 0,
-        Unloading: 0,
-        Freight: 0,
-        Loading: 0,
+        OtherDly: 0,
         rateDifference: 0,
         newSubTotal: 0,
         subTotal: 0,
@@ -326,11 +263,74 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   //#region to Add a new item to the table or edit
+  // addDetails(event) {
+  //   const request = {
+  //     List: this.tableData,
+  //     Details: event,
+  //   }
+  //   this.tableload = true;
+  //   const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
+  //     data: request,
+  //     width: "100%",
+  //     disableClose: true,
+  //     position: {
+  //       top: "20px",
+  //     },
+  //   });
+  //   dialogRef.afterClosed().subscribe(async (data) => {
+  //     console.log(data);
+  //     const delayDuration = 1000;
+  //     // Create a promise that resolves after the specified delay
+  //     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  //     // Use async/await to introduce the delay
+  //     await delay(delayDuration);
+  //     // this.otherCharges = data;
+  //     // this.calucatedCharges();
+  //     const json = {
+  //       id: data.id,
+  //       consignmentNoteNumber: data.consignmentNoteNumber,
+  //       OtherDly: this.totalMRamt.toFixed(2),
+  //       subTotal: this.filteredDocket[0].tOTAMT,
+  //       newSubTotal: parseFloat(data.newSubTotal) || 0,
+  //       rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
+  //       totalAmount: (parseFloat(data.Document || 0) +
+  //         + parseFloat(data.Insurance || 0)
+  //         + parseFloat(data["Green Tax"] || 0)
+  //         + parseFloat(data.Demurrage || 0)
+  //         + parseFloat(data.GST || 0)
+  //         + parseFloat(data.Unloading || 0)
+  //         + parseFloat(data.Freight || 0)
+  //         + parseFloat(data.Loading || 0)) - parseFloat(data.Discount || 0),
+  //       payBasis: data.payBasis,
+  //       actions: ['Edit']
+  //     };
+  //     const chargeMapping = this.otherCharges.chargeData.map((x) => { return { name: x.cHGNM, operation: x.oPS, aMT: x.aMT } });
+  //     this.totalMRamt = chargeMapping.reduce((acc, curr) => {
+  //       if (curr.operation === "+") {
+  //         return acc + parseFloat(curr.aMT);
+  //       } else if (curr.operation === "-") {
+  //         return acc - parseFloat(curr.aMT);
+  //       } else {
+  //         return acc; // In case of an unknown operation
+  //       }
+  //     }, 0);
+  //     const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
+  //     totalMrItem ? totalMrItem.count = this.totalMRamt.toFixed(2) : 0
+  //     console.log(this.totalMRamt);
+  //     console.log(json);
+  //     this.tableData = this.tableData.filter(item => item.id !== data.id);
+  //     this.tableData.unshift(json);
+  //     this.tableload = false;
+
+
+  //   });
+  // }
   addDetails(event) {
     const request = {
       List: this.tableData,
       Details: event,
-    }
+    };
+
     this.tableload = true;
     const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
       data: request,
@@ -340,52 +340,58 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         top: "20px",
       },
     });
+
     dialogRef.afterClosed().subscribe(async (data) => {
+      try {
+        if (!data) return; // Handle the case when data is not available
 
-      const delayDuration = 1000;
-      // Create a promise that resolves after the specified delay
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      // Use async/await to introduce the delay
-      await delay(delayDuration);
+        // Delay execution for better user experience
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.otherCharges = data;
 
-      const json = {
-        id: data.id,
-        consignmentNoteNumber: data.consignmentNoteNumber,
-        Multipointdelivery: parseFloat(data["Multi-point delivery"]) || 0,
-        Document: parseFloat(data.Document) || 0,
-        Insurance: parseFloat(data.Insurance) || 0,
-        GreenTax: parseFloat(data["Green Tax"]) || 0,
-        Demurrage: parseFloat(data.Demurrage) || 0,
-        Discount: parseFloat(data.Discount) || 0,
-        GST: parseFloat(data.GST) || 0,
-        Unloading: parseFloat(data.Unloading) || 0,
-        Freight: parseFloat(data.Freight) || 0,
-        Loading: parseFloat(data.Loading) || 0,
-        newSubTotal: parseFloat(data.newSubTotal) || 0,
-        subTotal: data.subTotal || 0,
-        rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
-        totalAmount: (parseFloat(data.Document || 0) +
-          + parseFloat(data.Insurance || 0)
-          + parseFloat(data["Green Tax"] || 0)
-          + parseFloat(data.Demurrage || 0)
-          + parseFloat(data.GST || 0)
-          + parseFloat(data.Unloading || 0)
-          + parseFloat(data.Freight || 0)
-          + parseFloat(data.Loading || 0)) - parseFloat(data.Discount || 0),
-        payBasis: data.payBasis,
-        actions: ['Edit']
-      };
-      this.tableData = this.tableData.filter(item => item.id !== data.id);
-      this.tableData.unshift(json);
-      this.tableload = false;
-      let totalMr = 0;
-      this.tableData.forEach(item => {
-        totalMr += item.totalAmount;
-      });
-      const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
-      totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
+        const newData = {
+          id: data.id,
+          consignmentNoteNumber: data.consignmentNoteNumber,
+          OtherDly: this.calculateTotalAmount(data.chargeData),  // Calculate total amount based on charges
+          subTotal: this.filteredDocket[0].tOTAMT,
+          newSubTotal: parseFloat(data.newSubTotal) || 0,
+          rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
+          totalAmount: this.calculateTotalAmount(data.chargeData),
+          payBasis: data.payBasis,
+          actions: ['Edit']
+        };
+        let totalMr = 0;
+        this.tableData.forEach(item => {
+          totalMr += item.totalAmount;
+        });
+        const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
+        totalMrItem ? totalMrItem.count = this.totalMRamt.toFixed(2) : 0
+        console.log(this.totalMRamt);
+        this.tableData = this.tableData.filter(item => item.id !== data.id);
+        this.tableData.unshift(newData);
+        console.log(this.tableData);
+
+        this.tableload = false;
+      } catch (error) {
+        console.error("Error in addDetails:", error);
+        // Handle errors, e.g., show an error message to the user
+      }
     });
   }
+
+  calculateTotalAmount(charges) {
+    const chargeMapping = charges.map(x => ({ name: x.cHGNM, operation: x.oPS, aMT: x.aMT }));
+    return chargeMapping.reduce((acc, curr) => {
+      if (curr.operation === "+") {
+        return acc + parseFloat(curr.aMT);
+      } else if (curr.operation === "-") {
+        return acc - parseFloat(curr.aMT);
+      } else {
+        return acc; // In case of an unknown operation
+      }
+    }, 0);
+  }
+
   //#endregion
   //#region to fill or remove data form table to controls
   handleMenuItemClick(data) {
@@ -1001,4 +1007,41 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
 
   //#endregion
+  //#region to call getOtherCharge in modal 
+  async getOtherCharge(event) {
+    const request = {
+      List: this.tableData,
+      Details: event,
+    }
+    const dialogRef = this.dialog.open(DeliveryMrOtherDetailsComponent, {
+      data: request,
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe(async (data) => {
+      console.log(data);
+      const delayDuration = 1000;
+      // Create a promise that resolves after the specified delay
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      // Use async/await to introduce the delay
+      await delay(delayDuration);
+
+
+
+
+
+
+    });
+
+  }
+  // #endregion
+  calucatedCharges() {
+
+
+
+    //this.freightForm.controls['otherAmount'].setValue(total);
+  }
 }

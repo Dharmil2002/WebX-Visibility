@@ -15,7 +15,7 @@
 
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [FormTitle]="'Delivery MR Generation List'" [tableData]="tableData" [menuItems]="menuItems"
-        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" [TitleBoxData]="TotalAmountList"
+        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" [TitleBoxData]="TotalAmountList" (functionCallEmitter)="functionCallHandler($event)"
         (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag">
     </app-generic-table-v2>
 

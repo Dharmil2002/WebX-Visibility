@@ -128,6 +128,7 @@ export class ProductChargesComponent implements OnInit {
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
 
     if (this.isUpdate) {
+      console.log(this.UpdatedData);
       // this.customerTableForm.controls.Add_Deduct.set
       this.customerTableForm.controls["Add_Deduct"].setValue(
         this.UpdatedData.aDD_DEDU
@@ -137,6 +138,15 @@ export class ProductChargesComponent implements OnInit {
       );
       this.customerTableForm.controls["ChargesCode"].setValue(
         this.UpdatedData.cHACD
+      );
+      this.customerTableForm.controls["cAPTION"].setValue(
+        this.UpdatedData.cAPTION
+      );
+      this.customerTableForm.controls["isActive"].setValue(
+        this.UpdatedData.isActive
+      );
+      this.customerTableForm.controls["iSChargeMandatory"].setValue(
+        this.UpdatedData.iSREQ
       );
     }
   }
@@ -267,7 +277,7 @@ export class ProductChargesComponent implements OnInit {
       mODBY: this.storage.userName,
     };
     console.log(Body);
-    
+
     if (!this.isUpdate) {
       Body["cHACD"] = this.customerTableForm.value.ChargesCode;
       Body[
@@ -288,11 +298,11 @@ export class ProductChargesComponent implements OnInit {
 
     const res = this.isUpdate
       ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
+        this.masterService.masterPut("generic/update", req)
+      )
       : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+        this.masterService.masterPost("generic/create", req)
+      );
     if (res?.success) {
       this.GetTableData();
       this.Tabletab = !this.Tabletab;
@@ -379,6 +389,7 @@ export class ProductChargesComponent implements OnInit {
   async handleSelectCharges() {
 
     if (this.isUpdate) {
+      this.customerTableForm.controls['ChargesCode'].setValue(this.customerTableForm.value.SelectCharges.value)
       if (this.customerTableForm.value.SelectCharges.name == this.UpdatedData.sELCHA) {
         return;
       }
@@ -405,12 +416,21 @@ export class ProductChargesComponent implements OnInit {
       });
     }
   }
-  //#region to get Charge Applicable list
+  //#region to get and set Charge Applicable list
   getChargeApplicable() {
     const chargeApplicablelist = [
       { name: "ON GCN", value: "GCN" },
       { name: "On THC Generation", value: "THC" },
-      { name: "ON Delivery MR", value: "DeliveryMR" },]
+      { name: "ON Delivery MR", value: "DeliveryMR" }
+    ]
+
+    const updatedValue = this.UpdatedData.cHAPP;
+    if (this.isUpdate && updatedValue) {
+      console.log(updatedValue);
+      // Assuming updatedValue is an array
+      const selectedChargeApplicables = chargeApplicablelist.filter(x => updatedValue.includes(x.value));
+      this.customerTableForm.controls['chargeApplicableHandler'].patchValue(selectedChargeApplicables);
+    }
 
     this.filter.Filter(
       this.jsonControlArray,

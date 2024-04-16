@@ -6,6 +6,8 @@ import { DeliveryMrGeneration } from 'src/assets/FormControls/DeliveryMr';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
+import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-delivery-mr-generation-modal',
@@ -21,11 +23,13 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
   isChagesValid: boolean;
   jsonControlsEdit: any[];
   allJson: any[];
+  chargeList: any;
+  chargeControls: InvoiceModel[];
   constructor(private dialogRef: MatDialogRef<DeliveryMrGenerationModalComponent>,
     private fb: UntypedFormBuilder,
     @Inject(MAT_DIALOG_DATA)
     private objResult: any,
-    private invoiceService: InvoiceServiceService) { }
+    private thcService: ThcService) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -55,39 +59,82 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     this.dialogRef.close()
   }
   save() {
-    let data = this.MrGenerationForm.value
-    data["id"] = this.objResult.Details.data.id
-    data["consignmentNoteNumber"] = this.objResult.Details.data.consignmentNoteNumber
-    data["payBasis"] = this.objResult.Details.data.payBasis
-    data["subTotal"] = this.objResult.Details.data.subTotal
-    clearValidatorsAndValidate(this.MrGenerationForm)
-    this.dialogRef.close(data)
+    let formData = this.MrGenerationForm.value;
+    formData.id = this.objResult.Details.data.id;
+    formData.consignmentNoteNumber = this.objResult.Details.data.consignmentNoteNumber;
+    formData.payBasis = this.objResult.Details.data.payBasis;
+    formData.subTotal = this.objResult.Details.data.subTotal;
+    clearValidatorsAndValidate(this.MrGenerationForm);
+
+    console.log(formData);
+    debugger;
+
+    let chargeData = [];
+
+    let showAlert = false;
+    this.chargeControls.filter(x => x.hasOwnProperty("id")).forEach(element => {
+      if (element?.additionalData.showNameAndValue && this.MrGenerationForm.controls[element.name].value == 0) {
+        showAlert = true;
+        Swal.fire({
+          icon: "info",
+          title: `As charges are mandatory, they cannot be zero. Please enter another value.`,
+          showConfirmButton: true,
+        });
+        return;
+      } else {
+        let json = {
+          cHGID: element.name,
+          cHGNM: element.placeholder,
+          aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.MrGenerationForm.controls[element.name].value || 0) : (parseFloat(this.MrGenerationForm.controls[element.name].value) || 0),
+          oPS: element?.additionalData.metaData || "",
+        };
+        chargeData.push(json);
+      }
+    });
+
+    formData.chargeData = chargeData;
+
+    if (!showAlert) {
+      this.dialogRef.close(formData);
+    }
   }
 
-  async getCharges() {
-    const result = await this.invoiceService.getContractCharges({ "cHTY": { "D$in": ['C', 'B', 'V'] } });
-    // console.log(result);
 
-    if (result && result.length > 0) {
+  async getCharges() {
+    this.chargeList = await this.thcService.getCharges(
+      {
+        "cHAPP": { 'D$eq': 'DeliveryMR' },
+        'isActive': { 'D$eq': true }
+      });
+    console.log(this.chargeList);
+
+    if (this.chargeList && this.chargeList.length > 0) {
       const invoiceList: InvoiceModel[] = [];
 
-      result.forEach((element, index) => {
+      this.chargeList.forEach((element, index) => {
         if (element) {
           const invoice: InvoiceModel = {
             id: 1 + index,
-            name: element.cHNM || '',
-            label: `${element.cHNM}`,
-            placeholder: element.cHNM || '',
+            name: element.cHACD || '',
+            label: `${element.sELCHA}(${element.aDD_DEDU})`,
+            placeholder: element.cAPTION || '',
             type: 'text',
             value: '0',
             filterOptions: '',
             displaywith: '',
             generatecontrol: true,
             disable: true,
-            Validations: [],
+            Validations: [{
+              name: "pattern",
+              message: "Please Enter only positive numbers with up to two decimal places",
+              pattern: '^\\d+(\\.\\d{1,2})?$'
+            }],
             additionalData: {
-              showNameAndValue: false,
-              metaData: '',
+              metaData: element.aDD_DEDU,
+              showNameAndValue: element.iSREQ
+            },
+            functions: {
+              onChange: 'calucatedCharges',
             },
           };
 
@@ -99,8 +146,9 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
         name: `${x.name}`,
         disable: false
       }));
-      const combinedArray = enable.sort((a, b) => a.name.localeCompare(b.name));
-      this.allJson = [...this.jsonControlsEdit, ...combinedArray]
+      this.chargeControls = enable.sort((a, b) => a.name.localeCompare(b.name));
+      this.allJson = [...this.jsonControlsEdit, ...this.chargeControls]
+
     }
     this.MrGenerationForm = formGroupBuilder(this.fb, [this.allJson]);
     this.isChagesValid = true;

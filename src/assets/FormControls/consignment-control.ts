@@ -23,6 +23,9 @@ export class ConsignmentControl {
       {
         name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
         value: docketDetail?.docketNumber || 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
+        functions: {
+          onChange: "docketValidation",
+      },
         additionalData: {
           metaData: "Basic"
         },

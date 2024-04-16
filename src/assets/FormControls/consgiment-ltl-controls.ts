@@ -25,7 +25,7 @@ export class ConsignmentLtl extends BaseControl {
                 disable: false,
                 Validations: [],
                 functions: {
-                    change: "DocketValidation",
+                    onChange: "docketValidation",
                 },
                 additionalData:{
                     metaData: "Basic"

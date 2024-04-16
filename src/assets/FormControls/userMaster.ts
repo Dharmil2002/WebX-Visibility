@@ -35,17 +35,48 @@ export class UserControl {
             name: "pattern",
             message: "Please Enter alphanumeric of length 25!",
             pattern: "^[a-zA-Z0-9]{0,25}$",
-          },
+          }
         ],
+        additionalData: {
+          showNameAndValue:true,
+        },
         functions: {
           onChange: "CheckERPId",
         },
       },
       {
+        name: "userType",
+        label: "User Type",
+        placeholder: "Select User Type",
+        type: "dropdown",
+        value: UserTable.userType,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        functions:{
+          onOptionSelect:"onUserTypeChange"
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+    
+      {
         name: "name",
         label: "User Name",
         placeholder: "Enter User Name",
-        type: "text",
+        type: "dropdown",
         value: UserTable.name,
         generatecontrol: true,
         disable: false,
@@ -55,14 +86,23 @@ export class UserControl {
             message: "User Name is required",
           },
           {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+          {
             name: "pattern",
             message: "Please Enter only text!",
             pattern: "^[a-zA-Z ]{0,100}$",
           },
         ],
+        additionalData: {
+          showNameAndValue:true,
+        },
         functions: {
+          onModel:"getDropValue",
           onChange: "CheckUserName",
         },
+        
       },
       {
         name: "userpassword",
@@ -293,30 +333,6 @@ export class UserControl {
         ],
         functions: {
           onChange: "CheckEmailId",
-        },
-      },
-      {
-        name: "userType",
-        label: "User Type",
-        placeholder: "Select User Type",
-        type: "dropdown",
-        value: UserTable.userType,
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
         },
       },
       {

@@ -26,6 +26,9 @@ export class QuickBookingControls extends BaseControl {
         generatecontrol: true,
         disable: true,
         Validations: [],
+        functions: {
+          onChange: "docketValidation",
+      }
       },
       {
         name: "docketDate",

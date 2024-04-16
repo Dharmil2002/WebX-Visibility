@@ -14,7 +14,6 @@ export const StoreKeys = {
     LoginLocations: 'loginLocations',
     CompanyLogo: 'companyLogo',
     CompanyAlias: 'company_Code',
-
     MenuOption: 'menuOption',
     Menu: 'menu',
     MenuToBind: 'menuToBind',

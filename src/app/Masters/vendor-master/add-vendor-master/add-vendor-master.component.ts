@@ -148,7 +148,7 @@ export class AddVendorMasterComponent implements OnInit {
     private tdsMasterService: TdsMasterService
   ) {
     this.companyCode = this.storage.companyCode;
-    this.vendorTabledata.companyCode = this.storage.companyCode;
+    // this.vendorTabledata.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata =
         this.route.getCurrentNavigation().extras.state.data;

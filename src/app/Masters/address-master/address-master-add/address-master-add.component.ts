@@ -94,7 +94,7 @@ export class AddressMasterAddComponent implements OnInit {
       console.log("failed");
     }
   }
-  
+
   initializeFormControl() {
     this.addressFormControls = new AddressControl(
       this.addressTabledata,
@@ -215,15 +215,10 @@ export class AddressMasterAddComponent implements OnInit {
         name,
         status
       );
-      // is Update
       if (this.isUpdate) {
-        const customer = this.data.customer?.map((x) => x.code);
-        const selectedData = customerData.filter((x) =>
-          customer.includes(x.value)
-        );
-        this.addressTableForm.controls["customerNameDropdown"].setValue(
-          selectedData
-        );
+        const updatedValue = this.data.customer; // Assuming updatedValue is an array
+        const selectedData = customerData.filter(x => updatedValue.includes(x.value));
+        this.addressTableForm.controls['customerNameDropdown'].patchValue(selectedData);
       }
     }
   }
@@ -237,12 +232,7 @@ export class AddressMasterAddComponent implements OnInit {
     Object.values(this.addressTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
-    const customerName = this.addressTableForm.value.customerNameDropdown?.map((x)=>{
-      return {
-        code:x.value,
-        name:x.name,
-      }
-    });
+    const customerName = this.addressTableForm.value.customerNameDropdown?.map((item: any) => item.value) || "";
     this.addressTableForm.removeControl("customerNameDropdown");
     this.addressTableForm.controls["customer"].setValue(customerName);
     if (this.isUpdate) {

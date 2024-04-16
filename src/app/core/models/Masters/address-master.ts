@@ -14,6 +14,8 @@ export class AddressMaster {
     cityName: any;
     isActive: any;
     stateName: any;
+    companyCode: number;
+    customer: any;
     constructor(AddressMaster) {
         {
             this.addressCode = AddressMaster.addressCode || '';
@@ -24,6 +26,8 @@ export class AddressMaster {
             this.city = AddressMaster.city || '';
             this.state = AddressMaster.state || '';
             this.pincode = AddressMaster.pincode || '';
+            this.customer = AddressMaster.customer || "";
+            this.companyCode = AddressMaster.companyCode || '';
             this.activeFlag = AddressMaster.activeFlag || false;
         }
     }

@@ -7,7 +7,8 @@
     </generic-table-webxpress> -->
     <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
       [tableData]="csv" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)" (functionCallEmitter)="functionCallHandler($event)"
-      [menuItems]="menuItems" [staticField]="staticField"  [Link]="linkArray" [height]="height" [width]="width"
-      [maxWidth]="maxWidth" (onFlagChange)="IsActiveFuntion($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+      [menuItems]="menuItems" [staticField]="staticField"  [Link]="linkArray" [height]="height" [width]="width" [csvFileName]="csvFileName"
+      [maxWidth]="maxWidth" (onFlagChange)="IsActiveFuntion($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadComponent]=true
+      (uploadEvent)="upload()">
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

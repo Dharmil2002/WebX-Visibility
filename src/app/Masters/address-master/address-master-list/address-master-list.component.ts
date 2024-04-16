@@ -4,6 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { AddressMasterUploadComponent } from '../address-master-upload/address-master-upload.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-address-master-list',
@@ -16,8 +18,9 @@ export class AddressMasterListComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"];
   companyCode: any = 0;
+  uploadComponent = AddressMasterUploadComponent
   linkArray = []
-  columnHeader = {    
+  columnHeader = {
     addressCode: {
       Title: "Address Code",
       class: "matcolumnleft",
@@ -43,7 +46,7 @@ export class AddressMasterListComponent implements OnInit {
       Title: "Created Date",
       class: "matcolumnleft",
       Style: "max-width:150px",
-      datatype: "datetime",
+      // datatype: "datetime",
     },
     activeFlag: {
       type: "Activetoggle",
@@ -51,7 +54,7 @@ export class AddressMasterListComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:100px",
       functionName: "ActiveFunction",
-    },    
+    },
     actions: {
       Title: "",
       class: "matcolumncenter",
@@ -79,7 +82,7 @@ export class AddressMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  constructor(private masterService: MasterService, private storage: StorageService) {
+  constructor(private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/AddressMaster/AddAddressMaster";
   }
@@ -101,7 +104,7 @@ export class AddressMasterListComponent implements OnInit {
           });
           // Generate srno for each object in the array and format the eNTDT
           const dataWithFormattedDate = sortedData.map((item, index) => {
-            const formattedDate = moment(item.eNTDT).format("DD-MM-YYYY HH:mm:ss");
+            const formattedDate = moment(item.eNTDT).format("DD-MM-YYYY HH:mm");
             return {
               ...item,
               eNTDT: formattedDate,
@@ -145,4 +148,16 @@ export class AddressMasterListComponent implements OnInit {
       console.log("failed");
     }
   }
+
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.getAddressDetails();
+      });
+    }
+    //#endregion
 }

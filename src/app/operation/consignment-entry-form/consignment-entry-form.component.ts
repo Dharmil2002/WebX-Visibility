@@ -884,6 +884,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.invoiceTableForm.reset();
       this.tableLoadIn = false;
       this.loadIn = false;
+      this.filter.Filter(this.jsonInvoiceDetail,this.model.invoiceTableForm,this.matrials,"materialName",false);
       this.SetInvoiceData();
     }
   }

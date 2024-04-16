@@ -835,6 +835,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.loadIn = false;
       this.SetInvoiceData();
       this.invoiceForm.reset();
+      this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.matrials, "materialName", false);
     }
   }
   /*below functions for autofill and remove invoice*/

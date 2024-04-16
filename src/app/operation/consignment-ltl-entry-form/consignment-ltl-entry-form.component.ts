@@ -1407,6 +1407,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         finYear: financialYear,
         timeZone: this.storage.timeZone,
         data: docketDetails,
+        isManual:false,
         party: docketDetails["bPARTYNM"],
       };
       const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));

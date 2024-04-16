@@ -19,13 +19,24 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="arrivalTableData" [width]="width"
+    <!-- <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="arrivalTableData" [width]="width"
         [height]="height" [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
         [Link]="linkArray" [columnWidths]="columnWidths"  [toggleArray]="toggleArray" [menuItems]="menuItems"
         (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
         [dynamicControls]="dynamicControls" (dialogClosed)="updateDepartureData($event)" [height]="height"
         [width]="width" [maxWidth]="maxWidth">
 
-    </generic-table-webxpress>
+    </generic-table-webxpress> -->
+
+    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="arrivalTableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+        [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray"
+        [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
+        [height]="height" [width]="width"
+        [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [filterColumn]="filterColumn" 
+        [allColumnFilter]="allColumnFilter" [menuItemFlag]="menuItemflag"
+        [uploadedFiles]="uploadedFiles">
+    </app-generic-table-v2>
+
 </div>
 </div>

@@ -3,7 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+  production: true,
+  secretKey: "bRTsuawqfGB5Zd3e",
   AuthAPIGetway: "http://localhost:3000/v1/auth/",
   localNumberFormat: "en-IN",
   APIBaseURL:"http://localhost:3000/v1/",  

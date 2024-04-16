@@ -185,7 +185,7 @@ export class DocketService {
                 x.actions = statusInfo.actions;
                 x.aCTWT = Number(x.aCTWT || 0).toFixed(2); // Ensure two decimal places
                 x.billingParty = `${x.bPARTY}:${x.bPARTYNM}`//x.billingParty || "";
-                x.createOn = x?.eNTDT
+                x.createOn = x?.dKTDT || x?.eNTDT
                 return x;
             return null;
         }).filter((x) => x !== null);
@@ -659,10 +659,10 @@ export class DocketService {
                 return {
                     no: item?.dKTNO ?? "",
                     sfx: item?.sFX ?? 0,
-                    date: formattedDate,
+                    date: item.dKTDT,
                     paymentType: item?.pAYTYPNM ?? "",
-                    contractParty: `${item?.bPARTY}-${item?.bPARTYNM}`,
-                    orgdest: `${item?.oRGN ?? ""} : ${item?.dEST}`,
+                    contractParty: `${item?.bPARTY} : ${item?.bPARTYNM}`,
+                    orgdest: `${item?.oRGN ?? ""} - ${item?.dEST}`,
                     fromCityToCity: `${item?.fCT ?? ""} : ${item?.tCT ?? ""}`,
                     noofPackages: parseInt(item?.pKGS || 0),
                     chargedWeight: parseInt(item?.cHRWT || 0),

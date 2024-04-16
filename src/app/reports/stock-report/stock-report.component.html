@@ -10,6 +10,7 @@
         [columnHeader]="summaryHeader" 
         [csvFileName]="'Stock Summary'"
         [columnGroup]="summaryGroup"
+        [stickyHeader]="true" 
         [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray" 
         (functionCallEmitter)="functionCallHandler($event)">
     </app-generic-table-v2>

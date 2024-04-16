@@ -1,3 +1,5 @@
+import { Key } from "angular-feather/icons";
+
 export const StoreKeys = {
     CompanyCode: 'companyCode',
     UserId: 'UserName',
@@ -64,4 +66,10 @@ export const OperationActions = {
     getThc: "operation/thc/get",
     createCha:"operation/cha/create",
     createRake:"operation/rake/create"
+}
+
+export const UploadFieldType = {
+    Upload: 'UPLOAD',
+    Derived: 'DERIVED',
+    Key: 'KEY',
 }

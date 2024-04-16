@@ -365,26 +365,29 @@ export class StockReportComponent implements OnInit {
       .sortBy('StockTypeId')
       .value();
 
-    const columnGroup = [{
+    const columnGroup: any[] = [{
       Name: "LocationGroup",
       Title: "",
       class: "matcolumncenter",
-      ColSpan: 2
+      ColSpan: 2,
+      sticky: true
     }];
 
-    const displayJson = {};
+    const displayJson: any = {};
     const staticFields = ["Location", "ReportLocation"];
 
     displayJson["Location"] = {
       Title: "Location",
       class: "matcolumnleft",
-      Style: "min-width: 250px"
+      Style: "min-width: 250px",
+      sticky: true
     };
 
     displayJson["ReportLocation"] = {
       Title: "Reporting Location",
       class: "matcolumnleft",
-      Style: "min-width: 250px"
+      Style: "min-width: 250px",
+      sticky: true
     };
 
     const initializeAggregates = (stockTypes = null, isTotal = false) => {

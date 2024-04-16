@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
+import { environment } from "src/environments/environment";
 
-const secretKey = 'WebXpress';
+const secretKey = environment.secretKey || 'WebXpress';
 @Injectable({
   providedIn: 'root'
 })

@@ -4,30 +4,58 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, switchMap, map } from 'rxjs/operators';
 import { StorageService } from '../service/storage.service';
 import { AuthService } from '../service/auth.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { EncryptionService } from '../service/encryptionService.service';
+import { environment } from "src/environments/environment";
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
   constructor(
     private authenticationService: AuthService,
     private _jwt: JwtHelperService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private encryptionService: EncryptionService
   ) {}
 
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+
     const excludedPaths = ['/auth/login', '/auth/refresh-tokens'];
+    const contentType = request.headers.get('Content-Type')?.toLowerCase();
 
+    if (environment.production && ( contentType?.includes('application/json') || !contentType ) &&  request.body) {      
+        request = request.clone({
+          setHeaders: {
+            encrypt: `true`,
+          },
+        });
+    }
+
+    if (request.headers.get('encrypt')) {
+      const encryptedData = this.encryptionService.encrypt(JSON.stringify(request.body));
+
+      request = request.clone({
+        headers: request.headers,
+        body: { data: encryptedData }
+      });
+    }
+    
     if (!excludedPaths.some(path => request.url.endsWith(path))) {
-      request = this.addAuthorizationHeader(request);
 
+      if(this.isTokenValid()) {
+        request = this.addAuthorizationHeader(request);
+      }
+      else {
+        return this.refreshTokenAndRetry(request, next);
+      }
       // const accessToken = this.storageService.getItem('token');
       // if(this._jwt.isTokenExpired(accessToken)) {
       //   return this.refreshTokenAndRetry(request, next);
@@ -38,6 +66,16 @@ export class JwtInterceptor implements HttpInterceptor {
     }
 
     return next.handle(request).pipe(
+      map(event => {
+        if (event instanceof HttpResponse && event.headers.get('decrypt')) {
+          if(event.body && event.body.data) {
+            const decryptedData = this.encryptionService.decrypt(event.body.data);
+            const jsonData = JSON.parse(decryptedData);
+            return event.clone({ body: jsonData });
+          }
+        }
+        return event;
+      }),
       catchError((error) => {
         if (error.status === 401 && !excludedPaths.some(path => request.url.endsWith(path))) {
           // Unauthorized error, token might have expired, attempt to refresh
@@ -55,7 +93,7 @@ export class JwtInterceptor implements HttpInterceptor {
     
     const accessToken = this.storageService.getItem('token');
     //&& !this._jwt.isTokenExpired(accessToken)
-    if (accessToken) {
+    if (accessToken && !this._jwt.isTokenExpired(accessToken)) {
       return request.clone({
         setHeaders: {
           Authorization: `Bearer ${accessToken}`,
@@ -65,6 +103,15 @@ export class JwtInterceptor implements HttpInterceptor {
 
     return request;
   }
+
+  private isTokenValid(): boolean {
+    const accessToken = this.storageService.getItem('token');
+    if(accessToken && !this._jwt.isTokenExpired(accessToken)) {
+      return true;
+    }
+    return false;
+  }
+
 
   private refreshTokenAndRetry(
     request: HttpRequest<any>,

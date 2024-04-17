@@ -57,7 +57,9 @@ export const GenericActions = {
     Get: 'generic/get',
     GetOne: 'generic/getOne',
     Create: 'generic/create',
-    Update: 'generic/update'
+    Update: 'generic/update',
+    Query: 'generic/query',
+    FindLastOne: 'generic/findLastOne'
 };
 
 export const OperationActions = {

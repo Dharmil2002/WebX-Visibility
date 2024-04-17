@@ -8,7 +8,7 @@ export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
     private freightDetails:FormControls[];
-    private otherCharges:FormControls[];
+    private otherInfo:FormControls[];
     constructor(public generalService: GeneralService) {
         super(generalService, "LTL", ["ConsignmentLtl"]);
         this.docketFields = [
@@ -1060,7 +1060,7 @@ export class ConsignmentLtl extends BaseControl {
                 }, generatecontrol: true, disable: true
             }
         ]
-        this.otherCharges = [
+        this.otherInfo = [
             {
                 name: 'cust_ref_no', label: 'Customer Ref No.', placeholder: 'Customer Ref No.', type: 'text',
                 value: "", Validations: [],
@@ -1193,6 +1193,6 @@ export class ConsignmentLtl extends BaseControl {
         return this.docketFields;
     }
     getOtherDetails() {
-        return this.otherCharges
+        return this.otherInfo
     }
 }

@@ -39,6 +39,7 @@ import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -92,7 +93,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   NonFreightLoaded = false;
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
-
+  DocCalledAs: DocCalledAsModel;
   InvoiceDetailsList: { count: any; title: string; class: string }[];
   matrials: AutoComplete[];
   rules: any[]=[];
@@ -132,6 +133,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private _NavigationService: NavigationService
   ) {
     super();
+    this.DocCalledAs = controlPanel.DocCalledAs;
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.model.docketDetail = new DocketDetail({});
     if (navigationState != null) {
@@ -139,14 +141,25 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
       if (this.isUpdate) {
-        this.model.docketDetail = navigationState;
-        this.breadscrums[0].title = "Consignment Edit";
+        this.breadscrums = [
+          {
+            title: `${this.DocCalledAs.Docket} Edit`,
+            items: ["Operations"],
+            active: `${this.DocCalledAs.Docket}`,
+          },
+        ];
         this.ewayBill = false;
       } else {
         this.model.prqData = navigationState;
         this.prqFlag = true;
         this.ewayBill = false;
-        this.breadscrums[0].title = "Consignment Entry";
+        this.breadscrums = [
+          {
+            title: `${this.DocCalledAs.Docket} Entry`,
+            items: ["Operations"],
+            active: `${this.DocCalledAs.Docket}`,
+          },
+        ];
       }
     }
     this.initializeFormControl();
@@ -923,81 +936,54 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*end*/
   async docketValidation(){
-    const res=await this.dcrService.validateFromSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
-    if(Object.keys(res).length>0){
-      switch(res.aSNTO){
-        case "E":
-          if(res.aSNNM){
-            if(this.storage.userName==res.aSNCD){
-             this.validateDcr();
-            }
-            else{
-              this.errorMessage();
-            }
-           
+    debugger
+    const res = await this.dcrService.validateFromSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
+    this.dcrDetail=res;
+    if(res) {
+      if(res.aLOTO == 'L' && res.aSNTO == 'E' && res.aSNCD && res.aLOCD==this.storage.branch) {
+       await this.validateDcr(res);
+      }
+      else if(res.aLOTO == 'L' && res.aSNTO == 'B' && this.storage.userName == res.aSNCD) {
+        await this.validateDcr(res);
+      }
+      else if(res.aLOTO == 'C' && res.aSNTO == 'C' && res.aSNCD) { 
+        const billingParty=this.model.consignmentTableForm.controls['billingParty'].value?.value||"";
+        if(billingParty) {
+          if(res.aSNCD==billingParty) {
+            await this.validateDcr(res);
           }
           else{
-            if(res.aLOTO=="L"){
-              if(res.aLOCD==this.storage.branch){
-                this.validateDcr();
-              }
-              else{
-                this.errorMessage();
-              }
-            }
+            await this.errorMessage();
           }
-          break
-        case "B":
-          if(res.aSNCD){
-            if(this.storage.userName==res.aSNCD){
-              this.validateDcr();
-            }
-            else{
-              this.errorMessage();
-            }
-          }
-          break
-          case "C":
-            if(res.aSNTO=="C" && res.aLOCD==this.storage.branch){
-              const billingParty=this.model.consignmentTableForm.controls['billingParty'].value?.value||"";
-              if(billingParty){
-                if(res.aSNCD==billingParty){
-                  this.validateDcr();
-                }
-                else{
-                  this.errorMessage();
-                }
-              }
-              else{
-                this.validateDcr();
-                this.model.consignmentTableForm.controls['billingParty'].setValue({name:res.aSNNM,value:res.aSNCD})
-              }
-              
-            }
-            else{
-               this.errorMessage();
-            }
-            break;
-
         }
-       
+        else {
+          if(await this.validateDcr(res)) {
+            this.model.consignmentTableForm.controls['billingParty'].setValue( { name:res.aSNNM,value:res.aSNCD } );
+          }
+          else{
+            await this.errorMessage();
+          }
+        }
+      }
+      else{
+        this.errorMessage();
+      }
     }
     else{
       this.errorMessage();
     }
-    this.dcrDetail=res;
     
   }
   /*check Dcr is use or not*/
-  async validateDcr(){
-    const res=await this.dcrService.getDCRDocument({dOCNO:this.model.consignmentTableForm.controls['docketNumber'].value});
-   
-    if(Object.keys(res).length>0){
-     
+  async validateDcr(dcr: any): Promise<boolean> {   
+    let isValid = false;
+    const dktNo = this.model.consignmentTableForm.controls['docketNumber'].value;
+    const doc = await this.dcrService.getDCRDocument({dOCNO: dktNo});
+    if(doc && doc.dOCNO == dktNo) {
       Swal.fire({
-        icon: 'error',
-        title:'DCR No is already used',
-        text:'DCR No is already used',
+        icon: 'warning',
+        title: `${this.DocCalledAs.Docket} No is ${ doc.sTS == 2 ? "declared void" : "already used"}`,
+        text: `${this.DocCalledAs.Docket} No is ${ doc.sTS == 2 ? "declared void" : "already used"}`,
         showConfirmButton: true,
         confirmButtonText: 'OK',
         timer: 5000,
@@ -1006,54 +992,55 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.consignmentTableForm.controls['docketNumber'].setValue("");
     }
     else{
-      if(this.mseq){
-        const mseq=await this.dcrService.getLastDocumentNo(this.dcrDetail);
-        const nextCode=await nextKeyCode(mseq.dOCNO)
-        if(nextCode==this.model.consignmentTableForm.controls['docketNumber'].value){
+      if(this.mseq) {
+        const nextCode = await this.dcrService.getNextDocumentNo(this.dcrDetail);
+        if (nextCode == "" || nextCode != dktNo) {
           Swal.fire({
-            icon: 'success',
-            title:'Valid',
-            text:' DCR number has been allocated. You may now proceed',
-            showConfirmButton: true,
-            confirmButtonText: 'OK',
-            timer: 5000,
-            timerProgressBar: true,
-          });
-        }
-        else{
-          Swal.fire({
-            icon: 'error',
-            title:'The DCR number is out of sequence',
+            icon: 'warning',
+            title:  `${this.DocCalledAs.Docket} No is out of sequence. Next no is sequence is ${nextCode}.`,
             showConfirmButton: true,
             confirmButtonText: 'OK',
             timer: 5000,
             timerProgressBar: true,
 
           })
-          this.model.consignmentTableForm.controls['docketNumber'].setValue("");
+          this.model.consignmentTableForm.controls['docketNumber'].setValue("");         
         }
+        else{
+          isValid = true
+          Swal.fire({
+            icon: 'success',
+            title:'Valid',
+            text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+          });
+        }     
       }
       else{
+        isValid = true
         Swal.fire({
           icon: 'success',
           title:'Valid',
-          text:' DCR number has been allocated. You may now proceed',
+          text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
           showConfirmButton: true,
           confirmButtonText: 'OK',
           timer: 5000,
           timerProgressBar: true,
         });
-      }
-     
+      }     
     }
-  
+
+    return isValid;
   }
   /*end*/
   async errorMessage(){
     Swal.fire({
       icon: 'error',
-      title:'DCR No is not valid',
-      text:'DCR No is not valid',
+      title:`${this.DocCalledAs.Docket} No is not valid`,
+      text:`${this.DocCalledAs.Docket} No is not valid`,
       showConfirmButton: true,
       confirmButtonText: 'OK',
       timer: 5000,
@@ -1064,7 +1051,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*get Rules*/
   async getRules(){
     const filter={
-      mODULE:"CNOTE"
+      cID:this.storage.companyCode,
+      mODULE:"CNOTE",
+      aCTIVE:true
     }
     const res=await this.controlPanel.getModuleRules(filter);
     if(res.length>0){
@@ -1075,58 +1064,30 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*End*/
    checkDocketRules(){
-      this.rules.forEach((x)=>{
-        switch(x.rULENM){
-          case "STYP":
-            const isManual = x.vAL === "C";
-            this.model.allformControl.forEach(control => {
-                if (control.name === "docketNumber") {
-                    control.disable = isManual;
-                   this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual==false?"":"Computerized");
-                }
-            });
-            this.isManual=isManual==false?true:false;
-            break;
-          case "ELOC":
-           if(!x.vAL.includes(this.storage.branch)){
-            Swal.fire({
-              icon: "info", 
-              title: "Missing Information",
-              text: "this branch is not allowed to create docket.",
-              showConfirmButton: true,
-              confirmButtonText: 'OK',
-              confirmButtonColor: '#d33',
-              timer: 5000,
-              timerProgressBar: true,
-            
-          });
-            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-           }
-            break;
+      const STYP = this.rules.find(x=>x.rULENM=="STYP" && x.aCTIVE)
+      if(STYP){
+        const isManual = STYP.vAL === "M";
+        this.model.allformControl.find(x=>x.name=="docketNumber").disable = !isManual;
+        this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual?"":"Computerized");        
+        this.isManual=isManual;
+        this.isUpdate=isManual;
+      }
 
-          case "NTYP":
-           this.alpaNumber=x.vAL=="AN";
-          break;
-          case "SL":
-            this.sequence=x.vAL=="S";
-            break;
-          case "BCD":
-            this.isBrachCode=x.vAL=="Y";
-            break;
-          case "YEAR":
-            this.fyear=x.vAL=="F";
-            break;
-          case "LENGTH":
-            this.length=x.vAL;
-            break;
-          case "MSEQ":
-          this.mseq=x.vAL=="Y";
-          //  this.mseq=true;
-            break;
-
+      const ELOC = this.rules.find(x=>x.rULENM=="ELOC" && x.aCTIVE)
+      if(ELOC){
+        if(!ELOC.vAL.includes(this.storage.branch)) {
+          // check exception for branch
         }
-      })
+      }
+
+      this.alpaNumber = this.rules.find(x=>x.rULENM=="NTYP" && x.aCTIVE)?.vAL=="AN";
+      this.sequence = this.rules.find(x=>x.rULENM=="SL" && x.aCTIVE)?.vAL=="S";
+      this.isBrachCode = this.rules.find(x=>x.rULENM=="BCD" && x.aCTIVE)?.vAL=="Y";
+      this.fyear = this.rules.find(x=>x.rULENM=="YEAR" && x.aCTIVE)?.vAL=="F";
+      this.length = ConvertToNumber(this.rules.find(x=>x.rULENM=="LENGTH" && x.aCTIVE)?.vAL);
+      this.mseq = this.rules.find(x=>x.rULENM=="MSEQ" && x.aCTIVE)?.vAL=="Y";
   }
+
   vendorFieldChanged() {
 
     const vendorType = this.model.consignmentTableForm.value.vendorType !== undefined

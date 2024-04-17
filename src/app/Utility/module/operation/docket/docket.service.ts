@@ -1475,15 +1475,15 @@ export class DocketService {
         return res.data;
     }
     async addDcrDetails(data,dcrData){
-        const req={
+        const req = {
             companyCode:this.storage.companyCode,
             collectionName:"dcr_documents",
             data:  {
-                _id: `${this.storage.companyCode}-${'CN'}-${dcrData.bOOK}-${data.dKTNO}`,
+                _id: `${this.storage.companyCode}-${dcrData.tYP}-${dcrData.bOOK}-${data.dKTNO}`,
                 cID: this.storage.companyCode,
-                tYP: 'CN',
-                bOOK:dcrData.bOOK,
-                dOCNO:data.dKTNO,
+                tYP: dcrData.tYP,
+                bOOK: dcrData.bOOK,
+                dOCNO: data.dKTNO,
                 sTS: dcrStatus.Used, // 1: Used, 2: Void, 9: Cancelled
                 sTSNM:dcrStatus[dcrStatus.Used],
                 vRES: '',
@@ -1493,10 +1493,11 @@ export class DocketService {
             }
         }
         await firstValueFrom(this.operation.operationMongoPost("generic/create", req));
+
         const reqDcr={
             companyCode:this.storage.companyCode,
             collectionName:"dcr_header",
-            filter:{bOOK:dcrData.bOOK,cID:this.storage.companyCode}
+            filter:{ bOOK:dcrData.bOOK,cID:this.storage.companyCode}
         }
         const getDcr = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", reqDcr));
         const dcrDetails = getDcr.data;
@@ -1505,7 +1506,12 @@ export class DocketService {
             companyCode: this.storage.companyCode,
             collectionName: "dcr_header",
             filter: { bOOK: dcrData.bOOK, cID: this.storage.companyCode },
-            update: { uSED: uSED }
+            update: { 
+                uSED: uSED,
+                mODBY: this.storage.userName,
+                mODDT: new Date(),
+                mODLOC: this.storage.branch
+            }
         }
         await firstValueFrom(this.operation.operationMongoPut("generic/update",updateDcr))
         return true

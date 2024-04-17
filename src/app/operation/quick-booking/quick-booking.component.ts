@@ -212,7 +212,7 @@ export class QuickBookingComponent implements OnInit {
   }
   /*end*/
   async docketValidation(){
-    const res=await this.dcrService.validateSeries(this.quickDocketTableForm.controls['docketNumber'].value);
+    const res=await this.dcrService.validateFromSeries(this.quickDocketTableForm.controls['docketNumber'].value);
     if(Object.keys(res).length>0){
       switch(res.aSNTO){
         case "E":
@@ -279,7 +279,7 @@ export class QuickBookingComponent implements OnInit {
   }
   /*check Dcr is use or not*/
   async validateDcr(){
-    const res=await this.dcrService.getDCRDetail({dOCNO:this.quickDocketTableForm.controls['docketNumber'].value});
+    const res=await this.dcrService.getDCRDocument({dOCNO:this.quickDocketTableForm.controls['docketNumber'].value});
    
     if(Object.keys(res).length>0){
      
@@ -297,7 +297,7 @@ export class QuickBookingComponent implements OnInit {
     }
     else{
       if(this.mseq){
-        const mseq=await this.dcrService.getListDcrNo(this.dcrDetail);
+        const mseq=await this.dcrService.getLastDocumentNo(this.dcrDetail);
         const nextCode=await nextKeyCode(mseq.dOCNO)
         if(nextCode==this.quickDocketTableForm.controls['docketNumber'].value){
           Swal.fire({

@@ -5,6 +5,8 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { fi } from "date-fns/locale";
+import { GenericActions } from "src/app/config/myconstants";
+import { isBetween, nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 
 @Injectable({
   providedIn: "root",
@@ -157,7 +159,7 @@ export class DCRService {
       ],
     };
     const res = await firstValueFrom(
-      this.masterServices.masterMongoPost("generic/query", reqBody)
+      this.masterServices.masterMongoPost(GenericActions.Query, reqBody)
     );
     return res.data;
   }
@@ -168,13 +170,15 @@ export class DCRService {
 
     return inputValue >= startValue && inputValue <= endValue;
   }
-  async validateSeries(number) {
+  async validateFromSeries(number) {
     
     const req = {
       companyCode: this.storage.companyCode,
       collectionName: "dcr_header",
       filter: {
-        tYP: "CNote", sTS: 4,
+        cID: this.storage.companyCode,
+        tYP: "CNote", 
+        sTS: 4,
         D$or: [
           { fROM: { D$lte: number }, tO: { D$gte: number } }, // Check if the value is within any range
           { fROM: number }, // Check if the value is the same as the 'from' value of any range
@@ -182,29 +186,69 @@ export class DCRService {
         ]
       }
     }
-     const res = await firstValueFrom(this.operation.operationMongoPost("generic/getOne",req));
+    const res = await firstValueFrom(this.operation.operationMongoPost(GenericActions.GetOne,req));
     return res.data;
   }
-  async getDCRDetail(filter = {}) {
+  
+  async getDCRDocument(filter = {}) {
     const req = {
       companyCode: this.storage.companyCode,
       collectionName: "dcr_documents",
       filter: filter,
     };
     const res = await firstValueFrom(
-      this.operation.operationMongoPost("generic/getOne", req)
+      this.operation.operationMongoPost(GenericActions.GetOne, req)
     );
     return res.data;
   }
-  async getListDcrNo(data) {
-    try {
-      let query = { cID: this.storage.companyCode,bOOK:data.bOOK };
-      const req = { companyCode: this.storage.companyCode, collectionName: "dcr_documents", filter: query, sorting: { dOCNO: -1 } };
-      const response = await firstValueFrom(this.operation.operationMongoPost("generic/findLastOne", req));
-      return response?.data;
-    } catch (error) {
-      throw error;
-    }
+
+  async getLastDocumentNo(data) {    
+    let query = { cID: this.storage.companyCode, bOOK:data.bOOK, sTS: 1};
+    const req = { 
+      companyCode: this.storage.companyCode, 
+      collectionName: "dcr_documents", 
+      filter: query, 
+      sorting: { dOCNO: -1 } 
+    };
+    const response = await firstValueFrom(this.operation.operationMongoPost(GenericActions.FindLastOne, req));
+    return response?.data;
   }
-  
+
+  async getVoidDocuments(data) {    
+      let matchQuery = { 
+        cID: this.storage.companyCode, bOOK:data.bOOK, sTS: 2
+      };
+
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "dcr_documents",
+        filters: [
+          {
+            D$match: matchQuery
+          },
+          { D$sort: { dOCNO: -1  } }
+        ],
+      };
+
+      const response = await firstValueFrom(this.operation.operationMongoPost(GenericActions.Query, req));
+      return response?.data || [];    
+  }
+
+  async getNextDocumentNo(data) { 
+    const ld = await this.getLastDocumentNo(data);    
+    
+    let nextCode = (ld?.dOCNO) ? await nextKeyCode(ld?.dOCNO) : data.fROM;    
+    if(nextCode.length == data.fROM.length && isBetween(nextCode, data.fROM, data.tO)) {
+      const vd = await this.getVoidDocuments(data);
+      if(vd.length > 0) {          
+        while(vd.includes(nextCode) && nextCode.length == data.fROM.length) {
+          nextCode = await nextKeyCode(nextCode);
+        }
+      }
+      nextCode = (nextCode == await nextKeyCode(data.tO)) ? "" : nextCode;
+      
+      return nextCode;
+    }
+    return "";
+  }
 }

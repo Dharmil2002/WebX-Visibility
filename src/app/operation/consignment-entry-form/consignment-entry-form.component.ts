@@ -923,7 +923,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*end*/
   async docketValidation(){
-    const res=await this.dcrService.validateSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
+    const res=await this.dcrService.validateFromSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
     if(Object.keys(res).length>0){
       switch(res.aSNTO){
         case "E":
@@ -990,7 +990,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*check Dcr is use or not*/
   async validateDcr(){
-    const res=await this.dcrService.getDCRDetail({dOCNO:this.model.consignmentTableForm.controls['docketNumber'].value});
+    const res=await this.dcrService.getDCRDocument({dOCNO:this.model.consignmentTableForm.controls['docketNumber'].value});
    
     if(Object.keys(res).length>0){
      
@@ -1007,7 +1007,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     }
     else{
       if(this.mseq){
-        const mseq=await this.dcrService.getListDcrNo(this.dcrDetail);
+        const mseq=await this.dcrService.getLastDocumentNo(this.dcrDetail);
         const nextCode=await nextKeyCode(mseq.dOCNO)
         if(nextCode==this.model.consignmentTableForm.controls['docketNumber'].value){
           Swal.fire({

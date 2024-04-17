@@ -23,7 +23,10 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message:  `${DocCalledAs.Docket}No required`,
+                  }],
                 functions: {
                     onChange: "docketValidation",
                 },

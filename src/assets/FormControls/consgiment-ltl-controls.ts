@@ -4,6 +4,9 @@ import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+const today = new Date();
+today.setHours(23, 59, 59, 999); // Set the time to the end of the day
+let maxDate = today;
 export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
@@ -23,7 +26,10 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message:  `${DocCalledAs.Docket}No required`,
+                  }],
                 functions: {
                     onChange: "docketValidation",
                 },
@@ -52,7 +58,7 @@ export class ConsignmentLtl extends BaseControl {
                     onDate: "changeInvoice"
                 },
                 additionalData: {
-                    minDate: new Date(),
+                    maxDate:maxDate,
                     metaData: "Basic"
                 }
             },

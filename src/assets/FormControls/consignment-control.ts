@@ -2,7 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { StoreKeys } from "src/app/config/myconstants";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
 import * as StorageService from "src/app/core/service/storage.service";
-
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -21,19 +21,24 @@ export class ConsignmentControl {
   constructor(docketDetail) {
     this.ConsignmentControlArray = [
       {
-        name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
-        value: docketDetail?.docketNumber || 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
+        name: "docketNumber",label: `${DocCalledAs.Docket} No`,
+        placeholder: `${DocCalledAs.Docket} No`, type: "text",
+        value: docketDetail?.docketNumber || 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [   {
+          name: "required",
+          message:  `${DocCalledAs.Docket}No required`,
+        }], generatecontrol: true, disable: true,
         functions: {
           onChange: "docketValidation",
       },
+      
         additionalData: {
           metaData: "Basic"
         },
       },
       {
         name: "docketDate",
-        label: 'Consignment Note Date',
-        placeholder: 'Consignment Note Date',
+        label: `${DocCalledAs.Docket} Date`,
+        placeholder: `${DocCalledAs.Docket} Date`,
         type: "datetimerpicker",
         value: docketDetail.docketDate,
         filterOptions: "",
@@ -44,7 +49,7 @@ export class ConsignmentControl {
         Validations: [
           {
             name: "required",
-            message: "Pickup Date is required",
+            message: `${DocCalledAs.Docket} Date required`,
           },
         ],
         additionalData: {

@@ -33,6 +33,7 @@ import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
 import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
+import { debug } from 'console';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -228,7 +229,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.bindQuickdocketData();
     this.commonDropDownMapping();
     this.getVolControls();
-    if(this.quickDocket){
+    if(!this.quickDocket){
       this.getRules();
     }
   }
@@ -1071,6 +1072,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         break;
 
     }
+    const actualWeight=parseFloat(this.invoiceForm.controls['actualWeight'].value);
+    const totolCharge = cft*cubWt
+    if(totolCharge>actualWeight){
+    this.invoiceForm.controls['chargeWeight'].setValue(totolCharge.toFixed(2))
+    }
+    else{
+      this.invoiceForm.controls['chargeWeight'].setValue(actualWeight.toFixed(2))
+    }
+    
   }
   }
   /*below function would be change when the Payment time field as select any value*/
@@ -1094,14 +1104,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*end*/
   async docketValidation(){
     const res = await this.dcrService.validateFromSeries(this.consignmentForm.controls['docketNumber'].value);
+    this.dcrDetail=res;
     if(res) {
       if(res.aLOTO == 'L' && res.aSNTO == 'E' && res.aSNCD && res.aLOCD==this.storage.branch) {
-        await this.validateDcr(res);
+       await this.validateDcr(res);
       }
       else if(res.aLOTO == 'L' && res.aSNTO == 'B' && this.storage.userName == res.aSNCD) {
         await this.validateDcr(res);
       }
-      if(res.aLOTO == 'C' && res.aSNTO == 'C' && res.aSNCD) { 
+      else if(res.aLOTO == 'C' && res.aSNTO == 'C' && res.aSNCD) { 
         const billingParty=this.consignmentForm.controls['billingParty'].value?.value||"";
         if(billingParty) {
           if(res.aSNCD==billingParty) {
@@ -1115,6 +1126,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           if(await this.validateDcr(res)) {
             this.consignmentForm.controls['billingParty'].setValue( { name:res.aSNNM,value:res.aSNCD } );
           }
+          else{
+            await this.errorMessage();
+          }
         }
       }
       else{
@@ -1124,7 +1138,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     else{
       this.errorMessage();
     }
-    this.dcrDetail=res;
     
   }
   /*check Dcr is use or not*/
@@ -1147,7 +1160,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     else{
       if(this.mseq) {
         const nextCode = await this.dcrService.getNextDocumentNo(this.dcrDetail);
-        if (nextCode == "" && nextCode != dktNo) {
+        if (nextCode == "" || nextCode != dktNo) {
           Swal.fire({
             icon: 'warning',
             title:  `${this.DocCalledAs.Docket} No is out of sequence. Next no is sequence is ${nextCode}.`,
@@ -1159,6 +1172,18 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           })
           this.consignmentForm.controls['docketNumber'].setValue("");         
         }
+        else{
+          isValid = true
+          Swal.fire({
+            icon: 'success',
+            title:'Valid',
+            text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+          });
+        }     
       }
       else{
         isValid = true
@@ -1173,6 +1198,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         });
       }     
     }
+
     return isValid;
   }
   /*end*/
@@ -1191,7 +1217,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*get Rules*/
   async getRules(){
     const filter={
-      mODULE:"CNOTE"
+      cID:this.storage.companyCode,
+      mODULE:"CNOTE",
+      aCTIVE:true
     }
     const res=await this.controlPanel.getModuleRules(filter);
     if(res.length>0){
@@ -1202,12 +1230,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*End*/
    checkDocketRules(){
-
       const STYP = this.rules.find(x=>x.rULENM=="STYP" && x.aCTIVE)
       if(STYP){
         const isManual = STYP.vAL === "M";
         this.allFormControls.find(x=>x.name=="docketNumber").disable = !isManual;
-        this.consignmentForm.controls['docketNumber'].setValue(isManual==false?"":"Computerized");        
+        this.consignmentForm.controls['docketNumber'].setValue(isManual?"":"Computerized");        
         this.isManual=isManual;
         this.isUpdate=isManual;
       }

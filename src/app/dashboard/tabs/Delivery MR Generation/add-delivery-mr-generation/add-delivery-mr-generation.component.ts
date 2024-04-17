@@ -205,7 +205,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         newSubTotal: 0,
         subTotal: 0,
         payBasis: element.pAYTYPNM,
-        otherCharge:null,
+        otherCharge: null,
         actions: ['Edit']
       };
       this.tableData.push(json);
@@ -268,7 +268,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     debugger
     console.log('event', event)
     const request = {
-      charges:event.data.otherCharge?event.data:"",
+      charges: event.data,
       Details: event,
       show: event.functionName ? true : false
     };
@@ -293,22 +293,31 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         // Delay execution for better user experience
         await new Promise(resolve => setTimeout(resolve, 1000));
         this.otherCharges = data;
-        const chargesList = data.Charge
-        data.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
-        const newData = {
-          id: data.id,
-          consignmentNoteNumber: data.consignmentNoteNumber,
-          subTotal: this.filteredDocket[0].tOTAMT,
-          newSubTotal: parseFloat(data.newSubTotal).toFixed(2) || 0,
-          rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
-          OtherDly: this.calculateTotalAmount(data.chargeData).toFixed(2),  // Calculate total amount based on charges
-          totalAmount: this.calculateTotalAmount(data.chargeData),
-          payBasis: data.payBasis,
-          otherCharge: data.Charge,
-          actions: ['Edit']
-        };
-        this.tableData = this.tableData.filter(item => item.id !== data.id);
-        this.tableData.unshift(newData);
+
+        let dt = this.tableData.find(x => x.id === data.id);
+        dt.otherCharge = data.chargeData;       
+        dt.newSubTotal = parseFloat(data.newSubTotal).toFixed(2) || 0;
+        dt.rateDifference = parseFloat(data.newSubTotal) - parseFloat(data.subTotal);
+        dt.totalAmount = this.calculateTotalAmount(data.chargeData);
+        dt.OtherDly = dt.totalAmount.toFixed(2);
+        
+        // const chargesList = data.Charge
+        // data.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
+        // const newData = {
+        //   id: data.id,
+        //   consignmentNoteNumber: data.consignmentNoteNumber,
+        //   subTotal: this.filteredDocket[0].tOTAMT,
+        //   newSubTotal: parseFloat(data.newSubTotal).toFixed(2) || 0,
+        //   rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
+        //   OtherDly: this.calculateTotalAmount(data.chargeData).toFixed(2),  // Calculate total amount based on charges
+        //   totalAmount: this.calculateTotalAmount(data.chargeData),
+        //   payBasis: data.payBasis,
+        //   otherCharge: data.Charge,
+        //   actions: ['Edit']
+        // };
+        // this.tableData = this.tableData.filter(item => item.id !== data.id);
+        // this.tableData.unshift(newData);
+
         let totalMr = 0;
         this.tableData.forEach(item => {
           totalMr += item.totalAmount;

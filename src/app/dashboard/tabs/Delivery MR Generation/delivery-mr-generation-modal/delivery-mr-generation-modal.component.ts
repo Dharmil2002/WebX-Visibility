@@ -31,7 +31,7 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     private objResult: any,
     private thcService: ThcService) {
       debugger
-    this.chargeData = this.objResult?.charges?.otherCharge||"";
+    this.chargeData = this.objResult?.charges?.otherCharge;
     console.log(this.objResult, this.chargeData);
 
     this.objResult.show ? this.showSaveAndCancelButton = false : this.showSaveAndCancelButton = true;
@@ -112,10 +112,12 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     debugger
     try {
       if (this.showSaveAndCancelButton && this.chargeData) {//to edit charges
-        await this.processChargeData(this.chargeData.chargeData, false);
-      } else if (!this.showSaveAndCancelButton && this.chargeData) { //to show charges
-        await this.processChargeData(this.chargeData.chargeData, true);
-      } else if (this.showSaveAndCancelButton) {//to add charges
+        await this.processChargeData(this.chargeData, false);
+      } 
+      else if (!this.showSaveAndCancelButton && this.chargeData) { //to show charges
+        await this.processChargeData(this.chargeData, true);
+      }
+      else if (this.showSaveAndCancelButton) {//to add charges
         await this.fetchAndProcessCharges();
       }
     } catch (error) {
@@ -126,7 +128,6 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
 
   private async processChargeData(data: any[], disable: boolean) {
     const invoiceList = data
-      .filter(element => element)
       .map((element, index) => ({
         id: index + 1,
         name: element.cHGID || '',

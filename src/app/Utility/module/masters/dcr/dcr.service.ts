@@ -177,7 +177,7 @@ export class DCRService {
       collectionName: "dcr_header",
       filter: {
         cID: this.storage.companyCode,
-        tYP: "CNote", 
+        tYP: "CN", 
         sTS: 4,
         D$or: [
           { fROM: { D$lte: number }, tO: { D$gte: number } }, // Check if the value is within any range
@@ -236,12 +236,12 @@ export class DCRService {
 
   async getNextDocumentNo(data) { 
     const ld = await this.getLastDocumentNo(data);    
-    
     let nextCode = (ld?.dOCNO) ? await nextKeyCode(ld?.dOCNO) : data.fROM;    
     if(nextCode.length == data.fROM.length && isBetween(nextCode, data.fROM, data.tO)) {
       const vd = await this.getVoidDocuments(data);
-      if(vd.length > 0) {          
-        while(vd.includes(nextCode) && nextCode.length == data.fROM.length) {
+      if(vd.length > 0) {   
+        const vdList=vd.map(x=>x.dOCNO);
+        while(vdList.includes(nextCode) && nextCode.length == data.fROM.length) {
           nextCode = await nextKeyCode(nextCode);
         }
       }

@@ -4,7 +4,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { DeliveryMrGeneration } from 'src/assets/FormControls/DeliveryMr';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
-import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import Swal from 'sweetalert2';
@@ -20,27 +19,26 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
   MrGenerationForm: UntypedFormGroup
   payBasisName: string;
   payBasisstatus: boolean;
-  isChagesValid: boolean;
   jsonControlsEdit: any[];
   allJson: any[];
   chargeList: any;
   chargeControls: InvoiceModel[];
   chargeData: any;
-  isEdit: boolean;
+  showSaveAndCancelButton: boolean;
   constructor(private dialogRef: MatDialogRef<DeliveryMrGenerationModalComponent>,
     private fb: UntypedFormBuilder,
     @Inject(MAT_DIALOG_DATA)
     private objResult: any,
     private thcService: ThcService) {
-    this.chargeData = this.objResult.charges;
-    this.isEdit = this.objResult.charges ? true : false;
+      debugger
+    this.chargeData = this.objResult?.charges?.otherCharge||"";
+    console.log(this.objResult, this.chargeData);
+
+    this.objResult.show ? this.showSaveAndCancelButton = false : this.showSaveAndCancelButton = true;
   }
 
   ngOnInit(): void {
     this.initializeFormControl();
-    console.log(this.objResult);
-
-    console.log(this.chargeData, this.isEdit);
   }
   //#region to initialize form control
   async initializeFormControl() {
@@ -59,18 +57,22 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     }
   }
   //#endregion
+  //#region to close dialog
   Close() {
-    this.dialogRef.close()
+    this.dialogRef.close(null)
   }
   cancel() {
-    this.dialogRef.close()
+    this.dialogRef.close(null)
   }
+  //#endregion
+  //#region to send charges to parent component
   save() {
     let formData = this.MrGenerationForm.value;
     formData.id = this.objResult.Details.data.id;
     formData.consignmentNoteNumber = this.objResult.Details.data.consignmentNoteNumber;
     formData.payBasis = this.objResult.Details.data.payBasis;
     formData.subTotal = this.objResult.Details.data.subTotal;
+    formData.newSubTotals = this.objResult.Details.data.newSubTotal;
     clearValidatorsAndValidate(this.MrGenerationForm);
 
     let chargeData = [];
@@ -81,7 +83,8 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
         showAlert = true;
         Swal.fire({
           icon: "info",
-          title: `As charges are mandatory, they cannot be zero. Please enter another value.`,
+          title: "Information",
+          text: `As charges are mandatory, they cannot be zero. Please enter another value.`,
           showConfirmButton: true,
         });
         return;
@@ -97,108 +100,108 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     });
 
     formData.chargeData = chargeData;
+    formData.Charge = { consignmentNoteNumber: this.objResult.Details.data.consignmentNoteNumber, charges: chargeData }
 
     if (!showAlert) {
       this.dialogRef.close(formData);
     }
   }
-
-
+  //#endregion
+  //#region to get charges
   async getCharges() {
-    this.chargeList = await this.thcService.getCharges(
-      {
-        "cHAPP": { 'D$eq': 'DeliveryMR' },
-        'isActive': { 'D$eq': true }
-      });
-    // console.log(this.chargeList);
+    debugger
+    try {
+      if (this.showSaveAndCancelButton && this.chargeData) {//to edit charges
+        await this.processChargeData(this.chargeData.chargeData, false);
+      } else if (!this.showSaveAndCancelButton && this.chargeData) { //to show charges
+        await this.processChargeData(this.chargeData.chargeData, true);
+      } else if (this.showSaveAndCancelButton) {//to add charges
+        await this.fetchAndProcessCharges();
+      }
+    } catch (error) {
+      console.error('Error fetching or processing charges:', error);
+      // Handle the error appropriately
+    }
+  }
 
-    if (!this.isEdit && this.chargeList && this.chargeList.length > 0) {
-      const invoiceList: InvoiceModel[] = [];
+  private async processChargeData(data: any[], disable: boolean) {
+    const invoiceList = data
+      .filter(element => element)
+      .map((element, index) => ({
+        id: index + 1,
+        name: element.cHGID || '',
+        label: `${element.cHGNM}(${element.oPS})`,
+        placeholder: element.cHGNM || '',
+        type: 'text',
+        value: `${Math.abs(element.aMT)}`,
+        filterOptions: '',
+        displaywith: '',
+        generatecontrol: true,
+        disable: disable,
+        Validations: [{
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
+        }],
+        additionalData: {
+          showNameAndValue: element.iSREQ,
+          metaData: element.oPS
+        },
+      }));
 
-      this.chargeList.forEach((element, index) => {
-        if (element) {
-          const invoice: InvoiceModel = {
-            id: 1 + index,
-            name: element.cHACD || '',
-            label: `${element.sELCHA}(${element.aDD_DEDU})`,
-            placeholder: element.cAPTION || '',
-            type: 'text',
-            value: '0',
-            filterOptions: '',
-            displaywith: '',
-            generatecontrol: true,
-            disable: true,
-            Validations: [{
-              name: "pattern",
-              message: "Please Enter only positive numbers with up to two decimal places",
-              pattern: '^\\d+(\\.\\d{1,2})?$'
-            }],
-            additionalData: {
-              metaData: element.aDD_DEDU,
-              showNameAndValue: element.iSREQ
-            },
-          };
+    const enable = invoiceList.map(x => ({
+      ...x,
+      name: `${x.name}`,
+      disable: disable
+    }));
 
-          invoiceList.push(invoice);
-        }
-      });
-      const enable: InvoiceModel[] = invoiceList.map((x) => ({
+    this.chargeControls = enable.sort((a, b) => a.name.localeCompare(b.name));
+    this.allJson = this.chargeControls;
+    this.MrGenerationForm = formGroupBuilder(this.fb, [this.allJson]);
+  }
+
+  private async fetchAndProcessCharges() {
+    this.chargeList = await this.thcService.getCharges({
+      "cHAPP": { 'D$eq': 'DeliveryMR' },
+      'isActive': { 'D$eq': true }
+    });
+
+    if (this.chargeList && this.chargeList.length > 0) {
+      const invoiceList = this.chargeList
+        .filter(element => element)
+        .map((element, index) => ({
+          id: 1 + index,
+          name: element.cHACD || '',
+          label: `${element.sELCHA}(${element.aDD_DEDU})`,
+          placeholder: element.cAPTION || '',
+          type: 'text',
+          value: '0',
+          filterOptions: '',
+          displaywith: '',
+          generatecontrol: true,
+          disable: true,
+          Validations: [{
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: '^\\d+(\\.\\d{1,2})?$'
+          }],
+          additionalData: {
+            metaData: element.aDD_DEDU,
+            showNameAndValue: element.iSREQ
+          },
+        }));
+
+      const enable = invoiceList.map(x => ({
         ...x,
         name: `${x.name}`,
         disable: false
       }));
+
       this.chargeControls = enable.sort((a, b) => a.name.localeCompare(b.name));
-      this.allJson = [...this.jsonControlsEdit, ...this.chargeControls]
+      this.allJson = [...this.jsonControlsEdit, ...this.chargeControls];
       this.MrGenerationForm = formGroupBuilder(this.fb, [this.allJson]);
-
-    } else {
-      console.log(this.chargeData);
-
-      if (this.chargeData && this.chargeData.length > 0 && this.isEdit) {
-        const invoiceList = [];
-        this.chargeData.chargeData.
-          forEach((element, index) => {
-            if (element) {
-              const invoice: InvoiceModel = {
-                id: index + 1,
-                name: element.cHGID || '',
-                label: `${element.cHGNM}(${element.oPS})`,
-                placeholder: element.cHGNM || '',
-                type: 'text',
-                value: `${Math.abs(element.aMT)}`,
-                filterOptions: '',
-                displaywith: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                  name: "pattern",
-                  message: "Please Enter only positive numbers with up to two decimal places",
-                  pattern: '^\\d+(\\.\\d{1,2})?$'
-                }],
-                additionalData: {
-                  showNameAndValue: element.iSREQ,
-                  metaData: element.oPS
-                },
-
-              };
-
-              invoiceList.push(invoice);
-            }
-          });
-
-        this.chargeControls = invoiceList;
-        const enable: InvoiceModel[] = invoiceList.map((x) => ({
-          ...x,
-          name: `${x.name}`,
-          disable: false
-        }));
-        console.log(this.jsonControlsEdit);
-
-        this.chargeControls = enable.sort((a, b) => a.name.localeCompare(b.name));
-        this.allJson = [...this.jsonControlsEdit, ...this.chargeControls]
-      }
     }
-    this.isChagesValid = true;
-
   }
+
+  //#endregion
 }

@@ -129,7 +129,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
-      console.log(data.data);
       this.docketNo = data.data.no;
     }
   }
@@ -206,6 +205,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         newSubTotal: 0,
         subTotal: 0,
         payBasis: element.pAYTYPNM,
+        otherCharge:null,
         actions: ['Edit']
       };
       this.tableData.push(json);
@@ -265,11 +265,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to Add a new item to the table or edit
   addDetails(event) {
-    console.log(event);
-
+    debugger
+    console.log('event', event)
     const request = {
-      charges: this.otherCharges,
+      charges:event.data.otherCharge?event.data:"",
       Details: event,
+      show: event.functionName ? true : false
     };
 
     this.tableload = true;
@@ -284,21 +285,26 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async (data) => {
       try {
-        if (!data) return; // Handle the case when data is not available
+        if (!data) {
+          this.tableload = false;
+          return;
+        } // Handle the case when data is not available
 
         // Delay execution for better user experience
         await new Promise(resolve => setTimeout(resolve, 1000));
         this.otherCharges = data;
-
+        const chargesList = data.Charge
+        data.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
         const newData = {
           id: data.id,
           consignmentNoteNumber: data.consignmentNoteNumber,
           subTotal: this.filteredDocket[0].tOTAMT,
-          newSubTotal: parseFloat(data.newSubTotal) || 0,
+          newSubTotal: parseFloat(data.newSubTotal).toFixed(2) || 0,
           rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
-          OtherDly: this.calculateTotalAmount(data.chargeData),  // Calculate total amount based on charges
+          OtherDly: this.calculateTotalAmount(data.chargeData).toFixed(2),  // Calculate total amount based on charges
           totalAmount: this.calculateTotalAmount(data.chargeData),
           payBasis: data.payBasis,
+          otherCharge: data.Charge,
           actions: ['Edit']
         };
         this.tableData = this.tableData.filter(item => item.id !== data.id);
@@ -309,8 +315,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         });
         const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
         totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
-        console.log(totalMr);
-        console.log(this.tableData);
 
         this.tableload = false;
       } catch (error) {
@@ -320,17 +324,30 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     });
   }
 
+  // calculating TotalAmount
   calculateTotalAmount(charges) {
-    const chargeMapping = charges.map(x => ({ name: x.cHGNM, operation: x.oPS, aMT: x.aMT }));
-    return chargeMapping.reduce((acc, curr) => {
+    // Map charges to an array of objects with name, operation, and aMT properties
+    const chargeMapping = charges.map(charge => ({
+      name: charge.cHGNM,
+      operation: charge.oPS,
+      aMT: parseFloat(charge.aMT) // Parse the amount to ensure numerical calculations
+    }));
+
+    // Reduce the chargeMapping array to calculate the total amount
+    const totalAmount = chargeMapping.reduce((acc, curr) => {
+      // Apply the operation to the accumulated total based on the charge's operation
       if (curr.operation === "+") {
-        return acc + parseFloat(curr.aMT);
+        return acc + curr.aMT;
       } else if (curr.operation === "-") {
-        return acc - parseFloat(curr.aMT);
+        return acc - Math.abs(curr.aMT); // Subtract the positive amount
       } else {
-        return acc; // In case of an unknown operation
+        // Handle unknown operations (if any)
+        console.log(`Unknown operation "${curr.operation}" for charge "${curr.name}"`);
+        return acc;
       }
     }, 0);
+
+    return totalAmount;
   }
 
   //#endregion
@@ -366,7 +383,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       if (this.filteredDocket.length === 0) {
         Swal.fire({
           icon: "info",
-          title: `This Consignment No: ${NoofDocketValue} is not valid`,
+          title: "Information",
+          text: `This Consignment No: ${NoofDocketValue} is not valid`,
           showConfirmButton: true,
         });
         this.deliveryMrTableForm.controls.ConsignmentNoteNumber.reset();
@@ -670,31 +688,16 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             return {
               cID: this.storage.companyCode,
               dOCNO: element.consignmentNoteNumber,
-              mLTPNTDLRY: element.Multipointdelivery,
-              dOC: element.Document,
-              iNSURNC: element.Insurance,
-              gRNTX: element.GreenTax,
-              dMRG: element.Demurrage,
-              dISCNT: element.Discount,
-              gST: element.GST,
-              uNLODNG: element.Unloading,
-              fRGHT: element.Freight,
-              lODNG: element.Loading,
-              //cNSGTNO:
+              cHG: this.otherCharges.chargeData,
               pYBASIS: element.payBasis,
               sUBTTL: element.subTotal,
               nWSUBTTL: element.newSubTotal,
               rTDFRNC: element.rateDifference,
               vNO: VoucherNo,
-              //dORDLVRY:
-              // fRCLPCHRGE:
-              //   gTPSCHRG:
-              // oTHRCHRG:
               tOTL: element.totalAmount,
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName
-
             }
           });
 
@@ -948,35 +951,4 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
 
   //#endregion
-  //#region to call getOtherCharge in modal 
-  async getOtherCharge(event) {
-    const request = {
-      List: this.tableData,
-      Details: event,
-    }
-    const dialogRef = this.dialog.open(DeliveryMrOtherDetailsComponent, {
-      data: request,
-      width: "100%",
-      disableClose: true,
-      position: {
-        top: "20px",
-      },
-    });
-    dialogRef.afterClosed().subscribe(async (data) => {
-      console.log(data);
-      const delayDuration = 1000;
-      // Create a promise that resolves after the specified delay
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      // Use async/await to introduce the delay
-      await delay(delayDuration);
-
-
-
-
-
-
-    });
-
-  }
-  // #endregion
 }

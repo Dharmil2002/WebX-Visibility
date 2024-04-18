@@ -3,7 +3,8 @@ import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { ConvertToDate, sumProperty } from "src/app/Utility/commonFunction/common";
+import { ConvertToDate, ConvertToNumber, sumProperty } from "src/app/Utility/commonFunction/common";
+import { GenericActions } from "src/app/config/myconstants";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
@@ -25,7 +26,7 @@ export class ArrivalVehicleService {
                 {
                     D$match: matchQuery,
                 },
-                 {
+                {
                     "D$lookup": {
                         "from": "mf_headers_ltl",
                         "let": { "docNumber": "$docNo" }, // Renamed for clarity
@@ -106,13 +107,13 @@ export class ArrivalVehicleService {
 
     /*Below function is for register entry of mark Arrival*/
     async fieldMappingMarkArrival(trip, data, dktList) {
-        let legID =  `${this.storage.companyCode}-${trip.TripID}-${trip.cLOC}-${trip.nXTLOC}`;
+        let legID = `${this.storage.companyCode}-${trip.TripID}-${trip.cLOC}-${trip.nXTLOC}`;
         var lagData = await this.getCheckOnce({
             "_id": legID,
         });
-        if(!lagData && lagData?._id != legID)
+        if (!lagData && lagData?._id != legID)
             return;
-        
+
         let eventJson = dktList;
         const arrivalData = {
             aRR: {
@@ -157,7 +158,7 @@ export class ArrivalVehicleService {
                     "dOCNO": data?.TripID || "",
                     "sTS": DocketStatus.Arrived,
                     "sTSNM": DocketStatus[DocketStatus.Arrived],
-                    "oPSSTS":`Arrived at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
+                    "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
                     "eNTBY": this.storage.userName
@@ -227,12 +228,12 @@ export class ArrivalVehicleService {
     }
     /*End*/
     async fieldMappingArrivalScan(data, dktList, scanDkt) {
-        
-        let legID =  `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
+
+        let legID = `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
         var lagData = await this.getCheckOnce({
             "_id": legID,
         });
-        if(!lagData && lagData?._id != legID)
+        if (!lagData && lagData?._id != legID)
             return;
 
         let eventJson = dktList;
@@ -423,7 +424,7 @@ export class ArrivalVehicleService {
                 oPSST: 2,
                 oPSSTNM: "Closed"
             }
-    
+
             const reqTHC = {
                 companyCode: this.storage.companyCode,
                 collectionName: "thc_summary_ltl",
@@ -437,8 +438,8 @@ export class ArrivalVehicleService {
                 nXTLOC: "",
                 vEHNO: "",
                 tHC: "",
-                lSNO:"",
-                mFNO:"",
+                lSNO: "",
+                mFNO: "",
                 sTS: 7,// Assuming this is the status code for "In Transit",
                 sTSNM: "Route Updated"
             }
@@ -454,9 +455,9 @@ export class ArrivalVehicleService {
                 companyCode: this.storage.companyCode,
                 collectionName: "vehicle_status",
                 filter: { vehNo: data.VehicleNo },
-                update: { currentLocation: this.storage.branch, tripId: "", route: "",status: "Available" }
+                update: { currentLocation: this.storage.branch, tripId: "", route: "", status: "Available" }
             }
-            
+
             await firstValueFrom(this.operation.operationMongoPut("generic/update", reqVehicle));
             Swal.fire({
                 icon: "info",
@@ -466,5 +467,154 @@ export class ArrivalVehicleService {
             });
         }
         return true
+    }
+
+    async getTHCDetaisWithDockets(thcNo) {
+        let query = [
+            {
+                D$match: {
+                    cID: this.storage.companyCode,
+                    docNo: { D$in: Array.isArray(thcNo) ? thcNo : [thcNo] },
+                    cNL: {
+                        D$in: [false, null],
+                    },
+                },
+            },
+            {
+                D$lookup: {
+                    from: "mf_headers_ltl",
+                    let: { docNo: "$docNo", },
+                    pipeline: [
+                        {
+                            D$match: {
+                                D$and: [
+                                    {
+                                        D$expr: { D$eq: ["$cID", this.storage.companyCode] },
+                                    },
+                                    {
+                                        D$expr: { D$eq: ["$tHC", "$$docNo"], },
+                                    },
+                                    {
+                                        cNL: { D$in: [false, null], },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            D$lookup: {
+                                from: "mf_details_ltl",
+                                let: { mFNO: "$mFNO", },
+                                pipeline: [
+                                    {
+                                        D$match: {
+                                            D$and: [
+                                                {
+                                                    D$expr: { D$eq: ["$cID", this.storage.companyCode] },
+                                                },
+                                                {
+                                                    D$expr: { D$eq: ["$mFNO", "$$mFNO"], },
+                                                }
+                                            ],
+                                        },
+                                    },
+                                    {
+                                        D$lookup: {
+                                            from: "dockets_ltl",
+                                            let: { dKTNO: "$dKTNO" },
+                                            pipeline: [
+                                                {
+                                                    D$match: {
+                                                        D$and: [
+                                                            {
+                                                                D$expr: { D$eq: ["$cID", this.storage.companyCode] },
+                                                            },
+                                                            {
+                                                                D$expr: { D$eq: ["$dKTNO", "$$dKTNO"], },
+                                                            }
+                                                        ],
+                                                    },
+                                                },
+                                            ],
+                                            as: "docket",
+                                        },
+                                    },
+                                    {
+                                        $unwind: "$docket"
+                                    }
+                                ],
+                                as: "mf_dockets",
+                            },
+                        },
+                    ],
+                    as: "mf_header",
+                },
+            },
+        ];
+
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "thc_summary_ltl",
+            filters: query,
+        };
+
+        const res = await firstValueFrom(this.operation.operationMongoPost(GenericActions.Query, req));
+        return res?.data || [];
+    }
+
+    async updateTHCCostForDockets(thcNo) {
+        var thcs = await this.getTHCDetaisWithDockets(thcNo);
+        if (thcs.length === 0) {
+            return;
+        }
+
+        thcs.forEach(async (thc) => { 
+            const tripCost = thc.tOTAMT;
+
+            //Need to calculate find total charge weight, currently its done on loaded weight (actual weight) because charge weight is not available
+            const totalWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
+            const totalCWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDCWT || m.cWT || m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);            
+            let aCPKG = ConvertToNumber(tripCost/totalWT, 2);
+            let cCPKG = ConvertToNumber(tripCost/totalCWT, 2);
+
+            await Promise.all(thc.mf_header.map(async (mf) => {
+                await Promise.all(mf.mf_dockets.map(async (mfd) => {
+                    const aCTCOST = ConvertToNumber((mfd.lDWT || mfd.wT) * aCPKG, 2);
+                    const cHGCOST = ConvertToNumber((mfd.lDCWT || mfd.cWT || mfd.lDWT || mfd.wT) * cCPKG, 2);
+
+                    mfd["aCTCOST"] = aCTCOST;
+                    mfd["cHGCOST"] = cHGCOST;
+                    const updateDocket = {
+                        companyCode: this.storage.companyCode,
+                        collectionName: "mf_details_ltl",
+                        filter: { _id: mfd._id },
+                        update: {
+                            aCTCOST: aCTCOST,
+                            cHGCOST: cHGCOST
+                        }
+                    }
+                    await firstValueFrom(this.operation.operationMongoPut(GenericActions.Update, updateDocket));
+                }));
+            }));
+
+            const originWiseCost = thc.mf_header.map(x => {
+                return x.mf_dockets.map(m => ({
+                    oRGN: m.docket.oRGN,
+                    aCTCOST: m.aCTCOST || 0,
+                    cHGCOST: m.cHGCOST || 0
+                })).flat();
+            });
+
+            const sumByOrigin = originWiseCost.reduce((acc, curr) => {
+                const { oRGN, aCTCOST, cHGCOST } = curr;
+                if (!acc[oRGN]) {
+                    acc[oRGN] = { aCTCOST: 0, cHGCOST: 0 };
+                }
+                acc[oRGN].aCTCOST += (aCTCOST || 0);
+                acc[oRGN].cHGCOST += (cHGCOST || 0);
+                return acc;
+            }, {});
+            
+            console.log(sumByOrigin);
+        });
     }
 }

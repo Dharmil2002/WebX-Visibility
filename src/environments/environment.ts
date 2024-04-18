@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  secretKey: "bRTsuawqfGB5Zd3e",
   AuthAPIGetway: "http://localhost:3000/v1/auth/",
   localNumberFormat: "en-IN",
   APIBaseURL:"http://localhost:3000/v1/",  

@@ -12,7 +12,7 @@ import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 
 @Component({
@@ -110,7 +110,7 @@ export class UploadOpeningBalanceLedgerWiseComponent implements OnInit {
           },
         ];
 
-        const rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
 
         rPromise.then(async response => {
           // STEP 1 : check for the duplicates

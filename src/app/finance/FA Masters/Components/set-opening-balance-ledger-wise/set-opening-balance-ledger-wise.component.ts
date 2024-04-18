@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subject, catchError, firstValueFrom, forkJoin, take, takeUntil } from 'rxjs';
-import { PayBasisdetailFromApi as GetGeneralmasterDetailsFromAPI } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData as GetGeneralmasterDetailsFromAPI } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -120,7 +120,8 @@ export class SetOpeningBalanceLedgerWiseComponent implements OnInit {
     public StorageService: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService) {
-      this.companyCode = this.storage.companyCode;
+    this.companyCode = this.storage.companyCode;
+    this.filterRequest.cID = this.storage.companyCode;
   }
 
   ngOnInit(): void {

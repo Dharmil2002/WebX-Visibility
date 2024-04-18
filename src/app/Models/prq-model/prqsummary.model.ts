@@ -35,8 +35,9 @@ export class PrqSummaryModel implements IFieldDefinition {
     },
     pickUpDate: {
       Title: "Pickup Date & Time",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:16%",
+      datatype: "datetime",
     },
     status: {
       Title: "Status",
@@ -51,7 +52,7 @@ export class PrqSummaryModel implements IFieldDefinition {
     },
     actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       //iconClass: "tbl-fav-edit",
       Style: "max-width:6%",
       stickyEnd: true,

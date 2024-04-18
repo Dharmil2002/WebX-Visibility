@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { LastMileDelivery } from 'src/app/Models/VendorContract/vendorContract';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
@@ -83,10 +83,10 @@ export class LastMileDeliveryBulkUploadComponent implements OnInit {
 
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
-        this.rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP');
+        this.rateTypeDropDown = await GetGeneralMasterData(this.masterService, 'RTTYP');
         const containerData = await this.objContainerService.getContainerList();
         this.locationList = await this.objLocationService.getLocationList();
-        this.timeFrameList = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
+        this.timeFrameList = await GetGeneralMasterData(this.masterService, 'TMFRM')
         const vehicleData = await this.objGeneralService.getGeneralMasterData("VEHSIZE");
 
         this.mergedCapacity = [...containerData, ...vehicleData];
@@ -164,7 +164,7 @@ export class LastMileDeliveryBulkUploadComponent implements OnInit {
         }
         ];
 
-        var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        var rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
         rPromise.then(async response => {
           // Specify the keys for Route and Capacity
           const routeKey = "Location";

@@ -80,7 +80,7 @@ export class StateService {
   
   //#endregion
   //#region to get state list
-  async getStateWithZone(filter = {}) {
+  async getStateWithZone(filter = {}): Promise<any> {
     try {
       // Retrieve the company code from localStorage
       const companyCode = this.storage.companyCode;

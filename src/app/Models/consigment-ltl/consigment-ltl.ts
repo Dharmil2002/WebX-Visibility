@@ -58,7 +58,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Style: "min-width:2px",
     },
     chargedWeight: {
-      Title: "Charged Weight (MT)",
+      Title: "Charged Weight (Kg)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },

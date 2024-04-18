@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
 
-import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -164,7 +164,7 @@ export class StockReportComponent implements OnInit {
   //#endregion
   async getDropdownData() {
 
-    const paybasisList = await PayBasisdetailFromApi(this.masterService, 'PAYTYP')
+    const paybasisList = await GetGeneralMasterData(this.masterService, 'PAYTYP')
     const modeList = await productdetailFromApi(this.masterService);
     // console.log(modeList);
 
@@ -365,25 +365,29 @@ export class StockReportComponent implements OnInit {
       .sortBy('StockTypeId')
       .value();
 
-    const columnGroup = [{
-      Name: "Location",
-      class: "matcolumnleft",
-      ColSpan: 2
+    const columnGroup: any[] = [{
+      Name: "LocationGroup",
+      Title: "",
+      class: "matcolumncenter",
+      ColSpan: 2,
+      sticky: true
     }];
 
-    const displayJson = {};
+    const displayJson: any = {};
     const staticFields = ["Location", "ReportLocation"];
 
     displayJson["Location"] = {
       Title: "Location",
       class: "matcolumnleft",
-      Style: "min-width: 250px"
+      Style: "min-width: 250px",
+      sticky: true
     };
 
     displayJson["ReportLocation"] = {
       Title: "Reporting Location",
       class: "matcolumnleft",
-      Style: "min-width: 250px"
+      Style: "min-width: 250px",
+      sticky: true
     };
 
     const initializeAggregates = (stockTypes = null, isTotal = false) => {
@@ -434,14 +438,15 @@ export class StockReportComponent implements OnInit {
 
     allStockTypes.map(type => {
       columnGroup.push({
-        Name: type.StockType,
-        class: "matcolumnright",
+        Name: `${type.StockType}-Group`,
+        Title: type.StockType.replace(/_/g, ' '),
+        class: "matcolumncenter",
         ColSpan: 8
       });
 
       fields.map(f => {
         displayJson[`${type.StockType}_${f.field}`] = {
-          Title: `${type.StockType.replace(/_/g, ' ')} ${f.caption}`,
+          Title: `${f.caption}`,
           class: "matcolumnright",
           Style: "min-width: 100px",
           datatype: "number",

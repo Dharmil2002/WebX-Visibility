@@ -4,28 +4,34 @@ import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+const today = new Date();
+today.setHours(23, 59, 59, 999); // Set the time to the end of the day
+let maxDate = today;
 export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
     private freightDetails:FormControls[];
-    private otherCharges:FormControls[];
+    private otherInfo:FormControls[];
     constructor(public generalService: GeneralService) {
-        super(generalService, "LTL", ["Consignment"]);
+        super(generalService, "LTL", ["ConsignmentLtl"]);
         this.docketFields = [
             {
                 name: "docketNumber",
                 label: `${DocCalledAs.Docket} No`,
                 placeholder: `${DocCalledAs.Docket} No`,
                 type: "text",
-                value: "Computerized",
+                value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: true,
-                Validations: [],
+                disable: false,
+                Validations: [{
+                    name: "required",
+                    message:  `${DocCalledAs.Docket}No required`,
+                  }],
                 functions: {
-                    change: "DocketValidation",
+                    onChange: "docketValidation",
                 },
                 additionalData:{
                     metaData: "Basic"
@@ -45,14 +51,14 @@ export class ConsignmentLtl extends BaseControl {
                 Validations: [
                     {
                         name: "required",
-                        message: "C Note Date is required",
+                        message: `${DocCalledAs.Docket} Date required`,
                     },
                 ],
                 functions: {
                     onDate: "changeInvoice"
                 },
                 additionalData: {
-                    minDate: new Date(),
+                    maxDate:maxDate,
                     metaData: "Basic"
                 }
             },
@@ -96,6 +102,9 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
+                functions:{
+                    onSelection:"onPaymentType"
+                },
                 Validations: [
                     {
                         name: "required",
@@ -578,7 +587,12 @@ export class ConsignmentLtl extends BaseControl {
                 autocomplete: "",
                 displaywith: "",
                 maxlength: 12,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "pattern",
+                        pattern: '^[0-9]{12}',
+                        message: "Please enter a valid E-way Bill number. It must consist of exactly 12 digits."
+                    }],
                 functions:{
                  
                 },
@@ -922,6 +936,9 @@ export class ConsignmentLtl extends BaseControl {
                     {name:"Normal",value:"Normal"}
                 ],
                 Validations: [],
+                functions:{
+                    onSelection:"onMaterialDensity"
+                },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
@@ -932,7 +949,7 @@ export class ConsignmentLtl extends BaseControl {
         ]
         this.freightDetails = [
             {
-                name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'mobile-number',
+                name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'number',
                 value: "", Validations: [{
                     name: "required",
                     message: "Freight Rate is required",
@@ -959,7 +976,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'freight_amount', label: 'Frieght Amount (₹)', placeholder: 'Freight Amount', type: 'mobile-number',
+                name: 'freight_amount', label: 'Frieght Amount (₹)', placeholder: 'Freight Amount', type: 'number',
                 value: "", Validations: [{
                     name: "required",
                     message: " Freight Amount is required",
@@ -975,7 +992,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'mobile-number',
+                name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'number',
                 value: 0.00, Validations: [], generatecontrol: true, functions: {
                     onModel: "preventNegative",
                     onChange: "calculateFreight"
@@ -986,7 +1003,7 @@ export class ConsignmentLtl extends BaseControl {
                  disable: false
             },
             {
-                name: 'grossAmount', label: 'Gross Amount(₹)', placeholder: 'Gross Amount', type: 'mobile-number',
+                name: 'grossAmount', label: 'Gross Amount(₹)', placeholder: 'Gross Amount', type: 'number',
                 value: 0.00, Validations: [], generatecontrol: true, disable: true,
                 additionalData: {
                     metaData: "freightDetails"
@@ -1011,6 +1028,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 functions: {
+                    onSelection: "onRcmChange"
                 },
                 Validations: [],
                 additionalData: {
@@ -1019,7 +1037,7 @@ export class ConsignmentLtl extends BaseControl {
                 },
             },
             {
-                name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
+                name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'number',
                 value:0.00, Validations: [],  
                 functions: {
                     onModel: "preventNegative",
@@ -1030,7 +1048,7 @@ export class ConsignmentLtl extends BaseControl {
                 },generatecontrol: true, disable: false
             },
             {
-                name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
+                name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'number',
                 value:0.00, Validations: [],
                 additionalData: {
                     metaData: "freightDetails"
@@ -1048,7 +1066,7 @@ export class ConsignmentLtl extends BaseControl {
                 }, generatecontrol: true, disable: true
             }
         ]
-        this.otherCharges = [
+        this.otherInfo = [
             {
                 name: 'cust_ref_no', label: 'Customer Ref No.', placeholder: 'Customer Ref No.', type: 'text',
                 value: "", Validations: [],
@@ -1181,6 +1199,6 @@ export class ConsignmentLtl extends BaseControl {
         return this.docketFields;
     }
     getOtherDetails() {
-        return this.otherCharges
+        return this.otherInfo
     }
 }

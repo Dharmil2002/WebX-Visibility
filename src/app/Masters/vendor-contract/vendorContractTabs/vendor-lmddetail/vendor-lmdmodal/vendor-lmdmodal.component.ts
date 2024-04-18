@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
@@ -254,8 +254,8 @@ export class VendorLMDModalComponent implements OnInit {
 
   //#region to get rateType list
   async getDropDownData() {
-    const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
-    const timeFrameDropDown = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
+    const rateTypeDropDown = await GetGeneralMasterData(this.masterService, 'RTTYP')
+    const timeFrameDropDown = await GetGeneralMasterData(this.masterService, 'TMFRM')
     const containerData = await this.objContainerService.getContainerList();
     const vehicleData = await this.objGeneralService.getGeneralMasterData("VEHSIZE");
 

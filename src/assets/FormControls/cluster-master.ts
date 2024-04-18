@@ -67,6 +67,31 @@ export class ClusterControl {
                 generatecontrol: true, disable: false
             },
             {
+              name: 'clusterType',
+              label: "Cluster Type",
+              placeholder: "Select Cluster Type",
+              type: 'dropdown',
+              value: clusterMasterTable.clusterType,
+              generatecontrol: true,
+              disable: false,
+              Validations: [
+                  {
+                      name: "required",
+                      message: "Cluster Type is required"
+                  },
+                  {
+                      name: "autocomplete",
+                  },
+                  {
+                      name: "invalidAutocompleteObject",
+                      message: "Choose proper value",
+                  }
+              ],
+              additionalData: {
+                  showNameAndValue: false
+              },
+            },
+            {
               name: "activeFlag",
               label: "Active Flag",
               placeholder: "",

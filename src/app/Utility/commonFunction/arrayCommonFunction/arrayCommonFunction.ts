@@ -3,6 +3,19 @@ import moment from "moment";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
 /**
+ * Splits an array into smaller arrays of a specified size.
+ * @param data - The array to be split.
+ * @param size - The size of each smaller array.
+ * @returns An array of smaller arrays.
+ */
+export function chunkArray(data: any[], size: number): any[] {
+  if (data.length <= size) {
+    return [data];
+  } else {
+    return [data.slice(0, size), ...chunkArray(data.slice(size), size)];
+  }
+}
+/**
  * Removes duplicate objects from an array based on all key-value pairs.
  * @param {Array} objects - The array of objects.
  * @returns {Array} - The array with duplicate objects removed.

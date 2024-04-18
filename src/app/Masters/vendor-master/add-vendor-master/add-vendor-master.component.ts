@@ -14,7 +14,7 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
-import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { TdsMasterService } from "src/app/Utility/module/masters/tds-master/tds-master-Service";
@@ -329,11 +329,11 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
   async getDropDownData() {
-    this.vendorTypeData = await PayBasisdetailFromApi(
+    this.vendorTypeData = await GetGeneralMasterData(
       this.masterService,
       "VENDTYPE"
     );
-    this.msmeTypeData = await PayBasisdetailFromApi(
+    this.msmeTypeData = await GetGeneralMasterData(
       this.masterService,
       "MSMETYP"
     );

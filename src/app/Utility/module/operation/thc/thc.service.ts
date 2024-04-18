@@ -4,6 +4,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { Collections, GenericActions, OperationActions } from "src/app/config/myconstants";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { firstValueFrom } from "rxjs";
+import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 
 @Injectable({
     providedIn: "root",
@@ -18,43 +19,44 @@ export class ThcService {
 
         let matchQuery = {
             'D$and': [
-                 { sTS: { D$in: [1,4] } },
-                 ...( fromDate ?  [{ 'dKTDT': { 'D$gte': fromDate } }] : []) ,
-                 ...( toDate ?  [{ 'dKTDT': { 'D$lte': toDate } }] : []) ,
-                 ...( ( prqNo && prqNo != "" ) ? [{ 'pRQNO': prqNo }] : []) ,
-                 ...( ( stockCity && stockCity != "" ) ? [{ 'cCT': stockCity }] : []) ,
-                 ...( ( fromCity && fromCity != "" ) ? [{ 'oCT': fromCity }] : []) ,
-                 ...( ( toCity && toCity != "" ) ? [{ 'dCT': toCity }] : []) ,
-                 ...( containersWise ? [{ 'cNO': { 'D$nin': ["", null] } }] : [{ 'cNO': { 'D$in': ["", null] } }] ) ,
+                { sTS: { D$in: [1, 4] } },
+                ...(fromDate ? [{ 'dKTDT': { 'D$gte': fromDate } }] : []),
+                ...(toDate ? [{ 'dKTDT': { 'D$lte': toDate } }] : []),
+                ...((prqNo && prqNo != "") ? [{ 'pRQNO': prqNo }] : []),
+                ...((stockCity && stockCity != "") ? [{ 'cCT': stockCity }] : []),
+                ...((fromCity && fromCity != "") ? [{ 'oCT': fromCity }] : []),
+                ...((toCity && toCity != "") ? [{ 'dCT': toCity }] : []),
+                ...(containersWise ? [{ 'cNO': { 'D$nin': ["", null] } }] : [{ 'cNO': { 'D$in': ["", null] } }]),
             ],
-       };
+        };
 
-       const reqBody = {
-        companyCode: this.storage.companyCode,
-        collectionName: Collections.docketOp,
-        filters: [  
-            {
-                "D$match": matchQuery
-            }, {
-                "D$lookup": {
-                    "from": Collections.Dockets,
-                    "let": { "dKTNO": "$dKTNO" },
-                    "pipeline": [
-                        {
-                            "D$match": {
-                                "D$and": [
-                                { "D$expr": { "D$eq": ["$dKTNO", "$$dKTNO"] } },
-                                { "cNL": { "D$in": [false, null] } }
-                            ]
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.docketOp,
+            filters: [
+                {
+                    "D$match": matchQuery
+                }, {
+                    "D$lookup": {
+                        "from": Collections.Dockets,
+                        "let": { "dKTNO": "$dKTNO" },
+                        "pipeline": [
+                            {
+                                "D$match": {
+                                    "D$and": [
+                                        { "D$expr": { "D$eq": ["$dKTNO", "$$dKTNO"] } },
+                                        { "cNL": { "D$in": [false, null] } }
+                                    ]
+                                }
                             }
-                        }
-                    ],
-                    "as": "docket"
+                        ],
+                        "as": "docket"
+                    }
+                }, {
+                    "D$unwind": { "path": "$docket", "preserveNullAndEmptyArrays": false }
                 }
-            }, {
-                "D$unwind": { "path": "$docket", "preserveNullAndEmptyArrays": false }
-            }
-        ]};
+            ]
+        };
 
         const res = await firstValueFrom(this.operationService.operationMongoPost("generic/query", reqBody));
         const createShipmentObjectContainerWise = (ops) => {
@@ -78,16 +80,16 @@ export class ThcService {
         let docketList = res.data.map((ops) => {
             return createShipmentObjectContainerWise(ops);
         });
-            
+
         return docketList || [];
     }
 
-    async getShipment(vehicle = false,filter = {}) {
+    async getShipment(vehicle = false, filter = {}) {
 
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
-            filter:filter
+            filter: filter
         };
 
         // Perform an asynchronous operation to fetch data from the operation service
@@ -148,7 +150,7 @@ export class ThcService {
         var locBody = {
             companyCode: this.storage.companyCode,
             collectionName: "location_detail",
-            filter: { 
+            filter: {
                 companyCode: this.storage.companyCode,
                 locCode: locCode
             }
@@ -248,55 +250,205 @@ export class ThcService {
         return nestedDetail;
     }
     /*get Charges are come from product Charged master*/
-  async getCharges(filter = {}) {
-    const req = {
-      companyCode: this.storage.companyCode,
-      collectionName: "product_charges_detail",
-      filter: filter
-    };
-    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
-    return res.data;
-  }
-  /*end*/
-  async getChargesV2(filter,productFilter){
-    const devShardReq={
-      companyCode: this.storage.companyCode,
-      filter:filter,
-      collectionName: "charges",
+    async getCharges(filter = {}) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "product_charges_detail",
+            filter: filter
+        };
+        const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+        return res.data;
     }
-    const devShardRes = await firstValueFrom(this.operationService.operationMongoPost("generic/get", devShardReq));
-    const TenantShardreq = {
-        companyCode: this.storage.companyCode,
-        collectionName: "product_charges_detail",
-        filter: productFilter
-      };
-      const TenantShardres = await firstValueFrom(this.operationService.operationPost("generic/get", TenantShardreq));
-      
-      if(TenantShardres.success){
-        const retArry=TenantShardres.data.map(r=>{
-            let ch= devShardRes.data.find(f=> f.cHCD===r.cHACD);
-            if(ch){
-                return r
-            }
-        }).filter(Boolean);;
-        //console.log(retArry)
-        return retArry
-      }
-    
-    //console.log('null');
-    return null
-  }
-  /*end*/
-  /*below function is for the update a shipment*/
-  async updateVehicle(data,filter={}) {
-    const req={
-        companyCode:this.storage.companyCode,
-        collectionName:"vehicle_status",
-        filter:filter,
-        update:data
-    }
-    return await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update,req));
-  }
-  /*end*/
+    /*end*/
+    async getChargesV2(filter, productFilter) {
+        const devShardReq = {
+            companyCode: this.storage.companyCode,
+            filter: filter,
+            collectionName: "charges",
+        }
+        const devShardRes = await firstValueFrom(this.operationService.operationMongoPost("generic/get", devShardReq));
+        const TenantShardreq = {
+            companyCode: this.storage.companyCode,
+            collectionName: "product_charges_detail",
+            filter: productFilter
+        };
+        const TenantShardres = await firstValueFrom(this.operationService.operationPost("generic/get", TenantShardreq));
 
+        if (TenantShardres.success) {
+            const retArry = TenantShardres.data.map(r => {
+                let ch = devShardRes.data.find(f => f.cHCD === r.cHACD);
+                if (ch) {
+                    return r
+                }
+            }).filter(Boolean);;
+            //console.log(retArry)
+            return retArry
+        }
+
+        //console.log('null');
+        return null
+    }
+    /*end*/
+    /*below function is for the update a shipment*/
+    async updateVehicle(data, filter = {}) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "vehicle_status",
+            filter: filter,
+            update: data
+        }
+        return await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update, req));
+    }
+    /*end*/
+
+
+    async getTHCDetaisWithDockets(thcNo) {
+        let query = [
+            {
+                D$match: {
+                    cID: this.storage.companyCode,
+                    docNo: { D$in: Array.isArray(thcNo) ? thcNo : [thcNo] },
+                    cNL: {
+                        D$in: [false, null],
+                    },
+                },
+            },
+            {
+                D$lookup: {
+                    from: "mf_header",
+                    let: { docNo: "$docNo", },
+                    pipeline: [
+                        {
+                            D$match: {
+                                D$and: [
+                                    {
+                                        D$expr: { D$eq: ["$cID", this.storage.companyCode] },
+                                    },
+                                    {
+                                        D$expr: { D$eq: ["$tHC", "$$docNo"], },
+                                    },
+                                    {
+                                        cNL: { D$in: [false, null], },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            D$lookup: {
+                                from: "mf_details",
+                                let: { mFNO: "$docNo", },
+                                pipeline: [
+                                    {
+                                        D$match: {
+                                            D$and: [
+                                                {
+                                                    D$expr: { D$eq: ["$cID", this.storage.companyCode] },
+                                                },
+                                                {
+                                                    D$expr: { D$eq: ["$mFNO", "$$mFNO"], },
+                                                }
+                                            ],
+                                        },
+                                    },
+                                    {
+                                        D$lookup: {
+                                            from: "dockets",
+                                            let: { dKTNO: "$dKTNO" },
+                                            pipeline: [
+                                                {
+                                                    D$match: {
+                                                        D$and: [
+                                                            {
+                                                                D$expr: { D$eq: ["$cID", this.storage.companyCode] },
+                                                            },
+                                                            {
+                                                                D$expr: { D$eq: ["$dKTNO", "$$dKTNO"], },
+                                                            }
+                                                        ],
+                                                    },
+                                                },
+                                            ],
+                                            as: "docket",
+                                        },
+                                    },
+                                    {
+                                        $unwind: "$docket"
+                                    }
+                                ],
+                                as: "mf_dockets",
+                            },
+                        },
+                    ],
+                    as: "mf_header",
+                },
+            },
+        ];
+
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "thc_summary",
+            filters: query,
+        };
+
+        const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Query, req));
+        return res?.data || [];
+    }
+
+    async updateTHCCostForDockets(thcNo) {
+        var thcs = await this.getTHCDetaisWithDockets(thcNo);
+        if (thcs.length === 0) {
+            return;
+        }
+
+        thcs.forEach(async (thc) => {
+            const tripCost = thc.tOTAMT;
+
+            //Need to calculate find total charge weight, currently its done on loaded weight (actual weight) because charge weight is not available
+            const totalWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
+            const totalCWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDCWT || m.cWT || m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
+            let aCPKG = ConvertToNumber(tripCost / totalWT, 2);
+            let cCPKG = ConvertToNumber(tripCost / totalCWT, 2);
+
+            await Promise.all(thc.mf_header.map(async (mf) => {
+                await Promise.all(mf.mf_dockets.map(async (mfd) => {
+                    const aCTCOST = ConvertToNumber((mfd.lDWT || mfd.wT) * aCPKG, 2);
+                    const cHGCOST = ConvertToNumber((mfd.lDCWT || mfd.cWT || mfd.lDWT || mfd.wT) * cCPKG, 2);
+
+                    mfd["aCTCOST"] = aCTCOST;
+                    mfd["cHGCOST"] = cHGCOST;
+                    const updateDocket = {
+                        companyCode: this.storage.companyCode,
+                        collectionName: "mf_details",
+                        filter: { _id: mfd._id },
+                        update: {
+                            aCTCOST: aCTCOST,
+                            cHGCOST: cHGCOST
+                        }
+                    }
+                    await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update, updateDocket));
+                }));
+            }));
+
+            const originWiseCost = thc.mf_header.map(x => {
+                return x.mf_dockets.map(m => ({
+                    oRGN: m.docket.oRGN,
+                    aCTCOST: m.aCTCOST || 0,
+                    cHGCOST: m.cHGCOST || 0
+                })).flat();
+            });
+
+            const sumByOrigin = originWiseCost.reduce((acc, curr) => {
+                const { oRGN, aCTCOST, cHGCOST } = curr;
+                if (!acc[oRGN]) {
+                    acc[oRGN] = { aCTCOST: 0, cHGCOST: 0 };
+                }
+                acc[oRGN].aCTCOST += (aCTCOST || 0);
+                acc[oRGN].cHGCOST += (cHGCOST || 0);
+                return acc;
+            }, {});
+
+            console.log(sumByOrigin);
+        });
+
+    }
 }

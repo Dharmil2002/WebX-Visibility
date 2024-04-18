@@ -3,7 +3,7 @@ import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import * as XLSX from 'xlsx';
-import { PayBasisdetailFromApi } from "src/app/Masters/Customer Contract/CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "src/app/Masters/Customer Contract/CustomerContractAPIUtitlity";
 import moment from "moment";
 @Injectable({
      providedIn: "root",
@@ -202,7 +202,7 @@ export class CustGSTInvoiceService {
                const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
 
                // Fetch pay basis details
-               let paybasis = await PayBasisdetailFromApi(this.masterServices, 'PAYTYP');
+               let paybasis = await GetGeneralMasterData(this.masterServices, 'PAYTYP');
 
                // Process data using Promise.all and map
                const modifiedData = await Promise.all(res.data.map(async (item) => {

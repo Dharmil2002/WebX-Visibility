@@ -290,13 +290,15 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
             "Notes": ""
           });
 
-          UpdatedData.push({
-            "MainCategory": "9. Profit And loss for the year [7-8]",
-            "SubCategory": "",
-            "TotalAmountCurrentFinYear": (((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear) - (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit)).toFixed(2),
-            "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
-            "Notes": ""
-          });
+          if (exceptionalItems && extraordinaryItems) {
+            UpdatedData.push({
+              "MainCategory": "9. Profit And loss for the year [7-8]",
+              "SubCategory": "",
+              "TotalAmountCurrentFinYear": (((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear) - (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit)).toFixed(2),
+              "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
+              "Notes": ""
+            });
+          }
         }
 
 

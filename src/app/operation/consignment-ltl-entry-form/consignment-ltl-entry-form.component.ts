@@ -987,10 +987,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       (parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0))
     );
     if(this.freightForm.controls['rcm'].value=="Y"){
-      this.freightForm.get("totAmt")?.setValue(ConvertToNumber(
-        (parseFloat(this.freightForm.get("totAmt")?.value) || 0) -
-        (parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0))
-      );
+      this.freightForm.get("totAmt")?.setValue(this.freightForm.get("grossAmount")?.value);
     }
     this.calculateRate();
   }
@@ -1088,13 +1085,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const height = parseFloat(this.invoiceForm.controls['height']?.value || 0.00);
     const pkg = parseFloat(this.invoiceForm.controls['noOfPackage']?.value || 0.00);
     const cftRatio = parseFloat(this.invoiceForm.controls['cftRatio']?.value || 0.00);
-    const cubWt = length * breadth * height *cftRatio/ 27000;
+    const cubWt = (length * breadth * height *pkg *cftRatio)/ 27000;
     this.invoiceForm.controls['cubWT']?.setValue(cubWt.toFixed(2));
     let cft = 0;
     let chargeWeight = 0;
     switch (this.unitsName) {
       case "CM":
-        cft = length * breadth * height * pkg * cftRatio/27000;
+        cft = length * breadth * height * pkg * cftRatio;
         chargeWeight = cftRatio * cft
         this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
         break

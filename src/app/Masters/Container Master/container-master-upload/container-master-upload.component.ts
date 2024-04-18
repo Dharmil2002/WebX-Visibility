@@ -47,7 +47,7 @@ export class ContainerMasterUploadComponent implements OnInit {
     const chunks = chunkArray(contChunks, 50);
     const promises = chunks.map((chunk) =>
       this.objContainerService.ContainerDetail({
-        containerCode: { D$in: chunk },
+        containerName: { D$in: chunk },
       })
     );
     const results = await Promise.all(promises);
@@ -70,7 +70,7 @@ export class ContainerMasterUploadComponent implements OnInit {
   processData(element, lastcontainerCode: string, i: number) {
     const updateContainer = this.ContainerList.find(
       (item) =>
-        item.containerCode.toLowerCase() === element.ContainerType.toLowerCase()
+        item.containerName.toLowerCase() === element.ContainerType.toLowerCase()
     );
     const updatevendor = this.VendorList.find(
       (item) =>
@@ -122,7 +122,7 @@ export class ContainerMasterUploadComponent implements OnInit {
               { Required: true },
               {
                 TakeFromList: this.ContainerList.map((x) => {
-                  return x.containerCode;
+                  return x.containerName;
                 }),
               },
             ],

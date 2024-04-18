@@ -956,6 +956,9 @@ export class DocketService {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
+            tOTCWT: ConvertToNumber(data?.aCTWT || 0, 3),
+            tOTWT:ConvertToNumber(data?.cHRWT || 0, 3),
+            tOTPKG: parseInt(data?.pKGS || 0),
             dKTDT: ConvertToDate(data?.dKTDT),
             oRGN: data?.oRGN || "",
             dEST: data?.dEST || "",
@@ -1356,6 +1359,7 @@ export class DocketService {
 
     }
     async walkinFieldMapping(data, isCsgn, isCsgne) {
+        debugger
         let req={};
         let walkingData = {};
         req['companyCode']=this.storage.companyCode;
@@ -1401,7 +1405,9 @@ export class DocketService {
             delete walkingData['eNTLOC'];
             walkingData["mODBY"]=this.storage.userName,
             walkingData["mODDT"]=new Date(),
-            walkingData["mODLOC"]= this.storage.branch
+            walkingData["mODLOC"]= this.storage.branch,
+            req["update"]=req['data'];
+            delete req["data"];
           await firstValueFrom(this.operation.operationMongoPut('generic/update', req))
           return true
         }

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
-import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, ThcStatus, getEnumName } from "src/app/Models/docStatus";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { ConvertToDate, ConvertToNumber, sumProperty } from "src/app/Utility/commonFunction/common";
 import { GenericActions } from "src/app/config/myconstants";
@@ -121,6 +121,11 @@ export class ArrivalVehicleService {
                 "eXPDT": ConvertToDate(data?.ETA || data?.ArrivalTime),
                 "aCTDT": ConvertToDate(data?.ArrivalTime || new Date()),
                 "oDOMT": 0,
+                "sEALNO": data?.Sealno || "",
+                "sEALSTS": data?.SealStatus || "",
+                "lTRES": data?.LateReason || "",
+                "rES": data.Reason || "",
+                "pOD": data.Upload || "",
                 "aRBY": this.storage.userName
             },
             uNLOAD: {
@@ -128,12 +133,7 @@ export class ArrivalVehicleService {
                 "pKGS": 0,
                 "wT": 0,
                 "vOL": 0,
-                "vWT": 0,
-                "sEALNO": data?.Sealno || "",
-                "sEALSTS": data?.SealStatus || "",
-                "lTRES": data?.LateReason || "",
-                "rES": data.Reason || "",
-                "pOD": data.Upload || "",
+                "vWT": 0
             },
             mODDT: new Date(),
             mODLOC: this.storage.branch,
@@ -420,15 +420,14 @@ export class ArrivalVehicleService {
         }
         else {
 
-            const thcSummary = {
-                oPSST: 2,
-                oPSSTNM: "Closed"
-            }
-
+            const thcSummary={
+                oPSST:ThcStatus.Arrived,    
+                oPSSTNM:ThcStatus[ThcStatus.Arrived],
+              }
             const reqTHC = {
                 companyCode: this.storage.companyCode,
                 collectionName: "thc_summary_ltl",
-                filter: { docNo: legID },
+                filter: { tHC: data.TripID },
                 update: thcSummary
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/update", reqTHC));

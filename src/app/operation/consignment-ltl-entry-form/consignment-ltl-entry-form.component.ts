@@ -443,6 +443,30 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   /*End*/
+  /*below is the code for the walking custmer*/
+  GetWalkingAutofill(){
+    const payType = this.consignmentForm.get('payType').value;
+    const payTypeNm = this.paymentType.find(x => x.value === payType)?.name;
+    const walkinConsg=this.consignmentForm.controls['cnWinCsgn'].value;
+    const walkinConsge=this.consignmentForm.controls['cnWinCsgne'].value;
+    if(walkinConsg){
+    if(payTypeNm=="PAID"){
+      const value=typeof(this.consignmentForm.controls['consignorName'].value)=="object"
+      ?this.consignmentForm.controls['consignorName'].value:
+      {name:this.consignmentForm.controls['consignorName'].value,value:"C8888"}
+      this.consignmentForm.controls['billingParty'].setValue(value)
+    }
+  }
+  if(walkinConsge){
+    if(payTypeNm=="TO PAY"){
+      const value=typeof(this.consignmentForm.controls['consigneeName'].value)=="object"
+      ?this.consignmentForm.controls['consigneeName'].value:
+      {name:this.consignmentForm.controls['consigneeName'].value,value:"C8888"}
+      this.consignmentForm.controls['billingParty'].setValue(value)
+    } 
+  }
+  }
+  /*end*/
   /*below function is for the get a customer or consignor/consignee */
   async getCustomer(event) {
     const controlMap = new Map([
@@ -968,6 +992,20 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         (parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0))
       );
     }
+    this.calculateRate();
+  }
+  calculateRate(){
+    if(this.freightForm.controls['rcm'].value=="N"){
+    const gstRate=parseFloat(this.freightForm.controls['gstRate'].value);
+    const grossAmt=parseFloat(this.freightForm.controls['grossAmount'].value);
+    const gstAmt=(grossAmt*gstRate)/100;
+    const totalgst=gstAmt?parseFloat(gstAmt.toFixed(2)):gstAmt
+    this.freightForm.controls["gstChargedAmount"].setValue(totalgst);
+    this.freightForm.get("totAmt")?.setValue(ConvertToNumber(
+      (parseFloat(this.freightForm.get("grossAmount")?.value) || 0) +
+      (parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0))
+    );
+    }
   }
   onRcmChange(){
     if(this.freightForm.controls['rcm'].value=="Y"){
@@ -1050,13 +1088,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const height = parseFloat(this.invoiceForm.controls['height']?.value || 0.00);
     const pkg = parseFloat(this.invoiceForm.controls['noOfPackage']?.value || 0.00);
     const cftRatio = parseFloat(this.invoiceForm.controls['cftRatio']?.value || 0.00);
-    const cubWt = length * breadth * height / 28316.8466;
+    const cubWt = length * breadth * height *cftRatio/ 27000;
     this.invoiceForm.controls['cubWT']?.setValue(cubWt.toFixed(2));
     let cft = 0;
     let chargeWeight = 0;
     switch (this.unitsName) {
       case "CM":
-        cft = length * breadth * height * pkg / 28316.8466;
+        cft = length * breadth * height * pkg * cftRatio
         chargeWeight = cftRatio * cft
         this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
         break
@@ -1066,7 +1104,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
         break
       default:
-        cft = length * breadth * height * pkg / 27000
+        cft = length * breadth * height * pkg * cftRatio
         chargeWeight = cftRatio * cft
         this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
         break;
@@ -1174,28 +1212,28 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         }
         else{
           isValid = true
-          Swal.fire({
-            icon: 'success',
-            title:'Valid',
-            text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
-            showConfirmButton: true,
-            confirmButtonText: 'OK',
-            timer: 5000,
-            timerProgressBar: true,
-          });
+          // Swal.fire({
+          //   icon: 'success',
+          //   title:'Valid',
+          //   text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
+          //   showConfirmButton: true,
+          //   confirmButtonText: 'OK',
+          //   timer: 5000,
+          //   timerProgressBar: true,
+          // });
         }     
       }
       else{
         isValid = true
-        Swal.fire({
-          icon: 'success',
-          title:'Valid',
-          text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
-          showConfirmButton: true,
-          confirmButtonText: 'OK',
-          timer: 5000,
-          timerProgressBar: true,
-        });
+        // Swal.fire({
+        //   icon: 'success',
+        //   title:'Valid',
+        //   text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
+        //   showConfirmButton: true,
+        //   confirmButtonText: 'OK',
+        //   timer: 5000,
+        //   timerProgressBar: true,
+        // });
       }     
     }
 
@@ -1230,7 +1268,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*End*/
    checkDocketRules(){
-      const STYP = this.rules.find(x=>x.rULENM=="STYP" && x.aCTIVE)
+      const STYP = this.rules.find(x=>x.rULEID=="STYP" && x.aCTIVE)
       if(STYP){
         const isManual = STYP.vAL === "M";
         this.allFormControls.find(x=>x.name=="docketNumber").disable = !isManual;
@@ -1239,19 +1277,19 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.isUpdate=isManual;
       }
 
-      const ELOC = this.rules.find(x=>x.rULENM=="ELOC" && x.aCTIVE)
+      const ELOC = this.rules.find(x=>x.rULEID=="ELOC" && x.aCTIVE)
       if(ELOC){
         if(!ELOC.vAL.includes(this.storage.branch)) {
           // check exception for branch
         }
       }
 
-      this.alpaNumber = this.rules.find(x=>x.rULENM=="NTYP" && x.aCTIVE)?.vAL=="AN";
-      this.sequence = this.rules.find(x=>x.rULENM=="SL" && x.aCTIVE)?.vAL=="S";
-      this.isBrachCode = this.rules.find(x=>x.rULENM=="BCD" && x.aCTIVE)?.vAL=="Y";
-      this.fyear = this.rules.find(x=>x.rULENM=="YEAR" && x.aCTIVE)?.vAL=="F";
-      this.length = ConvertToNumber(this.rules.find(x=>x.rULENM=="LENGTH" && x.aCTIVE)?.vAL);
-      this.mseq = this.rules.find(x=>x.rULENM=="MSEQ" && x.aCTIVE)?.vAL=="Y";
+      this.alpaNumber = this.rules.find(x=>x.rULEID=="NTYP" && x.aCTIVE)?.vAL=="AN";
+      this.sequence = this.rules.find(x=>x.rULEID=="SL" && x.aCTIVE)?.vAL=="S";
+      this.isBrachCode = this.rules.find(x=>x.rULEID=="BCD" && x.aCTIVE)?.vAL=="Y";
+      this.fyear = this.rules.find(x=>x.rULEID=="YEAR" && x.aCTIVE)?.vAL=="F";
+      this.length = ConvertToNumber(this.rules.find(x=>x.rULEID=="LENGTH" && x.aCTIVE)?.vAL);
+      this.mseq = this.rules.find(x=>x.rULEID=="MSEQ" && x.aCTIVE)?.vAL=="Y";
   }
   async save() {
     if(!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit){
@@ -1301,7 +1339,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         "cUSTNM": this.consignmentForm.controls['consignorName'].value?.name || this.consignmentForm.controls['consignorName'].value,
         "cUSTPH": this.consignmentForm.controls['ccontactNumber'].value,
         "aLTPH": this.consignmentForm.controls['calternateContactNo'].value,
-        "aDD": this.consignmentForm.controls['cnoAddress'].value,
+        "aDD": typeof(this.consignmentForm.controls['cnoAddress'].value)=="object"?this.consignmentForm.controls['cnoAddress'].value.name:this.consignmentForm.controls['cnoAddress'].value,
         "gSTNO": this.consignmentForm.controls['cnogst'].value,
       }
       await this.docketService.walkinFieldMapping(data, cnWinCsgn, false)
@@ -1311,7 +1349,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         "cUSTNM": this.consignmentForm.controls['consigneeName'].value?.name || this.consignmentForm.controls['consigneeName'].value,
         "cUSTPH": this.consignmentForm.controls['cncontactNumber'].value,
         "aLTPH": this.consignmentForm.controls['cnalternateContactNo'].value,
-        "aDD": this.consignmentForm.controls['cneAddress'].value,
+        "aDD":typeof(this.consignmentForm.controls['cneAddress'].value)=="object"?this.consignmentForm.controls['cneAddress'].value.name:this.consignmentForm.controls['cneAddress'].value,
         "gSTNO": this.consignmentForm.controls['cnegst'].value,
       }
       await this.docketService.walkinFieldMapping(data, false, cnWinCsgne)

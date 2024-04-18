@@ -301,7 +301,15 @@ export class ThcService {
     }
     /*end*/
 
-
+    async updateThcLTL(data, filter = {}){
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "thc_summary_ltl",
+            filter: filter,
+            update: data
+        }
+        return await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update, req));
+   }
     async getTHCDetaisWithDockets(thcNo) {
         let query = [
             {

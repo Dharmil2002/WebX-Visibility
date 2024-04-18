@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
-import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { financialYear, timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -134,7 +134,7 @@ export class GeneralLedgerReportComponent implements OnInit {
       const financialYearlist = this.generalLedgerReportService.getFinancialYear();
       const statelist = await this.stateService.getState();
       const branchList = await this.locationService.locationFromApi();
-      const categorylist = await PayBasisdetailFromApi(this.masterService, "MCT");
+      const categorylist = await GetGeneralMasterData(this.masterService, "MCT");
       const accountList = await this.generalLedgerReportService.getAccountDetail();
 
       // Apply filters for each dropdown

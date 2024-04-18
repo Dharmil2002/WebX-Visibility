@@ -36,10 +36,6 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Invoice Amount",
       class: "matcolumncenter",
       Style: "min-width:2px",
-    }, cft: {
-      Title: "CFT Total",
-      class: "matcolumncenter",
-      Style: "min-width:2px",
     },
     cubWT: {
       Title: "Cubic Weight",
@@ -62,7 +58,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Style: "min-width:2px",
     },
     chargedWeight: {
-      Title: "Charged Weight (MT)",
+      Title: "Charged Weight (Kg)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -110,16 +106,19 @@ export class ConsigmentLtlModel implements IFieldDefinition {
     },
     length: {
       Title: "Length",
+      lable: "Length",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     breadth: {
       Title: "Breadth",
+      lable: "Breadth",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     height: {
       Title: "Height",
+      lable: "Height",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -138,6 +137,11 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+        cft: {
+      Title: "CFT Total",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     materialName: {
       Title: "Material Name",
       class: "matcolumncenter",
@@ -149,7 +153,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Style: "min-width:2px",
     },
     chargedWeight: {
-      Title: "Charged Weight (MT)",
+      Title: "Charged Weight (Kg)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -158,6 +162,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",

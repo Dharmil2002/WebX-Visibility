@@ -102,10 +102,10 @@ export class VendorBillListComponent implements OnInit {
     // { label: 'Modify', id: 6, type: 'Action' },
   ]
   filterRequest = {
-    companyCode: this.companyCode,
+    companyCode: 0,
     vendorNames: [],
     StatusNames: [],
-    StatusCode: [],
+    StatusCode: [1, 2, 4, 5, 6, 7],
     startdate: new Date(),
     enddate: new Date()
   }
@@ -115,6 +115,7 @@ export class VendorBillListComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private objVendorBillService: VendorBillService,
     private masterService: MasterService) {
+    this.filterRequest.companyCode = this.StorageService.companyCode;
     this.companyCode = this.StorageService.companyCode;
     this.filterRequest.startdate.setDate(new Date().getDate() - 30);
   }

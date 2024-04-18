@@ -29,6 +29,7 @@ export class GenericTableV2Component
   @Input() csvData;
   @Input() columnHeader = [];
   @Input() TableStyle;
+  @Input() TableContainerStyle;
   @Input() addAndEditPath;
   @Input() disbleCheckbox;
   @Input() uploadComponent;
@@ -60,6 +61,7 @@ export class GenericTableV2Component
   @Input() extraData;
   @Input() EventButton;
   @Input() FormTitle: string = "";
+  @Input() stickyHeader: boolean = false;
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
   @Input() showHeader: boolean = true;
@@ -93,6 +95,8 @@ export class GenericTableV2Component
   AllChack = false
   @Input() centerAligned;
   @Input() selectAllRequired;
+
+  displayedHeaders: string[];
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
@@ -102,6 +106,7 @@ export class GenericTableV2Component
     this.height = changes.height?.currentValue ?? this.height;
     this.menuItems = changes.menuItems?.currentValue ?? this.menuItems;
     this.addFlag = changes.addFlag?.currentValue ?? this.addFlag;
+    this.displayedHeaders = (changes?.columnGroup?.currentValue ?? this.columnGroup ?? []).map(g => g.Name);
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
@@ -216,14 +221,13 @@ export class GenericTableV2Component
       }
     }
     
-    if(val) {
-      if (typeof val === 'string' && isValidDate(val)) {
-        return moment(new Date(val)).format("DD/MM/YYYY");
-      } else if (typeof val !== 'boolean' && !isNaN(Number(val))) {
+    if(val) {      
+      if (typeof val !== 'boolean' && isValidNumber(val)) {
         return Number(val);
+      } else if (typeof val === 'string' && isValidDate(val)) {
+        return moment(new Date(val)).format("DD/MM/YYYY");
       }
     }
-
     return val;
   }
   //#endregion

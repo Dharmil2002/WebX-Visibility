@@ -29,18 +29,14 @@ export class ThcSummaryComponent implements OnInit {
   TableStyle = "width:80%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
-  columnHeader = {
-    createOn: {
-      Title: "Created Date",
-      class: "matcolumncenter",
-      Style: "min-width:140px",
-    },
+  columnHeader = {   
     docNo: {
       Title: "THC No",
       class: "matcolumncenter",
       Style: "min-width:210px",
       functionName: 'openExternalWindow',
       type: 'windowLink',
+      sticky: true
     },
     rUTNM: {
       Title: "Route",
@@ -67,10 +63,17 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
+    createOn: {
+      Title: "Created Date",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
+      datatype: "datetime",
+    },
     actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      Style: "max-width:80px; width:80px",
+      stickyEnd: true
     }
   };
   allColumnFilter: any;

@@ -53,6 +53,11 @@ export class PendingBillingComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width: 390px",
     },
+    tMODE: {
+      Title: "Mode",
+      class: "matcolumnleft",
+      Style: "max-width: 100px",
+    },
     dockets: {
       Title: "Shipment",
       class: "matcolumncenter",
@@ -75,6 +80,7 @@ export class PendingBillingComponent implements OnInit {
     }
   }
   staticField = [
+    "tMODE",
     "billingParty",
     "sum"
   ]

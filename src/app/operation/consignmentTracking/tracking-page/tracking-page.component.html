@@ -72,34 +72,36 @@
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>EDD:</p>
-                            <p class="font-width-600" style="color: red;">{{item.sTSTM | date: "dd-MMM-YYYY"}}</p>
+                            <p class="font-width-600"></p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>ATD:</p>
-                            <p class="font-width-600"></p>
+                            <p class="font-width-600" style="color: #4caf50">
+                                {{item.ATD | date: "dd/MM/YY"}}
+                            </p>
                         </div>
                     </div>
                     <div class="trakingCard" style="width: 35%; ">
                         <p>
-                            Status:
+                            Status:                            
                         </p>
                         <p class="font-width-600">
                             <span *ngIf="item.sTSNM"
                                 [style.color]="item.GroupColor || rgb(123, 140, 161)">
-                                {{item.sTSNM}} :
+                                 {{item.sTSNM}}
                             </span>
-                            {{item.oPSSTS}}
+                            | {{item.oPSSTS}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 14%; ">
                         <p>
                             Booking Date:
                         </p>
-                        <p class="font-width-600" style="display: flex; align-items: center; color: rgb(0, 146, 0);">
+                        <p class="font-width-600" style="display: flex; align-items: center; color: #ff8e11">
                             <mat-icon *ngIf="item.docketData.dKTDT"
-                                style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color: rgb(0, 146, 0);"
+                                style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color:#ff8e11;"
                                 fontIcon="verified"></mat-icon>
-                            {{item.docketData.dKTDT | date: "dd-MMM-YYYY"}}
+                            {{item.docketData.dKTDT | date: "dd/MM/YY"}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 15%; text-align: center; ">
@@ -107,21 +109,21 @@
                             Transit Mode:
                         </p>
                         <p class="font-width-600">
-                            {{item.TransitMode.Party}}
-                            {{item.TransitMode.Party&&item.TransitMode.Mod?' / ':''}}
-                            {{item.TransitMode.Mod}}
-                            {{item.TransitMode.Mod&&item.TransitMode.Servis?' / ':''}}
-                            {{item.TransitMode.Servis}}
+                            {{item.TransitMode.join(' / ') }}                            
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>EWB:</p>
-                            <p class="font-width-600"></p>
+                            <p class="font-width-600">
+                                {{item.eWBNO}}
+                            </p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>Valid:</p>
-                            <p class="font-width-600"></p>
+                            <p class="font-width-600">
+                                {{item.eXPDT| date: "dd/MM/YY HH:mm"}}
+                            </p>
                         </div>
                     </div>
                     <div class="trakingCard" style="width: 18%; ">

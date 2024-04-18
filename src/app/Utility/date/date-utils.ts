@@ -48,3 +48,5 @@ export function runningNumber() {
 
   return `${moment().format("YYMMDDHH")}${Math.floor(1000 + Math.random() * 9000)}`
 };
+
+export const timeZone='Asia/Kolkata'

@@ -2,6 +2,7 @@
     <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
         [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray"
+        [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
         [height]="height" [width]="width" [FormTitle]="'Docket List'" [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)"
         (onFlagChange)="selectCheckBox($event)" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
         [uploadedFiles]="uploadedFiles">

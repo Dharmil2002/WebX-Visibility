@@ -61,7 +61,7 @@ export class TrackingPageComponent implements OnInit {
     {
       title: "Booked",
       count: 0,
-      Color: "#ffb463",  
+      Color: "#ff8e11",  
       groupId: 1
     },
     {
@@ -132,12 +132,12 @@ export class TrackingPageComponent implements OnInit {
           D$match: {
             D$and: [
               {
-                eNTDT: {
+                dKTDT: {
                   D$gte: this.QueryData.start,
                 },
               },
               {
-                eNTDT: {
+                dKTDT: {
                   D$lte: this.QueryData.end,
                 },
               },
@@ -195,7 +195,7 @@ export class TrackingPageComponent implements OnInit {
     const req = {
       companyCode: this.CompanyCode,
       collectionName:
-        this.Mode == "FTL" ? "docket_ops_det" : "docket_ops_det_ltl",
+        this.Mode == "FTL" ? "dockets" : "dockets_ltl",
       filters: [{ ...QueryFilter }, ...PipeLine],
     };
     

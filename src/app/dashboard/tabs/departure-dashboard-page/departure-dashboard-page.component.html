@@ -13,6 +13,7 @@
          -->
     <div class="verticalScrollbar">
         <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+            [stickyHeader]="true"
             [tableData]="tableData" [metaData]="metaData" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" (selectAllClicked)="onSelectAllClicked($event)"
             [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray">
         </app-generic-table-v2>

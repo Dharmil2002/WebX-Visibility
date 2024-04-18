@@ -102,7 +102,7 @@ export class StocksComponent
       let matches = { 
         cID: this.storage.companyCode,
         cLOC: this.storage.branch ,
-        sTS: { 'D$nin': [DocketStatus.Delivered,DocketStatus.Cancelled]}
+        sTS: { 'D$nin': [DocketStatus.Delivered,DocketStatus.Cancelled, DocketStatus.Del_MR_Generated]}
       };
 
       const data =await this.docketService.getDocketList(matches);
@@ -123,15 +123,17 @@ export class StocksComponent
         Title: this.DocCalledAs.Docket,
         class: "matcolumnleft",
         Style: "min-width:15%",
+        sticky: true
       },
       date: {
         Title: `${this.DocCalledAs.Docket} Date`,
-        class: "matcolumnleft",
+        class: "matcolumncenter",
         Style: "min-width:125px",
+        datatype: "date"
       },
       paymentType: {
         Title: "Pay Type",
-        class: "matcolumnleft",
+        class: "matcolumncenter",
         Style: "min-width:15px",
       },
       contractParty: {
@@ -146,18 +148,22 @@ export class StocksComponent
       },
       noofPackages: {
         Title: "Pkgs",
-        class: "matcolumncenter",
+        class: "matcolumnright",
         Style: "max-width:70px",
       },
       actualWeight: {
         Title: "Actual Weight",
-        class: "matcolumncenter",
+        class: "matcolumnright",
         Style: "min-width:145px",
+        //datatype: "number",
+        //decimalPlaces: 2
       },
       chargedWeight: {
         Title: "Charged Weight",
-        class: "matcolumncenter",
+        class: "matcolumnright",
         Style: "min-width:155px",
+        //datatype: "number",
+        //decimalPlaces: 2
       },
       status: {
         Title: "Status",
@@ -168,6 +174,7 @@ export class StocksComponent
         Title: "Action",
         class: "matcolumnleft",
         Style: "min-width:100px",
+        stickyEnd: true,
       },
     } ,
  

@@ -3,6 +3,7 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
 import { StorageService } from "src/app/core/service/storage.service";
+
 @Component({
   selector: "app-departure-dashboard-page",
   templateUrl: "./departure-dashboard-page.component.html",
@@ -76,11 +77,13 @@ export class DepartureDashboardPageComponent
       Title:"Route and Schedule",
       class: "matcolumnleft",
       Style: "min-width:200px",
+      sticky: true
     },
     VehicleNo: {
       Title: "Vehicle No",
       class: "matcolumnleft",
       Style: "min-width:80px",
+      sticky: true
     },
     TripID: {
       Title: "Trip ID",
@@ -93,11 +96,13 @@ export class DepartureDashboardPageComponent
       Title: "Scheduled",
       class: "matcolumnleft",
       Style: "min-width:100px",
+      datatype: "datetime",
     },
     Expected: {
       Title: "Expected",
       class: "matcolumnleft",
       Style: "min-width:100px",
+      datatype: "datetime",
     },
     Hrs: {
       Title: "Hrs",
@@ -108,6 +113,7 @@ export class DepartureDashboardPageComponent
       Title: "Action",
       class: "matcolumnleft",
       Style: "min-width:100px",
+      stickyEnd: true,
     },
   };
   staticField = [

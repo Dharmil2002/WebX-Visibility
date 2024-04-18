@@ -40,6 +40,28 @@ export class CustomerService {
     }
   }
 
+  async getCustomer(filter, project = null): Promise<any | null> {
+
+    let filters= [];
+    filters.push({
+      D$match: filter
+    });
+
+    if(project) {
+      filters.push({ 'D$project': project });
+    }
+
+    const reqBody = {
+      companyCode: this.storage.companyCode, // Get company code from local storage
+      collectionName: 'customer_detail',
+      filters: filters
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+    return res?.data || [];
+  }
+
+
   async getCustomerByCodeOrName(code, name) {
     try {
 
@@ -188,7 +210,7 @@ export class CustomerService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: localStorage.getItem("companyCode"),
+          companyCode:this.storage.companyCode,
           collectionName: "walkin_customers",
           filter,
         };

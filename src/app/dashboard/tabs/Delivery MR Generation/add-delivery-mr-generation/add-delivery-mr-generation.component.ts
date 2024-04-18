@@ -19,6 +19,7 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -514,7 +515,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to get dropdown's data
   async getTDSData() {
-    const filter = { locCode: this.storage.branch }
+    const filter = { locCode: this.storage.getItem(StoreKeys.Branch) }
     const stateList = await this.objLocationService.locationFromApi(filter);
     this.billingForm.get("Stateofbooking").setValue(stateList?.[0]?.state);
     let Accountinglocation = this.billingForm.value.Stateofbooking

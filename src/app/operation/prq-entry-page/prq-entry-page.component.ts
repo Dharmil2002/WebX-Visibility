@@ -628,8 +628,18 @@ export class PrqEntryPageComponent implements OnInit {
             this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
           }
           else {
-            const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * (containerCode * 1000);
-            this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+            if (res[0].FreightChargeMatrixDetails?.rTYPCD == "RTTYP-0001") {
+              const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT
+              this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+            }
+            else if (res[0].FreightChargeMatrixDetails?.rTYPCD == "RTTYP-0006") {
+              const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * this.prqEntryTableForm?.value?.cNTSIZE * 1000
+              this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+            } else {
+              const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * (containerCode * 1000);
+              this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+
+            }
           }
 
 
@@ -650,6 +660,6 @@ export class PrqEntryPageComponent implements OnInit {
           text: `Something went wrong! ${err.message}`,
           showConfirmButton: false,
         });
-      });   
+      });
   }
 }

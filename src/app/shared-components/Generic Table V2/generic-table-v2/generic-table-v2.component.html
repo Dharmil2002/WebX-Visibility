@@ -137,39 +137,32 @@
                         </div>
                     </div>
                     <!-- Generic Table -->
-                    <div class="responsive_table">
-                        <mat-table [style]="TableStyle" [dataSource]="dataSource" matSort>
-                            <!-- <ng-container [matColumnDef]="columnGroup" *ngFor="let group of columnGroup">                  
-                                <ng-container *ngIf="group.Name">
-                                    <mat-header-cell *matHeaderCellDef
-                                        [class]="group.class"
-                                        [style]="group.Style"
-                                        [style.text-align]="center"
-                                        [attr.colspan]="group.ColSpan">
-                                        {{group.Name}}
-                                    </mat-header-cell>
-                                </ng-container>
-                            </ng-container> -->
-                            <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">                               
+                    <div [ngClass]="stickyHeader ? ['responsive_table', 'fixHeight'] : ['responsive_table']" [style]="TableContainerStyle"  >
+                        <table mat-table [style.width]="'100%'" [style]="TableStyle" [dataSource]="dataSource" matSort >
+                            
+                            <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)"
+                            [sticky]="columnHeader[tableData].sticky" [stickyEnd]="columnHeader[tableData].stickyEnd">                               >                               
                                 <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
-                                    <mat-header-cell [style]="columnHeader[tableData].Style" *matHeaderCellDef
+                                    <th mat-header-cell [style]="columnHeader[tableData].Style" *matHeaderCellDef
                                         mat-sort-header [class]="columnHeader[tableData].class">
                                         {{columnHeader[tableData].Title}}
-                                    </mat-header-cell>
+                                    </th>
                                 </ng-container>
                                 <ng-template #elseBlock>
-                                    <mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class"
+                                    <th mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class"
                                         [style]="columnHeader[tableData].Style">
                                         {{columnHeader[tableData].Title}}
                                         <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
                                             *ngIf="tableData === 'checkBoxRequired' && selectAllRequired"
                                             color="primary" (change)="selectAll($event)" [(ngModel)]="AllChack"
                                             [indeterminate]="someComplete()"
-                                            [disabled]="this.disbleCheckbox"></mat-checkbox>
-                                    </mat-header-cell>
+                                            [disabled]="this.disbleCheckbox">
+                                        </mat-checkbox>
+                                    </th>
                                 </ng-template>
-                                <mat-cell *matCellDef="let element" [style]="columnHeader[tableData].Style"
-                                    [class]="columnHeader[tableData].class">
+                                <td mat-cell *matCellDef="let element" [style]="columnHeader[tableData].Style"
+                                    [class]="columnHeader[tableData].class"
+                                    [sticky]="tableData=='actions'">
                                     <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
                                         *ngIf="tableData=='checkBoxRequired'" color="primary"
                                         [(ngModel)]="element.isSelected" [disabled]="this.disbleCheckbox"
@@ -195,7 +188,10 @@
                                     <button mat-icon-button *ngIf="tableData=='actions'"
                                         [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="editCall(element)"
                                         (click)="$event.stopPropagation()" class="tbl-action-btn">
-                                        <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                                        <app-feather-icons 
+                                            [icon]="columnHeader[tableData].iconName || 'edit'"
+                                            [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]">
+                                        </app-feather-icons>
                                     </button>
                                     <mat-menu #menu="matMenu">
                                         <button mat-menu-item *ngFor="let item of menuItems"
@@ -206,8 +202,10 @@
                                     <ng-container *ngIf="tableData === 'actionsItems'">
                                         <button mat-icon-button [matMenuTriggerFor]="menuItemFlag ? actionsItems : null"
                                             (click)="$event.stopPropagation()" class="tbl-action-btn">
-                                            <app-feather-icons [icon]="'edit'"
-                                                [class]="'tbl-fav-edit'"></app-feather-icons>
+                                            <app-feather-icons 
+                                                [icon]="columnHeader[tableData].iconName || 'more-vertical'"
+                                                [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]">
+                                            </app-feather-icons>
                                         </button>
 
                                         <mat-menu #actionsItems="matMenu">
@@ -247,7 +245,7 @@
                                     </ng-container>
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'view'">
                                         <app-feather-icons [icon]="'eye'" style="cursor: pointer"
-                                            [class]="'tbl-fav-edit'"
+                                            [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]"
                                             (click)="openImageDialog(element)"></app-feather-icons>
                                     </ng-container>
 
@@ -265,14 +263,24 @@
 
                                     <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
                                         (click)="View(element)" class="tbl-action-btn">
-                                        <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                                        <app-feather-icons [icon]="columnHeader[tableData].iconName || 'eye'" [ngClass]="[ columnHeader[tableData]?.iconClass || '' ]"></app-feather-icons>
                                     </button>
-                                </mat-cell>
+                                </td>
+                            </ng-container>                           
+                            <ng-container *ngIf="columnGroup">
+                                <ng-container [matColumnDef]="group.Name" *ngFor="let group of columnGroup">                                                 
+                                    <th mat-header-cell *matHeaderCellDef
+                                        [class]="group.class"
+                                        [style.text-align]="center"
+                                        [attr.colspan]="group.ColSpan">
+                                        {{group.Title}}
+                                    </th>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedHeaders; sticky: stickyHeader"></tr>
                             </ng-container>
-
-                            <mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></mat-header-row>
-                            <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></mat-row>
-                        </mat-table>
+                            <tr mat-header-row *matHeaderRowDef="objectKeys(columnHeader); sticky: stickyHeader" ></tr>
+                            <tr mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></tr>
+                        </table>
                         <div style="height: 70px;" [ngStyle]="{'display': showPaginator ? 'block' : 'none'}">
                             <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0"
                                 [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions">
@@ -286,6 +294,11 @@
 </div>
 
 <style>
+    .fixHeight {
+        height: 400px;
+        overflow: auto;
+    }
+
     .pointer u {
         text-decoration: none !important;
         /* color: #36cbe9; */

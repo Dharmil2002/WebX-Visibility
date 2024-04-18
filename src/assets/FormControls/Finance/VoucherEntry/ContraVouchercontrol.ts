@@ -1,3 +1,4 @@
+import { StoreKeys } from 'src/app/config/myconstants';
 import { FormControls } from 'src/app/core/models/FormControl/formcontrol';
 import * as StorageService from "src/app/core/service/storage.service";
 
@@ -37,7 +38,7 @@ export class ContraVoucherControl {
         label: "Entry Location",
         placeholder: "Entry Location",
         type: "text",
-        value: StorageService.getItem('Branch'),
+        value: StorageService.getItem(StoreKeys.Branch),
         generatecontrol: true,
         disable: true,
         Validations: [],

@@ -18,7 +18,7 @@
                 </mat-tab> -->
                 <mat-tab *ngIf="hasPermission('DocketStock')" label="DocketStock">
                     <ng-template mat-tab-label>
-                        Docket Stock
+                        {{docCalledAs.Docket}} Stock
                     </ng-template>
                     <app-stocks (CurrentIndex)="GetSelectedIndex($event)" 
                         [selectedIndex]="1"></app-stocks>
@@ -65,14 +65,14 @@
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('docket')" label="docket">
                     <ng-template mat-tab-label>
-                        Docket Summary
+                        {{docCalledAs.Docket}} Summary
                     </ng-template>
                     <app-docket-list (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="7"
                         *ngIf="tabName === 'docket'"></app-docket-list>
                 </mat-tab>
                 <mat-tab *ngIf="hasPermission('THC')" label="THC">
                     <ng-template mat-tab-label>
-                        THC Summary
+                        {{docCalledAs.THC}} Summary
                     </ng-template>
                     <app-thc-summary (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="8"
                         *ngIf="tabName === 'THC'"></app-thc-summary>

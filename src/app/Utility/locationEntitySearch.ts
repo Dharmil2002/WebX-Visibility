@@ -1,4 +1,8 @@
+import { firstValueFrom } from "rxjs";
+import * as StorageService from '../core/service/storage.service';
+import { StoreKeys } from "../config/myconstants";
 export class locationEntitySearch {
+
   GetGenericMappedAria(RequestData, search, fieldsToSearch) {
     const uniqueValues = new Set();
 
@@ -7,7 +11,7 @@ export class locationEntitySearch {
         const fieldValue = element[fieldToSearch].toString().toLowerCase();
         if (fieldValue.startsWith(search.toLowerCase()) && !uniqueValues.has(fieldValue)) {
           uniqueValues.add(fieldValue);
-          acc.push({ name: element[fieldToSearch].toString(), value: fieldToSearch });
+          acc.push({ name: element[fieldToSearch].toString(), value: fieldToSearch, });
         }
       });
 
@@ -26,20 +30,61 @@ export class locationEntitySearch {
     return Result;
   }
 
-  GetMergedData(PinCodeList, StateList, mergeField) {
-    // Create a lookup object for faster access to StateList data
-    const stateListLookup = StateList.data.reduce((lookup, item) => {
-      lookup[item[mergeField]] = item;
-      return lookup;
-    }, {});
+  async GetMergedData(PinCodeList, StateList, mergeField, masterService = null, ArialWise = false) {
+    const stateListLookup = this.createStateListLookup(StateList, mergeField);
+    let mergedArray = this.mergeArrays(PinCodeList.data, stateListLookup, mergeField);
 
-    // Merge the two JSON arrays based on the specified mergeField
-    const mergedArray = PinCodeList.data.map(pinCodeItem => {
-      const stateItem = stateListLookup[pinCodeItem[mergeField]];
-      return stateItem ? { ...pinCodeItem, ...stateItem } : pinCodeItem;
-    });
+    if (ArialWise) {
+      const ariaList = await this.getAriaList(masterService);
+      mergedArray = [...mergedArray, ...ariaList];
+    }
 
     return mergedArray;
   }
+
+  createStateListLookup(StateList, mergeField) {
+    return StateList.data.reduce((lookup, item) => {
+      lookup[item[mergeField]] = item;
+      return lookup;
+    }, {});
+  }
+
+  mergeArrays(pinCodeList, stateListLookup, mergeField) {
+    return pinCodeList.map(pinCodeItem => {
+      const stateItem = stateListLookup[pinCodeItem[mergeField]];
+      return stateItem ? { ...pinCodeItem, ...stateItem, AR: '' } : pinCodeItem;
+    });
+  }
+
+  async getAriaList(masterService) {
+    const AriaRequestBody = {
+      companyCode: StorageService.getItem(StoreKeys.CompanyCode),
+      filter: {
+
+        cLSTYP: "CLSTYP-0001",
+        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
+        activeFlag: true,
+      },
+      collectionName: "cluster_detail",
+    };
+
+    const clusterdetail: any = await firstValueFrom(masterService.masterPost("generic/get", AriaRequestBody));
+    const ariaList = clusterdetail.data.map(cluster => ({
+      "AR": `${cluster.clusterName}`,
+      "_id": "",
+      "PIN": 0,
+      "ST": "",
+      "CT": "",
+      "STSN": "",
+      "STNM": "",
+      "CNTR": "",
+      "ZN": "",
+      "ISUT": false,
+    }));
+
+    return ariaList;
+  }
+
+
 
 }

@@ -4,28 +4,34 @@ import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+const today = new Date();
+today.setHours(23, 59, 59, 999); // Set the time to the end of the day
+let maxDate = today;
 export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
     private freightDetails:FormControls[];
-    private otherCharges:FormControls[];
+    private otherInfo:FormControls[];
     constructor(public generalService: GeneralService) {
-        super(generalService, "LTL", ["Consignment"]);
+        super(generalService, "LTL", ["ConsignmentLtl"]);
         this.docketFields = [
             {
                 name: "docketNumber",
                 label: `${DocCalledAs.Docket} No`,
                 placeholder: `${DocCalledAs.Docket} No`,
                 type: "text",
-                value: "Computerized",
+                value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message:  `${DocCalledAs.Docket}No required`,
+                  }],
                 functions: {
-                    change: "DocketValidation",
+                    onChange: "docketValidation",
                 },
                 additionalData:{
                     metaData: "Basic"
@@ -45,11 +51,14 @@ export class ConsignmentLtl extends BaseControl {
                 Validations: [
                     {
                         name: "required",
-                        message: "C Note Date is required",
+                        message: `${DocCalledAs.Docket} Date required`,
                     },
                 ],
+                functions: {
+                    onDate: "changeInvoice"
+                },
                 additionalData: {
-                    minDate: new Date(),
+                    maxDate:maxDate,
                     metaData: "Basic"
                 }
             },
@@ -93,6 +102,9 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
+                functions:{
+                    onSelection:"onPaymentType"
+                },
                 Validations: [
                     {
                         name: "required",
@@ -174,36 +186,10 @@ export class ConsignmentLtl extends BaseControl {
                 },
                 additionalData: {
                     metaData: "Basic",
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
             },
-            {
-                name: "fromPinCode",
-                label: "From Pin Code",
-                placeholder: "From Pin Code",
-                type: "dropdown",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "From Pin Code is required",
-                    },
-                    { name: "autocomplete" },
-                    { name: "invalidAutocompleteObject", message: "Choose proper value" }
-                ],
-                functions: {
-                    
-                },
-                additionalData: {
-                    metaData: "Basic",
-                    showNameAndValue: false,
-                },
-            },
+       
             {
                 name: "toCity",
                 label: "To City",
@@ -229,34 +215,7 @@ export class ConsignmentLtl extends BaseControl {
                 },
                 additionalData: {
                     metaData: "Basic",
-                    showNameAndValue: false,
-                },
-            },
-            {
-                name: "toPinCode",
-                label: "To Pin Code",
-                placeholder: "To Pin Code",
-                type: "dropdown",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "From Pin Code is required",
-                    },
-                    { name: "autocomplete" },
-                    { name: "invalidAutocompleteObject", message: "Choose proper value" }
-                ],
-                functions: {
-                    onOptionSelect: 'getDestinationBasedOnPincode'
-                },
-                additionalData: {
-                    metaData: "Basic",
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
             },
             {
@@ -351,6 +310,37 @@ export class ConsignmentLtl extends BaseControl {
                 }
             },
             {
+                name: "cnbp",
+                label: "Consignor same as Billing Party",
+                placeholder: "",
+                type: "toggle",
+                value: false,
+                generatecontrol: true,
+                disable: false,
+                functions: { onChange: "onAutoBillingBased" },
+                Validations: [],
+                additionalData: {
+                    showNameAndValue: true,
+                    metaData: "custom"
+                }
+            },
+          
+            {
+                name: "cnebp",
+                label: "Consignee same as Billing Party",
+                placeholder: "",
+                type: "toggle",
+                value: false,
+                generatecontrol: true,
+                disable: false,
+                functions: { onChange: "onAutoBillingBased" },
+                Validations: [],
+                additionalData: {
+                    showNameAndValue: true,
+                    metaData: "custom"
+                }
+            },
+            {
                 name: "f_vol",
                 label: "Volumetric",
                 placeholder: "Volumetric",
@@ -369,44 +359,14 @@ export class ConsignmentLtl extends BaseControl {
                 }
             },
             {
-                name: "cnbp",
-                label: "Consignor same as Billing Party",
-                placeholder: "",
-                type: "toggle",
-                value: false,
-                generatecontrol: true,
-                disable: false,
-                functions: { onChange: "onAutoBillingBased" },
-                Validations: [],
-                additionalData: {
-                    showNameAndValue: true,
-                    metaData: "custom"
-                }
-            },
-            {
                 name: "cnWinCsgn",
                 label: "walk in",
                 placeholder: "",
                 type: "toggle",
                 value: false,
-                generatecontrol: true,
+                generatecontrol: false,
                 disable: false,
-                functions: { onChange:"walkin"},
-                Validations: [],
-                additionalData: {
-                    showNameAndValue: true,
-                    metaData: "custom"
-                }
-            },
-            {
-                name: "cnebp",
-                label: "Consignee same as Billing Party",
-                placeholder: "",
-                type: "toggle",
-                value: false,
-                generatecontrol: true,
-                disable: false,
-                functions: { onChange: "onAutoBillingBased" },
+                functions: { },
                 Validations: [],
                 additionalData: {
                     showNameAndValue: true,
@@ -419,26 +379,16 @@ export class ConsignmentLtl extends BaseControl {
                 placeholder: "",
                 type: "toggle",
                 value: false,
-                generatecontrol: true,
+                generatecontrol: false,
                 disable: false,
-                functions: { onChange: "walkin" },
+                functions: {  },
                 Validations: [],
                 additionalData: {
                     showNameAndValue: true,
                     metaData: "custom"
                 }
             },
-
-            {
-                name: 'weight_in', label: 'Size In', placeholder: 'Size In', type: 'Staticdropdown',
-                value: [], Validations: [], generatecontrol: true, disable: false,
-                functions:{
-                    onSelection:"unitChange"
-                },
-                additionalData: {
-                    metaData: "custom",
-                },
-            }, {
+          , {
                 name: 'consignorName', label: "Consignor Name",
                 placeholder: "Consignor Name & Code",
                 type: "dropdown",
@@ -637,12 +587,14 @@ export class ConsignmentLtl extends BaseControl {
                 autocomplete: "",
                 displaywith: "",
                 maxlength: 12,
-                Validations: [{
-                    name: "required",
-                    message: "Eway Bill No is required",
-                }],
+                Validations: [
+                    {
+                        name: "pattern",
+                        pattern: '^[0-9]{12}',
+                        message: "Please enter a valid E-way Bill number. It must consist of exactly 12 digits."
+                    }],
                 functions:{
-                    "onChange":"checkInvoiceExist"
+                 
                 },
                 additionalData: {
                     metaData: "invoiceDetail"
@@ -659,10 +611,7 @@ export class ConsignmentLtl extends BaseControl {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [{
-                    name: "required",
-                    message: "Eway Bill Date is required",
-                }],
+                Validations: [],
                 additionalData: {
                     minDate: new Date(),
                     metaData: "invoiceDetail"
@@ -679,10 +628,7 @@ export class ConsignmentLtl extends BaseControl {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [{
-                    name: "required",
-                    message: "Expiry Date is required",
-                }],
+                Validations: [],
                 additionalData: {
                     minDate: new Date(),
                     metaData: "invoiceDetail"
@@ -707,6 +653,9 @@ export class ConsignmentLtl extends BaseControl {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
                 },
+                functions:{
+                    "onChange":"checkInvoiceExist"
+                },
                 generatecontrol: true,
                 disable: false,
             },
@@ -724,7 +673,7 @@ export class ConsignmentLtl extends BaseControl {
                     message: "Eway Bill Date is required",
                 }],
                 additionalData: {
-                    minDate: new Date(),
+                    maxDate: new Date(),
                     metaData: "invoiceDetail"
                 },
                 generatecontrol: true,
@@ -847,17 +796,14 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "cubWT",
-                label: "Cubit Weight",
-                placeholder: "Cubit Weight",
+                label: "Cubic Weight",
+                placeholder: "Cubic Weight",
                 type: "number",
-                value: "",
+                value: "0.00",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [{
-                    name: "required",
-                    message: "Cubit Weight is required",
-                }],
+                Validations: [],
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
@@ -866,7 +812,7 @@ export class ConsignmentLtl extends BaseControl {
                     onModel: "preventNegative"
                   },
                 generatecontrol: true,
-                disable: false,
+                disable: true,
             },
             {
                 name: "cft",
@@ -922,10 +868,7 @@ export class ConsignmentLtl extends BaseControl {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [{
-                    name: "required",
-                    message: "Material Name is required",
-                }],
+                Validations: [],
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
@@ -935,8 +878,8 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "actualWeight",
-                label: "Actual Weight (MT)",
-                placeholder: "Actual Weight",
+                label: "Actual Weight (Kg)",
+                placeholder: "Actual Weight (Kg)",
                 type: "number",
                 value: "",
                 filterOptions: "",
@@ -958,8 +901,8 @@ export class ConsignmentLtl extends BaseControl {
             },
             {
                 name: "chargedWeight",
-                label: "Charged Weight  (MT)",
-                placeholder: "Charged Weight",
+                label: "Charged Weight (Kg)",
+                placeholder: "Charged Weight (Kg)",
                 type: "number",
                 value: "",
                 filterOptions: "",
@@ -992,10 +935,10 @@ export class ConsignmentLtl extends BaseControl {
                     {name:"Bulky",value:"Bulky"},
                     {name:"Normal",value:"Normal"}
                 ],
-                Validations: [{
-                    name: "required",
-                    message: "Material Density is required",
-                }],
+                Validations: [],
+                functions:{
+                    onSelection:"onMaterialDensity"
+                },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "invoiceDetail"
@@ -1006,7 +949,7 @@ export class ConsignmentLtl extends BaseControl {
         ]
         this.freightDetails = [
             {
-                name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'mobile-number',
+                name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'number',
                 value: "", Validations: [{
                     name: "required",
                     message: "Freight Rate is required",
@@ -1033,7 +976,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'freight_amount', label: 'Frieght Amount (₹)', placeholder: 'Freight Amount', type: 'mobile-number',
+                name: 'freight_amount', label: 'Frieght Amount (₹)', placeholder: 'Freight Amount', type: 'number',
                 value: "", Validations: [{
                     name: "required",
                     message: " Freight Amount is required",
@@ -1049,7 +992,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'mobile-number',
+                name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'number',
                 value: 0.00, Validations: [], generatecontrol: true, functions: {
                     onModel: "preventNegative",
                     onChange: "calculateFreight"
@@ -1060,7 +1003,7 @@ export class ConsignmentLtl extends BaseControl {
                  disable: false
             },
             {
-                name: 'grossAmount', label: 'Gross Amount(₹)', placeholder: 'Gross Amount', type: 'mobile-number',
+                name: 'grossAmount', label: 'Gross Amount(₹)', placeholder: 'Gross Amount', type: 'number',
                 value: 0.00, Validations: [], generatecontrol: true, disable: true,
                 additionalData: {
                     metaData: "freightDetails"
@@ -1085,6 +1028,7 @@ export class ConsignmentLtl extends BaseControl {
                 generatecontrol: true,
                 disable: false,
                 functions: {
+                    onSelection: "onRcmChange"
                 },
                 Validations: [],
                 additionalData: {
@@ -1093,7 +1037,7 @@ export class ConsignmentLtl extends BaseControl {
                 },
             },
             {
-                name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
+                name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'number',
                 value:0.00, Validations: [],  
                 functions: {
                     onModel: "preventNegative",
@@ -1104,7 +1048,7 @@ export class ConsignmentLtl extends BaseControl {
                 },generatecontrol: true, disable: false
             },
             {
-                name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
+                name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'number',
                 value:0.00, Validations: [],
                 additionalData: {
                     metaData: "freightDetails"
@@ -1122,7 +1066,7 @@ export class ConsignmentLtl extends BaseControl {
                 }, generatecontrol: true, disable: true
             }
         ]
-        this.otherCharges = [
+        this.otherInfo = [
             {
                 name: 'cust_ref_no', label: 'Customer Ref No.', placeholder: 'Customer Ref No.', type: 'text',
                 value: "", Validations: [],
@@ -1255,6 +1199,6 @@ export class ConsignmentLtl extends BaseControl {
         return this.docketFields;
     }
     getOtherDetails() {
-        return this.otherCharges
+        return this.otherInfo
     }
 }

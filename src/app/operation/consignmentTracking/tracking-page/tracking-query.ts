@@ -7,22 +7,65 @@ export const GetTrakingDataPipeLine = () => {
     return [
       {
         D$lookup: {
-          from: "dockets",
-          localField: "dKTNO",
-          foreignField: "dKTNO",
-          as: "docketData",
-        },
+            from: "docket_ops_det",
+            localField: "dKTNO",
+            foreignField: "dKTNO",
+            as: "opsData"
+        }
       },
       {
-        D$unwind: "$docketData",
+          D$unwind: "$opsData"
+      },
+      {
+          D$replaceRoot: {
+              newRoot: {
+                  D$mergeObjects: ["$opsData", { "docketData": "$$ROOT" }]
+              }
+          }
+      },
+      {
+        D$lookup: {
+            "from": "docket_invoices",
+            "localField": "dKTNO",
+            "foreignField": "dKTNO",
+            "as": "invoiceData"
+        }
+      },
+      {
+          D$unwind:  {
+            "path": "$invoiceData",
+            "preserveNullAndEmptyArrays": true
+          }
       },
       {
         D$addFields: {
-          TransitMode: {
-            Party: "$docketData.pAYTYPNM",
-            Mod: "$docketData.tRNMODNM",
-            Servis: "$docketData.mODNM",
+          eWBNO: "$invoiceData.eWBNO",
+          eXPDT: "$invoiceData.eXPDT",
+        }
+      },
+      {
+          D$sort: {  "eXPDT": 1  }
+      },
+      {
+        D$group: {
+          _id: "$dKTNO",
+          doc: {
+            D$first: "$$ROOT",
           },
+        },
+      },
+      {
+        D$replaceRoot: {
+          newRoot: "$doc",
+        }, 
+      },
+      {
+        D$addFields: {
+          TransitMode: [ 
+            { D$ifNull: ["$docketData.pAYTYPNM", ""] },
+            { D$ifNull: [ "$docketData.tRNMODNM", "Road"] },
+            { D$ifNull: ["$docketData.mODNM", "LTL"] },
+          ],
           Consignee: {
             D$concat: [
               {
@@ -41,6 +84,13 @@ export const GetTrakingDataPipeLine = () => {
               "$docketData.cSGNNM",
             ],
           },
+          ATD: {
+            D$cond: {
+              if: { D$eq: ["$sTS", 3] },
+              then: "$sTSTM",
+              else: null
+            },
+          }
         },
       },
       {
@@ -94,22 +144,67 @@ export const GetTrakingDataPipeLine = () => {
     return [
       {
         D$lookup: {
-          from: "dockets_ltl",
+            from: "docket_ops_det_ltl",
+            localField: "dKTNO",
+            foreignField: "dKTNO",
+            as: "opsData"
+        }
+      },
+      {
+          D$unwind: "$opsData"
+      },
+      {
+          D$replaceRoot: {
+              newRoot: {
+                  D$mergeObjects: ["$opsData", { "docketData": "$$ROOT" }]
+              }
+          }
+      },
+      {
+        D$lookup: {
+          from: "docket_invoices_ltl",
           localField: "dKTNO",
           foreignField: "dKTNO",
-          as: "docketData",
+          as: "invoiceData",
         },
       },
       {
-        D$unwind: "$docketData",
+        D$unwind: {
+          path: "$invoiceData",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         D$addFields: {
-          TransitMode: {
-            Party: "$docketData.pAYTYPNM",
-            Mod: "$docketData.tRNMODNM",
-            Servis: "$docketData.sVCTYPN",
+          eWBNO: "$invoiceData.eWBNO",
+          eXPDT: "$invoiceData.eXPDT",
+        },
+      },
+      {
+        D$sort: {
+          eXPDT: 1,
+        },
+      },
+      {
+        D$group: {
+          _id: "$dKTNO",
+          doc: {
+            D$first: "$$ROOT",
           },
+        },
+      },
+      {
+        D$replaceRoot: {
+          newRoot: "$doc",
+        },
+      },
+      {
+        D$addFields: {
+          TransitMode: [ 
+            { D$ifNull: ["$docketData.pAYTYPNM", ""] },
+            { D$ifNull: ["$docketData.tRNMODNM", "Road"] },
+            { D$ifNull: ["$docketData.mODNM", "LTL"] },
+          ], 
           Consignee: {
             D$concat: [
               {
@@ -128,6 +223,15 @@ export const GetTrakingDataPipeLine = () => {
               "$docketData.cSGN.nM",
             ],
           },
+          ATD: {
+            D$cond: {
+              if: { D$eq: ["$iSDEL", true] },
+              then: {
+                D$ifNull: ["$dELDT", "$sTSTM"],
+              },
+              else: null
+            },
+          }
         },
       },
       {

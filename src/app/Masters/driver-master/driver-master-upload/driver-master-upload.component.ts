@@ -159,7 +159,7 @@ export class DriverMasterUploadComponent implements OnInit {
           },
         ];
         try {
-          const response = await firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+          const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
           console.log("jsonData", jsonData)
           const filteredData = await Promise.all(response.map(async (element) => {
 

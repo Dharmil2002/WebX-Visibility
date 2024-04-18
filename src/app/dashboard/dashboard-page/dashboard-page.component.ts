@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { MenuAccessService } from 'src/app/core/service/menu-access/menu-access.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
@@ -118,12 +119,16 @@ export class DashboardPageComponent implements OnInit {
     },
   ];
   tabName: any;
+  docCalledAs: any;
   constructor(private changeDetectorRef: ChangeDetectorRef,
     private activeRoute: ActivatedRoute,
     private Route: Router,
     private _menuAccessService: MenuAccessService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private controlPanel: ControlPanelService,
+  ) {
     this.mode = this.storageService.mode;
+    this.docCalledAs = this.controlPanel.DocCalledAs;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
 
     }

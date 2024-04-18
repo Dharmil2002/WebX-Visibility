@@ -1359,7 +1359,6 @@ export class DocketService {
 
     }
     async walkinFieldMapping(data, isCsgn, isCsgne) {
-        debugger
         let req={};
         let walkingData = {};
         req['companyCode']=this.storage.companyCode;

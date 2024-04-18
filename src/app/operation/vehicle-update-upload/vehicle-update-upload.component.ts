@@ -200,7 +200,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
 
   updatePackage() {
-    debugger
     if (this.scanPackage) {
       this.tableload = true;
       // Get the trimmed values of scan and leg

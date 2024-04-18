@@ -156,9 +156,9 @@ export class AddVendorMasterComponent implements OnInit {
       this.isUpdate = true;
       this.imageData = {
         msmeScan: this.vendorTabledata.msmeScan === "" ? null : this.vendorTabledata.msmeScan,
-        panCardScan:this.vendorTabledata.panCardScan === "" ? null : this.vendorTabledata.panCardScan,
-        uPRC:this.vendorTabledata.uPRC === "" ? null : this.vendorTabledata.uPRC,
-        uTDSD:this.vendorTabledata.uTDSD === "" ? null : this.vendorTabledata.uTDSD,
+        panCardScan: this.vendorTabledata.panCardScan === "" ? null : this.vendorTabledata.panCardScan,
+        uPRC: this.vendorTabledata.uPRC === "" ? null : this.vendorTabledata.uPRC,
+        uTDSD: this.vendorTabledata.uTDSD === "" ? null : this.vendorTabledata.uTDSD,
         uCC: this.vendorTabledata.uCC === "" ? null : this.vendorTabledata.uCC,
         uploadKYC: this.vendorTabledata.uploadKYC === "" ? null : this.vendorTabledata.uploadKYC,
       };
@@ -364,9 +364,9 @@ export class AddVendorMasterComponent implements OnInit {
         );
         const pincode = this.vendorTabledata.vendorPinCode
           ? {
-              name: this.vendorTabledata.vendorPinCode,
-              value: this.vendorTabledata.vendorPinCode,
-            }
+            name: this.vendorTabledata.vendorPinCode,
+            value: this.vendorTabledata.vendorPinCode,
+          }
           : "";
         this.vendorTableForm.controls.vendorPinCode.setValue(pincode);
       }
@@ -875,7 +875,7 @@ export class AddVendorMasterComponent implements OnInit {
 
       // Create a request object with the filter criteria
       const req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
+        companyCode: this.storage.companyCode,
         collectionName: "vendor_detail",
         filter: { [fieldName]: fieldValue },
       };
@@ -1024,11 +1024,10 @@ export class AddVendorMasterComponent implements OnInit {
     if (invalidEmails.length > 0) {
       let EmailString = "";
       invalidEmails.forEach((x) => {
-        EmailString = `${
-          EmailString != ""
-            ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
-            : "<li style='margin:0px;'>" + x + "<li>"
-        }`;
+        EmailString = `${EmailString != ""
+          ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
+          : "<li style='margin:0px;'>" + x + "<li>"
+          }`;
       });
       Swal.fire({
         text: "This Email is not valid. Please try with another!",

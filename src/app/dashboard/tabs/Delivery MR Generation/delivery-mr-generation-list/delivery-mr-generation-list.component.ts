@@ -32,6 +32,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       Title: "Cnote",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      sticky: true
     },
     date: {
       Title: "Date of Cnote",
@@ -78,7 +79,8 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:90px",
       type: "Link",
-      functionName: "validateLocation"
+      functionName: "validateLocation",
+      stickyEnd: true,
     },
   };
 

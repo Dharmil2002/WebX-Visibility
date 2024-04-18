@@ -7,6 +7,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 import { ExpressRouteBulkUploadComponent } from "../../vendor-contract/vendorContractTabs/vendor-terdetail/express-route-bulk-upload/express-route-bulk-upload.component";
 import { MatDialog } from "@angular/material/dialog";
+import { ContainerMasterUploadComponent } from "../container-master-upload/container-master-upload.component";
 
 @Component({
   selector: "app-list-container",
@@ -102,6 +103,7 @@ export class ListContainerComponent implements OnInit {
   ];
   TableData: any;
   csvFileName = "Container Master";
+  uploadComponent = ContainerMasterUploadComponent
   headerForCsv = {
     "entryDate": "Created Date",
     "cNTYPNM": "Container Type ",
@@ -184,13 +186,15 @@ export class ListContainerComponent implements OnInit {
     }
   }
 
-  upload() {
-    const dialogRef = this.dialog.open(ExpressRouteBulkUploadComponent, {
-      width: "800px",
-      height: "500px",
-    });
-    dialogRef.afterClosed().subscribe(() => {
-      // this.getXpressDetail();
-    });
-  }
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.ngOnInit();
+      });
+    }
+    //#endregion
 }

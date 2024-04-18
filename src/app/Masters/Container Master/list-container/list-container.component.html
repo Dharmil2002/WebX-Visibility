@@ -1,6 +1,8 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
   <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-    [tableData]="TableData" (functionCallEmitter)="functionCallHandler($event)" [addAndEditPath]="'/Masters/ContainerMaster/AddContainer'"
-    [FormTitle]="'Container List'" [csvFileName]="csvFileName" [csvHeaders]="headerForCsv" [staticField]="staticField">
+    [tableData]="TableData" (functionCallEmitter)="functionCallHandler($event)"
+    [addAndEditPath]="'/Masters/ContainerMaster/AddContainer'"
+    [FormTitle]="'Container List'" [csvFileName]="csvFileName" [csvHeaders]="headerForCsv"
+    [staticField]="staticField" [uploadComponent]=true (uploadEvent)="upload()">
   </app-generic-table-v2>
 </app-common-wrapper-webxpress>

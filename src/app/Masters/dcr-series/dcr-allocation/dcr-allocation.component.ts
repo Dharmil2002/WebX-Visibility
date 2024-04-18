@@ -355,17 +355,17 @@ export class DcrAllocationComponent implements OnInit {
           true
         );
         break;
-      case "C":
-        this.DCRTableForm.controls["name"].setValue("");
-        const customerdetails = await this.dcrService.CustomerDetail(this.masterService);
-        this.filter.Filter(
-          this.jsonControlCustomerArray,
-          this.DCRTableForm,
-          customerdetails,
-          "name",
-          true
-        );
-        break;
+      // case "C":
+      //   this.DCRTableForm.controls["name"].setValue("");
+      //   const customerdetails = await this.dcrService.CustomerDetail(this.masterService);
+      //   this.filter.Filter(
+      //     this.jsonControlCustomerArray,
+      //     this.DCRTableForm,
+      //     customerdetails,
+      //     "name",
+      //     true
+      //   );
+      //   break;
     }
   }
   //#endregion

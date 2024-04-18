@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeliveryMrGenerationModalComponent } from '../delivery-mr-generation-modal/delivery-mr-generation-modal.component';
 import { Router } from '@angular/router';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { GetAccountDetailFromApi, GetBankDetailFromApi, GetsachsnFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
+import { GetAccountDetailFromApi, GetsachsnFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { firstValueFrom } from 'rxjs';
@@ -20,6 +20,7 @@ import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, Vouc
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { StoreKeys } from 'src/app/config/myconstants';
+
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -50,15 +51,14 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   columnHeader = {
     consignmentNoteNumber: {
-      Title: "GRN No.",
+      Title: "Consignment Note Number ",
       class: "matcolumnleft",
-      Style: "min-width:18%",
-      sticky: true
+      Style: "min-width:15em",
     },
     payBasis: {
       Title: "PayBasis",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      // Style: "min-width:80px",
     },
     subTotal: {
       Title: "Sub Total Amount(₹)",
@@ -73,25 +73,82 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     rateDifference: {
       Title: "Rate Difference(₹)",
       class: "matcolumncenter",
-      Style: "min-width:10px",
+      //Style: "min-width:80px",
     },
-    OtherDly: {
-      Title: "Other Charges(₹)",
+    Loading: {
+      Title: "Loading(₹)",
       class: "matcolumncenter",
-      Style: "min-width:10px",
-      type: "Link",
-      functionName: "addDetails"
+      //Style: "max-width:70px",
+    },
+    Freight: {
+      Title: "Freight(₹)",
+      class: "matcolumncenter",
+      //Style: "max-width:70px",
+    },
+    Unloading: {
+      Title: "Unloading Charge(₹)",
+      class: "matcolumncenter",
+      //Style: "max-width:70px",
+    },
+    GST: {
+      Title: "GST(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    Discount: {
+      Title: "Discount(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    Demurrage: {
+      Title: "Demurrage(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    GreenTax: {
+      Title: "Green Tax(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    Insurance: {
+      Title: "Insurance(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    Document: {
+      Title: "Document(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    Multipointdelivery: {
+      Title: "Multi-point delivery(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
+    },
+    totalAmount: {
+      Title: "Total Amount(₹)",
+      class: "matcolumncenter",
+      //Style: "min-width:100px",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
-      Style: "min-width:5px",
-      stickyEnd: true,
+      //Style: "min-width:100px",
     },
   };
 
   staticField = [
     "totalAmount",
+    "Multipointdelivery",
+    "Document",
+    "Insurance",
+    "GreenTax",
+    "Demurrage",
+    "Discount",
+    "GST",
+    "Unloading",
+    "Freight",
+    "Loading",
     "rateDifference",
     "newSubTotal",
     "subTotal",
@@ -112,8 +169,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   headerDetails: any;
   docketNo: any;
   AlljsonControlMRArray: any;
-  totalMRamt: any;
-  AccountsBanksList: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -128,6 +183,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
+      //console.log(data.data.no);
       this.docketNo = data.data.no;
     }
   }
@@ -199,12 +255,20 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         id: this.tableData.length + 1,
         consignmentNoteNumber: element.dKTNO,
         totalAmount: 0,
-        OtherDly: 0,
+        Multipointdelivery: 0,
+        Document: 0,
+        Insurance: 0,
+        GreenTax: 0,
+        Demurrage: 0,
+        Discount: 0,
+        GST: 0,
+        Unloading: 0,
+        Freight: 0,
+        Loading: 0,
         rateDifference: 0,
         newSubTotal: 0,
         subTotal: 0,
         payBasis: element.pAYTYPNM,
-        otherCharge: null,
         actions: ['Edit']
       };
       this.tableData.push(json);
@@ -255,7 +319,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       NameofReceiver.clearValidators();
       NameofReceiver.updateValueAndValidity();
 
-      // Apply required validator for NameofConsignee control      
+      // Apply required validator for NameofConsignee control
       NameofConsignee.setValue(cgnm);
       NameofConsignee.setValidators([Validators.required]);
       NameofConsignee.updateValueAndValidity();
@@ -265,11 +329,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#region to Add a new item to the table or edit
   addDetails(event) {
     const request = {
-      charges: event.data,
+      List: this.tableData,
       Details: event,
-      show: event.functionName ? true : false
-    };
-
+    }
     this.tableload = true;
     const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
       data: request,
@@ -279,72 +341,59 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         top: "20px",
       },
     });
-
     dialogRef.afterClosed().subscribe(async (data) => {
-      try {
-        if (!data) {
-          this.tableload = false;
-          return;
-        }  
-        // Delay execution for better user experience
-        await new Promise(resolve => setTimeout(resolve, 1000));
-       
-        let dt = this.tableData.find(x => x.id === data.id);
-        dt.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
-        dt.otherCharge = data.chargeData;
-        dt.newSubTotal = parseFloat(data.newSubTotal).toFixed(2) || 0;
-        dt.rateDifference = parseFloat(data.newSubTotal) - parseFloat(data.subTotal);
-        dt.totalAmount = this.calculateTotalAmount(data.chargeData);
-        dt.OtherDly = dt.totalAmount.toFixed(2);
 
-        let totalMr = 0;
-        this.tableData.forEach(item => {
-          totalMr += item.totalAmount;
-        });
-        const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
-        totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
+      const delayDuration = 1000;
+      // Create a promise that resolves after the specified delay
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      // Use async/await to introduce the delay
+      await delay(delayDuration);
 
-        this.tableload = false;
-      } catch (error) {
-        console.error("Error in addDetails:", error);
-        // Handle errors, e.g., show an error message to the user
-      }
+      const json = {
+        id: data.id,
+        consignmentNoteNumber: data.consignmentNoteNumber,
+        Multipointdelivery: parseFloat(data["Multi-point delivery"]) || 0,
+        Document: parseFloat(data.Document) || 0,
+        Insurance: parseFloat(data.Insurance) || 0,
+        GreenTax: parseFloat(data["Green Tax"]) || 0,
+        Demurrage: parseFloat(data.Demurrage) || 0,
+        Discount: parseFloat(data.Discount) || 0,
+        GST: parseFloat(data.GST) || 0,
+        Unloading: parseFloat(data.Unloading) || 0,
+        Freight: parseFloat(data.Freight) || 0,
+        Loading: parseFloat(data.Loading) || 0,
+        newSubTotal: parseFloat(data.newSubTotal) || 0,
+        subTotal: data.subTotal || 0,
+        rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
+        totalAmount: (parseFloat(data.Document || 0) +
+          + parseFloat(data.Insurance || 0)
+          + parseFloat(data["Green Tax"] || 0)
+          + parseFloat(data.Demurrage || 0)
+          + parseFloat(data.GST || 0)
+          + parseFloat(data.Unloading || 0)
+          + parseFloat(data.Freight || 0)
+          + parseFloat(data.Loading || 0)) - parseFloat(data.Discount || 0),
+        payBasis: data.payBasis,
+        actions: ['Edit']
+      };
+      this.tableData = this.tableData.filter(item => item.id !== data.id);
+      this.tableData.unshift(json);
+      this.tableload = false;
+      let totalMr = 0;
+      this.tableData.forEach(item => {
+        totalMr += item.totalAmount;
+      });
+      const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
+      totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
     });
   }
-
-  // calculating TotalAmount
-  calculateTotalAmount(charges) {
-    // Map charges to an array of objects with name, operation, and aMT properties
-    const chargeMapping = charges.map(charge => ({
-      name: charge.cHGNM,
-      operation: charge.oPS,
-      aMT: parseFloat(charge.aMT) // Parse the amount to ensure numerical calculations
-    }));
-
-    // Reduce the chargeMapping array to calculate the total amount
-    const totalAmount = chargeMapping.reduce((acc, curr) => {
-      // Apply the operation to the accumulated total based on the charge's operation
-      if (curr.operation === "+") {
-        return acc + curr.aMT;
-      } else if (curr.operation === "-") {
-        return acc - Math.abs(curr.aMT); // Subtract the positive amount
-      } else {
-        // Handle unknown operations (if any)
-        console.log(`Unknown operation "${curr.operation}" for charge "${curr.name}"`);
-        return acc;
-      }
-    }, 0);
-
-    return totalAmount;
-  }
-
   //#endregion
   //#region to fill or remove data form table to controls
   handleMenuItemClick(data) {
     //console.log(data);
     this.addDetails(data)
   }
-  //#endregion 
+  //#endregion
   //#region to validate docket number
   async validateConsig() {
     const NoofDocketValue = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
@@ -371,8 +420,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       if (this.filteredDocket.length === 0) {
         Swal.fire({
           icon: "info",
-          title: "Information",
-          text: `This Consignment No: ${NoofDocketValue} is not valid`,
+          title: `This Consignment No: ${NoofDocketValue} is not valid`,
           showConfirmButton: true,
         });
         this.deliveryMrTableForm.controls.ConsignmentNoteNumber.reset();
@@ -422,9 +470,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const Accountinglocation = this.storage.branch;
     switch (PaymentMode) {
       case "Cheque":
-        // const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation);
-        this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
-        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
+        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation);
         this.filter.Filter(
           this.jsonControlPaymentArray,
           this.PaymentSummaryFilterForm,
@@ -638,7 +684,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         try {
           const headerRequest = {
             cID: this.storage.companyCode,
-            dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
+            gCNNO: this.tableData.map(item => item.consignmentNoteNumber),
             dLVRT: this.headerDetails.Deliveredto,
             cNTCTNO: this.headerDetails.ContactNumber,
             rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
@@ -677,17 +723,32 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const detailRequests = this.tableData.map(element => {
             return {
               cID: this.storage.companyCode,
-              dOCNO: element.consignmentNoteNumber,
-              cHG: element.otherCharge,
+              gCNNO: element.consignmentNoteNumber,
+              mLTPNTDLRY: element.Multipointdelivery,
+              dOC: element.Document,
+              iNSURNC: element.Insurance,
+              gRNTX: element.GreenTax,
+              dMRG: element.Demurrage,
+              dISCNT: element.Discount,
+              gST: element.GST,
+              uNLODNG: element.Unloading,
+              fRGHT: element.Freight,
+              lODNG: element.Loading,
+              //cNSGTNO:
               pYBASIS: element.payBasis,
-              sUBTTL: parseFloat(element.subTotal),
-              nWSUBTTL: parseFloat(element.newSubTotal),
-              rTDFRNC: parseFloat(element.rateDifference),
+              sUBTTL: element.subTotal,
+              nWSUBTTL: element.newSubTotal,
+              rTDFRNC: element.rateDifference,
               vNO: VoucherNo,
-              tOTL: parseFloat(element.totalAmount),
+              //dORDLVRY:
+              // fRCLPCHRGE:
+              //   gTPSCHRG:
+              // oTHRCHRG:
+              tOTL: element.totalAmount,
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName
+
             }
           });
 
@@ -801,17 +862,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   GenerateVoucher() {
-    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
-    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
-      const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
-      if (AccountDetails != undefined) {
-        this.PaymentSummaryFilterForm.get("Bank").setValue(AccountDetails)
-      } else {
-        this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
-        return;
-      }
-    }
+
     this.snackBarUtilityService.commonToast(async () => {
       try {
 
@@ -905,7 +956,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherRequestModel.details = voucherLineItemList;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
-        //console.log(this.VoucherRequestModel);
+        console.log(this.VoucherRequestModel);
 
         firstValueFrom(this.voucherServicesService
           .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {

@@ -58,6 +58,7 @@ export const GenericActions = {
     GetOne: 'generic/getOne',
     Create: 'generic/create',
     Update: 'generic/update',
+    UpdateBulk: 'generic/updateBulk',
     Query: 'generic/query',
     FindLastOne: 'generic/findLastOne'
 };

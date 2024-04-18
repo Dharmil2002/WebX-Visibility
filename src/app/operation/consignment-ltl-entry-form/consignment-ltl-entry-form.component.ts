@@ -1094,7 +1094,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     let chargeWeight = 0;
     switch (this.unitsName) {
       case "CM":
-        cft = length * breadth * height * pkg * cftRatio
+        cft = length * breadth * height * pkg * cftRatio/27000;
         chargeWeight = cftRatio * cft
         this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
         break

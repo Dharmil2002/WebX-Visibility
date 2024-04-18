@@ -23,6 +23,27 @@ export class VendorService {
     // Return the data from the response
     return response.data;
   }
+
+  async VendorDetail(filter = {}) {
+    // Prepare the request body with necessary parameters
+    const reqBody = {
+      companyCode: this.storage.companyCode, // Get company code from local storage
+      collectionName: "vendor_detail",
+      filter: filter,
+    };
+    try {
+      // Make an asynchronous request to the API using masterMongoPost method
+      const res = await firstValueFrom(this.masterService
+        .masterMongoPost("generic/get", reqBody));
+      return res.data
+      // Sort the mapped data in ascending order by location name
+    } catch (error) {
+      // Handle any errors that occur during the API request
+      console.error("An error occurred:", error);
+      return null; // Return null to indicate an error occurred
+    }
+  }
+
   async getVendorForAutoComplete(form, jsondata, controlName, codeStatus) {
     try {
       const cValue = form.controls[controlName].value;

@@ -53,7 +53,7 @@ export class DcrAllocationForm {
         value: [
           { value: "E", name: "Employee" },
           { value: "B", name: "BA", },
-          { value: "C", name: "Customer", },
+          // { value: "C", name: "Customer", },
           ],
         generatecontrol: true,
         disable: false,

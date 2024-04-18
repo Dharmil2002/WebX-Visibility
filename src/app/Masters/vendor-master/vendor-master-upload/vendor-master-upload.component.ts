@@ -15,6 +15,8 @@ import { VendorMaster } from 'src/app/core/models/Masters/vendor-master';
 import { nextKeyCodeByN } from 'src/app/Utility/commonFunction/stringFunctions';
 import { chunkArray } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { max } from 'lodash';
+import { Code } from 'angular-feather/icons';
+import { UploadFieldType } from 'src/app/config/myconstants';
 
 @Component({
   selector: 'app-vendor-master-upload',
@@ -28,9 +30,187 @@ export class VendorMasterUploadComponent implements OnInit {
   vendorTypeList: any;
   locationList: any;
 
+  validationRules: any[] = [
+    // {
+    //   Type: UploadFieldType.Key,
+    //   Fields: ["",""], // string or string[]
+    //   Items: ["", ""], // string or string[]      
+    // },
+    {
+      ItemsName: "VendorName",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        { Pattern: "^[a-zA-Z0-9 -/]{3,150}$" },
+        // { 
+        //   Unique: true,
+        //   From: "vendor_detail",
+        //   Field: "vendorName",
+        // },
+        { DuplicateFromList: true }
+      ],
+    },
+    {
+      ItemsName: "VendorManager",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z - a-zA-Z]{3,25}$" }
+      ]
+    },
+    {
+      ItemsName: "VendorType",
+      Validations: [
+        { Required: true },
+        {
+          ExistsInGeneralMaster: true,
+          IsComaSeparated: false,
+          CodeType: "VENDTYPE",
+          //TakeFromArrayList: this.vendorTypeList.map((x) => {return x.name;})
+        }
+      ]
+    },
+    {
+      ItemsName: "VendorAddress",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        { Pattern: "^.{1,500}$" }
+      ]
+    },
+    {
+      ItemsName: "VendorLocation",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        {
+          ExistsInLocationMaster: true,
+          IsComaSeparated: true
+          //TakeFromArrayList: this.locationList.map((x) => { return x.locCode; }),
+        }
+      ],
+    },
+    {
+      ItemsName: "VendorPinCode",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        {
+          ExistsInPincodeMaster: true,
+          IsComaSeparated: false,
+          //TakeFromList: this.pincodeList.map((x) => { return x.PIN; }),
+        }
+      ],
+    },
+    {
+      ItemsName: "VendorContactNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[1-9][0-9]{9}$" }
+      ],
+    },
+    {
+      ItemsName: "VendorEmailID",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
+      ],
+    },
+
+    {
+      ItemsName: "PANNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" },
+        { 
+          Unique: true,
+          From: "vendor_detail",
+          Field: "panNo",
+        },
+        //{ DuplicateFromList: true }
+      ],
+    },
+    {
+      ItemsName: "CINNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z0-9]{4,100}$" },
+        { 
+          Unique: true,
+          From: "vendor_detail",
+          Field: "cinNumber",
+        },
+        //{ DuplicateFromList: true }
+      ],
+    },
+    {
+      ItemsName: "ITRNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z0-9]{4,100}$" }
+      ],
+    },
+    {
+      ItemsName: "VendorAdvance%",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Numeric: true },
+      ],
+    },
+    {
+      ItemsName: "VendorTypeId",
+      Type: UploadFieldType.Derived,
+      BasedOn: "VendorType",
+      From: "General",
+      Field: "codeId",
+      CodeType: "VENDTYPE",
+      Validations: [],
+    },
+    {
+      ItemsName: "VendorCity",
+      Type: UploadFieldType.Derived,
+      BasedOn: "VendorPinCode",
+      From: "Pincode",
+      Field: "CT",
+      Validations: [],
+    },   
+    {
+      ItemsName: "VendorStateId",
+      Type: UploadFieldType.Derived,
+      BasedOn: "VendorPinCode",
+      From: "Pincode",
+      Field: "ST",
+      Validations: [],
+    },         
+    {
+      ItemsName: "VendorState",
+      Type: UploadFieldType.Derived,
+      BasedOn: "VendorStateId",
+      From: "State",
+      Field: "STNM",
+      Validations: [],
+    },
+    {
+      ItemsName: "CountryId",
+      Type: UploadFieldType.Derived,
+      BasedOn: "VendorStateId",
+      From: "State",
+      Field: "CNTR",
+      Validations: [],
+    },
+    {
+      ItemsName: "Country",
+      Type: UploadFieldType.Derived,
+      BasedOn: "CountryId",
+      From: "Country",
+      Field: "Country",
+      Validations: [],
+    },
+  ];
+
   constructor(
     private fb: UntypedFormBuilder,
-    private xlsxUtils: xlsxutilityService,
+    private xlsxUtils: xlsxutilityService,    
     private dialog: MatDialog,
     private masterService: MasterService,
     private dialogRef: MatDialogRef<VendorMasterUploadComponent>,
@@ -83,7 +263,7 @@ export class VendorMasterUploadComponent implements OnInit {
   }
   //#endregion
   //#region to select file
-  selectedFile(event) {
+  async selectedFile(event) {
     let fileList: FileList = event.target.files;
     if (fileList.length !== 1) {
       throw new Error("Cannot use multiple files");
@@ -91,177 +271,85 @@ export class VendorMasterUploadComponent implements OnInit {
     const file = fileList[0];
 
     if (file) {
-      this.xlsxUtils.readFile(file).then(async (jsonData) => {
+      const jsonData = await this.xlsxUtils.readFile(file);
 
-        const pincodes = [...new Set(jsonData.map((x) => x.VendorPinCode))];
-        const locations = [...new Set(jsonData.map((x) => x.VendorLocation))];
-        const locationItems = String(locations).split(',').map(item => item.trim().toUpperCase());
+      // const pincodes = [...new Set(jsonData.map((x) => x.VendorPinCode))];
+      // const locations = [...new Set(jsonData.map((x) => x.VendorLocation))];
+      // const locationItems = String(locations).split(',').map(item => item.trim().toUpperCase());
 
-        // Fetch data from DB
-        this.vendorTypeList = await GetGeneralMasterData(this.masterService, "VENDTYPE");
-        this.pincodeList = await this.fetchAllPincodeData(pincodes);
-        this.locationList = await this.fetchAllLocationData(locationItems);
+      // //Fetch data from DB
+      // this.vendorTypeList = await GetGeneralMasterData(this.masterService, "VENDTYPE");
+      // this.pincodeList = await this.fetchAllPincodeData(pincodes);
+      // this.locationList = await this.fetchAllLocationData(locationItems);
 
-        const states = [...new Set(this.pincodeList.map((x) => x.ST))];
-        this.zonelist = await this.objState.getStateWithZone({ ST: { D$in: states } });
-        this.countryList = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"));
+      // const states = [...new Set(this.pincodeList.map((x) => x.ST))];
+      // this.zonelist = await this.objState.getStateWithZone({ ST: { D$in: states } });
+      // this.countryList = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"));
+      
+      try {
 
-        const validationRules = [
-          {
-            ItemsName: "VendorName",
-            Validations: [
-              { Required: true },
-              { Pattern: "^[a-zA-Z0-9 -/]{3,150}$" },
-              { DuplicateFromList: true }
-            ],
-          },
-          {
-            ItemsName: "VendorManager",
-            Validations: [
-              { Pattern: "^[a-zA-Z - a-zA-Z]{3,25}$" }
-            ]
-          },
-          {
-            ItemsName: "VendorType",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromArrayList: this.vendorTypeList.map((x) => {
-                  return x.name;
-                })
-              }
-            ]
-          },
-          {
-            ItemsName: "VendorAddress",
-            Validations: [
-              { Required: true },
-              { Pattern: "^.{1,500}$" }
-            ]
-          },
-          {
-            ItemsName: "VendorLocation",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromArrayList: this.locationList.map((x) => {
-                  return x.locCode;
-                }),
-              }
-            ],
-          },
-          {
-            ItemsName: "VendorPinCode",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromList: this.pincodeList.map((x) => {
-                  return x.PIN;
-                }),
-              }
-            ],
-          },
-          {
-            ItemsName: "VendorContactNo",
-            Validations: [
-              { Pattern: "^[1-9][0-9]{9}$" }
-            ],
-          },
-          {
-            ItemsName: "VendorEmailID",
-            Validations: [
-              { Pattern: "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
-            ],
-          },
+        const response = await this.xlsxUtils.validateAllData(jsonData, this.validationRules);
+        const existingRecords = await this.getVendorData(response);
 
-          {
-            ItemsName: "PANNo",
-            Validations: [
-              { Required: true },
-              { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" },
-              { DuplicateFromList: true }
-            ],
-          },
-          {
-            ItemsName: "CINNo",
-            Validations: [
-              { Pattern: "^[a-zA-Z0-9]{4,100}$" },
-              { DuplicateFromList: true }
-            ],
-          },
-          {
-            ItemsName: "ITRNo",
-            Validations: [
-              { Pattern: "^[a-zA-Z0-9]{4,100}$" }
-            ],
-          },
-          {
-            ItemsName: "VendorAdvance%",
-            Validations: [
-              { Numeric: true },
-            ],
+        // Creating lookup tables
+        const vendorNames = new Set();
+        const panNos = new Set();
+        const cinNos = new Set();
+
+        existingRecords.forEach(rec => {
+          if (rec.vendorName) vendorNames.add(rec.vendorName.toLowerCase());
+          if (rec.panNo && rec.panNo !== "") panNos.add(rec.panNo);
+          if (rec.cinNumber && rec.cinNumber !== "") cinNos.add(rec.cinNumber);
+        });
+
+        const filteredData = await Promise.all(response.map(async (element) => {
+          element.error = element.error || [];
+
+          if (vendorNames.has(element.VendorName.toLowerCase())) {
+            element.error.push(`VendorName : ${element.VendorName} Already exists`);
           }
-        ];
+          if (panNos.has(element.PANNo)) {
+            element.error.push(`PANNo : ${element.PANNo} Already exists`);
+          }
+          if (cinNos.has(element.CINNo)) {
+            element.error.push(`CINNo : ${element.CINNo} Already exists`);
+          }
 
-        try {
+          // const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
+          // if (city) {
+          //   element.VendorCity = city.CT;
+          //   const state = this.zonelist.find(x => x.ST === city.ST);
+          //   if (state) {
+          //     element.VendorState = state.STNM;
+          //     const country = this.countryList.find(x => x.Code.toLowerCase() === state.CNTR.toLowerCase());
+          //     if (country) {
+          //       element.Country = country.Country;
+          //     }
+          //   }
+          // }
 
-          const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
-          const existingRecords = await this.getVendorData(response);
+          if (element.error.length === 0) {
+            element.error = null // set the error property null if there are no errors;
+          }
+          return element;
+        }));
 
-          // Creating lookup tables
-          const vendorNames = new Set();
-          const panNos = new Set();
-          const cinNos = new Set();
-
-          existingRecords.forEach(rec => {
-            if (rec.vendorName) vendorNames.add(rec.vendorName.toLowerCase());
-            if (rec.panNo && rec.panNo !== "") panNos.add(rec.panNo);
-            if (rec.cinNumber && rec.cinNumber !== "") cinNos.add(rec.cinNumber);
-          });
-
-          const filteredData = await Promise.all(response.map(async (element) => {
-            element.error = element.error || [];
-
-            if (vendorNames.has(element.VendorName.toLowerCase())) {
-              element.error.push(`VendorName : ${element.VendorName} Already exists`);
-            }
-            if (panNos.has(element.PANNo)) {
-              element.error.push(`PANNo : ${element.PANNo} Already exists`);
-            }
-            if (cinNos.has(element.CINNo)) {
-              element.error.push(`CINNo : ${element.CINNo} Already exists`);
-            }
-
-            const city = this.pincodeList.find(x => x.PIN === parseInt(element.PinCode));
-            if (city) {
-              element.VendorCity = city.CT;
-              const state = this.zonelist.find(x => x.ST === city.ST);
-              if (state) {
-                element.VendorState = state.STNM;
-                const country = this.countryList.find(x => x.Code.toLowerCase() === state.CNTR.toLowerCase());
-                if (country) {
-                  element.Country = country.Country;
-                }
-              }
-            }
-            if (element.error.length === 0) {
-              element.error = null // set the error property null if there are no errors;
-            }
-            return element;
-          }));
-
-          this.OpenPreview(filteredData);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      });
+        
+        this.OpenPreview(filteredData);
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   }
   //#endregion
   //#region to open modal to show validated data
   OpenPreview(results) {
-    const dialogRef = this.dialog.open(XlsxPreviewPageComponent, {
+    const metaData = {
       data: results,
+      hideColumns: this.validationRules.filter(x => x.Type === UploadFieldType.Derived).map(x => x.ItemsName),
+    }
+    const dialogRef = this.dialog.open(XlsxPreviewPageComponent, {
+      data: metaData,
       width: "100%",
       disableClose: true,
       position: {
@@ -269,7 +357,9 @@ export class VendorMasterUploadComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
+      
       if (result) {
+        //console.log(result);
         this.save(result)
       }
     });
@@ -335,8 +425,6 @@ export class VendorMasterUploadComponent implements OnInit {
 
   processData(element, lastVendorCode: string, i: number) {
 
-    const updateVendortype = this.vendorTypeList.find(item => item.name.toLowerCase() === element.VendorType.toLowerCase());
-
     let vendorLocations: string[];
 
     // Check if element.vendorLocation contains a comma
@@ -345,11 +433,8 @@ export class VendorMasterUploadComponent implements OnInit {
       vendorLocations = element.VendorLocation.split(',').map(location => location.trim().toUpperCase());
     } else {
       // If it doesn't contain a comma, treat it as a single location
-      vendorLocations = [element.VendorLocation.trim()];
+      vendorLocations = [element.VendorLocation.trim().toUpperCase()];
     }
-
-    // Find the matching locations in locationList
-    const updateLocationList = this.locationList.filter(item => vendorLocations.includes(item.locCode.toUpperCase()));
 
     // Create a new VendorModel instance to store processed data
     const processedData = new VendorMaster({});
@@ -361,12 +446,10 @@ export class VendorMasterUploadComponent implements OnInit {
     processedData.companyCode = this.storage.companyCode;
     processedData.vendorName = element.VendorName.toUpperCase();
     processedData.vendorManager = element.VendorManager;
-    processedData.vendorType = updateVendortype.value || '';
-    processedData.vendorTypeName = updateVendortype.name || '';
+    processedData.vendorType = element.VendorTypeId || '';
+    processedData.vendorTypeName = element.VendorType || '';
     processedData.vendorAddress = element.VendorAddress;
-    processedData.vendorLocation = updateLocationList.map((x) => {
-      return x.locCode;
-    }) || [];
+    processedData.vendorLocation = vendorLocations || [];
     processedData.vendorPinCode = element.VendorPinCode;
     processedData.vendorCity = element.VendorCity;
     processedData.vendorState = element.VendorState;

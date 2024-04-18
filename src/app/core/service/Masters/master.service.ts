@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable, firstValueFrom } from 'rxjs';
+import * as StorageService from '../storage.service';
+import { StoreKeys } from 'src/app/config/myconstants';
 
 @Injectable({
   providedIn: 'root'
@@ -113,6 +115,29 @@ export class MasterService {
     return this.companyGst;
   }
 
+  async getGeneralMasterData(codeType) {
+    let reqBody = {
+      companyCode: StorageService.getItem(StoreKeys.CompanyCode),
+      collectionName: "General_master",
+      filter: { activeFlag: true },
+    };
+
+    if (codeType) {
+      reqBody.filter["codeType"] = Array.isArray(codeType) ? 
+                                   { D$in: codeType } : 
+                                   { D$eq: codeType };
+    }
+
+    try {
+      const res = await firstValueFrom(await this.masterPost("generic/get", reqBody));
+  
+      // Use the correct filter condition with a return statement
+      return res.data;
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return [];
+    }
+  }
   /**
    * Retrieves the last ID from a collection based on the provided parameters.
    * If the ID is not found or an error occurs, it returns a default ID with the specified prefix.

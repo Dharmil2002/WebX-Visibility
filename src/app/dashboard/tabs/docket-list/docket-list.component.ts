@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
@@ -16,6 +17,7 @@ export class DocketListComponent implements OnInit {
     tableLoad: boolean;
     orgBranch: string = "";
     TableContainerStyle = "height:500px!important";
+    docCalledAs: any;
 
    /* column header is for the changes css or title in the table*/
   columnHeader = {    
@@ -114,11 +116,16 @@ export class DocketListComponent implements OnInit {
     private router: Router,
     private docketService: DocketService,
     private thcService: ThcService,
-    private storage: StorageService
+    private storage: StorageService,
+    private controlPanel: ControlPanelService
   ) {
     this.orgBranch = this.storage.branch;
+    this.docCalledAs = this.controlPanel.DocCalledAs;
+    this.columnHeader.docNo.Title = this.docCalledAs.Docket;
+
     this.getShipmentDetail();
     this.allColumnFilter = this.columnHeader
+
   }
 
   ngOnInit(): void {

@@ -1,3 +1,5 @@
+import { Key } from "angular-feather/icons";
+
 export const StoreKeys = {
     CompanyCode: 'companyCode',
     UserId: 'UserName',
@@ -14,7 +16,6 @@ export const StoreKeys = {
     LoginLocations: 'loginLocations',
     CompanyLogo: 'companyLogo',
     CompanyAlias: 'company_Code',
-
     MenuOption: 'menuOption',
     Menu: 'menu',
     MenuToBind: 'menuToBind',
@@ -56,7 +57,10 @@ export const GenericActions = {
     Get: 'generic/get',
     GetOne: 'generic/getOne',
     Create: 'generic/create',
-    Update: 'generic/update'
+    Update: 'generic/update',
+    UpdateBulk: 'generic/updateBulk',
+    Query: 'generic/query',
+    FindLastOne: 'generic/findLastOne'
 };
 
 export const OperationActions = {
@@ -64,4 +68,10 @@ export const OperationActions = {
     getThc: "operation/thc/get",
     createCha:"operation/cha/create",
     createRake:"operation/rake/create"
+}
+
+export const UploadFieldType = {
+    Upload: 'UPLOAD',
+    Derived: 'DERIVED',
+    Key: 'KEY',
 }

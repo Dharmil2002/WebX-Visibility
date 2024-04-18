@@ -144,5 +144,83 @@ export class InvoiceCountService {
       console.error("An error occurred:", error);
     }
   }
+  async getDashboardDataForLTL() {
+    try {
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_fin_det_ltl",
+        filters: [
+          {
+            D$facet: {
+              docket_fin_det_facet: [
+                { D$match: { isBILLED: false, bLOC: this.storage.branch } },
+                {
+                  D$lookup: {
+                    from: "dockets_ltl",
+                    let: { cID: "$cID" },
+                    pipeline: [
+                      {
+                        D$match: {
+                          D$expr: {
+                            D$and: [
+                              { D$eq: ["$cID", "$$cID"] },
+                              { D$eq: ["$fSTS", 1] },
+                              { D$eq: ["$oRGN", this.storage.branch] },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                    as: "financialDetails",
+                  },
+                },
+                {
+                  D$group: {
+                    _id: null,
+                    Unbilled_aMTltl: { D$sum: "$tOTAMT" },
+                    Unbilledcountltl: {
+                      D$sum: {
+                        D$cond: {
+                          if: { D$eq: ['$sTS', 0] },
+                          then: 1,
+                          else: 0,
+                        },
+                      },
+                    },
+                    approvedBillCountltl: {
+                      D$sum: {
+                        D$cond: {
+                          if: { D$eq: ['$sTS', 1] },
+                          then: 1,
+                          else: 0,
+                        },
+                      },
+
+                      // D$first: { D$size: "$financialDetails" }
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            D$project: {
+              dashboardCounts: {
+                D$mergeObjects: {
+                  D$arrayElemAt: ["$docket_fin_det_facet", 0],
+                },
+              },
+            },
+          },
+        ]
+      };
+
+      const res = await firstValueFrom(this.operationService.operationPost('generic/query', req));
+      // console.log(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }
   //#endregion
 }

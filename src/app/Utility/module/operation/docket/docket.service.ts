@@ -12,7 +12,7 @@ import { format, isValid, parseISO } from "date-fns";
 import moment from "moment";
 import { convertCmToFeet, roundNumber } from "src/app/Utility/commonfunction";
 import { ConvertToDate, ConvertToNumber, isValidDate, roundToNumber } from "src/app/Utility/commonFunction/common";
-import { DocketFinStatus, DocketStatus } from "src/app/Models/docStatus";
+import { DocketFinStatus, DocketStatus, dcrStatus } from "src/app/Models/docStatus";
 import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
 @Injectable({
     providedIn: "root",
@@ -185,7 +185,7 @@ export class DocketService {
                 x.actions = statusInfo.actions;
                 x.aCTWT = Number(x.aCTWT || 0).toFixed(2); // Ensure two decimal places
                 x.billingParty = `${x.bPARTY}:${x.bPARTYNM}`//x.billingParty || "";
-                x.createOn = x?.eNTDT
+                x.createOn = x?.dKTDT || x?.eNTDT
                 return x;
             return null;
         }).filter((x) => x !== null);
@@ -659,10 +659,10 @@ export class DocketService {
                 return {
                     no: item?.dKTNO ?? "",
                     sfx: item?.sFX ?? 0,
-                    date: formattedDate,
+                    date: item.dKTDT,
                     paymentType: item?.pAYTYPNM ?? "",
-                    contractParty: `${item?.bPARTY}-${item?.bPARTYNM}`,
-                    orgdest: `${item?.oRGN ?? ""} : ${item?.dEST}`,
+                    contractParty: `${item?.bPARTY} : ${item?.bPARTYNM}`,
+                    orgdest: `${item?.oRGN ?? ""} - ${item?.dEST}`,
                     fromCityToCity: `${item?.fCT ?? ""} : ${item?.tCT ?? ""}`,
                     noofPackages: parseInt(item?.pKGS || 0),
                     chargedWeight: parseInt(item?.cHRWT || 0),
@@ -698,11 +698,11 @@ export class DocketService {
      * @param {Object} formData - The source data for mapping.
      * @returns {Object} - The mapped docket details in shorthand notation.
      */
-    async quickDocketsMapping(formData) {
+    async quickDocketsMapping(formData,isManual) {
 
         return {
             "cID": this.storage.companyCode,
-            "dKTNO": "", // If this is supposed to be a dynamic value, consider updating it similar to others
+            "dKTNO":isManual?formData.docketNumber:"", // If this is supposed to be a dynamic value, consider updating it similar to others
             "dKTDT": formData.docketDate,
             "pAYTYP": formData.payType,
             "pAYTYPNM": formData.pAYTYPNM,
@@ -730,7 +730,7 @@ export class DocketService {
     }
     /*End*/
     /*here the code for the docket Booking Create */
-    async createDocket(data) {
+    async createDocket(data,isManual) {
         let reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "dockets_ltl",
@@ -740,6 +740,7 @@ export class DocketService {
             timeZone: this.storage.timeZone,
             data: data,
             party: data["bPARTYNM"],
+            isManual:isManual
         };
         const res = await firstValueFrom(this.operation.operationMongoPost('operation/docket/ltl/create', reqBody)).then((res: any) => {
             Swal.fire({
@@ -951,7 +952,7 @@ export class DocketService {
 
     /*End*/
     /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
-    async operationsFieldMapping(data, invoiceDetails = [], docketFin) {
+    async operationsFieldMapping(data, invoiceDetails = [], docketFin,isDcr = false) {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
@@ -993,13 +994,31 @@ export class DocketService {
             eNTLOC: data?.eNTLOC || "",
             eNTBY: data?.eNTBY || ""
         };
-        let reqBody = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_ops_det_ltl",
-            filter: { dKTNO: data?.dKTNO },
-            update: ops
-        };
-        await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
+        if (isDcr) {
+            ops['_id']=`${this.storage.companyCode}-${data.dKTNO}-0`
+            delete ops.mODBY
+            delete ops.mODDT
+            delete ops.mODLOC
+            ops['eNTDT']=new Date();
+            ops['eNTBY']=new Date();
+            ops['eNTLOC']=this.storage.branch;
+            ops['cID']=this.storage.companyCode;
+            let reqBody = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                data: ops
+            };
+            await firstValueFrom(this.operation.operationMongoPost('generic/create', reqBody));
+        }
+        else {
+            let reqBody = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                filter: { dKTNO: data?.dKTNO },
+                update: ops
+            };
+            await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
+        }
         let reqinvoice = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_invoices_ltl",
@@ -1112,6 +1131,7 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData) {
+        
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -1204,7 +1224,7 @@ export class DocketService {
             let h = convertCmToFeet(ConvertToNumber(element?.height || 0, 3));
            let cubwt=ConvertToNumber(element?.cubWT||0)
             const invoiceJson = {
-                "_id": isUpdate ? `${this.storage.companyCode}-${data?.docketNumber}-${element?.INVNO}` : "",
+                "_id": isUpdate ? `${this.storage.companyCode}-${data?.docketNumber}-${element?.invoiceNumber}` : "",
                 "cID": this.storage.companyCode,
                 "dKTNO": isUpdate ? data?.docketNumber : "",
                 "iNVNO": element?.invoiceNumber || "",
@@ -1252,8 +1272,8 @@ export class DocketService {
             cHG: otherData ? otherData.otherCharges : '',
             nFCHG: 0,
             tOTAMT: ConvertToNumber(docketField['iNVTOT'] || 0, 2),
-            sTS: DocketStatus.Booked,
-            sTSNM: DocketStatus[DocketStatus.Booked],
+            sTS: DocketFinStatus.Pending,
+            sTSNM: DocketFinStatus[DocketFinStatus.Pending],
             sTSTM: new Date(),
             isBILLED: false,
             bILLNO: "",
@@ -1337,16 +1357,6 @@ export class DocketService {
     }
     async walkinFieldMapping(data, isCsgn, isCsgne) {
         let req={};
-        // let id = {
-        //     type: "Feature",
-        //     geometry: {
-        //         type: "Point",
-        //         coordinates: [Location.longitude, Location.latitude]
-        //     },
-        //     properties: {
-        //         description: "A descriptive label or additional data"
-        //     }
-        // }
         let walkingData = {};
         req['companyCode']=this.storage.companyCode;
         req['collectionName']="walkin_customers";
@@ -1464,4 +1474,47 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
         return res.data;
     }
+    async addDcrDetails(data,dcrData){
+        const req = {
+            companyCode:this.storage.companyCode,
+            collectionName:"dcr_documents",
+            data:  {
+                _id: `${this.storage.companyCode}-${dcrData.tYP}-${dcrData.bOOK}-${data.dKTNO}`,
+                cID: this.storage.companyCode,
+                tYP: dcrData.tYP,
+                bOOK: dcrData.bOOK,
+                dOCNO: data.dKTNO,
+                sTS: dcrStatus.Used, // 1: Used, 2: Void, 9: Cancelled
+                sTSNM:dcrStatus[dcrStatus.Used],
+                vRES: '',
+                eNTBY:this.storage.userName,
+                eNTDT:new Date(),
+                eNTLOC:this.storage.branch
+            }
+        }
+        await firstValueFrom(this.operation.operationMongoPost("generic/create", req));
+
+        const reqDcr={
+            companyCode:this.storage.companyCode,
+            collectionName:"dcr_header",
+            filter:{ bOOK:dcrData.bOOK,cID:this.storage.companyCode}
+        }
+        const getDcr = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", reqDcr));
+        const dcrDetails = getDcr.data;
+        const uSED = dcrDetails.uSED + 1;
+        const updateDcr = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dcr_header",
+            filter: { bOOK: dcrData.bOOK, cID: this.storage.companyCode },
+            update: { 
+                uSED: uSED,
+                mODBY: this.storage.userName,
+                mODDT: new Date(),
+                mODLOC: this.storage.branch
+            }
+        }
+        await firstValueFrom(this.operation.operationMongoPut("generic/update",updateDcr))
+        return true
+    }
+    
 }

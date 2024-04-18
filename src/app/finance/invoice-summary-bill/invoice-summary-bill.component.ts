@@ -94,6 +94,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   invoiceSummaryJsonArray: any;
   status: number;
   gstTypeValue: any;
+  tMode: any;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -107,6 +108,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.backPath = "/dashboard/Index?tab=Billing​";
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
+      this.tMode = this.router.getCurrentNavigation()?.extras?.state.data.columnData.tMODE;
       this.status = this.router.getCurrentNavigation()?.extras?.state.data.title.status;
     }
 
@@ -200,7 +202,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.setControlValue(this.invoiceTableForm.controls['collectionOffice']);
     const shipments = this.tableData.filter((x) => x.isSelected);
     this.invoiceTableForm.controls['billingAmount'].setValue(this.invoiceTableForm.controls['unbilledAmount'].value);
-    const allFormBinding = { ...this.invoiceTableForm.value, ...this.invoiceSummaryTableForm.value };
+    const allFormBinding = { ...this.invoiceTableForm.value, ...this.invoiceSummaryTableForm.value, tMode: this.tMode };
     const addRes = await this.invoiceServiceService.addBillDetails(allFormBinding, shipments);
     if (addRes) {
       //const update = await UpdateDetail(this.masterService, this.invoiceTableForm.value);
@@ -247,7 +249,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.invoiceTableForm.controls['gstType'].setValue(Object.keys(gstTypes).join());
 
     // const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
-    const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO, this.status);
+    const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO, this.status, this.tMode);
     const shipments = await this.invoiceServiceService.filterShipment(invoice);
     const invoiceDetail = await this.invoiceServiceService.getInvoiceDetail(shipments, this.invoiceTableForm.controls['gstRate'].value);
     this.tableData = invoiceDetail;

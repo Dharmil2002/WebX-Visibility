@@ -4,28 +4,34 @@ import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+const today = new Date();
+today.setHours(23, 59, 59, 999); // Set the time to the end of the day
+let maxDate = today;
 export class ConsignmentLtl extends BaseControl {
     private docketFields: FormControls[];
     private invoiceDetail: FormControls[];
     private freightDetails:FormControls[];
-    private otherCharges:FormControls[];
+    private otherInfo:FormControls[];
     constructor(public generalService: GeneralService) {
-        super(generalService, "LTL", ["Consignment"]);
+        super(generalService, "LTL", ["ConsignmentLtl"]);
         this.docketFields = [
             {
                 name: "docketNumber",
                 label: `${DocCalledAs.Docket} No`,
                 placeholder: `${DocCalledAs.Docket} No`,
                 type: "text",
-                value: "Computerized",
+                value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: true,
-                Validations: [],
+                disable: false,
+                Validations: [{
+                    name: "required",
+                    message:  `${DocCalledAs.Docket}No required`,
+                  }],
                 functions: {
-                    change: "DocketValidation",
+                    onChange: "docketValidation",
                 },
                 additionalData:{
                     metaData: "Basic"
@@ -45,14 +51,14 @@ export class ConsignmentLtl extends BaseControl {
                 Validations: [
                     {
                         name: "required",
-                        message: "C Note Date is required",
+                        message: `${DocCalledAs.Docket} Date required`,
                     },
                 ],
                 functions: {
                     onDate: "changeInvoice"
                 },
                 additionalData: {
-                    minDate: new Date(),
+                    maxDate:maxDate,
                     metaData: "Basic"
                 }
             },
@@ -1060,7 +1066,7 @@ export class ConsignmentLtl extends BaseControl {
                 }, generatecontrol: true, disable: true
             }
         ]
-        this.otherCharges = [
+        this.otherInfo = [
             {
                 name: 'cust_ref_no', label: 'Customer Ref No.', placeholder: 'Customer Ref No.', type: 'text',
                 value: "", Validations: [],
@@ -1193,6 +1199,6 @@ export class ConsignmentLtl extends BaseControl {
         return this.docketFields;
     }
     getOtherDetails() {
-        return this.otherCharges
+        return this.otherInfo
     }
 }

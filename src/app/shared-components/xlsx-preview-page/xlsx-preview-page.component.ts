@@ -16,10 +16,12 @@ import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-ser
 export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
   displayedColumns: MyObject[] = [];
   columnKeys: string[] = [];
+  hideColumns: string[] = [];
   RoutePlanDashboardFilter: FormGroup;
   public dataSource = new MatTableDataSource<any>();
   selection = new SelectionModel<any>(true, []);
   maxTextLengths = {};
+  objResult: any
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild("filter", { static: true }) filter: ElementRef;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
@@ -27,9 +29,11 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
   constructor(
     private matDialog: MatDialog,
     public dialogRef: MatDialogRef<XlsxPreviewPageComponent>,
-    @Inject(MAT_DIALOG_DATA) public objResult: any
+    @Inject(MAT_DIALOG_DATA) public metaData: any
   ) {
     super();
+    this.objResult = (Array.isArray(metaData) ? metaData : metaData.data) || [];
+    this.hideColumns = (!Array.isArray(metaData) ? metaData.hideColumns : []) || [];
     this.SetMaxLength(this.objResult);
   }
 
@@ -56,7 +60,7 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
 
   saveDialog() {
     const filteredData = this.selection.selected.map(item => {
-      const filteredItem = {};
+      const filteredItem: any = {};
       this.columnKeys.forEach(key => {
         if (item[key]) {
           filteredItem[key] = item[key];
@@ -84,7 +88,8 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
   SetList() {
     const tableTitle = Object.keys(this.objResult[0]);
 
-    this.displayedColumns = tableTitle.map((value) => {
+    const columns = tableTitle.filter(key => !this.hideColumns.includes(key));
+    this.displayedColumns = columns.map((value) => {
       const Mydata: MyObject = {
         Key: value,
         title: value,
@@ -104,7 +109,7 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
       return Mydata;
     });
 
-    this.columnKeys = ['select', 'status', 'error', ...tableTitle.filter(key => key !== 'select' && key !== 'status' && key !== 'error')];
+    this.columnKeys = ['select', 'status', 'error', ...columns.filter(key => key !== 'select' && key !== 'status' && key !== 'error')];
 
     this.dataSource.data = this.objResult;
     this.dataSource.sort = this.sort;

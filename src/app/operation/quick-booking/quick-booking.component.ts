@@ -19,6 +19,9 @@ import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 
 @Component({
   selector: "app-quick-booking",
@@ -55,7 +58,17 @@ export class QuickBookingComponent implements OnInit {
     },
   ];
   paymentType: AutoComplete[];
-
+  rules: any[]=[];
+  alpaNumber: boolean;
+  sequence:boolean;
+  isBrachCode:boolean;
+  fyear:boolean;
+  length:number=0;
+  mseq: boolean;
+  lastDoc:string;
+  isManual: boolean;
+  dcrDetail={};
+  formTitle: string;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -67,7 +80,8 @@ export class QuickBookingComponent implements OnInit {
     private storage: StorageService,
     private pinCodeService: PinCodeService,
     private vehicleService:VehicleService,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private dcrService:DCRService
   ) {    
     this.companyCode = this.storage.companyCode;
     this.userName = this.storage.userName;
@@ -79,6 +93,7 @@ export class QuickBookingComponent implements OnInit {
         active: `${this.DocCalledAs.Docket} Quick Booking`,
       }
     ]
+    this.formTitle=`${this.DocCalledAs.Docket} Quick Booking`
     this.initializeFormControl();    
   }
 
@@ -98,6 +113,7 @@ export class QuickBookingComponent implements OnInit {
         // Create the form group using the form builder and the form controls array
         this.quickDocketTableForm = formGroupBuilder(this.fb, [ this.jsonControlDocketArray ]);
     });
+    this.getRules();
   }
 
   async getDataFromGeneralMaster() {
@@ -197,9 +213,158 @@ export class QuickBookingComponent implements OnInit {
       "dashboard/Index"
     );
   }
+  /*end*/
+  async docketValidation(){
+    const res = await this.dcrService.validateFromSeries(this.quickDocketTableForm.controls['docketNumber'].value);
+    this.dcrDetail=res;
+    if(res) {
+      if(res.aLOTO == 'L' && res.aSNTO == 'E' && res.aSNCD && res.aLOCD==this.storage.branch) {
+       await this.validateDcr(res);
+      }
+      else if(res.aLOTO == 'L' && res.aSNTO == 'B' && this.storage.userName == res.aSNCD) {
+        await this.validateDcr(res);
+      }
+      else if(res.aLOTO == 'C' && res.aSNTO == 'C' && res.aSNCD) { 
+        const billingParty=this.quickDocketTableForm.controls['billingParty'].value?.value||"";
+        if(billingParty) {
+          if(res.aSNCD==billingParty) {
+            await this.validateDcr(res);
+          }
+          else{
+            await this.errorMessage();
+          }
+        }
+        else {
+          if(await this.validateDcr(res)) {
+            this.quickDocketTableForm.controls['billingParty'].setValue( { name:res.aSNNM,value:res.aSNCD } );
+          }
+          else{
+            await this.errorMessage();
+          }
+        }
+      }
+      else{
+        this.errorMessage();
+      }
+    }
+    else{
+      this.errorMessage();
+    }
+    
+  }
+  /*check Dcr is use or not*/
+  async validateDcr(dcr: any): Promise<boolean> {   
+    let isValid = false;
+    const dktNo = this.quickDocketTableForm.controls['docketNumber'].value;
+    const doc = await this.dcrService.getDCRDocument({dOCNO: dktNo});
+    if(doc && doc.dOCNO == dktNo) {
+      Swal.fire({
+        icon: 'warning',
+        title: `${this.DocCalledAs.Docket} No is ${ doc.sTS == 2 ? "declared void" : "already used"}`,
+        text: `${this.DocCalledAs.Docket} No is ${ doc.sTS == 2 ? "declared void" : "already used"}`,
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      this.quickDocketTableForm.controls['docketNumber'].setValue("");
+    }
+    else{
+      if(this.mseq) {
+        const nextCode = await this.dcrService.getNextDocumentNo(this.dcrDetail);
+        if (nextCode == "" || nextCode != dktNo) {
+          Swal.fire({
+            icon: 'warning',
+            title:  `${this.DocCalledAs.Docket} No is out of sequence. Next no is sequence is ${nextCode}.`,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
 
+          })
+          this.quickDocketTableForm.controls['docketNumber'].setValue("");         
+        }
+        else{
+          isValid = true
+          Swal.fire({
+            icon: 'success',
+            title:'Valid',
+            text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timer: 5000,
+            timerProgressBar: true,
+          });
+        }     
+      }
+      else{
+        isValid = true
+        Swal.fire({
+          icon: 'success',
+          title:'Valid',
+          text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          timer: 5000,
+          timerProgressBar: true,
+        });
+      }     
+    }
+
+    return isValid;
+  }
+  /*end*/
+  async errorMessage(){
+    Swal.fire({
+      icon: 'error',
+      title:`${this.DocCalledAs.Docket} No is not valid`,
+      text:`${this.DocCalledAs.Docket} No is not valid`,
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+      timer: 5000,
+      timerProgressBar: true,
+    });
+    this.quickDocketTableForm.controls['docketNumber'].setValue("");
+  }
+  /*get Rules*/
+  async getRules(){
+    const filter={
+      cID:this.storage.companyCode,
+      mODULE:"CNOTE",
+      aCTIVE:true
+    }
+    const res=await this.controlPanel.getModuleRules(filter);
+    if(res.length>0){
+      this.rules=res;
+      this.checkDocketRules();
+    }
+    
+  }
+  /*End*/
+   checkDocketRules(){
+      const STYP = this.rules.find(x=>x.rULENM=="STYP" && x.aCTIVE)
+      if(STYP){
+        const isManual = STYP.vAL === "M";
+        this.jsonControlDocketArray.find(x=>x.name=="docketNumber").disable = !isManual;
+        this.quickDocketTableForm.controls['docketNumber'].setValue(isManual?"":"Computerized");        
+        this.isManual=isManual;
+      }
+
+      const ELOC = this.rules.find(x=>x.rULENM=="ELOC" && x.aCTIVE)
+      if(ELOC){
+        if(!ELOC.vAL.includes(this.storage.branch)) {
+          // check exception for branch
+        }
+      }
+
+      this.alpaNumber = this.rules.find(x=>x.rULENM=="NTYP" && x.aCTIVE)?.vAL=="AN";
+      this.sequence = this.rules.find(x=>x.rULENM=="SL" && x.aCTIVE)?.vAL=="S";
+      this.isBrachCode = this.rules.find(x=>x.rULENM=="BCD" && x.aCTIVE)?.vAL=="Y";
+      this.fyear = this.rules.find(x=>x.rULENM=="YEAR" && x.aCTIVE)?.vAL=="F";
+      this.length = ConvertToNumber(this.rules.find(x=>x.rULENM=="LENGTH" && x.aCTIVE)?.vAL);
+      this.mseq = this.rules.find(x=>x.rULENM=="MSEQ" && x.aCTIVE)?.vAL=="Y";
+  }
   async save() {
-
     // Clear form validators and revalidate the form
     const formControls = this.quickDocketTableForm;
     clearValidatorsAndValidate(formControls);
@@ -208,8 +373,11 @@ export class QuickBookingComponent implements OnInit {
     // Set payment type name based on selected value
     const paymentTypeEntry = this.paymentType.find(entry => entry.value === requestData.payType);
     requestData.pAYTYPNM = paymentTypeEntry ? paymentTypeEntry.name : "";
-    const fieldMapping = await this.docketService.quickDocketsMapping(requestData);
-    await this.docketService.createDocket(fieldMapping);
+    const fieldMapping = await this.docketService.quickDocketsMapping(requestData,this.isManual);
+      if(this.isManual){
+        await this.docketService.addDcrDetails(fieldMapping,this.dcrDetail);
+      }
+    await this.docketService.createDocket(fieldMapping,this.isManual);
   }
   
   preventNegative(event) {

@@ -53,4 +53,13 @@ export class ControlPanelService {
     const data = this.storage.getItem(StoreKeys.DocCallAs);
     return JSON.parse(data);
   }
+  async getModuleRules(filter={}) {
+    const req={
+      companyCode:this.storage.getItem(StoreKeys.CompanyCode),
+      collectionName:"module_rules",
+      filter:filter
+    }
+    const res = await firstValueFrom(this.http.post<any>(`${environment.APIBaseURL}${GenericActions.Get}`, req));
+    return res.data;
+  }
 }

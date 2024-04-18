@@ -936,7 +936,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*end*/
   async docketValidation(){
-    debugger
     const res = await this.dcrService.validateFromSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
     this.dcrDetail=res;
     if(res) {

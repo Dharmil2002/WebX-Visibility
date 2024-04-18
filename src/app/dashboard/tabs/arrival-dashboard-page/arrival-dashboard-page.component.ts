@@ -306,7 +306,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this.tableload=false;
   }
   handleMenuItemClick(label: string, element) {
-    debugger
+    
     let Data = { label: label, data: element }
     //  this.menuItemClicked.emit(Data);
     this.advancdeDetails = {

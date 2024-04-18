@@ -182,6 +182,7 @@ import { CustomerMasterUploadComponent } from './customer-master/customer-master
 import { DriverMasterUploadComponent } from './driver-master/driver-master-upload/driver-master-upload.component';
 import { VendorMasterUploadComponent } from './vendor-master/vendor-master-upload/vendor-master-upload.component';
 import { AddressMasterUploadComponent } from './address-master/address-master-upload/address-master-upload.component';
+import { ContainerMasterUploadComponent } from './Container Master/container-master-upload/container-master-upload.component';
 
 @NgModule({
   imports: [
@@ -379,7 +380,8 @@ import { AddressMasterUploadComponent } from './address-master/address-master-up
     DriverMasterUploadComponent ,
     CustomerMasterUploadComponent,
     VendorMasterUploadComponent,
-    AddressMasterUploadComponent
+    AddressMasterUploadComponent,
+    ContainerMasterUploadComponent
   ],
   providers: [
     DatePipe,

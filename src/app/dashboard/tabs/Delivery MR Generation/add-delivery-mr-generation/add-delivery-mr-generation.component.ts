@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeliveryMrGenerationModalComponent } from '../delivery-mr-generation-modal/delivery-mr-generation-modal.component';
 import { Router } from '@angular/router';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { GetAccountDetailFromApi, GetsachsnFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
+import { GetAccountDetailFromApi, GetBankDetailFromApi, GetsachsnFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { firstValueFrom } from 'rxjs';
@@ -19,8 +19,6 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
-import { DeliveryMrOtherDetailsComponent } from '../delivery-mr-other-details/delivery-mr-other-details.component';
-
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -53,7 +51,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     consignmentNoteNumber: {
       Title: "GRN No.",
       class: "matcolumnleft",
-      Style: "min-width:15%",
+      Style: "min-width:18%",
       sticky: true
     },
     payBasis: {
@@ -113,8 +111,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   headerDetails: any;
   docketNo: any;
   AlljsonControlMRArray: any;
-  otherCharges: any;
   totalMRamt: any;
+  AccountsBanksList: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -265,8 +263,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to Add a new item to the table or edit
   addDetails(event) {
-    debugger
-    console.log('event', event)
     const request = {
       charges: event.data,
       Details: event,
@@ -288,35 +284,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         if (!data) {
           this.tableload = false;
           return;
-        } // Handle the case when data is not available
-
+        }  
         // Delay execution for better user experience
         await new Promise(resolve => setTimeout(resolve, 1000));
-        this.otherCharges = data;
-
+       
         let dt = this.tableData.find(x => x.id === data.id);
-        dt.otherCharge = data.chargeData;       
+        dt.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
+        dt.otherCharge = data.chargeData;
         dt.newSubTotal = parseFloat(data.newSubTotal).toFixed(2) || 0;
         dt.rateDifference = parseFloat(data.newSubTotal) - parseFloat(data.subTotal);
         dt.totalAmount = this.calculateTotalAmount(data.chargeData);
         dt.OtherDly = dt.totalAmount.toFixed(2);
-        
-        // const chargesList = data.Charge
-        // data.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
-        // const newData = {
-        //   id: data.id,
-        //   consignmentNoteNumber: data.consignmentNoteNumber,
-        //   subTotal: this.filteredDocket[0].tOTAMT,
-        //   newSubTotal: parseFloat(data.newSubTotal).toFixed(2) || 0,
-        //   rateDifference: parseFloat(data.newSubTotal) - parseFloat(data.subTotal),
-        //   OtherDly: this.calculateTotalAmount(data.chargeData).toFixed(2),  // Calculate total amount based on charges
-        //   totalAmount: this.calculateTotalAmount(data.chargeData),
-        //   payBasis: data.payBasis,
-        //   otherCharge: data.Charge,
-        //   actions: ['Edit']
-        // };
-        // this.tableData = this.tableData.filter(item => item.id !== data.id);
-        // this.tableData.unshift(newData);
 
         let totalMr = 0;
         this.tableData.forEach(item => {
@@ -443,7 +421,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const Accountinglocation = this.storage.branch;
     switch (PaymentMode) {
       case "Cheque":
-        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation);
+        // const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation);
+        this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
         this.filter.Filter(
           this.jsonControlPaymentArray,
           this.PaymentSummaryFilterForm,
@@ -534,7 +514,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to get dropdown's data
   async getTDSData() {
-    const filter = { locCode: this.storage.getItem('Branch') }
+    const filter = { locCode: this.storage.branch }
     const stateList = await this.objLocationService.locationFromApi(filter);
     this.billingForm.get("Stateofbooking").setValue(stateList?.[0]?.state);
     let Accountinglocation = this.billingForm.value.Stateofbooking
@@ -697,13 +677,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             return {
               cID: this.storage.companyCode,
               dOCNO: element.consignmentNoteNumber,
-              cHG: this.otherCharges.chargeData,
+              cHG: element.otherCharge,
               pYBASIS: element.payBasis,
-              sUBTTL: element.subTotal,
-              nWSUBTTL: element.newSubTotal,
-              rTDFRNC: element.rateDifference,
+              sUBTTL: parseFloat(element.subTotal),
+              nWSUBTTL: parseFloat(element.newSubTotal),
+              rTDFRNC: parseFloat(element.rateDifference),
               vNO: VoucherNo,
-              tOTL: element.totalAmount,
+              tOTL: parseFloat(element.totalAmount),
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName
@@ -820,7 +800,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   GenerateVoucher() {
-
+    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+      const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
+      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      if (AccountDetails != undefined) {
+        this.PaymentSummaryFilterForm.get("Bank").setValue(AccountDetails)
+      } else {
+        this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
+        return;
+      }
+    }
     this.snackBarUtilityService.commonToast(async () => {
       try {
 
@@ -914,7 +904,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherRequestModel.details = voucherLineItemList;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
-        console.log(this.VoucherRequestModel);
+        //console.log(this.VoucherRequestModel);
 
         firstValueFrom(this.voucherServicesService
           .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {

@@ -4,7 +4,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { DeliveryMrGeneration } from 'src/assets/FormControls/DeliveryMr';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
-import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import Swal from 'sweetalert2';
 
@@ -17,8 +16,6 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
   mrGenerationControls: DeliveryMrGeneration;
   jsonControlArray: any;
   MrGenerationForm: UntypedFormGroup
-  payBasisName: string;
-  payBasisstatus: boolean;
   jsonControlsEdit: any[];
   allJson: any[];
   chargeList: any;
@@ -30,10 +27,7 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     private objResult: any,
     private thcService: ThcService) {
-      debugger
     this.chargeData = this.objResult?.charges?.otherCharge;
-    console.log(this.objResult, this.chargeData);
-
     this.objResult.show ? this.showSaveAndCancelButton = false : this.showSaveAndCancelButton = true;
   }
 
@@ -67,16 +61,17 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
   //#endregion
   //#region to send charges to parent component
   save() {
-    let formData = this.MrGenerationForm.value;
-    formData.id = this.objResult.Details.data.id;
-    formData.consignmentNoteNumber = this.objResult.Details.data.consignmentNoteNumber;
-    formData.payBasis = this.objResult.Details.data.payBasis;
-    formData.subTotal = this.objResult.Details.data.subTotal;
-    formData.newSubTotals = this.objResult.Details.data.newSubTotal;
-    clearValidatorsAndValidate(this.MrGenerationForm);
+    const tOTL = this.MrGenerationForm.value.newSubTotal || this.objResult.Details.data.newSubTotal;
+    const formData = {
+      id: this.objResult.Details.data.id,
+      consignmentNoteNumber: this.objResult.Details.data.consignmentNoteNumber,
+      payBasis: this.objResult.Details.data.payBasis,
+      subTotal: this.objResult.Details.data.subTotal,
+      newSubTotal: tOTL,
+      chargeData: []
+    };
 
     let chargeData = [];
-
     let showAlert = false;
     this.chargeControls.filter(x => x.hasOwnProperty("id")).forEach(element => {
       if (element?.additionalData.showNameAndValue && this.MrGenerationForm.controls[element.name].value == 0) {
@@ -89,18 +84,17 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
         });
         return;
       } else {
-        let json = {
+        const json = {
           cHGID: element.name,
           cHGNM: element.placeholder,
           aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.MrGenerationForm.controls[element.name].value || 0) : (parseFloat(this.MrGenerationForm.controls[element.name].value) || 0),
-          oPS: element?.additionalData.metaData || "",
+          oPS: element.additionalData.metaData || "",
         };
         chargeData.push(json);
       }
     });
 
     formData.chargeData = chargeData;
-    formData.Charge = { consignmentNoteNumber: this.objResult.Details.data.consignmentNoteNumber, charges: chargeData }
 
     if (!showAlert) {
       this.dialogRef.close(formData);
@@ -109,11 +103,10 @@ export class DeliveryMrGenerationModalComponent implements OnInit {
   //#endregion
   //#region to get charges
   async getCharges() {
-    debugger
     try {
       if (this.showSaveAndCancelButton && this.chargeData) {//to edit charges
         await this.processChargeData(this.chargeData, false);
-      } 
+      }
       else if (!this.showSaveAndCancelButton && this.chargeData) { //to show charges
         await this.processChargeData(this.chargeData, true);
       }

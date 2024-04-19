@@ -235,6 +235,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     if (!this.quickDocket) {
       this.getRules();
     }
+    this.freightForm.controls['gstRate'].disable();
+    this.freightForm.controls['gstChargedAmount'].disable();
   }
   /*end*/
 
@@ -1018,9 +1020,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   onRcmChange() {
     if (this.freightForm.controls['rcm'].value == "Y") {
+      this.freightForm.controls['gstRate'].disable();
+      this.freightForm.controls['gstChargedAmount'].disable();
+      this.freightForm.controls['gstRate'].setValue(0);
+      this.freightForm.controls['gstChargedAmount'].setValue(0);
       this.calculateFreight();
     }
     else {
+      this.freightForm.controls['gstRate'].enable();
+      this.freightForm.controls['gstChargedAmount'].enable();
+      this.invoiceControlArray.find(x => x.name == "gstRate").disable=false
+      this.invoiceControlArray.find(x => x.name == "gstChargedAmount").disable=false
       this.calculateFreight();
     }
   }
@@ -1336,7 +1346,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       return false
     }
     this.isSubmit = true;
-    const data = { ...this.consignmentForm.value, ...this.freightForm.value }
+    const data = { ...this.consignmentForm.getRawValue(), ...this.freightForm.getRawValue() }
     const tableData = this.tableData
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
     data['pkgsTypeName'] = this.pkgsType.find(x => x.value == data?.pkgsType)?.name ?? '';

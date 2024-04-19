@@ -1,7 +1,7 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     
     <form [formGroup]="quickDocketTableForm" *ngIf="jsonControlDocketArray">
-        <app-form-webxpress [form]="quickDocketTableForm" [FormTitle]="formTitle" [formData]="jsonControlDocketArray" [showSaveAndCancelButton]="true"
+        <app-form-webxpress [form]="quickDocketTableForm" [FormTitle]="formTitle" [formData]="jsonControlDocketArray" [showSaveAndCancelButton]="isSubmit"
             (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>

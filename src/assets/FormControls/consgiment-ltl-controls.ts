@@ -1028,7 +1028,7 @@ export class ConsignmentLtl extends BaseControl {
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 functions: {
                     onSelection: "onRcmChange"
                 },

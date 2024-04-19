@@ -1,5 +1,5 @@
 import { Component,OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
@@ -46,6 +46,7 @@ export class QuickBookingComponent implements OnInit {
   destination: string;
   destinationStatus: boolean;
   vehNo: string;
+  
   vehicleStatus: boolean;
   /*it's breadScrums to used in html you must delcare here */
   userName = "";
@@ -368,6 +369,7 @@ export class QuickBookingComponent implements OnInit {
     // Clear form validators and revalidate the form
     const formControls = this.quickDocketTableForm;
     clearValidatorsAndValidate(formControls);
+    // Set a 'required' error on the 'isSubmit' form control
     // Prepare request data
     const requestData = { ...formControls.value, isComplete: false };
     // Set payment type name based on selected value

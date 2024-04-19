@@ -285,10 +285,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         if (!data) {
           this.tableload = false;
           return;
-        }  
+        }
         // Delay execution for better user experience
         await new Promise(resolve => setTimeout(resolve, 1000));
-       
+
         let dt = this.tableData.find(x => x.id === data.id);
         dt.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
         dt.otherCharge = data.chargeData;
@@ -638,7 +638,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         try {
           const headerRequest = {
             cID: this.storage.companyCode,
-            dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
+            gCNNO: this.tableData.map(item => item.consignmentNoteNumber),
             dLVRT: this.headerDetails.Deliveredto,
             cNTCTNO: this.headerDetails.ContactNumber,
             rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
@@ -677,7 +677,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const detailRequests = this.tableData.map(element => {
             return {
               cID: this.storage.companyCode,
-              dOCNO: element.consignmentNoteNumber,
+              gCNNO: element.consignmentNoteNumber,
               cHG: element.otherCharge,
               pYBASIS: element.payBasis,
               sUBTTL: parseFloat(element.subTotal),

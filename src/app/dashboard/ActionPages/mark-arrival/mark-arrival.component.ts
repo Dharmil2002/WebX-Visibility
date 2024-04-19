@@ -12,13 +12,16 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
-import { getDocketFromApiDetail,updateTracking } from './mark-arrival-utlity';
+import { getDocketFromApiDetail, updateTracking } from './mark-arrival-utlity';
 import { extractUniqueValues } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { HawkeyeUtilityService } from 'src/app/Utility/module/hawkeye/hawkeye-utility.service';
 import { StoreKeys } from 'src/app/config/myconstants';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import { firstValueFrom } from 'rxjs';
+import { ThcCostUpdateService } from 'src/app/Utility/module/operation/thc/thc-cost-update.service';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -41,18 +44,21 @@ export class MarkArrivalComponent implements OnInit {
   uploadedFiles: File[];
   mfList: any[];
   dktList: any[];
+  Request: {};
   constructor(
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog,
-    private storage:StorageService,
+    private storage: StorageService,
     private generalService: GeneralService,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private Route: Router,
-    private arrivalService:ArrivalVehicleService,
+    private arrivalService: ArrivalVehicleService,
     private _operationService: OperationService,
+    private controlPanel: ControlPanelService,
+    private thcCostUpdateService: ThcCostUpdateService,
     private hawkeyeUtilityService: HawkeyeUtilityService) {
     this.MarkArrivalTable = item;
   }
@@ -111,12 +117,12 @@ export class MarkArrivalComponent implements OnInit {
     })
   }
   async getManifestDetail() {
-    
-    const shipment= await this.arrivalService.getThcWiseMeniFest({tHC:this.MarkArrivalTable.TripID,"D$or":[{iSDEL:false},{iSDEL:{D$exists:false}}]});
-    this.mfList=shipment
+
+    const shipment = await this.arrivalService.getThcWiseMeniFest({ tHC: this.MarkArrivalTable.TripID, "D$or": [{ iSDEL: false }, { iSDEL: { D$exists: false } }] });
+    this.mfList = shipment
   }
   async save() {
-    
+
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -124,75 +130,109 @@ export class MarkArrivalComponent implements OnInit {
       )
 
     let tripDetailForm = this.MarkArrivalTableForm.value
-    const res=await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm,this.mfList);
-    if(res){
+    const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
+    if (res) {
       this.updateTripData()
     }
   }
 
-  updateTripData() {
-    
+  async updateTripData() {
+    //#region Make RequestBody For Update Trip
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "THC",
+      aCTIVE: true,
+      rULEID: { D$in: ["THCIBC", "THCCB"] }
+    }
+    const res: any = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.Request = {
+        isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+        thcNo: this.MarkArrivalTableForm.value?.TripID,
+        thc: {
+          collation: "thc_summary_ltl",
+          docNoField: "docNo"
+        },
+        mfheader: {
+          collation: "mf_headers_ltl",
+          docNoField: "mFNO",
+          thcField: "tHC"
+        },
+        mfdetails: {
+          collation: "mf_details_ltl",
+          docNoField: "mFNO",
+          dktField: "dKTNO"
+        },
+        docket: {
+          collation: "dockets_ltl",
+          docNoField: "dKTNO"
+        }
+      };
+    }
+    //#endregion
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
-    
-    let tripStatus, tripDetails,stCode,stName;
+
+    let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
-      stCode=5,
-      stName="Vehicle Arrived"
+      stCode = 5,
+        stName = "Vehicle Arrived"
       tripDetails = {
         sTS: stCode,
         sTSNM: stName
       };
     } else if (dktStatus === "noDkt") {
       tripStatus = next ? "Update Trip" : "close";
-        stCode=next?6:7,
-        stName="Picked Up"
+      stCode = next ? 6 : 7,
+        stName = "Picked Up"
 
       tripDetails = {
         sTS: stCode,
         sTSNM: stName,
-        ...(next ? {} : {cTM:new Date()})
+        ...(next ? {} : { cTM: new Date() })
       };
-      if(!next){
-        tripDetails.vEHNO="",
-        tripDetails.tHC="",
-        tripDetails.cLOC= this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
-        tripDetails.nXTLOC= ""
-        if(stCode==7){
-          
-          const reqArrivalDeparture={
-            action:"TripArrivalDepartureUpdate",
-            reqBody:{
-              cid:this.companyCode,
-              EventType:'A',
-              loc:this.currentBranch,
-              tripId:this.MarkArrivalTableForm.value?.TripID
+      if (!next) {
+        tripDetails.vEHNO = "",
+          tripDetails.tHC = "",
+          tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
+          tripDetails.nXTLOC = ""
+        if (stCode == 7) {
+
+          const reqArrivalDeparture = {
+            action: "TripArrivalDepartureUpdate",
+            reqBody: {
+              cid: this.companyCode,
+              EventType: 'A',
+              loc: this.currentBranch,
+              tripId: this.MarkArrivalTableForm.value?.TripID
             }
           }
           this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+          this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
         }
       }
-      else{
-        tripDetails.cLOC=this.storage.branch,
-        tripDetails.nXTLOC= next || ""
+      else {
+        tripDetails.cLOC = this.storage.branch,
+          tripDetails.nXTLOC = next || ""
       }
     }
-    if(stCode==5||stCode==6){
-      const reqArrivalDeparture={
-        action:"TripArrivalDepartureUpdate",
-        reqBody:{
-          cid:this.companyCode,
-          EventType:'A',
-          loc:this.currentBranch,
-          tripId:this.MarkArrivalTableForm.value?.TripID
+    if (stCode == 5 || stCode == 6) {
+      const reqArrivalDeparture = {
+        action: "TripArrivalDepartureUpdate",
+        reqBody: {
+          cid: this.companyCode,
+          EventType: 'A',
+          loc: this.currentBranch,
+          tripId: this.MarkArrivalTableForm.value?.TripID
         }
       }
       this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+      this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
     }
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_Route_Schedule",
-      "filter": {tHC:this.MarkArrivalTableForm.value?.TripID},
+      "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
       "update": {
         ...tripDetails
       }
@@ -200,7 +240,7 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
-          if (stCode ==7) {
+          if (stCode == 7) {
             //this.getDocketTripWise(tripId);
             // Call the vehicleStatusUpdate function here
             const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
@@ -212,10 +252,10 @@ export class MarkArrivalComponent implements OnInit {
             });
             this.getPreviousData();
           } else {
-             // await this.updateDocket();
-              this.getPreviousData();
+            // await this.updateDocket();
+            this.getPreviousData();
             //this.getDocketTripWise(tripId);
-           
+
           }
         }
       }
@@ -246,31 +286,31 @@ export class MarkArrivalComponent implements OnInit {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: this.departature });
   }
   async getReasonList() {
-    
-   const lateReasonlist = await this.generalService.getGeneralMasterData("LTRES");
-      this.filter.Filter(
-        this.jsonControlArray,
-        this.MarkArrivalTableForm,
-        lateReasonlist,
-        this.latereasonlist,
-        this.latereasonlistStatus,
-      );
+
+    const lateReasonlist = await this.generalService.getGeneralMasterData("LTRES");
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.MarkArrivalTableForm,
+      lateReasonlist,
+      this.latereasonlist,
+      this.latereasonlistStatus,
+    );
 
   }
 
   async checkSealNumber() {
-    let isMatchingSeal=false
-    const sealNo=await this.arrivalService.getCheckOnce({
+    let isMatchingSeal = false
+    const sealNo = await this.arrivalService.getCheckOnce({
       "_id": `${this.storage.companyCode}-${this.MarkArrivalTable.TripID}-${this.MarkArrivalTable.cLOC}-${this.storage.branch}`,
       "D$expr": {
-        "D$eq": [ "$lOAD.sEALNO",this.MarkArrivalTableForm.value.Sealno ] 
+        "D$eq": ["$lOAD.sEALNO", this.MarkArrivalTableForm.value.Sealno]
       }
     });
 
-    isMatchingSeal= ( sealNo?.lOAD?.sEALNO == this.MarkArrivalTableForm.value.Sealno)
-    
+    isMatchingSeal = (sealNo?.lOAD?.sEALNO == this.MarkArrivalTableForm.value.Sealno)
+
     this.MarkArrivalTableForm.controls.SealStatus.setValue(isMatchingSeal ? 'Matching' : 'Not Matching');
-    
+
     this.jsonControlArray.forEach(data => {
       if (data.name === 'Reason') {
         // Set Late Reason related variables

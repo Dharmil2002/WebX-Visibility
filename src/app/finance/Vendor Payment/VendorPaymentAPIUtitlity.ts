@@ -1,3 +1,4 @@
+import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
 import { StoreKeys } from "src/app/config/myconstants";
@@ -54,7 +55,7 @@ export async function GetAdvancePaymentListFromApi(masterService, Filters) {
         const result = res.map((x, index) => ({
             isSelected: false,
             THC: x.docNo,
-            GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(), "dd-MM-yy"),
+            GenerationDate: x.tHCDT ? moment(x.tHCDT).format("DD MMM YYYY") : "",
             VehicleNumber: x.vEHNO,
             THCamount: (x.tOTAMT || 0).toFixed(2),
             THCContraAmount: (x.cONTAMT || 0).toFixed(2),
@@ -188,7 +189,7 @@ export async function GetTHCListBasdedOnBillNumberFromApi(masterService, BillNum
             const result = res.data.map((x, index) => ({
                 isSelected: false,
                 THC: x.docNo,
-                GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(), "dd-MM-yy"),
+                GenerationDate: x.tHCDT ? moment(x.tHCDT).format("DD MMM YYYY") : "",
                 VehicleNumber: x.vEHNO,
                 THCamount: x.tOTAMT,
                 THCContraAmount: (x.cONTAMT || 0).toFixed(2),

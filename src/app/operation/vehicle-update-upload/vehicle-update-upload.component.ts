@@ -41,7 +41,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "Packages": "Packages",
     "loaded": "Loaded",
     "Pending": "Pending",
-    "Leg": "Leg",
+    "Leg": "Leg"
   };
   centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'loaded', 'Pending'];
   columnWidths = {
@@ -145,9 +145,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
         let json = {
           "Leg": element?.lEG.replace(" ", "") || '',
           "Shipment": element?.tOTDKT || 0,
-          "Packages": parseInt(element?.pKGS) || 0,
-          "WeightKg": parseInt(element?.wT) || 0,
-          "VolumeCFT": parseInt(element?.vCFT) || 0
+          "Packages": parseInt(element?.pKGS||0) || 0,
+          "WeightKg": parseFloat(element?.wT||0) || 0,
+          "VolumeCFT": parseFloat(element?.vCFT||0) || 0,
+          "CWeightKg": parseFloat(element?.cWT||0) || 0
         };
         dataLoading.push(json);
       });
@@ -168,6 +169,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Destination": element?.dLOC || '',
             "Packages": parseInt(element?.pKGS) || 0,
             "weight": parseInt(element?.wT) || 0,
+            "cWeight": parseInt(element?.cWT) || 0,
             "cft": parseInt(element?.vCFT) || 0,
             "loaded": 0,
             "Pending": parseInt(element?.pKGS) || 0,

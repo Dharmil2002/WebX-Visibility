@@ -300,25 +300,24 @@ export class GenericTableV2Component
         },
       });
     }
+    else if (this.menuItems) {
+      let navigateToComponent;
+      if (tableData === "Action") {
+        let action = item.Action;
+        navigateToComponent = this.menuItems.find((x) => x.label === action);
+      } else {
+        navigateToComponent = this.menuItems.find(
+          (x) => x.label === tableData
+        );
+      }
+      if (navigateToComponent) {
+        this.GeneralMultipleView(item, navigateToComponent.componentDetails);
+      }
+    }
     else if (!drillDownLink.Path && drillDownLink.componentDetails) {
       this.GeneralMultipleView(item, drillDownLink.componentDetails, drillDownLink.title);
     }
-    else {
-      if (this.menuItems) {
-        let navigateToComponent;
-        if (tableData === "Action") {
-          let action = item.Action;
-          navigateToComponent = this.menuItems.find((x) => x.label === action);
-        } else {
-          navigateToComponent = this.menuItems.find(
-            (x) => x.label === tableData
-          );
-        }
-        if (navigateToComponent) {
-          this.GeneralMultipleView(item, navigateToComponent.componentDetails);
-        }
-      }
-    }
+
   }
   //#endregion
   // #region  to Convert to Csv File

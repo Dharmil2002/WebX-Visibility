@@ -104,3 +104,10 @@ Allocation = 1,
 Assgine = 2,
 Reallocation = 4,
 }
+export enum ThcStatus {
+  Generated=1,
+  In_Transit=2,
+  Arrived=3,
+  closed=4,
+  Cancelled=9
+}

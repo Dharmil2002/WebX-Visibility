@@ -1469,6 +1469,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
   }
+  else{
+     Swal.fire({
+      icon: "success",
+      title: "Booked Successfully",
+      text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
+      showConfirmButton: true
+    }).then((result) => {
+      // Redirect after the alert is closed, regardless of whether it is confirmed or not.
+      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+    });
+  }
   }
   async generateArray(companyCode, dockno, pkg) {
     return new Promise((resolve, reject) => {

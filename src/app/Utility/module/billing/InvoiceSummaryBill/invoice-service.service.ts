@@ -21,10 +21,10 @@ export class InvoiceServiceService {
     private customerService: CustomerService
   ) { }
 
-  async getInvoice(shipment: string[], status: number = 0) {
+  async getInvoice(shipment: string[], status: number = 0, tMODE) {
     const req = {
       companyCode: this.storage.companyCode,
-      collectionName: "dockets",
+      collectionName: tMODE == "FTL" ? 'dockets' : "dockets_ltl",
       filter: { "docNo": { "D$in": shipment }, "fSTS": status }
     };
     const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
@@ -148,7 +148,7 @@ export class InvoiceServiceService {
       "_id": `${this.storage.companyCode}-${data?.invoiceNo}` || "",
       "cID": this.storage.companyCode,
       "companyCode": this.storage.companyCode,
-      "bUSVRT": "FTL", //From Session
+      "bUSVRT": data?.tMode || "",
       "bILLNO": data?.invoiceNo,
       "bGNDT": data?.invoiceDate || new Date(),
       "bDUEDT": data?.dueDate || new Date(),
@@ -504,20 +504,20 @@ export class InvoiceServiceService {
     return res
   }
   /*here the code which is writen for Shipment Approval*/
-  async updateShipmentStatus(item) {
+  async updateShipmentStatus(item, tMODE) {
 
     const dKTNO = item;
     const dockets = { fSTS: 1, fSTSN: "Approved" };
     const finance = { sTS: 1, sTSNM: "Approved", sTSTM: new Date() };
     const reqDockets = {
       companyCode: this.storage.companyCode,
-      collectionName: "dockets",
+      collectionName: tMODE == "FTL" ? 'dockets' : "dockets_ltl",
       filter: { docNo: dKTNO },
       update: dockets,
     };
     const reqFinance = {
       companyCode: this.storage.companyCode,
-      collectionName: "docket_fin_det",
+      collectionName: tMODE == "FTL" ? 'docket_fin_det' : "docket_fin_det_ltl",
       filter: { dKTNO: dKTNO },
       update: finance,
     };
@@ -530,7 +530,7 @@ export class InvoiceServiceService {
   }
   /*End*/
   /*Below code is for Confirm a Approval*/
-  async confirmApprove(data) {
+  async confirmApprove(data, tMODE) {
     const result = await Swal.fire({
       title: "Are you sure you want to Approve a Docket?",
       icon: 'warning',
@@ -540,14 +540,14 @@ export class InvoiceServiceService {
     });
 
     if (result.isConfirmed) {
-      await this.handleApprove(data);
+      await this.handleApprove(data, tMODE);
     } else {
       Swal.fire('Cancelled', 'Your Approve was cancelled', 'info');
     }
   }
   /*End*/
-  async handleApprove(data) {
-    const res = await this.updateShipmentStatus(data.data.shipment);
+  async handleApprove(data, tMODE) {
+    const res = await this.updateShipmentStatus(data.data.shipment, tMODE);
     if (res) {
       Swal.fire('Success!', 'Your Approve was successful!', 'success');
     }

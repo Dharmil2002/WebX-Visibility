@@ -9,7 +9,7 @@
     <form [formGroup]="MrGenerationForm">
         <app-form-webxpress [form]="MrGenerationForm" [formData]="allJson"
             [FormTitle]="'Delivery MR Delivery Charges'" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)" [submit]="submit">
+            [showSaveAndCancelButton]="showSaveAndCancelButton" (callFunction)="functionCallHandler($event)" [submit]="submit">
         </app-form-webxpress>
     </form>
 </div>

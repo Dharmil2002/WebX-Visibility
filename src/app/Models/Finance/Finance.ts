@@ -117,6 +117,7 @@ export enum VoucherInstanceType {
   BalancePayment = 9,
   DeliveryMR = 10,
   VendorBillPayment = 11,
+  THCArrival = 12,
 }
 
 export const ledgerInfo = {
@@ -193,6 +194,16 @@ export const ledgerInfo = {
   "Billed creditors": {
     "LeadgerCode": "LIA001002",
     "LeadgerName": "Billed creditors",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Inter branch control": {
+    "LeadgerCode": "EXP001024",
+    "LeadgerName": "Inter branch control",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "Transport Expense": {
+    "LeadgerCode": "EXP001003",
+    "LeadgerName": "Transport Expense",
     "LeadgerCategory": "EXPENSE"
   },
 

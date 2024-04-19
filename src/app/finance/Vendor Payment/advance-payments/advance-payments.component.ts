@@ -584,36 +584,37 @@ export class AdvancePaymentsComponent implements OnInit {
 
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        const JornalRequests = selectedData.map((data, index) =>
-          timer(index * 1000).pipe(concatMap(() => this.createJournalRequest(data)))
-        );
+        const Response = [];
 
-        const DebitRequests = selectedData.map((data, index) =>
-          timer(index * 1000).pipe(concatMap(() => this.createDebitRequest(data)))
-        );
+        // Process Journal Requests
+        for (let i = 0; i < selectedData.length; i++) {
+          const data = selectedData[i];
+          const result = await firstValueFrom(this.createJournalRequest(data));
 
-        const AllRequests = [...JornalRequests, ...DebitRequests];
+          const ResultObject = {
+            THCNo: result.data.ops[0].docNo,
+            VoucherNo: result.data.ops[0].vNO
+          };
 
-        forkJoin(AllRequests).subscribe((results: any[]) => {
-          const Response = [];
-          results.forEach((item) => {
-            const ResultObject = {
-              THCNo: item.data.ops[0].docNo,
-              VoucherNo: item.data.ops[0].vNO
-            }
-            Response.push(ResultObject);
-          });
-          this.UpdateTHCAmount(Response, this.PaymentData?.Mode);
+          Response.push(ResultObject);
+        }
 
-        }, error => {
-          this.snackBarUtilityService.ShowCommonSwal("error", error);
-          Swal.hideLoading();
-          setTimeout(() => {
-            Swal.close();
-          }, 2000);
-        });
+        // Process Debit Requests
+        for (let i = 0; i < selectedData.length; i++) {
+          const data = selectedData[i];
+          const result = await firstValueFrom(this.createDebitRequest(data));
+
+          const ResultObject = {
+            THCNo: result.data.ops[0].docNo,
+            VoucherNo: result.data.ops[0].vNO
+          };
+
+          Response.push(ResultObject);
+        }
+
+        this.UpdateTHCAmount(Response, this.PaymentData?.Mode);
       } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+        this.snackBarUtilityService.ShowCommonSwal("error", error);
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();

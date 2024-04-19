@@ -46,6 +46,8 @@ import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { clearValidatorsAndUpdate, getValueOrDefault } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
 import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { ThcCostUpdateService } from "src/app/Utility/module/operation/thc/thc-cost-update.service";
 @Component({
   selector: "app-thc-generation",
   templateUrl: "./thc-generation.component.html",
@@ -168,7 +170,7 @@ export class ThcGenerationComponent implements OnInit {
       Title: "Arrival Time",
       class: "matcolumncenter",
       Style: "min-width:140px",
-      datatype:"datetime"
+      datatype: "datetime"
     },
     remarks: {
       Title: "Remarks",
@@ -283,6 +285,7 @@ export class ThcGenerationComponent implements OnInit {
   isLoadInvoice: boolean;
   delChargeControl: any[];
   balanceAmount: any;
+  Request: {};
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -304,7 +307,9 @@ export class ThcGenerationComponent implements OnInit {
     private prqService: PrqService,
     private objImageHandling: ImageHandling,
     private definition: RakeEntryModel,
-    private hawkeyeUtilityService: HawkeyeUtilityService
+    private hawkeyeUtilityService: HawkeyeUtilityService,
+    private controlPanel: ControlPanelService,
+    private thcCostUpdateService: ThcCostUpdateService,
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -769,7 +774,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   selectCheckBox(event) {
-    
+
     if (this.DocketsContainersWise) {
       if (event.length > 1) {
         Swal.fire({
@@ -1634,8 +1639,8 @@ export class ThcGenerationComponent implements OnInit {
       mfdetailsList.sFX = res.sFX;
       mfdetailsList.cNO = res.cNO;
       mfdetailsList.oRGN = this.thcTableForm.controls['branch'].value || "";
-      mfdetailsList.fCT=this.thcTableForm.controls['fromCity'].value || "";
-      mfdetailsList.tCT=this.thcTableForm.controls['fromCity'].value || "";
+      mfdetailsList.fCT = this.thcTableForm.controls['fromCity'].value || "";
+      mfdetailsList.tCT = this.thcTableForm.controls['fromCity'].value || "";
       mfdetailsList.dEST = this.thcTableForm.controls['closingBranch'].value || "";
       mfdetailsList.pKGS = res.pKGS;
       mfdetailsList.wT = res.aCTWT;
@@ -2005,7 +2010,7 @@ export class ThcGenerationComponent implements OnInit {
       if ((vendorTypevalue == 2 || vendorTypevalue == 4) && contAmt <= 0) {
         Swal.fire({
           icon: 'error',
-          title: 'error', 
+          title: 'error',
           text: 'Contract amount must be greater than zero for Attached and Market vendor types.',
           showConfirmButton: true,
         });
@@ -2023,7 +2028,7 @@ export class ThcGenerationComponent implements OnInit {
         return false;
       }
     }
-    const selectedDkt = this.isUpdate ? this.tableData.filter((x)=>x.isSelected) : this.selectedData ? this.selectedData : [];
+    const selectedDkt = this.isUpdate ? this.tableData.filter((x) => x.isSelected) : this.selectedData ? this.selectedData : [];
     if ((selectedDkt.length === 0 && !this.isUpdate) && !this.DocketsIsEmpty) {
       Swal.fire({
         icon: 'info',
@@ -2127,10 +2132,10 @@ export class ThcGenerationComponent implements OnInit {
       // Fetch location details asynchronously
       const locData = await this.thcService.getLocationDetail(branch);
       // Determine if the destination has been arrived at
-      const toCityValue=this.thcTableForm.getRawValue();
+      const toCityValue = this.thcTableForm.getRawValue();
       const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase();
-      if(!isArrivedDel){
-        if(this.tableData.length==podDetails.length){
+      if (!isArrivedDel) {
+        if (this.tableData.length == podDetails.length) {
           Swal.fire({
             icon: "error",
             title: 'Oops...',
@@ -2148,9 +2153,9 @@ export class ThcGenerationComponent implements OnInit {
         cHG: charges,
         bALAMT: this.chargeForm.get("balAmt").value,
         tOTAMT: this.chargeForm.get("totAmt").value,
-        mODBY:this.storage.userName,
-        mODDT:new Date(),
-        mODLOC:this.storage.branch
+        mODBY: this.storage.userName,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch
       };
       const data = this.thcTableForm.getRawValue();
       const res = await showConfirmationDialogThc(
@@ -2167,6 +2172,40 @@ export class ThcGenerationComponent implements OnInit {
         await this.thcService.updateVehicle({ tripId: "", status: "Available", route: "" }, { vehNo: this.thcDetailGlobal.thcDetails.vEHNO })
       }
       if (res) {
+        // Generate Vouchers for the selected dockets
+        //#region Make RequestBody For Update Trip
+        const filter = {
+          cID: this.storage.companyCode,
+          mODULE: "THC",
+          aCTIVE: true,
+          rULEID: { D$in: ["THCIBC", "THCCB"] }
+        }
+        const res: any = await this.controlPanel.getModuleRules(filter);
+        if (res.length > 0) {
+          this.Request = {
+            isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+            thcNo: this.thcTableForm.get("tripId").value,
+            thc: {
+              collation: "thc_summary",
+              docNoField: "docNo"
+            },
+            mfheader: {
+              collation: "mf_header",
+              docNoField: "docNo",
+              thcField: "tHC"
+            },
+            mfdetails: {
+              collation: "mf_details",
+              docNoField: "mFNO",
+              dktField: "dKTNO"
+            },
+            docket: {
+              collation: "dockets",
+              docNoField: "dKTNO"
+            }
+          };
+        }
+        //#endregion
         Swal.fire({
           icon: "success",
           title: "Update Successfuly",
@@ -2183,6 +2222,7 @@ export class ThcGenerationComponent implements OnInit {
           }
         }
         this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+        this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
         this.goBack("THC");
       }
     } else {

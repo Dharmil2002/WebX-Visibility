@@ -72,7 +72,7 @@ export class DeliveryMrGeneration {
             },
             {
                 name: 'ConsignmentNoteNumber',
-                label: 'Consignment Note Number',
+                label: 'Consignment Number',
                 placeholder: 'Enter Consignment Note Number',
                 type: 'government-id',
                 value: "",

@@ -319,7 +319,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       NameofReceiver.clearValidators();
       NameofReceiver.updateValueAndValidity();
 
-      // Apply required validator for NameofConsignee control      
+      // Apply required validator for NameofConsignee control
       NameofConsignee.setValue(cgnm);
       NameofConsignee.setValidators([Validators.required]);
       NameofConsignee.updateValueAndValidity();
@@ -393,7 +393,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     //console.log(data);
     this.addDetails(data)
   }
-  //#endregion 
+  //#endregion
   //#region to validate docket number
   async validateConsig() {
     const NoofDocketValue = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
@@ -684,7 +684,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         try {
           const headerRequest = {
             cID: this.storage.companyCode,
-            dOCNO: this.tableData.map(item => item.consignmentNoteNumber),
+            gCNNO: this.tableData.map(item => item.consignmentNoteNumber),
             dLVRT: this.headerDetails.Deliveredto,
             cNTCTNO: this.headerDetails.ContactNumber,
             rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
@@ -723,7 +723,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const detailRequests = this.tableData.map(element => {
             return {
               cID: this.storage.companyCode,
-              dOCNO: element.consignmentNoteNumber,
+              gCNNO: element.consignmentNoteNumber,
               mLTPNTDLRY: element.Multipointdelivery,
               dOC: element.Document,
               iNSURNC: element.Insurance,

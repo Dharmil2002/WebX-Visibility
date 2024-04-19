@@ -10,62 +10,64 @@ import { GenericService } from 'src/app/core/service/generic-services/generic-se
 @Component({
   selector: 'app-shipment-edit-billing',
   templateUrl: './shipment-edit-billing.component.html'
-  
+
 })
 export class ShipmentEditBillingComponent implements OnInit {
   shipments: any;
-  tableData:any;
-  headerColumn:any;
-  isLoad:boolean=true;
-  staticField=[''];
-  menuItems = [{label:"Approve",status:[0]},{label:"Edit",status:[1]},{label:"Hold",status:[1]}];
+  tableData: any;
+  headerColumn: any;
+  isLoad: boolean = true;
+  staticField = [''];
+  menuItems = [{ label: "Approve", status: [0] }, { label: "Edit", status: [1] }, { label: "Hold", status: [1] }];
   menuItemflag: boolean = true;
-metaData = {
-  checkBoxRequired: true,
-  noColumnSort: ["checkBoxRequired"],
-};
-dynamicControls = {
-  add: false,
-  edit: true,
-  csv: false,
-};
+  metaData = {
+    checkBoxRequired: true,
+    noColumnSort: ["checkBoxRequired"],
+  };
+  dynamicControls = {
+    add: false,
+    edit: true,
+    csv: false,
+  };
   status: number;
+  tMODE: string;
   constructor(
     public dialogRef: MatDialogRef<GenericViewTableComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private invoiceServiceService: InvoiceServiceService,
-    public definition:invoiceModel,
-    private genericService:GenericService,
+    public definition: invoiceModel,
+    private genericService: GenericService,
     public dialog: MatDialog,
   ) {
-    const flag=this.genericService.getSharedData();
-    this.status=flag.title.shipment=="apDkt"?1:0
+    const flag = this.genericService.getSharedData();
+    this.status = flag.title.shipment == "apDkt" ? 1 : 0
     this.shipments = this.data;
-    this.menuItems=this.menuItems.filter((item)=>item.status.includes(this.status));
+    this.menuItems = this.menuItems.filter((item) => item.status.includes(this.status));
     this.getShipmentDetails();
   }
   async getShipmentDetails() {
-    const shipments=this.shipments.dKTNO;
-    let details=await this.invoiceServiceService.getInvoice(shipments,this.status);
-    let filterData=await this.invoiceServiceService.filterShipment(details,true);
-    this.tableData=filterData;
-    this.isLoad=false;
+    const shipments = this.shipments.dKTNO;
+    this.tMODE = this.shipments.tMODE;
+    let details = await this.invoiceServiceService.getInvoice(shipments, this.status, this.tMODE);
+    let filterData = await this.invoiceServiceService.filterShipment(details, true);
+    this.tableData = filterData;
+    this.isLoad = false;
   }
 
   ngOnInit(): void {
   }
-  onSelectAllClicked(event){
+  onSelectAllClicked(event) {
 
   }
-   // Implement this method
-   onCloseButtonClick(): void {
+  // Implement this method
+  onCloseButtonClick(): void {
     // Add logic to close the MatDialog
     this.dialogRef.close();
   }
   async handleMenuItemClick(data) {
-    
+
     if (data.label.label === "Edit") {
-       const dialogref = this.dialog.open(UpdateShipmentAmountComponent, {
+      const dialogref = this.dialog.open(UpdateShipmentAmountComponent, {
         width: '100vw',
         height: '100vw',
         maxWidth: '232vw',
@@ -76,13 +78,13 @@ dynamicControls = {
       });
 
     }
-    if(data.label.label==="Approve"){
-      await this.invoiceServiceService.confirmApprove(data);
+    if (data.label.label === "Approve") {
+      await this.invoiceServiceService.confirmApprove(data, this.tMODE);
       this.getShipmentDetails();
     }
-    }
-    ngOnDestroy() {
-     this.genericService.clearSharedData();
-    }
+  }
+  ngOnDestroy() {
+    this.genericService.clearSharedData();
+  }
 
 }

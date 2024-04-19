@@ -27,6 +27,7 @@ export class AddContainerComponent implements OnInit {
   VendorName: any;
   VendorNameStatus: any;
   CompanyCode: any = 0;
+  backPath: string;
   UpdateData: any;
   FormTitle: string = "Add Container";
   constructor(
@@ -55,6 +56,7 @@ export class AddContainerComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFormControl();
+    this.backPath = "/Masters/ContainerMaster/ListContainer";
   }
 
   initializeFormControl() {
@@ -215,6 +217,7 @@ export class AddContainerComponent implements OnInit {
       tRW: +this.containerTableForm.value.TareWeight,
       nETW: +this.containerTableForm.value.NetWeight,
       aCT: this.containerTableForm.value.isActive,
+      companyCode: this.storage.companyCode,
     };
     if (!this.isUpdate) {
       const tableReq = {

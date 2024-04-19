@@ -1104,6 +1104,7 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
+    debugger
     // Refactored calls using the new function
     clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
     clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
@@ -1890,9 +1891,9 @@ export class ThcGenerationComponent implements OnInit {
     const filter = { "pRNm": product, aCTV: true, cHBTY: "Delivery" }
     const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product }
     const delCharge = await this.thcService.getChargesV2(filter, productFilter);
+    const delChargeList = []
+    const invoiceList = [];
     if (charges && charges.length > 0) {
-      const invoiceList = [];
-      const delChargeList = []
       charges.forEach((element, index) => {
         if (element) {
           const invoice: InvoiceModel = {
@@ -1919,60 +1920,61 @@ export class ThcGenerationComponent implements OnInit {
           invoiceList.push(invoice);
         }
       });
-      if (!this.isView && delCharge && delCharge.length > 0) {
-        delCharge.forEach((element, index) => {
-          if (element) {
-            const invoice: InvoiceModel = {
-              id: index + 1,
-              name: element.cHACD || '',
-              label: `${element.sELCHA}(${element.aDD_DEDU})`,
-              placeholder: element.sELCHA || '',
-              type: 'text',
-              value: "0",
-              filterOptions: '',
-              displaywith: '',
-              generatecontrol: true,
-              disable: false,
-              Validations: [],
-              additionalData: {
-                showNameAndValue: false,
-                metaData: element.aDD_DEDU
-              },
-              functions: {
-                onChange: 'getChangesOnDelCharge',
-              },
-            };
-
-            delChargeList.push(invoice);
-          }
-        });
-      }
-      // Directly concatenate, spreading null/undefined has no effect
-      let chargeControl = [
-        ...(invoiceList || []),
-        ...(delChargeList || []),
-        ...this.chargeJsonControl
-      ];
-
-      this.chargeJsonControl = chargeControl;
-      this.delChargeControl = delChargeList;
-      chargeControl.sort((a, b) => {
-        if (a.name == "contAmt") return -1;
-        if (b.name == "contAmt") return 1;
-        return 0;
-      });
-      this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
-      this.isCharge = true;
-      const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
-      const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
-      this.chargeForm.controls["advPdAt"].setValue(location);
-      this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
-      this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
-      this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
-      this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
-      this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
-      this.balanceAmount = thcNestedDetails?.thcDetails.bALAMT
+    
     }
+    if (!this.isView && delCharge && delCharge.length > 0) {
+      delCharge.forEach((element, index) => {
+        if (element) {
+          const invoice: InvoiceModel = {
+            id: index + 1,
+            name: element.cHACD || '',
+            label: `${element.sELCHA}(${element.aDD_DEDU})`,
+            placeholder: element.sELCHA || '',
+            type: 'text',
+            value: "0",
+            filterOptions: '',
+            displaywith: '',
+            generatecontrol: true,
+            disable: false,
+            Validations: [],
+            additionalData: {
+              showNameAndValue: false,
+              metaData: element.aDD_DEDU
+            },
+            functions: {
+              onChange: 'getChangesOnDelCharge',
+            },
+          };
+
+          delChargeList.push(invoice);
+        }
+      });
+    }
+    // Directly concatenate, spreading null/undefined has no effect
+    let chargeControl = [
+      ...(invoiceList || []),
+      ...(delChargeList || []),
+      ...this.chargeJsonControl
+    ];
+
+    this.chargeJsonControl = chargeControl;
+    this.delChargeControl = delChargeList;
+    chargeControl.sort((a, b) => {
+      if (a.name == "contAmt") return -1;
+      if (b.name == "contAmt") return 1;
+      return 0;
+    });
+    this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
+    this.isCharge = true;
+    const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
+    const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
+    this.chargeForm.controls["advPdAt"].setValue(location);
+    this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
+    this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
+    this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
+    this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
+    this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
+    this.balanceAmount = thcNestedDetails?.thcDetails.bALAMT
 
   }
   /*End*/

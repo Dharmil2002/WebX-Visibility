@@ -30,7 +30,11 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { ConvertToNumber, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
+import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
+import { StoreKeys } from 'src/app/config/myconstants';
+import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
+import { debug } from 'console';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -1464,6 +1468,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         });
       }
     }
+  }
+  else{
+     Swal.fire({
+      icon: "success",
+      title: "Booked Successfully",
+      text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
+      showConfirmButton: true
+    }).then((result) => {
+      // Redirect after the alert is closed, regardless of whether it is confirmed or not.
+      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+    });
   }
   }
   async generateArray(companyCode, dockno, pkg) {

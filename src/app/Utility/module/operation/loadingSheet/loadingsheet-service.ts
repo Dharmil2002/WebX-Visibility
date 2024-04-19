@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
-import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, ThcStatus, getEnumName } from "src/app/Models/docStatus";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { OperationService } from "src/app/core/service/operations/operation.service";
@@ -59,8 +59,8 @@ export class LoadingSheetService {
       //   "nM":"",
       //   "pAN":""
       // },
-      "oPSST": 0,
-      "oPSSTNM": "",
+      oPSST:ThcStatus.Generated,    
+      oPSSTNM:ThcStatus[ThcStatus.Generated],
       "fINST": 0,
       "fINSTNM": "",
       "cONTAMT": 0,
@@ -186,6 +186,7 @@ export class LoadingSheetService {
               "dLOC": ls?.dEST || "",
               "pKGS": ls?.pKGS || 0,
               "wT": ls?.aCTWT || 0,
+              "cWT": ls?.cHRWT || 0,
               "vCFT": element?.volumeCFT || "",
               "eNTBY": this.storage.userName,
               "eNTDT": new Date(),
@@ -362,6 +363,7 @@ export class LoadingSheetService {
               "dLOC": ls?.dEST || "",
               "pKGS": ls?.pKGS || 0,
               "wT": ls?.aCTWT || 0,
+              "cWT": ls?.cHRWT || 0,
               "vCFT": element?.volumeCFT || "",
               "eNTBY": this.storage.userName,
               "eNTDT": new Date(),

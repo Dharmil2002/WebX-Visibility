@@ -299,6 +299,22 @@ export class QuickBookingControls extends BaseControl {
           onModel: "preventNegative"
         },
       },
+      {
+        name: "isSubmit",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+        },
+      },
     ];
   }
   getDocketFieldControls() {

@@ -939,7 +939,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*end*/
   async docketValidation(){
-    debugger
     const res = await this.dcrService.validateFromSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
     this.dcrDetail=res;
     if(res) {
@@ -1067,7 +1066,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*End*/
    checkDocketRules(){
-      const STYP = this.rules.find(x=>x.rULENM=="STYP" && x.aCTIVE)
+      const STYP = this.rules.find(x=>x.rULEID=="STYP" && x.aCTIVE)
       if(STYP){
         const isManual = STYP.vAL === "M";
         this.model.allformControl.find(x=>x.name=="docketNumber").disable = !isManual;
@@ -1076,19 +1075,19 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.isUpdate=isManual;
       }
 
-      const ELOC = this.rules.find(x=>x.rULENM=="ELOC" && x.aCTIVE)
+      const ELOC = this.rules.find(x=>x.rULEID=="ELOC" && x.aCTIVE)
       if(ELOC){
         if(!ELOC.vAL.includes(this.storage.branch)) {
           // check exception for branch
         }
       }
 
-      this.alpaNumber = this.rules.find(x=>x.rULENM=="NTYP" && x.aCTIVE)?.vAL=="AN";
-      this.sequence = this.rules.find(x=>x.rULENM=="SL" && x.aCTIVE)?.vAL=="S";
-      this.isBrachCode = this.rules.find(x=>x.rULENM=="BCD" && x.aCTIVE)?.vAL=="Y";
-      this.fyear = this.rules.find(x=>x.rULENM=="YEAR" && x.aCTIVE)?.vAL=="F";
-      this.length = ConvertToNumber(this.rules.find(x=>x.rULENM=="LENGTH" && x.aCTIVE)?.vAL);
-      this.mseq = this.rules.find(x=>x.rULENM=="MSEQ" && x.aCTIVE)?.vAL=="Y";
+      this.alpaNumber = this.rules.find(x=>x.rULEID=="NTYP" && x.aCTIVE)?.vAL=="AN";
+      this.sequence = this.rules.find(x=>x.rULEID=="SL" && x.aCTIVE)?.vAL=="S";
+      this.isBrachCode = this.rules.find(x=>x.rULEID=="BCD" && x.aCTIVE)?.vAL=="Y";
+      this.fyear = this.rules.find(x=>x.rULEID=="YEAR" && x.aCTIVE)?.vAL=="F";
+      this.length = ConvertToNumber(this.rules.find(x=>x.rULEID=="LENGTH" && x.aCTIVE)?.vAL);
+      this.mseq = this.rules.find(x=>x.rULEID=="MSEQ" && x.aCTIVE)?.vAL=="Y";
   }
 
   vendorFieldChanged() {

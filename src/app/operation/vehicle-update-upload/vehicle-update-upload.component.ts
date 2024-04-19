@@ -11,6 +11,9 @@ import { firstValueFrom } from 'rxjs';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import { ManifestService } from 'src/app/Utility/module/operation/mf-service/mf-service';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import { Manifest } from 'src/app/Models/vehicle-loading/manifest';
+import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipment-details.component';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -41,7 +44,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "Packages": "Packages",
     "loaded": "Loaded",
     "Pending": "Pending",
-    "Leg": "Leg",
+    "Leg": "Leg"
   };
   centerAlignedData = ['Shipment', 'Suffix', 'Packages', 'loaded', 'Pending'];
   columnWidths = {
@@ -74,7 +77,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
   ]
   toggleArray = []
-  menuItems = []
+
   linkArray = []
   dynamicControls = {
     add: false,
@@ -87,6 +90,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   boxData: { count: any; title: any; class: string; }[];
   updateListData: any;
   Scan: any;
+  isScan:boolean=false;
   vehicelLoadData: any;
   shipingDataTable: any;
   legWiseData: any;
@@ -95,36 +99,74 @@ export class VehicleUpdateUploadComponent implements OnInit {
   packageData: any;
   dktList: any;
   scanMessage: string = '';
-
+  menuItemflag=true;
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
+  rules: any;
   
   constructor(
     private Route: Router,
     private mfService: ManifestService,
+    private definition:Manifest,
     private dialog: MatDialog,
-    public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
-    @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
+    private controlPanel: ControlPanelService,
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
     private storage: StorageService
   ) {
+    debugger
     this.companyCode = this.storage.companyCode;
     this.currentBranch = this.storage.branch;
     this.userName = this.storage.userName;
-    if (item.LoadingSheet) {
-
+    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+      // Retrieve the data from the state
       this.shipmentStatus = 'Loaded'
-      this.vehicelLoadData = item;
+      this.vehicelLoadData = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
     }
+   
     this.getLoadingSheet();
     this.IntializeFormControl()    
   }
 
   ngOnInit(): void {
+    this.getRules(); 
+  }
+  async getRules(){
+    const filter={
+      cID:this.storage.companyCode,
+      mODULE:"Scanning",
+      aCTIVE:true
+    }
+    const res=await this.controlPanel.getModuleRules(filter);
+    if(res.length>0){
+      this.rules=res;
+      this.checkDocketRules();
+    }
     
   }
+  checkDocketRules(){
+    const scan = this.rules.find(x=>x.rULEID=="SCAN" && x.aCTIVE);
+    this.isScan=scan.vAL=="Y"?true:false;
 
+  }
+   handleMenuItemClick(data) {
+     debugger
+    if (data.label.label === "Update") {
+      const dialogRef: MatDialogRef<EditShipmentDetailsComponent> = this.dialog.open(EditShipmentDetailsComponent, {
+        data: data.data,
+      });
+      
+      return dialogRef.afterClosed()
+      .toPromise()
+      .then(result => {
+        debugger
+        console.log('The dialog was closed', result);
+        return Promise.resolve(result);
+      });
+
+  }
+}
+/*below function is call when the partial */
   async getLoadingSheet() {
 
     const reqBody = {
@@ -145,9 +187,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
         let json = {
           "Leg": element?.lEG.replace(" ", "") || '',
           "Shipment": element?.tOTDKT || 0,
-          "Packages": parseInt(element?.pKGS) || 0,
-          "WeightKg": parseInt(element?.wT) || 0,
-          "VolumeCFT": parseInt(element?.vCFT) || 0
+          "Packages": parseInt(element?.pKGS||0) || 0,
+          "WeightKg": parseFloat(element?.wT||0) || 0,
+          "VolumeCFT": parseFloat(element?.vCFT||0) || 0,
+          "CWeightKg": parseFloat(element?.cWT||0) || 0
         };
         dataLoading.push(json);
       });
@@ -168,10 +211,14 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Destination": element?.dLOC || '',
             "Packages": parseInt(element?.pKGS) || 0,
             "weight": parseInt(element?.wT) || 0,
+            "cWeight": parseInt(element?.cWT) || 0,
             "cft": parseInt(element?.vCFT) || 0,
-            "loaded": 0,
-            "Pending": parseInt(element?.pKGS) || 0,
+            "loadedPkg": 0,
+            "loadedWT": 0,
+            "pendPkg": 0,
+            "pendWt": 0,
             "Leg": lsDetails?.lEG.replace(" ", "") || '',
+            "actions":["Edit"]
           };
           docketData.push(json);
         });
@@ -332,7 +379,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
             showConfirmButton: true,
           })
           this.goBack('Departures');
-          this.dialogRef.close("");
         });
       }
       else {
@@ -342,15 +388,12 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: `Arrival Scan done Successfully`,
           showConfirmButton: true,
         })
-        this.dialogRef.close(this.loadingSheetTableForm.value);
         this.goBack('Departures');
-        this.dialogRef.close("");
       }
     }
 
   }
   Close(): void {
-    this.dialogRef.close()
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });

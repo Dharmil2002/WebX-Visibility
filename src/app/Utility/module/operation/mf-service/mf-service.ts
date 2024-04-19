@@ -10,6 +10,7 @@ import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatu
     providedIn: "root",
 })
 export class ManifestService {
+    menfiestData: any;
     constructor(
         private storage: StorageService,
         private operationService: OperationService
@@ -118,5 +119,11 @@ export class ManifestService {
         }
         const res= await firstValueFrom(this.operationService.operationMongoPost("operation/mf/ltl/create",req));
         return res.data;
+    }
+    set manifestData(data){
+        this.menfiestData=data
+    }
+    get manifestDetails(){
+       return this.menfiestData
     }
 }

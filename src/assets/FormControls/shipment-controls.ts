@@ -6,7 +6,24 @@ export class ShipmentEditControls {
         this.shipmentEditControlArray = [
             {
                 name: 'actualWeight',
-                label: 'Weight(Kg)',
+                label: 'Actual Weight(Kg)',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Weight is Required"
+                    }
+                ],
+                functions:{
+                    onChange:"getValidate"
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'ctWeight',
+                label: 'Charge Weight(Kg)',
                 placeholder: '',
                 type: 'text',
                 value: '',

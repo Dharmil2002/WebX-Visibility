@@ -63,6 +63,7 @@ export class QuickBookingComponent implements OnInit {
   alpaNumber: boolean;
   sequence:boolean;
   isBrachCode:boolean;
+  isSubmit:boolean=true;
   fyear:boolean;
   length:number=0;
   mseq: boolean;
@@ -366,6 +367,7 @@ export class QuickBookingComponent implements OnInit {
       this.mseq = this.rules.find(x=>x.rULEID=="MSEQ" && x.aCTIVE)?.vAL=="Y";
   }
   async save() {
+    this.isSubmit=false;
     // Clear form validators and revalidate the form
     const formControls = this.quickDocketTableForm;
     clearValidatorsAndValidate(formControls);

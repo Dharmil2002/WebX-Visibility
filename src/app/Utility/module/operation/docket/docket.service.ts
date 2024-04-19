@@ -956,8 +956,8 @@ export class DocketService {
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
-            tOTCWT: ConvertToNumber(data?.aCTWT || 0, 3),
-            tOTWT:ConvertToNumber(data?.cHRWT || 0, 3),
+            tOTCWT: ConvertToNumber(data?.cHRWT || 0, 3),
+            tOTWT:ConvertToNumber(data?.aCTWT || 0, 3),
             tOTPKG: parseInt(data?.pKGS || 0),
             dKTDT: ConvertToDate(data?.dKTDT),
             oRGN: data?.oRGN || "",

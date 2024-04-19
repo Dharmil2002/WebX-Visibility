@@ -290,7 +290,7 @@ export class ThcService {
     }
     /*end*/
     /*below function is for the update a shipment*/
-    async updateVehicle(data, filter = {}) {
+    async updateVehicle(data,filter) {
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "vehicle_status",
@@ -300,7 +300,7 @@ export class ThcService {
         return await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update, req));
     }
     /*end*/
-    async updateThcLTL(data, filter = {}){
+    async updateThcLTL(data,filter){
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "thc_summary_ltl",

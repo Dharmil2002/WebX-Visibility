@@ -7,7 +7,7 @@
     </form>
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [metaData]="metaData" (functionCallEmitter)="functionCallHandler($event)" (selectAllClicked)="onSelectAllClicked($event)"
-        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [boxData]="boxData" [height]="height"
+        [menuItems]="menuItems"[selectAllRequired]="selectAllRequired" [staticField]="staticField" [Link]="linkArray" [boxData]="boxData" [height]="height"
         [width]="width"  [maxWidth]="maxWidth">
     </app-generic-table-v2>
     <div class="row" *ngIf="!tableload">

@@ -10,6 +10,11 @@ import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 export class Manifest implements IFieldDefinition {
   constructor() {}
   public columnHeader = {   
+    checkBoxRequired: {
+      Title: "",
+      class: "matcolumncenter",
+      Style: "max-width:80px",
+    },  
     Shipment: {
       Title:`${DocCalledAs.Docket} No`,
       class: "matcolumnleft",
@@ -83,7 +88,7 @@ export class Manifest implements IFieldDefinition {
     Name: "Docket Details",
     Title: "",
     class: "matcolumncenter",
-    ColSpan: 4,
+    ColSpan: 5,
     sticky: true
   },
   {
@@ -111,7 +116,7 @@ export class Manifest implements IFieldDefinition {
     Name: "leg",
     Title: "",
     class: "matcolumncenter",
-    ColSpan: 2,
+    ColSpan: 3,
     sticky: true
   }
 ];;

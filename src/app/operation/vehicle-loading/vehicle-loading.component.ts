@@ -102,15 +102,15 @@ export class VehicleLoadingComponent implements OnInit {
     "PackagesLoaded": "PackagesLoaded",
     "Pending": "Pending"
   };
-
+  selectAllRequired:boolean=true;
   toggleArray = [];
   linkArray = [
-    { Row: 'Action', Path: "Operation/vehicle-loading" },
+    { Row: 'Action', Path: "" },
     { Row: 'printPending', Path: '' },
   ];
 
   menuItems = [
-    //{ label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
+    { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
      { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];

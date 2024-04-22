@@ -66,6 +66,15 @@ export class ShipmentEditControls {
                 value: '',
                 Validations: [],
                 generatecontrol: false, disable: false
+            },
+            {
+                name: 'suffix',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '',
+                Validations: [],
+                generatecontrol: false, disable: false
             }
         ];
     }

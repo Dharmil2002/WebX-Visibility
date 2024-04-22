@@ -77,6 +77,7 @@ export class ArrivalVehicleService {
                         "oRG": "$mfHeader.oRGN",
                         "dEST": "$mfHeader.dEST",
                         "wT": "$md.wT",
+                        "cWT": "$md.cWT",
                         "vOL": "$md.vOL",
                         "iSARR": "$mfHeader.iSARR",
                         "rUTCD": "$mfHeader.rUTCD",
@@ -223,14 +224,14 @@ export class ArrivalVehicleService {
 
 
         }
+    
 
         return true
     }
     /*End*/
-    async fieldMappingArrivalScan(data, dktList, scanDkt) {
-
+    async fieldMappingArrivalScan(data, dktList,notSelectedData, scanDkt,isScan) {
         let legID = `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
-        var lagData = await this.getCheckOnce({
+        let lagData = await this.getCheckOnce({
             "_id": legID,
         });
         if (!lagData && lagData?._id != legID)
@@ -263,7 +264,7 @@ export class ArrivalVehicleService {
         }
         await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
 
-
+       if(dktList && dktList.length>0){
         const destDocket = dktList.filter((x) => x.Destination == this.storage.branch);
         const transDocket = dktList.filter((x) => x.Destination != this.storage.branch);
 
@@ -367,7 +368,7 @@ export class ArrivalVehicleService {
             }
             await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
         }
-
+         if(isScan){
         const reqPkg = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_pkgs_ltl",
@@ -382,6 +383,7 @@ export class ArrivalVehicleService {
             update: { cLOC: this.storage.branch, iSARR: true }
         }
         await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMF));
+    }
         const mfNo = dktList.map((x) => x.mfNo);
         const reqMf = {
             companyCode: this.storage.companyCode,
@@ -397,6 +399,75 @@ export class ArrivalVehicleService {
             update: { iSDEL: true }
         }
         await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMfDet));
+        const sfxDockets = dktList.filter((x) => x.pendPkg != 0 && x.pendWt != 0);
+        let sfxDocketsData = []
+        let isSuffex = false;
+        const sfxEnvData = [];
+        if (sfxDockets.length > 0) {
+            sfxDocketsData = sfxDockets.map(docket => {
+                // Parsing and incrementing the suffix safely
+                const nextSuffix = Number(docket.Suffix) + 1;
+                if (isNaN(nextSuffix)) {
+                    throw new Error("Invalid Suffix value: " + docket.Suffix);
+                }
+
+                // Generating a timestamp with moment.js for consistent formatting
+                const currentTime = moment().tz('Asia/Kolkata').format("DD MMM YYYY @ hh:mm A");
+                const entryTimestamp = new Date();
+
+                // Constructing the new docket JSON object
+                const newDocket = {
+                    "_id": `${this.storage.companyCode}-${docket.Shipment}-${nextSuffix}`,
+                    "cID": this.storage.companyCode,
+                    "dKTNO": docket.Shipment,
+                    "sFX": nextSuffix,
+                    "cLOC": docket.Origin,
+                    "oRGN": docket.Origin,
+                    "dEST": docket.Destination,
+                    "aCTWT": ConvertToNumber(docket.pendWt, 3),
+                    "cHRWT": ConvertToNumber(docket.pendCwt, 3),
+                    "tOTCWT": ConvertToNumber(docket.pendWt, 3),
+                    "tOTWT": ConvertToNumber(docket.pendWt, 3),
+                    "tOTPKG": parseInt(docket.pendPkg) || 0,
+                    "pKGS": parseInt(docket.pendPkg) || 0,
+                    "cFTTOT": ConvertToNumber(docket.pendCft, 3),
+                    "vEHNO": "",
+                    "sTS": DocketStatus.Booked,
+                    "sTSNM": DocketStatus[DocketStatus.Booked],
+                    "sTSTM": entryTimestamp,
+                    "oPSSTS": `Booked at ${this.storage.branch} on ${currentTime}`,
+                    "iSDEL": false,
+                    "eNTDT": entryTimestamp,
+                    "eNTLOC": this.storage.branch,
+                    "eNTBY": this.storage.userName
+                };
+                let sfxData = {
+                    _id: `${this.storage.companyCode}-${docket.Shipment}-${nextSuffix}-${DocketEvents.Booking}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+                    cID: this.storage.companyCode,
+                    dKTNO: docket?.Shipment || "",
+                    sFX: docket?.Suffix || 0,
+                    lOC:docket.Origin,
+                    eVNID: DocketEvents.Booking,
+                    eVNDES: getEnumName(DocketEvents, DocketEvents.Booking),
+                    eVNDT: new Date(),
+                    eVNSRC: 'Booking',
+                    dOCTY: 'CN',
+                    dOCNO: docket?.Shipment || "",
+                    sTS: DocketStatus.Booked,
+                    sTSNM: DocketStatus[DocketStatus.Booked],
+                    oPSSTS: `Booked at ${this.storage.branch} on ${currentTime}`,
+                    eNTDT: new Date(),
+                    eNTLOC: this.storage.branch,
+                    eNTBY: this.storage.userName,
+                };
+                sfxEnvData.push(sfxData);
+                return newDocket;
+            });
+            isSuffex = true;
+        }
+        if(isSuffex){
+            await this.getArrivalBasesdocket(sfxDocketsData,sfxEnvData);
+        }
         if (next) {
             const tripStatus = {
                 cLOC: this.storage.branch,
@@ -466,5 +537,169 @@ export class ArrivalVehicleService {
             });
         }
         return true
+    }
+    else{
+        await this.updateNotStockUpdate(notSelectedData,isScan,scanDkt,ls);
+        return true
+    }
+    }
+    async getArrivalBasesdocket(sfxData,sfxEnvData) {
+            const reqInv={
+                companyCode:this.storage.companyCode,
+                collectionName: "dockets_ltl",
+                filters:[
+                    {
+                      D$match: {
+                        dKTNO:{
+                          D$in:sfxData.map((sfx) => sfx.dKTNO)
+                        }
+                      }
+                    },
+                    {
+                      D$lookup: {
+                        from:"docket_invoices_ltl",
+                        localField: "docNo",
+                        foreignField: "dKTNO",
+                        as: "dktInvoice"
+                      }
+                    },
+                    {
+                      D$unwind: {
+                        path: "$dktInvoice",
+                        preserveNullAndEmptyArrays: false
+                      }
+                    },
+                    {
+                      D$project: {
+                        dKTNO:1,
+                        dKTDT:1,
+                        cFTRATO:1,
+                        cFTTOT:1,
+                        lENGHT:"$dktInvoice.vOL.l",
+                        bREADTH:"$dktInvoice.vOL.b",
+                        hEIGHT:"$dktInvoice.vOL.h",
+                        cUBWT:"$dktInvoice.vOL.cU"
+                        
+                      }
+                    }
+                  ]
+            }
+            const getData=await firstValueFrom(this.operation.operationMongoPost("generic/query",reqInv));
+            if(getData.length>0){
+              
+                sfxData.forEach(sfx=>{
+                    const invData=getData.find((inv)=>inv.dKTNO==sfx.dKTNO);
+                    if(invData){
+                        sfx.cFTTOT=
+                        (parseFloat(invData.lENGHT)*
+                        parseFloat(invData.bREADTH)*
+                        parseFloat(invData.hEIGHT)*
+                        parseInt(sfx.tOTPKG)
+                        );
+                    }
+                })
+
+            }
+
+            const req = {
+                companyCode:this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                data:sfxData
+            }
+        await firstValueFrom(this.operation.operationPost("generic/create", req));
+        if(sfxEnvData && sfxEnvData.length>0){
+            const reqEvent = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_events_ltl",
+                data: sfxEnvData
+            }
+            await firstValueFrom(this.operation.operationPost("generic/create", reqEvent));
+        }
+        return true
+
+    }
+    async updateNotStockUpdate(dktList,isScan,scanDkt,ls){
+        if(dktList&&dktList.length>0){
+            const dockets = dktList.map((d) => `${d.Shipment}-${d.Suffix}`)
+            const dktOps = {
+                "cLOC": this.storage.branch,
+                "tHC": "",
+                "sTS": DocketStatus.Booked,
+                "sTSNM": DocketStatus[DocketStatus.Booked],
+                "sTSTM": new Date(),
+                "oPSSTS":`Booked at ${this.storage.branch} on${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
+                "mODDT": new Date(),
+                "mODLOC": this.storage.branch,
+                "mODBY": this.storage.userName
+            }
+
+            const reqOps = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
+                update: dktOps
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
+            const eventJson = dktList.map(dkt => {
+                const evn = {
+                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "cID": this.storage.companyCode,
+                    "dKTNO": dkt.Shipment,
+                    "sFX": 0,
+                    "lOC":dkt.Origin,
+                    "eVNID": DocketEvents.Booking,
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Booking),
+                    "eVNDT": new Date(),
+                    "eVNSRC": "Arrival Scan",
+                    "dOCTY": "CN",
+                    "dOCNO": dkt.Shipment,
+                    "sTS": DocketStatus.Booked,
+                    "sTSNM": DocketStatus[DocketStatus.Booked],
+                    "oPSSTS":`Booked at ${this.storage.branch} on${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
+                    "eNTDT": new Date(),
+                    "eNTLOC": this.storage.branch,
+                    "eNTBY": this.storage.userName
+                }
+                return evn
+            });
+            const reqEvent = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_events_ltl",
+                data: eventJson
+            }
+            await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
+            
+         if(isScan){
+            const reqPkg = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_pkgs_ltl",
+                filter: { pKGSNO: { "D$in": scanDkt } },
+                update: ls
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqPkg));
+            const reqMF = {
+                companyCode: this.storage.companyCode,
+                collectionName: "mf_pkgs_details",
+                filter: { pKGSNO: { "D$in": scanDkt } },
+                update: { cLOC: this.storage.branch, iSARR: true }
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMF));
+        }
+            const mfNo = dktList.map((x) => x.mfNo);
+            const reqMf = {
+                companyCode: this.storage.companyCode,
+                collectionName: "mf_headers_ltl",
+                filter: { mFNO: { "D$in": mfNo } },
+                update: { iSDEL:false }
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMf));
+            const reqMfDet = {
+                companyCode: this.storage.companyCode,
+                collectionName: "mf_details_ltl",
+                filter: { mFNO: { "D$in": mfNo } },
+                update: { iSDEL: false }
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMfDet));
+        }
     }
 }

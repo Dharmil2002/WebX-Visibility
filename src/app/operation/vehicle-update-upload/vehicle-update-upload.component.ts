@@ -22,7 +22,7 @@ import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipm
 export class VehicleUpdateUploadComponent implements OnInit {
   arrivalUrl = '../../../assets/data/arrival-dashboard-data.json'
   packageUrl = '../../../assets/data/package-data.json'
-  tableload = false;
+  tableload = true;
   csv: any[];
   loadingTableData: any[];
   data: [] | any;
@@ -52,6 +52,33 @@ export class VehicleUpdateUploadComponent implements OnInit {
     'Suffix': 'min-width:1%'
   };
   shipingHeader = {
+    "Leg":  {
+      Title: 'Leg',
+      class: "matcolumnleft",
+      Style: "min-width:18%",
+    },
+    "Shipment": {
+      Title: 'Shipments',
+      class: "matcolumnright",
+      Style: "min-width:80px;max-width:80px;",
+    },
+    "Packages": {
+      Title: 'Packages',
+      class: "matcolumnright",
+      Style: "min-width:80px;max-width:80px;",
+    },
+    "WeightKg": {
+      Title: 'Weight (KG)',
+      class: "matcolumnright",
+      Style: "min-width:100px;max-width:100px;",
+    },
+    "VolumeCFT": {
+      Title: 'Volume (CFT)',
+      class: "matcolumnright",
+      Style: "min-width:100px;max-width:100px;",
+    }
+  }
+  shipingStaticHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
@@ -102,28 +129,33 @@ export class VehicleUpdateUploadComponent implements OnInit {
   menuItemflag=true;
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
   rules: any;
-  
+  selectAllRequired:boolean=true;
+  metaData = {};
   constructor(
     private Route: Router,
     private mfService: ManifestService,
     private definition:Manifest,
     private dialog: MatDialog,
+    public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
+    @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private controlPanel: ControlPanelService,
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
     private storage: StorageService
   ) {
-    debugger
+    this.metaData={
+      checkBoxRequired: true,
+      noColumnSort: Object.keys(this.definition.columnHeader),
+    }
     this.companyCode = this.storage.companyCode;
     this.currentBranch = this.storage.branch;
     this.userName = this.storage.userName;
-    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      // Retrieve the data from the state
+    if (item.LoadingSheet) {
+
       this.shipmentStatus = 'Loaded'
-      this.vehicelLoadData = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
+      this.vehicelLoadData = item;
     }
-   
     this.getLoadingSheet();
     this.IntializeFormControl()    
   }
@@ -147,28 +179,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
   checkDocketRules(){
     const scan = this.rules.find(x=>x.rULEID=="SCAN" && x.aCTIVE);
     this.isScan=scan.vAL=="Y"?true:false;
-
   }
-   handleMenuItemClick(data) {
-     debugger
-    if (data.label.label === "Update") {
-      const dialogRef: MatDialogRef<EditShipmentDetailsComponent> = this.dialog.open(EditShipmentDetailsComponent, {
-        data: data.data,
-      });
-      
-      return dialogRef.afterClosed()
-      .toPromise()
-      .then(result => {
-        debugger
-        console.log('The dialog was closed', result);
-        return Promise.resolve(result);
-      });
-
-  }
-}
+  
 /*below function is call when the partial */
   async getLoadingSheet() {
-
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "ls_headers_ltl",
@@ -210,9 +224,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Origin": element?.bLOC || element?.lOC || '',
             "Destination": element?.dLOC || '',
             "Packages": parseInt(element?.pKGS) || 0,
-            "weight": parseInt(element?.wT) || 0,
-            "cWeight": parseInt(element?.cWT) || 0,
-            "cft": parseInt(element?.vCFT) || 0,
+            "weight": parseFloat(element?.wT) || 0,
+            "cWeight": parseFloat(element?.cWT) || 0,
+            "cft": parseFloat(element?.vCFT) || 0,
             "loadedPkg": 0,
             "loadedWT": 0,
             "pendPkg": 0,
@@ -224,6 +238,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         });
         this.loadingTableData = docketData;
       }
+      this.tableload=false;
       this.kpiData("")
     }
     this.getPackagesData();
@@ -351,7 +366,29 @@ export class VehicleUpdateUploadComponent implements OnInit {
       console.log("failed");
     }
   }
+  onDailogClose(event){
+    this.shipmentsEdit(event)
+  }
+  shipmentsEdit(event) {
+    const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
+    const data = this.loadingTableData.find(x => x.Shipment === shipment && x.Suffix === suffix);
+    if (data) {
+      const loadedPkg = parseInt(noofPkts, 10);
+      const loadedWT = parseFloat(actualWeight).toFixed(2);
+      const pendPkg = data.Packages - loadedPkg;
+      const pendWt = data.weight - parseFloat(actualWeight);
+      const pendCwt = data.cWeight - parseFloat(ctWeight);
+    
+      // Update the data object directly
+      Object.assign(data, { loadedPkg, loadedWT, pendPkg, pendWt, pendCwt });
+    
+      this.cdr.detectChanges();
+    }
+  }
+  
   async CompleteScan() {
+    let resMf=""
+    if(this.isScan){
     let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
     if(packageChecked){
       Swal.fire({
@@ -362,8 +399,26 @@ export class VehicleUpdateUploadComponent implements OnInit {
       })
       return;
     }
-    const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
-    const resMf = await this.mfService.createMfDetails(fieldMapping);
+      const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
+       resMf = await this.mfService.createMfDetails(fieldMapping);
+    }
+    else{
+      let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
+      if(selectedData.length>0){
+        Swal.fire({
+          icon: "warning",
+          title: "Action Needed",
+          text: "Please select at least one option to proceed.",
+          showConfirmButton: true,
+          confirmButtonText: 'OK'
+        })
+        
+        return false;
+      }
+      let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+      const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
+      resMf = await this.mfService.createMfDetails(fieldMapping);
+    }
     if (resMf) {
       if (this.shipmentStatus == 'Loaded') {
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
@@ -379,6 +434,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             showConfirmButton: true,
           })
           this.goBack('Departures');
+          this.dialogRef.close("");
         });
       }
       else {
@@ -388,12 +444,15 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: `Arrival Scan done Successfully`,
           showConfirmButton: true,
         })
+        this.dialogRef.close(this.loadingSheetTableForm.value);
         this.goBack('Departures');
+        this.dialogRef.close("");
       }
     }
 
   }
   Close(): void {
+    this.dialogRef.close()
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });

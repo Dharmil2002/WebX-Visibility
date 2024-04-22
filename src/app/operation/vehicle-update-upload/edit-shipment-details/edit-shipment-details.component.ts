@@ -37,6 +37,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     private storage:StorageService,
     private manifestService:ManifestService
   ) {
+    debugger
     this.shipmentDetails = item;
   }
 
@@ -65,6 +66,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     const shipmentControls = new ShipmentEditControls();
     this.jsonControlArray =shipmentControls.getShipmentFormControls();
     this.EditShipmentForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.EditShipmentForm.controls['suffix'].setValue(this.shipmentDetails.Suffix);
     this.EditShipmentForm.controls['shipment'].setValue(this.shipmentDetails.Shipment);
     this.EditShipmentForm.controls['actualWeight'].setValue(this.shipmentDetails.weight);
     this.EditShipmentForm.controls['ctWeight'].setValue(this.shipmentDetails.cWeight);
@@ -102,8 +104,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     }
   }
 
-  async save() {
-    debugger
+   save() {
     //this.notifyParent.emit((this.EditShipmentForm.value);
    this.dialogRef.close(this.EditShipmentForm.value)
   }

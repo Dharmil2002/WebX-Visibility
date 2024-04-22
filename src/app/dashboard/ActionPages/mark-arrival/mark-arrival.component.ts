@@ -176,9 +176,15 @@ export class MarkArrivalComponent implements OnInit {
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
 
     let tripStatus, tripDetails, stCode, stName;
+    if (!next) {
+      tripDetails.vEHNO = "",
+      tripDetails.tHC = "",
+      tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
+      tripDetails.nXTLOC = ""
+    }
     if (dktStatus === "dktAvail") {
       stCode = 5,
-        stName = "Vehicle Arrived"
+      stName = "Vehicle Arrived"
       tripDetails = {
         sTS: stCode,
         sTSNM: stName
@@ -193,53 +199,9 @@ export class MarkArrivalComponent implements OnInit {
         sTS: stCode,
         sTSNM: stName,
         ...(next ? {} : { cTM: new Date() })
-      };
-      if (!next) {
-        tripDetails.vEHNO = "",
-        tripDetails.tHC = "",
-        tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
-        tripDetails.nXTLOC = ""
-
-        this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
-
-        try {          
-          const reqArrivalDeparture = {
-            action: "TripArrivalDepartureUpdate",
-            reqBody: {
-              cid: this.companyCode,
-              EventType: 'A',
-              loc: this.currentBranch,
-              tripId: this.MarkArrivalTableForm.value?.TripID
-            }
-          } 
-          this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-        } catch (error) {
-          console.log("Error in pushToCTCommon", error);
-        }
-
-      }
-      else {
-        tripDetails.cLOC = this.storage.branch,
-        tripDetails.nXTLOC = next || ""
-      }
+      };      
     }
-    if (stCode == 5 || stCode == 6) {      
-      try {
-        const reqArrivalDeparture = {
-          action: "TripArrivalDepartureUpdate",
-          reqBody: {
-            cid: this.companyCode,
-            EventType: 'A',
-            loc: this.currentBranch,
-            tripId: this.MarkArrivalTableForm.value?.TripID
-          }
-        }
-        
-        this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-      } catch (error) {
-        console.log("Error in pushToCTCommon", error);
-      }
-    }
+    
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_Route_Schedule",
@@ -251,10 +213,36 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
+          
+          try {
+            if (!next) {            
+              this.thcCostUpdateService.updateTHCCostForDockets(this.Request);            
+            }          
+          } catch (error) {
+            console.log("Error in updateTHCCostForDockets", error);
+          }
+
+          try {
+            const reqArrivalDeparture = {
+              action: "TripArrivalDepartureUpdate",
+              reqBody: {
+                cid: this.companyCode,
+                EventType: 'A',
+                loc: this.currentBranch,
+                tripId: this.MarkArrivalTableForm.value?.TripID
+              }
+            }
+            
+            this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+          } catch (error) {
+            console.log("Error in pushToCTCommon", error);
+          }
+
           if (stCode == 7) {
             //this.getDocketTripWise(tripId);
             // Call the vehicleStatusUpdate function here
             const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
+
             Swal.fire({
               icon: "info",
               title: "Trip is close",

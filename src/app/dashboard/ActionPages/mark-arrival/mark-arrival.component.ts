@@ -175,33 +175,41 @@ export class MarkArrivalComponent implements OnInit {
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
 
-    let tripStatus, tripDetails, stCode, stName;
+    let tripStatus, tripDetails = {
+      vEHNO: "",
+      tHC: "",
+      cLOC: "",
+      nXTLOC: "",
+      sTS: null,
+      sTSNM: "",
+      cTM: null
+    }, stCode, stName;
     if (!next) {
-      tripDetails.vEHNO = "",
-      tripDetails.tHC = "",
-      tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
-      tripDetails.nXTLOC = ""
+      tripDetails['vEHNO'] = "";
+      tripDetails['tHC'] = "";
+      tripDetails['cLOC'] = this.MarkArrivalTable.Route.split(":")[1].split("-")[0];
+      tripDetails['nXTLOC'] = "";
     }
     if (dktStatus === "dktAvail") {
       stCode = 5,
-      stName = "Vehicle Arrived"
-      tripDetails = {
-        sTS: stCode,
-        sTSNM: stName
-      };
+        stName = "Vehicle Arrived"
+      tripDetails.sTS = stCode;
+      tripDetails.sTSNM = stName;
     }
     else if (dktStatus === "noDkt") {
       tripStatus = next ? "Update Trip" : "close";
       stCode = next ? 6 : 7,
-      stName = "Arrived"
+        stName = "Arrived"
 
-      tripDetails = {
-        sTS: stCode,
-        sTSNM: stName,
-        ...(next ? {} : { cTM: new Date() })
-      };      
+      tripDetails.sTS = stCode;
+      tripDetails.sTSNM = stName;
+
+
+      if (next) {
+        tripDetails.cTM = new Date()
+      }
     }
-    
+
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_Route_Schedule",
@@ -213,11 +221,11 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
-          
+
           try {
-            if (!next) {            
-              this.thcCostUpdateService.updateTHCCostForDockets(this.Request);            
-            }          
+            if (!next) {
+              this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+            }
           } catch (error) {
             console.log("Error in updateTHCCostForDockets", error);
           }
@@ -232,7 +240,7 @@ export class MarkArrivalComponent implements OnInit {
                 tripId: this.MarkArrivalTableForm.value?.TripID
               }
             }
-            
+
             this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
           } catch (error) {
             console.log("Error in pushToCTCommon", error);

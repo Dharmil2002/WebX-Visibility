@@ -272,7 +272,7 @@ export class ThcCostUpdateService {
                 docType: "VR",
                 branch: RequestData.OriginBranch,
                 finYear: financialYear,
-                accLocation: THCInfo.lOC,
+                accLocation: this.storage.branch, //THCInfo.lOC,
                 preperedFor: "Vendor",
                 partyCode: THCInfo.vND.cD,
                 partyName: THCInfo.vND.nM,
@@ -395,10 +395,10 @@ export class ThcCostUpdateService {
             narration: `when THC No ${THCNo} Is Arrived`
         });
         const Result = [];
-        Result.push(createVoucher(ledgerInfo['Inter branch control'].LeadgerCode,
-            ledgerInfo['Inter branch control'].LeadgerName, ledgerInfo['Inter branch control'].LeadgerCategory, 0, ChargeCost, THCNo));
-        Result.push(createVoucher(ledgerInfo['Transport Expense'].LeadgerCode,
-            ledgerInfo['Transport Expense'].LeadgerName, ledgerInfo['Transport Expense'].LeadgerCategory, ChargeCost, 0, THCNo));
+        Result.push(createVoucher(ledgerInfo['EXP001024'].LeadgerCode,
+            ledgerInfo['EXP001024'].LeadgerName, ledgerInfo['EXP001024'].LeadgerCategory, 0, ChargeCost, THCNo));
+        Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode,
+            ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, ChargeCost, 0, THCNo));
 
         return Result;
     }

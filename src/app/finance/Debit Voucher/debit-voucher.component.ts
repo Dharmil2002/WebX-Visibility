@@ -109,7 +109,7 @@ export class DebitVoucherComponent implements OnInit {
     private objImageHandling: ImageHandling,
     private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
-    
+
   ) {
     this.companyCode = this.storage.companyCode;
     // this.imageData = {
@@ -652,14 +652,14 @@ export class DebitVoucherComponent implements OnInit {
 
       var RoundOffList = {
         "Instance": "debit voucher",
-        "Value": ledgerInfo['Round off Amount'].LeadgerName,
-        "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
-        "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
+        "Value": ledgerInfo['EXP001042'].LeadgerName,
+        "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
+        "Ledgername": ledgerInfo['EXP001042'].LeadgerName,
         "SubLedger": "EXPENSE",
         "Dr": isAmountNegative ? "" : Amount.toFixed(2),
         "Cr": isAmountNegative ? (-Amount).toFixed(2) : "",
         "Location": Accountinglocation,
-        "Narration": ledgerInfo['Round off Amount'].LeadgerName,
+        "Narration": ledgerInfo['EXP001042'].LeadgerName,
       };
 
       FinalListOfDebitVoucher.push(RoundOffList)

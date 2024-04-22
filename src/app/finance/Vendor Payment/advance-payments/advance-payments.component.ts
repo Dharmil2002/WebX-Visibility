@@ -903,7 +903,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
     const Result = [];
 
-    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
 
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {
@@ -969,13 +969,13 @@ export class AdvancePaymentsComponent implements OnInit {
     });
 
     if (OtherChargePositiveAmt != 0) {
-      Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, OtherChargePositiveAmt, 0, SelectedData.THC));
+      Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, OtherChargePositiveAmt, 0, SelectedData.THC));
     }
     if (OtherChargeNegativeAmt != 0) {
-      Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, 0, OtherChargeNegativeAmt, SelectedData.THC));
+      Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, 0, OtherChargeNegativeAmt, SelectedData.THC));
     }
-    Result.push(createVoucher(ledgerInfo['Contract Charges'].LeadgerCode, ledgerInfo['Contract Charges'].LeadgerName, ledgerInfo['Contract Charges'].LeadgerCategory, parseFloat(SelectedData.THCContraAmount), 0, SelectedData.THC));
-    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, 0, parseFloat(SelectedData.THCamount), SelectedData.THC));
+    Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode, ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, parseFloat(SelectedData.THCContraAmount), 0, SelectedData.THC));
+    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, 0, parseFloat(SelectedData.THCamount), SelectedData.THC));
     return Result;
   }
 }

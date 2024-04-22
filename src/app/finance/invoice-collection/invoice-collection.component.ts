@@ -551,7 +551,7 @@ export class InvoiceCollectionComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, 0, NetPayable),
+      createVoucher(ledgerInfo['AST002002'].LeadgerCode, ledgerInfo['AST002002'].LeadgerName, ledgerInfo['AST002002'].LeadgerCategory, 0, NetPayable),
     ];
 
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
@@ -568,8 +568,8 @@ export class InvoiceCollectionComponent implements OnInit {
     if (PaymentAmount != NetPayable) {
       const Amount = NetPayable - PaymentAmount;
       const isAmountNegative = Amount < 0;
-      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName,
-        ledgerInfo['Unbilled debtors'].LeadgerCategory, isAmountNegative ? 0 : Amount.toFixed(2), isAmountNegative ? (-Amount).toFixed(2) : 0));
+      response.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName,
+        ledgerInfo['AST001001'].LeadgerCategory, isAmountNegative ? 0 : Amount.toFixed(2), isAmountNegative ? (-Amount).toFixed(2) : 0));
 
     }
 

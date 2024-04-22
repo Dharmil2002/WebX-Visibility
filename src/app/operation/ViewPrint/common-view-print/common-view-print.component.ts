@@ -15,6 +15,7 @@ export class CommonViewPrintComponent implements OnInit {
   companyCode = 0;
   JsonData;
   templateBody: any;
+  
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,

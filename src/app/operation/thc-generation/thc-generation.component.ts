@@ -1920,7 +1920,7 @@ export class ThcGenerationComponent implements OnInit {
           invoiceList.push(invoice);
         }
       });
-    
+
     }
     if (!this.isView && delCharge && delCharge.length > 0) {
       delCharge.forEach((element, index) => {
@@ -2224,7 +2224,11 @@ export class ThcGenerationComponent implements OnInit {
           }
         }
         this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-        this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+
+        //if arrived at destination than update thc cost
+        if (isArrivedDel) {
+          this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+        }
         this.goBack("THC");
       }
     } else {

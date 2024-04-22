@@ -908,7 +908,7 @@ export class AdvancePaymentsComponent implements OnInit {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;
-      Result.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, parseFloat(SelectedData.Advance), SelectedData.THC));
+      Result.push(createVoucher(CashAccount.aCCD, CashAccount.aCNM, "ASSET", 0, parseFloat(SelectedData.Advance), SelectedData.THC));
     }
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;

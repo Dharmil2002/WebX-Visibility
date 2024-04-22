@@ -270,7 +270,7 @@ export class ThcCostUpdateService {
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 transDate: new Date(),
                 docType: "VR",
-                branch: this.storage.branch,
+                branch: RequestData.OriginBranch,
                 finYear: financialYear,
                 accLocation: THCInfo.lOC,
                 preperedFor: "Vendor",
@@ -304,12 +304,12 @@ export class ThcCostUpdateService {
                 accountCode: "",
                 date: "",
                 scanSupportingDocument: "",
-                transactionNumber: THCInfo.tHC,
+                transactionNumber: THCInfo.docNo,
             }
         };
 
         // Retrieve voucher line items
-        const voucherlineItems = this.GetJournalVoucherLedgers(RequestData.ChargeCost, THCInfo.tHC);
+        const voucherlineItems = this.GetJournalVoucherLedgers(RequestData.ChargeCost, THCInfo.docNo, RequestData.OriginBranch);
         voucherRequest.details = voucherlineItems;
 
         // Create and return an observable representing the HTTP request
@@ -326,14 +326,14 @@ export class ThcCostUpdateService {
                     voucherNo: res?.data?.mainData?.ops[0].vNO,
                     transDate: Date(),
                     finYear: financialYear,
-                    branch: this.storage.branch,
+                    branch: RequestData.OriginBranch,
                     transCode: VoucherInstanceType.THCArrival,
                     transType: VoucherInstanceType[VoucherInstanceType.THCArrival],
                     voucherCode: VoucherType.JournalVoucher,
                     voucherType: VoucherType[VoucherType.JournalVoucher],
                     docType: "Voucher",
                     partyType: "Vendor",
-                    docNo: THCInfo.tHC,
+                    docNo: THCInfo.docNo,
                     partyCode: "" + THCInfo.vND.cD || "",
                     partyName: THCInfo.vND.nM || "",
                     entryBy: this.storage.userName,
@@ -369,7 +369,7 @@ export class ThcCostUpdateService {
         );
     }
 
-    GetJournalVoucherLedgers(ChargeCost, THCNo) {
+    GetJournalVoucherLedgers(ChargeCost, THCNo, branch = undefined) {
 
         const createVoucher = (accCode, accName, accCategory, debit, credit, THCNo) => ({
             companyCode: this.storage.companyCode,
@@ -380,7 +380,7 @@ export class ThcCostUpdateService {
             voucherType: VoucherType[VoucherType.JournalVoucher],
             transDate: new Date(),
             finYear: financialYear,
-            branch: this.storage.branch,
+            branch: branch || this.storage.branch,
             accCode,
             accName,
             accCategory,

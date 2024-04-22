@@ -50,7 +50,7 @@ export class MarkArrivalComponent implements OnInit {
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<GenericTableComponent>,
-    private tripService:ThcService,
+    private tripService: ThcService,
     public dialog: MatDialog,
     private storage: StorageService,
     private generalService: GeneralService,
@@ -229,7 +229,6 @@ export class MarkArrivalComponent implements OnInit {
         }
       }
       this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-      this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
     }
     const reqBody = {
       "companyCode": this.companyCode,

@@ -137,13 +137,22 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   ) {
     super();
     this.DocCalledAs = controlPanel.DocCalledAs;
-    const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
-    this.model.docketDetail = new DocketDetail({});
+    this.breadscrums = [
+      {
+        title: `${this.DocCalledAs.Docket} Entry`,
+        items: ["Operation"],
+        active: `${this.DocCalledAs.Docket} Entry`
+      },
+    ];
+
+    const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;    
     if (navigationState != null) {
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
-        navigationState.actions[0] === "Edit Docket";
+        navigationState.actions[0] === `Edit ${this.DocCalledAs.Docket}`;
+
       if (this.isUpdate) {
+        this.model.docketDetail = navigationState;
         this.breadscrums = [
           {
             title: `${this.DocCalledAs.Docket} Edit`,
@@ -153,6 +162,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         ];
         this.ewayBill = false;
       } else {
+        this.model.docketDetail = new DocketDetail({});
         this.model.prqData = navigationState;
         this.prqFlag = true;
         this.ewayBill = false;
@@ -165,6 +175,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         ];
       }
     }
+    else 
+      this.model.docketDetail = new DocketDetail({});
+    
     this.initializeFormControl();
   }
 
@@ -179,17 +192,21 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
   /*Here the function which is used for the bind staticDropdown Value*/
   async getGeneralmasterData() {
-    this.packagingTypes = await this.generalService.getGeneralMasterData("PKGS");
-    this.paymentBases = await this.generalService.getGeneralMasterData("PAYTYP");
-    this.movementTypes = await this.generalService.getGeneralMasterData("MOVTYP");
-    this.vendorTypes = await this.generalService.getGeneralMasterData("VENDTYPE");
-    this.deliveryTypes = await this.generalService.getGeneralMasterData("DELTYP");
-    this.rateTypes = await this.generalService.getGeneralMasterData("RTTYP");
-    this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
-    this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
+
+    const gmData = await this.generalService.getGeneralMasterData(["PKGS","PAYTYP","MOVTYP","VENDTYPE","DELTYP","RTTYP","WTUNIT","RISKTYP","PROD"]);
+
+    this.packagingTypes = gmData.filter((x) => x.type == "PKGS");
+    this.paymentBases = gmData.filter((x) => x.type == "PAYTYP");
+    this.movementTypes = gmData.filter((x) => x.type == "MOVTYP");
+    this.vendorTypes = gmData.filter((x) => x.type == "VENDTYPE");
+    this.deliveryTypes = gmData.filter((x) => x.type == "DELTYP");
+    this.rateTypes = gmData.filter((x) => x.type == "RTTYP");
+    this.wtUnits = gmData.filter((x) => x.type == "WTUNIT");
+    this.riskTypes = gmData.filter((x) => x.type == "RISKTYP");
     // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
-    this.matrials = await this.generalService.getGeneralMasterData("PROD");
+    this.matrials = gmData.filter((x) => x.type == "PROD");
+
     // Find the form control with the name 'packaging_type'
     this.setGeneralMasterData(this.model.allformControl, this.packagingTypes, "packaging_type");
     this.setGeneralMasterData(this.model.allformControl, this.paymentBases, "payType");
@@ -217,9 +234,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /* End*/
   //#region initializeFormControl
   async initializeFormControl() {
-    const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail)
+    const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail);   
+
     // Create LocationFormControls instance to get form controls for different sections
-    this.model.ConsignmentFormControls = new ConsignmentControl(docketDetails);
+    this.model.ConsignmentFormControls = new ConsignmentControl(docketDetails, this.DocCalledAs);
     this.model.FreightFromControl = new FreightControl(docketDetails);
 
     // Get form controls for Driver Details section
@@ -272,7 +290,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         value: this.model.prqData?.prqNo,
       });
     }
-    this.getRules();
+    if(!this.isUpdate) {
+      this.getRules();
+    }
   }
   //#endregion
   getContainerType(event) {
@@ -391,9 +411,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     callback();
   }
   async bindDataFromDropdown() {
-
-    const locDetails = await this.locationService.locationFromApi({ locCode: this.storage.branch });
-    if (!locDetails.length || locDetails[0].locLevel == 1) {
+    debugger;
+    const locDetails = this.storage.getItemObject<any>(StoreKeys.WorkingLoc);
+    if (!locDetails || locDetails?.locLevel == 1) {
       Swal.fire({
         icon: 'info', // Change the icon to 'info' for an informational message
         title: 'Information', // Update the title to reflect the nature of the message
@@ -403,10 +423,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         showConfirmButton: true, // Set to true to show a confirm button
         confirmButtonText: 'OK' // You can customize the text of the confirm button
       });
-      this.navService.navigateTotab(
-        "docket",
-        "dashboard/Index"
-      );
+      this.navService.navigateTotab("docket","dashboard/Index");
       return false;
     }
     const vehicleList = await getVehicleStatusFromApi(

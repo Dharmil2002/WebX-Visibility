@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
-import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { StorageService } from 'src/app/core/service/storage.service';
-import { ViewPrintControl } from 'src/assets/FormControls/view-print';
-import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import Swal from 'sweetalert2';
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
+import { ViewPrintControl } from "src/assets/FormControls/view-print";
+import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import Swal from "sweetalert2";
 @Component({
-  selector: 'app-view-print',
-  templateUrl: './view-print.component.html'
+  selector: "app-view-print",
+  templateUrl: "./view-print.component.html",
 })
 export class ViewPrintComponent implements OnInit {
   breadScrums = [
@@ -31,20 +31,21 @@ export class ViewPrintComponent implements OnInit {
     private generalService: GeneralService,
     private filter: FilterUtils,
     private storage: StorageService,
-    private masterServices: MasterService,
+    private masterServices: MasterService
   ) {
     this.initializeFormControl();
   }
 
   ngOnInit(): void {
-    this.getDropDownList()
+    this.getDropDownList();
   }
 
   initializeFormControl() {
     this.viewprintFormControls = new ViewPrintControl();
-    this.jsonControlViewArray = this.viewprintFormControls.getFormControlsView();
-    this.jsonControlViewArray.forEach(data => {
-      if (data.name === 'vIEWTYPE') {
+    this.jsonControlViewArray =
+      this.viewprintFormControls.getFormControlsView();
+    this.jsonControlViewArray.forEach((data) => {
+      if (data.name === "vIEWTYPE") {
         this.viewName = data.name;
         this.viewStatus = data.additionalData.showNameAndValue;
       }
@@ -57,7 +58,13 @@ export class ViewPrintComponent implements OnInit {
     // Resetting the value of the 'dOCNO' control to an empty string
     this.viewTableForm.controls.dOCNO.setValue("");
     // Retrieving view types from the 'General_master' collection
-    const viewType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "View Print" }, "codeDesc", "_id");
+    const viewType: AutoComplateCommon[] =
+      await this.generalService.getDataForMultiAutoComplete(
+        "General_master",
+        { codeType: "View Print" },
+        "codeDesc",
+        "_id"
+      );
     // Filtering the data and updating the viewTableForm
     this.filter.Filter(
       this.jsonControlViewArray,
@@ -77,7 +84,6 @@ export class ViewPrintComponent implements OnInit {
   //   window.open(url, '', 'width=1000,height=800');
   // }
   async save() {
-    
     // Function to display error message
     const showError = (errorMessage) => {
       Swal.fire({
@@ -107,42 +113,84 @@ export class ViewPrintComponent implements OnInit {
     const BillingViewArray = [
       {
         name: "Dabour View-Print",
-        partyCode:"CUST00014",
-        viewName:"CustomerBill"
+        partyCode: "CUST00014",
+        viewName: "CustomerBill",
       },
       {
         name: "Godrej View-Print",
-        partyCode:"CONSRAJT23",
-        viewName:"CustomerBill"
+        partyCode: "CONSRAJT23",
+        viewName: "CustomerBill",
       },
       {
         name: "Adani View-Print",
-        partyCode:"CUST00018",
-        viewName:"CustomerBill"
+        partyCode: "CUST00018",
+        viewName: "CustomerBill",
       },
       {
         name: "AsianPaint View-Print",
-        partyCode:"CONSRAJT22",
-        viewName:"CustomerBill"
+        partyCode: "CONSRAJT22",
+        viewName: "CustomerBill",
       },
       {
         name: "Polycab View-Print",
-        partyCode:"CONSRAJT20",
-        viewName:"CustomerBill"
+        partyCode: "CONSRAJT20",
+        viewName: "CustomerBill",
       },
+      {
+        name: "Docket View-Print",
+        partyCode: "CONSRAJT58",
+        viewName: "Docket",
+      },
+      {
+        name: "Job View-Print",
+        partyCode: "CONSRAJT25",
+        viewName: "job",
+      },
+      {
+        name: "PRQ View-Print",
+        partyCode: "CONSRAJT25",
+        viewName: "prq",
+      },
+      {
+        name: "THC View-Print",
+        partyCode: "CONSRAJ19",
+        viewName: "thc",
+      },
+      {
+        name: "LoadingSheet View-Print",
+        partyCode: "CONSRAJT26",
+        viewName: "loadingSheet",
+      },
+      {
+        name: "Manifest View-Print",
+        partyCode: "CONSRAJT27",
+        viewName: "Manifest",
+      },
+      {
+        name: "DocketJC View-Print",
+        partyCode:"CONSRAJT24",
+        viewName:"Docket"
+      },
+      {
+        name: "MR View-Print",
+        partyCode:"CUST00028",
+        viewName:"DeliveryMr"
+      }
     ];
-    const FindBillView = BillingViewArray.find((x) => x.name == viewType.name)
+    const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {
       templateName: FindBillView?.viewName || viewType.name,
       partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
-    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
-    window.open(url, '', 'width=1000,height=800');
+    const url = `${
+      window.location.origin
+    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, "", "width=1300,height=800");
   }
 
   functionCallHandler($event) {
-    let functionName = $event.functionName;     // name of the function , we have to call
+    let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);

@@ -43,6 +43,30 @@ export class MRRegister {
                 generatecontrol: true, disable: false
             },
             {
+                name: 'division',
+                label: 'Select Division',
+                placeholder: 'Select Division',
+                type: "dropdown",
+                value: [],
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    }
+                ],
+                additionalData: {
+                    showNameAndValue: false,
+                },
+
+                generatecontrol: true, disable: false
+            },
+            {
                 name: 'MRType',
                 label: 'Select MR Type',
                 placeholder: '',
@@ -77,6 +101,76 @@ export class MRRegister {
                     onToggleAll: "toggleSelectAll",
                 },
                 generatecontrol: true, disable: false
+            },
+            {
+                name: '',
+                label: "",
+                placeholder: "",
+                type: '',
+                value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            {
+                name: '',
+                label: "",
+                placeholder: "",
+                type: '',
+                value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            {
+                name: 'OR',
+                label: "",
+                placeholder: "",
+                type: 'OR',
+                value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            {
+                name: '',
+                label: "",
+                placeholder: "",
+                type: '',
+                value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            {
+                name: 'MRNO',
+                label: "MR. NO.",
+                placeholder: "Please Enter MR. NO. comma(,) separated",
+                type: 'text',
+                value: [],
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            // {
+            //     name: 'OR',
+            //     label: "",
+            //     placeholder: "",
+            //     type: 'OR',
+            //     value: '',
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: []
+            // },
+            {
+                name: 'Cnote',
+                label: "Cnote No.",
+                placeholder: "Please Enter Cnote Number comma(,) separated",
+                type: 'text',
+                value: [],
+                generatecontrol: true,
+                disable: false,
+                Validations: []
             },
             {
                 name: 'custnmcdHandler',

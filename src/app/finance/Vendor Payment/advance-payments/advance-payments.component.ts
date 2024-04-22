@@ -903,7 +903,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
     const Result = [];
 
-    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+    Result.push(createVoucher(ledgerInfo['EXP001024'].LeadgerCode, ledgerInfo['EXP001024'].LeadgerName, ledgerInfo['EXP001024'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
 
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {

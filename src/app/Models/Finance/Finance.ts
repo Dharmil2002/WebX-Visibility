@@ -127,7 +127,7 @@ export enum VoucherInstanceType {
 export const ledgerInfo = {
   "LIA002004": {
     "LeadgerCode": "LIA002004",
-    "LeadgerName": "IGST payable",//GetLeadgerDeatilfromAPI("LIA002004"),
+    "LeadgerName": "IGST payable",
     "LeadgerCategory": "LIABILITY"
   },
   "LIA002002": {
@@ -167,7 +167,7 @@ export const ledgerInfo = {
   },
   "EXP001003": {
     "LeadgerCode": "EXP001003",
-    "LeadgerName": "Contract Charges",
+    "LeadgerName": "Transport Expense",
     "LeadgerCategory": "EXPENSE"
   },
   "EXP001009": {
@@ -201,22 +201,26 @@ export const ledgerInfo = {
 
 };
 
-async function GetLeadgerDeatilfromAPI(data: string) {
-  // Call API and get Data Of Account Master
+async function GetLedgerDetailFromAPI(data: string): Promise<any[] | null> {
   try {
     const masterService = new MasterService(new HttpClient(null));
-    debugger
     const companyCode = Storage.getItem(StoreKeys.CompanyCode);
+
     const filter = {
       aCCD: data,
     };
+
     const req = { companyCode, collectionName: 'account_detail', filter };
     const res = await masterService.masterPost('generic/get', req).toPromise();
+
     if (res && res.data) {
-      return res.data.map(x => ({
-        name: x.aCNM, value: x.aCCD, ...x
+      return res.data.map((x: any) => ({
+        name: x.aCNM,
+        value: x.aCCD,
+        ...x,
       }));
     }
+
     console.log('Data fetched from API:', res.data);
     return res.data;
   } catch (error) {

@@ -37,6 +37,7 @@ import { VendorsVehicleDetailComponent } from "../Modal/vendors-vehicle-detail/v
 import { BeneficiaryDetailComponent } from "../../Vendor Bills/beneficiary-detail/beneficiary-detail.component";
 import { catchError, concatMap, filter, finalize, mergeMap, switchMap } from 'rxjs/operators';
 import { GetBankDetailFromApi } from "../../Debit Voucher/debitvoucherAPIUtitlity";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 @Component({
   selector: "app-advance-payments",
   templateUrl: "./advance-payments.component.html",
@@ -133,6 +134,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
+  isInterBranchControl = false;
   constructor(
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -143,6 +145,7 @@ export class AdvancePaymentsComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private matDialog: MatDialog,
     private storage: StorageService,
+    private controlPanel: ControlPanelService,
   ) {
     // Retrieve the passed data from the state
     this.companyCode = this.storage.companyCode;
@@ -156,7 +159,7 @@ export class AdvancePaymentsComponent implements OnInit {
   RedirectToTHCPayment() {
     this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
   }
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.initializeFormControl();
     this.TotalAmountList = [
       {
@@ -172,6 +175,16 @@ export class AdvancePaymentsComponent implements OnInit {
     ];
     this.GetVendorInformation();
     this.SetMastersData();
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "THC",
+      aCTIVE: true,
+      rULEID: { D$in: ["THCIBC"] }
+    }
+    const res: any = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC").vAL
+    }
   }
   async GetVendorInformation() {
     this.VendorDetails = await GetSingleVendorDetailsFromApi(
@@ -903,8 +916,12 @@ export class AdvancePaymentsComponent implements OnInit {
 
     const Result = [];
 
-    Result.push(createVoucher(ledgerInfo['EXP001024'].LeadgerCode, ledgerInfo['EXP001024'].LeadgerName, ledgerInfo['EXP001024'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
-
+    if (this.isInterBranchControl) {
+      Result.push(createVoucher(ledgerInfo['EXP001024'].LeadgerCode, ledgerInfo['EXP001024'].LeadgerName, ledgerInfo['EXP001024'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+    }
+    else {
+      Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+    }
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;

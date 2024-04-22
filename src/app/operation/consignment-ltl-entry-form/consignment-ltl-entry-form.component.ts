@@ -1097,37 +1097,41 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const height = parseFloat(this.invoiceForm.controls['height']?.value || 0.00);
       const pkg = parseInt(this.invoiceForm.controls['noOfPackage']?.value || 0.00);
       const cftRatio = parseFloat(this.invoiceForm.controls['cftRatio']?.value || 0.00);
-      const cubWt = (
-        convert(length).from('cm').to('ft') *
-        convert(breadth).from('cm').to('ft') *
-        convert(height).from('cm').to('ft') *
-        pkg *
-        cftRatio)
-      this.invoiceForm.controls['cubWT']?.setValue(cubWt.toFixed(2));
+      const pkGcft = convert(length).from('cm').to('ft') *
+                     convert(breadth).from('cm').to('ft') *
+                     convert(height).from('cm').to('ft') ;
+
+      let volWt = 0;
+      this.invoiceForm.controls['cubWT']?.setValue(volWt.toFixed(2));
       let cft = 0;
       let chargeWeight = 0;
       switch (this.unitsName) {
         case "CM":
-          cft = length * breadth * height * pkg * cftRatio;
-          chargeWeight = cftRatio * cft
+          //cft = length * breadth * height * pkg / 27000
+          cft = convert(length).from('cm').to('ft') *
+                      convert(breadth).from('cm').to('ft') *
+                      convert(height).from('cm').to('ft') * pkg;
+          volWt = cft * cftRatio;
           this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
           break
         case "Inches":
-          cft = length * breadth * height * pkg / 1728
-          chargeWeight = cftRatio * cft
+          //cft = length * breadth * height * pkg / 1728
+          cft = convert(length).from('in').to('ft') *
+                      convert(breadth).from('in').to('ft') *
+                      convert(height).from('in').to('ft') * pkg;
+          volWt = cft * cftRatio;
+
           this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
           break
         default:
-          cft = length * breadth * height * pkg * cftRatio
-          chargeWeight = cftRatio * cft
+          cft = length * breadth * height * pkg 
+          volWt = cftRatio * cft
           this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
           break;
-
       }
-      const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value);
-      const totolCharge = cft * cubWt
-      if (totolCharge > actualWeight) {
-        this.invoiceForm.controls['chargeWeight'].setValue(totolCharge.toFixed(2))
+      const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value);      
+      if (volWt > actualWeight) {
+        this.invoiceForm.controls['chargeWeight'].setValue(volWt.toFixed(2))
       }
       else {
         this.invoiceForm.controls['chargeWeight'].setValue(actualWeight.toFixed(2))
@@ -1306,7 +1310,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.mseq = this.rules.find(x => x.rULEID == "MSEQ" && x.aCTIVE)?.vAL == "Y";
     this.unitsName=this.rules.find(x => x.rULEID == "UNITS" && x.aCTIVE)?.vAL;
     this.cftRation=this.rules.find(x => x.rULEID == "CFTRATION" && x.aCTIVE)?.vAL;
-    this.isScan=this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
+    this.isScan = true; //Generate Package Number even if scan is not active
+    //this.isScan = this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL || "Y" == "Y";
+    
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {

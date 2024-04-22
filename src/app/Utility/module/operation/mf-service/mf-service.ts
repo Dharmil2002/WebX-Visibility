@@ -113,47 +113,27 @@ export class ManifestService {
     }
     async mapFieldsWithoutScanning(details, header, formField,isScan,notSelectedData) {
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
-        const mfHeader = {
-            "_id": "",
-            "cID": this.storage.companyCode,
-            "mFDT": new Date(),
-            "oRGN": formField.Leg?.split("-")[0].trim() || "",
-            "dEST": formField.Leg?.split("-")[1].trim() || "",
-            "rUTCD": formField.route.split(":")[0].trim() || "",
-            "rUTNM": formField.route.split(":")[1].trim() || "",
-            "leg": formField?.Leg || 0,
-            "dKTS": formField?.Shipments || 0,
-            "pKGS": parseInt(formField?.Packages) || 0,
-            "wT": ConvertToNumber(header[0]?.WeightKg || 0, 3) || 0,
-            "vOL": ConvertToNumber(header[0]?.VolumeCFT || 0, 3) || 0,
-            "tHC": formField?.tripId || 0,
-            "iSARR": false,
-            "eNTDT": new Date(),
-            "eNTLOC": this.storage.branch,
-            "eNTBY": this.storage.userName,
-            "docNo": ""
-        }
-
+       
         //collectionName:"mf_details_ltl"
         const envData = [];
-        const mfDetails = details.map((element, index) => {
+        const mfDetails = details.map((d) => {
             try {
                 const mfJson = {
                     "_id": "",
                     "cID": this.storage.companyCode,
                     "mFNO": "",
-                    "dKTNO": element?.Shipment || "",
-                    "sFX": element?.Suffix || 0,
-                    "oRGN": element?.Origin || "",
-                    "dEST": element?.Destination || "",
-                    "pKGS": parseInt(element?.Packages) || 0,
-                    "vOL": ConvertToNumber(element?.cft, 3) || 0,
-                    "wT": ConvertToNumber(element?.weight, 3) || 0,
-                    "cWT": ConvertToNumber(element?.cWeight, 3) || 0,
-                    "lDPKG": ConvertToNumber(element?.loaded, 3) || 0,
-                    "lDVOL": ConvertToNumber(element?.cft, 3) || 0,
-                    "lDWT": ConvertToNumber(element?.weight, 3) || 0,
-                    "lDCWT": ConvertToNumber(element?.weight, 3) || 0,
+                    "dKTNO": d?.Shipment || "",
+                    "sFX": d?.Suffix || 0,
+                    "oRGN": d?.Origin || "",
+                    "dEST": d?.Destination || "",
+                    "pKGS": parseInt(d?.Packages) || 0,
+                    "vOL": ConvertToNumber(d?.cft, 3) || 0,
+                    "wT": ConvertToNumber(d?.weight, 3) || 0,
+                    "cWT": ConvertToNumber(d?.cWeight, 3) || 0,
+                    "lDPKG": ConvertToNumber(d?.loadedPkg, 3) || 0,
+                    "lDVOL": ConvertToNumber(d?.cft, 3) || 0,
+                    "lDWT": ConvertToNumber(d?.loadedWT, 3) || 0,
+                    "lDCWT": ConvertToNumber(d?.loadedCWT, 3) || 0,
                     "iSARR": false,
                     "eNTDT": new Date(),
                     "eNTLOC": this.storage.branch,
@@ -162,8 +142,8 @@ export class ManifestService {
                 let evnJson = {
                     _id: ``,
                     cID: this.storage.companyCode,
-                    dKTNO: element?.Shipment || "",
-                    sFX: element?.Suffix || 0,
+                    dKTNO: d?.Shipment || "",
+                    sFX: d?.Suffix || 0,
                     lOC: this.storage.branch,
                     eVNID: DocketEvents.Menifest_Generation,
                     eVNDES: getEnumName(DocketEvents, DocketEvents.Menifest_Generation)?.replace(/_/g, " "),
@@ -185,38 +165,40 @@ export class ManifestService {
             }
         });
         const filteredMfDetails = mfDetails.filter(detail => detail !== null);
-        const sfxDockets = details.filter((x) => x.pendPkg != 0 && x.pendWt != 0);
+        const sfxDockets = details.filter((x) => x.pendPkg > 0);
+        
         let sfxDocketsData = []
         let isSuffex = false;
         const sfxEnvData = [];
         if (sfxDockets.length > 0) {
-            sfxDocketsData = sfxDockets.map(docket => {
+            sfxDocketsData = sfxDockets.map((d) => {
+
                 // Parsing and incrementing the suffix safely
-                const nextSuffix = Number(docket.Suffix) + 1;
+                const nextSuffix = Number(d.Suffix) + 1;
                 if (isNaN(nextSuffix)) {
-                    throw new Error("Invalid Suffix value: " + docket.Suffix);
+                    throw new Error("Invalid Suffix value: " + d.Suffix);
                 }
 
                 // Generating a timestamp with moment.js for consistent formatting
-                const currentTime = moment().tz('Asia/Kolkata').format("DD MMM YYYY @ hh:mm A");
+                const currentTime = moment().tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A");
                 const entryTimestamp = new Date();
 
                 // Constructing the new docket JSON object
                 const newDocket = {
-                    "_id": `${this.storage.companyCode}-${docket.Shipment}-${nextSuffix}`,
+                    "_id": `${this.storage.companyCode}-${d.Shipment}-${nextSuffix}`,
                     "cID": this.storage.companyCode,
-                    "dKTNO": docket.Shipment,
+                    "dKTNO": d.Shipment,
                     "sFX": nextSuffix,
                     "cLOC": this.storage.branch,
-                    "oRGN": docket.Origin,
-                    "dEST": docket.Destination,
-                    "aCTWT": ConvertToNumber(docket.pendWt, 3),
-                    "cHRWT": ConvertToNumber(docket.pendCwt, 3),
-                    "tOTCWT": ConvertToNumber(docket.pendWt, 3),
-                    "tOTWT": ConvertToNumber(docket.pendWt, 3),
-                    "tOTPKG": parseInt(docket.pendPkg) || 0,
-                    "pKGS": parseInt(docket.pendPkg) || 0,
-                    "cFTTOT": ConvertToNumber(docket.pendCft, 3),
+                    "oRGN": d.Origin,
+                    "dEST": d.Destination,
+                    "aCTWT": ConvertToNumber(d.pendWt, 3),
+                    "cHRWT": ConvertToNumber(d.pendCwt, 3),
+                    "tOTCWT": ConvertToNumber(d.pendWt, 3),
+                    "tOTWT": ConvertToNumber(d.pendWt, 3),
+                    "tOTPKG": parseInt(d.pendPkg) || 0,
+                    "pKGS": parseInt(d.pendPkg) || 0,
+                    "cFTTOT": ConvertToNumber(d.pendCft, 3),
                     "vEHNO": "",
                     "sTS": DocketStatus.Booked,
                     "sTSNM": DocketStatus[DocketStatus.Booked],
@@ -228,17 +210,17 @@ export class ManifestService {
                     "eNTBY": this.storage.userName
                 };
                 let sfxData = {
-                    _id: `${this.storage.companyCode}-${docket.Shipment}-${nextSuffix}-${DocketEvents.Booking}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+                    _id: `${this.storage.companyCode}-${d.Shipment}-${nextSuffix}-${DocketEvents.Booking}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
                     cID: this.storage.companyCode,
-                    dKTNO: docket?.Shipment || "",
-                    sFX: docket?.Suffix || 0,
+                    dKTNO: d?.Shipment || "",
+                    sFX: d?.Suffix || 0,
                     lOC: this.storage.branch,
                     eVNID: DocketEvents.Booking,
                     eVNDES: getEnumName(DocketEvents, DocketEvents.Booking),
                     eVNDT: new Date(),
                     eVNSRC: 'Booking',
                     dOCTY: 'CN',
-                    dOCNO: docket?.Shipment || "",
+                    dOCNO: d?.Shipment || "",
                     sTS: DocketStatus.Booked,
                     sTSNM: DocketStatus[DocketStatus.Booked],
                     oPSSTS: `Booked at ${this.storage.branch} on ${currentTime}`,
@@ -251,6 +233,29 @@ export class ManifestService {
             });
             isSuffex = true;
         }
+
+        
+        const mfHeader = {
+            "_id": "",
+            "cID": this.storage.companyCode,
+            "mFDT": new Date(),
+            "oRGN": formField.Leg?.split("-")[0].trim() || "",
+            "dEST": formField.Leg?.split("-")[1].trim() || "",
+            "rUTCD": formField.route.split(":")[0].trim() || "",
+            "rUTNM": formField.route.split(":")[1].trim() || "",
+            "leg": formField?.Leg || 0,
+            "dKTS": formField?.Shipments || 0,
+            "pKGS": parseInt(formField?.Packages) || 0,
+            "wT": ConvertToNumber(header[0]?.WeightKg || 0, 3) || 0,
+            "vOL": ConvertToNumber(header[0]?.VolumeCFT || 0, 3) || 0,
+            "tHC": formField?.tripId || 0,
+            "iSARR": false,
+            "eNTDT": new Date(),
+            "eNTLOC": this.storage.branch,
+            "eNTBY": this.storage.userName,
+            "docNo": ""
+        }
+
         await this.updateDocketDetails(notSelectedData);
         return { mfHeader, filteredMfDetails, envData, lsNo, sfxDocketsData, isSuffex, sfxEnvData,isScan }
     }

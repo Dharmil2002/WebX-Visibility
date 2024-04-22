@@ -5,10 +5,30 @@ export class ShipmentEditControls {
     constructor() {
         this.shipmentEditControlArray = [
             {
+                name: 'noofPkts',
+                label: 'Package',
+                placeholder: '',
+                type: 'number',
+                value: '',
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Package  is Required"
+                    }
+                ],
+                additionalData: {
+                },
+                functions: {
+                    onChange:"getValidate",
+                },
+                generatecontrol: true,
+                disable: false
+            },
+            {
                 name: 'actualWeight',
                 label: 'Actual Weight(Kg)',
                 placeholder: '',
-                type: 'text',
+                type: 'number',
                 value: '',
                 Validations: [
                     {
@@ -25,7 +45,7 @@ export class ShipmentEditControls {
                 name: 'ctWeight',
                 label: 'Charge Weight(Kg)',
                 placeholder: '',
-                type: 'text',
+                type: 'number',
                 value: '',
                 Validations: [
                     {
@@ -37,27 +57,7 @@ export class ShipmentEditControls {
                     onChange:"getValidate"
                 },
                 generatecontrol: true, disable: false
-            },
-            {
-                name: 'noofPkts',
-                label: 'Package',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Package  is Required"
-                    }
-                ],
-                additionalData: {
-                },
-                functions: {
-                    onChange:"getValidate",
-                },
-                generatecontrol: true,
-                disable: false
-            },
+            },            
             {
                 name: 'shipment',
                 label: '',

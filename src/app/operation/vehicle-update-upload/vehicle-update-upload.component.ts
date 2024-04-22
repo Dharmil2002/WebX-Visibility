@@ -78,13 +78,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
       Style: "min-width:100px;max-width:100px;",
     }
   }
-  shipingStaticHeader = {
-    "Leg": "Leg",
-    "Shipment": "Shipments",
-    "Packages": "Packages",
-    "WeightKg": "Weight Kg",
-    "VolumeCFT": "Volume CFT"
-  }
+  shipingStaticHeader = ["Leg", "Shipment", "Packages", "WeightKg", "VolumeCFT"];
+
   centerShippingData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   shipingHeaderForCsv = {
     "Leg": "Leg",
@@ -176,9 +171,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
     
   }
-  checkDocketRules(){
-    const scan = this.rules.find(x=>x.rULEID=="SCAN" && x.aCTIVE);
-    this.isScan=scan.vAL=="Y"?true:false;
+  checkDocketRules() {    
+    this.isScan=this.rules.find(x=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y" ? true : false;
   }
   
 /*below function is call when the partial */
@@ -229,8 +223,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "cft": parseFloat(element?.vCFT) || 0,
             "loadedPkg": 0,
             "loadedWT": 0,
+            "loadedCWT": 0,
             "pendPkg": 0,
             "pendWt": 0,
+            "pendCWt": 0,
             "Leg": lsDetails?.lEG.replace(" ", "") || '',
             "actions":["Edit"]
           };
@@ -371,16 +367,18 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   shipmentsEdit(event) {
     const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
+    
     const data = this.loadingTableData.find(x => x.Shipment === shipment && x.Suffix === suffix);
     if (data) {
       const loadedPkg = parseInt(noofPkts, 10);
       const loadedWT = parseFloat(actualWeight).toFixed(2);
+      const loadedCWT = parseFloat(ctWeight).toFixed(2);
       const pendPkg = data.Packages - loadedPkg;
-      const pendWt = data.weight - parseFloat(actualWeight);
-      const pendCwt = data.cWeight - parseFloat(ctWeight);
-    
+      const pendWt = (data.weight - parseFloat(actualWeight)).toFixed(2);
+      const pendCWt = (data.cWeight - parseFloat(ctWeight)).toFixed(2);
+      
       // Update the data object directly
-      Object.assign(data, { loadedPkg, loadedWT, pendPkg, pendWt, pendCwt });
+      Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCWt });
     
       this.cdr.detectChanges();
     }
@@ -388,6 +386,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
   
   async CompleteScan() {
     let resMf=""
+    debugger;
+
     if(this.isScan){
     let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
     if(packageChecked){
@@ -403,18 +403,20 @@ export class VehicleUpdateUploadComponent implements OnInit {
        resMf = await this.mfService.createMfDetails(fieldMapping);
     }
     else{
+      
       let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-      if(selectedData.length>0){
+      if(selectedData.length <= 0) 
+      {
         Swal.fire({
           icon: "warning",
           title: "Action Needed",
           text: "Please select at least one option to proceed.",
           showConfirmButton: true,
           confirmButtonText: 'OK'
-        })
-        
+        });        
         return false;
       }
+
       let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
       const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
       resMf = await this.mfService.createMfDetails(fieldMapping);

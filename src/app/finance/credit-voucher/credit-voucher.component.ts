@@ -425,14 +425,14 @@ export class CreditVoucherComponent implements OnInit {
 
       var RoundOffList = {
         "Instance": "Credit voucher",
-        "Value": ledgerInfo['Round off Amount'].LeadgerName,
-        "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
-        "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
+        "Value": ledgerInfo['EXP001042'].LeadgerName,
+        "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
+        "Ledgername": ledgerInfo['EXP001042'].LeadgerName,
         "SubLedger": "EXPENSE",
         "Dr": isAmountNegative ? (-Amount).toFixed(2) : 0,
         "Cr": isAmountNegative ? 0 : Amount.toFixed(2),
         "Location": Accountinglocation,
-        "Narration": ledgerInfo['Round off Amount'].LeadgerName,
+        "Narration": ledgerInfo['EXP001042'].LeadgerName,
       };
 
       FinalListOfCreditVoucher.push(RoundOffList)

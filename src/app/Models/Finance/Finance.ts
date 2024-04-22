@@ -1,3 +1,7 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as Storage from 'src/app/core/service/storage.service';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { HttpClient } from '@angular/common/http';
 export class VoucherRequestModel {
   companyCode: number
   docType: string
@@ -121,90 +125,106 @@ export enum VoucherInstanceType {
 }
 
 export const ledgerInfo = {
-  "IGST": {
+  "LIA002004": {
     "LeadgerCode": "LIA002004",
     "LeadgerName": "IGST payable",
     "LeadgerCategory": "LIABILITY"
   },
-  "UGST": {
+  "LIA002002": {
     "LeadgerCode": "LIA002002",
     "LeadgerName": "UGST payable",
     "LeadgerCategory": "LIABILITY"
   },
-  "SGST": {
+  "LIA002001": {
     "LeadgerCode": "LIA002001",
     "LeadgerName": "SGST payable",
     "LeadgerCategory": "LIABILITY"
   },
-  "CGST": {
+  "LIA002003": {
     "LeadgerCode": "LIA002003",
     "LeadgerName": "CGST payable",
     "LeadgerCategory": "LIABILITY"
   },
-  "Round off Amount": {
+  "EXP001042": {
     "LeadgerCode": "EXP001042",
     "LeadgerName": "Round off Amount",
     "LeadgerCategory": "EXPENSE"
   },
-  "Unbilled debtors": {
+  "AST001001": {
     "LeadgerCode": "AST001001",
     "LeadgerName": "Unbilled debtors",
     "LeadgerCategory": "ASSET"
   },
-  "Freight income": {
+  "INC001003": {
     "LeadgerCode": "INC001003",
     "LeadgerName": "Freight income",
     "LeadgerCategory": "INCOME"
   },
-  "Billed debtors": {
+  "AST002002": {
     "LeadgerCode": "AST002002",
     "LeadgerName": "Billed debtors",
     "LeadgerCategory": "ASSET"
   },
-  "Contract Charges": {
-    "LeadgerCode": "EXP001003",
-    "LeadgerName": "Contract Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Other Charges": {
-    "LeadgerCode": "EXP001009",
-    "LeadgerName": "Other Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Loading Charge": {
-    "LeadgerCode": "EXP001011",
-    "LeadgerName": "Loading Charge",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Unloading Charges": {
-    "LeadgerCode": "EXP001011",
-    "LeadgerName": "Unloading Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Enroute Charges": {
-    "LeadgerCode": "EXP001007",
-    "LeadgerName": "Enroute Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Miscellaneous Charges": {
-    "LeadgerCode": "EXP001009",
-    "LeadgerName": "Miscellaneous Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Billed creditors": {
-    "LeadgerCode": "LIA001002",
-    "LeadgerName": "Billed creditors",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Inter branch control": {
-    "LeadgerCode": "EXP001024",
-    "LeadgerName": "Inter branch control",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Transport Expense": {
+  "EXP001003": {
     "LeadgerCode": "EXP001003",
     "LeadgerName": "Transport Expense",
     "LeadgerCategory": "EXPENSE"
   },
+  "EXP001009": {
+    "LeadgerCode": "EXP001009",
+    "LeadgerName": "Other Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "EXP001011": {
+    "LeadgerCode": "EXP001011",
+    "LeadgerName": "Loading Charge",
+    "LeadgerCategory": "EXPENSE"
+  },
+
+  "EXP001007": {
+    "LeadgerCode": "EXP001007",
+    "LeadgerName": "Enroute Charges",
+    "LeadgerCategory": "EXPENSE"
+  },
+
+  "LIA001002": {
+    "LeadgerCode": "LIA001002",
+    "LeadgerName": "Billed creditors",
+    "LeadgerCategory": "EXPENSE"
+  },
+  "EXP001024": {
+    "LeadgerCode": "EXP001024",
+    "LeadgerName": "Inter branch control",
+    "LeadgerCategory": "EXPENSE"
+  },
+
 
 };
+
+async function GetLedgerDetailFromAPI(data: string): Promise<any[] | null> {
+  try {
+    const masterService = new MasterService(new HttpClient(null));
+    const companyCode = Storage.getItem(StoreKeys.CompanyCode);
+
+    const filter = {
+      aCCD: data,
+    };
+
+    const req = { companyCode, collectionName: 'account_detail', filter };
+    const res = await masterService.masterPost('generic/get', req).toPromise();
+
+    if (res && res.data) {
+      return res.data.map((x: any) => ({
+        name: x.aCNM,
+        value: x.aCCD,
+        ...x,
+      }));
+    }
+
+    console.log('Data fetched from API:', res.data);
+    return res.data;
+  } catch (error) {
+    console.error('Error fetching data from API:', error);
+    return null; // Return null or handle the error as needed
+  }
+}

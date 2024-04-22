@@ -98,16 +98,16 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   DocCalledAs: DocCalledAsModel;
   InvoiceDetailsList: { count: any; title: string; class: string }[];
   matrials: AutoComplete[];
-  rules: any[]=[];
+  rules: any[] = [];
   alpaNumber: boolean;
-  sequence:boolean;
-  isBrachCode:boolean;
-  fyear:boolean;
-  length:number=0;
+  sequence: boolean;
+  isBrachCode: boolean;
+  fyear: boolean;
+  length: number = 0;
   mseq: boolean;
-  lastDoc:string;
+  lastDoc: string;
   isManual: boolean;
-  dcrDetail={};
+  dcrDetail = {};
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -132,7 +132,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private addressService: AddressService,
     private voucherServicesService: VoucherServicesService,
     private controlPanel: ControlPanelService,
-    private dcrService:DCRService,
+    private dcrService: DCRService,
     private _NavigationService: NavigationService
   ) {
     super();
@@ -917,7 +917,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.invoiceTableForm.reset();
       this.tableLoadIn = false;
       this.loadIn = false;
-      this.filter.Filter(this.jsonInvoiceDetail,this.model.invoiceTableForm,this.matrials,"materialName",false);
+      this.filter.Filter(this.jsonInvoiceDetail, this.model.invoiceTableForm, this.matrials, "materialName", false);
       this.SetInvoiceData();
     }
   }
@@ -955,54 +955,54 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.SetInvoiceData();
   }
   /*end*/
-  async docketValidation(){
+  async docketValidation() {
     const res = await this.dcrService.validateFromSeries(this.model.consignmentTableForm.controls['docketNumber'].value);
-    this.dcrDetail=res;
-    if(res) {
-      if(res.aLOTO == 'L' && res.aSNTO == 'E' && res.aSNCD && res.aLOCD==this.storage.branch) {
-       await this.validateDcr(res);
-      }
-      else if(res.aLOTO == 'L' && res.aSNTO == 'B' && this.storage.userName == res.aSNCD) {
+    this.dcrDetail = res;
+    if (res) {
+      if (res.aLOTO == 'L' && res.aSNTO == 'E' && res.aSNCD && res.aLOCD == this.storage.branch) {
         await this.validateDcr(res);
       }
-      else if(res.aLOTO == 'C' && res.aSNTO == 'C' && res.aSNCD) { 
-        const billingParty=this.model.consignmentTableForm.controls['billingParty'].value?.value||"";
-        if(billingParty) {
-          if(res.aSNCD==billingParty) {
+      else if (res.aLOTO == 'L' && res.aSNTO == 'B' && this.storage.userName == res.aSNCD) {
+        await this.validateDcr(res);
+      }
+      else if (res.aLOTO == 'C' && res.aSNTO == 'C' && res.aSNCD) {
+        const billingParty = this.model.consignmentTableForm.controls['billingParty'].value?.value || "";
+        if (billingParty) {
+          if (res.aSNCD == billingParty) {
             await this.validateDcr(res);
           }
-          else{
+          else {
             await this.errorMessage();
           }
         }
         else {
-          if(await this.validateDcr(res)) {
-            this.model.consignmentTableForm.controls['billingParty'].setValue( { name:res.aSNNM,value:res.aSNCD } );
+          if (await this.validateDcr(res)) {
+            this.model.consignmentTableForm.controls['billingParty'].setValue({ name: res.aSNNM, value: res.aSNCD });
           }
-          else{
+          else {
             await this.errorMessage();
           }
         }
       }
-      else{
+      else {
         this.errorMessage();
       }
     }
-    else{
+    else {
       this.errorMessage();
     }
-    
+
   }
   /*check Dcr is use or not*/
-  async validateDcr(dcr: any): Promise<boolean> {   
+  async validateDcr(dcr: any): Promise<boolean> {
     let isValid = false;
     const dktNo = this.model.consignmentTableForm.controls['docketNumber'].value;
-    const doc = await this.dcrService.getDCRDocument({dOCNO: dktNo});
-    if(doc && doc.dOCNO == dktNo) {
+    const doc = await this.dcrService.getDCRDocument({ dOCNO: dktNo });
+    if (doc && doc.dOCNO == dktNo) {
       Swal.fire({
         icon: 'warning',
-        title: `${this.DocCalledAs.Docket} No is ${ doc.sTS == 2 ? "declared void" : "already used"}`,
-        text: `${this.DocCalledAs.Docket} No is ${ doc.sTS == 2 ? "declared void" : "already used"}`,
+        title: `${this.DocCalledAs.Docket} No is ${doc.sTS == 2 ? "declared void" : "already used"}`,
+        text: `${this.DocCalledAs.Docket} No is ${doc.sTS == 2 ? "declared void" : "already used"}`,
         showConfirmButton: true,
         confirmButtonText: 'OK',
         timer: 5000,
@@ -1010,56 +1010,56 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       });
       this.model.consignmentTableForm.controls['docketNumber'].setValue("");
     }
-    else{
-      if(this.mseq) {
+    else {
+      if (this.mseq) {
         const nextCode = await this.dcrService.getNextDocumentNo(this.dcrDetail);
         if (nextCode == "" || nextCode != dktNo) {
           Swal.fire({
             icon: 'warning',
-            title:  `${this.DocCalledAs.Docket} No is out of sequence. Next no is sequence is ${nextCode}.`,
+            title: `${this.DocCalledAs.Docket} No is out of sequence. Next no is sequence is ${nextCode}.`,
             showConfirmButton: true,
             confirmButtonText: 'OK',
             timer: 5000,
             timerProgressBar: true,
 
           })
-          this.model.consignmentTableForm.controls['docketNumber'].setValue("");         
+          this.model.consignmentTableForm.controls['docketNumber'].setValue("");
         }
-        else{
+        else {
           isValid = true
           Swal.fire({
             icon: 'success',
-            title:'Valid',
+            title: 'Valid',
             text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
             showConfirmButton: true,
             confirmButtonText: 'OK',
             timer: 5000,
             timerProgressBar: true,
           });
-        }     
+        }
       }
-      else{
+      else {
         isValid = true
         Swal.fire({
           icon: 'success',
-          title:'Valid',
+          title: 'Valid',
           text: `${this.DocCalledAs.Docket} No has been allocated. You may now proceed`,
           showConfirmButton: true,
           confirmButtonText: 'OK',
           timer: 5000,
           timerProgressBar: true,
         });
-      }     
+      }
     }
 
     return isValid;
   }
   /*end*/
-  async errorMessage(){
+  async errorMessage() {
     Swal.fire({
       icon: 'error',
-      title:`${this.DocCalledAs.Docket} No is not valid`,
-      text:`${this.DocCalledAs.Docket} No is not valid`,
+      title: `${this.DocCalledAs.Docket} No is not valid`,
+      text: `${this.DocCalledAs.Docket} No is not valid`,
       showConfirmButton: true,
       confirmButtonText: 'OK',
       timer: 5000,
@@ -1068,43 +1068,43 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.consignmentTableForm.controls['docketNumber'].setValue("");
   }
   /*get Rules*/
-  async getRules(){
-    const filter={
-      cID:this.storage.companyCode,
-      mODULE:"CNOTE",
-      aCTIVE:true
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "CNOTE",
+      aCTIVE: true
     }
-    const res=await this.controlPanel.getModuleRules(filter);
-    if(res.length>0){
-      this.rules=res;
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
       this.checkDocketRules();
     }
-    
+
   }
   /*End*/
-   checkDocketRules(){
-      const STYP = this.rules.find(x=>x.rULEID=="STYP" && x.aCTIVE)
-      if(STYP){
-        const isManual = STYP.vAL === "M";
-        this.model.allformControl.find(x=>x.name=="docketNumber").disable = !isManual;
-        this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual?"":"Computerized");        
-        this.isManual=isManual;
-        this.isUpdate=isManual;
-      }
+  checkDocketRules() {
+    const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
+    if (STYP) {
+      const isManual = STYP.vAL === "M";
+      this.model.allformControl.find(x => x.name == "docketNumber").disable = !isManual;
+      this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
+      this.isManual = isManual;
+      this.isUpdate = isManual;
+    }
 
-      const ELOC = this.rules.find(x=>x.rULEID=="ELOC" && x.aCTIVE)
-      if(ELOC){
-        if(!ELOC.vAL.includes(this.storage.branch)) {
-          // check exception for branch
-        }
+    const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
+    if (ELOC) {
+      if (!ELOC.vAL.includes(this.storage.branch)) {
+        // check exception for branch
       }
+    }
 
-      this.alpaNumber = this.rules.find(x=>x.rULEID=="NTYP" && x.aCTIVE)?.vAL=="AN";
-      this.sequence = this.rules.find(x=>x.rULEID=="SL" && x.aCTIVE)?.vAL=="S";
-      this.isBrachCode = this.rules.find(x=>x.rULEID=="BCD" && x.aCTIVE)?.vAL=="Y";
-      this.fyear = this.rules.find(x=>x.rULEID=="YEAR" && x.aCTIVE)?.vAL=="F";
-      this.length = ConvertToNumber(this.rules.find(x=>x.rULEID=="LENGTH" && x.aCTIVE)?.vAL);
-      this.mseq = this.rules.find(x=>x.rULEID=="MSEQ" && x.aCTIVE)?.vAL=="Y";
+    this.alpaNumber = this.rules.find(x => x.rULEID == "NTYP" && x.aCTIVE)?.vAL == "AN";
+    this.sequence = this.rules.find(x => x.rULEID == "SL" && x.aCTIVE)?.vAL == "S";
+    this.isBrachCode = this.rules.find(x => x.rULEID == "BCD" && x.aCTIVE)?.vAL == "Y";
+    this.fyear = this.rules.find(x => x.rULEID == "YEAR" && x.aCTIVE)?.vAL == "F";
+    this.length = ConvertToNumber(this.rules.find(x => x.rULEID == "LENGTH" && x.aCTIVE)?.vAL);
+    this.mseq = this.rules.find(x => x.rULEID == "MSEQ" && x.aCTIVE)?.vAL == "Y";
   }
 
   vendorFieldChanged() {
@@ -1677,7 +1677,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         finYear: financialYear,
         timeZone: this.storage.timeZone,
         data: docketDetails,
-        isManual:this.isManual,
+        isManual: this.isManual,
         party: docketDetails["billingPartyName"],
       };
       if (this.prqFlag) {
@@ -1691,9 +1691,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         }
         await this.consigmentUtility.updatePrq(prqData, update);
       }
-      if(this.isManual){
-        const data={dKTNO:this.model.consignmentTableForm.controls['docketNumber'].value}
-        await this.docketService.addDcrDetails(data,this.dcrDetail)
+      if (this.isManual) {
+        const data = { dKTNO: this.model.consignmentTableForm.controls['docketNumber'].value }
+        await this.docketService.addDcrDetails(data, this.dcrDetail)
       }
       firstValueFrom(this.operationService.operationMongoPost("operation/docket/create", reqBody))
         .then((res: any) => {
@@ -2465,9 +2465,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           "transDate": new Date(),
           "finYear": financialYear,
           "branch": this.storage.branch,
-          "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
-          "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
-          "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
+          "accCode": ledgerInfo['AST001001'].LeadgerCode,
+          "accName": ledgerInfo['AST001001'].LeadgerName,
+          "accCategory": ledgerInfo['AST001001'].LeadgerCategory,
           "sacCode": "",
           "sacName": "",
           "debit": TotalAmount,
@@ -2489,9 +2489,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           "transDate": new Date(),
           "finYear": financialYear,
           "branch": this.storage.branch,
-          "accCode": ledgerInfo['Freight income'].LeadgerCode,
-          "accName": `${ledgerInfo['Freight income'].LeadgerName} - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
-          "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
+          "accCode": ledgerInfo['INC001003'].LeadgerCode,
+          "accName": `${ledgerInfo['INC001003'].LeadgerName} - ${this.products.find(x => x.value == this.model.consignmentTableForm.value.transMode).name}`,
+          "accCategory": ledgerInfo['INC001003'].LeadgerCategory,
           "sacCode": "",
           "sacName": "",
           "debit": 0,
@@ -2530,16 +2530,16 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
                 debit: [{
-                  "accCode": ledgerInfo['Unbilled debtors'].LeadgerCode,
-                  "accName": ledgerInfo['Unbilled debtors'].LeadgerName,
-                  "accCategory": ledgerInfo['Unbilled debtors'].LeadgerCategory,
+                  "accCode": ledgerInfo['AST001001'].LeadgerCode,
+                  "accName": ledgerInfo['AST001001'].LeadgerName,
+                  "accCategory": ledgerInfo['AST001001'].LeadgerCategory,
                   "amount": TotalAmount,
                   "narration": `when C note No ${DocketNo} Is Booked`
                 }],
                 credit: [{
-                  "accCode": ledgerInfo['Freight income'].LeadgerCode,
-                  "accName": ledgerInfo['Freight income'].LeadgerName + " - Road",
-                  "accCategory": ledgerInfo['Freight income'].LeadgerCategory,
+                  "accCode": ledgerInfo['INC001003'].LeadgerCode,
+                  "accName": ledgerInfo['INC001003'].LeadgerName + " - Road",
+                  "accCategory": ledgerInfo['INC001003'].LeadgerCategory,
                   "amount": TotalAmount,
                   "narration": `when C note No ${DocketNo} Is Booked`
                 }],

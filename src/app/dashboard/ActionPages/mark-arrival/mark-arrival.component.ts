@@ -183,10 +183,11 @@ export class MarkArrivalComponent implements OnInit {
         sTS: stCode,
         sTSNM: stName
       };
-    } else if (dktStatus === "noDkt") {
+    }
+    else if (dktStatus === "noDkt") {
       tripStatus = next ? "Update Trip" : "close";
       stCode = next ? 6 : 7,
-        stName = "Picked Up"
+      stName = "Arrived"
 
       tripDetails = {
         sTS: stCode,
@@ -195,11 +196,13 @@ export class MarkArrivalComponent implements OnInit {
       };
       if (!next) {
         tripDetails.vEHNO = "",
-          tripDetails.tHC = "",
-          tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
-          tripDetails.nXTLOC = ""
-        if (stCode == 7) {
+        tripDetails.tHC = "",
+        tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
+        tripDetails.nXTLOC = ""
 
+        this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+
+        try {          
           const reqArrivalDeparture = {
             action: "TripArrivalDepartureUpdate",
             reqBody: {
@@ -208,27 +211,34 @@ export class MarkArrivalComponent implements OnInit {
               loc: this.currentBranch,
               tripId: this.MarkArrivalTableForm.value?.TripID
             }
-          }
+          } 
           this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-          this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+        } catch (error) {
+          console.log("Error in pushToCTCommon", error);
         }
+
       }
       else {
         tripDetails.cLOC = this.storage.branch,
-          tripDetails.nXTLOC = next || ""
+        tripDetails.nXTLOC = next || ""
       }
     }
-    if (stCode == 5 || stCode == 6) {
-      const reqArrivalDeparture = {
-        action: "TripArrivalDepartureUpdate",
-        reqBody: {
-          cid: this.companyCode,
-          EventType: 'A',
-          loc: this.currentBranch,
-          tripId: this.MarkArrivalTableForm.value?.TripID
+    if (stCode == 5 || stCode == 6) {      
+      try {
+        const reqArrivalDeparture = {
+          action: "TripArrivalDepartureUpdate",
+          reqBody: {
+            cid: this.companyCode,
+            EventType: 'A',
+            loc: this.currentBranch,
+            tripId: this.MarkArrivalTableForm.value?.TripID
+          }
         }
+        
+        this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+      } catch (error) {
+        console.log("Error in pushToCTCommon", error);
       }
-      this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
     }
     const reqBody = {
       "companyCode": this.companyCode,

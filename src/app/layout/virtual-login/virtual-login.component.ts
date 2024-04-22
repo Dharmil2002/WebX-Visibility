@@ -6,6 +6,7 @@ import { th } from 'date-fns/locale';
 import { Observable, map, startWith } from 'rxjs';
 import { BranchDropdown } from 'src/app/Models/Comman Model/CommonModel';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
+import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { StoreKeys } from 'src/app/config/myconstants';
 import { AuthService } from 'src/app/core/service/auth.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -24,6 +25,7 @@ export class VirtualLoginComponent implements OnInit {
 
   constructor(
     private storageService: StorageService,
+    private locationService: LocationService,
     public fb: FormBuilder,
     public dialogRef: MatDialogRef<AuthService>
   ) {
@@ -75,9 +77,13 @@ export class VirtualLoginComponent implements OnInit {
   }
 
   Onsubmit() {
-    this.storageService.setItem(StoreKeys.Branch, this.VitualLoginForm.value.Branch.locCode);
-    this.dialogRef.close();
-    location.reload();
+    this.storageService.setItem(StoreKeys.Branch, this.VitualLoginForm.value.Branch.locCode);    
+    this.locationService.getLocation( { companyCode: this.storageService.companyCode, locCode: this.storageService.branch } )
+    .then((loc) => {
+      this.storageService.setItem(StoreKeys.WorkingLoc, JSON.stringify(loc));
+      this.dialogRef.close();
+      location.reload();
+    });
   }
 
 }

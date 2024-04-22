@@ -23,7 +23,9 @@ async getGeneralMasterData(codeType): Promise<AutoComplete[]> {
     const reqBody = {
         companyCode: this.storage.companyCode,
         collectionName: "General_master",
-        filter: { codeType: codeType, activeFlag: true }
+        filter: { 
+            codeType: { D$in: Array.isArray(codeType) ? codeType : [codeType] }, 
+            activeFlag: true }
     };
 
     // Send a POST request to the masterService to retrieve data and await the response.
@@ -33,7 +35,7 @@ async getGeneralMasterData(codeType): Promise<AutoComplete[]> {
     const resGen: GeneralMaster[] = res.data;
 
     // Map the GeneralMaster objects to AutoComplete objects and return the strongly typed result.
-    return resGen.map((x) => { return { name: x.codeDesc, value: x.codeId } });
+    return resGen.map((x) => { return { name: x.codeDesc, value: x.codeId, type: x.codeType } });
 }
 
 async getDataForAutoComplete(containerName, filter, nameField, valueField ): Promise<AutoComplete[]> {

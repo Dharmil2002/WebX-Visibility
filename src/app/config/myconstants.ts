@@ -29,7 +29,8 @@ export const StoreKeys = {
     Sidebar_Status: 'sidebar_status',
     Choose_Skin: 'choose_skin',
     Choose_Skin_Active:'choose_skin_active',
-    IsRtl: 'isRtl'
+    IsRtl: 'isRtl',
+    WorkingLoc: 'WorkingLoc'
 }
 
 export const Collections = {

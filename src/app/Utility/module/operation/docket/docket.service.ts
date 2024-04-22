@@ -14,6 +14,8 @@ import { convertCmToFeet, roundNumber } from "src/app/Utility/commonfunction";
 import { ConvertToDate, ConvertToNumber, isValidDate, roundToNumber } from "src/app/Utility/commonFunction/common";
 import { DocketFinStatus, DocketStatus, dcrStatus } from "src/app/Models/docStatus";
 import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 @Injectable({
     providedIn: "root",
 })
@@ -24,6 +26,7 @@ export class DocketService {
         "TO PAY": "consigneeName",
     }
     vehicleDetail: any;
+    docCalledAs: DocCalledAsModel;
     RateTypeCalculation = [{
         "codeId": "RTTYP-0004",
         "codeDesc": "% of Freight",
@@ -81,6 +84,10 @@ export class DocketService {
         "3": {
             status: "Delivered",
             actions: [""],
+        },
+        "4": {
+            status: "Arrived",
+            actions: [""],
         }
         // Add more status mappings as needed
     };
@@ -130,8 +137,17 @@ export class DocketService {
         private storage: StorageService,
         private filter: FilterUtils,
         private navService: NavigationService,
-        private geoLocationService: GeolocationService
-    ) { }
+        private geoLocationService: GeolocationService,
+        private controlPanel: ControlPanelService
+    ) { 
+        this.docCalledAs = this.controlPanel.DocCalledAs;
+
+        this.statusMapping["1"].actions = [`Edit ${this.docCalledAs.Docket}`];
+        this.statusMapping["2"].actions = [`${this.docCalledAs.THC} Generated`];
+        this.statusLTLMapping["0"].actions = [`Edit ${this.docCalledAs.Docket}`];
+        this.statusLTLMapping["2"].actions = [`${this.docCalledAs.LS} Generated`];
+        this.statusLTLMapping["3"].actions = [`${this.docCalledAs.MF} Generated`];
+    }
 
     async updateDocket(data, filter) {
 
@@ -179,7 +195,7 @@ export class DocketService {
 
         const res = shipmentList.map((x) => {
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
-                const statusInfo = this.statusMapping[x.oSTS] || this.statusMapping.default;
+                const statusInfo = this.statusMapping[x.docketsOPs.sTS] || this.statusMapping.default;
                 x.ftCity = `${x.fCT}-${x.tCT}`;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions;
@@ -1433,18 +1449,18 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
         return res.data
     }
-    async getDocketsDetails() {
-        let matches = { 
-            "D$or":[
-                {oRGN:this.storage.branch},
-                {cLOC:this.storage.branch},
-                {dEST:this.storage.branch,oSTS:"3"}
-              ]
-          };
+    async getDocketsDetails(city) {
+        
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "dockets",
             filters: [
+                {
+                    "D$match": {
+                        "cID": this.storage.companyCode,
+                        "cNL": { "D$in": [false, null] }
+                    }
+                },
                 {
                   D$lookup: {
                     from: "docket_ops_det",
@@ -1466,12 +1482,38 @@ export class DocketService {
                 },
                 {
                     D$match: {
-                        D$or:
-                            [{oRGN:this.storage.branch},
-                            {cLoc:this.storage.branch},
-                            {dEST:this.storage.branch,oSTS: "3"}]
-                    }
-                }
+                      D$and: [       
+                        {
+                          D$or: [
+                            {
+                              D$and: [
+                                {
+                                  D$expr: { D$eq: ["$docketsOPs.sTS", 2], },
+                                },
+                                {
+                                  D$expr: {
+                                    D$gte: ["$docketsOPs.sTSTM", moment().tz(this.storage.timeZone).startOf('day').toDate()],
+                                  }
+                                }
+                              ],
+                            },
+                            {
+                              D$expr: {
+                                D$not: {
+                                    D$in: ["$docketsOPs.sTS", [2,3]],
+                                }
+                              },
+                            }
+                          ],
+                        },
+                        {
+                            D$expr: {
+                                D$eq: ["$docketsOPs.cCT", city],
+                            },
+                        },
+                      ],
+                    },
+                  },
               ]
 
         }

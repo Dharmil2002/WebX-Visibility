@@ -105,7 +105,7 @@ export class GeneralBillCriteriaComponent implements OnInit {
       const vnCode = this.vendorBillGenerationForm.controls["VendorName"].value;
 
       // Fetch beneficiary details from API
-      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(vnCode);
+      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(vnCode.value);
 
       // Check if beneficiary data is available
       if (beneficiaryModalData.length > 0) {

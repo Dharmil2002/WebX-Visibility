@@ -1,3 +1,8 @@
+import { StoreKeys } from 'src/app/config/myconstants';
+import * as Storage from 'src/app/core/service/storage.service';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { HttpClient } from '@angular/common/http';
+import { constant } from 'lodash';
 export class VoucherRequestModel {
   companyCode: number
   docType: string
@@ -121,90 +126,27 @@ export enum VoucherInstanceType {
 }
 
 export const ledgerInfo = {
-  "IGST": {
-    "LeadgerCode": "LIA002004",
-    "LeadgerName": "IGST payable",
-    "LeadgerCategory": "LIABILITY"
-  },
-  "UGST": {
-    "LeadgerCode": "LIA002002",
-    "LeadgerName": "UGST payable",
-    "LeadgerCategory": "LIABILITY"
-  },
-  "SGST": {
-    "LeadgerCode": "LIA002001",
-    "LeadgerName": "SGST payable",
-    "LeadgerCategory": "LIABILITY"
-  },
-  "CGST": {
-    "LeadgerCode": "LIA002003",
-    "LeadgerName": "CGST payable",
-    "LeadgerCategory": "LIABILITY"
-  },
-  "Round off Amount": {
-    "LeadgerCode": "EXP001042",
-    "LeadgerName": "Round off Amount",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Unbilled debtors": {
-    "LeadgerCode": "AST001001",
-    "LeadgerName": "Unbilled debtors",
-    "LeadgerCategory": "ASSET"
-  },
-  "Freight income": {
-    "LeadgerCode": "INC001003",
-    "LeadgerName": "Freight income",
-    "LeadgerCategory": "INCOME"
-  },
-  "Billed debtors": {
-    "LeadgerCode": "AST002002",
-    "LeadgerName": "Billed debtors",
-    "LeadgerCategory": "ASSET"
-  },
-  "Contract Charges": {
-    "LeadgerCode": "EXP001003",
-    "LeadgerName": "Contract Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Other Charges": {
-    "LeadgerCode": "EXP001009",
-    "LeadgerName": "Other Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Loading Charge": {
-    "LeadgerCode": "EXP001011",
-    "LeadgerName": "Loading Charge",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Unloading Charges": {
-    "LeadgerCode": "EXP001011",
-    "LeadgerName": "Unloading Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Enroute Charges": {
-    "LeadgerCode": "EXP001007",
-    "LeadgerName": "Enroute Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Miscellaneous Charges": {
-    "LeadgerCode": "EXP001009",
-    "LeadgerName": "Miscellaneous Charges",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Billed creditors": {
-    "LeadgerCode": "LIA001002",
-    "LeadgerName": "Billed creditors",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Inter branch control": {
-    "LeadgerCode": "EXP001024",
-    "LeadgerName": "Inter branch control",
-    "LeadgerCategory": "EXPENSE"
-  },
-  "Transport Expense": {
-    "LeadgerCode": "EXP001003",
-    "LeadgerName": "Transport Expense",
-    "LeadgerCategory": "EXPENSE"
-  },
+  "LIA002004": GetLeadgerInfoFromLocalStorage("LIA002004"),
+  "LIA002002": GetLeadgerInfoFromLocalStorage("LIA002002"),
+  "LIA002001": GetLeadgerInfoFromLocalStorage("LIA002001"),
+  "LIA002003": GetLeadgerInfoFromLocalStorage("LIA002003"),
+  "EXP001042": GetLeadgerInfoFromLocalStorage("EXP001042"),
+  "AST001001": GetLeadgerInfoFromLocalStorage("AST001001"),
+  "INC001003": GetLeadgerInfoFromLocalStorage("INC001003"),
+  "AST002002": GetLeadgerInfoFromLocalStorage("AST002002"),
+  "EXP001003": GetLeadgerInfoFromLocalStorage("EXP001003"),
+  "EXP001009": GetLeadgerInfoFromLocalStorage("EXP001009"),
+  "EXP001011": GetLeadgerInfoFromLocalStorage("EXP001011"),
+  "EXP001007": GetLeadgerInfoFromLocalStorage("EXP001007"),
+  "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
+  "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
 
 };
+function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
+  // Get Data From Local Storage
+  const LeadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));
+
+  // Get Leadger Info
+  return LeadgerInfo.find((x) => x.LeadgerCode == LeadgerCode);
+
+}

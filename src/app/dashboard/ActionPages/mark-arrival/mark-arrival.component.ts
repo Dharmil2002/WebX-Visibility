@@ -19,6 +19,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { HawkeyeUtilityService } from 'src/app/Utility/module/hawkeye/hawkeye-utility.service';
 import { StoreKeys } from 'src/app/config/myconstants';
+import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { firstValueFrom } from 'rxjs';
 import { ThcCostUpdateService } from 'src/app/Utility/module/operation/thc/thc-cost-update.service';
@@ -49,6 +50,7 @@ export class MarkArrivalComponent implements OnInit {
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<GenericTableComponent>,
+    private tripService: ThcService,
     public dialog: MatDialog,
     private storage: StorageService,
     private generalService: GeneralService,
@@ -227,7 +229,6 @@ export class MarkArrivalComponent implements OnInit {
         }
       }
       this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-      this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
     }
     const reqBody = {
       "companyCode": this.companyCode,

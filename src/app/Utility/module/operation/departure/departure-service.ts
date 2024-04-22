@@ -9,7 +9,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 import { VendorService } from "../../masters/vendor-master/vendor.service";
-import { DocketEvents, DocketStatus, VehicleStatus, getEnumName } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, ThcStatus, VehicleStatus, getEnumName } from "src/app/Models/docStatus";
 
 @Injectable({
   providedIn: "root"
@@ -99,8 +99,8 @@ export class DepartureService {
           "nM": data?.Vendor || "",
           "pAN": vendorCode[0]?.panNo || "",
         },
-        "oPSST": 1,
-        "oPSSTNM": "In Transit",
+        "oPSST":ThcStatus.In_Transit,    
+        "oPSSTNM":ThcStatus[ThcStatus.In_Transit].split("_").join(" "),
         "fINST": 0,
         "fINSTNM": "",
         "cONTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),

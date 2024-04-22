@@ -79,7 +79,7 @@ export class AddressMasterUploadComponent implements OnInit {
     processedData.email = element.email;
     processedData.address = element.address;
     processedData.cityName = updatepincode.CT;
-    processedData.stateName = element.state;
+    processedData.stateName = element.stateName;
     processedData.pincode =  updatepincode.PIN;
     processedData.customer = updatecustomerList.map((x) => {
       return x.customerCode;
@@ -215,13 +215,13 @@ export class AddressMasterUploadComponent implements OnInit {
               if (address.has(element.address)) {
                 element.error.push(`address : ${element.address} Already exists`);
               }
-              const city = this.pincodeList.find(x => x.PIN === parseInt(element.pincode));
-              if (city) {
-                element["city"] = city.CT;
+              const cityName = this.pincodeList.find(x => x.PIN === parseInt(element.pincode));
+              if (cityName) {
+                element["cityName"] = cityName.CT;
                 // const state = this.pincodeList.find(x => x.ST === city.ST);
-                const state = this.zonelist.find(x => x.ST === city.ST);
-                if (state) {
-                  element["state"] = state.STNM;
+                const stateName = this.zonelist.find(x => x.ST === cityName.ST);
+                if (stateName) {
+                  element["stateName"] = stateName.STNM;
                 }
               }
               if (element.error.length === 0) {

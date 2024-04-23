@@ -8,6 +8,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AccountMasterControls } from "src/assets/FormControls/AccountMasterControls";
 import { AccountListFilterComponent } from "../account-list-filter/account-list-filter.component";
 import { StorageService } from "src/app/core/service/storage.service";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: "app-account-master",
@@ -24,17 +25,17 @@ export class AccountMasterComponent implements OnInit {
   linkArray = [];
   menuItems = [];
   EventButton = {
-    functionName:'AddFunction',
+    functionName: 'AddFunction',
     name: "Add New",
-    iconName:'add'
+    iconName: 'add'
   }
   dynamicControls = {
     add: false,
     edit: false,
     csv: false,
   };
-  columnHeader = {   
-    aCNM: {
+  columnHeader = {
+    Account: {
       Title: "Account",
       class: "matcolumnleft",
       Style: "min-width:25%",
@@ -50,13 +51,13 @@ export class AccountMasterComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:25%",
     },
-    EditAction:{
-      type:'iconClick',
+    EditAction: {
+      type: 'iconClick',
       Title: "Action",
       class: "matcolumnleft button-primary",
       Style: "min-width:6%",
-      functionName:'EditFunction',
-      iconName:'edit',
+      functionName: 'EditFunction',
+      iconName: 'edit',
       stickyEnd: true
     }
   };
@@ -65,7 +66,7 @@ export class AccountMasterComponent implements OnInit {
     functionName: "FilterList",
   };
   staticField = [
-    "aCNM",
+    "Account",
     "gRPNM",
     "cATNM",
   ];
@@ -119,27 +120,25 @@ export class AccountMasterComponent implements OnInit {
       collectionName: "account_detail",
       filter: filterQuery,
     };
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x, index) => {
         return {
           ...x,
           SrNo: index + 1,
-          Account:x.aCCD+' : '+ x.aCNM,
-          AccountGroup:x.SubCategoryCode=="" && x.SubCategoryName==""?"":x.SubCategoryCode+' : '+ x.SubCategoryName,
+          Account: x.aCCD + ' : ' + x.aCNM,
+          AccountGroup: x.SubCategoryCode == "" && x.SubCategoryName == "" ? "" : x.SubCategoryCode + ' : ' + x.SubCategoryName,
         };
       });
     }
     this.isTableLode = true;
   }
 
-  EditFunction(event){
+  EditFunction(event) {
     this.Route.navigate(["/Masters/AccountMaster/AddAccountMaster"], { state: { data: event?.data } });
   }
 
-  AddFunction(event){
+  AddFunction(event) {
     this.Route.navigate(["/Masters/AccountMaster/AddAccountMaster"]);
   }
 

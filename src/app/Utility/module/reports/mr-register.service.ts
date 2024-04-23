@@ -20,7 +20,6 @@ export class MrRegisterService {
     */
 
   async getMrRegisterData(data, optionalRequest) {
-    debugger
     // Check if docNoArray exists and is not empty
     const hasMRNO = optionalRequest.docNoArray?.length > 0;
     // Check if CnotenosArray exists and is not empty

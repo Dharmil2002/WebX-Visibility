@@ -170,6 +170,52 @@ export class ProductControls {
         generatecontrol: true,
         disable: false,
       },
+      // {
+      //   name: "Ledger",
+      //   label: "Account",
+      //   placeholder: "Account",
+      //   type: "dropdown",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "autocomplete",
+      //     },
+      //     {
+      //       name: "invalidAutocomplete",
+      //       message: "Choose proper value",
+      //     },
+      //   ],
+      //   additionalData: {
+      //     showNameAndValue: true,
+      //   },
+      //   functions: {},
+      // },
+
+      {
+        name: "Ledger",
+        label: "Account",
+        placeholder: "Account",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
+
       {
         name: "Variability",
         label: "Variability:",

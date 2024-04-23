@@ -1,6 +1,8 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class VendorBillGenerationControl {
   vendorBillGenerationArray: FormControls[];
+  VendorBillDetailArray: FormControls[];
+
   constructor() {
     this.vendorBillGenerationArray = [
       {
@@ -94,9 +96,41 @@ export class VendorBillGenerationControl {
         },
       },
     ]
+    this.VendorBillDetailArray = [
+      {
+        name: "TransactionType",
+        label: "Transaction Type",
+        placeholder: "Select Transaction Type",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Transaction Type is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
+      },
+    ]
   }
   getvendorBillGenerationArrayControl() {
     return this.vendorBillGenerationArray;
   }
-
+  getVendorBillDetailArrayControl() {
+    return this.VendorBillDetailArray;
+  }
 }

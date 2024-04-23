@@ -143,7 +143,7 @@ export class GeneralBillCriteriaComponent implements OnInit {
   }
   save() {
     console.log(this.vendorBillGenerationForm.value);
-    this.route.navigate(["/Finance/VendorPayment/VendorGeneralBillDetail"]);
+    this.route.navigate(["/Finance/VendorBillGeneration/Details"]);
   }
 }
 

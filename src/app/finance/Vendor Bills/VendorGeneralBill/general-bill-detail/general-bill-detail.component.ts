@@ -5,7 +5,13 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './general-bill-detail.component.html',
 })
 export class GeneralBillDetailComponent implements OnInit {
-
+  breadScrums = [
+    {
+      title: "Vendor Bill Generation",
+      items: ["Home"],
+      active: "Vendor Bill Generation",
+    },
+  ];
   constructor() { }
 
   ngOnInit(): void {

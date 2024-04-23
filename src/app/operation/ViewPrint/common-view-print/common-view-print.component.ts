@@ -13,6 +13,7 @@ export class CommonViewPrintComponent implements OnInit {
   companyCode = localStorage.getItem("companyCode");
   JsonData;
   templateBody: any;
+  
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,

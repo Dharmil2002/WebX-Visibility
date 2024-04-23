@@ -1,0 +1,11 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <form [formGroup]="mRRegisterForm">
+    <app-form-webxpress [form]="mRRegisterForm"
+      [FormTitle]="'MR Register Report'"
+      [formData]="jsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" 
+      (callFunction)="functionCallHandler($event)"
+      [showSaveButton]="true" [submit]="'Download'">
+    </app-form-webxpress>
+  </form>
+</app-common-wrapper-webxpress>

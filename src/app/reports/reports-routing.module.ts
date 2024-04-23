@@ -28,6 +28,7 @@ import { StockReportComponent } from './stock-report/stock-report.component';
 import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
 import { BalanceSheetCriteriaComponent } from './Account Report/Components/BalanceSheet/balance-sheet-criteria/balance-sheet-criteria.component';
 import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view/balance-sheet-view.component';
+import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 
 
 const routes: Routes = [
@@ -57,6 +58,7 @@ const routes: Routes = [
   { path: "DCRRegister", component: DcrRegisterComponent },
   { path: "AccountReport/BalanceSheet", component: BalanceSheetCriteriaComponent },
   { path: "AccountReport/BalanceSheetview", component: BalanceSheetViewComponent },
+  { path: "MR-Register-Report", component: MRRegisterReportComponent },
 
 
 ];

@@ -66,6 +66,7 @@ import { StockReportComponent } from './stock-report/stock-report.component';
 import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
 import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view/balance-sheet-view.component';
 import { BalanceSheetCriteriaComponent } from './Account Report/Components/BalanceSheet/balance-sheet-criteria/balance-sheet-criteria.component';
+import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -137,7 +138,8 @@ import { BalanceSheetCriteriaComponent } from './Account Report/Components/Balan
     StockReportComponent,
     DcrRegisterComponent,
     BalanceSheetViewComponent,
-    BalanceSheetCriteriaComponent
+    BalanceSheetCriteriaComponent,
+    MRRegisterReportComponent
   ],
   exports: [],
 

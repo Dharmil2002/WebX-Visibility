@@ -2,7 +2,8 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { StoreKeys } from "src/app/config/myconstants";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
 import * as StorageService from "src/app/core/service/storage.service";
-import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
+
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -18,14 +19,14 @@ export class ConsignmentControl {
   private invoiceDetail: FormControls[];
   private ewayBillDetail: FormControls[];
   private marketVehicle: FormControls[];
-  constructor(docketDetail) {
+  constructor(docketDetail, docCalledAs) {
     this.ConsignmentControlArray = [
       {
-        name: "docketNumber",label: `${DocCalledAs.Docket} No`,
-        placeholder: `${DocCalledAs.Docket} No`, type: "text",
+        name: "docketNumber",label: `${docCalledAs.Docket} No`,
+        placeholder: `${docCalledAs.Docket} No`, type: "text",
         value: docketDetail?.docketNumber || 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [   {
           name: "required",
-          message:  `${DocCalledAs.Docket}No required`,
+          message:  `${docCalledAs.Docket}No required`,
         }], generatecontrol: true, disable: true,
         functions: {
           onChange: "docketValidation",
@@ -37,8 +38,8 @@ export class ConsignmentControl {
       },
       {
         name: "docketDate",
-        label: `${DocCalledAs.Docket} Date`,
-        placeholder: `${DocCalledAs.Docket} Date`,
+        label: `${docCalledAs.Docket} Date`,
+        placeholder: `${docCalledAs.Docket} Date`,
         type: "datetimerpicker",
         value: docketDetail.docketDate,
         filterOptions: "",
@@ -49,7 +50,7 @@ export class ConsignmentControl {
         Validations: [
           {
             name: "required",
-            message: `${DocCalledAs.Docket} Date required`,
+            message: `${docCalledAs.Docket} Date required`,
           },
         ],
         additionalData: {

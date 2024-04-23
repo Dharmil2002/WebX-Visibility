@@ -87,7 +87,7 @@
         </div> -->
         <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
         <button class="msr-3" mat-raised-button color="primary"
-         (click)="save()">Generate Docket</button>
+         (click)="save()" [disabled]="isSubmit">Generate Docket</button>
         <button class="msr-3" mat-raised-button color="primary">Back</button>
         <button class="msr-3" [disabled]="
         !this.consignmentForm.value?.docketDate ||

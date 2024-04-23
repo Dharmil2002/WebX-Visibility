@@ -689,7 +689,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
 
 
-    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, NetPayable, 0, BillNo));
+    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, NetPayable, 0, BillNo));
     const PaymentMode = paymentData.PaymentMode;
     if (PaymentMode == "Cash") {
       const CashAccount = paymentData.CashAccount;

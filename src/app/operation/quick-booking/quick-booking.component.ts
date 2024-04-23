@@ -1,5 +1,5 @@
 import { Component,OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
@@ -46,6 +46,7 @@ export class QuickBookingComponent implements OnInit {
   destination: string;
   destinationStatus: boolean;
   vehNo: string;
+  
   vehicleStatus: boolean;
   /*it's breadScrums to used in html you must delcare here */
   userName = "";
@@ -62,6 +63,7 @@ export class QuickBookingComponent implements OnInit {
   alpaNumber: boolean;
   sequence:boolean;
   isBrachCode:boolean;
+  isSubmit:boolean=true;
   fyear:boolean;
   length:number=0;
   mseq: boolean;
@@ -342,7 +344,7 @@ export class QuickBookingComponent implements OnInit {
   }
   /*End*/
    checkDocketRules(){
-      const STYP = this.rules.find(x=>x.rULENM=="STYP" && x.aCTIVE)
+      const STYP = this.rules.find(x=>x.rULEID=="STYP" && x.aCTIVE)
       if(STYP){
         const isManual = STYP.vAL === "M";
         this.jsonControlDocketArray.find(x=>x.name=="docketNumber").disable = !isManual;
@@ -350,24 +352,26 @@ export class QuickBookingComponent implements OnInit {
         this.isManual=isManual;
       }
 
-      const ELOC = this.rules.find(x=>x.rULENM=="ELOC" && x.aCTIVE)
+      const ELOC = this.rules.find(x=>x.rULEID=="ELOC" && x.aCTIVE)
       if(ELOC){
         if(!ELOC.vAL.includes(this.storage.branch)) {
           // check exception for branch
         }
       }
 
-      this.alpaNumber = this.rules.find(x=>x.rULENM=="NTYP" && x.aCTIVE)?.vAL=="AN";
-      this.sequence = this.rules.find(x=>x.rULENM=="SL" && x.aCTIVE)?.vAL=="S";
-      this.isBrachCode = this.rules.find(x=>x.rULENM=="BCD" && x.aCTIVE)?.vAL=="Y";
-      this.fyear = this.rules.find(x=>x.rULENM=="YEAR" && x.aCTIVE)?.vAL=="F";
-      this.length = ConvertToNumber(this.rules.find(x=>x.rULENM=="LENGTH" && x.aCTIVE)?.vAL);
-      this.mseq = this.rules.find(x=>x.rULENM=="MSEQ" && x.aCTIVE)?.vAL=="Y";
+      this.alpaNumber = this.rules.find(x=>x.rULEID=="NTYP" && x.aCTIVE)?.vAL=="AN";
+      this.sequence = this.rules.find(x=>x.rULEID=="SL" && x.aCTIVE)?.vAL=="S";
+      this.isBrachCode = this.rules.find(x=>x.rULEID=="BCD" && x.aCTIVE)?.vAL=="Y";
+      this.fyear = this.rules.find(x=>x.rULEID=="YEAR" && x.aCTIVE)?.vAL=="F";
+      this.length = ConvertToNumber(this.rules.find(x=>x.rULEID=="LENGTH" && x.aCTIVE)?.vAL);
+      this.mseq = this.rules.find(x=>x.rULEID=="MSEQ" && x.aCTIVE)?.vAL=="Y";
   }
   async save() {
+    this.isSubmit=false;
     // Clear form validators and revalidate the form
     const formControls = this.quickDocketTableForm;
     clearValidatorsAndValidate(formControls);
+    // Set a 'required' error on the 'isSubmit' form control
     // Prepare request data
     const requestData = { ...formControls.value, isComplete: false };
     // Set payment type name based on selected value

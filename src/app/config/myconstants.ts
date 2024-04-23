@@ -4,7 +4,7 @@ export const StoreKeys = {
     CompanyCode: 'companyCode',
     UserId: 'UserName',
     UserName: 'Name',
-    Role: 'role',        
+    Role: 'role',
     CurrentUser: 'currentUser',
     CurrentBranch: 'currentBranch',
     Branch: 'branch',
@@ -23,13 +23,15 @@ export const StoreKeys = {
     SearchResults: 'searchResults',
     DocCallAs: 'docCallAs',
     DocNames: 'DocNames',
+    AccountMaster: 'AccountMaster',
 
     Theme: 'theme',
     Choose_LogoHeader: 'choose_logoheader',
     Sidebar_Status: 'sidebar_status',
     Choose_Skin: 'choose_skin',
     Choose_Skin_Active:'choose_skin_active',
-    IsRtl: 'isRtl'
+    IsRtl: 'isRtl',
+    WorkingLoc: 'WorkingLoc'
 }
 
 export const Collections = {
@@ -66,8 +68,8 @@ export const GenericActions = {
 export const OperationActions = {
     CreateThc: "operation/thc/create",
     getThc: "operation/thc/get",
-    createCha:"operation/cha/create",
-    createRake:"operation/rake/create"
+    createCha: "operation/cha/create",
+    createRake: "operation/rake/create"
 }
 
 export const UploadFieldType = {

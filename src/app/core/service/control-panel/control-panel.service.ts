@@ -53,7 +53,7 @@ export class ControlPanelService {
     const data = this.storage.getItem(StoreKeys.DocCallAs);
     return JSON.parse(data);
   }
-  async getModuleRules(filter={}) {
+  async getModuleRules(filter) {
     const req={
       companyCode:this.storage.getItem(StoreKeys.CompanyCode),
       collectionName:"module_rules",

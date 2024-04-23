@@ -408,7 +408,8 @@ export class ConsignmentLtl extends BaseControl {
                 ],
                 functions: {
                     onModel: "getCustomer",
-                    onOptionSelect: 'getConsignor'
+                    onOptionSelect: 'getConsignor',
+                    onChange:"GetWalkingAutofill"
                 },
                 additionalData: {
                     showNameAndValue: true,
@@ -503,7 +504,8 @@ export class ConsignmentLtl extends BaseControl {
                 ],
                 functions: {
                     onModel: "getCustomer",
-                    onOptionSelect: 'getConsignee'
+                    onOptionSelect: 'getConsignee',
+                    onChange:"GetWalkingAutofill"
                 },
                 additionalData: {
                     showNameAndValue: true,
@@ -1026,7 +1028,7 @@ export class ConsignmentLtl extends BaseControl {
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 functions: {
                     onSelection: "onRcmChange"
                 },
@@ -1037,11 +1039,11 @@ export class ConsignmentLtl extends BaseControl {
                 },
             },
             {
-                name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'number',
+                name: 'gstRate', label: 'GST Rate(%)', placeholder: 'GST Rate', type: 'number',
                 value:0.00, Validations: [],  
                 functions: {
                     onModel: "preventNegative",
-                    onChange: "calculateFreight"
+                    onChange: "calculateRate"
                 },
                 additionalData: {
                     metaData: "freightDetails"

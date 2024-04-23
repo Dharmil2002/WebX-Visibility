@@ -175,7 +175,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this.getArrivalDetails();
   }
   ngOnInit(): void {
-    this.viewComponent = MarkArrivalComponent //setting Path to add data
 
     try {
     } catch (error) {
@@ -307,6 +306,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this.tableload=false;
   }
   handleMenuItemClick(label: string, element) {
+    
     let Data = { label: label, data: element }
     //  this.menuItemClicked.emit(Data);
     this.advancdeDetails = {

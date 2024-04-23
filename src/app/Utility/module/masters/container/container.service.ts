@@ -73,7 +73,7 @@ export class ContainerService {
   }
   //#endregion
 
-  //#region 
+  //#region
   async getDetail() {
     const request = {
       companyCode: this.companyCode,
@@ -130,4 +130,45 @@ export class ContainerService {
     return containerDataWithPrefix;
     return containerData
   }
-}  
+  async ContainerDetail(filter = {}) {
+    // Prepare the request body with necessary parameters
+    const reqBody = {
+      companyCode: this.storage.companyCode, // Get company code from local storage
+      collectionName: "container_detail",
+      filter: filter,
+    };
+    try {
+      // Make an asynchronous request to the API using masterMongoPost method
+      const res = await this.masterService
+        .masterMongoPost("generic/get", reqBody)
+        .toPromise();
+      return res.data
+      // Sort the mapped data in ascending order by location name
+    } catch (error) {
+      // Handle any errors that occur during the API request
+      console.error("An error occurred:", error);
+      return null; // Return null to indicate an error occurred
+    }
+  }
+
+  async getContainer(filter, project = null): Promise<any | null> {
+
+    let filters= [];
+    filters.push({
+      D$match: filter
+    });
+
+    if(project) {
+      filters.push({ 'D$project': project });
+    }
+
+    const reqBody = {
+      companyCode: this.storage.companyCode, // Get company code from local storage
+      collectionName: 'container_detail',
+      filters: filters
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+    return res?.data || [];
+  }
+}

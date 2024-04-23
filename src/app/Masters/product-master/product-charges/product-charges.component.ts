@@ -113,7 +113,6 @@ export class ProductChargesComponent implements OnInit {
   HendelFormFunction() {
     this.initializeFormControl();
     this.bindDropdown();
-    this.ChargesBehaviourDropdown();
     this.ChargesListDropdown();
     this.getChargeApplicable();
   }
@@ -159,12 +158,13 @@ export class ProductChargesComponent implements OnInit {
         // Set category-related variables
         this.ChargesBehaviourCode = data.name;
         this.ChargesBehaviourStatus = data.additionalData.showNameAndValue;
+        this.ChargesBehaviourDropdown();
       }
       if (data.name === "Ledger") {
         // Set category-related variables
         this.LedgerCode = data.name;
         this.LedgerStatus = data.additionalData.showNameAndValue;
-        // this.getLedger();
+        this.getLedger();
       }
     });
   }
@@ -234,8 +234,8 @@ export class ProductChargesComponent implements OnInit {
       );
     }
   }
-  async getLedger(event) {
-    console.log('event' ,event)
+  async getLedger() {
+    console.log("ok")
     let req = {
       companyCode: this.companyCode,
       filter: { iSSYS: true },
@@ -244,6 +244,7 @@ export class ProductChargesComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
+      console.log('Res' ,Res)
     if (Res.success && Res.data.length > 0) {
       const LedgerData = Res.data.map((x) => {
         return {
@@ -384,6 +385,7 @@ export class ProductChargesComponent implements OnInit {
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;
+    console.log('functionName' ,functionName)
     try {
       this[functionName]($event);
     } catch (error) {

@@ -62,12 +62,12 @@ export async function getbankreconcilationList(masterService, request) {
             return result.map((x, index) => ({
                 voucherNo: x.vNO,
                 chequeNumber: x.rNO,
-                voucherDate: formatDate(x.tTDT, "dd-MMM-yy HH:mm a"),
+                voucherDate: x.tTDT,
                 party: ((x?.pCODE ?? "") && x?.pNAME ? x.pCODE + " - " + x.pNAME : x?.pCODE ?? x?.pNAME ?? ""),
                 amount: (x.nNETP).toFixed(2),
                 VoucherType: x.vTYPNM,
                 VoucherFor: x.pRE,
-                ClearanceDate: formatDate(x.dT, "dd-MMM-yy HH:mm a"),
+                ClearanceDate: x.dT,
                 Comments: x.nAR,
                 OthersData: x
             })) ?? null;

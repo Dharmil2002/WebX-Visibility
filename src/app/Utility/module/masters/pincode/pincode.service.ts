@@ -337,6 +337,7 @@ export class PinCodeService {
           //   text: `No data found for City ${cValue}`,
           //   showConfirmButton: true,
           // });
+          return codeData
         } else {
           // Call the filter function with the filtered data
           this.filter.Filter(
@@ -346,6 +347,7 @@ export class PinCodeService {
             controlName,
             codeStatus
           );
+          return codeData
         }
       }
     } catch (error) {

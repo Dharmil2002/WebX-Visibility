@@ -49,7 +49,7 @@ export class AddressMasterAddComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    public StorageServiceI: StorageService,
+    public StorageServiceI: StorageService
   ) {
     this.companyCode = this.StorageServiceI.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -127,7 +127,7 @@ export class AddressMasterAddComponent implements OnInit {
   }
   //#region Pincode Dropdown
 
- async getPincodeData() {
+  async getPincodeData() {
     if (!this.isUpdate || !this.pincodeDataFetched) {
       await this.fetchPincodeData();
     }
@@ -139,30 +139,36 @@ export class AddressMasterAddComponent implements OnInit {
 
   async fetchPincodeData() {
     const pincodeReq = {
-      "companyCode": this.companyCode,
-      "collectionName": "pincode_master",
-      "filter": {}
+      companyCode: this.companyCode,
+      collectionName: "pincode_master",
+      filter: {},
     };
 
     try {
-      const pincodeRes = await this.masterService.masterPost('generic/get', pincodeReq).toPromise();
+      const pincodeRes = await this.masterService
+        .masterPost("generic/get", pincodeReq)
+        .toPromise();
       this.pincodeDet = pincodeRes?.data || [];
       const pincodeList = this.pincodeDet.map((x) => ({
         name: x.PIN.toString(),
         value: x.PIN.toString(),
       }));
 
-      const pincodeValue = this.addressTableForm.controls['pincode'].value;
+      const pincodeValue = this.addressTableForm.controls["pincode"].value;
 
       if (this.isUpdate && !this.pincodeDataFetched) {
         const updatePin = pincodeList.find((x) => x.value == this.data.pincode);
-        this.addressTableForm.controls['pincode'].setValue(updatePin);
+        this.addressTableForm.controls["pincode"].setValue(updatePin);
       }
       // Check if pincodeValue is a valid number
       if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
-        const exactPincodeMatch = pincodeList.find((element) => element.name === pincodeValue);
+        const exactPincodeMatch = pincodeList.find(
+          (element) => element.name === pincodeValue
+        );
         if (!exactPincodeMatch) {
-          const filteredPincodeDet = pincodeList.filter((element) => element.name.includes(pincodeValue.toString()));
+          const filteredPincodeDet = pincodeList.filter((element) =>
+            element.name.includes(pincodeValue.toString())
+          );
           if (filteredPincodeDet.length === 0) {
             // Show a popup indicating no data found for the given pincode
             Swal.fire({
@@ -184,7 +190,7 @@ export class AddressMasterAddComponent implements OnInit {
       }
       this.pincodeDataFetched = true;
     } catch (error) {
-      console.error('Error fetching pincode data:', error);
+      console.error("Error fetching pincode data:", error);
     }
   }
   //#endregion
@@ -216,9 +222,9 @@ export class AddressMasterAddComponent implements OnInit {
         status
       );
       if (this.isUpdate) {
-        const updatedValue = this.data.customer; // Assuming updatedValue is an array
-        const selectedData = customerData.filter(x => updatedValue.includes(x.value));
-        this.addressTableForm.controls['customerNameDropdown'].patchValue(selectedData);
+        const customer = this.data.customer?.map((x) => x.code);
+        const selectedData = customerData.filter((x) => customer.includes(x.value));
+        this.addressTableForm.controls["customerNameDropdown"].setValue(selectedData);
       }
     }
   }
@@ -232,7 +238,14 @@ export class AddressMasterAddComponent implements OnInit {
     Object.values(this.addressTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
-    const customerName = this.addressTableForm.value.customerNameDropdown?.map((item: any) => item.value) || "";
+    const customerName = this.addressTableForm.value.customerNameDropdown?.map(
+      (x) => {
+        return {
+          code: x.value,
+          name: x.name,
+        };
+      }
+    );
     this.addressTableForm.removeControl("customerNameDropdown");
     this.addressTableForm.controls["customer"].setValue(customerName);
     if (this.isUpdate) {
@@ -246,7 +259,7 @@ export class AddressMasterAddComponent implements OnInit {
           ...this.addressTableForm.value,
           mODDT: new Date(),
           mODLOC: this.StorageServiceI.branch,
-          mODBY:this.StorageServiceI.userName,
+          mODBY: this.StorageServiceI.userName,
         },
       };
       this.masterService.masterPut("generic/update", req).subscribe({
@@ -289,7 +302,7 @@ export class AddressMasterAddComponent implements OnInit {
           ...this.addressTableForm.value,
           eNTDT: new Date(),
           eNTLOC: this.StorageServiceI.branch,
-          eNTBY:this.StorageServiceI.userName,
+          eNTBY: this.StorageServiceI.userName,
         },
       };
       this.masterService.masterPost("generic/create", req).subscribe({

@@ -5,13 +5,13 @@ import { firstValueFrom } from "rxjs";
 import { AddressMaster } from "src/app/core/models/Masters/address-master";
 import { xlsxutilityService } from "src/app/core/service/Utility/xlsx Utils/xlsxutility.service";
 import { StorageService } from "src/app/core/service/storage.service";
-import { chunkArray } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
-import { nextKeyCodeByN } from 'src/app/Utility/commonFunction/stringFunctions';
+import { chunkArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { nextKeyCodeByN } from "src/app/Utility/commonFunction/stringFunctions";
 import { XlsxPreviewPageComponent } from "src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
-import { max } from 'lodash';
-import Swal from 'sweetalert2';
+import { max } from "lodash";
+import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 
@@ -24,6 +24,7 @@ export class AddressMasterUploadComponent implements OnInit {
   pincodeList: any;
   customerList: any;
   zonelist: any;
+  customerData: any[];
   constructor(
     private dialogRef: MatDialogRef<AddressMasterUploadComponent>,
     private fb: UntypedFormBuilder,
@@ -55,22 +56,30 @@ export class AddressMasterUploadComponent implements OnInit {
 
   //#region processData
   processData(element, lastAddressCode: string, i: number) {
-    const updatepincode = this.pincodeList.find(item => item.PIN === parseInt(element.pincode));
+    const updatepincode = this.pincodeList.find(
+      (item) => item.PIN === parseInt(element.pincode)
+    );
     let customer: string[];
     // Check if element.customer contains a comma
-    if (element.customer.includes(',')) {
+    if (element.customer.includes(",")) {
       // If it contains a comma, split into an array of locations
-      customer = element.customer.split(',').map(customer => customer.trim().toUpperCase());
+      customer = element.customer
+        .split(",")
+        .map((customer) => customer.trim().toUpperCase());
     } else {
       // If it doesn't contain a comma, treat it as a single location
       customer = [element.customer.trim()];
     }
     // Find the matching locations in locationList
-    const updatecustomerList = this.customerList.filter(item => customer.includes(item.customerCode.toUpperCase()));
+    const updatecustomerList = this.customerData.filter(
+      (item) =>
+        customer.includes(item.customerCode) ||
+        customer.includes(item.customerName)
+    );
     // Create a new VendorModel instance to store processed data
     const processedData = new AddressMaster({});
     // Set basic properties
-    const newAddressCode = nextKeyCodeByN(lastAddressCode, (i + 1));
+    const newAddressCode = nextKeyCodeByN(lastAddressCode, i + 1);
     processedData.addressCode = newAddressCode;
     processedData._id = newAddressCode;
     processedData.companyCode = this.storage.companyCode;
@@ -80,47 +89,55 @@ export class AddressMasterUploadComponent implements OnInit {
     processedData.address = element.address;
     processedData.cityName = updatepincode.CT;
     processedData.stateName = element.stateName;
-    processedData.pincode =  updatepincode.PIN;
-    processedData.customer = updatecustomerList.map((x) => {
-      return x.customerCode;
-    }) || [];
+    processedData.pincode = updatepincode.PIN;
+    processedData.customer = updatecustomerList.map(x => ({
+      code: x.customerCode,
+      name: x.customerName
+  }));
     // Set timestamp and user information
-    processedData['eNTDT'] = new Date();
-    processedData['eNTBY'] = this.storage.userName;
-    processedData['eNTLOC'] = this.storage.branch;
+    processedData["eNTDT"] = new Date();
+    processedData["eNTBY"] = this.storage.userName;
+    processedData["eNTLOC"] = this.storage.branch;
     // Return the processed data
     return processedData;
   }
   //#endregion
 
-    //#region to fetch all pincode data
-    async fetchAllPincodeData(pinChunks) {
-      const chunks = chunkArray(pinChunks, 50);
+  //#region to fetch all pincode data
+  async fetchAllPincodeData(pinChunks) {
+    const chunks = chunkArray(pinChunks, 50);
 
-      const promises = chunks.map(chunk =>
-        this.objPinCodeService.pinCodeDetail({ PIN: { D$in: chunk } })
-      );
+    const promises = chunks.map((chunk) =>
+      this.objPinCodeService.pinCodeDetail({ PIN: { D$in: chunk } })
+    );
 
-      const results = await Promise.all(promises);
-      return results.flat();  // This will merge all results into a single array
-    }
-    //#endregion
+    const results = await Promise.all(promises);
+    return results.flat(); // This will merge all results into a single array
+  }
+  //#endregion
 
-    //#region to fetch all location data
-    async fetchAllCustomerData(customerChunks) {
-      const chunks = chunkArray(customerChunks, 50);
-
-      const promises = chunks.map(chunk =>
-        this.objCustomerService.getCustomer({
+  //#region to fetch all location data
+  async fetchAllCustomerData(customerChunks) {
+    const chunks = chunkArray(customerChunks, 50);
+    const promises = chunks.map((chunk) =>
+      this.objCustomerService.getCustomer(
+        {
           companyCode: this.storage.companyCode,
-          customerCode: { D$in: chunk },
-          activeFlag: true
-        }, { _id: 0, customerCode: 1, customerName: 1 })
-      );
-      const result = await Promise.all(promises);
-      return result.flat();  // This will merge all results into a single array
-    }
-    //#endregion
+          D$or: [
+            { customerCode: { D$in: chunk } },
+            { customerName: { D$in: chunk } },
+          ],
+          activeFlag: true,
+        },
+        { _id: 0, customerCode: 1, customerName: 1 }
+      )
+    );
+
+    const result = await Promise.all(promises);
+    return result.flat(); // This will merge all results into a single array
+  }
+
+  //#endregion
 
   //#region to select file
   selectedFile(event) {
@@ -139,9 +156,16 @@ export class AddressMasterUploadComponent implements OnInit {
           .map((item) => item.trim().toUpperCase());
         // Fetch data from DB
         this.pincodeList = await this.fetchAllPincodeData(pincodes);
-        this.customerList = await this.fetchAllCustomerData(customerItems);
+        this.customerData = await this.fetchAllCustomerData(customerItems);
+
         const states = [...new Set(this.pincodeList.map((x) => x.ST))];
-        this.zonelist = await this.objState.getStateWithZone({ ST: { D$in: states } });
+        this.zonelist = await this.objState.getStateWithZone({
+          ST: { D$in: states },
+        });
+        const datawithcode = this.customerData.map((x) => x.customerCode);
+        const datawithName = this.customerData.map((x) => x.customerName);
+        this.customerList = [...datawithcode, ...datawithName];
+
         const validationRules = [
           {
             ItemsName: "manualCode",
@@ -172,19 +196,17 @@ export class AddressMasterUploadComponent implements OnInit {
               {
                 TakeFromList: this.pincodeList.map((x) => {
                   return x.PIN;
-                })
-              }
-            ]
+                }),
+              },
+            ],
           },
           {
             ItemsName: "customer",
             Validations: [
               { Required: true },
               {
-                TakeFromArrayList: this.customerList.map((x) => {
-                  return x.customerCode;
-                }),
-              }
+                TakeFromArrayList: this.customerList,
+              },
             ],
           },
         ];
@@ -198,7 +220,7 @@ export class AddressMasterUploadComponent implements OnInit {
           const manualCode = new Set();
           const address = new Set();
 
-          existingRecords.forEach(rec => {
+          existingRecords.forEach((rec) => {
             if (rec.manualCode) manualCode.add(rec.manualCode);
             if (rec.address && rec.address !== "") address.add(rec.address);
           });
@@ -213,13 +235,19 @@ export class AddressMasterUploadComponent implements OnInit {
                 );
               }
               if (address.has(element.address)) {
-                element.error.push(`address : ${element.address} Already exists`);
+                element.error.push(
+                  `address : ${element.address} Already exists`
+                );
               }
-              const cityName = this.pincodeList.find(x => x.PIN === parseInt(element.pincode));
+              const cityName = this.pincodeList.find(
+                (x) => x.PIN === parseInt(element.pincode)
+              );
               if (cityName) {
                 element["cityName"] = cityName.CT;
                 // const state = this.pincodeList.find(x => x.ST === city.ST);
-                const stateName = this.zonelist.find(x => x.ST === cityName.ST);
+                const stateName = this.zonelist.find(
+                  (x) => x.ST === cityName.ST
+                );
                 if (stateName) {
                   element["stateName"] = stateName.STNM;
                 }
@@ -242,8 +270,8 @@ export class AddressMasterUploadComponent implements OnInit {
 
   //#region getAddressData
   async getAddressData(data) {
-    const manualCode = [... new Set(data.map((x) => x.manualCode))];
-    const address = [... new Set(data.map((x) => x.address))];
+    const manualCode = [...new Set(data.map((x) => x.manualCode))];
+    const address = [...new Set(data.map((x) => x.address))];
 
     const mncod = chunkArray(manualCode, 25);
     const addrs = chunkArray(address, 25);
@@ -262,10 +290,12 @@ export class AddressMasterUploadComponent implements OnInit {
             $or: [
               ...(mc.length > 0 ? [{ manualCode: { D$in: mc } }] : []),
               ...(ad.length > 0 ? [{ address: { D$in: ad } }] : []),
-            ]
+            ],
           },
         };
-        const response = await firstValueFrom(this.masterService.masterPost("generic/get", request));
+        const response = await firstValueFrom(
+          this.masterService.masterPost("generic/get", request)
+        );
         results = [...results, ...response.data];
       }
     }
@@ -296,24 +326,33 @@ export class AddressMasterUploadComponent implements OnInit {
     try {
       const chunkSize = 50;
       let successfulUploads = 0;
-      const lastAddressCode = await this.masterService.getLastId("address_detail", this.storage.companyCode, 'companyCode', 'addressCode', 'A')
+      const lastAddressCode = await this.masterService.getLastId(
+        "address_detail",
+        this.storage.companyCode,
+        "companyCode",
+        "addressCode",
+        "A"
+      );
 
       // Process each element in data using processData
-      const processedData = data.map((element, i) => this.processData(element, lastAddressCode, i));
+      const processedData = data.map((element, i) =>
+        this.processData(element, lastAddressCode, i)
+      );
 
       // Chunk the processedData data recursively
       const chunks = chunkArray(processedData, chunkSize);
       const sendData = async (chunks: AddressMaster[][]) => {
-        chunks.forEach(async chunk => {
+        chunks.forEach(async (chunk) => {
           const request = {
             companyCode: this.storage.companyCode,
             collectionName: "address_detail",
             data: chunk,
           };
           try {
-            const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
+            const response = await firstValueFrom(
+              this.masterService.masterPost("generic/create", request)
+            );
             if (response.success) {
-
               successfulUploads++;
             }
           } catch (error) {
@@ -333,7 +372,6 @@ export class AddressMasterUploadComponent implements OnInit {
       };
 
       await sendData(chunks);
-
     } catch (error) {
       console.log(error);
       Swal.fire({

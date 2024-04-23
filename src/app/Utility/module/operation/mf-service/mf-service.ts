@@ -5,6 +5,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
+import convert from 'convert-units';
 import moment from "moment";
 
 @Injectable({
@@ -112,12 +113,21 @@ export class ManifestService {
 
     }
     async mapFieldsWithoutScanning(details, header, formField,isScan,notSelectedData) {
+        debugger
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
-       
         //collectionName:"mf_details_ltl"
         const envData = [];
+        const getInvoice=await this.gettingLastSuffix(details);
         const mfDetails = details.map((d) => {
             try {
+                let lDVOL={};
+                if(getInvoice && getInvoice.length>0){
+                    const vol=getInvoice.find(x=>x.dKTNO==d.Shipment)?.vOL || 0;
+                    lDVOL = convert(vol.l).from('cm').to('ft') *
+                    convert(vol.b).from('cm').to('ft') *
+                    convert(vol.h).from('cm').to('ft') * parseInt(d?.Packages);
+                    d.cft=lDVOL;
+                }
                 const mfJson = {
                     "_id": "",
                     "cID": this.storage.companyCode,
@@ -166,30 +176,30 @@ export class ManifestService {
         });
         const filteredMfDetails = mfDetails.filter(detail => detail !== null);
         const sfxDockets = details.filter((x) => x.pendPkg > 0);
-        
         let sfxDocketsData = []
         let isSuffex = false;
         const sfxEnvData = [];
         if (sfxDockets.length > 0) {
-            sfxDocketsData = sfxDockets.map((d) => {
-
+            const suffixData=await this.gettingLastSuffix(sfxDockets);
+            if(suffixData && suffixData.length>0){
+              sfxDocketsData = sfxDockets.map((d) => {
                 // Parsing and incrementing the suffix safely
-                const nextSuffix = Number(d.Suffix) + 1;
-                if (isNaN(nextSuffix)) {
-                    throw new Error("Invalid Suffix value: " + d.Suffix);
+                const dktOps=suffixData.find(x=>x.dKTNO==d.Shipment);
+                if (!dktOps) {
+                    throw new Error("No Data Found");
                 }
-
+                const nextSuffix = Number(dktOps.Suffix) + 1;
                 // Generating a timestamp with moment.js for consistent formatting
                 const currentTime = moment().tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A");
                 const entryTimestamp = new Date();
-
+               
                 // Constructing the new docket JSON object
                 const newDocket = {
                     "_id": `${this.storage.companyCode}-${d.Shipment}-${nextSuffix}`,
                     "cID": this.storage.companyCode,
                     "dKTNO": d.Shipment,
-                    "sFX": nextSuffix,
-                    "cLOC": this.storage.branch,
+                    "sFX":nextSuffix,
+                    "cLOC":dktOps.cLOC,
                     "oRGN": d.Origin,
                     "dEST": d.Destination,
                     "aCTWT": ConvertToNumber(d.pendWt, 3),
@@ -205,15 +215,15 @@ export class ManifestService {
                     "sTSTM": entryTimestamp,
                     "oPSSTS": `Booked at ${this.storage.branch} on ${currentTime}`,
                     "iSDEL": false,
-                    "eNTDT": entryTimestamp,
-                    "eNTLOC": this.storage.branch,
-                    "eNTBY": this.storage.userName
+                    "eNTDT":dktOps.eNTDT,
+                    "eNTLOC":dktOps.eNTLOC,
+                    "eNTBY":dktOps.eNTBY
                 };
                 let sfxData = {
                     _id: `${this.storage.companyCode}-${d.Shipment}-${nextSuffix}-${DocketEvents.Booking}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
                     cID: this.storage.companyCode,
                     dKTNO: d?.Shipment || "",
-                    sFX: d?.Suffix || 0,
+                    sFX: nextSuffix || 0,
                     lOC: this.storage.branch,
                     eVNID: DocketEvents.Booking,
                     eVNDES: getEnumName(DocketEvents, DocketEvents.Booking),
@@ -233,8 +243,7 @@ export class ManifestService {
             });
             isSuffex = true;
         }
-
-        
+        }
         const mfHeader = {
             "_id": "",
             "cID": this.storage.companyCode,
@@ -244,10 +253,11 @@ export class ManifestService {
             "rUTCD": formField.route.split(":")[0].trim() || "",
             "rUTNM": formField.route.split(":")[1].trim() || "",
             "leg": formField?.Leg || 0,
-            "dKTS": formField?.Shipments || 0,
-            "pKGS": parseInt(formField?.Packages) || 0,
-            "wT": ConvertToNumber(header[0]?.WeightKg || 0, 3) || 0,
-            "vOL": ConvertToNumber(header[0]?.VolumeCFT || 0, 3) || 0,
+            "dKTS":mfDetails.length,
+            "pKGS":mfDetails.reduce((a,b)=>a+b.lDPKG,0) || 0,
+            "wT":mfDetails.reduce((a,b)=>a+b.lDWT,0) || 0,
+            "vOL":mfDetails.reduce((a,b)=>a+b.lDVOL,0) || 0,
+            "cWT":mfDetails.reduce((a,b)=>a+b.lDCWT,0) || 0,
             "tHC": formField?.tripId || 0,
             "iSARR": false,
             "eNTDT": new Date(),
@@ -258,6 +268,49 @@ export class ManifestService {
 
         await this.updateDocketDetails(notSelectedData);
         return { mfHeader, filteredMfDetails, envData, lsNo, sfxDocketsData, isSuffex, sfxEnvData,isScan }
+    }
+    async gettingLastSuffix(data){
+         const req={
+            companyCode:this.storage.companyCode,
+            collection:"docket_ops_det_ltl",
+            filters:[
+                {
+                  D$match: {
+                    dKTNO:data.map(d=>d.Shipment)
+                  }
+                },
+                {
+                    D$lookup: {
+                      from: "docket_invoices_ltl",
+                      localField: "dKTNO",
+                      foreignField: "dKTNO",
+                      as: "InvoiceDetails"
+                    }
+                  },
+                  {
+                    D$unwind: {
+                      path: "$InvoiceDetails",
+                      preserveNullAndEmptyArrays: false
+                    }
+                  },
+                {
+                  D$group: {
+                    _id: "$dKTNO",
+                    dKTNO: {D$first: "$dKTNO" },
+                    eNTDT:{D$first:"$eNTDT"},
+                    eNTLOC:{D$first:"$eNTLOC"},
+                    eNTBY:{D$first:"$eNTBY"},
+                    cLOC:{D$first:"$cLOC"},
+                    vOL:{D$first:"$InvoiceDetails.vOL"},
+                    Suffix: {
+                      D$max: "$sFX"
+                    }
+                  }
+                }
+              ]
+         }
+         const res=await firstValueFrom(this.operationService.operationMongoPost("generic/query",req));
+         return res.data;
     }
     async createMfDetails(data) {
         const req = {

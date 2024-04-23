@@ -305,7 +305,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
 
   kpiData(event) {
-
+    debugger
     let packages = 0;
     let shipingloaded = 0;
     this.loadingTableData.forEach((element, index) => {
@@ -321,8 +321,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     const shipData = [
       createShipDataObject(this.loadingTableData.length, "Shipments", "bg-c-Bottle-light"),
       createShipDataObject(packages, "Packages", "bg-c-Grape-light"),
-      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-c-Daisy-light"),
-      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-c-Grape-light"),
+      createShipDataObject(event?.loadedWT || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-c-Daisy-light"),
+      createShipDataObject(event?.loadedPkg || 0, "Packages" + ' ' + this.shipmentStatus, "bg-c-Grape-light"),
     ];
 
     this.boxData = shipData;
@@ -381,13 +381,12 @@ export class VehicleUpdateUploadComponent implements OnInit {
       Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCWt });
     
       this.cdr.detectChanges();
+       this.kpiData(data);
     }
   }
   
   async CompleteScan() {
     let resMf=""
-    debugger;
-
     if(this.isScan){
     let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
     if(packageChecked){

@@ -1,13 +1,13 @@
-import { Component, OnInit, Renderer2 } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { firstValueFrom } from "rxjs";
-import { MasterService } from "src/app/core/service/Masters/master.service";
-import { StorageService } from "src/app/core/service/storage.service";
+import { Component, OnInit, Renderer2 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
-  selector: "app-common-view-print",
-  templateUrl: "./common-view-print.component.html",
+  selector: 'app-common-view-print',
+  templateUrl: './common-view-print.component.html'
 })
+
 export class CommonViewPrintComponent implements OnInit {
   showView = false;
   HtmlTemplate;
@@ -23,7 +23,7 @@ export class CommonViewPrintComponent implements OnInit {
     private storage: StorageService
   ) {
     this.companyCode = this.storage.companyCode;
-
+    
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
       "display",
@@ -51,10 +51,10 @@ export class CommonViewPrintComponent implements OnInit {
       docType: this.templateBody.templateName,
       partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
-    }; 
-    const Res = await firstValueFrom(
-      this.masterService.masterPost("viewprint/View", req)
-    );
+    };
+    const Res = await this.masterService
+      .masterPost("viewprint/View", req)
+      .toPromise();
     if (Res.success) {
       this.JsonData = Res.data.jsonData;
       this.FieldMapping = Res.data.fieldMapping;

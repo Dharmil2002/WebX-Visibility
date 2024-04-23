@@ -6,6 +6,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
+import { ClusterMasterService } from "../cluster/cluster.master.service";
 
 @Injectable({
   providedIn: "root",
@@ -14,7 +15,8 @@ export class PinCodeService {
   companyCode = 0;
   constructor(private masterService: MasterService,
     private storage: StorageService,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private clusterMasterService: ClusterMasterService,
   ) {
     this.companyCode = this.storage.companyCode;
   }
@@ -281,7 +283,7 @@ export class PinCodeService {
     }
   }
   /*below is function for getting city and pincode*/
-  async getCityPincode(form, jsondata, controlName, codeStatus, isCity) {
+  async getCityPincode(form, jsondata, controlName, codeStatus, isCity, isArea = false) {
     try {
       const cValue = form.controls[controlName].value;
       let filter = {}
@@ -293,7 +295,7 @@ export class PinCodeService {
         else {
           let gte = parseInt(`${cValue}00000`.slice(0, 6));
           let lte = parseInt(`${cValue}99999`.slice(0, 6));
-           filter = { PIN: { 'D$gte': gte, 'D$lte': lte } }
+          filter = { PIN: { 'D$gte': gte, 'D$lte': lte } }
         }
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
@@ -305,50 +307,52 @@ export class PinCodeService {
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
         // Extract data from the response
         let codeData = []
+        let mergeData = []
+        if (isArea) {
+          try {
+            const data = await this.clusterMasterService.getClusterData(cValue);
+             mergeData = (data) ? data : [];
+          } catch (error) {
+            console.error("Failed to retrieve cluster data:", error);
+            // Handle the error appropriately
+          }
+        }
         if (isCity) {
-          codeData = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
+          const data = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
             .map(ct => {
               // Find the first occurrence of this ct in the original data to get its pincode
               const originalItem = cResponse.data.find(item => item.CT === ct);
               return {
-                name:originalItem.PIN,
-                value:ct,
-                ct:ct,
-                pincode: originalItem ? originalItem.PIN : null // include pincode here
+                name: originalItem.PIN,
+                value: ct,
+                ct: ct,
+                pincode: originalItem.PIN, // include pincode here
+                st: originalItem?.ST
               };
             });
+
+            mergeData = (data) ? [...mergeData, ...data] : mergeData;
         }
         else {
           codeData = cResponse.data
             .filter((x) => x.PIN.toString().startsWith(cValue))
             .map((element) => ({
               name: element.CT,
-              value:  element.PIN,
-              ct:element.CT,
-              pincode: element.PIN.toString()
+              value: element.PIN,
+              ct: element.CT,
+              pincode: element.PIN.toString(),
+              st: element.ST
             }));
+          mergeData = codeData;
         }
-        // Filter cityCodeData for partial matches
-        if (codeData.length === 0) {
-          // Show a popup indicating no data found for the given pincode
-          // Swal.fire({
-          //   icon: "info",
-          //   title: "No Data Found",
-          //   text: `No data found for City ${cValue}`,
-          //   showConfirmButton: true,
-          // });
-          return codeData
-        } else {
-          // Call the filter function with the filtered data
-          this.filter.Filter(
-            jsondata,
-            form,
-            codeData,
-            controlName,
-            codeStatus
-          );
-          return codeData
-        }
+
+        this.filter.Filter(
+          jsondata,
+          form,
+          mergeData,
+          controlName,
+          codeStatus
+        );        
       }
     } catch (error) {
       // Handle any errors that may occur during the asynchronous operation

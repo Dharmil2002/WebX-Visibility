@@ -38,6 +38,7 @@ import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -157,6 +158,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private _NavigationService: NavigationService,
     private prqService: PrqService,
     private customer: CustomerService,
+    private clusterMasterService: ClusterMasterService,
     private consigmentLtlModel: ConsigmentLtlModel,
     private route: Router,
     private operationService: OperationService,
@@ -406,6 +408,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*End*/
   /*pincode based city*/
   async getPincodeDetail(event) {
+    debugger
     const value = this.consignmentForm.controls[event.field.name].value;
     if (typeof (value) == "string" || typeof (value) == "number") {
       if (isValidNumber(value)) {
@@ -422,6 +425,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           this.consignmentForm,
           this.allFormControls,
           event.field.name,
+          true,
           true,
           true
         );
@@ -1659,11 +1663,74 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*below code is for invoke a contract*/
   InvockedContract() {
+    debugger
     const paymentBasesName = this.paymentType.find(x => x.value == this.consignmentForm.value.payType).name;
     const TransMode = this.tranType.find(x => x.value == this.consignmentForm.value.transMode).name;
     const party = this.docketService.paymentBaseContract[paymentBasesName]
     const partyDt = this.consignmentForm.controls[party].value.value
     const capacity = this.tableData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
+
+    const terms = ["Area", "Pincode", "City", "State"];
+
+    function generateCombinations(terms) {
+      const combinations = [];
+      for (let i = 0; i < terms.length; i++) {
+        for (let j = i + 1; j < terms.length; j++) { // Only generate unique combinations
+          combinations.push([terms[i], terms[j]]);
+        }
+      }
+      return combinations;
+    }
+
+    // Updated function to handle `isOrigin` condition correctly
+    function getTermValue(term, isOrigin) {
+      debugger
+      const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
+      const fieldKey = isOrigin ? "fromCity" : "toCity";
+      const type = typeMapping[term];
+      let valueKey;
+
+      // Determine the correct key based on term
+      switch (term) {
+        case "Area":
+          valueKey = "clusterName";
+          break;
+        case "Pincode":
+          valueKey = "pincode";
+          break;
+        case "City":
+          valueKey = "ct";
+          break;
+        case "State":
+          valueKey = "st";
+          break;
+        default:
+          return [];
+      }
+     
+      const value = this.consignmentForm[fieldKey].value[valueKey];
+      if (value) {
+        return [{ "D$expr": { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] } },
+        { "D$expr": { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] } }];
+      }
+      return [];
+    }
+
+    const allCombinations = generateCombinations(terms);
+
+    let matches = allCombinations.map(([fromTerm, toTerm]) => {
+      let match = { "D$and": [] };
+      let fromConditions = getTermValue(fromTerm, true);  // For origin
+      let toConditions = getTermValue(toTerm, false);     // For destination
+
+      if (fromConditions.length > 0 || toConditions.length > 0) {
+        match["D$and"].push(...fromConditions, ...toConditions);
+        return match;
+      }
+      return null;
+    }).filter(x => x != null);
+
+
     let reqBody =
     {
       "companyCode": this.storage.companyCode,
@@ -1673,7 +1740,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "basis": paymentBasesName,
       "from": this.consignmentForm.value.fromCity.value,
       "to": this.consignmentForm.value.toCity.value,
-      "capacity": capacity
+      "capacity": capacity,
+      "matches": matches
     }
 
     firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))

@@ -13,7 +13,6 @@ export class ClusterMasterService {
     }
 
     async getClusterData(value:string) {
-        debugger
         if (value.length >= 3) {
             const filter = { clusterName: { 'D$regex': `^${value}`, 'D$options': 'i' } }
             const reqBody = {
@@ -38,11 +37,12 @@ export class ClusterMasterService {
                            const found = pincodes.data.find(x => data.pincode.includes(x.PIN));
                             const json={
                                 value:data.clusterName,
-                                name:found?found.PIN:'',
-                                pincode:found?found.PIN:'',
-                                city:found?found.CT:'',
-                                clusterName:data.clusterName,
-                                clusterId:data.clusterCode
+                                name: found?.PIN || '',
+                                pincode: found?.PIN || '',
+                                ct: found?.CT || '',
+                                st: found?.ST || '',
+                                clusterName: data?.clusterName,
+                                clusterId: data?.clusterCode
                             }
                             cluster.push(json);
                           });
@@ -52,5 +52,14 @@ export class ClusterMasterService {
                
               }
         }
+    }
+    async getClusterByPincode(filter) {
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "cluster_detail",
+            filter:filter,
+        };
+        const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
+        return res.data;
     }
 }

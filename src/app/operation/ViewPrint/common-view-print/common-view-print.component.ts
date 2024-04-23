@@ -7,7 +7,6 @@ import { StorageService } from 'src/app/core/service/storage.service';
   selector: 'app-common-view-print',
   templateUrl: './common-view-print.component.html'
 })
-
 export class CommonViewPrintComponent implements OnInit {
   showView = false;
   HtmlTemplate;

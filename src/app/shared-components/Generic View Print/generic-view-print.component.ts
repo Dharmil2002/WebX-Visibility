@@ -48,6 +48,8 @@ export class GenericViewPrintComponent implements OnInit {
 
   private updateTableHtml(): void {
 
+    debugger
+
     const template = this.HtmlTemplate;
     const doc = this.parseHTML(template);
 

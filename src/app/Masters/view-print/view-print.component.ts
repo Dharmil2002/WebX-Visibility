@@ -175,7 +175,17 @@ export class ViewPrintComponent implements OnInit {
         name: "MR View-Print",
         partyCode:"CUST00028",
         viewName:"DeliveryMr"
-      }
+      },
+      {
+        name: "DocketATC View-Print",
+        partyCode: "CON0025",
+        viewName: "Docket",
+      },
+      {
+        name: "GatePassATC View-Print",
+        partyCode: "CON0025",
+        viewName: "DeliveryMr",
+      },
     ];
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {

@@ -19,10 +19,10 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { HawkeyeUtilityService } from 'src/app/Utility/module/hawkeye/hawkeye-utility.service';
 import { StoreKeys } from 'src/app/config/myconstants';
-import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { firstValueFrom } from 'rxjs';
 import { ThcCostUpdateService } from 'src/app/Utility/module/operation/thc/thc-cost-update.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -50,7 +50,6 @@ export class MarkArrivalComponent implements OnInit {
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<GenericTableComponent>,
-    private tripService: ThcService,
     public dialog: MatDialog,
     private storage: StorageService,
     private generalService: GeneralService,
@@ -87,7 +86,7 @@ export class MarkArrivalComponent implements OnInit {
     this.IntializeFormControl();
     this.getReasonList();
     this.MarkArrivalTableForm.controls.Vehicle.setValue(this.MarkArrivalTable.VehicleNo)
-    this.MarkArrivalTableForm.controls.ETA.setValue(this.MarkArrivalTable.Expected)
+    this.MarkArrivalTableForm.controls.ETA.setValue(moment(this.MarkArrivalTable.Expected).tz(this.storage.timeZone).format("DD MMM YYYY hh:mm A"))
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
     this.MarkArrivalTableForm.controls.TripID.setValue(this.MarkArrivalTable.TripID)
     this.getManifestDetail();
@@ -130,7 +129,6 @@ export class MarkArrivalComponent implements OnInit {
         this.MarkArrivalTableForm.controls['LateReason']?.
           value.name || ""
       )
-
     let tripDetailForm = this.MarkArrivalTableForm.value
     const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
     if (res) {
@@ -175,38 +173,33 @@ export class MarkArrivalComponent implements OnInit {
     const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
 
-    let tripStatus, tripDetails = {
-      vEHNO: "",
-      tHC: "",
-      cLOC: "",
-      nXTLOC: "",
-      sTS: null,
-      sTSNM: "",
-      cTM: null
-    }, stCode, stName;
-    if (!next) {
-      tripDetails['vEHNO'] = "";
-      tripDetails['tHC'] = "";
-      tripDetails['cLOC'] = this.MarkArrivalTable.Route.split(":")[1].split("-")[0];
-      tripDetails['nXTLOC'] = "";
-    }
+    let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
       stCode = 5,
         stName = "Vehicle Arrived"
-      tripDetails.sTS = stCode;
-      tripDetails.sTSNM = stName;
-    }
-    else if (dktStatus === "noDkt") {
+      tripDetails = {
+        sTS: stCode,
+        sTSNM: stName
+      };
+    } else if (dktStatus === "noDkt") {
       tripStatus = next ? "Update Trip" : "close";
       stCode = next ? 6 : 7,
-        stName = "Arrived"
+        stName = "Picked Up"
 
-      tripDetails.sTS = stCode;
-      tripDetails.sTSNM = stName;
-
-
-      if (next) {
-        tripDetails.cTM = new Date()
+      tripDetails = {
+        sTS: stCode,
+        sTSNM: stName,
+        ...(next ? {} : { cTM: new Date() })
+      };
+      if (!next) {
+        tripDetails.vEHNO = "",
+          tripDetails.tHC = "",
+          tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
+          tripDetails.nXTLOC = ""
+      }
+      else {
+        tripDetails.cLOC = this.storage.branch,
+          tripDetails.nXTLOC = next || ""
       }
     }
 
@@ -221,15 +214,13 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
-
-          try {
-            if (!next) {
+          if (!next) {
+            try {
               this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+            } catch (error) {
+              console.log("Error in updateTHCCostForDockets", error);
             }
-          } catch (error) {
-            console.log("Error in updateTHCCostForDockets", error);
           }
-
           try {
             const reqArrivalDeparture = {
               action: "TripArrivalDepartureUpdate",
@@ -240,7 +231,6 @@ export class MarkArrivalComponent implements OnInit {
                 tripId: this.MarkArrivalTableForm.value?.TripID
               }
             }
-
             this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
           } catch (error) {
             console.log("Error in pushToCTCommon", error);
@@ -250,7 +240,6 @@ export class MarkArrivalComponent implements OnInit {
             //this.getDocketTripWise(tripId);
             // Call the vehicleStatusUpdate function here
             const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
-
             Swal.fire({
               icon: "info",
               title: "Trip is close",

@@ -60,5 +60,6 @@ export class CommonViewPrintComponent implements OnInit {
       this.HtmlTemplate = Res.data.Template;
       this.showView = true;
     }
+    
   }
 }

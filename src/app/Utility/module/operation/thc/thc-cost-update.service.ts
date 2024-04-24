@@ -270,7 +270,7 @@ export class ThcCostUpdateService {
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 transDate: new Date(),
                 docType: "VR",
-                branch: this.storage.branch,
+                branch: RequestData.OriginBranch,
                 finYear: financialYear,
                 accLocation: RequestData.OriginBranch,
                 preperedFor: "Vendor",
@@ -395,8 +395,8 @@ export class ThcCostUpdateService {
             narration: `when THC No ${THCNo} Is Arrived`
         });
         const Result = [];
-        Result.push(createVoucher(ledgerInfo['EXP001024'].LeadgerCode,
-            ledgerInfo['EXP001024'].LeadgerName, ledgerInfo['EXP001024'].LeadgerCategory, 0, ChargeCost, THCNo));
+        Result.push(createVoucher(ledgerInfo['LIA003004'].LeadgerCode,
+            ledgerInfo['LIA003004'].LeadgerName, ledgerInfo['LIA003004'].LeadgerCategory, 0, ChargeCost, THCNo));
         Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode,
             ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, ChargeCost, 0, THCNo));
 

@@ -165,8 +165,8 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
         const startDate: Date = new Date(item.cSTARTDT);
         const endDate: Date = new Date(item.cENDDT);
 
-        item.cSTARTDT = moment(startDate).format('DD-MM-YYYY');
-        item.cENDDT = moment(endDate).format('DD-MM-YYYY');
+        item.cSTARTDT = moment(startDate).format('DD MMM YY');
+        item.cENDDT = moment(endDate).format('DD MMM YY');
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);

@@ -162,7 +162,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   formatData(val: string, key: string) {
     if (key.includes('Date') && val !== null) {
       let dt = new Date(val);
-      return moment(dt).format('DD-MM-YYYY HH:mm'); // <-- Use 'DD-MM-YYYY HH:mm' instead of 'DD/MM/YYYY HH:MM'
+      return moment(dt).format('DD MMM YY HH:mm');
     }
     return val;
   }
@@ -271,7 +271,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     }
     const formattedData = [Object.values(this.csvHeaders), ...jsonCsv.map(row => {
       return Object.keys(this.csvHeaders).map(col => {
-        let value = (col.toLowerCase().includes('date') || col.toLowerCase().includes('dob') || col.toLowerCase().includes('dt')) ? moment(new Date(row[col])).format('DD-MM-YYYY') === 'Invalid date' ? row[col] : moment(new Date(row[col])).format('DD-MM-YYYY') : row[col];
+        let value = (col.toLowerCase().includes('date') || col.toLowerCase().includes('dob') || col.toLowerCase().includes('dt')) ? moment(new Date(row[col])).format('DD MMM YY') === 'Invalid date' ? row[col] : moment(new Date(row[col])).format('DD MMM YY') : row[col];
         return value
       })
     })]

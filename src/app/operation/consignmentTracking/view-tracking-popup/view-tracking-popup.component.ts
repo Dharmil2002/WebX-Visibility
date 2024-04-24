@@ -92,8 +92,8 @@ export class ViewTrackingPopupComponent implements OnInit {
       ?.map((x) => {
         return {
           ...x,
-          Date: moment(x.eVNDT).format("DD-MM-YYYY hh:mm"),
-          eNTDT: moment(x.eNTDT).format("DD-MM-YYYY hh:mm"),
+          Date: moment(x.eVNDT).format("DD MMM YY hh:mm"),
+          eNTDT: moment(x.eNTDT).format("DD MMM YY hh:mm"),
           Location: x.lOC || x.eNTLOC,
           DocNo: x.dOCNO || x.dKTNO,
           AdditionalDetails: x.oPSSTS || x.oPSTS,

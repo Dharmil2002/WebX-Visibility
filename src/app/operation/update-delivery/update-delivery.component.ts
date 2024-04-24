@@ -186,7 +186,7 @@ export class UpdateDeliveryComponent implements OnInit {
               x.deliveryPkgs=parseInt(result.deliveryPkgs);
               x.cODDODCharges=result?.cODDODCharges||"0.00",
               x.codDodPaid=result?.codDodPaid||"0.00",
-              x.dDateTime=moment.utc(result.DTTM).format("DD/MM/YYYY HH:MM:SS");
+              x.dDateTime=moment.utc(result.DTTM).format("DD MMM YY HH:MM:SS");
               x.deliveryPartial=result.deliveryPartial||"",
               x.pod= result.upload||"",
               x.ltReason=result.ltReason||"",

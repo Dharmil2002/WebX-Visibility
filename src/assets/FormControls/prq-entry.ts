@@ -78,7 +78,7 @@ oneday: Date;
           },
         ],
         functions: {
-          onDate: 'format'
+          onDate: 'formatDate'
         },
         additionalData: {
            minDate: isUpdate ? "" :this.oneMonthAgo,

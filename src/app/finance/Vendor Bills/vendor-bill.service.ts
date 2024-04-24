@@ -94,6 +94,6 @@ export class VendorBillService {
   // Helper function to format the date using moment
   formatDate(dateString) {
     let dt = new Date(dateString);
-    return moment(dt).format("DD/MM/YYYY");
+    return moment(dt).format("DD MMM YY");
   }
 }

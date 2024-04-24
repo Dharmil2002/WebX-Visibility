@@ -86,7 +86,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
   }
 
   isValidDateFormat(dateString) {
-    // Define a regular expression for the "DD-MM-YYYY" format
+    // Define a regular expression for the "DD MMM YY" format
     const dateFormatRegex = /^\d{2}-\d{2}-\d{4}$/;
 
     // Check if the date string matches the pattern

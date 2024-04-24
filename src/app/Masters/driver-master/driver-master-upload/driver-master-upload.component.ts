@@ -277,13 +277,13 @@ export class DriverMasterUploadComponent implements OnInit {
     processedData.manualDriverCode = element.ManualDriverCode || '';
     processedData.driverName = element.DriverName || '';
     processedData.licenseNo = element.LicenseNo || '';
-    processedData.valdityDt = moment(element.LicenseValidityDate, 'DD-MMM-YY').toDate();
+    processedData.valdityDt = moment(element.LicenseValidityDate, 'DD MMM YY').toDate();
     processedData.telno = element.MobileNo || '';
     processedData.address = element.Address || '';
     processedData.pincode = element.PinCode || '';
     processedData.city = element.City || '';
     processedData.vehicleNo = element.AssignedVehicleNo || '';
-    processedData.dDob = moment(element.DateofBirth, 'DD-MMM-YY').toDate();
+    processedData.dDob = moment(element.DateofBirth, 'DD MMM YY').toDate();
     processedData.activeFlag = element.Active === 'Y';
     processedData.eNTBY = this.storage.userName;
     // processedData.countryCD = element.CountryCode || ''

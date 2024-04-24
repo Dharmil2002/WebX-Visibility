@@ -207,9 +207,9 @@ export class GenericTableV2Component
     if (colDef && colDef.datatype) {
       switch (colDef.datatype) {
         case "date":
-          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY") : "";
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY") : "";
         case "datetime":
-          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY HH:mm") : "";
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY HH:mm") : "";
         case "time":
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "HH:mm") : "";
         case "currency":
@@ -225,7 +225,7 @@ export class GenericTableV2Component
       if (typeof val !== 'boolean' && isValidNumber(val)) {
         return Number(val);
       } else if (typeof val === 'string' && isValidDate(val)) {
-        return moment(new Date(val)).format("DD/MM/YYYY");
+        return moment(new Date(val)).format("DD MMM YY HH:mm");
       }
     }
     return val;

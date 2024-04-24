@@ -25,7 +25,8 @@
           <img [src]="logo" class="pointer" height="35px" alt="Company Logo" (click)="navigateToPage()">
         </li>
         <li class="nav-item">
-           <button mat-icon-button (click)="openSearchPopup()">
+           <button mat-icon-button (click)="openSearchPopup()" matTooltip="Search" matTooltipPosition="above"
+           matTooltipClass="tooltip">
               <app-feather-icons [icon]="'search'" [class]="'header-icon'"></app-feather-icons>
           </button>
         </li>
@@ -44,7 +45,7 @@
         </li>
         <!-- Full Screen Button -->
         <li class="fullscreen">
-          <button mat-icon-button (click)="callFullscreen()" class=" nav-notification-icons">
+          <button mat-icon-button (click)="callFullscreen()" class="nav-notification-icons mdc-button mat-mdc-button mat-unthemed mat-mdc-button-base">
             <app-feather-icons [icon]="'maximize'" [class]="'header-icon'"></app-feather-icons>
           </button>
         </li>

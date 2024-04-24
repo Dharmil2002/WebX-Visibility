@@ -292,6 +292,7 @@ export class GenericTableV2Component
 
   //#region Funtion to send data for edit
   drillDownData(item, tableData, title = "") {
+    debugger
     let drillDownLink = this.Link.find((x) => x.Row == tableData);
     if (drillDownLink.Path) {
       this.router.navigate([drillDownLink.Path], {

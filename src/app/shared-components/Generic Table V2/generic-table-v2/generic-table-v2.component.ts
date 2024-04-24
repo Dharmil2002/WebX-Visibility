@@ -300,7 +300,7 @@ export class GenericTableV2Component
         },
       });
     }
-    else if (this.menuItems.length>0) {
+    else if (this.menuItems && this.menuItems.length>0) {
       let navigateToComponent;
       if (tableData === "Action") {
         let action = item.Action;

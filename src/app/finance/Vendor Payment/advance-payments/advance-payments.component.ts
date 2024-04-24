@@ -602,7 +602,7 @@ export class AdvancePaymentsComponent implements OnInit {
         const Response = [];
 
         // Process Journal Requests
-        if(this.isInterBranchControl) {
+        if (this.isInterBranchControl) {
           // Process Debit Requests
           for (let i = 0; i < selectedData.length; i++) {
             const data = selectedData[i];
@@ -617,7 +617,7 @@ export class AdvancePaymentsComponent implements OnInit {
           }
         } else {
           for (let i = 0; i < selectedData.length; i++) {
-            const data = selectedData[i];          
+            const data = selectedData[i];
             const result = await firstValueFrom(this.createJournalRequest(data));
 
             const ResultObject = {
@@ -626,7 +626,7 @@ export class AdvancePaymentsComponent implements OnInit {
             };
 
             Response.push(ResultObject);
-          }        
+          }
 
           // Process Debit Requests
           for (let i = 0; i < selectedData.length; i++) {
@@ -906,7 +906,7 @@ export class AdvancePaymentsComponent implements OnInit {
     );
   }
 
-  
+
   GetDebitVoucherLedgers(thc) {
 
     const createVoucher = (accCode, debit, credit, THCNo, accName = null, accCategory = null) => ({
@@ -933,17 +933,16 @@ export class AdvancePaymentsComponent implements OnInit {
       narration: `When Advance Paid against THC NO : ${THCNo}`,
     });
 
-    const Result = [];    
-    const balAMT = ConvertToNumber(thc.tOTAMT - thc.Advance, 3);
+    const Result = [];
+    const balAMT = ConvertToNumber(thc.THCamount - thc.Advance, 3);
     /*In case of Inter Branch Control
-     Debit thc.tOTAMT to LIA003004
+     Debit thc.THCamount to LIA003004
      Credit thc.Advance to AST003001
      Credit balAMT to LIA001002, if balAMT > 0
     */
-    if(this.isInterBranchControl) 
-    {
-      Result.push(createVoucher('LIA003004', thc.tOTAMT, 0, thc.THC));
-      if(balAMT > 0) {
+    if (this.isInterBranchControl) {
+      Result.push(createVoucher('LIA003004', thc.THCamount, 0, thc.THC));
+      if (balAMT > 0) {
         Result.push(createVoucher('LIA001002', 0, balAMT, thc.THC));
       }
     }

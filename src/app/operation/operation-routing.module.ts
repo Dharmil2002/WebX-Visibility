@@ -38,6 +38,7 @@ import { UpdateDeliveryComponent } from "./update-delivery/update-delivery.compo
 import { QueryPageComponent } from "./consignmentTracking/query-page/query-page.component";
 import { TrackingPageComponent } from "./consignmentTracking/tracking-page/tracking-page.component";
 import { ConsignmentLTLEntryFormComponent } from "./consignment-ltl-entry-form/consignment-ltl-entry-form.component";
+import { PrqTrackingComponent } from "./prq-tracking/prq-tracking.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -189,10 +190,14 @@ const routes: Routes = [
     component: TrackingPageComponent
   },
   {
+    path: "PRQTracking",
+    component: PrqTrackingComponent
+  },
+  {
     path: "consignment-entry-ltl",
     component: ConsignmentLTLEntryFormComponent
   }
-  
+
 ]
 
 @NgModule({

@@ -271,7 +271,8 @@ export class AdvancePaymentsComponent implements OnInit {
     console.log("BalanceUnbilledFunction", event);
     const templateBody = {
       DocNo: event.data.THC,
-      templateName: "THC View-Print",
+      templateName: "thc",
+      partyCode: "CONSRAJ19",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

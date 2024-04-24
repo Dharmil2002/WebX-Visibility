@@ -1189,8 +1189,8 @@ export class DocketService {
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
             "cSGE": {
-                "cD": data?.consignorName?.value || "",
-                "nM": data?.consignorName?.name || "",
+                "cD": data?.consignorName?.value ||"C0008",
+                "nM": data?.consignorName?.name ||data?.consignorName,
                 "cT": data?.fromCity?.value || "",
                 "pIN": data?.fromCity?.pincode || "",
                 "aDD": data.cnoAddress?.name || data.cnoAddress,
@@ -1200,8 +1200,8 @@ export class DocketService {
                 "aLMOB": data?.calternateContactNo || "",
             },
             "cSGN": {
-                "cD": data?.consigneeName?.value || "",
-                "nM": data?.consigneeName?.name || "",
+                "cD": data?.consigneeName?.value||"C0008",
+                "nM": data?.consigneeName?.name||data?.consigneeName,
                 "cT": data?.toCity?.value || "",
                 "pIN": data?.toCity?.pincode || "",
                 "aDD": data?.cneAddress?.name || data.cneAddress,

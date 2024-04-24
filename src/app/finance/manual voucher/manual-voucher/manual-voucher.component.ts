@@ -7,6 +7,8 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VoucherControlControl } from 'src/assets/FormControls/Finance/VoucherEntry/Vouchercontrol';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import moment from 'moment';
+import { da } from 'date-fns/locale';
 
 @Component({
   selector: 'app-manual-voucher',
@@ -39,6 +41,7 @@ export class ManualVoucherComponent implements OnInit {
       Title: "Voucher  Date",
       class: "matcolumncenter",
       Style: "max-width: 200px",
+      datatype: 'datetime'
     },
     nNETP: {
       Title: "Amount(₹)",
@@ -54,6 +57,7 @@ export class ManualVoucherComponent implements OnInit {
       Title: "Created on",
       class: "matcolumncenter",
       Style: "max-width: 200px",
+      datatype: 'datetime'
     },
     vCAN: {
       Title: "Status",
@@ -113,10 +117,9 @@ export class ManualVoucherComponent implements OnInit {
   async getVoucherList() {
     const detail = await manualvoucharDetail(this.masterService);
     this.AllTableData = detail.map((x) => {
-      const formattedDate = this.datePipe.transform(x.tTDT, 'dd-MMM-yy HH:mm a');
-      const createdDate = this.datePipe.transform(x.eNTDT, 'dd-MMM-yy HH:mm a');
+
       return {
-        ...x, vCAN: "Generated", tTDT: formattedDate, eNTDT: createdDate,
+        ...x, vCAN: "Generated",
         actions: ["Modify", "Delete"]
       };
     });

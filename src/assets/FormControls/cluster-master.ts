@@ -34,8 +34,8 @@ export class ClusterControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please Enter only text with 1-20 alphabets",
-                        pattern: '^[a-zA-Z ]{1,20}$'
+                        message: "Please Enter alphanumeric Cluster Name of length 1 to 100",
+                        pattern: "^.{1,100}$"
                     }
                 ],
                 generatecontrol: true, disable: isUpdate ? true : false,

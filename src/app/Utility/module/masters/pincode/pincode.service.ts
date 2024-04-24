@@ -311,39 +311,55 @@ export class PinCodeService {
         if (isArea) {
           try {
             const data = await this.clusterMasterService.getClusterData(cValue);
-             mergeData = (data) ? data : [];
+            mergeData = (data) ? data : [];
           } catch (error) {
             console.error("Failed to retrieve cluster data:", error);
             // Handle the error appropriately
           }
         }
         if (isCity) {
+          
+          const filter = { pincode: { D$in: cResponse.data.map((x) => x.PIN) } };
+          const clusters = await this.clusterMasterService.getClusterByPincode(filter);
           const data = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
             .map(ct => {
               // Find the first occurrence of this ct in the original data to get its pincode
               const originalItem = cResponse.data.find(item => item.CT === ct);
+              const getCluster = clusters.find(x => x.pincode.includes(originalItem.PIN));
               return {
                 name: originalItem.PIN,
                 value: ct,
                 ct: ct,
                 pincode: originalItem.PIN, // include pincode here
-                st: originalItem?.ST
+                st: originalItem?.ST,
+                clusterName: getCluster?.clusterName,
+                clusterId: getCluster?.clusterCode
               };
             });
 
-            mergeData = (data) ? [...mergeData, ...data] : mergeData;
+          mergeData = (data) ? [...mergeData, ...data] : mergeData;
         }
         else {
+          const filter = { pincode: { D$in: cResponse.data.map((x) => x.PIN) } };
+          const clusters = await this.clusterMasterService.getClusterByPincode(filter);
           codeData = cResponse.data
             .filter((x) => x.PIN.toString().startsWith(cValue))
-            .map((element) => ({
-              name: element.CT,
-              value: element.PIN,
-              ct: element.CT,
-              pincode: element.PIN.toString(),
-              st: element.ST
-            }));
-          mergeData = codeData;
+            .map((element) => (
+              {
+                name: element.CT,
+                value: element.PIN,
+                ct: element.CT,
+                pincode: element.PIN,
+                st: element.ST
+              }));
+          mergeData = codeData.map((element) => {
+            const getCluster = clusters.find(x => x.pincode.includes(element.pincode));
+            return {
+              ...element,
+              clusterName: getCluster?.clusterName,
+              clusterId: getCluster?.clusterCode
+            }
+          });
         }
 
         this.filter.Filter(
@@ -352,7 +368,7 @@ export class PinCodeService {
           mergeData,
           controlName,
           codeStatus
-        );        
+        );
       }
     } catch (error) {
       // Handle any errors that may occur during the asynchronous operation

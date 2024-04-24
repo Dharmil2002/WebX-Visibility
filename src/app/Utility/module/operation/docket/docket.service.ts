@@ -1142,7 +1142,7 @@ export class DocketService {
         return res.data;
     }
     async checkInvoiceExistLTL(filter) {
-
+ 
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_invoices_ltl",
@@ -1152,13 +1152,6 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData) {
-        debugger;
-        const consignmentField = await this.fetchClusterByPincode(data);
-        const getAreaByPincode = (pincode) =>
-        consignmentField.length > 0 ? consignmentField.find(x => x.pincode.includes(pincode)) : [];
-        // Use the helper function to find areas for 'fromCity' and 'toCity'
-        const fromArea = getAreaByPincode(data?.fromCity?.pincode);
-        const toArea = getAreaByPincode(data?.toCity?.pincode);
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -1174,13 +1167,13 @@ export class DocketService {
             "oRGN": data?.origin || "",
             "fCT": data?.fromCity?.ct || "",
             "fPIN": data?.fromCity?.pincode || "",
-            "fAREA": fromArea ? fromArea.clusterName : "",
-            "fAREACD": fromArea ? fromArea.clusterCode : "",
+            "fAREA":data?.fromCity?.clusterName|| "",
+            "fAREACD":data?.fromCity?.clusterId||"",
             "dEST": data?.destination?.value || "",
             "tCT": data?.toCity?.ct || "",
             "tPIN": data?.toCity?.pincode || "",
-            "tAREA": toArea ? toArea.clusterName : "",
-            "tAREACD": toArea ? toArea.clusterCode : "",
+            "tAREA": data?.toCity?.clusterName|| "",
+            "tAREACD":data?.toCity?.clusterId|| "",
             "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
             "pKGS": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)) : 0,
             "aCTWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)) : 0,
@@ -1189,7 +1182,7 @@ export class DocketService {
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
             "cSGE": {
-                "cD": data?.consignorName?.value ||"C0008",
+                "cD": data?.consignorName?.value ||"C8888",
                 "nM": data?.consignorName?.name ||data?.consignorName,
                 "cT": data?.fromCity?.value || "",
                 "pIN": data?.fromCity?.pincode || "",
@@ -1200,8 +1193,8 @@ export class DocketService {
                 "aLMOB": data?.calternateContactNo || "",
             },
             "cSGN": {
-                "cD": data?.consigneeName?.value||"C0008",
-                "nM": data?.consigneeName?.name||data?.consigneeName,
+                "cD": data?.consigneeName?.value||"C8888",
+                "nM": data?.consigneeName?.name|| data?.consigneeName,
                 "cT": data?.toCity?.value || "",
                 "pIN": data?.toCity?.pincode || "",
                 "aDD": data?.cneAddress?.name || data.cneAddress,

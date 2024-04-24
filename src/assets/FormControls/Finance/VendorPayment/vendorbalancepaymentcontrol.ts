@@ -13,7 +13,7 @@ export class VendorBalancePaymentControl {
         label: "TDS Exempted",
         placeholder: "TDS Exempted",
         type: "toggle",
-        value: true,
+        value: false,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -58,7 +58,12 @@ export class VendorBalancePaymentControl {
         placeholder: "TDS Rate",
         type: "number",
         value: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "TDS Rate is required",
+          },
+        ],
 
         generatecontrol: true,
         disable: true,
@@ -71,7 +76,12 @@ export class VendorBalancePaymentControl {
         value: "",
         generatecontrol: true,
         disable: true,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "TDS Amount is required",
+          }
+        ],
       },
     ];
     this.VendorBalanceTaxationGSTArray = [

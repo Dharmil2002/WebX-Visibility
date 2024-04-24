@@ -530,42 +530,33 @@ export class BalancePaymentComponent implements OnInit {
     );
   }
 
-  GSTSACcodeFieldChanged() { }
 
   toggleTDSExempted() {
     const TDSExemptedValue =
       this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted;
 
-    if (TDSExemptedValue) {
-      this.jsonControlVendorBalanceTaxationTDSFilterArray =
-        this.AlljsonControlVendorBalanceTaxationTDSFilterArray;
-      const TDSSection =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
-      TDSSection.setValidators([
-        Validators.required,
-        autocompleteObjectValidator(),
-      ]);
+    if (!TDSExemptedValue) {
+      this.jsonControlVendorBalanceTaxationTDSFilterArray = this.AlljsonControlVendorBalanceTaxationTDSFilterArray;
+      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      TDSSection.setValidators([Validators.required, autocompleteObjectValidator(),]);
+
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
       TDSRate.setValidators([Validators.required]);
-      const TDSAmount =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+
       TDSAmount.setValidators([Validators.required]);
       TDSAmount.updateValueAndValidity();
       this.getTDSSectionDropdown();
+
     } else {
-      this.jsonControlVendorBalanceTaxationTDSFilterArray =
-        this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter(
-          (x) => x.name == "TDSExempted"
-        );
-      const TDSSection =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      this.jsonControlVendorBalanceTaxationTDSFilterArray = this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter((x) => x.name == "TDSExempted");
+      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
       TDSSection.setValue("");
       TDSSection.clearValidators();
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
       TDSRate.setValue("");
       TDSRate.clearValidators();
-      const TDSAmount =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
       TDSAmount.setValue("");
       TDSAmount.clearValidators();
       TDSAmount.updateValueAndValidity();

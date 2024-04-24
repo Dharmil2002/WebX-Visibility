@@ -12,6 +12,7 @@ import { AccountGroupComponent } from "../../AccoutGroupMaster/account-group/acc
 import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 
 @Component({
   selector: "app-add-account",
@@ -528,6 +529,8 @@ export class AddAccountComponent implements OnInit {
   }
 
   async save() {
+    const groupCode = this.AccountForm.value.GroupCode.value;
+
     const commonBody = {
       aCNM: this.AccountForm.value.AccountDescription,
       mATCD: this.AccountForm.value.MainCategory.value,
@@ -556,16 +559,20 @@ export class AddAccountComponent implements OnInit {
         : "",
     };
     if (!this.isUpdate) {
-      const index =
-        this.TableData.length === 0
-          ? 1
-          : parseInt(
-              this.TableData[this.TableData.length - 1].aCCD.substring(3)
-            ) + 1;
-      const accountcode = `${this.AccountForm.value.GroupCode.name.substr(
-        0,
-        3
-      )}${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`;
+
+      const idReq = {
+        companyCode: this.CompanyCode,
+        collectionName: "account_detail",
+        filter: { 
+          cID: this.CompanyCode,
+          gRPCD: commonBody.gRPCD
+        },
+        sorting: { aCCD: -1 },
+      };
+
+      const idRes = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", idReq));
+      const lastId = idRes?.data?.aCCD ?? `${commonBody.gRPCD}000`;
+      const accountcode = nextKeyCode(lastId);
 
       commonBody["_id"] = `${this.CompanyCode}-${accountcode}`;
       commonBody["aCCD"] = accountcode;
@@ -587,12 +594,8 @@ export class AddAccountComponent implements OnInit {
     };
 
     const res = this.isUpdate
-      ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
-      : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+      ? await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      : await firstValueFrom(this.masterService.masterPost("generic/create", req));
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");

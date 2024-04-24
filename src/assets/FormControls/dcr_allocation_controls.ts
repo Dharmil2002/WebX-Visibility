@@ -71,7 +71,15 @@ export class DcrAllocationForm {
         value: allocationData?.name , // Set default value
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
         // Additional properties can be added.
         additionalData: {
             showNameAndValue: true,

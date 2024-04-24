@@ -138,7 +138,7 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   formatData(val: string, key: string) {
     if (key === 'valdity_dt' && val !== null) {
       let dt = new Date(val)
-      return moment(dt).format('DD/MM/YYYY');
+      return moment(dt).format('DD MMM YY');
       // return this.datePipe.transform(dt, "dd/MM/yyyy");
     }
     return val
@@ -213,7 +213,7 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
     }
     const formattedData = [Object.values(this.csvHeaders), ...jsonCsv.map(row => {
       return Object.keys(this.csvHeaders).map(col => {
-        let value = (col.toLowerCase().includes('date') || col.toLowerCase().includes('dob') || col.toLowerCase().includes('dt')) ? moment(new Date(row[col])).format('DD-MM-YYYY') === 'Invalid date' ? row[col] : moment(new Date(row[col])).format('DD-MM-YYYY') : row[col];
+        let value = (col.toLowerCase().includes('date') || col.toLowerCase().includes('dob') || col.toLowerCase().includes('dt')) ? moment(new Date(row[col])).format('DD MMM YY') === 'Invalid date' ? row[col] : moment(new Date(row[col])).format('DD MMM YY') : row[col];
         return value
       })
     })]

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { PrqEntryControls } from "src/assets/FormControls/prq-entry";
@@ -81,7 +81,8 @@ export class PrqEntryPageComponent implements OnInit {
   AddressStatus: any;
   Address: string;
   userLocations: any;
-  constructor(
+
+  constructor(   
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private router: Router,
@@ -94,8 +95,8 @@ export class PrqEntryPageComponent implements OnInit {
     private storage: StorageService,
     private customerService: CustomerService,
     private generalService: GeneralService,
-    private masterService: MasterService
-  ) {
+    private masterService: MasterService,
+    ) {    
     this.companyCode = this.storage.companyCode;
     this.branchCode = this.storage.branch;
 

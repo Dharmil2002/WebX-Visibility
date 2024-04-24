@@ -13,6 +13,7 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { FormGroupDirective, UntypedFormGroup } from "@angular/forms";
+import moment from "moment";
 import { CustomeDatePickerComponent } from "src/app/shared/components/custome-date-picker/custome-date-picker.component";
 
 @Component({
@@ -88,13 +89,13 @@ export class FormComponent {
     context["functionName"] = "toggleUpDown";
     this.functionCallEmitter.emit(context);
   }
-  functionCalled(context) {
+  functionCalled(context) {    
     // console.log(context , "from form components");
     if (
       (context.functionName !== undefined || context.functionName != null) &&
       context.functionName?.length > 0
     ) {
-      this.callFunction.emit(context);
+      this.callFunction.emit(context); 
     }
   }
 

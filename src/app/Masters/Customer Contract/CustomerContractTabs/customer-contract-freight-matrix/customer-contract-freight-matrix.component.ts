@@ -175,11 +175,11 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
   async ngOnChanges(changes: SimpleChanges) {
     const MinDate = changes.contractData?.currentValue?.cSTARTDT ?? "";
-    const MinDateObj = MinDate ? moment(MinDate, 'DD-MM-YYYY').toDate() : null;
+    const MinDateObj = MinDate ? moment(MinDate, 'DD MMM YY').toDate() : null;
 
     // Similarly for MaxDate
     const MaxDate = changes.contractData?.currentValue?.cENDDT ?? "";
-    const MaxDateObj = MaxDate ? moment(MaxDate, 'DD-MM-YYYY').toDate() : null;
+    const MaxDateObj = MaxDate ? moment(MaxDate, 'DD MMM YY').toDate() : null;
 
     this.initializeFormControlData = {
       MinDate: MinDateObj,
@@ -393,8 +393,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const isUpdate = this.isUpdate;
     const formData = this.FreightMatrixForm.value;
 
-    const startDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
-    const endDate = moment(formData.ValidToDate, "DD-MM-YYYY");
+    const startDate = moment(formData.ValidFromDate, "DD MMM YY");
+    const endDate = moment(formData.ValidToDate, "DD MMM YY");
 
     if (startDate && endDate && startDate >= endDate) {
       this.FreightMatrixForm.get('ValidFromDate').setValue("");
@@ -414,10 +414,10 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
 
       const filterCondition = (item) => {
-        const startDate = moment(item.vFDT, "DD-MM-YYYY");
-        const endDate = moment(item.vEDT, "DD-MM-YYYY");
-        const formDataStartDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
-        const formDataEndDate = moment(formData.ValidToDate, "DD-MM-YYYY");
+        const startDate = moment(item.vFDT, "DD MMM YY");
+        const endDate = moment(item.vEDT, "DD MMM YY");
+        const formDataStartDate = moment(formData.ValidFromDate, "DD MMM YY");
+        const formDataEndDate = moment(formData.ValidToDate, "DD MMM YY");
         const commonConditions =
           (item.fROM == formData.From.name && item.tO == formData.To.name) &&
           ((startDate <= formDataEndDate && endDate >= formDataStartDate) ||

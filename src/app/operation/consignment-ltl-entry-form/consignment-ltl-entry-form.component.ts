@@ -846,13 +846,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const invoice = this.invoiceForm.getRawValue();
       const req = {
         'ewayBillNo': invoice.ewayBillNo,
-        'expiryDate': invoice.expiryDate ? moment(invoice.expiryDate).format("DD-MM-YYYY HH:MM") : "",
+        'expiryDate': invoice.expiryDate ? moment(invoice.expiryDate).format("DD MMM YY HH:MM") : "",
         'oExpiryDate': invoice.expiryDate,
-        'ewayBillDate': invoice.expiryDate ? moment(invoice.billDate).format("DD-MM-YYYY HH:MM") : "",
+        'ewayBillDate': invoice.expiryDate ? moment(invoice.billDate).format("DD MMM YY HH:MM") : "",
         'oEwayBillDate': invoice.billDate,
         'invoiceNumber': invoice.invoiceNo,
         'oInvDt': invoice.invoiceDate,
-        'invDt': moment(invoice.invoiceDate).format("DD-MM-YYYY HH:MM"),
+        'invDt': moment(invoice.invoiceDate).format("DD MMM YY HH:MM"),
         'cftRation': invoice.cftRatio,
         'length': invoice.length,
         'breadth': invoice.breadth,

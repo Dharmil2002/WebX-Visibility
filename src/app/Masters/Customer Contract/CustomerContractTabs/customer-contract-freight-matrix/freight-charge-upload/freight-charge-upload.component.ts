@@ -255,18 +255,18 @@ export class FreightChargeUploadComponent implements OnInit {
   }
   ReValidateData(data, existingData) {
     let validData = data.filter(x => {
-      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
-      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
-      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD/MM/YYYY');
-      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD/MM/YYYY');
+      const validFromDate = moment(x.ValidFromDate, 'DD MMM YY');
+      const validToDate = moment(x.ValidToDate, 'DD MMM YY');
+      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY');
+      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY');
 
       return validFromDate.isSameOrAfter(contractStartDate) && validToDate.isSameOrBefore(contractEndDate);
     });
     const invalidData = data.filter(x => {
-      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
-      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
-      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD/MM/YYYY');
-      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD/MM/YYYY');
+      const validFromDate = moment(x.ValidFromDate, 'DD MMM YY');
+      const validToDate = moment(x.ValidToDate, 'DD MMM YY');
+      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY');
+      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY');
 
       return validFromDate.isBefore(contractStartDate) || validToDate.isAfter(contractEndDate);
     });
@@ -279,8 +279,8 @@ export class FreightChargeUploadComponent implements OnInit {
       return {
         ...element,
         RecordType: "existing",
-        ValidFromDate: moment(element.vFDT).format('DD/MM/YYYY'),
-        ValidToDate: moment(element.vEDT).format('DD/MM/YYYY'),
+        ValidFromDate: moment(element.vFDT).format('DD MMM YY'),
+        ValidToDate: moment(element.vEDT).format('DD MMM YY'),
         From: element.fROM,
         To: element.tO,
         Capacity: element.cAP,
@@ -496,8 +496,8 @@ export class FreightChargeUploadComponent implements OnInit {
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
 
     // SET Start Date And End Date
-    processedData.vFDT = moment(element.ValidFromDate, 'DD-MM-YYYY').toDate();
-    processedData.vEDT = moment(element.ValidToDate, 'DD-MM-YYYY').toDate();
+    processedData.vFDT = moment(element.ValidFromDate, 'DD MMM YY').toDate();
+    processedData.vEDT = moment(element.ValidToDate, 'DD MMM YY').toDate();
 
     // Set timestamp and user information
     processedData.eNTDT = new Date();

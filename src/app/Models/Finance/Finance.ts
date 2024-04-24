@@ -140,6 +140,7 @@ export const ledgerInfo = {
   "EXP001007": GetLeadgerInfoFromLocalStorage("EXP001007"),
   "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
   "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
+  "LIA003004": GetLeadgerInfoFromLocalStorage("LIA003004"),
 
 };
 function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {

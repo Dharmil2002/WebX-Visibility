@@ -22,7 +22,6 @@ import { LoadingSheetService } from "src/app/Utility/module/operation/loadingShe
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
-import { debug } from "console";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -425,6 +424,23 @@ export class CreateLoadingSheetComponent implements OnInit {
       { field: 'selectedDkts', calculate: item => { return [] } },
     ];
 
+    let legs = nextLocs.map(x => { 
+      return { 
+        leg: `${orgn}-${x}`,
+        routeLocs: [orgn, ...nextLocs],
+        count: 0,
+        packages: 0,
+        weightKg: 0,
+        volumeCFT: 0,
+        tCount: 0,
+        tPackages: 0,
+        tWeightKg: 0,
+        tVolumeCFT: 0,
+        items: [],
+        selectedDkts: []
+      }
+    });
+
     if (this.shipmentData && this.shipmentData.length > 0) {
       let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn, true);
       
@@ -436,17 +452,14 @@ export class CreateLoadingSheetComponent implements OnInit {
         return l;
       });
 
+      
 
       //Here i user cnoteDetails varible to used in updateDocketDetails() method
       //this._cnoteService.setShipingData(dockets);
       this.alldocket = dockets;
       this.cnoteDetails = dockets;
       const groupedShipments = aggData;
-      if (groupedShipments.length > 0) {
-        this.tableload = false;
-      } else {
-        this.departFlag = true;
-      }
+
       groupedShipments.forEach(item => {
         if (item['items'] && Array.isArray(item['items'])) {
           item['items'].forEach(subItem => {
@@ -459,7 +472,21 @@ export class CreateLoadingSheetComponent implements OnInit {
       groupedShipments.forEach(item => {
         item['selectedDkts'] = selectedDockets;
       });
-      this.tableData = groupedShipments
+      
+      const tableData = legs.map((x) => { 
+          return groupedShipments.find((y) => y['leg'] == x.leg) || x;
+      });
+
+      if (tableData.length > 0) {
+        this.tableload = false;
+      } else {
+        this.departFlag = true;
+      }
+      this.tableData = tableData
+    }
+    else {
+      this.tableData = legs;
+      this.tableload = false;
     }
   }
   ngOnDestroy(): void {
@@ -536,7 +563,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   updateLoadingData(event) {
     if (event) {
-         debugger;
+
       let selectedDockets = this.tableData.filter(x => x.leg != event[0].leg.trim())
                             .map((x) => x['items']?.filter((y) => y.isSelected == true).map((z) => z.dKTNO)).flat();
 
@@ -576,7 +603,7 @@ export class CreateLoadingSheetComponent implements OnInit {
           let vehicleDetails = res.data.map((x) => {
             return { 
               name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
-              value: x.vehNo, 
+              value: `${x.vehNo}`, 
               status: x.status
             };
           }).sort((a, b) => {

@@ -106,7 +106,7 @@ Currently, all flows are working together without proper separation.
     this.dataDetails = data;
   }
   updateShipping() {
-    debugger
+    
     // Create a JSON object with the shipping details
     const shipment=this.tableData.filter((x) => x.isSelected == true )
     // Close the dialog and pass the JSON object as the result
@@ -151,7 +151,7 @@ Currently, all flows are working together without proper separation.
     const fromDate = moment(new Date()).add(-60, 'days').toDate();
     const toDate = moment(new Date()).endOf('day').toDate();
     const otherDockets = await this.getShipmentInStock(this.loadingSheet.routeLocs || [], fromDate, toDate, selectedDkts || []);    
-    debugger;
+    
     let data = [...this.loadingSheet.items, ...otherDockets];
     data.forEach(f => { f['dIndex'] = (`${f.cLOC}-${f.dEST}` == this.loadingSheet.leg) ? 1 : 2 });
 

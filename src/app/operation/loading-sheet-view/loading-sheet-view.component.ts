@@ -108,10 +108,7 @@ Currently, all flows are working together without proper separation.
   updateShipping() {
     debugger
     // Create a JSON object with the shipping details
-    const shipment=this.tableData.filter((x) =>
-      //`${x.cLOC}-${x.dEST}`== this.loadingSheet.leg  || 
-      x.isSelected == true
-    )
+    const shipment=this.tableData.filter((x) => x.isSelected == true )
     // Close the dialog and pass the JSON object as the result
     this.dialogRef.close(shipment);
   }

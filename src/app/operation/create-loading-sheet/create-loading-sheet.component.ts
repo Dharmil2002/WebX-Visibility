@@ -544,8 +544,8 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       this.tableData.forEach(row => {
         if (row.leg.trim() === event[0].leg.trim()) {
-          row.items = event;
-          const e = event.filter(f => f.isSelected == true );          
+          const e = event.filter(f => f.isSelected == true );      
+          row.items = e;
           row.count = e.length
           row.weightKg = e.reduce((acc, cur) => acc + cur.aCTWT, 0);
           row.volumeCFT = e.reduce((acc, cur) => acc + cur.cFTTOT, 0);

@@ -104,7 +104,7 @@ export class DepartureService {
         "fINST": 0,
         "fINSTNM": "",
         "cONTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
-        "aDVPENAMT": 0,
+        "aDVPENAMT":ConvertToNumber(data?.TotalAdv || 0, 2),
         "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
         "cAP": {
           "wT": data?.Capacity || 0,
@@ -127,8 +127,8 @@ export class DepartureService {
           "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
         },
         "bALAMT": data?.BalanceAmt || 0,
-        "aDPAYAT": "",
-        "bLPAYAT": "",
+        "aDPAYAT":data?.advPdAt?.value||"",
+        "bLPAYAT": data?.balAmtAt?.value||"",
         "iSBILLED": false,
         "bILLNO": "",
         "dRV": {

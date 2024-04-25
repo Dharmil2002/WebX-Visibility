@@ -43,8 +43,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     edit: false,
     csv: true,
   };
+  containerWidth = '1024px';
   height = "100vw";
-  maxTableWidth = '1024px';
   width = "100vw";
   maxWidth: "232vw";
   menuItems = [
@@ -54,9 +54,9 @@ export class CreateLoadingSheetComponent implements OnInit {
   // Declaring breadcrumbs
   breadscrums = [
     {
-      title: "Create-Loading-Sheet",
-      items: ["Loading-Sheet"],
-      active: "Loading-Sheet",
+      title: "Create Loading Sheet",
+      items: ["Departure"],
+      active: "Create Loading Sheet",
     },
   ];
   linkArray = [{ Row: "count", Path: "" }];

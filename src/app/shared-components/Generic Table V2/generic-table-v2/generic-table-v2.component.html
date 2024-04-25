@@ -140,7 +140,7 @@
                     <!-- Generic Table -->
                     <div [ngClass]="stickyHeader ? ['responsive_table', 'fixHeight'] : ['responsive_table']" 
                         [style]="TableContainerStyle"
-                        [style.width]="maxWidth || '100%'">
+                        [style.width]="containerWidth || '100%'">
                         <table mat-table [style.width]="'100%'" [style]="TableStyle" [dataSource]="dataSource" matSort >
                             
                             <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)"

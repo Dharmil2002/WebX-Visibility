@@ -346,8 +346,8 @@ export class PinCodeService {
             .filter((x) => x.PIN.toString().startsWith(cValue))
             .map((element) => (
               {
-                name: element.CT,
-                value: element.PIN,
+                name: element.PIN,
+                value: element.CT,
                 ct: element.CT,
                 pincode: element.PIN,
                 st: element.ST

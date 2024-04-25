@@ -170,7 +170,7 @@ export class ConsignmentControl {
           onOptionSelect: 'getLocBasedOnCity'
         },
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },
@@ -236,7 +236,7 @@ export class ConsignmentControl {
           onOptionSelect: 'getLocBasedOnCity'
         },
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },
@@ -694,6 +694,18 @@ export class ConsignmentControl {
         placeholder: '',
         type: '',
         value: docketDetail.tran_hour,
+        Validations: [],
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
+      },
+      {
+        name: 'contract',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: docketDetail.contract,
         Validations: [],
         generatecontrol: false, disable: false,
         additionalData: {

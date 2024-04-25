@@ -44,6 +44,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     csv: true,
   };
   height = "100vw";
+  maxTableWidth = '1024px';
   width = "100vw";
   maxWidth: "232vw";
   menuItems = [
@@ -132,32 +133,32 @@ export class CreateLoadingSheetComponent implements OnInit {
       decimalPlaces: 0
     },
     
-    tCount: {
-      Title: "Shipment",
-      class: "matcolumnright",
-      Style: "max-width:50px; min-width:50px"
-    },
-    tPackages: {
-      Title: "Packages",
-      class: "matcolumnright",
-      Style: "max-width:50px; min-width:50px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-    tWeightKg: {
-      Title: "Weight (KG)",
-      class: "matcolumnright",
-      Style: "max-width:80px; min-width:80px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-    tVolumeCFT: {
-      Title: "Volume (CFT)",
-      class: "matcolumnright",
-      Style: "max-width:80px; min-width:80px",
-      datatype: 'number',
-      decimalPlaces: 0
-    }
+    // tCount: {
+    //   Title: "Shipment",
+    //   class: "matcolumnright",
+    //   Style: "max-width:50px; min-width:50px"
+    // },
+    // tPackages: {
+    //   Title: "Packages",
+    //   class: "matcolumnright",
+    //   Style: "max-width:50px; min-width:50px",
+    //   datatype: 'number',
+    //   decimalPlaces: 0
+    // },
+    // tWeightKg: {
+    //   Title: "Weight (KG)",
+    //   class: "matcolumnright",
+    //   Style: "max-width:80px; min-width:80px",
+    //   datatype: 'number',
+    //   decimalPlaces: 0
+    // },
+    // tVolumeCFT: {
+    //   Title: "Volume (CFT)",
+    //   class: "matcolumnright",
+    //   Style: "max-width:80px; min-width:80px",
+    //   datatype: 'number',
+    //   decimalPlaces: 0
+    // }
   };
   staticField = ["leg", "packages", "weightKg", "volumeCFT", "tCount","tPackages", "tWeightKg", "tVolumeCFT"];
   // Declaring CSV file's header as key and value pair

@@ -4,6 +4,9 @@ import { GenericTableComponent } from '../../shared-components/Generic Table/gen
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { DocketStatus } from 'src/app/Models/docStatus';
+import { firstValueFrom } from 'rxjs';
+import moment from 'moment';
 
 @Component({
   selector: 'app-loading-sheet-view',
@@ -81,6 +84,7 @@ Currently, all flows are working together without proper separation.
 
   constructor(
     private storage: StorageService,
+    private operationService: OperationService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any
   ) {
@@ -102,18 +106,75 @@ Currently, all flows are working together without proper separation.
     this.dataDetails = data;
   }
   updateShipping() {
+    debugger
     // Create a JSON object with the shipping details
-    const shipment=this.tableData.filter((x) => x.isSelected == true)
+    const shipment=this.tableData.filter((x) =>
+      //`${x.cLOC}-${x.dEST}`== this.loadingSheet.leg  || 
+      x.isSelected == true
+    )
     // Close the dialog and pass the JSON object as the result
     this.dialogRef.close(shipment);
   }
 
-  getLoadingSheetDetails() {
-    this.tableData = this.loadingSheet.items.map(x => {
+  async getShipmentInStock(routeLocs: string[], fromDate: Date, toDate: Date, dktNotIn: string[] = []) {
+      const dest = this.loadingSheet.leg.split('-')[1];
+      routeLocs =  routeLocs.filter(x => x != dest);
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "docket_ops_det_ltl",
+        filter: {
+          'D$and': [
+            { cLOC: this.storage.branch },
+            { 'D$or': [
+                {'D$and': [
+                  { sTSTM: { 'D$gte': fromDate } },
+                  { sTSTM: { 'D$lte': toDate } },  
+                ]},
+                { dEST: { 'D$eq': dest } }
+            ]},
+            { dEST: { 'D$nin': [...new Set([this.storage.branch, ...routeLocs])] } },
+            { sTS: { 'D$in': [DocketStatus.Booked, DocketStatus.In_Transhipment_Stock] } },
+            ...((dktNotIn && dktNotIn.length > 0) ? [{ dKTNO: { 'D$nin': dktNotIn } }] : [] ),
+            { 'D$or': [{ lSNO: { "D$exists": false } }, { lSNO: "" }] }
+          ]
+        }
+      };
+      const result = await firstValueFrom(this.operationService.operationMongoPost("generic/get", req));
+      if(result && result.data) {
+        return result.data || [];
+      }
+  }
+
+  async getLoadingSheetDetails() {
+    
+    let selectedDkts = this.loadingSheet.items.map(x => x.dKTNO) || [];
+    let otherDkts  = this.loadingSheet.selectedDkts || [];
+    selectedDkts = [... new Set([...selectedDkts, ...otherDkts])] ;
+    
+    const fromDate = moment(new Date()).add(-60, 'days').toDate();
+    const toDate = moment(new Date()).endOf('day').toDate();
+    const otherDockets = await this.getShipmentInStock(this.loadingSheet.routeLocs || [], fromDate, toDate, selectedDkts || []);    
+    debugger;
+    let data = [...this.loadingSheet.items, ...otherDockets];
+    data.forEach(f => { f['dIndex'] = (`${f.cLOC}-${f.dEST}` == this.loadingSheet.leg) ? 1 : 2 });
+
+    data = data.sort((a, b) => {
+      const legComparison = a.dIndex - b.dIndex;
+      if (legComparison !== 0) {
+          return legComparison;
+      }
+      const statusComparison = `${a.cLOC}-${a.dEST}`.localeCompare(`${b.cLOC}-${b.dEST}`);
+      if (statusComparison !== 0) {
+          return statusComparison;
+      }
+      return a.dKTNO.localeCompare(b.dKTNO);
+    });
+
+    this.tableData = data.map(x => {
       return { ...x, leg: this.loadingSheet.leg };
-  });
+    });
   
-      this.tableload = false;
+    this.tableload = false;
   }
 
   goBack(): void {

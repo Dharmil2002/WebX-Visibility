@@ -22,6 +22,7 @@ import { LoadingSheetService } from "src/app/Utility/module/operation/loadingShe
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { debug } from "console";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -43,6 +44,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     csv: true,
   };
   height = "100vw";
+  maxTableWidth = '1024px';
   width = "100vw";
   maxWidth: "232vw";
   menuItems = [
@@ -70,15 +72,95 @@ export class CreateLoadingSheetComponent implements OnInit {
   orgBranch: string = "";
   shipmentData: any;
   tableData: any[];
+  headerGroup = [ {
+      Name: "LegGroup",
+      Title: "",
+      class: "matcolumncenter",
+      ColSpan: 2,
+      sticky: true
+    },{
+      Name: "LoadedGroup",
+      Title: "Loaded",
+      class: "matcolumncenter",
+      ColSpan: 4
+    },{
+      Name: "TotalGroup",
+      Title: "Total",
+      class: "matcolumncenter",
+      ColSpan: 4
+    }
+  ];
   columnHeader = {
-    checkBoxRequired: "",
-    leg: "Leg",
-    count: "Shipments",
-    packages: "Packages",
-    weightKg: "Weight Kg",
-    volumeCFT: "Volume CFT",
+    checkBoxRequired: {
+      Title: "",
+      class: "matcolumncenter",
+      Style: "max-width:20px; max-width:20px",
+      sticky: true,
+    },
+    leg: {
+      Title: "Leg",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+      sticky: true,
+    },
+    count: {
+      Title: "Shipment",
+      class: "matcolumnright",
+      Style: "max-width:50px; min-width:50px"
+    },
+    
+    packages: {
+      Title: "Packages",
+      class: "matcolumnright",
+      Style: "max-width:50px; min-width:50px",
+      datatype: 'number',
+      decimalPlaces: 0
+    },
+   
+    weightKg: {
+      Title: "Weight (KG)",
+      class: "matcolumnright",
+      Style: "max-width:80px; min-width:80px",
+      datatype: 'number',
+      decimalPlaces: 0
+    },
+    
+    volumeCFT: {
+      Title: "Volume (CFT)",
+      class: "matcolumnright",
+      Style: "max-width:80px; min-width:80px",
+      datatype: 'number',
+      decimalPlaces: 0
+    },
+    
+    // tCount: {
+    //   Title: "Shipment",
+    //   class: "matcolumnright",
+    //   Style: "max-width:50px; min-width:50px"
+    // },
+    // tPackages: {
+    //   Title: "Packages",
+    //   class: "matcolumnright",
+    //   Style: "max-width:50px; min-width:50px",
+    //   datatype: 'number',
+    //   decimalPlaces: 0
+    // },
+    // tWeightKg: {
+    //   Title: "Weight (KG)",
+    //   class: "matcolumnright",
+    //   Style: "max-width:80px; min-width:80px",
+    //   datatype: 'number',
+    //   decimalPlaces: 0
+    // },
+    // tVolumeCFT: {
+    //   Title: "Volume (CFT)",
+    //   class: "matcolumnright",
+    //   Style: "max-width:80px; min-width:80px",
+    //   datatype: 'number',
+    //   decimalPlaces: 0
+    // }
   };
-  centerAlignedData = ["leg", "packages", "weightKg", "volumeCFT"];
+  staticField = ["leg", "packages", "weightKg", "volumeCFT", "tCount","tPackages", "tWeightKg", "tVolumeCFT"];
   // Declaring CSV file's header as key and value pair
   headerForCsv = {
     RouteandSchedule: "Leg",
@@ -247,8 +329,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const loadingControlFormControls = new loadingControl();
 
     // Get the form controls from the loadingControlFormControls instance
-    this.jsonControlArray =
-      loadingControlFormControls.getMarkArrivalsertFormControls();
+    this.jsonControlArray = loadingControlFormControls.getMarkArrivalsertFormControls();
 
     // Loop through the jsonControlArray to find the vehicleType control and set related properties
     this.jsonControlArray.forEach((data) => {
@@ -303,7 +384,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     if (!this.isShipmentUpdate) {
       let routeDetail =
         this.tripData?.RouteandSchedule.split(":")[1].split("-");
-      routeDetail = routeDetail.map((str) =>
+        routeDetail = routeDetail.map((str) =>
         String.prototype.replace.call(str, " ", "")
       );
       // Update route details if shipment is not being updated
@@ -322,7 +403,8 @@ export class CreateLoadingSheetComponent implements OnInit {
         x.orgLoc = x.oRGN;
         x.destLoc = x.dEST;
         return x;
-      }).filter(f => nextLocs.includes(f.destLoc));
+      })
+      //.filter(f => nextLocs.includes(f.destLoc));
     }
 
     const gropuColumns = ['curLoc', 'destLoc'];
@@ -331,13 +413,21 @@ export class CreateLoadingSheetComponent implements OnInit {
       { outputField: 'packages', inputField: 'pKGS', operation: 'sum' },
       { outputField: 'weightKg', inputField: 'aCTWT', operation: 'sum' },
       { outputField: 'volumeCFT', inputField: 'cFTTOT', operation: 'sum' },
+      { outputField: 'tCount', inputField: 'dktCount', operation: 'sum' },
+      { outputField: 'tPackages', inputField: 'pKGS', operation: 'sum' },
+      { outputField: 'tWeightKg', inputField: 'aCTWT', operation: 'sum' },
+      { outputField: 'tVolumeCFT', inputField: 'cFTTOT', operation: 'sum' },
     ];
     const fixedColumn = [
-      { field: 'leg', calculate: item => { return `${item.curLoc}-${item.destLoc}` } }
+      { field: 'leg', calculate: item => { return `${item.curLoc}-${item.destLoc}` } },
+      { field: 'routeLocs', calculate: item => { return [orgn, ...nextLocs] } },
+      { field: 'items', calculate: item => { return [] } },
+      { field: 'selectedDkts', calculate: item => { return [] } },
     ];
 
     if (this.shipmentData && this.shipmentData.length > 0) {
       let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn, true);
+      
       let dockets = [];
       aggData = aggData.map((l: any) => {
         let docs = this.shipmentData.filter(f => f.curLoc == l.curLoc && f.destLoc == l.destLoc);
@@ -348,7 +438,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
 
       //Here i user cnoteDetails varible to used in updateDocketDetails() method
-      this._cnoteService.setShipingData(dockets);
+      //this._cnoteService.setShipingData(dockets);
       this.alldocket = dockets;
       this.cnoteDetails = dockets;
       const groupedShipments = aggData;
@@ -364,11 +454,16 @@ export class CreateLoadingSheetComponent implements OnInit {
           });
         }
       });
+      
+      let selectedDockets = groupedShipments.map((x) => x['items']?.filter((y) => y.isSelected = true).map((z) => z.dKTNO)).flat()
+      groupedShipments.forEach(item => {
+        item['selectedDkts'] = selectedDockets;
+      });
       this.tableData = groupedShipments
     }
   }
   ngOnDestroy(): void {
-    this._cnoteService.setShipingData([]);
+    //this._cnoteService.setShipingData([]);
     // Perform cleanup, unsubscribe from observables, etc.
   }
   async loadingSheetGenerate() {
@@ -441,25 +536,23 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   updateLoadingData(event) {
     if (event) {
-      let totalPackages = 0, totalWeightKg = 0, totalVolumeCFT = 0;
-      // Calculate totals in a single iteration
-      event.forEach(item => {
-        totalPackages += item.pKGS;
-        totalWeightKg += item.aCTWT;
-        totalVolumeCFT += item.cFTTOT;
-      });
+         debugger;
+      let selectedDockets = this.tableData.filter(x => x.leg != event[0].leg.trim())
+                            .map((x) => x['items']?.filter((y) => y.isSelected == true).map((z) => z.dKTNO)).flat();
+
+      let newSelected = event.filter((y) => y.isSelected = true).map((z) => z.dKTNO);
+      selectedDockets = [... new Set([...selectedDockets, ...newSelected])];
+
       this.tableData.forEach(row => {
         if (row.leg.trim() === event[0].leg.trim()) {
-          row.count = event.length;
-          row.weightKg = totalWeightKg;
-          row.volumeCFT = totalVolumeCFT;
-          row.packages = totalPackages;
-
-          // Update isSelected based on event data
-          row.items.forEach(detail => {
-            detail.isSelected = event.some(e => e.dKTNO === detail.dKTNO);
-          });
+          const e = event.filter(f => f.isSelected == true );      
+          row.items = e;
+          row.count = e.length
+          row.weightKg = e.reduce((acc, cur) => acc + cur.aCTWT, 0);
+          row.volumeCFT = e.reduce((acc, cur) => acc + cur.cFTTOT, 0);
+          row.packages = e.reduce((acc, cur) => acc + cur.pKGS, 0);;
         }
+        row.selectedDkts = selectedDockets;
       });
     }
     this.getCapacity();
@@ -471,7 +564,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const vehRequest = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
-      filter: { status: "Available", currentLocation: this.storage.branch }
+      filter: { currentLocation: this.storage.branch } //status: "Available", 
     };
 
     // Fetch data from the JSON endpoint
@@ -481,7 +574,17 @@ export class CreateLoadingSheetComponent implements OnInit {
         if (res) {
 
           let vehicleDetails = res.data.map((x) => {
-            return { name: x.vehNo, value: x.vehNo };
+            return { 
+              name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
+              value: x.vehNo, 
+              status: x.status
+            };
+          }).sort((a, b) => {
+              const statusComparison = a.status.localeCompare(b.status);
+              if (statusComparison !== 0) {
+                  return statusComparison;
+              }
+              return a.value.localeCompare(b.value);
           });
 
           this.filter.Filter(
@@ -650,6 +753,11 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   async loadVehicleDetails() {
     try {
+      const vehControl = this.loadingSheetTableForm.controls["vehicle"];
+      if(vehControl.value.status != "Available") {
+        vehControl.setValue("");
+        return;
+      }
       const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
       this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
       this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);

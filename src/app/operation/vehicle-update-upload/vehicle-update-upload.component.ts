@@ -305,7 +305,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
 
   kpiData(event) {
-    debugger
     let packages = 0;
     let shipingloaded = 0;
     this.loadingTableData.forEach((element, index) => {

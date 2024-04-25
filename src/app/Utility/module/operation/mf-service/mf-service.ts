@@ -270,13 +270,14 @@ export class ManifestService {
         return { mfHeader, filteredMfDetails, envData, lsNo, sfxDocketsData, isSuffex, sfxEnvData,isScan }
     }
     async gettingLastSuffix(data){
+        debugger
          const req={
             companyCode:this.storage.companyCode,
-            collection:"docket_ops_det_ltl",
+            collectionName:"docket_ops_det_ltl",
             filters:[
                 {
                   D$match: {
-                    dKTNO:data.map(d=>d.Shipment)
+                    dKTNO:{D$in:data.map(d=>d.Shipment)}
                   }
                 },
                 {

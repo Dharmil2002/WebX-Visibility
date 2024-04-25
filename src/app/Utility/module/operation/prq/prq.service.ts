@@ -262,7 +262,9 @@ export class PrqService {
     const reqBarnch = {
       companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "location_detail",
-      filter: {locCode:this.branchCode},
+      filter: {
+        locCode: this.branchCode 
+      },
     }
 
     const resBarnch = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBarnch));
@@ -274,7 +276,7 @@ export class PrqService {
     const reqBody = {
       companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
-      filter: barnchCode && barnchCode == 1?{}:{ bRCD: this.branchCode },
+      filter: barnchCode && barnchCode == 1? {} : { bRCD: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method

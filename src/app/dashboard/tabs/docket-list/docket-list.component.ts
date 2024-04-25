@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
@@ -18,6 +19,7 @@ export class DocketListComponent implements OnInit {
     orgBranch: string = "";
     TableContainerStyle = "height:500px!important";
     docCalledAs: any;
+    formTitle = "Docket List";
 
    /* column header is for the changes css or title in the table*/
   columnHeader = {    
@@ -95,9 +97,7 @@ export class DocketListComponent implements OnInit {
 
   /*.......End................*/
   /* here the varible declare for menu Item option Both is required */
-  menuItems = [
-    { label: "Edit Docket" }
-  ]
+  menuItems = []
   menuItemflag: boolean = true;
   //  TableStyle = "width:90%"
   /*.......End................*/
@@ -116,12 +116,17 @@ export class DocketListComponent implements OnInit {
     private router: Router,
     private docketService: DocketService,
     private thcService: ThcService,
+    private locationService: LocationService,
     private storage: StorageService,
     private controlPanel: ControlPanelService
   ) {
     this.orgBranch = this.storage.branch;
     this.docCalledAs = this.controlPanel.DocCalledAs;
     this.columnHeader.docNo.Title = this.docCalledAs.Docket;
+    this.formTitle = `${this.docCalledAs.Docket} List`;
+    this.menuItems = [
+      { label: `Edit ${this.docCalledAs.Docket}` }
+    ]
 
     this.getShipmentDetail();
     this.allColumnFilter = this.columnHeader
@@ -132,8 +137,11 @@ export class DocketListComponent implements OnInit {
   }
 
   async getShipmentDetail() {
+
+    const loc = await this.locationService.getLocation( { companyCode: this.storage.companyCode, locCode: this.storage.branch } );
     /*below the method to get docket Detail using service*/
-    const shipmentList = await this.docketService.getDocketsDetails();
+    
+    const shipmentList = await this.docketService.getDocketsDetails(loc.locCity);
     this.tableData = await this.docketService.processShipmentList(shipmentList)
     this.tableLoad = false;
     /*end*/
@@ -143,12 +151,12 @@ export class DocketListComponent implements OnInit {
     const { label } = data.label;
 
     switch (label) {
-      case "Edit Docket":
+      case `Edit ${this.docCalledAs.Docket}`:
         this.router.navigate(['/Operation/ConsignmentEntry'], {
           state: { data: data.data },
         });
         break;
-      case "Create THC":
+      case `Create ${this.docCalledAs.THC}`:
         this.router.navigate(['/Operation/thc-create'], {
           state: { data: { data: data.data, addThc: true, viewType: 'addthc' } },
         });
@@ -178,8 +186,9 @@ export class DocketListComponent implements OnInit {
   }
   OpenCnote(data) {
     const templateBody = {
+      templateName: "Docket",
+      partyCode: "CONSRAJT58",
       DocNo: data.docNo,
-      templateName: 'Docket View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');

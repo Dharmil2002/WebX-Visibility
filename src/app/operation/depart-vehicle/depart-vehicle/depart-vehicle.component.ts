@@ -791,8 +791,9 @@ export class DepartVehicleComponent implements OnInit {
   // }
   viewMenifest(event) {
     const req = {
-      templateName: "Manifest View-Print",
       DocNo: event.data?.manifest,
+      templateName: "Manifest",
+      partyCode: "CONSRAJT27",
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, '', 'width=1000,height=800');

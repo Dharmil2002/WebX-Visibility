@@ -15,6 +15,7 @@ export class CommonViewPrintComponent implements OnInit {
   companyCode = 0;
   JsonData;
   templateBody: any;
+  
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,
@@ -43,6 +44,7 @@ export class CommonViewPrintComponent implements OnInit {
     this.GetviewPrint() // Template Data
   }
 
+  
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
@@ -59,5 +61,6 @@ export class CommonViewPrintComponent implements OnInit {
       this.HtmlTemplate = Res.data.Template;
       this.showView = true;
     }
+    
   }
 }

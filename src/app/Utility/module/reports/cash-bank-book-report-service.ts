@@ -233,8 +233,8 @@ export class CashBankBookReportService {
                          debit: parseFloat(parseFloat(item.debit).toFixed(2)),
                          credit: parseFloat(parseFloat(item.credit).toFixed(2)),
                          bal: parseFloat(parseFloat(item.bal).toFixed(2)),
-                         vDate: item.vDate ? moment(item.vDate).format('DD-MM-YYYY') : "",
-                         refNo: item.rNO ? `${item.pMD} ${item.rNO}, dated ${moment(item.dT).format("DD-MM-YYYY")}` : ""
+                         vDate: item.vDate ? moment(item.vDate).format('DD MMM YY') : "",
+                         refNo: item.rNO ? `${item.pMD} ${item.rNO}, dated ${moment(item.dT).format("DD MMM YY")}` : ""
                     }
                });
 
@@ -242,11 +242,11 @@ export class CashBankBookReportService {
                const total = reportData.reduce((accumulator, item) => {
 
                     // // Format date
-                    // item.vDate = item.vDate ? moment(item.vDate).format('DD-MM-YYYY') : "";
+                    // item.vDate = item.vDate ? moment(item.vDate).format('DD MMM YY') : "";
 
                     // // Generate reference number if available
                     // if (item.rNO) {
-                    //      item.refNo = `Cheque ${item.rNO}, dated ${moment(item.dT).format("DD-MM-YYYY")}`;
+                    //      item.refNo = `Cheque ${item.rNO}, dated ${moment(item.dT).format("DD MMM YY")}`;
                     // }
 
                     // Update the totals

@@ -204,12 +204,11 @@ const shipData = [
 
 
   OpenManifest(data){
-    // console.log('data' ,data.TripID)
-
     const TripID = data.TripID
     const templateBody = {
+      templateName: 'Manifest',
+      partyCode: "CONSRAJT27",
       DocNo: TripID,
-      templateName: 'Manifest View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');

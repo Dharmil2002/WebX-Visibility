@@ -115,7 +115,7 @@ export class DocketTrackingComponent implements OnInit {
       this.tableData = docketList.map((x)=>{
         return {
           ...x,
-          eNTDT:moment(x.eNTDT).format("DD/MM/YYYY"),
+          eNTDT:moment(x.eNTDT).format("DD MMM YY"),
           Event:x.oPSSTS
         }
       });

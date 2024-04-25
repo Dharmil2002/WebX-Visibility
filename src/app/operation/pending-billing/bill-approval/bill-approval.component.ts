@@ -325,19 +325,19 @@ export class BillApprovalComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, TotalAmount, 0),
-      createVoucher(ledgerInfo['Freight income'].LeadgerCode, ledgerInfo['Freight income'].LeadgerName, ledgerInfo['Freight income'].LeadgerCategory, 0, DocketAmount),
+      createVoucher(ledgerInfo['AST002002'].LeadgerCode, ledgerInfo['AST002002'].LeadgerName, ledgerInfo['AST002002'].LeadgerCategory, TotalAmount, 0),
+      createVoucher(ledgerInfo['INC001003'].LeadgerCode, ledgerInfo['INC001003'].LeadgerName, ledgerInfo['INC001003'].LeadgerCategory, 0, DocketAmount),
     ];
     if (data?.rOUNOFFAMT > 0) {
-      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, ledgerInfo['Round off Amount'].LeadgerCategory, data?.rOUNOFFAMT, 0));
+      response.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName, ledgerInfo['EXP001042'].LeadgerCategory, data?.rOUNOFFAMT, 0));
     }
 
 
     const gstTypeMapping = {
-      UGST: { accCode: ledgerInfo['UGST'].LeadgerCode, accName: ledgerInfo['UGST'].LeadgerName, accCategory: ledgerInfo['UGST'].LeadgerCategory, prop: "uGST" },
-      CGST: { accCode: ledgerInfo['CGST'].LeadgerCode, accName: ledgerInfo['CGST'].LeadgerName, accCategory: ledgerInfo['CGST'].LeadgerCategory, prop: "cGST" },
-      IGST: { accCode: ledgerInfo['IGST'].LeadgerCode, accName: ledgerInfo['IGST'].LeadgerName, accCategory: ledgerInfo['IGST'].LeadgerCategory, prop: "iGST" },
-      SGST: { accCode: ledgerInfo['SGST'].LeadgerCode, accName: ledgerInfo['SGST'].LeadgerName, accCategory: ledgerInfo['SGST'].LeadgerCategory, prop: "sGST" },
+      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
+      CGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
+      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
+      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
     };
 
     const gstType = data?.gST?.tYP;

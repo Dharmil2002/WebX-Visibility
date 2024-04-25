@@ -1,10 +1,36 @@
-import { Key } from "angular-feather/icons";
+import { OwlDateTimeFormats } from "@danielmoncada/angular-datetime-picker";
+
+export const MY_CUSTOM_FORMAT: OwlDateTimeFormats = {
+    parseInput: 'dd MMM yy HH:mm',         // Correct date and time parsing format
+    fullPickerInput: 'dd MMM yy HH:mm',    // Full date-time input format
+    datePickerInput: 'dd MMM yy',          // Date input format
+    timePickerInput: 'HH:mm',              // Time input format
+    monthYearLabel: 'MMM yy',              // Month-Year label format
+    dateA11yLabel: 'dd MMMM yyyy',         // Accessibility label for full date
+    monthYearA11yLabel: 'MMMM yyyy'        // Accessibility label for Month-Year
+};
+
+export const MY_DATE_FORMAT = {
+    parse: {
+        dateInput: 'DD MMM YY',
+        dateTimeInput: 'DD MMM YY HH:mm'
+    },
+    display: {
+        dateInput: 'DD MMM YY',                // used for the date input displayed value
+        dateTimeInput: 'DD MMM YY HH:mm',      // used for the date-time input displayed value
+        monthYearLabel: 'MMM YYYY',            // used for the date picker's month and year label
+        dateA11yLabel: 'LL',                   // used for the long format accessibility label
+        monthYearA11yLabel: 'MMMM YYYY',       // used for the month and year accessibility label
+    },
+};
+
+
 
 export const StoreKeys = {
     CompanyCode: 'companyCode',
     UserId: 'UserName',
     UserName: 'Name',
-    Role: 'role',        
+    Role: 'role',
     CurrentUser: 'currentUser',
     CurrentBranch: 'currentBranch',
     Branch: 'branch',
@@ -23,13 +49,15 @@ export const StoreKeys = {
     SearchResults: 'searchResults',
     DocCallAs: 'docCallAs',
     DocNames: 'DocNames',
+    AccountMaster: 'AccountMaster',
 
     Theme: 'theme',
     Choose_LogoHeader: 'choose_logoheader',
     Sidebar_Status: 'sidebar_status',
     Choose_Skin: 'choose_skin',
-    Choose_Skin_Active:'choose_skin_active',
-    IsRtl: 'isRtl'
+    Choose_Skin_Active: 'choose_skin_active',
+    IsRtl: 'isRtl',
+    WorkingLoc: 'WorkingLoc'
 }
 
 export const Collections = {
@@ -66,8 +94,8 @@ export const GenericActions = {
 export const OperationActions = {
     CreateThc: "operation/thc/create",
     getThc: "operation/thc/get",
-    createCha:"operation/cha/create",
-    createRake:"operation/rake/create"
+    createCha: "operation/cha/create",
+    createRake: "operation/rake/create"
 }
 
 export const UploadFieldType = {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { StoreKeys } from 'src/app/config/myconstants';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { DocketStatus } from 'src/app/Models/docStatus';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
@@ -129,14 +130,15 @@ export class DeliveryMrGenerationListComponent implements OnInit {
         .reverse()
         .map(item => {
 
-          // Extract the destination location from the event data
-          const location = item.orgdest.split(":")[1].trim();
+          // Extract the branch information from the destination location and remove any leading or trailing whitespaces
+          const location = item.orgdest.split("-")[1].trim();
           let actions = '';
 
+          const localBranch = this.storage.getItem(StoreKeys.Branch).trim();
           // Check if the branch matches the specified branch
-          if (this.storage.branch && this.storage.branch.trim() === location) {
-            // Assign the action only if the condition is met
+          if (localBranch === location) {
 
+            // Assign the action only if the condition is met
             actions = item.status === 'Del_Mr_Generated' ? '' : 'Delivery MR';
           }
 

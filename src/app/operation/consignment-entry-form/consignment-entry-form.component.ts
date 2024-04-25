@@ -1739,14 +1739,15 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       firstValueFrom(this.operationService.operationMongoPost("operation/docket/create", reqBody))
         .then((res: any) => {
           if (res.success) {
+            const dockNo= this.isManual? this.model.consignmentTableForm.controls['docketNumber'].value: res.data
             const PayTypeCode = this.model.consignmentTableForm.value.payType;
             if (PayTypeCode === "P01") {
-              this.AccountPosting(res.data)
+              this.AccountPosting(dockNo)
             } else {
               Swal.fire({
                 icon: "success",
                 title: "Booked Successfully",
-                text: "DocketNo: " + res.data,
+                text: "DocketNo: " + dockNo,
                 showConfirmButton: true,
               }).then((result) => {
                 if (result.isConfirmed) {

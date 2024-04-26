@@ -27,3 +27,13 @@ export function sumProperty(list, propertyName) {
       return acc + (isNaN(value) ? 0 : value);
     }, 0);
   }
+
+export function  generateCombinations(terms) {
+    const combinations = [];
+    for (let i = 0; i < terms.length; i++) {
+      for (let j = 0; j < terms.length; j++) {
+        combinations.push([terms[i], terms[j]]);
+      }
+    }
+    return combinations;
+  }

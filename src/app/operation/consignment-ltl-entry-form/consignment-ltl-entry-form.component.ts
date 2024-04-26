@@ -29,7 +29,7 @@ import { firstValueFrom } from 'rxjs';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
-import { ConvertToNumber, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
+import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
 import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
@@ -158,7 +158,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private _NavigationService: NavigationService,
     private prqService: PrqService,
     private customer: CustomerService,
-    private clusterMasterService: ClusterMasterService,
     private consigmentLtlModel: ConsigmentLtlModel,
     private route: Router,
     private operationService: OperationService,
@@ -1657,15 +1656,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       );
     }
   }
-   generateCombinations(terms) {
-    const combinations = [];
-    for (let i = 0; i < terms.length; i++) {
-      for (let j = i + 1; j < terms.length; j++) { // Only generate unique combinations
-        combinations.push([terms[i], terms[j]]);
-      }
-    }
-    return combinations;
-  }
 
   // Updated function to handle `isOrigin` condition correctly
    getTermValue(term, isOrigin) {
@@ -1713,7 +1703,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const terms = ["Area", "Pincode", "City", "State"];
 
   
-    const allCombinations = this.generateCombinations(terms);
+    const allCombinations = generateCombinations(terms);
 
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
       let match = { "D$and": [] };

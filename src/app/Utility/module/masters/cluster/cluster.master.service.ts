@@ -14,7 +14,7 @@ export class ClusterMasterService {
 
     async getClusterData(value:string) {
         if (value.length >= 3) {
-            const filter = { clusterName: { 'D$regex': `^${value}`, 'D$options': 'i' } }
+            const filter = { clusterName: { 'D$regex': `^${value}`, 'D$options': 'i' } ,cLSTYPNM:"Area"}
             const reqBody = {
                 companyCode: this.storage.companyCode,
                 collectionName: "cluster_detail",

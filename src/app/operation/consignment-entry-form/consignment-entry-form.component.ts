@@ -35,7 +35,7 @@ import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
 import { AddressService } from "src/app/Utility/module/masters/Address/address.service";
-import { ConvertToNumber, isValidNumber } from "src/app/Utility/commonFunction/common";
+import { ConvertToNumber, generateCombinations, isValidNumber } from "src/app/Utility/commonFunction/common";
 import { StoreKeys } from "src/app/config/myconstants";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
@@ -2243,15 +2243,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       }
     ]
   }
-  generateCombinations(terms) {
-    const combinations = [];
-    for (let i = 0; i < terms.length; i++) {
-      for (let j = i + 1; j < terms.length; j++) { // Only generate unique combinations
-        combinations.push([terms[i], terms[j]]);
-      }
-    }
-    return combinations;
-  }
 
   // Updated function to handle `isOrigin` condition correctly
    getTermValue(term, isOrigin) {
@@ -2299,8 +2290,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     } else {
       containerCode = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
     }
-    const terms = ["Area", "Pincode", "City", "State"];
-    const allCombinations = this.generateCombinations(terms);
+      const terms = ["Area", "Pincode", "City", "State"];
+      const allCombinations =generateCombinations(terms);
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
       let match = { "D$and": [] };
       let fromConditions = this.getTermValue(fromTerm, true);  // For origin

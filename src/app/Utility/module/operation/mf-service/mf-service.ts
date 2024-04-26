@@ -18,6 +18,7 @@ export class ManifestService {
         private operationService: OperationService
     ) { }
     async getFieldMapping(details, header, formField, pkgs) {
+        debugger
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
         const mfHeader = {
             "_id": "",
@@ -113,7 +114,6 @@ export class ManifestService {
 
     }
     async mapFieldsWithoutScanning(details, header, formField,isScan,notSelectedData) {
-        debugger
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
         //collectionName:"mf_details_ltl"
         const envData = [];

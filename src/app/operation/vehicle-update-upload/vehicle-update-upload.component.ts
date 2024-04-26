@@ -383,72 +383,102 @@ export class VehicleUpdateUploadComponent implements OnInit {
        this.kpiData(data);
     }
   }
-  
+  getMFGrouping(selectedData){
+    debugger
+    let groupedDataWithoutKey;
+    const groupedData = selectedData.reduce((acc, element) => {
+      const leg = element.Leg;
+      if (!acc[leg]) {
+        acc[leg] = {
+          Leg: leg,
+          TotalWeightKg: 0,
+          TotalVolumeCFT: 0,
+          TotalPackages: 0,
+          ShipmentCount: 0,
+          Data: []
+        };
+      }
+      acc[leg].TotalWeightKg += element.weight;
+      acc[leg].TotalVolumeCFT += element.cft;
+      acc[leg].TotalPackages += element.Packages;
+      acc[leg].ShipmentCount++;
+      acc[leg].Data.push(element);
+      return acc;
+    }, {});
+    groupedDataWithoutKey = Object.values(groupedData);
+    return groupedDataWithoutKey;
+  }
   async CompleteScan() {
+    debugger
     let resMf=""
-    if(this.isScan){
-    let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
-    if(packageChecked){
-      Swal.fire({
-        icon: "error",
-        title: "load Package",
-        text: `Please load All  Your Package`,
-        showConfirmButton: true,
-      })
-      return;
-    }
-      const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
-       resMf = await this.mfService.createMfDetails(fieldMapping);
-    }
-    else{
+    if(this.isScan){}
+    let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
+    const menifest=await this.getMFGrouping(selectedData);
+    console.log(menifest);
+    // let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
+    // if(packageChecked){
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "load Package",
+    //     text: `Please load All  Your Package`,
+    //     showConfirmButton: true,
+    //   })
+    //   return;
+    // }
+    //   const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
+    //    resMf = await this.mfService.createMfDetails(fieldMapping);
+    // }
+    // else{
       
-      let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-      if(selectedData.length <= 0) 
-      {
-        Swal.fire({
-          icon: "warning",
-          title: "Action Needed",
-          text: "Please select at least one option to proceed.",
-          showConfirmButton: true,
-          confirmButtonText: 'OK'
-        });        
-        return false;
-      }
+    //   let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
+    //   if(selectedData.length <= 0) 
+    //   {
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "Action Needed",
+    //       text: "Please select at least one option to proceed.",
+    //       showConfirmButton: true,
+    //       confirmButtonText: 'OK'
+    //     });        
+    //     return false;
+    //   }
 
-      let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
-      const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
-      resMf = await this.mfService.createMfDetails(fieldMapping);
-    }
-    if (resMf) {
-      if (this.shipmentStatus == 'Loaded') {
-        const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
-          width: '100%', // Set the desired width
-          data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable, mfNo: resMf } // Pass the data object
-        });
+    //   let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+    //   const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
+    //   resMf = await this.mfService.createMfDetails(fieldMapping);
+    //   this.shipingDataTable=selectedData
+    // }
 
-        dialogRef.afterClosed().subscribe(result => {
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: `Manifest Generated Successfully`,
-            showConfirmButton: true,
-          })
-          this.goBack('Departures');
-          this.dialogRef.close("");
-        });
-      }
-      else {
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: `Arrival Scan done Successfully`,
-          showConfirmButton: true,
-        })
-        this.dialogRef.close(this.loadingSheetTableForm.value);
-        this.goBack('Departures');
-        this.dialogRef.close("");
-      }
-    }
+    // if (resMf) {
+    //   if (this.shipmentStatus == 'Loaded') {
+    //     const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
+    //       width: '100%', // Set the desired width
+    //       data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable, mfNo: resMf } // Pass the data object
+    //     });
+
+    //     dialogRef.afterClosed().subscribe(result => {
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Successful",
+    //         text: `Manifest Generated Successfully`,
+    //         showConfirmButton: true,
+    //       })
+    //       this.goBack('Departures');
+    //       this.dialogRef.close("");
+    //     });
+    //   }
+    //   else {
+    //     Swal.fire({
+    //       icon: "success",
+    //       title: "Successful",
+    //       text: `Arrival Scan done Successfully`,
+    //       showConfirmButton: true,
+    //     })
+    //     this.dialogRef.close(this.loadingSheetTableForm.value);
+    //     this.goBack('Departures');
+    //     this.dialogRef.close("");
+    //   }
+    // }
 
   }
   Close(): void {

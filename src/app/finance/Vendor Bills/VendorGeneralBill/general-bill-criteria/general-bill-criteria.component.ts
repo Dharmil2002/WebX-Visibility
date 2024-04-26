@@ -19,9 +19,9 @@ import { MatDialog } from '@angular/material/dialog';
 export class GeneralBillCriteriaComponent implements OnInit {
   breadScrums = [
     {
-      title: "Vendor Bill Generation",
+      title: "Vendor General Bill Generation",
       items: ["Home"],
-      active: "Vendor Bill Generation",
+      active: "Vendor General Bill Generation",
     },
   ];
   backPath: string;

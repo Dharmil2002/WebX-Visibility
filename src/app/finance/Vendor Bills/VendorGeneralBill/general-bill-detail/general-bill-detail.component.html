@@ -1,6 +1,86 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <!-- <p>general-bill-detail works!</p> -->
-    <div>
-        
+
+    <form [formGroup]="DebitVoucherSummaryForm">
+        <app-form-webxpress [form]="DebitVoucherSummaryForm" [FormTitle]="'Summary'"
+            [formData]="jsonControlDebitVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false" [className]="className">
+        </app-form-webxpress>
+    </form>
+    <app-generic-table-v2 *ngIf="LoadVoucherDetails && DebitVoucherSummaryForm.valid"
+        [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData"
+        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [FormTitle]="'Details'"
+        [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
+        (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true [DisplayCheckbox]="true"
+        (AddNewButtonEvent)="AddNewDebits()" (functionCallEmitter)="functionCallHandler($event)"
+        (callFunction)="functionCallHandler($event)">
+    </app-generic-table-v2>
+
+    <div class="row">
+        <div class="col-4" *ngIf="DebitVoucherSummaryForm.value.Accountinglocation">
+            <form [formGroup]="DebitVoucherTaxationTDSForm">
+                <app-form-webxpress [form]="DebitVoucherTaxationTDSForm" [FormTitle]="'TDS'"
+                    [formData]="jsonControlDebitVoucherTaxationTDSArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-4" *ngIf="DebitVoucherSummaryForm.value.Accountinglocation">
+
+            <form [formGroup]="DebitVoucherTaxationTCSForm">
+                <app-form-webxpress [form]="DebitVoucherTaxationTCSForm" [FormTitle]="'TCS'"
+                    [formData]="jsonControlDebitVoucherTaxationTCSArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-4" *ngIf=" this.DebitVoucherSummaryForm.value.Partystate">
+            <form [formGroup]="DebitVoucherTaxationGSTForm">
+                <app-form-webxpress [form]="DebitVoucherTaxationGSTForm" [FormTitle]="'GST'"
+                    [formData]="jsonControlDebitVoucherTaxationGSTArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
     </div>
+    <div class="row">
+        <div class="col-5">
+            <form [formGroup]="DebitVoucherTaxationPaymentSummaryForm">
+                <app-form-webxpress [form]="DebitVoucherTaxationPaymentSummaryForm" [FormTitle]="'Payment Summary'"
+                    [DisplayCheckbox]="true" [CheckBoxMessage]="'Round Off'"
+                    [formData]="jsonControlDebitVoucherTaxationPaymentSummaryArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col">
+            <form [formGroup]="DebitVoucherTaxationPaymentDetailsForm">
+                <app-form-webxpress [form]="DebitVoucherTaxationPaymentDetailsForm" [FormTitle]="'Payment Details'"
+                    [formData]="jsonControlDebitVoucherTaxationPaymentDetailsArray"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button [disabled]="!DebitVoucherSummaryForm.valid || 
+                tableData.length==0 || !DebitVoucherTaxationPaymentDetailsForm.valid" class="msr-3" mat-raised-button
+                    color="primary" (click)="Submit()">Submit</button>
+                <button mat-button (click)="cancel('Billing​')">Back</button>
+            </div>
+        </div>
+    </div>
+
 </app-common-wrapper-webxpress>

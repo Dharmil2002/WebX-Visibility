@@ -274,6 +274,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
       data: request,
       width: "100%",
+      height: "90%",
       disableClose: true,
       position: {
         top: "20px",
@@ -768,13 +769,14 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#endregion
   //#region to set Partially Collected checkbox value
   setPartiallyCollected() {
+    debugger
     // Reset values
     this.billingForm.get("PartiallyCollectedAmt").setValue(0);
     this.billingForm.get("PartiallyCollected").setValue(false);
 
     // Get values from the form
-    const collectedAMT = this.billingForm.value.CollectionAmount;
-    const mrNetAMT = this.billingForm.value.DeliveryMRNetAmount;
+    const collectedAMT = parseFloat(this.billingForm.value.CollectionAmount) || 0;
+    const mrNetAMT = parseFloat(this.billingForm.value.DeliveryMRNetAmount) || 0;
 
     // Check conditions
     if (collectedAMT < mrNetAMT) {
@@ -796,10 +798,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.billingForm.get("PartiallyCollected").setValue(false);
       return;
     }
-    else {
-      // No partial collection
+    else if ((collectedAMT == mrNetAMT)) {
       this.billingForm.get("PartiallyCollected").setValue(false);
     }
+
   }
   //#endregion
   GenerateVoucher() {

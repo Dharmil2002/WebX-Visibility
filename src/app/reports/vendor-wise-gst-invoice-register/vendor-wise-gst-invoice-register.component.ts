@@ -236,10 +236,12 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
 
     // Extract vendor names from vennmcdHandler if it's an array
+    // const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
+    //   ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => parseInt(x.value))
+    //   : [];
     const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
-      ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => parseInt(x.value))
-      : [];
-
+          ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
+          : [];
     // Extract saccdHandler, gststateHandler values
     const sacData = Array.isArray(this.vendorgstregisTableForm.value.saccdHandler)
       ? this.vendorgstregisTableForm.value.saccdHandler.map(x => parseInt(x.value))

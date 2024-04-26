@@ -16,7 +16,7 @@ export class VendorGSTInvoiceService {
     ) { }
 
     async getvendorGstRegisterReportDetail(data, docNo) {
-
+        const vendorNames = data.vendrnm ? data.vendrnm.map(x => x.vCD) || [] : [];
         // Check if the array contains only empty strings
         const isEmptyDocNo = docNo.every(value => value === "");
         let matchQuery
@@ -27,7 +27,7 @@ export class VendorGSTInvoiceService {
                     { bDT: { 'D$gte': data.startValue } }, // Convert start date to ISO format
                     { bDT: { 'D$lte': data.endValue } }, // Bill date less than or equal to end date       
                     ...(data.stateData.length > 0 ? [{ 'sT': { 'D$in': data.stateData } }] : []), // State names condition
-                    ...(data.vendrnm.length > 0 ? [{ 'D$expr': { 'D$in': ['$vND.cD', data.vendrnm] } }] : []), // State names condition
+                    ...(data.vendrnm.length > 0 ? [{ 'D$expr': { 'D$in': ['$vND.cD', vendorNames] } }] : []), // State names condition
                     ...(data.sacData.length > 0 ? [{ 'D$expr': { 'D$in': ['$gST.sAC', data.sacData] } }] : []), // State names condition              
                 ],
             };
@@ -50,14 +50,12 @@ export class VendorGSTInvoiceService {
         };
 
         const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
-        // console.log(res.data);
 
         const states = await this.objStateService.getState();
         const reportFile: any = await firstValueFrom(this.masterServices.getJsonFileDetails('vendorGstReport'));
 
         let reportData: any[] = [];
         reportData = prepareReportData(res.data, reportFile);
-        console.log(reportData);
         
         reportData.forEach(f => {
             f["Bill_To_State"] = states.find(a => a.value == f["Bill_To_State"])?.name || f["Bill_To_State"];

@@ -141,7 +141,22 @@ export const ledgerInfo = {
   "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
   "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
   "LIA003004": GetLeadgerInfoFromLocalStorage("LIA003004"),
-
+  "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
+  "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
+  "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),
+  "CGST": GetLeadgerInfoFromLocalStorage("LIA002003"),
+};
+export const SACInfo = {
+  "9964": {
+    "sacCode": "9964",
+    "sacName": "Passenger Transport Services",
+    "GSTRT": 12
+  },
+  "996511": {
+    "sacCode": "996511",
+    "sacName": "road transport services of goods",
+    "GSTRT": 12
+  }
 };
 function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
   // Get Data From Local Storage

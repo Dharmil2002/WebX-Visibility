@@ -9,7 +9,7 @@
         [columnHeader]="columnHeader"   [Link]="linkArray"         
         [menuItems]="menuItems" [staticField]="staticField" 
         [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle" [selectAllRequired]="true"
-        [maxWidth]="maxTableWidth" [uploadComponent]="uploadComponent"  [addAndEditPath]="addAndEditPath"
+        [maxWidth]="maxWidth"[height]="height"[width]="width" [uploadComponent]="uploadComponent"  [addAndEditPath]="addAndEditPath"
         [menuItemFlag]="menuItemflag" [menuItemFlag]="menuItemflag" 
         (menuItemClicked)="handleMenuItemClick($event)"         
         (selectAllClicked)="IsActiveFuntion($event)" 
@@ -21,7 +21,7 @@
   <div class="row" [ngClass]="{'blur-effect': isSubmit}" *ngIf="!isSubmit">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
       <div class="example-button-row d-flex justify-content-end">
-        <button class="msr-3" mat-raised-button color="primary" [disabled]="!loadingSheetTableForm.value.vehicle.value" *ngIf="!tableload"
+        <button class="msr-3" mat-raised-button color="primary" [disabled]="!loadingSheetTableForm.valid" *ngIf="!tableload"
           (click)="loadingSheetGenerate()">Generate LoadingSheet</button>
         <button class="msr-3" mat-raised-button color="primary" (click)="goBack('Departures')">Back</button>
         <button class="msr-3" mat-raised-button color="primary" *ngIf="departFlag" (click)="departVehicle()">Depart

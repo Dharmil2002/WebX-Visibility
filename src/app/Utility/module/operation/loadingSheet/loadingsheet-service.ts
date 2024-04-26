@@ -6,6 +6,7 @@ import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { VehicleService } from "../../masters/vehicle-master/vehicle-master-service";
 
 @Injectable({
   providedIn: "root",
@@ -13,7 +14,8 @@ import { StorageService } from "src/app/core/service/storage.service";
 export class LoadingSheetService {
   constructor(
     private operationService: OperationService,
-    private storage: StorageService
+    private storage: StorageService,
+    private marketVehicleService:VehicleService
   ) { }
 
   async getDocketsForLoadingSheet(nextLocs: string[]) {
@@ -47,7 +49,7 @@ export class LoadingSheetService {
       // "tCT": "",
       "rUTCD": data?.Route.split(":")[0] || "",
       "rUTNM": data?.Route.split(":")[1] || "",
-      "vEHNO": data?.vehicle.value || "",
+      "vEHNO": data?.vehicle.value ||data?.vehicle||"",
       "vTYP": data?.vehicleTypeCode || "",
       "vTYPNM": data?.vehicleType || "",
       "tMODE":data?.transMode||"",
@@ -228,7 +230,60 @@ export class LoadingSheetService {
       evnData: evnData
     }
   }
-
+  async marketVehicle(data){
+    const vehNo=data?.vehicle||data?.vehicle?.value||"";
+    const vehicleNo=await this.marketVehicleService.getMarketVehicle({vID:vehNo,cID:this.storage.companyCode});
+    let vehicle={}
+    let isUpdate=false;
+    if(vehicleNo.length>0){
+       vehicle= {
+          "_id":`${this.storage.companyCode}-${vehNo}`,
+          "vID":vehNo,
+          "wTCAP":data?.Capacity,
+          "vOLCAP":data?.CapacityVolumeCFT,
+          "cID":this.storage.companyCode,
+          "mODBY":this.storage.userName,
+          "mODDT":new Date(),
+          "mODLOC":this.storage.branch
+        
+      }
+      isUpdate=true;
+    }
+    else{
+      vehicle= {
+        "_id":`${this.storage.companyCode}-${vehNo}`,
+        "vID":vehNo,
+        "wTCAP":data?.Capacity,
+        "vOLCAP":data?.CapacityVolumeCFT,
+        "iNCEXP":null,
+        "fITDT": null,
+        "vSPNM":null,
+        "vSPPH":null,
+        "cID": this.storage.companyCode,
+        "eNTDT": new Date(),
+        "eNTBY":this.storage.userName,
+        "eNTLOC":this.storage.branch,
+        "vndNM":"",
+        "vndCD":"",
+        "vndPH":null,
+        "pANNO":"",
+        "drvNM":"",
+        "ETA":null,
+        "drvPH":null,
+        "dLNO":"",
+        "dLEXP":null,
+        "eNGNO":"",
+        "sDOC": ""
+      }
+    }
+    try{
+    await this.marketVehicleService.addMarketVehicleDetails(vehicle,isUpdate);
+    }
+    catch(error){
+      console.log("error",error)
+    }
+    return true
+  }
 
   async updatetripFieldMapping(data, tabledata) {
     let tripSummary = {

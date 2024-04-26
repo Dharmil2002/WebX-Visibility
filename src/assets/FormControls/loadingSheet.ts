@@ -21,13 +21,20 @@ export class loadingControl {
                 placeholder: '',
                 type: 'dropdown',
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Vehicle is required'
+                    }
+                ],
                 generatecontrol: true,
                 additionalData: {
                     showNameAndValue: false
                 },
                 functions: {
-                    onOptionSelect: 'loadVehicleDetails'
+                    onModel: 'checkVehicle',
+                    onOptionSelect: 'loadVehicleDetails',
+                    onChange:'checkIsMarketVehicle'
                 },
                 disable: false
             },
@@ -43,8 +50,14 @@ export class loadingControl {
                 generatecontrol: true,
                 disable: true,
                 Validations: [
+                    {
+                        name: 'required',
+                        message: 'Vehicle Type is required'
+                    }
                 ],
-                functions: { },
+                functions: { 
+                 onSelection:"isMarketVehicle"
+                },
                 additionalData: {}
             },
             {
@@ -100,9 +113,12 @@ export class loadingControl {
                 name: 'Capacity',
                 label: 'Capacity(In Tons)',
                 placeholder: '',
-                type: 'text',
+                type: 'number',
                 value:'',
-                Validations: [],
+                Validations: [ {
+                    name: 'required',
+                    message: 'Capacitye is required'
+                }],
                 generatecontrol: true,
                 disable: true
             },
@@ -110,9 +126,12 @@ export class loadingControl {
                 name: 'CapacityVolumeCFT',
                 label: 'Capacity Volume CFT',
                 placeholder: '',
-                type: 'text',
+                type: 'number',
                 value:'',
-                Validations: [],
+                Validations: [{
+                    name: 'required',
+                    message: 'Capacitye Volume is required'
+                }],
                 generatecontrol: true,
                 disable: true
             },
@@ -179,6 +198,16 @@ export class loadingControl {
             {
                 name: 'vehicleTypeCode',
                 label: 'Vehicle Type Code',
+                placeholder: '',
+                type: '',
+                value:'',
+                Validations: [],
+                generatecontrol: true,
+                disable: true
+            },
+            {
+                name: 'vendorType',
+                label: '',
                 placeholder: '',
                 type: '',
                 value:'',

@@ -141,19 +141,24 @@ export const ledgerInfo = {
   "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
   "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
   "LIA003004": GetLeadgerInfoFromLocalStorage("LIA003004"),
-
+  "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
+  "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
+  "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),
+  "CGST": GetLeadgerInfoFromLocalStorage("LIA002003"),
 };
-// export const ledgerCodes = [
-//   "LIA002004", "LIA002002", "LIA002001", "LIA002003", "EXP001042",
-//   "AST001001", "INC001003", "AST002002", "EXP001003", "EXP001009",
-//   "EXP001011", "EXP001007", "LIA001002", "EXP001024"
-// ];
+export const SACInfo = {
+  "9964": {
+    "sacCode": "9964",
+    "sacName": "Passenger Transport Services",
+    "GSTRT": 12
+  },
+  "996511": {
+    "sacCode": "996511",
+    "sacName": "road transport services of goods",
+    "GSTRT": 12
+  }
+};
 
-// export const ledgerInfo: { [key: string]: any } = {};
-
-// for (const code of ledgerCodes) {
-//   ledgerInfo[code] = GetLeadgerInfoFromLocalStorage(code);
-// }
 function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
   // Get Data From Local Storage
   const LeadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));

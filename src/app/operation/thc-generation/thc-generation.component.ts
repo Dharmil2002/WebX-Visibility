@@ -469,7 +469,6 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
-    //   debugger
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {
@@ -1104,7 +1103,6 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
-    debugger
     // Refactored calls using the new function
     clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
     clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);

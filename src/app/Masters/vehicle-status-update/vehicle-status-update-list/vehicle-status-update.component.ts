@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { getVehicleDashboardDetails, getVehicleStatusFromApi } from '../vehicle-status-utility';
+import { getVehicleDashboardDetails } from '../vehicle-status-utility';
 import { formatDate } from 'src/app/Utility/date/date-utils';
-import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 
 @Component({
   selector: 'app-vehicle-status-update',
@@ -11,8 +11,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 })
 export class VehicleStatusUpdateComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  companyCode = 0;
-  branchCode = "";
+  companyCode = 0
   addAndEditPath: string = 'Masters/Vehicle/Status/Add';
   data: [] | any;
   uploadComponent: any;
@@ -74,7 +73,8 @@ export class VehicleStatusUpdateComponent implements OnInit {
   boxData: any;
   constructor(
     private _operationService: OperationService,
-    private storage: StorageService
+    private storage: StorageService,
+    private vehicleStatus:VehicleStatusService
   ) {
     this.companyCode = this.storage.companyCode;
     this.fetchVehicleStatus();
@@ -86,10 +86,10 @@ export class VehicleStatusUpdateComponent implements OnInit {
   async fetchVehicleStatus() {
 
     try {
-      const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
+      const vehicleData= await this.vehicleStatus.getVehicleData({currentLocation:this.storage.branch})
       // Assuming vehicleDetail.data is an array of objects with 'id' property
       // Generate srno for each object in the array
-      const vehicleTableData = vehicleStatusData.filter((x) => x.currentLocation.trim() === this.branchCode.trim()).map((obj, index) => {
+      const vehicleTableData = vehicleData.map((obj, index) => {
         return {
           ...obj,
           srNo: index + 1,

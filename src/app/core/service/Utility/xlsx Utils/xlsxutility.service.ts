@@ -368,7 +368,6 @@ export class xlsxutilityService {
     for (const rule of rulesToDerive) {
       item[rule.ItemsName] = null; // Default to null if no data found or rule doesn't apply
       if(rule.From == 'General'){
-        debugger;
         var a = '';
       }
 

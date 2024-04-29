@@ -36,13 +36,13 @@ export class MRRegisterReportComponent implements OnInit {
     MRTime: "MR Time",
     MRType: "MR Type",
     MRLocation: "MR Location",
-    Party: "Party",
+    PartyName: "Party",
     MRAmount: "MR Amount",
     TDS: "TDS",
     GSTAmount: "GST Amount",
     FreightRebate: "Freight Rebate",
     CLAIM: "CLAIM",
-    OtherDeduction: "Other Deduction",
+    // OtherDeduction: "Other Deduction",
     NetMRCloseAmt: "Net MR Close Amt",
     MRCloseDate: "MR Close Date",
     MRCloseBy: "MR Close By",
@@ -73,19 +73,20 @@ export class MRRegisterReportComponent implements OnInit {
     Receiver: "Receiver",
     ReceiverNo: "Receiver No.",
     Remark: "Remark",
-    FreightDeduction: "Freight Deduction",
-    ClaimDeduction: "Claim Deduction",
-    OtherAmount: "Other Amount",
-    ServiceCharges: "Service Charges",
-    Discount: "Discount",
-    SpecialCharges: "Special Charges",
-    UnloadingCharges: "Unloading Charges",
-    Damurrage: "Damurrage",
-    DetentionCharge: "Detention charge",
-    OtherCharges: "Other Charges",
-    DDCharges: "DD Charges"
+    // FreightDeduction: "Freight Deduction",
+    // ClaimDeduction: "Claim Deduction",
+    // OtherAmount: "Other Amount",
+    // ServiceCharges: "Service Charges",
+    // Discount: "Discount",
+    // SpecialCharges: "Special Charges",
+    // UnloadingCharges: "Unloading Charges",
+    // Damurrage: "Damurrage",
+    // DetentionCharge: "Detention charge",
+    // OtherCharges: "Other Charges",
+    // DDCharges: "DD Charges"
   }
   protected _onDestroy = new Subject<void>();
+  chargesKeys: any[];
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -208,10 +209,7 @@ export class MRRegisterReportComponent implements OnInit {
         const optionalRequest = { docNoArray, CnotenosArray }
         // console.log(requestbody);
 
-
         const data = await this.mrRegisterService.getMrRegisterData(request, optionalRequest);
-
-        // Swal.hideLoading();
 
         if (!data || (Array.isArray(data) && data.length === 0)) {
 
@@ -229,8 +227,15 @@ export class MRRegisterReportComponent implements OnInit {
           Swal.close();
         }, 1000);
 
+        const transformedHeader = this.setcharges(data, this.CSVHeader); // Set the header for the CSV file
+        const finalData = this.setCsvData(data); // Set the data for the CSV file
+
+        const total = this.getSum(finalData); //getting total of charges
+        const lastRowTTL = this.matchKeysAndSetValues(transformedHeader, total);
+        finalData.push(lastRowTTL);
+
         // Export the record to Excel
-        // this.exportService.exportAsCSV(data, `MR Register-${moment().format("YYYYMMDD-HHmmss")}`, this.CSVHeader);
+        this.exportService.exportAsCSV(finalData, `MR Register-${moment().format("YYYYMMDD-HHmmss")}`, transformedHeader);
 
       } catch (error) {
         console.log(error);
@@ -241,5 +246,78 @@ export class MRRegisterReportComponent implements OnInit {
       }
     }, "MR Register Report Generating Please Wait..!");
   }
+
+  // function to set charges
+  setcharges(chargeList: any[], headers) {
+
+    const columnHeader = { ...headers };
+    this.chargesKeys = [];
+    chargeList.forEach((item) => {
+      item.chargeList.forEach((charge) => {
+        const key = Object.keys(charge)[0];
+
+        if (!this.chargesKeys.includes(key)) {
+          this.chargesKeys.push(key);
+        }
+        columnHeader[key] = key;  // Add the charge to the header
+      });
+    });
+
+    return columnHeader; // Return the transformed data
+  }
+
+  // function to set csv data
+  setCsvData(data: any[]) {
+    const transformed = data.map((item) => {
+      const newItem = { ...item }; // Create a new object for each item
+
+      item.chargeList.forEach((charge: any) => {
+        const key = Object.keys(charge)[0];
+        const value = charge[key];
+        newItem[key] = value; // Add charge properties to the new item
+      });
+
+      delete newItem.chargeList; // Remove the original chargeList property
+      return newItem;
+    });
+    return transformed;
+  }
+
+  //calculating sum of charges
+  getSum(data) {
+    const keys = ['MRAmount', 'TDS', 'GSTAmount', 'NetMRCloseAmt', 'ChequeAmount', 'BasicFreight',
+      'SubTotal', 'DocketTotal', 'ActualWeight', 'ChargedWeight', 'NoPkg'];
+    keys.push(...this.chargesKeys);
+
+    const total = data.reduce((accumulator, item) => {
+      keys.forEach(key => {
+        const totalKey = key;
+        accumulator[totalKey] = (accumulator[totalKey] || 0) + (item[key] ? parseFloat(item[key]) : 0);
+      });
+      return accumulator;
+    }, {});
+
+    return total;
+  }
+  // matching key and setting its value
+  matchKeysAndSetValues(keysMap, valuesMap) {
+
+    const matchedValues = {};
+
+    Object.keys(keysMap).forEach(key => {
+      if (key === 'MRNo') {
+        matchedValues[key] = "Total";
+        return;
+
+      } else {
+        const mappedKey = key;
+        const value = valuesMap[mappedKey];
+        matchedValues[key] = value !== undefined ? value : "";
+      }
+    });
+
+    return matchedValues;
+  }
+
   //#endregion
 }

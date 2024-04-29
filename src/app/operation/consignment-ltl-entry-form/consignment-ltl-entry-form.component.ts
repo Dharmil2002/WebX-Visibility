@@ -29,7 +29,7 @@ import { firstValueFrom } from 'rxjs';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
-import { ConvertToNumber, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
+import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
 import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
@@ -38,6 +38,7 @@ import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -284,6 +285,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     mapControlArray(this.allFormControls, destinationMapping);
   }
   //End
+
   async bindQuickdocketData() {
     if (this.quickDocket) {
       this.DocketDetails = this.quickdocketDetaildata?.docketsDetails || {};
@@ -422,6 +424,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           this.consignmentForm,
           this.allFormControls,
           event.field.name,
+          true,
           true,
           true
         );
@@ -1106,7 +1109,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     return true;
   }
-
   calucateCft() {
     let units = ''
     if (this.consignmentForm.controls['f_vol'].value) {
@@ -1174,7 +1176,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.consignmentForm.get('billingParty').updateValueAndValidity();
     this.consignmentForm.get('billingParty').setValue("");
   }
-
   /*end*/
   async docketValidation() {
     const res = await this.dcrService.validateFromSeries(this.consignmentForm.controls['docketNumber'].value);
@@ -1333,7 +1334,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
-    debugger;
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
       this.consignmentForm.markAllAsTouched();
       this.freightForm.markAllAsTouched();
@@ -1447,7 +1447,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));
       if (res) {
         this.consignmentForm.controls["docketNumber"].setValue(res.data);
-        debugger;
         await this.Addseries(reqDkt.docketsDetails.pKGS);
       }
     }
@@ -1657,6 +1656,42 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       );
     }
   }
+
+  // Updated function to handle `isOrigin` condition correctly
+   getTermValue(term, isOrigin) {
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
+    const fieldKey = isOrigin ? "fromCity" : "toCity";
+    const type = typeMapping[term];
+    let valueKey;
+
+    // Determine the correct key based on term
+    switch (term) {
+      case "Area":
+        valueKey = "clusterName";
+        break;
+      case "Pincode":
+        valueKey = "pincode";
+        break;
+      case "City":
+        valueKey = "ct";
+        break;
+      case "State":
+        valueKey = "st";
+        break;
+      default:
+        return [];
+    }
+    const controls = this.consignmentForm;
+    const value = this.consignmentForm.controls[fieldKey].value[valueKey];
+    if (value) {
+      return [
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] } ,
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] } ];
+      
+    }
+    return [];
+  }
+
   /*below code is for invoke a contract*/
   InvockedContract() {
     const paymentBasesName = this.paymentType.find(x => x.value == this.consignmentForm.value.payType).name;
@@ -1664,6 +1699,25 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const party = this.docketService.paymentBaseContract[paymentBasesName]
     const partyDt = this.consignmentForm.controls[party].value.value
     const capacity = this.tableData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
+
+    const terms = ["Area", "Pincode", "City", "State"];
+
+  
+    const allCombinations = generateCombinations(terms);
+
+    let matches = allCombinations.map(([fromTerm, toTerm]) => {
+      let match = { "D$and": [] };
+      let fromConditions = this.getTermValue(fromTerm, true);  // For origin
+      let toConditions = this.getTermValue(toTerm, false);     // For destination
+
+      if (fromConditions.length > 0 || toConditions.length > 0) {
+        match["D$and"].push(...fromConditions, ...toConditions);
+        return match;
+      }
+      return null;
+    }).filter(x => x != null);
+
+
     let reqBody =
     {
       "companyCode": this.storage.companyCode,
@@ -1673,10 +1727,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "basis": paymentBasesName,
       "from": this.consignmentForm.value.fromCity.value,
       "to": this.consignmentForm.value.toCity.value,
-      "capacity": capacity
+      "capacity": capacity,
+      "matches": matches
     }
 
-    firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
+    firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/invokecontract", reqBody))
       .then(async (res: any) => {
         if (res.length == 1) {
 
@@ -1884,9 +1939,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   async checkInvoiceExist() {
-
     if (this.invoiceForm.controls['invoiceNo'].value) {
-      const res = await this.docketService.checkInvoiceExistLTL({ cID: this.storage.companyCode, iNVNO: this.invoiceForm.controls['invoiceNo'].value });
+      const invoiceNoValue = this.invoiceForm.controls['invoiceNo'].value;
+      const isNumber = typeof invoiceNoValue === 'number';
+      const filter = isNumber 
+          ? {cID: this.storage.companyCode, iNVNO: invoiceNoValue } 
+          : {cID: this.storage.companyCode, iNVNO: { D$regex:`^${invoiceNoValue}$`, D$options: "i" } };
+      const res = await this.docketService.checkInvoiceExistLTL(filter);
       if (res) {
         Swal.fire({
           icon: 'info',

@@ -162,6 +162,9 @@ export class ThcCostUpdateService {
         }
 
         thcs.map(async (thc) => {
+            await this.calculateCosts(request, thc);
+
+             /*
             const tripCost = thc.tOTAMT;
 
             //Need to calculate find total charge weight, currently its done on loaded weight (actual weight) because charge weight is not available
@@ -178,12 +181,25 @@ export class ThcCostUpdateService {
 
                     mfd.aCTCOST = aCTCOST;
                     mfd.cHGCOST = cHGCOST;
+                });
+            });
 
+            const tACTCOST = thc.mf_header.map((x) => x.mf_dockets.map(m => m.aCTCOST || 0)).flat().reduce((acc, curr) => acc + curr, 0);
+            const tCHGCOST = thc.mf_header.map((x) => x.mf_dockets.map(m => m.cHGCOST || 0)).flat().reduce((acc, curr) => acc + curr, 0);
+
+            let aDiff = tripCost - tACTCOST;
+            let cDiff = tripCost - tCHGCOST;
+
+            thc.mf_header[0].mf_dockets[0].aCTCOST += aDiff;
+            thc.mf_header[0].mf_dockets[0].cHGCOST += cDiff;
+
+            thc.mf_header.map((mf) => {
+                mf.mf_dockets.map((mfd) => {
                     batchOperations.push({
                         filter: { _id: mfd._id },
                         update: {
-                            aCTCOST: aCTCOST,
-                            cHGCOST: cHGCOST
+                            aCTCOST: mfd.aCTCOST,
+                            cHGCOST: mfd.cHGCOST
                         }
                     });
                 });
@@ -227,10 +243,122 @@ export class ThcCostUpdateService {
                     ChargeCost: value.cHGCOST
                 }));
 
-                this.AccountPosting(thcs[0], ChargeCost);
+                this.AccountPosting(thc, ChargeCost);
             }
+            */
         });
+       
     }
+
+    async calculateCosts(request, thc) {
+        const { tripCost, totalWT, totalCWT } = this.calculateWeightsAndCost(thc);
+        const { aCPKG, cCPKG } = this.calculateCostPerKg(tripCost, totalWT, totalCWT);
+        const batchOperations = this.processDockets(thc, aCPKG, cCPKG);
+
+        // Bulk update database with the new costs
+        await this.updateBulk(request, batchOperations);
+
+        // Calculate and process origin wise cost if Inter Branch Control is enabled
+        if (request.isInterBranchControl) {
+            this.processInterBranchControl(thc);
+        }
+    }
+    
+    calculateWeightsAndCost(thc) {
+        const tripCost = thc.tOTAMT;
+        const totalWT = this.calculateTotal(thc.mf_header, m => m.lDWT || m.wT);
+        const totalCWT = this.calculateTotal(thc.mf_header, m => m.lDCWT || m.cWT || m.lDWT || m.wT);
+        return { tripCost, totalWT, totalCWT };
+    }
+    
+    calculateTotal(headers, weightSelector) {
+        return headers.map(x => x.mf_dockets.map(weightSelector)).flat().reduce((acc, curr) => acc + curr, 0);
+    }
+    
+    calculateCostPerKg(tripCost, totalWT, totalCWT) {
+        return {
+            aCPKG: tripCost / totalWT,
+            cCPKG: tripCost / totalCWT
+        };
+    }
+    
+    processDockets(thc, aCPKG, cCPKG) {
+        let batchOperations = [];
+        thc.mf_header.map(mf => {
+            mf.mf_dockets.map(mfd => {
+                const { aCTCOST, cHGCOST } = this.calculateDocketCosts(mfd, aCPKG, cCPKG);
+                mfd.aCTCOST = aCTCOST;
+                mfd.cHGCOST = cHGCOST;
+    
+                batchOperations.push({
+                    filter: { _id: mfd._id },
+                    update: { aCTCOST, cHGCOST }
+                });
+            });
+        });
+    
+        // Compensate for any rounding differences in the first docket
+        this.compensateRounding(thc, batchOperations[0]);
+    
+        return batchOperations;
+    }
+    
+    calculateDocketCosts(mfd, aCPKG, cCPKG) {
+        const aCTCOST = ConvertToNumber((mfd.lDWT || mfd.wT) * aCPKG, 3);
+        const cHGCOST = ConvertToNumber((mfd.lDCWT || mfd.cWT || mfd.lDWT || mfd.wT) * cCPKG, 3);
+        return { aCTCOST, cHGCOST };
+    }
+    
+    compensateRounding(thc, firstOperation) {
+        const tACTCOST = this.calculateTotal(thc.mf_header, m => m.aCTCOST || 0);
+        const tCHGCOST = this.calculateTotal(thc.mf_header, m => m.cHGCOST || 0);
+    
+        const aDiff = thc.tOTAMT - tACTCOST;
+        const cDiff = thc.tOTAMT - tCHGCOST;
+    
+        firstOperation.update.aCTCOST += aDiff;
+        firstOperation.update.cHGCOST += cDiff;
+    }
+    
+    async updateBulk(request, operations) {
+        let chunks = chunkArray(operations, 100);
+        await Promise.all(
+            chunks.map(async (chunk) => {
+                const updateRequest = {
+                    companyCode: this.storage.companyCode,
+                    collectionName: request.mfdetails.collation,
+                    data: chunk
+                };
+                return firstValueFrom(this.operationService.operationMongoPut(GenericActions.UpdateBulk, updateRequest));
+            })
+        );
+    }
+    
+    processInterBranchControl(thc) {
+        const originWiseCost = this.calculateOriginWiseCost(thc);
+        const ChargeCost = this.aggregateCostsByOrigin(originWiseCost);
+        this.AccountPosting(thc, ChargeCost);
+    }
+    
+    calculateOriginWiseCost(thc) {
+        return thc.mf_header.map(x => x.mf_dockets.map(m => ({
+            oRGN: m.docket.oRGN,
+            aCTCOST: m.aCTCOST || 0,
+            cHGCOST: m.cHGCOST || 0
+        }))).flat();
+    }
+    
+    aggregateCostsByOrigin(costs) {
+        return costs.reduce((acc, { oRGN, aCTCOST, cHGCOST }) => {
+            if (!acc[oRGN]) {
+                acc[oRGN] = { aCTCOST: 0, cHGCOST: 0 };
+            }
+            acc[oRGN].aCTCOST += aCTCOST;
+            acc[oRGN].cHGCOST += cHGCOST;
+            return acc;
+        }, {});
+    }
+
     async AccountPosting(THCInfo, ChargeCost: any[]) {
         try {
             const Response = [];
@@ -270,7 +398,7 @@ export class ThcCostUpdateService {
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 transDate: new Date(),
                 docType: "VR",
-                branch: this.storage.branch,
+                branch: RequestData.OriginBranch,
                 finYear: financialYear,
                 accLocation: RequestData.OriginBranch,
                 preperedFor: "Vendor",

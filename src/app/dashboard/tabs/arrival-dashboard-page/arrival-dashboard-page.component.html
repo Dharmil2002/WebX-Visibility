@@ -34,7 +34,7 @@
         [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
         [height]="height" [width]="width"
         [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [filterColumn]="filterColumn" 
-        [allColumnFilter]="allColumnFilter" [menuItemFlag]="menuItemflag"
+        [allColumnFilter]="allColumnFilter" (dialogClosed)="updateDepartureData($event)" [menuItemFlag]="menuItemflag"
         [uploadedFiles]="uploadedFiles">
     </app-generic-table-v2>
 

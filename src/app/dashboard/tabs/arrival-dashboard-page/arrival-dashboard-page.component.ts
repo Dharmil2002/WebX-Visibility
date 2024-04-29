@@ -280,30 +280,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         this._operation.setShipmentStatus(shipmentStatus);
   }
   updateDepartureData(event) {
-    
     this.tableload=true
     this.getArrivalDetails()
-    const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
-    const action = result?.Action ?? '';
-    if (action) {
-      this.arrivalTableData = event;
-    }
-    else {
-      this.CnoteService.setDeparture(event)
-      if (event) {
-        this.arrivalTableData = this.arrivalTableData.filter((x) => x.TripID != event.tripID);
-        /*Here Function is Declare for get Latest arrival Data*/
-        let arrivalData = {
-          arrivalData: this.arrivalTableData,
-          packagesData: this.data?.packagesData || "",
-          shippingData: this.data?.shippingData || ""
-        }
-        this.CnoteService.setVehicleArrivalData(arrivalData);
-        /*End*/
-      }
-
-    }
-    this.tableload=false;
   }
   handleMenuItemClick(label: string, element) {
     

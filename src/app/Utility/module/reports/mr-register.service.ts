@@ -26,7 +26,7 @@ export class MrRegisterService {
     const hasCnoteno = optionalRequest.CnotenosArray?.length > 0;
 
     // Set isEmptyDocNo based on the conditions
-    const isEmptyDocNo = !hasCnoteno ?? !hasMRNO;
+    const isEmptyDocNo = !hasCnoteno && !hasMRNO;
 
     let matchQuery
 
@@ -36,7 +36,7 @@ export class MrRegisterService {
           { eNTDT: { 'D$gte': data.startDate } },
           { eNTDT: { 'D$lte': data.endDate } },
           ...(data.branch ? [{ 'eNTLOC': { 'D$eq': data.branch } }] : []),
-          ...(data.customerList.length > 0 ? [{ bPARTY: { 'D$in': data.customerList } }] : [])
+          ...(data.customerList.length > 0 ? [{ bILNGPRT: { 'D$in': data.customerList } }] : [])
         ]
       };
     }
@@ -73,10 +73,22 @@ export class MrRegisterService {
 
         {
           D$lookup: {
-            from: "docket_ops_det_ltl",
-            localField: "docNo",
-            foreignField: "dLMRNO",
+            from: "dockets_ltl",
+            localField: "gCNNO", //base collection field
+            foreignField: "dKTNO",//lookup collection field
             as: "docketDetails",
+          },
+        },
+        {
+          D$addFields: {
+            Party: {
+              D$concat: [
+                { D$arrayElemAt: ["$docketDetails.bPARTY", 0] },
+                " : ",
+                { D$arrayElemAt: ["$docketDetails.bPARTYNM", 0] },
+              ],
+            },
+
           },
         },
         {
@@ -106,9 +118,7 @@ export class MrRegisterService {
             MRLocation: {
               D$ifNull: ["$eNTLOC", ""],
             },
-            PartyName: {
-              D$ifNull: ["$bILNGPRT", ""],
-            },
+            PartyName: "$Party",
             MRAmount: {
               D$ifNull: ["$dLVRMRAMT", ""],
             },
@@ -118,9 +128,9 @@ export class MrRegisterService {
             GSTAmount: {
               D$ifNull: ["$gSTAMT", ""],
             },
-            FreightRebate: {
-              D$ifNull: ["$FreightRebate", 0],
-            },
+            // FreightRebate: {
+            //   D$ifNull: ["$FreightRebate", 0],
+            // },
             CLAIM: {
               D$ifNull: ["$CLAIM", ""],
             },
@@ -186,9 +196,33 @@ export class MrRegisterService {
               D$arrayElemAt: ["$docketDetails.dEST", 0],
             },
 
-            BasicFreight: "",
-            SubTotal: "",
-            DocketTotal: "",
+            BasicFreight: {
+              D$sum: {
+                D$map: {
+                  input: "$docketDetails",
+                  as: "totaltfRTAMT",
+                  in: "$$totaltfRTAMT.fRTAMT",
+                },
+              }
+            },
+            SubTotal: {
+              D$sum: {
+                D$map: {
+                  input: "$docketDetails",
+                  as: "totalgROAMT",
+                  in: "$$totalgROAMT.gROAMT",
+                },
+              }
+            },
+            DocketTotal: {
+              D$sum: {
+                D$map: {
+                  input: "$docketDetails",
+                  as: "totaltOTAMT",
+                  in: "$$totaltOTAMT.tOTAMT",
+                },
+              }
+            },
 
             ActualWeight: {
               D$sum: {
@@ -241,7 +275,6 @@ export class MrRegisterService {
         },
       ]
     }
-    console.log(reqBody.filters);
 
     try {
       const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
@@ -253,36 +286,8 @@ export class MrRegisterService {
         item.ChequeDate = item.ChequeDate ? moment(item.ChequeDate).format('DD MMM YY') : '';
         item.MRCloseDate = item.MRCloseDate ? moment(item.MRCloseDate).format('DD MMM YY') : '';
 
-        item.chargeList = item.chargeList.map(chargeArray => {
-
-          // Pick unique charge names
-          const uniqueChargeNames = [...new Set(chargeArray.map(charge => charge.cHGNM))];
-
-          // Initialize totals for each unique charge name
-          const chargeTotals: { [key: string]: number } = {}; // Define the type of chargeTotals
-
-          uniqueChargeNames.forEach((chargeName: string) => {
-            chargeTotals[chargeName] = 0; // Use chargeName as the key directly
-          });
-
-          chargeArray.forEach(charge => {
-            if (charge.oPS === "+") { // Addition operation
-              chargeTotals[charge.cHGNM] += charge.aMT; // Add amount to total for the charge type
-            } else if (charge.oPS === "-") { // Subtraction operation
-              chargeTotals[charge.cHGNM] -= charge.aMT; // Subtract amount from total for the charge type
-            }
-          });
-
-          // Update cHGNM with total amount for each unique charge type
-          chargeArray.forEach(charge => {
-            charge.cHGNM = chargeTotals[charge.cHGNM]; // Update cHGNM with total amount for the charge type
-          });
-
-          return chargeArray; // Return the updated chargeArray
-        });
-
+        item.chargeList = this.setchargeList(item.chargeList);
       });
-      console.log(res.data);
 
       return res.data
     } catch (error) {
@@ -290,4 +295,30 @@ export class MrRegisterService {
       return [];
     }
   }
+  setchargeList(chargeArray) {
+
+    const chargeTotals: { [key: string]: number } = {}; // Initialize chargeTotals to store totals for each charge name
+
+    chargeArray.forEach(chrge => {
+      chrge.forEach(charge => {
+        if (!chargeTotals[charge.cHGNM]) {
+          chargeTotals[charge.cHGNM] = charge.aMT; // Initialize total for charge name if not already present
+        } else {
+          if (charge.oPS === "+") {
+            chargeTotals[charge.cHGNM] += charge.aMT; // Add amount for addition operation
+          } else if (charge.oPS === "-") {
+            chargeTotals[charge.cHGNM] -= Math.abs(charge.aMT); // Subtract amount for subtraction operation
+          }
+        }
+      });
+    });
+
+    // Convert chargeTotals object to array of objects with desired format
+    const result = Object.keys(chargeTotals).map(chargeName => ({
+      [chargeName]: chargeTotals[chargeName],
+    }));
+
+    return result; // Return the transformed data
+  }
+
 }

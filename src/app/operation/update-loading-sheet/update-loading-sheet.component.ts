@@ -342,7 +342,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   async CompleteScan() {
     let packageChecked = false;
-    let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
+    let locationWiseData = this.csv;
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
     if (exists) {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);

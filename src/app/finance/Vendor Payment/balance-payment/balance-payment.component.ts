@@ -562,7 +562,47 @@ export class BalancePaymentComponent implements OnInit {
       TDSAmount.updateValueAndValidity();
     }
   }
+  toggleVendorGSTRegistered() {
+    const VendorGSTRegistered =
+      this.VendorBalanceTaxationGSTFilterForm.value.VendorGSTRegistered;
 
+    if (VendorGSTRegistered) {
+      // this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray;
+
+      const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
+      GSTSACcode.setValidators([Validators.required, autocompleteObjectValidator(),]);
+      GSTSACcode.updateValueAndValidity();
+
+      const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
+      Billbookingstate.setValidators([Validators.required, autocompleteObjectValidator(),]);
+      Billbookingstate.updateValueAndValidity();
+
+      const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
+      Vendorbillstate.setValidators([Validators.required, autocompleteObjectValidator(),]);
+      Vendorbillstate.updateValueAndValidity();
+
+      this.getSACcodeDropdown();
+      this.getStateDropdown();
+
+
+    } else {
+      // this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter((x) => x.name == "VendorGSTRegistered");
+      const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
+      GSTSACcode.setValue("");
+      GSTSACcode.clearValidators();
+      GSTSACcode.updateValueAndValidity();
+
+      const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
+      Billbookingstate.setValue("");
+      Billbookingstate.clearValidators();
+      Billbookingstate.updateValueAndValidity();
+
+      const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
+      Vendorbillstate.setValue("");
+      Vendorbillstate.clearValidators();
+      Vendorbillstate.updateValueAndValidity();
+    }
+  }
   TDSSectionFieldChanged() {
     if (this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value) {
       const FindData = this.TDSdata.find(
@@ -1330,7 +1370,7 @@ export class BalancePaymentComponent implements OnInit {
       }
 
       // Push TDS Sectiond Data
-      if (this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted) {
+      if (!this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted) {
         Result.push(createVoucher(this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value, this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name, "LIABILITY", 0, +this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount, DataItem.THC, BillNo));
       }
       if (RoundOffAmount != 0) {

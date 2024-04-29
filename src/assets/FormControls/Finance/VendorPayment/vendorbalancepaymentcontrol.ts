@@ -93,6 +93,9 @@ export class VendorBalancePaymentControl {
         value: FormValues?.VendorGSTRegistered == "Yes" ? true : false,
         generatecontrol: true,
         disable: false,
+        functions: {
+          onChange: "toggleVendorGSTRegistered",
+        },
         Validations: [],
       },
       {
@@ -106,13 +109,17 @@ export class VendorBalancePaymentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
+          // {
+          //   name: "required",
+          //   message: "GST SAC code is required",
+          // },
+          // {
+          //   name: "invalidAutocompleteObject",
+          //   message: "Choose proper value",
+          // },
+          // {
+          //   name: "autocomplete",
+          // },
         ],
         additionalData: {
           showNameAndValue: false,
@@ -133,17 +140,17 @@ export class VendorBalancePaymentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Bill booking state is required",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
+          // {
+          //   name: "required",
+          //   message: "Bill booking state is required",
+          // },
+          // {
+          //   name: "invalidAutocompleteObject",
+          //   message: "Choose proper value",
+          // },
+          // {
+          //   name: "autocomplete",
+          // },
         ],
         additionalData: {
           showNameAndValue: true,
@@ -184,17 +191,17 @@ export class VendorBalancePaymentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Vendor bill state is required",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
+          // {
+          //   name: "required",
+          //   message: "Vendor bill state is required",
+          // },
+          // {
+          //   name: "invalidAutocompleteObject",
+          //   message: "Choose proper value",
+          // },
+          // {
+          //   name: "autocomplete",
+          // },
         ],
         additionalData: {
           showNameAndValue: true,

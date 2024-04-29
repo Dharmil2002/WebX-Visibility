@@ -11,6 +11,7 @@ import { VendorBillService } from '../../vendor-bill.service';
 import { BeneficiaryDetailComponent } from '../../beneficiary-detail/beneficiary-detail.component';
 import Swal from 'sweetalert2';
 import { MatDialog } from '@angular/material/dialog';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
 @Component({
   selector: 'app-general-bill-criteria',
@@ -36,6 +37,7 @@ export class GeneralBillCriteriaComponent implements OnInit {
     private masterService: MasterService,
     private dialog: MatDialog,
     private vendorService: VendorService,
+    private encryptionService: EncryptionService,
     private route: Router) {
     this.backPath = "/Finance/VendorPayment/Dashboard"
   }
@@ -142,8 +144,10 @@ export class GeneralBillCriteriaComponent implements OnInit {
     }
   }
   save() {
-    console.log(this.vendorBillGenerationForm.value);
-    this.route.navigate(["/Finance/VendorBillGeneration/Details"]);
+    const EncriptedData = this.encryptionService.encrypt(JSON.stringify(this.vendorBillGenerationForm.value));
+    this.route.navigate(['/Finance/VendorBillGeneration/Details'], {
+      queryParams: { data: EncriptedData },
+    });
   }
 }
 

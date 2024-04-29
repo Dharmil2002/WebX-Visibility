@@ -36,6 +36,7 @@ export const StoreKeys = {
     Branch: 'branch',
     Mode: 'Mode',
     TimeZone: 'timeZone',
+    PunchLine: 'SJ5E9neu',
     Token: 'token',
     RefreshToken: 'refreshToken',
     UserLocations: 'userLocations',

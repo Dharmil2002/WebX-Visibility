@@ -469,7 +469,6 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
-    //   debugger
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {

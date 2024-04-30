@@ -108,7 +108,7 @@ export class ViewPrintComponent implements OnInit {
       showError("Please select a View Type");
       return;
     }
-
+ 
     // Form is complete, proceed with generating URL
     const BillingViewArray = [
       {

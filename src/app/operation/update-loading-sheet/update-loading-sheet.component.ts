@@ -17,6 +17,7 @@ import { firstValueFrom } from 'rxjs';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { StockUpdate } from 'src/app/Models/stock-update/stock-update';
+import { showAlert } from 'src/app/Utility/message/sweet-alert';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -182,16 +183,18 @@ export class UpdateLoadingSheetComponent implements OnInit {
   onDailogClose(event){
     this.shipmentsEdit(event)
   }
+
   shipmentsEdit(event) {
     const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
     const data = this.csv.find(x => x.Shipment === shipment && x.Suffix === suffix);
     if (data) {
       const unloadedPkg = parseInt(noofPkts, 10);
       const unloadedWT = parseFloat(actualWeight).toFixed(2);
+      const unloadctWeight = parseFloat(ctWeight).toFixed(2);
       const pendPkg = data.Packages - unloadedPkg;
       const pendWt = data.weight - parseFloat(actualWeight);
       const pendCwt = data.cWeight - parseFloat(ctWeight);
-      Object.assign(data, { unloadedPkg, unloadedWT, pendPkg, pendWt, pendCwt });
+      Object.assign(data, { unloadedPkg, unloadedWT,unloadctWeight, pendPkg, pendWt, pendCwt });
       this.cdr.detectChanges();
     }
   }
@@ -341,6 +344,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async CompleteScan() {
+    debugger
     let packageChecked = false;
     let locationWiseData = this.csv;
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
@@ -357,17 +361,14 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     else if(!this.isScan){
       let selectedData= this.csv.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-      if(selectedData.length>0){
-        Swal.fire({
-          icon: "warning",
-          title: "Action Needed",
-          text: "Please select at least one option to proceed.",
-          showConfirmButton: true,
-          confirmButtonText: 'OK'
-        })
-        
+      let checkPend = selectedData.filter((x)=>x.pendPkg == x.Packages);
+      if (selectedData.length == 0) {
+        showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
         return false;
-      }
+    } else if (selectedData.length == checkPend.length) {
+        showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
+        return false;
+    }
       let notSelectedData= this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
       let selectlocationWiseData =  selectedData.filter((x) => x.Destination === this.currentBranch);
       let nselectlocationWiseData =  notSelectedData.filter((x) => x.Destination === this.currentBranch);

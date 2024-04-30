@@ -14,6 +14,7 @@ import { ManifestService } from 'src/app/Utility/module/operation/mf-service/mf-
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { Manifest } from 'src/app/Models/vehicle-loading/manifest';
 import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipment-details.component';
+import { showAlert } from 'src/app/Utility/message/sweet-alert';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -384,23 +385,22 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
   }
   getMFGrouping(selectedData){
-    debugger
     let groupedDataWithoutKey;
     const groupedData = selectedData.reduce((acc, element) => {
       const leg = element.Leg;
       if (!acc[leg]) {
         acc[leg] = {
           Leg: leg,
-          TotalWeightKg: 0,
-          TotalVolumeCFT: 0,
-          TotalPackages: 0,
+          WeightKg: 0,
+          VolumeCFT: 0,
+          Packages: 0,
           ShipmentCount: 0,
           Data: []
         };
       }
-      acc[leg].TotalWeightKg += element.weight;
-      acc[leg].TotalVolumeCFT += element.cft;
-      acc[leg].TotalPackages += element.Packages;
+      acc[leg].WeightKg += parseFloat(element.loadedWT);
+      acc[leg].VolumeCFT += element.cft;
+      acc[leg].Packages += parseFloat(element.loadedPkg);
       acc[leg].ShipmentCount++;
       acc[leg].Data.push(element);
       return acc;
@@ -409,76 +409,71 @@ export class VehicleUpdateUploadComponent implements OnInit {
     return groupedDataWithoutKey;
   }
   async CompleteScan() {
-    debugger
+    let menifest=[]
     let resMf=""
-    if(this.isScan){}
-    let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-    const menifest=await this.getMFGrouping(selectedData);
-    console.log(menifest);
-    // let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
-    // if(packageChecked){
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "load Package",
-    //     text: `Please load All  Your Package`,
-    //     showConfirmButton: true,
-    //   })
-    //   return;
-    // }
-    //   const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
-    //    resMf = await this.mfService.createMfDetails(fieldMapping);
-    // }
-    // else{
-      
-    //   let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-    //   if(selectedData.length <= 0) 
-    //   {
-    //     Swal.fire({
-    //       icon: "warning",
-    //       title: "Action Needed",
-    //       text: "Please select at least one option to proceed.",
-    //       showConfirmButton: true,
-    //       confirmButtonText: 'OK'
-    //     });        
-    //     return false;
-    //   }
+    if(this.isScan){
+    let packageChecked = this.loadingTableData.every(obj => obj.Pending >0);
+    if(packageChecked){
+      Swal.fire({
+        icon: "error",
+        title: "load Package",
+        text: `Please load All  Your Package`,
+        showConfirmButton: true,
+      })
+      return;
+    }
+      const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
+       resMf = await this.mfService.createMfDetails(fieldMapping);
+    }
+    
+    else{
+      let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
+      let checkPend =selectedData.filter((x)=>x.pendPkg == x.Packages);
+       menifest=await this.getMFGrouping(selectedData);
+       if (selectedData.length == 0) {
+        showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
+        return false;
+    } else if (selectedData.length == checkPend.length) {
+        showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
+        return false;
+    }
 
-    //   let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
-    //   const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
-    //   resMf = await this.mfService.createMfDetails(fieldMapping);
-    //   this.shipingDataTable=selectedData
-    // }
+      let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+      const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
+      resMf = await this.mfService.createMfDetails(fieldMapping);
+      this.shipingDataTable=selectedData
+    }
 
-    // if (resMf) {
-    //   if (this.shipmentStatus == 'Loaded') {
-    //     const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
-    //       width: '100%', // Set the desired width
-    //       data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable, mfNo: resMf } // Pass the data object
-    //     });
+    if (resMf) {
+      if (this.shipmentStatus == 'Loaded') {
+        const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
+          width: '100%', // Set the desired width
+          data: { arrivalData: this.arrivalData, loadingSheetData: menifest?menifest:this.shipingDataTable, mfNo: resMf } // Pass the data object
+        });
 
-    //     dialogRef.afterClosed().subscribe(result => {
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Successful",
-    //         text: `Manifest Generated Successfully`,
-    //         showConfirmButton: true,
-    //       })
-    //       this.goBack('Departures');
-    //       this.dialogRef.close("");
-    //     });
-    //   }
-    //   else {
-    //     Swal.fire({
-    //       icon: "success",
-    //       title: "Successful",
-    //       text: `Arrival Scan done Successfully`,
-    //       showConfirmButton: true,
-    //     })
-    //     this.dialogRef.close(this.loadingSheetTableForm.value);
-    //     this.goBack('Departures');
-    //     this.dialogRef.close("");
-    //   }
-    // }
+        dialogRef.afterClosed().subscribe(result => {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Manifest Generated Successfully`,
+            showConfirmButton: true,
+          })
+          this.goBack('Departures');
+          this.dialogRef.close("");
+        });
+      }
+      else {
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: `Arrival Scan done Successfully`,
+          showConfirmButton: true,
+        })
+        this.dialogRef.close(this.loadingSheetTableForm.value);
+        this.goBack('Departures');
+        this.dialogRef.close("");
+      }
+    }
 
   }
   Close(): void {

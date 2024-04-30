@@ -332,6 +332,8 @@ export class AddUserMasterComponent implements OnInit {
     }
   }
   onUserTypeChange() {
+    debugger
+    const name =this.userTableForm.controls["name"].value;
     this.userTableForm.controls["name"].setValue("");
     this.userTableForm.controls["name"].clearValidators();
     this.userTableForm.controls["name"].updateValueAndValidity();
@@ -365,6 +367,14 @@ export class AddUserMasterComponent implements OnInit {
         break;
     }
     this.userTableForm.controls["name"].updateValueAndValidity();
+    if (this.isUpdate) {
+      if (userType == "Customer" && name) {
+        this.userTableForm.controls["name"].setValue(name);
+      }
+      else {
+        this.userTableForm.controls["name"].setValue({ name: name, value: name });
+      }
+    }
     this.getDropValue();
   }
   async getDropValue() {

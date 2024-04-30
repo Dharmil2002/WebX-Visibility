@@ -117,6 +117,7 @@ export class ManifestService {
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
         //collectionName:"mf_details_ltl"
         const envData = [];
+        const ops=[];
         const getInvoice=await this.gettingLastSuffix(details);
         const mfDetails = details.map((d) => {
             try {
@@ -168,7 +169,19 @@ export class ManifestService {
                     eNTLOC: this.storage.branch,
                     eNTBY: this.storage.userName,
                 };
+                let dktOps = {
+                    dKTNO: d?.Shipment || "",
+                    sFX: d?.Suffix || 0,
+                    tOTWT: ConvertToNumber(d?.weight, 3) || 0,
+                    tOTPKG: parseInt(d?.Packages) || 0,
+                    tOTCWT: ConvertToNumber(d?.cWeight, 3) || 0,
+                    aCTWT: ConvertToNumber(d?.weight, 3) || 0,
+                    cHRWT:ConvertToNumber(d?.cWeight, 3) || 0,
+                    pKGS: parseInt(d?.Packages) || 0,
+                    cFTTOT: ConvertToNumber(d?.cft, 3) || 0
+                }
                 envData.push(evnJson);
+                ops.push(dktOps);
                 return mfJson;
             } catch (error) {
                 return null; // Example error handling
@@ -267,10 +280,9 @@ export class ManifestService {
         }
 
         await this.updateDocketDetails(notSelectedData);
-        return { mfHeader, filteredMfDetails, envData, lsNo, sfxDocketsData, isSuffex, sfxEnvData,isScan }
+        return { mfHeader, filteredMfDetails, envData, lsNo, sfxDocketsData, isSuffex, sfxEnvData,isScan,ops }
     }
     async gettingLastSuffix(data){
-        debugger
          const req={
             companyCode:this.storage.companyCode,
             collectionName:"docket_ops_det_ltl",

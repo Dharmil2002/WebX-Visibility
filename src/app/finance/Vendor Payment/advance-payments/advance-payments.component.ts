@@ -38,6 +38,7 @@ import { BeneficiaryDetailComponent } from "../../Vendor Bills/beneficiary-detai
 import { catchError, concatMap, filter, finalize, mergeMap, switchMap } from 'rxjs/operators';
 import { GetBankDetailFromApi } from "../../Debit Voucher/debitvoucherAPIUtitlity";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 @Component({
   selector: "app-advance-payments",
   templateUrl: "./advance-payments.component.html",
@@ -271,7 +272,8 @@ export class AdvancePaymentsComponent implements OnInit {
     console.log("BalanceUnbilledFunction", event);
     const templateBody = {
       DocNo: event.data.THC,
-      templateName: "THC View-Print",
+      templateName: "thc",
+      partyCode: "CONSRAJ19",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
@@ -600,29 +602,44 @@ export class AdvancePaymentsComponent implements OnInit {
         const Response = [];
 
         // Process Journal Requests
-        for (let i = 0; i < selectedData.length; i++) {
-          const data = selectedData[i];
-          const result = await firstValueFrom(this.createJournalRequest(data));
+        if (this.isInterBranchControl) {
+          // Process Debit Requests
+          for (let i = 0; i < selectedData.length; i++) {
+            const data = selectedData[i];
+            const result = await firstValueFrom(this.createDebitRequest(data));
 
-          const ResultObject = {
-            THCNo: result.data.ops[0].docNo,
-            VoucherNo: result.data.ops[0].vNO
-          };
+            const ResultObject = {
+              THCNo: result.data.ops[0].docNo,
+              VoucherNo: result.data.ops[0].vNO
+            };
 
-          Response.push(ResultObject);
-        }
+            Response.push(ResultObject);
+          }
+        } else {
+          for (let i = 0; i < selectedData.length; i++) {
+            const data = selectedData[i];
+            const result = await firstValueFrom(this.createJournalRequest(data));
 
-        // Process Debit Requests
-        for (let i = 0; i < selectedData.length; i++) {
-          const data = selectedData[i];
-          const result = await firstValueFrom(this.createDebitRequest(data));
+            const ResultObject = {
+              THCNo: result.data.ops[0].docNo,
+              VoucherNo: result.data.ops[0].vNO
+            };
 
-          const ResultObject = {
-            THCNo: result.data.ops[0].docNo,
-            VoucherNo: result.data.ops[0].vNO
-          };
+            Response.push(ResultObject);
+          }
 
-          Response.push(ResultObject);
+          // Process Debit Requests
+          for (let i = 0; i < selectedData.length; i++) {
+            const data = selectedData[i];
+            const result = await firstValueFrom(this.createDebitRequest(data));
+
+            const ResultObject = {
+              THCNo: result.data.ops[0].docNo,
+              VoucherNo: result.data.ops[0].vNO
+            };
+
+            Response.push(ResultObject);
+          }
         }
 
         this.UpdateTHCAmount(Response, this.PaymentData?.Mode);
@@ -888,9 +905,11 @@ export class AdvancePaymentsComponent implements OnInit {
       })
     );
   }
-  GetDebitVoucherLedgers(SelectedData) {
 
-    const createVoucher = (accCode, accName, accCategory, debit, credit, THCNo) => ({
+
+  GetDebitVoucherLedgers(thc) {
+
+    const createVoucher = (accCode, debit, credit, THCNo, accName = null, accCategory = null) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.AdvancePayment,
@@ -900,9 +919,9 @@ export class AdvancePaymentsComponent implements OnInit {
       transDate: new Date(),
       finYear: financialYear,
       branch: this.storage.branch,
-      accCode,
-      accName,
-      accCategory,
+      accCode: ledgerInfo[accCode]?.LeadgerCode || accCode,
+      accName: ledgerInfo[accCode]?.LeadgerName || accName,
+      accCategory: ledgerInfo[accCode]?.LeadgerCategory || accCategory,
       sacCode: "",
       sacName: "",
       debit,
@@ -915,21 +934,29 @@ export class AdvancePaymentsComponent implements OnInit {
     });
 
     const Result = [];
-
+    const balAMT = ConvertToNumber(thc.THCamount - thc.Advance, 3);
+    /*In case of Inter Branch Control
+     Debit thc.THCamount to LIA003004
+     Credit thc.Advance to AST003001
+     Credit balAMT to LIA001002, if balAMT > 0
+    */
     if (this.isInterBranchControl) {
-      Result.push(createVoucher(ledgerInfo['EXP001024'].LeadgerCode, ledgerInfo['EXP001024'].LeadgerName, ledgerInfo['EXP001024'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+      Result.push(createVoucher('LIA003004', thc.THCamount, 0, thc.THC));
+      if (balAMT > 0) {
+        Result.push(createVoucher('LIA001002', 0, balAMT, thc.THC));
+      }
     }
     else {
-      Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, parseFloat(SelectedData.Advance), 0, SelectedData.THC));
+      Result.push(createVoucher('LIA001002', parseFloat(thc.Advance), 0, thc.THC));
     }
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;
-      Result.push(createVoucher(CashAccount.aCCD, CashAccount.aCNM, "ASSET", 0, parseFloat(SelectedData.Advance), SelectedData.THC));
+      Result.push(createVoucher(CashAccount.aCCD, 0, parseFloat(thc.Advance), thc.THC, CashAccount.aCNM, "ASSET"));
     }
-    if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+    else if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      Result.push(createVoucher(BankDetails.value, BankDetails.name, "ASSET", 0, parseFloat(SelectedData.Advance), SelectedData.THC));
+      Result.push(createVoucher(BankDetails.value, 0, parseFloat(thc.Advance), thc.THC, BankDetails.name, "ASSET"));
     }
 
     return Result;

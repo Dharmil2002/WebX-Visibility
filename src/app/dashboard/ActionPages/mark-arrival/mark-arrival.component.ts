@@ -19,10 +19,10 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { HawkeyeUtilityService } from 'src/app/Utility/module/hawkeye/hawkeye-utility.service';
 import { StoreKeys } from 'src/app/config/myconstants';
-import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { firstValueFrom } from 'rxjs';
 import { ThcCostUpdateService } from 'src/app/Utility/module/operation/thc/thc-cost-update.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -50,7 +50,6 @@ export class MarkArrivalComponent implements OnInit {
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<GenericTableComponent>,
-    private tripService: ThcService,
     public dialog: MatDialog,
     private storage: StorageService,
     private generalService: GeneralService,
@@ -87,7 +86,7 @@ export class MarkArrivalComponent implements OnInit {
     this.IntializeFormControl();
     this.getReasonList();
     this.MarkArrivalTableForm.controls.Vehicle.setValue(this.MarkArrivalTable.VehicleNo)
-    this.MarkArrivalTableForm.controls.ETA.setValue(this.MarkArrivalTable.Expected)
+    this.MarkArrivalTableForm.controls.ETA.setValue(moment(this.MarkArrivalTable.Expected).tz(this.storage.timeZone).format("DD MMM YYYY hh:mm A"))
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
     this.MarkArrivalTableForm.controls.TripID.setValue(this.MarkArrivalTable.TripID)
     this.getManifestDetail();
@@ -130,7 +129,6 @@ export class MarkArrivalComponent implements OnInit {
         this.MarkArrivalTableForm.controls['LateReason']?.
           value.name || ""
       )
-
     let tripDetailForm = this.MarkArrivalTableForm.value
     const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
     if (res) {
@@ -172,9 +170,8 @@ export class MarkArrivalComponent implements OnInit {
       };
     }
     //#endregion
-    const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
+    const dktStatus = (this.mfList ?? []).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
-
     let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
       stCode = 5,
@@ -198,38 +195,13 @@ export class MarkArrivalComponent implements OnInit {
           tripDetails.tHC = "",
           tripDetails.cLOC = this.MarkArrivalTable.Route.split(":")[1].split("-")[0],
           tripDetails.nXTLOC = ""
-        if (stCode == 7) {
-
-          const reqArrivalDeparture = {
-            action: "TripArrivalDepartureUpdate",
-            reqBody: {
-              cid: this.companyCode,
-              EventType: 'A',
-              loc: this.currentBranch,
-              tripId: this.MarkArrivalTableForm.value?.TripID
-            }
-          }
-          this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-          this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
-        }
       }
       else {
         tripDetails.cLOC = this.storage.branch,
           tripDetails.nXTLOC = next || ""
       }
     }
-    if (stCode == 5 || stCode == 6) {
-      const reqArrivalDeparture = {
-        action: "TripArrivalDepartureUpdate",
-        reqBody: {
-          cid: this.companyCode,
-          EventType: 'A',
-          loc: this.currentBranch,
-          tripId: this.MarkArrivalTableForm.value?.TripID
-        }
-      }
-      this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-    }
+
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_Route_Schedule",
@@ -241,6 +213,28 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
+          if (!next) {
+            try {
+              this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+            } catch (error) {
+              console.log("Error in updateTHCCostForDockets", error);
+            }
+          }
+          try {
+            const reqArrivalDeparture = {
+              action: "TripArrivalDepartureUpdate",
+              reqBody: {
+                cid: this.companyCode,
+                EventType: 'A',
+                loc: this.currentBranch,
+                tripId: this.MarkArrivalTableForm.value?.TripID
+              }
+            }
+            this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+          } catch (error) {
+            console.log("Error in pushToCTCommon", error);
+          }
+
           if (stCode == 7) {
             //this.getDocketTripWise(tripId);
             // Call the vehicleStatusUpdate function here

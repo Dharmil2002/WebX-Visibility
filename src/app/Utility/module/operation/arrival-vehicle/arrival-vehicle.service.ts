@@ -74,8 +74,8 @@ export class ArrivalVehicleService {
                         "sFX": "$md.sFX",
                         "dkt": "$mfHeader.dKTS",
                         "lEG": "$mfHeader.leg",
-                        "oRG": "$mfHeader.oRGN",
-                        "dEST": "$mfHeader.dEST",
+                        "oRG": "$md.oRGN",
+                        "dEST": "$md.dEST",
                         "wT": "$md.wT",
                         "vOL": "$md.vOL",
                         "iSARR": "$mfHeader.iSARR",
@@ -253,7 +253,10 @@ export class ArrivalVehicleService {
             }
         }
         const ls = {
-            cLOC: this.storage.branch
+            cLOC: this.storage.branch,
+            lSNO: "",
+            mFNO: "",
+            tHC:""
         }
         const req = {
             companyCode: this.storage.companyCode,
@@ -272,6 +275,8 @@ export class ArrivalVehicleService {
             const dktOps = {
                 "cLOC": this.storage.branch,
                 "tHC": "",
+                "lSNO": "",
+                "mFNO": "",
                 "sTS": DocketStatus.In_Delivery_Stock,
                 "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
                 "sTSTM": new Date(),
@@ -322,6 +327,8 @@ export class ArrivalVehicleService {
             const dktOps = {
                 "cLOC": this.storage.branch,
                 "tHC": "",
+                "lSNO": "",
+                "mFNO": "",
                 "sTS": DocketStatus.In_Transhipment_Stock,
                 "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
                 "sTSTM": new Date(),
@@ -367,21 +374,23 @@ export class ArrivalVehicleService {
             }
             await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
         }
-
-        const reqPkg = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_pkgs_ltl",
-            filter: { pKGSNO: { "D$in": scanDkt } },
-            update: ls
+        const pkgsno = scanDkt.map((x) => x.pKGSNO);
+        if (pkgsno && pkgsno.length > 0) {
+            const reqPkg = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_pkgs_ltl",
+                filter: { pKGSNO: { "D$in": pkgsno } },
+                update: ls
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqPkg));
+            const reqMF = {
+                companyCode: this.storage.companyCode,
+                collectionName: "mf_pkgs_details",
+                filter: { pKGSNO: { "D$in": pkgsno } },
+                update: { cLOC: this.storage.branch, iSARR: true }
+            }
+            await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMF));
         }
-        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqPkg));
-        const reqMF = {
-            companyCode: this.storage.companyCode,
-            collectionName: "mf_pkgs_details",
-            filter: { pKGSNO: { "D$in": scanDkt } },
-            update: { cLOC: this.storage.branch, iSARR: true }
-        }
-        await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqMF));
         const mfNo = dktList.map((x) => x.mfNo);
         const reqMf = {
             companyCode: this.storage.companyCode,
@@ -420,10 +429,10 @@ export class ArrivalVehicleService {
         }
         else {
 
-            const thcSummary={
-                oPSST:ThcStatus.Arrived,    
-                oPSSTNM:ThcStatus[ThcStatus.Arrived],
-              }
+            const thcSummary = {
+                oPSST: ThcStatus.Arrived,
+                oPSSTNM: ThcStatus[ThcStatus.Arrived],
+            }
             const reqTHC = {
                 companyCode: this.storage.companyCode,
                 collectionName: "thc_summary_ltl",

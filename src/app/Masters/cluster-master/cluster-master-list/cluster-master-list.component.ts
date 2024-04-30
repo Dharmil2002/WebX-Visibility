@@ -12,8 +12,8 @@ import Swal from 'sweetalert2';
   templateUrl: './cluster-master-list.component.html',
 })
 export class ClusterMasterListComponent implements OnInit {
-  data: [] | any; 
-  csv: any[];  
+  data: [] | any;
+  csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   companyCode: any = 0;
@@ -32,11 +32,11 @@ export class ClusterMasterListComponent implements OnInit {
         class: "matcolumncenter",
         Style: "min-width:200px; max-width:200px",
         sticky: true,
-      }, 
-      "pincode": {
+      },
+      "pincodeDisplay": {
         Title: "Pincode",
         class: "matcolumncenter",
-        Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"        
+        Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"
       },
       activeFlag: {
         type: "Activetoggle",
@@ -61,14 +61,14 @@ export class ClusterMasterListComponent implements OnInit {
       },
     }
   headerForCsv = {
-    // "srNo": "Sr No.",    
+    // "srNo": "Sr No.",
     "clusterCode": "Cluster Code",
     "clusterName": "Cluster Name",
-    "pincode": "Pincode",
+    "pincodeDisplay": "Pincode",
     "eNTDT": "Created Date",
     "activeFlag": "Active Status",
   }
-  staticField = ["clusterCode","clusterName","pincode","eNTDT"];
+  staticField = ["clusterCode","clusterName","pincodeDisplay","eNTDT"];
 
   breadScrums = [
     {
@@ -116,7 +116,7 @@ export class ClusterMasterListComponent implements OnInit {
         return {
           ...obj,
           eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : '',
-          pincode: formattedPincode
+          pincodeDisplay: formattedPincode
         }
       })
       this.csv = dataWithSrno;
@@ -133,7 +133,7 @@ export class ClusterMasterListComponent implements OnInit {
     this.route.navigate([this.addAndEditPath], { state: { data: event?.data } });
   }
 
-  //#region to manage flag 
+  //#region to manage flag
   async IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls

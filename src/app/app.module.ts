@@ -37,6 +37,7 @@ import { JwtInterceptor } from "./core/interceptor/jwt.interceptor";
 import { JwtModule } from "@auth0/angular-jwt";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatMenuModule } from "@angular/material/menu";
+
 import {
   BrowserCacheLocation,
   IPublicClientApplication,

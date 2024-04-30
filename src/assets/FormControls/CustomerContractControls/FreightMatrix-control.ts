@@ -170,7 +170,7 @@ export class ContractFreightMatrixControl {
         label: "Valid From Date",
         placeholder: "Valid From Date",
         type: "date",
-        value: isUpdate ? moment(UpdateData.vFDT, 'DD-MM-YYYY').toDate() : "",
+        value: isUpdate ? moment(UpdateData.vFDT, 'DD MMM YY').toDate() : "",
         generatecontrol: true,
         disable: false,
         Validations: [{
@@ -191,7 +191,7 @@ export class ContractFreightMatrixControl {
         label: "Valid To Date",
         placeholder: "Valid To Date",
         type: "date",
-        value: isUpdate ? moment(UpdateData.vEDT, 'DD-MM-YYYY').toDate() : "",
+        value: isUpdate ? moment(UpdateData.vEDT, 'DD MMM YY').toDate() : "",
         generatecontrol: true,
         disable: false,
         Validations: [{

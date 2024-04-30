@@ -176,7 +176,7 @@ export class DcrAllocationComponent implements OnInit {
         let req = {
           companyCode: this.companyCode,
           collectionName: "location_detail",
-          filter: {},
+          filter: {companyCode: this.companyCode,activeFlag:true},
         };
         try {
           const res: any = await firstValueFrom(
@@ -212,7 +212,7 @@ export class DcrAllocationComponent implements OnInit {
         let req1 = {
           companyCode: this.companyCode,
           collectionName: "customer_detail",
-          filter: {},
+          filter: {companyCode: this.companyCode,activeFlag:true},
         };
         try {
           const res: any = await firstValueFrom(

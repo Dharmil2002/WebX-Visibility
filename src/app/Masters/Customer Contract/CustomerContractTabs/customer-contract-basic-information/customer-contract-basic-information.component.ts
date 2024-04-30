@@ -89,8 +89,8 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     this.ProductsForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayProductsForm,
     ]);
-    this.ProductsForm.get("ContractStartDate").setValue(moment(data.ContractStartDate, 'DD-MM-YYYY').toDate())
-    this.ProductsForm.get("Expirydate").setValue(moment(data.Expirydate, 'DD-MM-YYYY').toDate())
+    this.ProductsForm.get("ContractStartDate").setValue(moment(data.ContractStartDate, 'DD MMM YY').toDate())
+    this.ProductsForm.get("Expirydate").setValue(moment(data.Expirydate, 'DD MMM YY').toDate())
 
     this.onContractStartDateChanged("")
 

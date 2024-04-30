@@ -682,9 +682,9 @@ export class ConsignmentLtl extends BaseControl {
                 disable: false,
             },
             {
-                name: "cftRatio",
-                label: "CFT Ratio",
-                placeholder: "CFT Ratio",
+                name: "invoiceAmount",
+                label: "Invoice Amount (₹)",
+                placeholder: "Invoice Amount",
                 type: "number",
                 value: "",
                 filterOptions: "",
@@ -692,18 +692,18 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 Validations: [{
                     name: "required",
-                    message: "CFT Ratio is required",
+                    message: "Invoice Amount is required",
                 }],
                 additionalData: {
                     showNameAndValue: false,
-                    metaData: "volumetric"
+                    metaData: "invoiceDetail"
                 },
-                functions:{
-                    "onChange":"calucateCft"
-                },
+                functions: {
+                    onModel: "preventNegative"
+                  },
                 generatecontrol: true,
                 disable: false,
-            },
+            },            
             {
                 name: "length",
                 label: "Length",
@@ -774,9 +774,9 @@ export class ConsignmentLtl extends BaseControl {
                 disable: false,
             },
             {
-                name: "invoiceAmount",
-                label: "Invoice Amount (₹)",
-                placeholder: "Invoice Amount",
+                name: "noOfPackage",
+                label: "No Of Package",
+                placeholder: "No Of Package",
                 type: "number",
                 value: "",
                 filterOptions: "",
@@ -784,7 +784,74 @@ export class ConsignmentLtl extends BaseControl {
                 displaywith: "",
                 Validations: [{
                     name: "required",
-                    message: "Invoice Amount is required",
+                    message: "No of Package is required",
+                }],
+                functions: {
+                    keypress: "integerOnly",
+                    onChange:"calucateCft"
+                  },
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "invoiceDetail"
+                },
+                generatecontrol: true,
+                disable: false,
+            },
+            {
+                name: "cftRatio",
+                label: "CFT Ratio",
+                placeholder: "CFT Ratio",
+                type: "number",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [{
+                    name: "required",
+                    message: "CFT Ratio is required",
+                }],
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "volumetric"
+                },
+                functions:{
+                    "onChange":"calucateCft"
+                },
+                generatecontrol: true,
+                disable: false,
+            },
+            {
+                name: "cft",
+                label: "CFT Total",
+                placeholder: "CFT Total",
+                type: "text",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [],
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "volumetric"
+                },
+                functions: {
+                    onModel: ""
+                  },
+                generatecontrol: true,
+                disable: true
+            },
+            {
+                name: "actualWeight",
+                label: "Actual Weight (Kg)",
+                placeholder: "Actual Weight (Kg)",
+                type: "number",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [{
+                    name: "required",
+                    message: "Actual Weight is required",
                 }],
                 additionalData: {
                     showNameAndValue: false,
@@ -817,91 +884,6 @@ export class ConsignmentLtl extends BaseControl {
                 disable: true,
             },
             {
-                name: "cft",
-                label: "CFT Total",
-                placeholder: "CFT Total",
-                type: "text",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [],
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "volumetric"
-                },
-                functions: {
-                    onModel: ""
-                  },
-                generatecontrol: true,
-                disable: true
-            },
-            {
-                name: "noOfPackage",
-                label: "No Of Package",
-                placeholder: "No Of Package",
-                type: "number",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [{
-                    name: "required",
-                    message: "No of Package is required",
-                }],
-                functions: {
-                    keypress: "integerOnly",
-                    onChange:"calucateCft"
-                  },
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "invoiceDetail"
-                },
-                generatecontrol: true,
-                disable: false,
-            },
-            
-            {
-                name: "materialName",
-                label: "Material Name",
-                placeholder: "Material Name",
-                type: "dropdown",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [],
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "invoiceDetail"
-                },
-                generatecontrol: true,
-                disable: false,
-            },
-            {
-                name: "actualWeight",
-                label: "Actual Weight (Kg)",
-                placeholder: "Actual Weight (Kg)",
-                type: "number",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [{
-                    name: "required",
-                    message: "Actual Weight is required",
-                }],
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "invoiceDetail"
-                },
-                functions: {
-                    onModel: "preventNegative"
-                  },
-                generatecontrol: true,
-                disable: false,
-            },
-            {
                 name: "chargedWeight",
                 label: "Charged Weight (Kg)",
                 placeholder: "Charged Weight (Kg)",
@@ -921,6 +903,23 @@ export class ConsignmentLtl extends BaseControl {
                 functions: {
                     onModel: "preventNegative"
                   },
+                generatecontrol: true,
+                disable: false,
+            },            
+            {
+                name: "materialName",
+                label: "Material Name",
+                placeholder: "Material Name",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [],
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "invoiceDetail"
+                },
                 generatecontrol: true,
                 disable: false,
             },

@@ -186,8 +186,9 @@ export class DocketListComponent implements OnInit {
   }
   OpenCnote(data) {
     const templateBody = {
+      templateName: "Docket",
+      partyCode: "CONSRAJT58",
       DocNo: data.docNo,
-      templateName: 'Docket View-Print'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');

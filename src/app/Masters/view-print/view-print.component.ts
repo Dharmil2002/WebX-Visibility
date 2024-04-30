@@ -108,7 +108,7 @@ export class ViewPrintComponent implements OnInit {
       showError("Please select a View Type");
       return;
     }
-
+ 
     // Form is complete, proceed with generating URL
     const BillingViewArray = [
       {
@@ -168,14 +168,29 @@ export class ViewPrintComponent implements OnInit {
       },
       {
         name: "DocketJC View-Print",
-        partyCode:"CONSRAJT24",
-        viewName:"Docket"
+        partyCode: "CONSRAJT24",
+        viewName: "Docket"
       },
       {
         name: "MR View-Print",
-        partyCode:"CUST00028",
-        viewName:"DeliveryMr"
-      }
+        partyCode: "CUST00028",
+        viewName: "DeliveryMr"
+      },
+      {
+        name: "DocketATC View-Print",
+        partyCode: "CON0025",
+        viewName: "Docket",
+      },
+      {
+        name: "GatePassATC View-Print",
+        partyCode: "CON0025",
+        viewName: "DeliveryMr",
+      },
+      {
+        name: "Voucher View-Print",
+        partyCode: "CUST00029",
+        viewName: "Voucher",
+      },
     ];
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {
@@ -183,11 +198,10 @@ export class ViewPrintComponent implements OnInit {
       partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");
-  }
+  } 
 
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call

@@ -56,6 +56,7 @@ export class GenericTableV2Component
   @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
+  @Input() containerWidth;
   @Input() width;
   @Input() maxWidth;
   @Input() extraData;
@@ -101,6 +102,7 @@ export class GenericTableV2Component
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
     this.columnGroup = changes.columnGroup?.currentValue ?? this.columnGroup;
+    this.containerWidth = changes.containerWidth?.currentValue ?? this.containerWidth;
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
@@ -207,9 +209,9 @@ export class GenericTableV2Component
     if (colDef && colDef.datatype) {
       switch (colDef.datatype) {
         case "date":
-          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY") : "";
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY") : "";
         case "datetime":
-          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY HH:mm") : "";
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY HH:mm") : "";
         case "time":
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "HH:mm") : "";
         case "currency":
@@ -225,7 +227,7 @@ export class GenericTableV2Component
       if (typeof val !== 'boolean' && isValidNumber(val)) {
         return Number(val);
       } else if (typeof val === 'string' && isValidDate(val)) {
-        return moment(new Date(val)).format("DD/MM/YYYY");
+        return moment(new Date(val)).format("DD MMM YY HH:mm");
       }
     }
     return val;
@@ -300,7 +302,7 @@ export class GenericTableV2Component
         },
       });
     }
-    else if (this.menuItems) {
+    else if (this.menuItems && this.menuItems.length>0) {
       let navigateToComponent;
       if (tableData === "Action") {
         let action = item.Action;

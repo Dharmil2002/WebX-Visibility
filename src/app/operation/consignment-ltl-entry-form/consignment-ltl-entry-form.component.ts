@@ -29,12 +29,16 @@ import { firstValueFrom } from 'rxjs';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
-import { ConvertToNumber, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
+import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
 import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
 import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
 import { debug } from 'console';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -147,6 +151,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   isManual: boolean;
   cftRation: any;
   isScan: boolean;
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -166,7 +172,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private vehicleStatusService: VehicleStatusService,
     private docketService: DocketService,
     public dialog: MatDialog,
-    private dcrService: DCRService
+    private dcrService: DCRService,
+    public snackBarUtilityService: SnackBarUtilityService,
+    private voucherServicesService: VoucherServicesService,
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -277,6 +285,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     mapControlArray(this.allFormControls, destinationMapping);
   }
   //End
+
   async bindQuickdocketData() {
     if (this.quickDocket) {
       this.DocketDetails = this.quickdocketDetaildata?.docketsDetails || {};
@@ -415,6 +424,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           this.consignmentForm,
           this.allFormControls,
           event.field.name,
+          true,
           true,
           true
         );
@@ -839,13 +849,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const invoice = this.invoiceForm.getRawValue();
       const req = {
         'ewayBillNo': invoice.ewayBillNo,
-        'expiryDate': invoice.expiryDate ? moment(invoice.expiryDate).format("DD-MM-YYYY HH:MM") : "",
+        'expiryDate': invoice.expiryDate ? moment(invoice.expiryDate).format("DD MMM YY HH:MM") : "",
         'oExpiryDate': invoice.expiryDate,
-        'ewayBillDate': invoice.expiryDate ? moment(invoice.billDate).format("DD-MM-YYYY HH:MM") : "",
+        'ewayBillDate': invoice.expiryDate ? moment(invoice.billDate).format("DD MMM YY HH:MM") : "",
         'oEwayBillDate': invoice.billDate,
         'invoiceNumber': invoice.invoiceNo,
         'oInvDt': invoice.invoiceDate,
-        'invDt': moment(invoice.invoiceDate).format("DD-MM-YYYY HH:MM"),
+        'invDt': moment(invoice.invoiceDate).format("DD MMM YY HH:MM"),
         'cftRation': invoice.cftRatio,
         'length': invoice.length,
         'breadth': invoice.breadth,
@@ -970,7 +980,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.freightForm.controls["freight_rate"]?.value || 0;
     let rateTypeMap = {};
     if (typeof freightRateType === "string") {
-      let chargedWeight=0;
+      let chargedWeight = 0;
       if (this.consignmentForm.controls['f_vol'].value) {
         const chargeWt = this.getInvoiceAggValue("chargedWeight");
         const cubicWeight = this.getInvoiceAggValue("cubWT");
@@ -978,12 +988,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       } else {
         chargedWeight = this.getInvoiceAggValue("chargedWeight");
       }
-      
+
       rateTypeMap = {
         'RTTYP-0001': 1.0,
         'RTTYP-0006': this.getInvoiceAggValue("noOfPackage"),
-        'RTTYP-0005':chargedWeight,
-        'RTTYP-0002':chargedWeight / 1000,
+        'RTTYP-0005': chargedWeight,
+        'RTTYP-0002': chargedWeight / 1000,
         'RTTYP-0007': this.tableData.length > 0 ? this.tableData.length : 1,
       };
     }
@@ -1029,8 +1039,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     else {
       this.freightForm.controls['gstRate'].enable();
       this.freightForm.controls['gstChargedAmount'].enable();
-      this.invoiceControlArray.find(x => x.name == "gstRate").disable=false
-      this.invoiceControlArray.find(x => x.name == "gstChargedAmount").disable=false
+      this.invoiceControlArray.find(x => x.name == "gstRate").disable = false
+      this.invoiceControlArray.find(x => x.name == "gstChargedAmount").disable = false
       this.calculateFreight();
     }
   }
@@ -1107,37 +1117,41 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const height = parseFloat(this.invoiceForm.controls['height']?.value || 0.00);
       const pkg = parseInt(this.invoiceForm.controls['noOfPackage']?.value || 0.00);
       const cftRatio = parseFloat(this.invoiceForm.controls['cftRatio']?.value || 0.00);
-      const cubWt = (
-        convert(length).from('cm').to('ft') *
+      const pkGcft = convert(length).from('cm').to('ft') *
         convert(breadth).from('cm').to('ft') *
-        convert(height).from('cm').to('ft') *
-        pkg *
-        cftRatio)
-      this.invoiceForm.controls['cubWT']?.setValue(cubWt.toFixed(2));
+        convert(height).from('cm').to('ft');
+
+      let volWt = 0;
       let cft = 0;
       let chargeWeight = 0;
       switch (this.unitsName) {
         case "CM":
-          cft = length * breadth * height * pkg * cftRatio;
-          chargeWeight = cftRatio * cft
+          //cft = length * breadth * height * pkg / 27000
+          cft = convert(length).from('cm').to('ft') *
+            convert(breadth).from('cm').to('ft') *
+            convert(height).from('cm').to('ft') * pkg;
+          volWt = cft * cftRatio;
           this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
           break
         case "Inches":
-          cft = length * breadth * height * pkg / 1728
-          chargeWeight = cftRatio * cft
+          //cft = length * breadth * height * pkg / 1728
+          cft = convert(length).from('in').to('ft') *
+            convert(breadth).from('in').to('ft') *
+            convert(height).from('in').to('ft') * pkg;
+          volWt = cft * cftRatio;
+
           this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
           break
         default:
-          cft = length * breadth * height * pkg * cftRatio
-          chargeWeight = cftRatio * cft
+          cft = length * breadth * height * pkg
+          volWt = cftRatio * cft
           this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
           break;
-
       }
+      this.invoiceForm.controls['cubWT']?.setValue(volWt.toFixed(2));
       const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value);
-      const totolCharge = cft * cubWt
-      if (totolCharge > actualWeight) {
-        this.invoiceForm.controls['chargeWeight'].setValue(totolCharge.toFixed(2))
+      if (volWt > actualWeight) {
+        this.invoiceForm.controls['chargeWeight'].setValue(volWt.toFixed(2))
       }
       else {
         this.invoiceForm.controls['chargeWeight'].setValue(actualWeight.toFixed(2))
@@ -1162,7 +1176,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.consignmentForm.get('billingParty').updateValueAndValidity();
     this.consignmentForm.get('billingParty').setValue("");
   }
-
   /*end*/
   async docketValidation() {
     const res = await this.dcrService.validateFromSeries(this.consignmentForm.controls['docketNumber'].value);
@@ -1280,7 +1293,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async getRules() {
     const filter = {
       cID: this.storage.companyCode,
-      mODULE:{"D$in":["CNOTE","Scanning"]},
+      mODULE: { "D$in": ["CNOTE", "Scanning"] },
       aCTIVE: true
     }
     const res = await this.controlPanel.getModuleRules(filter);
@@ -1314,9 +1327,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.fyear = this.rules.find(x => x.rULEID == "YEAR" && x.aCTIVE)?.vAL == "F";
     this.length = ConvertToNumber(this.rules.find(x => x.rULEID == "LENGTH" && x.aCTIVE)?.vAL);
     this.mseq = this.rules.find(x => x.rULEID == "MSEQ" && x.aCTIVE)?.vAL == "Y";
-    this.unitsName=this.rules.find(x => x.rULEID == "UNITS" && x.aCTIVE)?.vAL;
-    this.cftRation=this.rules.find(x => x.rULEID == "CFTRATION" && x.aCTIVE)?.vAL;
-    this.isScan=this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
+    this.unitsName = this.rules.find(x => x.rULEID == "UNITS" && x.aCTIVE)?.vAL;
+    this.cftRation = this.rules.find(x => x.rULEID == "CFTRATION" && x.aCTIVE)?.vAL;
+    this.isScan = true;
+    //this.isScan=this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
@@ -1438,58 +1452,74 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   async Addseries(pkgs) {
-    if(this.isScan){
-    if (parseInt(pkgs) > 0) {
-      try {
-        // Generate the array with required data.
-        const resultArray = await this.generateArray(
-          this.storage.companyCode,
-          this.consignmentForm.controls["docketNumber"].value,
-          pkgs
-        );
+    if (this.isScan) {
+      if (parseInt(pkgs) > 0) {
+        try {
+          // Generate the array with required data.
+          const resultArray = await this.generateArray(
+            this.storage.companyCode,
+            this.consignmentForm.controls["docketNumber"].value,
+            pkgs
+          );
 
-        // Prepare the request body.
-        const reqBody = {
-          companyCode: this.storage.companyCode,
-          collectionName: "docket_pkgs_ltl",
-          data: resultArray
-        }
-        // Make the POST request and wait for the response.
-        const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
-        // Check if response is successful.
-        if (res) {
-          // Display success message.
-          await Swal.fire({
-            icon: "success",
-            title: "Booked Successfully",
-            text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
-            showConfirmButton: true,
-          }).then((result) => {
-            // Redirect after the alert is closed, regardless of whether it is confirmed or not.
-            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+          // Prepare the request body.
+          const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_pkgs_ltl",
+            data: resultArray
+          }
+          // Make the POST request and wait for the response.
+          const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
+          // Check if response is successful.
+          if (res) {
+            // Display success message.
+            const payType = this.consignmentForm.get('payType').value;
+            //const PayTypeCode = this.paymentType.find(x => x.value === payType)?.name;
+
+            if (payType === "P01") {
+              this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
+            }
+            else {
+              await Swal.fire({
+                icon: "success",
+                title: "Booked Successfully",
+                text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
+                showConfirmButton: true,
+              }).then((result) => {
+                // Redirect after the alert is closed, regardless of whether it is confirmed or not.
+                this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+              });
+            }
+          }
+
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Failed to Book",
+            text: "An error occurred: " + error.message,
           });
         }
+      }
+    }
+    else {
+      const payType = this.consignmentForm.get('payType').value;
+      //const PayTypeCode = this.paymentType.find(x => x.value === payType)?.name;
 
-      } catch (error) {
+      if (payType === "P01") {
+        this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
+      }
+      else {
         Swal.fire({
-          icon: "error",
-          title: "Failed to Book",
-          text: "An error occurred: " + error.message,
+          icon: "success",
+          title: "Booked Successfully",
+          text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
+          showConfirmButton: true
+        }).then((result) => {
+          // Redirect after the alert is closed, regardless of whether it is confirmed or not.
+          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
         });
       }
     }
-  }
-  else{
-     Swal.fire({
-      icon: "success",
-      title: "Booked Successfully",
-      text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
-      showConfirmButton: true
-    }).then((result) => {
-      // Redirect after the alert is closed, regardless of whether it is confirmed or not.
-      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-    });
-  }
   }
   async generateArray(companyCode, dockno, pkg) {
     return new Promise((resolve, reject) => {
@@ -1626,6 +1656,42 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       );
     }
   }
+
+  // Updated function to handle `isOrigin` condition correctly
+   getTermValue(term, isOrigin) {
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
+    const fieldKey = isOrigin ? "fromCity" : "toCity";
+    const type = typeMapping[term];
+    let valueKey;
+
+    // Determine the correct key based on term
+    switch (term) {
+      case "Area":
+        valueKey = "clusterName";
+        break;
+      case "Pincode":
+        valueKey = "pincode";
+        break;
+      case "City":
+        valueKey = "ct";
+        break;
+      case "State":
+        valueKey = "st";
+        break;
+      default:
+        return [];
+    }
+    const controls = this.consignmentForm;
+    const value = this.consignmentForm.controls[fieldKey].value[valueKey];
+    if (value) {
+      return [
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] } ,
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] } ];
+      
+    }
+    return [];
+  }
+
   /*below code is for invoke a contract*/
   InvockedContract() {
     const paymentBasesName = this.paymentType.find(x => x.value == this.consignmentForm.value.payType).name;
@@ -1633,6 +1699,25 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const party = this.docketService.paymentBaseContract[paymentBasesName]
     const partyDt = this.consignmentForm.controls[party].value.value
     const capacity = this.tableData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
+
+    const terms = ["Area", "Pincode", "City", "State"];
+
+  
+    const allCombinations = generateCombinations(terms);
+
+    let matches = allCombinations.map(([fromTerm, toTerm]) => {
+      let match = { "D$and": [] };
+      let fromConditions = this.getTermValue(fromTerm, true);  // For origin
+      let toConditions = this.getTermValue(toTerm, false);     // For destination
+
+      if (fromConditions.length > 0 || toConditions.length > 0) {
+        match["D$and"].push(...fromConditions, ...toConditions);
+        return match;
+      }
+      return null;
+    }).filter(x => x != null);
+
+
     let reqBody =
     {
       "companyCode": this.storage.companyCode,
@@ -1642,10 +1727,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "basis": paymentBasesName,
       "from": this.consignmentForm.value.fromCity.value,
       "to": this.consignmentForm.value.toCity.value,
-      "capacity": capacity
+      "capacity": capacity,
+      "matches": matches
     }
 
-    firstValueFrom(this.operationService.operationMongoPost("operation/docket/invokecontract", reqBody))
+    firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/invokecontract", reqBody))
       .then(async (res: any) => {
         if (res.length == 1) {
 
@@ -1853,9 +1939,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   async checkInvoiceExist() {
-
     if (this.invoiceForm.controls['invoiceNo'].value) {
-      const res = await this.docketService.checkInvoiceExistLTL({ cID: this.storage.companyCode, iNVNO: this.invoiceForm.controls['invoiceNo'].value });
+      const invoiceNoValue = this.invoiceForm.controls['invoiceNo'].value;
+      const isNumber = typeof invoiceNoValue === 'number';
+      const filter = isNumber 
+          ? {cID: this.storage.companyCode, iNVNO: invoiceNoValue } 
+          : {cID: this.storage.companyCode, iNVNO: { D$regex:`^${invoiceNoValue}$`, D$options: "i" } };
+      const res = await this.docketService.checkInvoiceExistLTL(filter);
       if (res) {
         Swal.fire({
           icon: 'info',
@@ -1877,5 +1967,199 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         }
       }
     }
+  }
+  // Account Posting When  C Note Booked 	
+  async AccountPosting(DocketNo) {
+
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0
+        const TotalAmount = this.freightForm.controls['totAmt'].value;
+
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBooking;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CNoteBooking];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+
+        this.VoucherDataRequestModel.transDate = this.consignmentForm.value.docketDate
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = this.consignmentForm.value?.billingParty?.value;
+        this.VoucherDataRequestModel.partyName = this.consignmentForm.value?.billingParty?.name;
+        this.VoucherDataRequestModel.partyState = "";
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
+
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = 0;
+        this.VoucherDataRequestModel.SGST = 0;
+        this.VoucherDataRequestModel.CGST = 0;
+        this.VoucherDataRequestModel.UGST = 0;
+        this.VoucherDataRequestModel.GSTTotal = GSTAmount;
+
+        this.VoucherDataRequestModel.GrossAmount = TotalAmount;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = 0;
+        this.VoucherDataRequestModel.voucherCanceled = false
+
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        this.VoucherDataRequestModel.transactionNumber = DocketNo;
+        var VoucherlineitemList = [{
+
+          "companyCode": this.storage.companyCode,
+          "voucherNo": "",
+          "transCode": VoucherInstanceType.CNoteBooking,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+          "voucherCode": VoucherType.JournalVoucher,
+          "voucherType": VoucherType[VoucherType.JournalVoucher],
+          "transDate": new Date(),
+          "finYear": financialYear,
+          "branch": this.storage.branch,
+          "accCode": ledgerInfo['AST001001'].LeadgerCode,
+          "accName": ledgerInfo['AST001001'].LeadgerName,
+          "accCategory": ledgerInfo['AST001001'].LeadgerCategory,
+          "sacCode": "",
+          "sacName": "",
+          "debit": TotalAmount,
+          "credit": 0,
+          "GSTRate": 0,
+          "GSTAmount": 0,
+          "Total": TotalAmount,
+          "TDSApplicable": false,
+          "narration": `when C note No ${DocketNo} Is Booked`
+        },
+        {
+
+          "companyCode": this.storage.companyCode,
+          "voucherNo": "",
+          "transCode": VoucherInstanceType.CNoteBooking,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+          "voucherCode": VoucherType.JournalVoucher,
+          "voucherType": VoucherType[VoucherType.JournalVoucher],
+          "transDate": new Date(),
+          "finYear": financialYear,
+          "branch": this.storage.branch,
+          "accCode": ledgerInfo['INC001003'].LeadgerCode,
+          "accName": `${ledgerInfo['INC001003'].LeadgerName} - ${this.tranType.find(x => x.value == this.consignmentForm.value.transMode).name}`,
+          "accCategory": ledgerInfo['INC001003'].LeadgerCategory,
+          "sacCode": "",
+          "sacName": "",
+          "debit": 0,
+          "credit": TotalAmount,
+          "GSTRate": 0,
+          "GSTAmount": 0,
+          "Total": TotalAmount,
+          "TDSApplicable": false,
+          "narration": `when C note No ${DocketNo} Is Booked`
+        }];
+
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transCode: VoucherInstanceType.CNoteBooking,
+                transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.branch,
+                docType: "Voucher",
+                partyType: "Customer",
+                docNo: DocketNo,
+                partyCode: this.consignmentForm.value?.billingParty?.value,
+                partyName: this.consignmentForm.value?.billingParty?.name,
+                entryBy: this.storage.getItem(StoreKeys.UserId),
+                entryDate: Date(),
+                debit: [{
+                  "accCode": ledgerInfo['AST001001'].LeadgerCode,
+                  "accName": ledgerInfo['AST001001'].LeadgerName,
+                  "accCategory": ledgerInfo['AST001001'].LeadgerCategory,
+                  "amount": TotalAmount,
+                  "narration": `when C note No ${DocketNo} Is Booked`
+                }],
+                credit: [{
+                  "accCode": ledgerInfo['INC001003'].LeadgerCode,
+                  "accName": ledgerInfo['INC001003'].LeadgerName + " - Road",
+                  "accCategory": ledgerInfo['INC001003'].LeadgerCategory,
+                  "amount": TotalAmount,
+                  "narration": `when C note No ${DocketNo} Is Booked`
+                }],
+
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Booked Successfully And Voucher Created",
+                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
+                      showConfirmButton: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        Swal.hideLoading();
+                        setTimeout(() => {
+                          Swal.close();
+                        }, 2000);
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                      }
+                    });
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+
+    }, "C-Note Booking Voucher Generating..!");
+
   }
 }

@@ -102,17 +102,7 @@ export class AddressMasterListComponent implements OnInit {
           const sortedData = response.data.sort((a, b) => {
             return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
           });
-          // Generate srno for each object in the array and format the eNTDT
-          const dataWithFormattedDate = sortedData.map((item, index) => {
-            const formattedDate = moment(item.eNTDT).format("DD-MM-YYYY HH:mm");
-            return {
-              ...item,
-              eNTDT: formattedDate,
-            };
-          });
-          // Extract the updatedDate from the first element (latest record)
-          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].eNTDT : null;
-          this.csv = dataWithFormattedDate;
+          this.csv = sortedData;
           this.tableLoad = false;
         }
       }

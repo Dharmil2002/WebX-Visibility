@@ -271,8 +271,9 @@ export class TrackingPageComponent implements OnInit {
   }
   OpenDocketView(DockNo) {
     const req = {
-      templateName: "Docket View-Print",
       DocNo: DockNo,
+      templateName: "Docket",
+      partyCode: "CONSRAJT58",
     };
     const url = `${
       window.location.origin
@@ -284,10 +285,10 @@ export class TrackingPageComponent implements OnInit {
     const csvData = this.TableData.map((x) => {
       return {
         CnoteNo: x.dKTNO,
-        EDD: moment(new Date(x.sTSTM)).format("DD-MM-YYYY"),
+        EDD: moment(new Date(x.sTSTM)).format("DD MMM YY"),
         ATD: "",
         Status: x.oPSSTS,
-        docketDate: moment(new Date(x.docketData.dKTDT)).format("DD-MM-YYYY"),
+        docketDate: moment(new Date(x.docketData.dKTDT)).format("DD MMM YY"),
         TransitMode: `${x.TransitMode.Servis} / ${x.TransitMode.Mod} / ${x.TransitMode.Servis} `,
         EWB: "",
         Valid: "",
@@ -313,10 +314,10 @@ export class TrackingPageComponent implements OnInit {
             col.toLowerCase().includes("date") ||
             col.toLowerCase().includes("dob") ||
             col.toLowerCase().includes("dt")
-              ? moment(new Date(row[col])).format("DD-MM-YYYY") ===
+              ? moment(new Date(row[col])).format("DD MMM YY") ===
                 "Invalid date"
                 ? row[col]
-                : moment(new Date(row[col])).format("DD-MM-YYYY")
+                : moment(new Date(row[col])).format("DD MMM YY")
               : row[col];
           return value;
         });

@@ -168,13 +168,13 @@ export class ViewPrintComponent implements OnInit {
       },
       {
         name: "DocketJC View-Print",
-        partyCode:"CONSRAJT24",
-        viewName:"Docket"
+        partyCode: "CONSRAJT24",
+        viewName: "Docket"
       },
       {
         name: "MR View-Print",
-        partyCode:"CUST00028",
-        viewName:"DeliveryMr"
+        partyCode: "CUST00028",
+        viewName: "DeliveryMr"
       },
       {
         name: "DocketATC View-Print",
@@ -198,9 +198,8 @@ export class ViewPrintComponent implements OnInit {
       partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");
   }
 

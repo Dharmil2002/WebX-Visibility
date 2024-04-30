@@ -38,9 +38,10 @@ import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
 import { utilityService } from "../Utility/utility.service";
 import { FilterUtils } from "../Utility/dropdownFilter";
 import { AddGpsRuleComponent } from "./GPSRules/add-gps-rule/add-gps-rule.component";
+import { DcrRulesComponent } from './dcr-rules/dcr-rules/dcr-rules.component';
 
 @NgModule({
-  declarations: [GPSRuleComponent, AddGpsRuleComponent],
+  declarations: [GPSRuleComponent, AddGpsRuleComponent, DcrRulesComponent],
   imports: [
     SharedComponentsModule,
     ControlPanelRoutingModule,

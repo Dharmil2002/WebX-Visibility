@@ -35,7 +35,7 @@ export class ClusterMasterListComponent implements OnInit {
         Style: "min-width:200px; max-width:200px",
         sticky: true,
       },
-      "pincode": {
+      "pincodeDisplay": {
         Title: "Pincode",
         class: "matcolumncenter",
         Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"
@@ -66,11 +66,11 @@ export class ClusterMasterListComponent implements OnInit {
     // "srNo": "Sr No.",
     "clusterCode": "Cluster Code",
     "clusterName": "Cluster Name",
-    "pincode": "Pincode",
+    "pincodeDisplay": "Pincode",
     "eNTDT": "Created Date",
     "activeFlag": "Active Status",
   }
-  staticField = ["clusterCode","clusterName","pincode","eNTDT"];
+  staticField = ["clusterCode","clusterName","pincodeDisplay","eNTDT"];
 
   breadScrums = [
     {
@@ -119,7 +119,7 @@ export class ClusterMasterListComponent implements OnInit {
         return {
           ...obj,
           eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : '',
-          pincode: formattedPincode
+          pincodeDisplay: formattedPincode
         }
       })
       this.csv = dataWithSrno;

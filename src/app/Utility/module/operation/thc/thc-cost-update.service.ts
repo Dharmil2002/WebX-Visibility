@@ -260,7 +260,7 @@ export class ThcCostUpdateService {
 
         // Calculate and process origin wise cost if Inter Branch Control is enabled
         if (request.isInterBranchControl) {
-            this.processInterBranchControl(thc);
+            await this.processInterBranchControl(thc);
         }
     }
     
@@ -334,10 +334,10 @@ export class ThcCostUpdateService {
         );
     }
     
-    processInterBranchControl(thc) {
+    async processInterBranchControl(thc) {
         const originWiseCost = this.calculateOriginWiseCost(thc);
         const ChargeCost = this.aggregateCostsByOrigin(originWiseCost);
-        this.AccountPosting(thc, ChargeCost);
+        await this.AccountPosting(thc, ChargeCost);
     }
     
     calculateOriginWiseCost(thc) {
@@ -363,9 +363,9 @@ export class ThcCostUpdateService {
         try {
             const Response = [];
 
-            for (let i = 0; i < ChargeCost.length; i++) {
-                const data = ChargeCost[i];
-                const result = await firstValueFrom(this.createJournalRequest(THCInfo, data));
+            Object.keys(ChargeCost).forEach(async (key) => { 
+                const data = ChargeCost[key];
+                const result = await firstValueFrom(this.createJournalRequest(THCInfo, { OriginBranch:key, ChargeCost: data.cHGCOST }));
 
                 const ResultObject = {
                     THCNo: result.data.ops[0].docNo,
@@ -373,8 +373,7 @@ export class ThcCostUpdateService {
                 };
 
                 Response.push(ResultObject);
-            }
-
+            });
             return Response;
         } catch (error) {
             console.log(error);

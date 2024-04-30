@@ -17,6 +17,7 @@ export class HomePageComponent implements OnInit {
   allOptions: any;
   searchData: any;
   isNavbarCollapsed = true;
+  punchLine: string = "";
   cardList = [
     {
       title:"Full Truck Operations",
@@ -60,16 +61,25 @@ export class HomePageComponent implements OnInit {
       mode: "Billing​",
       route: "",
       class: "fa fa-shipping-fast card-icon",
-      bgColor: "#00bdeb",
+      bgColor: "#8C6A5D",
+      color: "#ffffff"
+    },
+    {
+      title:"Payments",
+      iconName:"payments",
+      mode: "",
+      route: "/Finance/VendorPayment/Dashboard",
+      class: "fa fa-shipping-fast card-icon",
+      bgColor: "#5F374B",
       color: "#ffffff"
     },
     {
       title:"Accounts",
-      iconName:"payments",
+      iconName:"account_balance_wallet",
       mode: "Accounts",
       route: "",
       class: "fa fa-shipping-fast card-icon",
-      bgColor: "#00ac5f",
+      bgColor: "#5C8374",
       color: "#ffffff"
     },
     {
@@ -101,6 +111,7 @@ export class HomePageComponent implements OnInit {
     },
   ];
   constructor(private router: Router, private masterService: MasterService, private menuService: MenuService, private storage: StorageService) {       
+    this.punchLine = this.storage.getItem(StoreKeys.PunchLine) || "";
     this.bindMenu();
   }
 
@@ -110,6 +121,7 @@ export class HomePageComponent implements OnInit {
     this.searchData = JSON.parse(this.storage.getItem(StoreKeys.SearchData) || "[]");   
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
+
   }
 
   onSearchInput() {

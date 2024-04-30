@@ -190,7 +190,7 @@ export class ViewPrintComponent implements OnInit {
         name: "Voucher View-Print",
         partyCode: "CUST00029",
         viewName: "Voucher",
-      },
+      }, 
     ];
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {

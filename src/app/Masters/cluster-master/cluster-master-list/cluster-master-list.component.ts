@@ -6,14 +6,16 @@ import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunc
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { ClusterMasterUploadComponent } from '../cluster-master-upload/cluster-master-upload.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cluster-master-list',
   templateUrl: './cluster-master-list.component.html',
 })
 export class ClusterMasterListComponent implements OnInit {
-  data: [] | any; 
-  csv: any[];  
+  data: [] | any;
+  csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   companyCode: any = 0;
@@ -32,11 +34,11 @@ export class ClusterMasterListComponent implements OnInit {
         class: "matcolumncenter",
         Style: "min-width:200px; max-width:200px",
         sticky: true,
-      }, 
+      },
       "pincode": {
         Title: "Pincode",
         class: "matcolumncenter",
-        Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"        
+        Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"
       },
       activeFlag: {
         type: "Activetoggle",
@@ -61,7 +63,7 @@ export class ClusterMasterListComponent implements OnInit {
       },
     }
   headerForCsv = {
-    // "srNo": "Sr No.",    
+    // "srNo": "Sr No.",
     "clusterCode": "Cluster Code",
     "clusterName": "Cluster Name",
     "pincode": "Pincode",
@@ -85,9 +87,10 @@ export class ClusterMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
+  uploadComponent = ClusterMasterUploadComponent
   constructor(
     private route: Router,
-    private masterService: MasterService, private storage: StorageService) {
+    private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
@@ -133,7 +136,7 @@ export class ClusterMasterListComponent implements OnInit {
     this.route.navigate([this.addAndEditPath], { state: { data: event?.data } });
   }
 
-  //#region to manage flag 
+  //#region to manage flag
   async IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
@@ -170,4 +173,16 @@ export class ClusterMasterListComponent implements OnInit {
     }
   }
   //#endregion
+
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.getClusterDetails();
+      });
+    }
+    //#endregion
 }

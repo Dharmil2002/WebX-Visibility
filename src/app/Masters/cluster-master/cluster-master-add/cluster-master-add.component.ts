@@ -201,7 +201,6 @@ export class ClusterMasterAddComponent implements OnInit {
   }
   //#region Save Function
   async save() {
-
     const pincodeDropdown =
       this.clusterTableForm.value.pincodeDropdown == ""
         ? []
@@ -225,6 +224,7 @@ export class ClusterMasterAddComponent implements OnInit {
       data['mODLOC'] = this.storage.branch;
       data['mODBY:'] = this.storage.userName;
       delete data["clusterType"];
+      delete data["entryDate"];
       let req = {
         companyCode: this.companyCode,
         collectionName: "cluster_detail",

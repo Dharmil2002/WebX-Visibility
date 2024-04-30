@@ -202,7 +202,7 @@ export class ViewPrintComponent implements OnInit {
       window.location.origin
     }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");
-  }
+  } 
 
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call

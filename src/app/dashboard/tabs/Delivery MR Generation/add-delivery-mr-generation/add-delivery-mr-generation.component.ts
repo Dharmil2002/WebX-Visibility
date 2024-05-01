@@ -16,7 +16,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { StoreKeys } from 'src/app/config/myconstants';
@@ -872,61 +872,82 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 
 
-        const companyCode = this.storage.companyCode;
-        const CurrentBranchCode = this.storage.branch;
-
-        let voucherLineItemList = [];
-
-        this.tableData.forEach(item => {
-          // console.log(this.billingForm.value);
-
-          const voucherLineItem = {
-            companyCode: companyCode,
-            voucherNo: "",
-            transCode: VoucherInstanceType.DeliveryMR,
-            transType: VoucherInstanceType[VoucherInstanceType.DeliveryMR],
-            voucherCode: VoucherType.JournalVoucher,
-            voucherType: VoucherType[VoucherType.JournalVoucher],
-            transDate: new Date(),
-            finYear: financialYear,
-            branch: CurrentBranchCode,
-            accCode: '',
-            accName: '',
-            sacCode: "",
-            sacName: "",
-            debit: parseFloat(item.totalAmount).toFixed(2),
-            credit: 0,
-            GSTRate: this.billingForm.value?.GSTRate,
-            GSTAmount: item.GST,
-            Total: parseFloat(item.totalAmount).toFixed(2),
-            TDSApplicable: false,
-            narration: ""
-          };
-
-          voucherLineItemList.push(voucherLineItem);
-        });
-
-        this.VoucherRequestModel.details = voucherLineItemList;
+        const voucherlineItems = this.GetJournalVoucherLedgers();
+        this.VoucherRequestModel.details = voucherlineItems;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
-        //console.log(this.VoucherRequestModel);
 
         firstValueFrom(this.voucherServicesService
           .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
             if (res.success) {
-              Swal.hideLoading();
-              Swal.close();
-              this.GenerateMR(res?.data?.mainData?.ops[0].vNO)
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.tableData[0].OthersData?.cLOC || this.storage.branch,
+                transCode: VoucherInstanceType.BalancePayment,
+                transType:
+                  VoucherInstanceType[VoucherInstanceType.BalancePayment],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
+                docType: "Voucher",
+                partyType: "Vendor",
+                docNo: this.docketNo,
+                partyCode: "" + this.tableData[0].OthersData?.vND?.cD || "",
+                partyName: this.tableData[0].OthersData?.vND?.nM || "",
+                entryBy: this.storage.userName,
+                entryDate: Date(),
+                debit: voucherlineItems
+                  .filter((item) => item.credit == 0)
+                  .map(function (item) {
+                    return {
+                      accCode: item.accCode,
+                      accName: item.accName,
+                      accCategory: item.accCategory,
+                      amount: item.debit,
+                      narration: item.narration ?? "",
+                    };
+                  }),
+                credit: voucherlineItems
+                  .filter((item) => item.debit == 0)
+                  .map(function (item) {
+                    return {
+                      accCode: item.accCode,
+                      accName: item.accName,
+                      accCategory: item.accCategory,
+                      amount: item.credit,
+                      narration: item.narration ?? "",
+                    };
+                  }),
+              };
+              firstValueFrom(
+                this.voucherServicesService.FinancePost(
+                  "fin/account/posting",
+                  reqBody
+                )
+              ).then((res: any) => {
+                if (res.success) {
+                  this.GenerateMR(reqBody.voucherNo)
+                  Swal.hideLoading();
+                  Swal.close();
+                } else {
+                  this.snackBarUtilityService.ShowCommonSwal(
+                    "error",
+                    "Fail To Do Account Posting..!"
+                  );
+                }
+              });
             }
-          }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-          .finally(() => {
-
-          });
-
+          })
+          .catch((error) => {
+            this.snackBarUtilityService.ShowCommonSwal("error", error);
+          })
+          .finally(() => { });
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
-          error.message
+          "Fail To Submit Data..!"
         );
       }
     }, "Delivery MR Voucher Generating..!");
@@ -953,6 +974,48 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   navigateWithTabIndex(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
+  GetJournalVoucherLedgers() {
+    const createVoucher = (
+      accCode,
+      accName,
+      accCategory,
+      debit,
+      credit,
+      DocketNo,
+      sacCode = "",
+      sacName = ""
+    ) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.DeliveryMR,
+      transType: VoucherInstanceType[VoucherInstanceType.DeliveryMR],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: sacCode,
+      sacName: sacName,
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Delivery MR Generation  For : ${DocketNo}`,
+    });
 
+    const Result = [];
+
+    Result.push(createVoucher(ledgerInfo["INC001006"].LeadgerCode, ledgerInfo["INC001006"].LeadgerName, ledgerInfo["INC001006"].LeadgerCategory,
+      0, parseFloat(this.billingForm.value.CollectionAmount) || 0, this.docketNo));
+    Result.push(createVoucher(ledgerInfo["AST001002"].LeadgerCode, ledgerInfo["AST001002"].LeadgerName, ledgerInfo["AST001002"].LeadgerCategory,
+      parseFloat(this.billingForm.value.CollectionAmount) || 0, 0, this.docketNo));
+
+    return Result;
+  }
   //#endregion
 }

@@ -6,12 +6,12 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { VendorService } from 'src/app/Utility/module/masters/vendor-master/vendor.service';
 import { ChequeRegisterService } from 'src/app/Utility/module/reports/cheque-register.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
-import { exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GetAccountDetailFromApi, GetBankDetailFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
@@ -59,7 +59,8 @@ export class ChequeRegisterComponent implements OnInit {
     private customerService: CustomerService,
     private snackBarUtilityService: SnackBarUtilityService,
     private generalLedgerReportService: GeneralLedgerReportService,
-    private chequeRegisterService: ChequeRegisterService
+    private chequeRegisterService: ChequeRegisterService,
+    private exportService: ExportService
   ) { }
 
 
@@ -204,7 +205,7 @@ export class ChequeRegisterComponent implements OnInit {
           Swal.close();
         }, 1000);
         // Export the record to Excel
-        exportAsExcelFile(data, `Cheque_Register_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(data, `Cheque_Register_Report-${timeString}`, this.CSVHeader);
 
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(

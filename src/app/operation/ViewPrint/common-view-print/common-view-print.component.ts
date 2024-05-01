@@ -55,6 +55,7 @@ export class CommonViewPrintComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("viewprint/View", req)
       .toPromise();
+      console.log('Res' ,Res)
     if (Res.success) {
       this.JsonData = Res.data.jsonData;
       this.FieldMapping = Res.data.fieldMapping;

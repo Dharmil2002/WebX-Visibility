@@ -3,10 +3,10 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { CustOutstandingService } from 'src/app/Utility/module/reports/customer-outstanding-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -58,6 +58,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
     private storage: StorageService,
     private masterServices: MasterService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl()
   }
@@ -304,7 +305,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
-       exportAsExcelFile(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

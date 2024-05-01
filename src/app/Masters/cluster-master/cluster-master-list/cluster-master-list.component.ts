@@ -6,6 +6,8 @@ import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunc
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { ClusterMasterUploadComponent } from '../cluster-master-upload/cluster-master-upload.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cluster-master-list',
@@ -85,9 +87,10 @@ export class ClusterMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
+  uploadComponent = ClusterMasterUploadComponent
   constructor(
     private route: Router,
-    private masterService: MasterService, private storage: StorageService) {
+    private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
@@ -170,4 +173,16 @@ export class ClusterMasterListComponent implements OnInit {
     }
   }
   //#endregion
+
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.getClusterDetails();
+      });
+    }
+    //#endregion
 }

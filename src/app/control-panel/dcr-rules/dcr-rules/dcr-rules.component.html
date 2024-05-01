@@ -2,12 +2,9 @@
   <form [formGroup]="dcrRulesTableForm">
     <app-form-webxpress [form]="dcrRulesTableForm" [formData]="jsonControlArray" [FormTitle]="'Series Admin Rules'"
       (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-      [showSaveAndCancelButton]="false">
+      [showSaveButton]="true" [submit]="'Exception'" *ngIf="dcrRulesTableForm.valid" (click)="manageExceptions()">
     </app-form-webxpress>
   </form>
-  <button type="button" mat-raised-button color="primary" *ngIf="dcrRulesTableForm.valid" (click)="manageExceptions()">
-    Manage
-  </button>
   <form *ngIf="showForm" [formGroup]="ManageExceptionsTableForm">
     <app-form-webxpress [form]="ManageExceptionsTableForm" [formData]="ManageExceptionsjsonControlArray" [FormTitle]="'Manage Exceptions'"
       (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"

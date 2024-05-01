@@ -151,4 +151,9 @@ export class DcrRulesComponent implements OnInit {
   }
   //#endregion
 
+  //#region save
+  save() {
+  }
+  //#endregion
+
 }

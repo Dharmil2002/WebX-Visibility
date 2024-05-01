@@ -18,7 +18,6 @@ export class ManifestService {
         private operationService: OperationService
     ) { }
     async getFieldMapping(details, header, formField, pkgs) {
-        debugger
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
         const mfHeader = {
             "_id": "",
@@ -137,7 +136,7 @@ export class ManifestService {
                     "sFX": d?.Suffix || 0,
                     "oRGN": d?.Origin || "",
                     "dEST": d?.Destination || "",
-                    "pKGS": parseInt(d?.Packages) || 0,
+                    "pKGS": parseInt(d?.loadedPkg) || 0,
                     "vOL": ConvertToNumber(d?.cft, 3) || 0,
                     "wT": ConvertToNumber(d?.loadedWT, 3) || 0,
                     "cWT": ConvertToNumber(d?.loadedCWT, 3) || 0,

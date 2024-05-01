@@ -344,7 +344,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async CompleteScan() {
-    debugger
     let packageChecked = false;
     let locationWiseData = this.csv;
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));

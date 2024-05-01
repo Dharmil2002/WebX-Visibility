@@ -238,14 +238,13 @@ export class ArrivalVehicleService {
         });
         if (!lagData && lagData?._id != legID)
             return;
-
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'unloadedPkg');
         const unloadWeightKg = sumProperty(dktList, 'unloadedWT');
         const unloadctWeight = sumProperty(dktList, 'unloadctWeight');
         const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
         const getInvoice = await this.gettingLastSuffix(dktList);
-        let lDVOL = {};
+        let lDVOL = 0;
         if (getInvoice && getInvoice.length > 0) {
             let height = getInvoice.reduce((a, b) => a + b.vOL.h, 0);
             let length = getInvoice.reduce((a, b) => a + b.vOL.l, 0);
@@ -261,7 +260,7 @@ export class ArrivalVehicleService {
                 pKGS: unloadPackage,
                 wT: unloadWeightKg,
                 cWT: unloadctWeight,
-                vOL: lDVOL,
+                vOL: parseFloat(lDVOL.toFixed(2)),
                 vWT: 0, // Assuming this is to be calculated or filled in later
             }
         }
@@ -291,9 +290,9 @@ export class ArrivalVehicleService {
                      the getting height weight vol for the calucation of  CFT*/
                      if (getInvoice && getInvoice.length > 0) {
                          try {
-                             let h = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.h || 0;
-                             let l = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.l || 0;
-                             let b = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.b || 0;
+                             let h = getInvoice.find((x) => x.dKTNO == element.Shipment).vOL.h || 0;
+                             let l = getInvoice.find((x) => x.dKTNO == element.Shipment).vOL.l || 0;
+                             let b = getInvoice.find((x) => x.dKTNO == element.Shipment).vOL.b || 0;
                              let pkgs = element?.unloadedPkg || 0;
                              dktLd = convert(h).from('cm').to('ft') *
                                  convert(l).from('cm').to('ft') *
@@ -308,7 +307,7 @@ export class ArrivalVehicleService {
                         "tOTCWT": element?.unloadctWeight || 0,
                         "tOTWT": element?.unloadedWT || 0,
                         "tOTPKG": element?.unloadedPkg || 0,
-                        "cFTTOT":dktLd,
+                        "cFTTOT":parseFloat(dktLd.toFixed(2)),
                         "cLOC": this.storage.branch,
                         "tHC": "",
                         "lSNO": "",
@@ -329,30 +328,31 @@ export class ArrivalVehicleService {
                         update: dktOps
                     }
                     await firstValueFrom(this.operation.operationMongoPut("generic/update", reqOps));
-                    eventJson = dktList.map(dkt => {
-                        const evn = {
-                            "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
-                            "cID": this.storage.companyCode,
-                            "dKTNO": dkt.Shipment,
-                            "sFX": 0,
-                            "lOC": this.storage.branch,
-                            "eVNID": DocketEvents.Arrival_Scan,
-                            "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan).replace(/_/g, " "),
-                            "eVNDT": new Date(),
-                            "eVNSRC": "Arrival Scan",
-                            "dOCTY": "TH",
-                            "dOCNO": data?.TripID || "",
-                            "sTS": DocketStatus.In_Delivery_Stock,
-                            "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
-                            "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
-                            "eNTDT": new Date(),
-                            "eNTLOC": this.storage.branch,
-                            "eNTBY": this.storage.userName
-                        }
-                        return evn
-                    });
+                   
                 });
 
+                eventJson = destDocket.map(dkt => {
+                    const evn = {
+                        "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                        "cID": this.storage.companyCode,
+                        "dKTNO": dkt.Shipment,
+                        "sFX": 0,
+                        "lOC": this.storage.branch,
+                        "eVNID": DocketEvents.Arrival_Scan,
+                        "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan).replace(/_/g, " "),
+                        "eVNDT": new Date(),
+                        "eVNSRC": "Arrival Scan",
+                        "dOCTY": "TH",
+                        "dOCNO": data?.TripID || "",
+                        "sTS": DocketStatus.In_Delivery_Stock,
+                        "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
+                        "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                        "eNTDT": new Date(),
+                        "eNTLOC": this.storage.branch,
+                        "eNTBY": this.storage.userName
+                    }
+                    return evn
+                });
                 const reqEvent = {
                     companyCode: this.storage.companyCode,
                     collectionName: "docket_events_ltl",
@@ -363,10 +363,31 @@ export class ArrivalVehicleService {
             /* End */
             /* below code is for the transhiment stock */
               let eventJson=[];
+              let dktLd = 0
             if (transDocket.length > 0) {
                 transDocket.forEach(async element => {
+                      /*below getInvoice varible is used for
+                     the getting height weight vol for the calucation of  CFT*/
+                     if (getInvoice && getInvoice.length > 0) {
+                         try {
+                             let h = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.h || 0;
+                             let l = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.l || 0;
+                             let b = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.b || 0;
+                             let pkgs = element?.unloadedPkg || 0;
+                             dktLd = convert(h).from('cm').to('ft') *
+                                 convert(l).from('cm').to('ft') *
+                                 convert(b).from('cm').to('ft') * parseInt(pkgs);
+                         }
+                         catch (err) {
+                             console.log(err);
+                         }
+                    }
                     const dockets = [`${element.Shipment}-${element.Suffix}`];
                     const dktOps = {
+                        "tOTCWT": element?.unloadctWeight || 0,
+                        "tOTWT": element?.unloadedWT || 0,
+                        "tOTPKG": element?.unloadedPkg || 0,
+                        "cFTTOT":parseFloat(dktLd.toFixed(2)),
                         "cLOC": this.storage.branch,
                         "tHC": "",
                         "lSNO": "",

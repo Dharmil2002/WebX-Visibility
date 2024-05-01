@@ -422,7 +422,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       })
       return;
     }
-      const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
+       const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
        resMf = await this.mfService.createMfDetails(fieldMapping);
     }
     

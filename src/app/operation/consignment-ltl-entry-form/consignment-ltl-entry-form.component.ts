@@ -1305,6 +1305,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*End*/
   checkDocketRules() {
+    debugger
     const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
     if (STYP) {
       const isManual = STYP.vAL === "M";

@@ -14,6 +14,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { de } from 'date-fns/locale';
 
 @Component({
   selector: "app-cluster-master-add",
@@ -123,10 +124,11 @@ export class ClusterMasterAddComponent implements OnInit {
   //#region
   async getdata(){
     if(this.isUpdate){
+      const pincode=this.clusterTabledata.pincode.map(m => {
+        return { name: m, value: m}
+      });
       this.clusterTableForm.controls["pincodeDropdown"].patchValue(
-        this.clusterTabledata.pincode.map(m => {
-          return { name: m, value: m }
-        })
+        pincode
       );
     }
 
@@ -143,7 +145,6 @@ export class ClusterMasterAddComponent implements OnInit {
 
   //#region Pincode Dropdown
   async getPincodeData() {
-
     const pincodeValue = this.clusterTableForm.controls["pincode"].value;
     const selectedPincodes = this.clusterTableForm.controls["pincodeDropdown"].value;
 
@@ -179,6 +180,15 @@ export class ClusterMasterAddComponent implements OnInit {
           this.pincodeStatus
         );
       }
+    }
+    else{
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.clusterTableForm,
+        selectedPincodes,
+        this.pincodeList,
+        this.pincodeStatus
+      );
     }
   }
 

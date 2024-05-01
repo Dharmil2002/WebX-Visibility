@@ -13,8 +13,8 @@ import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { Subject, take, takeUntil } from 'rxjs';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import moment from 'moment';
+import { ExportService } from 'src/app/Utility/module/export.service';
 @Component({
   selector: 'app-voucher-register-report',
   templateUrl: './voucher-register-report.component.html'
@@ -62,7 +62,8 @@ export class VoucherRegisterReportComponent implements OnInit {
     private voucherregService: voucherRegService,
     private locationService: LocationService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private generalLedgerReportService: GeneralLedgerReportService
+    private generalLedgerReportService: GeneralLedgerReportService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
   }
@@ -162,7 +163,7 @@ export class VoucherRegisterReportComponent implements OnInit {
         name: element.tTYPNM,
         value: element.tTYP,
       }))
-      .filter(element => element.name !== 'CNoteBooking') 
+      .filter(element => element.name !== 'CNoteBooking')
       .sort((a, b) => a.value - b.value);
     const partyTPDet = mergedData.Data
       .map(element => ({
@@ -317,7 +318,7 @@ export class VoucherRegisterReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
-        exportAsExcelFile(csv, `Voucher-Register_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(csv, `Voucher-Register_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

@@ -7,10 +7,11 @@ import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { convertToCSV, exportAsExcelFile, SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
+import { convertToCSV, SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
 import { salesRegisterControl } from 'src/assets/FormControls/Reports/sales-register/sales-register-advance';
 // import { salesRegisterControl } from 'src/assets/FormControls/sales-register/sales-register-advance';
 import Swal from 'sweetalert2';
@@ -56,7 +57,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     private generalService: GeneralService,
     private operationService: OperationService,
     private customerService: CustomerService,
-    private salesRegisterService: SalesRegisterService
+    private salesRegisterService: SalesRegisterService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
   }
@@ -456,7 +458,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       const { destin, origin, booktp, ...rest } = record;
       return rest;
     });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Sales_Register_Advance_Report-${timeString}`, this.CSVHeader);
+    this.exportService.exportAsCSV(filteredRecordsWithoutKeys, `Sales_Register_Advance_Report-${timeString}`, this.CSVHeader);
   }
 
   functionCallHandler($event) {

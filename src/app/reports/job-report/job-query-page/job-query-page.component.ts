@@ -6,7 +6,8 @@ import { Subject, take, firstValueFrom, takeUntil } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
-import { JobRegisterService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/job-register.service';
+import { ExportService } from 'src/app/Utility/module/export.service';
+import { JobRegisterService, convertToCSV } from 'src/app/Utility/module/reports/job-register.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -501,7 +502,8 @@ export class JobQueryPageComponent implements OnInit {
     private masterService: MasterService,
     private operationService: OperationService,
     private storage: StorageService,
-    private jobRegisterService: JobRegisterService
+    private jobRegisterService: JobRegisterService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
     this.allColumnFilter = this.columnHeader;
@@ -626,7 +628,7 @@ export class JobQueryPageComponent implements OnInit {
   async save() {
     const startValue = new Date(this.jobQueryTableForm.controls.start.value);
     const endValue = new Date(this.jobQueryTableForm.controls.end.value);
-    let data = await this.jobRegisterService.getJobregisterReportDetail(startValue,endValue);
+    let data = await this.jobRegisterService.getJobregisterReportDetail(startValue, endValue);
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
       ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
       : [];
@@ -663,7 +665,7 @@ export class JobQueryPageComponent implements OnInit {
       const { jobLocation, ...rest } = record;
       return rest;
     });
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Job-Summary-Report-${timeString}`, this.CSVHeader);
+    this.exportService.exportAsCSV(filteredRecordsWithoutKeys, `Job-Summary-Report-${timeString}`, this.CSVHeader);
   }
 
   cancel() {

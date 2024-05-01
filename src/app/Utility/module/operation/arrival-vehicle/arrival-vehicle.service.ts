@@ -413,7 +413,7 @@ export class ArrivalVehicleService {
                             "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                             "cID": this.storage.companyCode,
                             "dKTNO": dkt.Shipment,
-                            "sFX": 0,
+                            "sFX": dkt.Suffix,
                             "lOC": this.storage.branch,
                             "eVNID": DocketEvents.Arrival_Scan,
                             "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan).replace(/_/g, " "),
@@ -493,9 +493,14 @@ export class ArrivalVehicleService {
             let isSuffex = false;
             const sfxEnvData = [];
             if (sfxDockets.length > 0) {
+                const suffixData = await this.gettingLastSuffix(sfxDockets);
                 sfxDocketsData = sfxDockets.map(docket => {
                     // Parsing and incrementing the suffix safely
-                    const nextSuffix = Number(docket.Suffix) + 1;
+                    const dktOps = suffixData.find(x => x.dKTNO == docket.Shipment);
+                    if (!dktOps) {
+                        throw new Error("No Data Found");
+                    }
+                    const nextSuffix = Number(dktOps.Suffix) + 1;
                     if (isNaN(nextSuffix)) {
                         throw new Error("Invalid Suffix value: " + docket.Suffix);
                     }
@@ -708,7 +713,6 @@ export class ArrivalVehicleService {
 
     }
     async updateNotStockUpdate(dktList, isScan, scanDkt, ls) {
-        debugger
         if (dktList && dktList.length > 0) {
             const dockets = dktList.map((d) => `${d.Shipment}-${d.Suffix}`)
             const dktOps = {

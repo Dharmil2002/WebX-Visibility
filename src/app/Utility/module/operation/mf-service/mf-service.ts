@@ -139,8 +139,8 @@ export class ManifestService {
                     "dEST": d?.Destination || "",
                     "pKGS": parseInt(d?.Packages) || 0,
                     "vOL": ConvertToNumber(d?.cft, 3) || 0,
-                    "wT": ConvertToNumber(d?.weight, 3) || 0,
-                    "cWT": ConvertToNumber(d?.cWeight, 3) || 0,
+                    "wT": ConvertToNumber(d?.loadedWT, 3) || 0,
+                    "cWT": ConvertToNumber(d?.loadedCWT, 3) || 0,
                     "lDPKG": ConvertToNumber(d?.loadedPkg, 3) || 0,
                     "lDVOL": ConvertToNumber(d?.cft, 3) || 0,
                     "lDWT": ConvertToNumber(d?.loadedWT, 3) || 0,
@@ -172,12 +172,12 @@ export class ManifestService {
                 let dktOps = {
                     dKTNO: d?.Shipment || "",
                     sFX: d?.Suffix || 0,
-                    tOTWT: ConvertToNumber(d?.weight, 3) || 0,
-                    tOTPKG: parseInt(d?.Packages) || 0,
-                    tOTCWT: ConvertToNumber(d?.cWeight, 3) || 0,
-                    aCTWT: ConvertToNumber(d?.weight, 3) || 0,
-                    cHRWT:ConvertToNumber(d?.cWeight, 3) || 0,
-                    pKGS: parseInt(d?.Packages) || 0,
+                    tOTWT: ConvertToNumber(d?.loadedWT, 3) || 0,
+                    tOTPKG: parseInt(d?.loadedPkg) || 0,
+                    tOTCWT: ConvertToNumber(d?.loadedCWT, 3) || 0,
+                    aCTWT: ConvertToNumber(d?.loadedWT, 3) || 0,
+                    cHRWT:ConvertToNumber(d?.loadedCWT, 3) || 0,
+                    pKGS: parseInt(d?.loadedPkg) || 0,
                     cFTTOT: ConvertToNumber(d?.cft, 3) || 0
                 }
                 envData.push(evnJson);

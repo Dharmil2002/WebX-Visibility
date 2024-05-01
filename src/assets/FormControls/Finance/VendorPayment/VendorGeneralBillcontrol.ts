@@ -4,7 +4,6 @@ import * as StorageService from "src/app/core/service/storage.service";
 
 export class VendorGeneralBillControl {
   VendorBillSummaryArray: FormControls[];
-  VendorBillDocumentArray: FormControls[];
   VendorBillDetailsArray: FormControls[];
   DebitAgainstDocumentArray: FormControls[];
   VendorBillTaxationTDSArray: FormControls[];
@@ -94,21 +93,6 @@ export class VendorGeneralBillControl {
         },
       },
       {
-        name: "Preparedby",
-        label: "Prepared by",
-        placeholder: "Prepared by",
-        type: "text",
-        value: StorageService.getItem(StoreKeys.UserId),
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-
-
-    ];
-    this.VendorBillDocumentArray = [
-
-      {
         name: "DocumentSelection",
         label: "Document Selection",
         placeholder: "Document Selection",
@@ -133,31 +117,9 @@ export class VendorGeneralBillControl {
         },
       },
 
-      {
-        name: 'TotalAmount',
-        label: 'Total Amount ₹',
-        placeholder: 'Total Amount ₹',
-        type: 'number',
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: true,
-      },
-
-      {
-        name: 'BillPending',
-        label: 'Bill Pending ₹',
-        placeholder: 'Bill Pending ₹',
-        type: 'number',
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: true,
-
-      },
-
 
     ];
+
     this.VendorBillDetailsArray = [
       {
         name: "Ledger",
@@ -746,10 +708,6 @@ export class VendorGeneralBillControl {
     return this.VendorBillDetailsArray;
   }
 
-
-  getVendorBillDocumentArrayControls() {
-    return this.VendorBillDocumentArray;
-  }
   getVendorBillTaxationTDSArrayControls() {
     return this.VendorBillTaxationTDSArray;
   }

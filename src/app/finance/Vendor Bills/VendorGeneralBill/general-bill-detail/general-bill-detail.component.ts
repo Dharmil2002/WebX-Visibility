@@ -66,9 +66,6 @@ export class GeneralBillDetailComponent implements OnInit {
   VendorBillForm: UntypedFormGroup;
   jsonControlVendorBillArray: any;
 
-  VendorBillDocumentForm: UntypedFormGroup;
-  jsonControlVendorBillDocumentArray: any;
-
   VendorBillTaxationTDSFilterForm: UntypedFormGroup;
   jsonControlVendorBillTaxationTDSFilterArray: any;
   AlljsonControlVendorBillTaxationTDSFilterArray: any;
@@ -168,6 +165,7 @@ export class GeneralBillDetailComponent implements OnInit {
     VendorPan: "",
   };
   VendorDetails;
+  TotalAmountList: { count: any; title: string; class: string }[];
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -191,6 +189,18 @@ export class GeneralBillDetailComponent implements OnInit {
       this.Request.VendorName = Response.VendorName.name;
       this.Request.VendorPan = Response.VendorPANNumber;
     });
+    this.TotalAmountList = [
+      {
+        count: "0.00",
+        title: "Total Amount",
+        class: `color-Success-light`,
+      },
+      {
+        count: "0.00",
+        title: "Balance Pending",
+        class: `color-Success-light`,
+      },
+    ];
   }
   ngOnInit(): void {
     this.initializeFormControl();
@@ -207,11 +217,6 @@ export class GeneralBillDetailComponent implements OnInit {
       this.jsonControlVendorBillArray,
     ]);
 
-    this.jsonControlVendorBillDocumentArray =
-      this.VendorBillControl.getVendorBillDocumentArrayControls();
-    this.VendorBillDocumentForm = formGroupBuilder(this.fb, [
-      this.jsonControlVendorBillDocumentArray,
-    ]);
 
     this.jsonControlVendorBillTaxationTDSFilterArray =
       this.VendorBillControl.getVendorBillTaxationTDSArrayControls();
@@ -249,8 +254,8 @@ export class GeneralBillDetailComponent implements OnInit {
       },
     ];
     this.filter.Filter(
-      this.jsonControlVendorBillDocumentArray,
-      this.VendorBillDocumentForm,
+      this.jsonControlVendorBillArray,
+      this.VendorBillForm,
       DocumentsList,
       "DocumentSelection",
       false
@@ -343,7 +348,7 @@ export class GeneralBillDetailComponent implements OnInit {
     const request = {
       LedgerList: this.AccountGroupList,
       SACCode: this.SACCodeList,
-      DocumentType: this.VendorBillDocumentForm.value.DocumentSelection.value,
+      DocumentType: this.VendorBillForm.value.DocumentSelection.value,
       Details: event,
     };
     this.LoadVoucherDetails = false;
@@ -476,12 +481,14 @@ export class GeneralBillDetailComponent implements OnInit {
       CalculatedSumWithTDS + parseFloat(GSTAmount.toFixed(2));
     const formattedCalculatedSum = CalculatedSum.toFixed(2);
 
-    this.VendorBillDocumentForm.get("TotalAmount").setValue(
-      formattedCalculatedSum
-    );
-    this.VendorBillDocumentForm.get("BillPending").setValue(
-      formattedCalculatedSum
-    );
+    this.TotalAmountList.forEach((x) => {
+      if (x.title == "Balance Pending") {
+        x.count = formattedCalculatedSum;
+      }
+      if (x.title == "Total Amount") {
+        x.count = formattedCalculatedSum
+      }
+    });
   }
 
   StateChange() {
@@ -629,12 +636,12 @@ export class GeneralBillDetailComponent implements OnInit {
         "Please Add Atleast One Data in Table"
       );
     } else {
-      const PaymentAmount = parseFloat(
-        this.VendorBillDocumentForm.get("TotalAmount").value
-      );
-      const NetPayable = parseFloat(
-        this.VendorBillDocumentForm.get("BillPending").value
-      );
+      const PaymentAmount = this.TotalAmountList.find(
+        (x) => x.title == "Balance Pending"
+      ).count;
+      const NetPayable = this.TotalAmountList.find(
+        (x) => x.title == "Total Amount"
+      ).count;
       const RoundOffAmount = NetPayable - PaymentAmount;
       this.snackBarUtilityService.commonToast(async () => {
         try {
@@ -794,10 +801,12 @@ export class GeneralBillDetailComponent implements OnInit {
     this.snackBarUtilityService.commonToast(() => {
       try {
         const PaymentAmount = parseFloat(
-          this.VendorBillDocumentForm.get("TotalAmount").value
+          this.TotalAmountList.find((x) => x.title == "Balance Pending")
+            .count
         );
         const NetPayable = parseFloat(
-          this.VendorBillDocumentForm.get("BillPending").value
+          this.TotalAmountList.find((x) => x.title == "Total Amount")
+            .count
         );
         const RoundOffAmount = NetPayable - PaymentAmount;
 

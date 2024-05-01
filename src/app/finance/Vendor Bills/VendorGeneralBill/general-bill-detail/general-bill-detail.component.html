@@ -6,17 +6,11 @@
             (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false" [className]="className">
         </app-form-webxpress>
     </form>
-    <form [formGroup]="VendorBillDocumentForm">
-        <app-form-webxpress [form]="VendorBillDocumentForm" [FormTitle]="'Vendor Bill Documents'"
-            [formData]="jsonControlVendorBillDocumentArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false" [className]="className">
-        </app-form-webxpress>
-    </form>
-    <app-generic-table-v2 *ngIf="LoadVoucherDetails && VendorBillDocumentForm.valid" [dynamicControls]="dynamicControls"
+    <app-generic-table-v2 *ngIf="LoadVoucherDetails && VendorBillForm.valid" [dynamicControls]="dynamicControls"
         [columnHeader]="columnHeader" [tableData]="tableData" [staticField]="staticField" [menuItems]="menuItems"
         [Link]="linkArray" [FormTitle]="'Transaction Details'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag"
-        [showHeader]="false" (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true
-        (AddNewButtonEvent)="AddBills()" (functionCallEmitter)="functionCallHandler($event)"
+        [TitleBoxData]="TotalAmountList" [showHeader]="false" (menuItemClicked)="handleMenuItemClick($event)"
+        [DisplayAddNewButton]=true (AddNewButtonEvent)="AddBills()" (functionCallEmitter)="functionCallHandler($event)"
         (callFunction)="functionCallHandler($event)">
     </app-generic-table-v2>
 

@@ -222,14 +222,15 @@ export class GenericTableV2Component
           return val;
       }
     }
-    
-    // if(val) {      
-    //   if (typeof val !== 'boolean' && isValidNumber(val)) {
-    //     return Number(val);
-    //   } else if (typeof val === 'string' && isValidDate(val)) {
-    //     return moment(new Date(val)).format("DD MMM YY HH:mm");
-    //   }
-    // }
+    else {
+      if(val) {      
+        if (typeof val !== 'boolean' && isValidNumber(val)) {
+          return Number(val);
+        } else if (typeof val === 'string' && isValidDate(val)) {
+          return moment(new Date(val)).format("DD MMM YY HH:mm");
+        }
+      }
+    }
     return val;
   }
   //#endregion

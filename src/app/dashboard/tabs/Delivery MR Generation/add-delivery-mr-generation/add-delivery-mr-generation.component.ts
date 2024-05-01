@@ -202,7 +202,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         OtherDly: 0,
         rateDifference: 0,
         newSubTotal: 0,
-        subTotal: 0,
+        subTotal: this.filteredDocket[0].gROAMT,
         payBasis: element.pAYTYPNM,
         otherCharge: null,
         actions: ['Edit']
@@ -291,7 +291,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         let dt = this.tableData.find(x => x.id === data.id);
-        dt.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
+        dt.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.subTotal;
         dt.otherCharge = data.chargeData;
         dt.newSubTotal = parseFloat(data.newSubTotal).toFixed(2) || 0;
         dt.rateDifference = parseFloat(data.newSubTotal) - parseFloat(data.subTotal);

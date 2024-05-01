@@ -170,9 +170,8 @@ export class MarkArrivalComponent implements OnInit {
       };
     }
     //#endregion
-    const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
+    const dktStatus = (this.mfList ?? []).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
-
     let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
       stCode = 5,

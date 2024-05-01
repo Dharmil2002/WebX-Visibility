@@ -104,6 +104,7 @@ export class SigninComponent
             this.storage.setItem(StoreKeys.CompanyLogo, companyDetail.company_Image);
             this.storage.setItem(StoreKeys.CompanyAlias, companyDetail.company_Code);
             this.storage.setItem(StoreKeys.TimeZone, companyDetail?.timeZone || "");
+            this.storage.setItem(StoreKeys.PunchLine, companyDetail?.punch_Line || "");
             //Need to be retrived from User Master
             this.storage.setItem(StoreKeys.Mode, "FTL");
 

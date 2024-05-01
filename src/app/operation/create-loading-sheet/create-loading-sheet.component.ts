@@ -221,6 +221,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.shippingData =
         this.Route.getCurrentNavigation()?.extras?.state.shipping;
 
+        console.log(this.tripData);
       // Check if tripData meets the condition for navigation
       const routeMap = {
         "Depart Vehicle": "Operation/DepartVehicle",
@@ -388,7 +389,11 @@ export class CreateLoadingSheetComponent implements OnInit {
       );
       // Update route details if shipment is not being updated
     }
-    const [orgn, ...nextLocs] = this.tripData?.RouteandSchedule.split(":")[1].split("-");
+    
+    let routeLocations = this.tripData?.RouteandSchedule.split(":")[1].split("-");
+    const removeItemsBeforeX = (arr, x) => { const idx = arr.indexOf(x); return arr.slice(idx >= 0 ? idx : arr.length); };
+
+    const [orgn, ...nextLocs] = removeItemsBeforeX(routeLocations, this.storage.branch);
 
     const res = await this.loadingSheetService.getDocketsForLoadingSheet(nextLocs);
     if (res.data.length > 0) {
@@ -781,7 +786,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   async loadVehicleDetails() {
     try {
       const vehControl = this.loadingSheetTableForm.controls["vehicle"];
-      if(vehControl.value.status != "Available") {
+      if(!this.isUpdate && vehControl.value.status != "Available") {
         vehControl.setValue("");
         return;
       }

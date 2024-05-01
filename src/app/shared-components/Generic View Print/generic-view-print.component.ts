@@ -47,39 +47,44 @@ export class GenericViewPrintComponent implements OnInit {
   }
 
   private updateTableHtml(): void {
-
     const template = this.HtmlTemplate;
     const doc = this.parseHTML(template);
-
+ 
     const elementsWithDataRow = Array.from(doc.querySelectorAll("[data-row]"));
-
+ 
     const processedRowKeys: string[] = [];
     const rows: { Key: string; Value: string }[] = [];
-
+ 
     this.FieldMapping.filter((f) => f.Value.includes(".[#].")).forEach((f) => {
       const key = f.Value.slice(0, f.Value.indexOf(".[#]."));
-
       elementsWithDataRow.forEach((ele) => {
         if (ele.textContent && ele.textContent.includes(f.Key)) {
           if (!rows.find((r) => r.Key === key)) {
             processedRowKeys.push(key);
             rows.push({ Key: key, Value: ele.outerHTML });
-
-            const dataArray = this.JsonData[key];
+            const dataArray = this.JsonData[key] || [];
             const parent = ele.parentNode as HTMLElement;
-
-            for (let i = 0; i < dataArray.length; i++) {
+            if (dataArray.length !== 0) {
+              for (let i = 0; i < dataArray.length; i++) {
+                let row = ele.outerHTML;
+                this.FieldMapping.filter((f) => f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`)
+                ).forEach((f) => {
+                  const val = f.Value.replace(".[#].", `.${i}.`);
+                  row = row.replace(
+                    f.Key,
+                    this.getValueByFieldName(this.JsonData, val)
+                  );
+                });
+                const tr = this.createElementFromHTML(row);
+                parent.appendChild(tr);
+              }
+            } else {
               let row = ele.outerHTML;
-              console.log("row", row);
               this.FieldMapping.filter(
                 (f) =>
                   f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`)
               ).forEach((f) => {
-                const val = f.Value.replace(".[#].", `.${i}.`);
-                row = row.replace(
-                  f.Key,
-                  this.getValueByFieldName(this.JsonData, val)
-                );
+                row = row.replace(f.Key, "");
               });
               const tr = this.createElementFromHTML(row);
               parent.appendChild(tr);
@@ -89,13 +94,14 @@ export class GenericViewPrintComponent implements OnInit {
         }
       });
     });
-
+ 
     const elementsWithDatacolumn = Array.from(
       doc.querySelectorAll("[data-column]")
     );
     elementsWithDatacolumn.forEach((coll) => {
       const AttributeVelue = coll.getAttribute("data-column");
-      const keyindex = AttributeVelue.split(".")[1];
+      console.log("tagName",coll.tagName.toLowerCase())
+      const keyindex = AttributeVelue.split(".")[1] || 0;
       const parent = coll.parentNode as HTMLElement;
       this.FieldMapping.filter((f) => f.Value.includes(`.[##].`)).forEach(
         (f) => {
@@ -105,19 +111,32 @@ export class GenericViewPrintComponent implements OnInit {
             f.Value.indexOf(".[#].") + 5,
             f.Value.indexOf(".[##].")
           );
-          const dataArray = this.JsonData[key][keyindex][nestedKey];
-          if(dataArray.length !== 0){
+          const dataArray =
+            (this.JsonData[key] || []).length !== 0
+              ? this.JsonData[key][keyindex][nestedKey]
+              : [];
+          if (dataArray.length !== 0) {
             for (let i = 0; i < dataArray.length; i++) {
               const nestedval = val.replace(".[##].", `.${i}.`);
-              const element = document.createElement('td')
-              element.textContent = this.getValueByFieldName(this.JsonData, nestedval)
-              element.style.textAlign = 'center'; 
-              parent.appendChild(element)
+              const element = document.createElement(coll.tagName.toLowerCase());
+              element.textContent = this.getValueByFieldName(
+                this.JsonData,
+                nestedval
+              );
+              element.style.textAlign = "center";
+              element.className = coll.className
+              parent.appendChild(element);
             }
+          } else {
+            const element = document.createElement(coll.tagName.toLowerCase());
+            element.textContent = "";
+            element.style.textAlign = "center";
+            element.className = coll.className
+            parent.appendChild(element);
           }
         }
       );
-      coll.remove()
+      coll.remove();
     });
 
     let updatedTemplate = doc.documentElement.innerHTML;

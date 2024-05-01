@@ -351,7 +351,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
     if (packageChecked && this.isScan) {
-      const res=await this.arrivalService.fieldMappingArrivalScan(this.arrivalData,locationWiseData,[],this.packageData,this.isScan);
+      const res=await this.arrivalService.fieldMappingArrivalScan(this.arrivalData,locationWiseData,this.packageData);
       if(res){
         this.dialogRef.close(this.loadingSheetTableForm.value)
         this.goBack('Departures')
@@ -371,7 +371,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       let notSelectedData= this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
       let selectlocationWiseData =  selectedData.filter((x) => x.Destination === this.currentBranch);
       let nselectlocationWiseData =  notSelectedData.filter((x) => x.Destination === this.currentBranch);
-        const res=await this.arrivalService.fieldMappingArrivalScan(this.arrivalData,selectlocationWiseData,nselectlocationWiseData,this.packageData,this.isScan);
+        const res=await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData,selectlocationWiseData,nselectlocationWiseData,this.packageData,this.isScan);
         if(res){
           this.dialogRef.close(this.loadingSheetTableForm.value)
           this.goBack('Departures')

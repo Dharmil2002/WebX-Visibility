@@ -227,7 +227,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "loadedCWT": 0,
             "pendPkg": 0,
             "pendWt": 0,
-            "pendCWt": 0,
+            "pendCwt": 0,
             "Leg": lsDetails?.lEG.replace(" ", "") || '',
             "actions":["Edit"]
           };
@@ -367,7 +367,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   shipmentsEdit(event) {
     const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
-    
     const data = this.loadingTableData.find(x => x.Shipment === shipment && x.Suffix === suffix);
     if (data) {
       const loadedPkg = parseInt(noofPkts, 10);
@@ -375,10 +374,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
       const loadedCWT = parseFloat(ctWeight).toFixed(2);
       const pendPkg = data.Packages - loadedPkg;
       const pendWt = (data.weight - parseFloat(actualWeight)).toFixed(2);
-      const pendCWt = (data.cWeight - parseFloat(ctWeight)).toFixed(2);
+      const pendCwt = (data.cWeight - parseFloat(ctWeight)).toFixed(2);
       
       // Update the data object directly
-      Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCWt });
+      Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCwt });
     
       this.cdr.detectChanges();
        this.kpiData(data);
@@ -387,7 +386,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   getMFGrouping(selectedData){
     let groupedDataWithoutKey;
     const groupedData = selectedData.reduce((acc, element) => {
-      const leg = element.Leg;
+      const leg = `${element.oRGN}-${element.dEST}`;
       if (!acc[leg]) {
         acc[leg] = {
           Leg: leg,
@@ -398,9 +397,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
           Data: []
         };
       }
-      acc[leg].WeightKg += parseFloat(element.loadedWT);
-      acc[leg].VolumeCFT += element.cft;
-      acc[leg].Packages += parseFloat(element.loadedPkg);
+      acc[leg].WeightKg += parseFloat(element.lDWT);
+      acc[leg].VolumeCFT += parseFloat(element.lDVOL);
+      acc[leg].Packages += parseFloat(element.lDPKG);
       acc[leg].ShipmentCount++;
       acc[leg].Data.push(element);
       return acc;
@@ -429,7 +428,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
     else{
       let selectedData= this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
       let checkPend =selectedData.filter((x)=>x.pendPkg == x.Packages);
-       menifest=await this.getMFGrouping(selectedData);
        if (selectedData.length == 0) {
         showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
         return false;
@@ -440,6 +438,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
       let notSelectedData= this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
       const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData,this.isScan,notSelectedData);
+      menifest=await this.getMFGrouping(fieldMapping.filteredMfDetails);
       resMf = await this.mfService.createMfDetails(fieldMapping);
       this.shipingDataTable=selectedData
     }

@@ -113,6 +113,7 @@ export class ManifestService {
 
     }
     async mapFieldsWithoutScanning(details, header, formField,isScan,notSelectedData) {
+        debugger
         const lsNo = { lSNO: formField?.LoadingSheet || "", rUTCD: formField.route.split(":")[0].trim(), count: parseInt(formField.count) }
         //collectionName:"mf_details_ltl"
         const envData = [];
@@ -120,12 +121,12 @@ export class ManifestService {
         const getInvoice=await this.gettingLastSuffix(details);
         const mfDetails = details.map((d) => {
             try {
-                let lDVOL={};
+                let lDVOL=0;
                 if(getInvoice && getInvoice.length>0){
                     const vol=getInvoice.find(x=>x.dKTNO==d.Shipment)?.vOL || 0;
                     lDVOL = convert(vol.l).from('cm').to('ft') *
                     convert(vol.b).from('cm').to('ft') *
-                    convert(vol.h).from('cm').to('ft') * parseInt(d?.Packages);
+                    convert(vol.h).from('cm').to('ft') * parseInt(d?.loadedPkg);
                     d.cft=lDVOL;
                 }
                 const mfJson = {
@@ -216,7 +217,7 @@ export class ManifestService {
                     "dEST": d.Destination,
                     "aCTWT": ConvertToNumber(d.pendWt, 3),
                     "cHRWT": ConvertToNumber(d.pendCwt, 3),
-                    "tOTCWT": ConvertToNumber(d.pendWt, 3),
+                    "tOTCWT": ConvertToNumber(d.pendCwt, 3),
                     "tOTWT": ConvertToNumber(d.pendWt, 3),
                     "tOTPKG": parseInt(d.pendPkg) || 0,
                     "pKGS": parseInt(d.pendPkg) || 0,

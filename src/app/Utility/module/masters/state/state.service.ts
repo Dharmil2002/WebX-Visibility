@@ -77,7 +77,7 @@ export class StateService {
       throw error;
     }
   }
-  
+
   //#endregion
   //#region to get state list
   async getStateWithZone(filter = {}): Promise<any> {
@@ -105,4 +105,17 @@ export class StateService {
   }
 
   //#endregion
+  getGSTType(fromState: any, toState: any): { CGST: boolean, IGST: boolean, SGST: boolean, UTGST: boolean } {
+
+    if (fromState.ST == toState.ST && (fromState.ISUT || toState.ISUT)) {
+      return { CGST: false, IGST: false, SGST: true, UTGST: true };
+    }
+    if (fromState.ST == toState.ST && !fromState.ISUT && !toState.ISUT) {
+      return { CGST: true, IGST: false, SGST: true, UTGST: false };
+    }
+    else if (fromState.ST != toState.ST) {
+      return { CGST: false, IGST: true, SGST: false, UTGST: false };
+    }
+    return { CGST: false, IGST: true, SGST: false, UTGST: false };
+  }
 }

@@ -20,6 +20,11 @@ import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, Vouc
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { StoreKeys } from 'src/app/config/myconstants';
+import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
+import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -28,6 +33,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   jsonControlDeliveryMrGenArray: any;
   deliveryMrTableForm: UntypedFormGroup
+
+  jsonControlBookingTimechargesArray: any;
+  AlljsonControlBookingTimechargesArray: any;
+  BookingTimechargesForm: UntypedFormGroup
+
   breadscrums = [
     {
       title: "Delivery MR Generation",
@@ -35,85 +45,37 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       active: "Delivery MR Generation",
     },
   ];
-  tableData: any = [];
-  tableload: boolean; // flag , indicates if data is still lodaing or not , used to show loading animation
-  menuItemflag: boolean = true;
-  dynamicControls = {
-    add: false,
-    edit: false,
-    csv: false,
-  };
-  linkArray = [];
 
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
+  className = "col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2";
 
-  columnHeader = {
-    consignmentNoteNumber: {
-      Title: "GRN No.",
-      class: "matcolumnleft",
-      Style: "min-width:18%",
-      sticky: true
-    },
-    payBasis: {
-      Title: "PayBasis",
-      class: "matcolumnleft",
-      Style: "min-width:80px",
-    },
-    subTotal: {
-      Title: "Sub Total Amount(₹)",
-      class: "matcolumncenter",
-      //Style: "max-width:70px",
-    },
-    newSubTotal: {
-      Title: "New Sub Total Amount(₹)",
-      class: "matcolumncenter",
-      //Style: "min-width:200px",
-    },
-    rateDifference: {
-      Title: "Rate Difference(₹)",
-      class: "matcolumncenter",
-      Style: "min-width:10px",
-    },
-    OtherDly: {
-      Title: "Other Charges(₹)",
-      class: "matcolumncenter",
-      Style: "min-width:10px",
-      type: "Link",
-      functionName: "addDetails"
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumncenter",
-      Style: "min-width:5px",
-      stickyEnd: true,
-    },
-  };
 
-  staticField = [
-    "totalAmount",
-    "rateDifference",
-    "newSubTotal",
-    "subTotal",
-    "payBasis",
-    "consignmentNoteNumber"
-  ];
-  menuItems = [
-    { label: 'Edit' },
-  ]
+
   jsonControlPaymentArray: any;
   PaymentSummaryFilterForm: UntypedFormGroup;
   AlljsonControlPaymentSummaryFilterArray: any;
-  jsonControlBillingArray: any;
-  billingForm: UntypedFormGroup;
+  jsonSummaryControlArray: any;
+  jsonSummaryControls: any;
+  SummaryForm: UntypedFormGroup;
   filteredDocket = []
+  DocketDetails: any;
+  DocketFinDetails: any;
   SACCodeList: any;
-  TotalAmountList: { count: string; title: string; class: string; }[];
   headerDetails: any;
   docketNo: any;
   AlljsonControlMRArray: any;
   totalMRamt: any;
   AccountsBanksList: any;
+
+  ShowBookingTimeCharges = false;
+  chargeList: any;
+  DeliveryTimeChargesArray: any[];
+  DeliveryTimeChargesForm: UntypedFormGroup;
+  ChargesList: any;
+  States: any[];
+  GSTType: any;
+  GSTRate: number = 12;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -125,28 +87,24 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService,
     private docketService: DocketService,
+    private invoiceService: InvoiceServiceService,
+    private thcService: ThcService,
+    private stateService: StateService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
       this.docketNo = data.data.no;
+    } else {
+      this.docketNo = "DEL2013";
     }
   }
 
   ngOnInit(): void {
     this.initializeDeliveryMrFormControls();
-    this.getTDSData();
-    this.TotalAmountList = [
-      {
-        count: "0.00",
-        title: "Total MR Amount",
-        class: `color-Success-light`,
-      }
-    ];
   }
   //#region to call handler function
   functionCallHandler($event) {
-    let functionName = $event.functionName; // name of the function , we have to call
-    // function of this name may not exists, hence try..catch
+    let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
@@ -162,243 +120,279 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     // Retrieve the generated form controls array from the DeliveryMrGeneration instance.
     this.jsonControlDeliveryMrGenArray = deliveryMrControlsGenerator.getDeliveryMrControls();
-    this.jsonControlPaymentArray = deliveryMrControlsGenerator.getDeliveryMrPaymentControls();
-    this.jsonControlBillingArray = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
-    this.AlljsonControlPaymentSummaryFilterArray = this.jsonControlPaymentArray;
     this.AlljsonControlMRArray = this.jsonControlDeliveryMrGenArray;
-    this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentArray])
-
-    // Build the form group using the FormBuilder and the obtained form controls array.
     this.deliveryMrTableForm = formGroupBuilder(this.fb, [this.jsonControlDeliveryMrGenArray]);
-    this.billingForm = formGroupBuilder(this.fb, [this.jsonControlBillingArray]);
+
+    this.jsonControlBookingTimechargesArray = deliveryMrControlsGenerator.getBookingTimecharges();
+
+    this.jsonControlPaymentArray = deliveryMrControlsGenerator.getDeliveryMrPaymentControls();
+    this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentArray])
+    this.AlljsonControlPaymentSummaryFilterArray = this.jsonControlPaymentArray;
     this.jsonControlPaymentArray = this.jsonControlPaymentArray.slice(0, 1);
 
-    this.deliveryMrTableForm.controls['Deliveredto'].setValue("Receiver");
-    const filterFunction = (x) => x.name !== "NameofConsignee";
-    this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
+    this.jsonSummaryControlArray = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
+    this.jsonSummaryControls = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
+    this.SummaryForm = formGroupBuilder(this.fb, [this.jsonSummaryControlArray]);
 
-    // Clear validation for NameofReceiver control
-    const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
-    NameofConsignee.clearValidators();
-    NameofConsignee.updateValueAndValidity();
 
     this.deliveryMrTableForm.controls['ConsignmentNoteNumber'].setValue(this.docketNo);
-    this.docketNo ? this.validateConsig() : null;
+    this.docketNo ? this.ValidateDocketNo() : null;
+    this.GetGSTRate();
   }
-  //#endregion
-  //#region to add data in table
-  async save() {
-    this.tableload = true;
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
-    this.filteredDocket.forEach(element => {
-      const json = {
-        id: this.tableData.length + 1,
-        consignmentNoteNumber: element.dKTNO,
-        totalAmount: 0,
-        OtherDly: 0,
-        rateDifference: 0,
-        newSubTotal: 0,
-        subTotal: 0,
-        payBasis: element.pAYTYPNM,
-        otherCharge: null,
-        actions: ['Edit']
-      };
-      this.tableData.push(json);
-    });
-    this.tableload = false;
-
-    if (this.deliveryMrTableForm.value.Deliveredto === 'Receiver') {
-      this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].bPARTYNM);
-    } else {
-      this.billingForm.controls['BillingParty'].setValue(this.filteredDocket[0].cSGN.nM);
-    }
-    this.headerDetails = this.deliveryMrTableForm.value;
-    this.deliveryMrTableForm.reset();
-  }
-  //#endregion
-  //#region to change control
-  async hideControl() {
-    const deliveredToValue = this.deliveryMrTableForm.value.Deliveredto;
-
-    const filter = { "dKTNO": this.docketNo };
-    const consigneeName = await this.docketService.getDocketsDetailsLtl(filter);
-
-    const cgnm = consigneeName[0]?.cSGN.nM;
-
-    const NameofReceiver = this.deliveryMrTableForm.get('NameofReceiver');
-    const NameofConsignee = this.deliveryMrTableForm.get('NameofConsignee');
-
-    if (deliveredToValue === 'Receiver') {
-      const filterFunction = (x) => x.name !== "NameofConsignee";
-      this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
-
-      // Reset values and clear validators
-      NameofConsignee.setValue('');
-      NameofConsignee.clearValidators();
-      NameofConsignee.updateValueAndValidity();
-
-      // Apply required validator for NameofReceiver control
-      NameofReceiver.setValidators([Validators.required]);
-      NameofReceiver.updateValueAndValidity();
-    }
-
-    if (deliveredToValue === 'Consignee') {
-      const filterFunction = (x) => x.name !== "NameofReceiver";
-      this.jsonControlDeliveryMrGenArray = this.AlljsonControlMRArray.filter(filterFunction);
-
-      // Reset values and clear validators
-      NameofReceiver.setValue('');
-      NameofReceiver.clearValidators();
-      NameofReceiver.updateValueAndValidity();
-
-      // Apply required validator for NameofConsignee control      
-      NameofConsignee.setValue(cgnm);
-      NameofConsignee.setValidators([Validators.required]);
-      NameofConsignee.updateValueAndValidity();
-    }
-  }
-  //#endregion
-  //#region to Add a new item to the table or edit
-  addDetails(event) {
-    const request = {
-      charges: event.data,
-      Details: event,
-      show: event.functionName ? true : false
-    };
-
-    this.tableload = true;
-    const dialogRef = this.dialog.open(DeliveryMrGenerationModalComponent, {
-      data: request,
-      width: "100%",
-      height: "90%",
-      disableClose: true,
-      position: {
-        top: "20px",
-      },
-    });
-
-    dialogRef.afterClosed().subscribe(async (data) => {
-      try {
-        if (!data) {
-          this.tableload = false;
-          return;
-        }
-        // Delay execution for better user experience
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        let dt = this.tableData.find(x => x.id === data.id);
-        dt.newSubTotal = data.newSubTotals > 0 ? data.newSubTotals : data.newSubTotal;
-        dt.otherCharge = data.chargeData;
-        dt.newSubTotal = parseFloat(data.newSubTotal).toFixed(2) || 0;
-        dt.rateDifference = parseFloat(data.newSubTotal) - parseFloat(data.subTotal);
-        dt.totalAmount = this.calculateTotalAmount(data.chargeData);
-        dt.OtherDly = dt.totalAmount.toFixed(2);
-
-        let totalMr = 0;
-        this.tableData.forEach(item => {
-          totalMr += item.totalAmount;
-        });
-        const totalMrItem = this.TotalAmountList.find(x => x.title === "Total MR Amount");
-        totalMrItem ? totalMrItem.count = totalMr.toFixed(2) : 0
-
-        this.tableload = false;
-      } catch (error) {
-        console.error("Error in addDetails:", error);
-        // Handle errors, e.g., show an error message to the user
-      }
-    });
-  }
-
-  // calculating TotalAmount
-  calculateTotalAmount(charges) {
-    // Map charges to an array of objects with name, operation, and aMT properties
-    const chargeMapping = charges.map(charge => ({
-      name: charge.cHGNM,
-      operation: charge.oPS,
-      aMT: parseFloat(charge.aMT) // Parse the amount to ensure numerical calculations
-    }));
-
-    // Reduce the chargeMapping array to calculate the total amount
-    const totalAmount = chargeMapping.reduce((acc, curr) => {
-      // Apply the operation to the accumulated total based on the charge's operation
-      if (curr.operation === "+") {
-        return acc + curr.aMT;
-      } else if (curr.operation === "-") {
-        return acc - Math.abs(curr.aMT); // Subtract the positive amount
-      } else {
-        // Handle unknown operations (if any)
-        console.log(`Unknown operation "${curr.operation}" for charge "${curr.name}"`);
-        return acc;
-      }
-    }, 0);
-
-    return totalAmount;
-  }
-
-  //#endregion
-  //#region to fill or remove data form table to controls
-  handleMenuItemClick(data) {
-    //console.log(data);
-    this.addDetails(data)
-  }
-  //#endregion 
   //#region to validate docket number
-  async validateConsig() {
-    const NoofDocketValue = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
-    const consignmentNoteNumbers = NoofDocketValue.includes(',') ? NoofDocketValue.split(',').map(i => i.trim()) : [NoofDocketValue];
+  async ValidateDocketNo() {
+    const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
+    if (!DocketNo) {
+      return;
+    }
 
     try {
-      const docketDataArray = await Promise.all(
-        consignmentNoteNumbers.map(async (element) => {
-          const filter = { "dKTNO": element };
-          return await this.docketService.getDocketsDetailsLtl(filter)
-        })
-      );
+      const filter = { "dKTNO": DocketNo };
+      const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
 
-      // Flatten the array of arrays
-      const flattenedDocketData = docketDataArray.flat();
-
-      // Filter out null values and ensure uniqueness based on docketNumber
-      this.filteredDocket = flattenedDocketData.filter(
-        (data, index, self) =>
-          data !== null &&
-          index === self.findIndex((d) => d.dKTNO === data.dKTNO)
-      );
-
-      if (this.filteredDocket.length === 0) {
-        Swal.fire({
+      if (docketdetails.length === 1) {
+        this.DocketDetails = docketdetails[0];
+        this.SetDocketsDetails(this.DocketDetails);
+      } else {
+        await Swal.fire({
           icon: "info",
           title: "Information",
-          text: `This Consignment No: ${NoofDocketValue} is not valid`,
+          text: `This Consignment No: ${DocketNo} is not valid`,
           showConfirmButton: true,
         });
         this.deliveryMrTableForm.controls.ConsignmentNoteNumber.reset();
         return;
       }
-
-      // Check if billingParty is the same for all elements
-      const uniqueBillingParties = [...new Set(this.filteredDocket.map(data => data.bPARTYNM))];
-
-      if (uniqueBillingParties.length !== 1) {
-        // If billingParty is not the same for all elements, show an informative message
-        Swal.fire({
-          icon: "info",
-          title: "Billing parties are different for given consignment note numbers",
-          showConfirmButton: true,
-        });
-        // Return or handle accordingly
-        return;
-      }
-
     } catch (error) {
       console.error("Error fetching data:", error);
+      // Handle error gracefully, maybe show an error message to the user
     }
   }
-  //#endregion
+  SetDocketsDetails(data) {
+    this.deliveryMrTableForm.get('PayBasis').setValue(data.pAYTYPNM);
+    this.deliveryMrTableForm.get('Consignor').setValue(`${data.cSGN.cD}:${data.cSGN.nM}`);
+    this.deliveryMrTableForm.get('ConsignorGST').setValue(data.cSGN.gST);
+    this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
+    this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
+    this.deliveryMrTableForm.get('GSTApplicability').setValue(data.rCM);
+    this.GetBookingTimeCharges();
+    if (data.cSGN.gST && data.cSGE.gST) {
+      const StateCodeList = [parseInt(data.cSGN.gST.substring(0, 2)), parseInt(data.cSGE.gST.substring(0, 2))]
+      this.GetStateCodeWiseStateDetails(StateCodeList);
+    }
+    this.fetchAndProcessCharges();
+  }
+  async GetBookingTimeCharges() {
+    const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
+    if (!DocketNo) {
+      return;
+    }
+    const filter = { "dKTNO": DocketNo };
+    const docketFindetails = await this.docketService.getDocketsFinDetailsLtl(filter);
+
+    if (docketFindetails.length === 1) {
+      this.DocketFinDetails = docketFindetails[0];
+      if (this.DocketFinDetails.cHG.length > 0) {
+        this.ChargesList = await this.SetBookingTimeCharges(this.DocketFinDetails.cHG);
+        this.AlljsonControlBookingTimechargesArray = [...this.jsonControlBookingTimechargesArray, ...this.ChargesList,];
+
+        this.BookingTimechargesForm = formGroupBuilder(this.fb, [
+          this.AlljsonControlBookingTimechargesArray,
+        ]);
+        this.BookingTimechargesForm.get('OldFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
+        this.BookingTimechargesForm.get('NewFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
+        this.ShowBookingTimeCharges = true;
+      }
+    }
+  }
+  async SetBookingTimeCharges(charges) {
+    const generateCharges = (charge) => {
+      // Helper function to generate a single charge object
+      const generateChargeObject = (index) => ({
+        name: charge.cHGID + index, // Add an index to make names unique
+        label: `${charge.cHGNM} (${charge.oPS}) ₹`,
+        placeholder: charge.cHGNM,
+        type: "number",
+        value: index == 3 ? 0 : charge.aMT,
+        generatecontrol: true,
+        disable: index == 2 ? false : true,
+        ChargType: charge.oPS,
+        ChargeId: charge.cHGID,
+        FormType: "BookingTimeCharges",
+        Validations: [
+
+          index == 2 ? {
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          } : [],],
+        functions: {
+          onChange: "OnChangeBookingTimeCharges",
+        },
+      });
+
+      // Generate three charge objects based on the input charge
+      const charges = [];
+      for (let i = 1; i <= 3; i++) {
+        charges.push(generateChargeObject(i));
+      }
+      return charges;
+    };
+
+    // Generate three sets of charges for each charge object
+    let combinedCharges = [];
+    charges.forEach(charge => {
+      combinedCharges = combinedCharges.concat(generateCharges(charge));
+    });
+
+    return combinedCharges;
+  }
+
+  private async fetchAndProcessCharges() {
+    this.chargeList = await this.thcService.getCharges({
+      "cHAPP": { 'D$eq': 'DeliveryMR' },
+      'isActive': { 'D$eq': true }
+    });
+
+    if (this.chargeList && this.chargeList.length > 0) {
+      const invoiceList = this.chargeList
+        .filter(element => element)
+        .map((element, index) => ({
+          id: 1 + index,
+          name: element.cHACD || '',
+          label: `${element.sELCHA}(${element.aDD_DEDU})`,
+          placeholder: element.cAPTION || '',
+          type: 'number',
+          value: 0,
+          filterOptions: '',
+          displaywith: '',
+          generatecontrol: true,
+          disable: true,
+          FormType: "DeliveryTimeCharges",
+          Validations: [{
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          }],
+          additionalData: {
+            metaData: element.aDD_DEDU,
+            showNameAndValue: element.iSREQ
+          },
+          functions: {
+            onChange: "OnChangeBookingTimeCharges",
+          },
+        }));
+
+      const enable = invoiceList.map(x => ({
+        ...x,
+        name: `${x.name}`,
+        disable: false
+      }));
+
+      this.DeliveryTimeChargesArray = enable.sort((a, b) => a.name.localeCompare(b.name));
+      this.DeliveryTimeChargesForm = formGroupBuilder(this.fb, [this.DeliveryTimeChargesArray]);
+      this.OnChangeBookingTimeCharges(null);
+    }
+  }
+
+  OnChangeBookingTimeCharges(event) {
+    // Set Diffrent Amount
+    if (event) {
+      if (event.field.FormType === "BookingTimeCharges") {
+        const OldAmount = parseFloat(this.BookingTimechargesForm.get(event.field.ChargeId + "1").value);
+        const NewAmount = parseFloat(this.BookingTimechargesForm.get(event.field.ChargeId + "2").value);
+        const DiffAmount = parseFloat((OldAmount - NewAmount).toFixed(2));
+        this.BookingTimechargesForm.get(event.field.ChargeId + "3").setValue(DiffAmount);
+      }
+    }
+
+    const NewFreight = this.BookingTimechargesForm.get('NewFreight').value;
+    // Calculate the Booking time charges
+
+    let TotalBookingTimeCharges = 0;
+    let TotalEditedAmount = 0;
+    let TotalDiffrentAmount = 0;
+
+    for (let i = 1; i <= 3; i++) {
+      this.DocketFinDetails.cHG.forEach(item => {
+        const value = parseFloat(this.BookingTimechargesForm.get(item.cHGID + i).value);
+        const amountToAdd = isNaN(value) ? 0 : (item.oPS === "+" ? value : -value);
+
+        if (i === 1) {
+          TotalBookingTimeCharges += amountToAdd;
+        } else if (i === 2) {
+          TotalEditedAmount += amountToAdd;
+        } else if (i === 3) {
+          TotalDiffrentAmount += amountToAdd;
+        }
+      });
+    }
+
+    // Calculate Delivery Time Charges
+    let TotalDeliveryTimeCharges = 0;
+    this.DeliveryTimeChargesArray.forEach((element) => {
+      const value = parseFloat(this.DeliveryTimeChargesForm.get(element.name).value);
+      const amountToAdd = isNaN(value) ? 0 : (element.additionalData.metaData === "+" ? value : -value);
+      TotalDeliveryTimeCharges += amountToAdd;
+    });
+    const taxableAmount = TotalEditedAmount + NewFreight + TotalDeliveryTimeCharges;
+    this.SummaryForm.get('DocketNewTotal').setValue(taxableAmount);
+
+    let GSTAmount = ConvertToNumber(taxableAmount * (this.GSTRate / 100), 2);
+
+    const gstToRemove = [];
+    const gstApplied = [];
+    for (const key in Object.keys(this.GSTType)) {
+      if (!this.GSTType[key])
+        gstToRemove.push[key];
+      else
+        gstApplied.push[key];
+    }
+
+    this.jsonSummaryControlArray = this.jsonSummaryControlArray.filter(x => !gstToRemove.includes(x.name));
+    this.jsonSummaryControlArray.filter(f => gstApplied.includes(f.name)).forEach(item => {
+      this.SummaryForm.get(item.name).setValue((GSTAmount / gstApplied.length).toFixed(2));
+    });
+
+
+  }
+
+  async GetStateCodeWiseStateDetails(GSTCodeList) {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "state_master",
+      filter: {
+        ST: { D$in: GSTCodeList },
+      }
+    };
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+    if (res.data && res.data.length > 0) {
+      this.States = []
+      if (res.data.length > 1)
+        this.GSTType = await this.stateService.getGSTType(res.data[0], res.data[1]);
+      else {
+        this.GSTType = await this.stateService.getGSTType(res.data[0], res.data[0]);
+      }
+    }
+  }
+
+  async GetGSTRate() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "sachsn_master",
+      filter: {
+        TYP: "SAC",
+        SID: 577
+      }
+    };
+    const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req));
+    if (res.data) {
+      this.GSTRate = res.data.GSTRT || 12;
+    }
+  }
+
+  //#endregion 
+
   //#region Payment Modes Changes
   async OnPaymentModeChange(event) {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
@@ -410,8 +404,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
         break;
       case "Cash":
-        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank"
-          && x.name !== 'depositedIntoBank' && x.name !== 'issuedFromBank' && x.name !== 'OnAccount';
+        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank" && x.name !== 'Date';
         break;
       case "RTGS/UTR":
         filterFunction = (x) => x.name !== "CashAccount";
@@ -423,7 +416,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const Accountinglocation = this.storage.branch;
     switch (PaymentMode) {
       case "Cheque":
-        // const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation);
         this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
         const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
         this.filter.Filter(
@@ -433,13 +425,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           "Bank",
           false
         );
-        this.filter.Filter(
-          this.jsonControlPaymentArray,
-          this.PaymentSummaryFilterForm,
-          responseFromAPIBank,
-          "depositedIntoBank",
-          true
-        );
+
         const Bank = this.PaymentSummaryFilterForm.get("Bank");
         Bank.setValidators([
           Validators.required,
@@ -447,20 +433,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         ]);
         Bank.updateValueAndValidity();
 
-        const depositedIntoBank = this.PaymentSummaryFilterForm.get("depositedIntoBank");
-        depositedIntoBank.setValidators([
-          Validators.required,
-          autocompleteObjectValidator(),
-        ]);
-        depositedIntoBank.updateValueAndValidity();
 
         const ChequeOrRefNo = this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
 
-        const issuedFromBank = this.PaymentSummaryFilterForm.get("issuedFromBank");
-        issuedFromBank.setValidators([Validators.required]);
-        issuedFromBank.updateValueAndValidity();
 
         const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount");
         CashAccount.setValue("");
@@ -499,134 +476,44 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         ChequeOrRefNoS.clearValidators();
         ChequeOrRefNoS.updateValueAndValidity();
 
-        const depositedInBank = this.PaymentSummaryFilterForm.get("depositedIntoBank");
-        depositedInBank.setValue("");
-        depositedInBank.clearValidators();
-        depositedInBank.updateValueAndValidity();
-
-        const issuedBank = this.PaymentSummaryFilterForm.get("issuedFromBank");
-        issuedBank.setValue("");
-        issuedBank.clearValidators();
-        issuedBank.updateValueAndValidity();
         break;
       case "RTGS/UTR":
+        this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        const responseFromAPIBankRTGS = await GetBankDetailFromApi(this.masterService, Accountinglocation)
+        this.filter.Filter(
+          this.jsonControlPaymentArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPIBank,
+          "Bank",
+          false
+        );
+
+        const BankRTGS = this.PaymentSummaryFilterForm.get("Bank");
+        BankRTGS.setValidators([
+          Validators.required,
+          autocompleteObjectValidator(),
+        ]);
+        BankRTGS.updateValueAndValidity();
+
+
+        const ChequeOrRefNoRTGS = this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        ChequeOrRefNoRTGS.setValidators([Validators.required]);
+        ChequeOrRefNoRTGS.updateValueAndValidity();
+
+
+        const CashAccountRTGS = this.PaymentSummaryFilterForm.get("CashAccount");
+        CashAccountRTGS.setValue("");
+        CashAccountRTGS.clearValidators();
+        CashAccountRTGS.updateValueAndValidity();
         break;
     }
   }
-  //#endregion
-  //#region to get dropdown's data
-  async getTDSData() {
-    const filter = { locCode: this.storage.getItem(StoreKeys.Branch) }
-    const stateList = await this.objLocationService.locationFromApi(filter);
-    this.billingForm.get("Stateofbooking").setValue(stateList?.[0]?.state);
-    let Accountinglocation = this.billingForm.value.Stateofbooking
-    let responseFromAPITDS = await GetAccountDetailFromApi(this.masterService, "TDS", Accountinglocation)
-    this.filter.Filter(
-      this.jsonControlBillingArray,
-      this.billingForm,
-      responseFromAPITDS,
-      "TDSSection",
-      false
-    );
-    this.SACCodeList = await GetsachsnFromApi(this.masterService)
-    this.filter.Filter(
-      this.jsonControlBillingArray,
-      this.billingForm,
-      this.SACCodeList,
-      "SACCode",
-      false
-    );
-    const stateReqBody = {
-      companyCode: this.storage.companyCode,
-      filter: {},
-      collectionName: "state_master",
-    };
 
-    const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
-    const StateLists = resState?.data
-      .map(x => ({
-        value: x.ST, name: x.STNM
-      }))
-      .filter(x => x != null)
-      .sort((a, b) => a.name.localeCompare(b.name));
 
-    this.filter.Filter(
-      this.jsonControlBillingArray,
-      this.billingForm,
-      StateLists,
-      "StateofSupply",
-      false
-    );
-  }
-  //#endregion
-  //#region to set bank name
-  setBankName() {
-    const bnknm = this.PaymentSummaryFilterForm.value.Bank;
-    bnknm ? this.PaymentSummaryFilterForm.controls['depositedIntoBank'].setValue(bnknm) : '';
-  }
-  //#endregion
-  //#region to calculate TDS related amount
-  TDSSectionFieldChanged(event) {
-    // Get the value of TDSSection from the form
-    const TDSFormValue = this.billingForm.value.TDSSection;
 
-    // Get the TDS rate from the TDSSection value
-    const TDSRate = TDSFormValue?.rHUF || 0;
-
-    // Set the TDS rate in the form
-    this.billingForm.get("TDSRate").setValue(TDSRate);
-
-    // Get the total amount count from TotalAmountList or default to 0 if undefined
-    const totalAmountCount = parseFloat(this.TotalAmountList[0]?.count) || 0;
-
-    // Calculate TDS amount based on the TDS rate and total amount
-    const TDSAmount = totalAmountCount * TDSRate / 100;
-
-    // Calculate the remaining amount after deducting TDS
-    const totalTDSamt = totalAmountCount - TDSAmount;
-
-    // Set the TDS amount in the form
-    this.billingForm.get("TDSAmount").setValue(TDSAmount);
-
-    // Get the GSTAmount from the form or default to 0 if undefined
-    const totalGSTamt = this.billingForm.value.GSTAmount || 0;
-
-    // Calculate the DeliveryMRNetAmount by adding TDS and GST amounts
-    const deliveryMramt = parseFloat(totalTDSamt + totalGSTamt).toFixed(2);
-
-    // Set the DeliveryMRNetAmount in the form
-    this.billingForm.get("DeliveryMRNetAmount").setValue(deliveryMramt);
-
-  }
-  //#endregion
-  //#region to calculate GST related amount
-  SACCodeFieldChanged() {
-    // Get the selected SAC code from the form
-    const selectedSACCode = this.billingForm.value.SACCode?.name;
-
-    // Find the corresponding SAC code object from SACCodeList
-    const selectedSACCodeObject = this.SACCodeList.find(x => x.name === selectedSACCode);
-
-    // Set GSTRate in the form
-    this.billingForm.get("GSTRate").setValue(selectedSACCodeObject?.GSTRT || 0);
-
-    // Get the total amount count from TotalAmountList or default to 0 if undefined
-    const totalAmountCount = parseFloat(this.TotalAmountList[0]?.count) || 0;
-
-    // Calculate and set GSTAmount in the form
-    const GSTAmount = totalAmountCount * (selectedSACCodeObject?.GSTRT || 0) / 100;
-    //const totalGSTamt = totalAmountCount + GSTAmount;
-
-    // Set GSTAmount in the form
-    this.billingForm.get("GSTAmount").setValue(GSTAmount);
-
-    // Enable GSTCharged based on the presence of GSTRate
-    this.billingForm.get("GSTCharged").setValue(!!this.billingForm.value.GSTRate);
-  }
-  //#endregion
-  //#region to save data to collection delivery_mr_header and delivery_mr_details
   async GenerateMR(VoucherNo) {
-    if (this.tableData.length === 0 || !this.billingForm.valid) {
+    const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
+    if (DocketNo || !this.SummaryForm.valid) {
       Swal.fire({
         text: 'Please fill the required details above',
         icon: "warning",
@@ -639,7 +526,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         try {
           const headerRequest = {
             cID: this.storage.companyCode,
-            gCNNO: this.tableData.map(item => item.consignmentNoteNumber),
+            gCNNO: DocketNo,
             dLVRT: this.headerDetails.Deliveredto,
             cNTCTNO: this.headerDetails.ContactNumber,
             rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
@@ -652,47 +539,45 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
             dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
             dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
-            bILNGPRT: this.billingForm.value.BillingParty,
-            bKNGST: this.billingForm.value.Stateofbooking,
-            sPLYSTNM: this.billingForm.value.StateofSupply.name,
-            sPLYSTCD: this.billingForm.value.StateofSupply.value,
-            sACCDNM: this.billingForm.value.SACCode.name,
-            sACCd: this.billingForm.value.SACCode.value,
-            gSTRT: this.billingForm.value.GSTRate,
-            gSTAMT: parseFloat(this.billingForm.value.GSTAmount.toFixed(2)) || 0,
-            tDSSCTCD: this.billingForm.value.TDSSection.value,
-            tDSSCTNM: this.billingForm.value.TDSSection.name,
-            tDSRT: this.billingForm.value.TDSRate,
-            tDSAmt: parseFloat(this.billingForm.value.TDSAmount).toFixed(2) || 0,
-            gSTCHRGD: this.billingForm.value.GSTCharged,
-            dLVRMRAMT: this.billingForm.value.DeliveryMRNetAmount,
-            cLLCTAMT: this.billingForm.value.CollectionAmount,
-            rNDOFF: this.billingForm.value.roundOffAmt || 0,
-            pRTLYCLCTD: this.billingForm.value.PartiallyCollected,
-            pRTLYRMGAMT: (this.billingForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
+            bILNGPRT: this.SummaryForm.value.BillingParty,
+            bKNGST: this.SummaryForm.value.Stateofbooking,
+            sPLYSTNM: this.SummaryForm.value.StateofSupply.name,
+            sPLYSTCD: this.SummaryForm.value.StateofSupply.value,
+            sACCDNM: this.SummaryForm.value.SACCode.name,
+            sACCd: this.SummaryForm.value.SACCode.value,
+            gSTRT: this.SummaryForm.value.GSTRate,
+            gSTAMT: parseFloat(this.SummaryForm.value.GSTAmount.toFixed(2)) || 0,
+            tDSSCTCD: this.SummaryForm.value.TDSSection.value,
+            tDSSCTNM: this.SummaryForm.value.TDSSection.name,
+            tDSRT: this.SummaryForm.value.TDSRate,
+            tDSAmt: parseFloat(this.SummaryForm.value.TDSAmount).toFixed(2) || 0,
+            gSTCHRGD: this.SummaryForm.value.GSTCharged,
+            dLVRMRAMT: this.SummaryForm.value.DeliveryMRNetAmount,
+            cLLCTAMT: this.SummaryForm.value.CollectionAmount,
+            rNDOFF: this.SummaryForm.value.roundOffAmt || 0,
+            pRTLYCLCTD: this.SummaryForm.value.PartiallyCollected,
+            pRTLYRMGAMT: (this.SummaryForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
             vNO: VoucherNo,
             lOC: this.storage.branch,
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName
           }
-          const detailRequests = this.tableData.map(element => {
-            return {
-              cID: this.storage.companyCode,
-              gCNNO: element.consignmentNoteNumber,
-              cHG: element.otherCharge,
-              pYBASIS: element.payBasis,
-              sUBTTL: parseFloat(element.subTotal),
-              nWSUBTTL: parseFloat(element.newSubTotal),
-              rTDFRNC: parseFloat(element.rateDifference),
-              vNO: VoucherNo,
-              lOC: this.storage.branch,
-              tOTL: parseFloat(element.totalAmount),
-              eNTDT: new Date(),
-              eNTLOC: this.storage.branch,
-              eNTBY: this.storage.userName
-            }
-          });
+          const detailRequests = {
+            cID: this.storage.companyCode,
+            gCNNO: this.DocketDetails.dKTNO,
+            cHG: this.DocketDetails.cHG,
+            // pYBASIS: element.payBasis,
+            // sUBTTL: parseFloat(element.subTotal),
+            // nWSUBTTL: parseFloat(element.newSubTotal),
+            // rTDFRNC: parseFloat(element.rateDifference),
+            // vNO: VoucherNo,
+            // lOC: this.storage.branch,
+            // tOTL: parseFloat(element.totalAmount),
+            eNTDT: new Date(),
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName
+          }
 
           let data = {
             chargeDetails: detailRequests,
@@ -743,66 +628,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
 
   }
-  //#endregion
-  //#region to roundoff delivery Amount
-  applyRoundOffIfChecked() {
-    const isChecked = this.billingForm.value.RoundOff;
-    const deliveryMRNetAmountControl = this.billingForm.get("DeliveryMRNetAmount");
-    let value = deliveryMRNetAmountControl.value;
 
-    if (isChecked) {
-      // Round off the value to the nearest integer
-      const roundedValue = value ? Math.round(value) : 0;
 
-      // Calculate the decimal part
-      const decimalPart = (value - roundedValue).toFixed(2);
-      //console.log(decimalPart);
-
-      // Set the rounded value back to the form control
-      deliveryMRNetAmountControl.setValue(roundedValue);
-      this.billingForm.get("roundOffAmt").setValue(decimalPart);
-    } else {
-      // No rounding required, set the original value
-      deliveryMRNetAmountControl.setValue(value);
-    }
-  }
-  //#endregion
-  //#region to set Partially Collected checkbox value
-  setPartiallyCollected() {
-    debugger
-    // Reset values
-    this.billingForm.get("PartiallyCollectedAmt").setValue(0);
-    this.billingForm.get("PartiallyCollected").setValue(false);
-
-    // Get values from the form
-    const collectedAMT = parseFloat(this.billingForm.value.CollectionAmount) || 0;
-    const mrNetAMT = parseFloat(this.billingForm.value.DeliveryMRNetAmount) || 0;
-
-    // Check conditions
-    if (collectedAMT < mrNetAMT) {
-      const PartiallyCollectedAmt = mrNetAMT - collectedAMT;
-
-      // Set values and log
-      this.billingForm.get("PartiallyCollected").setValue(true);
-      this.billingForm.get("PartiallyCollectedAmt").setValue(PartiallyCollectedAmt);
-      //console.log("Partially Collected Amount:", PartiallyCollectedAmt);
-    } else if ((collectedAMT > mrNetAMT)) {
-
-      Swal.fire({
-        icon: "info",
-        title: `Delivery MR Net Amount should be less than CollectionAmount`,
-        showConfirmButton: true,
-      });
-      this.billingForm.controls.CollectionAmount.reset();
-      // No partial collection
-      this.billingForm.get("PartiallyCollected").setValue(false);
-      return;
-    }
-    else if ((collectedAMT == mrNetAMT)) {
-      this.billingForm.get("PartiallyCollected").setValue(false);
-    }
-
-  }
   //#endregion
   GenerateVoucher() {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
@@ -838,15 +665,15 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherDataRequestModel.preperedFor = "Customer"
         this.VoucherDataRequestModel.partyCode = this.filteredDocket[0]?.bPARTY;
         this.VoucherDataRequestModel.partyName = this.filteredDocket[0]?.bPARTYNM;
-        this.VoucherDataRequestModel.partyState = this.billingForm.value.StateofSupply.name
+        this.VoucherDataRequestModel.partyState = this.SummaryForm.value.StateofSupply.name
         this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
         this.VoucherDataRequestModel.panNo = ""
 
-        this.VoucherDataRequestModel.tdsSectionCode = this.billingForm.value.SACCode.value;
-        this.VoucherDataRequestModel.tdsSectionName = this.billingForm.value.SACCode.name;
-        this.VoucherDataRequestModel.tdsRate = this.billingForm.value.TDSRate;
-        this.VoucherDataRequestModel.tdsAmount = this.billingForm.value.TDSAmount;
+        this.VoucherDataRequestModel.tdsSectionCode = this.SummaryForm.value.SACCode.value;
+        this.VoucherDataRequestModel.tdsSectionName = this.SummaryForm.value.SACCode.name;
+        this.VoucherDataRequestModel.tdsRate = this.SummaryForm.value.TDSRate;
+        this.VoucherDataRequestModel.tdsAmount = this.SummaryForm.value.TDSAmount;
         this.VoucherDataRequestModel.tdsAtlineitem = false;
         this.VoucherDataRequestModel.tcsSectionCode = undefined
         this.VoucherDataRequestModel.tcsSectionName = undefined
@@ -857,11 +684,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.VoucherDataRequestModel.SGST = 0;
         this.VoucherDataRequestModel.CGST = 0;
         this.VoucherDataRequestModel.UGST = 0;
-        this.VoucherDataRequestModel.GSTTotal = this.billingForm.value.GSTAmount;
+        this.VoucherDataRequestModel.GSTTotal = this.SummaryForm.value.GSTAmount;
 
-        this.VoucherDataRequestModel.GrossAmount = this.billingForm.value.DeliveryMRNetAmount || 0;
-        this.VoucherDataRequestModel.netPayable = this.billingForm.value.CollectionAmount || 0;
-        this.VoucherDataRequestModel.roundOff = this.billingForm.value.roundOffAmt || 0;
+        this.VoucherDataRequestModel.GrossAmount = this.SummaryForm.value.DeliveryMRNetAmount || 0;
+        this.VoucherDataRequestModel.netPayable = this.SummaryForm.value.CollectionAmount || 0;
+        this.VoucherDataRequestModel.roundOff = this.SummaryForm.value.roundOffAmt || 0;
         this.VoucherDataRequestModel.voucherCanceled = false;
 
         this.VoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
@@ -885,7 +712,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transDate: Date(),
                 finYear: financialYear,
-                branch: this.tableData[0].OthersData?.cLOC || this.storage.branch,
+                branch: this.storage.branch,
                 transCode: VoucherInstanceType.BalancePayment,
                 transType:
                   VoucherInstanceType[VoucherInstanceType.BalancePayment],
@@ -894,8 +721,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                 docType: "Voucher",
                 partyType: "Vendor",
                 docNo: this.docketNo,
-                partyCode: "" + this.tableData[0].OthersData?.vND?.cD || "",
-                partyName: this.tableData[0].OthersData?.vND?.nM || "",
+                partyCode: "" + this.DocketDetails.cSGE?.cD || "",
+                partyName: this.DocketDetails.cSGE?.nM || "",
                 entryBy: this.storage.userName,
                 entryDate: Date(),
                 debit: voucherlineItems
@@ -957,8 +784,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   isSubmitDisabled(): boolean {
     return (
       !this.PaymentSummaryFilterForm.valid ||
-      !this.billingForm.valid ||
-      this.TotalAmountList[0].count === '0.00'
+      !this.SummaryForm.valid
     );
   }
   //#endregion
@@ -1011,9 +837,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const Result = [];
 
     Result.push(createVoucher(ledgerInfo["INC001006"].LeadgerCode, ledgerInfo["INC001006"].LeadgerName, ledgerInfo["INC001006"].LeadgerCategory,
-      0, parseFloat(this.billingForm.value.CollectionAmount) || 0, this.docketNo));
+      0, parseFloat(this.SummaryForm.value.CollectionAmount) || 0, this.docketNo));
     Result.push(createVoucher(ledgerInfo["AST001002"].LeadgerCode, ledgerInfo["AST001002"].LeadgerName, ledgerInfo["AST001002"].LeadgerCategory,
-      parseFloat(this.billingForm.value.CollectionAmount) || 0, 0, this.docketNo));
+      parseFloat(this.SummaryForm.value.CollectionAmount) || 0, 0, this.docketNo));
 
     return Result;
   }

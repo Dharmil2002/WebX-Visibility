@@ -76,8 +76,8 @@ export class GenericViewPrintComponent implements OnInit {
                 const innerFields = this.FieldMapping.filter((f) => f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`));
                 for (const f of innerFields) {
                   const val = f.Value.replace(".[#].", `.${i}.`);
-                  if (val == "{index}") {
-                    row = row.replace(f.Key, `${i}`);
+                  if (val.endsWith("{index}")) {
+                    row = row.replace(f.Key, `${i+1}`);
                   } else {
                     row = row.replace(f.Key, await this.getValueByFieldName(this.JsonData, val, f.type || ""));
                   }

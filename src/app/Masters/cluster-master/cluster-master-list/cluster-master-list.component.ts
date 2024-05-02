@@ -47,10 +47,11 @@ export class ClusterMasterListComponent implements OnInit {
         Style: "min-width:80px; max-width:80px",
         functionName: "IsActiveFuntion",
       },
-      "eNTDT": {
+      eNTDT: {
         Title: "Created Date",
         class: "matcolumncenter",
         Style: "min-width:150px; max-width:150px",
+        datatype: "datetime",
       },
       EditAction: {
         type: "iconClick",
@@ -118,7 +119,7 @@ export class ClusterMasterListComponent implements OnInit {
 
         return {
           ...obj,
-          eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : '',
+          eNTDT: obj.eNTDT,
           pincodeDisplay: formattedPincode
         }
       })

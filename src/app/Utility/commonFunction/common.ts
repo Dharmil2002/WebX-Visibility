@@ -10,14 +10,19 @@ export function isValidNumber(value: any): boolean {
 }  
 
 export function isValidDate(value: any): boolean {
+  if (value instanceof Date) { 
+    return true;
+  } else {
     const date = new Date(value);
     const tm = date.getTime();
-    if (isNaN(tm) || tm <= 0) {
-      return false; // Not a date
-  }
+    return !isNaN(tm) && tm > 0;
+    // if (isNaN(tm) || tm <= 0) {
+    //     return false; // Not a date
+    // }
 
-  const dt = parseISO(value);
-  return isValid(dt);
+    // const dt = parseISO(value);
+    // return isValid(dt);
+  }
 }
 
 export function ConvertToDate(value: any): Date {

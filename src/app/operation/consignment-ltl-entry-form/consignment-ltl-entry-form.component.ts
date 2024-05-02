@@ -30,15 +30,11 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
-import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
-import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
-import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
-import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -169,7 +165,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private locationService: LocationService,
     private customerService: CustomerService,
     private addressService: AddressService,
-    private vehicleStatusService: VehicleStatusService,
     private docketService: DocketService,
     public dialog: MatDialog,
     private dcrService: DCRService,

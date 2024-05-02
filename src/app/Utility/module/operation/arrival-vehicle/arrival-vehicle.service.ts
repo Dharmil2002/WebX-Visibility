@@ -3,12 +3,13 @@ import { get } from "lodash";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { DocketEvents, DocketStatus, ThcStatus, getEnumName } from "src/app/Models/docStatus";
-import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { chunkArray, getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { ConvertToDate, ConvertToNumber, sumProperty } from "src/app/Utility/commonFunction/common";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 import convert from 'convert-units';
+import { GenericActions } from "src/app/config/myconstants";
 @Injectable({
     providedIn: "root",
 })
@@ -71,15 +72,15 @@ export class ArrivalVehicleService {
                         "mFNO": "$mfHeader.docNo",
                         "dKTNO": "$md.dKTNO",
                         "tHCNO": "$mfHeader.tHC",
-                        "pKGS": "$md.pKGS",
+                        "pKGS": "$md.lDPKG",
                         "sFX": "$md.sFX",
                         "dkt": "$mfHeader.dKTS",
                         "lEG": "$mfHeader.leg",
                         "oRG": "$md.oRGN",
                         "dEST": "$md.dEST",
-                        "wT": "$md.wT",
-                        "cWT": "$md.cWT",
-                        "vOL": "$md.vOL",
+                        "wT": "$md.lDWT",
+                        "cWT": "$md.lDCWT",
+                        "vOL": "$md.lDVOL",
                         "iSARR": "$mfHeader.iSARR",
                         "rUTCD": "$mfHeader.rUTCD",
                         "rUTNM": "$mfHeader.rUTNM",
@@ -485,7 +486,6 @@ export class ArrivalVehicleService {
     /*End*/
     /*below code is for the withoutScan*/
     async fieldMappingWithoutScanArrival(data, dktList, notSelectedData, scanDkt, isScan) {
-        
         let legID = `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
         let lagData = await this.getCheckOnce({
             "_id": legID,
@@ -537,53 +537,10 @@ export class ArrivalVehicleService {
             const transDocket = dktList.filter((x) => x.Destination != this.storage.branch);
             /*below code execute for the update In delivery stock Update*/
             if (destDocket.length > 0) {
-                let dktLd = 0
                 let eventJson = [];
-                destDocket.forEach(async element => {
-                    /*below getInvoice varible is used for
-                     the getting height weight vol for the calucation of  CFT*/
-                     if (getInvoice && getInvoice.length > 0) {
-                         try {
-                             let h = getInvoice.find((x) => x.dKTNO == element.Shipment).vOL.h || 0;
-                             let l = getInvoice.find((x) => x.dKTNO == element.Shipment).vOL.l || 0;
-                             let b = getInvoice.find((x) => x.dKTNO == element.Shipment).vOL.b || 0;
-                             let pkgs = element?.unloadedPkg || 0;
-                             dktLd = convert(h).from('cm').to('ft') *
-                                 convert(l).from('cm').to('ft') *
-                                 convert(b).from('cm').to('ft') * parseInt(pkgs);
-                         }
-                         catch (err) {
-                             console.log(err);
-                         }
-                    }
-                    const dockets = [`${element.Shipment}-${element.Suffix}`]
-                    const dktOps = {
-                        "tOTCWT": element?.unloadctWeight || 0,
-                        "tOTWT": element?.unloadedWT || 0,
-                        "tOTPKG": element?.unloadedPkg || 0,
-                        "cFTTOT":parseFloat(dktLd.toFixed(2)),
-                        "cLOC": this.storage.branch,
-                        "tHC": "",
-                        "lSNO": "",
-                        "mFNO": "",
-                        "sTS": DocketStatus.In_Delivery_Stock,
-                        "sTSNM": DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
-                        "sTSTM": new Date(),
-                        "oPSSTS": `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
-                        "mODDT": new Date(),
-                        "mODLOC": this.storage.branch,
-                        "mODBY": this.storage.userName
-                    }
-
-                    const reqOps = {
-                        companyCode: this.storage.companyCode,
-                        collectionName: "docket_ops_det_ltl",
-                        filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
-                        update: dktOps
-                    }
-                    await firstValueFrom(this.operation.operationMongoPut("generic/update", reqOps));
-                   
-                });
+                const batchOperations =   this.processDockets(destDocket,getInvoice,{code:DocketStatus.In_Transhipment_Stock,name:DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " ")});
+                // Bulk update database with the new costs
+                 await this.updateBulk(batchOperations);
 
                 eventJson = destDocket.map(dkt => {
                     const evn = {
@@ -617,52 +574,11 @@ export class ArrivalVehicleService {
             /* End */
             /* below code is for the transhiment stock */
               let eventJson=[];
-              let dktLd = 0
             if (transDocket.length > 0) {
-                transDocket.forEach(async element => {
-                      /*below getInvoice varible is used for
-                     the getting height weight vol for the calucation of  CFT*/
-                     if (getInvoice && getInvoice.length > 0) {
-                         try {
-                             let h = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.h || 0;
-                             let l = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.l || 0;
-                             let b = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.b || 0;
-                             let pkgs = element?.unloadedPkg || 0;
-                             dktLd = convert(h).from('cm').to('ft') *
-                                 convert(l).from('cm').to('ft') *
-                                 convert(b).from('cm').to('ft') * parseInt(pkgs);
-                         }
-                         catch (err) {
-                             console.log(err);
-                         }
-                    }
-                    const dockets = [`${element.Shipment}-${element.Suffix}`];
-                    const dktOps = {
-                        "tOTCWT": element?.unloadctWeight || 0,
-                        "tOTWT": element?.unloadedWT || 0,
-                        "tOTPKG": element?.unloadedPkg || 0,
-                        "cFTTOT":parseFloat(dktLd.toFixed(2)),
-                        "cLOC": this.storage.branch,
-                        "tHC": "",
-                        "lSNO": "",
-                        "mFNO": "",
-                        "sTS": DocketStatus.In_Transhipment_Stock,
-                        "sTSNM": DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " "),
-                        "sTSTM": new Date(),
-                        "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
-                        "mODDT": new Date(),
-                        "mODLOC": this.storage.branch,
-                        "mODBY": this.storage.userName
-                    }
-
-                    const reqOps = {
-                        companyCode: this.storage.companyCode,
-                        collectionName: "docket_ops_det_ltl",
-                        filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
-                        update: dktOps
-                    }
-                    await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqOps));
-                    eventJson = dktList.map(dkt => {
+                const batchOperations =   this.processDockets(transDocket,getInvoice,{code:DocketStatus.In_Transhipment_Stock,name:DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " ")});
+                // Bulk update database with the new costs
+                    await this.updateBulk(batchOperations);
+                    eventJson = transDocket.map(dkt => {
                         const evn = {
                             "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                             "cID": this.storage.companyCode,
@@ -684,7 +600,6 @@ export class ArrivalVehicleService {
                         };
                         return evn
                     });
-                });
 
                 const reqEvent = {
                     companyCode: this.storage.companyCode,
@@ -1104,4 +1019,72 @@ export class ArrivalVehicleService {
         return res.data;
     }
     /*End*/
+    /*procces Dockets for the destionation and instorck status update*/
+    processDockets(shipments,getInvoice,status) {
+        let batchOperations = [];
+              /*below getInvoice varible is used for
+                     the getting height weight vol for the calucation of  CFT*/
+                     shipments.forEach(async element => {
+                     let dktLd = 0
+                     if (getInvoice && getInvoice.length > 0) {
+                         try {
+                             let h = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.h || 0;
+                             let l = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.l || 0;
+                             let b = getInvoice.find((x) => x.dKTNO == element.shipment).vOL.b || 0;
+                             let pkgs = element?.unloadedPkg || 0;
+                             dktLd = convert(h).from('cm').to('ft') *
+                                 convert(l).from('cm').to('ft') *
+                                 convert(b).from('cm').to('ft') * parseInt(pkgs);
+                         }
+                         catch (err) {
+                             console.log(err);
+                         }
+                    }
+                    const dockets = [`${element.Shipment}-${element.Suffix}`];
+                    const dktOps = {
+                        "tOTCWT": element?.unloadctWeight || 0,
+                        "tOTWT": element?.unloadedWT || 0,
+                        "tOTPKG": element?.unloadedPkg || 0,
+                        "cHRWT": element?.unloadctWeight || 0,
+                        "aCTWT": element?.unloadedWT || 0,
+                        "pKGS": element?.unloadedPkg || 0,
+                        "cFTTOT":parseFloat(dktLd.toFixed(2)),
+                        "cLOC": this.storage.branch,
+                        "tHC": "",
+                        "lSNO": "",
+                        "mFNO": "",
+                        "sTS":status?.code,
+                        "sTSNM":status?.name,
+                        "sTSTM": new Date(),
+                        "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                        "mODDT": new Date(),
+                        "mODLOC": this.storage.branch,
+                        "mODBY": this.storage.userName
+                    }
+                batchOperations.push({
+                    filter: {"D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
+                    update: dktOps
+                });
+            });
+        // Compensate for any rounding differences in the first docket
+        //this.compensateRounding(thc, batchOperations[0]);
+    
+        return batchOperations;
+    }
+    /**/
+    /*process Dockets */
+    async updateBulk(operations) {
+        let chunks = chunkArray(operations, 100);
+        await Promise.all(
+            chunks.map(async (chunk) => {
+                const updateRequest = {
+                    companyCode: this.storage.companyCode,
+                    collectionName: "docket_ops_det_ltl",
+                    data: chunk
+                };
+                return firstValueFrom(this.operation.operationMongoPut(GenericActions.UpdateBulk, updateRequest));
+            })
+        );
+    }
+	 
 }

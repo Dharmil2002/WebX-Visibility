@@ -42,7 +42,7 @@ export class ConsignmentChargesComponent implements OnInit {
     async getCharges() {
       if(!this.isEdit){
 
-      const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": this.chargeData.transModeName},);
+      const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": this.chargeData.transModeName,isActive:true});
       if (result && result.length > 0) {
         const invoiceList = [];
         result.forEach((element, index) => {

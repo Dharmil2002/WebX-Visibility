@@ -120,27 +120,41 @@ export class salesRegisterControl {
                     },
                },
                {
-                    name: 'cnote',
-                    label: 'CNote Number',
-                    placeholder: '',
-                    type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         isIndeterminate: false,
-                         isChecked: false,
-                         support: "cnoteHandler",
-                         showNameAndValue: false,
-                         Validations: [{
-                              name: "",
-                              message: ""
-                         }]
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
+                    name: "cnote",
+                    label: "CNote Number",
+                    placeholder: "",
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [],
+                    additionalData: {},
                },
+               // {
+               //      name: 'cnote',
+               //      label: 'CNote Number',
+               //      placeholder: '',
+               //      type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           isIndeterminate: false,
+               //           isChecked: false,
+               //           support: "cnoteHandler",
+               //           showNameAndValue: false,
+               //           Validations: [{
+               //                name: "",
+               //                message: ""
+               //           }]
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: 'busType',
                     label: 'Business Type',

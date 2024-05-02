@@ -59,7 +59,6 @@ export class PrqRegisterReportComponent implements OnInit {
   }
 
   CSVHeader = {
-    "srno": "Sl No",
     "prqNo": "PRQ Number",
     "prqDt": "PRQ Date",
     "PickDtTime": "Pick Up Date & Time",

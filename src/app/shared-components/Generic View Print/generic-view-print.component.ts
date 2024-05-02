@@ -1,3 +1,4 @@
+import moment from "moment";
 import {
   Component,
   EventEmitter,
@@ -7,6 +8,10 @@ import {
   Output,
   Renderer2,
 } from "@angular/core";
+import { ConvertToNumber, generateQR, isValidDate } from "src/app/Utility/commonFunction/common";
+import { ToWords } from 'to-words';
+import { isValid } from "date-fns";
+
 //import { FieldMapping, HtmlTemplate, JsonData } from "./InvoiceTemplate";
 
 @Component({
@@ -49,12 +54,12 @@ export class GenericViewPrintComponent implements OnInit {
   private updateTableHtml(): void {
     const template = this.HtmlTemplate;
     const doc = this.parseHTML(template);
- 
+
     const elementsWithDataRow = Array.from(doc.querySelectorAll("[data-row]"));
- 
+
     const processedRowKeys: string[] = [];
     const rows: { Key: string; Value: string }[] = [];
- 
+
     this.FieldMapping.filter((f) => f.Value.includes(".[#].")).forEach((f) => {
       const key = f.Value.slice(0, f.Value.indexOf(".[#]."));
       elementsWithDataRow.forEach((ele) => {
@@ -70,10 +75,14 @@ export class GenericViewPrintComponent implements OnInit {
                 this.FieldMapping.filter((f) => f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`)
                 ).forEach((f) => {
                   const val = f.Value.replace(".[#].", `.${i}.`);
-                  row = row.replace(
-                    f.Key,
-                    this.getValueByFieldName(this.JsonData, val)
-                  );
+                  if (val == "{index}") {
+                    row = row.replace(f.Key, `${i}`);
+                  } else {
+                    row = row.replace(
+                      f.Key,
+                      this.getValueByFieldName(this.JsonData, val, f.type || "")
+                    );
+                  }
                 });
                 const tr = this.createElementFromHTML(row);
                 parent.appendChild(tr);
@@ -94,13 +103,13 @@ export class GenericViewPrintComponent implements OnInit {
         }
       });
     });
- 
+
     const elementsWithDatacolumn = Array.from(
       doc.querySelectorAll("[data-column]")
     );
     elementsWithDatacolumn.forEach((coll) => {
       const AttributeVelue = coll.getAttribute("data-column");
-      console.log("tagName",coll.tagName.toLowerCase())
+      console.log("tagName", coll.tagName.toLowerCase())
       const keyindex = AttributeVelue.split(".")[1] || 0;
       const parent = coll.parentNode as HTMLElement;
       this.FieldMapping.filter((f) => f.Value.includes(`.[##].`)).forEach(
@@ -121,7 +130,8 @@ export class GenericViewPrintComponent implements OnInit {
               const element = document.createElement(coll.tagName.toLowerCase());
               element.textContent = this.getValueByFieldName(
                 this.JsonData,
-                nestedval
+                nestedval,
+                f.type || ""
               );
               element.style.textAlign = "center";
               element.className = coll.className
@@ -143,7 +153,7 @@ export class GenericViewPrintComponent implements OnInit {
     this.FieldMapping.filter((f) => !f.Value.includes(".[#].")).forEach((f) => {
       updatedTemplate = updatedTemplate.replace(
         f.Key,
-        this.getValueByFieldName(this.JsonData, f.Value)
+        this.getValueByFieldName(this.JsonData, f.Value, f.type || "")
       );
     });
 
@@ -161,20 +171,63 @@ export class GenericViewPrintComponent implements OnInit {
     return template.content.firstChild as HTMLElement;
   }
 
-  private getValueByFieldName(obj: any, fieldName: string): any {
+  private getValueByFieldName(obj: any, fieldName: string, type: string = "", decimalPlaces: number = 0): any {
     const fieldNames = fieldName.split(".");
     let value = obj;
 
     for (const field of fieldNames) {
-      if (value && typeof value === "object" && field in value) {
-        value = value[field];
-      } else {
-        return "";
+      const toWords = new ToWords();
+      //console.log(`${fieldName} -> ${field}`, value[field]);
+      if (value && typeof value === "object" && field in value) {        
+        if (type) {
+          switch (type) {
+            case 'date':
+              value = isValidDate(value[field]) ? moment(new Date(value[field])).format("DD MMM YY") : value[field];
+              break;
+            case 'time':
+              value = isValidDate(value[field]) ? moment(new Date(value[field])).format("HH:mm") : value[field];
+              break;
+            case 'datetime':
+              value = isValidDate(value[field]) ? moment(new Date(value[field])).format("DD MMM YY HH:mm") : value[field];
+              break;
+            case "currency":
+              value = ConvertToNumber(value[field] || 0, decimalPlaces || 0).toFixed(2);
+            case "currencyToWords":
+              value = toWords.convert(ConvertToNumber(value[field] || 0, decimalPlaces || 0), { currency: true, ignoreZeroCurrency: true });
+            case "number":
+              value = ConvertToNumber(value[field] || 0, decimalPlaces || 0).toFixed(decimalPlaces || 0);
+            case "numberToWords":
+              value = toWords.convert(ConvertToNumber(value[field] || 0, decimalPlaces || 0));
+            case "boolean":
+              value = value[field] ? "Yes" : "No";
+            case "qrCode":
+              debugger;
+              value =  typeof value[field] == 'string' ? generateQR(value[field]) : "";
+            default:
+              value = value[field];
+          }
+        } else {
+          value = value[field];
+        }
       }
+      else 
+      {
+        value = "";
+      } 
     }
 
     return value;
   }
+
+  qrGeneration(text: string) {
+
+    generateQR(text).then((res) => {
+      return res;
+    }).catch((err) => {
+      return null;
+    });
+  }
+
   functionHandle(name, element) {
     this.functionCallEmitter.emit({ functionName: name, data: element });
   }

@@ -1,4 +1,5 @@
 import { parseISO, isValid } from 'date-fns';
+import QRCode from 'qrcode';
 
 export function roundToNumber(number: number, decimalPlaces: number = 0): number {
     return Number(number.toFixed(decimalPlaces));
@@ -49,3 +50,13 @@ export function  generateCombinations(terms) {
     }
     return combinations;
   }
+
+export async function generateQR(content: string): Promise<any>{
+  try {    
+    const qr = await QRCode.toDataURL(content);
+    return qr;
+  } catch (err) {
+    console.error(err);
+    return '';
+  }
+}

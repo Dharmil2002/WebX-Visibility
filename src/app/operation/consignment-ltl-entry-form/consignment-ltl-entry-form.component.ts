@@ -1166,10 +1166,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     switch (payTypeNm) {
       case "TBB":
         this.consignmentForm.get('billingParty').setValidators([Validators.required]);
+        this.consignmentForm.get('billingParty').enable();
         break;
       case "PAID":
+        this.consignmentForm.get('billingParty').disable();
       case "TO PAY":
+        this.consignmentForm.get('billingParty').disable();
       case "FOC":
+        this.consignmentForm.get('billingParty').disable();
         this.consignmentForm.get('billingParty').clearValidators();
         break;
     }
@@ -1334,6 +1338,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
+    const payType = this.consignmentForm.get('payType').value;
+    const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
       this.consignmentForm.markAllAsTouched();
       this.freightForm.markAllAsTouched();
@@ -1350,7 +1356,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       });
       return false;
     }
-    if (this.tableData.length == 0) {
+    if (this.tableData.length == 0 && payTypeNm!="FOC") {
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -1625,8 +1631,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   InvockedContract() {
     const paymentBasesName = this.paymentType.find(x => x.value == this.consignmentForm.value.payType).name;
     const TransMode = this.tranType.find(x => x.value == this.consignmentForm.value.transMode).name;
-    const party = this.docketService.paymentBaseContract[paymentBasesName]
-    const partyDt = this.consignmentForm.controls[party].value.value
+   // const party = this.docketService.paymentBaseContract[paymentBasesName]
+    const partyDt = this.consignmentForm.controls['billingParty'].value.value
     const capacity = this.tableData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
 
     const terms = ["Area", "Pincode", "City", "State"];
@@ -1656,7 +1662,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "basis": paymentBasesName,
       "from": this.consignmentForm.value.fromCity.value,
       "to": this.consignmentForm.value.toCity.value,
-      "capacity": capacity,
+      "capacity":0,
       "matches": matches
     }
 

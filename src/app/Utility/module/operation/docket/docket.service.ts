@@ -1158,7 +1158,7 @@ export class DocketService {
             "docNo": data?.docketNumber || "",
             "dKTNO": data?.docketNumber || "",
             "pRQNO": data?.prqNo?.value || "",
-            "dKTDT": ConvertToDate(data?.docketDate),
+            "dKTDT": data?.docketDate,
             "pAYTYP": data?.payType || "",
             "pAYTYPNM": data?.payTypeName || "",
             "bPARTY": data?.billingParty.value || "",

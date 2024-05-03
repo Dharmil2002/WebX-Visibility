@@ -42,7 +42,7 @@ export class ConsignmentChargesComponent implements OnInit {
     async getCharges() {
       if(!this.isEdit){
       const filter = { "pRNm": this.chargeData.transModeName, aCTV: true, cHBTY: "Booking" }
-      const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM":this.chargeData.transModeName,"cHAPP":{D$in:["GCN"]} }
+      const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM":this.chargeData.transModeName,"cHAPP":{D$in:["GCN"]},isActive:true}
       const result = await this.thcService.getChargesV2(filter, productFilter);
       if (result && result.length > 0) {
         const invoiceList = [];

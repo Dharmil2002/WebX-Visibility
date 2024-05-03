@@ -1617,7 +1617,7 @@ async  generateArray(data, pkg) {
           const bcSerialNo = `${data.dKTNO}-${serialNo}`;
           const bcDockSf=0;
           return {
-            _id: `${this.storage.companyCode}-${serialNo}-${data?.sFX}`,
+            _id: `${this.storage.companyCode}-${bcSerialNo}-${data?.sFX}`,
             cID:this.storage.companyCode,
             dKTNO:data?.dKTNO,
             pKGSNO: bcSerialNo,

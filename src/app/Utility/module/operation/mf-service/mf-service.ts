@@ -255,8 +255,9 @@ export class ManifestService {
                         isSuffex = true;
                     }
 
-                    return mfJson;
+                   
                 }
+                return mfJson;
             } catch (error) {
                 return null; // Example error handling
             }

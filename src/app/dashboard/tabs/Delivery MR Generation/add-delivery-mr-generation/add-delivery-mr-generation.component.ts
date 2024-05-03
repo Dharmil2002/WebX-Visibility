@@ -107,9 +107,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
       this.docketNo = data.data.no;
-    } else {
-      this.docketNo = "DEL2013";
     }
+    // else {
+    //   this.docketNo = "DEL2013";
+    // }
   }
 
   ngOnInit(): void {
@@ -191,14 +192,14 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
     this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
 
-    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM") ? true : false;
+    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM") ? false : true;
     this.deliveryMrTableForm.get('GSTApplicability').setValue(this.isGSTApplicable ? "Yes" : "No");
     await this.GetBookingTimeCharges();
     if (data.cSGN.gST && data.cSGE.gST) {
       const StateCodeList = [parseInt(data.cSGN.gST.substring(0, 2)), parseInt(data.cSGE.gST.substring(0, 2))]
       await this.GetStateCodeWiseStateDetails(StateCodeList);
     }
-    await this.fetchAndProcessCharges();
+    await this.fetchAndProcessCharges("DeliveryMR");
   }
   async GetBookingTimeCharges() {
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
@@ -269,9 +270,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     return combinedCharges;
   }
 
-  private async fetchAndProcessCharges() {
+  private async fetchAndProcessCharges(ChargeName) {
     this.chargeList = await this.thcService.getCharges({
-      "cHAPP": { 'D$eq': 'DeliveryMR' },
+      "cHAPP": { 'D$eq': ChargeName },
       'isActive': { 'D$eq': true }
     });
 
@@ -426,7 +427,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     };
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res.data && res.data.length > 0) {
-      this.States =res.data;
+      this.States = res.data;
       if (res.data.length > 1)
         this.GSTType = await this.stateService.getGSTType(res.data[0], res.data[1]);
       else {
@@ -456,7 +457,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
-        this.isInterBranchControl =  res.find(x => x.rULEID === "THCIBC")?.vAL || false;
+      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL || false;
     }
   }
 
@@ -660,9 +661,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             return nd;
           });
 
-
-console.log(this.AccountsBanksList);
-console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummaryFilterForm.value.Bank.value)?.aCNM);
+          let PaymentMode = this.PaymentSummaryFilterForm.value.PaymentMode
           const headerRequest = {
             cID: this.storage.companyCode,
             gCNNO: DocketNo,
@@ -671,13 +670,13 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
             rCEIVNM: this.DocketDetails.cSGN?.nM || '',
             CONSGNM: this.DocketDetails.cSGN?.nM || '',
             mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
-            bNK: this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummaryFilterForm.value.Bank.value)?.aCNM || '',
-            cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : '',
-            cHQDT: this.PaymentSummaryFilterForm.value.Date ? this.PaymentSummaryFilterForm.value.Date : '',
+            bNK: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummaryFilterForm.value.Bank.value)?.aCNM || '' : '',
+            cHQNo: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo || '' : '',
+            cHQDT: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Date || '' : '',
             iSUBNK: "",
             oNACC: "",
-            dPOSTBNKNM: this.PaymentSummaryFilterForm.value.Bank.name,
-            dPOSTBNKCD: this.PaymentSummaryFilterForm.value.Bank.value,
+            dPOSTBNKNM: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank.name : '',
+            dPOSTBNKCD: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank.value : '',
             bILNGPRT: this.DocketDetails.bPARTYNM,
             bPARTY: this.DocketDetails.bPARTY,
             bKNGST: this.States[0].STNM,
@@ -751,14 +750,15 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
           if (res.success) {
             if (headerRequest.cLLCTAMT > 0) {
-              const vRes = await this.GenerateVoucher(res?.data);
-              if (vRes && vRes.success ) {
+              const vRes: any = await this.GenerateVoucher(res?.data.data.ops[0]);
+              console.log(vRes)
+              if (vRes && vRes.length > 0) {
                 const reqMR = {
                   companyCode: this.storage.companyCode,
                   collectionName: "delivery_mr_header",
                   filter: { docNo: res?.data?.data?.docNo, cID: this.storage.companyCode },
                   update: {
-                    vNO: vRes?.data?.chargeDetails?.ops[0]?.dMRNO
+                    vNO: vRes
                   }
                 }
                 await firstValueFrom(this.operation.operationPut(GenericActions.UpdateMany, reqMR));
@@ -768,12 +768,12 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
                   collectionName: "delivery_mr_details",
                   filter: { dLMRNO: res?.data?.data?.docNo, cID: this.storage.companyCode },
                   update: {
-                    vNO: vRes?.data?.chargeDetails?.ops[0]?.dMRNO
+                    vNO: vRes
                   }
                 }
                 await firstValueFrom(this.operation.operationPut(GenericActions.Update, reqMRDet));
 
-                 // If the branches match, navigate to the DeliveryMrGeneration page
+                // If the branches match, navigate to the DeliveryMrGeneration page
                 this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
                   state: {
                     data: res.data.chargeDetails
@@ -790,7 +790,7 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
             Swal.hideLoading();
             setTimeout(() => {
               Swal.close();
-            }, 2000);           
+            }, 2000);
           } else {
             this.snackBarUtilityService.ShowCommonSwal(
               "error",
@@ -836,32 +836,35 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
 
   //#endregion
   async GenerateVoucher(data) {
-    let res = [];
+
+    let Result = [];
     if (!data)
       return null;
 
-    const dmr = data?.data?.header;
-    if(!dmr)
+    const dmr = data;
+    if (!dmr)
       return null;
-    
+
     try {
+
       const paybase = this.DocketDetails.pAYTYP;
-      let requestModel = this.PrepareVoucher("collection",this.storage.branch, dmr, paybase);
+      let requestModel = this.PrepareVoucher("collection", this.storage.branch, dmr, paybase);
       const res = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", requestModel));
       if (res.success) {
-         res.push(res?.data?.mainData?.ops[0].vNO);
-         await this.accountPosting(res, this.storage.branch, requestModel); 
+        Result.push(res?.data?.mainData?.ops[0].vNO);
+        await this.accountPosting(res, this.storage.branch, requestModel);
       }
 
-      if(this.isInterBranchControl ) {
+      if (this.isInterBranchControl) {
         let requestModel2 = this.PrepareVoucher("transfer", this.DocketDetails.oRGN, dmr, paybase);
-        const res2 = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", requestModel));
+        const res2 = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", requestModel2));
         if (res2.success) {
-          res.push(res2?.data?.mainData?.ops[0].vNO);
-          await this.accountPosting(res2, this.DocketDetails.oRGN, requestModel2); 
+          Result.push(res2?.data?.mainData?.ops[0].vNO);
+          await this.accountPosting(res2, this.DocketDetails.oRGN, requestModel2);
         }
       }
-      
+      return Result;
+
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal(
         "error",
@@ -888,7 +891,7 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
       partyName: this.DocketDetails.bPARTYNM,
       entryBy: this.storage.userName,
       entryDate: Date(),
-      debit: requestModel.voucherlineItems
+      debit: requestModel.details
         .filter((item) => item.credit == 0)
         .map(function (item) {
           return {
@@ -899,7 +902,7 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
             narration: item.narration ?? "",
           };
         }),
-      credit: requestModel.voucherlineItems
+      credit: requestModel.details
         .filter((item) => item.debit == 0)
         .map(function (item) {
           return {
@@ -920,26 +923,28 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
     }
   }
   PrepareVoucher(type, branch, dmr, paybase): any {
+
     let voucherRequestModel = new VoucherRequestModel();
     let voucherDataRequestModel = new VoucherDataRequestModel();
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
 
-    let gst = {};    
-    let GSTAmount = dmr.cLLCTAMT/(1+(this.GSTRate / 100));
-    this.GSTApplied.map(x => {
-      gst[x] = ConvertToNumber(GSTAmount/this.GSTApplied.length, 2);
-    });
+    let gst = {};
+    let GSTAmount = ConvertToNumber(dmr.cLLCTAMT - (dmr.cLLCTAMT / (1 + (this.GSTRate / 100))), 2);
+    if (!this.isGSTApplicable) {
+      GSTAmount = 0;
+    }
+    else {
+      this.GSTApplied.map(x => {
+        gst[x] = ConvertToNumber(GSTAmount / this.GSTApplied.length, 2);
+      });
+    }
 
+    let AccountDetails;
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
-      if (AccountDetails != undefined) {
-        this.PaymentSummaryFilterForm.get("Bank").setValue(AccountDetails)
-      } else {
-        this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
-        return;
-      }
+      AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
     }
+
     voucherRequestModel.companyCode = this.storage.companyCode;
     voucherRequestModel.docType = "VR";
 
@@ -960,11 +965,11 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
     voucherDataRequestModel.preperedFor = "Customer"
     voucherDataRequestModel.partyCode = this.DocketDetails.bPARTY;
     voucherDataRequestModel.partyName = this.DocketDetails.bPARTYNM;
-    if(this.DocketDetails.pAYTYP == 'P01') {
-      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGN.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGN.gST.substring(0, 2); 
+    if (this.DocketDetails.pAYTYP == 'P01') {
+      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGN.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGN.gST.substring(0, 2);
     }
     else {
-      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGE.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGE.gST.substring(0, 2); 
+      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGE.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGE.gST.substring(0, 2);
     }
     voucherDataRequestModel.entryBy = this.storage.userName;
     voucherDataRequestModel.entryDate = new Date();
@@ -978,15 +983,15 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
 
     voucherDataRequestModel.GSTTotal = GSTAmount;
 
-    voucherDataRequestModel.GrossAmount =  ConvertToNumber(dmr.cLLCTAMT - GSTAmount,2) || 0;
-    voucherDataRequestModel.netPayable = ConvertToNumber(dmr.cLLCTAMT,2) || 0;
+    voucherDataRequestModel.GrossAmount = ConvertToNumber(dmr.cLLCTAMT - GSTAmount, 2) || 0;
+    voucherDataRequestModel.netPayable = ConvertToNumber(dmr.cLLCTAMT, 2) || 0;
     voucherDataRequestModel.roundOff = 0;
     voucherDataRequestModel.voucherCanceled = false;
 
     voucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
     voucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : "";
-    voucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank.bANM : this.PaymentSummaryFilterForm.value.CashAccount.name;
-    voucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank.bANCD : this.PaymentSummaryFilterForm.value.CashAccount.value;
+    voucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails?.bANM : this.PaymentSummaryFilterForm.value.CashAccount.name;
+    voucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails?.bANCD : this.PaymentSummaryFilterForm.value.CashAccount.value;
     voucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.date : "";
 
     voucherDataRequestModel.scanSupportingDocument = "";
@@ -997,7 +1002,7 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
     voucherRequestModel.data = voucherDataRequestModel;
     voucherRequestModel.debitAgainstDocumentList = [];
 
-    return voucherRequestModel;        
+    return voucherRequestModel;
   }
   //#region to disable submit btn
   isSubmitDisabled(): boolean {
@@ -1055,65 +1060,64 @@ console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummar
 
     const Result = [];
 
-    if(type == "collection") {
-      const PaymentMode = VoucherDataRequestModel.PaymentMode;
-        if (PaymentMode == "Cash") {
-          Result.push(createVoucher(VoucherDataRequestModel.accountCode,VoucherDataRequestModel.accountName, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
-        }
-        if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
-          const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == VoucherDataRequestModel.accountCode && item.bANM == VoucherDataRequestModel.accountName)
-          Result.push(createVoucher(AccountDetails.aCCD, AccountDetails.aCNM, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
-        }
-        
-      if(this.isInterBranchControl) {
-        Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory, 
-                    0, VoucherDataRequestModel.netPayable, VoucherDataRequestModel.transactionNumber));
+    if (type == "collection") {
+      const PaymentMode = VoucherDataRequestModel.paymentMode;
+      if (PaymentMode == "Cash") {
+        Result.push(createVoucher(VoucherDataRequestModel.accountCode, VoucherDataRequestModel.accountName, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
+      }
+      if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+        const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == VoucherDataRequestModel.accountCode && item.bANM == VoucherDataRequestModel.accountName)
+        Result.push(createVoucher(AccountDetails.aCCD, AccountDetails.aCNM, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
+      }
+
+      if (this.isInterBranchControl) {
+        Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory,
+          0, VoucherDataRequestModel.netPayable, VoucherDataRequestModel.transactionNumber));
       }
       else {
 
-        Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory, 
-                      0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
+        Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
+          0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
 
         Object.keys(gst).forEach(item => {
-          Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory, 
-                  0, gst[item], VoucherDataRequestModel.transactionNumber));
+          Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,
+            0, gst[item], VoucherDataRequestModel.transactionNumber));
         });
       }
     }
-    else if(type == "transfer") {
-      if(this.isInterBranchControl) {
-        Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory, 
-        VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
+    else if (type == "transfer") {
+      if (this.isInterBranchControl) {
+        Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory,
+          VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
 
-        if(paybase == 'P01') 
-        {         
-          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory, 
-                      0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
+        if (paybase == 'P01') {
+          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
+            0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
 
           Object.keys(gst).forEach(item => {
-            Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory, 
-                    0, gst[item], VoucherDataRequestModel.transactionNumber));
+            Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,
+              0, gst[item], VoucherDataRequestModel.transactionNumber));
           });
         }
         else {
 
-            const diff = ConvertToNumber(VoucherDataRequestModel.netPayable - this.DocketDetails.tOTAMT,2);
-            const gross =  ConvertToNumber(diff - VoucherDataRequestModel.GSTTotal, 2)
+          const diff = ConvertToNumber(VoucherDataRequestModel.netPayable - this.DocketDetails.tOTAMT, 2);
+          const gross = ConvertToNumber(diff - VoucherDataRequestModel.GSTTotal, 2)
 
-            Result.push(createVoucher(ledgerInfo["INC001009"].LeadgerCode, ledgerInfo["INC001009"].LeadgerName, ledgerInfo["INC001009"].LeadgerCategory, 
-                      0, this.DocketDetails.tOTAMT, VoucherDataRequestModel.transactionNumber));
+          Result.push(createVoucher(ledgerInfo["INC001009"].LeadgerCode, ledgerInfo["INC001009"].LeadgerName, ledgerInfo["INC001009"].LeadgerCategory,
+            0, this.DocketDetails.tOTAMT, VoucherDataRequestModel.transactionNumber));
 
-            Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory, 
-                      0, gross, VoucherDataRequestModel.transactionNumber));
+          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
+            0, gross, VoucherDataRequestModel.transactionNumber));
 
-            Object.keys(gst).forEach(item => {
-              Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory, 
-                      0, gst[item], VoucherDataRequestModel.transactionNumber));
-            });
+          Object.keys(gst).forEach(item => {
+            Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,
+              0, gst[item], VoucherDataRequestModel.transactionNumber));
+          });
         }
       }
     }
-    
+
     return Result;
   }
   //#endregion

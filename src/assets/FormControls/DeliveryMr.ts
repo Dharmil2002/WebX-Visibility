@@ -4,72 +4,12 @@ export class DeliveryMrGeneration {
     deliveryMrControlArray: FormControls[];
     deliveryMrDetailsControlArray: FormControls[];
     deliveryMrPaymentModeArray: FormControls[];
-    deliveryMrBillingArray: FormControls[];
+    SummaryArray: FormControls[];
+    CollectionDetails: FormControls[];
+    BookingTimechargesArray: FormControls[];
+
     constructor() {
         this.deliveryMrControlArray = [
-            {
-                name: 'Deliveredto',
-                label: 'Delivered To ',
-                placeholder: 'Delivered to ',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Receiver", name: "Receiver" },
-                    { value: "Consignee", name: "Consignee" },
-                ],
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                    name: "required",
-                    message: "Delivered To is required",
-                },],
-                functions: {
-                    onSelection: "hideControl"
-                }
-            },
-            {
-                name: 'NameofReceiver',
-                label: 'Name of Receiver',
-                placeholder: 'Name of Receiver',
-                type: 'text',
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                    name: "required",
-                    message: "Name of Receiver is required",
-                },]
-            },
-            {
-                name: 'NameofConsignee',
-                label: 'Name of Consignee',
-                placeholder: 'Name of Consignee',
-                type: 'text',
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                    name: "required",
-                    message: "Name of Consignee is required",
-                },]
-            },
-            {
-                name: 'ContactNumber',
-                label: 'Contact Number ',
-                placeholder: 'Contact Number ',
-                type: "mobile-number",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                    name: "required",
-                    message: "Contact Number is required",
-                },
-                {
-                    name: "pattern",
-                    message: "Please enter 10 digit Contact number",
-                    pattern: "^[0-9]{10,12}$",
-                },]
-            },
             {
                 name: 'ConsignmentNoteNumber',
                 label: 'Consignment Number',
@@ -83,9 +23,71 @@ export class DeliveryMrGeneration {
                     message: "Consignment Note Number is required",
                 },],
                 functions: {
-                    onChange: "validateConsig"
+                    onChange: "ValidateDocketNo"
                 }
-            }
+            },
+
+            {
+                name: 'PayBasis',
+                label: 'Pay Basis',
+                placeholder: 'Pay Basis',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: 'Consignor',
+                label: 'Consignor',
+                placeholder: 'Consignor',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: 'ConsignorGST',
+                label: 'Consignor GST No.',
+                placeholder: 'Consignor GST No.',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: 'Consignee',
+                label: 'Consignee',
+                placeholder: 'Consignee',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: 'ConsigneeGST',
+                label: 'Consignee GST No.',
+                placeholder: 'Consignee GST No.',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: 'GSTApplicability',
+                label: 'GST Applicability',
+                placeholder: 'GST Applicability',
+                type: 'text',
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+
         ]
         this.deliveryMrDetailsControlArray = [
             {
@@ -238,302 +240,206 @@ export class DeliveryMrGeneration {
                 },
             },
 
-            {
-                name: "issuedFromBank",
-                label: "Issued from Bank",
-                placeholder: "Issued from Bank",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: [{
-                    name: "required",
-                    message: "Issued from Bank is required"
-                },]
-            },
-            {
-                name: "OnAccount",
-                label: "On Account",
-                placeholder: "On Account",
-                type: "checkbox",
-                value: false,
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            },
-            {
-                name: "depositedIntoBank",
-                label: "Deposited into Bank",
-                placeholder: "Deposited into Bank",
-                type: "dropdown",
-                value: "",
-                filterOptions: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Deposited into Bank is required"
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                ],
-                additionalData: {
-                    showNameAndValue: false,
-                    //metaData: "Basic"
-                },
-                functions: {
-                    onOptionSelect: "PayBasisFieldChanged"
-                },
-            },
-
         ]
-        this.deliveryMrBillingArray = [
+        this.SummaryArray = [
             {
-                name: "BillingParty",
-                label: "Billing Party",
-                placeholder: "Billing Party",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "Stateofbooking",
-                label: "State of Booking",
-                placeholder: "State of Booking",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "StateofSupply",
-                label: "State of Supply",
-                placeholder: "State of Supply",
-                type: "dropdown",
+                name: 'DocketNewTotal',
+                label: 'Docket New Total ₹',
+                placeholder: 'Docket New Total ₹',
+                type: 'number',
                 value: "",
-                filterOptions: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Place of Supply is required"
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                ],
+                Validations: [],
+                generatecontrol: true, disable: true,
                 additionalData: {
-                    showNameAndValue: false,
-                    //metaData: "Basic"
-                },
+                    metaData: "DocketNewTotal"
+                }
+            },
 
-            },
             {
-                name: "SACCode",
-                label: "SAC Code",
-                placeholder: "SAC Code",
-                type: "dropdown",
+                name: "IGST",
+                label: "IGST ₹",
+                placeholder: "IGST ₹",
+                type: "number",
                 value: "",
-                filterOptions: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "SAC Code is required"
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                ],
-                additionalData: {
-                    showNameAndValue: true,
-                    metaData: "Basic"
-                },
-                functions: {
-                    onOptionSelect: "SACCodeFieldChanged"
-                },
-            },
-            {
-                name: "GSTRate",
-                label: "GST Rate",
-                placeholder: "GST Rate",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "GSTAmount",
-                label: "GST Amount",
-                placeholder: "GST Amount",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "TDSSection",
-                label: "TDS Section",
-                placeholder: "TDS Section",
-                type: "dropdown",
-                value: "",
-                filterOptions: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Place of Supply is required"
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                ],
-                additionalData: {
-                    showNameAndValue: false,
-                    //metaData: "Basic"
-                },
-                functions: {
-                    onOptionSelect: "TDSSectionFieldChanged"
-                },
-            },
-            {
-                name: "TDSRate",
-                label: 'TDS Rate %',
-                placeholder: "TDS Rate",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "TDS Rate is required"
-                    },
-                ],
-                functions: {
-                    onChange: "calculateTDSAndTotal"
-                },
-            },
-            {
-                name: "TDSAmount",
-                label: "TDS Amount",
-                placeholder: "TDS Amount",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "DeliveryMRNetAmount",
-                label: "Delivery MR Net Amount",
-                placeholder: "Delivery MR Net Amount",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "CollectionAmount",
-                label: "Collection Amount",
-                placeholder: "Collection Amount",
-                type: "text",
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Collection Amount is required"
-                    },
-                ],
-                functions: {
-                    onChange: "setPartiallyCollected"
-                },
-            },
-            {
-                name: "GSTCharged",
-                label: "GST Charged",
-                placeholder: "GST Charged",
-                type: "checkbox",
-                value: false,
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "PartiallyCollected",
-                label: "Partially Collected ",
-                placeholder: "Partially Collected ",
-                type: "checkbox",
-                value: false,
-                generatecontrol: true,
-                disable: true,
-                Validations: []
-            },
-            {
-                name: "RoundOff",
-                label: "Round Off",
-                placeholder: "Round Off",
-                type: "checkbox",
-                value: false,
                 generatecontrol: true,
                 disable: true,
                 Validations: [],
-                functions: {
-                    onChange: "applyRoundOffIfChecked"
+            },
+            {
+                name: "UGST",
+                label: "UGST ₹",
+                placeholder: "UGST ₹",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },
+            {
+                name: "SGST",
+                label: "SGST ₹",
+                placeholder: "SGST ₹",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },            
+            {
+                name: 'Dockettotal',
+                label: 'Docket Total ₹',
+                placeholder: 'Docket Total ₹',
+                type: 'number',
+                value: "",
+                Validations: [],
+                generatecontrol: true, disable: true,
+                additionalData: {
+                    metaData: "Dockettotal"
                 }
             },
             {
-                name: "PartiallyCollectedAmt",
-                label: "Round Off",
-                placeholder: "Round Off",
+                name: "CGST",
+                label: "CGST ₹",
+                placeholder: "CGST ₹",
                 type: "number",
-                value: 0,
-                generatecontrol: false,
+                value: "",
+                generatecontrol: true,
                 disable: true,
-                Validations: []
+                Validations: [],
             },
             {
-                name: "roundOffAmt",
-                label: "Round Off",
-                placeholder: "Round Off",
-                type: "text",
-                value: 0,
-                generatecontrol: false,
+                name: 'RoundOffAmount',
+                label: 'Round Off Amount ₹',
+                placeholder: '',
+                type: 'number',
+                value: "",
+                Validations: [],
+                generatecontrol: true, 
+                disable: true
+            },
+            {
+                name: 'RoundedOff',
+                label: 'Rounded Off ₹',
+                placeholder: '',
+                type: 'number',
+                value: "",
+                Validations: [],
+                generatecontrol: true, 
+                disable: true
+            }
+        ]
+        this.CollectionDetails = [
+            {
+                name: 'CollectedAmount',
+                label: 'Collected Amount ₹',
+                placeholder: 'Collected Amount ₹',
+                type: 'number',
+                value: 0.00,
+                Validations: [],
+                generatecontrol: true, 
+                disable: true,                
+            },
+            {
+                name: 'CollectionMRNo',
+                label: 'Collection MR No',
+                placeholder: 'Collection MR No',
+                type: 'text',
+                value: "",
+                Validations: [],
+                generatecontrol: true, 
+                disable: true,                
+            },
+            {
+                name: 'NewCollectionAmount',
+                label: 'Collection Amount ₹',
+                placeholder: 'Collection Amount ₹',
+                type: 'number',
+                value: 0.00,
+                Validations: [],
+                generatecontrol: true, 
+                disable: true,                
+            },
+            {
+                name: 'PendingAmount',
+                label: 'Pending Amount ₹',
+                placeholder: 'Pending Amount ₹',
+                type: 'number',
+                value: 0.00,
+                Validations: [],
+                generatecontrol: false, 
+                disable: true,                
+            },
+            // {
+            //     name: 'BillingParty',
+            //     label: 'Billing Party',
+            //     placeholder: 'Billing Party',
+            //     type: 'number',
+            //     value: 0.00,
+            //     Validations: [],
+            //     generatecontrol: true, 
+            //     disable: true,                
+            // },
+        ]
+        this.BookingTimechargesArray = [
+            {
+                name: "or",
+                label: "Booking Time charges Amount",
+                placeholder: "Booking Time charges Amount",
+                type: "OR",
+                value: "",
+                generatecontrol: true,
                 disable: true,
-                Validations: []
+                Validations: [],
+            },
+            {
+                name: "or",
+                label: "Edit Amount",
+                placeholder: "Edit Amount",
+                type: "OR",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },
+            {
+                name: "or",
+                label: "Difference Amount",
+                placeholder: "Difference Amount",
+                type: "OR",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },
+            {
+                name: "OldFreight",
+                label: "Freight ₹",
+                placeholder: "Freight ₹",
+                type: "number",
+                value: 0,
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },
+            {
+                name: "NewFreight",
+                label: "Freight ₹",
+                placeholder: "Freight ₹",
+                type: "number",
+                value: 0,
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },
+            {
+                name: "DiffFreight",
+                label: "Freight ₹",
+                placeholder: "Freight ₹",
+                type: "number",
+                value: 0,
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
             },
         ]
     }
@@ -547,7 +453,12 @@ export class DeliveryMrGeneration {
         return this.deliveryMrPaymentModeArray;
     }
     getDeliveryMrBillingControls() {
-        return this.deliveryMrBillingArray;
+        return this.SummaryArray;
     }
-
+    getBookingTimecharges() {
+        return this.BookingTimechargesArray
+    }
+    getCollectionDetailsControls() {
+        return this.CollectionDetails
+    }
 }

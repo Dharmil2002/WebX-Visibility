@@ -19,7 +19,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     noColumnSort: ["checkBoxRequired"],
   };
   dynamicControls = {
-    add: false,
+    add: true,
     edit: false,
     csv: false,
   };
@@ -97,11 +97,14 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     "status"
   ];
   boxData: any[];
+  addAndEditPath: string;
   constructor(
     private docketService: DocketService,
     private storage: StorageService,
     private router: Router,
-  ) { }
+  ) {
+    this.addAndEditPath = "dashboard/DeliveryMrGeneration";
+  }
 
   ngOnInit(): void {
     this.getDocketDetails();

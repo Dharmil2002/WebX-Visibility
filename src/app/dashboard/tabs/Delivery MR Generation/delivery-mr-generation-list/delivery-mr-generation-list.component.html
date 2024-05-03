@@ -2,6 +2,7 @@
     <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
-        [Link]="linkArray"[refreshbtn]=true (functionCallEmitter)="functionCallHandler($event)">
+        [Link]="linkArray" [refreshbtn]=true (functionCallEmitter)="functionCallHandler($event)"
+        [addAndEditPath]="addAndEditPath">
     </app-generic-table-v2>
 </div>

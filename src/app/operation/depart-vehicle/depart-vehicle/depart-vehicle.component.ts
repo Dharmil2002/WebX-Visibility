@@ -571,7 +571,9 @@ export class DepartVehicleComponent implements OnInit {
   }
   async getCharges(prod) {
     this.advanceControlArray = this.advanceControlArray.filter((x) => !x.hasOwnProperty('id'));
-    const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,isActive:true},);
+    const filter = { "pRNm": prod, aCTV: true, cHBTY: "Booking" }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,"cHAPP":{D$in:["THC"] },isActive:true }
+    const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
       result.forEach((element, index) => {

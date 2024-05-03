@@ -206,8 +206,8 @@ const shipData = [
   OpenManifest(data){
     const TripID = data.TripID
     const templateBody = {
-      templateName: 'Manifest',
-      partyCode: "CONSRAJT27",
+      templateName: 'thc',
+      partyCode: "CONSRAJ19",
       DocNo: TripID,
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

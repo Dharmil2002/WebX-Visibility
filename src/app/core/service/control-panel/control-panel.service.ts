@@ -55,7 +55,7 @@ export class ControlPanelService {
   }
   async getModuleRules(filter) {
     const req={
-      companyCode:this.storage.getItem(StoreKeys.CompanyCode),
+      companyCode:this.storage.companyCode,
       collectionName:"module_rules",
       filter:filter
     }

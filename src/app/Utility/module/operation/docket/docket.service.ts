@@ -971,6 +971,8 @@ export class DocketService {
     /*End*/
     /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
     async operationsFieldMapping(data, invoiceDetails = [], docketFin, isDcr = false) {
+        const pkgs = parseInt(data?.pKGS || 0);
+        const docketNumber = data?.dKTNO || ""
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
@@ -1060,8 +1062,32 @@ export class DocketService {
             };
             await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
         }
+        if (docketNumber && pkgs > 0) {
+            try {
+                const pkgData = await this.generateArray(ops, pkgs);
+                const chunks = this.chunkArray(pkgData, 50); // Change 50 to whatever number suits your scenario
+                for (const chunk of chunks) {
+                    const req = {
+                        companyCode: this.storage.companyCode,
+                        collectionName: "docket_pkgs_ltl",
+                        data: chunk
+                    };
+                    await firstValueFrom(this.operation.operationMongoPost('generic/create', req));
+                }
+            } catch (err) {
+            }
+        }
         return true
 
+    }
+    /*End*/
+    /*below function is for the aa data in chunks*/
+    chunkArray(array, chunkSize) {
+        const result = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+            result.push(array.slice(i, i + chunkSize));
+        }
+        return result;
     }
     /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
@@ -1240,11 +1266,11 @@ export class DocketService {
                 "cGRT": 6,
                 "uGRT": 0,
                 "iGST": 0,
-                "sGST": ConvertToNumber(data?.gstChargedAmount/2 || 0, 2),
-                "cGST": ConvertToNumber(data?.gstChargedAmount/2 || 0, 2),
+                "sGST": ConvertToNumber(data?.gstChargedAmount / 2 || 0, 2),
+                "cGST": ConvertToNumber(data?.gstChargedAmount / 2 || 0, 2),
                 "uGST": 0,
                 "aMT": ConvertToNumber(data?.gstChargedAmount || 0, 2)
-             },
+            },
             "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
             "pKGTYN": data?.pkgsTypeName || "",
             "pKGTY": data?.pkgsType || "",
@@ -1624,4 +1650,34 @@ export class DocketService {
         return res.data;
     }
     /*End*/
+    /*below code is for the packages Update*/
+    async generateArray(data, pkg) {
+        return new Promise((resolve, reject) => {
+            try {
+                const array = Array.from({ length: pkg }, (_, index) => {
+                    const serialNo = (index + 1).toString().padStart(4, "0");
+                    const bcSerialNo = `${data.dKTNO}-${serialNo}`;
+                    const bcDockSf = 0;
+                    return {
+                        _id: `${this.storage.companyCode}-${bcSerialNo}-${data?.sFX}`,
+                        cID: this.storage.companyCode,
+                        dKTNO: data?.dKTNO,
+                        pKGSNO: bcSerialNo,
+                        sFX: bcDockSf,
+                        lOC: data?.oRGN,
+                        cLOC: data?.cLOC,
+                        eNTDT: new Date(),
+                        eNTLOC: this.storage.branch,
+                        eNTBY: this.storage.userName
+                    };
+                });
+
+                resolve(array);
+            } catch (error) {
+                reject(new Error("Failed to generate the array: " + error.message));
+            }
+        });
+    }
+
+    /*end*/
 }

@@ -19,6 +19,8 @@
                 </div>
             </div>-->
             <div class="row my-lg-5 my-md-3 my-md-1 my-xl-5">
+                <!-- <button class="btn btn-primary" (click)="onAddAppClick()">Prepare Voucher</button> -->
+
                 <div *ngFor="let item of cardList" class="col-md-4 col-xl-3 custom-icon icon-pedding"
                     (click)="onAppClick($event, item)">                    
                     <div class=" pointer card-shape" [style.background-color]="item.bgColor">

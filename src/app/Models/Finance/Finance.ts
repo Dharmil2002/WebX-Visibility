@@ -141,6 +141,8 @@ export const ledgerInfo = {
   "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
   "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
   "LIA003004": GetLeadgerInfoFromLocalStorage("LIA003004"),
+  "INC001006": GetLeadgerInfoFromLocalStorage("INC001006"),
+  "AST001002": GetLeadgerInfoFromLocalStorage("AST001002"),
   "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
   "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
   "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),

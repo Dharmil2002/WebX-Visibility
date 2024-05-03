@@ -596,7 +596,13 @@ export class CreateLoadingSheetComponent implements OnInit {
     const vehRequest = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
-      filter: { currentLocation: this.storage.branch } //status: "Available", 
+      filter: { 
+        D$or: [
+          { vendorTypeCode: { D$in: [1, "1"] }, currentLocation: this.storage.branch },
+          { vendorTypeCode: { D$nin: [1, "1"] } },
+        ]
+        //status: "Available", 
+      }
     };
 
     // Fetch data from the JSON endpoint

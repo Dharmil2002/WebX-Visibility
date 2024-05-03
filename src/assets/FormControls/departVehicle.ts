@@ -211,7 +211,6 @@ export class BalanceControl {
                 Validations: [{
                     name: "required",
                     message: "Advance Paid At  is required",
-
                 },
                 {
                     name: "invalidAutocompleteObject",
@@ -220,7 +219,7 @@ export class BalanceControl {
                   {
                     name: "autocomplete",
                   },
-                ],
+            ],
                 functions:{
                     onModel:"getLocation"
                 },

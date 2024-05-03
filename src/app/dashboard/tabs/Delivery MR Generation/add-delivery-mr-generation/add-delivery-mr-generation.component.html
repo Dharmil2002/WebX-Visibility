@@ -36,23 +36,32 @@
             </form>
         </div>
         <div class="col">
-            <form [formGroup]="PaymentSummaryFilterForm">
-                <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Collection 
-'" [formData]="jsonControlPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
-                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"
-                    (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+            <form [formGroup]="CollectionForm">
+                <app-form-webxpress [form]="CollectionForm" [FormTitle]="'Collection Details'"
+                    [formData]="jsonCollectionControlArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"                    
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="col">
+                <form [formGroup]="PaymentSummaryFilterForm">
+                    <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Collection'" [formData]="jsonControlPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
+                        [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"
+                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    </app-form-webxpress>
+                </form>
+            </div>
         </div>
     </div>
-
-
-
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
                 <button [disabled]="isSubmitDisabled()" mat-button mat-raised-button color="primary"
-                    (click)="GenerateVoucher()">
+                    (click)="GenerateMR()">
                     Submit
                 </button>
             </div>

@@ -105,17 +105,17 @@ export class StateService {
   }
 
   //#endregion
-  getGSTType(fromState: any, toState: any): { CGST: boolean, IGST: boolean, SGST: boolean, UTGST: boolean } {
+  getGSTType(fromState: any, toState: any): { CGST: boolean, IGST: boolean, SGST: boolean, UGST: boolean } {
 
     if (fromState.ST == toState.ST && (fromState.ISUT || toState.ISUT)) {
-      return { CGST: false, IGST: false, SGST: true, UTGST: true };
+      return { CGST: true, IGST: false, SGST: false, UGST: true };
     }
     if (fromState.ST == toState.ST && !fromState.ISUT && !toState.ISUT) {
-      return { CGST: true, IGST: false, SGST: true, UTGST: false };
+      return { CGST: true, IGST: false, SGST: true, UGST: false };
     }
     else if (fromState.ST != toState.ST) {
-      return { CGST: false, IGST: true, SGST: false, UTGST: false };
+      return { CGST: false, IGST: true, SGST: false, UGST: false };
     }
-    return { CGST: false, IGST: true, SGST: false, UTGST: false };
+    return { CGST: false, IGST: true, SGST: false, UGST: false };
   }
 }

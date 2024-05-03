@@ -19,12 +19,13 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
-import { StoreKeys } from 'src/app/config/myconstants';
+import { GenericActions, StoreKeys } from 'src/app/config/myconstants';
 import { InvoiceModel } from 'src/app/Models/dyanamic-form/dyanmic.form.model';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -57,12 +58,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   AlljsonControlPaymentSummaryFilterArray: any;
   jsonSummaryControlArray: any;
   jsonSummaryControls: any;
+  jsonCollectionControlArray: any;
+
   SummaryForm: UntypedFormGroup;
   filteredDocket = []
   DocketDetails: any;
   DocketFinDetails: any;
-  SACCodeList: any;
-  headerDetails: any;
+  SACCode: any;
   docketNo: any;
   AlljsonControlMRArray: any;
   totalMRamt: any;
@@ -72,10 +74,20 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   chargeList: any;
   DeliveryTimeChargesArray: any[];
   DeliveryTimeChargesForm: UntypedFormGroup;
+  CollectionForm: UntypedFormGroup;
   ChargesList: any;
   States: any[];
+  isGSTApplicable: boolean = true;
   GSTType: any;
   GSTRate: number = 12;
+  GSTApplied: string[];
+  VoucherDetails: any;
+  TotalBookingTimeCharges: number = 0;
+  TotalDeliveryTimeCharges: number = 0;
+  TotalEditedAmount: number = 0;
+  TotalDiffrentAmount: number = 0;
+  isInterBranchControl: boolean = false;
+
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -89,7 +101,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private docketService: DocketService,
     private invoiceService: InvoiceServiceService,
     private thcService: ThcService,
-    private stateService: StateService
+    private stateService: StateService,
+    private controlPanel: ControlPanelService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
@@ -114,7 +127,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
   //#region to initializes the form controls for the Delivery MR table.
-  initializeDeliveryMrFormControls() {
+  async initializeDeliveryMrFormControls() {
     // Create an instance of the DeliveryMrGeneration class to generate form controls.
     const deliveryMrControlsGenerator = new DeliveryMrGeneration();
 
@@ -134,10 +147,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.jsonSummaryControls = deliveryMrControlsGenerator.getDeliveryMrBillingControls();
     this.SummaryForm = formGroupBuilder(this.fb, [this.jsonSummaryControlArray]);
 
+    this.jsonCollectionControlArray = deliveryMrControlsGenerator.getCollectionDetailsControls();
+    this.CollectionForm = formGroupBuilder(this.fb, [this.jsonCollectionControlArray]);
 
     this.deliveryMrTableForm.controls['ConsignmentNoteNumber'].setValue(this.docketNo);
-    this.docketNo ? this.ValidateDocketNo() : null;
-    this.GetGSTRate();
+    this.docketNo ? await this.ValidateDocketNo() : null;
+    await this.GetGSTRate();
+    await this.getAccountingRules();
   }
   //#region to validate docket number
   async ValidateDocketNo() {
@@ -152,7 +168,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
       if (docketdetails.length === 1) {
         this.DocketDetails = docketdetails[0];
-        this.SetDocketsDetails(this.DocketDetails);
+        await this.SetDocketsDetails(this.DocketDetails);
       } else {
         await Swal.fire({
           icon: "info",
@@ -168,19 +184,21 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       // Handle error gracefully, maybe show an error message to the user
     }
   }
-  SetDocketsDetails(data) {
+  async SetDocketsDetails(data) {
     this.deliveryMrTableForm.get('PayBasis').setValue(data.pAYTYPNM);
     this.deliveryMrTableForm.get('Consignor').setValue(`${data.cSGN.cD}:${data.cSGN.nM}`);
     this.deliveryMrTableForm.get('ConsignorGST').setValue(data.cSGN.gST);
     this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
     this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
-    this.deliveryMrTableForm.get('GSTApplicability').setValue(data.rCM);
-    this.GetBookingTimeCharges();
+
+    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM") ? true : false;
+    this.deliveryMrTableForm.get('GSTApplicability').setValue(this.isGSTApplicable ? "Yes" : "No");
+    await this.GetBookingTimeCharges();
     if (data.cSGN.gST && data.cSGE.gST) {
       const StateCodeList = [parseInt(data.cSGN.gST.substring(0, 2)), parseInt(data.cSGE.gST.substring(0, 2))]
-      this.GetStateCodeWiseStateDetails(StateCodeList);
+      await this.GetStateCodeWiseStateDetails(StateCodeList);
     }
-    this.fetchAndProcessCharges();
+    await this.fetchAndProcessCharges();
   }
   async GetBookingTimeCharges() {
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
@@ -189,7 +207,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
     const filter = { "dKTNO": DocketNo };
     const docketFindetails = await this.docketService.getDocketsFinDetailsLtl(filter);
-
     if (docketFindetails.length === 1) {
       this.DocketFinDetails = docketFindetails[0];
       if (this.DocketFinDetails.cHG.length > 0) {
@@ -203,9 +220,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.BookingTimechargesForm.get('NewFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
         this.ShowBookingTimeCharges = true;
       }
+      if (this.DocketDetails.pAYTYP == 'P01') {
+        await this.getVoucherDetails();
+      }
     }
   }
   async SetBookingTimeCharges(charges) {
+
     const generateCharges = (charge) => {
       // Helper function to generate a single charge object
       const generateChargeObject = (index) => ({
@@ -215,7 +236,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         type: "number",
         value: index == 3 ? 0 : charge.aMT,
         generatecontrol: true,
-        disable: index == 2 ? false : true,
+        disable: (this.DocketDetails.pAYTYP == 'P01' && index > 1) || index == 1 ? true : false,
         ChargType: charge.oPS,
         ChargeId: charge.cHGID,
         FormType: "BookingTimeCharges",
@@ -275,7 +296,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             pattern: "^\\d+(\\.\\d{1,2})?$",
           }],
           additionalData: {
-            metaData: element.aDD_DEDU,
+            metaData: element,
             showNameAndValue: element.iSREQ
           },
           functions: {
@@ -309,9 +330,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const NewFreight = this.BookingTimechargesForm.get('NewFreight').value;
     // Calculate the Booking time charges
 
-    let TotalBookingTimeCharges = 0;
-    let TotalEditedAmount = 0;
-    let TotalDiffrentAmount = 0;
+    this.TotalBookingTimeCharges = 0;
+    this.TotalEditedAmount = 0;
+    this.TotalDiffrentAmount = 0;
 
     for (let i = 1; i <= 3; i++) {
       this.DocketFinDetails.cHG.forEach(item => {
@@ -319,42 +340,80 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         const amountToAdd = isNaN(value) ? 0 : (item.oPS === "+" ? value : -value);
 
         if (i === 1) {
-          TotalBookingTimeCharges += amountToAdd;
+          this.TotalBookingTimeCharges += amountToAdd;
         } else if (i === 2) {
-          TotalEditedAmount += amountToAdd;
+          this.TotalEditedAmount += amountToAdd;
         } else if (i === 3) {
-          TotalDiffrentAmount += amountToAdd;
+          this.TotalDiffrentAmount += amountToAdd;
         }
       });
     }
 
     // Calculate Delivery Time Charges
-    let TotalDeliveryTimeCharges = 0;
+    this.TotalDeliveryTimeCharges = 0;
     this.DeliveryTimeChargesArray.forEach((element) => {
       const value = parseFloat(this.DeliveryTimeChargesForm.get(element.name).value);
-      const amountToAdd = isNaN(value) ? 0 : (element.additionalData.metaData === "+" ? value : -value);
-      TotalDeliveryTimeCharges += amountToAdd;
+      const amountToAdd = isNaN(value) ? 0 : (element.additionalData.metaData.aDD_DEDU === "-" ? -value : value);
+      this.TotalDeliveryTimeCharges += amountToAdd;
     });
-    const taxableAmount = TotalEditedAmount + NewFreight + TotalDeliveryTimeCharges;
-    this.SummaryForm.get('DocketNewTotal').setValue(taxableAmount);
+    const taxableAmount = this.TotalEditedAmount + NewFreight + this.TotalDeliveryTimeCharges;
+    this.SummaryForm.get('DocketNewTotal').setValue(taxableAmount.toFixed(2));
 
-    let GSTAmount = ConvertToNumber(taxableAmount * (this.GSTRate / 100), 2);
+    let GSTAmount = 0;
+    if (this.isGSTApplicable) {
+      GSTAmount = ConvertToNumber(taxableAmount * (this.GSTRate / 100), 2);
 
-    const gstToRemove = [];
-    const gstApplied = [];
-    for (const key in Object.keys(this.GSTType)) {
-      if (!this.GSTType[key])
-        gstToRemove.push[key];
-      else
-        gstApplied.push[key];
+      this.jsonSummaryControlArray.filter(f => this.GSTApplied.includes(f.name)).forEach(item => {
+        this.SummaryForm.get(item.name).setValue((GSTAmount / this.GSTApplied.length).toFixed(2));
+      });
     }
 
-    this.jsonSummaryControlArray = this.jsonSummaryControlArray.filter(x => !gstToRemove.includes(x.name));
-    this.jsonSummaryControlArray.filter(f => gstApplied.includes(f.name)).forEach(item => {
-      this.SummaryForm.get(item.name).setValue((GSTAmount / gstApplied.length).toFixed(2));
-    });
+    const total = (taxableAmount + GSTAmount);
+    this.SummaryForm.get('Dockettotal').setValue(total.toFixed(2));
 
+    this.OnChangeCheckBox(null);
+  }
 
+  // Function to calculate and update summary form values
+  updateSummaryForm(total, eventCheck) {
+    const roundedValue = eventCheck ? Math.ceil(total) : total;
+    const diff = ConvertToNumber(roundedValue - total, 2);
+
+    this.SummaryForm.get("RoundOffAmount").setValue(diff.toFixed(2));
+    this.SummaryForm.get("RoundedOff").setValue(roundedValue.toFixed(2));
+  }
+
+  // Function to calculate and update collection form values
+  updateCollectionForm(total) {
+    let collectedAmount = this.DocketDetails.pAYTYP === "P01" ? this.DocketDetails.tOTAMT || 0 : 0;
+    if (this.VoucherDetails) {
+      collectedAmount = this.VoucherDetails.nNETP || 0;
+      this.CollectionForm.get("CollectionMRNo").setValue(this.VoucherDetails?.vNO || "");
+    }
+
+    const collectionAmount = ConvertToNumber(total - collectedAmount, 2);
+    this.CollectionForm.get("CollectedAmount").setValue(collectedAmount.toFixed(2));
+    this.CollectionForm.get("NewCollectionAmount").setValue(collectionAmount.toFixed(2));
+    this.CollectionForm.get("PendingAmount").setValue(0.00);
+  }
+
+  // Handler for checkbox change
+  OnChangeCheckBox(event) {
+    const total = ConvertToNumber(this.SummaryForm.get("Dockettotal").value, 2);
+    this.updateSummaryForm(total, event?.event?.checked);
+
+    const roundedValue = ConvertToNumber(this.SummaryForm.get("RoundedOff").value, 2);
+    this.updateCollectionForm(roundedValue);
+  }
+
+  // Handler for toggle up/down
+  toggleUpDown(event) {
+    const total = ConvertToNumber(this.SummaryForm.get("Dockettotal").value, 2);
+    const isUpDown = event.isUpDown;
+    this.updateSummaryForm(total, isUpDown);
+
+    const roundedValue = ConvertToNumber(this.SummaryForm.get("RoundedOff").value, 2);
+    this.updateCollectionForm(roundedValue);
   }
 
   async GetStateCodeWiseStateDetails(GSTCodeList) {
@@ -367,12 +426,37 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     };
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res.data && res.data.length > 0) {
-      this.States = []
+      this.States =res.data;
       if (res.data.length > 1)
         this.GSTType = await this.stateService.getGSTType(res.data[0], res.data[1]);
       else {
         this.GSTType = await this.stateService.getGSTType(res.data[0], res.data[0]);
       }
+    }
+    const gstToRemove = [];
+    this.GSTApplied = [];
+
+    Object.keys(this.GSTType).forEach(key => {
+      if (this.GSTType[key])
+        this.GSTApplied.push(key);
+      else
+        gstToRemove.push(key);
+    });
+    console.log(this.GSTApplied);
+
+    this.jsonSummaryControlArray = this.jsonSummaryControlArray.filter(x => !gstToRemove.includes(x.name));
+  }
+
+  async getAccountingRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "THC",
+      aCTIVE: true,
+      rULEID: { D$in: ["THCIBC", "THCCB"] }
+    }
+    const res: any = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+        this.isInterBranchControl =  res.find(x => x.rULEID === "THCIBC")?.vAL || false;
     }
   }
 
@@ -387,7 +471,22 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     };
     const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req));
     if (res.data) {
+      this.SACCode = res.data
       this.GSTRate = res.data.GSTRT || 12;
+    }
+  }
+
+  async getVoucherDetails() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "voucher_trans",
+      filter: {
+        tTYP: 1, vTNO: this.DocketDetails.dKTNO
+      }
+    };
+    const res = await firstValueFrom(this.masterService.masterPost("generic/getOne", req));
+    if (res.data) {
+      this.VoucherDetails = res.data;
     }
   }
 
@@ -417,7 +516,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     switch (PaymentMode) {
       case "Cheque":
         this.AccountsBanksList = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
-        const responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
+        let responseFromAPIBank = await GetBankDetailFromApi(this.masterService, Accountinglocation)
+
+        const bankCodes = this.AccountsBanksList.map(item => `${item.bANCD}:${item.bANM}`);
+
+        responseFromAPIBank = responseFromAPIBank.filter(f => bankCodes.includes(`${f.Accountnumber}:${f.Bankname}`));
+
         this.filter.Filter(
           this.jsonControlPaymentArray,
           this.PaymentSummaryFilterForm,
@@ -511,9 +615,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
 
 
-  async GenerateMR(VoucherNo) {
+  async GenerateMR() {
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
-    if (DocketNo || !this.SummaryForm.valid) {
+    if (!DocketNo) {
       Swal.fire({
         text: 'Please fill the required details above',
         icon: "warning",
@@ -524,40 +628,82 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     } else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
+          let gst = {};
+          let GSTAmount = 0;
+          this.GSTApplied.map(x => {
+            gst[x] = ConvertToNumber(this.SummaryForm.value[x].value, 2);
+            GSTAmount = GSTAmount + parseFloat(this.SummaryForm.value[x].value);
+          });
+
+          const btChgs = this.DocketFinDetails.cHG.map(item => {
+            let d = {
+              ...item,
+              cHACAT: "B"
+            };
+
+            const value = ConvertToNumber(this.BookingTimechargesForm.get(d.cHGID + 2).value, 2);
+            d.aMT = isNaN(value) ? 0 : (d.oPS === "-" ? -value : value);
+            return d;
+          });
+
+          const dtChgs = this.DeliveryTimeChargesArray.map((d) => {
+
+            var nd = {
+              "cHGID": d.additionalData.metaData.cHACD,
+              "cHGNM": d.additionalData.metaData.cAPTION || d.additionalData.metaData.sELCHA,
+              "aMT": 0,
+              "oPS": d.additionalData.metaData.aDD_DEDU,
+              "cHACAT": d.additionalData.metaData.cHACAT,
+            }
+            const value = parseFloat(this.DeliveryTimeChargesForm.get(d.name).value);
+            nd.aMT = isNaN(value) ? 0 : (d.additionalData.metaData.aDD_DEDU === "-" ? -value : value);
+            return nd;
+          });
+
+
+console.log(this.AccountsBanksList);
+console.log(this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummaryFilterForm.value.Bank.value)?.aCNM);
           const headerRequest = {
             cID: this.storage.companyCode,
             gCNNO: DocketNo,
-            dLVRT: this.headerDetails.Deliveredto,
-            cNTCTNO: this.headerDetails.ContactNumber,
-            rCEIVNM: this.headerDetails.NameofReceiver ? this.headerDetails.NameofReceiver : '',
-            CONSGNM: this.headerDetails.NameofConsignee ? this.headerDetails.NameofConsignee : '',
+            dLVRT: "",
+            cNTCTNO: this.DocketDetails.cSGN?.mOB || '',
+            rCEIVNM: this.DocketDetails.cSGN?.nM || '',
+            CONSGNM: this.DocketDetails.cSGN?.nM || '',
             mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
-            bNK: this.PaymentSummaryFilterForm.value.Bank.name,
-            cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo,
-            cHQDT: this.PaymentSummaryFilterForm.value.Date,
-            iSUBNK: this.PaymentSummaryFilterForm.value.issuedFromBank,
-            oNACC: this.PaymentSummaryFilterForm.value.OnAccount,
-            dPOSTBNKNM: this.PaymentSummaryFilterForm.value.depositedIntoBank.name,
-            dPOSTBNKCD: this.PaymentSummaryFilterForm.value.depositedIntoBank.value,
-            bILNGPRT: this.SummaryForm.value.BillingParty,
-            bKNGST: this.SummaryForm.value.Stateofbooking,
-            sPLYSTNM: this.SummaryForm.value.StateofSupply.name,
-            sPLYSTCD: this.SummaryForm.value.StateofSupply.value,
-            sACCDNM: this.SummaryForm.value.SACCode.name,
-            sACCd: this.SummaryForm.value.SACCode.value,
-            gSTRT: this.SummaryForm.value.GSTRate,
-            gSTAMT: parseFloat(this.SummaryForm.value.GSTAmount.toFixed(2)) || 0,
-            tDSSCTCD: this.SummaryForm.value.TDSSection.value,
-            tDSSCTNM: this.SummaryForm.value.TDSSection.name,
-            tDSRT: this.SummaryForm.value.TDSRate,
-            tDSAmt: parseFloat(this.SummaryForm.value.TDSAmount).toFixed(2) || 0,
-            gSTCHRGD: this.SummaryForm.value.GSTCharged,
-            dLVRMRAMT: this.SummaryForm.value.DeliveryMRNetAmount,
-            cLLCTAMT: this.SummaryForm.value.CollectionAmount,
-            rNDOFF: this.SummaryForm.value.roundOffAmt || 0,
-            pRTLYCLCTD: this.SummaryForm.value.PartiallyCollected,
-            pRTLYRMGAMT: (this.SummaryForm.value.PartiallyCollectedAmt).toFixed(2) || 0,
-            vNO: VoucherNo,
+            bNK: this.AccountsBanksList.find(item => item.bANCD == this.PaymentSummaryFilterForm.value.Bank.value)?.aCNM || '',
+            cHQNo: this.PaymentSummaryFilterForm.value.ChequeOrRefNo ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : '',
+            cHQDT: this.PaymentSummaryFilterForm.value.Date ? this.PaymentSummaryFilterForm.value.Date : '',
+            iSUBNK: "",
+            oNACC: "",
+            dPOSTBNKNM: this.PaymentSummaryFilterForm.value.Bank.name,
+            dPOSTBNKCD: this.PaymentSummaryFilterForm.value.Bank.value,
+            bILNGPRT: this.DocketDetails.bPARTYNM,
+            bPARTY: this.DocketDetails.bPARTY,
+            bKNGST: this.States[0].STNM,
+            bKNGSTCD: this.States[0].ST,
+            sPLYSTNM: this.States[1]?.STNM || this.States[0].STNM,
+            sPLYSTCD: this.States[1]?.ST || this.States[0].ST,
+            sACCDNM: this.SACCode.SNM,
+            sACCd: this.SACCode.SHCD,
+            gSTRT: this.GSTRate,
+            gST: {
+              ...gst
+            },
+            sUBTTL: ConvertToNumber(this.SummaryForm.value.DocketNewTotal, 2),
+            gSTAMT: ConvertToNumber(GSTAmount, 2),
+            //tDSSCTCD: this.SummaryForm.value.TDSSection.value,
+            //tDSSCTNM: this.SummaryForm.value.TDSSection.name,
+            //tDSRT: this.SummaryForm.value.TDSRate,
+            //tDSAmt: parseFloat(this.SummaryForm.value.TDSAmount).toFixed(2) || 0,
+            gSTCHRGD: ConvertToNumber(GSTAmount, 2),
+            tOTAMT: ConvertToNumber(this.SummaryForm.value.Dockettotal, 2),
+            rNDOFF: ConvertToNumber(this.SummaryForm.value.RoundOffAmount, 2) || 0,
+            dLVRMRAMT: ConvertToNumber(this.SummaryForm.value.RoundedOff, 2),
+            cLLCTAMT: ConvertToNumber(this.CollectionForm.value.NewCollectionAmount, 2),
+            pRTLYCLCTD: false,
+            pRTLYRMGAMT: ConvertToNumber(this.CollectionForm.value.PendingAmount, 2),
+            vNO: "",
             lOC: this.storage.branch,
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
@@ -566,21 +712,29 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const detailRequests = {
             cID: this.storage.companyCode,
             gCNNO: this.DocketDetails.dKTNO,
-            cHG: this.DocketDetails.cHG,
-            // pYBASIS: element.payBasis,
-            // sUBTTL: parseFloat(element.subTotal),
-            // nWSUBTTL: parseFloat(element.newSubTotal),
-            // rTDFRNC: parseFloat(element.rateDifference),
-            // vNO: VoucherNo,
-            // lOC: this.storage.branch,
-            // tOTL: parseFloat(element.totalAmount),
+            dKTNO: this.DocketDetails.dKTNO,
+            cHG: [...btChgs, ...dtChgs],
+            pYBASIS: this.DocketDetails.pAYTYP,
+            sUBTTL: this.DocketDetails.gROAMT,
+            nWSUBTTL: ConvertToNumber(this.SummaryForm.value.DocketNewTotal, 2),
+            gSTAMT: ConvertToNumber(GSTAmount, 2),
+            sACCDNM: this.SACCode.SNM,
+            sACCd: this.SACCode.SHCD,
+            gSTRT: this.GSTRate,
+            gST: {
+              ...gst
+            },
+            rTDFRNC: ConvertToNumber(this.SummaryForm.value.DocketNewTotal - this.DocketDetails.gROAMT, 2),
+            vNO: "",
+            lOC: this.storage.branch,
+            tOTL: ConvertToNumber(this.SummaryForm.value.Dockettotal, 2),
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName
           }
 
           let data = {
-            chargeDetails: detailRequests,
+            chargeDetails: [detailRequests],
             ...headerRequest
           };
           // Prepare the request body with company code, collection name, and job detail data.
@@ -595,13 +749,62 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
           //Send a POST request to create the job detail in the MongoDB collection.
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
+          if (res.success) {
+            if (headerRequest.cLLCTAMT > 0) {
+              const vRes = await this.GenerateVoucher(res?.data);
+              if (vRes && vRes.success ) {
+                const reqMR = {
+                  companyCode: this.storage.companyCode,
+                  collectionName: "delivery_mr_header",
+                  filter: { docNo: res?.data?.data?.docNo, cID: this.storage.companyCode },
+                  update: {
+                    vNO: vRes?.data?.chargeDetails?.ops[0]?.dMRNO
+                  }
+                }
+                await firstValueFrom(this.operation.operationPut(GenericActions.UpdateMany, reqMR));
+
+                const reqMRDet = {
+                  companyCode: this.storage.companyCode,
+                  collectionName: "delivery_mr_details",
+                  filter: { dLMRNO: res?.data?.data?.docNo, cID: this.storage.companyCode },
+                  update: {
+                    vNO: vRes?.data?.chargeDetails?.ops[0]?.dMRNO
+                  }
+                }
+                await firstValueFrom(this.operation.operationPut(GenericActions.Update, reqMRDet));
+
+                 // If the branches match, navigate to the DeliveryMrGeneration page
+                this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
+                  state: {
+                    data: res.data.chargeDetails
+                  },
+                });
+              }
+              else {
+                this.snackBarUtilityService.ShowCommonSwal(
+                  "error",
+                  "Fail To Do Account Posting!"
+                );
+              }
+            }
+            Swal.hideLoading();
+            setTimeout(() => {
+              Swal.close();
+            }, 2000);           
+          } else {
+            this.snackBarUtilityService.ShowCommonSwal(
+              "error",
+              "Fail Generate Delivery MR!"
+            );
+          }
+          /*
           if (res) {
             const reqBody = {
               companyCode: this.storage.companyCode,
               collectionName: "voucher_trans",
               filter: { vNO: VoucherNo },
               update: {
-                vTNO: res?.data?.chargeDetails?.ops[0]?.dLMRNO
+                vTNO: res?.data?.chargeDetails?.ops[0]?.dMRNO
               }
             };
             await firstValueFrom(this.operation.operationPut("generic/update", reqBody));
@@ -617,8 +820,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
               },
             });
           }
+          */
         }
         catch (error) {
+          console.error("Error fetching data:", error);
           this.snackBarUtilityService.ShowCommonSwal(
             "error",
             "Fail To Submit Data..!"
@@ -629,10 +834,102 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   }
 
-
   //#endregion
-  GenerateVoucher() {
+  async GenerateVoucher(data) {
+    let res = [];
+    if (!data)
+      return null;
+
+    const dmr = data?.data?.header;
+    if(!dmr)
+      return null;
+    
+    try {
+      const paybase = this.DocketDetails.pAYTYP;
+      let requestModel = this.PrepareVoucher("collection",this.storage.branch, dmr, paybase);
+      const res = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", requestModel));
+      if (res.success) {
+         res.push(res?.data?.mainData?.ops[0].vNO);
+         await this.accountPosting(res, this.storage.branch, requestModel); 
+      }
+
+      if(this.isInterBranchControl ) {
+        let requestModel2 = this.PrepareVoucher("transfer", this.DocketDetails.oRGN, dmr, paybase);
+        const res2 = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", requestModel));
+        if (res2.success) {
+          res.push(res2?.data?.mainData?.ops[0].vNO);
+          await this.accountPosting(res2, this.DocketDetails.oRGN, requestModel2); 
+        }
+      }
+      
+    } catch (error) {
+      this.snackBarUtilityService.ShowCommonSwal(
+        "error",
+        "Fail To Submit Data..!"
+      );
+    }
+  }
+
+  async accountPosting(res, branch, requestModel) {
+    let reqBody = {
+      companyCode: this.storage.companyCode,
+      voucherNo: res?.data?.mainData?.ops[0].vNO,
+      transDate: Date(),
+      finYear: financialYear,
+      branch: branch,
+      transCode: VoucherInstanceType.DeliveryMR,
+      transType: VoucherInstanceType[VoucherInstanceType.DeliveryMR],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      docType: "VR",
+      partyType: "Customer",
+      docNo: this.docketNo,
+      partyCode: this.DocketDetails.bPARTY,
+      partyName: this.DocketDetails.bPARTYNM,
+      entryBy: this.storage.userName,
+      entryDate: Date(),
+      debit: requestModel.voucherlineItems
+        .filter((item) => item.credit == 0)
+        .map(function (item) {
+          return {
+            accCode: item.accCode,
+            accName: item.accName,
+            accCategory: item.accCategory,
+            amount: item.debit,
+            narration: item.narration ?? "",
+          };
+        }),
+      credit: requestModel.voucherlineItems
+        .filter((item) => item.debit == 0)
+        .map(function (item) {
+          return {
+            accCode: item.accCode,
+            accName: item.accName,
+            accCategory: item.accCategory,
+            amount: item.credit,
+            narration: item.narration ?? "",
+          };
+        }),
+    };
+    const resPosting = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody));
+    if (resPosting.success) {
+      //
+    }
+    else {
+      console.log("Error in Account Posting", resPosting);
+    }
+  }
+  PrepareVoucher(type, branch, dmr, paybase): any {
+    let voucherRequestModel = new VoucherRequestModel();
+    let voucherDataRequestModel = new VoucherDataRequestModel();
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+
+    let gst = {};    
+    let GSTAmount = dmr.cLLCTAMT/(1+(this.GSTRate / 100));
+    this.GSTApplied.map(x => {
+      gst[x] = ConvertToNumber(GSTAmount/this.GSTApplied.length, 2);
+    });
+
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
       const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
@@ -643,142 +940,64 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         return;
       }
     }
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
+    voucherRequestModel.companyCode = this.storage.companyCode;
+    voucherRequestModel.docType = "VR";
 
-        this.VoucherRequestModel.companyCode = this.storage.companyCode;
-        this.VoucherRequestModel.docType = "VR";
-        this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear;
+    voucherRequestModel.branch = branch; //Nee to change as per Inter branch control logic
+    voucherRequestModel.finYear = financialYear;
 
-        this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.DeliveryMR;
-        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.DeliveryMR];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
-        this.VoucherDataRequestModel.transDate = new Date();
-        this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = this.storage.branch;
-        this.VoucherDataRequestModel.finYear = financialYear;
+    voucherDataRequestModel.voucherNo = "";
+    voucherDataRequestModel.transCode = VoucherInstanceType.DeliveryMR;
+    voucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.DeliveryMR];
+    voucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+    voucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+    voucherDataRequestModel.transDate = new Date();
+    voucherDataRequestModel.docType = "VR";
+    voucherDataRequestModel.branch = branch;
+    voucherDataRequestModel.finYear = financialYear;
 
-        this.VoucherDataRequestModel.accLocation = this.storage.branch;
-        this.VoucherDataRequestModel.preperedFor = "Customer"
-        this.VoucherDataRequestModel.partyCode = this.filteredDocket[0]?.bPARTY;
-        this.VoucherDataRequestModel.partyName = this.filteredDocket[0]?.bPARTYNM;
-        this.VoucherDataRequestModel.partyState = this.SummaryForm.value.StateofSupply.name
-        this.VoucherDataRequestModel.entryBy = this.storage.userName;
-        this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo = ""
+    voucherDataRequestModel.accLocation = branch;
+    voucherDataRequestModel.preperedFor = "Customer"
+    voucherDataRequestModel.partyCode = this.DocketDetails.bPARTY;
+    voucherDataRequestModel.partyName = this.DocketDetails.bPARTYNM;
+    if(this.DocketDetails.pAYTYP == 'P01') {
+      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGN.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGN.gST.substring(0, 2); 
+    }
+    else {
+      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGE.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGE.gST.substring(0, 2); 
+    }
+    voucherDataRequestModel.entryBy = this.storage.userName;
+    voucherDataRequestModel.entryDate = new Date();
 
-        this.VoucherDataRequestModel.tdsSectionCode = this.SummaryForm.value.SACCode.value;
-        this.VoucherDataRequestModel.tdsSectionName = this.SummaryForm.value.SACCode.name;
-        this.VoucherDataRequestModel.tdsRate = this.SummaryForm.value.TDSRate;
-        this.VoucherDataRequestModel.tdsAmount = this.SummaryForm.value.TDSAmount;
-        this.VoucherDataRequestModel.tdsAtlineitem = false;
-        this.VoucherDataRequestModel.tcsSectionCode = undefined
-        this.VoucherDataRequestModel.tcsSectionName = undefined
-        this.VoucherDataRequestModel.tcsRate = 0;
-        this.VoucherDataRequestModel.tcsAmount = 0;
+    voucherDataRequestModel.tcsRate = 0;
+    voucherDataRequestModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST = 0;
-        this.VoucherDataRequestModel.SGST = 0;
-        this.VoucherDataRequestModel.CGST = 0;
-        this.VoucherDataRequestModel.UGST = 0;
-        this.VoucherDataRequestModel.GSTTotal = this.SummaryForm.value.GSTAmount;
+    Object.keys(gst).forEach(item => {
+      voucherDataRequestModel[item] = ConvertToNumber(gst[item], 2)
+    });
 
-        this.VoucherDataRequestModel.GrossAmount = this.SummaryForm.value.DeliveryMRNetAmount || 0;
-        this.VoucherDataRequestModel.netPayable = this.SummaryForm.value.CollectionAmount || 0;
-        this.VoucherDataRequestModel.roundOff = this.SummaryForm.value.roundOffAmt || 0;
-        this.VoucherDataRequestModel.voucherCanceled = false;
+    voucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.VoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
-        this.VoucherDataRequestModel.refNo = this.PaymentSummaryFilterForm.value?.ChequeOrRefNo;
-        this.VoucherDataRequestModel.accountName = this.PaymentSummaryFilterForm.value?.Bank.name;
-        this.VoucherDataRequestModel.accountCode = this.PaymentSummaryFilterForm.value?.Bank.value;
-        this.VoucherDataRequestModel.date = this.PaymentSummaryFilterForm.value?.Date;
-        this.VoucherDataRequestModel.scanSupportingDocument = "";
+    voucherDataRequestModel.GrossAmount =  ConvertToNumber(dmr.cLLCTAMT - GSTAmount,2) || 0;
+    voucherDataRequestModel.netPayable = ConvertToNumber(dmr.cLLCTAMT,2) || 0;
+    voucherDataRequestModel.roundOff = 0;
+    voucherDataRequestModel.voucherCanceled = false;
 
+    voucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
+    voucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : "";
+    voucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank.bANM : this.PaymentSummaryFilterForm.value.CashAccount.name;
+    voucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank.bANCD : this.PaymentSummaryFilterForm.value.CashAccount.value;
+    voucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.date : "";
 
-        const voucherlineItems = this.GetJournalVoucherLedgers();
-        this.VoucherRequestModel.details = voucherlineItems;
-        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-        this.VoucherRequestModel.debitAgainstDocumentList = [];
+    voucherDataRequestModel.scanSupportingDocument = "";
+    voucherDataRequestModel.transactionNumber = dmr.docNo;
 
-        firstValueFrom(this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-            if (res.success) {
-              let reqBody = {
-                companyCode: this.storage.companyCode,
-                voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transDate: Date(),
-                finYear: financialYear,
-                branch: this.storage.branch,
-                transCode: VoucherInstanceType.BalancePayment,
-                transType:
-                  VoucherInstanceType[VoucherInstanceType.BalancePayment],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
-                docType: "Voucher",
-                partyType: "Vendor",
-                docNo: this.docketNo,
-                partyCode: "" + this.DocketDetails.cSGE?.cD || "",
-                partyName: this.DocketDetails.cSGE?.nM || "",
-                entryBy: this.storage.userName,
-                entryDate: Date(),
-                debit: voucherlineItems
-                  .filter((item) => item.credit == 0)
-                  .map(function (item) {
-                    return {
-                      accCode: item.accCode,
-                      accName: item.accName,
-                      accCategory: item.accCategory,
-                      amount: item.debit,
-                      narration: item.narration ?? "",
-                    };
-                  }),
-                credit: voucherlineItems
-                  .filter((item) => item.debit == 0)
-                  .map(function (item) {
-                    return {
-                      accCode: item.accCode,
-                      accName: item.accName,
-                      accCategory: item.accCategory,
-                      amount: item.credit,
-                      narration: item.narration ?? "",
-                    };
-                  }),
-              };
-              firstValueFrom(
-                this.voucherServicesService.FinancePost(
-                  "fin/account/posting",
-                  reqBody
-                )
-              ).then((res: any) => {
-                if (res.success) {
-                  this.GenerateMR(reqBody.voucherNo)
-                  Swal.hideLoading();
-                  Swal.close();
-                } else {
-                  this.snackBarUtilityService.ShowCommonSwal(
-                    "error",
-                    "Fail To Do Account Posting..!"
-                  );
-                }
-              });
-            }
-          })
-          .catch((error) => {
-            this.snackBarUtilityService.ShowCommonSwal("error", error);
-          })
-          .finally(() => { });
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal(
-          "error",
-          "Fail To Submit Data..!"
-        );
-      }
-    }, "Delivery MR Voucher Generating..!");
+    const voucherlineItems = this.GetJournalVoucherLedgers(type, voucherDataRequestModel, gst, paybase);
+    voucherRequestModel.details = voucherlineItems;
+    voucherRequestModel.data = voucherDataRequestModel;
+    voucherRequestModel.debitAgainstDocumentList = [];
 
+    return voucherRequestModel;        
   }
   //#region to disable submit btn
   isSubmitDisabled(): boolean {
@@ -800,7 +1019,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   navigateWithTabIndex(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
-  GetJournalVoucherLedgers() {
+  GetJournalVoucherLedgers(type, VoucherDataRequestModel, gst, paybase) {
     const createVoucher = (
       accCode,
       accName,
@@ -836,11 +1055,65 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     const Result = [];
 
-    Result.push(createVoucher(ledgerInfo["INC001006"].LeadgerCode, ledgerInfo["INC001006"].LeadgerName, ledgerInfo["INC001006"].LeadgerCategory,
-      0, parseFloat(this.SummaryForm.value.CollectionAmount) || 0, this.docketNo));
-    Result.push(createVoucher(ledgerInfo["AST001002"].LeadgerCode, ledgerInfo["AST001002"].LeadgerName, ledgerInfo["AST001002"].LeadgerCategory,
-      parseFloat(this.SummaryForm.value.CollectionAmount) || 0, 0, this.docketNo));
+    if(type == "collection") {
+      const PaymentMode = VoucherDataRequestModel.PaymentMode;
+        if (PaymentMode == "Cash") {
+          Result.push(createVoucher(VoucherDataRequestModel.accountCode,VoucherDataRequestModel.accountName, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
+        }
+        if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+          const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == VoucherDataRequestModel.accountCode && item.bANM == VoucherDataRequestModel.accountName)
+          Result.push(createVoucher(AccountDetails.aCCD, AccountDetails.aCNM, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
+        }
+        
+      if(this.isInterBranchControl) {
+        Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory, 
+                    0, VoucherDataRequestModel.netPayable, VoucherDataRequestModel.transactionNumber));
+      }
+      else {
 
+        Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory, 
+                      0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
+
+        Object.keys(gst).forEach(item => {
+          Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory, 
+                  0, gst[item], VoucherDataRequestModel.transactionNumber));
+        });
+      }
+    }
+    else if(type == "transfer") {
+      if(this.isInterBranchControl) {
+        Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory, 
+        VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
+
+        if(paybase == 'P01') 
+        {         
+          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory, 
+                      0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
+
+          Object.keys(gst).forEach(item => {
+            Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory, 
+                    0, gst[item], VoucherDataRequestModel.transactionNumber));
+          });
+        }
+        else {
+
+            const diff = ConvertToNumber(VoucherDataRequestModel.netPayable - this.DocketDetails.tOTAMT,2);
+            const gross =  ConvertToNumber(diff - VoucherDataRequestModel.GSTTotal, 2)
+
+            Result.push(createVoucher(ledgerInfo["INC001009"].LeadgerCode, ledgerInfo["INC001009"].LeadgerName, ledgerInfo["INC001009"].LeadgerCategory, 
+                      0, this.DocketDetails.tOTAMT, VoucherDataRequestModel.transactionNumber));
+
+            Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory, 
+                      0, gross, VoucherDataRequestModel.transactionNumber));
+
+            Object.keys(gst).forEach(item => {
+              Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory, 
+                      0, gst[item], VoucherDataRequestModel.transactionNumber));
+            });
+        }
+      }
+    }
+    
     return Result;
   }
   //#endregion

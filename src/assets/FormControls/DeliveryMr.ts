@@ -5,7 +5,9 @@ export class DeliveryMrGeneration {
     deliveryMrDetailsControlArray: FormControls[];
     deliveryMrPaymentModeArray: FormControls[];
     SummaryArray: FormControls[];
+    CollectionDetails: FormControls[];
     BookingTimechargesArray: FormControls[];
+
     constructor() {
         this.deliveryMrControlArray = [
             {
@@ -282,17 +284,7 @@ export class DeliveryMrGeneration {
                 generatecontrol: true,
                 disable: true,
                 Validations: [],
-            },
-            {
-                name: "CGST",
-                label: "CGST ₹",
-                placeholder: "CGST ₹",
-                type: "number",
-                value: "",
-                generatecontrol: true,
-                disable: true,
-                Validations: [],
-            },
+            },            
             {
                 name: 'Dockettotal',
                 label: 'Docket Total ₹',
@@ -305,6 +297,88 @@ export class DeliveryMrGeneration {
                     metaData: "Dockettotal"
                 }
             },
+            {
+                name: "CGST",
+                label: "CGST ₹",
+                placeholder: "CGST ₹",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [],
+            },
+            {
+                name: 'RoundOffAmount',
+                label: 'Round Off Amount ₹',
+                placeholder: '',
+                type: 'number',
+                value: "",
+                Validations: [],
+                generatecontrol: true, 
+                disable: true
+            },
+            {
+                name: 'RoundedOff',
+                label: 'Rounded Off ₹',
+                placeholder: '',
+                type: 'number',
+                value: "",
+                Validations: [],
+                generatecontrol: true, 
+                disable: true
+            }
+        ]
+        this.CollectionDetails = [
+            {
+                name: 'CollectedAmount',
+                label: 'Collected Amount ₹',
+                placeholder: 'Collected Amount ₹',
+                type: 'number',
+                value: 0.00,
+                Validations: [],
+                generatecontrol: true, 
+                disable: true,                
+            },
+            {
+                name: 'CollectionMRNo',
+                label: 'Collection MR No',
+                placeholder: 'Collection MR No',
+                type: 'text',
+                value: "",
+                Validations: [],
+                generatecontrol: true, 
+                disable: true,                
+            },
+            {
+                name: 'NewCollectionAmount',
+                label: 'Collection Amount ₹',
+                placeholder: 'Collection Amount ₹',
+                type: 'number',
+                value: 0.00,
+                Validations: [],
+                generatecontrol: true, 
+                disable: true,                
+            },
+            {
+                name: 'PendingAmount',
+                label: 'Pending Amount ₹',
+                placeholder: 'Pending Amount ₹',
+                type: 'number',
+                value: 0.00,
+                Validations: [],
+                generatecontrol: false, 
+                disable: true,                
+            },
+            // {
+            //     name: 'BillingParty',
+            //     label: 'Billing Party',
+            //     placeholder: 'Billing Party',
+            //     type: 'number',
+            //     value: 0.00,
+            //     Validations: [],
+            //     generatecontrol: true, 
+            //     disable: true,                
+            // },
         ]
         this.BookingTimechargesArray = [
             {
@@ -384,5 +458,7 @@ export class DeliveryMrGeneration {
     getBookingTimecharges() {
         return this.BookingTimechargesArray
     }
-
+    getCollectionDetailsControls() {
+        return this.CollectionDetails
+    }
 }

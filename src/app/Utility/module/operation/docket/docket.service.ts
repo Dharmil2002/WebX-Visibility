@@ -1168,6 +1168,8 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData) {
+
+
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -1228,9 +1230,21 @@ export class DocketService {
             "fRTAMT": ConvertToNumber(data?.freight_amount || 0, 2),
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
             "gROAMT": ConvertToNumber(data?.grossAmount || 0, 2),
-            "rCM": data?.rcm || "",
+            "rCM": data?.rcm || "N",
             "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
+            "gST": {
+                "tY": "SGST",
+                "iGRT": 0,
+                "sGRT": 6,
+                "cGRT": 6,
+                "uGRT": 0,
+                "iGST": 0,
+                "sGST": ConvertToNumber(data?.gstChargedAmount/2 || 0, 2),
+                "cGST": ConvertToNumber(data?.gstChargedAmount/2 || 0, 2),
+                "uGST": 0,
+                "aMT": ConvertToNumber(data?.gstChargedAmount || 0, 2)
+             },
             "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
             "pKGTYN": data?.pkgsTypeName || "",
             "pKGTY": data?.pkgsType || "",

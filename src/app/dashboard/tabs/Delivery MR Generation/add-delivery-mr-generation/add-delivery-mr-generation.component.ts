@@ -221,6 +221,16 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.BookingTimechargesForm.get('NewFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
         this.ShowBookingTimeCharges = true;
       }
+      else {
+      
+        this.AlljsonControlBookingTimechargesArray = [...this.jsonControlBookingTimechargesArray];
+        this.BookingTimechargesForm = formGroupBuilder(this.fb, [
+          this.AlljsonControlBookingTimechargesArray,
+        ]);
+        this.BookingTimechargesForm.get('OldFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
+        this.BookingTimechargesForm.get('NewFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
+        this.ShowBookingTimeCharges = true;
+      }
       if (this.DocketDetails.pAYTYP == 'P01') {
         await this.getVoucherDetails();
       }
@@ -323,7 +333,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       if (event.field.FormType === "BookingTimeCharges") {
         const OldAmount = parseFloat(this.BookingTimechargesForm.get(event.field.ChargeId + "1").value);
         const NewAmount = parseFloat(this.BookingTimechargesForm.get(event.field.ChargeId + "2").value);
-        const DiffAmount = parseFloat((OldAmount - NewAmount).toFixed(2));
+        const DiffAmount = parseFloat((NewAmount - OldAmount).toFixed(2));
         this.BookingTimechargesForm.get(event.field.ChargeId + "3").setValue(DiffAmount);
       }
     }

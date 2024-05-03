@@ -303,9 +303,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         value: this.DocketDetails?.dEST || ""
       }
       this.consignmentForm.controls["destination"].setValue(destionation);
-      this.invoiceForm.controls["noOfPackage"].setValue(this.DocketDetails?.noOfPackage || "");
-      this.invoiceForm.controls["actualWeight"].setValue(this.DocketDetails?.actualWeight || "");
-      this.invoiceForm.controls["chargedWeight"].setValue(this.DocketDetails?.chargedWeight || "");
+      this.invoiceForm.controls["noOfPackage"].setValue(this.DocketDetails?.pKGS || "");
+      this.invoiceForm.controls["actualWeight"].setValue(this.DocketDetails?.aCTWT || "");
+      this.invoiceForm.controls["chargedWeight"].setValue(this.DocketDetails?.cHRWT || "");
       const destinationMapping = await this.locationService.locationFromApi({
         locCity: { D$in: [this.DocketDetails?.fCT, this.DocketDetails?.tCT] },
       });

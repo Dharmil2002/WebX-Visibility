@@ -332,7 +332,6 @@ export class AddUserMasterComponent implements OnInit {
     }
   }
   onUserTypeChange() {
-    debugger
     const name =this.userTableForm.controls["name"].value;
     this.userTableForm.controls["name"].setValue("");
     this.userTableForm.controls["name"].clearValidators();

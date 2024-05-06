@@ -1340,7 +1340,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.unitsName = this.rules.find(x => x.rULEID == "UNITS" && x.aCTIVE)?.vAL;
     this.cftRation = this.rules.find(x => x.rULEID == "CFTRATION" && x.aCTIVE)?.vAL;
     this.isScan = true;
-    //this.isScan=this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
@@ -1374,6 +1373,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.isSubmit = true;
     const data = { ...this.consignmentForm.getRawValue(), ...this.freightForm.getRawValue() }
     const tableData = this.tableData
+    data['iSSCAN']=  this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
     data['pkgsTypeName'] = this.pkgsType.find(x => x.value == data?.pkgsType)?.name ?? '';
     data['rsktyName'] = this.riskType.find(x => x.value == data?.risk)?.name ?? '';

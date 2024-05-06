@@ -4,9 +4,9 @@ import moment from 'moment';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
@@ -202,6 +202,7 @@ export class CnoteBillMrReportComponent implements OnInit {
     private operationService: OperationService,
     private masterServices: MasterService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
   }
@@ -346,12 +347,12 @@ export class CnoteBillMrReportComponent implements OnInit {
       try {
         const docketNo = this.cnoteBillMRTableForm.value.cnote;
         const docketArray = docketNo ? docketNo.includes(',') ? docketNo.split(',') : [docketNo] : [];
-        
+
         const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
         const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
         const startDate = moment(startValue).startOf('day').toDate();
         const endDate = moment(endValue).endOf('day').toDate();
-        
+
         const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
           ? this.cnoteBillMRTableForm.value.fromlocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
           : [];
@@ -393,7 +394,7 @@ export class CnoteBillMrReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
-        exportAsExcelFile(data, `Cnote_Bill_MR_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(data, `Cnote_Bill_MR_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

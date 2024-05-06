@@ -180,11 +180,12 @@ export class PrqTrackingComponent implements OnInit {
   //#endregion
 
   //#region OpenPrq
-  OpenPrq(data) {
-    const prqNo = data.prqNo;
+  OpenPrq(res) {
+    const prqNo = res.data.pRQNO;
     const templateBody = {
       DocNo: prqNo,
-      templateName: "PRQ View-Print",
+      partyCode: "CONSRAJT25",
+      templateName: "prq",
     };
     const url = `${
       window.location.origin

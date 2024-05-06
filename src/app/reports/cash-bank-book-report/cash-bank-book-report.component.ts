@@ -6,7 +6,6 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import Swal from 'sweetalert2';
 import { CashBankBookReportService } from 'src/app/Utility/module/reports/cash-bank-book-report-service';
 import moment from 'moment';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
@@ -14,6 +13,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ExportService } from 'src/app/Utility/module/export.service';
 @Component({
   selector: 'app-cash-bank-book-report',
   templateUrl: './cash-bank-book-report.component.html'
@@ -58,7 +58,8 @@ export class CashBankBookReportComponent implements OnInit {
     private locationService: LocationService,
     private filter: FilterUtils,
     private storage: StorageService,
-    private masterServices: MasterService
+    private masterServices: MasterService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
   }
@@ -197,7 +198,7 @@ export class CashBankBookReportComponent implements OnInit {
     // Filter unnecessary fields
     const filteredRecordsWithoutKeys = formattedResults.map(({ rNO, dT, month, pMD, ...rest }) => rest);
     // Generate and download the CSV file
-    exportAsExcelFile(filteredRecordsWithoutKeys, `Cash-Bank-Book_Report-${timeString}`, this.DetCSVHeader);
+    this.exportService.exportAsCSV(filteredRecordsWithoutKeys, `Cash-Bank-Book_Report-${timeString}`, this.DetCSVHeader);
   }
 
   async getDropDownList() {

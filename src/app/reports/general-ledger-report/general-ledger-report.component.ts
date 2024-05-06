@@ -7,10 +7,10 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { financialYear, timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
-import { exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralLedgerReport } from 'src/assets/FormControls/Reports/General-Ledger-Report/general-ledger-report';
@@ -72,6 +72,7 @@ export class GeneralLedgerReportComponent implements OnInit {
     private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
     private generalLedgerReportService: GeneralLedgerReportService,
+    private exportService: ExportService
   ) { }
 
   ngOnInit(): void {
@@ -230,7 +231,7 @@ export class GeneralLedgerReportComponent implements OnInit {
           Swal.close();
         }, 1000);
         // Export the record to Excel
-        exportAsExcelFile(data, `General_Ledger_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(data, `General_Ledger_Report-${timeString}`, this.CSVHeader);
 
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(

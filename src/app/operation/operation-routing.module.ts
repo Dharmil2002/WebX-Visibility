@@ -38,6 +38,7 @@ import { UpdateDeliveryComponent } from "./update-delivery/update-delivery.compo
 import { QueryPageComponent } from "./consignmentTracking/query-page/query-page.component";
 import { TrackingPageComponent } from "./consignmentTracking/tracking-page/tracking-page.component";
 import { ConsignmentLTLEntryFormComponent } from "./consignment-ltl-entry-form/consignment-ltl-entry-form.component";
+import { VehicleUpdateUploadComponent } from "./vehicle-update-upload/vehicle-update-upload.component";
 import { PrqTrackingComponent } from "./prq-tracking/prq-tracking.component";
 const routes: Routes = [
   {
@@ -196,6 +197,10 @@ const routes: Routes = [
   {
     path: "consignment-entry-ltl",
     component: ConsignmentLTLEntryFormComponent
+  },
+  {
+    path: "vehicle-loading",
+    component: VehicleUpdateUploadComponent
   }
 
 ]

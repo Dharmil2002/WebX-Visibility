@@ -4,7 +4,6 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { finYear, timeString } from 'src/app/Utility/date/date-utils';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';

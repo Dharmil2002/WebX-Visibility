@@ -971,6 +971,8 @@ export class DocketService {
     /*End*/
     /*here the Code for the FieldMapping while Full dock generated  via quick docket*/
     async operationsFieldMapping(data, invoiceDetails = [], docketFin, isDcr = false) {
+        const pkgs = parseInt(data?.pKGS || 0);
+        const docketNumber = data?.dKTNO || ""
         const ops = {
             dKTNO: data?.dKTNO || "",
             sFX: 0,
@@ -1060,12 +1062,36 @@ export class DocketService {
             };
             await firstValueFrom(this.operation.operationMongoPost('generic/create', reqfin));
         }
+        if (docketNumber && pkgs > 0) {
+            try {
+                const pkgData = await this.generateArray(ops, pkgs);
+                const chunks = this.chunkArray(pkgData, 50); // Change 50 to whatever number suits your scenario
+                for (const chunk of chunks) {
+                    const req = {
+                        companyCode: this.storage.companyCode,
+                        collectionName: "docket_pkgs_ltl",
+                        data: chunk
+                    };
+                    await firstValueFrom(this.operation.operationMongoPost('generic/create', req));
+                }
+            } catch (err) {
+            }
+        }
         return true
 
     }
     /*End*/
+    /*below function is for the aa data in chunks*/
+    chunkArray(array, chunkSize) {
+        const result = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+            result.push(array.slice(i, i + chunkSize));
+        }
+        return result;
+    }
+    /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
-    async getDocketList(filter) {
+    async getDocketList(filter,iSMR=false) {
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,
@@ -1081,8 +1107,23 @@ export class DocketService {
                         "pipeline": [
                             {
                                 "D$match": {
-                                    "D$expr": {
-                                        "D$eq": ["$docNo", "$$docNoVar"] // Use "$docNo" from "dockets_ltl" and compare it with "docNoVar"
+                                    // "D$expr": {
+                                    //     "D$eq": ["$docNo", "$$docNoVar"] // Use "$docNo" from "dockets_ltl" and compare it with "docNoVar"
+
+                                    // },
+                                    'D$expr': {
+                                        'D$and': [
+                                            {
+                                                'D$eq': [
+                                                    '$docNo', '$$docNoVar'
+                                                ]
+                                            },
+                                            iSMR ? {
+                                                'D$in': [
+                                                    '$pAYTYP', ['P03', 'P01']
+                                                ]
+                                            } : {}
+                                        ]
                                     }
                                 }
                             }
@@ -1142,7 +1183,7 @@ export class DocketService {
         return res.data;
     }
     async checkInvoiceExistLTL(filter) {
- 
+
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "docket_invoices_ltl",
@@ -1152,6 +1193,8 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData) {
+
+
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -1167,13 +1210,13 @@ export class DocketService {
             "oRGN": data?.origin || "",
             "fCT": data?.fromCity?.ct || "",
             "fPIN": data?.fromCity?.pincode || "",
-            "fAREA":data?.fromCity?.clusterName|| "",
-            "fAREACD":data?.fromCity?.clusterId||"",
+            "fAREA": data?.fromCity?.clusterName || "",
+            "fAREACD": data?.fromCity?.clusterId || "",
             "dEST": data?.destination?.value || "",
             "tCT": data?.toCity?.ct || "",
             "tPIN": data?.toCity?.pincode || "",
-            "tAREA": data?.toCity?.clusterName|| "",
-            "tAREACD":data?.toCity?.clusterId|| "",
+            "tAREA": data?.toCity?.clusterName || "",
+            "tAREACD": data?.toCity?.clusterId || "",
             "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
             "pKGS": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)) : 0,
             "aCTWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)) : 0,
@@ -1182,8 +1225,8 @@ export class DocketService {
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
             "cSGE": {
-                "cD": data?.consignorName?.value ||"C8888",
-                "nM": data?.consignorName?.name ||data?.consignorName,
+                "cD": data?.consignorName?.value || "C8888",
+                "nM": data?.consignorName?.name || data?.consignorName,
                 "cT": data?.fromCity?.value || "",
                 "pIN": data?.fromCity?.pincode || "",
                 "aDD": data.cnoAddress?.name || data.cnoAddress,
@@ -1193,8 +1236,8 @@ export class DocketService {
                 "aLMOB": data?.calternateContactNo || "",
             },
             "cSGN": {
-                "cD": data?.consigneeName?.value||"C8888",
-                "nM": data?.consigneeName?.name|| data?.consigneeName,
+                "cD": data?.consigneeName?.value || "C8888",
+                "nM": data?.consigneeName?.name || data?.consigneeName,
                 "cT": data?.toCity?.value || "",
                 "pIN": data?.toCity?.pincode || "",
                 "aDD": data?.cneAddress?.name || data.cneAddress,
@@ -1212,9 +1255,21 @@ export class DocketService {
             "fRTAMT": ConvertToNumber(data?.freight_amount || 0, 2),
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
             "gROAMT": ConvertToNumber(data?.grossAmount || 0, 2),
-            "rCM": data?.rcm || "",
+            "rCM": data?.rcm || "N",
             "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
+            "gST": {
+                "tY": "SGST",
+                "iGRT": 0,
+                "sGRT": 6,
+                "cGRT": 6,
+                "uGRT": 0,
+                "iGST": 0,
+                "sGST": ConvertToNumber(data?.gstChargedAmount / 2 || 0, 2),
+                "cGST": ConvertToNumber(data?.gstChargedAmount / 2 || 0, 2),
+                "uGST": 0,
+                "aMT": ConvertToNumber(data?.gstChargedAmount || 0, 2)
+            },
             "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
             "pKGTYN": data?.pkgsTypeName || "",
             "pKGTY": data?.pkgsType || "",
@@ -1239,7 +1294,8 @@ export class DocketService {
             "fSTS": DocketFinStatus.Pending,
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
-            "cONTRACT": data?.contract || ""
+            "cONTRACT": data?.contract || "",
+            "iSSCAN":data?.iSSCAN
         };
 
         let invoiceDetails = invoiceData.map((element) => {
@@ -1582,5 +1638,46 @@ export class DocketService {
             throw error; // Rethrowing the error might be useful if you want to handle it outside this function
         }
     }
+    /* here the api is for only get LTL details */
+    async getDocketsFinDetailsLtl(filter = {}) {
 
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_fin_det_ltl",
+            filter: filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', reqBody));
+        return res.data;
+    }
+    /*End*/
+    /*below code is for the packages Update*/
+    async generateArray(data, pkg) {
+        return new Promise((resolve, reject) => {
+            try {
+                const array = Array.from({ length: pkg }, (_, index) => {
+                    const serialNo = (index + 1).toString().padStart(4, "0");
+                    const bcSerialNo = `${data.dKTNO}-${serialNo}`;
+                    const bcDockSf = 0;
+                    return {
+                        _id: `${this.storage.companyCode}-${bcSerialNo}-${data?.sFX}`,
+                        cID: this.storage.companyCode,
+                        dKTNO: data?.dKTNO,
+                        pKGSNO: bcSerialNo,
+                        sFX: bcDockSf,
+                        lOC: data?.oRGN,
+                        cLOC: data?.cLOC,
+                        eNTDT: new Date(),
+                        eNTLOC: this.storage.branch,
+                        eNTBY: this.storage.userName
+                    };
+                });
+
+                resolve(array);
+            } catch (error) {
+                reject(new Error("Failed to generate the array: " + error.message));
+            }
+        });
+    }
+
+    /*end*/
 }

@@ -39,6 +39,7 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
+import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -89,6 +90,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   addNewTitle: string = "Other Freight Charges";
   columnInvoice: any;
   dcrDetail = {};
+  GSTRate: any = 12;
+  GSTType: any;
+  GSTApplied: any[];
   staticFieldInvoice = [
     'ewayBillNo',
     'expiryDate',
@@ -173,6 +177,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private docketService: DocketService,
     public dialog: MatDialog,
     private dcrService: DCRService,
+    private stateService: StateService,
     public snackBarUtilityService: SnackBarUtilityService,
     private voucherServicesService: VoucherServicesService,
   ) {
@@ -303,9 +308,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         value: this.DocketDetails?.dEST || ""
       }
       this.consignmentForm.controls["destination"].setValue(destionation);
-      this.invoiceForm.controls["noOfPackage"].setValue(this.DocketDetails?.noOfPackage || "");
-      this.invoiceForm.controls["actualWeight"].setValue(this.DocketDetails?.actualWeight || "");
-      this.invoiceForm.controls["chargedWeight"].setValue(this.DocketDetails?.chargedWeight || "");
+      this.invoiceForm.controls["noOfPackage"].setValue(this.DocketDetails?.pKGS || "");
+      this.invoiceForm.controls["actualWeight"].setValue(this.DocketDetails?.aCTWT || "");
+      this.invoiceForm.controls["chargedWeight"].setValue(this.DocketDetails?.cHRWT || "");
       const destinationMapping = await this.locationService.locationFromApi({
         locCity: { D$in: [this.DocketDetails?.fCT, this.DocketDetails?.tCT] },
       });
@@ -1034,6 +1039,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.freightForm.controls['gstChargedAmount'].disable();
       this.freightForm.controls['gstRate'].setValue(0);
       this.freightForm.controls['gstChargedAmount'].setValue(0);
+
       this.calculateFreight();
     }
     else {
@@ -1166,10 +1172,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     switch (payTypeNm) {
       case "TBB":
         this.consignmentForm.get('billingParty').setValidators([Validators.required]);
+        this.consignmentForm.get('billingParty').enable();
         break;
       case "PAID":
+        this.consignmentForm.get('billingParty').disable();
       case "TO PAY":
+        this.consignmentForm.get('billingParty').disable();
       case "FOC":
+        this.consignmentForm.get('billingParty').disable();
         this.consignmentForm.get('billingParty').clearValidators();
         break;
     }
@@ -1330,10 +1340,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.unitsName = this.rules.find(x => x.rULEID == "UNITS" && x.aCTIVE)?.vAL;
     this.cftRation = this.rules.find(x => x.rULEID == "CFTRATION" && x.aCTIVE)?.vAL;
     this.isScan = true;
-    //this.isScan=this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
+    const payType = this.consignmentForm.get('payType').value;
+    const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
       this.consignmentForm.markAllAsTouched();
       this.freightForm.markAllAsTouched();
@@ -1350,7 +1361,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       });
       return false;
     }
-    if (this.tableData.length == 0) {
+    if (this.tableData.length == 0 && payTypeNm != "FOC") {
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -1362,6 +1373,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.isSubmit = true;
     const data = { ...this.consignmentForm.getRawValue(), ...this.freightForm.getRawValue() }
     const tableData = this.tableData
+    data['iSSCAN']=  this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
     data['pkgsTypeName'] = this.pkgsType.find(x => x.value == data?.pkgsType)?.name ?? '';
     data['rsktyName'] = this.riskType.find(x => x.value == data?.risk)?.name ?? '';
@@ -1396,6 +1408,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
       await this.docketService.walkinFieldMapping(data, false, cnWinCsgne)
     }
+
     //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
       delete docketDetails['_id'];
@@ -1413,23 +1426,26 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const resUpdate = await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
       await this.docketService.operationsFieldMapping(reqDkt.docketsDetails, reqDkt.invoiceDetails, reqDkt.docketFin);
       if (resUpdate) {
-        this.Addseries(reqDkt.docketsDetails.pKGS);
+        await this.toPayAccouting();
       }
     }
     else if (this.isManual) {
-      delete docketDetails['invoiceDetails'];
-      delete docketDetails['docketFin'];
-      reqDkt.docketsDetails['_id'] = `${this.storage.companyCode}-${reqDkt?.docketsDetails.dKTNO}`;
       await this.docketService.addDcrDetails(reqDkt?.docketsDetails, this.dcrDetail);
       let reqBody = {
         companyCode: this.storage.companyCode,
         collectionName: "dockets_ltl",
-        data: { ...reqDkt?.docketsDetails }
+        docType: "CN",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        timeZone: this.storage.timeZone,
+        data: docketDetails,
+        isManual: true,
+        party: docketDetails["bPARTYNM"],
       };
-      await this.docketService.operationsFieldMapping(reqDkt.docketsDetails, reqDkt.invoiceDetails, reqDkt.docketFin, this.isManual);
-      const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
+      //await this.docketService.operationsFieldMapping(reqDkt.docketsDetails, reqDkt.invoiceDetails, reqDkt.docketFin, this.isManual);
+      const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));
       if (res) {
-        this.Addseries(reqDkt.docketsDetails.pKGS);
+        await this.toPayAccouting();
       }
     }
     else {
@@ -1447,103 +1463,28 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));
       if (res) {
         this.consignmentForm.controls["docketNumber"].setValue(res.data);
-        await this.Addseries(reqDkt.docketsDetails.pKGS);
+        await this.toPayAccouting();
       }
     }
   }
-  async Addseries(pkgs) {
-    if (this.isScan) {
-      if (parseInt(pkgs) > 0) {
-        try {
-          // Generate the array with required data.
-          const resultArray = await this.generateArray(
-            this.storage.companyCode,
-            this.consignmentForm.controls["docketNumber"].value,
-            pkgs
-          );
-
-          // Prepare the request body.
-          const reqBody = {
-            companyCode: this.storage.companyCode,
-            collectionName: "docket_pkgs_ltl",
-            data: resultArray
-          }
-          // Make the POST request and wait for the response.
-          const res = await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqBody));
-          // Check if response is successful.
-          if (res) {
-            // Display success message.
-            const payType = this.consignmentForm.get('payType').value;
-            //const PayTypeCode = this.paymentType.find(x => x.value === payType)?.name;
-
-            if (payType === "P01") {
-              this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
-            }
-            else {
-              await Swal.fire({
-                icon: "success",
-                title: "Booked Successfully",
-                text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
-                showConfirmButton: true,
-              }).then((result) => {
-                // Redirect after the alert is closed, regardless of whether it is confirmed or not.
-                this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-              });
-            }
-          }
-
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Failed to Book",
-            text: "An error occurred: " + error.message,
-          });
-        }
-      }
+  async toPayAccouting() {
+    const payType = this.consignmentForm.get('payType').value;
+    if (payType === "P01") {
+      this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
     }
     else {
-      const payType = this.consignmentForm.get('payType').value;
-      //const PayTypeCode = this.paymentType.find(x => x.value === payType)?.name;
-
-      if (payType === "P01") {
-        this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
-      }
-      else {
-        Swal.fire({
-          icon: "success",
-          title: "Booked Successfully",
-          text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
-          showConfirmButton: true
-        }).then((result) => {
-          // Redirect after the alert is closed, regardless of whether it is confirmed or not.
-          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-        });
-      }
+      Swal.fire({
+        icon: "success",
+        title: "Booked Successfully",
+        text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
+        showConfirmButton: true
+      }).then((result) => {
+        // Redirect after the alert is closed, regardless of whether it is confirmed or not.
+        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+      });
     }
   }
-  async generateArray(companyCode, dockno, pkg) {
-    return new Promise((resolve, reject) => {
-      const array = Array.from({ length: pkg }, (_, index) => {
-        const serialNo = (index + 1).toString().padStart(4, "0");
-        const bcSerialNo = `${dockno}-${serialNo}`;
-        const bcDockSf = "0";
-        return {
-          _id: `${companyCode}-${bcSerialNo}`,
-          cID: companyCode,
-          dKTNO: dockno,
-          pKGSNO: bcSerialNo,
-          sFX: bcDockSf,
-          lOC: this.storage.branch,
-          cLOC: this.storage.branch,
-          eNTBY: this.storage.userName,
-          eNTLOC: this.storage.branch,
-          eNTDT: new Date()
-        };
-      });
 
-      resolve(array);
-    });
-  }
   /*getConsignor*/
   getConsignor() {
     const payType = this.consignmentForm.get('payType').value;
@@ -1658,7 +1599,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
 
   // Updated function to handle `isOrigin` condition correctly
-   getTermValue(term, isOrigin) {
+  getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
     const fieldKey = isOrigin ? "fromCity" : "toCity";
     const type = typeMapping[term];
@@ -1685,9 +1626,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const value = this.consignmentForm.controls[fieldKey].value[valueKey];
     if (value) {
       return [
-        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] } ,
-        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] } ];
-      
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] }];
+
     }
     return [];
   }
@@ -1696,13 +1637,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   InvockedContract() {
     const paymentBasesName = this.paymentType.find(x => x.value == this.consignmentForm.value.payType).name;
     const TransMode = this.tranType.find(x => x.value == this.consignmentForm.value.transMode).name;
-    const party = this.docketService.paymentBaseContract[paymentBasesName]
-    const partyDt = this.consignmentForm.controls[party].value.value
+    // const party = this.docketService.paymentBaseContract[paymentBasesName]
+    const partyDt = this.consignmentForm.controls['billingParty'].value.value
     const capacity = this.tableData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
 
     const terms = ["Area", "Pincode", "City", "State"];
 
-  
+
     const allCombinations = generateCombinations(terms);
 
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
@@ -1727,7 +1668,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "basis": paymentBasesName,
       "from": this.consignmentForm.value.fromCity.value,
       "to": this.consignmentForm.value.toCity.value,
-      "capacity": capacity,
+      "capacity": 0,
       "matches": matches
     }
 
@@ -1942,9 +1883,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     if (this.invoiceForm.controls['invoiceNo'].value) {
       const invoiceNoValue = this.invoiceForm.controls['invoiceNo'].value;
       const isNumber = typeof invoiceNoValue === 'number';
-      const filter = isNumber 
-          ? {cID: this.storage.companyCode, iNVNO: invoiceNoValue } 
-          : {cID: this.storage.companyCode, iNVNO: { D$regex:`^${invoiceNoValue}$`, D$options: "i" } };
+      const filter = isNumber
+        ? { cID: this.storage.companyCode, iNVNO: invoiceNoValue }
+        : { cID: this.storage.companyCode, iNVNO: { D$regex: `^${invoiceNoValue}$`, D$options: "i" } };
       const res = await this.docketService.checkInvoiceExistLTL(filter);
       if (res) {
         Swal.fire({
@@ -1968,6 +1909,22 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
   }
+
+  async GetGSTRate() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "sachsn_master",
+      filter: {
+        TYP: "SAC",
+        SID: 577
+      }
+    };
+    const res = await firstValueFrom(this.operationService.operationPost("generic/getOne", req));
+    if (res.data) {
+      this.GSTRate = res.data.GSTRT || 12;
+    }
+  }
+
   // Account Posting When  C Note Booked 	
   async AccountPosting(DocketNo) {
 
@@ -2011,7 +1968,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherDataRequestModel.tcsRate = 0;
         this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST = 0;
+        this.VoucherDataRequestModel.IGST = GSTAmount;
         this.VoucherDataRequestModel.SGST = 0;
         this.VoucherDataRequestModel.CGST = 0;
         this.VoucherDataRequestModel.UGST = 0;
@@ -2039,18 +1996,18 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           "transDate": new Date(),
           "finYear": financialYear,
           "branch": this.storage.branch,
-          "accCode": ledgerInfo['AST001001'].LeadgerCode,
-          "accName": ledgerInfo['AST001001'].LeadgerName,
-          "accCategory": ledgerInfo['AST001001'].LeadgerCategory,
+          "accCode": ledgerInfo['AST003001'].LeadgerCode,
+          "accName": ledgerInfo['AST003001'].LeadgerName,
+          "accCategory": ledgerInfo['AST003001'].LeadgerCategory,
           "sacCode": "",
           "sacName": "",
-          "debit": TotalAmount,
+          "debit": ConvertToNumber(TotalAmount, 2),
           "credit": 0,
           "GSTRate": 0,
           "GSTAmount": 0,
-          "Total": TotalAmount,
+          "Total": ConvertToNumber(TotalAmount, 2),
           "TDSApplicable": false,
-          "narration": `when C note No ${DocketNo} Is Booked`
+          "narration": `When paid docket ${DocketNo} generated `
         },
         {
 
@@ -2063,18 +2020,66 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           "transDate": new Date(),
           "finYear": financialYear,
           "branch": this.storage.branch,
-          "accCode": ledgerInfo['INC001003'].LeadgerCode,
-          "accName": `${ledgerInfo['INC001003'].LeadgerName} - ${this.tranType.find(x => x.value == this.consignmentForm.value.transMode).name}`,
-          "accCategory": ledgerInfo['INC001003'].LeadgerCategory,
+          "accCode": ledgerInfo['INC001008'].LeadgerCode,
+          "accName": `${ledgerInfo['INC001008'].LeadgerName}`,
+          "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
           "sacCode": "",
           "sacName": "",
           "debit": 0,
-          "credit": TotalAmount,
+          "credit": ConvertToNumber(TotalAmount - GSTAmount, 2),
           "GSTRate": 0,
           "GSTAmount": 0,
-          "Total": TotalAmount,
+          "Total": ConvertToNumber(TotalAmount - GSTAmount, 2),
           "TDSApplicable": false,
-          "narration": `when C note No ${DocketNo} Is Booked`
+          "narration": `When paid docket ${DocketNo} generated `
+        },
+        {
+
+          "companyCode": this.storage.companyCode,
+          "voucherNo": "",
+          "transCode": VoucherInstanceType.CNoteBooking,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+          "voucherCode": VoucherType.JournalVoucher,
+          "voucherType": VoucherType[VoucherType.JournalVoucher],
+          "transDate": new Date(),
+          "finYear": financialYear,
+          "branch": this.storage.branch,
+          "accCode": ledgerInfo['SGST'].LeadgerCode,
+          "accName": `${ledgerInfo['SGST'].LeadgerName}`,
+          "accCategory": ledgerInfo['SGST'].LeadgerCategory,
+          "sacCode": "",
+          "sacName": "",
+          "debit": 0,
+          "credit": ConvertToNumber(GSTAmount / 2, 2),
+          "GSTRate": 6,
+          "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
+          "Total": ConvertToNumber(GSTAmount / 2, 2),
+          "TDSApplicable": false,
+          "narration": `When paid docket ${DocketNo} generated `
+        },
+        {
+
+          "companyCode": this.storage.companyCode,
+          "voucherNo": "",
+          "transCode": VoucherInstanceType.CNoteBooking,
+          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+          "voucherCode": VoucherType.JournalVoucher,
+          "voucherType": VoucherType[VoucherType.JournalVoucher],
+          "transDate": new Date(),
+          "finYear": financialYear,
+          "branch": this.storage.branch,
+          "accCode": ledgerInfo['CGST'].LeadgerCode,
+          "accName": `${ledgerInfo['CGST'].LeadgerName}`,
+          "accCategory": ledgerInfo['CGST'].LeadgerCategory,
+          "sacCode": "",
+          "sacName": "",
+          "debit": 0,
+          "credit": ConvertToNumber(GSTAmount / 2, 2),
+          "GSTRate": 6,
+          "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
+          "Total": ConvertToNumber(GSTAmount / 2, 2),
+          "TDSApplicable": false,
+          "narration": `When paid docket ${DocketNo} generated `
         }];
 
         this.VoucherRequestModel.details = VoucherlineitemList
@@ -2104,20 +2109,33 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
                 debit: [{
-                  "accCode": ledgerInfo['AST001001'].LeadgerCode,
-                  "accName": ledgerInfo['AST001001'].LeadgerName,
-                  "accCategory": ledgerInfo['AST001001'].LeadgerCategory,
-                  "amount": TotalAmount,
-                  "narration": `when C note No ${DocketNo} Is Booked`
+                  "accCode": ledgerInfo['AST003001'].LeadgerCode,
+                  "accName": ledgerInfo['AST003001'].LeadgerName,
+                  "accCategory": ledgerInfo['AST003001'].LeadgerCategory,
+                  "amount": ConvertToNumber(TotalAmount, 2),
+                  "narration": `When paid docket ${DocketNo} generated `
                 }],
                 credit: [{
-                  "accCode": ledgerInfo['INC001003'].LeadgerCode,
-                  "accName": ledgerInfo['INC001003'].LeadgerName + " - Road",
-                  "accCategory": ledgerInfo['INC001003'].LeadgerCategory,
-                  "amount": TotalAmount,
-                  "narration": `when C note No ${DocketNo} Is Booked`
-                }],
-
+                  "accCode": ledgerInfo['INC001008'].LeadgerCode,
+                  "accName": ledgerInfo['INC001008'].LeadgerName,
+                  "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
+                  "amount": ConvertToNumber(TotalAmount - GSTAmount, 2),
+                  "narration": `When paid docket ${DocketNo} generated `
+                },
+                {
+                  "accCode": ledgerInfo['SGST'].LeadgerCode,
+                  "accName": ledgerInfo['SGST'].LeadgerName,
+                  "accCategory": ledgerInfo['SGST'].LeadgerCategory,
+                  "amount": ConvertToNumber(GSTAmount / 2, 2),
+                  "narration": `When paid docket ${DocketNo} generated `
+                },
+                {
+                  "accCode": ledgerInfo['CGST'].LeadgerCode,
+                  "accName": ledgerInfo['CGST'].LeadgerName,
+                  "accCategory": ledgerInfo['CGST'].LeadgerCategory,
+                  "amount": ConvertToNumber(GSTAmount / 2, 2),
+                  "narration": `When paid docket ${DocketNo} generated `
+                }]
               };
 
               this.voucherServicesService

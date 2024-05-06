@@ -412,7 +412,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
     return groupedDataWithoutKey;
   }
   async CompleteScan() {
-    debugger
     let menifest = []
     let resMf = ""
     if (this.isScan) {

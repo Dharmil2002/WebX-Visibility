@@ -72,6 +72,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   ShowBookingTimeCharges = false;
   chargeList: any;
+  bookingChargeList: any;
   DeliveryTimeChargesArray: any[];
   DeliveryTimeChargesForm: UntypedFormGroup;
   CollectionForm: UntypedFormGroup;
@@ -164,7 +165,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
 
     try {
-      const filter = { "dKTNO": DocketNo };
+      const filter = { "cID": this.storage.companyCode, dEST: this.storage.branch, "dKTNO": DocketNo, pAYTYP: { D$in: ["P01", "P03"] } };
       const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
 
       if (docketdetails.length === 1) {
@@ -192,28 +193,52 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
     this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
 
-    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM") ? false : true;
+    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM" || data.rCM == "") ? false : true;
     this.deliveryMrTableForm.get('GSTApplicability').setValue(this.isGSTApplicable ? "Yes" : "No");
     await this.GetBookingTimeCharges();
     if (data.cSGN.gST && data.cSGE.gST) {
       const StateCodeList = [parseInt(data.cSGN.gST.substring(0, 2)), parseInt(data.cSGE.gST.substring(0, 2))]
       await this.GetStateCodeWiseStateDetails(StateCodeList);
     }
-    await this.fetchAndProcessCharges("DeliveryMR");
+    await this.fetchAndProcessCharges("DeliveryMR", data.tRNMOD);
   }
   async GetBookingTimeCharges() {
+
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
     if (!DocketNo) {
       return;
     }
-    const filter = { "dKTNO": DocketNo };
+
+    const filterCharges = { "pRNm": this.DocketDetails.tRNMODNM, aCTV: true, cHBTY: "Booking" }
+    const productFilter = {
+      "cHACAT": { "D$in": ['C', 'B'] },
+      "pRNM": this.DocketDetails.tRNMODNM,
+      "cHAPP": { D$in: ["GCN"] },
+      isActive: true
+    }
+    this.bookingChargeList = await this.thcService.getChargesV2(filterCharges, productFilter);
+
+
+
+    const filter = { cID: this.storage.companyCode, "dKTNO": DocketNo };
     const docketFindetails = await this.docketService.getDocketsFinDetailsLtl(filter);
     if (docketFindetails.length === 1) {
       this.DocketFinDetails = docketFindetails[0];
+      await this.SetExtraBookingTimeCharges();
       if (this.DocketFinDetails.cHG.length > 0) {
         this.ChargesList = await this.SetBookingTimeCharges(this.DocketFinDetails.cHG);
         this.AlljsonControlBookingTimechargesArray = [...this.jsonControlBookingTimechargesArray, ...this.ChargesList,];
 
+        this.BookingTimechargesForm = formGroupBuilder(this.fb, [
+          this.AlljsonControlBookingTimechargesArray,
+        ]);
+        this.BookingTimechargesForm.get('OldFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
+        this.BookingTimechargesForm.get('NewFreight').setValue(this.DocketFinDetails?.fRTAMT || 0);
+        this.ShowBookingTimeCharges = true;
+      }
+      else {
+
+        this.AlljsonControlBookingTimechargesArray = [...this.jsonControlBookingTimechargesArray];
         this.BookingTimechargesForm = formGroupBuilder(this.fb, [
           this.AlljsonControlBookingTimechargesArray,
         ]);
@@ -226,10 +251,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
     }
   }
-  async SetBookingTimeCharges(charges) {
+
+  async SetBookingTimeCharges(chargesList) {
 
     const generateCharges = (charge) => {
-      // Helper function to generate a single charge object
       const generateChargeObject = (index) => ({
         name: charge.cHGID + index, // Add an index to make names unique
         label: `${charge.cHGNM} (${charge.oPS}) ₹`,
@@ -242,12 +267,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         ChargeId: charge.cHGID,
         FormType: "BookingTimeCharges",
         Validations: [
-
           index == 2 ? {
             name: "pattern",
             message: "Please Enter only positive numbers with up to two decimal places",
             pattern: "^\\d+(\\.\\d{1,2})?$",
-          } : [],],
+          } : [],
+        ],
         functions: {
           onChange: "OnChangeBookingTimeCharges",
         },
@@ -263,16 +288,30 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     // Generate three sets of charges for each charge object
     let combinedCharges = [];
-    charges.forEach(charge => {
+    chargesList.forEach(charge => {
       combinedCharges = combinedCharges.concat(generateCharges(charge));
     });
 
     return combinedCharges;
   }
+  async SetExtraBookingTimeCharges() {
+    this.bookingChargeList.forEach(charge => {
+      if (!this.DocketFinDetails.cHG.find(item => item.cHGID === charge.cHACD)) {
+        this.DocketFinDetails.cHG.push({
+          cHGID: charge.cHACD,
+          cHGNM: charge.sELCHA,
+          aMT: 0,
+          oPS: charge.aDD_DEDU === "+" ? "+" : "-",
+          cHACAT: charge.cHACAT
+        });
+      }
+    });
+  }
 
-  private async fetchAndProcessCharges(ChargeName) {
+  private async fetchAndProcessCharges(ChargeName, ProductCode) {
     this.chargeList = await this.thcService.getCharges({
       "cHAPP": { 'D$eq': ChargeName },
+      "pRCD": { 'D$eq': ProductCode },
       'isActive': { 'D$eq': true }
     });
 
@@ -323,7 +362,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       if (event.field.FormType === "BookingTimeCharges") {
         const OldAmount = parseFloat(this.BookingTimechargesForm.get(event.field.ChargeId + "1").value);
         const NewAmount = parseFloat(this.BookingTimechargesForm.get(event.field.ChargeId + "2").value);
-        const DiffAmount = parseFloat((OldAmount - NewAmount).toFixed(2));
+        const DiffAmount = parseFloat((NewAmount - OldAmount).toFixed(2));
         this.BookingTimechargesForm.get(event.field.ChargeId + "3").setValue(DiffAmount);
       }
     }
@@ -756,7 +795,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                 const reqMR = {
                   companyCode: this.storage.companyCode,
                   collectionName: "delivery_mr_header",
-                  filter: { docNo: res?.data?.data?.docNo, cID: this.storage.companyCode },
+                  filter: { docNo: res?.data?.header?.docNo, cID: this.storage.companyCode },
                   update: {
                     vNO: vRes
                   }
@@ -766,7 +805,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                 const reqMRDet = {
                   companyCode: this.storage.companyCode,
                   collectionName: "delivery_mr_details",
-                  filter: { dLMRNO: res?.data?.data?.docNo, cID: this.storage.companyCode },
+                  filter: { dLMRNO: res?.data?.header?.docNo, cID: this.storage.companyCode },
                   update: {
                     vNO: vRes
                   }
@@ -1007,6 +1046,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#region to disable submit btn
   isSubmitDisabled(): boolean {
     return (
+      !this.deliveryMrTableForm.valid ||
       !this.PaymentSummaryFilterForm.valid ||
       !this.SummaryForm.valid
     );

@@ -1091,7 +1091,7 @@ export class DocketService {
     }
     /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
-    async getDocketList(filter) {
+    async getDocketList(filter,iSMR=false) {
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,
@@ -1117,13 +1117,12 @@ export class DocketService {
                                                 'D$eq': [
                                                     '$docNo', '$$docNoVar'
                                                 ]
-                                            }, {
+                                            },
+                                            iSMR ? {
                                                 'D$in': [
-                                                    '$pAYTYP', [
-                                                        'P03', 'P01'
-                                                    ]
+                                                    '$pAYTYP', ['P03', 'P01']
                                                 ]
-                                            }
+                                            } : {}
                                         ]
                                     }
                                 }
@@ -1295,7 +1294,8 @@ export class DocketService {
             "fSTS": DocketFinStatus.Pending,
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
-            "cONTRACT": data?.contract || ""
+            "cONTRACT": data?.contract || "",
+            "iSSCAN":data?.iSSCAN
         };
 
         let invoiceDetails = invoiceData.map((element) => {

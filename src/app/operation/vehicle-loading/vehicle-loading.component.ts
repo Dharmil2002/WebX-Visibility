@@ -9,6 +9,7 @@ import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { setFormControlValue } from 'src/app/Utility/commonFunction/setFormValue/setFormValue';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { ViewPrintComponent } from '../view-print/view-print.component';
 
 @Component({
   selector: 'app-vehicle-loading',
@@ -101,16 +102,16 @@ export class VehicleLoadingComponent implements OnInit {
     "PackagesLoaded": "PackagesLoaded",
     "Pending": "Pending"
   };
-
+  selectAllRequired:boolean=true;
   toggleArray = [];
   linkArray = [
-    { Row: 'Action', Path: '' },
+    { Row: 'Action', Path: "" },
     { Row: 'printPending', Path: '' },
   ];
 
   menuItems = [
     { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
-    // { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+     { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
 
@@ -125,7 +126,6 @@ export class VehicleLoadingComponent implements OnInit {
   tableload: boolean = true;
   tripDetails: any;
   docketDetail: any;
-  
   constructor(
     private Route: Router, // Injecting Router service
     private navigationService: NavigationService, // Injecting NavigationService

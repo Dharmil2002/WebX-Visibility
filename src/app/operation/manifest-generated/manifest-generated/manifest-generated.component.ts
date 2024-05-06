@@ -82,7 +82,7 @@ export class ManifestGeneratedComponent implements OnInit {
     }
   }
   getMenifest() {
-
+   
     let groupedDataWithoutKey;
     const groupedData = this.menifest.reduce((acc, element) => {
       const leg = element.Leg;

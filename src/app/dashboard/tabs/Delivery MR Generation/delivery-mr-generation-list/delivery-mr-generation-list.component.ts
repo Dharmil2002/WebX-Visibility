@@ -120,7 +120,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       };
 
       // Fetch docket list based on the query parameters
-      const data = await this.docketService.getDocketList(queryParameters);
+      const data = await this.docketService.getDocketList(queryParameters,true);
 
       // Fetch mapping details for the docket data
       const modifiedData = await this.docketService.getMappingDocketDetails(data);

@@ -357,6 +357,7 @@ export class InvoiceCollectionComponent implements OnInit {
   // Account Posting When  When Bill Has been Collected	
   async AccountPosting(data, mRNO) {
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
+    const isChequeOrRTGS = PaymentMode?.PaymentMode === "Cheque" || PaymentMode?.PaymentMode === "RTGS/UTR";
     this.snackBarUtilityService.commonToast(async () => {
       try {
         const TotalAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
@@ -407,13 +408,13 @@ export class InvoiceCollectionComponent implements OnInit {
         this.VoucherDataRequestModel.GrossAmount = data?.gROSSAMT || 0;
         this.VoucherDataRequestModel.netPayable = TotalAmount;
         this.VoucherDataRequestModel.roundOff = +(TotalAmount - PaymentAmount);
-        this.VoucherDataRequestModel.voucherCanceled = false
-        this.VoucherDataRequestModel.transactionNumber = mRNO,
-          this.VoucherDataRequestModel.paymentMode = PaymentMode,
-          this.VoucherDataRequestModel.refNo = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("ChequeOrRefNo").value : "";
-        this.VoucherDataRequestModel.accountName = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANM : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.name;
-        this.VoucherDataRequestModel.accountCode = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANCD : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.value;
-        this.VoucherDataRequestModel.date = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Date").value : "";
+        this.VoucherDataRequestModel.voucherCanceled = false;
+        this.VoucherDataRequestModel.transactionNumber = mRNO;
+        this.VoucherDataRequestModel.paymentMode = PaymentMode;
+        this.VoucherDataRequestModel.refNo = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("ChequeOrRefNo").value : "";
+        this.VoucherDataRequestModel.accountName = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANM : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.name;
+        this.VoucherDataRequestModel.accountCode = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANCD : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.value;
+        this.VoucherDataRequestModel.date = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("Date").value : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         var VoucherlineitemList = this.GetVouchersLedgers(data, mRNO);
 
@@ -501,7 +502,7 @@ export class InvoiceCollectionComponent implements OnInit {
       filter: { mRNO: MrNo },
       update: updateRequest,
     };
-    firstValueFrom(this.masterService.masterPut("generic/update", reqbillcollection)),
+    firstValueFrom(this.masterService.masterPut("generic/updateAll", reqbillcollection)),
       Swal.fire({
         icon: "success",
         title: "Invoice collection Successfully And Voucher Created",

@@ -413,7 +413,7 @@ export class InvoiceServiceService {
       element.collected = CollectedAmount;
       element.deductions = element?.bALAMT || 0;
       element.bDUEDT = element.bDUEDT;
-      element.bGNDT =element.bGNDT    ;
+      element.bGNDT = element.bGNDT;
       element.collectionAmount = PendingAmount - CollectedAmount || 0;
       element.pendingAmount = PendingAmount
       return element;
@@ -554,12 +554,16 @@ export class InvoiceServiceService {
   }
   /*here the function for the collection*/
   async getCollectionJson(formGroup, data, paymentsection) {
+    const isChequeOrRTGS = formGroup?.PaymentMode === "Cheque" || formGroup?.PaymentMode === "RTGS/UTR";
     const commonProperties = {
       cID: this.storage.companyCode,
       lOC: this.storage.branch,
       dTM: formGroup?.Date || new Date(),
       mOD: formGroup?.PaymentMode || "",
-      bANK: formGroup?.Bank.name || "",
+      bANK: formGroup?.Bank.bANM || "",
+      bANKCD: formGroup?.Bank.bANCD || "",
+      aCCD: isChequeOrRTGS ? (formGroup.Bank?.value || "") : formGroup.CashAccount.value,
+      aCNM: isChequeOrRTGS ? (formGroup.Bank?.name || "") : formGroup.CashAccount.name,
       bY: this.storage.userName,
       tRNO: formGroup?.ChequeOrRefNo || "",
       eNTDT: new Date(),

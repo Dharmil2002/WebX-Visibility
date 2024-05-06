@@ -72,6 +72,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   ShowBookingTimeCharges = false;
   chargeList: any;
+  bookingChargeList: any;
   DeliveryTimeChargesArray: any[];
   DeliveryTimeChargesForm: UntypedFormGroup;
   CollectionForm: UntypedFormGroup;
@@ -192,7 +193,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
     this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
 
-    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM") ? false : true;
+    this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM" || data.rCM == "") ? false : true;
     this.deliveryMrTableForm.get('GSTApplicability').setValue(this.isGSTApplicable ? "Yes" : "No");
     await this.GetBookingTimeCharges();
     if (data.cSGN.gST && data.cSGE.gST) {
@@ -202,10 +203,18 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     await this.fetchAndProcessCharges("DeliveryMR");
   }
   async GetBookingTimeCharges() {
+    
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
     if (!DocketNo) {
       return;
     }
+
+    this.bookingChargeList = await this.thcService.getCharges({
+      'pRCD': this.DocketDetails.tRNMOD,
+      'cHACAT': { 'D$eq': 'B' },
+      'isActive': { 'D$eq': true }
+    });
+
     const filter = { "dKTNO": DocketNo };
     const docketFindetails = await this.docketService.getDocketsFinDetailsLtl(filter);
     if (docketFindetails.length === 1) {
@@ -236,6 +245,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
     }
   }
+
   async SetBookingTimeCharges(charges) {
 
     const generateCharges = (charge) => {
@@ -252,12 +262,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         ChargeId: charge.cHGID,
         FormType: "BookingTimeCharges",
         Validations: [
-
           index == 2 ? {
             name: "pattern",
             message: "Please Enter only positive numbers with up to two decimal places",
             pattern: "^\\d+(\\.\\d{1,2})?$",
-          } : [],],
+          } : [],
+        ],
         functions: {
           onChange: "OnChangeBookingTimeCharges",
         },

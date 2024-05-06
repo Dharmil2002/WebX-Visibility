@@ -1,0 +1,13 @@
+<app-generic-bulk-upload
+    [title]="'Cluster Bulk Upload'"
+    [downloadFunction]="Download"
+    [fileName]="'Cluster Upload'"
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="clusterUploadForm">
+            <div class="col">
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

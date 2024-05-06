@@ -23,7 +23,6 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { debug } from "console";
-import { VehicleTypeService } from "src/app/Utility/module/masters/vehicle-type/vehicle-type-service";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -44,8 +43,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     edit: false,
     csv: true,
   };
+  containerWidth = '1024px';
   height = "100vw";
-  maxTableWidth = '1024px';
   width = "100vw";
   maxWidth: "232vw";
   menuItems = [
@@ -55,9 +54,9 @@ export class CreateLoadingSheetComponent implements OnInit {
   // Declaring breadcrumbs
   breadscrums = [
     {
-      title: "Create-Loading-Sheet",
-      items: ["Loading-Sheet"],
-      active: "Loading-Sheet",
+      title: "Create Loading Sheet",
+      items: ["Departure"],
+      active: "Create Loading Sheet",
     },
   ];
   linkArray = [{ Row: "count", Path: "" }];
@@ -225,6 +224,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.shippingData =
         this.Route.getCurrentNavigation()?.extras?.state.shipping;
 
+        console.log(this.tripData);
       // Check if tripData meets the condition for navigation
       const routeMap = {
         "Depart Vehicle": "Operation/DepartVehicle",
@@ -392,7 +392,11 @@ export class CreateLoadingSheetComponent implements OnInit {
       );
       // Update route details if shipment is not being updated
     }
-    const [orgn, ...nextLocs] = this.tripData?.RouteandSchedule.split(":")[1].split("-");
+    
+    let routeLocations = this.tripData?.RouteandSchedule.split(":")[1].split("-");
+    const removeItemsBeforeX = (arr, x) => { const idx = arr.indexOf(x); return arr.slice(idx >= 0 ? idx : arr.length); };
+
+    const [orgn, ...nextLocs] = removeItemsBeforeX(routeLocations, this.storage.branch);
 
     const res = await this.loadingSheetService.getDocketsForLoadingSheet(nextLocs);
     if (res.data.length > 0) {
@@ -428,6 +432,23 @@ export class CreateLoadingSheetComponent implements OnInit {
       { field: 'selectedDkts', calculate: item => { return [] } },
     ];
 
+    let legs = nextLocs.map(x => { 
+      return { 
+        leg: `${orgn}-${x}`,
+        routeLocs: [orgn, ...nextLocs],
+        count: 0,
+        packages: 0,
+        weightKg: 0,
+        volumeCFT: 0,
+        tCount: 0,
+        tPackages: 0,
+        tWeightKg: 0,
+        tVolumeCFT: 0,
+        items: [],
+        selectedDkts: []
+      }
+    });
+
     if (this.shipmentData && this.shipmentData.length > 0) {
       let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn, true);
       
@@ -439,17 +460,14 @@ export class CreateLoadingSheetComponent implements OnInit {
         return l;
       });
 
+      
 
       //Here i user cnoteDetails varible to used in updateDocketDetails() method
       //this._cnoteService.setShipingData(dockets);
       this.alldocket = dockets;
       this.cnoteDetails = dockets;
       const groupedShipments = aggData;
-      if (groupedShipments.length > 0) {
-        this.tableload = false;
-      } else {
-        this.departFlag = true;
-      }
+
       groupedShipments.forEach(item => {
         if (item['items'] && Array.isArray(item['items'])) {
           item['items'].forEach(subItem => {
@@ -462,7 +480,21 @@ export class CreateLoadingSheetComponent implements OnInit {
       groupedShipments.forEach(item => {
         item['selectedDkts'] = selectedDockets;
       });
-      this.tableData = groupedShipments
+      
+      const tableData = legs.map((x) => { 
+          return groupedShipments.find((y) => y['leg'] == x.leg) || x;
+      });
+
+      if (tableData.length > 0) {
+        this.tableload = false;
+      } else {
+        this.departFlag = true;
+      }
+      this.tableData = tableData
+    }
+    else {
+      this.tableData = legs;
+      this.tableload = false;
     }
   }
   ngOnDestroy(): void {
@@ -550,6 +582,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   updateLoadingData(event) {
     if (event) {
+         debugger;
       let selectedDockets = this.tableData.filter(x => x.leg != event[0].leg.trim())
                             .map((x) => x['items']?.filter((y) => y.isSelected == true).map((z) => z.dKTNO)).flat();
 
@@ -627,7 +660,13 @@ export class CreateLoadingSheetComponent implements OnInit {
     const vehRequest = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
-      filter: { currentLocation: this.storage.branch } //status: "Available", 
+      filter: { 
+        D$or: [
+          { vendorTypeCode: { D$in: [1, "1"] }, currentLocation: this.storage.branch },
+          { vendorTypeCode: { D$nin: [1, "1"] } },
+        ]
+        //status: "Available", 
+      }
     };
 
     // Fetch data from the JSON endpoint
@@ -637,7 +676,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         if (res) {
           let vehicleDetails = res.data.map((x) => {
             return { 
-              name: x.status == 'Available' ? `${x.vehNo} | Available` : `${x.vehNo} | In Transit [${x.tripId}] `,
+              name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
               value: x.vehNo, 
               status: x.status
             };
@@ -816,7 +855,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   async loadVehicleDetails() {
     try {
       const vehControl = this.loadingSheetTableForm.controls["vehicle"];
-      if(vehControl.value.status != "Available") {
+      if(!this.isUpdate && vehControl.value.status != "Available") {
         vehControl.setValue("");
         return;
       }

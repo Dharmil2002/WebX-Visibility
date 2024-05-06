@@ -537,9 +537,11 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
 
+
+
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
-            "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
+            "companyCode": companyCode,
             "voucherNo": "",
             "transCode": VoucherInstanceType.CreditVoucherCreation,
             "transType": VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
@@ -547,7 +549,7 @@ export class CreditVoucherComponent implements OnInit {
             "voucherType": VoucherType[VoucherType.CreditVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": this.storage.getItem(StoreKeys.Branch),
+            "branch": Branch,
             "accCode": item.Ledgercode,
             "accName": item.Ledgername,
             "accCategory": item.SubLedger,

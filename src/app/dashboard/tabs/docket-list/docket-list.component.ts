@@ -177,7 +177,6 @@ export class DocketListComponent implements OnInit {
     });
   }
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {

@@ -56,6 +56,7 @@ export class GenericTableV2Component
   @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
+  @Input() containerWidth;
   @Input() width;
   @Input() maxWidth;
   @Input() extraData;
@@ -101,6 +102,7 @@ export class GenericTableV2Component
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
     this.columnGroup = changes.columnGroup?.currentValue ?? this.columnGroup;
+    this.containerWidth = changes.containerWidth?.currentValue ?? this.containerWidth;
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
@@ -220,12 +222,13 @@ export class GenericTableV2Component
           return val;
       }
     }
-    
-    if(val) {      
-      if (typeof val !== 'boolean' && isValidNumber(val)) {
-        return Number(val);
-      } else if (typeof val === 'string' && isValidDate(val)) {
-        return moment(new Date(val)).format("DD MMM YY HH:mm");
+    else {
+      if(val) {      
+        if (typeof val !== 'boolean' && isValidNumber(val)) {
+          return Number(val);
+        } else if (typeof val === 'string' && isValidDate(val)) {
+          return moment(new Date(val)).format("DD MMM YY HH:mm");
+        }
       }
     }
     return val;

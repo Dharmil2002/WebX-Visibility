@@ -36,6 +36,7 @@ export const StoreKeys = {
     Branch: 'branch',
     Mode: 'Mode',
     TimeZone: 'timeZone',
+    PunchLine: 'SJ5E9neu',
     Token: 'token',
     RefreshToken: 'refreshToken',
     UserLocations: 'userLocations',
@@ -86,6 +87,7 @@ export const GenericActions = {
     GetOne: 'generic/getOne',
     Create: 'generic/create',
     Update: 'generic/update',
+    UpdateMany: "generic/updateAll",
     UpdateBulk: 'generic/updateBulk',
     Query: 'generic/query',
     FindLastOne: 'generic/findLastOne'

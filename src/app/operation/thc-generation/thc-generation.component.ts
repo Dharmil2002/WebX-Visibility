@@ -469,7 +469,6 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
-    //   debugger
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {
@@ -1104,7 +1103,6 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
-    debugger
     // Refactored calls using the new function
     clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlDriverArray);
     clearValidatorsAndUpdate(this.thcTableForm, this.jsonControlBasicArray);
@@ -1830,7 +1828,7 @@ export class ThcGenerationComponent implements OnInit {
     this.chargeJsonControl = this.chargeJsonControl.filter((x) => !x.hasOwnProperty('id'));
     //const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm },);
     const filter = { "pRNm": prodNm, aCTV: true, cHBTY: "Booking" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm,"cHAPP":{D$in:["THC"] },isActive:true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
@@ -1889,7 +1887,7 @@ export class ThcGenerationComponent implements OnInit {
   async getAutoFillCharges(charges, thcNestedDetails) {
     const product = thcNestedDetails?.thcDetails?.tMODENM || "";
     const filter = { "pRNm": product, aCTV: true, cHBTY: "Delivery" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product,"cHAPP":{D$in:["THC"] },isActive:true }
     const delCharge = await this.thcService.getChargesV2(filter, productFilter);
     const delChargeList = []
     const invoiceList = [];

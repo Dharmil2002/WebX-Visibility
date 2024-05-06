@@ -91,3 +91,8 @@
     font-size: 15px !important;
   }
 }
+
+.mat-form-field-readonly {
+  color: #999; /* Change color to your desired color */
+  cursor: not-allowed; /* Change cursor style */
+}

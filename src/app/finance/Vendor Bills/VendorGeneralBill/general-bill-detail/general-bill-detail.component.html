@@ -31,8 +31,7 @@
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
-                <button [disabled]="!VendorBillForm.valid || 
-                tableData.length==0 " (click)="BookVendorBill()" class="msr-3" mat-raised-button
+                <button [disabled]="!isFormValid()" (click)="BookVendorBill()" class="msr-3" mat-raised-button
                     color="primary">Submit</button>
                 <button mat-button (click)="cancel('Billing​')">Back</button>
             </div>

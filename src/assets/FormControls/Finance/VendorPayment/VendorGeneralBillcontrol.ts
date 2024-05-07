@@ -149,37 +149,7 @@ export class VendorGeneralBillControl {
           metaData: "Basic"
         },
       },
-      {
-        name: "SACCode",
-        label: "SAC Code",
-        placeholder: "SAC Code",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "SAC Code is required"
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-          metaData: "Basic"
-        },
-        functions: {
-          onOptionSelect: "SACCodeFieldChanged"
-        },
-      },
+
       {
         name: "Document",
         label: "Document",
@@ -230,53 +200,8 @@ export class VendorGeneralBillControl {
             pattern: '^[^-]+$'
           },
         ],
-        functions: {
-          onChange: "calculateGSTAndTotal"
-        },
       },
-      {
-        name: "GSTRate",
-        label: "GST Rate",
-        placeholder: "GST Rate",
-        type: "number",
-        value: FormValues?.GSTRate,
-        generatecontrol: true,
-        disable: true,
-        Validations: [
-          {
-            name: "required",
-            message: "GST Rate is required!",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter Valid GST Rate",
-            pattern: '^(100|[0-9]{1,2})$'
-          },
-        ],
-        functions: {
-          onChange: "calculateGSTAndTotal"
-        },
-      },
-      {
-        name: "GSTAmount",
-        label: "GST Amount ₹",
-        placeholder: "GST Amount ₹",
-        type: "number",
-        value: FormValues?.GSTAmount,
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-      {
-        name: "Total",
-        label: "Total ₹",
-        placeholder: "Total ₹",
-        type: "number",
-        value: FormValues?.Total,
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
+
 
       {
         name: "Narration",
@@ -305,16 +230,7 @@ export class VendorGeneralBillControl {
         disable: false,
         Validations: [],
       },
-      {
-        name: "SACCodeHdn",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "",
-        generatecontrol: false,
-        disable: false,
-        Validations: [],
-      },
+
       {
         name: "SubCategoryName",
         label: "",

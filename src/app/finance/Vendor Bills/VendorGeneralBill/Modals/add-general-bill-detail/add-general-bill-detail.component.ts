@@ -22,6 +22,7 @@ export class AddGeneralBillDetailComponent implements OnInit {
   VendorBillDetailsForm: UntypedFormGroup;
   jsonControlVendorBillDetailsArray: any;
   DocumentType: any;
+  VendorInfo: any;
   constructor(private filter: FilterUtils,
     private masterService: MasterService,
     private fb: UntypedFormBuilder, public dialogRef: MatDialogRef<AddGeneralBillDetailComponent>,
@@ -31,6 +32,7 @@ export class AddGeneralBillDetailComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl();
     console.log(this.objResult);
+    this.VendorInfo = this.objResult.VendorInfo;
   }
   Close() {
     this.dialogRef.close()
@@ -51,20 +53,12 @@ export class AddGeneralBillDetailComponent implements OnInit {
     this.filter.Filter(
       this.jsonControlVendorBillDetailsArray,
       this.VendorBillDetailsForm,
-      this.objResult.SACCode,
-      "SACCode",
-      false
-    );
-    this.filter.Filter(
-      this.jsonControlVendorBillDetailsArray,
-      this.VendorBillDetailsForm,
       this.objResult.Document,
       "Document",
       false
     );
     if (this.objResult.Details) {
       this.VendorBillDetailsForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.LedgerHdn))
-      this.VendorBillDetailsForm.controls.SACCode.setValue(this.objResult.SACCode.find(x => x.value == this.objResult.Details.SACCodeHdn))
       this.VendorBillDetailsForm.controls.Document.setValue(
         {
           name: this.objResult.Details.Document,
@@ -97,35 +91,15 @@ export class AddGeneralBillDetailComponent implements OnInit {
   }
   save(event) {
     const Ledger = this.VendorBillDetailsForm.value['Ledger'];
-    const SACCode = this.VendorBillDetailsForm.value['SACCode'];
     this.VendorBillDetailsForm.controls.Ledger.patchValue(Ledger.name)
-    this.VendorBillDetailsForm.controls.SACCode.patchValue(SACCode.name)
     this.VendorBillDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
-    this.VendorBillDetailsForm.controls.SACCodeHdn.patchValue(SACCode.value)
     this.VendorBillDetailsForm.controls.SubCategoryName.patchValue(Ledger.mRPNM)
     this.dialogRef.close(this.VendorBillDetailsForm.value)
   }
   cancel(event) {
     this.dialogRef.close()
   }
-  SACCodeFieldChanged(event) {
-    this.VendorBillDetailsForm.controls.GSTRate.patchValue(event?.eventArgs?.option?.value?.GSTRT)
-    this.calculateGSTAndTotal('');
-  }
-  calculateGSTAndTotal(event) {
-    const Amount = Number(this.VendorBillDetailsForm.value['Amount']);
-    const GSTRate = Number(this.VendorBillDetailsForm.value['GSTRate']);
 
-    if (!isNaN(Amount) && !isNaN(GSTRate)) {
-      const GSTAmount = (Amount * GSTRate) / 100;
-      const Total = GSTAmount + Amount;
-
-      this.VendorBillDetailsForm.controls.GSTAmount.setValue(GSTAmount.toFixed(2));
-      this.VendorBillDetailsForm.controls.Total.setValue(Total.toFixed(2));
-    } else {
-      console.error('Invalid input values for Amount or GSTRate');
-    }
-  }
   async SetDocumentOptions(event) {
     let fieldName = event.field.name;
     const search = this.VendorBillDetailsForm.controls[fieldName].value;
@@ -133,12 +107,16 @@ export class AddGeneralBillDetailComponent implements OnInit {
     if (search.length >= 2) {
       switch (this.DocumentType) {
         case "DRS":
-          data = await GetDocumentsWiseListFromApi(this.masterService, 'dockets', 'dKTNO', search, 'bPARTYNM', this.objResult?.PartName, 'oRGN', this.objResult?.Origin)
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'drs_headers', 'dRSNO', search,
+            'vND.cD', this.VendorInfo?.vendorCode, 'oPSST', 1)
           break;
-        case "THC":
-          data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_summary', 'docNo', search)
+        case "THCLTL":
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_summary_ltl', 'docNo', search,
+            'vND.cD', this.VendorInfo?.vendorCode, 'oPSST', 1)
           break;
-        case "TS":
+        case "THCFTL":
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_summary', 'docNo', search,
+            'vND.cD', this.VendorInfo?.vendorCode, 'oPSST', 1)
           break;
         case "OTR":
           break;

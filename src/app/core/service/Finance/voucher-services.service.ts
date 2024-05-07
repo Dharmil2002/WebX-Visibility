@@ -19,13 +19,7 @@ export class VoucherServicesService {
   async GetAccountDetailFromApi() {
     try {
       const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
-      const filter = {
-        aCCD: {
-          D$in: ["LIA002004", "LIA002002", "LIA002001", "LIA002003", "EXP001042",
-            "AST001001", "INC001003", "AST002002", "EXP001003", "EXP001009",
-            "EXP001011", "EXP001007", "LIA001002", "EXP001024"]
-        }
-      };
+      const filter = {};
       const req = { companyCode, collectionName: 'account_detail', filter };
       const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
       if (res && res.data) {
@@ -45,4 +39,37 @@ export class VoucherServicesService {
     }
     return [];
   }
+  //#endregion Delete Vouchers And Vouchers Details Based on Voucher Id
+  async DeleteVoucherAndVoucherDetails(voucherId) {
+    try {
+      const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
+
+      // Delete from Voucher Transaction Details
+      const detailsReq = {
+        companyCode: companyCode,
+        collectionName: 'voucher_trans_details',
+        filter: { cID: companyCode, vNO: voucherId }
+      };
+      const detailsRes = await firstValueFrom(this.masterService.masterMongoRemove("generic/removeAll", detailsReq));
+
+      // Delete from Voucher Transaction
+      const transactionReq = {
+        companyCode: companyCode,
+        collectionName: 'voucher_trans',
+        filter: { vNO: voucherId }
+      };
+      const transactionRes = await firstValueFrom(this.masterService.masterMongoRemove("generic/removeAll", transactionReq));
+
+      if (detailsRes && transactionRes) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      return [];
+    }
+  }
 }
+

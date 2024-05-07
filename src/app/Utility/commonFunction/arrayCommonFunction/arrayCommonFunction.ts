@@ -44,6 +44,7 @@ export function getNextLocation(locationsArray: string[], currentLocation: strin
   }
 
 }
+
 // Function to format the date in "dd mm yy hh:mm" format
 // Function to format the date in "dd mm yy hh:mm" format
 export const formatDateTimeString = (date) => {

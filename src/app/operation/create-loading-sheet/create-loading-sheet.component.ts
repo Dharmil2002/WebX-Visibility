@@ -22,6 +22,7 @@ import { LoadingSheetService } from "src/app/Utility/module/operation/loadingShe
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { debug } from "console";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -197,6 +198,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   isUpdate: boolean = false;
   vehicleSize:AutoComplete[];
   products:AutoComplete[];
+  vehicleDetails: any;
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -207,7 +209,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     private filter: FilterUtils,
     private storage: StorageService,
     private generalService: GeneralService,
-    private loadingSheetService: LoadingSheetService
+    private loadingSheetService: LoadingSheetService,
+    private vehicleTypeService: VehicleTypeService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
@@ -367,7 +370,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
     // Assign the value of $event to the loadingData property
     this.loadingData = $event;
-    if (!this.loadingSheetTableForm.value.vehicle.value) {
+    if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
       this.tableData.forEach((x) => {
         x.isSelected = false
@@ -498,13 +501,24 @@ export class CreateLoadingSheetComponent implements OnInit {
     //this._cnoteService.setShipingData([]);
     // Perform cleanup, unsubscribe from observables, etc.
   }
+  isMarketVehicle(){
+    this.loadingSheetTableForm.controls['vendorType'].setValue("Market");
+  }
   async loadingSheetGenerate() {
+    debugger
     const shipment = this.tableData.filter((x) => x.isSelected);
     if (shipment.length == 0) {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
       return false;
     }
     const lsForm = this.loadingSheetTableForm.value;
+    if (lsForm.vendorType == "Market" || !this.isUpdate) {
+      try {
+        await this.loadingSheetService.marketVehicle(lsForm);
+      } catch (e) {
+        console.log(e);
+      }
+    }
     if (this.isUpdate && this.tripData.TripID) {
       const tripData = await this.loadingSheetService.updatetripFieldMapping(lsForm, shipment);
       const lsDetails = await this.loadingSheetService.updateLoadingSheet(tripData);
@@ -568,7 +582,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   updateLoadingData(event) {
     if (event) {
-
+         debugger;
       let selectedDockets = this.tableData.filter(x => x.leg != event[0].leg.trim())
                             .map((x) => x['items']?.filter((y) => y.isSelected == true).map((z) => z.dKTNO)).flat();
 
@@ -590,7 +604,57 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.getCapacity();
   }
 
-
+  async checkIsMarketVehicle(vehicleData){
+    const fieldName = ["vehicleType","Capacity","CapacityVolumeCFT"];
+    if(typeof(this.loadingSheetTableForm.controls['vehicle'].value)=="string" || vehicleData==undefined){
+      const res = await this.vehicleTypeService.getVehicleTypeList();
+      const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
+        if (fieldName.includes(x.name)) {
+          x.disable = false
+        }
+        if(fieldName.includes(x.name) && x.name=="vehicleType"){
+          x.type="Staticdropdown"
+          x.value=vehicleType
+          x.disable = false
+        }
+        return x;
+      });
+    }
+  
+  }
+  checkVehicle(){
+    const fieldName = ["vehicleType","Capacity","CapacityVolumeCFT"];
+    const vehicleType=this.jsonControlArray.find((x)=>x.name=="vehicleType") ;
+    if(vehicleType.type=="Staticdropdown"
+     || this.loadingSheetTableForm.controls['vehicle'].value!=""
+     || this.loadingSheetTableForm.controls['vehicleType'].value!=""
+     ){
+      this.jsonControlArray.forEach((x) => {
+        if (fieldName.includes(x.name)) {
+          x.disable = true;  // Disable the control if fieldName includes x.name
+      
+          if (x.name === "vehicleType") {
+            x.type = "text";
+            x.value = "";  // Set value to empty string if name is "vehicleType"
+          } else {
+            x.value = 0;  // Set value to 0 for all other names
+          }
+        }
+      });
+    fieldName.forEach((x)=>{
+      this.loadingSheetTableForm.controls[x].setValue("");
+    })
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.loadingSheetTableForm,
+      this.vehicleDetails,
+      this.vehicleNoControlName,
+      this.vehicleControlStatus
+    );
+    }
+    
+  }
   // get vehicleNo
   GetVehicleDropDown() {
     const vehRequest = {
@@ -610,11 +674,10 @@ export class CreateLoadingSheetComponent implements OnInit {
       .operationMongoPost("generic/get", vehRequest)
       .subscribe((res) => {
         if (res) {
-
           let vehicleDetails = res.data.map((x) => {
             return { 
               name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
-              value: `${x.vehNo}`, 
+              value: x.vehNo, 
               status: x.status
             };
           }).sort((a, b) => {
@@ -624,7 +687,7 @@ export class CreateLoadingSheetComponent implements OnInit {
               }
               return a.value.localeCompare(b.value);
           });
-
+          this.vehicleDetails=vehicleDetails;
           this.filter.Filter(
             this.jsonControlArray,
             this.loadingSheetTableForm,
@@ -797,10 +860,16 @@ export class CreateLoadingSheetComponent implements OnInit {
         return;
       }
       const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
+      if(vehicleData){
       this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
       this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
+      this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData.vendorType);
       this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
       this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
+      }
+      else{
+        this.checkIsMarketVehicle(vehicleData);
+      }
     } catch (error) {
     }
   }

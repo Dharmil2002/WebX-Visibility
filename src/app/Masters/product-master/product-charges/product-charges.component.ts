@@ -301,8 +301,8 @@ export class ProductChargesComponent implements OnInit {
     const Body = {
       sELCHA: this.customerTableForm.value.SelectCharges.name,
       cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
-      aCCD: this.customerTableForm.value.Ledger.value || "",
-      aCNM: this.customerTableForm.value.Ledger.name || "",
+      aCCD: this.customerTableForm.value.Ledger?.value || "",
+      aCNM: this.customerTableForm.value.Ledger?.name || "",
       cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
       vAR: this.customerTableForm.value.Variability,
       aDD_DEDU: this.customerTableForm.value.Add_Deduct,

@@ -17,12 +17,12 @@ import { getLoadingSheetDetail } from "../depart-vehicle/depart-vehicle/depart-c
 import Swal from "sweetalert2";
 import { runningNumber } from "src/app/Utility/date/date-utils";
 import { aggregateData, setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { firstValueFrom } from "rxjs";
 import { LoadingSheetService } from "src/app/Utility/module/operation/loadingSheet/loadingsheet-service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
-import { debug } from "console";
+import { VehicleTypeService } from "src/app/Utility/module/masters/vehicle-type/vehicle-type-service";
+import { AddMarketVehicleComponent } from "../add-market-vehicle/add-market-vehicle.component";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -37,6 +37,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   addAndEditPath: string;
   uploadComponent: any;
   loadingSheetData: any;
+  NavData: any;
   csvFileName: string; // Name of the CSV file, when data is downloaded. You can also use a function to generate filenames based on dateTime.
   dynamicControls = {
     add: false,
@@ -90,6 +91,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       ColSpan: 4
     }
   ];
+  addNewTitle: string = "Add Market";
   columnHeader = {
     checkBoxRequired: {
       Title: "",
@@ -1015,5 +1017,16 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
 
+ //#region addMarket vehicle
+ addMarket(){
+  const dialogref = this.dialog.open(AddMarketVehicleComponent, {
+    data: "ltl",
+  });
+  dialogref.afterClosed().subscribe((result) => {
+    console.log(result)
+    if(result){
+    }
+  });
+ }
 
 }

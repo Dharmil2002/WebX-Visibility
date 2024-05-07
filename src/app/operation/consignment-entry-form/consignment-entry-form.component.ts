@@ -1112,14 +1112,13 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*End*/
   checkDocketRules() {
-    // const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
-    // if (STYP) {
-    //   const isManual = STYP.vAL === "M";
-    //   this.model.allformControl.find(x => x.name == "docketNumber").disable = !isManual;
-    //   this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
-    //   this.isManual = isManual;
-    // }
-
+    const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
+    if (STYP) {
+      const isManual = STYP.vAL === "M";
+      this.model.allformControl.find(x => x.name == "docketNumber").disable = !isManual;
+      this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
+      this.isManual = isManual;
+    }
     const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
     if (ELOC) {
       if (!ELOC.vAL.includes(this.storage.branch)) {

@@ -231,8 +231,8 @@ export class ProductControls {
       },
       {
         name: "Add_Deduct",
-        label: "",
-        placeholder: "",
+        label: "Add/Deduct",
+        placeholder: "Add/Deduct",
         type: "radiobutton",
         value: [
           { value: "+", name: "Add", checked: true },

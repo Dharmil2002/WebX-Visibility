@@ -123,7 +123,12 @@ export class ProductChargesComponent implements OnInit {
     );
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-
+    this.customerTableForm.controls["Add_Deduct"].setValue(
+      "+"
+    );
+    this.customerTableForm.controls["Variability"].setValue(
+      "N"
+    );
     if (this.isUpdate) {
 
       // this.customerTableForm.controls.Add_Deduct.set
@@ -324,7 +329,7 @@ export class ProductChargesComponent implements OnInit {
       Body["cHACD"] = this.customerTableForm.value.ChargesCode;
       Body[
         "_id"
-      ] = `${this.companyCode}-${this.ProductId}-${this.customerTableForm.value.ChargesCode}`;
+      ] = `${this.companyCode}-${this.ProductId}-${this.selectedValue}-${this.customerTableForm.value.ChargesCode}`;
       Body["cID"] = this.companyCode;
       Body["pRNM"] = this.ProductName;
       Body["pRCD"] = this.ProductId;

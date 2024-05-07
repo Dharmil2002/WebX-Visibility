@@ -39,4 +39,37 @@ export class VoucherServicesService {
     }
     return [];
   }
+  //#endregion Delete Vouchers And Vouchers Details Based on Voucher Id
+  async DeleteVoucherAndVoucherDetails(voucherId) {
+    try {
+      const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
+
+      // Delete from Voucher Transaction Details
+      const detailsReq = {
+        companyCode: companyCode,
+        collectionName: 'voucher_trans_details',
+        filter: { cID: companyCode, vNO: voucherId }
+      };
+      const detailsRes = await firstValueFrom(this.masterService.masterMongoRemove("generic/removeAll", detailsReq));
+
+      // Delete from Voucher Transaction
+      const transactionReq = {
+        companyCode: companyCode,
+        collectionName: 'voucher_trans',
+        filter: { vNO: voucherId }
+      };
+      const transactionRes = await firstValueFrom(this.masterService.masterMongoRemove("generic/removeAll", transactionReq));
+
+      if (detailsRes && transactionRes) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      return [];
+    }
+  }
 }
+

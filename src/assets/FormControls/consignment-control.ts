@@ -25,11 +25,11 @@ export class ConsignmentControl {
         name: "docketNumber",label: `${docCalledAs.Docket} No`,
         placeholder: `${docCalledAs.Docket} No`, type: "text",
         value: docketDetail?.docketNumber || 'System Generated', filterOptions: "", autocomplete: "", displaywith: "", Validations: [   {
-          //name: "required",
-          //message:  `${docCalledAs.Docket}No required`,
+          name: "required",
+          message:  `${docCalledAs.Docket}No required`,
         }], generatecontrol: true, disable: true,
         functions: {
-          //onChange: "docketValidation",
+        onChange: "docketValidation",
       },
       
         additionalData: {

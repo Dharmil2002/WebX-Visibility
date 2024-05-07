@@ -326,6 +326,7 @@ export class BalancePaymentComponent implements OnInit {
       StartDate.setDate(StartDate.getDate() - 30);
       Filters = {
         PaymentType: "Balance",
+        Mode: this.BillPaymentData?.Mode,
         StartDate: StartDate,
         EndDate: new Date(),
         VendorInfo: {
@@ -336,6 +337,7 @@ export class BalancePaymentComponent implements OnInit {
     } else {
       Filters = {
         PaymentType: "Balance",
+        Mode: this.BillPaymentData?.Mode,
         StartDate: this.BillPaymentData?.StartDate,
         EndDate: this.BillPaymentData?.EndDate,
         VendorInfo: this.BillPaymentData?.VendorInfo,
@@ -364,7 +366,8 @@ export class BalancePaymentComponent implements OnInit {
     if (this.IsModifyAction) {
       const GetBillData = await GetTHCListBasdedOnBillNumberFromApi(
         this.masterService,
-        this.BillPaymentData?.billNo
+        this.BillPaymentData?.billNo,
+        this.BillPaymentData?.Mode || 'FTL'
       );
       const MappedGetBillData = GetBillData.map((x, index) => {
         return {
@@ -527,48 +530,79 @@ export class BalancePaymentComponent implements OnInit {
     );
   }
 
-  GSTSACcodeFieldChanged() { }
 
   toggleTDSExempted() {
     const TDSExemptedValue =
       this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted;
 
-    if (TDSExemptedValue) {
-      this.jsonControlVendorBalanceTaxationTDSFilterArray =
-        this.AlljsonControlVendorBalanceTaxationTDSFilterArray;
-      const TDSSection =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
-      TDSSection.setValidators([
-        Validators.required,
-        autocompleteObjectValidator(),
-      ]);
+    if (!TDSExemptedValue) {
+      this.jsonControlVendorBalanceTaxationTDSFilterArray = this.AlljsonControlVendorBalanceTaxationTDSFilterArray;
+      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      TDSSection.setValidators([Validators.required, autocompleteObjectValidator(),]);
+
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
       TDSRate.setValidators([Validators.required]);
-      const TDSAmount =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+
       TDSAmount.setValidators([Validators.required]);
       TDSAmount.updateValueAndValidity();
       this.getTDSSectionDropdown();
+
     } else {
-      this.jsonControlVendorBalanceTaxationTDSFilterArray =
-        this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter(
-          (x) => x.name == "TDSExempted"
-        );
-      const TDSSection =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      this.jsonControlVendorBalanceTaxationTDSFilterArray = this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter((x) => x.name == "TDSExempted");
+      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
       TDSSection.setValue("");
       TDSSection.clearValidators();
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
       TDSRate.setValue("");
       TDSRate.clearValidators();
-      const TDSAmount =
-        this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
       TDSAmount.setValue("");
       TDSAmount.clearValidators();
       TDSAmount.updateValueAndValidity();
     }
   }
+  toggleVendorGSTRegistered() {
+    const VendorGSTRegistered =
+      this.VendorBalanceTaxationGSTFilterForm.value.VendorGSTRegistered;
 
+    if (VendorGSTRegistered) {
+      // this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray;
+
+      const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
+      GSTSACcode.setValidators([Validators.required, autocompleteObjectValidator(),]);
+      GSTSACcode.updateValueAndValidity();
+
+      const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
+      Billbookingstate.setValidators([Validators.required, autocompleteObjectValidator(),]);
+      Billbookingstate.updateValueAndValidity();
+
+      const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
+      Vendorbillstate.setValidators([Validators.required, autocompleteObjectValidator(),]);
+      Vendorbillstate.updateValueAndValidity();
+
+      this.getSACcodeDropdown();
+      this.getStateDropdown();
+
+
+    } else {
+      // this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter((x) => x.name == "VendorGSTRegistered");
+      const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
+      GSTSACcode.setValue("");
+      GSTSACcode.clearValidators();
+      GSTSACcode.updateValueAndValidity();
+
+      const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
+      Billbookingstate.setValue("");
+      Billbookingstate.clearValidators();
+      Billbookingstate.updateValueAndValidity();
+
+      const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
+      Vendorbillstate.setValue("");
+      Vendorbillstate.clearValidators();
+      Vendorbillstate.updateValueAndValidity();
+    }
+  }
   TDSSectionFieldChanged() {
     if (this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value) {
       const FindData = this.TDSdata.find(
@@ -591,7 +625,8 @@ export class BalancePaymentComponent implements OnInit {
   BalanceUnbilledFunction(event) {
     const templateBody = {
       DocNo: event.data.THC,
-      templateName: "THC View-Print",
+      partyCode: "CONSRAJ19",
+      templateName: "thc",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
@@ -602,6 +637,7 @@ export class BalancePaymentComponent implements OnInit {
       BillPaymentData: this.BillPaymentData,
       THCData: event?.data,
       Type: "balance",
+      Mode: this.BillPaymentData?.Mode,
     };
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
       data: RequestBody,
@@ -833,6 +869,7 @@ export class BalancePaymentComponent implements OnInit {
               cID: this.companyCode,
               docNo: IsUpdate ? this.BillPaymentData?.billNo : "",
               bDT: new Date(),
+              tMOD: this.BillPaymentData?.Mode || "",
               lOC: this.VendorDetails?.vendorCity,
               sT: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
               gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.VGSTNumber.value,
@@ -886,7 +923,7 @@ export class BalancePaymentComponent implements OnInit {
                 bILLNO: "",
                 tRIPNO: x.THC,
                 tTYP: "THC",
-                tMOD: "FTL",
+                tMOD: this.BillPaymentData?.Mode,
                 aDVAMT: x.Advance,
                 bALAMT: x.BalancePending,
                 tHCAMT: x.THCamount,
@@ -1326,28 +1363,28 @@ export class BalancePaymentComponent implements OnInit {
       }
 
       if (OtherChargePositiveAmt != 0) {
-        Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, OtherChargePositiveAmt, 0, DataItem.THC, BillNo));
+        Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, OtherChargePositiveAmt, 0, DataItem.THC, BillNo));
       }
       if (OtherChargeNegativeAmt != 0) {
-        Result.push(createVoucher(ledgerInfo['Other Charges'].LeadgerCode, ledgerInfo['Other Charges'].LeadgerName, ledgerInfo['Other Charges'].LeadgerCategory, 0, OtherChargeNegativeAmt, DataItem.THC, BillNo));
+        Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, 0, OtherChargeNegativeAmt, DataItem.THC, BillNo));
       }
 
       // Push TDS Sectiond Data
-      if (this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted) {
+      if (!this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted) {
         Result.push(createVoucher(this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value, this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name, "LIABILITY", 0, +this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount, DataItem.THC, BillNo));
       }
       if (RoundOffAmount != 0) {
-        Result.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName, ledgerInfo['Round off Amount'].LeadgerCategory, RoundOffAmount > 0 ? RoundOffAmount : 0, RoundOffAmount < 0 ? RoundOffAmount : 0, DataItem.THC, BillNo));
+        Result.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName, ledgerInfo['EXP001042'].LeadgerCategory, RoundOffAmount > 0 ? RoundOffAmount : 0, RoundOffAmount < 0 ? RoundOffAmount : 0, DataItem.THC, BillNo));
       }
       // Push GST Data
       if (this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount != 0) {
         if (this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount != 0) {
-          Result.push(createVoucher(ledgerInfo['IGST'].LeadgerCode, ledgerInfo['IGST'].LeadgerName, ledgerInfo['IGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002004'].LeadgerCode, ledgerInfo['LIA002004'].LeadgerName, ledgerInfo['LIA002004'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
         } else if (this.VendorBalancePaymentFilterForm.value.CGSTAmount != 0 && this.VendorBalancePaymentFilterForm.value.SGSTAmount != 0) {
-          Result.push(createVoucher(ledgerInfo['CGST'].LeadgerCode, ledgerInfo['CGST'].LeadgerName, ledgerInfo['CGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
-          Result.push(createVoucher(ledgerInfo['SGST'].LeadgerCode, ledgerInfo['SGST'].LeadgerName, ledgerInfo['SGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002003'].LeadgerCode, ledgerInfo['LIA002003'].LeadgerName, ledgerInfo['LIA002003'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002001'].LeadgerCode, ledgerInfo['LIA002001'].LeadgerName, ledgerInfo['LIA002001'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
         } else if (this.VendorBalancePaymentFilterForm.value.UGSTAmount != 0) {
-          Result.push(createVoucher(ledgerInfo['UGST'].LeadgerCode, ledgerInfo['UGST'].LeadgerName, ledgerInfo['UGST'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002002'].LeadgerCode, ledgerInfo['LIA002002'].LeadgerName, ledgerInfo['LIA002002'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
         }
       }
     });
@@ -1357,9 +1394,9 @@ export class BalancePaymentComponent implements OnInit {
     let difference = TotalDebit - TotalCredit;
 
     Result.push(createVoucher(
-      ledgerInfo['Billed creditors'].LeadgerCode,
-      ledgerInfo['Billed creditors'].LeadgerName,
-      ledgerInfo['Billed creditors'].LeadgerCategory,
+      ledgerInfo['LIA001002'].LeadgerCode,
+      ledgerInfo['LIA001002'].LeadgerName,
+      ledgerInfo['LIA001002'].LeadgerCategory,
       difference > 0 ? 0 : Math.abs(difference),
       difference < 0 ? 0 : Math.abs(difference),
       "",
@@ -1398,7 +1435,7 @@ export class BalancePaymentComponent implements OnInit {
 
 
 
-    Result.push(createVoucher(ledgerInfo['Billed creditors'].LeadgerCode, ledgerInfo['Billed creditors'].LeadgerName, ledgerInfo['Billed creditors'].LeadgerCategory, NetPayable, 0, BillNo));
+    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, NetPayable, 0, BillNo));
     const PaymentMode = paymentData.PaymentMode;
     if (PaymentMode == "Cash") {
       const CashAccount = paymentData.CashAccount;

@@ -15,14 +15,6 @@
                     <app-vendor-bill-list (CurrentIndex)="GetSelectedIndex($event)"
                         [selectedIndex]="0"></app-vendor-bill-list>
                 </mat-tab>
-                <mat-tab label="OnlinePaymentApproval">
-                    <ng-template mat-tab-label>
-                        Online Payment Approval
-                    </ng-template>
-                    <app-online-payment-approval (CurrentIndex)="GetSelectedIndex($event)"
-                        *ngIf="tabName === 'OnlinePaymentApproval'" [selectedIndex]="1"></app-online-payment-approval>
-                </mat-tab>
-
             </mat-tab-group>
         </div>
     </div>

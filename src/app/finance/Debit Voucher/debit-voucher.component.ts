@@ -109,7 +109,7 @@ export class DebitVoucherComponent implements OnInit {
     private objImageHandling: ImageHandling,
     private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
-    
+
   ) {
     this.companyCode = this.storage.companyCode;
     // this.imageData = {
@@ -652,14 +652,14 @@ export class DebitVoucherComponent implements OnInit {
 
       var RoundOffList = {
         "Instance": "debit voucher",
-        "Value": ledgerInfo['Round off Amount'].LeadgerName,
-        "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
-        "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
+        "Value": ledgerInfo['EXP001042'].LeadgerName,
+        "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
+        "Ledgername": ledgerInfo['EXP001042'].LeadgerName,
         "SubLedger": "EXPENSE",
         "Dr": isAmountNegative ? "" : Amount.toFixed(2),
         "Cr": isAmountNegative ? (-Amount).toFixed(2) : "",
         "Location": Accountinglocation,
-        "Narration": ledgerInfo['Round off Amount'].LeadgerName,
+        "Narration": ledgerInfo['EXP001042'].LeadgerName,
       };
 
       FinalListOfDebitVoucher.push(RoundOffList)
@@ -846,13 +846,13 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
 
 
-        const companyCode = this.companyCode;
+        const companyCode = this.storage.getItem(StoreKeys.CompanyCode);
         const Branch = this.storage.getItem(StoreKeys.Branch);
 
         let Accountdata = this.tableData.map(function (item) {
           return {
 
-            "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
+            "companyCode": companyCode,
             "voucherNo": "",
             "transCode": VoucherInstanceType.DebitVoucherCreation,
             "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
@@ -860,7 +860,7 @@ export class DebitVoucherComponent implements OnInit {
             "voucherType": VoucherType[VoucherType.DebitVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": this.storage.getItem(StoreKeys.Branch),
+            "branch": Branch,
             "accCode": item.LedgerHdn,
             "accName": item.Ledger,
             "accCategory": item.SubLedger,
@@ -882,7 +882,7 @@ export class DebitVoucherComponent implements OnInit {
             const creditAmount = parseFloat(item.Cr) || 0;
 
             return {
-              "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
+              "companyCode": companyCode,
               "voucherNo": "",
               "transCode": VoucherInstanceType.DebitVoucherCreation,
               "transType": VoucherInstanceType[VoucherInstanceType.DebitVoucherCreation],
@@ -890,7 +890,7 @@ export class DebitVoucherComponent implements OnInit {
               "voucherType": VoucherType[VoucherType.DebitVoucher],
               "transDate": new Date(),
               "finYear": financialYear,
-              "branch": this.storage.getItem(StoreKeys.Branch),
+              "branch": Branch,
               "accCode": `${item.Ledgercode}`,
               "accName": item.Ledgername,
               "accCategory": item.SubLedger,
@@ -953,7 +953,7 @@ export class DebitVoucherComponent implements OnInit {
                 };
               })
               let reqBody = {
-                companyCode: this.companyCode,
+                companyCode: companyCode,
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transDate: Date(),
                 finYear: financialYear,
@@ -1009,7 +1009,7 @@ export class DebitVoucherComponent implements OnInit {
             },
           });
       } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!" + error);
       }
 
 

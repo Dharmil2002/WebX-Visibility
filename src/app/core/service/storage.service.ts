@@ -44,7 +44,7 @@ export class StorageService {
     return this.getItemObject<number>(StoreKeys.CompanyCode);
   }
   get companyCd(): string {
-    return this.getItem(StoreKeys.CompanyCode);
+    return this.getItem(StoreKeys.CompanyAlias);
   }
 
   get branch(): string {

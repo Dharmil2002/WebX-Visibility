@@ -97,7 +97,7 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     DeliveryMrResponseModalComponent,
     PrqBulkUploadComponent,
     HomePageComponent,
-    ReportDashboardComponent
+    ReportDashboardComponent,
   ],
   imports: [
     CommonModule,

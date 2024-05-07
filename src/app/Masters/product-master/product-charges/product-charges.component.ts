@@ -1,15 +1,13 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { FormControl, UntypedFormBuilder, Validators } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ProductControls } from "src/assets/FormControls/ProductControls";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { firstValueFrom } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
-import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
-
 @Component({
   selector: "app-product-charges",
   templateUrl: "./product-charges.component.html",
@@ -56,11 +54,6 @@ export class ProductChargesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
-    VariabilityType: {
-      Title: "Variability",
-      class: "matcolumncenter",
-      Style: "min-width:20%",
-    },
     EditAction: {
       type: "iconClick",
       Title: "Action",
@@ -80,7 +73,6 @@ export class ProductChargesComponent implements OnInit {
 
   staticField = [
     "SrNo",
-    "VariabilityType",
     "cHABEH",
     "aDD_DEDU",
     "sELCHA",
@@ -99,6 +91,9 @@ export class ProductChargesComponent implements OnInit {
   ChargesData: any[] = [];
   UpdatedData: any;
   isUpdate: boolean = false;
+  protected _onDestroy = new Subject<void>();
+  LedgerStatus: any;
+  LedgerCode: any;
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder,
@@ -118,16 +113,19 @@ export class ProductChargesComponent implements OnInit {
   HendelFormFunction() {
     this.initializeFormControl();
     this.bindDropdown();
-    this.ChargesBehaviourDropdown();
     this.ChargesListDropdown();
+    this.getChargeApplicable();
   }
   initializeFormControl() {
     const customerFormControls = new ProductControls(this.isUpdate);
-    this.jsonControlArray = customerFormControls.getChargesControlsArray(this.isUpdate);
+    this.jsonControlArray = customerFormControls.getChargesControlsArray(
+      this.isUpdate
+    );
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
 
     if (this.isUpdate) {
+
       // this.customerTableForm.controls.Add_Deduct.set
       this.customerTableForm.controls["Add_Deduct"].setValue(
         this.UpdatedData.aDD_DEDU
@@ -137,6 +135,15 @@ export class ProductChargesComponent implements OnInit {
       );
       this.customerTableForm.controls["ChargesCode"].setValue(
         this.UpdatedData.cHACD
+      );
+      this.customerTableForm.controls["cAPTION"].setValue(
+        this.UpdatedData.cAPTION
+      );
+      this.customerTableForm.controls["isActive"].setValue(
+        this.UpdatedData.isActive
+      );
+      this.customerTableForm.controls["iSChargeMandatory"].setValue(
+        this.UpdatedData.iSREQ
       );
     }
   }
@@ -151,6 +158,13 @@ export class ProductChargesComponent implements OnInit {
         // Set category-related variables
         this.ChargesBehaviourCode = data.name;
         this.ChargesBehaviourStatus = data.additionalData.showNameAndValue;
+        this.ChargesBehaviourDropdown();
+      }
+      if (data.name === "Ledger") {
+        // Set category-related variables
+        this.LedgerCode = data.name;
+        this.LedgerStatus = data.additionalData.showNameAndValue;
+        this.getLedger();
       }
     });
   }
@@ -220,6 +234,42 @@ export class ProductChargesComponent implements OnInit {
       );
     }
   }
+  async getLedger() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { iSSYS: true },
+      collectionName: "account_detail",
+    };
+    const Res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
+
+    if (Res.success && Res.data.length > 0) {
+      const LedgerData = Res.data.map((x) => {
+        return {
+          ...x,
+          name: x.aCNM,
+          value: x.aCCD,
+        };
+      });
+
+      if (this.isUpdate) {
+        const element = LedgerData.find(
+          (x) => x.value == this.UpdatedData.aCCD
+        );
+        // this.ChargesData.push(element);
+        this.customerTableForm.controls["Ledger"].setValue(element);
+      }
+
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.customerTableForm,
+        LedgerData,
+        this.LedgerCode,
+        this.LedgerStatus
+      );
+    }
+  }
 
   async GetTableData() {
     this.TableLoad = false;
@@ -246,13 +296,22 @@ export class ProductChargesComponent implements OnInit {
       this.TableLoad = true;
     }
   }
+
   async save() {
     const Body = {
       sELCHA: this.customerTableForm.value.SelectCharges.name,
       cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
+      aCCD: this.customerTableForm.value.Ledger.value || "",
+      aCNM: this.customerTableForm.value.Ledger.name || "",
       cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
       vAR: this.customerTableForm.value.Variability,
       aDD_DEDU: this.customerTableForm.value.Add_Deduct,
+      cHAPP: this.customerTableForm.value.chargeApplicableHandler.map(
+        (x) => x.value
+      ),
+      cAPTION: this.customerTableForm.value.cAPTION,
+      iSREQ: this.customerTableForm.value.iSChargeMandatory,
+      isActive: this.customerTableForm.value.isActive,
       eNTDT: new Date(),
       eNTLOC: this.storage.branch,
       eNTBY: this.storage.userName,
@@ -260,6 +319,7 @@ export class ProductChargesComponent implements OnInit {
       mODLOC: this.storage.branch,
       mODBY: this.storage.userName,
     };
+
     if (!this.isUpdate) {
       Body["cHACD"] = this.customerTableForm.value.ChargesCode;
       Body[
@@ -280,11 +340,11 @@ export class ProductChargesComponent implements OnInit {
 
     const res = this.isUpdate
       ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
+        this.masterService.masterPut("generic/update", req)
+      )
       : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+        this.masterService.masterPost("generic/create", req)
+      );
     if (res?.success) {
       this.GetTableData();
       this.Tabletab = !this.Tabletab;
@@ -323,6 +383,7 @@ export class ProductChargesComponent implements OnInit {
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;
+    console.log('functionName', functionName)
     try {
       this[functionName]($event);
     } catch (error) {
@@ -369,20 +430,30 @@ export class ProductChargesComponent implements OnInit {
   }
 
   async handleSelectCharges() {
-    
     if (this.isUpdate) {
-      if (this.customerTableForm.value.SelectCharges.name == this.UpdatedData.sELCHA) {
+      this.customerTableForm.controls["ChargesCode"].setValue(
+        this.customerTableForm.value.SelectCharges.value
+      );
+      if (
+        this.customerTableForm.value.SelectCharges.name ==
+        this.UpdatedData.sELCHA
+      ) {
         return;
       }
-    }
-    else{
-      this.customerTableForm.controls['ChargesCode'].setValue(this.customerTableForm.value.SelectCharges.value)
+    } else {
+      this.customerTableForm.controls["ChargesCode"].setValue(
+        this.customerTableForm.value.SelectCharges.value
+      );
     }
 
     const req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
-      filter: { sELCHA: this.customerTableForm.value.SelectCharges.name , cHATY:this.selectedValue ,pRCD:this.ProductId },
+      filter: {
+        sELCHA: this.customerTableForm.value.SelectCharges.name,
+        cHATY: this.selectedValue,
+        pRCD: this.ProductId,
+      },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
@@ -397,4 +468,51 @@ export class ProductChargesComponent implements OnInit {
       });
     }
   }
+  //#region to get and set Charge Applicable list
+  getChargeApplicable() {
+    const chargeApplicablelist = [
+      { name: "ON GCN", value: "GCN" },
+      { name: "On THC Generation", value: "THC" },
+      { name: "ON Delivery MR", value: "DeliveryMR" },
+    ];
+
+    if (this.isUpdate && this.UpdatedData?.cHAPP) {
+      const updatedValue = this.UpdatedData.cHAPP;
+
+      // Assuming updatedValue is an array
+      const selectedChargeApplicables = chargeApplicablelist.filter((x) =>
+        updatedValue.includes(x.value)
+      );
+      this.customerTableForm.controls["chargeApplicableHandler"].patchValue(
+        selectedChargeApplicables
+      );
+    }
+
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.customerTableForm,
+      chargeApplicablelist,
+      "chargeApplicable",
+      false
+    );
+  }
+  //#endregion
+  //#region handles select All feature of all multiSelect fields of one form.
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.customerTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+  //#endregion
 }

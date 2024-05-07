@@ -7,7 +7,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { PayBasisdetailFromApi, checkForDuplicatesInFreightUpload, productdetailFromApi } from '../../../CustomerContractAPIUtitlity';
+import { GetGeneralMasterData, checkForDuplicatesInFreightUpload, productdetailFromApi } from '../../../CustomerContractAPIUtitlity';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
@@ -78,14 +78,14 @@ export class FreightChargeUploadComponent implements OnInit {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
-        const RateData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+        const RateData = await GetGeneralMasterData(this.masterService, "RTTYP");
         this.rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
           (x, index) => {
             return RateData.find((t) => t.value == x);
           }
         );
         const containerData = await this.objContainerService.getContainerList();
-        const vehicleData = await PayBasisdetailFromApi(
+        const vehicleData = await GetGeneralMasterData(
           this.masterService,
           "VEHSIZE"
         );
@@ -112,7 +112,7 @@ export class FreightChargeUploadComponent implements OnInit {
         );
 
         this.transportMode = await productdetailFromApi(this.masterService);
-        this.arealist = this.objlocationEntitySearch.GetMergedData(
+        this.arealist = await this.objlocationEntitySearch.GetMergedData(
           pincodeList,
           zonelist,
           "ST"
@@ -190,7 +190,7 @@ export class FreightChargeUploadComponent implements OnInit {
           },
         ];
 
-        const rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
+        const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
 
         rPromise.then(async response => {
 
@@ -255,18 +255,18 @@ export class FreightChargeUploadComponent implements OnInit {
   }
   ReValidateData(data, existingData) {
     let validData = data.filter(x => {
-      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
-      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
-      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD/MM/YYYY');
-      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD/MM/YYYY');
+      const validFromDate = moment(x.ValidFromDate, 'DD MMM YY');
+      const validToDate = moment(x.ValidToDate, 'DD MMM YY');
+      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY');
+      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY');
 
       return validFromDate.isSameOrAfter(contractStartDate) && validToDate.isSameOrBefore(contractEndDate);
     });
     const invalidData = data.filter(x => {
-      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
-      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
-      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD/MM/YYYY');
-      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD/MM/YYYY');
+      const validFromDate = moment(x.ValidFromDate, 'DD MMM YY');
+      const validToDate = moment(x.ValidToDate, 'DD MMM YY');
+      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY');
+      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY');
 
       return validFromDate.isBefore(contractStartDate) || validToDate.isAfter(contractEndDate);
     });
@@ -279,8 +279,8 @@ export class FreightChargeUploadComponent implements OnInit {
       return {
         ...element,
         RecordType: "existing",
-        ValidFromDate: moment(element.vFDT).format('DD/MM/YYYY'),
-        ValidToDate: moment(element.vEDT).format('DD/MM/YYYY'),
+        ValidFromDate: moment(element.vFDT).format('DD MMM YY'),
+        ValidToDate: moment(element.vEDT).format('DD MMM YY'),
         From: element.fROM,
         To: element.tO,
         Capacity: element.cAP,
@@ -463,7 +463,6 @@ export class FreightChargeUploadComponent implements OnInit {
 
   // function to process data and prepare request body
   processData(element, rateTypedata, capacityList, transportMode) {
-    debugger
     const processedData: any = {};
 
     const updaterateType = rateTypedata.find(item => item.name.toUpperCase() === element.RateType.toUpperCase());
@@ -497,8 +496,8 @@ export class FreightChargeUploadComponent implements OnInit {
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
 
     // SET Start Date And End Date
-    processedData.vFDT = moment(element.ValidFromDate, 'DD-MM-YYYY').toDate();
-    processedData.vEDT = moment(element.ValidToDate, 'DD-MM-YYYY').toDate();
+    processedData.vFDT = moment(element.ValidFromDate, 'DD MMM YY').toDate();
+    processedData.vEDT = moment(element.ValidToDate, 'DD MMM YY').toDate();
 
     // Set timestamp and user information
     processedData.eNTDT = new Date();

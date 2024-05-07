@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { firstValueFrom } from 'rxjs';
 import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
+import { da } from 'date-fns/locale';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -59,16 +60,74 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   // < column name : Column name you want to display on table >
 
   columnHeader = {
-    "Route": "Route",
-    "VehicleNo": "Veh No",
-    "TripID": "Trip ID",
-    "Location": "Location",
-    "Scheduled": "STA",
-    "Expected": "ETA",
-    "Status": "Status",
-    "Hrs": "Hrs.",
-    "Action": "Action"
+    Route: {
+      Title: "Route",
+      class: "matcolumnleft",
+      Style: "min-width:200px",
+      sticky: true,
+      datatype: 'string'
+    },
+    VehicleNo: {
+      Title: "Veh No",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+      sticky: true,
+      datatype: 'string'
+    },
+    TripID: {
+      Title: "Trip ID",
+      class: "matcolumnleft",
+      Style: "min-width:120px",
+      sticky: true,
+      datatype: 'string'
+    },
+    Location: {
+      Title: "Location",
+      class: "matcolumncenter",
+      Style: "min-width:100px",
+      datatype: 'string'
+    },
+    Scheduled: {
+      Title: "STA",
+      class: "matcolumncenter",
+      Style: "min-width:100px",
+      datatype: 'datetime'
+    },
+    Expected: {
+      Title: "ETA",
+      class: "matcolumncenter",
+      Style: "min-width:100px",
+      datatype: 'datetime'
+    },
+    Status: {
+      Title: "Status",
+      class: "matcolumnleft",
+      Style: "min-width:100px"
+    },
+    // Hrs: {
+    //   Title: "Hrs.",
+    //   class: "matcolumnright",
+    //   Style: "min-width:100px"
+    // },
+    Action: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+      stickyEnd: true
+    }
+
+    // "Route": "Route",
+    // "VehicleNo": "Veh No",
+    // "TripID": "Trip ID",
+    // "Location": "Location",
+    // "Scheduled": "STA",
+    // "Expected": "ETA",
+    // "Status": "Status",
+    // "Hrs": "Hrs.",
+    // "Action": "Action"
   }
+  staticField = ["Route","VehicleNo","TripID","Location","Scheduled","Expected","Status"] //,"Hrs"
+
   METADATA = {
     checkBoxRequired: true,
     // selectAllorRenderedData : false,
@@ -121,7 +180,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this.getArrivalDetails();
   }
   ngOnInit(): void {
-    this.viewComponent = MarkArrivalComponent //setting Path to add data
 
     try {
     } catch (error) {
@@ -179,8 +237,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
                 "VehicleNo": element?.vEHNO || '',
                 "TripID": element?.tHC || '',
                 "Location": this.storage.branch,
-                "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
-                "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
+                "Scheduled": scheduleTime,
+                "Expected": expectedTime,
                 "Status": timeDifferenceInHours > 0 ? "Delay" : "On Time",
                 "Hrs": timeDifferenceInHours.toFixed(2),                
                 "cLOC": element?.cLOC,
@@ -227,32 +285,11 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         this._operation.setShipmentStatus(shipmentStatus);
   }
   updateDepartureData(event) {
-    
     this.tableload=true
     this.getArrivalDetails()
-    const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
-    const action = result?.Action ?? '';
-    if (action) {
-      this.arrivalTableData = event;
-    }
-    else {
-      this.CnoteService.setDeparture(event)
-      if (event) {
-        this.arrivalTableData = this.arrivalTableData.filter((x) => x.TripID != event.tripID);
-        /*Here Function is Declare for get Latest arrival Data*/
-        let arrivalData = {
-          arrivalData: this.arrivalTableData,
-          packagesData: this.data?.packagesData || "",
-          shippingData: this.data?.shippingData || ""
-        }
-        this.CnoteService.setVehicleArrivalData(arrivalData);
-        /*End*/
-      }
-
-    }
-    this.tableload=false;
   }
   handleMenuItemClick(label: string, element) {
+    
     let Data = { label: label, data: element }
     //  this.menuItemClicked.emit(Data);
     this.advancdeDetails = {

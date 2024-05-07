@@ -29,18 +29,14 @@ export class ThcSummaryComponent implements OnInit {
   TableStyle = "width:80%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
-  columnHeader = {
-    createOn: {
-      Title: "Created Date",
-      class: "matcolumncenter",
-      Style: "min-width:140px",
-    },
+  columnHeader = {   
     docNo: {
       Title: "THC No",
       class: "matcolumncenter",
       Style: "min-width:210px",
       functionName: 'openExternalWindow',
       type: 'windowLink',
+      sticky: true
     },
     rUTNM: {
       Title: "Route",
@@ -67,10 +63,17 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
+    createOn: {
+      Title: "Created Date",
+      class: "matcolumncenter",
+      Style: "min-width:140px",
+      datatype: "datetime",
+    },
     actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      Style: "max-width:80px; width:80px",
+      stickyEnd: true
     }
   };
   allColumnFilter: any;
@@ -108,7 +111,6 @@ export class ThcSummaryComponent implements OnInit {
   //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
     const branch = this.storage.branch;
-
     const locData = await this.thcService.getLocationDetail(branch);
     console.log('locData', locData)
     const filter = {
@@ -118,18 +120,19 @@ export class ThcSummaryComponent implements OnInit {
         { tCT: locData.locCity },
         {vIA:{"D$in": [locData.locCity]}}
       ],
-      oPSST: { D$in: [1, 2] }
+      oPSST: { D$in: [1,3,2] }
     };
 
     let thcList = await this.thcService.getThcDetail(filter);
     const thcDetail = thcList.data.map((item) => {
+      const dest= item.tCT?.toLowerCase() === locData.locCity?.toLowerCase();
       const action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
       (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
       if (item.eNTDT) {
         item.createOn = moment(item.eNTDT).format('DD-MM-YY HH:mm');
         item.statusAction = item?.oPSSTNM
         item.loadedKg = item?.uTI?.wT
-        item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] : item.oPSST === 1 ? ["View"] : ["Delivered", "View"];
+        item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] :(dest&&item.oPSST!==2)? ["Update THC", "View"]:item.oPSST === 1 ||[2,3].includes(item.oPSST) ? ["View"] : ["Delivered", "View"];
       }
       return item;
     });
@@ -182,10 +185,9 @@ export class ThcSummaryComponent implements OnInit {
   openExternalWindow(data) {
     const templateBody = {
       DocNo: data.docNo,
-      templateName: 'THC View-Print'
+      templateName: "thc",
+      partyCode: "CONSRAJ19",
     }
-    console.log('templateBody', templateBody)
-    console.log('data', data)
 
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1500,height=800');

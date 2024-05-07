@@ -196,6 +196,8 @@ export class MfdetailsList {
   sFX: number
   cNO: string
   oRGN: string
+  fCT:string
+  tCT:string
   dEST: string
   pKGS: number
   vOL: number

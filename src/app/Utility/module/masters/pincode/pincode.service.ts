@@ -6,6 +6,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
+import { ClusterMasterService } from "../cluster/cluster.master.service";
 
 @Injectable({
   providedIn: "root",
@@ -14,7 +15,8 @@ export class PinCodeService {
   companyCode = 0;
   constructor(private masterService: MasterService,
     private storage: StorageService,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private clusterMasterService: ClusterMasterService,
   ) {
     this.companyCode = this.storage.companyCode;
   }
@@ -280,5 +282,97 @@ export class PinCodeService {
       // Handle any errors that may occur during the asynchronous operation
     }
   }
+  /*below is function for getting city and pincode*/
+  async getCityPincode(form, jsondata, controlName, codeStatus, isCity, isArea = false) {
+    try {
+      const cValue = form.controls[controlName].value;
+      let filter = {}
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (cValue.length >= 3) {
+        if (isCity) {
+          filter = { CT: { 'D$regex': `^${cValue}`, 'D$options': 'i' } }
+        }
+        else {
+          let gte = parseInt(`${cValue}00000`.slice(0, 6));
+          let lte = parseInt(`${cValue}99999`.slice(0, 6));
+          filter = { PIN: { 'D$gte': gte, 'D$lte': lte } }
+        }
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: this.storage.companyCode,
+          collectionName: "pincode_master",
+          filter,
+        };
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+        // Extract data from the response
+        let codeData = []
+        let mergeData = []
+        if (isArea) {
+          try {
+            const data = await this.clusterMasterService.getClusterData(cValue);
+            mergeData = (data) ? data : [];
+          } catch (error) {
+            console.error("Failed to retrieve cluster data:", error);
+            // Handle the error appropriately
+          }
+        }
+        if (isCity) {
+          
+          const filter = { pincode: { D$in: cResponse.data.map((x) => x.PIN) } };
+          const clusters = await this.clusterMasterService.getClusterByPincode(filter);
+          const data = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
+            .map(ct => {
+              // Find the first occurrence of this ct in the original data to get its pincode
+              const originalItem = cResponse.data.find(item => item.CT === ct);
+              const getCluster = clusters.find(x => x.pincode.includes(originalItem.PIN));
+              return {
+                name: originalItem.PIN,
+                value: ct,
+                ct: ct,
+                pincode: originalItem.PIN, // include pincode here
+                st: originalItem?.ST,
+                clusterName: getCluster?.clusterName,
+                clusterId: getCluster?.clusterCode
+              };
+            });
 
+          mergeData = (data) ? [...mergeData, ...data] : mergeData;
+        }
+        else {
+          const filter = { pincode: { D$in: cResponse.data.map((x) => x.PIN) } };
+          const clusters = await this.clusterMasterService.getClusterByPincode(filter);
+          codeData = cResponse.data
+            .filter((x) => x.PIN.toString().startsWith(cValue))
+            .map((element) => (
+              {
+                name: element.PIN,
+                value: element.CT,
+                ct: element.CT,
+                pincode: element.PIN,
+                st: element.ST
+              }));
+          mergeData = codeData.map((element) => {
+            const getCluster = clusters.find(x => x.pincode.includes(element.pincode));
+            return {
+              ...element,
+              clusterName: getCluster?.clusterName,
+              clusterId: getCluster?.clusterCode
+            }
+          });
+        }
+
+        this.filter.Filter(
+          jsondata,
+          form,
+          mergeData,
+          controlName,
+          codeStatus
+        );
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+    }
+  }
+  /*End*/
 }

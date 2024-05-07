@@ -42,6 +42,7 @@ export class BankReconciliationComponent implements OnInit {
       Title: "Voucher Date",
       class: "matcolumncenter",
       Style: "",
+      datatype: 'datetime'
     },
     party: {
       Title: "Party",
@@ -57,6 +58,7 @@ export class BankReconciliationComponent implements OnInit {
       Title: "Clearance Date",
       class: "matcolumncenter",
       Style: "",
+      datatype: 'datetime'
     },
     Comments: {
       Title: "Comments",

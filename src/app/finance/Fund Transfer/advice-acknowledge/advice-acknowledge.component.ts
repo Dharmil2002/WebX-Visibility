@@ -19,6 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { formatDate } from "src/app/Utility/date/date-utils";
 
 import { AdviceAcknowledgeFiltersComponent } from '../Models/advice-acknowledge-filters/advice-acknowledge-filters.component';
+import { StoreKeys } from 'src/app/config/myconstants';
 @Component({
   selector: 'app-advice-acknowledge',
   templateUrl: './advice-acknowledge.component.html',
@@ -107,7 +108,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
   isTableLode = true;
   constructor(private matDialog: MatDialog,
     public StorageService: StorageService, private router: Router, private masterService: MasterService,) {
-      this.companyCode = StorageService.companyCode;
+    this.companyCode = StorageService.companyCode;
     this.RequestData.StartDate.setDate(new Date().getDate() - 30);
   }
 
@@ -116,7 +117,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
   }
   async GetAdviceData() {
     const RequestBody = {
-      "companyCode": this.StorageService.getItem('companyCode'),
+      "companyCode": this.StorageService.getItem(StoreKeys.CompanyCode),
       "collectionName": "advice_details",
       "filter": {
         "D$and": [

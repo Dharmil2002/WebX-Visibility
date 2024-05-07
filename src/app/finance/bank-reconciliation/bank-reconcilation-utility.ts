@@ -1,5 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
 
 export async function getbankreconcilationList(masterService, request) {
@@ -10,7 +11,7 @@ export async function getbankreconcilationList(masterService, request) {
                 "pMD": { "D$in": ["RTGS/UTR", "Cheque"] },
             },
             {
-                "bRC": StorageService.getItem('Branch'),
+                "bRC": StorageService.getItem(StoreKeys.Branch),
             }, ...(request.fromDate ? [{ 'tTDT': { 'D$gte': request.fromDate } }] : []), ...(request.toDate ? [{ 'tTDT': { 'D$lt': request.toDate } }] : []),
             ...(request.bank ? [{ 'aNM': request.bank }] : []),
         ],
@@ -23,7 +24,7 @@ export async function getbankreconcilationList(masterService, request) {
     //             },
     // },
     const RequestBody = {
-        "companyCode": StorageService.getItem('companyCode'),
+        "companyCode": StorageService.getItem(StoreKeys.CompanyCode),
         "collectionName": "voucher_trans",
         "filters": [
             { D$match: matchQuery },
@@ -61,12 +62,12 @@ export async function getbankreconcilationList(masterService, request) {
             return result.map((x, index) => ({
                 voucherNo: x.vNO,
                 chequeNumber: x.rNO,
-                voucherDate: formatDate(x.tTDT, "dd-MMM-yy HH:mm a"),
+                voucherDate: x.tTDT,
                 party: ((x?.pCODE ?? "") && x?.pNAME ? x.pCODE + " - " + x.pNAME : x?.pCODE ?? x?.pNAME ?? ""),
                 amount: (x.nNETP).toFixed(2),
                 VoucherType: x.vTYPNM,
                 VoucherFor: x.pRE,
-                ClearanceDate: formatDate(x.dT, "dd-MMM-yy HH:mm a"),
+                ClearanceDate: x.dT,
                 Comments: x.nAR,
                 OthersData: x
             })) ?? null;
@@ -79,7 +80,7 @@ export async function getbankreconcilationList(masterService, request) {
 }
 export async function GetBankDropDown(masterService) {
     try {
-        const companyCode = parseInt(StorageService.getItem('companyCode'));
+        const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
         const filter = {
             companyCode: companyCode,
         };

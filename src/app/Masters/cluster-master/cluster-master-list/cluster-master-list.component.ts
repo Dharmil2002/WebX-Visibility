@@ -1,17 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { ClusterMasterUploadComponent } from '../cluster-master-upload/cluster-master-upload.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cluster-master-list',
   templateUrl: './cluster-master-list.component.html',
 })
 export class ClusterMasterListComponent implements OnInit {
-  data: [] | any; 
-  csv: any[];  
+  data: [] | any;
+  csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   companyCode: any = 0;
@@ -19,21 +23,56 @@ export class ClusterMasterListComponent implements OnInit {
   columnHeader =
     {
       // "srNo": "Sr No.",
-      "eNTDT": "Created Date",
-      "clusterCode": "Cluster Code",
-      "clusterName": "Cluster Name",
-      "pincode": "Pincode",
-      "activeFlag": "Active Status",
-      "actions": "Actions"
+      "clusterCode": {
+        Title: "Cluster Code",
+        class: "matcolumncenter",
+        Style: "min-width:150px; max-width:150px",
+        sticky: true,
+      },
+      "clusterName": {
+        Title: "Cluster Name",
+        class: "matcolumncenter",
+        Style: "min-width:200px; max-width:200px",
+        sticky: true,
+      },
+      "pincodeDisplay": {
+        Title: "Pincode",
+        class: "matcolumncenter",
+        Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"
+      },
+      activeFlag: {
+        type: "Activetoggle",
+        Title: "Active",
+        class: "matcolumncenter",
+        Style: "min-width:80px; max-width:80px",
+        functionName: "IsActiveFuntion",
+      },
+      eNTDT: {
+        Title: "Created Date",
+        class: "matcolumncenter",
+        Style: "min-width:150px; max-width:150px",
+        datatype: "datetime",
+      },
+      EditAction: {
+        type: "iconClick",
+        Title: "",
+        class: "matcolumncenter",
+        Style: "min-width:80px; max-width:80px;",
+        functionName: "EditFunction",
+        iconName: "edit",
+        stickyEnd: true,
+      },
     }
   headerForCsv = {
     // "srNo": "Sr No.",
-    "eNTDT": "Created Date",
     "clusterCode": "Cluster Code",
     "clusterName": "Cluster Name",
-    "pincode": "Pincode",
+    "pincodeDisplay": "Pincode",
+    "eNTDT": "Created Date",
     "activeFlag": "Active Status",
   }
+  staticField = ["clusterCode","clusterName","pincodeDisplay","eNTDT"];
+
   breadScrums = [
     {
       title: "Cluster Master",
@@ -49,7 +88,10 @@ export class ClusterMasterListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any;
   csvFileName: string;
-  constructor(private masterService: MasterService, private storage: StorageService) {
+  uploadComponent = ClusterMasterUploadComponent
+  constructor(
+    private route: Router,
+    private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
@@ -77,8 +119,8 @@ export class ClusterMasterListComponent implements OnInit {
 
         return {
           ...obj,
-          eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : '',
-          pincode: formattedPincode
+          eNTDT: obj.eNTDT,
+          pincodeDisplay: formattedPincode
         }
       })
       this.csv = dataWithSrno;
@@ -86,7 +128,16 @@ export class ClusterMasterListComponent implements OnInit {
     };
   }
   //#endregion
-  //#region to manage flag 
+
+  AddNew(){
+    this.route.navigateByUrl(this.addAndEditPath);
+  }
+
+  EditFunction(event){
+    this.route.navigate([this.addAndEditPath], { state: { data: event?.data } });
+  }
+
+  //#region to manage flag
   async IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
@@ -114,5 +165,25 @@ export class ClusterMasterListComponent implements OnInit {
       this.getClusterDetails();
     }
   }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
   //#endregion
+
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.getClusterDetails();
+      });
+    }
+    //#endregion
 }

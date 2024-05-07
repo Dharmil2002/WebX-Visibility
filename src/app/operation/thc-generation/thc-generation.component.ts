@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
-import { calculateTotal} from "./thc-utlity";
+import { calculateTotal } from "./thc-utlity";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -46,6 +46,8 @@ import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { clearValidatorsAndUpdate, getValueOrDefault } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
 import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { ThcCostUpdateService } from "src/app/Utility/module/operation/thc/thc-cost-update.service";
 @Component({
   selector: "app-thc-generation",
   templateUrl: "./thc-generation.component.html",
@@ -168,6 +170,7 @@ export class ThcGenerationComponent implements OnInit {
       Title: "Arrival Time",
       class: "matcolumncenter",
       Style: "min-width:140px",
+      datatype: "datetime"
     },
     remarks: {
       Title: "Remarks",
@@ -282,6 +285,7 @@ export class ThcGenerationComponent implements OnInit {
   isLoadInvoice: boolean;
   delChargeControl: any[];
   balanceAmount: any;
+  Request: {};
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -303,7 +307,9 @@ export class ThcGenerationComponent implements OnInit {
     private prqService: PrqService,
     private objImageHandling: ImageHandling,
     private definition: RakeEntryModel,
-    private hawkeyeUtilityService: HawkeyeUtilityService
+    private hawkeyeUtilityService: HawkeyeUtilityService,
+    private controlPanel: ControlPanelService,
+    private thcCostUpdateService: ThcCostUpdateService,
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -463,7 +469,6 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
-    //   debugger
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {
@@ -662,7 +667,7 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls['vendorName'].setValue(this.prqDetail?.vNDNM)
           this.thcTableForm.controls['venMobNo'].setValue(vehData?.vndPH)
           this.thcTableForm.controls['panNo'].setValue(vehData?.pANNO)
-          this.marketData=vehData;
+          this.marketData = vehData;
         }
       }
 
@@ -768,6 +773,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   selectCheckBox(event) {
+
     if (this.DocketsContainersWise) {
       if (event.length > 1) {
         Swal.fire({
@@ -781,7 +787,7 @@ export class ThcGenerationComponent implements OnInit {
     }
     // Assuming event is an array of objects
     // Sum all the calculated actualWeights
-    const totalActualWeight = event.reduce((acc, weight) => acc + weight.aCTWT, 0);
+    const totalActualWeight = event.reduce((acc, weight) => acc + parseFloat(weight.aCTWT), 0);
     let capacityTons = parseFloat(this.thcTableForm.controls["capacity"].value); // Get the capacity value in tons
     let loadedTons = totalActualWeight ? totalActualWeight / 1000 : 0;
     let percentage = loadedTons ? (loadedTons * 100) / capacityTons : 0;
@@ -802,7 +808,7 @@ export class ThcGenerationComponent implements OnInit {
             if (x.docNo === shipment) {
               x.remarks = remarks || "";
               x.pod = podUpload || "";
-              x.arrivalTime = arrivalTime ? formatDate(arrivalTime, 'HH:mm') : "";
+              x.arrivalTime = arrivalTime;
               x.receiveBy = receivedBy;
             }
           });
@@ -1535,8 +1541,8 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.vehSizeName = !isRake ? vehSize.name : "";
     //#region Load
     this.LOad.dKTS = this.tableData.filter(item => item.isSelected == true).length;
-    this.LOad.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.pKGS, 0);
-    this.LOad.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
+    this.LOad.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + parseInt(item.pKGS), 0);
+    this.LOad.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + parseFloat(item.aCTWT), 0);
     this.LOad.vOL = 0;
     this.LOad.vWT = 0;
     this.LOad.sEALNO = "";
@@ -1632,6 +1638,8 @@ export class ThcGenerationComponent implements OnInit {
       mfdetailsList.sFX = res.sFX;
       mfdetailsList.cNO = res.cNO;
       mfdetailsList.oRGN = this.thcTableForm.controls['branch'].value || "";
+      mfdetailsList.fCT = this.thcTableForm.controls['fromCity'].value || "";
+      mfdetailsList.tCT = this.thcTableForm.controls['fromCity'].value || "";
       mfdetailsList.dEST = this.thcTableForm.controls['closingBranch'].value || "";
       mfdetailsList.pKGS = res.pKGS;
       mfdetailsList.wT = res.aCTWT;
@@ -1820,7 +1828,7 @@ export class ThcGenerationComponent implements OnInit {
     this.chargeJsonControl = this.chargeJsonControl.filter((x) => !x.hasOwnProperty('id'));
     //const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm },);
     const filter = { "pRNm": prodNm, aCTV: true, cHBTY: "Booking" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm,"cHAPP":{D$in:["THC"] },isActive:true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
@@ -1869,8 +1877,8 @@ export class ThcGenerationComponent implements OnInit {
       const location = this.locationData.find(x => x.value == this.branchCode);
       this.chargeForm.controls['advPdAt'].setValue(location);
       this.isCharge = true;
-      if(this.prqFlag&&this.marketData){
-        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT||"0.00");
+      if (this.prqFlag && this.marketData) {
+        this.chargeForm.controls['contAmt'].setValue(this.marketData?.vEHCNAMT || "0.00");
       }
     }
   }
@@ -1879,11 +1887,11 @@ export class ThcGenerationComponent implements OnInit {
   async getAutoFillCharges(charges, thcNestedDetails) {
     const product = thcNestedDetails?.thcDetails?.tMODENM || "";
     const filter = { "pRNm": product, aCTV: true, cHBTY: "Delivery" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product,"cHAPP":{D$in:["THC"] },isActive:true }
     const delCharge = await this.thcService.getChargesV2(filter, productFilter);
+    const delChargeList = []
+    const invoiceList = [];
     if (charges && charges.length > 0) {
-      const invoiceList = [];
-      const delChargeList = []
       charges.forEach((element, index) => {
         if (element) {
           const invoice: InvoiceModel = {
@@ -1910,60 +1918,61 @@ export class ThcGenerationComponent implements OnInit {
           invoiceList.push(invoice);
         }
       });
-      if (!this.isView && delCharge && delCharge.length > 0) {
-        delCharge.forEach((element, index) => {
-          if (element) {
-            const invoice: InvoiceModel = {
-              id: index + 1,
-              name: element.cHACD || '',
-              label: `${element.sELCHA}(${element.aDD_DEDU})`,
-              placeholder: element.sELCHA || '',
-              type: 'text',
-              value: "0",
-              filterOptions: '',
-              displaywith: '',
-              generatecontrol: true,
-              disable: false,
-              Validations: [],
-              additionalData: {
-                showNameAndValue: false,
-                metaData: element.aDD_DEDU
-              },
-              functions: {
-                onChange: 'getChangesOnDelCharge',
-              },
-            };
 
-            delChargeList.push(invoice);
-          }
-        });
-      }
-      // Directly concatenate, spreading null/undefined has no effect
-      let chargeControl = [
-        ...(invoiceList || []),
-        ...(delChargeList || []),
-        ...this.chargeJsonControl
-      ];
-
-      this.chargeJsonControl = chargeControl;
-      this.delChargeControl = delChargeList;
-      chargeControl.sort((a, b) => {
-        if (a.name == "contAmt") return -1;
-        if (b.name == "contAmt") return 1;
-        return 0;
-      });
-      this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
-      this.isCharge = true;
-      const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
-      const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
-      this.chargeForm.controls["advPdAt"].setValue(location);
-      this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
-      this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
-      this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
-      this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
-      this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
-      this.balanceAmount=thcNestedDetails?.thcDetails.bALAMT 
     }
+    if (!this.isView && delCharge && delCharge.length > 0) {
+      delCharge.forEach((element, index) => {
+        if (element) {
+          const invoice: InvoiceModel = {
+            id: index + 1,
+            name: element.cHACD || '',
+            label: `${element.sELCHA}(${element.aDD_DEDU})`,
+            placeholder: element.sELCHA || '',
+            type: 'text',
+            value: "0",
+            filterOptions: '',
+            displaywith: '',
+            generatecontrol: true,
+            disable: false,
+            Validations: [],
+            additionalData: {
+              showNameAndValue: false,
+              metaData: element.aDD_DEDU
+            },
+            functions: {
+              onChange: 'getChangesOnDelCharge',
+            },
+          };
+
+          delChargeList.push(invoice);
+        }
+      });
+    }
+    // Directly concatenate, spreading null/undefined has no effect
+    let chargeControl = [
+      ...(invoiceList || []),
+      ...(delChargeList || []),
+      ...this.chargeJsonControl
+    ];
+
+    this.chargeJsonControl = chargeControl;
+    this.delChargeControl = delChargeList;
+    chargeControl.sort((a, b) => {
+      if (a.name == "contAmt") return -1;
+      if (b.name == "contAmt") return 1;
+      return 0;
+    });
+    this.chargeForm = formGroupBuilder(this.fb, [chargeControl]);
+    this.isCharge = true;
+    const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
+    const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
+    this.chargeForm.controls["advPdAt"].setValue(location);
+    this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
+    this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
+    this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
+    this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
+    this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
+    this.balanceAmount = thcNestedDetails?.thcDetails.bALAMT
 
   }
   /*End*/
@@ -1995,7 +2004,6 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is Called when the We click on Create THC*/
   async createThc() {
-     
     const vendorTypevalue = this.thcTableForm.get('vendorType').value;
     const contAmt = parseInt(this.chargeForm.get('contAmt').value);
     if (this)
@@ -2020,7 +2028,7 @@ export class ThcGenerationComponent implements OnInit {
         return false;
       }
     }
-    const selectedDkt = this.isUpdate ? this.tableData : this.selectedData ? this.selectedData : [];
+    const selectedDkt = this.isUpdate ? this.tableData.filter((x) => x.isSelected) : this.selectedData ? this.selectedData : [];
     if ((selectedDkt.length === 0 && !this.isUpdate) && !this.DocketsIsEmpty) {
       Swal.fire({
         icon: 'info',
@@ -2120,15 +2128,35 @@ export class ThcGenerationComponent implements OnInit {
           "aCTDT": new Date()
         }
       }
+      const branch = this.storage.branch;
+      // Fetch location details asynchronously
+      const locData = await this.thcService.getLocationDetail(branch);
+      // Determine if the destination has been arrived at
+      const toCityValue = this.thcTableForm.getRawValue();
+      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase();
+      if (!isArrivedDel) {
+        if (this.tableData.length == podDetails.length) {
+          Swal.fire({
+            icon: "error",
+            title: 'Oops...',
+            text: `You can not update all docket in this location`,
+            showConfirmButton: true,
+          });
+          return false
+        }
+      }
+      // Prepare the request body with appropriate values based on the destination status
       const requestBody = {
-        "oPSST": 2,
-        "oPSSTNM": "Arrived",
-        "aRR": newARR,
-        "cHG": charges,
-        "bALAMT": this.chargeForm.get("balAmt").value,
-        "tOTAMT": this.chargeForm.get("totAmt").value
+        oPSST: isArrivedDel ? 2 : 3,
+        oPSSTNM: isArrivedDel ? "Arrived At Destination" : "Arrived",
+        aRR: newARR,
+        cHG: charges,
+        bALAMT: this.chargeForm.get("balAmt").value,
+        tOTAMT: this.chargeForm.get("totAmt").value,
+        mODBY: this.storage.userName,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch
       };
-
       const data = this.thcTableForm.getRawValue();
       const res = await showConfirmationDialogThc(
         requestBody,
@@ -2141,9 +2169,43 @@ export class ThcGenerationComponent implements OnInit {
         data.prqNo
       );
       if (this.thcDetailGlobal.thcDetails.tMODENM == "Road") {
-        await this.thcService.updateVehicle({tripId:"",status:"Available",route:""},{vehNo:this.thcDetailGlobal.thcDetails.vEHNO})
+        await this.thcService.updateVehicle({ tripId: "", status: "Available", route: "" }, { vehNo: this.thcDetailGlobal.thcDetails.vEHNO })
       }
       if (res) {
+        // Generate Vouchers for the selected dockets
+        //#region Make RequestBody For Update Trip
+        const filter = {
+          cID: this.storage.companyCode,
+          mODULE: "THC",
+          aCTIVE: true,
+          rULEID: { D$in: ["THCIBC", "THCCB"] }
+        }
+        const res: any = await this.controlPanel.getModuleRules(filter);
+        if (res.length > 0) {
+          this.Request = {
+            isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+            thcNo: this.thcTableForm.get("tripId").value,
+            thc: {
+              collation: "thc_summary",
+              docNoField: "docNo"
+            },
+            mfheader: {
+              collation: "mf_header",
+              docNoField: "docNo",
+              thcField: "tHC"
+            },
+            mfdetails: {
+              collation: "mf_details",
+              docNoField: "mFNO",
+              dktField: "dKTNO"
+            },
+            docket: {
+              collation: "dockets",
+              docNoField: "dKTNO"
+            }
+          };
+        }
+        //#endregion
         Swal.fire({
           icon: "success",
           title: "Update Successfuly",
@@ -2160,6 +2222,11 @@ export class ThcGenerationComponent implements OnInit {
           }
         }
         this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+
+        //if arrived at destination than update thc cost
+        if (isArrivedDel) {
+          this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+        }
         this.goBack("THC");
       }
     } else {
@@ -2182,10 +2249,10 @@ export class ThcGenerationComponent implements OnInit {
         if (this.thcsummaryData.tMODENM == "Road") {
           await this.thcService.updateVehicle({
             vehNo: this.thcsummaryData.vehicle,
-            tripId:resThc.data?.mainData?.ops[0].docNo,
-            status:"In Transit",
-            route:this.thcsummaryData.route,
-          },{vehNo:this.thcsummaryData.vehicle})
+            tripId: resThc.data?.mainData?.ops[0].docNo,
+            status: "In Transit",
+            route: this.thcsummaryData.route,
+          }, { vehNo: this.thcsummaryData.vehicle })
         }
         if (resThc) {
           if (!isMarket && resThc.data?.mainData?.ops[0]?.docNo != "") {
@@ -2311,7 +2378,7 @@ export class ThcGenerationComponent implements OnInit {
         return acc; // In case of an unknown operation
       }
     }, 0);
-    const balance=parseFloat(this.balanceAmount)-Math.abs(total)
+    const balance = parseFloat(this.balanceAmount) - Math.abs(total)
     this.chargeForm.controls["balAmt"].setValue(balance);
   }
 }

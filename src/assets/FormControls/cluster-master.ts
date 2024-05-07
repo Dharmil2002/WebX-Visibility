@@ -34,8 +34,8 @@ export class ClusterControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please Enter only text with 1-20 alphabets",
-                        pattern: '^[a-zA-Z ]{1,20}$'
+                        message: "Please Enter alphanumeric Cluster Name of length 1 to 100",
+                        pattern: "^.{1,100}$"
                     }
                 ],
                 generatecontrol: true, disable: isUpdate ? true : false,
@@ -65,6 +65,31 @@ export class ClusterControl {
                     onModel: 'getPincodeData'
                 },
                 generatecontrol: true, disable: false
+            },
+            {
+              name: 'clusterType',
+              label: "Cluster Type",
+              placeholder: "Select Cluster Type",
+              type: 'dropdown',
+              value: clusterMasterTable.clusterType,
+              generatecontrol: true,
+              disable: false,
+              Validations: [
+                  {
+                      name: "required",
+                      message: "Cluster Type is required"
+                  },
+                  {
+                      name: "autocomplete",
+                  },
+                  {
+                      name: "invalidAutocompleteObject",
+                      message: "Choose proper value",
+                  }
+              ],
+              additionalData: {
+                  showNameAndValue: false
+              },
             },
             {
               name: "activeFlag",

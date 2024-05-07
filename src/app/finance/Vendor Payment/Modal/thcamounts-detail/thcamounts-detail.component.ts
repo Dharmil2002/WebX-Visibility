@@ -30,6 +30,7 @@ export class THCAmountsDetailComponent implements OnInit {
   BillPaymentData;
   THCData;
   Type: any;
+  Mode: any;
   isLessForm = false;
   companyCode: any = 0;
   isAddForm: boolean = false;
@@ -47,7 +48,7 @@ export class THCAmountsDetailComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     public dialogRef: MatDialogRef<THCAmountsDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public objResult: any
-  ) { 
+  ) {
     this.companyCode = this.storageService.companyCode;
   }
 
@@ -56,12 +57,13 @@ export class THCAmountsDetailComponent implements OnInit {
     this.BillPaymentData = this.objResult?.BillPaymentData;
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
+    this.Mode = this.objResult?.Mode;
     this.getTHCsummary();
   }
   async getTHCsummary() {
     const req = {
       companyCode: this.companyCode,
-      collectionName: "thc_summary",
+      collectionName: this.Mode == 'FTL' ? 'thc_summary' : 'thc_summary_ltl',
       filter: {
         docNo: this.THCData.THC,
       },
@@ -298,7 +300,7 @@ export class THCAmountsDetailComponent implements OnInit {
     };
     const req = {
       companyCode: this.companyCode,
-      collectionName: "thc_summary",
+      collectionName: this.Mode == 'FTL' ? 'thc_summary' : 'thc_summary_ltl',
       filter: { docNo: this.THCData.THC },
       update: commonBody,
     };

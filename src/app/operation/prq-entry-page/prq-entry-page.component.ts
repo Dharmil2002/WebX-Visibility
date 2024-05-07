@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { PrqEntryControls } from "src/assets/FormControls/prq-entry";
@@ -81,7 +81,8 @@ export class PrqEntryPageComponent implements OnInit {
   AddressStatus: any;
   Address: string;
   userLocations: any;
-  constructor(
+
+  constructor(   
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private router: Router,
@@ -94,8 +95,8 @@ export class PrqEntryPageComponent implements OnInit {
     private storage: StorageService,
     private customerService: CustomerService,
     private generalService: GeneralService,
-    private masterService: MasterService
-  ) {
+    private masterService: MasterService,
+    ) {    
     this.companyCode = this.storage.companyCode;
     this.branchCode = this.storage.branch;
 
@@ -628,8 +629,18 @@ export class PrqEntryPageComponent implements OnInit {
             this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
           }
           else {
-            const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * (containerCode * 1000);
-            this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+            if (res[0].FreightChargeMatrixDetails?.rTYPCD == "RTTYP-0001") {
+              const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT
+              this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+            }
+            else if (res[0].FreightChargeMatrixDetails?.rTYPCD == "RTTYP-0006") {
+              const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * this.prqEntryTableForm?.value?.cNTSIZE * 1000
+              this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+            } else {
+              const contractAmount = res[0]?.FreightChargeMatrixDetails?.rT * (containerCode * 1000);
+              this.prqEntryTableForm.controls["cONTRAMT"].setValue(contractAmount);
+
+            }
           }
 
 
@@ -650,6 +661,6 @@ export class PrqEntryPageComponent implements OnInit {
           text: `Something went wrong! ${err.message}`,
           showConfirmButton: false,
         });
-      });   
+      });
   }
 }

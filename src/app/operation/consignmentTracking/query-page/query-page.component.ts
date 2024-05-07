@@ -34,9 +34,9 @@ export class QueryPageComponent implements OnInit {
     this.DocCalledAs = this.controlPanel.DocCalledAs;
     this.breadscrums = [
       {
-        title: `${this.DocCalledAs.Docket} Tracking`,
+        title: 'Document Tracking',
         items: ["Home"],
-        active: `${this.DocCalledAs.Docket} Tracking`,
+        active: 'Document Tracking',
       }
     ]
   }
@@ -59,7 +59,7 @@ export class QueryPageComponent implements OnInit {
       if (data.name === "DocType") {
         this.DocTypeCode = data.name;
         this.DocTypeStatus = data.additionalData.showNameAndValue;
-        const DocTypedata = [{ name: "CNote Tracking", value: "CNote" }];
+        const DocTypedata = [{ name: "CNote Tracking", value: "CNote" },{ name: "PRQ Tracking", value: "PRQ" }];
 
         this.filter.Filter(
           this.jsonControlConsignmentQueryArray,
@@ -97,8 +97,10 @@ export class QueryPageComponent implements OnInit {
       case "CNote":
         url = "Operation/ConsignmentTracking";
         break;
+      case "PRQ":
+        url = "Operation/PRQTracking"; // PRQ Tracking
+        break;
       default:
-      // code block
     }
     this.Route.navigate([url], {
       state: { data: QueryJson },

@@ -76,7 +76,6 @@ import { SplitDcrComponent } from "./dcr-series/split-dcr/split-dcr.component";
 import { EwayBillDocketBookingV2Component } from "./eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t";
 import { AddVendorMasterComponent } from "./vendor-master/add-vendor-master/add-vendor-master.component";
 import { VendorMasterListComponent } from "./vendor-master/vendor-master-list/vendor-master-list.component";
-import { VendorMasterViewComponent } from "./vendor-master/vendor-master-view/vendor-master-view.component";
 import { RouteMasterLocationAddComponent } from "./route-master-location-wise/route-master-location-add/route-master-location-add.component";
 import { RouteMasterLocationWiseComponent } from "./route-master-location-wise/route-master-location-wise-list/route-master-location-wise.component";
 import { AirportMasterListComponent } from "./airport-master/airport-master-list/airport-master-list.component";
@@ -182,6 +181,9 @@ import { ActiveSeriesComponent } from "./dcr-series/active-series/active-series.
 import { CustomerMasterUploadComponent } from './customer-master/customer-master-upload/customer-master-upload.component';
 import { DriverMasterUploadComponent } from './driver-master/driver-master-upload/driver-master-upload.component';
 import { VendorMasterUploadComponent } from './vendor-master/vendor-master-upload/vendor-master-upload.component';
+import { AddressMasterUploadComponent } from './address-master/address-master-upload/address-master-upload.component';
+import { ContainerMasterUploadComponent } from './Container Master/container-master-upload/container-master-upload.component';
+import { ClusterMasterUploadComponent } from './cluster-master/cluster-master-upload/cluster-master-upload.component';
 
 @NgModule({
   imports: [
@@ -275,7 +277,6 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
     EwayBillDocketBookingV2Component,
     VendorMasterListComponent,
     AddVendorMasterComponent,
-    VendorMasterViewComponent,
     AirportMasterListComponent,
     AirportMasterAddComponent,
     RouteMasterLocationAddComponent,
@@ -379,7 +380,10 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
     CustomerMasterUploadComponent,
     DriverMasterUploadComponent ,
     CustomerMasterUploadComponent,
-    VendorMasterUploadComponent
+    VendorMasterUploadComponent,
+    AddressMasterUploadComponent,
+    ContainerMasterUploadComponent,
+    ClusterMasterUploadComponent
   ],
   providers: [
     DatePipe,

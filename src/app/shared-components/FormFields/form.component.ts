@@ -13,6 +13,7 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { FormGroupDirective, UntypedFormGroup } from "@angular/forms";
+import moment from "moment";
 import { CustomeDatePickerComponent } from "src/app/shared/components/custome-date-picker/custome-date-picker.component";
 
 @Component({
@@ -43,6 +44,7 @@ export class FormComponent {
   @Input() AddNewButton;
   @Input() EventButton;
   @Input() MatButton;
+  @Input() toggle;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
   @Input() DisplayCheckbox: boolean = false;
@@ -87,13 +89,13 @@ export class FormComponent {
     context["functionName"] = "toggleUpDown";
     this.functionCallEmitter.emit(context);
   }
-  functionCalled(context) {
+  functionCalled(context) {    
     // console.log(context , "from form components");
     if (
       (context.functionName !== undefined || context.functionName != null) &&
       context.functionName?.length > 0
     ) {
-      this.callFunction.emit(context);
+      this.callFunction.emit(context); 
     }
   }
 
@@ -104,7 +106,14 @@ export class FormComponent {
     };
     this.callFunction.emit(context);
   }
-
+  TogglefunctionCalled(context) {
+    if (
+      (context.functionName !== undefined || context.functionName != null) &&
+      context.functionName?.length > 0
+    ) {
+      this.callFunction.emit(context);
+    }
+  }
   AddNew() {
     this.AddNewButtonEvent.emit();
   }

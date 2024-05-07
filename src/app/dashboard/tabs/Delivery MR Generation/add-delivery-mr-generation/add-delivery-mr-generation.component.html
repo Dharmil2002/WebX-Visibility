@@ -1,45 +1,67 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
 
     <form [formGroup]="deliveryMrTableForm">
-        <app-form-webxpress [form]="deliveryMrTableForm" [FormTitle]="'Delivery MR Generation '"
+        <app-form-webxpress [form]="deliveryMrTableForm" [FormTitle]="'Delivery MR'"
             [formData]="jsonControlDeliveryMrGenArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true" submit='Submit'>
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false" submit='Submit'
+            [className]="className">
         </app-form-webxpress>
     </form>
-    <div *ngIf="tableload" class="d-flex justify-content-center align-items-center">
-        <!-- Bootstrap loader -->
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <ng-container *ngIf="ShowBookingTimeCharges">
+        <form [formGroup]="BookingTimechargesForm">
+            <app-form-webxpress [form]="BookingTimechargesForm" [FormTitle]="'Booking Time Charges'"
+                [formData]="AlljsonControlBookingTimechargesArray" (functionCallEmitter)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+                [className]="'col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-2'">
+            </app-form-webxpress>
+        </form>
+    </ng-container>
+
+    <form [formGroup]="DeliveryTimeChargesForm">
+        <app-form-webxpress [form]="DeliveryTimeChargesForm" [formData]="DeliveryTimeChargesArray"
+            [FormTitle]="'Delivery Time Charges'" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+
+    <div class="row">
+        <div class="col">
+            <form [formGroup]="SummaryForm">
+                <app-form-webxpress [form]="SummaryForm" [FormTitle]="'Summary'" [DisplayCheckbox]="true"
+                    [CheckBoxMessage]="'Round Off'" [formData]="jsonSummaryControlArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col">
+            <form [formGroup]="CollectionForm">
+                <app-form-webxpress [form]="CollectionForm" [FormTitle]="'Collection Details'"
+                    [formData]="jsonCollectionControlArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"                    
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="col">
+                <form [formGroup]="PaymentSummaryFilterForm">
+                    <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Collection'" [formData]="jsonControlPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
+                        [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"
+                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    </app-form-webxpress>
+                </form>
+            </div>
         </div>
     </div>
-
-    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [FormTitle]="'Delivery MR Generation List'" [tableData]="tableData" [menuItems]="menuItems"
-        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" [TitleBoxData]="TotalAmountList"
-        (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag">
-    </app-generic-table-v2>
-
-    <form [formGroup]="billingForm">
-        <app-form-webxpress [form]="billingForm" [FormTitle]="'Bill Summary'" [formData]="jsonControlBillingArray"
-            (functionCallEmitter)="functionCallHandler($event)" [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 '"
-            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <form [formGroup]="PaymentSummaryFilterForm">
-        <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
-            [formData]="jsonControlPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
-            [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 '" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-
-
-
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
                 <button [disabled]="isSubmitDisabled()" mat-button mat-raised-button color="primary"
-                    (click)="GenerateVoucher()">
+                    (click)="GenerateMR()">
                     Submit
                 </button>
             </div>

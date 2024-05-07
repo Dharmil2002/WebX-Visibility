@@ -4,7 +4,6 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { finYear, timeString } from 'src/app/Utility/date/date-utils';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
@@ -13,7 +12,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
-import { ProfitAndLossReport } from '../../../../../assets/FormControls/Reports/Account Reports/ProfitAndLossReport';
+import { ProfitAndLossReport } from '../../../../../../assets/FormControls/Reports/Account Reports/ProfitAndLossReport';
 import { Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 @Component({
@@ -290,13 +289,15 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
             "Notes": ""
           });
 
-          UpdatedData.push({
-            "MainCategory": "9. Profit And loss for the year [7-8]",
-            "SubCategory": "",
-            "TotalAmountCurrentFinYear": (((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear) - (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit)).toFixed(2),
-            "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
-            "Notes": ""
-          });
+          if (exceptionalItems && extraordinaryItems) {
+            UpdatedData.push({
+              "MainCategory": "9. Profit And loss for the year [7-8]",
+              "SubCategory": "",
+              "TotalAmountCurrentFinYear": (((TotalProfitAndLoss - exceptionalItems.TotalAmountCurrentFinYear) - extraordinaryItems.TotalAmountCurrentFinYear) - (TotalAmounts.TotalCredit - TotalAmounts.TotalDebit)).toFixed(2),
+              "TotalAmountLastFinYear": TotalAmountLastFinYear.toFixed(2),
+              "Notes": ""
+            });
+          }
         }
 
 

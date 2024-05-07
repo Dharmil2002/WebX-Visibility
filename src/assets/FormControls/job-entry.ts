@@ -239,7 +239,7 @@ export class JobControl {
             },
             {
                 name: 'jobLocation', label: "Job Location", placeholder: "Select Job Location", type: 'text',
-                value: StorageService.getItem('Branch'), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+                value: StorageService.getItem(StoreKeys.Branch), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [],
                 additionalData: {
                     showNameAndValue: false,

@@ -262,7 +262,9 @@ export class PrqService {
     const reqBarnch = {
       companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "location_detail",
-      filter: {locCode:this.branchCode},
+      filter: {
+        locCode: this.branchCode 
+      },
     }
 
     const resBarnch = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBarnch));
@@ -274,7 +276,7 @@ export class PrqService {
     const reqBody = {
       companyCode: this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
-      filter: barnchCode && barnchCode == 1?{}:{ bRCD: this.branchCode },
+      filter: barnchCode && barnchCode == 1? {} : { bRCD: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
@@ -453,7 +455,7 @@ export class PrqService {
       carrierTypeCode: element?.cARTYP || "",
       vehicleNo: element?.vEHNO || "",
       prqBranch: element?.bRCD || "",
-      pickUpDate: formatDocketDate(element?.pICKDT || new Date()),
+      pickUpDate: element?.pICKDT,
       pickupDate: element?.pICKDT || new Date(),
       status: this.status[element.sTS] || this.status.default,
       statusCode: element.sTS,
@@ -470,12 +472,12 @@ export class PrqService {
       vNDCD: element?.vNDCD || "",
       vNDNM: element?.vNDNM || "",
       vEHNO: element?.vEHNO || "",
-      createdDate: formatDocketDate(element?.eNTDT || new Date()),
+      createdDate: element?.eNTDT,
       createDateOrg: element?.eNTDT,
       //Below code added by manan sanghani
       pAddressName: element.pADDNM ?? "",
       oDRNO: element.oDRNO ?? "",
-      OrderDate: formatDocketDate(element?.oDRDT || new Date()),
+      OrderDate: element?.oDRDT || new Date(),
       oDRDT: element?.oDRDT || new Date(),
       oDRBY: element.oDRBY ?? "",
       rMKS: element.rMKS ?? "",
@@ -525,7 +527,7 @@ export class PrqService {
   /*below function is getting a data from prq*/
   async getPrqDetail(filter={}) {
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      companyCode:this.storage.companyCode, // Get company code from local storage
       collectionName: "prq_summary",
       filter:filter,
     };

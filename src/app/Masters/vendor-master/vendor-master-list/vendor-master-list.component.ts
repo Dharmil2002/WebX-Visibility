@@ -3,7 +3,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
-import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 import { MatDialog } from "@angular/material/dialog";
 import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-master-upload.component";

@@ -52,8 +52,8 @@ export class ConsignmentqueryControls {
       },
       {
         name: "Docket",
-        label: "Cnote No.",
-        placeholder: "Enter Cnote No.",
+        label: `Document No.`,
+        placeholder: `Enter Document No.`,
         type: "text",
         value: "",
         generatecontrol: true,

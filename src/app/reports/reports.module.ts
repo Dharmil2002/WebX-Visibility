@@ -54,9 +54,9 @@ import { PrqRegisterReportComponent } from './prq-register-report/prq-register-r
 import { VoucherRegisterReportComponent } from './voucher-register-report/voucher-register-report.component';
 import { ChequeRegisterComponent } from './cheque-register/cheque-register.component';
 import { CashBankBookReportComponent } from './cash-bank-book-report/cash-bank-book-report.component';
-import { ProfitAndLossCriteriaComponent } from './Account Report/Components/profit-and-loss-criteria/profit-and-loss-criteria.component';
-import { ProfitAndLossViewComponent } from './Account Report/Components/profit-and-loss-view/profit-and-loss-view.component';
-import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/profit-and-loss-view-details/profit-and-loss-view-details.component';
+import { ProfitAndLossCriteriaComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-criteria/profit-and-loss-criteria.component';
+import { ProfitAndLossViewComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view/profit-and-loss-view.component';
+import { ProfitAndLossViewDetailsComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details/profit-and-loss-view-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ControlTowerDashboardComponent } from './control-tower-dashboard/control-tower-dashboard.component';
 import { TrialBalanceCriteriaComponent } from './Account Report/Components/TrialBalance/trial-balance-criteria/trial-balance-criteria.component';
@@ -64,6 +64,9 @@ import { TrialBalanceViewComponent } from './Account Report/Components/TrialBala
 import { TrialBalanceViewDetailsComponent } from './Account Report/Components/TrialBalance/trial-balance-view-details/trial-balance-view-details.component';
 import { StockReportComponent } from './stock-report/stock-report.component';
 import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
+import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view/balance-sheet-view.component';
+import { BalanceSheetCriteriaComponent } from './Account Report/Components/BalanceSheet/balance-sheet-criteria/balance-sheet-criteria.component';
+import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -133,7 +136,10 @@ import { DcrRegisterComponent } from './dcr-register/dcr-register.component';
     TrialBalanceViewComponent,
     TrialBalanceViewDetailsComponent,
     StockReportComponent,
-    DcrRegisterComponent
+    DcrRegisterComponent,
+    BalanceSheetViewComponent,
+    BalanceSheetCriteriaComponent,
+    MRRegisterReportComponent
   ],
   exports: [],
 

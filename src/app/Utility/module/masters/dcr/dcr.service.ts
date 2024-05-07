@@ -5,6 +5,9 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { fi } from "date-fns/locale";
+import { GenericActions } from "src/app/config/myconstants";
+import { isBetween, nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { filter } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -35,7 +38,9 @@ export class DCRService {
   ) {
     try {
       const companyCode = this.storage.companyCode;
-      const req = { companyCode, collectionName };
+      const req = { companyCode, collectionName , filter: {
+        companyCode: this.storage.companyCode,
+        isActive:true}};
       const res = await masterService
         .masterPost("generic/get", req)
         .toPromise();
@@ -157,7 +162,7 @@ export class DCRService {
       ],
     };
     const res = await firstValueFrom(
-      this.masterServices.masterMongoPost("generic/query", reqBody)
+      this.masterServices.masterMongoPost(GenericActions.Query, reqBody)
     );
     return res.data;
   }
@@ -167,5 +172,86 @@ export class DCRService {
     const inputValue = parseInt(input.slice(2)); // Extract numeric part from input
 
     return inputValue >= startValue && inputValue <= endValue;
+  }
+  async validateFromSeries(number) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dcr_header",
+      filter: {
+        cID: this.storage.companyCode,
+        tYP: "CN",
+        sTS: 4,
+        D$or: [
+          { fROM: { D$lte: number }, tO: { D$gte: number } }, // Check if the value is within any range
+          { fROM: number }, // Check if the value is the same as the 'from' value of any range
+          { tO: number }
+        ]
+      }
+    }
+    const res = await firstValueFrom(this.operation.operationMongoPost(GenericActions.GetOne,req));
+    return res.data;
+  }
+
+  async getDCRDocument(filter = {}) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dcr_documents",
+      filter: filter,
+    };
+    const res = await firstValueFrom(
+      this.operation.operationMongoPost(GenericActions.GetOne, req)
+    );
+    return res.data;
+  }
+
+  async getLastDocumentNo(data) {
+    let query = { cID: this.storage.companyCode, bOOK:data.bOOK, sTS: 1};
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dcr_documents",
+      filter: query,
+      sorting: { dOCNO: -1 }
+    };
+    const response = await firstValueFrom(this.operation.operationMongoPost(GenericActions.FindLastOne, req));
+    return response?.data;
+  }
+
+  async getVoidDocuments(data) {
+      let matchQuery = {
+        cID: this.storage.companyCode, bOOK:data.bOOK, sTS: 2
+      };
+
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "dcr_documents",
+        filters: [
+          {
+            D$match: matchQuery
+          },
+          { D$sort: { dOCNO: -1  } }
+        ],
+      };
+
+      const response = await firstValueFrom(this.operation.operationMongoPost(GenericActions.Query, req));
+      return response?.data || [];
+  }
+
+  async getNextDocumentNo(data) {
+    const ld = await this.getLastDocumentNo(data);
+    let nextCode = (ld?.dOCNO) ? await nextKeyCode(ld?.dOCNO) : data.fROM;
+    if(nextCode.length == data.fROM.length && isBetween(nextCode, data.fROM, data.tO)) {
+      const vd = await this.getVoidDocuments(data);
+      if(vd.length > 0) {
+        const vdList=vd.map(x=>x.dOCNO);
+        while(vdList.includes(nextCode) && nextCode.length == data.fROM.length) {
+          nextCode = await nextKeyCode(nextCode);
+        }
+      }
+      nextCode = (nextCode == await nextKeyCode(data.tO)) ? "" : nextCode;
+
+      return nextCode;
+    }
+    return "";
   }
 }

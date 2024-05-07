@@ -82,7 +82,7 @@ export class ManifestGeneratedComponent implements OnInit {
     }
   }
   getMenifest() {
-
+   
     let groupedDataWithoutKey;
     const groupedData = this.menifest.reduce((acc, element) => {
       const leg = element.Leg;
@@ -148,8 +148,9 @@ export class ManifestGeneratedComponent implements OnInit {
 
   viewMFview(event){
       const req = {
-        templateName: "Manifest View-Print",
         DocNo: event.data?.MFNumber,
+        partyCode: "CONSRAJT27",
+        templateName: "Manifest",
       };
       const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
       window.open(url, '', 'width=1000,height=800');

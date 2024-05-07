@@ -23,7 +23,6 @@ export class ConsignmentChargesComponent implements OnInit {
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog
   ) {
-    debugger;
     if (item.length>0) {
        this.chargeData = item;
        this.isEdit=true;
@@ -42,8 +41,9 @@ export class ConsignmentChargesComponent implements OnInit {
     // /*below code is for getting a Chages from Charge Master*/
     async getCharges() {
       if(!this.isEdit){
-
-      const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": this.chargeData.transModeName},);
+      const filter = { "pRNm": this.chargeData.transModeName, aCTV: true, cHBTY: "Booking" }
+      const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM":this.chargeData.transModeName,"cHAPP":{D$in:["GCN"]},isActive:true}
+      const result = await this.thcService.getChargesV2(filter, productFilter);
       if (result && result.length > 0) {
         const invoiceList = [];
         result.forEach((element, index) => {

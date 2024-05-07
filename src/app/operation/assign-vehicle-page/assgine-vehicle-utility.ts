@@ -93,7 +93,7 @@ export async function getcontainerstatusFromApi(operationService, filterdata) {
         filter: {
             sTS: 1,
             vNTYP: filterdata,
-            oRG: StorageService.getItem('Branch'),
+            oRG: StorageService.getItem(StoreKeys.Branch),
         }
     };
 

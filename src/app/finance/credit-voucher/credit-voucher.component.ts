@@ -425,14 +425,14 @@ export class CreditVoucherComponent implements OnInit {
 
       var RoundOffList = {
         "Instance": "Credit voucher",
-        "Value": ledgerInfo['Round off Amount'].LeadgerName,
-        "Ledgercode": ledgerInfo['Round off Amount'].LeadgerCode,
-        "Ledgername": ledgerInfo['Round off Amount'].LeadgerName,
+        "Value": ledgerInfo['EXP001042'].LeadgerName,
+        "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
+        "Ledgername": ledgerInfo['EXP001042'].LeadgerName,
         "SubLedger": "EXPENSE",
         "Dr": isAmountNegative ? (-Amount).toFixed(2) : 0,
         "Cr": isAmountNegative ? 0 : Amount.toFixed(2),
         "Location": Accountinglocation,
-        "Narration": ledgerInfo['Round off Amount'].LeadgerName,
+        "Narration": ledgerInfo['EXP001042'].LeadgerName,
       };
 
       FinalListOfCreditVoucher.push(RoundOffList)
@@ -537,9 +537,11 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
 
+
+
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
-            "companyCode": this.storage.getItem(StoreKeys.CompanyCode),
+            "companyCode": companyCode,
             "voucherNo": "",
             "transCode": VoucherInstanceType.CreditVoucherCreation,
             "transType": VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
@@ -547,7 +549,7 @@ export class CreditVoucherComponent implements OnInit {
             "voucherType": VoucherType[VoucherType.CreditVoucher],
             "transDate": new Date(),
             "finYear": financialYear,
-            "branch": this.storage.getItem(StoreKeys.Branch),
+            "branch": Branch,
             "accCode": item.Ledgercode,
             "accName": item.Ledgername,
             "accCategory": item.SubLedger,

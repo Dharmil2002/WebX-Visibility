@@ -19,13 +19,13 @@
     <form [formGroup]="consignmentForm">
         <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignor Details'"
             [formData]="consignorControlArray" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+            [showSaveAndCancelButton]="false" [toggle]="toggleWinCsgn" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </div>
 <div  *ngIf="consigneeControlArray">
     <form [formGroup]="consignmentForm">
-        <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Consignee Details'"
+        <app-form-webxpress [form]="consignmentForm" [toggle]="toggleWinCsgne"[FormTitle]="'Consignee Details'"
             [formData]="consigneeControlArray" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
@@ -78,7 +78,7 @@
         </app-form-webxpress>
     </form>
 </div>
-<div class="row paddingdiv" *ngIf="basicFormControls">
+<div class="row paddingdiv" *ngIf="freightControlArray">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
       <div class="example-button-row d-flex justify-content-start">
         <!-- <div *ngIf="isSubmit">
@@ -86,9 +86,10 @@
           Loading...
         </div> -->
         <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
-        <button class="msr-3" mat-raised-button color="primary"(click)="save()">Generate Docket</button>
+        <button class="msr-3" mat-raised-button color="primary"
+         (click)="save()" [disabled]="isSubmit">Generate Docket</button>
         <button class="msr-3" mat-raised-button color="primary">Back</button>
-        <button class="msr-3" [disabled]="!this.consignmentForm.value?.billingParty ||
+        <button class="msr-3" [disabled]="
         !this.consignmentForm.value?.docketDate ||
         !this.consignmentForm.value?.toCity ||
         !this.consignmentForm.value?.payType ||

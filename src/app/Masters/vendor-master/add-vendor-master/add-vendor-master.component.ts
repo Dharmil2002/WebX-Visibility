@@ -14,7 +14,7 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
-import { PayBasisdetailFromApi } from "../../Customer Contract/CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { TdsMasterService } from "src/app/Utility/module/masters/tds-master/tds-master-Service";
@@ -148,7 +148,7 @@ export class AddVendorMasterComponent implements OnInit {
     private tdsMasterService: TdsMasterService
   ) {
     this.companyCode = this.storage.companyCode;
-    this.vendorTabledata.companyCode = this.storage.companyCode;
+    // this.vendorTabledata.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata =
         this.route.getCurrentNavigation().extras.state.data;
@@ -156,9 +156,9 @@ export class AddVendorMasterComponent implements OnInit {
       this.isUpdate = true;
       this.imageData = {
         msmeScan: this.vendorTabledata.msmeScan === "" ? null : this.vendorTabledata.msmeScan,
-        panCardScan:this.vendorTabledata.panCardScan === "" ? null : this.vendorTabledata.panCardScan,
-        uPRC:this.vendorTabledata.uPRC === "" ? null : this.vendorTabledata.uPRC,
-        uTDSD:this.vendorTabledata.uTDSD === "" ? null : this.vendorTabledata.uTDSD,
+        panCardScan: this.vendorTabledata.panCardScan === "" ? null : this.vendorTabledata.panCardScan,
+        uPRC: this.vendorTabledata.uPRC === "" ? null : this.vendorTabledata.uPRC,
+        uTDSD: this.vendorTabledata.uTDSD === "" ? null : this.vendorTabledata.uTDSD,
         uCC: this.vendorTabledata.uCC === "" ? null : this.vendorTabledata.uCC,
         uploadKYC: this.vendorTabledata.uploadKYC === "" ? null : this.vendorTabledata.uploadKYC,
       };
@@ -329,11 +329,11 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
   async getDropDownData() {
-    this.vendorTypeData = await PayBasisdetailFromApi(
+    this.vendorTypeData = await GetGeneralMasterData(
       this.masterService,
       "VENDTYPE"
     );
-    this.msmeTypeData = await PayBasisdetailFromApi(
+    this.msmeTypeData = await GetGeneralMasterData(
       this.masterService,
       "MSMETYP"
     );
@@ -364,9 +364,9 @@ export class AddVendorMasterComponent implements OnInit {
         );
         const pincode = this.vendorTabledata.vendorPinCode
           ? {
-              name: this.vendorTabledata.vendorPinCode,
-              value: this.vendorTabledata.vendorPinCode,
-            }
+            name: this.vendorTabledata.vendorPinCode,
+            value: this.vendorTabledata.vendorPinCode,
+          }
           : "";
         this.vendorTableForm.controls.vendorPinCode.setValue(pincode);
       }
@@ -831,53 +831,93 @@ export class AddVendorMasterComponent implements OnInit {
   //#endregion
 
   //#region to check if a value already exists in vendor list
-  async checkValueExists(fieldName, errorMessage,formGroup) {
+  async checkValueExists(fieldName, errorMessage) {
     try {
       // Get the field value from the form controls
-      const fieldValue = formGroup.controls[fieldName].value;
-      const filterUppercase = { [fieldName]: fieldValue.toUpperCase() };
-      const filterLowercase = { [fieldName]: fieldValue.toLowerCase() };
+      const fieldValue = this.vendorTableForm.controls[fieldName].value;
+
       // Create a request object with the filter criteria
       const req = {
         companyCode: this.storage.companyCode,
         collectionName: "vendor_detail",
-        filter: { ...filterUppercase, ...filterLowercase },
+        filter: { [fieldName]: fieldValue },
       };
+
       // Send the request to fetch user data
-      const userlist = await firstValueFrom(
-        this.masterService.masterPost("generic/get", req)
-      );
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
+
       // Check if data exists for the given filter criteria
-      if (userlist.data.length > 0) {
+      if (customerList.data.length > 0) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          text: `${errorMessage} already exists! Please try with another !`,
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
           icon: "error",
-          title: "error",
+          showCloseButton: false,
+          showCancelButton: false,
           showConfirmButton: true,
+          confirmButtonText: "OK"
         });
+
         // Reset the input field
-        formGroup.controls[fieldName].reset();
+        this.vendorTableForm.controls[fieldName].reset();
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(
-        `An error occurred while fetching ${fieldName} details:`,
-        error
-      );
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
     }
   }
 
+  async ValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.MSMETableForm.controls[fieldName].value;
+
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "vendor_detail",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
+
+      // Check if data exists for the given filter criteria
+      if (customerList.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.MSMETableForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
   // Function to check if ERP Id already exists
   async CheckPANNo() {
-    await this.checkValueExists("panNo", "PAN No",this.vendorTableForm);
+    await this.checkValueExists("panNo", "PAN No");
   }
   async CheckVendorName() {
-    await this.checkValueExists("vendorName", "Vendor Name",this.vendorTableForm);
+    await this.checkValueExists("vendorName", "Vendor Name");
   }
   async CheckCINnumber() {
-    await this.checkValueExists("cinNumber", "CIN number",this.vendorTableForm);
+    await this.checkValueExists("cinNumber", "CIN number");
   }
+  async CheckmsmeNumber() {
+    await this.ValueExists("msmeNumber", "MSME Number");
+  }
+
   //#endregion
 
   async addData() {
@@ -984,11 +1024,10 @@ export class AddVendorMasterComponent implements OnInit {
     if (invalidEmails.length > 0) {
       let EmailString = "";
       invalidEmails.forEach((x) => {
-        EmailString = `${
-          EmailString != ""
-            ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
-            : "<li style='margin:0px;'>" + x + "<li>"
-        }`;
+        EmailString = `${EmailString != ""
+          ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
+          : "<li style='margin:0px;'>" + x + "<li>"
+          }`;
       });
       Swal.fire({
         text: "This Email is not valid. Please try with another!",

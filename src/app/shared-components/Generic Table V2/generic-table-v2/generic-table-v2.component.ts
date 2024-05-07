@@ -29,6 +29,7 @@ export class GenericTableV2Component
   @Input() csvData;
   @Input() columnHeader = [];
   @Input() TableStyle;
+  @Input() TableContainerStyle;
   @Input() addAndEditPath;
   @Input() disbleCheckbox;
   @Input() uploadComponent;
@@ -55,11 +56,13 @@ export class GenericTableV2Component
   @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
+  @Input() containerWidth;
   @Input() width;
   @Input() maxWidth;
   @Input() extraData;
   @Input() EventButton;
   @Input() FormTitle: string = "";
+  @Input() stickyHeader: boolean = false;
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
   @Input() showHeader: boolean = true;
@@ -93,15 +96,19 @@ export class GenericTableV2Component
   AllChack = false
   @Input() centerAligned;
   @Input() selectAllRequired;
+
+  displayedHeaders: string[];
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
     this.columnGroup = changes.columnGroup?.currentValue ?? this.columnGroup;
+    this.containerWidth = changes.containerWidth?.currentValue ?? this.containerWidth;
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
     this.menuItems = changes.menuItems?.currentValue ?? this.menuItems;
     this.addFlag = changes.addFlag?.currentValue ?? this.addFlag;
+    this.displayedHeaders = (changes?.columnGroup?.currentValue ?? this.columnGroup ?? []).map(g => g.Name);
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
@@ -202,9 +209,9 @@ export class GenericTableV2Component
     if (colDef && colDef.datatype) {
       switch (colDef.datatype) {
         case "date":
-          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY") : "";
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY") : "";
         case "datetime":
-          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD/MM/YYYY HH:mm") : "";
+          return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY HH:mm") : "";
         case "time":
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "HH:mm") : "";
         case "currency":
@@ -215,15 +222,15 @@ export class GenericTableV2Component
           return val;
       }
     }
-    
-    if(val) {
-      if (typeof val === 'string' && isValidDate(val)) {
-        return moment(new Date(val)).format("DD/MM/YYYY");
-      } else if (typeof val !== 'boolean' && !isNaN(Number(val))) {
-        return Number(val);
+    else {
+      if(val) {      
+        if (typeof val !== 'boolean' && isValidNumber(val)) {
+          return Number(val);
+        } else if (typeof val === 'string' && isValidDate(val)) {
+          return moment(new Date(val)).format("DD MMM YY HH:mm");
+        }
       }
     }
-
     return val;
   }
   //#endregion
@@ -296,25 +303,24 @@ export class GenericTableV2Component
         },
       });
     }
+    else if (this.menuItems && this.menuItems.length>0) {
+      let navigateToComponent;
+      if (tableData === "Action") {
+        let action = item.Action;
+        navigateToComponent = this.menuItems.find((x) => x.label === action);
+      } else {
+        navigateToComponent = this.menuItems.find(
+          (x) => x.label === tableData
+        );
+      }
+      if (navigateToComponent) {
+        this.GeneralMultipleView(item, navigateToComponent.componentDetails);
+      }
+    }
     else if (!drillDownLink.Path && drillDownLink.componentDetails) {
       this.GeneralMultipleView(item, drillDownLink.componentDetails, drillDownLink.title);
     }
-    else {
-      if (this.menuItems) {
-        let navigateToComponent;
-        if (tableData === "Action") {
-          let action = item.Action;
-          navigateToComponent = this.menuItems.find((x) => x.label === action);
-        } else {
-          navigateToComponent = this.menuItems.find(
-            (x) => x.label === tableData
-          );
-        }
-        if (navigateToComponent) {
-          this.GeneralMultipleView(item, navigateToComponent.componentDetails);
-        }
-      }
-    }
+
   }
   //#endregion
   // #region  to Convert to Csv File

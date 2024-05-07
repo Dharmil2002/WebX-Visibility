@@ -4,7 +4,6 @@ import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
-
 /* here i create class for the bind controls in formGrop */
 export class QuickBookingControls extends BaseControl {
   private fieldMapping: FormControls[];
@@ -16,8 +15,8 @@ export class QuickBookingControls extends BaseControl {
     this.fieldMapping = [
       {
         name: "docketNumber",
-        label: "CNote No",
-        placeholder: "CNote No",
+        label: `${DocCalledAs.Docket} No`,
+        placeholder: `${DocCalledAs.Docket} No`,
         type: "text",
         value: "Computerized",
         filterOptions: "",
@@ -25,7 +24,13 @@ export class QuickBookingControls extends BaseControl {
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [],
+        Validations: [   {
+          name: "required",
+          message:  `${DocCalledAs.Docket}No required`,
+        }],
+        functions: {
+          onChange: "docketValidation",
+      }
       },
       {
         name: "docketDate",
@@ -41,7 +46,7 @@ export class QuickBookingControls extends BaseControl {
         Validations: [
           {
             name: "required",
-            message: "C Note Date is required",
+            message: `${DocCalledAs.Docket} is required`,
           },
         ],
         additionalData: {
@@ -292,6 +297,22 @@ export class QuickBookingControls extends BaseControl {
         functions: {
           change: "",
           onModel: "preventNegative"
+        },
+      },
+      {
+        name: "isSubmit",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
         },
       },
     ];

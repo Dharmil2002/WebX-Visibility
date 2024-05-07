@@ -106,7 +106,7 @@ export class AuthService {
             const locations = user.usr?.multiLocation || [];
             var locRes =  await this.locationService.getLocations(
               { locCode: { D$in: locations}, activeFlag: true },
-              { locCode: 1, locName: 1 }
+              { locCode: 1, locName: 1}
               );
             if(locRes && locRes.length > 0){      
               this.storageService.setItem(StoreKeys.UserLocations, locRes.map((x) => x.locCode).join(","));
@@ -119,6 +119,8 @@ export class AuthService {
               else {
                 this.storageService.setItem(StoreKeys.Branch, locRes[0].locCode);
               }
+              const loc =  await this.locationService.getLocation( { companyCode: user.usr.companyCode, locCode: this.storageService.branch } );
+              this.storageService.setItem(StoreKeys.WorkingLoc, JSON.stringify(loc));
             }
 
             this.currentUserSubject.next(user);
@@ -143,7 +145,7 @@ export class AuthService {
           connector: () => new ReplaySubject(1),
           resetOnComplete: () => timer(1000),
         }),
-        map((res) => {
+        map((res) => {         
           this.storageService.setItem(StoreKeys.Token, res.access.token);
           this.storageService.setItem(StoreKeys.RefreshToken, res.refresh.token);
           return res;

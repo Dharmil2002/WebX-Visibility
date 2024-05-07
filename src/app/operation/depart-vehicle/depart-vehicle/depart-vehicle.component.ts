@@ -27,6 +27,8 @@ import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
 
 
 @Component({
@@ -135,7 +137,9 @@ export class DepartVehicleComponent implements OnInit {
     private generalService: GeneralService,
     private departureService: DepartureService,
     private hawkeyeUtilityService: HawkeyeUtilityService,
-    private storage:StorageService
+    private storage:StorageService,
+    private locationService:LocationService,
+    private filter: FilterUtils
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
@@ -178,7 +182,11 @@ export class DepartVehicleComponent implements OnInit {
     const loadingLocationFormControl = this.loadingSheetTableForm.controls["LoadingLocation"];
     const loadingLocationValue = this.storage.branch || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
-
+    const route=this.tripData.RouteandSchedule.split(":")[1].split("-");
+    const first = route[0];  // Accessing the first element
+    const last = route[route.length - 1]; 
+    this.balanceTableForm.controls['balAmtAt'].setValue({name:last,value:last});
+    this.balanceTableForm.controls['advPdAt'].setValue({name:first,value:first});
 
   }
 
@@ -245,6 +253,8 @@ export class DepartVehicleComponent implements OnInit {
           this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
           this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
           this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
+          this.balanceTableForm.controls['balAmtAt'].setValue({name:thcData?.bLPAYAT||"",value:thcData?.bLPAYAT ||""});
+          this.balanceTableForm.controls['advPdAt'].setValue({name:thcData?.aDPAYAT||"",value:thcData?.aDPAYAT ||""});
           if(thcData.cHG && thcData.cHG.length>0){
             this.getAutoFillCharges(thcData.cHG,thcData);
           }
@@ -310,6 +320,28 @@ export class DepartVehicleComponent implements OnInit {
   IsActiveFuntion($event) {
     this.loadingData = $event;
   }
+  /*below function is for the Advance && blance at*/
+  async getLocation(event) {
+    if (this.balanceTableForm.controls[event.field.name].value.length > 2) {
+      const locData = await this.locationService.getLocations({
+        locCode: { 'D$regex': `^${this.balanceTableForm.controls[event.field.name].value}`, 'D$options': 'i' },
+      });
+      const locationMapping=locData.map((x)=>
+      {return {
+        name:x.locCode,
+        value:x.locCode,
+        locData:x
+      }})
+      this.filter.Filter(
+        this.balanceControlArray,
+        this.balanceTableForm,
+        locationMapping,
+        event.field.name,
+        false
+        );
+    }
+  }
+  /*End*/
   /**
  * Fetches shipment data from the API and updates the boxData and tableload properties.
  */
@@ -539,7 +571,9 @@ export class DepartVehicleComponent implements OnInit {
   }
   async getCharges(prod) {
     this.advanceControlArray = this.advanceControlArray.filter((x) => !x.hasOwnProperty('id'));
-    const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod },);
+    const filter = { "pRNm": prod, aCTV: true, cHBTY: "Booking" }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,"cHAPP":{D$in:["THC"] },isActive:true }
+    const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
       result.forEach((element, index) => {
@@ -791,8 +825,9 @@ export class DepartVehicleComponent implements OnInit {
   // }
   viewMenifest(event) {
     const req = {
-      templateName: "Manifest View-Print",
       DocNo: event.data?.manifest,
+      templateName: "Manifest",
+      partyCode: "CONSRAJT27",
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, '', 'width=1000,height=800');

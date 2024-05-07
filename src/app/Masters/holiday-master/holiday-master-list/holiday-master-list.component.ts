@@ -29,12 +29,41 @@ export class HolidayMasterComponent extends UnsubscribeOnDestroyAdapter implemen
     ];
     columnHeader =
         {
-            "srNo": "Sr No",
-            "holidayDate": "Holiday Date",
-            "days": "Day of Hoilday",
-            "holidayNote": "Holiday Note",
-            "isActive": "Active",
-            "View": "Edit"
+            "srNo": {
+                Title: " # ",
+                class: "matcolumncenter",
+                Style: "min-width:50px; max-width:50px",
+                sticky: true,
+              },
+              "holidayDate": {
+                Title: "Holiday Date",
+                class: "matcolumncenter",
+                Style: "min-width:150px; max-width:150px",
+                datatype: "date",
+                sticky: true,
+              },
+              "days": {
+                Title: "Day of Hoilday",
+                class: "matcolumnleft",
+                Style: "min-width:150px; max-width:100px",
+              },
+              "holidayNote": {
+                Title: "Holiday Note",
+                class: "matcolumnleft",
+                Style: "min-width:250px; max-width:150px",
+              },
+              "isActive": {
+                Title: "Active",
+                class: "matcolumnleft",
+                Style: "min-width:80px; max-width:80px",
+              },
+              view: {                
+                Title: "Edit",
+                class: "matcolumncenter",
+                Style: "min-width:80px; max-width:80px;",         
+                iconName: "edit",      
+                stickyEnd: true,
+              }
         }
     dynamicControls = {
         add: true,

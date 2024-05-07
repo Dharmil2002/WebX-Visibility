@@ -19,7 +19,7 @@ export function formatDate(dateString: string, format: string): string {
 export class DateFormatPipe implements PipeTransform {
   transform(value: string): string {
     const date = moment.utc(value, 'ddd, DD MMM YYYY HH:mm:ss [GMT]');
-    return date.format('DD/MM/YYYY HH:mm');
+    return date.format('DD MMM YY HH:mm');
   }
 }
 export function parseCustomDate(dateString, format) {
@@ -48,3 +48,5 @@ export function runningNumber() {
 
   return `${moment().format("YYMMDDHH")}${Math.floor(1000 + Math.random() * 9000)}`
 };
+
+export const timeZone='Asia/Kolkata'

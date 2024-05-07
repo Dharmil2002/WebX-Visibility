@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { StoreKeys } from 'src/app/config/myconstants';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { DocketStatus } from 'src/app/Models/docStatus';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
@@ -18,7 +19,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     noColumnSort: ["checkBoxRequired"],
   };
   dynamicControls = {
-    add: false,
+    add: true,
     edit: false,
     csv: false,
   };
@@ -32,6 +33,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       Title: "Cnote",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      sticky: true
     },
     date: {
       Title: "Date of Cnote",
@@ -78,7 +80,8 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:90px",
       type: "Link",
-      functionName: "validateLocation"
+      functionName: "validateLocation",
+      stickyEnd: true,
     },
   };
 
@@ -94,11 +97,14 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     "status"
   ];
   boxData: any[];
+  addAndEditPath: string;
   constructor(
     private docketService: DocketService,
     private storage: StorageService,
     private router: Router,
-  ) { }
+  ) {
+    this.addAndEditPath = "dashboard/DeliveryMrGeneration";
+  }
 
   ngOnInit(): void {
     this.getDocketDetails();
@@ -114,7 +120,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       };
 
       // Fetch docket list based on the query parameters
-      const data = await this.docketService.getDocketList(queryParameters);
+      const data = await this.docketService.getDocketList(queryParameters,true);
 
       // Fetch mapping details for the docket data
       const modifiedData = await this.docketService.getMappingDocketDetails(data);
@@ -127,14 +133,15 @@ export class DeliveryMrGenerationListComponent implements OnInit {
         .reverse()
         .map(item => {
 
-          // Extract the destination location from the event data
-          const location = item.orgdest.split(":")[1].trim();
+          // Extract the branch information from the destination location and remove any leading or trailing whitespaces
+          const location = item.orgdest.split("-")[1].trim();
           let actions = '';
 
+          const localBranch = this.storage.getItem(StoreKeys.Branch).trim();
           // Check if the branch matches the specified branch
-          if (this.storage.branch && this.storage.branch.trim() === location) {
-            // Assign the action only if the condition is met
+          if (localBranch === location) {
 
+            // Assign the action only if the condition is met
             actions = item.status === 'Del_Mr_Generated' ? '' : 'Delivery MR';
           }
 

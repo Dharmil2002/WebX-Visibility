@@ -18,7 +18,7 @@ import { SessionService } from "src/app/core/service/session.service";
 import Swal from "sweetalert2";
 import { ContractFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/FreightMatrix-control";
 import { Router } from "@angular/router";
-import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
 import { MatDialog } from "@angular/material/dialog";
@@ -29,7 +29,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 interface CurrentAccessListType {
   productAccess: string[];
 }
-const fieldsToSearch = ["PIN", "CT", "STNM", "ZN"];
+const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "AR"];
 @Component({
   selector: "app-customer-contract-freight-matrix",
   templateUrl: "./customer-contract-freight-matrix.component.html",
@@ -175,11 +175,11 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
   async ngOnChanges(changes: SimpleChanges) {
     const MinDate = changes.contractData?.currentValue?.cSTARTDT ?? "";
-    const MinDateObj = MinDate ? moment(MinDate, 'DD-MM-YYYY').toDate() : null;
+    const MinDateObj = MinDate ? moment(MinDate, 'DD MMM YY').toDate() : null;
 
     // Similarly for MaxDate
     const MaxDate = changes.contractData?.currentValue?.cENDDT ?? "";
-    const MaxDateObj = MaxDate ? moment(MaxDate, 'DD-MM-YYYY').toDate() : null;
+    const MaxDateObj = MaxDate ? moment(MaxDate, 'DD MMM YY').toDate() : null;
 
     this.initializeFormControlData = {
       MinDate: MinDateObj,
@@ -277,7 +277,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
 
   async getRatType() {
-    const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+    const RatData = await GetGeneralMasterData(this.masterService, "RTTYP");
     const rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
       (x, index) => {
         return RatData.find((t) => t.value == x);
@@ -300,7 +300,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   async getCapacityData() {
     const containerData = await this.objContainerService.getContainerList();
-    const vehicleData = await PayBasisdetailFromApi(
+    const vehicleData = await GetGeneralMasterData(
       this.masterService,
       "VEHSIZE"
     );
@@ -344,10 +344,12 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       this.PinCodeList = await firstValueFrom(
         this.masterService.masterPost("generic/get", pincodeReqBody)
       );
-      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
+      this.PinCodeList.data = await this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
-        "ST"
+        "ST",
+        this.masterService,
+        true
       );
     } catch (error) {
       // Handle any errors that occurred during the request
@@ -391,40 +393,61 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const isUpdate = this.isUpdate;
     const formData = this.FreightMatrixForm.value;
 
-    const filterCondition = (item) => {
-      const startDate = moment(item.vFDT, "DD-MM-YYYY");
-      const endDate = moment(item.vEDT, "DD-MM-YYYY");
-      const formDataStartDate = moment(formData.ValidFromDate, "DD-MM-YYYY");
-      const formDataEndDate = moment(formData.ValidToDate, "DD-MM-YYYY");
-      const commonConditions =
-        item.fROM == formData.From.name && item.tO == formData.To.name &&
-        (startDate <= formDataEndDate && endDate >= formDataStartDate) ||
-        (endDate >= formDataStartDate && startDate <= formDataEndDate);
+    const startDate = moment(formData.ValidFromDate, "DD MMM YY");
+    const endDate = moment(formData.ValidToDate, "DD MMM YY");
 
-
-      if (this.ServiceSelectiondata.loadType == "LT-0002") {
-        return isUpdate
-          ? commonConditions && item._id != this.UpdateData._id
-          : commonConditions;
-      } else {
-
-        return isUpdate
-          ? commonConditions &&
-          item.cAP == formData.capacity.name &&
-          item._id != this.UpdateData._id
-          : commonConditions && item.cAP == formData.capacity.name;
-      }
-    };
-    const filterData = this.tableData.filter(filterCondition);
-    if (filterData.length !== 0) {
+    if (startDate && endDate && startDate >= endDate) {
+      this.FreightMatrixForm.get('ValidFromDate').setValue("");
+      this.FreightMatrixForm.get('ValidToDate').setValue("");
       Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Enter Valid Freight Charges With Unique Date Range",
+        title: 'End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
         showConfirmButton: true,
+        confirmButtonText: "OK"
       });
+      return
     } else {
-      this.save();
+
+
+
+      const filterCondition = (item) => {
+        const startDate = moment(item.vFDT, "DD MMM YY");
+        const endDate = moment(item.vEDT, "DD MMM YY");
+        const formDataStartDate = moment(formData.ValidFromDate, "DD MMM YY");
+        const formDataEndDate = moment(formData.ValidToDate, "DD MMM YY");
+        const commonConditions =
+          (item.fROM == formData.From.name && item.tO == formData.To.name) &&
+          ((startDate <= formDataEndDate && endDate >= formDataStartDate) ||
+            (endDate >= formDataStartDate && startDate <= formDataEndDate))
+
+
+        if (this.ServiceSelectiondata.loadType == "LT-0002") {
+          return isUpdate
+            ? commonConditions && item._id != this.UpdateData._id
+            : commonConditions;
+        } else {
+
+          return isUpdate
+            ? commonConditions &&
+            item.cAP == formData.capacity.name &&
+            item._id != this.UpdateData._id
+            : commonConditions && item.cAP == formData.capacity.name;
+        }
+      };
+      const filterData = this.tableData.filter(filterCondition);
+      if (filterData.length !== 0) {
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Enter Valid Freight Charges With Unique Date Range",
+          showConfirmButton: true,
+        });
+      } else {
+        this.save();
+      }
     }
   }
 

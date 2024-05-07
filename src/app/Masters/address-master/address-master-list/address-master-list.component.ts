@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import Swal from 'sweetalert2';
+import { AddressMasterUploadComponent } from '../address-master-upload/address-master-upload.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-address-master-list',
@@ -15,17 +18,14 @@ export class AddressMasterListComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"];
   companyCode: any = 0;
+  uploadComponent = AddressMasterUploadComponent
   linkArray = []
   columnHeader = {
-    eNTDT: {
-      Title: "Created Date",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
     addressCode: {
       Title: "Address Code",
       class: "matcolumnleft",
       Style: "max-width:150px",
+      sticky: true,
     },
     manualCode: {
       Title: "Manual Code",
@@ -42,6 +42,12 @@ export class AddressMasterListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:480px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;",
     },
+    eNTDT: {
+      Title: "Created Date",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+      // datatype: "datetime",
+    },
     activeFlag: {
       type: "Activetoggle",
       Title: "Active",
@@ -50,9 +56,10 @@ export class AddressMasterListComponent implements OnInit {
       functionName: "ActiveFunction",
     },
     actions: {
-      Title: "Actions",
-      class: "matcolumnleft",
+      Title: "",
+      class: "matcolumncenter",
       Style: "max-width:100px",
+      stickyEnd: true,
     },
   };
   staticField = [
@@ -75,7 +82,7 @@ export class AddressMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  constructor(private masterService: MasterService, private storage: StorageService) {
+  constructor(private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/AddressMaster/AddAddressMaster";
   }
@@ -95,28 +102,11 @@ export class AddressMasterListComponent implements OnInit {
           const sortedData = response.data.sort((a, b) => {
             return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
           });
-          // Generate srno for each object in the array and format the eNTDT
-          const dataWithFormattedDate = sortedData.map((item, index) => {
-            const formattedDate = formatDate(item.eNTDT);
-            return {
-              ...item,
-              eNTDT: formattedDate,
-            };
-          });
-          // Extract the updatedDate from the first element (latest record)
-          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].eNTDT : null;
-          this.csv = dataWithFormattedDate;
+          this.csv = sortedData;
           this.tableLoad = false;
         }
       }
     });
-    function formatDate(dateString) {
-      const formattedDate = new Date(dateString);
-      const formatDatePart = (value) => (value < 10 ? '0' : '') + value;
-      const formattedDateStr = `${formatDatePart(formattedDate.getDate())}-${formatDatePart(formattedDate.getMonth() + 1)}-${formattedDate.getFullYear()}`;
-      const formattedTimeStr = `${formatDatePart(formattedDate.getHours())}:${formatDatePart(formattedDate.getMinutes())}`;
-      return `${formattedDateStr} ${formattedTimeStr}`;
-    }
   }
 
   async ActiveFunction(event) {
@@ -148,4 +138,16 @@ export class AddressMasterListComponent implements OnInit {
       console.log("failed");
     }
   }
+
+    //#region to call upload function
+    upload() {
+      const dialogRef = this.dialog.open(this.uploadComponent, {
+        width: "800px",
+        height: "500px",
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.getAddressDetails();
+      });
+    }
+    //#endregion
 }

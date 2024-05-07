@@ -9,18 +9,14 @@ import { StoreKeys } from "src/app/config/myconstants";
 export class PrqSummaryModel implements IFieldDefinition {
   constructor() {}
 
-  public columnHeader = {
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:6%",
-    },
+  public columnHeader = {   
     prqNo: {
       Title: "PRQ No",
       class: "matcolumnleft",
       Style: "min-width:18%",
       type: "windowLink",
       functionName: "OpenPrq",
+      sticky: true,
     },
     size: {
       Title: "Veh/Cont-Size",
@@ -39,8 +35,9 @@ export class PrqSummaryModel implements IFieldDefinition {
     },
     pickUpDate: {
       Title: "Pickup Date & Time",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:16%",
+      datatype: "datetime",
     },
     status: {
       Title: "Status",
@@ -49,10 +46,17 @@ export class PrqSummaryModel implements IFieldDefinition {
     },
     createdDate: {
       Title: "Created Date",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:10%",
+      datatype: "datetime",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumncenter",
+      //iconClass: "tbl-fav-edit",
+      Style: "max-width:6%",
+      stickyEnd: true,
     }
-
   };
 
   public staticField = [

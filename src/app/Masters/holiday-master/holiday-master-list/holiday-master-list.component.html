@@ -1,8 +1,17 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
-    <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="dateWiseData"
+    <!-- <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="dateWiseData"
         [headercode]="dialogData" [height]="height" [width]="width" (onFlagChange)="IsActive($event)"
         [viewComponent]="viewComponent" [dynamicControls]="dynamicControls" [toggleArray]="toggleArray"
         [menuItems]="menuItems" [Link]="linkArray" (dialogClosed)="getHolidayDetails()"
         (onFlagChange)="IsActiveFuntion($event)">
-    </generic-table-webxpress>
+    </generic-table-webxpress> -->
+
+    <app-generic-table-v2 *ngIf="!tableLoad" 
+        [dynamicControls]="dynamicControls" [headercode]="dialogData"
+         [columnHeader]="columnHeader" [tableData]="dateWiseData" [viewComponent]="viewComponent" 
+         [Link]="linkArray" [menuItems]="menuItems"  
+         [toggleArray]="toggleArray" (onFlagChange)="IsActiveFuntion($event)" 
+         (dialogClosed)="getHolidayDetails()">
+    </app-generic-table-v2>
+
 </app-common-wrapper-webxpress>

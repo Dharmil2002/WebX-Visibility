@@ -357,6 +357,7 @@ export class InvoiceCollectionComponent implements OnInit {
   // Account Posting When  When Bill Has been Collected	
   async AccountPosting(data, mRNO) {
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
+    const isChequeOrRTGS = PaymentMode?.PaymentMode === "Cheque" || PaymentMode?.PaymentMode === "RTGS/UTR";
     this.snackBarUtilityService.commonToast(async () => {
       try {
         const TotalAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
@@ -407,13 +408,13 @@ export class InvoiceCollectionComponent implements OnInit {
         this.VoucherDataRequestModel.GrossAmount = data?.gROSSAMT || 0;
         this.VoucherDataRequestModel.netPayable = TotalAmount;
         this.VoucherDataRequestModel.roundOff = +(TotalAmount - PaymentAmount);
-        this.VoucherDataRequestModel.voucherCanceled = false
-        this.VoucherDataRequestModel.transactionNumber = mRNO,
-          this.VoucherDataRequestModel.paymentMode = PaymentMode,
-          this.VoucherDataRequestModel.refNo = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("ChequeOrRefNo").value : "";
-        this.VoucherDataRequestModel.accountName = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANM : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.name;
-        this.VoucherDataRequestModel.accountCode = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANCD : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.value;
-        this.VoucherDataRequestModel.date = PaymentMode == "Cheque" || "RTGS/UTR" ? this.DebitVoucherTaxationPaymentDetailsForm.get("Date").value : "";
+        this.VoucherDataRequestModel.voucherCanceled = false;
+        this.VoucherDataRequestModel.transactionNumber = mRNO;
+        this.VoucherDataRequestModel.paymentMode = PaymentMode;
+        this.VoucherDataRequestModel.refNo = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("ChequeOrRefNo").value : "";
+        this.VoucherDataRequestModel.accountName = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANM : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.name;
+        this.VoucherDataRequestModel.accountCode = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value?.bANCD : this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value?.value;
+        this.VoucherDataRequestModel.date = isChequeOrRTGS ? this.DebitVoucherTaxationPaymentDetailsForm.get("Date").value : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         var VoucherlineitemList = this.GetVouchersLedgers(data, mRNO);
 
@@ -501,7 +502,7 @@ export class InvoiceCollectionComponent implements OnInit {
       filter: { mRNO: MrNo },
       update: updateRequest,
     };
-    firstValueFrom(this.masterService.masterPut("generic/update", reqbillcollection)),
+    firstValueFrom(this.masterService.masterPut("generic/updateAll", reqbillcollection)),
       Swal.fire({
         icon: "success",
         title: "Invoice collection Successfully And Voucher Created",
@@ -551,7 +552,7 @@ export class InvoiceCollectionComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['Billed debtors'].LeadgerCode, ledgerInfo['Billed debtors'].LeadgerName, ledgerInfo['Billed debtors'].LeadgerCategory, 0, NetPayable),
+      createVoucher(ledgerInfo['AST002002'].LeadgerCode, ledgerInfo['AST002002'].LeadgerName, ledgerInfo['AST002002'].LeadgerCategory, 0, NetPayable),
     ];
 
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
@@ -568,8 +569,8 @@ export class InvoiceCollectionComponent implements OnInit {
     if (PaymentAmount != NetPayable) {
       const Amount = NetPayable - PaymentAmount;
       const isAmountNegative = Amount < 0;
-      response.push(createVoucher(ledgerInfo['Round off Amount'].LeadgerCode, ledgerInfo['Round off Amount'].LeadgerName,
-        ledgerInfo['Unbilled debtors'].LeadgerCategory, isAmountNegative ? 0 : Amount.toFixed(2), isAmountNegative ? (-Amount).toFixed(2) : 0));
+      response.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName,
+        ledgerInfo['AST001001'].LeadgerCategory, isAmountNegative ? 0 : Amount.toFixed(2), isAmountNegative ? (-Amount).toFixed(2) : 0));
 
     }
 

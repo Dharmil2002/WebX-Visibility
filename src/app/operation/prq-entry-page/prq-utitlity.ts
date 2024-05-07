@@ -26,8 +26,8 @@ export async function updatePrqStatus(prqData, masterService) {
         },
         "update": {
             ...prqData,
-            mODBY: StorageService.getItem('UserName'),
-            mODLOC: StorageService.getItem('Branch'),
+            mODBY: StorageService.getItem(StoreKeys.UserId),
+            mODLOC: StorageService.getItem(StoreKeys.Branch),
             mODDT: new Date()
         }
     }

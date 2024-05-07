@@ -199,6 +199,34 @@ export class BalanceControl {
                 disable: true
             },
             {
+                name: 'advPdAt',
+                label: 'Advance Payable At',
+                placeholder: '',
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "vehLoad"
+                },
+                Validations: [{
+                    name: "required",
+                    message: "Advance Paid At  is required",
+                },
+                {
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                  },
+                  {
+                    name: "autocomplete",
+                  },
+            ],
+                functions:{
+                    onModel:"getLocation"
+                },
+                generatecontrol: true,
+                disable: false
+            },
+            {
                 name: 'BalanceAmt',
                 label: 'Balance Amount(₹)',
                 placeholder: '',
@@ -208,6 +236,34 @@ export class BalanceControl {
                 generatecontrol: true,
                 disable: true
             },
+            {
+                name: 'balAmtAt',
+                label: 'Balance Payable At',
+                placeholder: '',
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "vehLoad"
+                },
+                Validations: [{
+                    name: "required",
+                    message: "Balance Paid At is required",
+                },
+                {
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                  },
+                  {
+                    name: "autocomplete",
+                  },
+            ],
+                functions:{
+                    onModel:"getLocation"
+                },
+                generatecontrol: true,
+                disable:false
+            }
         ];
     }
     getBalanceFormControls() {

@@ -12,45 +12,45 @@
     </div>
     <div class="collapse navbar-collapse" [ngbCollapse]="isNavbarCollapsed">
       <ul class="pull-left collapse-menu-icon">
-        <li>
+        <li class="nav-item">
           <button mat-icon-button (click)="callSidemenuCollapse()" class="sidemenu-collapse">
             <app-feather-icons [icon]="'menu'" [class]="'header-icon'"></app-feather-icons>
           </button>
         </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-left globehide">
-        <li style="position:fixed;margin-left: 29px;">
-          <img [src]="logo" class="pointer" height="50px" width="150px" alt="Company Logo" (click)="navigateToPage()">
+      </ul> 
+
+      <!-- Search bar to the right of the logo navbar-left globehide-->
+      <ul class="nav navbar-nav navbar-left" style="margin-left: 5px;">
+        <li class="nav-item" >
+          <img [src]="logo" class="pointer" height="35px" alt="Company Logo" (click)="navigateToPage()">
+        </li>
+        <li class="nav-item">
+           <button mat-icon-button (click)="openSearchPopup()" matTooltip="Search" matTooltipPosition="above"
+           matTooltipClass="tooltip">
+              <app-feather-icons [icon]="'search'" [class]="'header-icon'"></app-feather-icons>
+          </button>
         </li>
       </ul>
-
-      <!-- Search bar to the right of the logo -->
-      <ul class="nav navbar-nav dropdownheader" style="margin-left: 175px;">
-        <li class="search-bar">
-          <!-- <button mat-icon-button class="large-icon" (click)="openSearchPopup()" style="color: rgb(255, 255, 255);">
-            <i-feather name="fas fa-search" class="mb-4"></i-feather>
-          </button> -->
-
-          <div class="icon-preview" (click)="openSearchPopup()"><i class="fas fa-search"
-              style="color: rgb(255, 255, 255);scale: 1.3;margin-top: 20px;cursor: pointer;"></i></div>
-
-        </li>
+      
+      <ul class="nav navbar-nav navbar-left">
+       
       </ul>
+      
 
       <ul class="nav navbar-nav navbar-right">
-        <li>
-          <label style="color: white;">{{BaseTimeZone | date: 'hh:mm a'}}</label>&nbsp;&nbsp;
-          <label style="color: white;">{{BaseTimeZone | date: 'MMM dd' }}</label>&nbsp;&nbsp;
+        <li>          
+          <label style="color: white; margin-right: 10px;">{{BaseTimeZone | date: 'hh:mm a'}}</label>
+          <label style="color: white; margin-right: 10px;">{{BaseTimeZone | date: 'MMM dd' }}</label>
           <label style="color: white;">FY {{FinancialYear}}</label>
         </li>
         <!-- Full Screen Button -->
         <li class="fullscreen">
-          <button mat-icon-button (click)="callFullscreen()" class=" nav-notification-icons">
+          <button mat-icon-button (click)="callFullscreen()" class="nav-notification-icons mdc-button mat-mdc-button mat-unthemed mat-mdc-button-base">
             <app-feather-icons [icon]="'maximize'" [class]="'header-icon'"></app-feather-icons>
           </button>
         </li>
 
-        <li style="margin: inherit;">
+        <li style="margin-right: 10px;">
           <p style="color: white;cursor: pointer;" matTooltip="Change Branch" matTooltipPosition="above"
             matTooltipClass="tooltip" (click)="VirtualLogin()"> {{CurrentLocation}} </p>
           <!-- <button mat-icon-button (click)="VirtualLogin()" class=" nav-notification-icons">

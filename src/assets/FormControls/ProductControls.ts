@@ -78,7 +78,7 @@ export class ProductControls {
           },
         ],
         generatecontrol: true,
-        disable:true,
+        disable: true,
         functions: {
           onChange: "handleChargesCode",
         },
@@ -138,6 +138,85 @@ export class ProductControls {
         functions: {},
       },
       {
+        name: "chargeApplicable",
+        label: "Charge Applicable On",
+        placeholder: "Select Charge Applicable",
+        type: "multiselect",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [],
+        additionalData: {
+          support: "chargeApplicableHandler",
+          showNameAndValue: true,
+        },
+        functions: {
+          onToggleAll: "toggleSelectAll",
+        },
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "cAPTION",
+        label: "Charge Caption",
+        placeholder: "Charge Caption",
+        type: "text",
+        value: '',
+        Validations: [{
+          name: "required",
+          message: "Charge Caption is required",
+        },],
+        generatecontrol: true,
+        disable: false,
+      },
+      // {
+      //   name: "Ledger",
+      //   label: "Account",
+      //   placeholder: "Account",
+      //   type: "dropdown",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "autocomplete",
+      //     },
+      //     {
+      //       name: "invalidAutocomplete",
+      //       message: "Choose proper value",
+      //     },
+      //   ],
+      //   additionalData: {
+      //     showNameAndValue: true,
+      //   },
+      //   functions: {},
+      // },
+
+      {
+        name: "Ledger",
+        label: "Account",
+        placeholder: "Account",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
+
+      {
         name: "Variability",
         label: "Variability:",
         placeholder: "Variability:",
@@ -161,6 +240,40 @@ export class ProductControls {
         ],
         Validations: [],
         generatecontrol: true,
+        disable: false,
+      },
+
+      {
+        name: "isActive",
+        label: "Active Flag",
+        placeholder: "Active Flag",
+        type: "toggle",
+        value: false,
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "iSChargeMandatory",
+        label: "Charge Mandatory",
+        placeholder: "Charge Mandatory",
+        type: "toggle",
+        value: false,
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "chargeApplicableHandler",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [{
+          name: "required",
+          message: "Charge Applicable On is required",
+        }],
+        generatecontrol: false,
         disable: false,
       },
     ];
@@ -214,7 +327,7 @@ export class ProductControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect:"handleServicesName"
+          onOptionSelect: "handleServicesName"
         },
       },
       {

@@ -644,7 +644,7 @@ export class ThcGenerationComponent implements OnInit {
             // driver: vehData.drvNM || '',
             //driverPan: vehData?.pANNO || '',
             engineNo: vehData?.eNGNO || '',
-            chassisNo: vehData?.cHNO || '',
+            chasisNo: vehData?.cHNO || '',
             lcNo: vehData.dLNO || '',
             lcExpireDate: vehData.dLEXP || new Date(),
             //dmobileNo: vehData.drvPH || '',
@@ -1745,6 +1745,7 @@ export class ThcGenerationComponent implements OnInit {
     this.rrLoad = true;
     if (data.label.label === "RemoveRake") {
       this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);
+      this.rrLoad = false;
     } else {
       this.rakeDetailsTableForm.controls['rrNo'].setValue(data.data['rrNo']);
       this.rakeDetailsTableForm.controls['rrDate'].setValue(

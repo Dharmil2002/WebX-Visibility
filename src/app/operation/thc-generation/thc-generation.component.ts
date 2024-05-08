@@ -309,7 +309,7 @@ export class ThcGenerationComponent implements OnInit {
     private definition: RakeEntryModel,
     private hawkeyeUtilityService: HawkeyeUtilityService,
     private controlPanel: ControlPanelService,
-    private thcCostUpdateService: ThcCostUpdateService,
+    private thcCostUpdateService: ThcCostUpdateService
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -1074,12 +1074,20 @@ export class ThcGenerationComponent implements OnInit {
     });
   }
   /*End*/
-  /*get pincode detail*/
-  async getPincodeDetail(event) {
-    const cityMapping = event.field.name == 'fromCity' ? this.fromCityStatus : this.toCityStatus;
-    this.pinCodeService.getCity(this.thcTableForm, this.jsonControlBasicArray, event.field.name, cityMapping);
-  }
-  /*end */
+  /*below the method for the getting a CityName for PinCode Collection*/
+  async getFromCityDetail(event) {
+    // const fcityMapping = event.field.name == "fCITY" ?? this.fromCityStatus;
+     await this.pinCodeService.getCityPincode(
+       this.thcTableForm,
+       this.jsonControlArray,
+       event.field.name,
+       true,
+       true,
+       true
+     );
+   }
+   /*End*/
+ 
   /* below function was the call when */
   async getLocBasedOnCity() {
 

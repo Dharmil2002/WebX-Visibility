@@ -50,8 +50,7 @@ export class DriverMasterUploadComponent implements OnInit {
     },
     {
       ItemsName: "CountryCode",
-      Type: UploadFieldType.Derived,
-      BasedOn: "PinCode",
+      Type: UploadFieldType.Upload,
       From: "Country",
       Field: "Country",
       Validations: [],
@@ -60,8 +59,8 @@ export class DriverMasterUploadComponent implements OnInit {
       ItemsName: "CountryId",
       Type: UploadFieldType.Derived,
       BasedOn: "CountryCode",
-      From: "State",
-      Field: "CNTR",
+      From: "Country",
+      Field: "PhoneCode",
       Validations: [],
     },
     {
@@ -72,7 +71,7 @@ export class DriverMasterUploadComponent implements OnInit {
     {
       ItemsName: "Address",
       Type: UploadFieldType.Upload,
-      Validations: [{ Required: true }, { Pattern: "^.{1,500}$" }],
+      Validations: [{ Pattern: "^.{1,500}$" }],
     },
     {
       ItemsName: "PinCode",
@@ -94,10 +93,23 @@ export class DriverMasterUploadComponent implements OnInit {
       Validations: [],
     },
     {
+      ItemsName: "LicenseValidityDate",
+      Validations: [
+        { Required: true },
+        { range: 1 },
+      ],
+    },
+    {
+      ItemsName: "DateofBirth",
+      Validations: [
+        { Required: true },
+        { range: 1 },
+      ],
+    },
+    {
       ItemsName: "AssignedVehicleNo",
       Type: UploadFieldType.Upload,
       Validations: [
-        { Required: true },
         { Pattern: "^[a-zA-Z0-9]{3,200}$" },
         { DuplicateFromList: false },
       ],
@@ -123,7 +135,6 @@ export class DriverMasterUploadComponent implements OnInit {
 
   //#region to select file
   async selectedFile(event) {
-    debugger;
     let fileList: FileList = event.target.files;
     if (fileList.length !== 1) {
       throw new Error("Cannot use multiple files");
@@ -238,8 +249,8 @@ export class DriverMasterUploadComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        //console.log(result);
-        this.save(result);
+        // console.log(result);
+        this.save(results);
       }
     });
   }
@@ -250,37 +261,46 @@ export class DriverMasterUploadComponent implements OnInit {
     try {
       const chunkSize = 50;
       let successfulUploads = 0;
-      const lastDriverCode = await this.masterService.getLastId("driver_detail", this.storage.companyCode, 'companyCode', 'manualDriverCode', 'DR')
+      const lastDriverCode = await this.masterService.getLastId(
+        "driver_detail",
+        this.storage.companyCode,
+        "companyCode",
+        "manualDriverCode",
+        "DR"
+      );
       // Process each element in data using processData
-      const processedData = data.map((element, i) => this.processData(element, lastDriverCode, i));
+      const processedData = data.map((element, i) =>
+        this.processData(element, lastDriverCode, i)
+      );
       // Chunk the processedData data recursively
       const chunks = chunkArray(processedData, chunkSize);
       const sendData = async (chunks: DriverMaster[][]) => {
-        // chunks.forEach(async chunk => {
-        //   const request = {
-        //     companyCode: this.storage.companyCode,
-        //     collectionName: "driver_detail",
-        //     data: chunk,
-        //   };
-        //   try {
-        //     const response = await firstValueFrom(this.masterService.masterPost("generic/create", request));
-        //     if (response.success) {
-
-        //       successfulUploads++;
-        //     }
-        //   } catch (error) {
-        //     console.log(error);
-        //   }
-        //   // Check if all chunks were successfully uploaded
-        //   if (successfulUploads === chunks.length) {
-        //     Swal.fire({
-        //       icon: "success",
-        //       title: "Success",
-        //       text: "Valid Vendor Data Uploaded",
-        //       showConfirmButton: true,
-        //     });
-        //   }
-        // });
+        chunks.forEach(async (chunk) => {
+          const request = {
+            companyCode: this.storage.companyCode,
+            collectionName: "driver_detail",
+            data: chunk,
+          };
+          try {
+            const response = await firstValueFrom(
+              this.masterService.masterPost("generic/create", request)
+            );
+            if (response.success) {
+              successfulUploads++;
+            }
+          } catch (error) {
+            console.log(error);
+          }
+          // Check if all chunks were successfully uploaded
+          if (successfulUploads === chunks.length) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Valid Vendor Data Uploaded",
+              showConfirmButton: true,
+            });
+          }
+        });
       };
       await sendData(chunks);
     } catch (error) {
@@ -293,8 +313,19 @@ export class DriverMasterUploadComponent implements OnInit {
       });
     }
   }
+  async getListId() {
+    try {
+      let query = { companyCode: this.storage.companyCode };
+      const req = { companyCode:this.storage.companyCode, collectionName: "driver_detail", filter: query, sorting: { manualDriverCode: -1 } };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
+
+      return response?.data;
+    } catch (error) {
+      console.error("Error fetching user list:", error);
+      throw error;
+    }
+  }
   processData(element, lastDriverCode: string, i: number) {
-    debugger;
     // Create a new VendorModel instance to store processed data
     const processedData = new DriverMaster({});
     // Set basic properties
@@ -305,11 +336,21 @@ export class DriverMasterUploadComponent implements OnInit {
     processedData.driverName = element.DriverName.toUpperCase();
     processedData.licenseNo = element.LicenseNo;
     processedData.country = element.CountryCode;
+    processedData.countryCD = element.CountryId  || "";
     processedData.telno = element.MobileNo;
     processedData.address = element.Address;
     processedData.pincode = element.PinCode;
     processedData.city = element.City;
+    processedData.valdityDt = new Date(element.LicenseValidityDate);
+    processedData.dDob = new Date(element.DateofBirth);
     processedData.vehicleNo = element.AssignedVehicleNo || "";
+    processedData.activeFlag = true;
+    processedData.addressProofDocNo = "";
+    processedData.DOBProofDocNo = "";
+    processedData.driverPhoto = "";
+    processedData.licenseScan = "";
+    processedData.addressProofScan = "";
+    processedData.DOBProofScan = "";
     // Set timestamp and user information
     processedData["eNTDT"] = new Date();
     processedData["eNTBY"] = this.storage.userName;
@@ -336,5 +377,4 @@ export class DriverMasterUploadComponent implements OnInit {
     }
   }
   //#endregion
-
 }

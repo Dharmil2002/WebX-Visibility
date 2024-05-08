@@ -353,12 +353,10 @@ export class AddDriverMasterComponent implements OnInit {
       const lastDriverCode = lastUsedDriverCode
         ? parseInt(lastUsedDriverCode.manualDriverCode.substring(3))
         : 0;
-
       const generateDriverCode = (initialCode: number = 0) => {
         const nextDriverCode = initialCode + 1;
-        return `DR${nextDriverCode.toString().padStart(4, "0")}`;
+        return `DR${nextDriverCode.toString().padStart(5, "0")}`;
       };
-
       this.newDriverCode = this.isUpdate ? this.DriverTable._id : generateDriverCode(lastDriverCode);
       //generate unique manualDriverCode
       commonBody.manualDriverCode = this.newDriverCode
@@ -408,7 +406,7 @@ export class AddDriverMasterComponent implements OnInit {
         };
         const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
-          
+
           if(commonBody?.vehicleNo && commonBody?.vehicleNo!=""){
             await this.updateStatusByVehicleNo(commonBody);
           }
@@ -463,11 +461,11 @@ export class AddDriverMasterComponent implements OnInit {
         let reqU = {
           companyCode: this.companyCode,
           collectionName: "vehicle_status",
-          filter: { 
+          filter: {
             driverCD: data.manualDriverCode },
           update: vehSD,
         };
-        
+
         const res = await firstValueFrom(
           this.masterService.masterMongoPut("generic/update", reqU)
         );
@@ -499,11 +497,11 @@ export class AddDriverMasterComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_status",
-        filter: { 
+        filter: {
           vehNo: data.vehicleNo },
         update: vehS,
       };
-      
+
       const res = await firstValueFrom(
         this.masterService.masterMongoPut("generic/update", req)
       );
@@ -549,15 +547,15 @@ export class AddDriverMasterComponent implements OnInit {
           lcNo:""
         }
       }
-      
+
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_status",
-        filter: { 
+        filter: {
           driverCD: data.manualDriverCode },
         update: vehS,
       };
-      
+
       const res = await firstValueFrom(
         this.masterService.masterMongoPut("generic/update", req)
       );

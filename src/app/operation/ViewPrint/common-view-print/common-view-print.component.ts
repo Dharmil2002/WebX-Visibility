@@ -1,5 +1,6 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 
@@ -15,7 +16,7 @@ export class CommonViewPrintComponent implements OnInit {
   companyCode = 0;
   JsonData;
   templateBody: any;
-  
+
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,
@@ -23,7 +24,7 @@ export class CommonViewPrintComponent implements OnInit {
     private storage: StorageService
   ) {
     this.companyCode = this.storage.companyCode;
-    
+
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
       "display",
@@ -44,7 +45,6 @@ export class CommonViewPrintComponent implements OnInit {
     this.GetviewPrint() // Template Data
   }
 
-  
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
@@ -52,15 +52,13 @@ export class CommonViewPrintComponent implements OnInit {
       partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
     };
-    const Res = await this.masterService
-      .masterPost("viewprint/View", req)
-      .toPromise();
+    const Res = await firstValueFrom(await this.masterService.masterPost("viewprint/ViewV2", req));
     if (Res.success) {
       this.JsonData = Res.data.jsonData;
       this.FieldMapping = Res.data.fieldMapping;
       this.HtmlTemplate = Res.data.Template;
       this.showView = true;
     }
-    
+
   }
 }

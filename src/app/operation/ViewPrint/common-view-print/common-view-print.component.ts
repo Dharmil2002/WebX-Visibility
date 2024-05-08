@@ -40,11 +40,12 @@ export class CommonViewPrintComponent implements OnInit {
       this.templateBody = JSON.parse(params["templateBody"]);
     }); //Get Parameters
   }
+
   ngOnInit(): void {
     this.GetviewPrint() // Template Data
   }
 
-  
+  //below function is for view print
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,

@@ -62,6 +62,7 @@ import { DeliveryMrResponseModalComponent } from './tabs/Delivery MR Generation/
 import { PrqBulkUploadComponent } from './tabs/prq-bulk-upload/prq-bulk-upload.component';
 import { HomePageComponent } from "./HomePage/home-page/home-page.component";
 import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-dashboard.component";
+import { CreditnoteManagementComponent } from "../operation/creditnote-management/creditnote-management.component";
 
 @NgModule({
   declarations: [
@@ -98,6 +99,7 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     PrqBulkUploadComponent,
     HomePageComponent,
     ReportDashboardComponent,
+    CreditnoteManagementComponent
   ],
   imports: [
     CommonModule,

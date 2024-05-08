@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { InvoiceCountService } from 'src/app/Utility/module/billing/invoice-count.service';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
@@ -21,6 +23,8 @@ export class InvoiceDashboardComponent implements OnInit {
       active: "Bill Payment Dashboard"
     }
   ]
+  DataResponseHeader: any;
+  countCreditnoteRecords: any;
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch
@@ -33,7 +37,8 @@ export class InvoiceDashboardComponent implements OnInit {
   }
   constructor(private http: HttpClient, private router: Router,
     private objInvoiceCountService: InvoiceCountService,
-    private storage: StorageService,) {
+    private storage: StorageService,
+    private masterService: MasterService,) {
   }
 
 
@@ -47,10 +52,8 @@ export class InvoiceDashboardComponent implements OnInit {
 
       // Fetch data from the service
       const count = await this.objInvoiceCountService.getDashboardData();
-      const ltlCount = await this.objInvoiceCountService.getDashboardDataForLTL();
-
-      // Fetch count of shipments without POD
-      //const emptyPodCount = await this.objInvoiceCountService.getPengPodCount(podFilter);    
+      const ltlCount = await this.objInvoiceCountService.getDashboardDataForLTL(); 
+      const ltlCnCount = await this.objInvoiceCountService.getCreditNoteDashboardData();
 
       // Extract relevant data
       const dashboardCounts = count[0]?.dashboardCounts || {};
@@ -88,6 +91,9 @@ export class InvoiceDashboardComponent implements OnInit {
           case "Pending PODs":
             item['count'] = approvedBillCount + approvedBillCountltl || '0';
             break;
+          case "Credit Notes":
+              item['count'] = ltlCnCount.length || '0';
+              break;
         }
       });
 
@@ -137,6 +143,12 @@ const Transactions = {
       title: "Pending PODs",
       class: "info-box7 bg-c-Daisy-light order-info-box7",
     },
+    {
+      id: 9,
+      title: "Credit Notes",
+      class: "info-box7 bg-c-Grape-light order-info-box7",
+    },
+
 
   ],
 };

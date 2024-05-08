@@ -222,5 +222,20 @@ export class InvoiceCountService {
       console.error("An error occurred:", error);
     }
   }
+
+  async getCreditNoteDashboardData() {
+    try {
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "cd_note_header",
+      };
+
+      const res = await firstValueFrom(this.operationService.operationPost('generic/query', req));
+      // console.log(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }
   //#endregion
 }

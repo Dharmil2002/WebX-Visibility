@@ -3,7 +3,7 @@
     <app-form-webxpress [form]="loadingSheetTableForm" [FormTitle]="'Create Loading Sheet'"
       [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
       [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
-      (AddNewButtonEvent)="addMarket()" [DisplayAddNewButton]=true [addNewTitle]="addNewTitle">
+      (AddNewButtonEvent)="addMarket()" [DisplayAddNewButton]="isDisplay" [addNewTitle]="addNewTitle">
     </app-form-webxpress>
   </form>
   <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [tableData]="tableData"
@@ -19,7 +19,7 @@
   <div class="row" [ngClass]="{'blur-effect': isSubmit}" *ngIf="!isSubmit">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
       <div class="example-button-row d-flex justify-content-end">
-        <button class="msr-3" mat-raised-button color="primary" [disabled]="!loadingSheetTableForm.value.vehicle.value"
+        <button class="msr-3" mat-raised-button color="primary" [disabled]="!loadingSheetTableForm.value.vehicle.value ||!loadingSheetTableForm.valid"
           *ngIf="!tableload" (click)="loadingSheetGenerate()">Generate LoadingSheet</button>
         <button class="msr-3" mat-raised-button color="primary" (click)="goBack('Departures')">Back</button>
         <button class="msr-3" mat-raised-button color="primary" *ngIf="departFlag" (click)="departVehicle()">Depart

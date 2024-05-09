@@ -243,7 +243,6 @@ export class ArrivalVehicleService {
         if (!lagData && lagData?._id != legID)
             return;
 
-        let eventJson = dktList;
         const dktCount = dktList.length;
         const unloadPackage = sumProperty(dktList, 'Packages');
         const unloadWeightKg = sumProperty(dktList, 'WeightKg');
@@ -486,6 +485,7 @@ export class ArrivalVehicleService {
     /*End*/
     /*below code is for the withoutScan*/
     async fieldMappingWithoutScanArrival(data, dktList, notSelectedData, scanDkt, isScan) {
+        
         let legID = `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
         let lagData = await this.getCheckOnce({
             "_id": legID,
@@ -533,12 +533,14 @@ export class ArrivalVehicleService {
         await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
 
         if (dktList && dktList.length > 0) {
+            
             const destDocket = dktList.filter((x) => x.Destination == this.storage.branch);
             const transDocket = dktList.filter((x) => x.Destination != this.storage.branch);
             /*below code execute for the update In delivery stock Update*/
             if (destDocket.length > 0) {
                 let eventJson = [];
-                const batchOperations =   this.processDockets(destDocket,getInvoice,{code:DocketStatus.In_Transhipment_Stock,name:DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " ")});
+                const stsMessage= `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`
+                const batchOperations =   this.processDockets(destDocket,getInvoice,{code:DocketStatus.In_Delivery_Stock,name:DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " ")},stsMessage);
                 // Bulk update database with the new costs
                  await this.updateBulk(batchOperations);
 
@@ -575,7 +577,8 @@ export class ArrivalVehicleService {
             /* below code is for the transhiment stock */
               let eventJson=[];
             if (transDocket.length > 0) {
-                const batchOperations =   this.processDockets(transDocket,getInvoice,{code:DocketStatus.In_Transhipment_Stock,name:DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " ")});
+                const stsMessage=  `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`
+                const batchOperations =   this.processDockets(transDocket,getInvoice,{code:DocketStatus.In_Transhipment_Stock,name:DocketStatus[DocketStatus.In_Transhipment_Stock].replace(/_/g, " ")},stsMessage);
                 // Bulk update database with the new costs
                     await this.updateBulk(batchOperations);
                     eventJson = transDocket.map(dkt => {
@@ -1020,7 +1023,7 @@ export class ArrivalVehicleService {
     }
     /*End*/
     /*procces Dockets for the destionation and instorck status update*/
-    processDockets(shipments,getInvoice,status) {
+    processDockets(shipments,getInvoice,status,stsmessage) {
         let batchOperations = [];
               /*below getInvoice varible is used for
                      the getting height weight vol for the calucation of  CFT*/
@@ -1056,7 +1059,7 @@ export class ArrivalVehicleService {
                         "sTS":status?.code,
                         "sTSNM":status?.name,
                         "sTSTM": new Date(),
-                        "oPSSTS": `In stock at ${this.storage.branch} and available for loadingsheet since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                        "oPSSTS":stsmessage,
                         "mODDT": new Date(),
                         "mODLOC": this.storage.branch,
                         "mODBY": this.storage.userName

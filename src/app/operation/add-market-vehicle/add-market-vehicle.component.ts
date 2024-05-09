@@ -12,6 +12,7 @@ import { marketVehicleControls } from 'src/assets/FormControls/market-vehicle';
 import Swal from 'sweetalert2';
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { VehicleService } from 'src/app/Utility/module/masters/vehicle-master/vehicle-master-service';
 @Component({
   selector: 'app-add-market-vehicle',
   templateUrl: './add-market-vehicle.component.html'
@@ -42,6 +43,7 @@ export class AddMarketVehicleComponent implements OnInit {
       private vehicleTypeService: VehicleTypeService,
       private generalService: GeneralService,
       private markerVehicleService: MarkerVehicleService,
+      private vehicleStatus:VehicleService,
       private objImageHandling: ImageHandling) {
 
     this.companyCode = this.storage.companyCode;
@@ -147,6 +149,16 @@ export class AddMarketVehicleComponent implements OnInit {
     this.marketVehicleTableForm.controls['margAMT'].setValue(total.toFixed(2));
   }
   async onVehicleNoChange() {
+    const isTransit=await this.vehicleStatus.getVehicleOne(this.marketVehicleTableForm.value.vehicelNo);
+    if (Object.keys(isTransit).length>0 && isTransit.status !== "Available") {
+      this.marketVehicleTableForm.controls['vehicelNo'].setValue('');
+      Swal.fire({
+        title: 'Alert',
+        text: 'Vehicle is already in transit',
+        icon: 'warning'
+    });
+      return false;
+  }
     const vehData = await this.markerVehicleService.GetVehicleData(this.marketVehicleTableForm.value.vehicelNo);
     if (vehData) {
       //this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP);
@@ -165,6 +177,10 @@ export class AddMarketVehicleComponent implements OnInit {
       this.marketVehicleTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
       this.marketVehicleTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
       this.marketVehicleTableForm.controls['ETA'].setValue(vehData.ETA ?? '');
+      this.marketVehicleTableForm.controls['vehicleSizeVol'].setValue(vehData.vOLCP ?? '');
+      this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP ?? '');
+      this.marketVehicleTableForm.controls['vehicleType'].setValue({name:vehData?.vEHTYP||"",value:vehData?.vEHTYPCD||""});
+      this.marketVehicleTableForm.markAllAsTouched();
       this.marketVehicleTableForm.controls['uploadSupport'].setValue(vehData.sDOC ?? '');
     }
   }

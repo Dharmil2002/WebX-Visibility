@@ -23,6 +23,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { VehicleTypeService } from "src/app/Utility/module/masters/vehicle-type/vehicle-type-service";
 import { AddMarketVehicleComponent } from "../add-market-vehicle/add-market-vehicle.component";
+import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -34,10 +35,12 @@ Currently, all flows are working together without proper separation.
   So, no need to worry about it for now.*/
 export class CreateLoadingSheetComponent implements OnInit {
   tableload = true;
+  isDisplay=false;
   addAndEditPath: string;
   uploadComponent: any;
   loadingSheetData: any;
   NavData: any;
+  isMarket: boolean = false;
   csvFileName: string; // Name of the CSV file, when data is downloaded. You can also use a function to generate filenames based on dateTime.
   dynamicControls = {
     add: false,
@@ -73,23 +76,23 @@ export class CreateLoadingSheetComponent implements OnInit {
   orgBranch: string = "";
   shipmentData: any;
   tableData: any[];
-  headerGroup = [ {
-      Name: "LegGroup",
-      Title: "",
-      class: "matcolumncenter",
-      ColSpan: 2,
-      sticky: true
-    },{
-      Name: "LoadedGroup",
-      Title: "Loaded",
-      class: "matcolumncenter",
-      ColSpan: 4
-    },{
-      Name: "TotalGroup",
-      Title: "Total",
-      class: "matcolumncenter",
-      ColSpan: 4
-    }
+  headerGroup = [{
+    Name: "LegGroup",
+    Title: "",
+    class: "matcolumncenter",
+    ColSpan: 2,
+    sticky: true
+  }, {
+    Name: "LoadedGroup",
+    Title: "Loaded",
+    class: "matcolumncenter",
+    ColSpan: 4
+  }, {
+    Name: "TotalGroup",
+    Title: "Total",
+    class: "matcolumncenter",
+    ColSpan: 4
+  }
   ];
   addNewTitle: string = "Add Market";
   columnHeader = {
@@ -110,7 +113,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       class: "matcolumnright",
       Style: "max-width:50px; min-width:50px"
     },
-    
+
     packages: {
       Title: "Packages",
       class: "matcolumnright",
@@ -118,7 +121,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       datatype: 'number',
       decimalPlaces: 0
     },
-   
+
     weightKg: {
       Title: "Weight (KG)",
       class: "matcolumnright",
@@ -126,7 +129,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       datatype: 'number',
       decimalPlaces: 0
     },
-    
+
     volumeCFT: {
       Title: "Volume (CFT)",
       class: "matcolumnright",
@@ -134,7 +137,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       datatype: 'number',
       decimalPlaces: 0
     },
-    
+
     // tCount: {
     //   Title: "Shipment",
     //   class: "matcolumnright",
@@ -162,7 +165,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     //   decimalPlaces: 0
     // }
   };
-  staticField = ["leg", "packages", "weightKg", "volumeCFT", "tCount","tPackages", "tWeightKg", "tVolumeCFT"];
+  staticField = ["leg", "packages", "weightKg", "volumeCFT", "tCount", "tPackages", "tWeightKg", "tVolumeCFT"];
   // Declaring CSV file's header as key and value pair
   headerForCsv = {
     RouteandSchedule: "Leg",
@@ -198,12 +201,12 @@ export class CreateLoadingSheetComponent implements OnInit {
   departFlag: boolean = false;
   alldocket: any;
   isUpdate: boolean = false;
-  vehicleSize:AutoComplete[];
-  products:AutoComplete[];
+  vehicleSize: AutoComplete[];
+  products: AutoComplete[];
   vehicleDetails: any;
+  MarketData: any;
   constructor(
     private Route: Router,
-    private _cnoteService: CnoteService,
     private _operationService: OperationService,
     private navigationService: NavigationService,
     private dialog: MatDialog,
@@ -212,13 +215,15 @@ export class CreateLoadingSheetComponent implements OnInit {
     private storage: StorageService,
     private generalService: GeneralService,
     private loadingSheetService: LoadingSheetService,
-    private vehicleTypeService: VehicleTypeService
+    private vehicleTypeService: VehicleTypeService,
+    private vehicleService:VehicleService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
-    this.userName = this.storage.userName;  
+    this.userName = this.storage.userName;
 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+      this.isDisplay=true;
       // Retrieve tripData and shippingData from the navigation state
       this.tripData =
         this.Route.getCurrentNavigation()?.extras?.state.data?.columnData ||
@@ -226,7 +231,6 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.shippingData =
         this.Route.getCurrentNavigation()?.extras?.state.shipping;
 
-        console.log(this.tripData);
       // Check if tripData meets the condition for navigation
       const routeMap = {
         "Depart Vehicle": "Operation/DepartVehicle",
@@ -239,6 +243,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.navigationService.navigateTo(route, this.tripData);
       }
       if (this.tripData.Action == "Update Trip") {
+        this.isDisplay=false;
         this.isUpdate = true;
       }
 
@@ -259,7 +264,6 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
     this.autoBindData();
   }
-
   async autoBindData() {
     // Set the value of 'vehicle' form control with tripData's VehicleNo or getloadingFormData's vehicle or an empty string
     //setFormControlValue(this.loadingSheetTableForm.controls['vehicle'], this.tripData?.VehicleNo, this.getloadingFormData?.vehicle, '');
@@ -328,7 +332,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.getshipmentData();
     }
   }
-
+  /*below function is for the inatalize a forGroup*/
   IntializeFormControl() {
     // Create an instance of loadingControl class
     const loadingControlFormControls = new loadingControl();
@@ -353,7 +357,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.jsonControlArray,
     ]);
   }
-
+  /*End*/
   ngOnInit(): void { }
 
   functionCallHandler($event) {
@@ -367,7 +371,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       console.log("failed");
     }
   }
-
+  /*when we check on checkbox that time that function would be called*/
   IsActiveFuntion($event) {
 
     // Assign the value of $event to the loadingData property
@@ -382,19 +386,19 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.getCapacity();
     }
   }
-
+  /*End*/
   // Function to retrieve shipment data
   async getshipmentData() {
 
     if (!this.isShipmentUpdate) {
       let routeDetail =
         this.tripData?.RouteandSchedule.split(":")[1].split("-");
-        routeDetail = routeDetail.map((str) =>
+      routeDetail = routeDetail.map((str) =>
         String.prototype.replace.call(str, " ", "")
       );
       // Update route details if shipment is not being updated
     }
-    
+
     let routeLocations = this.tripData?.RouteandSchedule.split(":")[1].split("-");
     const removeItemsBeforeX = (arr, x) => { const idx = arr.indexOf(x); return arr.slice(idx >= 0 ? idx : arr.length); };
 
@@ -434,8 +438,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       { field: 'selectedDkts', calculate: item => { return [] } },
     ];
 
-    let legs = nextLocs.map(x => { 
-      return { 
+    let legs = nextLocs.map(x => {
+      return {
         leg: `${orgn}-${x}`,
         routeLocs: [orgn, ...nextLocs],
         count: 0,
@@ -453,7 +457,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
     if (this.shipmentData && this.shipmentData.length > 0) {
       let aggData = aggregateData(this.shipmentData, gropuColumns, aggregationRules, fixedColumn, true);
-      
+
       let dockets = [];
       aggData = aggData.map((l: any) => {
         let docs = this.shipmentData.filter(f => f.curLoc == l.curLoc && f.destLoc == l.destLoc);
@@ -462,7 +466,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         return l;
       });
 
-      
+
 
       //Here i user cnoteDetails varible to used in updateDocketDetails() method
       //this._cnoteService.setShipingData(dockets);
@@ -477,14 +481,14 @@ export class CreateLoadingSheetComponent implements OnInit {
           });
         }
       });
-      
+
       let selectedDockets = groupedShipments.map((x) => x['items']?.filter((y) => y.isSelected = true).map((z) => z.dKTNO)).flat()
       groupedShipments.forEach(item => {
         item['selectedDkts'] = selectedDockets;
       });
-      
-      const tableData = legs.map((x) => { 
-          return groupedShipments.find((y) => y['leg'] == x.leg) || x;
+
+      const tableData = legs.map((x) => {
+        return groupedShipments.find((y) => y['leg'] == x.leg) || x;
       });
 
       if (tableData.length > 0) {
@@ -503,11 +507,10 @@ export class CreateLoadingSheetComponent implements OnInit {
     //this._cnoteService.setShipingData([]);
     // Perform cleanup, unsubscribe from observables, etc.
   }
-  isMarketVehicle(){
+  isMarketVehicle() {
     this.loadingSheetTableForm.controls['vendorType'].setValue("Market");
   }
   async loadingSheetGenerate() {
-    debugger
     const shipment = this.tableData.filter((x) => x.isSelected);
     if (shipment.length == 0) {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
@@ -516,9 +519,14 @@ export class CreateLoadingSheetComponent implements OnInit {
     const lsForm = this.loadingSheetTableForm.value;
     if (lsForm.vendorType == "Market" || !this.isUpdate) {
       try {
-        await this.loadingSheetService.marketVehicle(lsForm);
+        if (this.isMarket&&this.MarketData) {
+          const reqBody = await this.loadingSheetService.requestVehicle(this.MarketData)
+          await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
+        }
+        else{
+          await this.vehicleService.updateVehicleCap(this.loadingSheetTableForm.value);
+        }
       } catch (e) {
-        console.log(e);
       }
     }
     if (this.isUpdate && this.tripData.TripID) {
@@ -584,16 +592,15 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   updateLoadingData(event) {
     if (event) {
-         debugger;
       let selectedDockets = this.tableData.filter(x => x.leg != event[0].leg.trim())
-                            .map((x) => x['items']?.filter((y) => y.isSelected == true).map((z) => z.dKTNO)).flat();
+        .map((x) => x['items']?.filter((y) => y.isSelected == true).map((z) => z.dKTNO)).flat();
 
       let newSelected = event.filter((y) => y.isSelected = true).map((z) => z.dKTNO);
       selectedDockets = [... new Set([...selectedDockets, ...newSelected])];
 
       this.tableData.forEach(row => {
         if (row.leg.trim() === event[0].leg.trim()) {
-          const e = event.filter(f => f.isSelected == true );      
+          const e = event.filter(f => f.isSelected == true);
           row.items = e;
           row.count = e.length
           row.weightKg = e.reduce((acc, cur) => acc + cur.aCTWT, 0);
@@ -606,36 +613,38 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.getCapacity();
   }
 
-  async checkIsMarketVehicle(vehicleData){
-    const fieldName = ["vehicleType","Capacity","CapacityVolumeCFT"];
-    if(typeof(this.loadingSheetTableForm.controls['vehicle'].value)=="string" || vehicleData==undefined){
+  async checkIsMarketVehicle(vehicleData) {
+    const fieldName = ["vehicleType", "Capacity", "CapacityVolumeCFT"];
+    if (typeof (this.loadingSheetTableForm.controls['vehicle'].value) == "string" || vehicleData == undefined) {
       const res = await this.vehicleTypeService.getVehicleTypeList();
       const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
       this.jsonControlArray = this.jsonControlArray.map((x) => {
         if (fieldName.includes(x.name)) {
           x.disable = false
         }
-        if(fieldName.includes(x.name) && x.name=="vehicleType"){
-          x.type="Staticdropdown"
-          x.value=vehicleType
+        if (fieldName.includes(x.name) && x.name == "vehicleType") {
+          x.type = "Staticdropdown"
+          x.value = vehicleType
           x.disable = false
+
         }
         return x;
       });
     }
-  
+    
+
   }
-  checkVehicle(){
-    const fieldName = ["vehicleType","Capacity","CapacityVolumeCFT"];
-    const vehicleType=this.jsonControlArray.find((x)=>x.name=="vehicleType") ;
-    if(vehicleType.type=="Staticdropdown"
-     || this.loadingSheetTableForm.controls['vehicle'].value!=""
-     || this.loadingSheetTableForm.controls['vehicleType'].value!=""
-     ){
+  checkVehicle() {
+    const fieldName = ["vehicleType", "Capacity", "CapacityVolumeCFT"];
+    const vehicleType = this.jsonControlArray.find((x) => x.name == "vehicleType");
+    if (vehicleType.type == "Staticdropdown"
+      || this.loadingSheetTableForm.controls['vehicle'].value != ""
+      || this.loadingSheetTableForm.controls['vehicleType'].value != ""
+    ) {
       this.jsonControlArray.forEach((x) => {
         if (fieldName.includes(x.name)) {
           x.disable = true;  // Disable the control if fieldName includes x.name
-      
+
           if (x.name === "vehicleType") {
             x.type = "text";
             x.value = "";  // Set value to empty string if name is "vehicleType"
@@ -644,25 +653,25 @@ export class CreateLoadingSheetComponent implements OnInit {
           }
         }
       });
-    fieldName.forEach((x)=>{
-      this.loadingSheetTableForm.controls[x].setValue("");
-    })
-    this.filter.Filter(
-      this.jsonControlArray,
-      this.loadingSheetTableForm,
-      this.vehicleDetails,
-      this.vehicleNoControlName,
-      this.vehicleControlStatus
-    );
+      fieldName.forEach((x) => {
+        this.loadingSheetTableForm.controls[x].setValue("");
+      })
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.loadingSheetTableForm,
+        this.vehicleDetails,
+        this.vehicleNoControlName,
+        this.vehicleControlStatus
+      );
     }
-    
+
   }
   // get vehicleNo
   GetVehicleDropDown() {
     const vehRequest = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
-      filter: { 
+      filter: {
         D$or: [
           { vendorTypeCode: { D$in: [1, "1"] }, currentLocation: this.storage.branch },
           { vendorTypeCode: { D$nin: [1, "1"] } },
@@ -677,19 +686,19 @@ export class CreateLoadingSheetComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           let vehicleDetails = res.data.map((x) => {
-            return { 
+            return {
               name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
-              value: x.vehNo, 
+              value: x.vehNo,
               status: x.status
             };
           }).sort((a, b) => {
-              const statusComparison = a.status.localeCompare(b.status);
-              if (statusComparison !== 0) {
-                  return statusComparison;
-              }
-              return a.value.localeCompare(b.value);
+            const statusComparison = a.status.localeCompare(b.status);
+            if (statusComparison !== 0) {
+              return statusComparison;
+            }
+            return a.value.localeCompare(b.value);
           });
-          this.vehicleDetails=vehicleDetails;
+          this.vehicleDetails = vehicleDetails;
           this.filter.Filter(
             this.jsonControlArray,
             this.loadingSheetTableForm,
@@ -700,7 +709,6 @@ export class CreateLoadingSheetComponent implements OnInit {
         }
       });
   }
-
   //Add tripData
   async addTripData() {
     if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
@@ -773,7 +781,6 @@ export class CreateLoadingSheetComponent implements OnInit {
       // Handle the result after the dialog is closed
     });
   }
-
   async updateDocketDetails(docket, lsNo) {
     let loadingSheetData = {
       lsNo: lsNo
@@ -854,22 +861,25 @@ export class CreateLoadingSheetComponent implements OnInit {
       },
     });
   }
+
   async loadVehicleDetails() {
     try {
+      this.checkVehicle();
       const vehControl = this.loadingSheetTableForm.controls["vehicle"];
-      if(!this.isUpdate && vehControl.value.status != "Available") {
+      if (!this.isUpdate && vehControl.value.status != "Available") {
         vehControl.setValue("");
         return;
       }
       const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
-      if(vehicleData){
-      this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
-      this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
-      this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData.vendorType);
-      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
-      this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
+      if (vehicleData) {
+        this.isMarket=false;
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
+        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
+        this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData?.vendorType||"Market");
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
       }
-      else{
+      else {
         this.checkIsMarketVehicle(vehicleData);
       }
     } catch (error) {
@@ -1017,17 +1027,35 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
 
- //#region addMarket vehicle
- addMarket(){
-  const dialogref = this.dialog.open(AddMarketVehicleComponent, {
-    data: "ltl",
-  });
-  dialogref.afterClosed().subscribe((result) => {
-    console.log(result)
-    if(result){
-      this.isMarket= this.
+  //#region addMarket vehicle
+  addMarket() {
+    const dialogref = this.dialog.open(AddMarketVehicleComponent, {
+      data: "ltl",
+    });
+    dialogref.afterClosed().subscribe((result) => {
+      console.log(result)
+      if (result) {
+        this.isMarket = true;
+        this.MarketData=result;
+        this.autoBindMarketVehicleData(result);
+      }
+      else{
+        this.isMarket = false;
+        this.MarketData=null;
+      }
+    });
+  }
+  //#endregion
+  //#region bind Vehicle Data if it is market 
+  autoBindMarketVehicleData(result) {
+    if (result) {
+      this.loadingSheetTableForm.controls['vehicle'].setValue({name:result?.vehicelNo||"",value:result?.vehicelNo||""});
+      this.loadingSheetTableForm.controls['vehicleType'].setValue(result.vehicleType.name);
+      this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(result.vehicleType.value);
+      this.loadingSheetTableForm.controls['vendorType'].setValue("Market");
+      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(result.vehicleSizeVol);
+      this.loadingSheetTableForm.controls['Capacity'].setValue(result.vehicleSize);
     }
-  });
- }
-
+  }
+  //#end region
 }

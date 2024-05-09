@@ -21,20 +21,13 @@ export class loadingControl {
                 placeholder: '',
                 type: 'dropdown',
                 value: '',
-                Validations: [
-                    {
-                        name: 'required',
-                        message: 'Vehicle is required'
-                    }
-                ],
+                Validations: [],
                 generatecontrol: true,
                 additionalData: {
                     showNameAndValue: false
                 },
                 functions: {
-                    onModel: 'checkVehicle',
-                    onOptionSelect: 'loadVehicleDetails',
-                    onChange:'checkIsMarketVehicle'
+                    onOptionSelect: 'loadVehicleDetails'
                 },
                 disable: false
             },

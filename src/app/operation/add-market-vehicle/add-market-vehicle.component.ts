@@ -41,9 +41,8 @@ export class AddMarketVehicleComponent implements OnInit {
       private filter: FilterUtils,
       private storage: StorageService,
       private vehicleTypeService: VehicleTypeService,
-      private generalService: GeneralService,
       private markerVehicleService: MarkerVehicleService,
-      private vehicleStatus:VehicleService,
+      private vehicleStatus: VehicleService,
       private objImageHandling: ImageHandling) {
 
     this.companyCode = this.storage.companyCode;
@@ -64,6 +63,9 @@ export class AddMarketVehicleComponent implements OnInit {
       this.getVehicleType();
     }
     else {
+      this.marketVehicleTableForm.controls['vehicleType'].clearValidators()
+      this.marketVehicleTableForm.controls['vehicleType'].updateValueAndValidity();
+      this.jsonControlVehicleArray = this.jsonControlVehicleArray.filter((x) => x.name != "vehicleType");
       this.marketVehicleTableForm.controls['vehicleSizeVol'].clearValidators()
       this.marketVehicleTableForm.controls['vehicleSizeVol'].updateValueAndValidity();
       this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize || this.prqDetail?.containerSize || "")
@@ -127,9 +129,9 @@ export class AddMarketVehicleComponent implements OnInit {
       mRGAMT: this.marketVehicleTableForm.value.margAMT,
       rDPRT: this.marketVehicleTableForm.value.roadPrt,
       sDOC: uploadSupport,
-      eNTDT:new Date(),
+      eNTDT: new Date(),
       eNTBY: this.storage.userName,
-      
+
     };
     const res = await this.markerVehicleService.SaveVehicleData(data);
     if (res) {
@@ -149,16 +151,16 @@ export class AddMarketVehicleComponent implements OnInit {
     this.marketVehicleTableForm.controls['margAMT'].setValue(total.toFixed(2));
   }
   async onVehicleNoChange() {
-    const isTransit=await this.vehicleStatus.getVehicleOne(this.marketVehicleTableForm.value.vehicelNo);
-    if (Object.keys(isTransit).length>0 && isTransit.status !== "Available") {
+    const isTransit = await this.vehicleStatus.getVehicleOne(this.marketVehicleTableForm.value.vehicelNo);
+    if (Object.keys(isTransit).length > 0 && isTransit.status !== "Available") {
       this.marketVehicleTableForm.controls['vehicelNo'].setValue('');
       Swal.fire({
         title: 'Alert',
         text: 'Vehicle is already in transit',
         icon: 'warning'
-    });
+      });
       return false;
-  }
+    }
     const vehData = await this.markerVehicleService.GetVehicleData(this.marketVehicleTableForm.value.vehicelNo);
     if (vehData) {
       //this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP);
@@ -179,7 +181,7 @@ export class AddMarketVehicleComponent implements OnInit {
       this.marketVehicleTableForm.controls['ETA'].setValue(vehData.ETA ?? '');
       this.marketVehicleTableForm.controls['vehicleSizeVol'].setValue(vehData.vOLCP ?? '');
       this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP ?? '');
-      this.marketVehicleTableForm.controls['vehicleType'].setValue({name:vehData?.vEHTYP||"",value:vehData?.vEHTYPCD||""});
+      this.marketVehicleTableForm.controls['vehicleType'].setValue({ name: vehData?.vEHTYP || "", value: vehData?.vEHTYPCD || "" });
       this.marketVehicleTableForm.markAllAsTouched();
       this.marketVehicleTableForm.controls['uploadSupport'].setValue(vehData.sDOC ?? '');
     }

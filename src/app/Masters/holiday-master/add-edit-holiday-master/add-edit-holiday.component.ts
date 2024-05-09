@@ -272,7 +272,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
   }
 
   async SaveDateWise() {
-    const holidayDateData = moment(this.holidayDateWiseForm.controls.holidayDate.value).endOf('day').format('YYYY-MM-DD');
+    const holidayDateData = moment(this.holidayDateWiseForm.controls.holidayDate.value).endOf('day').format("DD MMM YYYY");
     const holidayNote = this.holidayDateWiseForm.value.holidayNote;
 
     // Get the first 2 letters of the holidayNote and convert them to uppercase

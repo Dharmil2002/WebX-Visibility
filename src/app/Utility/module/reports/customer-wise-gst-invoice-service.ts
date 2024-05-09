@@ -214,7 +214,7 @@ export class CustGSTInvoiceService {
                     return {
                          ...item,
                          PayBasis: payBasisName,
-                         BILLDT: moment(item.BILLDT).format('YYYY-MM-DD'),
+                         BILLDT: moment(item.BILLDT).format("DD MMM YY"),
                          ExchangeRate: "1",
                          CurrencyAmount: "0",
                          TDSRate: "0",

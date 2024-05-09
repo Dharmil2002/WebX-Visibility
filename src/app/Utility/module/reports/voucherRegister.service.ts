@@ -222,9 +222,9 @@ export class voucherRegService {
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
           // Format the date using moment
           res.data.forEach(item => {
-               item.vDt = item.vDt ? moment(item.vDt).format('YYYY-MM-DD') : "";
-               item.EDT = item.EDT ? moment(item.EDT).format('YYYY-MM-DD') : "";
-               item.CUDate = item.CUDate ? moment(item.CUDate).format('YYYY-MM-DD') : ""
+               item.vDt = item.vDt ? moment(item.vDt).format('DD MMM YY') : "";
+               item.EDT = item.EDT ? moment(item.EDT).format('DD MMM YY') : "";
+               item.CUDate = item.CUDate ? moment(item.CUDate).format('DD MMM YY') : ""
           });
           return res.data;
 

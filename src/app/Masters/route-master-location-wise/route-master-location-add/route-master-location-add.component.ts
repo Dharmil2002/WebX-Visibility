@@ -312,7 +312,15 @@ export class RouteMasterLocationAddComponent implements OnInit {
 
   //#region 
   async save() {
-    
+    if(this.tableData.length<=1){ 
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Please add atleast one Leg to the Route.",
+        showConfirmButton: true,
+      });
+      return false;
+    }
     const lastRt = await this.getListId();    
     const lastCode = lastRt?.routeId || "R0000";
     if (this.isUpdate) {

@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
   selector: "app-view-print",
   templateUrl: "./view-print.component.html",
 })
+
 export class ViewPrintComponent implements OnInit {
   breadScrums = [
     {
@@ -191,7 +192,7 @@ export class ViewPrintComponent implements OnInit {
         partyCode: "CUST00029",
         viewName: "Voucher",
       },
-    ];
+    ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {
       templateName: FindBillView?.viewName || viewType.name,

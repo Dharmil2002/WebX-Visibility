@@ -304,15 +304,16 @@ export class CnoteBillMRService {
                }
                return acc;
           }, []);
+          let dateFormat = "DD MMM YY";
           uniqueResults.forEach(item => {
-               item.bILLDT = item.bILLDT ? moment(item.bILLDT).format('YYYY-MM-DD') : "";
-               item.bILLSUBDT = item.bILLSUBDT ? moment(item.bILLSUBDT).format('YYYY-MM-DD') : "";
-               item.bILLCOLLECTDT = item.bILLCOLLECTDT ? moment(item.bILLCOLLECTDT).format('YYYY-MM-DD') : "";
-               item.cNOTEDT = item.cNOTEDT ? moment(item.cNOTEDT).format('YYYY-MM-DD') : "";
+               item.bILLDT = item.bILLDT ? moment(item.bILLDT).format(dateFormat) : "";
+               item.bILLSUBDT = item.bILLSUBDT ? moment(item.bILLSUBDT).format(dateFormat) : "";
+               item.bILLCOLLECTDT = item.bILLCOLLECTDT ? moment(item.bILLCOLLECTDT).format(dateFormat) : "";
+               item.cNOTEDT = item.cNOTEDT ? moment(item.cNOTEDT).format(dateFormat) : "";
                item.tIME = item.tIME ? moment(item.tIME).format('HH:mm') : "";
-               item.mRDT = item.mRDT ? moment(item.mRDT).format('YYYY-MM-DD') : "";
-               item.cNOTEEDITDT = item.cNOTEEDITDT ? moment(item.cNOTEEDITDT).format('YYYY-MM-DD') : "";
-               item.iNVDT = item.iNVDT ? moment(item.iNVDT).format('YYYY-MM-DD') : "";
+               item.mRDT = item.mRDT ? moment(item.mRDT).format(dateFormat) : "";
+               item.cNOTEEDITDT = item.cNOTEEDITDT ? moment(item.cNOTEEDITDT).format(dateFormat) : "";
+               item.iNVDT = item.iNVDT ? moment(item.iNVDT).format(dateFormat) : "";
           });
           return uniqueResults;
      }

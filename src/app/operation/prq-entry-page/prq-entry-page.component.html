@@ -10,8 +10,7 @@
     (click)="InvockedContract()" color="primary">
     Invoked
 </button>
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
-
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">    
     <form [formGroup]="prqEntryTableForm">
         <app-form-webxpress [form]="prqEntryTableForm" [FormTitle]="'PRQ Form'" [formData]="jsonControlPrqArray"
             [showSaveAndCancelButton]="iSShow" (callFunction)="functionCallHandler($event)"

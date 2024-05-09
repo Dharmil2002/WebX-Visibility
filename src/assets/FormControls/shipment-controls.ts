@@ -5,27 +5,10 @@ export class ShipmentEditControls {
     constructor() {
         this.shipmentEditControlArray = [
             {
-                name: 'actualWeight',
-                label: 'Weight(Kg)',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Weight is Required"
-                    }
-                ],
-                functions:{
-                    onChange:"getValidate"
-                },
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'noofPkts',
                 label: 'Package',
                 placeholder: '',
-                type: 'text',
+                type: 'number',
                 value: '',
                 Validations: [
                     {
@@ -42,7 +25,50 @@ export class ShipmentEditControls {
                 disable: false
             },
             {
+                name: 'actualWeight',
+                label: 'Actual Weight(Kg)',
+                placeholder: '',
+                type: 'number',
+                value: '',
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Weight is Required"
+                    }
+                ],
+                functions:{
+                    onChange:"getValidate"
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'ctWeight',
+                label: 'Charge Weight(Kg)',
+                placeholder: '',
+                type: 'number',
+                value: '',
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Weight is Required"
+                    }
+                ],
+                functions:{
+                    onChange:"getValidate"
+                },
+                generatecontrol: true, disable: false
+            },            
+            {
                 name: 'shipment',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '',
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'suffix',
                 label: '',
                 placeholder: '',
                 type: '',

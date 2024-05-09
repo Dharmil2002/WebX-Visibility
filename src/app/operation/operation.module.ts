@@ -75,6 +75,8 @@ import { ViewTrackingPopupComponent } from './consignmentTracking/view-tracking-
 import { ConsignmentLTLEntryFormComponent } from './consignment-ltl-entry-form/consignment-ltl-entry-form.component';
 import { ConsignmentChargesComponent } from './consignment-ltl-entry-form/consignment-charges/consignment-charges.component';
 import { ConsignmentOtherInfoComponent } from './consignment-ltl-entry-form/consignment-other-info/consignment-other-info.component';
+import { EditShipmentDetailsComponent } from "./vehicle-update-upload/edit-shipment-details/edit-shipment-details.component";
+import { PrqTrackingComponent } from './prq-tracking/prq-tracking.component';
 
 @NgModule({
   declarations: [
@@ -132,7 +134,9 @@ import { ConsignmentOtherInfoComponent } from './consignment-ltl-entry-form/cons
     ViewTrackingPopupComponent,
     ConsignmentLTLEntryFormComponent,
     ConsignmentChargesComponent,
-    ConsignmentOtherInfoComponent
+    ConsignmentOtherInfoComponent,
+    EditShipmentDetailsComponent,
+    PrqTrackingComponent
   ],
   imports: [
     CommonModule,

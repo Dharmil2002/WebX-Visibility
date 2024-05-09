@@ -123,9 +123,14 @@ export class ProductChargesComponent implements OnInit {
     );
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-
+    this.customerTableForm.controls["Add_Deduct"].setValue(
+      "+"
+    );
+    this.customerTableForm.controls["Variability"].setValue(
+      "N"
+    );
     if (this.isUpdate) {
-      console.log(this.UpdatedData);
+
       // this.customerTableForm.controls.Add_Deduct.set
       this.customerTableForm.controls["Add_Deduct"].setValue(
         this.UpdatedData.aDD_DEDU
@@ -235,7 +240,6 @@ export class ProductChargesComponent implements OnInit {
     }
   }
   async getLedger() {
-    console.log("ok")
     let req = {
       companyCode: this.companyCode,
       filter: { iSSYS: true },
@@ -244,7 +248,7 @@ export class ProductChargesComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-      console.log('Res' ,Res)
+
     if (Res.success && Res.data.length > 0) {
       const LedgerData = Res.data.map((x) => {
         return {
@@ -302,8 +306,8 @@ export class ProductChargesComponent implements OnInit {
     const Body = {
       sELCHA: this.customerTableForm.value.SelectCharges.name,
       cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
-      aCCD:this.customerTableForm.value.Ledger.value || "",
-      aCNM:this.customerTableForm.value.Ledger.name || "",
+      aCCD: this.customerTableForm.value.Ledger?.value || "",
+      aCNM: this.customerTableForm.value.Ledger?.name || "",
       cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
       vAR: this.customerTableForm.value.Variability,
       aDD_DEDU: this.customerTableForm.value.Add_Deduct,
@@ -320,13 +324,12 @@ export class ProductChargesComponent implements OnInit {
       mODLOC: this.storage.branch,
       mODBY: this.storage.userName,
     };
-    console.log(Body);
 
     if (!this.isUpdate) {
       Body["cHACD"] = this.customerTableForm.value.ChargesCode;
       Body[
         "_id"
-      ] = `${this.companyCode}-${this.ProductId}-${this.customerTableForm.value.ChargesCode}`;
+      ] = `${this.companyCode}-${this.ProductId}-${this.selectedValue}-${this.customerTableForm.value.ChargesCode}`;
       Body["cID"] = this.companyCode;
       Body["pRNM"] = this.ProductName;
       Body["pRCD"] = this.ProductId;
@@ -342,11 +345,11 @@ export class ProductChargesComponent implements OnInit {
 
     const res = this.isUpdate
       ? await firstValueFrom(
-          this.masterService.masterPut("generic/update", req)
-        )
+        this.masterService.masterPut("generic/update", req)
+      )
       : await firstValueFrom(
-          this.masterService.masterPost("generic/create", req)
-        );
+        this.masterService.masterPost("generic/create", req)
+      );
     if (res?.success) {
       this.GetTableData();
       this.Tabletab = !this.Tabletab;
@@ -385,7 +388,7 @@ export class ProductChargesComponent implements OnInit {
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;
-    console.log('functionName' ,functionName)
+    console.log('functionName', functionName)
     try {
       this[functionName]($event);
     } catch (error) {
@@ -478,9 +481,9 @@ export class ProductChargesComponent implements OnInit {
       { name: "ON Delivery MR", value: "DeliveryMR" },
     ];
 
-    const updatedValue = this.UpdatedData.cHAPP;
-    if (this.isUpdate && updatedValue) {
-      console.log(updatedValue);
+    if (this.isUpdate && this.UpdatedData?.cHAPP) {
+      const updatedValue = this.UpdatedData.cHAPP;
+
       // Assuming updatedValue is an array
       const selectedChargeApplicables = chargeApplicablelist.filter((x) =>
         updatedValue.includes(x.value)

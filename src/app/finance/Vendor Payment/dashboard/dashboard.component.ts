@@ -7,8 +7,9 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
-  Transactions: any;
-  TransactionsMore: any;
+  TransactionsSecond: any;
+  TransactionsFirst: any;
+  TransactionsThird: any;
   OnlinePaymentApprovals: any;
   jsonUrl = '../../../assets/data/dashboard-data.json'
   breadscrums = [
@@ -19,9 +20,10 @@ export class DashboardComponent implements OnInit {
     }
   ]
   constructor(private http: HttpClient, private router: Router,) {
-    this.Transactions = Transactions;
+    this.TransactionsFirst = TransactionsFirst;
     this.OnlinePaymentApprovals = OnlinePaymentApprovals;
-    this.TransactionsMore = TransactionsMore;
+    this.TransactionsSecond = TransactionsSecond;
+    this.TransactionsThird = TransactionsThird;
   }
 
   ngOnInit(): void {
@@ -45,12 +47,15 @@ export class DashboardComponent implements OnInit {
     if (event.data.id == 7) {
       this.router.navigate(['/Finance/VendorPayment/VendorBillPayment']);
     }
+    if (event.data.id == 9) {
+      this.router.navigate(['/Finance/VendorBillGeneration/Criteria']);
+    }
   }
 
 }
 
 
-const Transactions = {
+const TransactionsFirst = {
   Title: "Transactions",
   Items: [
     {
@@ -71,7 +76,7 @@ const Transactions = {
 
   ],
 };
-const TransactionsMore = {
+const TransactionsSecond = {
   Items: [
     {
       id: 4,
@@ -86,6 +91,15 @@ const TransactionsMore = {
     {
       id: 6,
       title: "Payment Against Trips",
+      class: "info-box7 bg-c-Daisy-light order-info-box7",
+    },
+  ],
+};
+const TransactionsThird = {
+  Items: [
+    {
+      id: 9,
+      title: "Vendor Bill - General",
       class: "info-box7 bg-c-Daisy-light order-info-box7",
     },
   ],

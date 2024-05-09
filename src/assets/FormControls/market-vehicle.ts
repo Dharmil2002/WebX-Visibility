@@ -36,6 +36,27 @@ export class marketVehicleControls {
         ],
       },
       {
+        name: 'vehicleType',
+        label: "Vehicle Type",
+        placeholder: "Select Vehicle Type",
+        type: 'dropdown',
+        value:"",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+            {
+                name: "required",
+                message: "Vehicle Type is required"
+            },
+            {
+                name: "autocomplete",
+            }
+        ],
+        additionalData: {
+            showNameAndValue: false
+        },
+    },
+      {
         name: "vehicleSize",
         label: "Vehicle Capacity(MT)",
         placeholder: "Vehicle Size",
@@ -55,6 +76,35 @@ export class marketVehicleControls {
           {
             name: "required",
             message: "Vehicle Capacity is required",
+          },
+        ],
+        functions: {
+          onSelection: "checkVehicleSize"
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "vehicleSizeVol",
+        label: "Capacity Vol [CFT]",
+        placeholder: "Vehicle Size",
+        type: "text",
+        value: [
+          // { value: "1", name: "1-MT" },
+          // { value: "9", name: "9-MT" },
+          // { value: "16", name: "16-MT" },
+          // { value: "32", name: "32-MT" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Capacity Vol is required",
           },
         ],
         functions: {
@@ -289,7 +339,7 @@ export class marketVehicleControls {
         label: 'Entry Date',
         placeholder: 'Entry Date',
         type: 'text',
-        value: new Date().toUTCString(),
+        value: new Date(),
         Validations: [],
         generatecontrol: false, disable: false
       },

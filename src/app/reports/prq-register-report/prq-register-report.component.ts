@@ -6,9 +6,10 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { PrqReportControl } from 'src/assets/FormControls/Reports/prq-register/prq-register';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { exportAsExcelFile, prqreportService } from 'src/app/Utility/module/reports/prq-register-service';
+import { prqreportService } from 'src/app/Utility/module/reports/prq-register-service';
 import Swal from 'sweetalert2';
 import { timeString } from 'src/app/Utility/date/date-utils';
+import { ExportService } from 'src/app/Utility/module/export.service';
 @Component({
   selector: 'app-prq-register-report',
   templateUrl: './prq-register-report.component.html'
@@ -40,7 +41,8 @@ export class PrqRegisterReportComponent implements OnInit {
     private storage: StorageService,
     private masterServices: MasterService,
     private filter: FilterUtils,
-    private prqreportservice: prqreportService
+    private prqreportservice: prqreportService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl()
   }
@@ -62,7 +64,7 @@ export class PrqRegisterReportComponent implements OnInit {
     "prqNo": "PRQ Number",
     "prqDt": "PRQ Date",
     "PickDtTime": "Pick Up Date & Time",
-    "prqStatus":"PRQ Status",
+    "prqStatus": "PRQ Status",
     "BillParty": "Billing Party Name & Code",
     "from": "From",
     "to": "To",
@@ -151,7 +153,7 @@ export class PrqRegisterReportComponent implements OnInit {
       return;
     }
     // Assuming exportAsExcelFile is a function that exports data to Excel
-    exportAsExcelFile(data, `PRQ_Register_Report-${timeString}`, this.CSVHeader);
+    this.exportService.exportAsCSV(data, `PRQ_Register_Report-${timeString}`, this.CSVHeader);
   }
 
   toggleSelectAll(argData: any) {

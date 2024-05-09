@@ -15,7 +15,7 @@ import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { vendOutControl } from 'src/assets/FormControls/Reports/Vendor-Outstanding-report/vendor-outstanding-report';
 import moment from 'moment';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
+import { ExportService } from 'src/app/Utility/module/export.service';
 
 @Component({
   selector: 'app-vendor-outstanding-report',
@@ -58,6 +58,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     private vendorWiseOutService: VendorWiseOutService,
     private generalService: GeneralService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl()
   }
@@ -137,7 +138,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     "jVAmt": "JV Amount",
     "paidAdvanceAmount": "Paid Advance Amount",
     "ledgerBalance": "Ledger Balance",
-    "msme":"MSME Registered",
+    "msme": "MSME Registered",
   }
 
   async getDropDownList() {
@@ -236,8 +237,8 @@ export class VendorOutstandingReportComponent implements OnInit {
         const vendData = Array.isArray(this.VendWiseOutTableForm.value.vendnmcdHandler)
           ? this.VendWiseOutTableForm.value.vendnmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
           : [];
-        const msme = this.VendWiseOutTableForm.value?.msmeRegistered||false;
-        const data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(msme,asonDate, startValue, endValue, locData, vendData, reportbasis);
+        const msme = this.VendWiseOutTableForm.value?.msmeRegistered || false;
+        const data = await this.vendorWiseOutService.getvendorWiseOutReportDetail(msme, asonDate, startValue, endValue, locData, vendData, reportbasis);
 
         if (data.length === 0) {
           if (data) {
@@ -255,7 +256,7 @@ export class VendorOutstandingReportComponent implements OnInit {
           Swal.close();
         }, 1000);
         // Assuming exportAsExcelFile is a function that exports data to Excel
-        exportAsExcelFile(data, `Vendor_Wise_Outstanding_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(data, `Vendor_Wise_Outstanding_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

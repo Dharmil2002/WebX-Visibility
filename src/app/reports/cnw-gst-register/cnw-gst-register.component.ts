@@ -8,7 +8,7 @@ import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.s
 import { cNoteGSTControl } from 'src/assets/FormControls/CNote-GST-Wise-Register-report/cnote-gst-wise-register';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
-import { CnwGstService, convertToCSV, exportAsExcelFile } from 'src/app/Utility/module/reports/cnw.gst.service';
+import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import Swal from 'sweetalert2';

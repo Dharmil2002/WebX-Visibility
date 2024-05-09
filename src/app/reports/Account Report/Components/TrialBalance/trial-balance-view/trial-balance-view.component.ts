@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { map } from 'rxjs/operators';
-import { exportAsExcelFile, exportAsExcelFileV2 } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { Router } from '@angular/router';
 import { GetCSVDataBasedOnReportType, GetCSVHeadersBasedOnReportType, GetHTMLBasedOnReportType } from '../TrialBalanceUtitlity';
+import { ExportService } from 'src/app/Utility/module/export.service';
 
 @Component({
   selector: 'app-trial-balance-view',
@@ -21,7 +21,8 @@ export class TrialBalanceViewComponent implements OnInit {
     name: "Download",
     iconName: "download",
   };
-  constructor(private accountReportService: AccountReportService, private router: Router,) {
+  constructor(private accountReportService: AccountReportService,
+    private router: Router, private exportService: ExportService) {
 
   }
 
@@ -146,7 +147,7 @@ export class TrialBalanceViewComponent implements OnInit {
   Download() {
     const CSVHeader: any = GetCSVHeadersBasedOnReportType(this.RequestBody.ReportType)
     const Result: any = GetCSVDataBasedOnReportType(this.RequestBody.ReportType, this.JsonData);
-    exportAsExcelFile(Result, `TrialBalance_Report-${timeString}`, CSVHeader);
+    this.exportService.exportAsCSV(Result, `TrialBalance_Report-${timeString}`, CSVHeader);
   }
 
 

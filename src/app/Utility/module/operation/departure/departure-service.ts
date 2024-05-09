@@ -41,8 +41,8 @@ export class DepartureService {
         RouteandSchedule: `${element.rUTCD}:${element.rUTNM}`, // Concatenating route code and name
         VehicleNo: element?.vEHNO || "", // Accessing vehicle number
         TripID: element?.tHC || "", // Matching THC record based on route code
-        Scheduled: formatDocketDate(new Date().toISOString()), // Formatting current date as scheduled date
-        Expected: formatDocketDate(new Date(new Date().getTime() + 10 * 60000).toISOString()), // Formatting expected date (10 mins from now)
+        Scheduled: new Date().toISOString(), // Formatting current date as scheduled date
+        Expected:new Date(new Date().getTime() + 10 * 60000).toISOString(), // Formatting expected date (10 mins from now)
         Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2), // Calculating the time difference in hours
         status:element.sTS,
         Action: this.statusActions[`${element.sTS}`], // Deciding action based on THC availability
@@ -104,7 +104,7 @@ export class DepartureService {
         "fINST": 0,
         "fINSTNM": "",
         "cONTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
-        "aDVPENAMT": 0,
+        "aDVPENAMT":ConvertToNumber(data?.TotalAdv || 0, 2),
         "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
         "cAP": {
           "wT": data?.Capacity || 0,
@@ -127,8 +127,8 @@ export class DepartureService {
           "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
         },
         "bALAMT": data?.BalanceAmt || 0,
-        "aDPAYAT": "",
-        "bLPAYAT": "",
+        "aDPAYAT":data?.advPdAt?.value||"",
+        "bLPAYAT": data?.balAmtAt?.value||"",
         "iSBILLED": false,
         "bILLNO": "",
         "dRV": {

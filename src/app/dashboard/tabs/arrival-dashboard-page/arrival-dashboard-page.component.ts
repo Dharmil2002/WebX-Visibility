@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { firstValueFrom } from 'rxjs';
 import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
+import { da } from 'date-fns/locale';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -63,24 +64,28 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       Title: "Route",
       class: "matcolumnleft",
       Style: "min-width:200px",
-      sticky: true
+      sticky: true,
+      datatype: 'string'
     },
     VehicleNo: {
       Title: "Veh No",
       class: "matcolumnleft",
       Style: "min-width:100px",
-      sticky: true
+      sticky: true,
+      datatype: 'string'
     },
     TripID: {
       Title: "Trip ID",
       class: "matcolumnleft",
       Style: "min-width:120px",
-      sticky: true
+      sticky: true,
+      datatype: 'string'
     },
     Location: {
       Title: "Location",
       class: "matcolumncenter",
-      Style: "min-width:100px"
+      Style: "min-width:100px",
+      datatype: 'string'
     },
     Scheduled: {
       Title: "STA",
@@ -99,11 +104,11 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       class: "matcolumnleft",
       Style: "min-width:100px"
     },
-    Hrs: {
-      Title: "Hrs.",
-      class: "matcolumnright",
-      Style: "min-width:100px"
-    },
+    // Hrs: {
+    //   Title: "Hrs.",
+    //   class: "matcolumnright",
+    //   Style: "min-width:100px"
+    // },
     Action: {
       Title: "Action",
       class: "matcolumnleft",
@@ -121,7 +126,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     // "Hrs": "Hrs.",
     // "Action": "Action"
   }
-  staticField = ["Route","VehicleNo","TripID","Location","Scheduled","Expected","Status","Hrs"]
+  staticField = ["Route","VehicleNo","TripID","Location","Scheduled","Expected","Status"] //,"Hrs"
 
   METADATA = {
     checkBoxRequired: true,
@@ -280,30 +285,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         this._operation.setShipmentStatus(shipmentStatus);
   }
   updateDepartureData(event) {
-    
     this.tableload=true
     this.getArrivalDetails()
-    const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
-    const action = result?.Action ?? '';
-    if (action) {
-      this.arrivalTableData = event;
-    }
-    else {
-      this.CnoteService.setDeparture(event)
-      if (event) {
-        this.arrivalTableData = this.arrivalTableData.filter((x) => x.TripID != event.tripID);
-        /*Here Function is Declare for get Latest arrival Data*/
-        let arrivalData = {
-          arrivalData: this.arrivalTableData,
-          packagesData: this.data?.packagesData || "",
-          shippingData: this.data?.shippingData || ""
-        }
-        this.CnoteService.setVehicleArrivalData(arrivalData);
-        /*End*/
-      }
-
-    }
-    this.tableload=false;
   }
   handleMenuItemClick(label: string, element) {
     

@@ -29,7 +29,7 @@ export class ConsignmentControl {
           message:  `${docCalledAs.Docket}No required`,
         }], generatecontrol: true, disable: true,
         functions: {
-          onChange: "docketValidation",
+        onChange: "docketValidation",
       },
       
         additionalData: {
@@ -170,7 +170,7 @@ export class ConsignmentControl {
           onOptionSelect: 'getLocBasedOnCity'
         },
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },
@@ -236,7 +236,7 @@ export class ConsignmentControl {
           onOptionSelect: 'getLocBasedOnCity'
         },
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },
@@ -694,6 +694,18 @@ export class ConsignmentControl {
         placeholder: '',
         type: '',
         value: docketDetail.tran_hour,
+        Validations: [],
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
+      },
+      {
+        name: 'contract',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: docketDetail.contract,
         Validations: [],
         generatecontrol: false, disable: false,
         additionalData: {
@@ -1245,13 +1257,13 @@ export class FreightControl {
       },
       {
         name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'mobile-number',
-        value: docketDetail.otherAmount, Validations: [], generatecontrol: true, functions: {
+        value: docketDetail?.otherAmount||0.00, Validations: [], generatecontrol: true, functions: {
           onChange: "calculateFreight"
         }, disable: false
       },
       {
         name: 'grossAmount', label: 'Gross Amount (₹)', placeholder: 'Gross Amount', type: 'mobile-number',
-        value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: true,
+        value: docketDetail?.grossAmount||0.00, Validations: [], generatecontrol: true, disable: true,
         functions: {
           onChange: "calculateFreight"
         },

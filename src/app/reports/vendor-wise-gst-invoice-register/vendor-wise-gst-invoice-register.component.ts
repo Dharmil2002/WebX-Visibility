@@ -5,8 +5,9 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
-import { VendorGSTInvoiceService, exportAsExcelFile } from 'src/app/Utility/module/reports/vendor-gst-invoice';
+import { VendorGSTInvoiceService } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { vendorWiseGSTControl } from 'src/assets/FormControls/Vendor-Wise-GST-Register-Report/vendor-wise-gst-register';
@@ -51,7 +52,8 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private vendorGSTInvoiceService: VendorGSTInvoiceService,
-    private objStateService: StateService
+    private objStateService: StateService,
+    private exportService: ExportService
 
   ) {
     this.initializeFormControl()
@@ -228,7 +230,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
 
     const startValue = moment(startDate).startOf('day').toDate();
     const endValue = moment(endDate).endOf('day').toDate();
-    
+
     const docummentNo = this.vendorgstregisTableForm.value.docNo;
     let cancelBill = this.vendorgstregisTableForm.value.cannon || [];
     cancelBill = cancelBill.length < 2 ? cancelBill : [];
@@ -236,10 +238,12 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
 
     // Extract vendor names from vennmcdHandler if it's an array
+    // const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
+    //   ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => parseInt(x.value))
+    //   : [];
     const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
-      ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => parseInt(x.value))
+      ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
       : [];
-
     // Extract saccdHandler, gststateHandler values
     const sacData = Array.isArray(this.vendorgstregisTableForm.value.saccdHandler)
       ? this.vendorgstregisTableForm.value.saccdHandler.map(x => parseInt(x.value))
@@ -271,7 +275,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       }
 
       // Export the record to Excel
-      exportAsExcelFile(data, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
+      this.exportService.exportAsCSV(data, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
 
     } catch (error) {
       console.error('Error fetching data:', error);

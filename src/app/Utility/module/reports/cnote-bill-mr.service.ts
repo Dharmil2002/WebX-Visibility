@@ -17,7 +17,7 @@ export class CnoteBillMRService {
      ) { }
 
      async getCNoteBillMRReportDetail(start, end, fromloc, toloc, payment, transitmode, businessType, movType, bookingType, customer, billAt, docketArray) {
-          
+
           const loc = fromloc ? fromloc.map(x => x.locCD) || [] : [];
           const Toloc = toloc ? toloc.map(x => x.locCD) || [] : [];
           const payBasis = payment ? payment.map(x => x.payNM) || [] : [];
@@ -304,51 +304,18 @@ export class CnoteBillMRService {
                }
                return acc;
           }, []);
+          let dateFormat = "DD MMM YY";
           uniqueResults.forEach(item => {
-               item.bILLDT = item.bILLDT ? moment(item.bILLDT).format('YYYY-MM-DD') : "";
-               item.bILLSUBDT = item.bILLSUBDT ? moment(item.bILLSUBDT).format('YYYY-MM-DD') : "";
-               item.bILLCOLLECTDT = item.bILLCOLLECTDT ? moment(item.bILLCOLLECTDT).format('YYYY-MM-DD') : "";
-               item.cNOTEDT = item.cNOTEDT ? moment(item.cNOTEDT).format('YYYY-MM-DD') : "";
+               item.bILLDT = item.bILLDT ? moment(item.bILLDT).format(dateFormat) : "";
+               item.bILLSUBDT = item.bILLSUBDT ? moment(item.bILLSUBDT).format(dateFormat) : "";
+               item.bILLCOLLECTDT = item.bILLCOLLECTDT ? moment(item.bILLCOLLECTDT).format(dateFormat) : "";
+               item.cNOTEDT = item.cNOTEDT ? moment(item.cNOTEDT).format(dateFormat) : "";
                item.tIME = item.tIME ? moment(item.tIME).format('HH:mm') : "";
-               item.mRDT = item.mRDT ? moment(item.mRDT).format('YYYY-MM-DD') : "";
-               item.cNOTEEDITDT = item.cNOTEEDITDT ? moment(item.cNOTEEDITDT).format('YYYY-MM-DD') : "";
-               item.iNVDT = item.iNVDT ? moment(item.iNVDT).format('YYYY-MM-DD') : "";
+               item.mRDT = item.mRDT ? moment(item.mRDT).format(dateFormat) : "";
+               item.cNOTEEDITDT = item.cNOTEEDITDT ? moment(item.cNOTEEDITDT).format(dateFormat) : "";
+               item.iNVDT = item.iNVDT ? moment(item.iNVDT).format(dateFormat) : "";
           });
           return uniqueResults;
      }
 }
 
-// This function exports data to an Excel file using the XLSX library.
-export function exportAsExcelFile(json: any[], excelFileName: string, customHeaders: Record<string, string>): void {
-     // // Remove the _id field from each row in the JSON data
-     const cleanedJson = json.map(row => {
-          delete row._id;
-          return row;
-     });
-     // Convert the JSON data to an Excel worksheet using XLSX.utils.json_to_sheet.
-     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(cleanedJson);
-     // Get the keys (headers) from the first row of the cleanedJson data.
-     const headerKeys = Object.keys(cleanedJson[0]);
-     // Iterate through the header keys and replace the default headers with custom headers.
-     for (let i = 0; i < headerKeys.length; i++) {
-          const headerKey = headerKeys[i];
-          if (headerKey && customHeaders[headerKey]) {
-               worksheet[XLSX.utils.encode_col(i) + '1'] = { t: 's', v: customHeaders[headerKey] };
-          }
-     }
-     // Format the headers in the worksheet.
-     for (const key in worksheet) {
-          if (Object.prototype.hasOwnProperty.call(worksheet, key)) {
-               // Check if the key corresponds to a header cell (e.g., A1, B1, etc.).
-               const reg = /^[A-Z]+1$/;
-               if (reg.test(key)) {
-                    // Set the format of the header cells to '0.00'.
-                    worksheet[key].z = '0.00';
-               }
-          }
-     }
-     // Create a workbook containing the worksheet.
-     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-     // Write the workbook to an Excel file with the specified filename.
-     XLSX.writeFile(workbook, `${excelFileName}.xlsx`);
-}

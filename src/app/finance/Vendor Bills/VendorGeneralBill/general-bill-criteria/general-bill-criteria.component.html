@@ -1,0 +1,11 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <div class="row">
+        <form [formGroup]="vendorBillGenerationForm">
+            <app-form-webxpress [form]="vendorBillGenerationForm" [FormTitle]="'Vendor General Bill Criteria'"
+                [formData]="jsonvendorBillGenerationArray" (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="true">
+            </app-form-webxpress>
+        </form>
+    </div>
+</app-common-wrapper-webxpress>

@@ -1,15 +1,9 @@
 <section class="content">
     <div class="container-fluid">
         <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="row search" style="width: 100%;">
+            <!--<div class="row search" style="width: 100%;">
                 <div class="col-12 container-fluid">
-                    <ul class="flex-row-custom justify-content-center" style="padding-top: 10px;">
-                        <!-- <li class="w-lg-10 w-md-15 w-sm-100" style="padding: 0px 10px; ">
-                            <div class="flex-row-center"
-                                style="height: 100%; font-size: 1.2rem; font-weight: bold;">
-                                Module
-                            </div>
-                        </li> -->
+                    <ul class="flex-row-custom justify-content-center" style="padding-top: 10px;">                        
                         <li class="search-bar w-lg-50 w-md-75 w-sm-100" style="position: relative;">
                             <input type="text" style="width: 100%;" class="form-control custom-input"
                                 placeholder="Search" [(ngModel)]="searchQuery" (input)="onSearchInput()" />
@@ -23,8 +17,10 @@
                         </li>
                     </ul>
                 </div>
-            </div>
+            </div>-->
             <div class="row my-lg-5 my-md-3 my-md-1 my-xl-5">
+                <!-- <button class="btn btn-primary" (click)="onAddAppClick()">Prepare Voucher</button> -->
+
                 <div *ngFor="let item of cardList" class="col-md-4 col-xl-3 custom-icon icon-pedding"
                     (click)="onAppClick($event, item)">                    
                     <div class=" pointer card-shape" [style.background-color]="item.bgColor">

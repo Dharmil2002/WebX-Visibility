@@ -136,7 +136,7 @@ export class ListContainerComponent implements OnInit {
       this.TableData = res.data.map((x) => {
         return {
           ...x,
-          entryDate: moment(x.eNTDT).format("DD-MM-YYYY"),
+          entryDate: moment(x.eNTDT).format("DD MMM YY"),
           Location: "",
           aCT: x.aCT == 1 ? true : false,
         };

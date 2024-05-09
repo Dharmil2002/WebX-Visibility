@@ -74,6 +74,9 @@ import { CreditVoucherPreviewComponent } from './credit-voucher/credit-voucher-p
 import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/set-opening-balance-ledger-wise/set-opening-balance-ledger-wise.component';
 import { EditOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/edit-opening-balance-ledger-wise/edit-opening-balance-ledger-wise.component';
 import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upload-opening-balance-ledger-wise/upload-opening-balance-ledger-wise.component';
+import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
+import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
+import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/Modals/add-general-bill-detail/add-general-bill-detail.component';
 
 @NgModule({
     declarations: [
@@ -113,7 +116,10 @@ import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upl
         CreditVoucherPreviewComponent,
         SetOpeningBalanceLedgerWiseComponent,
         EditOpeningBalanceLedgerWiseComponent,
-        UploadOpeningBalanceLedgerWiseComponent
+        UploadOpeningBalanceLedgerWiseComponent,
+        GeneralBillCriteriaComponent,
+        GeneralBillDetailComponent,
+        AddGeneralBillDetailComponent
     ],
     imports: [
         CommonModule,

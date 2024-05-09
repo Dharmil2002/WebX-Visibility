@@ -125,6 +125,12 @@ export class StocksComponent
         Style: "min-width:15%",
         sticky: true
       },
+      sfx: {
+        Title: "SFX",
+        class: "matcolumnleft",
+        Style: "min-width:15%",
+        datatype:"number"
+      },
       date: {
         Title: `${this.DocCalledAs.Docket} Date`,
         class: "matcolumncenter",
@@ -194,6 +200,7 @@ export class StocksComponent
     staticField: [
       "no",
       "date",
+      "sfx",
       "paymentType",
       "contractParty",
       "orgdest",

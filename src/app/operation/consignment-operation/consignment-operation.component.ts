@@ -101,7 +101,7 @@ export class ConsignmentOperationComponent implements OnInit {
       this.TableData = res.data.map((x) => {
         return {
           ...x,
-          Date: moment(x.eNTDT).format("DD/MM/YYYY"),
+          Date: moment(x.eNTDT).format("DD MMM YY"),
           Event: Mode == "FTL" ? x.oPSTS || "" : x.oPSSTS || "",
         };
       });

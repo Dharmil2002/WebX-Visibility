@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums"  [backPath]="backPath">
+<app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+[tableData]="csv" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+(functionCallEmitter)="functionCallHandler($event)" [menuItems]="menuItems" [staticField]="staticField"
+[Link]="linkArray" [height]="height" [width]="width" [csvFileName]="csvFileName" [maxWidth]="maxWidth"
+(onFlagChange)="IsActiveFuntion($event)" [menuItemFlag]="menuItemflag">
+</app-generic-table-v2>
+</app-common-wrapper-webxpress>

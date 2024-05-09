@@ -30,7 +30,7 @@ export class DeliveryMrResponseModalComponent implements OnInit {
   linkArray = [];
   toggleArray = [];
   columnHeader = {
-    dOCNO: {
+    gCNNO: {
       Title: "Consignment Note Number",
       class: "matcolumncenter",
       //Style: "min-width:40%",
@@ -50,7 +50,7 @@ export class DeliveryMrResponseModalComponent implements OnInit {
   };
 
   staticField = [
-    "dOCNO",
+    "gCNNO",
     "dLMRNO"
   ];
   resultData: any;

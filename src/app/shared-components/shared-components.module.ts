@@ -35,7 +35,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatMenuModule } from '@angular/material/menu';
 import { ChartsModule as chartjsModule } from 'ng2-charts';
-import { OWL_DATE_TIME_LOCALE, OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
+import { OWL_DATE_TIME_LOCALE, OwlDateTimeModule, OwlNativeDateTimeModule,  OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
+
 import { GenericChartDashboardComponent } from './generic-chart-dashboard/generic-chart-dashboard.component';
 import { GenericCardComponent } from './generic-card/generic-card.component';
 import { DecimaRangeValidatorDirective } from '../core/Directives/decimal-range-validator';
@@ -60,17 +61,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { GenericViewTableComponent } from './generic-view-table/generic-view-table.component';
 import { GenericCardWithMenuActionsComponent } from './generic-card-with-menu-actions/generic-card-with-menu-actions.component';
 import { GenericBulkUploadComponent } from './generic-bulk-upload/generic-bulk-upload.component';
-const MY_DATE_FORMAT = {
-  parse: {
-    dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
-  },
-  display: {
-    dateInput: 'DD/MM/YYYY', // this is how your date will get displayed on the Input
-    monthYearLabel: 'MMMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
+import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT } from '../config/myconstants';
 
 @NgModule({
   declarations: [GenericAccordionComponent, GenericTableComponent,
@@ -119,13 +110,11 @@ const MY_DATE_FORMAT = {
   ],
   providers: [
     {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE],
-
-    },
+      provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE],
+    },    
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
     { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-IN' },
+    //{ provide: OWL_DATE_TIME_FORMATS, useValue: MY_CUSTOM_FORMAT },
     FilterUtils, ImageHandling
   ],
 

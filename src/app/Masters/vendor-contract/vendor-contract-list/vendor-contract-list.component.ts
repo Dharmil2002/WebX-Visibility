@@ -61,8 +61,8 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
     this.tableData.forEach((item: any) => {
       const startDate: Date = new Date(item.cNSDT);
       const endDate: Date = new Date(item.eNDDT);
-      item.cNSDT = moment(startDate).format('DD-MM-YYYY');
-      item.eNDDT = moment(endDate).format('DD-MM-YYYY');
+      item.cNSDT = moment(startDate).format('DD MMM YY');
+      item.eNDDT = moment(endDate).format('DD MMM YY');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { exportAsExcelFile, exportAsExcelFileV2 } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
+import { exportAsExcelFileV2 } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { StorageService } from 'src/app/core/service/storage.service';

@@ -9,6 +9,7 @@ import { AddressControl } from "src/assets/FormControls/address-master";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 @Component({
   selector: "app-address-master-add",
   templateUrl: "./address-master-add.component.html",
@@ -50,6 +51,7 @@ export class AddressMasterAddComponent implements OnInit {
     private masterService: MasterService,
     private filter: FilterUtils,
     public StorageServiceI: StorageService,
+    private objPinCodeService: PinCodeService,
   ) {
     this.companyCode = this.StorageServiceI.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -80,7 +82,7 @@ export class AddressMasterAddComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getPincodeData();
+    //this.getPincodeData();
     this.backPath = "/Masters/AddressMaster/AddressMasterList";
   }
   functionCallHandler($event) {
@@ -105,6 +107,7 @@ export class AddressMasterAddComponent implements OnInit {
       this.jsonControlGroupArray,
     ]);
     this.bindDropdown();
+    this.getdata();
   }
   bindDropdown() {
     this.jsonControlGroupArray.forEach((data) => {
@@ -122,70 +125,81 @@ export class AddressMasterAddComponent implements OnInit {
       }
     });
   }
+  async getdata(){
+    if(this.isUpdate){
+      this.addressTableForm.controls["pincode"].patchValue(
+        {name:this.addressTabledata.pincode,value:this.addressTabledata.pincode}
+      );
+    }
+  }
   cancel() {
     this.Route.navigateByUrl("/Masters/AddressMaster/AddressMasterList");
   }
   //#region Pincode Dropdown
 
- async getPincodeData() {
-    if (!this.isUpdate || !this.pincodeDataFetched) {
-      await this.fetchPincodeData();
-    }
-
-    if (this.isUpdate) {
-      await this.fetchPincodeData();
-    }
+  async getPincodeData() {
+    await this.fetchPincodeData();
   }
 
+  // async fetchPincodeData() {
+  //   const pincodeReq = {
+  //     companyCode: this.companyCode,
+  //     collectionName: "pincode_master",
+  //     filter: {},
+  //   };
+
+  //   try {
+  //     const pincodeRes = await this.masterService
+  //       .masterPost("generic/get", pincodeReq)
+  //       .toPromise();
+  //     this.pincodeDet = pincodeRes?.data || [];
+  //     const pincodeList = this.pincodeDet.map((x) => ({
+  //       name: x.PIN.toString(),
+  //       value: x.PIN.toString(),
+  //     }));
+
+  //     const pincodeValue = this.addressTableForm.controls["pincode"].value;
+
+  //     if (this.isUpdate && !this.pincodeDataFetched) {
+  //       const updatePin = pincodeList.find((x) => x.value == this.data.pincode);
+  //       this.addressTableForm.controls["pincode"].setValue(updatePin);
+  //     }
+  //     // Check if pincodeValue is a valid number
+  //     if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
+  //       const exactPincodeMatch = pincodeList.find(
+  //         (element) => element.name === pincodeValue
+  //       );
+  //       if (!exactPincodeMatch) {
+  //         const filteredPincodeDet = pincodeList.filter((element) =>
+  //           element.name.includes(pincodeValue.toString())
+  //         );
+  //         if (filteredPincodeDet.length === 0) {
+  //           // Show a popup indicating no data found for the given pincode
+  //           Swal.fire({
+  //             icon: "info",
+  //             title: "No Data Found",
+  //             text: `No data found for pincode ${pincodeValue}`,
+  //             showConfirmButton: true,
+  //           });
+  //         } else {
+  //           this.filter.Filter(
+  //             this.jsonControlGroupArray,
+  //             this.addressTableForm,
+  //             filteredPincodeDet,
+  //             this.pincodeList,
+  //             this.pincodeStatus
+  //           );
+  //         }
+  //       }
+  //     }
+  //     this.pincodeDataFetched = true;
+  //   } catch (error) {
+  //     console.error("Error fetching pincode data:", error);
+  //   }
+  // }
+
   async fetchPincodeData() {
-    const pincodeReq = {
-      "companyCode": this.companyCode,
-      "collectionName": "pincode_master",
-      "filter": {}
-    };
-
-    try {
-      const pincodeRes = await this.masterService.masterPost('generic/get', pincodeReq).toPromise();
-      this.pincodeDet = pincodeRes?.data || [];
-      const pincodeList = this.pincodeDet.map((x) => ({
-        name: x.PIN.toString(),
-        value: x.PIN.toString(),
-      }));
-
-      const pincodeValue = this.addressTableForm.controls['pincode'].value;
-
-      if (this.isUpdate && !this.pincodeDataFetched) {
-        const updatePin = pincodeList.find((x) => x.value == this.data.pincode);
-        this.addressTableForm.controls['pincode'].setValue(updatePin);
-      }
-      // Check if pincodeValue is a valid number
-      if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
-        const exactPincodeMatch = pincodeList.find((element) => element.name === pincodeValue);
-        if (!exactPincodeMatch) {
-          const filteredPincodeDet = pincodeList.filter((element) => element.name.includes(pincodeValue.toString()));
-          if (filteredPincodeDet.length === 0) {
-            // Show a popup indicating no data found for the given pincode
-            Swal.fire({
-              icon: "info",
-              title: "No Data Found",
-              text: `No data found for pincode ${pincodeValue}`,
-              showConfirmButton: true,
-            });
-          } else {
-            this.filter.Filter(
-              this.jsonControlGroupArray,
-              this.addressTableForm,
-              filteredPincodeDet,
-              this.pincodeList,
-              this.pincodeStatus
-            );
-          }
-        }
-      }
-      this.pincodeDataFetched = true;
-    } catch (error) {
-      console.error('Error fetching pincode data:', error);
-    }
+    this.objPinCodeService.getPincodes(this.addressTableForm, this.jsonControlGroupArray, "pincode", this.pincodeStatus);
   }
   //#endregion
 
@@ -216,9 +230,9 @@ export class AddressMasterAddComponent implements OnInit {
         status
       );
       if (this.isUpdate) {
-        const updatedValue = this.data.customer; // Assuming updatedValue is an array
-        const selectedData = customerData.filter(x => updatedValue.includes(x.value));
-        this.addressTableForm.controls['customerNameDropdown'].patchValue(selectedData);
+        const customer = this.data.customer?.map((x) => x.code);
+        const selectedData = customerData.filter((x) => customer.includes(x.value));
+        this.addressTableForm.controls["customerNameDropdown"].setValue(selectedData);
       }
     }
   }
@@ -232,7 +246,14 @@ export class AddressMasterAddComponent implements OnInit {
     Object.values(this.addressTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
-    const customerName = this.addressTableForm.value.customerNameDropdown?.map((item: any) => item.value) || "";
+    const customerName = this.addressTableForm.value.customerNameDropdown?.map(
+      (x) => {
+        return {
+          code: x.value,
+          name: x.name,
+        };
+      }
+    );
     this.addressTableForm.removeControl("customerNameDropdown");
     this.addressTableForm.controls["customer"].setValue(customerName);
     if (this.isUpdate) {
@@ -246,7 +267,7 @@ export class AddressMasterAddComponent implements OnInit {
           ...this.addressTableForm.value,
           mODDT: new Date(),
           mODLOC: this.StorageServiceI.branch,
-          mODBY:this.StorageServiceI.userName,
+          mODBY: this.StorageServiceI.userName,
         },
       };
       this.masterService.masterPut("generic/update", req).subscribe({
@@ -289,7 +310,7 @@ export class AddressMasterAddComponent implements OnInit {
           ...this.addressTableForm.value,
           eNTDT: new Date(),
           eNTLOC: this.StorageServiceI.branch,
-          eNTBY:this.StorageServiceI.userName,
+          eNTBY: this.StorageServiceI.userName,
         },
       };
       this.masterService.masterPost("generic/create", req).subscribe({
@@ -314,13 +335,14 @@ export class AddressMasterAddComponent implements OnInit {
 
   //#region set city and sate data
   async setStateCityData() {
-    const fetchData = this.pincodeDet.find(
-      (item) => item.PIN == this.addressTableForm.controls["pincode"].value.name
-    );
+    // const fetchData = this.pincodeDet.find(
+    //   (item) => item.PIN == this.addressTableForm.controls["pincode"].value.name
+    // );
+    const data = this.addressTableForm.controls["pincode"].value;
     const pincodeReq = {
       companyCode: this.companyCode,
       collectionName: "state_master",
-      filter: { ST: fetchData.ST },
+      filter: { ST: data.allData.ST },
     };
 
     // Fetch pincode data
@@ -328,7 +350,7 @@ export class AddressMasterAddComponent implements OnInit {
       .masterPost("generic/get", pincodeReq)
       .toPromise();
     this.addressTableForm.controls.stateName.setValue(state.data[0].STNM);
-    this.addressTableForm.controls.cityName.setValue(fetchData.CT);
+    this.addressTableForm.controls.cityName.setValue(data.allData.CT);
   }
   //#endregion
 

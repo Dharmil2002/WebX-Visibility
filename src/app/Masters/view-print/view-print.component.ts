@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
   selector: "app-view-print",
   templateUrl: "./view-print.component.html",
 })
+
 export class ViewPrintComponent implements OnInit {
   breadScrums = [
     {

@@ -45,7 +45,7 @@ export class CommonViewPrintComponent implements OnInit {
     this.GetviewPrint() // Template Data
   }
 
-  
+  //below function is for view print
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,

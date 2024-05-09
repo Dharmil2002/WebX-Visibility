@@ -129,7 +129,7 @@ export class ThcSummaryComponent implements OnInit {
       const action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
       (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
       if (item.eNTDT) {
-        item.createOn = moment(item.eNTDT).format('DD-MM-YY HH:mm');
+        item.createOn = item.eNTDT;
         item.statusAction = item?.oPSSTNM
         item.loadedKg = item?.uTI?.wT
         item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] :(dest&&item.oPSST!==2)? ["Update THC", "View"]:item.oPSST === 1 ||[2,3].includes(item.oPSST) ? ["View"] : ["Delivered", "View"];

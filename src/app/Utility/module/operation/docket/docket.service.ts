@@ -1192,9 +1192,16 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData) {
-
-
+    async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
+        let nonfreightAmt={};
+        if (nonfreight) {
+          Object.keys(nonfreight).forEach((key) => {
+            let modifiedKey = key.replace(/./g, (match, index) => {
+              return index >0 ? match.toUpperCase() : match.toLowerCase();
+            });
+            nonfreightAmt[modifiedKey] = nonfreight[key];
+          });
+        }
         let docketField = {
             "_id": data?.id || "",
             "cID": this.storage.companyCode,
@@ -1295,7 +1302,8 @@ export class DocketService {
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
             "cONTRACT": data?.contract || "",
-            "iSSCAN":data?.iSSCAN
+            "iSSCAN":data?.iSSCAN,
+            "nFCHG": nonfreightAmt
         };
 
         let invoiceDetails = invoiceData.map((element) => {

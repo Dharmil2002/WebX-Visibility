@@ -369,9 +369,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         return false;
     }
       let notSelectedData= this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
-      let selectlocationWiseData =  selectedData.filter((x) => x.Destination === this.currentBranch);
-      let nselectlocationWiseData =  notSelectedData.filter((x) => x.Destination === this.currentBranch);
-        const res=await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData,selectlocationWiseData,nselectlocationWiseData,this.packageData,this.isScan);
+        const res=await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData,selectedData,notSelectedData,this.packageData,this.isScan);
         if(res){
           this.dialogRef.close(this.loadingSheetTableForm.value)
           this.goBack('Departures')

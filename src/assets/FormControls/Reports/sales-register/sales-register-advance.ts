@@ -62,8 +62,8 @@ export class salesRegisterControl {
                     placeholder: 'Flow Type',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Outgoing", name: "Outgoing" },
-                         { value: "Incoming", name: "Incoming" },
+                         { value: "O", name: "Outgoing" },
+                         { value: "I", name: "Incoming" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -155,48 +155,48 @@ export class salesRegisterControl {
                //      },
                //      generatecontrol: true, disable: false
                // },
-               {
-                    name: 'busType',
-                    label: 'Business Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "busiTypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
-               {
-                    name: 'loadType',
-                    label: 'Load Type',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Frozen", name: "Frozen" },
-                         { value: "Chiller", name: "Chiller" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [],
-                    additionalData: {
-                         support: "loadTypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'busType',
+               //      label: 'Business Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "busiTypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
+               // {
+               //      name: 'loadType',
+               //      label: 'Load Type',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "Frozen", name: "Frozen" },
+               //           { value: "Chiller", name: "Chiller" },
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [],
+               //      additionalData: {
+               //           support: "loadTypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: "cust",
                     label: "Customer",
@@ -243,18 +243,18 @@ export class salesRegisterControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
-                         { value: "Billed", name: "Billed" },
-                         { value: "Unbilled", name: "Unbilled" },
-                         { value: "Delivered", name: "Delivered" },
-                         { value: "Undelivered", name: "Undelivered" },
-                         { value: "Cancelled", name: "Cancelled" },
-                         { value: "Finalized", name: "Finalized" },
-                         { value: "Quick", name: "Quick" },
-                         { value: "Quick not completed", name: "Quick not completed" },
-                         { value: "Quick Completed", name: "Quick Completed" },
-                         { value: "POD Scanned", name: "POD Scanned" },
-                         { value: "POD Not Scanned", name: "POD Not Scanned" },
-                         { value: "POD scanned but not billed", name: "POD scanned but not billed" },
+                         { value: "true", name: "Billed" },
+                         { value: "false", name: "Unbilled" },
+                         { value: 3, name: "Delivered" },
+                         { value: 5, name: "Undelivered" },
+                         // { value: "Cancelled", name: "Cancelled" },
+                         // { value: "Finalized", name: "Finalized" },
+                         // { value: "Quick", name: "Quick" },
+                         // { value: "Quick not completed", name: "Quick not completed" },
+                         // { value: "Quick Completed", name: "Quick Completed" },
+                         // { value: "POD Scanned", name: "POD Scanned" },
+                         // { value: "POD Not Scanned", name: "POD Not Scanned" },
+                         // { value: "POD scanned but not billed", name: "POD scanned but not billed" },
                     ],
                     filterOptions: "",
                     autocomplete: "",
@@ -270,26 +270,26 @@ export class salesRegisterControl {
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: "billAt",
-                    label: "Billed At",
-                    placeholder: "",
-                    type: "multiselect",
-                    value: '',
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [],
-                    additionalData: {
-                         support: "billHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll"
-                    },
-               },
+               // {
+               //      name: "billAt",
+               //      label: "Billed At",
+               //      placeholder: "",
+               //      type: "multiselect",
+               //      value: '',
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      generatecontrol: true,
+               //      disable: false,
+               //      Validations: [],
+               //      additionalData: {
+               //           support: "billHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll"
+               //      },
+               // },
                {
                     name: 'billHandler',
                     label: 'billHandler',

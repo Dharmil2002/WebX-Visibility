@@ -236,7 +236,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     "SubTotal": "Sub Total",
     "GSTRate": "GST Rate",
     "GSTAmount": "GST Amount",
-    // "GSTCharge": "GST Charge",
+    "GSTCharge": "GST Charge",
     "VATRate": "VAT Rate",
     "VATAmount": "VAT Amount",
     "DocketTotal": "Docket Total",
@@ -441,7 +441,9 @@ export class SalesRegisterAdvancedComponent implements OnInit {
         const mode = Array.isArray(this.salesregisterTableForm.value.transitHandler)
           ? this.salesregisterTableForm.value.transitHandler.map(x => { return { mdCD: x.value, mdNm: x.name }; })
           : [];
-        let data = await this.salesRegisterService.getsalesRegisterReportDetail(startDate, endDate, loct, toloc, payment, bookingtype, cnote, customer, mode);
+        const flowType = this.salesregisterTableForm.value.flowType;
+        const status = this.salesregisterTableForm.value.status;
+        let data = await this.salesRegisterService.getsalesRegisterReportDetail(startDate, endDate, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status);
         if (data.length === 0) {
           if (data) {
             Swal.fire({
@@ -459,9 +461,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
         }, 1000);
         const transformedHeader = this.setcharges(data, this.CSVHeader); // Set the header for the CSV file
         const finalData = this.setCsvData(data); // Set the data for the CSV file
-        // exportAsExcelFile(data, `Sales_Register_Report-${timeString}`, this.CSVHeader);
         this.exportService.exportAsCSV(finalData, `Sales_Register_Report-${moment().format("YYYYMMDD-HHmmss")}`, transformedHeader);
-        // this.exportService.exportAsCSV(data, `Sales_Register_Report-${moment().format("YYYYMMDD-HHmmss")}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
@@ -472,68 +472,39 @@ export class SalesRegisterAdvancedComponent implements OnInit {
   }
 
   // function to set charges
-  // setcharges(chargeList: any[], headers) {
-  //   debugger
-  //   const columnHeader = { ...headers };
-  //   this.chargesKeys = [];
-  //   chargeList.forEach((item) => {
-  //     item.chargeList.forEach((charge) => {
-  //       const key = charge["cHGNM"]; // Use "cHGNM" as the header
-
-  //       if (!this.chargesKeys.includes(key)) {
-  //         this.chargesKeys.push(key);
-  //       }
-  //       columnHeader[key] = key; // Add "aMT" as the value for the header
-  //     });
-  //   });
-
-  //   return columnHeader; // Return the transformed data
-  // }
-  setcharges(chargeList, headers) {
-    debugger;
+  setcharges(chargeList: any[], headers) {
     const columnHeader = { ...headers };
     this.chargesKeys = [];
 
     chargeList.forEach((item) => {
-      if (Array.isArray(item.chargeList)) {
+      if (item.chargeList && item.chargeList.length > 0) {
         item.chargeList.forEach((charge) => {
           const key = charge["cHGNM"]; // Use "cHGNM" as the header
+
           if (!this.chargesKeys.includes(key)) {
             this.chargesKeys.push(key);
           }
-          columnHeader[key] = charge["aMT"]; // Add "aMT" as the value for the header
+          columnHeader[key] = key; // Add "aMT" as the value for the header
         });
-      } else {
-        console.error("chargeList item does not have a chargeList array:", item);
       }
     });
 
     return columnHeader; // Return the transformed data
   }
 
-
-  // // function to set csv data
-  // setCsvData(data: any[]) {
-  //   debugger
-  //   const transformed = data.map((item) => {
-  //     item.chargeList.forEach((x)=>{
-  //       item[x.cHGNM]=x.aMT
-  //     })
-  //     delete item.chargeList
-  //      return item;
-  //    });
-  //   return transformed;
-  // }
+  // function to set csv data
   setCsvData(data: any[]) {
-    debugger
     const transformed = data.map((item) => {
-      if (Array.isArray(item.chargeList)) {
+      if (item.chargeList && item.chargeList.length > 0) {
         item.chargeList.forEach((x) => {
-          item[x.cHGNM] = x.aMT;
-        });
-        delete item.chargeList;
+          item[x.cHGNM] = x.aMT
+        })
+        delete item.chargeList
+        return item;
       }
-      return item;
+      else {
+        return item;
+      }
     });
     return transformed;
   }

@@ -7,379 +7,6 @@ import * as XLSX from 'xlsx';
 @Injectable({
      providedIn: "root",
 })
-// export class SalesRegisterService {
-//      constructor(
-//           private masterServices: MasterService,
-//           private storage: StorageService
-//      ) { }
-
-//      async getsalesRegisterReportDetail(start, end) {
-//           const startValue = start;
-//           const endValue = end;
-//           const reqBody = {
-//                companyCode: this.storage.companyCode,
-//                collectionName: "dockets",
-//                filter: {
-//                     cID: this.storage.companyCode,
-//                     "D$and": [
-//                          {
-//                               "dKTDT": {
-//                                    "D$gte": startValue
-//                               }
-//                          },
-//                          {
-//                               "dKTDT": {
-//                                    "D$lte": endValue
-//                               }
-//                          }
-//                     ]
-//                }
-//           }
-//           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "cust_contract"
-//           const rescuscontract = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "cha_details"
-//           const reschadetails = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "job_details"
-//           const resjobdetails = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "job_header"
-//           const resjobheaderdetails = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "cust_bill_details"
-//           const rescustbilldetails = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "docket_invoices"
-//           const resdocketinvdet = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "docket_fin_det"
-//           const resdocfin = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "cust_bill_headers"
-//           const rescustbillheader = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "docket_ops_det"
-//           const resdockops = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "thc_summary"
-//           const resthcsummary = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           reqBody.collectionName = "customer_detail"
-//           const rescustomerdet = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-//           let docketCharges = [];
-//           resdocfin.data.forEach(element => {
-//                if (element.cHG.length > 0) {
-//                     element.cHG.forEach(chg => {
-//                          const docketCharge = {
-//                               dKTNO: element?.dKTNO || "",
-//                               [chg.cHGNM]: chg?.aMT || 0.00
-//                          }
-//                          docketCharges.push(docketCharge);
-//                     });
-//                }
-//           });
-//           let salesList = [];
-//           res.data.map((element) => {
-//                const relevantCharges = docketCharges.filter(charge => charge.dKTNO === element?.dKTNO);
-//                const custcontractDet = rescuscontract.data ? rescuscontract.data.find((entry) => entry.cUSTID === element?.bPARTY) : null;
-//                const chadetailsDet = reschadetails.data ? reschadetails.data.find((entry) => entry.cUSTID === element?.bPARTY) : null;
-//                const jobdetailsDet = resjobdetails.data ? resjobdetails.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
-//                const jobheaderdet = resjobheaderdetails.data ? resjobheaderdetails.data.find((entry) => entry.jID === jobdetailsDet?.jID) : null;
-//                const custbilldet = rescustbilldetails.data ? rescustbilldetails.data.find((entry) => entry.dKTNO === element?.docNo) : null;
-//                const docketinvdet = resdocketinvdet.data ? resdocketinvdet.data.find((entry) => entry.dKTNO === element?.docNo) : null;
-//                const custbillheaderdet = rescustbillheader.data ? rescustbillheader.data.find((entry) => entry.bILLNO === custbilldet?.bILLNO) : null;
-//                const dockopsdet = resdockops.data ? resdockops.data.find((entry) => entry.dKTNO === element?.dKTNO) : null;
-//                const thcsummarydet = resthcsummary.data ? resthcsummary.data.find((entry) => entry.docNo === dockopsdet?.tHC) : null;
-//                const ConsignorToFind = element?.cSGNNM;
-//                const customerdet = rescustomerdet.data && ConsignorToFind
-//                     ? rescustomerdet.data.find((entry) => entry.customerName === ConsignorToFind)
-//                     : null;
-//                const ConsigneeToFind = element?.cSGNNM;
-//                const customerConsigneedet = rescustomerdet.data && ConsigneeToFind
-//                     ? rescustomerdet.data.find((entry) => entry.customerName === ConsigneeToFind)
-//                     : null;
-//                let contID = 0;
-//                let constParty = 0;
-//                let cHAID = 0;
-//                let chaAmt = 0;
-//                let seriveType = 0;
-//                let container = 0;
-//                let transportedBy = 0;
-//                // let billAt = 0;
-//                let invNo = 0;
-//                let invDt = 0;
-//                let gstRate = 0;
-//                let tripsheetNo = 0;
-//                let thcDt = 0;
-//                let custEmail = 0;
-//                let custAdd = 0;
-//                let pincode = 0;
-//                let city = 0;
-//                let Consigneecity = 0;
-//                let Consigneepincode = 0;
-//                let email = 0;
-//                let Consigneeemail = 0;
-//                let tele = 0;
-//                let RegisteredAddress = 0;
-//                let Consigneegst = 0;
-//                let gst = 0;
-//                let jDT = 0;
-//                let jobtype = 0;
-//                let portofDis = 0;
-//                if (custcontractDet) {
-//                     contID = custcontractDet.cONID
-//                     constParty = custcontractDet.cUSTNM
-//                }
-
-//                if (chadetailsDet) {
-//                     cHAID = chadetailsDet.cHAID
-//                     chaAmt = chadetailsDet.tOTAMT
-//                }
-//                if (jobheaderdet) {
-//                     seriveType = jobheaderdet.eTYPNM
-//                     container = jobheaderdet.cNTS
-//                     transportedBy = jobheaderdet.tBYNM
-//                     jDT = jobheaderdet.jDT
-//                     jobtype = jobheaderdet.jTYPNM
-//                }
-//                // if (custbilldet) {
-//                //      billAt = custbilldet.eNTLOC
-//                // }
-//                if (docketinvdet) {
-//                     invNo = docketinvdet.iNVNO
-//                     invDt = docketinvdet.eNTDT
-//                }
-//                if (custbillheaderdet) {
-//                     gstRate = custbillheaderdet.gST.rATE
-//                     custEmail = custbillheaderdet.cUST.eML
-//                     custAdd = custbillheaderdet.cUST.aDD
-//                     tele = custbillheaderdet.tEL
-//                }
-//                if (thcsummarydet) {
-//                     tripsheetNo = thcsummarydet.docNo
-//                     thcDt = thcsummarydet.eNTDT
-//                }
-//                if (customerdet) {
-//                     pincode = customerdet.PinCode
-//                     city = customerdet.city
-//                     email = customerdet.Customer_Emails
-//                     gst = customerdet.GSTdetails[0].gstNo
-//                }
-//                if (customerConsigneedet) {
-//                     Consigneepincode = customerConsigneedet.PinCode
-//                     Consigneecity = customerConsigneedet.city
-//                     Consigneeemail = customerConsigneedet.Customer_Emails
-//                     RegisteredAddress = customerConsigneedet.RegisteredAddress
-//                     Consigneegst = customerConsigneedet.GSTdetails[0].gstNo
-//                }
-//                let salesData = {
-//                     "cNOTENO": element?.docNo || '',
-//                     "cNOTEDT": element?.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
-//                     "tIME": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
-//                     "eDD": element.dKTDT ? (() => {
-//                          const cNOTEDate = new Date(element.dKTDT);
-//                          cNOTEDate.setDate(cNOTEDate.getDate() + 1);
-//                          return cNOTEDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-');
-//                     })() : "",
-//                     "bOOGBRANCH": element?.eNTLOC || '',
-//                     "lOADTY": "FTL",
-//                     "dELIVERYBRANCH": element?.dEST || '',
-//                     "lASTEDITBY": element?.eNTBY || '',
-//                     "cNOTEDITDT": formatDocketDate(element?.eNTDT || ''),
-//                     "pAYTY": element?.pAYTYPNM || '',
-//                     "bUSTY": 'FTL',
-//                     "pROD": element?.tRNMODNM || '',
-//                     "cONTID": contID || '',
-//                     "cONTPARTY": constParty || '',
-//                     "sERTY": "FTL",
-//                     "vEHNO": element?.vEHNO || '',
-//                     "bACODE": '',
-//                     "eEDD": "",
-//                     "eEDDREASON": "",
-//                     "cUSTREFNO": '',
-//                     "rEMA": '',
-//                     "bILLAT": element?.eNTLOC || '',
-//                     "pINCODE": pincode || '',
-//                     "pINCODECAT": '',
-//                     "pINCODEAREA": '',
-//                     "fROMZONE": '',
-//                     "tOZONE": '',
-//                     "oDA": '',
-//                     "TruckRequestDate": '',
-//                     "TRFromZone": '',
-//                     "TRToZone": '',
-//                     "TRFromCenter": '',
-//                     "TRToCenter": '',
-//                     "TRFromState": '',
-//                     "TRToState": '',
-//                     "dRIVERNM": '',
-//                     "tRUCKREQNO": '',
-//                     "lOACALCNOTE": '',
-//                     "bILLPARTYNM": `${element?.bPARTY || ''} - ${element?.bPARTYNM || ''}`,
-//                     "mOVTY": element?.mODNM || '',
-//                     "tRANMODE": element?.tRNMODNM || '',
-//                     "sTAT": element?.oSTSN || '',
-//                     "fROMCITY": element?.fCT || '',
-//                     "tOCITY": element?.tCT || "",
-//                     "VendorName": element?.vNDNM || '',
-//                     "VendorCode": element?.vNDCD || '',
-//                     "SpecialInstruction": '',
-//                     "FRRate": element?.fRTRT || '',
-//                     "FRTType": element?.fRTRTYN || '',
-//                     "NoofPkgs": element?.pKGS || '',
-//                     "SubTotal": element?.tOTAMT || '',
-//                     "ActualWeight": element?.aCTWT || '',
-//                     "CubicWeight": '0.00',
-//                     "ChargedPkgsNo": '0',
-//                     "ChargedkM": '0',
-//                     "InvoiceNo": invNo || '',
-//                     "InvoiceDate": formatDocketDate(invDt || ''),
-//                     "DeclaredValue": '0.00',
-//                     "Length": '0.00',
-//                     "Breadth": '0.00',
-//                     "Height": '0.00',
-//                     "FreightCharge": '0.00',
-//                     "OtherCharges": '0.00',
-//                     "Greentax": '0.00',
-//                     "DropCharges": '0.00',
-//                     "DocumentCharges": '0.00',
-//                     "WarehouseCharges": '0.00',
-//                     "Deduction": '0',
-//                     "HolidayServiceCharges": '0.00',
-//                     "FOVCharges": '0.00',
-//                     "DODharges": '0.00',
-//                     "appointchar": '0.00',
-//                     "ODACharges": '0.00',
-//                     "FuelSurchargeCharges": '0.00',
-//                     "MultipickupCharges": '0.00',
-//                     "UnloadingCharges": '0.00',
-//                     "MultideliveryCharges": '0.00',
-//                     "LoadingCharges": '0.00',
-//                     "GSTRate": gstRate || '',
-//                     "DOD": '',
-//                     "DACC": '',
-//                     "Deferment": '',
-//                     "PolicyNoDate": '',
-//                     "WeightType": '',
-//                     "DefaultCarRate": '',
-//                     "FuePerRate": '',
-//                     "ContractId": contID || '',
-//                     "ArriveDate": '',
-//                     "NextLocation": '',
-//                     "StockUpdateDate": '',
-//                     "ADD": '',
-//                     "PickupDelivery": '',
-//                     "SourceCNote": '',
-//                     "Caption": '',
-//                     "BookingType": 'CN',
-//                     "SalesPersonBookingName": '',
-//                     "SalesPersonClosingName": '',
-//                     "ReturnCNote": '',
-//                     "PermitApplicable": '',
-//                     "PermitRecievedAt": '',
-//                     "DocketTemperature": '',
-//                     "Temperature": '',
-//                     "Temp2": '',
-//                     "Temp3": '',
-//                     "TemperatureinCentigrate": '',
-//                     "OperationVehicleNo": '',
-//                     "TripSheetNo": tripsheetNo || '',
-//                     "TripSheetStartDate": '',
-//                     "TripSheetEndDate": '',
-//                     "ThcDate": formatDocketDate(thcDt || ''),
-//                     "AsBillingParty": element?.bPARTYNM || '',
-//                     "ConsignorEMail": custEmail || '',
-//                     "ConsignorAddressCode": custAdd || '',
-//                     "ConsignorAddress": custAdd || '',
-//                     "ConsignorCityPincode": `${city || ''} - ${pincode || ''}`,
-//                     "ICNo": '',
-//                     "RackNo": '',
-//                     "GroupNonGroup": '',
-//                     "AppointmentID": '',
-//                     "Industry": '',
-//                     "GSTCharge": element?.gSTAMT || 0.00,
-//                     "VATRate": '',
-//                     "VATAmount": '',
-//                     "DocketTotal": '',
-//                     "CalamityCessRate": '',
-//                     "CalamityCessAmount": '',
-//                     "AdvanceAmount": '',
-//                     "AdvanceRemark": '',
-//                     "DPHRate": '',
-//                     "DPHAmount": '',
-//                     "DPHAmout": '',
-//                     "DiscRate": '',
-//                     "DiscAmount": '',
-//                     "CNoteCancelledBy": '',
-//                     "CNoteCancelledDate": '',
-//                     "Cancelled": '',
-//                     "DONo": '',
-//                     "PoNumber": '',
-//                     "PoDate": '',
-//                     "FuelRateType": '',
-//                     "FOVRateType": '',
-//                     "CFTRatio": '',
-//                     "TotalCFT": '',
-//                     "ServiceOptedFor": '',
-//                     "FSCChargeRate": '',
-//                     "FOV": '',
-//                     "Multidelivery": '',
-//                     "Multipickup": '',
-//                     "SealNo": '',
-//                     "JobNo": element?.jOBNO || '',
-//                     "ContainerNo": '',
-//                     "ContainerCapacity": '',
-//                     "ContainerType": '',
-//                     "BOENo": '',
-//                     "Contents": '',
-//                     "BatchNo": '',
-//                     "PartNo": '',
-//                     "PartDescription": '',
-//                     "PartQuntity": '',
-//                     "ChargedWeight": element?.cHRWT || '',
-//                     "PackagingType": element?.pKGTY || '',
-//                     "GSTAmount": element?.gSTAMT || '',
-//                     "RiskType": element?.rSKTYN || '',
-//                     "EntryDate": formatDocketDate(element?.eNTDT || ''),
-//                     "EntryBy": element?.eNTBY || '',
-//                     "ConsignorId": element?.cSGNCD || '',
-//                     "ConsignorName": element?.cSGNNM || '',
-//                     "ConsignorMobileNo": element?.cSGNPH || '',
-//                     "ConsigneeId": element?.cSGECD || '',
-//                     "ConsigneeName": element?.cSGENM || '',
-//                     "ConsigneeMobileNo": element?.cSGEPH || '',
-//                     "JobNumber": element?.jOBNO || '',
-//                     "Weight": element?.wTIN || '',
-//                     "origin": element?.oRGN || '',
-//                     "destin": element?.dEST || '',
-//                     "booktp": element?.dELTYN || "",
-//                     "NoofPkts": element?.pKGS || '',
-//                     "CurrentLocation": element?.oRGN || '',
-//                     "BillingParty": element?.bPARTY || '',
-//                     "ConsignorTelephoneNo": element?.cSGNPH || '',
-//                     "ConsignorGST": gst || '',
-//                     "ConsigneeAddressCode": RegisteredAddress || '',
-//                     "ConsigneeAddress": RegisteredAddress || '',
-//                     "ConsigneeCityPincode": `${Consigneecity || ''} - ${Consigneepincode || ''}`,
-//                     "ConsigneeEMail": Consigneeemail,
-//                     "ConsigneeTelephoneNo": element?.cSGEPH || '',
-//                     "ConsigneeGST": Consigneegst || '',
-//                     "JobDate": formatDocketDate(jDT || ''),
-//                     "JobType": jobtype || '',
-//                     "PortofDischarge": '',
-//                     "DestinationCountry": "",
-//                     "VehicleSize": "",
-//                     "TransportedBy": transportedBy || '',
-//                     "NoofContainer": container || '0',
-//                     "ExportType ": seriveType || '',
-//                     "CHANumber": cHAID || '',
-//                     "CHAAmount": chaAmt || "0.00",
-//                }
-
-//                const loadingCharge = relevantCharges.find(charge => charge.hasOwnProperty("Loading"));
-//                const UnloadingCharge = relevantCharges.find(charge => charge.hasOwnProperty("Unloading"));
-
-//                if (loadingCharge) {
-//                     salesData.LoadingCharges = loadingCharge.Loading !== undefined ? Number(loadingCharge.Loading).toFixed(2) : "0.00";
-//                     salesData.UnloadingCharges = UnloadingCharge.Unloading !== undefined ? Number(UnloadingCharge.Unloading).toFixed(2) : "0.00";
-//                }
-//                salesList.push(salesData)
-//           })
-//           return salesList
-//      }
-// }
 
 export class SalesRegisterService {
 
@@ -388,13 +15,49 @@ export class SalesRegisterService {
           private storage: StorageService
      ) { }
 
-     async getsalesRegisterReportDetail(start, end, loct, toloc, payment, bookingtype, cnote, customer, mode) {
+     async getsalesRegisterReportDetail(start, end, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status) {
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const location = toloc ? toloc.map(x => x.locCD) || [] : [];
           const paymentBasis = payment ? payment.map(x => x.payNm) || [] : [];
           const bookingType = bookingtype ? bookingtype.map(x => x.bkNm) || [] : [];
           const cust = customer ? customer.map(x => x.custCD) || [] : [];
           const transitMode = mode ? mode.map(x => x.mdCD) || [] : [];
+          const flowTypeMatch=flowType === "O"?[2]:flowType=="I"?[3,4]:undefined;
+          let stsFin=
+          status=="true"?
+          ["$docket_fin_det.isBILLED",true]
+          :status=="false"?["$docket_fin_det.isBILLED",false]:"";
+          let stsOps= status==3?
+          ["$docket_ops_det.sTS",3]
+          :status==5?["$docket_ops_det.sTS",5]:"";
+          let locFlow=flowType=="I"?["$docket_ops_det.dEST",this.storage.branch]:["$docket_ops_det.oRGN",this.storage.branch]
+          let matchflowType = {}
+          if (flowTypeMatch) {
+               matchflowType = {
+                    D$expr: {
+                         "D$and": [
+                         {D$in: ["$docket_ops_det.sTS", flowTypeMatch]},
+                         {D$eq:locFlow}
+                         ]
+                    }
+               }
+          }
+          let matchFin={}
+          let matchOps={}
+          if(stsFin){
+               matchFin = {
+                    D$expr: {
+                         D$eq:stsFin
+                    }
+               } 
+          }
+          if(stsOps){
+               matchOps = {
+                    D$expr: {
+                         D$eq:stsOps
+                    }
+               } 
+          }
           let matchQuery = {
                'D$and': [
                     { dKTDT: { 'D$gte': start } }, // Convert start date to ISO format
@@ -409,6 +72,9 @@ export class SalesRegisterService {
                     ...(cnote != "" ? [{ dKTNO: { 'D$eq': cnote } }] : []),
                     ...(cust.length > 0 ? [{ D$expr: { D$in: ["$bPARTY", cust] } }] : []), // Location code condition
                     ...(transitMode.length > 0 ? [{ D$expr: { D$in: ["$tRNMOD", transitMode] } }] : []), // Location code condition
+                   // ...(flowType === "O" ? [{ 'D$expr': { 'D$in': ["$dEST", location.length > 0 ? location : []] } }] :
+                   //      (flowType === "I" ? [{ 'D$expr': { 'D$in': ["$oRGN", loc.length > 0 ? loc : []] } }] : [])),
+               //...(status === "true" ? [{ D$expr: { D$in: ["$docket_fin_det.isBILLED" ,"isBILLED", status] } }] : []),
                ]
           };
 
@@ -475,6 +141,12 @@ export class SalesRegisterService {
                                    path: "$docket_ops_det",
                                    preserveNullAndEmptyArrays: true,
                               },
+                         },
+                         {
+                              D$match:matchflowType,
+                         },
+                                 {
+                              D$match:matchOps,
                          },
                          {
                               D$lookup: {
@@ -588,17 +260,9 @@ export class SalesRegisterService {
                                    preserveNullAndEmptyArrays: true
                               }
                          },
-                         // {
-                         //      D$addFields: {
-                         //           charge: {
-                         //                D$map: {
-                         //                     input: "$docket_fin_det.cHG",
-                         //                     as: "item",
-                         //                     in: "$$item"
-                         //                },
-                         //           },
-                         //      },
-                         // },    
+                         {
+                            D$match:matchFin
+                         },
                          {
                               "D$addFields": {
                                    "charge": {
@@ -869,57 +533,57 @@ export class SalesRegisterService {
                                    FRTType: {
                                         D$ifNull: ["$fRTRTYN", ""],
                                    },
-                                   // FreightCharge: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // OtherCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // Greentax: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // DropCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // DocumentCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // WarehouseCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
+                                   FreightCharge: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   OtherCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   Greentax: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   DropCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   DocumentCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   WarehouseCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
                                    Deduction: {
                                         D$ifNull: ["", ""],
                                    },
-                                   // HolidayServiceCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // FOVCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // DODharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // appointchar: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // ODACharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // FuelSurchargeCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // MultipickupCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // UnloadingCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // MultideliveryCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
-                                   // LoadingCharges: {
-                                   //      D$ifNull: ["", ""],
-                                   // },
+                                   HolidayServiceCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   FOVCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   DODharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   appointchar: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   ODACharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   FuelSurchargeCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   MultipickupCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   UnloadingCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   MultideliveryCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
+                                   LoadingCharges: {
+                                        D$ifNull: ["", ""],
+                                   },
                                    SubTotal: {
                                         D$ifNull: ["$tOTAMT", ""],
                                    },
@@ -929,9 +593,9 @@ export class SalesRegisterService {
                                    GSTAmount: {
                                         D$ifNull: ["$gSTAMT", ""],
                                    },
-                                   // GSTCharge: {
-                                   //      D$ifNull: ["$gSTAMT", ""],
-                                   // },
+                                   GSTCharge: {
+                                        D$ifNull: ["$gSTAMT", ""],
+                                   },
                                    VATRate: {
                                         D$ifNull: ["", ""],
                                    },
@@ -1270,8 +934,8 @@ export class SalesRegisterService {
                     ]
           };
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
-          console.log(res, "res");
           return res.data;
      }
 
 }
+

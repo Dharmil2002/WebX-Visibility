@@ -92,7 +92,7 @@ export class InvoiceDashboardComponent implements OnInit {
             item['count'] = approvedBillCount + approvedBillCountltl || '0';
             break;
           case "Credit Notes":
-              item['count'] = ltlCnCount.length || '0';
+              item['count'] = ltlCnCount || '0';
               break;
         }
       });

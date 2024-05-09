@@ -416,20 +416,20 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           this.CNTHdrDataRequestModel.sTSBY = this.storage.loginName;
           this.CNTHdrDataRequestModel.sTSDT = new Date();
           this.CNTHdrDataRequestModel.vNO = "";
-          this.CNTHdrDataRequestModel.cNL = false; // assuming cNL is a boolean, assign false for empty
-          this.CNTHdrDataRequestModel.cNLDT = null;
-          this.CNTHdrDataRequestModel.cNLBY = "";
-          this.CNTHdrDataRequestModel.cNLRES = "";
+          // this.CNTHdrDataRequestModel.cNL = false; // assuming cNL is a boolean, assign false for empty
+          // this.CNTHdrDataRequestModel.cNLDT = null;
+          // this.CNTHdrDataRequestModel.cNLBY = "";
+          // this.CNTHdrDataRequestModel.cNLRES = "";
           this.CNTHdrDataRequestModel.eNTDT = new Date();
           this.CNTHdrDataRequestModel.eNTLOC = this.storage.branch;
-          this.CNTHdrDataRequestModel.eNTBY = "";
-          this.CNTHdrDataRequestModel.mODDT = null;
-          this.CNTHdrDataRequestModel.mODLOC = "";
-          this.CNTHdrDataRequestModel.mODBY = "";
+          this.CNTHdrDataRequestModel.eNTBY = this.storage.loginName;
+          // this.CNTHdrDataRequestModel.mODDT = null;
+          // this.CNTHdrDataRequestModel.mODLOC = "";
+          // this.CNTHdrDataRequestModel.mODBY = "";
 
           //Detasils data
           this.CNTDetDataRequestModel._id = "";
-          this.CNTDetDataRequestModel.cID = 0;
+          this.CNTDetDataRequestModel.cID = this.storage.companyCode;
           this.CNTDetDataRequestModel.docNo = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
           this.CNTDetDataRequestModel.tYP = "C";
           this.CNTDetDataRequestModel.nTNO = "";
@@ -476,9 +476,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
             this.CNTHdrDataRequestModel;
           this.CreditNoteRequestModel.Headerdata = this.CNTHdrDataRequestModel;
           this.CreditNoteRequestModel.Detailsdata = this.CNTDetDataRequestModel;
-
-          console.log(this.CreditNoteRequestModel);
-
           firstValueFrom(
             this.voucherServicesService.FinancePost(
               "fin/account/CreditNoteEntry",
@@ -582,13 +579,13 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       const res = await firstValueFrom(
         this.masterService.masterPut("generic/update", req))
       if (res.success) {
-      
+
         const Bodys = {
           companyCode: this.storage.companyCode,
           collectionName: "cust_bill_headers",
           filter: { bILLNO: this.hdninvoiceno },
         };
-    
+
         this.InvoiceDataResponse = await firstValueFrom(this.masterService.masterPost("generic/get", Bodys));
 
         const Body = {
@@ -596,9 +593,9 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           collectionName: "cust_bill_headers",
           filter: { bILLNO: this.hdninvoiceno },
           update: {
-            cOL:{
-              aMT: this.InvoiceDataResponse?.data[0].cOL.aMT  - this.hdncnamt,
-              bALAMT:this.InvoiceDataResponse?.data[0].cOL.bALAMT + this.hdncnamt
+            cOL: {
+              aMT: this.InvoiceDataResponse?.data[0].cOL.aMT - this.hdncnamt,
+              bALAMT: this.InvoiceDataResponse?.data[0].cOL.bALAMT + this.hdncnamt
             }
           }
         };
@@ -634,7 +631,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
         filter: { nTNO: this.hdncreditno },
       };
       this.DataResponseDetails = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataDetails));
-      console.log(this.DataResponseDetails)
 
       this.snackBarUtilityService.commonToast(() => {
         try {
@@ -700,7 +696,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           this.VoucherRequestModel.details = voucherlineItems;
           this.VoucherRequestModel.data = this.VoucherDataRequestModel;
           this.VoucherRequestModel.debitAgainstDocumentList = [];
-          console.log(this.VoucherRequestModel);
           firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
             let reqBody = {
               companyCode: this.storage.companyCode,

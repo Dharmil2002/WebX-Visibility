@@ -325,7 +325,7 @@ export class BillApprovalComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['AST002002'].LeadgerCode, ledgerInfo['AST002002'].LeadgerName, ledgerInfo['AST002002'].LeadgerCategory, TotalAmount, 0),
+      createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, TotalAmount, 0),
       createVoucher(ledgerInfo['INC001003'].LeadgerCode, ledgerInfo['INC001003'].LeadgerName, ledgerInfo['INC001003'].LeadgerCategory, 0, DocketAmount),
     ];
     if (data?.rOUNOFFAMT > 0) {

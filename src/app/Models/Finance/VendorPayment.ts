@@ -66,7 +66,7 @@ export class VendorBillEntry {
   BillDetails?: Vendbilldetails[];
 }
 export class Vendbilldetails {
-  _id: string;
+  //_id: string;
   cID: number;
   bILLNO?: string;
   tRIPNO?: string;

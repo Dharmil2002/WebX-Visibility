@@ -229,11 +229,11 @@ oneday: Date;
           }
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
         functions: {
           onOptionSelect: "getAddressDetails",
-          onModel: "getFromCityDetail",
+          onModel: "getCityDetail",
         },
       },
       {
@@ -261,10 +261,10 @@ oneday: Date;
           }
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true
         },
         functions: {
-          onModel: "getPincodeDetail",
+          onModel: "getCityDetail",
           onOptionSelect: ''
         },
       },

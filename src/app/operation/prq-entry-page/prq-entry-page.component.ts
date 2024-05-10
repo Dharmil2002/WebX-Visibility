@@ -84,7 +84,7 @@ export class PrqEntryPageComponent implements OnInit {
   Address: string;
   userLocations: any;
 
-  constructor(   
+  constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private router: Router,
@@ -99,7 +99,7 @@ export class PrqEntryPageComponent implements OnInit {
     private customerService: CustomerService,
     private generalService: GeneralService,
     private masterService: MasterService,
-    ) {    
+    ) {
     this.companyCode = this.storage.companyCode;
     this.branchCode = this.storage.branch;
 
@@ -206,16 +206,9 @@ export class PrqEntryPageComponent implements OnInit {
       prqRaiseOn: { variable: "prqRaiseOn", status: "prqRaiseOnStatus" },
       cRTTYP: { variable: "carrierTypeOn", status: "carrierTypeOnStatus" },
       bRCD: { variable: "prqBranchCode", status: "prqBranchStatus" },
-      cNTYP: {
-        variable: "typeContainerCode",
-        status: "typeContainerStatus",
-      },
+      cNTYP: { variable: "typeContainerCode", status: "typeContainerStatus"},
     };
-    processProperties.call(
-      this,
-      this.jsonControlPrqArray,
-      locationPropertiesMapping
-    );
+    processProperties.call(this,this.jsonControlPrqArray,locationPropertiesMapping);
   }
 
   functionCallHandler($event) {
@@ -249,7 +242,7 @@ export class PrqEntryPageComponent implements OnInit {
       filters: [
         {
           D$match: {
-            cityName: this.prqEntryTableForm.controls["fCITY"].value.value,
+            cityName: this.prqEntryTableForm.controls["fCITY"].value.ct,
             customer: {
               D$elemMatch: {
                 code:
@@ -316,7 +309,7 @@ export class PrqEntryPageComponent implements OnInit {
     }
   }
   /*below the method for the getting a CityName for PinCode Collection*/
-  async getFromCityDetail(event) {
+  async getCityDetail(event) {
    // const fcityMapping = event.field.name == "fCITY" ?? this.fromCityStatus;
     await this.pinCodeService.getCityPincode(
       this.prqEntryTableForm,
@@ -349,6 +342,10 @@ export class PrqEntryPageComponent implements OnInit {
     prqDetails["fAREACD"] = this.prqEntryTableForm.value.fCITY?.clusterName||"";
     prqDetails["tAREA"] = this.prqEntryTableForm.value.tCITY?.clusterId||"";
     prqDetails["tAREACD"] = this.prqEntryTableForm.value.tCITY?.clusterName||"";
+    prqDetails["fPIN"] = this.prqEntryTableForm.value.fCITY?.pincode||"";
+    prqDetails["fPIN"] = this.prqEntryTableForm.value.fCITY?.pincode||"";
+    prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode||"";
+    prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode||"";
 
     const cntrNames = [
       { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
@@ -452,7 +449,6 @@ export class PrqEntryPageComponent implements OnInit {
       // showConfirmationDialog(this.prqEntryTableForm.value, this.masterService, this.goBack.bind(this), tabIndex);
     }
     this.iSShow = true;
-    // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
     this.router.navigate(["/dashboard/Index"], {
@@ -582,8 +578,6 @@ export class PrqEntryPageComponent implements OnInit {
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
   InvockedContract() {
-    console.log(this.prqEntryTableForm.value);
-
     const paymentBasesName = this.paymentBase.find(
       (x) => x.value == this.prqEntryTableForm.value.pAYTYP
     ).name;
@@ -594,7 +588,7 @@ export class PrqEntryPageComponent implements OnInit {
     } else {
       containerCode = this.prqEntryTableForm.value.vEHSIZE;
     }
-    
+
     const terms = ["Area", "Pincode", "City", "State"];
 
 
@@ -677,7 +671,7 @@ export class PrqEntryPageComponent implements OnInit {
         });
       });
   }
-  getTermValue(term, isOrigin) {  
+  getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
     const fieldKey = isOrigin ? "fCITY" : "tCITY";
     const type = typeMapping[term];

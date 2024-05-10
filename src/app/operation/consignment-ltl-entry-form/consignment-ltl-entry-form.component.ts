@@ -1373,7 +1373,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.isSubmit = true;
     const data = { ...this.consignmentForm.getRawValue(), ...this.freightForm.getRawValue() }
     const tableData = this.tableData
-    data['iSSCAN']=  this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
+    data['iSSCAN'] = this.rules.find((x) => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y";
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
     data['pkgsTypeName'] = this.pkgsType.find(x => x.value == data?.pkgsType)?.name ?? '';
     data['rsktyName'] = this.riskType.find(x => x.value == data?.risk)?.name ?? '';
@@ -2033,55 +2033,57 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           "TDSApplicable": false,
           "narration": `When paid docket ${DocketNo} generated `
         },
-        {
+        ];
+        if (GSTAmount > 0) {
+          VoucherlineitemList.push({
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['SGST'].LeadgerCode,
-          "accName": `${ledgerInfo['SGST'].LeadgerName}`,
-          "accCategory": ledgerInfo['SGST'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": 0,
-          "credit": ConvertToNumber(GSTAmount / 2, 2),
-          "GSTRate": 6,
-          "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
-          "Total": ConvertToNumber(GSTAmount / 2, 2),
-          "TDSApplicable": false,
-          "narration": `When paid docket ${DocketNo} generated `
-        },
-        {
+            "companyCode": this.storage.companyCode,
+            "voucherNo": "",
+            "transCode": VoucherInstanceType.CNoteBooking,
+            "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+            "voucherCode": VoucherType.JournalVoucher,
+            "voucherType": VoucherType[VoucherType.JournalVoucher],
+            "transDate": new Date(),
+            "finYear": financialYear,
+            "branch": this.storage.branch,
+            "accCode": ledgerInfo['SGST'].LeadgerCode,
+            "accName": `${ledgerInfo['SGST'].LeadgerName}`,
+            "accCategory": ledgerInfo['SGST'].LeadgerCategory,
+            "sacCode": "",
+            "sacName": "",
+            "debit": 0,
+            "credit": ConvertToNumber(GSTAmount / 2, 2),
+            "GSTRate": 6,
+            "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
+            "Total": ConvertToNumber(GSTAmount / 2, 2),
+            "TDSApplicable": false,
+            "narration": `When paid docket ${DocketNo} generated `
+          });
+          VoucherlineitemList.push({
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['CGST'].LeadgerCode,
-          "accName": `${ledgerInfo['CGST'].LeadgerName}`,
-          "accCategory": ledgerInfo['CGST'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": 0,
-          "credit": ConvertToNumber(GSTAmount / 2, 2),
-          "GSTRate": 6,
-          "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
-          "Total": ConvertToNumber(GSTAmount / 2, 2),
-          "TDSApplicable": false,
-          "narration": `When paid docket ${DocketNo} generated `
-        }];
-
+            "companyCode": this.storage.companyCode,
+            "voucherNo": "",
+            "transCode": VoucherInstanceType.CNoteBooking,
+            "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+            "voucherCode": VoucherType.JournalVoucher,
+            "voucherType": VoucherType[VoucherType.JournalVoucher],
+            "transDate": new Date(),
+            "finYear": financialYear,
+            "branch": this.storage.branch,
+            "accCode": ledgerInfo['CGST'].LeadgerCode,
+            "accName": `${ledgerInfo['CGST'].LeadgerName}`,
+            "accCategory": ledgerInfo['CGST'].LeadgerCategory,
+            "sacCode": "",
+            "sacName": "",
+            "debit": 0,
+            "credit": ConvertToNumber(GSTAmount / 2, 2),
+            "GSTRate": 6,
+            "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
+            "Total": ConvertToNumber(GSTAmount / 2, 2),
+            "TDSApplicable": false,
+            "narration": `When paid docket ${DocketNo} generated `
+          });
+        }
         this.VoucherRequestModel.details = VoucherlineitemList
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
@@ -2121,22 +2123,24 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                   "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
                   "amount": ConvertToNumber(TotalAmount - GSTAmount, 2),
                   "narration": `When paid docket ${DocketNo} generated `
-                },
-                {
+                }]
+              };
+              if (GSTAmount > 0) {
+                reqBody.credit.push({
                   "accCode": ledgerInfo['SGST'].LeadgerCode,
                   "accName": ledgerInfo['SGST'].LeadgerName,
                   "accCategory": ledgerInfo['SGST'].LeadgerCategory,
                   "amount": ConvertToNumber(GSTAmount / 2, 2),
                   "narration": `When paid docket ${DocketNo} generated `
-                },
-                {
+                });
+                reqBody.credit.push({
                   "accCode": ledgerInfo['CGST'].LeadgerCode,
                   "accName": ledgerInfo['CGST'].LeadgerName,
                   "accCategory": ledgerInfo['CGST'].LeadgerCategory,
                   "amount": ConvertToNumber(GSTAmount / 2, 2),
                   "narration": `When paid docket ${DocketNo} generated `
-                }]
-              };
+                });
+              }
 
               this.voucherServicesService
                 .FinancePost("fin/account/posting", reqBody)

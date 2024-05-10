@@ -32,7 +32,8 @@ export class LocationService {
           state: x.locState,
           locLevel:x.locLevel,
           locCity: x.locCity,
-          pincode:x.locPincode
+          pincode:x.locPincode,
+          extraData:x
         })) ?? null;
 
       // Sort the mapped data in ascending order by location name

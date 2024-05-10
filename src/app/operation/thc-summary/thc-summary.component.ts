@@ -112,12 +112,12 @@ export class ThcSummaryComponent implements OnInit {
   async getThcDetails() {
     const branch = this.storage.branch;
     const locData = await this.thcService.getLocationDetail(branch);
-    console.log('locData', locData)
     const filter = {
       cID: this.storage.companyCode,
       D$or: [
         { fCT: locData.locCity },
         { tCT: locData.locCity },
+        { tCT:{"D$in":locData?.mappedCity||[]}},
         {vIA:{"D$in": [locData.locCity]}}
       ],
       oPSST: { D$in: [1,3,2] }
@@ -126,8 +126,13 @@ export class ThcSummaryComponent implements OnInit {
     let thcList = await this.thcService.getThcDetail(filter);
     const thcDetail = thcList.data.map((item) => {
       const dest= item.tCT?.toLowerCase() === locData.locCity?.toLowerCase();
-      const action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
+      let action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
       (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
+      if(!action){
+        if (locData && locData.mappedCity && locData.mappedCity.includes(item.tCT)) {
+            action = true;
+        }
+      }
       if (item.eNTDT) {
         item.createOn = item.eNTDT;
         item.statusAction = item?.oPSSTNM

@@ -3,10 +3,10 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { exportAsExcelFile } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { UnbillRegisterService, convertToCSV } from 'src/app/Utility/module/reports/unbill-register.service';
 import { billRegControl } from 'src/assets/FormControls/Reports/Unbill-Register/unbill-register';
@@ -38,6 +38,7 @@ export class UnbillRegisterComponent implements OnInit {
     private filter: FilterUtils,
     private unbillRegisterService: UnbillRegisterService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
   }
@@ -144,7 +145,7 @@ export class UnbillRegisterComponent implements OnInit {
         const endValue = new Date(this.unbillRegisTableForm.controls.end.value);
         const startDate = moment(startValue).startOf('day').toDate();
         const endDate = moment(endValue).endOf('day').toDate();
-        
+
         let data = await this.unbillRegisterService.getunbillRegisterReportDetail(startDate, endDate);
         const loc = Array.isArray(this.unbillRegisTableForm.value.locHandler)
           ? this.unbillRegisTableForm.value.locHandler.map(x => x.value)
@@ -175,7 +176,7 @@ export class UnbillRegisterComponent implements OnInit {
         //   const { odKTDT, ...rest } = record;
         //   return rest;
         // });
-        exportAsExcelFile(filteredRecords, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(filteredRecords, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

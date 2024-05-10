@@ -51,7 +51,7 @@ export function kpiData(csv, shipmentStatus, event) {
     // Iterate through the csv array to calculate total packages and unloaded shipments
     csv.forEach((element, index) => {
       packages = element.Packages + packages;
-      shipingUnloaded = element.Unloaded + shipingUnloaded;
+      shipingUnloaded = element.unloadedPkg + shipingUnloaded;
     });
   
     // Helper function to create a shipData object

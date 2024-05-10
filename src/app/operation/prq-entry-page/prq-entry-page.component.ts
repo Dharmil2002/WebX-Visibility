@@ -25,6 +25,8 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { rules } from "src/app/Utility/commonFunction/rules/rule";
+import { generateCombinations } from "src/app/Utility/commonFunction/common";
+import { CustomerContractService } from "src/app/core/service/customerContract/customerContract-services.service";
 
 @Component({
   selector: "app-prq-entry-page",
@@ -82,7 +84,7 @@ export class PrqEntryPageComponent implements OnInit {
   Address: string;
   userLocations: any;
 
-  constructor(   
+  constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private router: Router,
@@ -90,13 +92,14 @@ export class PrqEntryPageComponent implements OnInit {
     private operationService: OperationService,
     private containerService: ContainerService,
     private locationService: LocationService,
+    private customerContractService: CustomerContractService,
     private pinCodeService: PinCodeService,
     private prqService: PrqService,
     private storage: StorageService,
     private customerService: CustomerService,
     private generalService: GeneralService,
     private masterService: MasterService,
-    ) {    
+    ) {
     this.companyCode = this.storage.companyCode;
     this.branchCode = this.storage.branch;
 
@@ -203,16 +206,9 @@ export class PrqEntryPageComponent implements OnInit {
       prqRaiseOn: { variable: "prqRaiseOn", status: "prqRaiseOnStatus" },
       cRTTYP: { variable: "carrierTypeOn", status: "carrierTypeOnStatus" },
       bRCD: { variable: "prqBranchCode", status: "prqBranchStatus" },
-      cNTYP: {
-        variable: "typeContainerCode",
-        status: "typeContainerStatus",
-      },
+      cNTYP: { variable: "typeContainerCode", status: "typeContainerStatus"},
     };
-    processProperties.call(
-      this,
-      this.jsonControlPrqArray,
-      locationPropertiesMapping
-    );
+    processProperties.call(this,this.jsonControlPrqArray,locationPropertiesMapping);
   }
 
   functionCallHandler($event) {
@@ -246,7 +242,7 @@ export class PrqEntryPageComponent implements OnInit {
       filters: [
         {
           D$match: {
-            cityName: this.prqEntryTableForm.controls["fCITY"].value.value,
+            cityName: this.prqEntryTableForm.controls["fCITY"].value.ct,
             customer: {
               D$elemMatch: {
                 code:
@@ -312,26 +308,16 @@ export class PrqEntryPageComponent implements OnInit {
       control.value = data;
     }
   }
-
   /*below the method for the getting a CityName for PinCode Collection*/
-  async getPincodeDetail(event) {
-    const cityMapping = event.field.name == "tCITY" ?? this.fromCityStatus;
-    this.pinCodeService.getCity(
+  async getCityDetail(event) {
+   // const fcityMapping = event.field.name == "fCITY" ?? this.fromCityStatus;
+    await this.pinCodeService.getCityPincode(
       this.prqEntryTableForm,
       this.jsonControlPrqArray,
       event.field.name,
-      cityMapping
-    );
-  }
-  /*End*/
-  /*below the method for the getting a CityName for PinCode Collection*/
-  async getFromCityDetail(event) {
-    const fcityMapping = event.field.name == "fCITY" ?? this.fromCityStatus;
-    this.pinCodeService.getCity(
-      this.prqEntryTableForm,
-      this.jsonControlPrqArray,
-      event.field.name,
-      fcityMapping
+      true,
+      true,
+      true
     );
   }
   /*End*/
@@ -344,15 +330,22 @@ export class PrqEntryPageComponent implements OnInit {
     this.iSShow = false;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
-
     prqDetails["cID"] = this.storage.companyCode;
     prqDetails["bPARTY"] = this.prqEntryTableForm.value.bPARTY.value;
     prqDetails["bPARTYNM"] = this.prqEntryTableForm.value.bPARTY.name;
-    prqDetails["fCITY"] = this.prqEntryTableForm.value.fCITY.name;
-    prqDetails["tCITY"] = this.prqEntryTableForm.value.tCITY.name;
+    prqDetails["fCITY"] = this.prqEntryTableForm.value.fCITY.ct;
+    prqDetails["tCITY"] = this.prqEntryTableForm.value.tCITY.ct;
     prqDetails["bRCD"] = this.prqEntryTableForm.value.bRCD.name;
     prqDetails["pADD"] = this.prqEntryTableForm.value.pADD?.value || "A8888";
     prqDetails["pADDNM"] = this.prqEntryTableForm.value.pADD?.name || this.prqEntryTableForm.value.pADD;
+    prqDetails["fAREA"] = this.prqEntryTableForm.value.fCITY?.clusterId||"";
+    prqDetails["fAREACD"] = this.prqEntryTableForm.value.fCITY?.clusterName||"";
+    prqDetails["tAREA"] = this.prqEntryTableForm.value.tCITY?.clusterId||"";
+    prqDetails["tAREACD"] = this.prqEntryTableForm.value.tCITY?.clusterName||"";
+    prqDetails["fPIN"] = this.prqEntryTableForm.value.fCITY?.pincode||"";
+    prqDetails["fPIN"] = this.prqEntryTableForm.value.fCITY?.pincode||"";
+    prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode||"";
+    prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode||"";
 
     const cntrNames = [
       { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
@@ -456,7 +449,6 @@ export class PrqEntryPageComponent implements OnInit {
       // showConfirmationDialog(this.prqEntryTableForm.value, this.masterService, this.goBack.bind(this), tabIndex);
     }
     this.iSShow = true;
-    // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
     this.router.navigate(["/dashboard/Index"], {
@@ -586,8 +578,6 @@ export class PrqEntryPageComponent implements OnInit {
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
   InvockedContract() {
-    console.log(this.prqEntryTableForm.value);
-
     const paymentBasesName = this.paymentBase.find(
       (x) => x.value == this.prqEntryTableForm.value.pAYTYP
     ).name;
@@ -598,20 +588,38 @@ export class PrqEntryPageComponent implements OnInit {
     } else {
       containerCode = this.prqEntryTableForm.value.vEHSIZE;
     }
-    let reqBody = {
-      companyCode: this.storage.companyCode,
-      customerCode: this.prqEntryTableForm.value.bPARTY.value,
-      contractDate: this.prqEntryTableForm.value.pICKDT,
-      productName: "Road",
-      basis: paymentBasesName,
-      from: this.prqEntryTableForm.value.fCITY.value,
-      to: this.prqEntryTableForm.value.tCITY.value,
-      capacity: containerCode,
-    };
 
+    const terms = ["Area", "Pincode", "City", "State"];
+
+
+    const allCombinations = generateCombinations(terms);
+
+    let matches = allCombinations.map(([fromTerm, toTerm]) => {
+      let match = { "D$and": [] };
+      let fromConditions = this.getTermValue(fromTerm, true);  // For origin
+      let toConditions = this.getTermValue(toTerm,false);     // For destination
+
+      if (fromConditions.length > 0 || toConditions.length > 0) {
+        match["D$and"].push(...fromConditions, ...toConditions);
+        return match;
+      }
+      return null;
+    }).filter(x => x != null);
+    let reqBody =
+    {
+      "companyCode": this.storage.companyCode,
+      "customerCode":  this.prqEntryTableForm.value.bPARTY.value,
+      "contractDate": this.prqEntryTableForm.value.pICKDT,
+      "productName":  "Road",
+      "basis": paymentBasesName,
+      "from":  this.prqEntryTableForm.value.fCITY.value,
+      "to":this.prqEntryTableForm.value.tCITY.value,
+      "capacity": containerCode,
+      "matches": matches
+    }
     firstValueFrom(
       this.operationService.operationMongoPost(
-        "operation/docket/invokecontract",
+        "operation/docket/ltl/invokecontract",
         reqBody
       )
     )
@@ -663,4 +671,36 @@ export class PrqEntryPageComponent implements OnInit {
         });
       });
   }
+  getTermValue(term, isOrigin) {
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
+    const fieldKey = isOrigin ? "fCITY" : "tCITY";
+    const type = typeMapping[term];
+    let valueKey;
+    // Determine the correct key based on term
+    switch (term) {
+      case "Area":
+        valueKey = "clusterName";
+        break;
+      case "Pincode":
+        valueKey = "pincode";
+        break;
+      case "City":
+        valueKey = "ct";
+        break;
+      case "State":
+        valueKey = "st";
+        break;
+      default:
+        return [];
+    }
+    const value = this.prqEntryTableForm.controls[fieldKey].value[valueKey];
+    if (value) {
+      return [
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] }];
+
+    }
+    return [];
+  }
+
 }

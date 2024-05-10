@@ -44,7 +44,6 @@ export class ThcUpdateComponent implements OnInit {
   }
 
   functionCaller($event) {
-    // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
 

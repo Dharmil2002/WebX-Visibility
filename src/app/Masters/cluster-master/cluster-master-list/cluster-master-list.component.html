@@ -9,12 +9,12 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" 
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls"
          [columnHeader]="columnHeader" [tableData]="csv" [csvFileName]="csvFileName"
          [metaData]="METADATA"  [Link]="linkArray" [menuItemFlag]="menuItemflag"
          [menuItems]="menuItems" [staticField]="staticField" [addAndEditPath]="addAndEditPath"
-         [height]="height" [width]="width" [maxWidth]="maxWidth" 
-         (functionCallEmitter)="functionCallHandler($event)"         
+         [height]="height" [width]="width" [maxWidth]="maxWidth"
+         (functionCallEmitter)="functionCallHandler($event)" [uploadComponent]=true (uploadEvent)="upload()"
          (onFlagChange)="IsActiveFuntion($event)" >
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

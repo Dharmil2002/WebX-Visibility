@@ -208,16 +208,23 @@ export class DepartVehicleComponent implements OnInit {
         firstValueFrom(this._operationService.operationMongoPost("generic/getOne", reqVeh)),
         this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
       ]);
-      if (res) {
+      if (Object.keys(res.data).length > 0) {
         const { data } = res;
         this.departvehicleTableForm.controls["VendorType"].setValue(data?.vendorType || "");
         this.departvehicleTableForm.controls["Vendor"].setValue(data?.vendor || "");
         this.departvehicleTableForm.controls["Driver"].setValue(data?.driver || "");
         this.departvehicleTableForm.controls["DriverMob"].setValue(data?.dMobNo || "");
         this.departvehicleTableForm.controls["License"].setValue(data?.lcNo || "");
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehType || "");
+        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehTypeCode || "");
         this.departvehicleTableForm.controls["Expiry"].setValue(formatDocketDate(data?.lcExpireDate));
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(data?.capacityVolCFT || 0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedKg'].setValue(data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(data?.capacityVolCFT || 0);
+
       }
-      if (resVeh) {
+      if (Object.keys(resVeh.data).length > 0) {
         const { data } = resVeh;
         this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehicleType || "");
         this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehicleTypeCode || "");
@@ -226,43 +233,43 @@ export class DepartVehicleComponent implements OnInit {
         this.loadingSheetTableForm.controls['LoadedKg'].setValue(data?.capacity || 0);
         this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(data?.cft || 0); // Assuming you meant cft here for consistency
         // THC Details handling
-        if (thcDetails) {
-
-          const { data: thcData } = thcDetails;
-          if(thcData?.tMODE){
-          this.loadingSheetTableForm.controls['transMode'].setValue(`${thcData?.tMODE}`);
-          }
-          else{
-            const products=this.products.find((x)=>x.name=="Road");
-            this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
-          }
-          this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(thcData?.lOADED.wT || 0);
-          this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(thcData?.lOADED.vOL || 0);
-          this.loadingSheetTableForm.controls['WeightUtilization'].setValue(thcData?.uTI.wT || 0);
-          this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(thcData?.uTI.vOL || 0);
-
-          // this.advanceTableForm.controls['OtherChrge'].setValue(thcData?.cHG.oAMT || 0);
-          // this.advanceTableForm.controls['Loading'].setValue(thcData?.cHG.lOADING || 0);
-          // this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
-          // this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
-          // this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
-          this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
-          this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
-          this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
-          this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
-          this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
-          this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
-          this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
-          this.balanceTableForm.controls['balAmtAt'].setValue({name:thcData?.bLPAYAT||"",value:thcData?.bLPAYAT ||""});
-          this.balanceTableForm.controls['advPdAt'].setValue({name:thcData?.aDPAYAT||"",value:thcData?.aDPAYAT ||""});
-          if(thcData.cHG && thcData.cHG.length>0){
-            this.getAutoFillCharges(thcData.cHG,thcData);
-          }
-          else{
-            this.getCharges(thcData?.tMODENM||"Road");
-          }
-          
+      
+      }
+      if (Object.keys(thcDetails.data).length > 0) {
+        const { data: thcData } = thcDetails;
+        if(thcData?.tMODE){
+        this.loadingSheetTableForm.controls['transMode'].setValue(`${thcData?.tMODE}`);
         }
+        else{
+          const products=this.products.find((x)=>x.name=="Road");
+          this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
+        }
+        this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(thcData?.lOADED.wT || 0);
+        this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(thcData?.lOADED.vOL || 0);
+        this.loadingSheetTableForm.controls['WeightUtilization'].setValue(thcData?.uTI.wT || 0);
+        this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(thcData?.uTI.vOL || 0);
+
+        // this.advanceTableForm.controls['OtherChrge'].setValue(thcData?.cHG.oAMT || 0);
+        // this.advanceTableForm.controls['Loading'].setValue(thcData?.cHG.lOADING || 0);
+        // this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
+        // this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
+        // this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
+        this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
+        this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
+        this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
+        this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
+        this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
+        this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
+        this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
+        this.balanceTableForm.controls['balAmtAt'].setValue({name:thcData?.bLPAYAT||"",value:thcData?.bLPAYAT ||""});
+        this.balanceTableForm.controls['advPdAt'].setValue({name:thcData?.aDPAYAT||"",value:thcData?.aDPAYAT ||""});
+        if(thcData.cHG && thcData.cHG.length>0){
+          this.getAutoFillCharges(thcData.cHG,thcData);
+        }
+        else{
+          this.getCharges(thcData?.tMODENM||"Road");
+        }
+        
       }
     } catch (error) {
       console.error("Error fetching vehicle details:", error);
@@ -571,7 +578,9 @@ export class DepartVehicleComponent implements OnInit {
   }
   async getCharges(prod) {
     this.advanceControlArray = this.advanceControlArray.filter((x) => !x.hasOwnProperty('id'));
-    const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod },);
+    const filter = { "pRNm": prod, aCTV: true, cHBTY: "Booking" }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,"cHAPP":{D$in:["THC"] },isActive:true }
+    const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
       result.forEach((element, index) => {

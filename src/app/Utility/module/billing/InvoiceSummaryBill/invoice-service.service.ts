@@ -412,8 +412,8 @@ export class InvoiceServiceService {
       const PendingAmount = element.hasOwnProperty('cOL') ? +element.cOL.bALAMT : 0;
       element.collected = CollectedAmount;
       element.deductions = element?.bALAMT || 0;
-      element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
-      element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
+      element.bDUEDT = element.bDUEDT;
+      element.bGNDT = element.bGNDT;
       element.collectionAmount = PendingAmount - CollectedAmount || 0;
       element.pendingAmount = PendingAmount
       return element;
@@ -468,7 +468,7 @@ export class InvoiceServiceService {
     // Assuming formatDate is defined somewhere
     const status = [1, 2];
     const filteredData = data.filter((x) => status.includes(x.bSTS)).map((x) => {
-      x.bGNDT = formatDate(x.bGNDT, 'dd-MM-yy hh:mm');
+      x.bGNDT = x.bGNDT;
       x.customerName = `${x.cUST.cD}:${x.cUST.nM}`;
       x.status = x.bSTSNM;
       x.pendingAmt = x.cOL ? x.cOL.bALAMT : 0;
@@ -554,12 +554,16 @@ export class InvoiceServiceService {
   }
   /*here the function for the collection*/
   async getCollectionJson(formGroup, data, paymentsection) {
+    const isChequeOrRTGS = formGroup?.PaymentMode === "Cheque" || formGroup?.PaymentMode === "RTGS/UTR";
     const commonProperties = {
       cID: this.storage.companyCode,
       lOC: this.storage.branch,
       dTM: formGroup?.Date || new Date(),
       mOD: formGroup?.PaymentMode || "",
-      bANK: formGroup?.Bank.name || "",
+      bANK: formGroup?.Bank.bANM || "",
+      bANKCD: formGroup?.Bank.bANCD || "",
+      aCCD: isChequeOrRTGS ? (formGroup.Bank?.value || "") : formGroup.CashAccount.value,
+      aCNM: isChequeOrRTGS ? (formGroup.Bank?.name || "") : formGroup.CashAccount.name,
       bY: this.storage.userName,
       tRNO: formGroup?.ChequeOrRefNo || "",
       eNTDT: new Date(),

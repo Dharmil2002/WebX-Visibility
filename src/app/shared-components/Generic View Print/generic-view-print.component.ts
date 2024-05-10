@@ -1,3 +1,4 @@
+import moment from "moment";
 import {
   Component,
   EventEmitter,
@@ -7,6 +8,10 @@ import {
   Output,
   Renderer2,
 } from "@angular/core";
+import { ConvertToNumber, generateQR, isValidDate } from "src/app/Utility/commonFunction/common";
+import { ToWords } from 'to-words';
+import { isValid } from "date-fns";
+
 //import { FieldMapping, HtmlTemplate, JsonData } from "./InvoiceTemplate";
 
 @Component({
@@ -46,10 +51,7 @@ export class GenericViewPrintComponent implements OnInit {
     this.updateTableHtml();
   }
 
-  private updateTableHtml(): void {
-
-    debugger
-
+  private async updateTableHtml(): Promise<void> {
     const template = this.HtmlTemplate;
     const doc = this.parseHTML(template);
 
@@ -58,77 +60,86 @@ export class GenericViewPrintComponent implements OnInit {
     const processedRowKeys: string[] = [];
     const rows: { Key: string; Value: string }[] = [];
 
-    this.FieldMapping.filter((f) => f.Value.includes(".[#].")).forEach((f) => {
+    const filteredFieldMapping = this.FieldMapping.filter((f) => f.Value.includes(".[#]."));
+    for (const f of filteredFieldMapping) {
       const key = f.Value.slice(0, f.Value.indexOf(".[#]."));
-
-      elementsWithDataRow.forEach((ele) => {
+      for (const ele of elementsWithDataRow) {
         if (ele.textContent && ele.textContent.includes(f.Key)) {
-          if (!rows.find((r) => r.Key === key)) {
+          if (!rows.some((r) => r.Key === key)) {
             processedRowKeys.push(key);
             rows.push({ Key: key, Value: ele.outerHTML });
-
-            const dataArray = this.JsonData[key];
+            const dataArray = this.JsonData[key] || [];
             const parent = ele.parentNode as HTMLElement;
-
-            for (let i = 0; i < dataArray.length; i++) {
+            if (dataArray.length !== 0) {
+              for (let i = 0; i < dataArray.length; i++) {
+                let row = ele.outerHTML;
+                const innerFields = this.FieldMapping.filter((f) => f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`));
+                for (const f of innerFields) {
+                  const val = f.Value.replace(".[#].", `.${i}.`);
+                  if (val.endsWith("{index}")) {
+                    row = row.replace(f.Key, `${i+1}`);
+                  } else {
+                    row = row.replace(f.Key, await this.getValueByFieldName(this.JsonData, val, f.type || ""));
+                  }
+                }
+                const tr = this.createElementFromHTML(row);
+                parent.appendChild(tr);
+              }
+            } else {
               let row = ele.outerHTML;
-              console.log("row", row);
-              this.FieldMapping.filter(
-                (f) =>
-                  f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`)
-              ).forEach((f) => {
-                const val = f.Value.replace(".[#].", `.${i}.`);
-                row = row.replace(
-                  f.Key,
-                  this.getValueByFieldName(this.JsonData, val)
-                );
-              });
+              const blankFields = this.FieldMapping.filter((f) => f.Value.includes(`${key}.[#].`) && !f.Value.includes(`.[##].`));
+              for (const f of blankFields) {
+                row = row.replace(f.Key, "");
+              }
               const tr = this.createElementFromHTML(row);
               parent.appendChild(tr);
             }
             parent.removeChild(ele);
           }
         }
-      });
-    });
+      }
+    }
 
-    const elementsWithDatacolumn = Array.from(
-      doc.querySelectorAll("[data-column]")
-    );
-    elementsWithDatacolumn.forEach((coll) => {
-      const AttributeVelue = coll.getAttribute("data-column");
-      const keyindex = AttributeVelue.split(".")[1];
+    const elementsWithDatacolumn = Array.from(doc.querySelectorAll("[data-column]"));
+    for (const coll of elementsWithDatacolumn) {
+      const AttributeValue = coll.getAttribute("data-column");
+      const keyindex = AttributeValue.split(".")[1] || 0;
       const parent = coll.parentNode as HTMLElement;
-      this.FieldMapping.filter((f) => f.Value.includes(`.[##].`)).forEach(
-        (f) => {
-          let val = f.Value.replace(".[#].", `.${keyindex}.`);
-          const key = f.Value.split(".[#].")[0];
-          const nestedKey = f.Value.slice(
-            f.Value.indexOf(".[#].") + 5,
-            f.Value.indexOf(".[##].")
-          );
-          const dataArray = this.JsonData[key][keyindex][nestedKey];
-          if(dataArray.length !== 0){
-            for (let i = 0; i < dataArray.length; i++) {
-              const nestedval = val.replace(".[##].", `.${i}.`);
-              const element = document.createElement('td')
-              element.textContent = this.getValueByFieldName(this.JsonData, nestedval)
-              element.style.textAlign = 'center'; 
-              parent.appendChild(element)
-            }
+      const fieldsMapping = this.FieldMapping.filter((f) => f.Value.includes(`.[##].`));
+      for (const f of fieldsMapping) {
+        let val = f.Value.replace(".[#].", `.${keyindex}.`);
+        const key = f.Value.split(".[#].")[0];
+        const nestedKey = f.Value.slice(f.Value.indexOf(".[#].") + 5, f.Value.indexOf(".[##]."));
+        const dataArray = this.JsonData[key] && this.JsonData[key][keyindex] ? this.JsonData[key][keyindex][nestedKey] : [];
+        if (dataArray.length !== 0) {
+          for (let i = 0; i < dataArray.length; i++) {
+            const nestedVal = val.replace(".[##].", `.${i}.`);
+            const element = document.createElement(coll.tagName.toLowerCase());
+            element.textContent = await this.getValueByFieldName(this.JsonData, nestedVal, f.type || "");
+            element.style.textAlign = "center";
+            element.className = coll.className;
+            parent.appendChild(element);
           }
+        } else {
+            const element = document.createElement(coll.tagName.toLowerCase());
+            element.textContent = "";
+            element.style.textAlign = "center";
+            element.className = coll.className;
+            parent.appendChild(element);
         }
-      );
-      coll.remove()
-    });
+      }
+      coll.remove();
+    }
 
     let updatedTemplate = doc.documentElement.innerHTML;
-    this.FieldMapping.filter((f) => !f.Value.includes(".[#].")).forEach((f) => {
-      updatedTemplate = updatedTemplate.replace(
-        f.Key,
-        this.getValueByFieldName(this.JsonData, f.Value)
-      );
-    });
+    for (const f of this.FieldMapping.filter((f) => !f.Value.includes(".[#].") && !f.Value.includes(".[##]."))) {
+      if(f.type == "qrCode") {
+        debugger;
+        const qrCode = "";
+      }
+      let val = await this.getValueByFieldName(this.JsonData, f.Value, f.type || "");
+      updatedTemplate = updatedTemplate.replace(f.Key, val);
+    }
 
     document.getElementById("TemplateData").innerHTML = updatedTemplate;
   }
@@ -144,20 +155,69 @@ export class GenericViewPrintComponent implements OnInit {
     return template.content.firstChild as HTMLElement;
   }
 
-  private getValueByFieldName(obj: any, fieldName: string): any {
+  private async getValueByFieldName(obj: any, fieldName: string, type: string = "", decimalPlaces: number = 0): Promise<any> {
     const fieldNames = fieldName.split(".");
     let value = obj;
 
     for (const field of fieldNames) {
-      if (value && typeof value === "object" && field in value) {
-        value = value[field];
-      } else {
-        return "";
+      const toWords = new ToWords();
+      //console.log(`${fieldName} -> ${field}`, value[field]);
+      if (value && typeof value === "object" && field in value) {        
+        if (type) {
+          switch (type) {
+            case 'date':
+              value = isValidDate(value[field]) ? moment(new Date(value[field])).format("DD MMM YY") : value[field];
+              break;
+            case 'time':
+              value = isValidDate(value[field]) ? moment(new Date(value[field])).format("HH:mm") : value[field];
+              break;
+            case 'datetime':
+              value = isValidDate(value[field]) ? moment(new Date(value[field])).format("DD MMM YY HH:mm") : value[field];
+              break;
+            case "currency":
+              value = ConvertToNumber(value[field] || 0, decimalPlaces || 0).toFixed(2);
+              break;
+            case "currencyToWords":
+              value = toWords.convert(ConvertToNumber(value[field] || 0, decimalPlaces || 0), { currency: true, ignoreZeroCurrency: true });
+              break;
+            case "number":
+              value = ConvertToNumber(value[field] || 0, decimalPlaces || 0).toFixed(decimalPlaces || 0);
+              break;
+            case "numberToWords":
+              value = toWords.convert(ConvertToNumber(value[field] || 0, decimalPlaces || 0));
+              break;
+            case "boolean":
+              value = value[field] ? "Yes" : "No";
+              break;
+            case "qrCode":
+              value =  typeof value[field] == 'string' ? await generateQR(value[field]) : value[field];
+              break;
+            default:
+              value = value[field];
+              break;
+          }
+        } else {
+          value = value[field];
+        }
       }
+      else 
+      {
+        value = "";
+      } 
     }
 
     return value;
   }
+
+  qrGeneration(text: string) {
+
+    generateQR(text).then((res) => {
+      return res;
+    }).catch((err) => {
+      return null;
+    });
+  }
+
   functionHandle(name, element) {
     this.functionCallEmitter.emit({ functionName: name, data: element });
   }

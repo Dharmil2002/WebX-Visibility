@@ -1,99 +1,142 @@
 import { Injectable } from "@angular/core";
 import { IFieldDefinition } from "../../Interface/IFieldDefinition.interface";
-import * as StorageService from 'src/app/core/service/storage.service';
-import { StoreKeys } from "src/app/config/myconstants";
+import { EditShipmentDetailsComponent } from "src/app/operation/vehicle-update-upload/edit-shipment-details/edit-shipment-details.component";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+
 
 @Injectable({
   providedIn: "root",
 })
-export class Menifest implements IFieldDefinition {
+export class Manifest implements IFieldDefinition {
   constructor() {}
   public columnHeader = {   
-    shipment: {
-      Title: "GCN NO",
+    checkBoxRequired: {
+      Title: "",
+      class: "matcolumncenter",
+      Style: "max-width:80px",
+    },  
+    Shipment: {
+      Title:`${DocCalledAs.Docket} No`,
       class: "matcolumnleft",
       Style: "min-width:18%",
-      type: "windowLink",
-      functionName: "OpenPrq",
-      sticky: true,
     },
-    suffix: {
+    Suffix: {
       Title: "Suffix",
       class: "matcolumncenter",
       Style: "min-width:6%",
     },
-    origin: {
+    Origin: {
       Title: "Origin",
       class: "matcolumnleft",
       Style: "min-width:8%",
     },
-    dest: {
+    Destination: {
       Title: "Destination",
       class: "matcolumnleft",
       Style: "min-width:10%",
     },
-    bookPkg: {
+    Packages: {
       Title: "Pkgs",
       class: "matcolumncenter",
       Style: "min-width:16%",
-      datatype: "datetime",
+      datatype:"number",
+      sticky: true
     },
-    bookWT: {
+    weight: {
         Title: "Wt",
         class: "matcolumncenter",
         Style: "min-width:16%",
-        datatype: "datetime",
+        datatype:"number",
       },
     loadedPkg: {
         Title: "Pkgs",
         class: "matcolumncenter",
         Style: "min-width:16%",
-        datatype: "datetime",
+        datatype:"number",
       },
     loadedWT: {
           Title: "Wt",
+          datatype:"number",
           class: "matcolumncenter",
           Style: "min-width:16%",
-          datatype: "datetime",
         },
     pendPkg: {
       Title: "Pkgs",
+      datatype:"number",
       class: "matcolumnleft",
       Style: "min-width:6%",
     },
     pendWt: {
       Title: "Wt",
+      datatype:"number",
       class: "matcolumncenter",
       Style: "min-width:10%",
-      datatype: "datetime",
     },
-    leg: {
+    Leg: {
         Title: "Leg",
         class: "matcolumncenter",
         Style: "min-width:10%",
-        datatype: "datetime",
       },
-    actionsItems: {
+      actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
       Style: "max-width:6%",
       stickyEnd: true,
     }
   };
+  summaryGroup =  [{
+    Name: "Docket Details",
+    Title: "",
+    class: "matcolumncenter",
+    ColSpan: 5,
+    sticky: true
+  },
+  {
+    Name: "Booked",
+    Title: "Booked",
+    class: "matcolumncenter",
+    ColSpan: 2,
+    sticky: true
+  },
+  {
+    Name: "Loaded",
+    Title: "Loaded",
+    class: "matcolumncenter",
+    ColSpan: 2,
+    sticky: true
+  },
+  {
+    Name: "Pending",
+    Title: "Pending",
+    class: "matcolumncenter",
+    ColSpan: 2,
+    sticky: true
+  },
+  {
+    Name: "leg",
+    Title: "",
+    class: "matcolumncenter",
+    ColSpan: 3,
+    sticky: true
+  }
+];;
   public staticField = [
-    "shipment",
-    "suffix",
-    "origin",
-    "dest",
-    "bookPkg",
-    "bookWT",
+    "Shipment",
+    "Suffix",
+    "Origin",
+    "Destination",
+    "Packages",
+    "weight",
     "loadedPkg",
     "loadedWT",
     "pendPkg",
     "pendWt",
-    "leg"
+    "Leg"
   ];
-  
+  menuItems = [
+    { label: 'Edit', componentDetails: EditShipmentDetailsComponent, function: "GeneralMultipleView" },
+    // Add more menu items as needed
+  ];
   getColumn(columnName: string): any | undefined {
     return this.columnHeader[columnName] ?? undefined;
   }

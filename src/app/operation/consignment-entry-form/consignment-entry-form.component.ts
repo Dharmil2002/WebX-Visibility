@@ -1119,7 +1119,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
       this.isManual = isManual;
     }
-
     const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
     if (ELOC) {
       if (!ELOC.vAL.includes(this.storage.branch)) {

@@ -85,7 +85,7 @@ export class PrqSummaryPageComponent implements OnInit {
     }
     if (data.label) {
       if (data.label.route) {
-        const inputDate = moment(data.data.pickUpDate, "DD-MM-YY HH:mm", true);
+        const inputDate = moment(data.data.pickUpDate);
 
         // Use current date and time for 'today'
         const today = moment();

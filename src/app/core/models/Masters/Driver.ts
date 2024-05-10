@@ -6,7 +6,6 @@ export class DriverMaster {
   country: string;
   licenseScan: string;
   DOBProofScan: string;
-  _id: number;
   dCategory: string;
   driverLocation: string
   entryBy: string
@@ -19,6 +18,7 @@ export class DriverMaster {
   activeFlag: boolean;
   telno: number;
   dDob: Date;
+  _id: string;
   Ethnicity: string;
   DriverTestCode: string;
   address: string;
@@ -52,5 +52,5 @@ export class DriverMaster {
     this.eNTBY = DriverMaster.eNTBY || '';
     this.cID = DriverMaster.companyCode || parseInt(localStorage.getItem("companyCode"));
   }
- 
+
 }

@@ -141,8 +141,31 @@ export const ledgerInfo = {
   "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
   "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
   "LIA003004": GetLeadgerInfoFromLocalStorage("LIA003004"),
-
+  "INC001006": GetLeadgerInfoFromLocalStorage("INC001006"),
+  "AST001002": GetLeadgerInfoFromLocalStorage("AST001002"),
+  "AST003001": GetLeadgerInfoFromLocalStorage("AST003001"),
+  "INC001008": GetLeadgerInfoFromLocalStorage("INC001008"),
+  "AST006002": GetLeadgerInfoFromLocalStorage("AST006002"),
+  "INC001015": GetLeadgerInfoFromLocalStorage("INC001015"),
+  "INC001009": GetLeadgerInfoFromLocalStorage("INC001009"),
+  "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
+  "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
+  "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),
+  "CGST": GetLeadgerInfoFromLocalStorage("LIA002003"),
 };
+export const SACInfo = {
+  "9964": {
+    "sacCode": "9964",
+    "sacName": "Passenger Transport Services",
+    "GSTRT": 12
+  },
+  "996511": {
+    "sacCode": "996511",
+    "sacName": "road transport services of goods",
+    "GSTRT": 12
+  }
+};
+
 function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
   // Get Data From Local Storage
   const LeadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));

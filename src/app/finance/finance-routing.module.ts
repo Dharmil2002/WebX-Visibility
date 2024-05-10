@@ -19,6 +19,8 @@ import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/adv
 import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
 import { CreditVoucherComponent } from './credit-voucher/credit-voucher.component';
 import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/set-opening-balance-ledger-wise/set-opening-balance-ledger-wise.component';
+import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
+import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -40,6 +42,8 @@ const routes: Routes = [
   { path: 'FundTransfer/AdviceAcknowledge', component: AdviceAcknowledgeComponent },
   { path: 'VoucherEntry/CreditVoucher', component: CreditVoucherComponent },
   { path: 'FAMasters/SetOpeningBalanceLedgerWise', component: SetOpeningBalanceLedgerWiseComponent },
+  { path: 'VendorBillGeneration/Criteria', component: GeneralBillCriteriaComponent },
+  { path: 'VendorBillGeneration/Details', component: GeneralBillDetailComponent }
 ];
 
 @NgModule({

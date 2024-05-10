@@ -17,7 +17,7 @@ import { UploadFieldType } from 'src/app/config/myconstants';
 })
 
 export class xlsxutilityService {
-  
+
   constructor(
     private matDialog: MatDialog,
     //private http: HttpClient,
@@ -95,18 +95,18 @@ export class xlsxutilityService {
         if(field.Validations.some(x => ("FromGeneralMaster" in x && x.FromGeneralMaster) || ("ExistsInGeneralMaster" in x && x.ExistsInGeneralMaster))){
           items = [...items, ...field.Validations.filter(x => x.CodeType).map(x => x.CodeType).flat()];
         }
-        else { 
-          const extracted = validatedData.map(x =>  
-            field.Validations.some(x => "IsComaSeparated" in x && x.IsComaSeparated) 
+        else {
+          const extracted = validatedData.map(x =>
+            field.Validations.some(x => "IsComaSeparated" in x && x.IsComaSeparated)
             ? x[field.ItemsName]?.split(',').map(x => x.trim()).filter(x => x) || []
-            : [x[field.ItemsName]] 
+            : [x[field.ItemsName]]
           ) || []
           items = [...items, ...extracted.flat()];
         }
       });
       items = [... new Set(items.filter(item => !!item))];
 
-      if (items.length > 0) {        
+      if (items.length > 0) {
         dataFromDB[dataKey] = await fetchFunction(items);
       }
     }
@@ -173,10 +173,10 @@ export class xlsxutilityService {
 
      // Filter out objects with error as null
      const objectsWithErrors = results.filter(obj => obj.error !== null).flat();
- 
+
      // Filter out objects with error not null
      const objectsWithoutErrors = results.filter(obj => obj.error === null).flat();
- 
+
      // Concatenate the two arrays, putting objects without errors first
      const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
      console.log(sortedValidatedData);
@@ -262,13 +262,13 @@ export class xlsxutilityService {
         if (validation.ExistsInPincodeMaster) {
           var vals = [];
           if(validation.IsComaSeparated) {
-            vals = value.split(',').map(x => x.trim()).filter(x =>  parseInt(x || 0));
+            vals = value.split(',').map(x => parseInt(x.trim())).filter(x =>  parseInt(x || 0));
           }
           else {
             vals = [parseInt(value || 0)];
           }
 
-          const pincode = dataFromDB['Pincode'].find(x => vals.includes(x.PIN));
+          const pincode = dataFromDB['Pincode'].find(x => vals.includes(parseInt(x.PIN)));
           if (!pincode) {
             errors.push(`${rule.ItemsName} is not valid.`);
           }
@@ -350,7 +350,7 @@ export class xlsxutilityService {
         //     })
         //   );
         //   validationObservables.push(validationObservable);
-        // }          
+        // }
       }
       if (errors.length > 0) {
         break; // Exit the loop if errors are found
@@ -368,7 +368,6 @@ export class xlsxutilityService {
     for (const rule of rulesToDerive) {
       item[rule.ItemsName] = null; // Default to null if no data found or rule doesn't apply
       if(rule.From == 'General'){
-        debugger;
         var a = '';
       }
 
@@ -479,7 +478,7 @@ export class xlsxutilityService {
           //     })
           //   );
           //   validationObservables.push(validationObservable);
-          // }          
+          // }
         }
         if (errors.length > 0) {
           break; // Exit the loop if errors are found
@@ -538,7 +537,7 @@ export class xlsxutilityService {
       })
     );
   }
-  
+
   async readFile(file: File): Promise<any> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -557,7 +556,7 @@ export class xlsxutilityService {
       reader.readAsArrayBuffer(file);
     });
   }
-  
+
 
   OpenPreview(results) {
 

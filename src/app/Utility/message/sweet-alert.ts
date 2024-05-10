@@ -17,3 +17,13 @@ export async function showSuccessMessage(title: string) {
       confirmButtonText: 'OK',
     });
   }
+
+  export function showAlert(icon, title, text) {
+    Swal.fire({
+        icon: icon,
+        title: title,
+        text: text,
+        showConfirmButton: true,
+        confirmButtonText: 'OK'
+    });
+}

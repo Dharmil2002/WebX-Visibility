@@ -2,8 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { DcrAction } from 'src/app/Models/docStatus';
-import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { createShipDataObject } from 'src/app/Utility/commonFunction/dashboard/dashboard';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -41,6 +39,7 @@ export class ActiveSeriesComponent implements OnInit {
       Title: "Document",
       class: "matcolumncenter",
       Style: "",//min-width:15%
+      sticky: true
     },
     bOOK: {
       Title: "Book code",
@@ -91,6 +90,7 @@ export class ActiveSeriesComponent implements OnInit {
       Title: "Action",
       class: "matcolumncenter",
       Style: "",//max-width:90px
+      stickyEnd: true,
     },
   };
   staticField = [ "tYPNM", "bOOK", "fROM", "tO", "pAGES", "uSED", "eNTDT","aLOCD","aSNTO","aSNNM"];
@@ -112,7 +112,7 @@ export class ActiveSeriesComponent implements OnInit {
   };
   constructor(private Route: Router,
     private masterService: MasterService,
-    private http: HttpClient, private storage: StorageService) { 
+    private http: HttpClient, private storage: StorageService) {
       this.companyCode = this.storage.companyCode;
     }
 
@@ -161,7 +161,7 @@ export class ActiveSeriesComponent implements OnInit {
               ...obj,
               tYPNM: typeName,// Replace document type with its name
               actions: this.statusActions[`${obj.sTS}`] || this.statusActions.default,
-              eNTDT: formatDocketDate(obj.eNTDT)
+              eNTDT: obj.eNTDT
             };
           });
           // Extract the updatedDate from the first element (latest record)

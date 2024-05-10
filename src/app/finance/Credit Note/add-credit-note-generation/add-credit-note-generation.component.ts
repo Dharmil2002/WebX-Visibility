@@ -94,6 +94,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
         this.updatecreditnote = false;
         this.hdninvoiceno = extrasState.data.data.docNo;
         this.hdncreditno = extrasState.data.data.nTNO;
+        this.hdncnamt = extrasState.data.data.aMT;
       }
       if (extrasState.data.label.label == "Approve") {
         this.isUpdate = 2;
@@ -128,6 +129,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
     };
 
     this.hsnInvoiceDataResponse = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
+
     this.CreditnoteGenerationFormTableForm.controls["InvoiceDate"].setValue(this.hsnInvoiceDataResponse?.data[0].bGNDT || "");
     this.CreditnoteGenerationFormTableForm.controls["InvoiceDate"].setValue(
       this.hsnInvoiceDataResponse?.data[0]?.bGNDT
@@ -163,6 +165,11 @@ export class AddCreditNoteGenerationComponent implements OnInit {
     this.creditnotedetailTableForm = formGroupBuilder(this.fb, [this.creditnotedetailjsonControlArray]);
     if (this.isUpdate == 1) {
       this.CreditnoteGenerationTableForm.controls["InvoiceNumber"].setValue(this.hdninvoiceno);
+      this.CreditnoteGenerationTableForm.patchValue({
+        InvoiceNumber: {
+          value: this.hdninvoiceno
+        }
+      });
       this.Dataform()
       this.update();
     }
@@ -198,6 +205,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
     );
   }
 
+  // Comman DropDown Binding
   bindDropdown() {
     this.CreditnoteGenerationjsonControlArray.forEach((data) => {
       if (data.name === "InvoiceNumber") {
@@ -262,6 +270,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
   }
 
+  // Invoice Number DropDown Binding
   async InvoiceNumberChange(event) {
     this.creditnote = false;
     this.creditnote = false;
@@ -277,6 +286,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
     this.hsnSacDataResponse = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
     const hsnData = this.hsnSacDataResponse.data.map(x => ({ name: x.SNM, value: x.SHCD }));
+
     this.filter.Filter(
       this.CreditnoteGenerationFormjsonControlArray,
       this.CreditnoteGenerationFormTableForm,
@@ -529,10 +539,32 @@ export class AddCreditNoteGenerationComponent implements OnInit {
         },
 
       };
-
       const res = await firstValueFrom(
         this.masterService.masterPut("generic/update", req))
       if (res.success) {
+
+        const Bodys = {
+          companyCode: this.storage.companyCode,
+          collectionName: "cust_bill_headers",
+          filter: { bILLNO: this.hdninvoiceno },
+        };
+
+        this.InvoiceDataResponse = await firstValueFrom(this.masterService.masterPost("generic/get", Bodys));
+
+        const Body = {
+          companyCode: this.storage.companyCode,
+          collectionName: "cust_bill_headers",
+          filter: { bILLNO: this.hdninvoiceno },
+          update: {
+            cOL: {
+              aMT: this.InvoiceDataResponse?.data[0].cOL.aMT - this.hdncnamt + this.creditnotedetailTableForm.value.CreditNoteAmt,
+              bALAMT: this.InvoiceDataResponse?.data[0].cOL.bALAMT + this.hdncnamt - this.creditnotedetailTableForm.value.CreditNoteAmt
+            }
+          }
+        };
+
+        const res = await firstValueFrom(
+          this.masterService.masterPut("generic/update", Body))
         //this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
         Swal.fire({
           icon: "success",
@@ -733,7 +765,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
                 };
               }),
             };
-            console.log(reqBody);
+   
             firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then(async (res: any) => {
               if (res) {
                 const req = {

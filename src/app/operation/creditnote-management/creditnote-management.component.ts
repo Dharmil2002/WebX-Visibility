@@ -53,18 +53,18 @@ export class CreditnoteManagementComponent implements OnInit {
 
   columnHeader = {
     nTNO: {
-      Title: "Credit Note No",
+      Title: "CN No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
       sticky: true
     },
     eNTDT: {
-      Title: "Credit Note date​",
+      Title: "CN date​",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
     aMT: {
-      Title: "Credit Note Amount",
+      Title: "CN Amount",
       class: "matcolumnright",
       Style: "max-width: 100px",
     },
@@ -74,7 +74,7 @@ export class CreditnoteManagementComponent implements OnInit {
       Style: "max-width: 220px",
     },
     docNo: {
-      Title: "Credit Note Ref No",
+      Title: "CN Ref No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
     },
@@ -94,7 +94,7 @@ export class CreditnoteManagementComponent implements OnInit {
       Style: "max-width: 100px",
     },
     sTSNM: {
-      Title: "Credit Note Status ",
+      Title: "CN Status ",
       class: "matcolumnleft",
       Style: "max-width: 150px",
       stickyEnd: true
@@ -118,18 +118,18 @@ export class CreditnoteManagementComponent implements OnInit {
   //Credit Note Approved Table Form
   columnHeaderCnote = {
     nTNO: {
-      Title: "Credit Note No",
+      Title: "CN No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
       sticky: true
     },
     eNTDT: {
-      Title: "Credit Note date​",
+      Title: "CN date​",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
     aMT: {
-      Title: "Credit Note Amount",
+      Title: "CN Amount",
       class: "matcolumnright",
       Style: "max-width: 100px",
     },
@@ -139,7 +139,7 @@ export class CreditnoteManagementComponent implements OnInit {
       Style: "max-width: 220px",
     },
     docNo: {
-      Title: "Credit Note Ref No",
+      Title: "CN Ref No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
     },
@@ -159,7 +159,7 @@ export class CreditnoteManagementComponent implements OnInit {
       Style: "max-width: 100px",
     },
     sTSNM: {
-      Title: "Credit Note Status ",
+      Title: "CN Status ",
       class: "matcolumnleft",
       Style: "max-width: 150px",
     },
@@ -235,7 +235,6 @@ export class CreditnoteManagementComponent implements OnInit {
         pARTY: item.pARTY.cD + ':' + item.pARTY.nM,
         gstRevlAmt: item.gST.aMT
       }));
-      console.log( this.DataResponseHeader.data);
 
     this.cNoteData = this.DataResponseHeader.data
       // .filter(item => item.sTS === 1) // Filter out items where sTS is not equal to 1

@@ -287,6 +287,10 @@ export class ThcGenerationComponent implements OnInit {
   delChargeControl: any[];
   balanceAmount: any;
   Request: {};
+  //below varible is used for Rules 
+  rules: any[] = [];
+  connectedLoc: boolean = false;
+  //End
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -294,7 +298,6 @@ export class ThcGenerationComponent implements OnInit {
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
-    private docketService: DocketService,
     private vehicleStatusService: VehicleStatusService,
     private vendorService: VendorService,
     private driverService: DriverService,
@@ -379,6 +382,7 @@ export class ThcGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.IntializeFormControl();
     this.backPath = "/dashboard/Index?tab=6";
+    this.getRules();
   }
   /*here the function which is use for the intialize a form for thc*/
   IntializeFormControl() {
@@ -436,6 +440,20 @@ export class ThcGenerationComponent implements OnInit {
     //this.DocketFilterData.cCT = this.thcTableForm.controls['fromCity'].value?.value || ''
   }
   /*End*/
+  //#region GetRules
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: { "D$in": ["CNOTE"] },
+      aCTIVE: true
+    }
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
+      this.connectedLoc = this.rules.find(x => x.rULEID == "CONLOC" && x.aCTIVE)?.vAL == "Y";
+    }
+  }
+  //#End
   /*count ETA*/
   changeEta() {
     const tripDate = new Date(this.thcTableForm.controls['tripDate'].value);
@@ -1234,12 +1252,15 @@ export class ThcGenerationComponent implements OnInit {
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];
-        if (x.tCT.toUpperCase() === this.currentLocation.locCity.toUpperCase() ||
-          (this.currentLocation.extraData && this.currentLocation.extraData.mappedCity && this.currentLocation.extraData.mappedCity.includes(x.tCT.toUpperCase()))
-        ) {
-          x.actions = ["Update"];
+        const toCity = x.tCT.toUpperCase();
+        // Check if city matches the current city or is in the mapped cities list
+        if (toCity == this.currentLocation.locCity.toUpperCase() ||
+            (this.connectedLoc &&
+             this.currentLocation.extraData &&
+             this.currentLocation.extraData.mappedCity &&
+             this.currentLocation.extraData.mappedCity.includes(toCity))) {
+            x.actions = ["Update"];
         }
-        
         else if (this.isView) {
 
         }
@@ -1766,7 +1787,7 @@ export class ThcGenerationComponent implements OnInit {
     this.rrLoad = true;
     if (data.label.label === "RemoveRake") {
       this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);
-       this.rrLoad = false;
+      this.rrLoad = false;
     } else {
       this.rakeDetailsTableForm.controls['rrNo'].setValue(data.data['rrNo']);
       this.rakeDetailsTableForm.controls['rrDate'].setValue(

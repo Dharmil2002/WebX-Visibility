@@ -15,13 +15,13 @@ export class CustInvRegFormControl {
         disable: false,
         Validations: [],
         additionalData: {
-             support: "end",
+          support: "end",
         },
       },
       {
-        name: "aCUST",
-        label: "Customer",
-        placeholder: "Select Customer",
+        name: "dTYPE",
+        label: "Document type",
+        placeholder: "Select Document type",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -40,51 +40,9 @@ export class CustInvRegFormControl {
         },
       },
       {
-        name: "aLOC",
-        label: "Allocation location",
-        placeholder: "Select Allocation location",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "aEMP",
-        label: "Employee",
-        placeholder: "Select Employee",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "aBUSAS",
-        label: "Business Associate",
-        placeholder: "Select Business Associate",
+        name: "gSTE",
+        label: "GST State",
+        placeholder: "Select GST State",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -106,40 +64,167 @@ export class CustInvRegFormControl {
         name: "sTS",
         label: "Status",
         placeholder: "Select Status",
-        type: "Staticdropdown",
-        value: [
-          { value: 1, name: "Added" },
-          { value: 2, name: "Allocated" },
-          { value: 3, name: "Reallocated" },
-          { value: 4, name: "Assigned" },
-          { value: 5, name: "Splitted" },
-          { value: 6, name: "Declared_Void" },
-          { value: 7, name: "Deallocated" },
-          { value: 9, name: "Cancelled" },
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
         ],
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
-        name: "bCODE",
-        label: "Book code",
-        placeholder: "Book code",
-        type: "text",
+        name: "CUST",
+        label: "Customer",
+        placeholder: "Select Customer",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {
+          onModel: "getCustomer",
+        },
+      },
+      {
+        name: "sACCODE",
+        label: "SAC Code",
+        placeholder: "Select SAC Code",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "lOC",
+        label: "Location",
+        placeholder: "Select Location",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
-        name: "sRICENO",
-        label: "Search by number",
-        placeholder: "Search by number",
-        type: "text",
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "OR",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "dNO",
+        label: "Enter Document No",
+        placeholder: "Document No",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {},
       },
       {
         name: "end",
@@ -152,7 +237,7 @@ export class CustInvRegFormControl {
         generatecontrol: false,
         disable: true,
         Validations: [],
-      }
+      },
     ];
   }
   getCustInvRegFormControls() {

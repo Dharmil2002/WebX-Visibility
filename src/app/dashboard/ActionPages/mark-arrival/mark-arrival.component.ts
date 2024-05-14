@@ -23,6 +23,8 @@ import { ControlPanelService } from 'src/app/core/service/control-panel/control-
 import { firstValueFrom } from 'rxjs';
 import { ThcCostUpdateService } from 'src/app/Utility/module/operation/thc/thc-cost-update.service';
 import moment from 'moment';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -46,6 +48,7 @@ export class MarkArrivalComponent implements OnInit {
   mfList: any[];
   dktList: any[];
   Request: {};
+  imageData: any = {};
   constructor(
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
@@ -60,6 +63,7 @@ export class MarkArrivalComponent implements OnInit {
     private _operationService: OperationService,
     private controlPanel: ControlPanelService,
     private thcCostUpdateService: ThcCostUpdateService,
+    private objImageHandling: ImageHandling,
     private hawkeyeUtilityService: HawkeyeUtilityService) {
     this.MarkArrivalTable = item;
   }
@@ -123,12 +127,13 @@ export class MarkArrivalComponent implements OnInit {
     this.mfList = shipment
   }
   async save() {
-
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
           value.name || ""
       )
+    const pod = this.imageData?.Upload || ""
+    this.MarkArrivalTableForm.controls['pod'].setValue(pod);
     let tripDetailForm = this.MarkArrivalTableForm.value
     const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
     if (res) {
@@ -326,39 +331,21 @@ export class MarkArrivalComponent implements OnInit {
       }
     });
   }
-  GetFileList(data) {
-    const files: FileList = data.eventArgs;
-    const fileCount: number = files.length;
-    const fileList: File[] = [];
-    const allowedExtensions: string[] = ['jpeg', 'jpg', 'png'];
-    let hasUnsupportedFiles = false;
-    const fileNames: string[] = [];
 
-    for (let i = 0; i < fileCount; i++) {
-      const file: File = files[i];
-      const fileExtension: string = file.name.split('.').pop()?.toLowerCase() || '';
-
-      if (allowedExtensions.includes(fileExtension)) {
-        fileList.push(file);
-        fileNames.push(file.name); // Save file name
-      } else {
-        hasUnsupportedFiles = true;
-      }
-    }
-
-    if (hasUnsupportedFiles) {
-      // Display an error message or take appropriate action
-      this.ObjSnackBarUtility.showNotification(
-        "snackbar-danger",
-        "Unsupported file format. Please select PNG, JPEG, or JPG files only.",
-        "bottom",
-        "center"
-      );
-    } else {
-      this.uploadedFiles = fileList; // Assign the file list to a separate variable
-    }
+  async GetFileList(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+      MarkArrivalTableForm, this.imageData, "MarkArrival", 'Operation', this.jsonControlArray, allowedFormats);
   }
-
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
 
 
 }

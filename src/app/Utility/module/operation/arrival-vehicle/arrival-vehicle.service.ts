@@ -110,7 +110,6 @@ export class ArrivalVehicleService {
 
     /*Below function is for register entry of mark Arrival*/
     async fieldMappingMarkArrival(trip, data, dktList) {
-        debugger
         let legID = `${this.storage.companyCode}-${trip.TripID}-${trip.cLOC}-${trip.nXTLOC}`;
         var lagData = await this.getCheckOnce({
             "_id": legID,

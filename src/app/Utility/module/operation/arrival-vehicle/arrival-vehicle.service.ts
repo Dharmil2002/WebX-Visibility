@@ -130,7 +130,7 @@ export class ArrivalVehicleService {
                 "sEALSTS": data?.SealStatus || "",
                 "lTRES": data?.LateReason || "",
                 "rES": data.Reason || "",
-                "pOD": data.Upload || "",
+                "pOD":data?.pod || "",
                 "aRBY": this.storage.userName
             },
             uNLOAD: {

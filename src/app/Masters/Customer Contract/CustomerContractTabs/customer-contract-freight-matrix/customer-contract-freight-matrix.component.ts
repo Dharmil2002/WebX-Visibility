@@ -222,13 +222,13 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     if (res.success) {
       this.tableData = res.data;
       this.tableData.sort((a, b) => (a.fCID > b.fCID ? -1 : 1));
-      this.tableData = this.tableData.map((x, index) => {
-        return {
-          ...x, // Spread the original item to retain other fields
-          vFDT: formatDate(x.vFDT || '', "dd-MM-yyyy"),
-          vEDT: formatDate(x.vEDT || '', "dd-MM-yyyy"),
-        };
-      })
+      // this.tableData = this.tableData.map((x, index) => {
+      //   return {
+      //     ...x, // Spread the original item to retain other fields
+      //     vFDT: formatDate(x.vFDT || '', "dd-MM-yyyy"),
+      //     vEDT: formatDate(x.vEDT || '', "dd-MM-yyyy"),
+      //   };
+      // })
       this.tableLoad = true;
       this.isLoad = false;
     }

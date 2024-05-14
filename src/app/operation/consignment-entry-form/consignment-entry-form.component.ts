@@ -953,8 +953,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
         expiryDate: this.model.invoiceTableForm.value.expiryDate
-          ? formatDate(this.model.invoiceTableForm.value.expiryDate, "dd-MM-yy HH:mm")
-          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm"),
+          ? this.model.invoiceTableForm.value.expiryDate
+          : new Date(),
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1355,8 +1355,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         x.id = index + 1;
         x.ewayBillNo = `${x.eWBNO}`;
         x.expiryDate = x.eXPDT
-          ? formatDate(x.eXPDT, "dd-MM-yy HH:mm")
-          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm");
+          ? x.eXPDT
+          : new Date();
         x.invoiceNo = x.iNVNO;
         x.invoiceAmount = x.iNVAMT;
         x.noofPkts = x.pKGS;

@@ -61,7 +61,10 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { GenericViewTableComponent } from './generic-view-table/generic-view-table.component';
 import { GenericCardWithMenuActionsComponent } from './generic-card-with-menu-actions/generic-card-with-menu-actions.component';
 import { GenericBulkUploadComponent } from './generic-bulk-upload/generic-bulk-upload.component';
-import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT } from '../config/myconstants';
+import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT, MY_DATETIME_FORMAT } from '../config/myconstants';
+import { NGX_MAT_DATE_FORMATS, NgxMatDateAdapter, NgxMatDatetimePickerModule, NgxMatTimepickerModule } from '@angular-material-components/datetime-picker';
+import { NgxMatMomentModule, NGX_MAT_MOMENT_DATE_ADAPTER_OPTIONS  } from '@angular-material-components/moment-adapter';
+import { CustomDateAdapter } from './FormFields/CustomDateAdapter';
 
 @NgModule({
   declarations: [GenericAccordionComponent, GenericTableComponent,
@@ -95,6 +98,9 @@ import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT } from '../config/myconstants';
     ReactiveFormsModule,
     ComponentsModule,
     MatNativeDateModule,
+    NgxMatDatetimePickerModule,
+    NgxMatTimepickerModule,
+    NgxMatMomentModule,
     OwlNativeDateTimeModule,
     OwlDateTimeModule,
     MatTreeModule,
@@ -114,6 +120,12 @@ import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT } from '../config/myconstants';
     },    
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
     { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-IN' },
+    { provide: NGX_MAT_DATE_FORMATS, useValue: MY_DATETIME_FORMAT},
+    // {
+    //   provide: NgxMatDateAdapter,
+    //   useClass: CustomDateAdapter,
+    //   deps: [NGX_MAT_DATE_FORMATS]
+    // },
     //{ provide: OWL_DATE_TIME_FORMATS, useValue: MY_CUSTOM_FORMAT },
     FilterUtils, ImageHandling
   ],
@@ -148,4 +160,3 @@ import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT } from '../config/myconstants';
 
 })
 export class SharedComponentsModule { }
-

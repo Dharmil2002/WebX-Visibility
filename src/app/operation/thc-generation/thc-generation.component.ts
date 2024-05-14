@@ -1281,7 +1281,7 @@ export class ThcGenerationComponent implements OnInit {
         const invoiceData = thcDetail.data.thcDetails.rAKE.iNV.map(element => {
           return {
             invNum: element.nO,
-            invDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
+            invDate: element.dT,
             orrInvDt: element.dT,
             invAmt: element.aMT,
             actions: []
@@ -1294,7 +1294,7 @@ export class ThcGenerationComponent implements OnInit {
         const invoiceData = thcDetail.data.thcDetails.rAKE.rR.map(element => {
           return {
             rrNo: element.nO,
-            rrDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
+            rrDate: element.dT,
             orrDate: element.dT,
             actions: []
           }
@@ -1765,7 +1765,7 @@ export class ThcGenerationComponent implements OnInit {
     await delay(delayDuration);
     const json = {
       rrNo: this.rakeDetailsTableForm.controls['rrNo'].value,
-      rrDate: formatDate(this.rakeDetailsTableForm.controls['rrDate'].value, "dd-MM-yy HH:mm"),
+      rrDate: this.rakeDetailsTableForm.controls['rrDate'].value,
       orrDate: this.rakeDetailsTableForm.controls['rrDate'].value,
       actions: ["EditRake", "RemoveRake"]
     };
@@ -1829,7 +1829,7 @@ export class ThcGenerationComponent implements OnInit {
     await delay(delayDuration);
     const json = {
       invNum: this.rakeInvoice.controls['invNo'].value,
-      invDate: formatDate(this.rakeInvoice.controls['invDt'].value, "dd-MM-yy HH:mm"),
+      invDate: this.rakeInvoice.controls['invDt'].value,
       orrInvDt: this.rakeInvoice.controls['invDt'].value,
       invAmt: this.rakeInvoice.controls['invAmt'].value,
       actions: ["EditInvoice", "RemoveInvoice"]

@@ -1,3 +1,4 @@
+import { NgxMatDateFormats } from "@angular-material-components/datetime-picker";
 import { OwlDateTimeFormats } from "@danielmoncada/angular-datetime-picker";
 
 export const MY_CUSTOM_FORMAT: OwlDateTimeFormats = {
@@ -23,6 +24,18 @@ export const MY_DATE_FORMAT = {
         monthYearA11yLabel: 'MMMM YYYY',       // used for the month and year accessibility label
     },
 };
+
+export const MY_DATETIME_FORMAT: NgxMatDateFormats = {
+    parse: {
+      dateInput: 'DD MMM YY HH:mm'
+    },
+    display: {
+      dateInput: 'DD MMM YY HH:mm',
+      monthYearLabel: "MMM YYYY",
+      dateA11yLabel: "LL",
+      monthYearA11yLabel: "MMMM YYYY"
+    }
+  };
 
 
 

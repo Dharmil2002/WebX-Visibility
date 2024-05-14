@@ -3,6 +3,7 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { AddHocRouteComponent } from "./add-hoc-route/add-hoc-route.component";
 
 @Component({
   selector: "app-departure-dashboard-page",
@@ -31,7 +32,7 @@ export class DepartureDashboardPageComponent
     },
   ];
   dynamicControls = {
-    add: false,
+    add: true,
     edit: true,
     csv: false,
   };
@@ -132,6 +133,7 @@ export class DepartureDashboardPageComponent
   boxData = [];
   loadingSheetData: any;
   departuredata: any[];
+  headerCode: any;
   // declararing properties
 
   constructor(
@@ -145,6 +147,8 @@ export class DepartureDashboardPageComponent
     this.loadingSheetData = this.CnoteService.getLsData();
     this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "departureData.csv";
+    this.headerCode ="Dhaval"
+    this.viewComponent = AddHocRouteComponent;
     this.getdepartureDetail();
   }
 

@@ -1,0 +1,6 @@
+<form [formGroup]="addHocForm">
+    <app-form-webxpress [form]="addHocForm" [FormTitle]="'Basic Detail'" [formData]="jsonAddHocControl"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+      (callFunction)="functionCallHandler($event)"   [className]="className">
+    </app-form-webxpress>
+  </form>

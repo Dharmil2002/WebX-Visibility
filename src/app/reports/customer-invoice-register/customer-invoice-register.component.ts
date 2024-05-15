@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
-import { StateService } from 'src/app/Utility/module/masters/state/state.service';
-import { CustInvRegFormControl } from 'src/assets/FormControls/Reports/Customer-invoice-register/CustomerInvoiceRegisterControls';
-import { GetsachsnFromApi } from 'src/app/finance/Vendor Bills/VendorGeneralBill/general-bill-detail/generalbillAPIUtitlity';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { StateService } from "src/app/Utility/module/masters/state/state.service";
+import { CustInvRegFormControl } from "src/assets/FormControls/Reports/Customer-invoice-register/CustomerInvoiceRegisterControls";
+import { GetsachsnFromApi } from "src/app/finance/Vendor Bills/VendorGeneralBill/general-bill-detail/generalbillAPIUtitlity";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { CustomerBillStatus } from "src/app/Models/docStatus";
 
 @Component({
-  selector: 'app-customer-invoice-register',
-  templateUrl: './customer-invoice-register.component.html'
+  selector: "app-customer-invoice-register",
+  templateUrl: "./customer-invoice-register.component.html",
 })
 export class CustomerInvoiceRegisterComponent implements OnInit {
-
   //#region breadScrums
   breadScrums = [
     {
@@ -24,8 +24,8 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
   ];
   //#endregion
 
-  CustInvREGTableForm: UntypedFormGroup
-  jsonCustInvREGFormArray: any
+  CustInvREGTableForm: UntypedFormGroup;
+  jsonCustInvREGFormArray: any;
   CustInvREGFormControl: CustInvRegFormControl;
   stateName: any;
   stateStatus: any;
@@ -36,15 +36,13 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     private customerService: CustomerService,
     private objStateService: StateService,
     private masterService: MasterService,
-    private filter: FilterUtils,
-
+    private filter: FilterUtils
   ) {
-    this.initializeFormControl()
+    this.initializeFormControl();
   }
 
-
   ngOnInit(): void {
-    this.getDropDownList()
+    this.getDropDownList();
   }
 
   //#region  initializeFormControl
@@ -52,12 +50,12 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     this.CustInvREGFormControl = new CustInvRegFormControl();
     this.jsonCustInvREGFormArray =
       this.CustInvREGFormControl.getCustInvRegFormControls();
-      this.stateName = this.jsonCustInvREGFormArray.find(
-        (data) => data.name === "gSTE"
-      )?.name;
-      this.stateStatus = this.jsonCustInvREGFormArray.find(
-        (data) => data.name === "gSTE"
-      )?.additionalData.showNameAndValue;
+    this.stateName = this.jsonCustInvREGFormArray.find(
+      (data) => data.name === "gSTE"
+    )?.name;
+    this.stateStatus = this.jsonCustInvREGFormArray.find(
+      (data) => data.name === "gSTE"
+    )?.additionalData.showNameAndValue;
     this.CustInvREGTableForm = formGroupBuilder(this.fb, [
       this.jsonCustInvREGFormArray,
     ]);
@@ -66,14 +64,17 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
 
   //#region
   async getCustomer() {
-    await this.customerService.getCustomerForAutoComplete
-    (this.CustInvREGTableForm, this.jsonCustInvREGFormArray,
-    "CUST", true);
+    await this.customerService.getCustomerForAutoComplete(
+      this.CustInvREGTableForm,
+      this.jsonCustInvREGFormArray,
+      "CUST",
+      true
+    );
   }
   //#endregion
 
   //#region
-  async getDropDownList(){
+  async getDropDownList() {
     const statelist = await this.objStateService.getState();
     this.filter.Filter(
       this.jsonCustInvREGFormArray,
@@ -90,13 +91,23 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
       "sACCODE",
       false
     );
-  }
 
+    const data = Object.entries(CustomerBillStatus)
+      .filter(([_key, dataValue]) => typeof dataValue === "number")
+      .map(([name, value]) => ({ name, value: String(value) })); // Explicitly cast value to string
+    this.filter.Filter(
+      this.jsonCustInvREGFormArray,
+      this.CustInvREGTableForm,
+      data,
+      "sTS",
+      false
+    );
+  }
   //#endregion
 
   //#region  functionCallHandler
   functionCallHandler($event) {
-    let functionName = $event.functionName;     // name of the function , we have to call
+    let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);

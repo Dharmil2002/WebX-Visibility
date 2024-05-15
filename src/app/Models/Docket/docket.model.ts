@@ -120,6 +120,7 @@ export class DocketEntryModel implements IFieldDefinition {
       Title: "Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype: "date"
     },
     invoiceNo: {
       Title: "Invoice No",
@@ -129,7 +130,7 @@ export class DocketEntryModel implements IFieldDefinition {
     invoiceAmount: {
       Title: "Invoice Amount",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "min-width:2px"
     },
     noofPkts: {
       Title: "No of Package",

@@ -161,7 +161,6 @@ export class DashboardPageComponent implements OnInit {
     this.tabName = event.tab.textLabel;
   }
   ngAfterViewInit(): void {
-
     this.activeRoute.queryParams.subscribe(params => {
       const selectedTabName = params['tab'];
       if (selectedTabName) {

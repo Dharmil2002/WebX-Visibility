@@ -257,7 +257,7 @@ export class VehicleStatusService {
         driver: x.driver,
         dMobNo: x.dMobNo,
         isMarket: vendorInfo.isMarket,
-        eta: formatDate(new Date().toUTCString(), 'dd/MM/yyyy HH:mm')
+        eta: formatDate(new Date().toUTCString(), 'dd MMM yyyy HH:mm')
       }
     });
     return results;

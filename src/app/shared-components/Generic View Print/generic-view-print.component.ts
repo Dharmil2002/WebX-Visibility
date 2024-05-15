@@ -27,6 +27,7 @@ export class GenericViewPrintComponent implements OnInit {
     },
   ];
   @Input() HtmlTemplate: any;
+  @Input() isLandscape: any = true;
   @Input() JsonData: any;
   @Input() FieldMapping: any[];
   @Input() EventButton;
@@ -34,6 +35,7 @@ export class GenericViewPrintComponent implements OnInit {
   @Input() barcode6Details: any = {};
   @Output() functionCallEmitter = new EventEmitter();
 
+  printStyles = { '@page': { size: `${this.isLandscape?'landscape':'portrait'} !important` } }
   constructor(private renderer: Renderer2) {
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
@@ -51,6 +53,9 @@ export class GenericViewPrintComponent implements OnInit {
     this.updateTableHtml();
   }
 
+  onToggleChange(event){
+    this.printStyles = { '@page': { size: `${event?'landscape':'portrait'} !important` } }
+  }
   private async updateTableHtml(): Promise<void> {
     const template = this.HtmlTemplate;
     const doc = this.parseHTML(template);

@@ -1,0 +1,34 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+
+    <form [formGroup]="CreditnoteGenerationTableForm">
+        <app-form-webxpress *ngIf="updatecreditnote" [form]="CreditnoteGenerationTableForm" [formData]="CreditnoteGenerationjsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveButton]="false"
+            (callFunction)="functionCallHandler($event)" [FormTitle]="">
+        </app-form-webxpress>
+
+    </form>
+    <button class="msr-3" *ngIf="updatecreditnote" (click)="Dataform()" mat-raised-button color="primary" style="margin-bottom: 7px;"
+        [disabled]="!CreditnoteGenerationTableForm.valid">Next</button>
+
+    <form [formGroup]="CreditnoteGenerationTableForm">
+        <app-form-webxpress *ngIf="creditnote" [form]="CreditnoteGenerationFormTableForm"
+            [formData]="CreditnoteGenerationFormjsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [FormTitle]=""
+            (menuItemClicked)="handleMenuItemClick($event)">
+        </app-form-webxpress>
+
+        <app-form-webxpress *ngIf="creditnote" [form]="creditnotedetailTableForm"
+            [formData]="creditnotedetailjsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)"
+            [FormTitle]="'Credit Note Detail'">
+        </app-form-webxpress>
+
+    </form>
+
+    <button type="button"  mat-raised-button color="primary" (click)="save()">
+       
+        <ng-template>Save</ng-template>
+    </button>&nbsp;&nbsp;
+   
+
+</app-common-wrapper-webxpress>

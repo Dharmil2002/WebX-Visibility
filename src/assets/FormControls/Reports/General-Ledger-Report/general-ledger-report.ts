@@ -25,6 +25,9 @@ export class GeneralLedgerReport {
                 additionalData: {
                     showNameAndValue: false,
                 },
+                functions: {
+                    onOptionSelect: "validateDateRange"
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -39,6 +42,7 @@ export class GeneralLedgerReport {
                 Validations: [],
                 additionalData: {
                     support: "end",
+                    minDate: new Date('2023-04-01'),
                 },
             },
             {
@@ -55,18 +59,39 @@ export class GeneralLedgerReport {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'state',
-                label: 'Select State',
-                placeholder: 'Select State ',
+                name: 'reportSubType',
+                label: 'Report Sub Type',
+                placeholder: 'Report Sub Type',
+                type: 'Staticdropdown',
+                value: [
+                    { value: "Location", name: "Location" },
+                    { value: "Customer", name: "Customer" },
+                    { value: "Vendor", name: "Vendor" },
+                    { value: "Employee", name: "Employee" },
+                    { value: "Driver", name: "Driver" },
+                    { value: "Vehicle", name: "Vehicle" },
+                ],
+                functions: {
+                    onSelection: "reportSubTypeChanged"
+                },
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'subLedger',
+                label: 'Sub Ledger',
+                placeholder: 'Sub Ledger',
                 type: 'multiselect',
                 value: [],
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [
-                ],
+                Validations: [{
+                    name: "autocomplete",
+                },
+                {
+                    name: "invalidAutocomplete",
+                    message: "Choose proper value",
+                },],
                 additionalData: {
-                    support: "stateHandler",
+                    support: "subLedgerHandler",
                     showNameAndValue: true,
                 },
                 functions: {
@@ -127,7 +152,7 @@ export class GeneralLedgerReport {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [ {
+                Validations: [{
                     name: "autocomplete",
                 },
                 {
@@ -180,8 +205,8 @@ export class GeneralLedgerReport {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'stateHandler',
-                label: 'stateHandler',
+                name: 'branchHandler',
+                label: 'branchHandler',
                 placeholder: ' ',
                 type: '',
                 value: '',
@@ -189,8 +214,8 @@ export class GeneralLedgerReport {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'branchHandler',
-                label: 'branchHandler',
+                name: 'subLedgerHandler',
+                label: '',
                 placeholder: ' ',
                 type: '',
                 value: '',

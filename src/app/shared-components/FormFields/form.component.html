@@ -439,13 +439,10 @@
                     <mat-datepicker-toggle matSuffix [for]="datetimepicker"></mat-datepicker-toggle>
                     -->
 
-                    <input matInput [ngxMatDatetimePicker]="datetimepicker" 
-                        placeholder={{formItem.placeholder}}
-                        [min]="formItem.additionalData?.minDate" 
-                        [max]="formItem.additionalData?.maxDate"
-                        [disabled]="false"
-                        [formControlName]="formItem.name"
-                        (dateTimeChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate, eventArgs: $event})">
+                    <input matInput [ngxMatDatetimePicker]="datetimepicker" placeholder={{formItem.placeholder}}
+                      [min]="formItem.additionalData?.minDate" [max]="formItem.additionalData?.maxDate"
+                      [disabled]="false" [formControlName]="formItem.name"
+                      (dateTimeChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate, eventArgs: $event})">
                     <mat-datepicker-toggle matSuffix [for]="datetimepicker"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #datetimepicker>
                     </ngx-mat-datetime-picker>
@@ -465,8 +462,10 @@
                     style="width: 100%" *ngIf="(formItem.type=='daterangpicker')" appearance="outline">
                     <mat-label class="fontbold">{{formItem.label}}</mat-label>
                     <mat-date-range-input [rangePicker]="picker">
-                      <input matStartDate [formControlName]="formItem.name" placeholder="Start date" />
-                      <input matEndDate [formControlName]="formItem.additionalData.support" placeholder="End date" />
+                      <input matStartDate [formControlName]="formItem.name" placeholder="Start date"
+                        [min]="formItem.additionalData?.minDate" />
+                      <input matEndDate [formControlName]="formItem.additionalData.support" placeholder="End date"
+                        [max]="formItem.additionalData?.maxDate" />
                     </mat-date-range-input>
                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-date-range-picker #picker [calendarHeaderComponent]="CustomeDatePickerComponent"

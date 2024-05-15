@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { prepareReportData } from '../../commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { tr } from 'date-fns/locale';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class GeneralLedgerReportService {
             vDT: { 'D$gte': data.startValue }
           }, // Convert start date to ISO format
           { vDT: { 'D$lte': data.endValue } }, // Bill date less than or equal to end date       
-          ...(data.state.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pST', data.state] } }] : []), // State names condition
+          ...(data.partyName.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pCODE', data.partyName] } }] : []), // State names condition
           ...(data?.category ? [{ aCCAT: { 'D$in': [data.category] } }] : []), // account code condition
           ...([{ lOC: { 'D$in': data.branch } }]), //branch condition
           ...(data.fnYear ? [{ 'fY': data.fnYear }] : []), // financial year condition
@@ -231,6 +232,114 @@ export class GeneralLedgerReportService {
     ];
 
     return financialYear;
+  }
+  //#endregion
+  //#region to get vendor list, user list, driver list, customer list, vehicle list
+  async vendorsData() {
+    // Create the request object for fetching active vendor details
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "vendor_detail",
+      filter: { isActive: true }
+    };
+
+    // Use firstValueFrom to convert the observable to a promise
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+    // Process the response if it exists
+    if (res) {
+      // Map the data to a simplified structure and filter out any null values
+      const data = res?.data
+        .map(x => ({ value: x.vendorCode, name: x.vendorName }))
+        .filter(x => x != null)
+        .sort((a, b) => a.value.localeCompare(b.value)); // Sort vendors by vendorCode
+
+      return data;
+    }
+  }
+
+  async usersData() {
+    // Create the request object for fetching active user details
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "user_master",
+      filter: { isActive: true }
+    };
+
+    try {
+      // Use firstValueFrom to convert the observable to a promise
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+      // Map the data to a simplified structure, sort by user name and return the result
+      const result = res?.data.map(x => ({ value: x.userId, name: x.name })) ?? null;
+      return result?.sort((a, b) => a.name.localeCompare(b.name)); // Sort users by name
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return null;
+    }
+  }
+
+  async driversData() {
+    // Create the request object for fetching active driver details
+    const reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: "driver_detail",
+      filter: { activeFlag: true }
+    };
+
+    try {
+      // Use firstValueFrom to convert the observable to a promise
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
+
+      // Map the data to a simplified structure, sort by driver name and return the result
+      const result = res?.data.map(x => ({ value: x.manualDriverCode, name: x.driverName })) ?? null;
+      return result?.sort((a, b) => a.name.localeCompare(b.name)); // Sort drivers by name
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return null;
+    }
+  }
+
+  async customersData() {
+    // Create the request object for fetching active customer details
+    const reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: "customer_detail",
+      filter: { activeFlag: true }
+    };
+
+    try {
+      // Use firstValueFrom to convert the observable to a promise
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
+
+      // Map the data to a simplified structure, sort by customer name and return the result
+      const result = res?.data.map(x => ({ value: x.customerCode, name: x.customerName })) ?? null;
+      return result?.sort((a, b) => a.name.localeCompare(b.name)); // Sort customers by name
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return null;
+    }
+  }
+
+  async vehicleData() {
+    // Create the request object for fetching active vehicle details
+    const reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: "vehicle_detail",
+      filter: { isActive: true }
+    };
+
+    try {
+      // Use firstValueFrom to convert the observable to a promise
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
+
+      // Map the data to a simplified structure, sort by vehicle number and return the result
+      const result = res?.data.map(x => ({ value: x.vehicleNo, name: x.vehicleNo })) ?? null;
+      return result?.sort((a, b) => a.name.localeCompare(b.name)); // Sort vehicles by vehicle number
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return null;
+    }
   }
   //#endregion
 }

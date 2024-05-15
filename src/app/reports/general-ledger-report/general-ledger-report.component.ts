@@ -9,7 +9,6 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -31,8 +30,6 @@ export class GeneralLedgerReportComponent implements OnInit {
     },
   ];
   generalLedgerForm: UntypedFormGroup;
-  stateName: any;
-  stateStatus: any;
   branchName: any;
   branchStatus: any;
   categoryName: any;
@@ -65,7 +62,6 @@ export class GeneralLedgerReportComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
 
   constructor(private fb: UntypedFormBuilder,
-    private stateService: StateService,
     private filter: FilterUtils,
     private locationService: LocationService,
     private masterService: MasterService,
@@ -88,10 +84,6 @@ export class GeneralLedgerReportComponent implements OnInit {
   }
   //#region to initialize form control
   initializeFormControl() {
-
-    // Retrieve and set details for the 'state' control
-    this.stateName = this.getControlDetails("state")?.name;
-    this.stateStatus = this.getControlDetails("state")?.status;
 
     // Retrieve and set details for the 'branch' control
     this.branchName = this.getControlDetails("branch")?.name;
@@ -133,14 +125,12 @@ export class GeneralLedgerReportComponent implements OnInit {
     try {
       // Fetch data from various services
       const financialYearlist = this.generalLedgerReportService.getFinancialYear();
-      const statelist = await this.stateService.getState();
       const branchList = await this.locationService.locationFromApi();
       const categorylist = await GetGeneralMasterData(this.masterService, "MCT");
       const accountList = await this.generalLedgerReportService.getAccountDetail();
 
       // Apply filters for each dropdown
       this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
-      this.filterDropdown(this.stateName, this.stateStatus, statelist);
       this.filterDropdown(this.branchName, this.branchStatus, branchList);
       this.filterDropdown(this.categoryName, this.categoryStatus, categorylist);
       this.filterDropdown(this.accountName, this.accountStatus, accountList);
@@ -195,9 +185,7 @@ export class GeneralLedgerReportComponent implements OnInit {
         const endValue = moment(endDate).endOf('day').toDate();
 
         const reportTyp = this.generalLedgerForm.value.reportTyp;
-        const state = Array.isArray(this.generalLedgerForm.value.stateHandler)
-          ? this.generalLedgerForm.value.stateHandler.map(x => x.name)
-          : [];
+
         const fnYear = this.generalLedgerForm.value.Fyear.value;
         const category = this.generalLedgerForm.value.category.name;
         const branch = this.ReportingBranches;
@@ -205,9 +193,14 @@ export class GeneralLedgerReportComponent implements OnInit {
         const accountCode = Array.isArray(this.generalLedgerForm.value.accountHandler)
           ? this.generalLedgerForm.value.accountHandler.map(x => x.value)
           : [];
+
+        const partyName = Array.isArray(this.generalLedgerForm.value.subLedgerHandler)
+          ? this.generalLedgerForm.value.subLedgerHandler.map(x => x.value)
+          : [];
+
         const reqBody = {
-          startValue, endValue, reportTyp, state, fnYear: parseInt(fnYear),
-          category, branch, individual, accountCode
+          startValue, endValue, reportTyp, fnYear: parseInt(fnYear),
+          category, branch, individual, accountCode, partyName
         }
         const data = await this.generalLedgerReportService.getGeneralLedger(reqBody)
         if (data.length === 0) {
@@ -257,6 +250,120 @@ export class GeneralLedgerReportComponent implements OnInit {
           isSelectAll ? val : []
         );
       });
+  }
+  //#endregion
+  validateDateRange() {
+    const startControl = this.generalLedgerForm.controls.start.value;
+    const endControl = this.generalLedgerForm.controls.end.value;
+    const fnYearControl = this.generalLedgerForm.value.Fyear.value;
+
+    // if (!startControl || !endControl || !fnYearControl) {
+    //   console.error('Form controls are not properly initialized.');
+    //   return;
+    // }
+
+
+
+    console.log(`startDate = ${startControl}, endDate = ${endControl}`);
+    console.log(`fnYear = ${fnYearControl}`);
+
+    if (fnYearControl == 2324) {
+      const startElement = this.jsonGeneralLedgerArray.find(x => x.name === 'start');
+      const endElement = this.jsonGeneralLedgerArray.find(x => x.name === 'end');
+
+      if (startElement) {
+        startElement.additionalData.minDate = new Date('2023-04-01');
+      } else {
+        console.error('Start element not found in jsonGeneralLedgerArray');
+      }
+
+      if (endElement) {
+        endElement.additionalData.maxDate = new Date('2024-03-31');
+      } else {
+        console.error('End element not found in jsonGeneralLedgerArray');
+      }
+
+      console.log('fnYear is 2324');
+    }
+  }
+  //#region to set party name according to received from data
+  async reportSubTypeChanged() {
+    const reportSubType = this.generalLedgerForm.value.reportSubType;
+
+    this.generalLedgerForm.controls.subLedger.setValue("");
+    this.generalLedgerForm.controls.subLedgerHandler.setValue("");
+
+    let responseFromAPI = [];
+    switch (reportSubType) {
+      case 'Location':
+        responseFromAPI = await this.locationService.getLocations(
+          { companyCode: this.storage.companyCode, activeFlag: true },
+          { _id: 0, locCode: 1, locName: 1 })
+        responseFromAPI = responseFromAPI.map(x => ({
+          value: x.locCode,
+          name: x.locName
+        }));
+        this.filter.Filter(
+          this.jsonGeneralLedgerArray,
+          this.generalLedgerForm,
+          responseFromAPI,
+          "subLedger",
+          true
+        );
+        break;
+      case 'Customer':
+        responseFromAPI = await this.generalLedgerReportService.customersData()
+        this.filter.Filter(
+          this.jsonGeneralLedgerArray,
+          this.generalLedgerForm,
+          responseFromAPI,
+          "subLedger",
+          true
+        );
+        break;
+      case 'Vendor':
+        responseFromAPI = await this.generalLedgerReportService.vendorsData();
+        this.filter.Filter(
+          this.jsonGeneralLedgerArray,
+          this.generalLedgerForm,
+          responseFromAPI,
+          "subLedger",
+          true
+        );
+        break;
+      case 'Employee':
+        responseFromAPI = await this.generalLedgerReportService.usersData()
+        this.filter.Filter(
+          this.jsonGeneralLedgerArray,
+          this.generalLedgerForm,
+          responseFromAPI,
+          "subLedger",
+          true
+        );
+        break;
+      case 'Driver':
+        responseFromAPI = await this.generalLedgerReportService.driversData()
+        this.filter.Filter(
+          this.jsonGeneralLedgerArray,
+          this.generalLedgerForm,
+          responseFromAPI,
+          "subLedger",
+          true
+        );
+        break;
+      case 'Vehicle':
+        responseFromAPI = await this.generalLedgerReportService.vehicleData()
+        this.filter.Filter(
+          this.jsonGeneralLedgerArray,
+          this.generalLedgerForm,
+          responseFromAPI,
+          "subLedger",
+          true
+        );
+        break;
+      default:
+
+    }
   }
   //#endregion
 }

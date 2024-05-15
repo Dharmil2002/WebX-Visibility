@@ -74,6 +74,10 @@ import { CreditVoucherPreviewComponent } from './credit-voucher/credit-voucher-p
 import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/set-opening-balance-ledger-wise/set-opening-balance-ledger-wise.component';
 import { EditOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/edit-opening-balance-ledger-wise/edit-opening-balance-ledger-wise.component';
 import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upload-opening-balance-ledger-wise/upload-opening-balance-ledger-wise.component';
+import { AddCreditNoteGenerationComponent } from './Credit Note/add-credit-note-generation/add-credit-note-generation.component';
+import { GeneralInvoiceCriteriaComponent } from './Customer General Invoice/general-invoice-criteria/general-invoice-criteria.component';
+import { GeneralInvoiceDetailComponent } from './Customer General Invoice/general-invoice-detail/general-invoice-detail.component';
+import { AddGeneralInvoiceDetailComponent } from './Customer General Invoice/Modals/add-general-invoice-detail/add-general-invoice-detail.component';
 import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
 import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
 import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/Modals/add-general-bill-detail/add-general-bill-detail.component';
@@ -117,9 +121,14 @@ import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/
         SetOpeningBalanceLedgerWiseComponent,
         EditOpeningBalanceLedgerWiseComponent,
         UploadOpeningBalanceLedgerWiseComponent,
+        AddCreditNoteGenerationComponent,
+        GeneralInvoiceCriteriaComponent,
+        GeneralInvoiceDetailComponent,
+        AddGeneralInvoiceDetailComponent,
         GeneralBillCriteriaComponent,
         GeneralBillDetailComponent,
         AddGeneralBillDetailComponent
+
     ],
     imports: [
         CommonModule,

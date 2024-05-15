@@ -783,7 +783,7 @@ export class DepartVehicleComponent implements OnInit {
       this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
       this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
       let convertedDate = driverDetail[0].valdityDt || '';
-      convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
+      convertedDate = convertedDate ? formatDate(convertedDate, 'dd MMM yy') : '';
       this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
 
     }

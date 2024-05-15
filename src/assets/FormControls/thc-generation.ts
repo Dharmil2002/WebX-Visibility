@@ -111,7 +111,7 @@ export class thcControl {
                         onOptionSelect: 'getLocBasedOnCity'
                     },
                     additionalData: {
-                        showNameAndValue: false,
+                        showNameAndValue: true,
                         metaData: "Basic"
                     },
                 },
@@ -143,7 +143,7 @@ export class thcControl {
                         onOptionSelect: 'getLocBasedOnCity'
                     },
                     additionalData: {
-                        showNameAndValue: false,
+                        showNameAndValue: true,
                         metaData: "Basic"
                     },
                 },

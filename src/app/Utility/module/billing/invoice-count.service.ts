@@ -244,10 +244,12 @@ export class InvoiceCountService {
         ]
       }
       const res = await firstValueFrom(this.operationService.operationPost('generic/query', req));
-      // Extract the count from the response data
-      const recordCount = res.data[0].count;
+      if (res.data.length > 0) {
+        // Extract the count from the response data
+        return res.data[0].count;
+      }
 
-      return recordCount;
+      return 0;
     } catch (error) {
       console.error("An error occurred:", error);
     }

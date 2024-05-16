@@ -146,6 +146,16 @@ export class MarkArrivalControl {
                 generatecontrol: false,
                 disable: false
             },
+            {
+                name: 'pod',
+                label: 'Pod',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            }
         ];
     }
     getMarkArrivalsertFormControls() {

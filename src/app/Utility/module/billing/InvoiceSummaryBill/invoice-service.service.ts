@@ -46,7 +46,7 @@ export class InvoiceServiceService {
         let locDetails = await firstValueFrom(this.operationService.operationPost('generic/get', req));
         const shipment = {
           shipment: element?.docNo || "",
-          bookingdate: formatDate(element?.dKTDT || "", 'dd-MM-yy HH:mm'),
+          bookingdate: element?.dKTDT,
           location: element?.oRGN || "",
           state: locDetails.data[0].locState || "", // Assuming locState is the state you want to assign
           vehicleNo: element?.vEHNO || "",

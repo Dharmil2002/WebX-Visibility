@@ -110,7 +110,6 @@ export class ArrivalVehicleService {
 
     /*Below function is for register entry of mark Arrival*/
     async fieldMappingMarkArrival(trip, data, dktList) {
-
         let legID = `${this.storage.companyCode}-${trip.TripID}-${trip.cLOC}-${trip.nXTLOC}`;
         var lagData = await this.getCheckOnce({
             "_id": legID,
@@ -175,7 +174,7 @@ export class ArrivalVehicleService {
                 companyCode: this.storage.companyCode,
                 collectionName: "thc_summary_ltl",
                 filter: { docNo: data?.TripID },
-                update: arrivalData.aRR
+                update: {aRR: arrivalData.aRR}
             }
             await firstValueFrom(this.operation.operationMongoPut("generic/update", updateThc));
 

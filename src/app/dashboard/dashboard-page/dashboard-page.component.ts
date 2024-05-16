@@ -83,38 +83,43 @@ export class DashboardPageComponent implements OnInit {
       "permission": ["Billing​"]
     },
     {
-      "id": "creditNote",
+      "id": "GeneralInvoice",
       "label": "Tab 14",
       "permission": ["Billing​"]
     },
     {
-      "id": "THC",
+      "id": "creditNote",
       "label": "Tab 15",
-      "permission": ["Export", "FTL", "EXIM"]
+      "permission": ["Billing​"]
     },
     {
-      "id": "THCUpdate",
+      "id": "THC",
       "label": "Tab 16",
       "permission": ["Export", "FTL", "EXIM"]
     },
     {
-      "id": "Voucher",
+      "id": "THCUpdate",
       "label": "Tab 17",
+      "permission": ["Export", "FTL", "EXIM"]
+    },
+    {
+      "id": "Voucher",
+      "label": "Tab 18",
       "permission": ['Accounts']
     },
     {
       "id": "BankReconciliation",
-      "label": "Tab 18",
+      "label": "Tab 19",
       "permission": ['Accounts']
     },
-     {
+    {
       "id": "TDSReconciliation",
-      "label": "Tab 18",
+      "label": "Tab 20",
       "permission": ['Accounts']
     },
     {
       "id": "Analytics",
-      "label": "Tab 19",
+      "label": "Tab 21",
       "permission": ['Accounts']
     },
   ];

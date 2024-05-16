@@ -347,7 +347,7 @@ export class ClusterMasterAddComponent implements OnInit {
       companyCode: this.companyCode,
       collectionName: "cluster_detail",
       filter: {
-        cID: this.companyCode
+        companyCode: this.companyCode
       },
       sorting: { clusterCode: -1 },
     };

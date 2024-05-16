@@ -64,6 +64,7 @@ import { HomePageComponent } from "./HomePage/home-page/home-page.component";
 import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-dashboard.component";
 import { AddHocRouteComponent } from './tabs/departure-dashboard-page/add-hoc-route/add-hoc-route.component';
 import { CreditnoteManagementComponent } from "../operation/creditnote-management/creditnote-management.component";
+import { GeneralInvoiceDashboardComponent } from "../finance/Customer General Invoice/general-invoice-dashboard/general-invoice-dashboard.component";
 
 @NgModule({
   declarations: [
@@ -101,7 +102,8 @@ import { CreditnoteManagementComponent } from "../operation/creditnote-managemen
     HomePageComponent,
     ReportDashboardComponent,
     AddHocRouteComponent,
-    CreditnoteManagementComponent
+    CreditnoteManagementComponent,
+    GeneralInvoiceDashboardComponent
   ],
   imports: [
     CommonModule,
@@ -109,7 +111,7 @@ import { CreditnoteManagementComponent } from "../operation/creditnote-managemen
     chartjsModule,
     MatMenuModule,
     MatIconModule,
-    MatButtonModule,    
+    MatButtonModule,
     MatSnackBarModule,
     PerfectScrollbarModule,
     NgApexchartsModule,

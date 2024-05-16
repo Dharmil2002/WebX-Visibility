@@ -192,6 +192,22 @@ export class ViewPrintComponent implements OnInit {
         partyCode: "CUST00029",
         viewName: "Voucher",
       },
+
+      {
+        name: "FreightInvoice View-Print",
+        partyCode: "CG0214574K",
+        viewName: "BillInvoice",
+      },
+      {
+        name: "Generalinvoice View-Print",
+        partyCode: "CG0000174",
+        viewName: "BillInvoice",
+      },
+      {
+        name: "MoneyReceipt View-Print",
+        partyCode: "CG00045",
+        viewName: "MoneyReceipt",
+      },
     ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {

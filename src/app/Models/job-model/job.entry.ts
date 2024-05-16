@@ -47,6 +47,7 @@ export class JobSummaryModel implements IFieldDefinition {
       Title: "Cnote Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype: "date"
     },
     noOfpkg: {
       Title: "No of Package",
@@ -84,6 +85,7 @@ export class JobSummaryModel implements IFieldDefinition {
     Title: "InvDate",
     class: "matcolumncenter",
     Style: "min-width:80px",
+    datatype: "date"
   },
   sbNum: {
     Title: "SBNum",
@@ -94,6 +96,7 @@ export class JobSummaryModel implements IFieldDefinition {
     Title: "SBDate",
     class: "matcolumncenter",
     Style: "min-width:2px",
+    datatype: "date"
   },
   pod: {
     Title: "POD",
@@ -131,6 +134,7 @@ export class JobSummaryModel implements IFieldDefinition {
     Title: "BLDate",
     class: "matcolumncenter",
     Style: "min-width:80px",
+    datatype: "date"
   },
   beNum: {
     Title: "BENum",
@@ -141,6 +145,7 @@ export class JobSummaryModel implements IFieldDefinition {
     Title: "BEDate",
     class: "matcolumncenter",
     Style: "min-width:2px",
+    datatype: "date"
   },
   pod: {
     Title: "POD",

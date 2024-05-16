@@ -18,6 +18,7 @@ export class RakeEntryModel implements IFieldDefinition {
             Title: "Job Date",
             class: "matcolumnleft",
             Style: "min-width:200px",
+            datatype: "date"
         },
         noOfPkg: {
             Title: "No Of Pkts",
@@ -60,6 +61,7 @@ export class RakeEntryModel implements IFieldDefinition {
             Title: "CNDate",
             class: "matcolumnleft",
             Style: "min-width:200px",
+            datatype: "date"
         },
         contCnt: {
             Title: "Containers",
@@ -107,6 +109,7 @@ export class RakeEntryModel implements IFieldDefinition {
             Title: "RR Date",
             class: "matcolumnleft",
             Style: "min-width:250px",
+            datatype: "date"
         },
         actionsItems: {
             Title: "Action",
@@ -124,6 +127,7 @@ export class RakeEntryModel implements IFieldDefinition {
             Title: "InvDate",
             class: "matcolumnleft",
             Style: "min-width:250px",
+            datatype: "date"
         },
         invAmt: {
             Title: "Inv Amount(Rs)",

@@ -18,27 +18,27 @@ export class CustInvRegFormControl {
           support: "end",
         },
       },
-      {
-        name: "dTYPE",
-        label: "Document type",
-        placeholder: "Select Document type",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
+      // {
+      //   name: "dTYPE",
+      //   label: "Document type",
+      //   placeholder: "Select Document type",
+      //   type: "dropdown",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "autocomplete",
+      //     },
+      //     {
+      //       name: "invalidAutocompleteObject",
+      //       message: "Choose proper value",
+      //     },
+      //   ],
+      //   additionalData: {
+      //     showNameAndValue: true,
+      //   },
+      // },
       {
         name: "gSTE",
         label: "GST State",
@@ -147,32 +147,7 @@ export class CustInvRegFormControl {
           showNameAndValue: true,
         },
       },
-      {
-        name: "OR",
-        label: "OR ",
-        placeholder: "OR",
-        type: "",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "OR",
-        label: "OR ",
-        placeholder: "OR",
-        type: "",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
+
       {
         name: "OR",
         label: "OR ",
@@ -225,6 +200,32 @@ export class CustInvRegFormControl {
         disable: false,
         Validations: [],
         additionalData: {},
+      },
+      {
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "OR",
+        label: "OR ",
+        placeholder: "OR",
+        type: "",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
         name: "end",

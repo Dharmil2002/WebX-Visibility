@@ -1,0 +1,22 @@
+
+
+
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+    <app-generic-card-webxpress [boxData]="boxData" ></app-generic-card-webxpress>
+
+
+<app-generic-table-v2 *ngIf="!tableLoad" 
+[dynamicControls]="dynamicControls" 
+[columnHeader]="columnHeader"
+[tableData]="tableData1"  
+[selectAllRequired]="true"
+[FormTitle]="" 
+[menuItems]="menuItems" 
+(functionCallEmitter)="functionCallHandler($event)" 
+[staticField]="staticField" 
+[Link]="linkArray"
+(menuItemClicked)="handleMenuItemClick($event)" 
+[addAndEditPath]="addAndEditPath"
+[menuItemFlag]="menuItemflag">
+</app-generic-table-v2>
+</app-common-wrapper-webxpress>

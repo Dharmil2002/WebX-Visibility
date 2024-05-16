@@ -491,7 +491,7 @@ export class ApproveDebitNoteComponent implements OnInit {
 
   GetVouchersLedgers(data) {
     const TotalAmount = this.DataResponseHeader.data[0].aMT;
-    const TXBLAMTAmount =  this.DataResponseHeader.data[0].tdsAMT > 0 ? this.DataResponseHeader.data[0].tXBLAMT - this.DataResponseHeader.data[0].tdsAMT  : this.DataResponseHeader.data[0].tXBLAMT;
+    const TXBLAMTAmount = this.DataResponseHeader.data[0].tdsAMT > 0 ? this.DataResponseHeader.data[0].tXBLAMT - this.DataResponseHeader.data[0].tdsAMT : this.DataResponseHeader.data[0].tXBLAMT;
     const createVoucher = (accCode, accName, accCategory, debit, credit) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
@@ -513,15 +513,15 @@ export class ApproveDebitNoteComponent implements OnInit {
       GSTAmount: 0,//credit,
       Total: debit + credit,
       TDSApplicable: false,
-      narration: `When Debit Note is Generated `,
+      narration: `When Debit Note is Generated :${this.DataResponseHeader.data[0].nTNO}`,
     });
 
     const response = [
 
       createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, TotalAmount, 0),
-     createVoucher(ledgerInfo['EXP001003'].LeadgerCode, ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, 0,TXBLAMTAmount),
+      createVoucher(ledgerInfo['EXP002006'].LeadgerCode, ledgerInfo['EXP002006'].LeadgerName, ledgerInfo['EXP002006'].LeadgerCategory, 0, TXBLAMTAmount),
     ]
-   
+
 
     if (this.DataResponseDetails.data[0].gST.cGST > 0) {
       response.push(createVoucher(ledgerInfo['LIA002003'].LeadgerCode, ledgerInfo['LIA002003'].LeadgerName, ledgerInfo['LIA002003'].LeadgerCategory, 0, this.DataResponseDetails.data[0].gST.cGST));
@@ -532,11 +532,11 @@ export class ApproveDebitNoteComponent implements OnInit {
     }
 
     if (this.DataResponseDetails.data[0].gST.sGST > 0) {
-      response.push(createVoucher(ledgerInfo['LIA002001'].LeadgerCode, ledgerInfo['LIA002001'].LeadgerName, ledgerInfo['LIA002001'].LeadgerCategory,0 , this.DataResponseDetails.data[0].gST.sGST));
+      response.push(createVoucher(ledgerInfo['LIA002001'].LeadgerCode, ledgerInfo['LIA002001'].LeadgerName, ledgerInfo['LIA002001'].LeadgerCategory, 0, this.DataResponseDetails.data[0].gST.sGST));
     }
 
     if (this.DataResponseHeader.data[0].tdsAMT > 0) {
-      response.push(createVoucher(ledgerInfo['LIA002002'].LeadgerCode, ledgerInfo['LIA002002'].LeadgerName, ledgerInfo['LIA002002'].LeadgerCategory,0 , this.DataResponseHeader.data[0].tdsAMT));
+      response.push(createVoucher(ledgerInfo['LIA002002'].LeadgerCode, ledgerInfo['LIA002002'].LeadgerName, ledgerInfo['LIA002002'].LeadgerCategory, 0, this.DataResponseHeader.data[0].tdsAMT));
     }
 
     return response;

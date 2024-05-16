@@ -3,7 +3,6 @@ import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { prepareReportData } from '../../commonFunction/arrayCommonFunction/arrayCommonFunction';
-import { tr } from 'date-fns/locale';
 
 @Injectable({
   providedIn: 'root'
@@ -71,7 +70,7 @@ export class GeneralLedgerReportService {
       };
 
       const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
-      // console.log(res.data);
+      console.log(res.data);
       const reportFile: any = await firstValueFrom(this.masterService.getJsonFileDetails('generalLedgerReport'));
 
       if (res.data && res.data.length > 0) {
@@ -342,4 +341,11 @@ export class GeneralLedgerReportService {
     }
   }
   //#endregion
+  setData(data: any) {
+    this.storage.setItem("GLReportsData", JSON.stringify(data));
+  }
+
+  getData() {
+    return this.storage.getItem("GLReportsData");
+  }
 }

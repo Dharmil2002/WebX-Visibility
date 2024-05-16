@@ -1,3 +1,4 @@
+import { on } from "events";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class GeneralLedgerReport {
@@ -25,9 +26,9 @@ export class GeneralLedgerReport {
                 additionalData: {
                     showNameAndValue: false,
                 },
-                functions: {
-                    onOptionSelect: "validateDateRange"
-                },
+                // functions: {
+                //     onOptionSelect: "validateDateRange"
+                // },
                 generatecontrol: true, disable: false
             },
             {
@@ -44,6 +45,7 @@ export class GeneralLedgerReport {
                     support: "end",
                     minDate: new Date('2023-04-01'),
                 },
+                functions: { onDate: "validateDateRange" }
             },
             {
                 name: 'reportTyp',
@@ -194,6 +196,7 @@ export class GeneralLedgerReport {
                 generatecontrol: false,
                 disable: true,
                 Validations: [],
+                functions: { onDate: "validateDateRange" }
             },
             {
                 name: 'accountHandler',

@@ -36,7 +36,6 @@ export class LoadingSheetService {
   }
   async tripFieldMapping(data, tabledata) {
     const route = data?.Route.split(":")[1].split("-");
-
     let tripSummary = {
       "_id": "",
       "cID": this.storage.companyCode,
@@ -221,13 +220,37 @@ export class LoadingSheetService {
         }
       })
     }
+    const trip_location={
+      "_id":`${this.storage.companyCode}-${data?.Route.split(":")[0]}-${data?.Route.split(":")[1]}`,
+      "cID": this.storage.companyCode,
+      "tHC": "",
+      "rUTCD":data?.Route.split(":")[0],
+      "rUTNM":data?.Route.split(":")[1],
+      "sTM":new Date(),
+      "cTM":null,
+      "vEHNO": data?.vehicle?.value|| "",
+      "sTS":DocketStatus.Awaiting_Loading,
+      "sTSNM":DocketStatus[DocketStatus.Awaiting_Loading].replace(/_/g, " "),
+      "cLOC":this.storage.branch,
+      "oRG":this.storage.branch,
+      "iSACT": true,
+      "dEST": "",
+      "nXTLOC": "",
+      "nXTETA": "",
+      "eNTDT":new Date(),
+      "eNTLOC":this.storage.branch,
+      "eNTBY":this.storage.userName,
+      "lSNO": "",
+      "mFNO": ""
+    }
     return {
       tripSummary: tripSummary,
       tripMovement: tripMovement,
       lsHeader: lsHeader,
       lsDetail: lsDetail,
       dktList: dktList,
-      evnData: evnData
+      evnData: evnData,
+      trip_location:trip_location
     }
   }
   async updatetripFieldMapping(data, tabledata) {

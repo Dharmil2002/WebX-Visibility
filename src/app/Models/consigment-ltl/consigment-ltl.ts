@@ -78,6 +78,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Eway Bill Number",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype:"string"
     },
     ewayBillDate: {
       Title: "Eway Bill Date",
@@ -93,6 +94,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Invoice Number",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string"
     },
     invDt: {
       Title: "Invoice Date",

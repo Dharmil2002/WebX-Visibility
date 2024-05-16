@@ -516,8 +516,6 @@ export class ThcGenerationComponent implements OnInit {
 
     const field = $event.field; //what is use of this variable
     const functionName = $event.functionName;
-    console.log(field);
-    console.log(functionName);
     try {
       this[functionName]($event);
     } catch (error) {
@@ -1255,11 +1253,11 @@ export class ThcGenerationComponent implements OnInit {
         const toCity = x.tCT.toUpperCase();
         // Check if city matches the current city or is in the mapped cities list
         if (toCity == this.currentLocation.locCity.toUpperCase() ||
-            (this.connectedLoc &&
-             this.currentLocation.extraData &&
-             this.currentLocation.extraData.mappedCity &&
-             this.currentLocation.extraData.mappedCity.includes(toCity))) {
-            x.actions = ["Update"];
+          (this.connectedLoc &&
+            this.currentLocation.extraData &&
+            this.currentLocation.extraData.mappedCity &&
+            this.currentLocation.extraData.mappedCity.includes(toCity))) {
+          x.actions = ["Update"];
         }
         else if (this.isView) {
 

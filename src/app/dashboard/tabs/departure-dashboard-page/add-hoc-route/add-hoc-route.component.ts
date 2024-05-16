@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { add } from 'lodash';
+import moment from 'moment';
 import { Subject, take, takeUntil } from 'rxjs';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
@@ -21,8 +23,40 @@ import Swal from 'sweetalert2';
 export class AddHocRouteComponent implements OnInit {
   addHocForm: UntypedFormGroup;
   jsonAddHocControl: FormControls[];
+  tableLoad: boolean;
+    /*.......End................*/
+  /* here the varible declare for menu Item option Both is required */
+  menuItems = [{ label: "Edit" }, { label: "Remove" }];
+  containerWidth = '1024px';
+  menuItemflag: boolean = true;
+  tableLoadIn: boolean = true;
+  loadIn: boolean = false;
+
+  /*.......End................*/
+  /*Here the Controls which Is Hide search or add Button in table*/
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  /*.......End................*/
+  addAndEditPath = '';
+  // menuItems = [{label:"Edit Docket"},{label:"View"}];
   products: any[];
-  className = "col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2";
+  className = "col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2";
+  columnHeader: any;
+  staticField: string[];
+  tableData:any=[];
+  FilterButton = {
+    name: "Add",
+    functionName: "addHocRoute",
+  };
+  EventButton = {
+    functionName: "AddNew",
+    name: "Add New",
+    iconName: "add",
+  };
+
   constructor(
     private fb: UntypedFormBuilder,
     private generalService: GeneralService,
@@ -40,6 +74,9 @@ export class AddHocRouteComponent implements OnInit {
     const addHocForm = new AddHocControls();
     this.jsonAddHocControl = addHocForm.addHoc;
     this.addHocForm = formGroupBuilder(this.fb, [this.jsonAddHocControl]);
+    this.columnHeader=addHocForm.columnHeader;
+    this.staticField=addHocForm.staticField;
+    this.tableLoad=false;
     this.getDropDownDetails();
   }
   async getDropDownDetails() {
@@ -57,77 +94,34 @@ export class AddHocRouteComponent implements OnInit {
     }
   }
   /*End*/
-  // function handles select All feature of all multiSelect fields of one form.
-  protected _onDestroy = new Subject<void>();
-  toggleSelectAll(argData: any) {
-    let fieldName = argData.field.name;
-    let autocompleteSupport = argData.field.additionalData.support;
-    let isSelectAll = argData.eventArgs;
-    const index = this.jsonAddHocControl.findIndex(
-      (obj) => obj.name === fieldName
-    );
-    this.jsonAddHocControl[index].filterOptions
-      .pipe(take(1), takeUntil(this._onDestroy))
-      .subscribe((val) => {
-        this.addHocForm.controls[autocompleteSupport].patchValue(
-          isSelectAll ? val : []
-        );
-      });
-  }
-  //#endregion
   /*  Below the function for the Getting a Location */
   async getLocation() {
-    let connectLoc =
-      this.addHocForm.value.connectLocationDropdown.length > 0
-        ? this.addHocForm.value.connectLocationDropdown.map((x) => x.value)
-        : "";
-    if (this.addHocForm.controls.connectLoc.value.length>=3) {
+    if (this.addHocForm.controls.loc.value.length >= 3) {
       let destinationMapping = await this.locationService.locationFromApi({
         locCode: {
-          D$regex: `^${this.addHocForm.controls.connectLoc.value}`,
+          D$regex: `^${this.addHocForm.controls.loc.value}`,
           D$options: "i",
         },
       });
-      if (connectLoc) {
-        destinationMapping = destinationMapping.filter(
-          (x) => !connectLoc.includes(x.value)
-        );
-        destinationMapping.push(
-          ...this.addHocForm.value.connectLocationDropdown
-        );
-      }
       this.filter.Filter(
         this.jsonAddHocControl,
         this.addHocForm,
         destinationMapping,
-        'connectLoc',
+        'loc',
         false
       );
     }
   }
   /*End*/
-  /*start*/
-  connectLocations() {
-    // Get the new locations from the dropdown
-    let newLocations = this.addHocForm.value.connectLocationDropdown.map((x) => x.value);
-    // Create a set from new locations to ensure uniqueness and maintain their order
-    let uniqueNewLocations = new Set(newLocations);
-    // Get the current value of the route
-    let currentRoute = this.addHocForm.controls.route.value || "";
-    // Split the current route into an array, remove empty entries if route was initially empty
-    let currentRouteParts = currentRoute.split('-').filter(part => part);
-    // Filter the current route parts to include only those that are still selected in the dropdown
-    let filteredRouteParts = currentRouteParts.filter(part => uniqueNewLocations.has(part));
-    // Combine the filtered existing parts with the new locations. Create a set to remove duplicates if any.
-    let combinedLocations = new Set([...filteredRouteParts, ...newLocations]);
-    // Convert the set back to a string with hyphens and update the route control
-    this.addHocForm.controls.route.patchValue(Array.from(combinedLocations).join("-"));
-  }
-  /*End*/
-  async save(){
+  async save() {
     const controls = this.addHocForm.getRawValue();
-    const route = await this.routeLocation.getRouteOne({companyCode:this.storage.companyCode,routeName:controls.route});
-    if(route){
+    const routeMode = this.products.find((x) => x.value == controls.routeMode)?.name || "";
+    controls.routeMode = routeMode;
+
+    const route = await this.routeLocation.getRouteOne({
+      D$or: [{ companyCode: this.storage.companyCode, routeName: controls.route }, { cID: this.storage.companyCode, rUTNM: controls.route }]
+    });
+    if (route) {
       Swal.fire({
         title: 'Route already exist',
         text: 'Route already exist',
@@ -136,37 +130,168 @@ export class AddHocRouteComponent implements OnInit {
       });
       return false;
     }
-    const res=await this.routeLocation.addRouteLocation(controls);
-    if(res){
+    const res = await this.routeLocation.addRouteLocation(controls,this.tableData);
+    if (res) {
       Swal.fire({
-        title:'Success',
+        title: 'Route Details',
         html: `
-          <table border="1">
-            <tr>
-              <th>Route Category</th>
-              <th>Controlling Branch</th>
-              <th>Schedule Departure Time</th>
-              <th>Route Type</th>
-              <th>Schedule Type</th>
-            </tr>
-            <tr>
-              <td>${res.routeCat}</td>
-              <td>${res.contBranch}</td>
-              <td>${res.scheduleTime}</td>
-              <td>${res.routeType}</td>
-              <td>${res.ScheduleType}</td>
-            </tr>
+          <style>
+            .swal2-html-container {
+              max-width: 100%;
+            }
+            .alert{
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+              font-size: 0.9em;
+              min-width: 400px;
+              border-radius: 5px 5px 0 0;
+              overflow: hidden;
+              box-shadow: 0 0 20px rgba(0,0,0,0.15);
+            }
+            th, td {
+              padding: 12px 15px;
+              text-align: left;
+              border-bottom: 1px solid #dddddd;
+            }
+            th {
+              background-color:#2F7EC0;
+              color: #ffffff;
+              text-align: center;
+            }
+            tr:nth-of-type(even) {
+              background-color:#2F7EC0;
+            }
+            tr:last-of-type {
+              border-bottom: 2px solid #2F7EC0;
+            }
+          }
+          </style>
+          <table class="alert">
+            <thead>
+              <tr>
+                <th>RtCat</th>
+                <th>CtrlBr</th>
+                <th>SchDepT</th>
+                <th>RtType</th>
+                <th>SchType</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${res.routeCat}</td>
+                <td>${res.contBranch}</td>
+                <td>${moment(res.scheduleTime).format("DD/MM/YYYY HH:MM")}</td>
+                <td>${res.routeType}</td>
+                <td>${res.ScheduleType}</td>
+              </tr>
+            </tbody>
           </table>`,
         showCloseButton: true,
         focusConfirm: false,
-        confirmButtonText: 'ok'
+        width: 623,
+        confirmButtonText: 'Close',
+        customClass: {
+          popup: 'custom-swal'
+        }
       });
-      
     }
-   
-     
-  }
-  cancel(){
     this.dialogRef.close();
   }
+  Close() {
+    this.dialogRef.close();
+  }
+
+  async AddNew(){
+    if (this.tableData.length > 0) {
+      const exist = this.tableData.find(
+        (x) => x.loc === this.addHocForm.value?.loc.value
+      );
+      if (exist) {
+        this.addHocForm.controls["loc"].setValue("");
+        Swal.fire({
+          icon: "info", // Use the "info" icon for informational messages
+          title: "Information",
+          text: "Please avoid entering duplicate location.",
+          showConfirmButton: true,
+        });
+        return false;
+      }
+    }
+    this.loadIn = true;
+    this.tableLoad = true;
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const json={
+      "loc":this.addHocForm.value?.loc.value||"",
+      "distance":this.addHocForm.value?.distance||0,
+      "transitHrs":this.addHocForm.value?.transitHrs||0,
+      'actions': ["Edit", "Remove"]
+    }
+    this.tableData.push(json);
+    const routeCode=this.tableData.map((x) => x.loc);
+    const routeName=routeCode.join('-');
+    this.tableLoad = false;
+    this.loadIn = false;
+    this.addHocForm.controls['loc'].setValue("");
+    this.addHocForm.controls['distance'].setValue("");
+    this.addHocForm.controls['transitHrs'].setValue("");
+    this.tableData.length > 0 ? this.addHocForm.controls['routeMode'].disable() :"";
+    this.addHocForm.controls['route'].setValue(routeName);
+  }
+  handleMenuItemClick(data) {
+    this.autoFill(data);
+  }
+  autoFill(data: any) {
+    if (data.label.label === "Remove") {
+      this.tableData = this.tableData.filter((x) => x.loc !== data.data.loc);
+      this.tableData.length <= 0 ? this.addHocForm.controls['routeMode'].enable() :"";
+    } else {
+      const atLeastOneValuePresent = Object.keys(this.addHocForm.controls)
+        .some(key => {
+          const control = this.addHocForm.get(key);
+          return control && (control.value !== null && control.value !== undefined && control.value !== '');
+        });
+
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, proceed!',
+          cancelButtonText: 'No, cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.fillDetails(data)
+          }
+        });
+      }
+      else {
+        this.fillDetails(data)
+      }
+    }
+  }
+    /*AutoFiill Invoice data*/
+    fillDetails(data) {
+      // Define a mapping of form control names to their respective keys in the incoming data
+      const formFields = {
+      "distance":this.addHocForm.value?.distance||0,
+      "transitHrs":this.addHocForm.value?.transitHrs||0,
+      };
+      // Loop through the defined form fields and set their values from the incoming data
+      Object.keys(formFields).forEach(field => {
+        this.addHocForm.controls[field].setValue(data.data?.[formFields[field]] || "");
+      });
+      this.addHocForm.controls['loc'].setValue({ name: data.data['loc'], value: data.data['loc'] })
+      this.tableData = this.tableData.filter(x => x.loc !== data.data.loc);
+      this.tableData.length <= 0 ? this.addHocForm.controls['routeMode'].enable() :"";
+    }
+    /*End*/
 }

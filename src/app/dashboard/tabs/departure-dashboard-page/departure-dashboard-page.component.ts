@@ -4,6 +4,7 @@ import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.se
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { AddHocRouteComponent } from "./add-hoc-route/add-hoc-route.component";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "app-departure-dashboard-page",
@@ -24,6 +25,10 @@ export class DepartureDashboardPageComponent
   @Input() arrivaldeparture: any;
   orgBranch: string = "";
   companyCode: number = 0;
+  FilterButton = {
+    name: "Add New",
+    functionName: "addHocRoute",
+  };
   breadscrums = [
     {
       title: "Departure Details",
@@ -32,7 +37,7 @@ export class DepartureDashboardPageComponent
     },
   ];
   dynamicControls = {
-    add: true,
+    add: false,
     edit: true,
     csv: false,
   };
@@ -139,7 +144,9 @@ export class DepartureDashboardPageComponent
   constructor(
     private CnoteService: CnoteService,
     private departureService: DepartureService,
-    private storage: StorageService
+    private storage: StorageService,
+    private dialog: MatDialog,
+    public dialogRef: MatDialogRef<AddHocRouteComponent>
   ) {
     super();
     this.companyCode = this.storage.companyCode;
@@ -148,7 +155,6 @@ export class DepartureDashboardPageComponent
     this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "departureData.csv";
     this.headerCode ="Dhaval"
-    this.viewComponent = AddHocRouteComponent;
     this.getdepartureDetail();
   }
 
@@ -198,7 +204,6 @@ const shipData = [
   }
 
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {
@@ -217,4 +222,20 @@ const shipData = [
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');
   }
-}
+  /*below is the function for add Hoc routes*/
+  addHocRoute() {
+    const dialogref = this.dialog.open(AddHocRouteComponent, {
+      width: "60%",
+      disableClose: true,
+      position: {
+        top: "20px",
+        bottom: "20px",
+      },
+      height:'70%'
+    });
+    dialogref.afterClosed().subscribe((result) => {
+    });
+  }
+
+  /*End*/
+} 

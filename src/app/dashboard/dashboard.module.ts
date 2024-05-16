@@ -27,7 +27,7 @@ import { DashboardCountPageComponent } from './tabs/dashboard-count-page/dashboa
 import { ArrivalDashboardPageComponent } from './tabs/arrival-dashboard-page/arrival-dashboard-page.component';
 import { SharedComponentsModule } from "../shared-components/shared-components.module";
 import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.component';
@@ -133,6 +133,6 @@ import { CreditnoteManagementComponent } from "../operation/creditnote-managemen
     MatChipsModule,
     MatButtonToggleModule
   ],
-  providers: [SnackBarUtilityService, DatePipe, utilityService, FilterUtils]
+  providers: [SnackBarUtilityService, DatePipe, utilityService, FilterUtils, { provide: MatDialogRef, useValue: {} }]
 })
 export class DashboardModule { }

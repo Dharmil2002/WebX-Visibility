@@ -1,6 +1,22 @@
+<div mat-dialog-title style="display: flex;
+  justify-content: end;margin:0px;">
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
 <form [formGroup]="addHocForm">
-    <app-form-webxpress [form]="addHocForm" [FormTitle]="'Basic Detail'" [formData]="jsonAddHocControl"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+    <app-form-webxpress [form]="addHocForm" [FormTitle]="'Basis Detail'" [formData]="jsonAddHocControl"
+      (functionCallEmitter)="functionCallHandler($event)"[EventButton]="EventButton" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)"   [className]="className">
     </app-form-webxpress>
   </form>
+
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+        [menuItems]="menuItems" [staticField]="staticField"[DisplaySaveButton]=true [Link]="linkArray"
+        [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
+       [containerWidth]="containerWidth"  (SubmitButtonEvent)="save()"   [width]="width" [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)"
+        (onFlagChange)="selectCheckBox($event)"[FormTitle]="'Route Details'" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+       [showPaginator]=false [showHeader]="false"
+       [tableWidth]="'75%'">
+    </app-generic-table-v2>

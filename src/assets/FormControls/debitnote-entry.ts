@@ -202,7 +202,7 @@ export class debitNoteGenerationControls {
                 type: "number",
                 value: FormValues?.tdsRevlAmt,
                 generatecontrol: true,
-                disable: true,
+                disable: false,
                 Validations:[],
 
             },

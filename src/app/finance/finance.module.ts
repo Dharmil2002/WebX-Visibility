@@ -76,7 +76,6 @@ import { EditOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/edit-
 import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upload-opening-balance-ledger-wise/upload-opening-balance-ledger-wise.component';
 import { AddCreditNoteGenerationComponent } from './Credit Note/add-credit-note-generation/add-credit-note-generation.component';
 import { GeneralInvoiceCriteriaComponent } from './Customer General Invoice/general-invoice-criteria/general-invoice-criteria.component';
-import { GeneralInvoiceDetailComponent } from './Customer General Invoice/general-invoice-detail/general-invoice-detail.component';
 import { AddGeneralInvoiceDetailComponent } from './Customer General Invoice/Modals/add-general-invoice-detail/add-general-invoice-detail.component';
 import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
 import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
@@ -123,7 +122,6 @@ import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/
         UploadOpeningBalanceLedgerWiseComponent,
         AddCreditNoteGenerationComponent,
         GeneralInvoiceCriteriaComponent,
-        GeneralInvoiceDetailComponent,
         AddGeneralInvoiceDetailComponent,
         GeneralBillCriteriaComponent,
         GeneralBillDetailComponent,

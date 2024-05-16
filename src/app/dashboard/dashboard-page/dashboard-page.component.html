@@ -118,12 +118,19 @@
                     <app-invoice-management (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Management​'"
                         [selectedIndex]="14"></app-invoice-management>
                 </mat-tab>
+                <mat-tab *ngIf=" hasPermission('GeneralInvoice')" label="GeneralInvoice">
+                    <ng-template mat-tab-label>
+                        General Invoice
+                    </ng-template>
+                    <app-general-invoice-dashboard (CurrentIndex)="GetSelectedIndex($event)"
+                        *ngIf="tabName === 'GeneralInvoice'" [selectedIndex]="15"></app-general-invoice-dashboard>
+                </mat-tab>
                 <mat-tab *ngIf=" hasPermission('creditNote')" label="creditNoteManagement​">
                     <ng-template mat-tab-label>
                         Credit Note
                     </ng-template>
                     <app-creditnote-management (CurrentIndex)="GetSelectedIndex($event)"
-                        *ngIf="tabName === 'creditNoteManagement​'" [selectedIndex]="15"></app-creditnote-management>
+                        *ngIf="tabName === 'creditNoteManagement​'" [selectedIndex]="16"></app-creditnote-management>
                 </mat-tab>
                 <!-- <mat-tab *ngIf=" hasPermission('invoiceBilling')" label="Contracts">
                     <ng-template mat-tab-label>

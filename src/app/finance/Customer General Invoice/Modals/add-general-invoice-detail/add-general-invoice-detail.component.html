@@ -1,1 +1,15 @@
-<p>add-general-invoice-detail works!</p>
+<div mat-dialog-title style="display: flex;
+  justify-content: end;margin:0px;">
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body" style="max-height: 420px;">
+    <form [formGroup]="VendorBillDetailsForm">
+        <app-form-webxpress [form]="VendorBillDetailsForm" [FormTitle]="'Transaction Details'"
+            [formData]="jsonControlVendorBillDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
+            [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+</div>

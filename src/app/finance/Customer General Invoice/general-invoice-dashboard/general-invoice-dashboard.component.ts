@@ -9,40 +9,13 @@ import { StorageService } from 'src/app/core/service/storage.service';
   templateUrl: './general-invoice-dashboard.component.html',
 })
 export class GeneralInvoiceDashboardComponent implements OnInit {
-  tableLoad2: boolean = false
-  Transactions: any;
-  tableLoad = true;
   tableData: any[];
-  csvFileName: string;
   addAndEditPath: string;
   dynamicControls = {
     add: true,
     edit: false,
     csv: false,
   };
-
-  menuItems = [{ label: "Modify" }, { label: "Approve" }, { label: "Cancel" }];
-  menuItemflag = true;
-
-
-  linkArray = [{ Row: "Action", Path: "" }];
-
-  METADATA = {
-    checkBoxRequired: true,
-    noColumnSort: ["checkBoxRequired"],
-  };
-  boxData: { count: number; title: string; class: string; }[];
-
-  EventButton = {
-    functionName: "openFilterDialog",
-    name: "Filter",
-    iconName: "filter_alt",
-  };
-  toggleArray = [];
-
-
-  //Credit Note Generated Table Form
-
   columnHeader = {
     nTNO: {
       Title: "CN No",
@@ -106,31 +79,9 @@ export class GeneralInvoiceDashboardComponent implements OnInit {
     "gstRevlAmt",
     "sTSNM",
   ]
-
-
-
-
-  unBillingData: any;
-  allPrq: any;
-  allColumnFilter: any;
-  DataResponseDetails: any;
-  DataResponseHeader: any;
-  cNoteData: any;
-  cNoteDataAp: any;
-  tableData1 = [];
-  tableData2 = [];
-  countSumOfAmounts: any;
-  countCreditnoteRecords: any;
-  countCreditnoteARecords: any;
-  countSumOfApprovedAmounts: any;
-  DataResponseHeader1: any;
-  creditnotedetails: any;
   constructor(
-    private router: Router,
-    private masterService: MasterService,
-    private storage: StorageService
   ) {
-    this.addAndEditPath = "Finance/CreditNote";
+    this.addAndEditPath = "Finance/CustomerInvoiceGeneral/Criteria";
   }
 
   ngOnInit(): void {
@@ -138,9 +89,6 @@ export class GeneralInvoiceDashboardComponent implements OnInit {
   }
 
   async getData() {
-
-
-    this.Transactions = []
   }
 
 
@@ -154,8 +102,5 @@ export class GeneralInvoiceDashboardComponent implements OnInit {
       console.log("failed");
     }
   }
-
-
-
 
 }

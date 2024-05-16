@@ -192,7 +192,6 @@ export class ViewPrintComponent implements OnInit {
         partyCode: "CUST00029",
         viewName: "Voucher",
       },
-
       {
         name: "FreightInvoice View-Print",
         partyCode: "CG0214574K",

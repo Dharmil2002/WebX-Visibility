@@ -14,7 +14,12 @@ export class AddHocControls {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+              name: "required",
+              message: "Route Mode is required"
+          }
+      ]
       },
       {
         name: "loc",
@@ -25,13 +30,25 @@ export class AddHocControls {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
         additionalData: {
         },
         functions: {
           onModel: "getLocation",
           onSelect: "connectLocations",
         },
+        Validations: [
+          {
+              name: "required",
+              message: "Location is required"
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          }
+      ],
         generatecontrol: true,
         disable: false,
       },

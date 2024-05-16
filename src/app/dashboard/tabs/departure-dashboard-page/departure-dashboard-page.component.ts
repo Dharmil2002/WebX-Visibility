@@ -234,6 +234,7 @@ const shipData = [
       height:'70%'
     });
     dialogref.afterClosed().subscribe((result) => {
+      this.getdepartureDetail();
     });
   }
 

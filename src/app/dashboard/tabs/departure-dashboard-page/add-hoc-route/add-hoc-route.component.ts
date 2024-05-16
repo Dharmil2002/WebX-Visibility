@@ -47,6 +47,7 @@ export class AddHocRouteComponent implements OnInit {
   columnHeader: any;
   staticField: string[];
   tableData:any=[];
+  DisplaySaveButton=false;
   FilterButton = {
     name: "Add",
     functionName: "addHocRoute",
@@ -242,14 +243,16 @@ export class AddHocRouteComponent implements OnInit {
     this.addHocForm.controls['transitHrs'].setValue("");
     this.tableData.length > 0 ? this.addHocForm.controls['routeMode'].disable() :"";
     this.addHocForm.controls['route'].setValue(routeName);
+    this.tableData.length>1?this.DisplaySaveButton=true:this.DisplaySaveButton=false;
   }
   handleMenuItemClick(data) {
     this.autoFill(data);
   }
   autoFill(data: any) {
-    if (data.label.label === "Remove") {
+    if (data.label === "Remove") {
       this.tableData = this.tableData.filter((x) => x.loc !== data.data.loc);
       this.tableData.length <= 0 ? this.addHocForm.controls['routeMode'].enable() :"";
+      this.tableData.length>1?this.DisplaySaveButton=true:this.DisplaySaveButton=false;
     } else {
       const atLeastOneValuePresent = Object.keys(this.addHocForm.controls)
         .some(key => {
@@ -292,6 +295,7 @@ export class AddHocRouteComponent implements OnInit {
       this.addHocForm.controls['loc'].setValue({ name: data.data['loc'], value: data.data['loc'] })
       this.tableData = this.tableData.filter(x => x.loc !== data.data.loc);
       this.tableData.length <= 0 ? this.addHocForm.controls['routeMode'].enable() :"";
+      this.tableData.length>1?this.DisplaySaveButton=true:this.DisplaySaveButton=false;
     }
     /*End*/
 }

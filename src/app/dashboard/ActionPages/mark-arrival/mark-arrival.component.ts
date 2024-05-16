@@ -206,60 +206,78 @@ export class MarkArrivalComponent implements OnInit {
           tripDetails.nXTLOC = next || ""
       }
     }
-
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "trip_Route_Schedule",
-      "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
-      "update": {
-        ...tripDetails
-      }
-    }
-    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
-      next: async (res: any) => {
-        if (res) {
-          if (!next) {
-            try {
-              this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
-            } catch (error) {
-              console.log("Error in updateTHCCostForDockets", error);
-            }
-          }
-          try {
-            const reqArrivalDeparture = {
-              action: "TripArrivalDepartureUpdate",
-              reqBody: {
-                cid: this.companyCode,
-                EventType: 'A',
-                loc: this.currentBranch,
-                tripId: this.MarkArrivalTableForm.value?.TripID
-              }
-            }
-            this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-          } catch (error) {
-            console.log("Error in pushToCTCommon", error);
-          }
-
-          if (stCode == 7) {
-            //this.getDocketTripWise(tripId);
-            // Call the vehicleStatusUpdate function here
-            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
-            Swal.fire({
-              icon: "info",
-              title: "Trip is close",
-              text: "Trip is close at " + this.currentBranch,
-              showConfirmButton: true
-            });
-            this.getPreviousData();
-          } else {
-            // await this.updateDocket();
-            this.getPreviousData();
-            //this.getDocketTripWise(tripId);
-
-          }
+    if (stCode == 7) {
+      await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
+      await this.arrivalService.deleteTrip({ cID: this.storage.companyCode, tHC: this.MarkArrivalTableForm.value?.TripID });
+      Swal.fire({
+        icon: "info",
+        title: "Trip is close",
+        text: "Trip is close at " + this.currentBranch,
+        showConfirmButton: true
+      });
+      if (!next) {
+        try {
+          await this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+        } catch (error) {
+          console.log("Error in updateTHCCostForDockets", error);
         }
       }
-    })
+      try {
+        const reqArrivalDeparture = {
+          action: "TripArrivalDepartureUpdate",
+          reqBody: {
+            cid: this.companyCode,
+            EventType: 'A',
+            loc: this.currentBranch,
+            tripId: this.MarkArrivalTableForm.value?.TripID
+          }
+        }
+        this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+      } catch (error) {
+        console.log("Error in pushToCTCommon", error);
+      }
+      this.getPreviousData();
+
+    }
+    else {
+      const reqBody = {
+        "companyCode": this.companyCode,
+        "collectionName": "trip_Route_Schedule",
+        "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
+        "update": {
+          ...tripDetails
+        }
+      }
+      this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
+        next: async (res: any) => {
+          if (res) {
+            if (!next) {
+              try {
+                this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+              } catch (error) {
+                console.log("Error in updateTHCCostForDockets", error);
+              }
+            }
+            try {
+              const reqArrivalDeparture = {
+                action: "TripArrivalDepartureUpdate",
+                reqBody: {
+                  cid: this.companyCode,
+                  EventType: 'A',
+                  loc: this.currentBranch,
+                  tripId: this.MarkArrivalTableForm.value?.TripID
+                }
+              }
+              this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+            } catch (error) {
+              console.log("Error in pushToCTCommon", error);
+            }
+            // await this.updateDocket();
+            this.getPreviousData();
+          }
+        }
+      })
+    }
   }
 
   /*here i write a code becuase of update docket states*/

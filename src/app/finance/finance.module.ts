@@ -80,6 +80,11 @@ import { AddGeneralInvoiceDetailComponent } from './Customer General Invoice/Mod
 import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
 import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
 import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/Modals/add-general-bill-detail/add-general-bill-detail.component';
+import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
+import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/generate-debit-note/generate-debit-note.component';
+import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
+import { ModifyDebitNoteDetailsComponent } from './Debit-Note/modify-debit-note-details/modify-debit-note-details/modify-debit-note-details.component';
+import { FilterDebitNoteDetailsComponent } from './Debit-Note/filter-debit-note-details/filter-debit-note-details/filter-debit-note-details.component';
 
 @NgModule({
     declarations: [
@@ -125,8 +130,12 @@ import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/
         AddGeneralInvoiceDetailComponent,
         GeneralBillCriteriaComponent,
         GeneralBillDetailComponent,
-        AddGeneralBillDetailComponent
-
+        AddGeneralBillDetailComponent,
+        ApproveDebitNoteComponent,
+        GenerateDebitNoteComponent,
+        DebitNoteDetailsComponent,
+        ModifyDebitNoteDetailsComponent,
+        FilterDebitNoteDetailsComponent,
     ],
     imports: [
         CommonModule,

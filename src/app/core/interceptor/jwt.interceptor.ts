@@ -31,7 +31,8 @@ export class JwtInterceptor implements HttpInterceptor {
     const excludedPaths = ['/auth/login', '/auth/refresh-tokens'];
     const contentType = request.headers.get('Content-Type')?.toLowerCase()?.split(';');
 
-    if (environment.production && ( contentType?.includes('application/json') || !contentType ) &&  request.body) {      
+    if (environment.production && ( contentType?.includes('application/json') || !contentType )
+        &&  request.body && !request.url.endsWith('/blob/upload')) {      
         request = request.clone({
           setHeaders: {
             encrypt: `true`,

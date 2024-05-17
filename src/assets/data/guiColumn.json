@@ -1,0 +1,71 @@
+{
+    "columns": [
+        {
+            "header": "Docket No",
+            "field": "DOCKNO",
+            "type": "string",
+            "styles": "text-decoration : underline;",
+            "align": "center",
+            "sorting": false
+        },
+        {
+            "header": "Party Name",
+            "field": "party_name",
+            "width": 300
+        },
+        {
+            "header": "Orginal Branch",
+            "field": "ORGNCD"
+        },
+        {
+            "header": "Destination Branch",
+            "field": "DESTCD",
+            "width": 160
+        },
+        {
+            "header": "From Location",
+            "field": "from_loc"
+        },
+        {
+            "header": "No of Package",
+            "field": "PKGSNO",
+            "type": "number"
+        },
+        {
+            "header": "Actual Weight",
+            "field": "ACTUWT",
+            "type": "number"
+        },
+        {
+            "header": "Charge Weight",
+            "field": "CHRGWT",
+            "type": "number"
+        }
+    ],
+    "paging": {
+        "enabled": true,
+        "page": 1,
+        "pageSize": 10,
+        "pageSizes": [
+            5,
+            10,
+            50,
+            100
+        ],
+        "display": "advanced"
+    },
+    "sorting": {
+        "enabled": true,
+        "multiSorting": true
+    },
+    "searching": {
+        "enabled": true,
+        "highlighting": true
+    },
+    "columnMenu": {
+        "enabled": true,
+        "sort": true,
+        "columnsManager": true
+    },
+    "theme": "MATERIAL"
+}

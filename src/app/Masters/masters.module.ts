@@ -184,6 +184,7 @@ import { VendorMasterUploadComponent } from './vendor-master/vendor-master-uploa
 import { AddressMasterUploadComponent } from './address-master/address-master-upload/address-master-upload.component';
 import { ContainerMasterUploadComponent } from './Container Master/container-master-upload/container-master-upload.component';
 import { ClusterMasterUploadComponent } from './cluster-master/cluster-master-upload/cluster-master-upload.component';
+import { GridUiExampleComponent } from './grid-ui-example/grid-ui-example.component';
 
 @NgModule({
   imports: [
@@ -378,12 +379,13 @@ import { ClusterMasterUploadComponent } from './cluster-master/cluster-master-up
     DcrManagementComponent,
     ActiveSeriesComponent,
     CustomerMasterUploadComponent,
-    DriverMasterUploadComponent ,
+    DriverMasterUploadComponent,
     CustomerMasterUploadComponent,
     VendorMasterUploadComponent,
     AddressMasterUploadComponent,
     ContainerMasterUploadComponent,
-    ClusterMasterUploadComponent
+    ClusterMasterUploadComponent,
+    GridUiExampleComponent,
   ],
   providers: [
     DatePipe,
@@ -400,4 +402,4 @@ import { ClusterMasterUploadComponent } from './cluster-master/cluster-master-up
     EncryptionService,
   ],
 })
-export class MastersModule {}
+export class MastersModule { }

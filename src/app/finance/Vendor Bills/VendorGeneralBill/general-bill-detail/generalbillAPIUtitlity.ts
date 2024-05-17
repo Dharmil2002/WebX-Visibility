@@ -10,7 +10,7 @@ export async function customerFromApi(masterService) {
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-        const result = res?.data.filter((x) => x.customerLocations.includes(branch)).map(x => ({ value: x.customerCode, name: x.customerName, pinCode: x.PinCode, mobile: x.customer_mobile })) ?? null;
+        const result = res?.data.filter((x) => x.customerLocations.includes(branch)).map(x => ({ value: x.customerCode, name: x.customerName, pinCode: x.PinCode, mobile: x.customer_mobile, details: x })) ?? null;
         return result.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);

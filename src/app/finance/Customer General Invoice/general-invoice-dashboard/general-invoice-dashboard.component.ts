@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 
@@ -17,69 +18,50 @@ export class GeneralInvoiceDashboardComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-    nTNO: {
-      Title: "CN No",
-      class: "matcolumnleft",
-      Style: "max-width: 300px",
-      sticky: true
-    },
-    eNTDT: {
-      Title: "CN date​",
+    customerCodeAndName: {
+      Title: "Customer Name",
       class: "matcolumncenter",
-      Style: "max-width: 200px",
+      Style: "min-width:180px",
     },
-    aMT: {
-      Title: "CN Amount",
-      class: "matcolumnright",
-      Style: "max-width: 100px",
+    billNo: {
+      Title: "Bill No",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
-    pARTY: {
-      Title: "Party in Credit Note",
+    billDate: {
+      Title: "Bill Date",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    billAmount: {
+      Title: "Bill Amount(₹)",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    billPendingAmount: {
+      Title: "Pending Amount(₹)",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    billStatus: {
+      Title: "Status",
       class: "matcolumnleft",
-      Style: "max-width: 220px",
-    },
-    docNo: {
-      Title: "CN Ref No",
-      class: "matcolumnleft",
-      Style: "max-width: 300px",
-    },
-    gST: {
-      Title: "GST Type​",
-      class: "matcolumnleft",
-      Style: "max-width: 200px",
-    },
-    tXBLAMT: {
-      Title: "Taxable Amt",
-      class: "matcolumnright",
-      Style: "max-width: 100px",
-    },
-    gstRevlAmt: {
-      Title: "GST Reversal Amt ",
-      class: "matcolumnright",
-      Style: "max-width: 100px",
-    },
-    sTSNM: {
-      Title: "CN Status ",
-      class: "matcolumnleft",
-      Style: "max-width: 150px",
-      stickyEnd: true
+      Style: "max-width:90px",
+    }
+  };
+  staticField =
+    [
+      "customerCodeAndName",
+      "billNo",
+      "billDate",
+      "billAmount",
+      "billPendingAmount",
+      "billStatus",
+    ]
 
-    },
-  }
-  staticField = [
 
-    "nTNO",
-    "eNTDT",
-    "aMT",
-    "pARTY",
-    "pARTYAmt",
-    "docNo",
-    "gST",
-    "tXBLAMT",
-    "gstRevlAmt",
-    "sTSNM",
-  ]
   constructor(
+    private invoiceServiceService: InvoiceServiceService,
   ) {
     this.addAndEditPath = "Finance/CustomerInvoiceGeneral/Criteria";
   }
@@ -89,6 +71,10 @@ export class GeneralInvoiceDashboardComponent implements OnInit {
   }
 
   async getData() {
+
+    // Get Bill data and bind to the table 
+    let data = await this.invoiceServiceService.getBillList()
+    this.tableData = data;
   }
 
 

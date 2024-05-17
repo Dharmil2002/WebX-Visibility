@@ -3,9 +3,10 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { VendorGeneralBillControl } from 'src/assets/FormControls/Finance/VendorPayment/VendorGeneralBillcontrol';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { GetDocumentsWiseListFromApi } from 'src/app/finance/Vendor Bills/VendorGeneralBill/general-bill-detail/generalbillAPIUtitlity';
+import { CustomerGeneralInvoiceControl } from 'src/assets/FormControls/Finance/InvoiceCollection/CustomerGeneralInvoicecontrol';
 
 @Component({
   selector: 'app-add-general-invoice-detail',
@@ -18,14 +19,15 @@ import { GetDocumentsWiseListFromApi } from 'src/app/finance/Vendor Bills/Vendor
 })
 export class AddGeneralInvoiceDetailComponent implements OnInit {
 
-  VendorBillControl: VendorGeneralBillControl;
+  CustomerGeneralInvoiceControl: CustomerGeneralInvoiceControl;
 
-  VendorBillDetailsForm: UntypedFormGroup;
-  jsonControlVendorBillDetailsArray: any;
+  CustomerGeneralInvoiceForm: UntypedFormGroup;
+  jsonControlCustomerGeneralInvoiceArray: any;
   DocumentType: any;
-  VendorInfo: any;
+  CustomerDetails: any;
   constructor(private filter: FilterUtils,
     private masterService: MasterService,
+    private storageService: StorageService,
     private fb: UntypedFormBuilder, public dialogRef: MatDialogRef<AddGeneralInvoiceDetailComponent>,
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) { }
@@ -33,34 +35,34 @@ export class AddGeneralInvoiceDetailComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl();
     console.log(this.objResult);
-    this.VendorInfo = this.objResult.VendorInfo;
+    this.CustomerDetails = this.objResult.CustomerDetails;
   }
   Close() {
     this.dialogRef.close()
   }
   initializeFormControl() {
-    this.VendorBillControl = new VendorGeneralBillControl(this.objResult.Details);
-    this.jsonControlVendorBillDetailsArray = this.VendorBillControl.getVendorBillDetailsArrayControls();
-    this.VendorBillDetailsForm = formGroupBuilder(this.fb, [this.jsonControlVendorBillDetailsArray]);
+    this.CustomerGeneralInvoiceControl = new CustomerGeneralInvoiceControl(this.objResult.Details);
+    this.jsonControlCustomerGeneralInvoiceArray = this.CustomerGeneralInvoiceControl.getCustomerGeneralInvoiceDetailsArrayControls();
+    this.CustomerGeneralInvoiceForm = formGroupBuilder(this.fb, [this.jsonControlCustomerGeneralInvoiceArray]);
 
     this.filter.Filter(
-      this.jsonControlVendorBillDetailsArray,
-      this.VendorBillDetailsForm,
+      this.jsonControlCustomerGeneralInvoiceArray,
+      this.CustomerGeneralInvoiceForm,
       this.objResult.LedgerList,
       "Ledger",
       false
     );
 
     this.filter.Filter(
-      this.jsonControlVendorBillDetailsArray,
-      this.VendorBillDetailsForm,
+      this.jsonControlCustomerGeneralInvoiceArray,
+      this.CustomerGeneralInvoiceForm,
       this.objResult.Document,
       "Document",
       false
     );
     if (this.objResult.Details) {
-      this.VendorBillDetailsForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.LedgerHdn))
-      this.VendorBillDetailsForm.controls.Document.setValue(
+      this.CustomerGeneralInvoiceForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.LedgerHdn))
+      this.CustomerGeneralInvoiceForm.controls.Document.setValue(
         {
           name: this.objResult.Details.Document,
           value: this.objResult.Details.Document
@@ -68,15 +70,15 @@ export class AddGeneralInvoiceDetailComponent implements OnInit {
       )
       // Remove Validation when Document is OTR
       if (this.objResult.Details.DocumentType == "OTR") {
-        this.VendorBillDetailsForm.controls.Document.clearValidators();
-        this.VendorBillDetailsForm.controls.Document.updateValueAndValidity();
+        this.CustomerGeneralInvoiceForm.controls.Document.clearValidators();
+        this.CustomerGeneralInvoiceForm.controls.Document.updateValueAndValidity();
       }
       this.DocumentType = this.objResult.Details.DocumentType;
     } else {
       // Remove Validation when Document is OTR
       if (this.objResult.DocumentType == "OTR") {
-        this.VendorBillDetailsForm.controls.Document.clearValidators();
-        this.VendorBillDetailsForm.controls.Document.updateValueAndValidity();
+        this.CustomerGeneralInvoiceForm.controls.Document.clearValidators();
+        this.CustomerGeneralInvoiceForm.controls.Document.updateValueAndValidity();
       }
       this.DocumentType = this.objResult.DocumentType;
     }
@@ -91,11 +93,11 @@ export class AddGeneralInvoiceDetailComponent implements OnInit {
     }
   }
   save(event) {
-    const Ledger = this.VendorBillDetailsForm.value['Ledger'];
-    this.VendorBillDetailsForm.controls.Ledger.patchValue(Ledger.name)
-    this.VendorBillDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
-    this.VendorBillDetailsForm.controls.SubCategoryName.patchValue(Ledger.mRPNM)
-    this.dialogRef.close(this.VendorBillDetailsForm.value)
+    const Ledger = this.CustomerGeneralInvoiceForm.value['Ledger'];
+    this.CustomerGeneralInvoiceForm.controls.Ledger.patchValue(Ledger.name)
+    this.CustomerGeneralInvoiceForm.controls.LedgerHdn.patchValue(Ledger.value)
+    this.CustomerGeneralInvoiceForm.controls.SubCategoryName.patchValue(Ledger.mRPNM)
+    this.dialogRef.close(this.CustomerGeneralInvoiceForm.value)
   }
   cancel(event) {
     this.dialogRef.close()
@@ -103,29 +105,37 @@ export class AddGeneralInvoiceDetailComponent implements OnInit {
 
   async SetDocumentOptions(event) {
     let fieldName = event.field.name;
-    const search = this.VendorBillDetailsForm.controls[fieldName].value;
+    const search = this.CustomerGeneralInvoiceForm.controls[fieldName].value;
     let data = [];
     if (search.length >= 2) {
       switch (this.DocumentType) {
         case "DRS":
           data = await GetDocumentsWiseListFromApi(this.masterService, 'drs_headers', 'dRSNO', search,
-            'vND.cD', this.VendorInfo?.vendorCode, 'oPSST', 1)
+            'vND.cD', this.CustomerDetails?.customerCode, 'oPSST', 1)
           break;
         case "THCLTL":
           data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_summary_ltl', 'docNo', search,
-            'vND.cD', this.VendorInfo?.vendorCode, 'oPSST', 1)
+            'vND.cD', this.CustomerDetails?.customerCode, 'oPSST', 1)
           break;
         case "THCFTL":
           data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_summary', 'docNo', search,
-            'vND.cD', this.VendorInfo?.vendorCode, 'oPSST', 1)
+            'vND.cD', this.CustomerDetails?.customerCode, 'oPSST', 1)
+          break;
+        case "GCNLTL":
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'dockets_ltl', 'dKTNO', search,
+            'bPARTY', this.CustomerDetails?.customerCode, 'oRGN', this.storageService.branch)
+          break;
+        case "GCNFTL":
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'dockets', 'dKTNO', search,
+            'bPARTY', this.CustomerDetails?.customerCode, 'oRGN', this.storageService.branch)
           break;
         case "OTR":
           break;
       }
 
       this.filter.Filter(
-        this.jsonControlVendorBillDetailsArray,
-        this.VendorBillDetailsForm,
+        this.jsonControlCustomerGeneralInvoiceArray,
+        this.CustomerGeneralInvoiceForm,
         data,
         "Document",
         false

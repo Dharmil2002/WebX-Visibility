@@ -52,11 +52,33 @@ export class CustomerGeneralInvoiceControl {
         name: "CustomerName",
         label: "Customer Name",
         placeholder: "Customer Name",
-        type: "text",
-        value: '',
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Customer Name required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "PartyNameFieldChanged",
+          onChange: "PartyNameFieldChanged"
+        },
       },
 
       {
@@ -300,15 +322,15 @@ export class CustomerGeneralInvoiceControl {
     ];
     this.CustomerGeneralInvoiceTaxationGSTArray = [
       {
-        name: "VendorGSTRegistered",
-        label: "Vendor GST Registered",
-        placeholder: "Vendor GST Registered",
+        name: "CustomerGSTRegistered",
+        label: "Customer GST Registered",
+        placeholder: "Customer GST Registered",
         type: "toggle",
-        value: FormValues?.VendorGSTRegistered == "Yes" ? true : false,
+        value: FormValues?.CustomerGSTRegistered == "Yes" ? true : false,
         generatecontrol: true,
         disable: false,
         functions: {
-          onChange: "toggleVendorGSTRegistered",
+          onChange: "toggleCustomerGSTRegistered",
         },
         Validations: [],
       },
@@ -396,8 +418,8 @@ export class CustomerGeneralInvoiceControl {
       },
       {
         name: "CustomerGeneralInvoicestate",
-        label: "Vendor bill state",
-        placeholder: "Vendor bill state",
+        label: "Customer bill state",
+        placeholder: "Customer bill state",
         type: "dropdown",
         value: "",
         filterOptions: "",
@@ -407,7 +429,7 @@ export class CustomerGeneralInvoiceControl {
         Validations: [
           // {
           //   name: "required",
-          //   message: "Vendor bill state is required",
+          //   message: "Customer bill state is required",
           // },
           // {
           //   name: "invalidAutocompleteObject",

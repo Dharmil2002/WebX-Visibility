@@ -131,9 +131,10 @@ export class CustInvRegFormControl {
         label: "Location",
         placeholder: "Select Location",
         type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
+        value: [],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         Validations: [
           {
             name: "autocomplete",
@@ -144,10 +145,24 @@ export class CustInvRegFormControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        generatecontrol: true,
+        disable: false,
       },
-
+      {
+        name: "Individual",
+        label: "",
+        placeholder: "Individual",
+        type: "radiobutton",
+        value: [
+          { value: "Y", name: "Individual", checked: true },
+          { value: "N", name: "Cumulative" },
+        ],
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
       {
         name: "OR",
         label: "OR ",

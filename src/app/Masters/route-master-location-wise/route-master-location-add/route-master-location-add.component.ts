@@ -365,6 +365,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       "_id":`${this.storage.companyCode}-${this.newRouteCode}`,
       "cID": this.storage.companyCode,
       "tHC": "",
+      "aDHOC":false,
       "rUTCD":this.newRouteCode,
       "rUTNM":routeName,
       "sTM": new Date(),
@@ -384,6 +385,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       Body['mODDT']= new Date();
       Body['mODLOC']=this.storage.branch;
       Body['mODBY']=this.storage.userName;
+      Body["aDHOC"]=false;
       routeMasterLocWise['mODDT']= new Date();
       routeMasterLocWise['mODLOC']=this.storage.branch;
       routeMasterLocWise['mODBY']=this.storage.userName;
@@ -420,6 +422,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       Body['eNTDT']= new Date();
       Body['eNTLOC']=this.storage.branch;
       Body['eNTBY']=this.storage.userName;
+      Body["aDHOC"]=false;
       routeMasterLocWise['eNTDT']= new Date();
       routeMasterLocWise['eNTLOC']=this.storage.branch;
       routeMasterLocWise['eNTBY']=this.storage.userName;

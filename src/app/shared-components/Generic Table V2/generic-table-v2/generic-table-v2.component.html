@@ -29,7 +29,7 @@
                                 <mat-icon>add</mat-icon>
                                 Add New
                             </button>
-                            <button *ngIf="DisplaySaveButton" matTooltip="Submit" mat-stroked-button
+                            <button *ngIf="DisplaySaveButton" matTooltip="Submit"  mat-stroked-button
                                 style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="Submit()"
                                 class="filter_btn">
                                 Submit
@@ -141,8 +141,7 @@
                     <div [ngClass]="stickyHeader ? ['responsive_table', 'fixHeight'] : ['responsive_table']" 
                         [style]="TableContainerStyle"
                         [style.width]="containerWidth || '100%'">
-                        <table mat-table [style.width]="'100%'" [style]="TableStyle" [dataSource]="dataSource" matSort >
-                            
+                        <table mat-table [style.width]="tableWidth || '100%'" [style]="TableStyle" [dataSource]="dataSource" matSort >
                             <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)"
                             [sticky]="columnHeader[tableData].sticky" [stickyEnd]="columnHeader[tableData].stickyEnd">                               >                               
                                 <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">

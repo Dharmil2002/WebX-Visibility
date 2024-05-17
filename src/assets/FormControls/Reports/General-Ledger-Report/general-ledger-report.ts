@@ -26,9 +26,9 @@ export class GeneralLedgerReport {
                 additionalData: {
                     showNameAndValue: false,
                 },
-                // functions: {
-                //     onOptionSelect: "validateDateRange"
-                // },
+                functions: {
+                    onOptionSelect: "resetDateRange"
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -43,7 +43,6 @@ export class GeneralLedgerReport {
                 Validations: [],
                 additionalData: {
                     support: "end",
-                    minDate: new Date('2023-04-01'),
                 },
                 functions: { onDate: "validateDateRange" }
             },
@@ -54,7 +53,7 @@ export class GeneralLedgerReport {
                 type: 'Staticdropdown',
                 value: [
                     { value: "General Ledger", name: "General Ledger" },
-                    { value: "Sub Ledger ", name: "Sub Ledger " },
+                    { value: "Sub Ledger", name: "Sub Ledger" },
                     { value: "Document/Cheque No  ", name: "Document/Cheque No  " },
                 ],
                 Validations: [],

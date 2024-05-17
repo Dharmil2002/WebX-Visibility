@@ -2,26 +2,18 @@
     <form [formGroup]="generalLedgerForm">
         <app-form-webxpress [form]="generalLedgerForm" [FormTitle]="'General Ledger Report'"
             [formData]="jsonGeneralLedgerArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveButton]="false">
+            (callFunction)="functionCallHandler($event)"  [showSaveButton]="true" [submit]="'Submit'">>
         </app-form-webxpress>
     </form>
-    <div class="row">
-        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
-            <button mat-button mat-raised-button color="primary" (click)="getDrillDown()">
-                Submit
-            </button>
-            &nbsp;&nbsp;
-            <button mat-button mat-raised-button color="primary" (click)="save()">
-                Download
-            </button>
-        </div>
-    </div>
+  
     <app-generic-table-v2 *ngIf="tableLoad" 
         [dynamicControls]="dynamicControls" 
         [columnHeader]="ledgerHeader" 
         [tableData]="drillDownData"
         [staticField]="staticField" 
         [Link]="linkArray" 
+        [csvHeaders]="CSVHeader"
+        [csvFileName]="csvFileName"
         (functionCallEmitter)="functionCallHandler($event)">
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

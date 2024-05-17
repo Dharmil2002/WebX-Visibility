@@ -61,7 +61,7 @@ export class GeneralLedgerReportComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: false,
+    csv: true,
   };
   linkArray = [];
 
@@ -102,6 +102,7 @@ export class GeneralLedgerReportComponent implements OnInit {
       Title: "Voucher No",
       class: "matcolumnleft",
       type: "Link",
+      datatype: "string",
       functionName: "getVoucherDetails",
       sticky: true
     },
@@ -158,7 +159,7 @@ export class GeneralLedgerReportComponent implements OnInit {
   }
   tableLoad: boolean = false;
   drillDownData: any[];
-
+  csvFileName: string;
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
@@ -180,6 +181,7 @@ export class GeneralLedgerReportComponent implements OnInit {
     this.generalLedgerForm.controls["start"].setValue(lastweek);
     this.generalLedgerForm.controls["end"].setValue(now);
     this.getDropdownData();
+    this.csvFileName = `General_Ledger_Report-${timeString}`;
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -265,44 +267,6 @@ export class GeneralLedgerReportComponent implements OnInit {
     }
   }
   //#endregion
-  //#region to export data in csv file
-  async save() {
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
-        const reqBody = await this.getRequestData();
-        const data = await this.generalLedgerReportService.getGeneralLedger(reqBody)
-        if (data.length === 0) {
-          Swal.hideLoading();
-          setTimeout(() => {
-            Swal.close();
-          }, 1000);
-
-          if (data) {
-            Swal.fire({
-              icon: "error",
-              title: "No Records Found",
-              text: "Cannot Download CSV",
-              showConfirmButton: true,
-            });
-          }
-          return;
-        }
-        Swal.hideLoading();
-        setTimeout(() => {
-          Swal.close();
-        }, 1000);
-        // Export the record to Excel
-        this.exportService.exportAsCSV(data, `General_Ledger_Report-${timeString}`, this.CSVHeader);
-
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal(
-          "error",
-          error.message
-        );
-      }
-    }, "General Leadger Report Generating Please Wait..!");
-  }
-  //#endregion
   //#region to call toggle function
   toggleSelectAll(argData: any) {
     let fieldName = argData.field.name;
@@ -320,128 +284,177 @@ export class GeneralLedgerReportComponent implements OnInit {
       });
   }
   //#endregion
-  validateDateRange() {
-     const startControl = this.generalLedgerForm.controls.start.value;
-    const endControl = this.generalLedgerForm.controls.end.value;
-    const fnYearControl = this.generalLedgerForm.value.Fyear.value;
+  //#region to validate date range according to financial year
+  validateDateRange(event): void {
 
-    // if (!startControl || !endControl || !fnYearControl) {
-    //   console.error('Form controls are not properly initialized.');
-    //   return;
-    // }
+    // Get the values from the form controls
+    const startControlValue = this.generalLedgerForm.controls.start.value;
+    const endControlValue = this.generalLedgerForm.controls.end.value;
+    const selectedFinancialYear = this.generalLedgerForm.controls.Fyear.value;
 
+    // Check if both start and end dates are selected
+    if (!startControlValue || !endControlValue) {
+      // Exit the function if either start or end date is not selected
+      return;
+    }
 
+    // Convert the control values to Date objects
+    const startDate = new Date(startControlValue);
+    const endDate = new Date(endControlValue);
 
-    console.log(`startDate = ${startControl}, endDate = ${endControl}`);
-    console.log(`fnYear = ${fnYearControl}`);
+    // Determine the financial year based on the start date
+    const startYear = startDate.getFullYear(); // Extract the year from the start date
 
-    if (fnYearControl == 2324) {
-      const startElement = this.jsonGeneralLedgerArray.find(x => x.name === 'start');
-      const endElement = this.jsonGeneralLedgerArray.find(x => x.name === 'end');
+    // Determine the financial year start
+    // If the month of the start date is less than March (0-based index, so 3 is April),
+    // it means the financial year started in the previous year.
+    // For example, if the start date is February 2024, the financial year started in April 2023.
+    const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
 
-      if (startElement) {
-        startElement.additionalData.minDate = new Date('2023-04-01');
+    // Calculate the financial year string in the format 'YYYYYYYY'
+    // The financial year string is a combination of the last two digits of the start year and the last two digits of the next year.
+    // For example, if the financial year started in 2023, the financial year string will be '2324'.
+    const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
+
+    // Check if the selected financial year matches the calculated financial year
+    if (selectedFinancialYear.value === calculatedFnYr) {
+
+      // Define the financial year date range
+      // Parse the selected financial year to get the start year (e.g., '2324' -> 2023)
+      const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+      const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+      const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+      // Check if both dates fall within the specified financial year range
+      if (startDate >= minDate && startDate <= maxDate && endDate >= minDate && endDate <= maxDate) {
+        // Both dates are within the valid range
+        console.log('Both dates are within the valid range.');
       } else {
-        console.error('Start element not found in jsonGeneralLedgerArray');
+        // Show a warning if the date range is not within the financial year
+        this.dateRangeWarning(selectedFinancialYear);
+        this.clearDateControls();
       }
-
-      if (endElement) {
-        endElement.additionalData.maxDate = new Date('2024-03-31');
-      } else {
-        console.error('End element not found in jsonGeneralLedgerArray');
-      }
-
-      console.log('fnYear is 2324');
+    }
+    else {
+      // Show a warning if the date range is not within the financial year
+      this.dateRangeWarning(selectedFinancialYear);
+      this.clearDateControls();
     }
   }
+  // Function to display a warning message if the date range is not within the selected financial year
+  dateRangeWarning(selectedFinancialYear): void {
+    Swal.fire({
+      icon: "warning",
+      title: "Warning",
+      text: `Date range not within FY ${selectedFinancialYear.name}`,
+      showConfirmButton: true,
+    });
+  }
+  // Function to clear the date range controls
+  clearDateControls(): void {
+    this.generalLedgerForm.controls["start"].setValue("");
+    this.generalLedgerForm.controls["end"].setValue("");
+  }
+  //#endregion
   //#region to set party name according to received from data
   async reportSubTypeChanged() {
-    const reportSubType = this.generalLedgerForm.value.reportSubType;
+    if (this.generalLedgerForm.controls.reportTyp.value === 'Sub Ledger') {
+      const reportSubType = this.generalLedgerForm.value.reportSubType;
 
-    this.generalLedgerForm.controls.subLedger.setValue("");
-    this.generalLedgerForm.controls.subLedgerHandler.setValue("");
+      this.generalLedgerForm.controls.subLedger.setValue("");
+      this.generalLedgerForm.controls.subLedgerHandler.setValue("");
 
-    let responseFromAPI = [];
-    switch (reportSubType) {
-      case 'Location':
-        responseFromAPI = await this.locationService.getLocations(
-          { companyCode: this.storage.companyCode, activeFlag: true },
-          { _id: 0, locCode: 1, locName: 1 })
-        responseFromAPI = responseFromAPI.map(x => ({
-          value: x.locCode,
-          name: x.locName
-        }));
-        this.filter.Filter(
-          this.jsonGeneralLedgerArray,
-          this.generalLedgerForm,
-          responseFromAPI,
-          "subLedger",
-          true
-        );
-        break;
-      case 'Customer':
-        responseFromAPI = await this.generalLedgerReportService.customersData()
-        this.filter.Filter(
-          this.jsonGeneralLedgerArray,
-          this.generalLedgerForm,
-          responseFromAPI,
-          "subLedger",
-          true
-        );
-        break;
-      case 'Vendor':
-        responseFromAPI = await this.generalLedgerReportService.vendorsData();
-        this.filter.Filter(
-          this.jsonGeneralLedgerArray,
-          this.generalLedgerForm,
-          responseFromAPI,
-          "subLedger",
-          true
-        );
-        break;
-      case 'Employee':
-        responseFromAPI = await this.generalLedgerReportService.usersData()
-        this.filter.Filter(
-          this.jsonGeneralLedgerArray,
-          this.generalLedgerForm,
-          responseFromAPI,
-          "subLedger",
-          true
-        );
-        break;
-      case 'Driver':
-        responseFromAPI = await this.generalLedgerReportService.driversData()
-        this.filter.Filter(
-          this.jsonGeneralLedgerArray,
-          this.generalLedgerForm,
-          responseFromAPI,
-          "subLedger",
-          true
-        );
-        break;
-      case 'Vehicle':
-        responseFromAPI = await this.generalLedgerReportService.vehicleData()
-        this.filter.Filter(
-          this.jsonGeneralLedgerArray,
-          this.generalLedgerForm,
-          responseFromAPI,
-          "subLedger",
-          true
-        );
-        break;
-      default:
+      let responseFromAPI = [];
+      switch (reportSubType) {
+        case 'Location':
+          responseFromAPI = await this.locationService.getLocations(
+            { companyCode: this.storage.companyCode, activeFlag: true },
+            { _id: 0, locCode: 1, locName: 1 })
+          responseFromAPI = responseFromAPI.map(x => ({
+            value: x.locCode,
+            name: x.locName
+          }));
+          this.filter.Filter(
+            this.jsonGeneralLedgerArray,
+            this.generalLedgerForm,
+            responseFromAPI,
+            "subLedger",
+            true
+          );
+          break;
+        case 'Customer':
+          responseFromAPI = await this.generalLedgerReportService.customersData()
+          this.filter.Filter(
+            this.jsonGeneralLedgerArray,
+            this.generalLedgerForm,
+            responseFromAPI,
+            "subLedger",
+            true
+          );
+          break;
+        case 'Vendor':
+          responseFromAPI = await this.generalLedgerReportService.vendorsData();
+          this.filter.Filter(
+            this.jsonGeneralLedgerArray,
+            this.generalLedgerForm,
+            responseFromAPI,
+            "subLedger",
+            true
+          );
+          break;
+        case 'Employee':
+          responseFromAPI = await this.generalLedgerReportService.usersData()
+          this.filter.Filter(
+            this.jsonGeneralLedgerArray,
+            this.generalLedgerForm,
+            responseFromAPI,
+            "subLedger",
+            true
+          );
+          break;
+        case 'Driver':
+          responseFromAPI = await this.generalLedgerReportService.driversData()
+          this.filter.Filter(
+            this.jsonGeneralLedgerArray,
+            this.generalLedgerForm,
+            responseFromAPI,
+            "subLedger",
+            true
+          );
+          break;
+        case 'Vehicle':
+          responseFromAPI = await this.generalLedgerReportService.vehicleData()
+          this.filter.Filter(
+            this.jsonGeneralLedgerArray,
+            this.generalLedgerForm,
+            responseFromAPI,
+            "subLedger",
+            true
+          );
+          break;
+        default:
 
+      }
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Warning",
+        text: `Select Report Type as Sub Ledger`,
+        showConfirmButton: true,
+      });
+      this.generalLedgerForm.controls["reportSubType"].setValue("");
     }
+
   }
   //#endregion
   //#region to get ledger data to show in table 
-  async getDrillDown() {
+  async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         this.tableLoad = false;
         const reqBody = await this.getRequestData();
         this.drillDownData = await this.generalLedgerReportService.getGeneralLedger(reqBody)
-        console.log(this.drillDownData)
+        // console.log(this.drillDownData)
         if (this.drillDownData.length === 0) {
           Swal.hideLoading();
           setTimeout(() => {
@@ -449,8 +462,8 @@ export class GeneralLedgerReportComponent implements OnInit {
           }, 1000);
           Swal.fire({
             icon: "error",
-            title: "No Records Found",
-            // text: "Cannot Download CSV",
+            title: "Error",
+            text: "No Records Found",
             showConfirmButton: true,
           });
           return
@@ -539,6 +552,12 @@ export class GeneralLedgerReportComponent implements OnInit {
     }
     this.exportService.exportAsCSV(csv, `Voucher-Register_Report-${timeString}`, voucherCSVHeader);
 
+  }
+  //#endregion
+  //#region to reset date range
+  resetDateRange() {
+    this.generalLedgerForm.controls["start"].setValue("");
+    this.generalLedgerForm.controls["end"].setValue("");
   }
   //#endregion
 }

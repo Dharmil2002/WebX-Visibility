@@ -312,7 +312,15 @@ export class RouteMasterLocationAddComponent implements OnInit {
 
   //#region 
   async save() {
-    
+    if(this.tableData.length<=1){ 
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Please add atleast one Leg to the Route.",
+        showConfirmButton: true,
+      });
+      return false;
+    }
     const lastRt = await this.getListId();    
     const lastCode = lastRt?.routeId || "R0000";
     if (this.isUpdate) {
@@ -357,6 +365,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       "_id":`${this.storage.companyCode}-${this.newRouteCode}`,
       "cID": this.storage.companyCode,
       "tHC": "",
+      "aDHOC":false,
       "rUTCD":this.newRouteCode,
       "rUTNM":routeName,
       "sTM": new Date(),
@@ -376,6 +385,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       Body['mODDT']= new Date();
       Body['mODLOC']=this.storage.branch;
       Body['mODBY']=this.storage.userName;
+      Body["aDHOC"]=false;
       routeMasterLocWise['mODDT']= new Date();
       routeMasterLocWise['mODLOC']=this.storage.branch;
       routeMasterLocWise['mODBY']=this.storage.userName;
@@ -412,6 +422,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       Body['eNTDT']= new Date();
       Body['eNTLOC']=this.storage.branch;
       Body['eNTBY']=this.storage.userName;
+      Body["aDHOC"]=false;
       routeMasterLocWise['eNTDT']= new Date();
       routeMasterLocWise['eNTLOC']=this.storage.branch;
       routeMasterLocWise['eNTBY']=this.storage.userName;

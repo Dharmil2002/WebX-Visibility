@@ -239,7 +239,7 @@ export class UploadOpeningBalanceLedgerWiseComponent implements OnInit {
           const updateData = {
             dAMT: element.DebitAmount ? element.DebitAmount : 0,
             cAMT: element.CreditAmount ? element.CreditAmount : 0,
-            mODDT: moment().format("YYYY-MM-DD"),
+            mODDT: new Date(),
             mODBY: this.storage.userName,
             mODLOC: this.storage.branch,
           };
@@ -300,7 +300,7 @@ export class UploadOpeningBalanceLedgerWiseComponent implements OnInit {
             cATNM: element.CategoryName,
             dAMT: element.DebitAmount ? element.DebitAmount : 0,
             cAMT: element.CreditAmount ? element.CreditAmount : 0,
-            eNTDT: moment().format("YYYY-MM-DD"),
+            eNTDT: new Date(),
             eNTBY: this.storage.userName,
             eNTLOC: this.storage.branch,
           };

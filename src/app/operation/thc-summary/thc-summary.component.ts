@@ -5,6 +5,7 @@ import { formatDate } from 'src/app/Utility/date/date-utils';
 import { MatDialog } from '@angular/material/dialog';
 import { StorageService } from 'src/app/core/service/storage.service';
 import moment from 'moment';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 
 @Component({
   selector: 'app-thc-summary',
@@ -29,7 +30,7 @@ export class ThcSummaryComponent implements OnInit {
   TableStyle = "width:80%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
-  columnHeader = {   
+  columnHeader = {
     docNo: {
       Title: "THC No",
       class: "matcolumncenter",
@@ -43,7 +44,7 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-    dEST:{
+    dEST: {
       Title: "Destination",
       class: "matcolumncenter",
       Style: "min-width:130px",
@@ -95,44 +96,71 @@ export class ThcSummaryComponent implements OnInit {
 
   //here declare varible for the KPi
   boxData: { count: number; title: string; class: string; }[];
+  rules: any[] = [];
+  connectedLoc: boolean = false;
   constructor(
     private router: Router,
     public dialog: MatDialog,
     private thcService: ThcService,
-    private storage: StorageService
+    private storage: StorageService,
+    private controlPanel: ControlPanelService,
   ) {
+
     this.getThcDetails();
     this.addAndEditPath = "Operation/thc-create";
     this.allColumnFilter = this.columnHeader;
   }
 
-
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: { "D$in": ["CNOTE"] },
+      aCTIVE: true
+    }
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
+    }
+  }
 
   //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
+    try {
+      await this.getRules();
+      this.connectedLoc = this.rules.find(x => x.rULEID == "CONLOC" && x.aCTIVE)?.vAL == "Y";
+    }
+    catch (err) {
+      console.log(err);
+    }
     const branch = this.storage.branch;
     const locData = await this.thcService.getLocationDetail(branch);
-    console.log('locData', locData)
-    const filter = {
+    let  filter = {
       cID: this.storage.companyCode,
       D$or: [
         { fCT: locData.locCity },
         { tCT: locData.locCity },
-        {vIA:{"D$in": [locData.locCity]}}
+        { vIA: { "D$in": [locData.locCity] } }
       ],
-      oPSST: { D$in: [1,3,2] }
+      oPSST: { D$in: [1, 3, 2] }
     };
-
+     if(this.connectedLoc){
+      filter.D$or.push({ tCT: { "D$in": locData?.mappedCity || [] } });
+     }
     let thcList = await this.thcService.getThcDetail(filter);
     const thcDetail = thcList.data.map((item) => {
-      const dest= item.tCT?.toLowerCase() === locData.locCity?.toLowerCase();
-      const action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
-      (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
+      const dest = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase();
+      let action = item.tCT?.toLowerCase() === locData.locCity?.toLowerCase() ||
+        (Array.isArray(item.vIA) && item.vIA.some(v => v.toLowerCase() === locData.locCity?.toLowerCase()));
+      if (!action) {
+        if (locData && locData.mappedCity && locData.mappedCity.includes(item.tCT) &&  this.connectedLoc) {
+          action = true;
+        }
+      }
       if (item.eNTDT) {
-        item.createOn = moment(item.eNTDT).format('DD-MM-YY HH:mm');
+        item.createOn = item.eNTDT;
         item.statusAction = item?.oPSSTNM
         item.loadedKg = item?.uTI?.wT
-        item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] :(dest&&item.oPSST!==2)? ["Update THC", "View"]:item.oPSST === 1 ||[2,3].includes(item.oPSST) ? ["View"] : ["Delivered", "View"];
+        item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] : (dest && item.oPSST !== 2) ? ["Update THC", "View"] : item.oPSST === 1 || [2, 3].includes(item.oPSST) ? ["View"] : ["Delivered", "View"];
       }
       return item;
     });

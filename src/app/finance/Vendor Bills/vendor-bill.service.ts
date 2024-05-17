@@ -27,7 +27,7 @@ export class VendorBillService {
         vnName: res.vND.nM,
         billType: "Vendor Bill",
         billNo: res.docNo,
-        Date: this.formatDate(res.bDT),
+        Date: res.bDT,
         TotalTHCAmount: res.tHCAMT,
         AdvancePayedAmount: res.aDVAMT,
         billAmount: res.bALAMT,

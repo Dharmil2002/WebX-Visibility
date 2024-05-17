@@ -6,6 +6,7 @@ import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { VehicleService } from "../../masters/vehicle-master/vehicle-master-service";
 
 @Injectable({
   providedIn: "root",
@@ -13,7 +14,8 @@ import { StorageService } from "src/app/core/service/storage.service";
 export class LoadingSheetService {
   constructor(
     private operationService: OperationService,
-    private storage: StorageService
+    private storage: StorageService,
+    private marketVehicleService: VehicleService
   ) { }
 
   async getDocketsForLoadingSheet(nextLocs: string[]) {
@@ -34,7 +36,6 @@ export class LoadingSheetService {
   }
   async tripFieldMapping(data, tabledata) {
     const route = data?.Route.split(":")[1].split("-");
-    
     let tripSummary = {
       "_id": "",
       "cID": this.storage.companyCode,
@@ -42,16 +43,16 @@ export class LoadingSheetService {
       "tHCDT": new Date(),
       "lOC": this.storage.branch,
       "oRGN": this.storage.branch,
-      "dEST": route[route.length - 1],      
+      "dEST": route[route.length - 1],
       // "fCT": "",
       // "tCT": "",
       "rUTCD": data?.Route.split(":")[0] || "",
       "rUTNM": data?.Route.split(":")[1] || "",
-      "vEHNO": data?.vehicle.value || "",
+      "vEHNO": data?.vehicle?.value|| "",
       "vTYP": data?.vehicleTypeCode || "",
       "vTYPNM": data?.vehicleType || "",
-      "tMODE":data?.transMode||"",
-      "tMODENM":data?.transModeName||"",
+      "tMODE": data?.transMode || "",
+      "tMODENM": data?.transModeName || "",
       // "vND": {
       //   "tY":"",
       //   "tYNM":"",
@@ -59,8 +60,8 @@ export class LoadingSheetService {
       //   "nM":"",
       //   "pAN":""
       // },
-      oPSST:ThcStatus.Generated,    
-      oPSSTNM:ThcStatus[ThcStatus.Generated],
+      oPSST: ThcStatus.Generated,
+      oPSSTNM: ThcStatus[ThcStatus.Generated],
       "fINST": 0,
       "fINSTNM": "",
       "cONTAMT": 0,
@@ -134,7 +135,7 @@ export class LoadingSheetService {
     }
 
     let tripMovement = [];
-   
+
     let lsHeader = []
     let lsDetail = []
     let dktList = [];
@@ -181,7 +182,7 @@ export class LoadingSheetService {
               "cID": this.storage.companyCode,
               "dKTNO": ls?.dKTNO || "",
               "sFX": ls?.sFX || 0,
-              "lOC":element?.curLoc || "",
+              "lOC": element?.curLoc || "",
               "bLOC": ls?.oRGN || "",
               "dLOC": ls?.dEST || "",
               "pKGS": ls?.pKGS || 0,
@@ -219,17 +220,39 @@ export class LoadingSheetService {
         }
       })
     }
+    const trip_location={
+      "_id":`${this.storage.companyCode}-${data?.Route.split(":")[0]}-${data?.Route.split(":")[1]}`,
+      "cID": this.storage.companyCode,
+      "tHC": "",
+      "rUTCD":data?.Route.split(":")[0],
+      "rUTNM":data?.Route.split(":")[1],
+      "sTM":new Date(),
+      "cTM":null,
+      "vEHNO": data?.vehicle?.value|| "",
+      "sTS":DocketStatus.Awaiting_Loading,
+      "sTSNM":DocketStatus[DocketStatus.Awaiting_Loading].replace(/_/g, " "),
+      "cLOC":this.storage.branch,
+      "oRG":this.storage.branch,
+      "iSACT": true,
+      "dEST": "",
+      "nXTLOC": "",
+      "nXTETA": "",
+      "eNTDT":new Date(),
+      "eNTLOC":this.storage.branch,
+      "eNTBY":this.storage.userName,
+      "lSNO": "",
+      "mFNO": ""
+    }
     return {
       tripSummary: tripSummary,
       tripMovement: tripMovement,
       lsHeader: lsHeader,
       lsDetail: lsDetail,
       dktList: dktList,
-      evnData: evnData
+      evnData: evnData,
+      trip_location:trip_location
     }
   }
-
-
   async updatetripFieldMapping(data, tabledata) {
     let tripSummary = {
       "cLOC": this.storage.branch,
@@ -377,7 +400,7 @@ export class LoadingSheetService {
               cNO: null,
               lOC: this.storage.branch,
               eVNID: DocketEvents.Loading_Sheet_Generation,
-              eVNDES:getEnumName(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
+              eVNDES: getEnumName(DocketEvents, DocketEvents.Loading_Sheet_Generation)?.replace(/_/g, " "),
               eVNDT: new Date(),
               eVNSRC: 'Loading Sheet',
               dOCTY: '',
@@ -645,5 +668,36 @@ export class LoadingSheetService {
     return res;
   }
 
+  async requestVehicle(data) {
+    const vehBody = {
+      "_id": data.vehicelNo,
+      "tripId": "",
+      "vehNo": data.vehicelNo,
+      "capacity": data?.vehicleSize||0,
+      "fromCity": "",
+      "toCity": "",
+      "status": "Available",
+      "eta": null,
+      "lcNo":data?.lcNo||"",
+      "lcExpireDate":data?.lcExpireDate||null,
+      "distance": 0,
+      "vendorType": "Market",
+      "vendor":data?.vendor||"",
+      "driver":data?.driver||"",
+      "dMobNo":data?.dmobileNo||"",
+      "vMobNo":data?.vMobileNo||"",
+      "driverPan": "",
+      "currentLocation": this.storage.branch,
+      "entryDate": new Date(),
+      "entryBy": this.storage.userName,
+      "vendorTypeCode": "4",
+      "route": "",
+      "capacityVolCFT":data?.vehicleSizeVol||0,
+      "vehType":data?.vehicleType.name||0,
+      "vehTypeCode":data?.vehicleType.value||0,
+
+    }
+    return vehBody
+  }
 
 }

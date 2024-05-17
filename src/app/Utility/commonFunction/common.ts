@@ -1,3 +1,6 @@
+import { parseISO, isValid } from 'date-fns';
+import QRCode from 'qrcode';
+
 export function roundToNumber(number: number, decimalPlaces: number = 0): number {
     return Number(number.toFixed(decimalPlaces));
 }
@@ -8,9 +11,19 @@ export function isValidNumber(value: any): boolean {
 }  
 
 export function isValidDate(value: any): boolean {
+  if (value instanceof Date) { 
+    return true;
+  } else {
     const date = new Date(value);
     const tm = date.getTime();
     return !isNaN(tm) && tm > 0;
+    // if (isNaN(tm) || tm <= 0) {
+    //     return false; // Not a date
+    // }
+
+    // const dt = parseISO(value);
+    // return isValid(dt);
+  }
 }
 
 export function ConvertToDate(value: any): Date {
@@ -37,3 +50,13 @@ export function  generateCombinations(terms) {
     }
     return combinations;
   }
+
+export async function generateQR(content: string): Promise<any>{
+  try {    
+    const qr = await QRCode.toDataURL(content);
+    return qr;
+  } catch (err) {
+    console.error(err);
+    return '';
+  }
+}

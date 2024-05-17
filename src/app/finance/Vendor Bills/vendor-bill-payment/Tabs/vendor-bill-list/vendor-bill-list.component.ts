@@ -32,6 +32,7 @@ export class VendorBillListComponent implements OnInit {
       Title: "Bill No",
       class: "matcolumncenter",
       Style: "min-width:17%",
+      datatype: "string",
       // type: "Link",
       // functionName: "VendorBillPaymentFunction"
     },

@@ -1,18 +1,27 @@
+<app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+
 <form [formGroup]="loadingSheetTableForm">
     <app-form-webxpress [form]="loadingSheetTableForm" [FormTitle]="'Vehicle Loading'"
     [formData]="updateListData" (functionCallEmitter)="functionCallHandler($event)"
     [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
   </app-form-webxpress>
 </form>
-<generic-table-webxpress *ngIf="!tableload" [columnHeader]="shipingHeader" [tableData]="shipingDataTable"
+<app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="shipingHeader"
+[tableData]="shipingDataTable" [metaData]="METADATA" [Link]="linkArray"
+[menuItems]="menuItems" [staticField]="shipingStaticHeader" [TableContainerStyle]="TableContainerStyle"
+[maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [showHeader]="false" [menuItemFlag]="menuItemflag">
+</app-generic-table-v2>
+
+<!-- <generic-table-webxpress *ngIf="!tableload" [columnHeader]="shipingHeader" [tableData]="shipingDataTable"
 [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="shipingHeaderForCsv"
 [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
 [toggleArray]="toggleArray" [extraData]="extraData" [menuItems]="menuItems"
 (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
 [dynamicControls]="dynamicControls" [centerAligned]="centerShippingData">
-</generic-table-webxpress>
+</generic-table-webxpress> -->
 
-<app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+
+<div *ngIf="isScan">
 <div class="search-bar-container">
     <input #scanPackageInput type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()"  class="search-bar-input">
     <button class="search-bar-button"(click)="updatePackage()">Scan</button>   
@@ -21,8 +30,6 @@
         <div class="list-group-item-text danger m-2">{{scanMessage}}</div>
     </mat-error>     
 </div>
-
-
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="loadingTableData"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
     [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
@@ -30,6 +37,18 @@
     (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
     [dynamicControls]="dynamicControls"  [columnWidths]="columnWidths" [centerAligned]="centerAlignedData">
 </generic-table-webxpress>
+</div>
+<div *ngIf="!isScan">
+    <!-- (selectAllClicked)="onSelectAllClicked($event)" -->
+<app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
+[tableData]="loadingTableData" [metaData]="metaData" 
+[menuItems]="definition.menuItems"  [columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
+[stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
+[maxWidth]="maxWidth"(dialogClosed)="onDailogClose($event)" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+[menuItemFlag]="menuItemflag"
+ [selectAllRequired]="selectAllRequired" [uploadComponent]= true  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
+</app-generic-table-v2>
+</div>
 <div class="row" *ngIf="!tableload">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-end">

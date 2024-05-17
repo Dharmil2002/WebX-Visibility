@@ -74,6 +74,12 @@ import { CreditVoucherPreviewComponent } from './credit-voucher/credit-voucher-p
 import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/set-opening-balance-ledger-wise/set-opening-balance-ledger-wise.component';
 import { EditOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/edit-opening-balance-ledger-wise/edit-opening-balance-ledger-wise.component';
 import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upload-opening-balance-ledger-wise/upload-opening-balance-ledger-wise.component';
+import { AddCreditNoteGenerationComponent } from './Credit Note/add-credit-note-generation/add-credit-note-generation.component';
+import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
+import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/generate-debit-note/generate-debit-note.component';
+import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
+import { ModifyDebitNoteDetailsComponent } from './Debit-Note/modify-debit-note-details/modify-debit-note-details/modify-debit-note-details.component';
+import { FilterDebitNoteDetailsComponent } from './Debit-Note/filter-debit-note-details/filter-debit-note-details/filter-debit-note-details.component';
 
 @NgModule({
     declarations: [
@@ -113,7 +119,13 @@ import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upl
         CreditVoucherPreviewComponent,
         SetOpeningBalanceLedgerWiseComponent,
         EditOpeningBalanceLedgerWiseComponent,
-        UploadOpeningBalanceLedgerWiseComponent
+        UploadOpeningBalanceLedgerWiseComponent,
+        AddCreditNoteGenerationComponent,
+        ApproveDebitNoteComponent,
+        GenerateDebitNoteComponent,
+        DebitNoteDetailsComponent,
+        ModifyDebitNoteDetailsComponent,
+        FilterDebitNoteDetailsComponent,
     ],
     imports: [
         CommonModule,

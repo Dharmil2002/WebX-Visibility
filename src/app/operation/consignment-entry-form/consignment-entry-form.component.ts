@@ -109,6 +109,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   lastDoc: string;
   isManual: boolean;
   dcrDetail = {};
+  conLoc: boolean;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -501,6 +502,28 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       clusterId: cluster && cluster.length > 0 ? cluster[0].clusterCode : ""
     };
     this.model.consignmentTableForm.get("toCity")?.setValue(city);
+    if (this.conLoc) {
+      const location = await this.locationService.getLocation({ companyCode: this.storage.companyCode, locCode: dest?.value || "" });
+      try {
+        const city = { CT: { D$in: location.mappedCity.map(x => x.trim()) } }
+        const clusterData = await this.clusterService.getClusterCityMapping(city);
+        this.filter.Filter(
+          this.model.allformControl,
+          this.model.consignmentTableForm,
+          clusterData,// clusterData,
+          'toCity',
+          true
+        );
+      } catch (err) {
+        this.filter.Filter(
+          this.model.allformControl,
+          this.model.consignmentTableForm,
+          [],// clusterData,
+          'toCity',
+          true
+        );
+      }
+    }
   }
   /*End*/
   /* below function was the call when */
@@ -930,8 +953,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
         expiryDate: this.model.invoiceTableForm.value.expiryDate
-          ? formatDate(this.model.invoiceTableForm.value.expiryDate, "dd-MM-yy HH:mm")
-          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm"),
+          ? this.model.invoiceTableForm.value.expiryDate
+          : new Date(),
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1098,6 +1121,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   /*get Rules*/
   async getRules() {
+
     const filter = {
       cID: this.storage.companyCode,
       mODULE: "CNOTE",
@@ -1119,7 +1143,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.model.consignmentTableForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
       this.isManual = isManual;
     }
-
     const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
     if (ELOC) {
       if (!ELOC.vAL.includes(this.storage.branch)) {
@@ -1133,6 +1156,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.fyear = this.rules.find(x => x.rULEID == "YEAR" && x.aCTIVE)?.vAL == "F";
     this.length = ConvertToNumber(this.rules.find(x => x.rULEID == "LENGTH" && x.aCTIVE)?.vAL);
     this.mseq = this.rules.find(x => x.rULEID == "MSEQ" && x.aCTIVE)?.vAL == "Y";
+    this.conLoc = this.rules.find((x) => x.rULEID == "CONLOC" && x.aCTIVE == true).vAL == "Y";
   }
 
   vendorFieldChanged() {
@@ -1331,8 +1355,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         x.id = index + 1;
         x.ewayBillNo = `${x.eWBNO}`;
         x.expiryDate = x.eXPDT
-          ? formatDate(x.eXPDT, "dd-MM-yy HH:mm")
-          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm");
+          ? x.eXPDT
+          : new Date();
         x.invoiceNo = x.iNVNO;
         x.invoiceAmount = x.iNVAMT;
         x.noofPkts = x.pKGS;
@@ -1507,11 +1531,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const toArea = this.model.consignmentTableForm.value.toCity?.clusterName || "";
     const fromAreaCode = this.model.consignmentTableForm.value.fromCity?.clusterId || "";
     const toAreaCode = this.model.consignmentTableForm.value.toCity?.clusterId || "";
-    const fromCity=this.model.consignmentTableForm.value.fromCity?.ct||this.model.consignmentTableForm.value.fromCity?.value||""
-    const toCity=this.model.consignmentTableForm.value.toCity?.ct||this.model.consignmentTableForm.value.toCity?.value||""
+    const fromCity = this.model.consignmentTableForm.value.fromCity?.ct || this.model.consignmentTableForm.value.fromCity?.value || ""
+    const toCity = this.model.consignmentTableForm.value.toCity?.ct || this.model.consignmentTableForm.value.toCity?.value || ""
     let resetData = [
-      { name: "fromCity", findIn: this.model.consignmentTableForm, value: fromCity},
-      { name: "toCity", findIn: this.model.consignmentTableForm, value:toCity},
+      { name: "fromCity", findIn: this.model.consignmentTableForm, value: fromCity },
+      { name: "toCity", findIn: this.model.consignmentTableForm, value: toCity },
       { name: "destination", findIn: this.model.consignmentTableForm, value: this.model.consignmentTableForm.value.destination?.value || this.model.consignmentTableForm.value?.destination || "" },
       //{ name: "vendorName", findIn: this.model.consignmentTableForm, value: vendorType === "Market" ? vendorName : vendorName?.name || "" },
       { name: "vehicleNo", findIn: this.model.consignmentTableForm, value: vehNo },
@@ -1739,7 +1763,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       firstValueFrom(this.operationService.operationMongoPost("operation/docket/create", reqBody))
         .then((res: any) => {
           if (res.success) {
-            const dockNo= this.isManual? this.model.consignmentTableForm.controls['docketNumber'].value: res.data
+            const dockNo = this.isManual ? this.model.consignmentTableForm.controls['docketNumber'].value : res.data
             const PayTypeCode = this.model.consignmentTableForm.value.payType;
             if (PayTypeCode === "P01") {
               this.AccountPosting(dockNo)
@@ -2113,26 +2137,28 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*end*/
   /*pincode based city*/
   async getPincodeDetail(event) {
-    const value = this.model.consignmentTableForm.controls[event.field.name].value;
-    if (typeof (value) == "string" || typeof (value) == "number") {
-      if (isValidNumber(value)) {
-        await this.pinCodeService.getCityPincode(
-          this.model.consignmentTableForm,
-          this.model.allformControl,
-          event.field.name,
-          true,
-          false
-        );
-      }
-      else {
-        await this.pinCodeService.getCityPincode(
-          this.model.consignmentTableForm,
-          this.model.allformControl,
-          event.field.name,
-          true,
-          true,
-          true
-        );
+    if (!this.conLoc) {
+      const value = this.model.consignmentTableForm.controls[event.field.name].value;
+      if (typeof (value) == "string" || typeof (value) == "number") {
+        if (isValidNumber(value)) {
+          await this.pinCodeService.getCityPincode(
+            this.model.consignmentTableForm,
+            this.model.allformControl,
+            event.field.name,
+            true,
+            false
+          );
+        }
+        else {
+          await this.pinCodeService.getCityPincode(
+            this.model.consignmentTableForm,
+            this.model.allformControl,
+            event.field.name,
+            true,
+            true,
+            true
+          );
+        }
       }
     }
   }
@@ -2245,7 +2271,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   // Updated function to handle `isOrigin` condition correctly
-   getTermValue(term, isOrigin) {
+  getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
     const fieldKey = isOrigin ? "fromCity" : "toCity";
     const type = typeMapping[term];
@@ -2272,9 +2298,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     const value = this.model.consignmentTableForm.controls[fieldKey].value[valueKey];
     if (value) {
       return [
-        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] } ,
-        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] } ];
-      
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] }];
+
     }
     return [];
   }
@@ -2290,8 +2316,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     } else {
       containerCode = this.model.invoiceData.reduce((a, c) => a + (parseFloat(c.actualWeight) || 0), 0);
     }
-      const terms = ["Area", "Pincode", "City", "State"];
-      const allCombinations =generateCombinations(terms);
+    const terms = ["Area", "Pincode", "City", "State"];
+    const allCombinations = generateCombinations(terms);
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
       let match = { "D$and": [] };
       let fromConditions = this.getTermValue(fromTerm, true);  // For origin

@@ -15,6 +15,9 @@ import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunct
 import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
 import { firstValueFrom } from 'rxjs';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import { StockUpdate } from 'src/app/Models/stock-update/stock-update';
+import { showAlert } from 'src/app/Utility/message/sweet-alert';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -102,20 +105,30 @@ export class UpdateLoadingSheetComponent implements OnInit {
   packageData: any;
   updateTrip: any;
   mfNos: string[];
-
+  rules: any;
   scanMessage: string = '';
+  isScan:boolean=false;
+  menuItemflag:boolean=true;
+  selectAllRequired:boolean=true;
+  metaData = {};
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
 
   constructor(
     private Route: Router,
+    private definition:StockUpdate,
     public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
+    private controlPanel: ControlPanelService,
     private _operation: OperationService,
     private cdr: ChangeDetectorRef,
     private storage:StorageService,
     private arrivalService: ArrivalVehicleService
   ) {
+    this.metaData={
+      checkBoxRequired: true,
+      noColumnSort: Object.keys(this.definition.columnHeader),
+    }
     this.currentBranch = this.storage.branch;
     this.companyCode = this.storage.companyCode;
     
@@ -132,7 +145,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async getLoadingSheetDetail() {
-    
     const shipmentData = await this.arrivalService.getThcWiseMeniFest({tHC:this.arrivalData?.TripID,dEST:this.storage.branch,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]});
     if(!shipmentData)
       return;
@@ -144,12 +156,18 @@ export class UpdateLoadingSheetComponent implements OnInit {
       Destination: shipment?.dEST||"",
       Suffix: shipment?.sFX||0,
       Packages: parseInt(shipment.pKGS),
-      Unloaded: 0,
-      Pending: parseInt(shipment.pKGS),
+      weight: parseInt(shipment.wT),
+      cWeight: parseInt(shipment.cWT),
+      unloadedPkg:0,
+      unloadedWT:0,
+      pendPkg: parseInt(shipment.pKGS),
+      pendWt:parseInt(shipment.wT),
+      pendCwt:parseInt(shipment.cWT),
       Leg: shipment?.lEG||"",
       KgWt: shipment?.wT||"",
       mfNo:shipment?.docNo||"",
-      CftVolume: shipment?.vOL || ""
+      CftVolume: shipment?.vOL || "",
+      actions:["Edit"]
     }));
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
     this.tableload = false;
@@ -161,6 +179,24 @@ export class UpdateLoadingSheetComponent implements OnInit {
     // Set the shipingDataTable to the grouped data
     this.shipingDataTable = shipingTableDataArray;
     this.getPackagesData();
+  }
+  onDailogClose(event){
+    this.shipmentsEdit(event)
+  }
+
+  shipmentsEdit(event) {
+    const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
+    const data = this.csv.find(x => x.Shipment === shipment && x.Suffix === suffix);
+    if (data) {
+      const unloadedPkg = parseInt(noofPkts, 10);
+      const unloadedWT = parseFloat(actualWeight).toFixed(2);
+      const unloadctWeight = parseFloat(ctWeight).toFixed(2);
+      const pendPkg = data.Packages - unloadedPkg;
+      const pendWt = data.weight - parseFloat(actualWeight);
+      const pendCwt = data.cWeight - parseFloat(ctWeight);
+      Object.assign(data, { unloadedPkg, unloadedWT,unloadctWeight, pendPkg, pendWt, pendCwt });
+      this.cdr.detectChanges();
+    }
   }
   async getPackagesData() {    
     const reqBody = {
@@ -238,7 +274,26 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   ngOnInit(): void {
+    this.getRules(); 
   }
+  async getRules(){
+    const filter={
+      cID:this.storage.companyCode,
+      mODULE:"Scanning",
+      aCTIVE:true
+    }
+    const res=await this.controlPanel.getModuleRules(filter);
+    if(res.length>0){
+      this.rules=res;
+      this.checkDocketRules();
+    }
+    
+  }
+  checkDocketRules(){
+    const scan = this.rules.find(x=>x.rULEID=="SCAN" && x.aCTIVE);
+    this.isScan=scan.vAL=="Y"?true:false;
+  }
+  
   /**
    * Function to initialize form controls for the loading sheet table
    */
@@ -284,24 +339,44 @@ export class UpdateLoadingSheetComponent implements OnInit {
       console.log("failed");
     }
   }
+  onSelectAllClicked(event){
 
+  }
 
   async CompleteScan() {
     let packageChecked = false;
     let locationWiseData = this.csv;
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
-
     if (exists) {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
-    if (packageChecked) {
+    if (packageChecked && this.isScan) {
       const res=await this.arrivalService.fieldMappingArrivalScan(this.arrivalData,locationWiseData,this.packageData);
       if(res){
         this.dialogRef.close(this.loadingSheetTableForm.value)
         this.goBack('Departures')
       }
      // this.updateTripStatus();
-    } else {
+    }
+    else if(!this.isScan){
+      let selectedData= this.csv.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
+      let checkPend = selectedData.filter((x)=>x.pendPkg == x.Packages);
+      if (selectedData.length == 0) {
+        showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
+        return false;
+    } else if (selectedData.length == checkPend.length) {
+        showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
+        return false;
+    }
+      let notSelectedData= this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+        const res=await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData,selectedData,notSelectedData,this.packageData,this.isScan);
+        if(res){
+          this.dialogRef.close(this.loadingSheetTableForm.value)
+          this.goBack('Departures')
+        }
+       // this.updateTripStatus();
+    }
+     else {
       Swal.fire({
         icon: "error",
         title: "Unload Package",

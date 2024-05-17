@@ -23,6 +23,8 @@ import { ControlPanelService } from 'src/app/core/service/control-panel/control-
 import { firstValueFrom } from 'rxjs';
 import { ThcCostUpdateService } from 'src/app/Utility/module/operation/thc/thc-cost-update.service';
 import moment from 'moment';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -46,6 +48,7 @@ export class MarkArrivalComponent implements OnInit {
   mfList: any[];
   dktList: any[];
   Request: {};
+  imageData: any = {};
   constructor(
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
@@ -60,6 +63,7 @@ export class MarkArrivalComponent implements OnInit {
     private _operationService: OperationService,
     private controlPanel: ControlPanelService,
     private thcCostUpdateService: ThcCostUpdateService,
+    private objImageHandling: ImageHandling,
     private hawkeyeUtilityService: HawkeyeUtilityService) {
     this.MarkArrivalTable = item;
   }
@@ -123,12 +127,13 @@ export class MarkArrivalComponent implements OnInit {
     this.mfList = shipment
   }
   async save() {
-
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
           value.name || ""
       )
+    const pod = this.imageData?.Upload || ""
+    this.MarkArrivalTableForm.controls['pod'].setValue(pod);
     let tripDetailForm = this.MarkArrivalTableForm.value
     const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
     if (res) {
@@ -170,9 +175,8 @@ export class MarkArrivalComponent implements OnInit {
       };
     }
     //#endregion
-    const dktStatus = (this.mfList ?? []).filter(x => x.dEST === (this.storage?.branch ?? "")).length > 0 ? "dktAvail" : "noDkt";
+    const dktStatus = (this.mfList ?? []).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
-
     let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
       stCode = 5,
@@ -202,60 +206,78 @@ export class MarkArrivalComponent implements OnInit {
           tripDetails.nXTLOC = next || ""
       }
     }
-
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "collectionName": "trip_Route_Schedule",
-      "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
-      "update": {
-        ...tripDetails
-      }
-    }
-    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
-      next: async (res: any) => {
-        if (res) {
-          if (!next) {
-            try {
-              this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
-            } catch (error) {
-              console.log("Error in updateTHCCostForDockets", error);
-            }
-          }
-          try {
-            const reqArrivalDeparture = {
-              action: "TripArrivalDepartureUpdate",
-              reqBody: {
-                cid: this.companyCode,
-                EventType: 'A',
-                loc: this.currentBranch,
-                tripId: this.MarkArrivalTableForm.value?.TripID
-              }
-            }
-            this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
-          } catch (error) {
-            console.log("Error in pushToCTCommon", error);
-          }
-
-          if (stCode == 7) {
-            //this.getDocketTripWise(tripId);
-            // Call the vehicleStatusUpdate function here
-            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
-            Swal.fire({
-              icon: "info",
-              title: "Trip is close",
-              text: "Trip is close at " + this.currentBranch,
-              showConfirmButton: true
-            });
-            this.getPreviousData();
-          } else {
-            // await this.updateDocket();
-            this.getPreviousData();
-            //this.getDocketTripWise(tripId);
-
-          }
+    if (stCode == 7) {
+      await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.MarkArrivalTable, this._operationService, true);
+      await this.arrivalService.deleteTrip({ cID: this.storage.companyCode, tHC: this.MarkArrivalTableForm.value?.TripID });
+      Swal.fire({
+        icon: "info",
+        title: "Trip is close",
+        text: "Trip is close at " + this.currentBranch,
+        showConfirmButton: true
+      });
+      if (!next) {
+        try {
+          await this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+        } catch (error) {
+          console.log("Error in updateTHCCostForDockets", error);
         }
       }
-    })
+      try {
+        const reqArrivalDeparture = {
+          action: "TripArrivalDepartureUpdate",
+          reqBody: {
+            cid: this.companyCode,
+            EventType: 'A',
+            loc: this.currentBranch,
+            tripId: this.MarkArrivalTableForm.value?.TripID
+          }
+        }
+        this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+      } catch (error) {
+        console.log("Error in pushToCTCommon", error);
+      }
+      this.getPreviousData();
+
+    }
+    else {
+      const reqBody = {
+        "companyCode": this.companyCode,
+        "collectionName": "trip_Route_Schedule",
+        "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
+        "update": {
+          ...tripDetails
+        }
+      }
+      this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
+        next: async (res: any) => {
+          if (res) {
+            if (!next) {
+              try {
+                this.thcCostUpdateService.updateTHCCostForDockets(this.Request);
+              } catch (error) {
+                console.log("Error in updateTHCCostForDockets", error);
+              }
+            }
+            try {
+              const reqArrivalDeparture = {
+                action: "TripArrivalDepartureUpdate",
+                reqBody: {
+                  cid: this.companyCode,
+                  EventType: 'A',
+                  loc: this.currentBranch,
+                  tripId: this.MarkArrivalTableForm.value?.TripID
+                }
+              }
+              this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
+            } catch (error) {
+              console.log("Error in pushToCTCommon", error);
+            }
+            // await this.updateDocket();
+            this.getPreviousData();
+          }
+        }
+      })
+    }
   }
 
   /*here i write a code becuase of update docket states*/
@@ -327,39 +349,21 @@ export class MarkArrivalComponent implements OnInit {
       }
     });
   }
-  GetFileList(data) {
-    const files: FileList = data.eventArgs;
-    const fileCount: number = files.length;
-    const fileList: File[] = [];
-    const allowedExtensions: string[] = ['jpeg', 'jpg', 'png'];
-    let hasUnsupportedFiles = false;
-    const fileNames: string[] = [];
 
-    for (let i = 0; i < fileCount; i++) {
-      const file: File = files[i];
-      const fileExtension: string = file.name.split('.').pop()?.toLowerCase() || '';
-
-      if (allowedExtensions.includes(fileExtension)) {
-        fileList.push(file);
-        fileNames.push(file.name); // Save file name
-      } else {
-        hasUnsupportedFiles = true;
-      }
-    }
-
-    if (hasUnsupportedFiles) {
-      // Display an error message or take appropriate action
-      this.ObjSnackBarUtility.showNotification(
-        "snackbar-danger",
-        "Unsupported file format. Please select PNG, JPEG, or JPG files only.",
-        "bottom",
-        "center"
-      );
-    } else {
-      this.uploadedFiles = fileList; // Assign the file list to a separate variable
-    }
+  async GetFileList(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+      MarkArrivalTableForm, this.imageData, "MarkArrival", 'Operation', this.jsonControlArray, allowedFormats);
   }
-
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
 
 
 }

@@ -19,7 +19,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     noColumnSort: ["checkBoxRequired"],
   };
   dynamicControls = {
-    add: false,
+    add: true,
     edit: false,
     csv: false,
   };
@@ -97,11 +97,14 @@ export class DeliveryMrGenerationListComponent implements OnInit {
     "status"
   ];
   boxData: any[];
+  addAndEditPath: string;
   constructor(
     private docketService: DocketService,
     private storage: StorageService,
     private router: Router,
-  ) { }
+  ) {
+    this.addAndEditPath = "dashboard/DeliveryMrGeneration";
+  }
 
   ngOnInit(): void {
     this.getDocketDetails();
@@ -117,7 +120,7 @@ export class DeliveryMrGenerationListComponent implements OnInit {
       };
 
       // Fetch docket list based on the query parameters
-      const data = await this.docketService.getDocketList(queryParameters);
+      const data = await this.docketService.getDocketList(queryParameters,true);
 
       // Fetch mapping details for the docket data
       const modifiedData = await this.docketService.getMappingDocketDetails(data);

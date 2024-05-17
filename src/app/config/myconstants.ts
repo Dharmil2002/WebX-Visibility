@@ -1,3 +1,4 @@
+import { NgxMatDateFormats } from "@angular-material-components/datetime-picker";
 import { OwlDateTimeFormats } from "@danielmoncada/angular-datetime-picker";
 
 export const MY_CUSTOM_FORMAT: OwlDateTimeFormats = {
@@ -24,6 +25,18 @@ export const MY_DATE_FORMAT = {
     },
 };
 
+export const MY_DATETIME_FORMAT: NgxMatDateFormats = {
+    parse: {
+      dateInput: 'DD MMM YY HH:mm'
+    },
+    display: {
+      dateInput: 'DD MMM YY HH:mm',
+      monthYearLabel: "MMM YYYY",
+      dateA11yLabel: "LL",
+      monthYearA11yLabel: "MMMM YYYY"
+    }
+  };
+
 
 
 export const StoreKeys = {
@@ -36,6 +49,7 @@ export const StoreKeys = {
     Branch: 'branch',
     Mode: 'Mode',
     TimeZone: 'timeZone',
+    PunchLine: 'SJ5E9neu',
     Token: 'token',
     RefreshToken: 'refreshToken',
     UserLocations: 'userLocations',
@@ -79,6 +93,8 @@ export const Collections = {
     route_details: 'route_schedules_details',
     thc_summary_ltl: 'thc_summary_ltl',
     Doccument_names: 'doc_names',
+    route_Master_LocWise:'routeMasterLocWise',
+    adhoc_routes:"adhoc_routes"
 };
 
 export const GenericActions = {
@@ -86,6 +102,7 @@ export const GenericActions = {
     GetOne: 'generic/getOne',
     Create: 'generic/create',
     Update: 'generic/update',
+    UpdateMany: "generic/updateAll",
     UpdateBulk: 'generic/updateBulk',
     Query: 'generic/query',
     FindLastOne: 'generic/findLastOne'

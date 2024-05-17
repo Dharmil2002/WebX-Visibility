@@ -145,7 +145,7 @@ export class AssignVehiclePageComponent implements OnInit {
       fromToCitySplit: `${fromCity}-${toCity}`,
       distance: 0,
       isMarket: true,
-      eta: formatDate(item.eta, "dd/MM/yyyy HH:mm"),
+      eta: item.eta,
     }));
     this.tableData = this.tableData
       ? this.tableData.concat(marketData)

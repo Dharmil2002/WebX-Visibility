@@ -5,8 +5,9 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { ExportService } from 'src/app/Utility/module/export.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
-import { CustGSTInvoiceService, exportAsExcelFile } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
+import { CustGSTInvoiceService } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { customerWiseGSTInvControl } from 'src/assets/FormControls/Customer-Wise-GST-Invoice/customer-wise-gst-invoice';
@@ -46,7 +47,8 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     private storage: StorageService,
     private masterServices: MasterService,
     private custGSTInvoiceService: CustGSTInvoiceService,
-    private objStateService: StateService
+    private objStateService: StateService,
+    private exportService: ExportService
   ) {
     this.initializeFormControl();
   }
@@ -211,7 +213,7 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
 
     const startDate = moment(startValue).startOf('day').toDate();
     const endDate = moment(endValue).endOf('day').toDate();
-  
+
     const docummentNo = this.CustGSTInvTableForm.value.docNo;
     const cancelBill = this.CustGSTInvTableForm.value.cannon;
 
@@ -232,7 +234,7 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
       ? this.CustGSTInvTableForm.value.gststateHandler.map(x => x.name)
       : [];
     const requestbody = { startDate, endDate, docNoArray, stateData, customerName }
-   // console.log(requestbody);
+    // console.log(requestbody);
 
     // Fetching data from the service based on provided parameters
     let data = await this.custGSTInvoiceService.getcustomerGstRegisterReportDetail(requestbody);
@@ -252,7 +254,7 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     }
 
     // Exporting filtered data to Excel
-    exportAsExcelFile(filteredRecord, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
+    this.exportService.exportAsCSV(filteredRecord, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
   }
   //#endregion
 

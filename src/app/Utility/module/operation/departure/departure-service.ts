@@ -31,29 +31,34 @@ export class DepartureService {
     private vendor:VendorService
   ) {
   }
-  async getRouteSchedule() {    
+  async getRouteSchedule() {
+    // Utility function to format route details with configurable keys
+    const formatDetails = (data, keys) => data.map(element => ({
+      id: element?._id || "",
+      RouteandSchedule: `${element[keys.routeCodeKey]}:${element[keys.routeNameKey]}`,
+      VehicleNo: element?.vEHNO || keys.defaultVehicleNo || "",
+      TripID: element?.tHC || keys.defaultTripID || "",
+      Scheduled: new Date().toISOString(),
+      Expected: new Date(new Date().getTime() + 10 * 60000).toISOString(),
+      Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2),
+      status: element.sTS || "1",
+      Action: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
+      location: element?.cLOC || element?.controlLoc || ""
+    }));
     try {
-      // Fetching route data based on company code and branch location
-      const routeData = await this.fetchData(Collections.trip_Route_Schedule, { cLOC: this.storage.branch,iSACT:true });
-      // Mapping route data to create departure details
-      const departureDetails = routeData.map(element => ({
-        id: element?._id || "", // Safely accessing the ID
-        RouteandSchedule: `${element.rUTCD}:${element.rUTNM}`, // Concatenating route code and name
-        VehicleNo: element?.vEHNO || "", // Accessing vehicle number
-        TripID: element?.tHC || "", // Matching THC record based on route code
-        Scheduled: formatDocketDate(new Date().toISOString()), // Formatting current date as scheduled date
-        Expected: formatDocketDate(new Date(new Date().getTime() + 10 * 60000).toISOString()), // Formatting expected date (10 mins from now)
-        Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2), // Calculating the time difference in hours
-        status:element.sTS,
-        Action: this.statusActions[`${element.sTS}`], // Deciding action based on THC availability
-        location: element?.cLOC || "", // Accessing location
-      }));
-      return departureDetails;
-      // Use departureDetails as needed
+      const tripDetails = await this.fetchData(Collections.trip_Route_Schedule, { cLOC: this.storage.branch, iSACT: true });
+      const route = await this.fetchData(Collections.route_Master_LocWise, { controlLoc: this.storage.branch, isActive: true });
+      const adHoc = await this.fetchData(Collections.adhoc_routes, {cLOC: this.storage.branch,iSACT: true });
+      const departureDetails = formatDetails(tripDetails, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Update Status' });
+      const routeDetails = formatDetails(route, { routeCodeKey: 'routeId', routeNameKey: 'routeName', defaultAction: 'Create Trip' });
+      const adHocDetails = formatDetails(adHoc, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Create Trip' });
+      return [...departureDetails, ...routeDetails, ...adHocDetails];
     } catch (error) {
-      // Handle any errors that occur during the fetching process
+      console.error('Error fetching route schedule:', error);
+      throw error; // Re-throw the error to handle it further up the chain
     }
   }
+  
   // Generic function to fetch data from a given collection with a specified filter
   async fetchData(collectionName, filter) {
     const req = {

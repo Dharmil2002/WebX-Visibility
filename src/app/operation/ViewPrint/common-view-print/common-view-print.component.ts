@@ -45,6 +45,7 @@ export class CommonViewPrintComponent implements OnInit {
     this.GetviewPrint() // Template Data
   }
 
+  
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
@@ -52,7 +53,9 @@ export class CommonViewPrintComponent implements OnInit {
       partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
     };
-    const Res = await firstValueFrom(await this.masterService.masterPost("viewprint/ViewV2", req));
+    const Res = await this.masterService
+      .masterPost("viewprint/View", req)
+      .toPromise();
     if (Res.success) {
       this.JsonData = Res.data.jsonData;
       this.FieldMapping = Res.data.fieldMapping;

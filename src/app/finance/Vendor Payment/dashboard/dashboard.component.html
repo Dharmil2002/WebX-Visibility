@@ -1,9 +1,16 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
     <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
-        [boxData]="this.Transactions"></app-generic-card-with-menu-actions>
+        [boxData]="this.TransactionsFirst"></app-generic-card-with-menu-actions>
     <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
-        [boxData]="this.TransactionsMore"></app-generic-card-with-menu-actions>
+        [boxData]="this.TransactionsSecond">
+    </app-generic-card-with-menu-actions>
+    <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
+        [boxData]="this.TransactionsThird">
+    </app-generic-card-with-menu-actions>
     <app-generic-card-with-menu-actions [boxData]="this.OnlinePaymentApprovals"
-        (functionCallEmitter)="functionCallHandler($event)"></app-generic-card-with-menu-actions>
+        (functionCallEmitter)="functionCallHandler($event)">
+    </app-generic-card-with-menu-actions>
+    <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
+    [boxData]="this.DebitNotes"></app-generic-card-with-menu-actions>
 
 </app-common-wrapper-webxpress>

@@ -234,10 +234,10 @@ export class JobEntryPageComponent implements OnInit {
     if (jobChallan.length > 0) {
       let challan = [];
       jobChallan.forEach((element, index) => {
-        const formattedInvDate = element.iNVDT ? formatDate(element.iNVDT, 'dd-MM-yy HH:mm') : "";
-        const formattedSbDt = element.sBDT ? formatDate(element.sBDT, 'dd-MM-yy HH:mm') : "";
-        const formattedblDate = element.bLDT ? formatDate(element.bLDT, 'dd-MM-yy HH:mm') : "";
-        const formattedbeDT = element.bEDT ? formatDate(element.bEDT, 'dd-MM-yy HH:mm') : "";
+        const formattedInvDate = element.iNVDT;
+        const formattedSbDt = element.sBDT;
+        const formattedblDate = element.bLDT;
+        const formattedbeDT = element.bEDT;
         const jsonChallan = {
           id: index + 1,
           invoice: true,
@@ -469,7 +469,7 @@ export class JobEntryPageComponent implements OnInit {
     const json = {
       id: tableData.length + 1,
       cnoteNo: this.containorTableForm.value.cnoteNo.value,
-      cnoteDate: formatDocketDate(this.containorTableForm.value?.cnoteDate || new Date()),
+      cnoteDate: this.containorTableForm.value?.cnoteDate || new Date(),
       dktDt: this.containorTableForm.value?.cnoteDate || new Date(),
       noOfpkg: this.containorTableForm.value.noOfpkg,
       loadedWeight: this.containorTableForm.value.loadedWeight,
@@ -984,9 +984,9 @@ export class JobEntryPageComponent implements OnInit {
       osb: sbDt,
       id: tableData.length + 1,
       invNum,
-      invDate: formatDate(invDate, 'dd-MM-yy HH:mm'),
+      invDate: invDate,
       sbNum,
-      sbDt: formatDate(sbDt, 'dd-MM-yy HH:mm'),
+      sbDt: sbDt,
       pod,
       cod,
       containerNum,
@@ -1021,9 +1021,9 @@ export class JobEntryPageComponent implements OnInit {
       obeDate: beDT,
       id: tableData.length + 1,
       blNum,
-      blDate: formatDate(blDate, 'dd-MM-yy HH:mm'),
+      blDate: blDate,
       beNum,
-      beDT: formatDate(beDT, 'dd-MM-yy HH:mm'),
+      beDT: beDT,
       pod,
       cod,
       invoice: true,

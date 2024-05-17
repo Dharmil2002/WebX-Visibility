@@ -41,13 +41,14 @@ import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { InvoiceServiceService } from "src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service";
 import { InvoiceModel } from "src/app/Models/dyanamic-form/dyanmic.form.model";
-import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
+import { ConvertToNumber, isValidNumber } from "src/app/Utility/commonFunction/common";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { clearValidatorsAndUpdate, getValueOrDefault } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
 import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-utility.service";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { ThcCostUpdateService } from "src/app/Utility/module/operation/thc/thc-cost-update.service";
+import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/cluster.master.service";
 @Component({
   selector: "app-thc-generation",
   templateUrl: "./thc-generation.component.html",
@@ -286,6 +287,10 @@ export class ThcGenerationComponent implements OnInit {
   delChargeControl: any[];
   balanceAmount: any;
   Request: {};
+  //below varible is used for Rules 
+  rules: any[] = [];
+  connectedLoc: boolean = false;
+  //End
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -293,7 +298,6 @@ export class ThcGenerationComponent implements OnInit {
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
-    private docketService: DocketService,
     private vehicleStatusService: VehicleStatusService,
     private vendorService: VendorService,
     private driverService: DriverService,
@@ -310,6 +314,7 @@ export class ThcGenerationComponent implements OnInit {
     private hawkeyeUtilityService: HawkeyeUtilityService,
     private controlPanel: ControlPanelService,
     private thcCostUpdateService: ThcCostUpdateService,
+    private clusterService: ClusterMasterService
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -377,6 +382,7 @@ export class ThcGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.IntializeFormControl();
     this.backPath = "/dashboard/Index?tab=6";
+    this.getRules();
   }
   /*here the function which is use for the intialize a form for thc*/
   IntializeFormControl() {
@@ -434,6 +440,20 @@ export class ThcGenerationComponent implements OnInit {
     //this.DocketFilterData.cCT = this.thcTableForm.controls['fromCity'].value?.value || ''
   }
   /*End*/
+  //#region GetRules
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: { "D$in": ["CNOTE"] },
+      aCTIVE: true
+    }
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
+      this.connectedLoc = this.rules.find(x => x.rULEID == "CONLOC" && x.aCTIVE)?.vAL == "Y";
+    }
+  }
+  //#End
   /*count ETA*/
   changeEta() {
     const tripDate = new Date(this.thcTableForm.controls['tripDate'].value);
@@ -469,6 +489,7 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
+    //   debugger
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {
@@ -495,8 +516,6 @@ export class ThcGenerationComponent implements OnInit {
 
     const field = $event.field; //what is use of this variable
     const functionName = $event.functionName;
-    console.log(field);
-    console.log(functionName);
     try {
       this[functionName]($event);
     } catch (error) {
@@ -554,15 +573,25 @@ export class ThcGenerationComponent implements OnInit {
         lcNo,
         lcExpireDate
       }));
-
       const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode });
+
+      let cluster = [];
+      try {
+        cluster = await this.clusterService.getClusterByPincode({ pincode: { D$in: [destinationMapping[0].pincode] }, companyCode: this.storage.companyCode });
+      }
+      catch (err) {
+        console.log(err);
+      }
       const city = {
-        name: destinationMapping[0].city,
+        name: destinationMapping[0].pincode,
         value: destinationMapping[0].city,
+        ct: destinationMapping[0].city,
+        pincode: destinationMapping[0].pincode, // include pincode here
+        st: destinationMapping[0]?.locStateId,
+        clusterName: cluster && cluster.length > 0 ? cluster[0].clusterName : "",
+        clusterId: cluster && cluster.length > 0 ? cluster[0].clusterCode : ""
       };
-
       this.thcTableForm.controls['fromCity'].setValue(city);
-
       const filterFieldsForVehicle = [
         { name: this.vehicleName, data: this.vehicleList, status: this.vehicleStatus, formGroup: this.VehicleTableForm, jsonControl: this.jsonVehicleControl },
         { name: this.vendorName, data: vendorDetail, status: this.vehicleStatus, formGroup: this.thcTableForm, jsonControl: this.jsonControlArray },
@@ -644,7 +673,7 @@ export class ThcGenerationComponent implements OnInit {
             // driver: vehData.drvNM || '',
             //driverPan: vehData?.pANNO || '',
             engineNo: vehData?.eNGNO || '',
-            chassisNo: vehData?.cHNO || '',
+            chasisNo: vehData?.cHNO || '',
             lcNo: vehData.dLNO || '',
             lcExpireDate: vehData.dLEXP || new Date(),
             //dmobileNo: vehData.drvPH || '',
@@ -1074,17 +1103,23 @@ export class ThcGenerationComponent implements OnInit {
     });
   }
   /*End*/
-  /*get pincode detail*/
+  /*pincode based city*/
   async getPincodeDetail(event) {
-    const cityMapping = event.field.name == 'fromCity' ? this.fromCityStatus : this.toCityStatus;
-    this.pinCodeService.getCity(this.thcTableForm, this.jsonControlBasicArray, event.field.name, cityMapping);
+    await this.pinCodeService.getCityPincode(
+      this.thcTableForm,
+      this.allBasicJsonArray,
+      event.field.name,
+      true,
+      true,
+      true
+    );
   }
-  /*end */
+  /*end*/
   /* below function was the call when */
   async getLocBasedOnCity() {
 
-    const fromCity = this.thcTableForm.controls['fromCity'].value?.value || ''
-    const toCity = this.thcTableForm.controls['toCity'].value?.value || ''
+    const fromCity = this.thcTableForm.controls['fromCity'].value?.ct || ''
+    const toCity = this.thcTableForm.controls['toCity'].value?.ct || ''
     const fromTo = `${fromCity}-${toCity}`
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
@@ -1215,7 +1250,13 @@ export class ThcGenerationComponent implements OnInit {
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         x.actions = [];
-        if (x.tCT == this.currentLocation.locCity.toUpperCase()) {
+        const toCity = x.tCT.toUpperCase();
+        // Check if city matches the current city or is in the mapped cities list
+        if (toCity == this.currentLocation.locCity.toUpperCase() ||
+          (this.connectedLoc &&
+            this.currentLocation.extraData &&
+            this.currentLocation.extraData.mappedCity &&
+            this.currentLocation.extraData.mappedCity.includes(toCity))) {
           x.actions = ["Update"];
         }
         else if (this.isView) {
@@ -1238,7 +1279,7 @@ export class ThcGenerationComponent implements OnInit {
         const invoiceData = thcDetail.data.thcDetails.rAKE.iNV.map(element => {
           return {
             invNum: element.nO,
-            invDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
+            invDate: element.dT,
             orrInvDt: element.dT,
             invAmt: element.aMT,
             actions: []
@@ -1251,7 +1292,7 @@ export class ThcGenerationComponent implements OnInit {
         const invoiceData = thcDetail.data.thcDetails.rAKE.rR.map(element => {
           return {
             rrNo: element.nO,
-            rrDate: formatDate(element.dT, "dd-MM-yy HH:mm"),
+            rrDate: element.dT,
             orrDate: element.dT,
             actions: []
           }
@@ -1266,7 +1307,6 @@ export class ThcGenerationComponent implements OnInit {
     // this.getShipmentDetails();
   }
   /*End*/
-
   async getCityDetail(event) {
     const formdata = this.thcTableForm.value
     const { additionalData, type, name } = event.field;
@@ -1723,7 +1763,7 @@ export class ThcGenerationComponent implements OnInit {
     await delay(delayDuration);
     const json = {
       rrNo: this.rakeDetailsTableForm.controls['rrNo'].value,
-      rrDate: formatDate(this.rakeDetailsTableForm.controls['rrDate'].value, "dd-MM-yy HH:mm"),
+      rrDate: this.rakeDetailsTableForm.controls['rrDate'].value,
       orrDate: this.rakeDetailsTableForm.controls['rrDate'].value,
       actions: ["EditRake", "RemoveRake"]
     };
@@ -1745,6 +1785,7 @@ export class ThcGenerationComponent implements OnInit {
     this.rrLoad = true;
     if (data.label.label === "RemoveRake") {
       this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);
+      this.rrLoad = false;
     } else {
       this.rakeDetailsTableForm.controls['rrNo'].setValue(data.data['rrNo']);
       this.rakeDetailsTableForm.controls['rrDate'].setValue(
@@ -1786,7 +1827,7 @@ export class ThcGenerationComponent implements OnInit {
     await delay(delayDuration);
     const json = {
       invNum: this.rakeInvoice.controls['invNo'].value,
-      invDate: formatDate(this.rakeInvoice.controls['invDt'].value, "dd-MM-yy HH:mm"),
+      invDate: this.rakeInvoice.controls['invDt'].value,
       orrInvDt: this.rakeInvoice.controls['invDt'].value,
       invAmt: this.rakeInvoice.controls['invAmt'].value,
       actions: ["EditInvoice", "RemoveInvoice"]
@@ -1828,7 +1869,7 @@ export class ThcGenerationComponent implements OnInit {
     this.chargeJsonControl = this.chargeJsonControl.filter((x) => !x.hasOwnProperty('id'));
     //const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm },);
     const filter = { "pRNm": prodNm, aCTV: true, cHBTY: "Booking" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm, "cHAPP": { D$in: ["THC"] }, isActive: true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
@@ -1887,7 +1928,7 @@ export class ThcGenerationComponent implements OnInit {
   async getAutoFillCharges(charges, thcNestedDetails) {
     const product = thcNestedDetails?.thcDetails?.tMODENM || "";
     const filter = { "pRNm": product, aCTV: true, cHBTY: "Delivery" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product, "cHAPP": { D$in: ["THC"] }, isActive: true }
     const delCharge = await this.thcService.getChargesV2(filter, productFilter);
     const delChargeList = []
     const invoiceList = [];
@@ -2051,8 +2092,6 @@ export class ThcGenerationComponent implements OnInit {
     const docket = selectedDkt;
     const formControlNames = [
       "prqNo",
-      "fromCity",
-      "toCity",
       "vendorType"
     ];
 
@@ -2060,6 +2099,15 @@ export class ThcGenerationComponent implements OnInit {
       const controlValue = this.thcTableForm.get(controlName).value?.value || this.thcTableForm.get(controlName).value;
       this.thcTableForm.get(controlName).setValue(controlValue);
     });
+    // Retrieve and set the 'fromCity' value
+    const fromCityControl = this.thcTableForm.get('fromCity');
+    const fromCity = fromCityControl.value?.ct || fromCityControl.value?.value || fromCityControl.value;
+    fromCityControl.setValue(fromCity);
+    // Retrieve and set the 'toCity' value
+    const toCityControl = this.thcTableForm.get('toCity');
+    const toCity = toCityControl.value?.ct || toCityControl.value?.value || toCityControl.value;
+    toCityControl.setValue(toCity);
+
     const controlValue = this.VehicleTableForm.get('vehicle').value?.value || this.VehicleTableForm.get('vehicle').value;
     this.VehicleTableForm.get('vehicle').setValue(controlValue);
     /*below code is for the set advance and blance payment location set*/

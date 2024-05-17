@@ -19,6 +19,10 @@ import { AdviceGenerationComponent } from './Fund Transfer/advice-generation/adv
 import { DebitVoucherComponent } from './Debit Voucher/debit-voucher.component';
 import { CreditVoucherComponent } from './credit-voucher/credit-voucher.component';
 import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/set-opening-balance-ledger-wise/set-opening-balance-ledger-wise.component';
+import { AddCreditNoteGenerationComponent } from './Credit Note/add-credit-note-generation/add-credit-note-generation.component';
+import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/generate-debit-note/generate-debit-note.component';
+import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
+import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -40,6 +44,11 @@ const routes: Routes = [
   { path: 'FundTransfer/AdviceAcknowledge', component: AdviceAcknowledgeComponent },
   { path: 'VoucherEntry/CreditVoucher', component: CreditVoucherComponent },
   { path: 'FAMasters/SetOpeningBalanceLedgerWise', component: SetOpeningBalanceLedgerWiseComponent },
+  { path: 'CreditNote', component: AddCreditNoteGenerationComponent },
+  { path: 'DebitNote/GenerateDebitNote', component:GenerateDebitNoteComponent},
+  { path: 'DebitNote/ApproveDebitNote', component:ApproveDebitNoteComponent},
+  { path: 'DebitNote/DebitNoteDetails', component:DebitNoteDetailsComponent},
+  
 ];
 
 @NgModule({

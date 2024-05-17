@@ -100,6 +100,201 @@ export class DebitAgainstDocumentList {
   DocumentType: string
 }
 
+export class CreditNoteRequestModel {
+  companyCode: number
+  docType: string
+  branch: string
+  finYear: string
+  data: CNTHdrDataRequestModel
+  Headerdata: CNTHdrDataRequestModel
+  Detailsdata: CNTDetDataRequestModel
+}
+
+
+export class CNTHdrDataRequestModel {
+  _id: string;
+  cID: number;
+  docNo: string;
+  tYP: string;
+  nTNO: string;
+  nTDT: Date;
+  lOC: string;
+  pARTY: {
+    cD: string;
+    nM: string;
+    tEL: string;
+    aDD: string;
+    eML: string;
+    cT: string;
+    sT: string;
+    gSTIN: string;
+  };
+  gST: {
+    aMT: number;
+  };
+  tXBLAMT: number;
+  aMT: number;
+  nTRESCD: string;
+  nTRESNM: string;
+  aCCD: string;
+  aCNM: string;
+  sTS: number;
+  sTSNM: string;
+  sTSBY: string;
+  sTSDT: Date;
+  vNO: string;
+  cNL: boolean;
+  cNLDT: Date;
+  cNLBY: string;
+  cNLRES: string;
+  eNTDT: Date;
+  eNTLOC: string;
+  eNTBY: string;
+  mODDT: Date;
+  mODLOC: string;
+  mODBY: string;
+}
+
+export class CNTDetDataRequestModel {
+  _id: string;
+  cID: number;
+  docNo: string;
+  tYP: string;
+  nTNO: string;
+  nTDT: Date;
+  lOC: string;
+  bILLNO: string;
+  bGNDT: string;
+  pARTY: {
+    cD: string;
+    nM: string;
+    tEL: string;
+    aDD: string;
+    eML: string;
+    cT: string;
+    sT: string;
+    gSTIN: string;
+  };
+  bAMT: number;
+  bALAMT: number;
+  tXBLAMT: number;
+  aMT: number;
+  eXMT: boolean;
+  eXMTRES: string;
+  gST: {
+    hSCD: string;
+    hSNM: string;
+    tYP: string;
+    rATE: number;
+    iGRT: number;
+    cGRT: number;
+    sGRT: number;
+    iGST: number;
+    cGST: number;
+    sGST: number;
+    aMT: number;
+  };
+  eNTDT: Date;
+  eNTLOC: string;
+  eNTBY: string;
+  mODDT: Date;
+  mODLOC: string;
+  mODBY: string;
+}
+
+export class DebitNoteRequestModel {
+  companyCode: number
+  docType: string
+  branch: string
+  finYear: string
+  data: DNTHdrDataRequestModel
+  Headerdata: DNTHdrDataRequestModel
+  Detailsdata: DNTDetDataRequestModel
+}
+
+
+export class DNTHdrDataRequestModel {
+  _id: string;
+  cID: number;
+  docNo: string;
+  tYP: string;
+  nTNO: string;
+  nTDT: Date;
+  lOC: string;
+  pARTY: {
+    cD: string;
+    nM: string;
+    tEL: string;
+  };
+  gST: {
+    aMT: number;
+  };
+  tXBLAMT: number;
+  aMT: number;
+  tdsAMT: number;
+  nTRESCD: string;
+  nTRESNM: string;
+  aCCD: string;
+  aCNM: string;
+  sTS: number;
+  sTSNM: string;
+  sTSBY: string;
+  sTSDT: Date;
+  vNO: string;
+  cNL: boolean;
+  cNLDT: Date;
+  cNLBY: string;
+  cNLRES: string;
+  eNTDT: Date;
+  eNTLOC: string;
+  eNTBY: string;
+  mODDT: Date;
+  mODLOC: string;
+  mODBY: string;
+}
+
+export class DNTDetDataRequestModel {
+  _id: string;
+  cID: number;
+  docNo: string;
+  tYP: string;
+  nTNO: string;
+  nTDT: Date;
+  lOC: string;
+  bILLNO: string;
+  bGNDT: string;
+  pARTY: {
+    cD: string;
+    nM: string;
+    tEL: string;
+  };
+  bAMT: number;
+  bALAMT: number;
+  tXBLAMT: number;
+  aMT: number;
+  eXMT: boolean;
+  eXMTRES: string;
+  gST: {
+    hSCD: string;
+    hSNM: string;
+    tYP: string;
+    rATE: number;
+    iGRT: number;
+    cGRT: number;
+    sGRT: number;
+    iGST: number;
+    cGST: number;
+    sGST: number;
+    aMT: number;
+  };
+  tdsAMT:number;
+  eNTDT: Date;
+  eNTLOC: string;
+  eNTBY: string;
+  mODDT: Date;
+  mODLOC: string;
+  mODBY: string;
+}
 
 export enum VoucherType {
   DebitVoucher = 0,
@@ -123,6 +318,8 @@ export enum VoucherInstanceType {
   DeliveryMR = 10,
   VendorBillPayment = 11,
   THCArrival = 12,
+  CreditNoteApproval=13,
+  DebitNoteApproval=14
 }
 
 export const ledgerInfo = {
@@ -141,6 +338,13 @@ export const ledgerInfo = {
   "LIA001002": GetLeadgerInfoFromLocalStorage("LIA001002"),
   "EXP001024": GetLeadgerInfoFromLocalStorage("EXP001024"),
   "LIA003004": GetLeadgerInfoFromLocalStorage("LIA003004"),
+  "INC001006": GetLeadgerInfoFromLocalStorage("INC001006"),
+  "AST001002": GetLeadgerInfoFromLocalStorage("AST001002"),
+  "AST003001": GetLeadgerInfoFromLocalStorage("AST003001"),
+  "INC001008": GetLeadgerInfoFromLocalStorage("INC001008"),
+  "AST006002": GetLeadgerInfoFromLocalStorage("AST006002"),
+  "INC001015": GetLeadgerInfoFromLocalStorage("INC001015"),
+  "INC001009": GetLeadgerInfoFromLocalStorage("INC001009"),
   "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
   "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
   "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),

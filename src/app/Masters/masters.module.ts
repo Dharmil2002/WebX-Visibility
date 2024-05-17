@@ -183,6 +183,7 @@ import { DriverMasterUploadComponent } from './driver-master/driver-master-uploa
 import { VendorMasterUploadComponent } from './vendor-master/vendor-master-upload/vendor-master-upload.component';
 import { AddressMasterUploadComponent } from './address-master/address-master-upload/address-master-upload.component';
 import { ContainerMasterUploadComponent } from './Container Master/container-master-upload/container-master-upload.component';
+import { ClusterMasterUploadComponent } from './cluster-master/cluster-master-upload/cluster-master-upload.component';
 
 @NgModule({
   imports: [
@@ -381,7 +382,8 @@ import { ContainerMasterUploadComponent } from './Container Master/container-mas
     CustomerMasterUploadComponent,
     VendorMasterUploadComponent,
     AddressMasterUploadComponent,
-    ContainerMasterUploadComponent
+    ContainerMasterUploadComponent,
+    ClusterMasterUploadComponent
   ],
   providers: [
     DatePipe,

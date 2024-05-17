@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
   selector: "app-view-print",
   templateUrl: "./view-print.component.html",
 })
+
 export class ViewPrintComponent implements OnInit {
   breadScrums = [
     {
@@ -168,13 +169,13 @@ export class ViewPrintComponent implements OnInit {
       },
       {
         name: "DocketJC View-Print",
-        partyCode:"CONSRAJT24",
-        viewName:"Docket"
+        partyCode: "CONSRAJT24",
+        viewName: "Docket"
       },
       {
         name: "MR View-Print",
-        partyCode:"CUST00028",
-        viewName:"DeliveryMr"
+        partyCode: "CUST00028",
+        viewName: "DeliveryMr"
       },
       {
         name: "DocketATC View-Print",
@@ -191,18 +192,32 @@ export class ViewPrintComponent implements OnInit {
         partyCode: "CUST00029",
         viewName: "Voucher",
       },
-    ];
+      {
+        name: "FreightInvoice View-Print",
+        partyCode: "CG0214574K",
+        viewName: "BillInvoice",
+      },
+      {
+        name: "Generalinvoice View-Print",
+        partyCode: "CG0000174",
+        viewName: "BillInvoice",
+      },
+      {
+        name: "MoneyReceipt View-Print",
+        partyCode: "CG00045",
+        viewName: "MoneyReceipt",
+      },
+    ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {
       templateName: FindBillView?.viewName || viewType.name,
       partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");
-  }
+  } 
 
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call

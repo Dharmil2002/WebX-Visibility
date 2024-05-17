@@ -501,7 +501,7 @@ export class ApproveDebitNoteComponent implements OnInit {
       voucherType: VoucherType[VoucherType.JournalVoucher],
       transDate: new Date(),
       finYear: financialYear,
-      branch: this.storage.branch,
+      branch: this.DataResponseHeader.data[0].lOC,
       accCode,
       accName,
       accCategory,

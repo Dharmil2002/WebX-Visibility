@@ -99,7 +99,6 @@ export class GenerateDebitNoteComponent implements OnInit {
       filter:  {
         'D$expr': {
           'D$and': [
-
             { 'D$gt': ['$bALPBAMT', 0] }
           ].filter(Boolean) // Remove undefined elements from the array
         }
@@ -132,7 +131,7 @@ export class GenerateDebitNoteComponent implements OnInit {
           // Check if Value is defined before checking cUST.cD
           Value !== undefined && { 'D$eq': ['$vND.cD', Value] },
           // Check if bALAMT is greater than 0
-          // { 'D$gt': ['$bALPBAMT', 0] }
+          { 'D$gt': ['$bALPBAMT', 0] }
         ].filter(Boolean) // Remove undefined elements from the array
       }
     }

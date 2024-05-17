@@ -11,15 +11,28 @@ export class CustInvoiceRegService {
     private storage: StorageService
   ) {}
 
-  async getcustInvRegReportDetail(startValue, endValue, docNo) {
+  async getcustInvRegReportDetail(data) {
     let matchQuery = {
       D$and: [
-        { bGNDT: { D$gte: startValue } }, // Convert start date to ISO format
-        { bGNDT: { D$lte: endValue } }, // Bill date less than or equal to end date
+        { bGNDT: { D$gte: data.startValue } }, // Convert start date to ISO format
+        { bGNDT: { D$lte: data.endValue } }, // Bill date less than or equal to end date
         {
           D$or: [{ cNL: false }, { cNL: { D$exists: false } }],
         },
-        ...(docNo != "" ? [{ bILLNO: { 'D$eq': docNo } }] : []),
+        ...(data.docNo != "" ? [{ bILLNO: { D$eq: data.docNo } }] : []),
+        ...(data.state && data.state.length > 0
+          ? [{ D$expr: { D$in: ["$gEN.sT", data.state] } }]
+          : []),
+        ...(data.status && data.status != ""
+          ? [{ bSTS: { D$eq: data.status } }]
+          : []),
+        ...(data.cust && data.cust.length > 0
+          ? [{ D$expr: { D$eq: ["$cUST.nM", data.cust] } }]
+          : []),
+        ...(data.sac && data.sac.length > 0
+          ? [{ D$expr: { D$in: ["$voucher_trans_details.sCOD", data.sac] } }]
+          : []),
+        ...[{ bLOC: { D$in: data.branch } }],
       ],
     };
     const reqBody = {
@@ -100,12 +113,59 @@ export class CustInvoiceRegService {
           },
         },
         {
+          D$lookup: {
+            from: "cd_note_header",
+            localField: "bILLNO",
+            foreignField: "docNo",
+            as: "cd_note_header",
+          },
+        },
+        {
+          D$unwind: {
+            path: "$cd_note_header",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          D$lookup: {
+            from: "cd_note_details",
+            localField: "bILLNO",
+            foreignField: "docNo",
+            as: "cd_note_details",
+          },
+        },
+        {
+          D$unwind: {
+            path: "$cd_note_details",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          D$lookup: {
+            from: "dockets",
+            localField: "cust_bill_details.dKTNO",
+            foreignField: "dKTNO",
+            as: "dockets",
+          },
+        },
+        {
+          D$unwind: {
+            path: "$dockets",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
           D$project: {
             bILLNO: {
               D$ifNull: ["$bILLNO", ""],
             },
             bGNDT: {
-              D$ifNull: ["$bGNDT", ""],
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$bGNDT" }, 86400000],
+                },
+              },
             },
             dOCTYP: {
               D$ifNull: ["$dOCTYP", ""],
@@ -119,11 +179,11 @@ export class CustInvoiceRegService {
             STIN: {
               D$ifNull: ["$cUST.gSTIN", ""],
             },
-            gSTIN: {
-              D$ifNull: ["$gEN.gSTIN", ""],
-            },
             bLOC: {
               D$ifNull: ["$bLOC", ""],
+            },
+            gSTIN: {
+              D$ifNull: ["$gEN.gSTIN", ""],
             },
             nRT: {
               D$ifNull: ["$nRT", ""],
@@ -140,6 +200,12 @@ export class CustInvoiceRegService {
             rATE: {
               D$ifNull: ["$gST.rATE", ""],
             },
+            gROSSAMT: {
+              D$ifNull: ["$gST.gROSSAMT", ""],
+            },
+            aMT: {
+              D$ifNull: ["$gST.iGST", ""],
+            },
             iGST: {
               D$ifNull: ["$gST.iGST", ""],
             },
@@ -152,16 +218,116 @@ export class CustInvoiceRegService {
             uTGST: {
               D$ifNull: ["$gST.uTGST", ""],
             },
+            dKTTOT: {
+              D$ifNull: ["$dKTTOT", ""],
+            },
+            cAMT: {
+              D$ifNull: ["$cOL.cAMT", ""],
+            },
+            bALAMT: {
+              D$ifNull: ["$cOL.bALAMT", ""],
+            },
+            cRAMT: {
+              D$ifNull: ["$cd_note_header.aMT", ""],
+            },
+            tDSAMT: {
+              D$ifNull: ["$voucher_trans.tDSAMT", ""],
+            },
+            tDSNM: {
+              D$ifNull: ["$voucher_trans.tDSNM", ""],
+            },
+            sT: {
+              D$ifNull: ["$gEN.sT", ""],
+            },
+            gEXMT: {
+              D$ifNull: ["$eXMT", ""],
+            },
+            pAYBAS: {
+              D$ifNull: ["$pAYBAS", ""],
+            },
             mRNO: {
               D$ifNull: ["$cust_bill_collection.mRNO", ""],
             },
-            glOC: {
-              D$ifNull: ["$gEN.lOC", ""],
+            dTM: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$dTM" }, 86400000],
+                },
+              },
+            },
+            nTNO: {
+              D$ifNull: ["$cd_note_header.nTNO", ""],
+            },
+            nTDT: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$cust_bill_collection.nTDT" }, 86400000],
+                },
+              },
+            },
+            gTEXMT: {
+              D$ifNull: ["$gEN.eXMT", ""],
+            },
+            geNTBY: {
+              D$ifNull: ["$eNTBY", ""],
+            },
+            eNTDT: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$cust_bill_collection.eNTDT" }, 86400000],
+                },
+              },
+            },
+            tO: {
+              D$ifNull: ["$sUB.tO", ""],
+            },
+            sDTM: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$sUB.dTM" }, 86400000],
+                },
+              },
+            },
+            aBY: {
+              D$ifNull: ["$aPR.aBY", ""],
+            },
+            aDT: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$aPR.aDT" }, 86400000],
+                },
+              },
+            },
+            cBY: {
+              D$ifNull: ["$cust_bill_collection.eNTBY", ""],
+            },
+            cDT: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$cust_bill_collection.eNTDT" }, 86400000],
+                },
+              },
+            },
+            cNBY: {
+              D$ifNull: ["$cd_note_header.eNTBY", ""],
+            },
+            cNDT: {
+              D$dateToString: {
+                format: "%Y-%m-%d %H:%M",
+                date: {
+                  D$add: [{ D$toDate: "$cd_note_header.eNTDT" }, 86400000],
+                },
+              },
             },
             eNTBY: {
               D$ifNull: ["$eNTBY", ""],
-            }
-
+            },
           },
         },
       ],
@@ -169,6 +335,11 @@ export class CustInvoiceRegService {
     const res = await firstValueFrom(
       this.masterServices.masterMongoPost("generic/query", reqBody)
     );
-    return res.data;
+    const details = res.data.map((item) => ({
+      ...item,
+      partyType: item.eXMT ? "Registered" : "UnRegistered",
+    }));
+
+    return details;
   }
 }

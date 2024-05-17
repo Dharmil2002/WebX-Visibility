@@ -57,6 +57,7 @@ export class CustInvRegFormControl {
           },
         ],
         additionalData: {
+          support: "stateHandler",
           showNameAndValue: true,
         },
       },
@@ -127,7 +128,7 @@ export class CustInvRegFormControl {
         },
       },
       {
-        name: "lOC",
+        name: "branch",
         label: "Location",
         placeholder: "Select Location",
         type: "dropdown",
@@ -253,6 +254,16 @@ export class CustInvRegFormControl {
         generatecontrol: false,
         disable: true,
         Validations: [],
+      },
+      {
+        name: "stateHandler",
+        label: "stateHandler",
+        placeholder: " ",
+        type: "",
+        value: "",
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
       },
     ];
   }

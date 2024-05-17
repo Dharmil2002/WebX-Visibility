@@ -35,7 +35,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatMenuModule } from '@angular/material/menu';
 import { ChartsModule as chartjsModule } from 'ng2-charts';
-import { OWL_DATE_TIME_LOCALE, OwlDateTimeModule, OwlNativeDateTimeModule,  OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
+import { OWL_DATE_TIME_LOCALE, OwlDateTimeModule, OwlNativeDateTimeModule, OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
 
 import { GenericChartDashboardComponent } from './generic-chart-dashboard/generic-chart-dashboard.component';
 import { GenericCardComponent } from './generic-card/generic-card.component';
@@ -63,8 +63,10 @@ import { GenericCardWithMenuActionsComponent } from './generic-card-with-menu-ac
 import { GenericBulkUploadComponent } from './generic-bulk-upload/generic-bulk-upload.component';
 import { MY_DATE_FORMAT, MY_CUSTOM_FORMAT, MY_DATETIME_FORMAT } from '../config/myconstants';
 import { NGX_MAT_DATE_FORMATS, NgxMatDateAdapter, NgxMatDatetimePickerModule, NgxMatTimepickerModule } from '@angular-material-components/datetime-picker';
-import { NgxMatMomentModule, NGX_MAT_MOMENT_DATE_ADAPTER_OPTIONS  } from '@angular-material-components/moment-adapter';
+import { NgxMatMomentModule, NGX_MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular-material-components/moment-adapter';
 import { CustomDateAdapter } from './FormFields/CustomDateAdapter';
+import { GuiGridModule } from '@generic-ui/ngx-grid';
+import { GenericUiGridComponent } from './generic-ui-grid/generic-ui-grid.component';
 
 @NgModule({
   declarations: [GenericAccordionComponent, GenericTableComponent,
@@ -74,7 +76,7 @@ import { CustomDateAdapter } from './FormFields/CustomDateAdapter';
     ImagePreviewComponent,
     GenericViewTableComponent,
     GenericCardWithMenuActionsComponent,
-    GenericBulkUploadComponent],
+    GenericBulkUploadComponent, GenericUiGridComponent],
 
   imports: [
     CommonModule,
@@ -112,15 +114,16 @@ import { CustomDateAdapter } from './FormFields/CustomDateAdapter';
     DragDropModule,
     TableVirtualScrollModule,
     ScrollingModule,
-    NgxPrintModule
+    NgxPrintModule,
+    GuiGridModule
   ],
   providers: [
     {
       provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE],
-    },    
+    },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
     { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-IN' },
-    { provide: NGX_MAT_DATE_FORMATS, useValue: MY_DATETIME_FORMAT},
+    { provide: NGX_MAT_DATE_FORMATS, useValue: MY_DATETIME_FORMAT },
     // {
     //   provide: NgxMatDateAdapter,
     //   useClass: CustomDateAdapter,
@@ -155,7 +158,8 @@ import { CustomDateAdapter } from './FormFields/CustomDateAdapter';
     GenericViewPrintComponent,
     LazyloadingeditabletableComponent,
     ImagePreviewComponent,
-    GenericBulkUploadComponent
+    GenericBulkUploadComponent,
+    GenericUiGridComponent
   ],
 
 })

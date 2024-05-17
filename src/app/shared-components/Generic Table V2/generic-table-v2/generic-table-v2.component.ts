@@ -56,6 +56,7 @@ export class GenericTableV2Component
   @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
+  @Input() tableWidth ;
   @Input() containerWidth;
   @Input() width;
   @Input() maxWidth;

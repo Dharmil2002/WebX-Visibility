@@ -93,6 +93,8 @@ export const Collections = {
     route_details: 'route_schedules_details',
     thc_summary_ltl: 'thc_summary_ltl',
     Doccument_names: 'doc_names',
+    route_Master_LocWise:'routeMasterLocWise',
+    adhoc_routes:"adhoc_routes"
 };
 
 export const GenericActions = {

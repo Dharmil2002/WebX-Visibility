@@ -56,6 +56,7 @@ export class CreditnoteManagementComponent implements OnInit {
       Title: "CN No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
+      datatype: "string",
       sticky: true
     },
     eNTDT: {

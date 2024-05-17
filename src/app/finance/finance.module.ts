@@ -75,12 +75,11 @@ import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/se
 import { EditOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/edit-opening-balance-ledger-wise/edit-opening-balance-ledger-wise.component';
 import { UploadOpeningBalanceLedgerWiseComponent } from './FA Masters/Modals/upload-opening-balance-ledger-wise/upload-opening-balance-ledger-wise.component';
 import { AddCreditNoteGenerationComponent } from './Credit Note/add-credit-note-generation/add-credit-note-generation.component';
-import { GeneralInvoiceCriteriaComponent } from './Customer General Invoice/general-invoice-criteria/general-invoice-criteria.component';
-import { GeneralInvoiceDetailComponent } from './Customer General Invoice/general-invoice-detail/general-invoice-detail.component';
-import { AddGeneralInvoiceDetailComponent } from './Customer General Invoice/Modals/add-general-invoice-detail/add-general-invoice-detail.component';
-import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
-import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
-import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/Modals/add-general-bill-detail/add-general-bill-detail.component';
+import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
+import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/generate-debit-note/generate-debit-note.component';
+import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
+import { ModifyDebitNoteDetailsComponent } from './Debit-Note/modify-debit-note-details/modify-debit-note-details/modify-debit-note-details.component';
+import { FilterDebitNoteDetailsComponent } from './Debit-Note/filter-debit-note-details/filter-debit-note-details/filter-debit-note-details.component';
 
 @NgModule({
     declarations: [
@@ -122,13 +121,11 @@ import { AddGeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/
         EditOpeningBalanceLedgerWiseComponent,
         UploadOpeningBalanceLedgerWiseComponent,
         AddCreditNoteGenerationComponent,
-        GeneralInvoiceCriteriaComponent,
-        GeneralInvoiceDetailComponent,
-        AddGeneralInvoiceDetailComponent,
-        GeneralBillCriteriaComponent,
-        GeneralBillDetailComponent,
-        AddGeneralBillDetailComponent
-
+        ApproveDebitNoteComponent,
+        GenerateDebitNoteComponent,
+        DebitNoteDetailsComponent,
+        ModifyDebitNoteDetailsComponent,
+        FilterDebitNoteDetailsComponent,
     ],
     imports: [
         CommonModule,

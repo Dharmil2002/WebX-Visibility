@@ -1,0 +1,25 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+
+    <form [formGroup]="DebitNoteDetailsForm">
+        <app-form-webxpress [form]="DebitNoteDetailsForm" [formData]="DebitNoteDetailsJson"
+            [showSaveAndCancelButton]="false" [FormTitle]="''" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+
+    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="dNoteData" [selectAllRequired]="true" [FormTitle]="'Debit Note​'" [TitleBoxData]="TotalAmountList"
+        [menuItems]="menuItems" (functionCallEmitter)="functionCallHandler($event)" [staticField]="staticField"
+        [Link]="linkArray" (onFlagChange)="checkbox($event)" (menuItemClicked)="handleMenuItemClick($event)"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [showSaveAndCancelButton]="false">
+    </app-generic-table-v2>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button class="msr-3" mat-raised-button color="primary" (click)="save()">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+</app-common-wrapper-webxpress>

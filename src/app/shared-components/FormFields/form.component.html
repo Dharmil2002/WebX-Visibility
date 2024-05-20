@@ -442,7 +442,7 @@
                     <input matInput [ngxMatDatetimePicker]="datetimepicker" placeholder={{formItem.placeholder}}
                       [min]="formItem.additionalData?.minDate" [max]="formItem.additionalData?.maxDate"
                       [disabled]="false" [formControlName]="formItem.name"
-                      (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate, eventArgs: $event})">
+                      (dateTimeChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate, eventArgs: $event})">
                     <mat-datepicker-toggle matSuffix [for]="datetimepicker"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #datetimepicker>
                     </ngx-mat-datetime-picker>

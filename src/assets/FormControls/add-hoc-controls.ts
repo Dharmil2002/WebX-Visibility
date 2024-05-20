@@ -34,7 +34,7 @@ export class AddHocControls {
         },
         functions: {
           onModel: "getLocation",
-          onSelect: "connectLocations",
+          onOptionSelect: "getlocationValidation"
         },
         Validations: [
           {

@@ -228,6 +228,9 @@ export class InvoiceCountService {
       const req = {
         companyCode: this.storage.companyCode,
         collectionName: "cd_note_header",
+        filter: {
+          TYP: "C"
+        },
         filters: [{
           D$group: {
             _id: null,

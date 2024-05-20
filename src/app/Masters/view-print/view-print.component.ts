@@ -193,19 +193,24 @@ export class ViewPrintComponent implements OnInit {
         viewName: "Voucher",
       },
       {
-        name: "FreightInvoice View-Print",
+        name: "Freight Invoice View-Print",
         partyCode: "CG0214574K",
         viewName: "BillInvoice",
       },
       {
-        name: "Generalinvoice View-Print",
+        name: "General invoice View-Print",
         partyCode: "CG0000174",
         viewName: "BillInvoice",
       },
       {
-        name: "MoneyReceipt View-Print",
+        name: "Money Receipt View-Print",
         partyCode: "CG00045",
         viewName: "MoneyReceipt",
+      },
+      {
+        name: "Credit Note View-Print",
+        partyCode: "CON0027",
+        viewName: "CreditNote",
       },
     ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
@@ -214,6 +219,7 @@ export class ViewPrintComponent implements OnInit {
       partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
+    console.log('req' ,req)
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");

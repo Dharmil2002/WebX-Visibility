@@ -155,14 +155,12 @@ export class DebitNoteDetailsComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
     private navigationService: NavigationService,
     private filter: FilterUtils,) {
-    debugger
     const extrasState = this.Route.getCurrentNavigation()?.extras?.state;
     this.hdnbillno = extrasState.billNO.value;
     // this.hdnfromdate = extrasState.start;
     // this.hdntodate = extrasState.end;
     // this.vendorcode = extrasState.extrasState
     // this.vendorname = extrasState.vendorname
-    console.log(extrasState)
   }
 
   ngOnInit(): void {
@@ -198,7 +196,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
   functionCallHandler($event) {
-    debugger
     let functionName = $event.functionName;
     try {
       this[functionName]($event);
@@ -208,7 +205,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
   async checkbox() {
-    debugger
     //const isSelected = $event.filter((x) => x.isSelected == true);
     let totalAMT = 0, totalSAMT = 0, totalGSTAMT = 0, total = 0;
     // Calculate totals based on table data
@@ -228,13 +224,11 @@ export class DebitNoteDetailsComponent implements OnInit {
     this.TotalAMOUNT = totalAMT;
     this.TotalGSTAMOUNT = totalSAMT;
     this.TotalTDSAMOUNT =totalGSTAMT;
-    console.log(this.TotalAMOUNT)
+
   }
   async handleMenuItemClick(data) {
     // const EditableId = this.dNoteData[0].billNO;
     const EditableId = data.data?.docNo
-    console.log("BILL NUMBER", EditableId);
-    console.log(this.dNoteData)
     const dialogRef = this.matDialog.open(ModifyDebitNoteDetailsComponent, {
       data: data.data,
       width: "100%",
@@ -244,13 +238,9 @@ export class DebitNoteDetailsComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log("result", result);
-
       if (result != undefined) {
         if (EditableId) {
-          debugger
           const tableData = this.dNoteData.find(x => x.docNo === EditableId);
-          console.log(tableData);
           if (tableData) {
             tableData.gstRevlAmt = result.GstRevAmount;
             tableData.dNAMT = result.DebitAmount;
@@ -312,7 +302,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
   async ReasonBind() {
-    debugger
     const Body = {
       companyCode: this.storage.companyCode,
       collectionName: "General_master",
@@ -340,8 +329,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   
     
   updateTotalAmounts() {
-    debugger
-    console.log(this.dNoteData)
     // Initialize total amounts
     let totalAMT = 0, totalSAMT = 0, totalGSTAMT = 0, total = 0;
     // Calculate totals based on table data
@@ -361,10 +348,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
   async save() {
-    console.log(this.TotalGSTAMOUNT)
-    console.log(this.dNoteData)
-    debugger
-
     this.snackBarUtilityService.commonToast(async () => {
       try {
         this.DebitNoteRequestModel.companyCode = this.storage.companyCode;
@@ -502,8 +485,6 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DebitNoteRequestModel.data = this.DNTHdrDataRequestModel;
         this.DebitNoteRequestModel.Headerdata = this.DNTHdrDataRequestModel;
         this.DebitNoteRequestModel.Detailsdata = this.DNTDetDataRequestModel;
-        console.log(this.dNoteData)
-        debugger
         firstValueFrom(
           this.voucherServicesService.FinancePost(
             "fin/account/CreditNoteEntry",
@@ -524,9 +505,6 @@ export class DebitNoteDetailsComponent implements OnInit {
                   };
                   const res = firstValueFrom(
                     this.masterService.masterPut("generic/update", req))
-                    debugger
-                    console.log(res)
-                
               });
 
               Swal.fire({

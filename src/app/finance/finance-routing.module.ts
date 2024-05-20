@@ -26,6 +26,7 @@ import { GeneralInvoiceCriteriaComponent } from './Customer General Invoice/gene
 import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/generate-debit-note/generate-debit-note.component';
 import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
 import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
+import { SetOpeningBalanceVendorWiseComponent } from './FA Masters/Components/set-opening-balance-vendor-wise/set-opening-balance-vendor-wise.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -55,6 +56,7 @@ const routes: Routes = [
   { path: 'DebitNote/GenerateDebitNote', component: GenerateDebitNoteComponent },
   { path: 'DebitNote/ApproveDebitNote', component: ApproveDebitNoteComponent },
   { path: 'DebitNote/DebitNoteDetails', component: DebitNoteDetailsComponent },
+  { path: 'FAMasters/SetOpeningBalanceVendorWise', component: SetOpeningBalanceVendorWiseComponent }
 
 ];
 

@@ -16,6 +16,7 @@ export class CommonViewPrintComponent implements OnInit {
   companyCode = 0;
   JsonData;
   templateBody: any;
+  copyName: any;
 
   constructor(
     private renderer: Renderer2,
@@ -60,6 +61,7 @@ export class CommonViewPrintComponent implements OnInit {
       this.JsonData = Res.data.jsonData;
       this.FieldMapping = Res.data.fieldMapping;
       this.HtmlTemplate = Res.data.Template;
+      this.copyName = Res.data?.copyName || ['Primary Copy']
       this.showView = true;
     }
 

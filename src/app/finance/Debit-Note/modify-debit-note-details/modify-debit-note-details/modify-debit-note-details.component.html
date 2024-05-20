@@ -5,11 +5,11 @@
     </button>
 </div>
 <div class="body" style="max-height: 420px;">
-    <form [formGroup]="CustomerGeneralInvoiceForm">
-        <app-form-webxpress [form]="CustomerGeneralInvoiceForm" [FormTitle]="'Transaction Details'"
-            [formData]="jsonControlCustomerGeneralInvoiceArray" (functionCallEmitter)="functionCallHandler($event)"
+    <form [formGroup]="modifyDebitNoteDetailsForm">
+        <app-form-webxpress [form]="modifyDebitNoteDetailsForm" [FormTitle]="'Debit Note Details'"
+            [formData]="jsonControlmodifyDebitNoteDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
             [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="true">
+            [showSaveAndCancelButton]="true">>
         </app-form-webxpress>
     </form>
 </div>

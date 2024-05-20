@@ -16,7 +16,7 @@ export class CommonViewPrintComponent implements OnInit {
   companyCode = 0;
   JsonData;
   templateBody: any;
-  
+
   constructor(
     private renderer: Renderer2,
     private router: ActivatedRoute,
@@ -24,7 +24,7 @@ export class CommonViewPrintComponent implements OnInit {
     private storage: StorageService
   ) {
     this.companyCode = this.storage.companyCode;
-    
+
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
       "display",
@@ -46,7 +46,6 @@ export class CommonViewPrintComponent implements OnInit {
   }
 
   
-  //below function is for view print
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
@@ -54,20 +53,15 @@ export class CommonViewPrintComponent implements OnInit {
       partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
     };
-    // let req = {
-    //   companyCode: this.companyCode,
-    //   docType: "LS",
-    //   DocNo: "LS/MUMB/2425/000002"
-    // };
-
-    const Res = await firstValueFrom(await this.masterService.masterPost("viewprint/ViewV2", req));
-    console.log('Res' ,Res)
+    const Res = await this.masterService
+      .masterPost("viewprint/View", req)
+      .toPromise();
     if (Res.success) {
       this.JsonData = Res.data.jsonData;
       this.FieldMapping = Res.data.fieldMapping;
       this.HtmlTemplate = Res.data.Template;
       this.showView = true;
     }
-    
+
   }
 }

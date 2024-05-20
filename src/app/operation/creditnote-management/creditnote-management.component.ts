@@ -56,6 +56,7 @@ export class CreditnoteManagementComponent implements OnInit {
       Title: "CN No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
+      datatype: "string",
       sticky: true
     },
     eNTDT: {
@@ -217,6 +218,9 @@ export class CreditnoteManagementComponent implements OnInit {
     const BodyDataHeader = {
       companyCode: this.storage.companyCode,
       collectionName: "cd_note_header",
+      filter: {
+        tYP: "C"
+      }
     };
     this.DataResponseHeader = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataHeader));
     this.cNoteData = this.DataResponseHeader.data;
@@ -224,6 +228,9 @@ export class CreditnoteManagementComponent implements OnInit {
     const BodyDataDetails = {
       companyCode: this.storage.companyCode,
       collectionName: "cd_note_details",
+      filter: {
+        TYP: "C"
+      }
     };
     this.DataResponseHeader1 = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataDetails));
     this.creditnotedetails = this.DataResponseHeader1.data;
@@ -292,6 +299,9 @@ export class CreditnoteManagementComponent implements OnInit {
     const BodyDataHeader = {
       companyCode: this.storage.companyCode,
       collectionName: "cd_note_header",
+      filter: {
+        tYP: "C"
+      }
     };
     this.DataResponseHeader = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataHeader));
 

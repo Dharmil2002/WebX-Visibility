@@ -214,6 +214,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       "cHACAT": { "D$in": ['C', 'B'] },
       "pRNM": this.DocketDetails.tRNMODNM,
       "cHAPP": { D$in: ["GCN"] },
+      "cHATY": { 'D$eq': 'Charges' },
       isActive: true
     }
     this.bookingChargeList = await this.thcService.getChargesV2(filterCharges, productFilter);
@@ -312,6 +313,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.chargeList = await this.thcService.getCharges({
       "cHAPP": { 'D$eq': ChargeName },
       "pRCD": { 'D$eq': ProductCode },
+      "cHATY": { 'D$eq': 'Charges' },
       'isActive': { 'D$eq': true }
     });
 

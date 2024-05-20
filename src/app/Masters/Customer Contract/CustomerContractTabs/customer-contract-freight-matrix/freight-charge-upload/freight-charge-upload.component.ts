@@ -254,20 +254,20 @@ export class FreightChargeUploadComponent implements OnInit {
     this.dialogRef.close()
   }
   ReValidateData(data, existingData) {
-    let validData = data.filter(x => {
-      const validFromDate = moment(x.ValidFromDate, 'DD MMM YY');
-      const validToDate = moment(x.ValidToDate, 'DD MMM YY');
-      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY');
-      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY');
+    const contractStartDateString = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY').format('DD/MM/YYYY');
+    const contractStartDate = moment(contractStartDateString, 'DD/MM/YYYY');
+    const contractEndDateString = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY').format('DD/MM/YYYY');
+    const contractEndDate = moment(contractEndDateString, 'DD/MM/YYYY');
 
+    let validData = data.filter(x => {
+      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
+      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
       return validFromDate.isSameOrAfter(contractStartDate) && validToDate.isSameOrBefore(contractEndDate);
     });
-    const invalidData = data.filter(x => {
-      const validFromDate = moment(x.ValidFromDate, 'DD MMM YY');
-      const validToDate = moment(x.ValidToDate, 'DD MMM YY');
-      const contractStartDate = moment(this.CurrentContractDetails.cSTARTDT, 'DD MMM YY');
-      const contractEndDate = moment(this.CurrentContractDetails.cENDDT, 'DD MMM YY');
 
+    const invalidData = data.filter(x => {
+      const validFromDate = moment(x.ValidFromDate, 'DD/MM/YYYY');
+      const validToDate = moment(x.ValidToDate, 'DD/MM/YYYY');
       return validFromDate.isBefore(contractStartDate) || validToDate.isAfter(contractEndDate);
     });
 

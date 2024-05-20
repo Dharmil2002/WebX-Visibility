@@ -249,7 +249,7 @@ export class AddDcrSeriesComponent
     this.addDcrFormControl = new AddDcrSeriesControl();
     this.jsonControlArray = this.addDcrFormControl.getAddDcrFormControls();
     this.addDcrTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    // this.addDcrTableForm.controls["documentType"].setValue("dkt");
+    this.addDcrTableForm.controls["documentType"].setValue("");
   }
 
   //#endregion

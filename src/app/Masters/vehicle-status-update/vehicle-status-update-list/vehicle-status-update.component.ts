@@ -109,7 +109,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
           return 0; // neither a nor b has updateDate, no preference for order
         }
       });
-      const tableDetail = sortedTableDetail.map((x) => { if (x.updateDate) { x.updateDt = formatDate(x.updateDate, 'dd/MM/yyyy HH:mm'), x.eta = formatDate(x.updateDate, 'dd/MM/yyyy HH:mm'), x.tripId = `${x.tripId} ` } return x })
+      const tableDetail = sortedTableDetail.map((x) => { if (x.updateDate) { x.updateDt = formatDate(x.updateDate, 'dd MMM yy HH:mm'), x.eta = formatDate(x.updateDate, 'dd MMM yyyy HH:mm'), x.tripId = `${x.tripId} ` } return x })
 
       this.tableData = tableDetail;
       this.IsActiveFuntion()

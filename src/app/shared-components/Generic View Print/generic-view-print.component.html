@@ -12,18 +12,14 @@
     style="margin-left: 0px; margin-bottom: 0; margin-right: 0;">
     <div class=" card">
         <div class="body">
-            <div class="col col-lg-2 mb-1">
-                <button mat-raised-button color="primary" [useExistingCss]="true" ngxPrint printSectionId="print"><i
-                        class="fas fa-print msr-2"></i>Print</button>
-
-                <span *ngIf="EventButton">
-                    <button mat-stroked-button style="margin-left:10px; " color="primary"
-                        (click)="functionHandle(EventButton.functionName , {})">
-                        <mat-icon *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
-                        {{EventButton.name}}
-                    </button>
-                </span>
-
+            <div style="width: 100%; display: flex; align-items: center;">
+                <div class="m-2">
+                    <button mat-raised-button color="primary" [useExistingCss]="true" [printStyle]="printStyles" ngxPrint
+                        printSectionId="print"><i class="fas fa-print msr-2"></i>Print</button>
+                </div>
+                <div class="m-2">
+                    <mat-slide-toggle (ngModelChange)="onToggleChange($event)" color="primary" [(ngModel)]="isLandscape" labelPosition="before">Landscape View</mat-slide-toggle>
+                </div>
             </div>
 
             <div id="print" class="landscape portrait">
@@ -38,6 +34,7 @@
                 </table>
                 <div id="TemplateData" class="page-break">
                     <!-- view print code -->
+                    
                 </div>
             </div>
         </div>

@@ -46,7 +46,7 @@ export class InvoiceServiceService {
         let locDetails = await firstValueFrom(this.operationService.operationPost('generic/get', req));
         const shipment = {
           shipment: element?.docNo || "",
-          bookingdate: formatDate(element?.dKTDT || "", 'dd-MM-yy HH:mm'),
+          bookingdate: element?.dKTDT,
           location: element?.oRGN || "",
           state: locDetails.data[0].locState || "", // Assuming locState is the state you want to assign
           vehicleNo: element?.vEHNO || "",
@@ -148,6 +148,7 @@ export class InvoiceServiceService {
       "_id": `${this.storage.companyCode}-${data?.invoiceNo}` || "",
       "cID": this.storage.companyCode,
       "companyCode": this.storage.companyCode,
+      "dOCTYP": "Transaction",
       "bUSVRT": data?.tMode || "",
       "bILLNO": data?.invoiceNo,
       "bGNDT": data?.invoiceDate || new Date(),
@@ -608,4 +609,31 @@ export class InvoiceServiceService {
   }
   /*End*/
 
+  //#region Get All Bill List for the Customer doctype is Transaction
+  async getBillList() {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "cust_bill_headers",
+      filter: {
+        "cID": this.storage.companyCode,
+        "dOCTYP": "General",
+      }
+    };
+    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+    if (!res.data) {
+      return [];
+    }
+    return res.data.map((item) => {
+      return {
+        customerCodeAndName: `${item.cUST.cD} - ${item.cUST.nM}`,
+        billNo: item.bILLNO,
+        billDate: item.bGNDT,
+        billAmount: item.gROSSAMT,
+        billPendingAmount: item.cOL.bALAMT,
+        billStatus: item.bSTSNM,
+
+      }
+    });
+  }
+  //#endregion
 }

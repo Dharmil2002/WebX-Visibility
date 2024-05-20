@@ -27,7 +27,7 @@ import { DashboardCountPageComponent } from './tabs/dashboard-count-page/dashboa
 import { ArrivalDashboardPageComponent } from './tabs/arrival-dashboard-page/arrival-dashboard-page.component';
 import { SharedComponentsModule } from "../shared-components/shared-components.module";
 import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.component';
@@ -62,6 +62,9 @@ import { DeliveryMrResponseModalComponent } from './tabs/Delivery MR Generation/
 import { PrqBulkUploadComponent } from './tabs/prq-bulk-upload/prq-bulk-upload.component';
 import { HomePageComponent } from "./HomePage/home-page/home-page.component";
 import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-dashboard.component";
+import { AddHocRouteComponent } from './tabs/departure-dashboard-page/add-hoc-route/add-hoc-route.component';
+import { CreditnoteManagementComponent } from "../operation/creditnote-management/creditnote-management.component";
+import { GeneralInvoiceDashboardComponent } from "../finance/Customer General Invoice/general-invoice-dashboard/general-invoice-dashboard.component";
 
 @NgModule({
   declarations: [
@@ -98,6 +101,9 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     PrqBulkUploadComponent,
     HomePageComponent,
     ReportDashboardComponent,
+    AddHocRouteComponent,
+    CreditnoteManagementComponent,
+    GeneralInvoiceDashboardComponent
   ],
   imports: [
     CommonModule,
@@ -105,7 +111,7 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     chartjsModule,
     MatMenuModule,
     MatIconModule,
-    MatButtonModule,    
+    MatButtonModule,
     MatSnackBarModule,
     PerfectScrollbarModule,
     NgApexchartsModule,
@@ -129,6 +135,6 @@ import { ReportDashboardComponent } from "./HomePage/report-dashboard/report-das
     MatChipsModule,
     MatButtonToggleModule
   ],
-  providers: [SnackBarUtilityService, DatePipe, utilityService, FilterUtils]
+  providers: [SnackBarUtilityService, DatePipe, utilityService, FilterUtils, { provide: MatDialogRef, useValue: {} }]
 })
 export class DashboardModule { }

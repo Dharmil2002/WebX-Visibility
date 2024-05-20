@@ -174,7 +174,6 @@ export class ConsignmentControl {
           metaData: "Basic"
         },
       },
-
       {
         name: "destination",
         label: "Destination",

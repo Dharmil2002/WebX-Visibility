@@ -30,11 +30,8 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
-import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
-import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
-import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
@@ -173,11 +170,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private locationService: LocationService,
     private customerService: CustomerService,
     private addressService: AddressService,
-    private vehicleStatusService: VehicleStatusService,
     private docketService: DocketService,
     public dialog: MatDialog,
     private dcrService: DCRService,
-    private stateService: StateService,
     public snackBarUtilityService: SnackBarUtilityService,
     private voucherServicesService: VoucherServicesService,
   ) {
@@ -890,7 +885,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   fillInvoice(data: any) {
 
     if (data.label.label === "Remove") {
-      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      this.tableData = this.tableData.filter((x) => x.invoiceNumber !== data.data.invoiceNumber);
     } else {
       const atLeastOneValuePresent = Object.keys(this.invoiceForm.controls)
         .some(key => {
@@ -951,7 +946,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
     //this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
     // Filter the invoiceData to exclude the entry with the provided data ID
-    this.tableData = this.tableData.filter(x => x.id !== data.data.id);
+    this.tableData = this.tableData.filter(x => x.invoiceNumber !== data.data.invoiceNumber);
   }
   /*End*/
   SetInvoiceData() {
@@ -1185,6 +1180,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     this.consignmentForm.get('billingParty').updateValueAndValidity();
     this.consignmentForm.get('billingParty').setValue("");
+    this.getConsignor();
+    this.getConsignee();
   }
   /*end*/
   async docketValidation() {
@@ -1373,7 +1370,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.isSubmit = true;
     const data = { ...this.consignmentForm.getRawValue(), ...this.freightForm.getRawValue() }
     const tableData = this.tableData
-    data['iSSCAN']=  this.rules.find((x)=>x.rULEID=="SCAN" && x.aCTIVE)?.vAL == "Y";
+    data['iSSCAN'] = this.rules.find((x) => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y";
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
     data['pkgsTypeName'] = this.pkgsType.find(x => x.value == data?.pkgsType)?.name ?? '';
     data['rsktyName'] = this.riskType.find(x => x.value == data?.risk)?.name ?? '';
@@ -2033,55 +2030,57 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           "TDSApplicable": false,
           "narration": `When paid docket ${DocketNo} generated `
         },
-        {
+        ];
+        if (GSTAmount > 0) {
+          VoucherlineitemList.push({
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['SGST'].LeadgerCode,
-          "accName": `${ledgerInfo['SGST'].LeadgerName}`,
-          "accCategory": ledgerInfo['SGST'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": 0,
-          "credit": ConvertToNumber(GSTAmount / 2, 2),
-          "GSTRate": 6,
-          "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
-          "Total": ConvertToNumber(GSTAmount / 2, 2),
-          "TDSApplicable": false,
-          "narration": `When paid docket ${DocketNo} generated `
-        },
-        {
+            "companyCode": this.storage.companyCode,
+            "voucherNo": "",
+            "transCode": VoucherInstanceType.CNoteBooking,
+            "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+            "voucherCode": VoucherType.JournalVoucher,
+            "voucherType": VoucherType[VoucherType.JournalVoucher],
+            "transDate": new Date(),
+            "finYear": financialYear,
+            "branch": this.storage.branch,
+            "accCode": ledgerInfo['SGST'].LeadgerCode,
+            "accName": `${ledgerInfo['SGST'].LeadgerName}`,
+            "accCategory": ledgerInfo['SGST'].LeadgerCategory,
+            "sacCode": "",
+            "sacName": "",
+            "debit": 0,
+            "credit": ConvertToNumber(GSTAmount / 2, 2),
+            "GSTRate": 6,
+            "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
+            "Total": ConvertToNumber(GSTAmount / 2, 2),
+            "TDSApplicable": false,
+            "narration": `When paid docket ${DocketNo} generated `
+          });
+          VoucherlineitemList.push({
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['CGST'].LeadgerCode,
-          "accName": `${ledgerInfo['CGST'].LeadgerName}`,
-          "accCategory": ledgerInfo['CGST'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": 0,
-          "credit": ConvertToNumber(GSTAmount / 2, 2),
-          "GSTRate": 6,
-          "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
-          "Total": ConvertToNumber(GSTAmount / 2, 2),
-          "TDSApplicable": false,
-          "narration": `When paid docket ${DocketNo} generated `
-        }];
-
+            "companyCode": this.storage.companyCode,
+            "voucherNo": "",
+            "transCode": VoucherInstanceType.CNoteBooking,
+            "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+            "voucherCode": VoucherType.JournalVoucher,
+            "voucherType": VoucherType[VoucherType.JournalVoucher],
+            "transDate": new Date(),
+            "finYear": financialYear,
+            "branch": this.storage.branch,
+            "accCode": ledgerInfo['CGST'].LeadgerCode,
+            "accName": `${ledgerInfo['CGST'].LeadgerName}`,
+            "accCategory": ledgerInfo['CGST'].LeadgerCategory,
+            "sacCode": "",
+            "sacName": "",
+            "debit": 0,
+            "credit": ConvertToNumber(GSTAmount / 2, 2),
+            "GSTRate": 6,
+            "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
+            "Total": ConvertToNumber(GSTAmount / 2, 2),
+            "TDSApplicable": false,
+            "narration": `When paid docket ${DocketNo} generated `
+          });
+        }
         this.VoucherRequestModel.details = VoucherlineitemList
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
@@ -2121,22 +2120,24 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                   "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
                   "amount": ConvertToNumber(TotalAmount - GSTAmount, 2),
                   "narration": `When paid docket ${DocketNo} generated `
-                },
-                {
+                }]
+              };
+              if (GSTAmount > 0) {
+                reqBody.credit.push({
                   "accCode": ledgerInfo['SGST'].LeadgerCode,
                   "accName": ledgerInfo['SGST'].LeadgerName,
                   "accCategory": ledgerInfo['SGST'].LeadgerCategory,
                   "amount": ConvertToNumber(GSTAmount / 2, 2),
                   "narration": `When paid docket ${DocketNo} generated `
-                },
-                {
+                });
+                reqBody.credit.push({
                   "accCode": ledgerInfo['CGST'].LeadgerCode,
                   "accName": ledgerInfo['CGST'].LeadgerName,
                   "accCategory": ledgerInfo['CGST'].LeadgerCategory,
                   "amount": ConvertToNumber(GSTAmount / 2, 2),
                   "narration": `When paid docket ${DocketNo} generated `
-                }]
-              };
+                });
+              }
 
               this.voucherServicesService
                 .FinancePost("fin/account/posting", reqBody)

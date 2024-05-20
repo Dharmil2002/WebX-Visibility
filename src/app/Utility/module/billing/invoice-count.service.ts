@@ -222,5 +222,41 @@ export class InvoiceCountService {
       console.error("An error occurred:", error);
     }
   }
+
+  async getCreditNoteDashboardData() {
+    try {
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "cd_note_header",
+        filter: {
+          tYP: "C"
+        },
+        filters: [{
+          D$group: {
+            _id: null,
+            count: { D$sum: 1 }
+          }
+
+        },
+        {
+          D$project: {
+            _id: 0,
+            count: 1
+          }
+        }
+        ]
+      }
+      const res = await firstValueFrom(this.operationService.operationPost('generic/query', req));
+      if (res.data.length > 0) {
+        // Extract the count from the response data
+        return res.data[0].count;
+      }
+
+      return 0;
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+
+  }
   //#endregion
 }

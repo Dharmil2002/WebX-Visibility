@@ -20,29 +20,28 @@
                     <ng-template mat-tab-label>
                         {{docCalledAs.Docket}} Stock
                     </ng-template>
-                    <app-stocks (CurrentIndex)="GetSelectedIndex($event)" 
-                        [selectedIndex]="1"></app-stocks>
+                    <app-stocks (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="1"></app-stocks>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('Arrivals')" label="Arrivals">
                     <ng-template mat-tab-label>
                         Arrivals
                     </ng-template>
-                    <app-arrival-dashboard-page (CurrentIndex)="GetSelectedIndex($event)" 
-                        [selectedIndex]="2" *ngIf="tabName === 'Arrivals'"></app-arrival-dashboard-page>
+                    <app-arrival-dashboard-page (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="2"
+                        *ngIf="tabName === 'Arrivals'"></app-arrival-dashboard-page>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('Departures')" label="Departures">
                     <ng-template mat-tab-label>
                         Departures
                     </ng-template>
-                    <app-departure-dashboard-page (CurrentIndex)="GetSelectedIndex($event)"
-                        [selectedIndex]="3" *ngIf="tabName === 'Departures'"></app-departure-dashboard-page>
+                    <app-departure-dashboard-page (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="3"
+                        *ngIf="tabName === 'Departures'"></app-departure-dashboard-page>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('Delivery')" label="Delivery">
                     <ng-template mat-tab-label>
                         Delivery
                     </ng-template>
-                    <app-pickup-delivery-planner (CurrentIndex)="GetSelectedIndex($event)"
-                        [selectedIndex]="4" *ngIf="tabName === 'Delivery'"></app-pickup-delivery-planner>
+                    <app-pickup-delivery-planner (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="4"
+                        *ngIf="tabName === 'Delivery'"></app-pickup-delivery-planner>
                 </mat-tab>
                 <!-- <mat-tab>
                               <ng-template mat-tab-label>
@@ -61,7 +60,7 @@
                         PRQ Summary
                     </ng-template>
                     <app-prq-summary-page (CurrentIndex)="GetSelectedIndex($event)"
-                        [selectedIndex]="6" ></app-prq-summary-page>
+                        [selectedIndex]="6"></app-prq-summary-page>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('docket')" label="docket">
                     <ng-template mat-tab-label>
@@ -86,7 +85,7 @@
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('Rake')" label="Rake">
                     <ng-template mat-tab-label>
-                        Rake Summary 
+                        Rake Summary
                     </ng-template>
                     <app-rake-update (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Rake'"
                         [selectedIndex]="10"></app-rake-update>
@@ -119,6 +118,20 @@
                     <app-invoice-management (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Management​'"
                         [selectedIndex]="14"></app-invoice-management>
                 </mat-tab>
+                <mat-tab *ngIf=" hasPermission('GeneralInvoice')" label="GeneralInvoice">
+                    <ng-template mat-tab-label>
+                        General Invoice
+                    </ng-template>
+                    <app-general-invoice-dashboard (CurrentIndex)="GetSelectedIndex($event)"
+                        *ngIf="tabName === 'GeneralInvoice'" [selectedIndex]="15"></app-general-invoice-dashboard>
+                </mat-tab>
+                <mat-tab *ngIf=" hasPermission('creditNote')" label="creditNoteManagement​">
+                    <ng-template mat-tab-label>
+                        Credit Note
+                    </ng-template>
+                    <app-creditnote-management (CurrentIndex)="GetSelectedIndex($event)"
+                        *ngIf="tabName === 'creditNoteManagement​'" [selectedIndex]="16"></app-creditnote-management>
+                </mat-tab>
                 <!-- <mat-tab *ngIf=" hasPermission('invoiceBilling')" label="Contracts">
                     <ng-template mat-tab-label>
                         Customer Contracts
@@ -137,7 +150,7 @@
                     <ng-template mat-tab-label>
                         Manual Voucher
                     </ng-template>
-                    <app-manual-voucher (CurrentIndex)="GetSelectedIndex($event)" 
+                    <app-manual-voucher (CurrentIndex)="GetSelectedIndex($event)"
                         [selectedIndex]="17"></app-manual-voucher>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('BankReconciliation')" label="BankReconciliation">
@@ -161,7 +174,7 @@
                     <app-analytics (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Analytics'"
                         [selectedIndex]="20"></app-analytics>
                 </mat-tab>
-              
+
             </mat-tab-group>
         </div>
         <!-- </div>

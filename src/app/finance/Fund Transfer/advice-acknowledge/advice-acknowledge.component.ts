@@ -148,7 +148,7 @@ export class AdviceAcknowledgeComponent implements OnInit {
         this.tableData = result.map((x, index) => ({
           SrNo: index + 1,
           docNo: x.docNo,
-          eNTDT: formatDate(x.eNTDT, "dd MMM yyyy HH:mm:ss"),
+          eNTDT: x.eNTDT,
           rBRANCH: x.rBRANCH,
           eNTLOC: x.eNTLOC,
           aMT: x.aMT,

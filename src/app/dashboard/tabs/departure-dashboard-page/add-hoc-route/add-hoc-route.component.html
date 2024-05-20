@@ -7,7 +7,7 @@
 <form [formGroup]="addHocForm">
     <app-form-webxpress [form]="addHocForm" [FormTitle]="'Basis Detail'" [formData]="jsonAddHocControl"
       (functionCallEmitter)="functionCallHandler($event)"  [EventButton]="addHocForm.valid ? EventButton : ''" [showSaveAndCancelButton]="false"
-      (callFunction)="functionCallHandler($event)" [className]="className">
+      (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
   </form>
 

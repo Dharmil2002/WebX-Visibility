@@ -225,13 +225,10 @@ const shipData = [
   /*below is the function for add Hoc routes*/
   addHocRoute() {
     const dialogref = this.dialog.open(AddHocRouteComponent, {
-      width: "60%",
-      disableClose: true,
-      position: {
-        top: "20px",
-        bottom: "20px",
-      },
-      height:'70%'
+      width: "70%",
+      height: "90%",
+      disableClose: true
+    
     });
     dialogref.afterClosed().subscribe((result) => {
       this.getdepartureDetail();

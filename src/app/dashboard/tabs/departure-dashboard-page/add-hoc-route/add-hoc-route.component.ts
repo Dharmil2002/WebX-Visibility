@@ -114,6 +114,18 @@ export class AddHocRouteComponent implements OnInit {
     }
   }
   /*End*/
+  /*below is a function for the check the  route first loc is current or not*/
+  getlocationValidation() {
+    const loc = this.addHocForm.controls.loc.value.value;
+    const sameLocation = loc && loc === this.storage.branch;
+    const controls = ['distance', 'transitHrs'];
+    controls.forEach(control => {
+      this.addHocForm.controls[control].setValue(0);
+      this.addHocForm.controls[control][sameLocation ? 'disable' : 'enable']();
+    });
+  }
+  
+  /*End*/
   async save() {
     const controls = this.addHocForm.getRawValue();
     const routeMode = this.products.find((x) => x.value == controls.routeMode)?.name || "";

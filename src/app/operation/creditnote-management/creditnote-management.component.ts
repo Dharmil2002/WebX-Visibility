@@ -229,7 +229,7 @@ export class CreditnoteManagementComponent implements OnInit {
       companyCode: this.storage.companyCode,
       collectionName: "cd_note_details",
       filter: {
-        TYP: "C"
+        tYP: "C"
       }
     };
     this.DataResponseHeader1 = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataDetails));

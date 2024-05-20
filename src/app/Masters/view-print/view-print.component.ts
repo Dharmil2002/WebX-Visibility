@@ -211,7 +211,7 @@ export class ViewPrintComponent implements OnInit {
         name: "DRS View-Print",
         partyCode: "CONSRAJ22",
         viewName: "drs",
-      }
+      },
     ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {

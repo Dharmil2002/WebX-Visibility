@@ -54,7 +54,7 @@ export class CommonViewPrintComponent implements OnInit {
       DocNo: this.templateBody.DocNo,
     };
     const Res = await this.masterService
-      .masterPost("viewprint/View", req)
+      .masterPost("viewprint/ViewV2", req)
       .toPromise();
     if (Res.success) {
       this.JsonData = Res.data.jsonData;

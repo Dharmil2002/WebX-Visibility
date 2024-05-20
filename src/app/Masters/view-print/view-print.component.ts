@@ -155,12 +155,27 @@ export class ViewPrintComponent implements OnInit {
       {
         name: "THC View-Print",
         partyCode: "CONSRAJ19",
+        viewName: "thc1",
+      },
+      {
+        name: "THC View-Print",
+        partyCode: "CONSRAJ19",
         viewName: "thc",
       },
       {
         name: "LoadingSheet View-Print",
         partyCode: "CONSRAJT26",
+        viewName: "LS1",
+      },
+      {
+        name: "LoadingSheet View-Print",
+        partyCode: "CONSRAJT26",
         viewName: "loadingSheet",
+      },
+      {
+        name: "Manifest View-Print",
+        partyCode: "CONSRAJ24",
+        viewName: "MF1",
       },
       {
         name: "Manifest View-Print",
@@ -192,6 +207,11 @@ export class ViewPrintComponent implements OnInit {
         partyCode: "CUST00029",
         viewName: "Voucher",
       },
+      {
+        name: "DRS View-Print",
+        partyCode: "CONSRAJ22",
+        viewName: "drs",
+      }
     ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {

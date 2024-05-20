@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
@@ -13,7 +14,8 @@ export class CustInvoiceRegService {
 
   async getcustInvRegReportDetail(data) {
     let matchQuery = {
-      D$and: [
+      ...(data.docNo != "" ? { bILLNO: { D$eq: data.docNo } }:
+      {D$and: [
         { bGNDT: { D$gte: data.startValue } }, // Convert start date to ISO format
         { bGNDT: { D$lte: data.endValue } }, // Bill date less than or equal to end date
         {
@@ -33,7 +35,8 @@ export class CustInvoiceRegService {
           ? [{ D$expr: { D$in: ["$voucher_trans_details.sCOD", data.sac] } }]
           : []),
         ...[{ bLOC: { D$in: data.branch } }],
-      ],
+      ]}
+      ),
     };
     const reqBody = {
       companyCode: this.storage.companyCode,
@@ -135,26 +138,6 @@ export class CustInvoiceRegService {
           },
         },
         {
-          D$unwind: {
-            path: "$cd_note_details",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          D$lookup: {
-            from: "dockets",
-            localField: "cust_bill_details.dKTNO",
-            foreignField: "dKTNO",
-            as: "dockets",
-          },
-        },
-        {
-          D$unwind: {
-            path: "$dockets",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
           D$project: {
             bILLNO: {
               D$ifNull: ["$bILLNO", ""],
@@ -201,7 +184,7 @@ export class CustInvoiceRegService {
               D$ifNull: ["$gST.rATE", ""],
             },
             gROSSAMT: {
-              D$ifNull: ["$gST.gROSSAMT", ""],
+              D$ifNull: ["$gROSSAMT", ""],
             },
             aMT: {
               D$ifNull: ["$gST.iGST", ""],
@@ -222,7 +205,7 @@ export class CustInvoiceRegService {
               D$ifNull: ["$dKTTOT", ""],
             },
             cAMT: {
-              D$ifNull: ["$cOL.cAMT", ""],
+              D$ifNull: ["$cOL.aMT", ""],
             },
             bALAMT: {
               D$ifNull: ["$cOL.bALAMT", ""],
@@ -252,7 +235,7 @@ export class CustInvoiceRegService {
               D$dateToString: {
                 format: "%Y-%m-%d %H:%M",
                 date: {
-                  D$add: [{ D$toDate: "$dTM" }, 86400000],
+                  D$add: [{ D$toDate: "$cust_bill_collection.dTM" }, 86400000],
                 },
               },
             },
@@ -263,12 +246,12 @@ export class CustInvoiceRegService {
               D$dateToString: {
                 format: "%Y-%m-%d %H:%M",
                 date: {
-                  D$add: [{ D$toDate: "$cust_bill_collection.nTDT" }, 86400000],
+                  D$add: [{ D$toDate: "$cd_note_header.nTDT" }, 86400000],
                 },
               },
             },
             gTEXMT: {
-              D$ifNull: ["$gEN.eXMT", ""],
+              D$ifNull: ["$eXMT", ""],
             },
             geNTBY: {
               D$ifNull: ["$eNTBY", ""],
@@ -277,7 +260,10 @@ export class CustInvoiceRegService {
               D$dateToString: {
                 format: "%Y-%m-%d %H:%M",
                 date: {
-                  D$add: [{ D$toDate: "$cust_bill_collection.eNTDT" }, 86400000],
+                  D$add: [
+                    { D$toDate: "$cust_bill_collection.eNTDT" },
+                    86400000,
+                  ],
                 },
               },
             },
@@ -285,12 +271,7 @@ export class CustInvoiceRegService {
               D$ifNull: ["$sUB.tO", ""],
             },
             sDTM: {
-              D$dateToString: {
-                format: "%Y-%m-%d %H:%M",
-                date: {
-                  D$add: [{ D$toDate: "$sUB.dTM" }, 86400000],
-                },
-              },
+              D$ifNull: ["$sUB.dTM", ""],
             },
             aBY: {
               D$ifNull: ["$aPR.aBY", ""],
@@ -310,7 +291,10 @@ export class CustInvoiceRegService {
               D$dateToString: {
                 format: "%Y-%m-%d %H:%M",
                 date: {
-                  D$add: [{ D$toDate: "$cust_bill_collection.eNTDT" }, 86400000],
+                  D$add: [
+                    { D$toDate: "$cust_bill_collection.eNTDT" },
+                    86400000,
+                  ],
                 },
               },
             },
@@ -337,6 +321,7 @@ export class CustInvoiceRegService {
     );
     const details = res.data.map((item) => ({
       ...item,
+      sDTM : item.sDTM ? moment(item.sDTM).format("DD MMM YY HH:MM") : "",
       partyType: item.eXMT ? "Registered" : "UnRegistered",
     }));
 

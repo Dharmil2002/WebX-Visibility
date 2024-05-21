@@ -99,7 +99,7 @@ export class AddUserMasterComponent implements OnInit {
           items: ["Master"],
           active: "Add User",
           generatecontrol: true,
-          toggle: false
+          toggle: true
         },
       ];
       this.userTable = new UserMaster({});
@@ -344,7 +344,7 @@ export class AddUserMasterComponent implements OnInit {
             element.type = "text";
           }
         });
-        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9]{0,25}$")]);
+        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9 ]{0,25}$")]);
         break;
       case "Customer":
       case "Business associate":
@@ -362,9 +362,10 @@ export class AddUserMasterComponent implements OnInit {
             element.type = "text";
           }
         });
-        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9]{0,25}$")]);
+        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9 ]{0,25}$")]);
         break;
     }
+
     this.userTableForm.controls["name"].updateValueAndValidity();
     if (this.isUpdate) {
       if (userType == "Customer" && name) {
@@ -376,6 +377,7 @@ export class AddUserMasterComponent implements OnInit {
     }
     this.getDropValue();
   }
+
   async getDropValue() {
     const userType = this.userTableForm.controls["userType"].value?.name || "";
     this.filter.Filter(
@@ -400,9 +402,9 @@ export class AddUserMasterComponent implements OnInit {
     this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
     this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
     //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
-    const division = this.userTableForm.value.division.map(
+    const division = this.userTableForm.value.division ? this.userTableForm.value.division.map(
       (item: any) => item.name
-    );
+    ) : [];
     this.userTableForm.controls["multiDivisionAccess"].setValue(division);
 
     const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map(

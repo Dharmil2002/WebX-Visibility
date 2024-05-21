@@ -19,13 +19,13 @@ import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
   templateUrl: "./add-account.component.html",
 })
 export class AddAccountComponent implements OnInit {
-  breadScrums = [
-    {
-      title: "Ledger Master",
-      items: ["Home"],
-      active: "Ledger Master",
-    },
-  ];
+  // breadScrums = [
+  //   {
+  //     title: "Ledger Master",
+  //     items: ["Home"],
+  //     active: "Ledger Master",
+  //   },
+  // ];
   jsonControlAccountArray: any;
   AccountForm: any;
   GroupCodeCode: any;
@@ -70,6 +70,7 @@ export class AddAccountComponent implements OnInit {
   BalanceSheetStatus: any;
   BalanceSheetCode: any;
   tdsData: any;
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -79,9 +80,27 @@ export class AddAccountComponent implements OnInit {
     private storage: StorageService
   ) {
     this.CompanyCode = this.storage.companyCode;
+    this.breadScrums = [
+      {
+        title: "Ledger Master",
+        items: ["Home"],
+        active: "Ledger Master",
+        generatecontrol: true,
+        toggle: false
+      },
+    ];
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
+      this.breadScrums = [
+        {
+          title: "Ledger Master",
+          items: ["Home"],
+          active: "Ledger Master",
+          generatecontrol: true,
+          toggle: this.UpdateData.iSSYS
+        },
+      ];
       this.FormTitle = "Edit Ledger";
       this.backPath = "/Masters/AccountMaster/AccountMasterList";
     }
@@ -123,9 +142,9 @@ export class AddAccountComponent implements OnInit {
         this.UpdateData.aCNM
       );
       this.AccountForm.controls["AccountCode"].setValue(this.UpdateData.aCCD);
-      this.AccountForm.controls["ActiveFlag"].setValue(
-        this.UpdateData.iSSYS == 0 ? false : true
-      );
+      // this.AccountForm.controls["ActiveFlag"].setValue(
+      //   this.UpdateData.iSSYS == 0 ? false : true
+      // );
       this.AccountForm.controls["isTDSapplicable"].setValue(
         this.UpdateData.isTDS == 0 ? false : true
       );

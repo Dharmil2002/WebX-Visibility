@@ -76,7 +76,7 @@ export class UserControl {
         name: "name",
         label: "User Name",
         placeholder: "Enter User Name",
-        type: "dropdown",
+        type: "text",
         value: UserTable.name,
         generatecontrol: true,
         disable: false,
@@ -408,10 +408,10 @@ export class UserControl {
         type: "",
         value: "",
         Validations: [
-          {
-            name: "required",
-            message: "Multi Division Access is Required...!",
-          },
+          // {
+          //   name: "required",
+          //   message: "Multi Division Access is Required...!",
+          // },
           {
             name: "invalidAutocompleteObject",
             message: "Choose proper value",

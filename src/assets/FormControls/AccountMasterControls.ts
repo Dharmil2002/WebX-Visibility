@@ -296,7 +296,7 @@ export class AccountMasterControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable:false,//isUpdate ? true : false,
+        disable: false,//isUpdate ? true : false,
         Validations: [
           {
             name: "required",
@@ -337,7 +337,7 @@ export class AccountMasterControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable:false,//isUpdate ? true : false,
+        disable: false,//isUpdate ? true : false,
         Validations: [
           {
             name: "required",
@@ -358,16 +358,7 @@ export class AccountMasterControls {
         //   onOptionSelect: "getGroupCodeDropdown",
         // },
       },
-      {
-        name: "ActiveFlag",
-        label: "Active Flag",
-        placeholder: "",
-        type: "toggle",
-        value: false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+     
       // {
       //   name: "LocationsDrop",
       //   label: "Locations",
@@ -407,6 +398,16 @@ export class AccountMasterControls {
         disable: false,
         Validations: [],
         functions: {},
+      },
+      {
+        name: "ActiveFlag",
+        label: "Active Flag",
+        placeholder: "",
+        type: "toggle",
+        value: false,
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
       },
     ];
 

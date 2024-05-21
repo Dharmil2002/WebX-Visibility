@@ -255,7 +255,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
           Swal.close();
         }, 1000);
         // Assuming exportAsExcelFile is a function that exports data to Excel
-        // this.exportService.exportAsCSV(data, `Customer_Invoice_Register_Report-${timeString}`, this.CSVHeader);
+        this.exportService.exportAsCSV(data, `Customer_Invoice_Register_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);
       }

@@ -68,12 +68,6 @@ export class CustInvoiceRegService {
           },
         },
         {
-          D$unwind: {
-            path: "$cust_bill_details",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
           D$lookup: {
             from: "cust_bill_collection",
             localField: "bILLNO",

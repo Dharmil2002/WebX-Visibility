@@ -11,6 +11,7 @@ import { columnHeader, generateRouteCode, staticField } from './route-location-u
 import { firstValueFrom } from 'rxjs';
 import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 
 @Component({
   selector: 'app-route-master-location-add',
@@ -23,7 +24,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
   jsonControlArray: any;
   submit = 'save';
   routeMasterLocationFormControls: RouteLocationControl;
-  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: boolean; }[];
   controlLoc: any;
   controlLocStatus: any;
   tableLoad: boolean = true;
@@ -62,12 +63,13 @@ export class RouteMasterLocationAddComponent implements OnInit {
   branchDet: any;
 
   constructor
-  (private fb: UntypedFormBuilder,
-   private route: Router,
-   private masterService: MasterService,
-   private filter: FilterUtils,
-   private storage:StorageService
-  ) {
+    (private fb: UntypedFormBuilder,
+      private route: Router,
+      private masterService: MasterService,
+      private filter: FilterUtils,
+      private storage: StorageService,
+      private routeLocation: RouteLocationService
+    ) {
     this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
@@ -116,8 +118,17 @@ export class RouteMasterLocationAddComponent implements OnInit {
     this.initializeRouteFormControl();
     this.getAllMastersData();
     this.backPath = "/Masters/RouteLocationWise/RouteList";
+    this.toggleControls(true);
   }
-
+  getlocationValidation() {
+    const loc = this.RouteDetailTableForm.controls.loccd.value.value;
+    if (loc && loc == this.storage.branch) {
+      this.toggleControls(false);
+    }
+    else {
+      this.toggleControls(true);
+    }
+  }
   intializeFormControls() {
     this.routeMasterLocationFormControls = new RouteLocationControl(this.data);
     this.jsonControlArray = this.routeMasterLocationFormControls.getFormControls();
@@ -136,6 +147,11 @@ export class RouteMasterLocationAddComponent implements OnInit {
     this.routeMasterLocationForm.controls["routeCat"].setValue(this.data?.routeCat);
     this.routeMasterLocationForm.controls["routeMode"].setValue(this.data?.routeMode);
     this.routeMasterLocationForm.controls["scheduleType"].setValue(this.data?.scheduleType);
+    if (!this.isUpdate) {
+      this.breadScrums[0].toggle = true;
+      this.onToggleChange(true);
+    }
+
   }
 
   initializeRouteFormControl() {
@@ -167,7 +183,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     try {
       let locationReq = {
         companyCode: this.companyCode,
-        filter: {},
+        filter: { companyCode: this.storage.companyCode },
         collectionName: "location_detail",
       };
       const locationRes = await firstValueFrom(this.masterService
@@ -252,15 +268,15 @@ export class RouteMasterLocationAddComponent implements OnInit {
     // Prepare the new row data
     const Body = {
       loccd: this.RouteDetailTableForm.value.loccd.value,
-      distKm: this.RouteDetailTableForm.value.distKm,
-      trtimeHr: this.RouteDetailTableForm.value.trtimeHr,
-      sttimeHr: this.RouteDetailTableForm.value.sttimeHr,
-      speedLightVeh: this.RouteDetailTableForm.value.speedLightVeh,
-      speedHeavyVeh: this.RouteDetailTableForm.value.speedHeavyVeh,
-      nightDrivingRestricted: this.RouteDetailTableForm.value.nightDrivingRestricted,
-      restrictedHoursFrom: this.RouteDetailTableForm.value.restrictedHoursFrom,
-      restrictedHoursTo: this.RouteDetailTableForm.value.restrictedHoursTo,
-      actions: ["Edit", "Remove"],// Define actions available for the new row
+      distKm: this.RouteDetailTableForm.value?.distKm || 0,
+      trtimeHr: this.RouteDetailTableForm.value?.trtimeHr || 0,
+      sttimeHr: this.RouteDetailTableForm.value?.sttimeHr || 0,
+      speedLightVeh: this.RouteDetailTableForm.value?.speedLightVeh || 0,
+      speedHeavyVeh: this.RouteDetailTableForm.value?.speedHeavyVeh || 0,
+      nightDrivingRestricted: this.RouteDetailTableForm.value?.nightDrivingRestricted || 0,
+      restrictedHoursFrom: this.RouteDetailTableForm.value?.restrictedHoursFrom || 0,
+      restrictedHoursTo: this.RouteDetailTableForm.value?.restrictedHoursTo || 0,
+      actions: ["Edit", "Remove"]// Define actions available for the new row
     };
     // Add the new row data to the tableData
     this.tableData.push(Body);
@@ -276,7 +292,29 @@ export class RouteMasterLocationAddComponent implements OnInit {
     this.getAllMastersData();
   }
   //#endregion
+  /*below function is for disbled and enbled*/
+  toggleControls(enable: boolean) {
+    const controls = [
+      'distKm',
+      'trtimeHr',
+      'sttimeHr',
+      'speedHeavyVeh',
+      'nightDrivingRestricted',
+      'restrictedHoursFrom',
+      'restrictedHoursTo',
+      'speedLightVeh'
+    ];
 
+    controls.forEach(control => {
+      if (enable) {
+        this.RouteDetailTableForm.controls[control].enable();
+      } else {
+        this.RouteDetailTableForm.controls[control].disable();
+      }
+    });
+  }
+
+  /*End*/
   //#region
   async handleMenuItemClick(data) {
     // Trigger the fillTableValue function and pass the provided data
@@ -289,7 +327,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     // Checking if the operation is 'Remove'
     if (data.label.label === 'Remove') {
       // If the operation is 'Remove', filter the tableData to exclude the specified Srno
-      this.tableData = this.tableData.filter((x) => x.Srno !== data.data.Srno);
+      this.tableData = this.tableData.filter((x) => x.loccd !== data.data.loccd);
     }
     else {
       // Find the location data that matches the specified name or value
@@ -305,14 +343,14 @@ export class RouteMasterLocationAddComponent implements OnInit {
       this.RouteDetailTableForm.controls['restrictedHoursFrom'].setValue(data.data?.restrictedHoursFrom || "");
       this.RouteDetailTableForm.controls['restrictedHoursTo'].setValue(data.data?.restrictedHoursTo || "");
       // Filter the tableData to exclude the specified Srno
-      this.tableData = this.tableData.filter((x) => x.Srno !== data.data.Srno);
+      this.tableData = this.tableData.filter((x) => x.loccd !== data.data.loccd);
     }
   }
   //#endregion
 
   //#region 
   async save() {
-    if(this.tableData.length<=1){ 
+    if (this.tableData.length <= 1) {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -321,18 +359,43 @@ export class RouteMasterLocationAddComponent implements OnInit {
       });
       return false;
     }
-    const lastRt = await this.getListId();    
-    const lastCode = lastRt?.routeId || "R0000";
+    const lastRt = await this.getListId();
+    const lastCode = lastRt?.routeId || this.routeLocation.routeCodeMaster[this.routeMasterLocationForm.value.routeMode];
     if (this.isUpdate) {
       this.newRouteCode = this.data._id;
     } else {
       this.newRouteCode = nextKeyCode(lastCode);
     }
-    const routeCode=this.tableData.map((x) => x.loccd);
-    const routeName=routeCode.join('-');
+    const routeCode = this.tableData.map((x) => x.loccd);
+    const routeName = routeCode.join('-');
+    if (!this.isUpdate) {
+      const route = await this.routeLocation.getRouteOne({
+        D$or: [{
+          companyCode: this.storage.companyCode, routeName: routeName, routeMode:
+          {
+            D$regex: `^${this.routeMasterLocationForm.value.routeMode}$`,
+            D$options: "i"
+          },
+        }, {
+          cID: this.storage.companyCode, rUTNM: routeName, rUTMODE: {
+            D$regex: `^${this.routeMasterLocationForm.value.routeMode}$`,
+            D$options: "i"
+          }
+        }]
+      });
+      if (route) {
+        Swal.fire({
+          title: 'Route already exist',
+          text: 'Route already exist',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        return false;
+      }
+    }
     let Body = {
       ...this.routeMasterLocationForm.value,
-      cID:this.storage.companyCode,
+      cID: this.storage.companyCode,
       routeId: this.newRouteCode,
       routeMode: this.routeMasterLocationForm.value.routeMode,
       routeCat: this.routeMasterLocationForm.value.routeCat,
@@ -342,7 +405,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       routeType: this.routeMasterLocationForm.value.routeType,
       scheduleType: this.routeMasterLocationForm.value.scheduleType,
       isActive: this.routeMasterLocationForm.value.isActive,
-      routeName:routeName,
+      routeName: routeName,
       updatedBy: this.storage.userName,
       _id: this.newRouteCode,
       companyCode: this.storage.companyCode,
@@ -360,95 +423,57 @@ export class RouteMasterLocationAddComponent implements OnInit {
         };
       }),
     };
-  
-   let routeMasterLocWise ={
-      "_id":`${this.storage.companyCode}-${this.newRouteCode}`,
-      "cID": this.storage.companyCode,
-      "tHC": "",
-      "aDHOC":false,
-      "rUTCD":this.newRouteCode,
-      "rUTNM":routeName,
-      "sTM": new Date(),
-      "cTM": "",
-      "vEHNO": "",
-      "sTS": 1,
-      "sTSNM": "Route Added",
-      "cLOC":this.storage.branch,
-      "oRG":this.storage.branch,
-      "iSACT": this.routeMasterLocationForm.value.isActive,
-      "dEST": "",
-      "nXTLOC": "",
-      "nXTETA": ""
-    }
+
     // this.customerTableForm.removeControl("customerLocationsDrop")
     if (this.isUpdate) {
-      Body['mODDT']= new Date();
-      Body['mODLOC']=this.storage.branch;
-      Body['mODBY']=this.storage.userName;
-      Body["aDHOC"]=false;
-      routeMasterLocWise['mODDT']= new Date();
-      routeMasterLocWise['mODLOC']=this.storage.branch;
-      routeMasterLocWise['mODBY']=this.storage.userName;
-      delete routeMasterLocWise['_id'];
-      delete routeMasterLocWise['id'];
+      Body['mODDT'] = new Date();
+      Body['mODLOC'] = this.storage.branch;
+      Body['mODBY'] = this.storage.userName;
+      Body["aDHOC"] = false;
+
       delete Body['_id'];
       delete Body['id'];
       let req = {
         companyCode: this.companyCode,
         collectionName: "routeMasterLocWise",
-        filter: { routeId:  this.routeMasterLocationForm.value.routeId },
+        filter: { routeId: this.routeMasterLocationForm.value.routeId },
         update: Body,
       };
-      let reqloc = {
-        companyCode: this.companyCode,
-        collectionName: "trip_Route_Schedule",
-        filter: { rUTCD:  this.routeMasterLocationForm.value.routeId },
-        update: routeMasterLocWise,
-      };
-      const res= await firstValueFrom(this.masterService.masterPut("generic/update", req));
-      await firstValueFrom(this.masterService.masterPut("generic/update", reqloc));
-          this.route.navigateByUrl(
-            "/Masters/RouteLocationWise/RouteList"
-          );
-          if (res) {
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-          }
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      this.route.navigateByUrl(
+        "/Masters/RouteLocationWise/RouteList"
+      );
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+      }
     } else {
-      Body['eNTDT']= new Date();
-      Body['eNTLOC']=this.storage.branch;
-      Body['eNTBY']=this.storage.userName;
-      Body["aDHOC"]=false;
-      routeMasterLocWise['eNTDT']= new Date();
-      routeMasterLocWise['eNTLOC']=this.storage.branch;
-      routeMasterLocWise['eNTBY']=this.storage.userName;
+      Body['eNTDT'] = new Date();
+      Body['eNTLOC'] = this.storage.branch;
+      Body['eNTBY'] = this.storage.userName;
+      Body["aDHOC"] = false;
       let req = {
         companyCode: this.companyCode,
         collectionName: "routeMasterLocWise",
         data: Body,
       };
-      let reqloc = {
-        companyCode: this.companyCode,
-        collectionName: "trip_Route_Schedule",
-        data:routeMasterLocWise
-      };
-      const res=await firstValueFrom(this.masterService.masterPost("generic/create", req))
-      await firstValueFrom(this.masterService.masterPost("generic/create", reqloc))
-          if (res) {
-            this.route.navigateByUrl(
-              "/Masters/RouteLocationWise/RouteList"
-            );
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-          }
+      const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
+      if (res) {
+        this.route.navigateByUrl(
+          "/Masters/RouteLocationWise/RouteList"
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+      }
     }
   }
   //#endregion
@@ -475,8 +500,15 @@ export class RouteMasterLocationAddComponent implements OnInit {
   }
   async getListId() {
     try {
-      let query = { companyCode: this.companyCode };
-      const req = { companyCode: this.companyCode, collectionName: "routeMasterLocWise", filter: query, sorting: {routeId:-1} };
+      const route = this.routeLocation.routeCodeMaster[this.routeMasterLocationForm.value.routeMode];
+      let query = {
+        companyCode: this.companyCode, routeMode: this.routeMasterLocationForm.value.routeMode,
+        routeId: {
+          D$regex: `^${route.substr(0, 1)}`,
+          D$options: "i",
+        },
+      };
+      const req = { companyCode: this.companyCode, collectionName: "routeMasterLocWise", filter: query, sorting: { routeId: -1 } };
       const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
       return response?.data;
     } catch (error) {

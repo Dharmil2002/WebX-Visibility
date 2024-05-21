@@ -110,6 +110,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   isManual: boolean;
   dcrDetail = {};
   conLoc: boolean;
+  pageLoad: boolean;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -139,6 +140,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private clusterService: ClusterMasterService
   ) {
     super();
+
     this.DocCalledAs = controlPanel.DocCalledAs;
     this.breadscrums = [
       {
@@ -178,10 +180,27 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         ];
       }
     }
-    else
+    else{
       this.model.docketDetail = new DocketDetail({});
-
-    this.initializeFormControl();
+    }
+    const docketDetailsPromise = this.docketService.docketObjectMapping(this.model.docketDetail).then((res) => {
+      return res;  // Return the result for further chaining
+    });
+    docketDetailsPromise.then((docketDetails) => {
+      this.model.ConsignmentFormControls = new ConsignmentControl(docketDetails, this.DocCalledAs, this.generalService);
+      this.model.FreightFromControl = new FreightControl(docketDetails, this.generalService);
+      return Promise.all([
+        this.model.ConsignmentFormControls.applyFieldRules(this.storage.companyCode),
+        this.model.FreightFromControl.applyFieldRules(this.storage.companyCode)
+      ]);
+    }).then(() => {
+      this.initializeFormControl();
+    }).catch((error) => {
+      // Handle errors if any of the promises fail
+      console.error("An error occurred:", error);
+    });
+    
+    
   }
 
   ngOnInit(): void {
@@ -237,17 +256,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /* End*/
   //#region initializeFormControl
   async initializeFormControl() {
-    const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail);
-
+    
     // Create LocationFormControls instance to get form controls for different sections
-    this.model.ConsignmentFormControls = new ConsignmentControl(docketDetails, this.DocCalledAs);
-    this.model.FreightFromControl = new FreightControl(docketDetails);
-
     // Get form controls for Driver Details section
     this.jsonControlArrayBasic =
       this.model.ConsignmentFormControls.getConsignmentControlControls().filter(
         (x) => x.additionalData && x.additionalData.metaData === "Basic"
       );
+
     this.jsonControlArrayConsignor =
       this.model.ConsignmentFormControls.getConsignmentControlControls().filter(
         (x) => x.additionalData && x.additionalData.metaData === "consignor"
@@ -293,9 +309,13 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         value: this.model.prqData?.prqNo,
       });
     }
+    this.pageLoad=true;
     if (!this.isUpdate) {
       this.getRules();
     }
+    this.onRcmChange();
+    this.model.FreightTableForm.controls['gstAmount'].disable();
+    this.model.FreightTableForm.controls['gstChargedAmount'].disable();
   }
   //#endregion
   getContainerType(event) {
@@ -1222,12 +1242,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
   async autofillDropDown() {
-
     const docketDetails = await this.docketService.docketObjectMapping(this.model.docketDetail);
 
     this.model.docketDetail.invoiceDetails = await this.docketService.getDocketByDocNO(docketDetails.docketNumber, "docket_invoices");
     this.model.docketDetail.containerDetail = await this.docketService.getDocketByDocNO(docketDetails.docketNumber, "docket_containers");
-
+    this.model.consignmentTableForm.controls['docketNumber'].setValue(docketDetails?.docketNumber||"")
     const { controls } = this.model.consignmentTableForm;
 
     // Helper function to set form control values.
@@ -1277,6 +1296,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     // Bind table data after form update.
     this.bindTableData();
     this.model.FreightTableForm.controls["rcm"].setValue(docketDetails?.rcm || "");
+    this.onRcmChange();
   }
   async AddressDetails() {
     const billingParty = this.model.consignmentTableForm.controls["billingParty"]?.value.value || "";
@@ -1458,9 +1478,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async save() {
-
     this.isSubmit = true;
-    // Remove all form errors
     const tabcontrols = this.model.consignmentTableForm;
     tabcontrols.removeControl['test'];
     clearValidatorsAndValidate(tabcontrols);
@@ -1869,8 +1887,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       const filter = { "dKTNO": reverseDocketObjectMapping.docNo }
       await Promise.all([
         this.docketService.updateDocket(reverseDocketObjectMapping, reverseDocketObjectMapping.docNo),
-        this.docketService.updateManyDockets(invDet, filter, "docket_invoices"),
-        this.docketService.updateManyDockets(contDet, filter, "docket_containers"),
+        invDet && invDet.length>0?this.docketService.updateManyDockets(invDet, filter, "docket_invoices"):null,
+        contDet && contDet.length>0? this.docketService.updateManyDockets(contDet, filter, "docket_containers"):null,
         this.docketService.addEventData(docketDetails),
         this.docketService.updateOperationData(docketDetails),
       ]);
@@ -2734,6 +2752,22 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     }, "C-Note Booking Voucher Generating..!");
 
+  }
+  //Rcm changed that function will be call
+  onRcmChange() {
+    if (this.model.FreightTableForm.controls['rcm'].value == "Y") {
+     this.model.FreightTableForm.controls['gstAmount'].disable();
+     this.model.FreightTableForm.controls['gstChargedAmount'].disable();
+     this.model.FreightTableForm.controls['gstAmount'].setValue(0);
+     this.model.FreightTableForm.controls['gstChargedAmount'].setValue(0);
+
+      this.calculateFreight();
+    }
+    else {
+     this.model.FreightTableForm.controls['gstAmount'].enable();
+     this.model.FreightTableForm.controls['gstChargedAmount'].enable();
+      this.calculateFreight();
+    }
   }
 }
 

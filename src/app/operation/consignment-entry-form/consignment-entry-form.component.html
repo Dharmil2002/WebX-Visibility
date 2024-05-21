@@ -13,7 +13,7 @@
   </div>
   <!-- End -->
   <!--  Basic Detail-->
-  <div *ngIf="!ewayBill">
+  <div *ngIf="pageLoad">
     <form [formGroup]="model.consignmentTableForm">
       <app-form-webxpress [form]="model.consignmentTableForm" [FormTitle]="'Basic Detail'"
         [formData]="jsonControlArrayBasic" (functionCallEmitter)="functionCallHandler($event)"

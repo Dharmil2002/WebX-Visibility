@@ -1,8 +1,10 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { StoreKeys } from "src/app/config/myconstants";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
 import * as StorageService from "src/app/core/service/storage.service";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
+import { BaseControl } from "./base-control";
 
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
@@ -13,13 +15,14 @@ yesterday.setDate(today.getDate() - 1); // Set the date to one day before
 yesterday.setHours(23, 59, 59, 999);
 let minDate = yesterday; // Now, maxDate holds the date for yesterday at the end of the day
 
-export class ConsignmentControl {
+export class ConsignmentControl extends BaseControl {
   private ConsignmentControlArray: FormControls[];
   private containordetail: FormControls[];
   private invoiceDetail: FormControls[];
   private ewayBillDetail: FormControls[];
   private marketVehicle: FormControls[];
-  constructor(docketDetail, docCalledAs) {
+  constructor(docketDetail, docCalledAs,public generalService: GeneralService) {
+    super(generalService, "FTL", ["ConsignmentControl"]);
     this.ConsignmentControlArray = [
       {
         name: "docketNumber",label: `${docCalledAs.Docket} No`,
@@ -1217,9 +1220,11 @@ export class ConsignmentControl {
   }
 }
 
-export class FreightControl {
+export class FreightControl extends BaseControl {
   private FreightControlArray: FormControls[];
-  constructor(docketDetail: DocketDetail) {
+  
+  constructor(docketDetail: DocketDetail,public generalService: GeneralService) {
+    super(generalService, "FTL", ["FreightControl"]);
     this.FreightControlArray = [
       {
         name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'mobile-number',
@@ -1278,15 +1283,19 @@ export class FreightControl {
           name: "No",
           value: "N"
         }
-        ], Validations: [], generatecontrol: true, disable: false
+        ],
+        functions: {
+          onSelection: "onRcmChange"
+      },
+         Validations: [], generatecontrol: true, disable: false
       },
       {
         name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
-        value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false
       },
       {
         name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
-        value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false,
+        value: docketDetail?.gstChargedAmount||0, Validations: [], generatecontrol: true, disable: false,
         functions: {
           onChange: "calculateFreight"
         }

@@ -104,7 +104,7 @@ export class RouteLocationControl {
                     }
                 ],
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 }
             },
             {
@@ -152,7 +152,7 @@ export class RouteLocationControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: routeLocationData?.isActive,
+                value: routeLocationData?.isActive||true,
                 Validations: [],
                 generatecontrol: false, disable: false
             },
@@ -220,11 +220,12 @@ export class RouteLocationControl {
                     }
                 ],
                 functions: {
+                    onOptionSelect: "getlocationValidation"
                    // onModel: 'getLocation'
 
                 },
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 }
             },
             {
@@ -232,7 +233,7 @@ export class RouteLocationControl {
                 label: "Distance (In Km)",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.distKm,
+                value: routeLocationData?.distKm||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -251,7 +252,7 @@ export class RouteLocationControl {
                 label: "Transit (Hours)",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.trtimeHr,
+                value: routeLocationData?.trtimeHr||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [ {
@@ -265,7 +266,7 @@ export class RouteLocationControl {
                 label: "Stoppage (Hours)",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.sttimeHr,
+                value: routeLocationData?.sttimeHr||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [ {
@@ -279,7 +280,7 @@ export class RouteLocationControl {
                 label: "Speed-Light Veh.",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.speedLightVeh,
+                value: routeLocationData?.speedLightVeh||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [],
@@ -290,7 +291,7 @@ export class RouteLocationControl {
                 label: "Speed-Heavy Veh.",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.speedHeavyVeh,
+                value: routeLocationData?.speedHeavyVeh||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [],
@@ -301,7 +302,7 @@ export class RouteLocationControl {
                 label: "Night Driving Restricted",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.nightDrivingRestricted,
+                value: routeLocationData?.nightDrivingRestricted||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [],
@@ -312,7 +313,7 @@ export class RouteLocationControl {
                 label: "Restricted Hrs (From)",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.restrictedHoursFrom,
+                value: routeLocationData?.restrictedHoursFrom||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [],
@@ -323,7 +324,7 @@ export class RouteLocationControl {
                 label: "Restricted Hrs (To)",
                 placeholder: "",
                 type: "text",
-                value: routeLocationData?.restrictedHoursTo,
+                value: routeLocationData?.restrictedHoursTo||0,
                 generatecontrol: true,
                 disable: false,
                 Validations: [],

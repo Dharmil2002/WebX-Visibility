@@ -82,7 +82,6 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     STIN: "Party GSTN",
     bLOC: "Invoice Branch",
     gSTIN: "Generation GST No",
-    nRT: "Narration",
     lOC: "Invoice Submitted At",
     eXMT: "RCM",
     sCOD: "SAC Code",
@@ -227,6 +226,9 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
         const endDate = new Date(this.CustInvREGTableForm.controls.end.value);
         const startValue = moment(startDate).startOf('day').toDate();
         const endValue = moment(endDate).endOf('day').toDate();
+        console.log("startValue",startValue);
+        console.log("endValue",endValue);
+        
         const docNo = this.CustInvREGTableForm.value.dNO;
         const state = this.CustInvREGTableForm.value.gSTE.value;
         const status = this.CustInvREGTableForm.value.sTS.value;

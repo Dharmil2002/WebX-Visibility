@@ -110,12 +110,6 @@ export class CustInvoiceRegService {
           },
         },
         {
-          D$unwind: {
-            path: "$voucher_trans_details",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
           D$lookup: {
             from: "cd_note_header",
             localField: "bILLNO",
@@ -167,9 +161,6 @@ export class CustInvoiceRegService {
             },
             gSTIN: {
               D$ifNull: ["$gEN.gSTIN", ""],
-            },
-            nRT: {
-              D$ifNull: ["$nRT", ""],
             },
             lOC: {
               D$ifNull: ["$sUB.lOC", ""],
@@ -323,6 +314,7 @@ export class CustInvoiceRegService {
       ...item,
       sDTM : item.sDTM ? moment(item.sDTM).format("DD MMM YY HH:MM") : "",
       partyType: item.eXMT ? "Registered" : "UnRegistered",
+      dOCTYP: item?.dOCTYP || "Transaction",
     }));
 
     return details;

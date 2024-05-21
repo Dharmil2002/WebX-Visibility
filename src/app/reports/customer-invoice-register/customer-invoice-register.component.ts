@@ -226,9 +226,6 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
         const endDate = new Date(this.CustInvREGTableForm.controls.end.value);
         const startValue = moment(startDate).startOf('day').toDate();
         const endValue = moment(endDate).endOf('day').toDate();
-        console.log("startValue",startValue);
-        console.log("endValue",endValue);
-        
         const docNo = this.CustInvREGTableForm.value.dNO;
         const state = this.CustInvREGTableForm.value.gSTE.value;
         const status = this.CustInvREGTableForm.value.sTS.value;
@@ -258,7 +255,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
           Swal.close();
         }, 1000);
         // Assuming exportAsExcelFile is a function that exports data to Excel
-        this.exportService.exportAsCSV(data, `Customer_Invoice_Register_Report-${timeString}`, this.CSVHeader);
+        // this.exportService.exportAsCSV(data, `Customer_Invoice_Register_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);
       }

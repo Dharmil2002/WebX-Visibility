@@ -221,8 +221,6 @@ export class ApproveDebitNoteComponent implements OnInit {
   }
 
   async handleMenuItemClick(data) {
-    console.log(data)
-    debugger
     if (data.label.label == "Reject") {
       const req = {
         companyCode: this.storage.companyCode,
@@ -352,8 +350,6 @@ export class ApproveDebitNoteComponent implements OnInit {
           this.VoucherRequestModel.details = voucherlineItems;
           this.VoucherRequestModel.data = this.VoucherDataRequestModel;
           this.VoucherRequestModel.debitAgainstDocumentList = [];
-          console.log(this.VoucherRequestModel);
-          debugger
           firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
             let reqBody = {
               companyCode: this.storage.companyCode,

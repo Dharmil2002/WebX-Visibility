@@ -229,7 +229,7 @@ export class InvoiceCountService {
         companyCode: this.storage.companyCode,
         collectionName: "cd_note_header",
         filter: {
-          TYP: "C"
+          tYP: "C"
         },
         filters: [{
           D$group: {

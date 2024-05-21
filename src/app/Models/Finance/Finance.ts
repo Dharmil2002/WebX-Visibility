@@ -294,6 +294,7 @@ export class DNTDetDataRequestModel {
   mODDT: Date;
   mODLOC: string;
   mODBY: string;
+  remark: string;
 }
 
 export enum VoucherType {

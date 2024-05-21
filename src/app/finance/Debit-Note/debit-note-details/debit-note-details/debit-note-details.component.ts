@@ -208,7 +208,6 @@ export class DebitNoteDetailsComponent implements OnInit {
     //const isSelected = $event.filter((x) => x.isSelected == true);
     let totalAMT = 0, totalSAMT = 0, totalGSTAMT = 0, total = 0;
     // Calculate totals based on table data
-    console.log(this.dNoteData);
     this.dNoteData.forEach(item => {
       //if (item.isSelected) {
         totalAMT += parseFloat(item.dNAMT);
@@ -216,7 +215,6 @@ export class DebitNoteDetailsComponent implements OnInit {
         totalGSTAMT += parseFloat(item.tdsRevlAmt);
      // }
     });
-    console.log(this.dNoteData);
     // Update total amounts in the list
     this.TotalAmountList[0].count = totalAMT;
     this.TotalAmountList[1].count = totalSAMT;
@@ -305,7 +303,7 @@ export class DebitNoteDetailsComponent implements OnInit {
     const Body = {
       companyCode: this.storage.companyCode,
       collectionName: "General_master",
-      filter: { codeType: "CNTREMARK" },
+      filter: { codeType: "DNTREMARK" },
     };
 
     this.hsnReasonDataResponse = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
@@ -426,8 +424,8 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTDetDataRequestModel.eNTBY= this.storage.loginName,
         this.DNTDetDataRequestModel.mODDT= null,
         this.DNTDetDataRequestModel.mODLOC= "",
-        this.DNTDetDataRequestModel.mODBY= ""
-
+        this.DNTDetDataRequestModel.mODBY= "",
+        this.DNTDetDataRequestModel.remark= this.DebitNoteDetailsForm.value.Remarks,
 
         //Detasils data
         // Assuming this.dNoteData is an array of objects
@@ -510,7 +508,7 @@ export class DebitNoteDetailsComponent implements OnInit {
               Swal.fire({
                 icon: "success",
                 title: "Debit Note Created Successfully",
-                text: "Credit Note No: " + res?.data?.mainData + "Vendor Name:" + res?.data?.details.ops[0].pARTY.cD + ":" + res?.data?.details.ops[0].pARTY.nM,
+                text: "Debit Note No: " + res?.data?.mainData + "Vendor Name:" + res?.data?.details.ops[0].pARTY.cD + ":" + res?.data?.details.ops[0].pARTY.nM,
                 showConfirmButton: true,
               }).then((result) => {
                 if (result.isConfirmed) {

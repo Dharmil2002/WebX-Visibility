@@ -1133,13 +1133,18 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
 
         if (paybase == 'P01') {
-          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
-            0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
-
           Object.keys(gst).forEach(item => {
             Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,
               0, gst[item], VoucherDataRequestModel.transactionNumber));
           });
+
+          let totalGST = 0;
+          Object.keys(gst).forEach(item => {
+            totalGST += gst[item];
+          });
+
+          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
+            0, VoucherDataRequestModel.netPayable - totalGST, VoucherDataRequestModel.transactionNumber));
         }
         else {
 

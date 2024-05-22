@@ -13,6 +13,11 @@ export class RouteLocationService {
     "Air": "R7777"
 
   }
+  routeCodeMaster={
+      "ROAD": "R0000",
+      "RAIL": "T0000",
+      "AIR":"A0000"
+  }
   constructor(private masterService: MasterService, private storage: StorageService) { }
   //#region to get route dropdown
   async getRouteLocationDetail(): Promise<any[]> {

@@ -155,12 +155,27 @@ export class ViewPrintComponent implements OnInit {
       {
         name: "THC View-Print",
         partyCode: "CONSRAJ19",
+        viewName: "thc1",
+      },
+      {
+        name: "THC View-Print",
+        partyCode: "CONSRAJ19",
         viewName: "thc",
       },
       {
         name: "LoadingSheet View-Print",
         partyCode: "CONSRAJT26",
+        viewName: "LS1",
+      },
+      {
+        name: "LoadingSheet View-Print",
+        partyCode: "CONSRAJT26",
         viewName: "loadingSheet",
+      },
+      {
+        name: "Manifest View-Print",
+        partyCode: "CONSRAJ24",
+        viewName: "MF1",
       },
       {
         name: "Manifest View-Print",
@@ -193,14 +208,14 @@ export class ViewPrintComponent implements OnInit {
         viewName: "Voucher",
       },
       {
-        name: "Freight Invoice View-Print",
-        partyCode: "CG0214574K",
-        viewName: "BillInvoice",
+        name: "DRS View-Print",
+        partyCode: "CONSRAJ22",
+        viewName: "drs",
       },
       {
-        name: "General invoice View-Print",
-        partyCode: "CG0000174",
-        viewName: "BillInvoice",
+        name: "Credit Note View-Print",
+        partyCode: "CON0027",
+        viewName: "CreditNote",
       },
       {
         name: "Money Receipt View-Print",
@@ -208,9 +223,14 @@ export class ViewPrintComponent implements OnInit {
         viewName: "MoneyReceipt",
       },
       {
-        name: "Credit Note View-Print",
-        partyCode: "CON0027",
-        viewName: "CreditNote",
+        name: "General invoice View-Print",
+        partyCode: "CG0000174",
+        viewName: "BillInvoice",
+      },
+      {
+        name: "Freight Invoice View-Print",
+        partyCode: "CG0214574K",
+        viewName: "BillInvoice",
       },
     ]; 
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
@@ -219,7 +239,6 @@ export class ViewPrintComponent implements OnInit {
       partyCode: FindBillView?.partyCode,
       DocNo: docNo,
     };
-    console.log('req' ,req)
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");

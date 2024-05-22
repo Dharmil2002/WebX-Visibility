@@ -197,7 +197,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
     this.consigmentControls = new ConsignmentLtl(this.generalService);
-
     this.consigmentControls.applyFieldRules(this.storage.companyCode).then(() => {
       this.initializeFormControl();
 

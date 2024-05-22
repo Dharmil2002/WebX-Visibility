@@ -90,7 +90,7 @@ export class ProductControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate,
         Validations: [
           {
             name: "required",

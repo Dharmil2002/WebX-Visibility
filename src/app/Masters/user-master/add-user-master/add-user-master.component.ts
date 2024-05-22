@@ -56,6 +56,7 @@ export class AddUserMasterComponent implements OnInit {
   newUserCode: any;
   submit = 'Save';
   backPath: string;
+  usrNameStatus: any;
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
@@ -130,6 +131,10 @@ export class AddUserMasterComponent implements OnInit {
       multiDivisionAccess: {
         property: "division",
         statusProperty: "divisionStatus",
+      },
+      name: {
+        property: "name",
+        statusProperty: "usrNameStatus",
       },
     };
 
@@ -332,50 +337,57 @@ export class AddUserMasterComponent implements OnInit {
     }
   }
   onUserTypeChange() {
-    const name =this.userTableForm.controls["name"].value;
-    this.userTableForm.controls["name"].setValue("");
-    this.userTableForm.controls["name"].clearValidators();
-    this.userTableForm.controls["name"].updateValueAndValidity();
+    const nameControl = this.userTableForm.controls["name"];
     const userType = this.userTableForm.controls["userType"].value?.name || "";
-    switch (userType) {
-      case "Employee":
-        this.jsonControlUserArray.forEach(element => {
-          if (element.name == "name") {
+    const currentNameValue = nameControl.value;
+
+    // Reset the name control value and validators
+    nameControl.setValue("");
+    nameControl.clearValidators();
+
+    // Update jsonControlUserArray and set appropriate validators
+    this.jsonControlUserArray.forEach(element => {
+      if (element.name === "name") {
+        switch (userType) {
+          case "Employee":
             element.type = "text";
-          }
-        });
-        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9 ]{0,25}$")]);
-        break;
-      case "Customer":
-      case "Business associate":
-      case "Vendor":
-        this.jsonControlUserArray.forEach(element => {
-          if (element.name == "name") {
+            nameControl.setValidators([
+              Validators.required,
+              Validators.pattern("^[a-zA-Z0-9 ]{0,25}$")
+            ]);
+            break;
+          case "Customer":
+          case "Business associate":
+          case "Vendor":
             element.type = "dropdown";
-          }
-        });
-        this.userTableForm.controls["name"].setValidators([autocompleteObjectValidator()]);
-        break;
-      default:
-        this.jsonControlUserArray.forEach(element => {
-          if (element.name == "name") {
+            nameControl.setValidators([
+              Validators.required,
+              autocompleteObjectValidator()
+            ]);
+            break;
+          default:
             element.type = "text";
-          }
-        });
-        this.userTableForm.controls["name"].setValidators([Validators.pattern("^[a-zA-Z0-9 ]{0,25}$")]);
-        break;
+            nameControl.setValidators([
+              Validators.required,
+              Validators.pattern("^[a-zA-Z0-9 ]{0,25}$")
+            ]);
+            break;
+        }
+      }
+    });
+
+    // Update the form control value and validators
+    nameControl.updateValueAndValidity();
+
+    // Preserve and reformat the current name value appropriately
+    if (this.isUpdate && currentNameValue) {
+      if (userType === "Customer" || userType === "Vendor" || userType === "Business associate") {
+        nameControl.setValue({ name: currentNameValue, value: currentNameValue });
+      } else {
+        nameControl.setValue(currentNameValue);
+      }
     }
 
-    this.userTableForm.controls["name"].updateValueAndValidity();
-    if (this.isUpdate) {
-      if (userType == "Customer" && name) {
-        this.userTableForm.controls["name"].setValue(name);
-      }
-      else {
-        this.userTableForm.controls["name"].setValue({ name: name, value: name });
-      }
-    }
-    this.getDropValue();
   }
 
   async getDropValue() {
@@ -430,9 +442,9 @@ export class AddUserMasterComponent implements OnInit {
     if (this.isUpdate) {
       this.newUserCode = this.userTable.userId;
     } else {
-      if (['Customer','Vendor','Business associate'].includes(this.userTableForm.value.userType.name)) {
+      if (['Customer', 'Vendor', 'Business associate'].includes(this.userTableForm.value.userType.name)) {
         this.newUserCode = this.userTableForm.controls["name"].value?.value || "";
-        this.userTableForm.controls["name"].setValue(this.userTableForm.value.name?.name||"");
+        this.userTableForm.controls["name"].setValue(this.userTableForm.value.name?.name || "");
       }
       else {
         this.newUserCode = nextKeyCode(lastUserCode);

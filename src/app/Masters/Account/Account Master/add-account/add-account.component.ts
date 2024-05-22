@@ -639,4 +639,10 @@ export class AddAccountComponent implements OnInit {
       console.log("failed");
     }
   }
+  // Function to handle the toggle change event
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    // console.log("Toggle value :", event);
+    this.AccountForm.controls['ActiveFlag'].setValue(event);
+  }
 }

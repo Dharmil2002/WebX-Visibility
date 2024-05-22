@@ -76,7 +76,7 @@ export class UserControl {
         name: "name",
         label: "User Name",
         placeholder: "Enter User Name",
-        type: "text",
+        type: "dropdown",
         value: UserTable.name,
         generatecontrol: true,
         disable: false,

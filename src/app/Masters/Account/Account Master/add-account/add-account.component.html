@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
    <form [formGroup]="AccountForm">
       <app-form-webxpress [form]="AccountForm" [formData]="jsonControlAccountArray" [showSaveAndCancelButton]="true"
          [FormTitle]="FormTitle" [MatButton]="EventButton"  [className]="'col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2'"

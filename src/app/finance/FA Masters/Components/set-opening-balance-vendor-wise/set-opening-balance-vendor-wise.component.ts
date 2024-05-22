@@ -14,41 +14,61 @@ import Swal from 'sweetalert2';
 import moment from 'moment';
 import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { financialYear } from 'src/app/Utility/date/date-utils';
+import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
+import { chunkArray } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { stateFromApi } from 'src/app/operation/pending-billing/filter-billing/filter-utlity';
+import { locationFromApi } from 'src/app/operation/prq-entry-page/prq-utitlity';
 
 @Component({
   selector: 'app-set-opening-balance-vendor-wise',
   templateUrl: './set-opening-balance-vendor-wise.component.html',
 })
 export class SetOpeningBalanceVendorWiseComponent implements OnInit {
-  fileUploadForm: UntypedFormGroup;
-  existingData: any;
-  capacityList: any[];
-  rateTypedata: any;
-  arealist: any[];
-  transportMode: any;
-  breadScrums = [
+  breadscrums = [
     {
-      title: "Set Vendor Wise Opening Balance",
+      title: "Upload Vendor Wise Opening Balance",
       items: ["FA Masters"],
-      active: "Set Vendor Wise Opening Balance",
+      active: "Upload Vendor Wise Opening Balance",
     },
   ];
+  fileUploadForm: UntypedFormGroup;
   BranchCode: any;
+  existingData: any;
+  customerList: any;
+  locationDropDown: any;
+
+
   constructor(
+
     private fb: UntypedFormBuilder,
-    private dialog: MatDialog,
     private xlsxUtils: xlsxutilityService,
-    private masterService: MasterService,
     private storage: StorageService,
-    private route: ActivatedRoute,
+    private masterService: MasterService,
+    private dialog: MatDialog,
+    private objCustomerService: CustomerService,
+
   ) {
     this.fileUploadForm = fb.group({
       singleUpload: [""],
     });
   }
 
-  async ngOnInit() {
-    this.BranchCode = this.storage.branch;
+  ngOnInit(): void {
+  }
+
+
+  async fetchAllCustomerData(customerChunks) {
+    const chunks = chunkArray(customerChunks, 50);
+
+    const promises = chunks.map(chunk =>
+      this.objCustomerService.getCustomer({
+        companyCode: this.storage.companyCode,
+        customerCode: { D$in: chunk },
+        activeFlag: true
+      }, { _id: 0, customerCode: 1, customerName: 1 })
+    );
+    const result = await Promise.all(promises);
+    return result.flat();  // This will merge all results into a single array
   }
 
   //#region to select file
@@ -57,61 +77,110 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
     if (fileList.length !== 1) {
       throw new Error("Cannot use multiple files");
     }
+    // this.customerList = await this.fetchAllCustomerData(customerItems);
+
     const file = fileList[0];
 
     if (file) {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
 
+        this.locationDropDown = await locationFromApi(this.masterService);
+        const stateDetail = await stateFromApi(this.masterService);
+
+        const locationValue = this.locationDropDown.map((x) => x.name);
+        const locationName = this.locationDropDown.map((x) => x.value);
+
+        const mergelocations = [...locationValue, ...locationName];
+
+        const customer = [...new Set(jsonData.map((x) => x.CustomerCode))];
+        const customerItems = String(customer)
+          .split(",")
+          .map((item) => item.trim().toUpperCase());
+
+        // Fetch data from DB
+        this.customerList = await this.fetchAllCustomerData(customerItems);
         const validationRules = [
           {
-            ItemsName: "AccountCode",
+            ItemsName: "ManualBillNo",
+            Validations: [{ Required: true }, { Type: "text" }],
+          },
+          {
+            ItemsName: "BillDate",
+            Validations: [{ Required: true }, { Type: "date" }],
+          },
+          {
+            ItemsName: "DueDate",
+            Validations: [{ Required: true }, { Type: "date" }],
+          },
+          {
+            ItemsName: "CustomerCode",
             Validations: [{ Required: true },
-            ],
+            {
+              TakeFromArrayList: this.customerList.map((x) => {
+                return x.customerCode;
+              }),
+            }
+            ]
           },
           {
-            ItemsName: "AccountName",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "AgreementNo",
+            Validations: [{ Required: true }],
           },
           {
-            ItemsName: "MainGroupCode",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "BillingBranch",
+            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
           },
           {
-            ItemsName: "MainGroupName",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "SubmissionBranch",
+            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
           },
           {
-            ItemsName: "GroupCode",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "CollectionBranch",
+            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
           },
           {
-            ItemsName: "GroupName",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "Narration",
+            Validations: [{ Required: true }, { Type: "text" }],
           },
           {
-            ItemsName: "CategoryCode",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "CreditAccount",
+            Validations: [{ Required: true }],
           },
           {
-            ItemsName: "CategoryName",
-            Validations: [{ Required: true },
-            ],
+            ItemsName: "Amount",
+            Validations: [{ Required: true }, { Numeric: true }, { MinValue: 1 }],
           },
           {
-            ItemsName: "DebitAmount",
-            Validations: [
-            ],
+            ItemsName: "GSTApplicable",
+            Validations: [{ Required: true }],
           },
           {
-            ItemsName: "CreditAmount",
-            Validations: [
-            ],
+            ItemsName: "GSTRate",
+            Validations: [{ Required: true }, { Numeric: true }],
+          },
+          {
+            ItemsName: "RCM",
+            Validations: [{ Required: true }],
+          },
+          {
+            ItemsName: "SACCode",
+            Validations: [{ Required: true }],
+          },
+          {
+            ItemsName: "StateofSupply",
+            Validations: [{ Required: true }],
+          },
+          {
+            ItemsName: "StateofBilling",
+            Validations: [{ Required: true }],
+          },
+          {
+            ItemsName: "CustomerGSTNo",
+            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" }],
+          },
+          {
+            ItemsName: "CompanyGSTNo",
+            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" }],
           },
         ];
 
@@ -123,7 +192,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           const uniqueEntries = new Set();
 
           response.forEach(tableEntry => {
-            const key = `${tableEntry['AccountCode']}`;
+            const key = `${tableEntry['ManualBillNo']}`;
             // Check if the key is already in the set (duplicate entry)
             if (uniqueEntries.has(key)) {
               // Push an error message to the 'error' array
@@ -138,50 +207,36 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           // Filter out objects with errors
           const objectsWithoutErrors = response.filter(obj => obj.error == null || obj.error.length === 0);
 
+
           // STEP 2 : Get the data from the DB if Exist onlu Uniq Records
-          const AccountList = objectsWithoutErrors.map((item, index) => {
-            const _id = `${this.storage.companyCode}-${item.AccountCode}-${this.BranchCode}`;
+          const billNo = objectsWithoutErrors.map((item, index) => {
+            // const _id = `${this.storage.companyCode}-${item.ManualBillNo}-${this.BranchCode}`;
+            const _id = `${this.storage.companyCode}-${item.ManualBillNo}`;
             return _id;
           });
+
 
           const filters = [
             {
               "D$match": {
                 "_id": {
-                  "D$in": AccountList
+                  "D$in": billNo
                 }
               }
             }
           ];
+
           this.existingData = await this.fetchExistingData(filters);
 
-          AccountList.forEach((element, index) => {
+          billNo.forEach((element, index) => {
             const data = this.existingData.find(item => item._id === element);
             if (data) {
               objectsWithoutErrors[index]['Operation'] = "Update";
+
             } else {
               objectsWithoutErrors[index]['Operation'] = "Insert";
             }
           });
-
-          // STEP 3 : Validate Credit And Debit Amount
-          objectsWithoutErrors.forEach(element => {
-            const debitAmountExists = element.DebitAmount !== undefined && element.DebitAmount !== null;
-            const creditAmountExists = element.CreditAmount !== undefined && element.CreditAmount !== null;
-
-            // Check if at least one of DebitAmount or CreditAmount exists and if one is 0 while the other is greater than 0
-            if ((debitAmountExists || creditAmountExists) && ((element.DebitAmount === 0 && element.CreditAmount > 0) || (element.DebitAmount > 0 && element.CreditAmount === 0))) {
-              // No error in this case
-            } else if (!debitAmountExists && !creditAmountExists) {
-              element.error = element.error || [];
-              element.error.push(`At least one field should have a value`);
-            } else if (debitAmountExists && creditAmountExists) {
-              element.error = element.error || [];
-              element.error.push(`Both Debit And Credit Amount Exist`);
-            }
-          });
-
-
 
           const objectsWithErrors = response.filter(obj => obj.error != null);
           const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
@@ -191,28 +246,19 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
       });
     }
   }
-  //#endregion
-  //#region to download template file
-  Download(): void {
-    let link = document.createElement("a");
-    link.download = "LedgerwiseOpeningBalanceUploadFormate";
-    link.href = "assets/Download/LedgerwiseOpeningBalanceUploadFormate.xlsx";
-    link.click();
-  }
-  //#endregion
-  //#region to get Existing Data from collection
+
   async fetchExistingData(filters) {
+    debugger
     const request = {
       companyCode: this.storage.companyCode,
-      collectionName: `acc_opening_${financialYear}`,
+      collectionName: "cust_bill_headers",
       filters
     };
 
     const response = await firstValueFrom(this.masterService.masterPost("generic/query", request));
     return response.data;
   }
-  //#endregion
-  //#region to open modal to show validated data
+
   OpenPreview(results) {
     const dialogRef = this.dialog.open(XlsxPreviewPageComponent, {
       data: results,
@@ -224,12 +270,23 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.saveData(result)
+        console.log("Save Data", result);
+
+        // this.saveData(result)
       }
     });
   }
-  //#endregion
-  //#region to save data
+
+
+
+  //#region to download template file
+  Download(): void {
+    let link = document.createElement("a");
+    link.download = "CustomerWiseOpeningBalanceUploadFormate";
+    link.href = "assets/Download/CustomerWiseOpeningBalance.xlsx";
+    link.click();
+  }
+
   async saveData(result) {
     try {
       const DataForUpdate = result.filter(x => x.Operation === "Update");
@@ -237,19 +294,35 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
       if (DataForUpdate.length > 0) {
         const updateRequests = DataForUpdate.map(element => {
           const updateData = {
-            dAMT: element.DebitAmount ? element.DebitAmount : 0,
-            cAMT: element.CreditAmount ? element.CreditAmount : 0,
-            mODDT: new Date(),
-            mODBY: this.storage.userName,
-            mODLOC: this.storage.branch,
+            // dAMT: element.DebitAmount ? element.DebitAmount : 0,
+            // cAMT: element.CreditAmount ? element.CreditAmount : 0,
+            //mODDT: moment().format("YYYY-MM-DD"),
+            // mODBY: this.storage.userName,
+            // mODLOC: this.storage.branch,
+            bLOC: element.CollectionBranch,
+            cUST: {
+
+              cD: "CUST00014",
+              nM: "DTDC",
+              tEL: 78711411414,
+              aDD: "Ahmedabad",
+              eML: "DTDC@gmail.com",
+              cT: "AHMEDABAD",
+              sT: "Gujarat",
+              gSTIN: "24ABCDE5678F2Z1",
+              cGCD: "CUGR0011",
+              cGNM: "LOGISTICS",
+            }
           };
+          console.log("updateData", updateData);
 
           const req = {
             companyCode: this.storage.companyCode,
-            filter: { _id: `${this.storage.companyCode}-${element.AccountCode}-${this.BranchCode}` },
-            collectionName: `acc_opening_${financialYear}`,
+            filter: { _id: `${this.storage.companyCode}-${element.ManualBillNo}` },
+            collectionName: `cust_bill_headers`,
             update: updateData
           };
+          console.log("req", req);
 
           return this.masterService.masterPut("generic/update", req).pipe(
             catchError(error => {
@@ -283,66 +356,68 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           }
         );
       }
-      const DataForInsert = result.filter(x => x.Operation === "Insert");
-      if (DataForInsert.length > 0) {
-        const insertRequests = DataForInsert.map(element => {
-          const insertData = {
-            _id: `${this.storage.companyCode}-${element.AccountCode}-${this.BranchCode}`,
-            cID: this.storage.companyCode,
-            bRCD: this.BranchCode,
-            aCCD: element.AccountCode,
-            aCNM: element.AccountName,
-            mATCD: element.MainGroupCode,
-            mRPNM: element.MainGroupName,
-            gRPCD: element.GroupCode,
-            gRPNM: element.GroupName,
-            cATCD: element.CategoryCode,
-            cATNM: element.CategoryName,
-            dAMT: element.DebitAmount ? element.DebitAmount : 0,
-            cAMT: element.CreditAmount ? element.CreditAmount : 0,
-            eNTDT: new Date(),
-            eNTBY: this.storage.userName,
-            eNTLOC: this.storage.branch,
-          };
+      // const DataForInsert = result.filter(x => x.Operation === "Insert");
+      // if (DataForInsert.length > 0) {
+      //   const insertRequests = DataForInsert.map(element => {
+      //     const insertData = {
+      //       _id: `${this.storage.companyCode}-${element.AccountCode}-${this.BranchCode}`,
+      //       cID: this.storage.companyCode,
+      //       bRCD: this.BranchCode,
+      //       aCCD: element.AccountCode,
+      //       aCNM: element.AccountName,
+      //       mATCD: element.MainGroupCode,
+      //       mRPNM: element.MainGroupName,
+      //       gRPCD: element.GroupCode,
+      //       gRPNM: element.GroupName,
+      //       cATCD: element.CategoryCode,
+      //       cATNM: element.CategoryName,
+      //       dAMT: element.DebitAmount ? element.DebitAmount : 0,
+      //       cAMT: element.CreditAmount ? element.CreditAmount : 0,
+      //       eNTDT: moment().format("YYYY-MM-DD"),
+      //       eNTBY: this.storage.userName,
+      //       eNTLOC: this.storage.branch,
+      //     };
 
-          const req = {
-            companyCode: this.storage.companyCode,
-            collectionName: `acc_opening_${financialYear}`,
-            data: insertData
-          };
+      //     console.log("insertData",insertData);
 
-          return this.masterService.masterPost("generic/create", req).pipe(
-            catchError(error => {
-              console.error("Error inserting account:", error);
-              return []; // Return empty array to continue with forkJoin
-            })
-          );
-        });
+      //     // const req = {
+      //     //   companyCode: this.storage.companyCode,
+      //     //   collectionName: `acc_opening_${financialYear}`,
+      //     //   data: insertData
+      //     // };
 
-        forkJoin(insertRequests).subscribe(
-          (responses: any[]) => {
-            responses.forEach((res, index) => {
-              if (res) {
-                Swal.fire({
-                  icon: "success",
-                  title: "Successful",
-                  text: `Account Opening Inserted Successfully`,
-                  showConfirmButton: true,
-                });
+      //     // return this.masterService.masterPost("generic/create", req).pipe(
+      //     //   catchError(error => {
+      //     //     console.error("Error inserting account:", error);
+      //     //     return []; // Return empty array to continue with forkJoin
+      //     //   })
+      //     // );
+      //   });
 
-                // Update isSelected property to false for the processed item
-              } else {
-                console.error("Failed to insert account:", res);
-                // Handle failed insert if necessary
-              }
-            });
-          },
-          error => {
-            console.error("Error inserting accounts:", error);
-            // Handle error if necessary
-          }
-        );
-      }
+      //   forkJoin(insertRequests).subscribe(
+      //     (responses: any[]) => {
+      //       responses.forEach((res, index) => {
+      //         if (res) {
+      //           Swal.fire({
+      //             icon: "success",
+      //             title: "Successful",
+      //             text: `Account Opening Inserted Successfully`,
+      //             showConfirmButton: true,
+      //           });
+
+      //           // Update isSelected property to false for the processed item
+      //         } else {
+      //           console.error("Failed to insert account:", res);
+      //           // Handle failed insert if necessary
+      //         }
+      //       });
+      //     },
+      //     error => {
+      //       console.error("Error inserting accounts:", error);
+      //       // Handle error if necessary
+      //     }
+      //   );
+      // }
 
     } catch (error) {
       // Handle any errors that occurred during the process
@@ -356,5 +431,4 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
       return;
     }
   }
-
 }

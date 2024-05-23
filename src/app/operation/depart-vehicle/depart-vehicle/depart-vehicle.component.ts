@@ -833,7 +833,7 @@ export class DepartVehicleComponent implements OnInit {
   viewMenifest(event) {
     const req = {
       DocNo: event.data?.manifest,
-      templateName: "Manifest",
+      templateName: "MF1",
       partyCode: "CONSRAJT27",
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;

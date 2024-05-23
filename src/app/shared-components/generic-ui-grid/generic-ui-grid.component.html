@@ -1,0 +1,78 @@
+<div class="row">
+    <div class="col-12" style="padding: 0px;">
+        <div class="card" style="margin-bottom: 6px;margin-right: 3px;margin-left: 3px;padding: 0px;">
+            <div class="body" style="padding: 0px;">
+                <div class="task-list">
+                    <div class="row">
+                        <div class="col" *ngIf="formTitle">
+                            <h4 style="margin-top:10px;margin-left:10px; color: orange;font-weight: 500;"><mat-icon
+                                    style="padding-top:4px;">view_list</mat-icon>
+                                {{formTitle}}
+                            </h4>
+                        </div>
+
+                        <div class="col-auto ms-auto" style="margin-top:10px;margin-right:15px;">
+                            <ul class="header-buttons">
+                                <li *ngIf="showCSVButton">
+                                    <div class="export-button m-l-10" matTooltip="CSV">
+                                        <img src="assets/images/icons/csv.png" alt="" (click)="exportToCsv()" />
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- <div class="materialTableHeader" style="min-width:auto !important;">
+                        <div class="row">
+                            <div class="col-auto" style="margin-top:10px;margin-right:15px;">
+                                <ul class="header-buttons-left ml-0 container-column">
+                                    <li class="dropdown m-l-20">
+                                        <label for="search-input"><i class="material-icons search-icon">search</i>
+                                        </label>
+                                        <input placeholder="Search" type="text" #filter
+                                            class="browser-default search-field" aria-label="Search box">
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="row mt-1">
+                        <div class="col">
+                            <!-- Gui grid table -->
+                            <gui-grid [source]="source" [sorting]="sorting" [columnMenu]="columnMenu"
+                                [maxHeight]="maxHeight" [width]="width" [paging]="paging"
+                                [virtualScroll]="virtualScroll" [searching]="searching" [loading]="loading"
+                                [theme]="theme">
+
+                                <ng-container *ngFor="let column of columns">
+
+                                    <gui-grid-column [header]="column.header" [field]="column.field"
+                                        [sorting]="column.sorting" [width]="column.width" [styles]="column.styles"
+                                        [align]="column.align" [type]="column.type" [formatter]="column.formatter">
+
+                                        <ng-template let-value="value" let-index="index" let-item="item">
+                                            <ng-container *ngIf="column.templateRef; else htmlContent">
+                                                <ng-container
+                                                    *ngTemplateOutlet="column.templateRef; context: {value: value, index: index, item: item}">
+                                                </ng-container>
+                                            </ng-container>
+                                            <ng-template #htmlContent>
+                                                <div [innerHTML]="value"></div>
+                                            </ng-template>
+                                        </ng-template>
+
+                                    </gui-grid-column>
+
+                                </ng-container>
+
+                            </gui-grid>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

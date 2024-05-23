@@ -84,6 +84,15 @@ export class BillApprovalComponent implements OnInit {
           aBY: this.storage.userName
         }
       }
+      // #region Update Invoice Status when account posting credit and debit in equal amount
+      var CreditDebitVouchersList = this.GetVouchersLedgers(data.data);
+      var CreditAmount = CreditDebitVouchersList.filter(item => item.credit > 0).map(item => item.credit).reduce((a, b) => a + b, 0);
+      var DebitAmount = CreditDebitVouchersList.filter(item => item.debit > 0).map(item => item.debit).reduce((a, b) => a + b, 0);
+      if (CreditAmount != DebitAmount) {
+        console.log(CreditDebitVouchersList);
+        SwalerrorMessage("error", "Error", "Credit and Debit Amount Should be Equal for Account Posting..!", false);
+        return;
+      }
 
       const res = await this.invoiceService.updateInvoiceStatus(filter, status);
       if (res) {

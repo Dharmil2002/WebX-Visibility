@@ -11,6 +11,8 @@ export class DashboardComponent implements OnInit {
   TransactionsFirst: any;
   TransactionsThird: any;
   OnlinePaymentApprovals: any;
+  DebitNotes: any;
+
   jsonUrl = '../../../assets/data/dashboard-data.json'
   breadscrums = [
     {
@@ -24,6 +26,7 @@ export class DashboardComponent implements OnInit {
     this.OnlinePaymentApprovals = OnlinePaymentApprovals;
     this.TransactionsSecond = TransactionsSecond;
     this.TransactionsThird = TransactionsThird;
+    this.DebitNotes = DebitNotes;
   }
 
   ngOnInit(): void {
@@ -48,7 +51,13 @@ export class DashboardComponent implements OnInit {
       this.router.navigate(['/Finance/VendorPayment/VendorBillPayment']);
     }
     if (event.data.id == 9) {
-      this.router.navigate(['/Finance/VendorBillGeneration/Criteria']);
+      this.router.navigate(['/Finance/VendorBillGeneration/Criteria'])
+    }
+    if (event.data.id == 10) {
+      this.router.navigate(['/Finance/DebitNote/GenerateDebitNote']);
+    }
+    if (event.data.id == 11) {
+      this.router.navigate(['/Finance/DebitNote/ApproveDebitNote']);
     }
   }
 
@@ -116,6 +125,23 @@ const OnlinePaymentApprovals = {
     {
       id: 8,
       "title": "Voucher Payment Approval",
+      "class": "info-box7 bg-c-Grape-light order-info-box7"
+    },
+  ]
+}
+
+
+const DebitNotes = {
+  "Title": "Debit Notes",
+  "Items": [
+    {
+      id: 10,
+      "title": "Generate Debit Note",
+      "class": "info-box7  bg-c-Bottle-light order-info-box7"
+    },
+    {
+      id: 11,
+      "title": "Approve Debit Note",
       "class": "info-box7 bg-c-Grape-light order-info-box7"
     },
   ]

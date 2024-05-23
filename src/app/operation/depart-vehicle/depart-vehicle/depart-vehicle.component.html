@@ -41,7 +41,7 @@
             <div class="example-button-row d-flex justify-content-end">
                 <button class="msr-3" mat-raised-button color="primary" [disabled]="!departureTableForm.valid ||!balanceTableForm.valid"
                     (click)="Close()">Depart</button>
-                <button class="msr-3" mat-raised-button color="primary" *ngIf="!CEWBflag"
+                <button class="msr-3" mat-raised-button color="primary" *ngIf="!CEWBflag && isSysCEVB"
                     (click)="GenerateCEWB()">Generate</button>
             </div>
         </div>

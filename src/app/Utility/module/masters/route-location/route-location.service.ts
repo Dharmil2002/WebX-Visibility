@@ -7,7 +7,17 @@ import { StorageService } from 'src/app/core/service/storage.service';
   providedIn: 'root'
 })
 export class RouteLocationService {
+  routeCode = {
+    "Road": "R9888",
+    "Rail": "R8888",
+    "Air": "R7777"
 
+  }
+  routeCodeMaster={
+      "ROAD": "R0000",
+      "RAIL": "T0000",
+      "AIR":"A0000"
+  }
   constructor(private masterService: MasterService, private storage: StorageService) { }
   //#region to get route dropdown
   async getRouteLocationDetail(): Promise<any[]> {
@@ -19,7 +29,7 @@ export class RouteLocationService {
         // Specify the collection name for route master locations
         collectionName: 'routeMasterLocWise',
         // Use an empty filter
-        filter: {companyCode: this.storage.companyCode}
+        filter: { companyCode: this.storage.companyCode }
       };
 
       // Send a POST request to the 'generic/get' endpoint using the masterService
@@ -37,6 +47,81 @@ export class RouteLocationService {
       // Handle errors, e.g., log them or throw a custom error
       console.error('Error in getRouteLocationDetail:', error);
       throw error; // Rethrow the error for the calling code to handle
+    }
+  }
+  //#endregion
+  //#below function is used for the check the Route is already exist or not
+  async getRouteOne(filter) {
+    const companyCode = this.storage.companyCode;
+    const getRequest = async (collectionName) => {
+        const response = await this.masterService.masterPost('generic/getOne', { companyCode, collectionName, filter });
+        return firstValueFrom(response);
+    };
+    try {
+        const resRoute = await getRequest("routeMasterLocWise");
+        const resAdHoc = await getRequest("adhoc_routes");
+        const merge = { ...resRoute?.data, ...resAdHoc?.data };
+        return Object.keys(merge).length > 0 ? merge : null;
+    } catch (error) {
+        console.error("Error fetching route data:", error);
+        return null;
+    }
+}
+  //#region to below function is used for the save the route
+  async addRouteLocation(data,tableData) {
+    const routeDetails=[]
+    if(tableData && tableData.length>0){
+      tableData.forEach(element => {
+        routeDetails.push({
+          "lOCCD": element?.loc||"",
+          "dTKM":element?.distance||"",
+          "tRNHR":element?.transitHrs||0,
+          "sTHR":0 ,
+          "sPHVEH": 0,
+          "SPLVEH":0,
+          "nGTRES":0,
+          "rHRFRM":0,
+          "rHRTO": 0
+        })
+      });
+     
+    }
+    try {
+      const dataRoute =
+      {
+        "_id": `${this.storage.companyCode}-${this.routeCode[data.routeMode]}-${data?.route || ""}`,
+        "rUTCD": this.routeCode[data.routeMode],
+        "rUTNM": data?.route,
+        "rUTMODE": data.routeMode,
+        "rUTCT": "LONG HAUL",
+        "rUTKM": 0,
+        "dPTM": null,
+        "rUTDET": routeDetails,
+        "cLOC": this.storage.branch,
+        "rUTTYP": "Once in Week",
+        "sDTYPE": "Daily",
+        "iSACT": true,
+        "eNTDT": new Date(),
+        "eNTLOC": this.storage.branch,
+        "eNTBY": this.storage.userName,
+        "cID": this.storage.companyCode
+      }
+      const reqRoute = {
+        companyCode: this.storage.companyCode,
+        collectionName: "adhoc_routes",
+        data: dataRoute
+      }
+      await firstValueFrom(this.masterService.masterPost('generic/create', reqRoute));
+      return {
+        routeCat: "LONG HAUL",
+        contBranch: this.storage.branch,
+        scheduleTime: new Date(),
+        routeType: "One Way",
+        ScheduleType: "once in Week"
+      };
+    }
+    catch (err) {
+      return false
     }
   }
   //#endregion

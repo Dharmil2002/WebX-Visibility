@@ -196,7 +196,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: CompanyDetailsResponse?.activeFlag, generatecontrol: true, disable: false,
+                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: CompanyDetailsResponse?.activeFlag, generatecontrol: false, disable: false,
                 Validations: []
             },
         ],

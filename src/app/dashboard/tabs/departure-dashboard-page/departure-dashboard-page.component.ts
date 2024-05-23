@@ -3,6 +3,8 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { DepartureService } from "src/app/Utility/module/operation/departure/departure-service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { AddHocRouteComponent } from "./add-hoc-route/add-hoc-route.component";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "app-departure-dashboard-page",
@@ -23,6 +25,10 @@ export class DepartureDashboardPageComponent
   @Input() arrivaldeparture: any;
   orgBranch: string = "";
   companyCode: number = 0;
+  FilterButton = {
+    name: "Add New",
+    functionName: "addHocRoute",
+  };
   breadscrums = [
     {
       title: "Departure Details",
@@ -104,11 +110,11 @@ export class DepartureDashboardPageComponent
       Style: "min-width:100px",
       datatype: "datetime",
     },
-    Hrs: {
-      Title: "Hrs",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
+    // Hrs: {
+    //   Title: "Hrs",
+    //   class: "matcolumnleft",
+    //   Style: "min-width:100px",
+    // },
     Action: {
       Title: "Action",
       class: "matcolumnleft",
@@ -121,7 +127,7 @@ export class DepartureDashboardPageComponent
     "VehicleNo",
     "Scheduled",
     "Expected",
-    "Hrs"
+    // "Hrs"
   ];
   //#endregion
 
@@ -132,12 +138,15 @@ export class DepartureDashboardPageComponent
   boxData = [];
   loadingSheetData: any;
   departuredata: any[];
+  headerCode: any;
   // declararing properties
 
   constructor(
     private CnoteService: CnoteService,
     private departureService: DepartureService,
-    private storage: StorageService
+    private storage: StorageService,
+    private dialog: MatDialog,
+    public dialogRef: MatDialogRef<AddHocRouteComponent>
   ) {
     super();
     this.companyCode = this.storage.companyCode;
@@ -145,6 +154,7 @@ export class DepartureDashboardPageComponent
     this.loadingSheetData = this.CnoteService.getLsData();
     this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "departureData.csv";
+    this.headerCode ="Dhaval"
     this.getdepartureDetail();
   }
 
@@ -194,7 +204,6 @@ const shipData = [
   }
 
   functionCallHandler(event) {
-    console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {
@@ -213,4 +222,18 @@ const shipData = [
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');
   }
-}
+  /*below is the function for add Hoc routes*/
+  addHocRoute() {
+    const dialogref = this.dialog.open(AddHocRouteComponent, {
+      width: "70%",
+      height: "90%",
+      disableClose: true
+    
+    });
+    dialogref.afterClosed().subscribe((result) => {
+      this.getdepartureDetail();
+    });
+  }
+
+  /*End*/
+} 

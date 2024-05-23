@@ -144,6 +144,30 @@ export class debitNoteGenerationControls {
                 },
             },
             {
+                name: "Ledgeraccount",
+                label: "Ledger account Code",
+                placeholder: "Ledger account Code",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                  {
+                    name: "required",
+                    message: "Ledger account Code is required",
+                  },
+                ],
+                additionalData: {
+                  showNameAndValue: true,
+                },
+                functions: {
+                  onSelection: ""
+                },
+              },
+            {
                 name: "Remarks",
                 label: "Remarks",
                 placeholder: "Remarks",

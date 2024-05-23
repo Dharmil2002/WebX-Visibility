@@ -272,7 +272,7 @@ export class BalanceControl {
 }
 export class DepartureControl {
     private DepartureControlArray: FormControls[];
-    constructor() {
+    constructor(isSysCEVB) {
         this.DepartureControlArray = [
             {
                 name: 'DeptartureTime',
@@ -321,7 +321,7 @@ export class DepartureControl {
                         message: "DeptartureTime is required"
                     }
                 ],
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: isSysCEVB
             },
         ];
     }

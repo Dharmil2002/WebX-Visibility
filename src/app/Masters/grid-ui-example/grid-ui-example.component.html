@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" *ngIf="columns.length">
+
+    <app-generic-ui-grid [formTitle]="formTitle" [showCSVButton]="true" [csvFileName]="csvFileName" [source]="source"
+        [columns]="columns" [sorting]="sorting" [columnMenu]="columnMenu" [paging]="paging" [searching]="searching"
+        [loading]="loading" [theme]="theme">
+    </app-generic-ui-grid>
+
+</app-common-wrapper-webxpress>

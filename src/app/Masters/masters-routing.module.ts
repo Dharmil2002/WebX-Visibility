@@ -96,6 +96,7 @@ import { ContainerStatusListComponent } from './container-status-update/containe
 import { MenuAccessRightComponent } from './Admin/MenuAccessRight/menu-access-right/menu-access-right.component';
 import { DcrAllocationComponent } from './dcr-series/dcr-allocation/dcr-allocation.component';
 import { DcrManagementComponent } from './dcr-series/dcr-management/dcr-management.component';
+import { GridUiExampleComponent } from './grid-ui-example/grid-ui-example.component';
 
 const routes: Routes = [
   { path: "ViewPrint", component: ViewPrintComponent },
@@ -208,8 +209,9 @@ const routes: Routes = [
   { path: "Container/Status/list", component: ContainerStatusListComponent },
   { path: "shardProduct/shardProductList", component: ProductListComponent },
 
-  { path: "AddDCR/DCRAllocation",component: DcrAllocationComponent},
-  {path: "DCRManagement", component: DcrManagementComponent},
+  { path: "AddDCR/DCRAllocation", component: DcrAllocationComponent },
+  { path: "DCRManagement", component: DcrManagementComponent },
+  { path: "GridUiExample", component: GridUiExampleComponent }
 ];
 
 @NgModule({

@@ -26,13 +26,6 @@ export class AddCompanyComponent implements OnInit {
   visible: any;
   fafIcondata: string = 'fas fa-alien'
   Icondata: string = 'download'
-  breadscrums = [
-    {
-      title: "Company Setup",
-      items: ["Home"],
-      active: "Company Setup",
-    },
-  ];
   data: any;
   TimeZoneDet: any;
   Theme: any;
@@ -41,9 +34,10 @@ export class AddCompanyComponent implements OnInit {
   selectedFiles: boolean;
   SelectFile: File;
   imageName: string;
-  constructor(private fb: UntypedFormBuilder, private masterService: MasterService, 
-    private filter: FilterUtils, private storage: StorageService) {    
-   }
+  breadscrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: boolean; }[];
+  constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
+    private filter: FilterUtils, private storage: StorageService) {
+  }
 
   ngOnInit(): void {
     this.getCompanyDet();
@@ -224,9 +218,22 @@ export class AddCompanyComponent implements OnInit {
           this.data = res.data[0];
           this.initializeFormControl();
           this.autoBindDropdown();
+          this.breadscrums = [
+            {
+              title: "Company Setup",
+              items: ["Home"],
+              active: "Company Setup",
+              generatecontrol: true,
+              toggle: this.data.activeFlag,
+            },
+          ];
         }
       }
     });
   }
-
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.AddCompanyFormsValue.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
 }

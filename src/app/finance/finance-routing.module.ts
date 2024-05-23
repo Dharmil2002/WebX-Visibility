@@ -22,6 +22,10 @@ import { SetOpeningBalanceLedgerWiseComponent } from './FA Masters/Components/se
 import { AddCreditNoteGenerationComponent } from './Credit Note/add-credit-note-generation/add-credit-note-generation.component';
 import { GeneralBillCriteriaComponent } from './Vendor Bills/VendorGeneralBill/general-bill-criteria/general-bill-criteria.component';
 import { GeneralBillDetailComponent } from './Vendor Bills/VendorGeneralBill/general-bill-detail/general-bill-detail.component';
+import { GeneralInvoiceCriteriaComponent } from './Customer General Invoice/general-invoice-criteria/general-invoice-criteria.component';
+import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/generate-debit-note/generate-debit-note.component';
+import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
+import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -45,7 +49,12 @@ const routes: Routes = [
   { path: 'FAMasters/SetOpeningBalanceLedgerWise', component: SetOpeningBalanceLedgerWiseComponent },
   { path: 'CreditNote', component: AddCreditNoteGenerationComponent },
   { path: 'VendorBillGeneration/Criteria', component: GeneralBillCriteriaComponent },
-  { path: 'VendorBillGeneration/Details', component: GeneralBillDetailComponent }
+  { path: 'VendorBillGeneration/Details', component: GeneralBillDetailComponent },
+  { path: 'CustomerInvoiceGeneral/Criteria', component: GeneralInvoiceCriteriaComponent },
+
+  { path: 'DebitNote/GenerateDebitNote', component: GenerateDebitNoteComponent },
+  { path: 'DebitNote/ApproveDebitNote', component: ApproveDebitNoteComponent },
+  { path: 'DebitNote/DebitNoteDetails', component: DebitNoteDetailsComponent },
 
 ];
 

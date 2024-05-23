@@ -9,6 +9,8 @@ import { StoreKeys } from 'src/app/config/myconstants';
   providedIn: 'root'
 })
 export class MasterService {
+  docketDataUrl = '../../../assets/data/docketData.json';
+  guiColumnUrl = '../../../assets/data/guiColumn.json';
   companyJsonUrl = '../../../assets/data/CompanyGST-data.json';
   dropDownUrl = '../../../assets/data/state-countryDropdown.json';
   masterUrl = '../../../assets/data/masters-data.json';
@@ -123,14 +125,14 @@ export class MasterService {
     };
 
     if (codeType) {
-      reqBody.filter["codeType"] = Array.isArray(codeType) ? 
-                                   { D$in: codeType } : 
-                                   { D$eq: codeType };
+      reqBody.filter["codeType"] = Array.isArray(codeType) ?
+        { D$in: codeType } :
+        { D$eq: codeType };
     }
 
     try {
       const res = await firstValueFrom(await this.masterPost("generic/get", reqBody));
-  
+
       // Use the correct filter condition with a return statement
       return res.data;
     } catch (error) {

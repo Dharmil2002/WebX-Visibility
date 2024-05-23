@@ -41,8 +41,8 @@ export class ConsignmentChargesComponent implements OnInit {
     // /*below code is for getting a Chages from Charge Master*/
     async getCharges() {
       if(!this.isEdit){
-      const filter = { "pRNm": this.chargeData.transModeName, aCTV: true, cHBTY: "Booking" }
-      const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM":this.chargeData.transModeName,"cHAPP":{D$in:["GCN"]},isActive:true}
+      const filter = { "pRNm": this.chargeData.transModeName, aCTV: true,cHBTY: {D$in:["Booking","Both"] }};
+      const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM":this.chargeData.transModeName,cHATY:"Charges","cHAPP":{D$in:["GCN"]},isActive:true}
       const result = await this.thcService.getChargesV2(filter, productFilter);
       if (result && result.length > 0) {
         const invoiceList = [];
@@ -51,8 +51,8 @@ export class ConsignmentChargesComponent implements OnInit {
             const invoice: InvoiceModel = {
               id: index + 1,
               name: element.cHACD || '',
-              label: `${element.sELCHA}(${element.aDD_DEDU})`,
-              placeholder:element.sELCHA || '',
+              label: `${element?.cAPTION||element?.sELCHA||""}(${element.aDD_DEDU})`,
+              placeholder: element?.cAPTION ||element?.sELCHA||"",
               type: 'text',
               value: '0.00',
               filterOptions: '',

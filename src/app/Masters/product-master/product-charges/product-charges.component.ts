@@ -25,7 +25,7 @@ export class ProductChargesComponent implements OnInit {
   };
   chargesTypeTitle = "Product Charges";
   addTitle = "+ Add Product Charges";
-  selectedValue = "Product";
+  selectedValue = "Charges";
   Tabletab = false;
   TableLoad = false;
   columnHeader = {
@@ -284,9 +284,9 @@ export class ProductChargesComponent implements OnInit {
       collectionName: "product_charges_detail",
     };
 
-    const Res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const Res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", req));
+  
     if (Res?.success) {
       this.tableData = Res?.data.map((x, index) => {
         return {
@@ -338,7 +338,7 @@ export class ProductChargesComponent implements OnInit {
     const req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
-      filter: this.isUpdate ? { cHACD: this.UpdatedData.cHACD } : undefined,
+      filter: this.isUpdate ? { cHACD:this.customerTableForm.value.ChargesCode,cHATY:this.selectedValue} : undefined,
       update: this.isUpdate ? Body : undefined,
       data: this.isUpdate ? undefined : Body,
     };
@@ -356,7 +356,7 @@ export class ProductChargesComponent implements OnInit {
       Swal.fire({
         icon: "success",
         title: "Successful",
-        text: "!Product add Successful",
+        text: "Charges add Successful",
         showConfirmButton: true,
       });
     } else {

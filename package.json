@@ -29,6 +29,7 @@
     "@azure/msal-angular": "^2.4.1",
     "@azure/msal-browser": "^2.38.2",
     "@danielmoncada/angular-datetime-picker": "^16.0.1",
+    "@generic-ui/ngx-grid": "^0.18.0",
     "@kolkov/angular-editor": "^2.1.0",
     "@mat-datetimepicker/core": "^11.0.3",
     "@microsoft/signalr": "^6.0.10",

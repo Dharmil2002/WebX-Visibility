@@ -30,11 +30,8 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } from 'src/app/Utility/commonFunction/common';
-import { ThcmovementDetails } from 'src/app/Models/THC/THCModel';
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { StoreKeys } from 'src/app/config/myconstants';
-import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
-import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
@@ -173,11 +170,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     private locationService: LocationService,
     private customerService: CustomerService,
     private addressService: AddressService,
-    private vehicleStatusService: VehicleStatusService,
     private docketService: DocketService,
     public dialog: MatDialog,
     private dcrService: DCRService,
-    private stateService: StateService,
     public snackBarUtilityService: SnackBarUtilityService,
     private voucherServicesService: VoucherServicesService,
   ) {
@@ -202,7 +197,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
     this.consigmentControls = new ConsignmentLtl(this.generalService);
-
     this.consigmentControls.applyFieldRules(this.storage.companyCode).then(() => {
       this.initializeFormControl();
 
@@ -890,7 +884,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   fillInvoice(data: any) {
 
     if (data.label.label === "Remove") {
-      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      this.tableData = this.tableData.filter((x) => x.invoiceNumber !== data.data.invoiceNumber);
     } else {
       const atLeastOneValuePresent = Object.keys(this.invoiceForm.controls)
         .some(key => {
@@ -951,7 +945,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
     //this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
     // Filter the invoiceData to exclude the entry with the provided data ID
-    this.tableData = this.tableData.filter(x => x.id !== data.data.id);
+    this.tableData = this.tableData.filter(x => x.invoiceNumber !== data.data.invoiceNumber);
   }
   /*End*/
   SetInvoiceData() {
@@ -1185,6 +1179,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     this.consignmentForm.get('billingParty').updateValueAndValidity();
     this.consignmentForm.get('billingParty').setValue("");
+    this.getConsignor();
+    this.getConsignee();
   }
   /*end*/
   async docketValidation() {

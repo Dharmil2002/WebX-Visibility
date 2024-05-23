@@ -23,7 +23,8 @@ export class SubmitionControl {
                 functions: {
                 },
                 additionalData: {
-                    minDate: new Date()
+                    // minDate: new Date(),
+                    maxDate: new Date(),
                 },
             },
             {
@@ -89,7 +90,7 @@ export class SubmitionControl {
                 additionalData: {
                     multiple: true,
                     isFileSelected: true
-                  },
+                },
                 functions: {
                     onChange: 'GetFileList',
                 },

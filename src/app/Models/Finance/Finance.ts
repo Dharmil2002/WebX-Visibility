@@ -60,6 +60,7 @@ export class VoucherDataRequestModel {
   mANNUM: string
   mREFNUM: string
   nAR: string;
+  onAccount: boolean = false;
 }
 
 export class DebitVoucherdetailsRequestModel {
@@ -288,7 +289,7 @@ export class DNTDetDataRequestModel {
     sGST: number;
     aMT: number;
   };
-  tdsAMT:number;
+  tdsAMT: number;
   eNTDT: Date;
   eNTLOC: string;
   eNTBY: string;
@@ -320,8 +321,8 @@ export enum VoucherInstanceType {
   DeliveryMR = 10,
   VendorBillPayment = 11,
   THCArrival = 12,
-  CreditNoteApproval=13,
-  DebitNoteApproval=14
+  CreditNoteApproval = 13,
+  DebitNoteApproval = 14
 }
 
 export const ledgerInfo = {

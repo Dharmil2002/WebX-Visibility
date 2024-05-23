@@ -173,7 +173,7 @@ export class DebitVoucherComponent implements OnInit {
     );
 
     this.SACCodeList = await GetsachsnFromApi(this.masterService)
-    console.log(this.SACCodeList)
+    // console.log(this.SACCodeList)
   }
   async BindLedger(BindLedger) {
     const account_groupReqBody = {
@@ -597,7 +597,7 @@ export class DebitVoucherComponent implements OnInit {
       case 'RTGS/UTR':
         break;
     }
-
+    this.SetOnAccountValue()
   }
 
   async AccountinglocationFieldChanged() {
@@ -843,8 +843,8 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
         this.VoucherDataRequestModel.accountCode = this.DebitVoucherTaxationPaymentDetailsForm.value?.Bank.value;
         this.VoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
-        this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
-
+        this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument;
+        this.VoucherDataRequestModel.onAccount = this.DebitVoucherTaxationPaymentDetailsForm.value.onAccount;
 
         const companyCode = this.storage.getItem(StoreKeys.CompanyCode);
         const Branch = this.storage.getItem(StoreKeys.Branch);
@@ -1040,6 +1040,18 @@ export class DebitVoucherComponent implements OnInit {
       width: '30%',
       height: '50%',
     });
+  }
+  //#endregion
+  //#region to set on account value
+  SetOnAccountValue() {
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
+    const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
+
+    if (PaymentMode !== "Cash" && Preparedfor == "Vendor" && this.tableData[0].LedgerHdn == "LIA001002") {
+      this.DebitVoucherTaxationPaymentDetailsForm.get("onAccount").setValue(true);
+    } else {
+      this.DebitVoucherTaxationPaymentDetailsForm.get("onAccount").setValue(false);
+    }
   }
   //#endregion
 }

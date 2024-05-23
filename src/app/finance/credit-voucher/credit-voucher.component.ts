@@ -242,7 +242,7 @@ export class CreditVoucherComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
+      //console.log(result);
 
       if (result != undefined) {
         if (EditableId) {
@@ -361,7 +361,7 @@ export class CreditVoucherComponent implements OnInit {
       case 'RTGS/UTR':
         break;
     }
-
+    this.SetOnAccountValue();
   }
   //#endregion
   //#region to navigate to dashboard
@@ -397,12 +397,14 @@ export class CreditVoucherComponent implements OnInit {
   saveCreditData() {
 
     const Accountinglocation = this.creditVoucherSummaryForm.value.Accountinglocation?.name
+    const partyName = this.creditVoucherSummaryForm.value.PartyName.name;
+
     let FinalListOfCreditVoucher = [];
     // Calculate debit voucher
-    console.log(this.tableData);
     var VoucherlineitemList = this.tableData.map(function (item) {
 
       return {
+        partyName: partyName,
         "Instance": "Credit voucher",
         "Value": "Voucher line item",
         "Ledgercode": item.LedgerHdn,
@@ -422,8 +424,10 @@ export class CreditVoucherComponent implements OnInit {
     if (PaymentAmount != NetPayable) {
       const Amount = NetPayable - PaymentAmount;
       const isAmountNegative = Amount < 0;
+      const partyName = this.creditVoucherSummaryForm.value.PartyName.name;
 
       var RoundOffList = {
+        partyName: partyName,
         "Instance": "Credit voucher",
         "Value": ledgerInfo['EXP001042'].LeadgerName,
         "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
@@ -466,17 +470,21 @@ export class CreditVoucherComponent implements OnInit {
         Leadgerdata = this.creditVoucherPaymentDetailsForm.get("DepositBank").value
         break;
     }
+    const bankName = this.creditVoucherPaymentDetailsForm.get("DepositBank").value;
 
     let PayableData = {
+      partyName: partyName,
+      "LedgerCode": Leadgerdata?.value,
+      "LedgerName": Leadgerdata?.name,
       "Instance": "Credit voucher",
       "Value": PaymentMode,
-      "Ledgercode": Leadgerdata?.value,
-      "Ledgername": Leadgerdata?.name,
+      "Ledgercode": bankName.value,
+      "Ledgername": bankName.name,
       "SubLedger": "BANK",
       "Dr": NetPayable.toFixed(2),
       "Cr": 0,
       "Location": Accountinglocation,
-      "Narration": ""
+      "Narration": this.tableData[0].Narration
     };
     FinalListOfCreditVoucher.push(PayableData)
 
@@ -498,7 +506,7 @@ export class CreditVoucherComponent implements OnInit {
   async SubmitRequest(FinalListOfCreditVoucher) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        console.log(FinalListOfCreditVoucher);
+        // console.log(FinalListOfCreditVoucher);
 
         const companyCode = this.storage.companyCode;
         const Branch = this.storage.branch;
@@ -536,8 +544,8 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.accountName = this.creditVoucherPaymentDetailsForm.value.DepositBank.name;
         this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
-
-
+        this.creditVoucherDataRequestModel.onAccount = this.creditVoucherPaymentDetailsForm.value.onAccount;
+        // console.log(FinalListOfCreditVoucher);
 
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
@@ -573,85 +581,85 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherRequestModel.data = this.creditVoucherDataRequestModel;
         this.creditVoucherRequestModel.debitAgainstDocumentList = [];
 
-        console.log(this.creditVoucherRequestModel);
+        // console.log(this.creditVoucherRequestModel);
 
-        this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
-          .subscribe({
-            next: (res: any) => {
-              var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {
-                return {
-                  "accCode": `${item.Ledgercode}`,
-                  "accName": item.Ledgername,
-                  "amount": item.Cr,
-                  "accCategory": item.SubLedger,
-                  "narration": item.Narration ? item.Narration : item.Ledgername,
-                };
-              })
-              var DebitData = FinalListOfCreditVoucher.filter(item => item.Cr == "").map(function (item) {
-                return {
-                  "accCode": `${item.Ledgercode}`,
-                  "accName": item.Ledgername,
-                  "amount": item.Dr,
-                  "accCategory": item.SubLedger,
-                  "narration": item.Narration ? item.Narration : item.Ledgername,
-                };
-              })
-              let reqBody = {
-                companyCode: companyCode,
-                voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transDate: Date(),
-                finYear: financialYear,
-                branch: this.storage.getItem(StoreKeys.Branch),
-                transCode: VoucherInstanceType.CreditVoucherCreation,
-                transType: VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
-                voucherCode: VoucherType.CreditVoucher,
-                voucherType: VoucherType[VoucherType.CreditVoucher],
-                docType: "Voucher",
-                partyType: this.creditVoucherSummaryForm.value.Preparedfor,
-                docNo: "",
-                partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
-                partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
-                entryBy: this.storage.getItem(StoreKeys.UserId),
-                entryDate: Date(),
-                debit: DebitData,
-                credit: CreditData,
-              };
-              this.voucherServicesService
-                .FinancePost("fin/account/posting", reqBody)
-                .subscribe({
-                  next: (res: any) => {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Voucher Created Successfully",
-                      text: "Voucher No: " + reqBody.voucherNo,
-                      showConfirmButton: true,
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        Swal.hideLoading();
-                        setTimeout(() => {
-                          Swal.close();
-                        }, 2000);
-                        this.navigationService.navigateTotab("Voucher", "dashboard/Index");
-                      }
-                    });
-                  },
-                  error: (err: any) => {
+        // this.voucherServicesService
+        //   .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
+        //   .subscribe({
+        //     next: (res: any) => {
+        //       var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {
+        //         return {
+        //           "accCode": `${item.Ledgercode}`,
+        //           "accName": item.Ledgername,
+        //           "amount": item.Cr,
+        //           "accCategory": item.SubLedger,
+        //           "narration": item.Narration ? item.Narration : item.Ledgername,
+        //         };
+        //       })
+        //       var DebitData = FinalListOfCreditVoucher.filter(item => item.Cr == "").map(function (item) {
+        //         return {
+        //           "accCode": `${item.Ledgercode}`,
+        //           "accName": item.Ledgername,
+        //           "amount": item.Dr,
+        //           "accCategory": item.SubLedger,
+        //           "narration": item.Narration ? item.Narration : item.Ledgername,
+        //         };
+        //       })
+        //       let reqBody = {
+        //         companyCode: companyCode,
+        //         voucherNo: res?.data?.mainData?.ops[0].vNO,
+        //         transDate: Date(),
+        //         finYear: financialYear,
+        //         branch: this.storage.getItem(StoreKeys.Branch),
+        //         transCode: VoucherInstanceType.CreditVoucherCreation,
+        //         transType: VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
+        //         voucherCode: VoucherType.CreditVoucher,
+        //         voucherType: VoucherType[VoucherType.CreditVoucher],
+        //         docType: "Voucher",
+        //         partyType: this.creditVoucherSummaryForm.value.Preparedfor,
+        //         docNo: "",
+        //         partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
+        //         partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
+        //         entryBy: this.storage.getItem(StoreKeys.UserId),
+        //         entryDate: Date(),
+        //         debit: DebitData,
+        //         credit: CreditData,
+        //       };
+        //       this.voucherServicesService
+        //         .FinancePost("fin/account/posting", reqBody)
+        //         .subscribe({
+        //           next: (res: any) => {
+        //             Swal.fire({
+        //               icon: "success",
+        //               title: "Voucher Created Successfully",
+        //               text: "Voucher No: " + reqBody.voucherNo,
+        //               showConfirmButton: true,
+        //             }).then((result) => {
+        //               if (result.isConfirmed) {
+        //                 Swal.hideLoading();
+        //                 setTimeout(() => {
+        //                   Swal.close();
+        //                 }, 2000);
+        //                 this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+        //               }
+        //             });
+        //           },
+        //           error: (err: any) => {
 
-                    if (err.status === 400) {
-                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
-                    } else {
-                      this.snackBarUtilityService.ShowCommonSwal("error", err);
-                    }
-                  },
-                });
+        //             if (err.status === 400) {
+        //               this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+        //             } else {
+        //               this.snackBarUtilityService.ShowCommonSwal("error", err);
+        //             }
+        //           },
+        //         });
 
-              console.log(reqBody);
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-            },
-          });
+        //       //console.log(reqBody);
+        //     },
+        //     error: (err: any) => {
+        //       this.snackBarUtilityService.ShowCommonSwal("error", err);
+        //     },
+        //   });
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }
@@ -659,6 +667,17 @@ export class CreditVoucherComponent implements OnInit {
 
     }, "Credit Voucher Generating..!");
 
+  }
+  //#endregion
+  //#region to set on account value
+  SetOnAccountValue() {
+    const PaymentMode = this.creditVoucherPaymentDetailsForm.get("ReceiptMode").value;
+    const Preparedfor = this.creditVoucherSummaryForm.value.Receivedfrom;
+    if (PaymentMode !== "Cash" && Preparedfor == "Customer" && this.tableData[0].LedgerHdn == "AST001002") {
+      this.creditVoucherPaymentDetailsForm.get("onAccount").setValue(true);
+    } else {
+      this.creditVoucherPaymentDetailsForm.get("onAccount").setValue(false);
+    }
   }
   //#endregion
 }

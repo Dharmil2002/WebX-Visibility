@@ -28,32 +28,37 @@ export class DepartureService {
   constructor(
     private operation: OperationService,
     private storage: StorageService,
-    private vendor:VendorService
+    private vendor: VendorService
   ) {
   }
-  async getRouteSchedule() {    
+  async getRouteSchedule() {
+    // Utility function to format route details with configurable keys
+    const formatDetails = (data, keys) => data.map(element => ({
+      id: element?._id || "",
+      RouteandSchedule: `${element[keys.routeCodeKey]}:${element[keys.routeNameKey]}`,
+      VehicleNo: element?.vEHNO || keys.defaultVehicleNo || "",
+      TripID: element?.tHC || keys.defaultTripID || "",
+      Scheduled: new Date().toISOString(),
+      Expected: new Date(new Date().getTime() + 10 * 60000).toISOString(),
+      Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2),
+      status: element.sTS || "1",
+      Action: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
+      location: element?.cLOC || element?.controlLoc || ""
+    }));
     try {
-      // Fetching route data based on company code and branch location
-      const routeData = await this.fetchData(Collections.trip_Route_Schedule, { cLOC: this.storage.branch,iSACT:true });
-      // Mapping route data to create departure details
-      const departureDetails = routeData.map(element => ({
-        id: element?._id || "", // Safely accessing the ID
-        RouteandSchedule: `${element.rUTCD}:${element.rUTNM}`, // Concatenating route code and name
-        VehicleNo: element?.vEHNO || "", // Accessing vehicle number
-        TripID: element?.tHC || "", // Matching THC record based on route code
-        Scheduled: new Date().toISOString(), // Formatting current date as scheduled date
-        Expected:new Date(new Date().getTime() + 10 * 60000).toISOString(), // Formatting expected date (10 mins from now)
-        Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2), // Calculating the time difference in hours
-        status:element.sTS,
-        Action: this.statusActions[`${element.sTS}`], // Deciding action based on THC availability
-        location: element?.cLOC || "", // Accessing location
-      }));
-      return departureDetails;
-      // Use departureDetails as needed
+      const tripDetails = await this.fetchData(Collections.trip_Route_Schedule, { cLOC: this.storage.branch, iSACT: true });
+      const route = await this.fetchData(Collections.route_Master_LocWise, { controlLoc: this.storage.branch, isActive: true });
+      const adHoc = await this.fetchData(Collections.adhoc_routes, { cLOC: this.storage.branch, iSACT: true });
+      const departureDetails = formatDetails(tripDetails, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Update Status' });
+      const routeDetails = formatDetails(route, { routeCodeKey: 'routeId', routeNameKey: 'routeName', defaultAction: 'Create Trip' });
+      const adHocDetails = formatDetails(adHoc, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Create Trip' });
+      return [...departureDetails, ...routeDetails, ...adHocDetails];
     } catch (error) {
-      // Handle any errors that occur during the fetching process
+      console.error('Error fetching route schedule:', error);
+      throw error; // Re-throw the error to handle it further up the chain
     }
   }
+
   // Generic function to fetch data from a given collection with a specified filter
   async fetchData(collectionName, filter) {
     const req = {
@@ -69,10 +74,13 @@ export class DepartureService {
     return (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
   }
   async getFieldDepartureMapping(data, shipment) {
-    
-    const vendorCode=await this.vendor.getVendorDetail(data?.Vendor);
-    const dktNoList = shipment?shipment.map((x) => x.dKTNO):[];
-    const dktSfx=shipment?shipment.map((x)=>`${x.dKTNO}-${x.sFX}`):[];
+    const vendorCode = await this.vendor.getVendorDetail(
+      {
+      companyCode:this.storage.companyCode,
+      vendorName: {'D$regex' : `^${data?.Vendor}`,'D$options' : 'i'}
+    });
+    const dktNoList = shipment ? shipment.map((x) => x.dKTNO) : [];
+    const dktSfx = shipment ? shipment.map((x) => `${x.dKTNO}-${x.sFX}`) : [];
     let eventJson = dktNoList;
     const origin = data.Route.split(":")[1].split("-")[0];
     const next = getNextLocation(data.Route.split(":")[1].split("-"), this.storage.branch);
@@ -80,31 +88,30 @@ export class DepartureService {
     const getLeg = {
       companyCode: this.storage.companyCode,
       collectionName: "thc_movement_ltl",
-      filter: { _id: legID},      
+      filter: { _id: legID },
     }
     let isLegExist = false;
-    let thc_movment = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", getLeg));    
-    let legData = thc_movment.data;    
+    let thc_movment = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", getLeg));
+    let legData = thc_movment.data;
     isLegExist = (legData?._id == legID);
 
-    let thcSummary = {};    
-    if(this.storage.branch == origin) 
-    {
+    let thcSummary = {};
+    if (this.storage.branch == origin) {
       thcSummary = {
         "tHCDT": new Date(),
         "vND": {
-          "tY": vendorCode[0]?.vendorType || "",
-          "tYNM": data?.VendorType || "",
-          "cD":vendorCode[0]?.vendorCode || "",
+          "tY": vendorCode[0]?.vendorType || "4",
+          "tYNM": data?.VendorType || "Market",
+          "cD": vendorCode[0]?.vendorCode || "V8888",
           "nM": data?.Vendor || "",
           "pAN": vendorCode[0]?.panNo || "",
         },
-        "oPSST":ThcStatus.In_Transit,    
-        "oPSSTNM":ThcStatus[ThcStatus.In_Transit].split("_").join(" "),
+        "oPSST": ThcStatus.In_Transit,
+        "oPSSTNM": ThcStatus[ThcStatus.In_Transit].split("_").join(" "),
         "fINST": 0,
         "fINSTNM": "",
         "cONTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
-        "aDVPENAMT":ConvertToNumber(data?.TotalAdv || 0, 2),
+        "aDVPENAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
         "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
         "cAP": {
           "wT": data?.Capacity || 0,
@@ -115,9 +122,9 @@ export class DepartureService {
           "wT": data?.WeightUtilization,
           "vOL": data?.VolumeUtilization,
           "vWT": 0
-        },    
-        "cHG":data?.cHG||0,
-        "tOTAMT":ConvertToNumber(data?.TotalTripAmt||0,2),
+        },
+        "cHG": data?.cHG || 0,
+        "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
         "aDV": {
           "aAMT": ConvertToNumber(data?.Advance || 0, 2),
           "pCASH": ConvertToNumber(data?.PaidByCash || 0, 2),
@@ -127,8 +134,8 @@ export class DepartureService {
           "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
         },
         "bALAMT": data?.BalanceAmt || 0,
-        "aDPAYAT":data?.advPdAt?.value||"",
-        "bLPAYAT": data?.balAmtAt?.value||"",
+        "aDPAYAT": data?.advPdAt?.value || "",
+        "bLPAYAT": data?.balAmtAt?.value || "",
         "iSBILLED": false,
         "bILLNO": "",
         "dRV": {
@@ -139,7 +146,7 @@ export class DepartureService {
         },
         "fLOC": this.storage.branch,
         "tLOC": next,
-        "dPT": {          
+        "dPT": {
           "sCHDT": ConvertToDate(data?.DeptartureTime),
           "eXPDT": ConvertToDate(data?.DeptartureTime),
           "aCTDT": ConvertToDate(data?.DeptartureTime),
@@ -147,9 +154,9 @@ export class DepartureService {
           "cEWB": data?.Cewb || ""
         },
         "aRR": {
-          "sCHDT":null,
-          "eXPDT":null,
-          "aCTDT":null,          
+          "sCHDT": null,
+          "eXPDT": null,
+          "aCTDT": null,
           "kM": "",
           "aCRBY": "",
           "aRBY": ""
@@ -177,25 +184,25 @@ export class DepartureService {
           "vWT": 0
         },
         "fLOC": this.storage.branch,
-        "tLOC": next,   
+        "tLOC": next,
         "mODDT": new Date(),
         "mODLOC": this.storage.branch,
-        "mODBY": this.storage.userName    
+        "mODBY": this.storage.userName
       }
     }
-    
+
     const tsReq = {
       companyCode: this.storage.companyCode,
       collectionName: "thc_summary_ltl",
-      filter: { _id: `${this.storage.companyCode}-${data.tripID}`},
+      filter: { _id: `${this.storage.companyCode}-${data.tripID}` },
       update: thcSummary
     }
     await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", tsReq));
-    
-    let loadedWT = shipment?shipment.reduce((a, c) => { return a + c.lDWT; }, 0) || 0:0; 
-    let loadedVol = shipment?shipment.reduce((a, c) => { return a + c.lDVOL; }, 0) || 0:0;
 
-    if(!isLegExist) {            
+    let loadedWT = shipment ? shipment.reduce((a, c) => { return a + c.lDWT; }, 0) || 0 : 0;
+    let loadedVol = shipment ? shipment.reduce((a, c) => { return a + c.lDVOL; }, 0) || 0 : 0;
+
+    if (!isLegExist) {
       legData = {
         "_id": legID,
         "tHC": data.tripID,
@@ -203,9 +210,9 @@ export class DepartureService {
         "fLOC": this.storage.branch || "",
         "tLOC": next || "",
         "lOAD": {
-          "dKTS":shipment?shipment.filter(f => f.lDPKG > 0).length || 0:0,
-          "pKGS":shipment?shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) ||0:0,
-          "wT": loadedWT || 0, 
+          "dKTS": shipment ? shipment.filter(f => f.lDPKG > 0).length || 0 : 0,
+          "pKGS": shipment ? shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0 : 0,
+          "wT": loadedWT || 0,
           "vOL": loadedVol || 0,
           "vWT": 0,
           "rMK": "",
@@ -225,7 +232,7 @@ export class DepartureService {
           "sCHDT": ConvertToDate(data?.DeptartureTime),
           "eXPDT": ConvertToDate(data?.DeptartureTime),
           "aCTDT": ConvertToDate(data?.DeptartureTime),
-          "gPSDT": null,         
+          "gPSDT": null,
           "oDOMT": 0
         },
         "aRR": {
@@ -256,9 +263,9 @@ export class DepartureService {
     else {
       legData = {
         "lOAD": {
-          "dKTS":shipment? shipment.filter(f => f.lDPKG > 0).length || 0:0,
-          "pKGS":shipment?shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0:0,
-          "wT": loadedWT || 0, 
+          "dKTS": shipment ? shipment.filter(f => f.lDPKG > 0).length || 0 : 0,
+          "pKGS": shipment ? shipment.reduce((a, c) => { return a + c.lDPKG; }, 0) || 0 : 0,
+          "wT": loadedWT || 0,
           "vOL": loadedVol || 0,
           "vWT": 0,
           "rMK": "",
@@ -278,7 +285,7 @@ export class DepartureService {
           "sCHDT": ConvertToDate(data?.DeptartureTime),
           "eXPDT": ConvertToDate(data?.DeptartureTime),
           "aCTDT": ConvertToDate(data?.DeptartureTime),
-          "gPSDT": null,         
+          "gPSDT": null,
           "oDOMT": 0
         },
         "mODDT": new Date(),
@@ -287,39 +294,39 @@ export class DepartureService {
       }
     }
 
-    if(isLegExist) {
+    if (isLegExist) {
       const reqthc = {
         companyCode: this.storage.companyCode,
         collectionName: "thc_movement_ltl",
         filter: { _id: legID },
         update: legData
-      }  
+      }
       await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqthc));
     }
     else {
       const reqthc = {
         companyCode: this.storage.companyCode,
-        collectionName: "thc_movement_ltl",        
+        collectionName: "thc_movement_ltl",
         data: legData
-      }  
+      }
       await firstValueFrom(this.operation.operationMongoPost("generic/create", reqthc));
     }
-  
+
     const tripDetails = {
-      sTS:VehicleStatus.Departed,
-      sTSNM:VehicleStatus[VehicleStatus.Departed],      
+      sTS: VehicleStatus.Departed,
+      sTSNM: VehicleStatus[VehicleStatus.Departed],
       nXTLOC: next
     }
 
     const reqDepart = {
       companyCode: this.storage.companyCode,
       collectionName: "trip_Route_Schedule",
-      filter:{tHC: data.tripID, rUTCD: data.Route.split(":")[0]},
+      filter: { tHC: data.tripID, rUTCD: data.Route.split(":")[0] },
       update: tripDetails
     }
     await firstValueFrom(this.operation.operationMongoPut("generic/update", reqDepart));
     if (dktNoList.length > 0) {
-      eventJson = dktNoList.map((element,index) => {
+      eventJson = dktNoList.map((element, index) => {
         const evn = {
           "_id": `${this.storage.companyCode}-${element}-${index}-${DocketEvents.Departure}-${moment(new Date()).format('YYYYMMDDHHmmss')}`, // Safely accessing the ID
           "cID": this.storage.companyCode,
@@ -332,8 +339,8 @@ export class DepartureService {
           "eVNSRC": "Depart Vehicle",
           "dOCTY": "TH",
           "dOCNO": data?.tripID || "",
-          "sTS":DocketStatus.Departed,
-          "sTSNM":DocketStatus[DocketStatus.Departed],
+          "sTS": DocketStatus.Departed,
+          "sTSNM": DocketStatus[DocketStatus.Departed],
           "oPSSTS": `Departed from ${this.storage.branch} to ${next} with THC ${data.tripID} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
           "eNTDT": new Date(),
           "eNTLOC": this.storage.branch,
@@ -344,23 +351,24 @@ export class DepartureService {
       const reqEvent = {
         companyCode: this.storage.companyCode,
         collectionName: "docket_events_ltl",
-        data:eventJson
+        data: eventJson
       }
       await firstValueFrom(this.operation.operationMongoPost("generic/create", reqEvent));
-     
-      const reqDktOpsDepart={
+
+      const reqDktOpsDepart = {
         companyCode: this.storage.companyCode,
-        collectionName:"docket_ops_det_ltl",
+        collectionName: "docket_ops_det_ltl",
         filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dktSfx] } },
-        update:{
-        "sTS":DocketStatus.Departed,
-        "sTSNM":DocketStatus[DocketStatus.Departed],
-        "oPSSTS":`Departed From ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
-        "mODBY":this.storage.userName,
-        "mODDT":new Date(),
-        "mODLOC":this.storage.branch}
+        update: {
+          "sTS": DocketStatus.Departed,
+          "sTSNM": DocketStatus[DocketStatus.Departed],
+          "oPSSTS": `Departed From ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+          "mODBY": this.storage.userName,
+          "mODDT": new Date(),
+          "mODLOC": this.storage.branch
+        }
       }
-      await firstValueFrom(this.operation.operationMongoPut("generic/updateAll",reqDktOpsDepart));
+      await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqDktOpsDepart));
     }
     Swal.fire({
       icon: "info",

@@ -1,0 +1,22 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <form [formGroup]="CustInvREGTableForm">
+    <app-form-webxpress [form]="CustInvREGTableForm" [FormTitle]="'Customer Invoice Register Report'"
+      [formData]="jsonCustInvREGFormArray" (functionCallEmitter)="functionCallHandler($event)"
+      (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Download'">
+    </app-form-webxpress>
+  </form>
+
+  <div class="scroll">
+    <app-generic-ui-grid *ngIf="LoadTable" [formTitle]="formTitle" [showCSVButton]="true" [csvFileName]="csvFileName" [source]="source"
+      [columns]="columns" [sorting]="sorting" [columnMenu]="columnMenu" [paging]="paging" [searching]="searching" [loading]="loading"
+      [theme]="theme">
+    </app-generic-ui-grid>
+  </div>
+
+</app-common-wrapper-webxpress>
+
+<style>
+  .scroll {
+    overflow-x: auto;
+  }
+</style>

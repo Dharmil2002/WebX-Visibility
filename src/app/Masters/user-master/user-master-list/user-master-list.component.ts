@@ -41,7 +41,7 @@ export class UserMasterListComponent implements OnInit {
     headerForCsv = {
         // "internalId": 'InternalID',
         "userId": 'UserId',
-        "userpassword": 'Password',
+        //"userpassword": 'Password',
         "name": 'Name',
         "gender": 'Gender',
         "dateOfJoining": 'DateofJoining',

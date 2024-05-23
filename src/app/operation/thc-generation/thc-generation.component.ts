@@ -516,8 +516,6 @@ export class ThcGenerationComponent implements OnInit {
 
     const field = $event.field; //what is use of this variable
     const functionName = $event.functionName;
-    console.log(field);
-    console.log(functionName);
     try {
       this[functionName]($event);
     } catch (error) {
@@ -1255,11 +1253,11 @@ export class ThcGenerationComponent implements OnInit {
         const toCity = x.tCT.toUpperCase();
         // Check if city matches the current city or is in the mapped cities list
         if (toCity == this.currentLocation.locCity.toUpperCase() ||
-            (this.connectedLoc &&
-             this.currentLocation.extraData &&
-             this.currentLocation.extraData.mappedCity &&
-             this.currentLocation.extraData.mappedCity.includes(toCity))) {
-            x.actions = ["Update"];
+          (this.connectedLoc &&
+            this.currentLocation.extraData &&
+            this.currentLocation.extraData.mappedCity &&
+            this.currentLocation.extraData.mappedCity.includes(toCity))) {
+          x.actions = ["Update"];
         }
         else if (this.isView) {
 
@@ -1870,8 +1868,8 @@ export class ThcGenerationComponent implements OnInit {
   async getCharges(prodNm, prdcd) {
     this.chargeJsonControl = this.chargeJsonControl.filter((x) => !x.hasOwnProperty('id'));
     //const result = await this.thcService.getCharges({ "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm },);
-    const filter = { "pRNm": prodNm, aCTV: true, cHBTY: "Booking" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm, "cHAPP": { D$in: ["THC"] }, isActive: true }
+    const filter = { "pRNm": prodNm, aCTV: true, cHBTY: {D$in:["Booking","Both"]} }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prodNm,cHATY:"Charges", "cHAPP": { D$in: ["THC"] }, isActive: true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
       const invoiceList = [];
@@ -1881,8 +1879,8 @@ export class ThcGenerationComponent implements OnInit {
           const invoice: InvoiceModel = {
             id: index + 1,
             name: element.cHACD || '',
-            label: `${element.sELCHA}(${element.aDD_DEDU})`,
-            placeholder: element.sELCHA || '',
+            label: `${element?.cAPTION||element?.sELCHA||""}(${element.aDD_DEDU})`,
+            placeholder: element?.cAPTION ||element?.sELCHA||"",
             type: 'text',
             value: '0.00',
             filterOptions: '',
@@ -1929,8 +1927,8 @@ export class ThcGenerationComponent implements OnInit {
   /*below code is for getting a Chages from Charge Master*/
   async getAutoFillCharges(charges, thcNestedDetails) {
     const product = thcNestedDetails?.thcDetails?.tMODENM || "";
-    const filter = { "pRNm": product, aCTV: true, cHBTY: "Delivery" }
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product, "cHAPP": { D$in: ["THC"] }, isActive: true }
+    const filter = { "pRNm": product, aCTV: true, cHBTY:{D$in:["Delivery","Both"] } }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": product,cHATY:"Charges","cHAPP": { D$in: ["THC"] }, isActive: true }
     const delCharge = await this.thcService.getChargesV2(filter, productFilter);
     const delChargeList = []
     const invoiceList = [];
@@ -1969,8 +1967,8 @@ export class ThcGenerationComponent implements OnInit {
           const invoice: InvoiceModel = {
             id: index + 1,
             name: element.cHACD || '',
-            label: `${element.sELCHA}(${element.aDD_DEDU})`,
-            placeholder: element.sELCHA || '',
+            label: `${element?.cAPTION||element?.sELCHA||""}(${element.aDD_DEDU})`,
+            placeholder: element?.cAPTION ||element?.sELCHA||"",
             type: 'text',
             value: "0",
             filterOptions: '',

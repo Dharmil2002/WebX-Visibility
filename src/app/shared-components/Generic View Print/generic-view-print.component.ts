@@ -27,13 +27,16 @@ export class GenericViewPrintComponent implements OnInit {
     },
   ];
   @Input() HtmlTemplate: any;
+  @Input() isLandscape: any = true;
   @Input() JsonData: any;
   @Input() FieldMapping: any[];
   @Input() EventButton;
   @Input() barcode6: boolean = false;
   @Input() barcode6Details: any = {};
+  @Input() CopysName: any[] = ['Primary Copy']; // MULTIPLE COPY ARRAY
   @Output() functionCallEmitter = new EventEmitter();
 
+  printStyles = { '@page': { size: `${this.isLandscape?'landscape':'portrait'} !important` } }
   constructor(private renderer: Renderer2) {
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
@@ -51,15 +54,17 @@ export class GenericViewPrintComponent implements OnInit {
     this.updateTableHtml();
   }
 
+  onToggleChange(event){
+    this.printStyles = { '@page': { size: `${event?'landscape':'portrait'} !important` } }
+  }
   private async updateTableHtml(): Promise<void> {
     const template = this.HtmlTemplate;
     const doc = this.parseHTML(template);
-
-    const elementsWithDataRow = Array.from(doc.querySelectorAll("[data-row]"));
-
     const processedRowKeys: string[] = [];
     const rows: { Key: string; Value: string }[] = [];
 
+    // DATA ROW PROCESS
+    const elementsWithDataRow = Array.from(doc.querySelectorAll("[data-row]"));
     const filteredFieldMapping = this.FieldMapping.filter((f) => f.Value.includes(".[#]."));
     for (const f of filteredFieldMapping) {
       const key = f.Value.slice(0, f.Value.indexOf(".[#]."));
@@ -99,7 +104,7 @@ export class GenericViewPrintComponent implements OnInit {
         }
       }
     }
-
+    // DATA COLUMN PROCESS
     const elementsWithDatacolumn = Array.from(doc.querySelectorAll("[data-column]"));
     for (const coll of elementsWithDatacolumn) {
       const AttributeValue = coll.getAttribute("data-column");
@@ -134,14 +139,18 @@ export class GenericViewPrintComponent implements OnInit {
     let updatedTemplate = doc.documentElement.innerHTML;
     for (const f of this.FieldMapping.filter((f) => !f.Value.includes(".[#].") && !f.Value.includes(".[##]."))) {
       if(f.type == "qrCode") {
-        debugger;
         const qrCode = "";
       }
       let val = await this.getValueByFieldName(this.JsonData, f.Value, f.type || "");
       updatedTemplate = updatedTemplate.replace(f.Key, val);
     }
-
-    document.getElementById("TemplateData").innerHTML = updatedTemplate;
+    // MULTIPLE COPY PROCESS
+    let TempletCopys = ''
+    for (const item of this.CopysName) {
+      TempletCopys += `\n<div class="page-break" style="page-break-before: always;margin-top:25px;">\n${updatedTemplate.replace('[[copyName]]',item)}\n</div>`
+    }
+    //SET TEMPLET 
+    document.getElementById("TemplateData").innerHTML = TempletCopys;
   }
 
   private parseHTML(html: string): Document {

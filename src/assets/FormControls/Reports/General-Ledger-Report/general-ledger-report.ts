@@ -1,3 +1,4 @@
+import { on } from "events";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class GeneralLedgerReport {
@@ -25,6 +26,9 @@ export class GeneralLedgerReport {
                 additionalData: {
                     showNameAndValue: false,
                 },
+                functions: {
+                    onOptionSelect: "resetDateRange"
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -40,6 +44,7 @@ export class GeneralLedgerReport {
                 additionalData: {
                     support: "end",
                 },
+                functions: { onDate: "validateDateRange" }
             },
             {
                 name: 'reportTyp',
@@ -48,25 +53,46 @@ export class GeneralLedgerReport {
                 type: 'Staticdropdown',
                 value: [
                     { value: "General Ledger", name: "General Ledger" },
-                    { value: "Sub Ledger ", name: "Sub Ledger " },
+                    { value: "Sub Ledger", name: "Sub Ledger" },
                     { value: "Document/Cheque No  ", name: "Document/Cheque No  " },
                 ],
                 Validations: [],
                 generatecontrol: true, disable: false
             },
             {
-                name: 'state',
-                label: 'Select State',
-                placeholder: 'Select State ',
+                name: 'reportSubType',
+                label: 'Report Sub Type',
+                placeholder: 'Report Sub Type',
+                type: 'Staticdropdown',
+                value: [
+                    { value: "Location", name: "Location" },
+                    { value: "Customer", name: "Customer" },
+                    { value: "Vendor", name: "Vendor" },
+                    { value: "Employee", name: "Employee" },
+                    { value: "Driver", name: "Driver" },
+                    { value: "Vehicle", name: "Vehicle" },
+                ],
+                functions: {
+                    onSelection: "reportSubTypeChanged"
+                },
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'subLedger',
+                label: 'Sub Ledger',
+                placeholder: 'Sub Ledger',
                 type: 'multiselect',
                 value: [],
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [
-                ],
+                Validations: [{
+                    name: "autocomplete",
+                },
+                {
+                    name: "invalidAutocomplete",
+                    message: "Choose proper value",
+                },],
                 additionalData: {
-                    support: "stateHandler",
+                    support: "subLedgerHandler",
                     showNameAndValue: true,
                 },
                 functions: {
@@ -127,7 +153,7 @@ export class GeneralLedgerReport {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
-                Validations: [ {
+                Validations: [{
                     name: "autocomplete",
                 },
                 {
@@ -169,6 +195,7 @@ export class GeneralLedgerReport {
                 generatecontrol: false,
                 disable: true,
                 Validations: [],
+                functions: { onDate: "validateDateRange" }
             },
             {
                 name: 'accountHandler',
@@ -180,8 +207,8 @@ export class GeneralLedgerReport {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'stateHandler',
-                label: 'stateHandler',
+                name: 'branchHandler',
+                label: 'branchHandler',
                 placeholder: ' ',
                 type: '',
                 value: '',
@@ -189,8 +216,8 @@ export class GeneralLedgerReport {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'branchHandler',
-                label: 'branchHandler',
+                name: 'subLedgerHandler',
+                label: '',
                 placeholder: ' ',
                 type: '',
                 value: '',

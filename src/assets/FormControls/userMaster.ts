@@ -408,10 +408,10 @@ export class UserControl {
         type: "",
         value: "",
         Validations: [
-          {
-            name: "required",
-            message: "Multi Division Access is Required...!",
-          },
+          // {
+          //   name: "required",
+          //   message: "Multi Division Access is Required...!",
+          // },
           {
             name: "invalidAutocompleteObject",
             message: "Choose proper value",

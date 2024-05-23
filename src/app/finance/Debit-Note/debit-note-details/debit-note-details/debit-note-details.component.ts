@@ -388,9 +388,9 @@ export class DebitNoteDetailsComponent implements OnInit {
 
         this.DNTDetDataRequestModel._id = "";
         this.DNTDetDataRequestModel.cID = this.storage.companyCode,
-        this.DNTDetDataRequestModel.docNo =this.dNoteData[0].docNo,
+        this.DNTDetDataRequestModel.docNo ="",
         this.DNTDetDataRequestModel.tYP = "";
-        this.DNTDetDataRequestModel.nTNO = "";
+        this.DNTDetDataRequestModel.nTNO = this.dNoteData[0].docNo;
         this.DNTDetDataRequestModel.nTDT = new Date(),
         this.DNTDetDataRequestModel.bILLNO = "";
         this.DNTDetDataRequestModel.bGNDT = "";

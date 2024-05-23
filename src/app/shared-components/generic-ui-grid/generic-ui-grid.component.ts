@@ -27,8 +27,10 @@ export class GenericUiGridComponent extends UnsubscribeOnDestroyAdapter implemen
   @Input() searching: GuiSearching;
   @Input() loading: boolean;
   @Input() theme: string | GuiTheme;
+  @Input() stickyHeader: boolean;
 
   @ViewChild("filter", { static: true }) filter: ElementRef;
+TableContainerStyle: any;
 
 
   constructor() {

@@ -115,6 +115,7 @@ export class CNTHdrDataRequestModel {
   _id: string;
   cID: number;
   docNo: string;
+  bILLNO: string;
   tYP: string;
   nTNO: string;
   nTDT: Date;

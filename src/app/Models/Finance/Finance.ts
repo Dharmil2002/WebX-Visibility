@@ -115,6 +115,7 @@ export class CNTHdrDataRequestModel {
   _id: string;
   cID: number;
   docNo: string;
+  bILLNO: string;
   tYP: string;
   nTNO: string;
   nTDT: Date;
@@ -287,7 +288,13 @@ export class DNTDetDataRequestModel {
     sGST: number;
     aMT: number;
   };
-  tdsAMT:number;
+  tDS: {
+    aMT: number;
+    eXMT: boolean;
+    rATE: number;
+    sECD: string;
+    sEC: string;
+  };
   eNTDT: Date;
   eNTLOC: string;
   eNTBY: string;

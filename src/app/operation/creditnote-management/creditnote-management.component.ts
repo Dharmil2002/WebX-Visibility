@@ -74,7 +74,7 @@ export class CreditnoteManagementComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width: 220px",
     },
-    docNo: {
+    bILLNO: {
       Title: "CN Ref No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
@@ -109,7 +109,7 @@ export class CreditnoteManagementComponent implements OnInit {
     "aMT",
     "pARTY",
     "pARTYAmt",
-    "docNo",
+    "bILLNO",
     "gST",
     "tXBLAMT",
     "gstRevlAmt",
@@ -139,7 +139,7 @@ export class CreditnoteManagementComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width: 220px",
     },
-    docNo: {
+    bILLNO: {
       Title: "CN Ref No",
       class: "matcolumnleft",
       Style: "max-width: 300px",
@@ -178,7 +178,7 @@ export class CreditnoteManagementComponent implements OnInit {
     "aMT",
     "pARTY",
     "pARTYAmt",
-    "docNo",
+    "bILLNO",
     "gST",
     "tXBLAMT",
     "gstRevlAmt",

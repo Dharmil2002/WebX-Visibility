@@ -99,11 +99,11 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       Style: "min-width:100px",
       datatype: 'datetime'
     },
-    Status: {
-      Title: "Status",
-      class: "matcolumnleft",
-      Style: "min-width:100px"
-    },
+    // Status: {
+    //   Title: "Status",
+    //   class: "matcolumnleft",
+    //   Style: "min-width:100px"
+    // },
     // Hrs: {
     //   Title: "Hrs.",
     //   class: "matcolumnright",
@@ -126,7 +126,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     // "Hrs": "Hrs.",
     // "Action": "Action"
   }
-  staticField = ["Route","VehicleNo","TripID","Location","Scheduled","Expected","Status"] //,"Hrs"
+  staticField = ["Route","VehicleNo","TripID","Location","Scheduled","Expected"] //,"Hrs","Scheduled","Expected","Status"
 
   METADATA = {
     checkBoxRequired: true,

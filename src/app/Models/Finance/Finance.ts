@@ -288,7 +288,13 @@ export class DNTDetDataRequestModel {
     sGST: number;
     aMT: number;
   };
-  tdsAMT:number;
+  tDS: {
+    aMT: number;
+    eXMT: boolean;
+    rATE: number;
+    sECD: string;
+    sEC: string;
+  };
   eNTDT: Date;
   eNTLOC: string;
   eNTBY: string;

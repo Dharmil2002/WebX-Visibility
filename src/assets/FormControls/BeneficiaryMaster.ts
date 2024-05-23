@@ -83,8 +83,8 @@ export class BeneficiaryControl {
                 },
                 {
                     name: "pattern",
-                    message: "Please enter valid Account code of length 10 to 15.",
-                    pattern: "^[0-9]{10,15}$",
+                    message: "Please enter valid Account code of length 10 to 16.",
+                    pattern: "^[0-9]{10,16}$",
                 },
                 ], functions: {
                     onChange: 'OnAccountChange'

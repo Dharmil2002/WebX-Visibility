@@ -29,6 +29,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 
 @Component({
@@ -126,6 +127,9 @@ export class DepartVehicleComponent implements OnInit {
   listDocket = [];
   next: string;
   products:AutoComplete[];
+  isSysCEVB: boolean = true;
+  rules: any;
+
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(
@@ -139,7 +143,8 @@ export class DepartVehicleComponent implements OnInit {
     private hawkeyeUtilityService: HawkeyeUtilityService,
     private storage:StorageService,
     private locationService:LocationService,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private controlPanel: ControlPanelService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
@@ -147,11 +152,25 @@ export class DepartVehicleComponent implements OnInit {
 
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
-    this.IntializeFormControl();
-    this.autoBindData();
-    this.fetchShipmentData();
-    this.generalMaster();
-    // this.autoBindData()
+    this.getRules().finally(() => {
+      this.IntializeFormControl();
+      this.autoBindData();
+      this.fetchShipmentData();
+      this.generalMaster();
+      // this.autoBindData()
+    });
+  }
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: { D$in: ["THC"] },
+      aCTIVE: true,
+    };
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
+      this.isSysCEVB = this.rules.find((x) => x.rULEID == "SYSCEWB" && x.aCTIVE)?.vAL == "Y";
+    }
   }
   async generalMaster() {
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
@@ -288,7 +307,7 @@ export class DepartVehicleComponent implements OnInit {
     this.advanceControlArray = AdvanceControls.getAdvanceFormControls();
     const BalanceControls = new BalanceControl();
     this.balanceControlArray = BalanceControls.getBalanceFormControls();
-    const DepartureControls = new DepartureControl();
+    const DepartureControls = new DepartureControl(this.isSysCEVB);
     this.departureControlArray = DepartureControls.getDepartureFormControls();
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [
       this.jsonControlArray,
@@ -833,7 +852,7 @@ export class DepartVehicleComponent implements OnInit {
   viewMenifest(event) {
     const req = {
       DocNo: event.data?.manifest,
-      templateName: "Manifest",
+      templateName: "MF1",
       partyCode: "CONSRAJT27",
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;

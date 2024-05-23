@@ -53,7 +53,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     billNo: {
       Title: "Bill No",
       class: "matcolumncenter",
-      Style: "min-width:200px"
+      Style: "min-width:200px",
+      datatype: "string"
     },
     Date: {
       Title: "Generation Date",
@@ -67,7 +68,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       Title: "Debit Note (₹)",
       class: "matcolumnright",
     },
-    AdvancePayedAmount: {
+    PayedAmount: {
       Title: "Paid Amount (₹)",
       class: "matcolumnright",
     },
@@ -86,7 +87,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }
   };
   menuItems = [
-    { label: 'Modify Bill Amount' },
+    { label: 'Partial Payment' },
   ]
   metaData = {
     checkBoxRequired: true,
@@ -101,7 +102,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  staticField = ["paymentAmount", "TotalTHCAmount", "debitNote", "Date", "AdvancePayedAmount", "pendingAmount", "billNo"];
+  staticField = ["paymentAmount", "TotalTHCAmount", "debitNote", "Date", "PayedAmount", "pendingAmount", "billNo"];
   summaryStaticField = ["amt", "institute", "ref", "paymentMethod"];
   documentSaticField = ["docNo", "document", "date"];
   companyCode: any = 0;
@@ -167,6 +168,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   ) {
     this.companyCode = this.storage.companyCode;
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
+    console.log(this.billData)
   }
 
   ngOnInit(): void {
@@ -214,7 +216,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         payment: 0,
         isSelected: false,
         Date: x.Date,
-        actions: ['Modify Bill Amount']
+        actions: ['Partial Payment']
       }));
     this.tableData = data
     this.isTableLode = true;
@@ -231,7 +233,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     SelectedData.forEach((element) => {
       this.TotalBillAmount = this.TotalBillAmount + +element.TotalTHCAmount;
       this.TotalDebitNote = this.TotalDebitNote + +element.debitNote;
-      this.TotalPaidAmount = this.TotalPaidAmount + +element.AdvancePayedAmount;
+      this.TotalPaidAmount = this.TotalPaidAmount + +element.PayedAmount;
       this.TotalPendingAmount = this.TotalPendingAmount + +element.pendingAmount;
       this.TotalPaymentAmount = this.TotalPaymentAmount + +element.paymentAmount //this.TotalPaymentAmount + +element.billAmount;
     });

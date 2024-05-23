@@ -93,20 +93,20 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       if (extrasState.data.label.label == "Modify") {
         this.isUpdate = 1;
         this.updatecreditnote = false;
-        this.hdninvoiceno = extrasState.data.data.docNo;
+        this.hdninvoiceno = extrasState.data.data.bILLNO;
         this.hdncreditno = extrasState.data.data.nTNO;
         this.hdncnamt = extrasState.data.data.aMT;
       }
       if (extrasState.data.label.label == "Approve") {
         this.isUpdate = 2;
         this.updatecreditnote = false;
-        this.hdninvoiceno = extrasState.data.data.docNo;
+        this.hdninvoiceno = extrasState.data.data.bILLNO;
         this.hdncreditno = extrasState.data.data.nTNO;
       }
       if (extrasState.data.label.label == "Cancel") {
         this.isUpdate = 3;
         this.updatecreditnote = false;
-        this.hdninvoiceno = extrasState.data.data.docNo;
+        this.hdninvoiceno = extrasState.data.data.bILLNO;
         this.hdncreditno = extrasState.data.data.nTNO;
         this.hdncnamt = extrasState.data.data.aMT;
       }
@@ -410,7 +410,8 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           //Header data 
           this.CNTHdrDataRequestModel._id = "";
           this.CNTHdrDataRequestModel.cID = this.storage.companyCode; // assuming cID is a number, assign 0 for empty
-          this.CNTHdrDataRequestModel.docNo = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
+          this.CNTHdrDataRequestModel.docNo = "";
+          this.CNTHdrDataRequestModel.bILLNO = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
           this.CNTHdrDataRequestModel.tYP = "C";
           this.CNTHdrDataRequestModel.nTNO = "";
           this.CNTHdrDataRequestModel.nTDT = new Date();
@@ -453,7 +454,8 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           //Detasils data
           this.CNTDetDataRequestModel._id = "";
           this.CNTDetDataRequestModel.cID = this.storage.companyCode;
-          this.CNTDetDataRequestModel.docNo = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
+          this.CNTDetDataRequestModel.docNo = "";
+          this.CNTDetDataRequestModel.bILLNO = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
           this.CNTDetDataRequestModel.tYP = "C";
           this.CNTDetDataRequestModel.nTNO = "";
           this.CNTDetDataRequestModel.nTDT = new Date();
@@ -528,7 +530,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
                     };
                     const res = firstValueFrom(
                       this.masterService.masterPut("generic/update", req))
-
 
                     Swal.hideLoading();
                     setTimeout(() => {

@@ -103,7 +103,7 @@ export class debitNoteGenerationControls {
                 type: "date",
                 value: "18-Apr-2024",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [],
             },
             {

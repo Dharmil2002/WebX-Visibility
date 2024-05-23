@@ -213,7 +213,7 @@ export class ThcSummaryComponent implements OnInit {
   openExternalWindow(data) {
     const templateBody = {
       DocNo: data.docNo,
-      templateName: "thc",
+      templateName: "thc1",
       partyCode: "CONSRAJ19",
     }
 

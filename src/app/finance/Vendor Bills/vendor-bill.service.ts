@@ -29,7 +29,7 @@ export class VendorBillService {
         billNo: res.docNo,
         Date: res.bDT,
         TotalTHCAmount: res.tHCAMT,
-        AdvancePayedAmount: res.aDVAMT,
+        PayedAmount: res.bPAIDAMT || 0,
         billAmount: res.bALAMT,
         pendingAmount: res.bALPBAMT,
         paymentAmount: res.bALPBAMT,

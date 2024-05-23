@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" (toggleChange)="onToggleChange($event)">
   <form [formGroup]="AddCompanyFormsValue">
     <generic-accordion-webxpress 
     [AccordionForm]="AddCompanyFormsValue" 

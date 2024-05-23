@@ -243,7 +243,7 @@ export class VehicleLoadingComponent implements OnInit {
     const LoadingSheet = event.data.LoadingSheet
     const templateBody = {
       DocNo: LoadingSheet,
-      templateName: "loadingSheet",
+      templateName: "LS1",
       partyCode: "CONSRAJT26",
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

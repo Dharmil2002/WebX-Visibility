@@ -371,7 +371,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       return;
     }
 
-    if (Gsttype == "SGST" || Gsttype == "CGST") {
+    if (Gsttype == "CGST,SGST") {
       var TaxableAmt = (CreditnoteAmount) / (1 + (this.Gstrate / 100));
       this.GstAmount = parseFloat(((TaxableAmt * (this.Gstrate / 100))).toFixed(2));
       this.SgstRate = (this.Gstrate / 2);

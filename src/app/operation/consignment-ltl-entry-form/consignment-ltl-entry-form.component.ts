@@ -1849,7 +1849,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const matDen = this.invoiceForm.controls['materialDensity'].value;
     if (matDen == "Bulky") {
       const oActualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value)
-      const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value) * 25 / 1000;
+      const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value) * 25 / 100;
       const total = oActualWeight + actualWeight;
       this.invoiceForm.controls['chargedWeight'].setValue(total);
     }

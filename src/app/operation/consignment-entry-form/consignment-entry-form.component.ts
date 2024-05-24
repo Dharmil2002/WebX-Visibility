@@ -140,7 +140,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     private clusterService: ClusterMasterService
   ) {
     super();
-
     this.DocCalledAs = controlPanel.DocCalledAs;
     this.breadscrums = [
       {
@@ -612,7 +611,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     };
     //this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
     this.model.consignmentTableForm.controls["fromCity"].setValue(city);
-
+      
     // mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
     // mapControlArray(this.consigneeControlArray, consigneeMappings); // Map consignee control array
     //mapControlArray(this.contractControlArray, destinationMapping);
@@ -670,8 +669,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       containerNumberControl.updateValueAndValidity();
     }
   }
-
-
   OnChnageContainerNumber(event) {
     const ContainerType = event?.eventArgs?.option?.value?.data?.cNTYPNM;
     const containerCapacity = this.model.containerTypeList.find(
@@ -1177,8 +1174,19 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.length = ConvertToNumber(this.rules.find(x => x.rULEID == "LENGTH" && x.aCTIVE)?.vAL);
     this.mseq = this.rules.find(x => x.rULEID == "MSEQ" && x.aCTIVE)?.vAL == "Y";
     this.conLoc = this.rules.find((x) => x.rULEID == "CONLOC" && x.aCTIVE == true).vAL == "Y";
+    if(this.conLoc){
+      this.setFromCity();
+      //this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
+    }
   }
-
+  async setFromCity(){
+    const location = await this.locationService.locationFromApi({
+      locCode: this.storage.branch,
+    });
+    const city = { CT: { D$in: location[0].extraData.mappedCity.map(x => x.trim()) } }
+    const clusterData = await this.clusterService.getClusterCityMapping(city);
+    this.filter.Filter(this.model.allformControl, this.model.consignmentTableForm,clusterData,this.model.fromCity,this.model.fromCityStatus);
+  }
   vendorFieldChanged() {
 
     const vendorType = this.model.consignmentTableForm.value.vendorType !== undefined

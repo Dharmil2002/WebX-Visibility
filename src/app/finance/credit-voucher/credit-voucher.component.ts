@@ -242,7 +242,7 @@ export class CreditVoucherComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
+      //console.log(result);
 
       if (result != undefined) {
         if (EditableId) {
@@ -361,7 +361,7 @@ export class CreditVoucherComponent implements OnInit {
       case 'RTGS/UTR':
         break;
     }
-
+    this.SetOnAccountValue();
   }
   //#endregion
   //#region to navigate to dashboard
@@ -397,12 +397,14 @@ export class CreditVoucherComponent implements OnInit {
   saveCreditData() {
 
     const Accountinglocation = this.creditVoucherSummaryForm.value.Accountinglocation?.name
+    const partyName = `${this.creditVoucherSummaryForm.value.PartyName.value} : ${this.creditVoucherSummaryForm.value.PartyName.name}`;
+
     let FinalListOfCreditVoucher = [];
     // Calculate debit voucher
-    console.log(this.tableData);
     var VoucherlineitemList = this.tableData.map(function (item) {
 
       return {
+        partyName: partyName,
         "Instance": "Credit voucher",
         "Value": "Voucher line item",
         "Ledgercode": item.LedgerHdn,
@@ -422,8 +424,10 @@ export class CreditVoucherComponent implements OnInit {
     if (PaymentAmount != NetPayable) {
       const Amount = NetPayable - PaymentAmount;
       const isAmountNegative = Amount < 0;
+      const partyName = this.creditVoucherSummaryForm.value.PartyName.name;
 
       var RoundOffList = {
+        partyName: partyName,
         "Instance": "Credit voucher",
         "Value": ledgerInfo['EXP001042'].LeadgerName,
         "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
@@ -466,17 +470,21 @@ export class CreditVoucherComponent implements OnInit {
         Leadgerdata = this.creditVoucherPaymentDetailsForm.get("DepositBank").value
         break;
     }
+    const bankName = this.creditVoucherPaymentDetailsForm.get("DepositBank").value;
 
     let PayableData = {
+      partyName: partyName,
+      "LedgerCode": Leadgerdata?.value,
+      "LedgerName": Leadgerdata?.name,
       "Instance": "Credit voucher",
       "Value": PaymentMode,
-      "Ledgercode": Leadgerdata?.value,
-      "Ledgername": Leadgerdata?.name,
+      "Ledgercode": bankName.value,
+      "Ledgername": bankName.name,
       "SubLedger": "BANK",
       "Dr": NetPayable.toFixed(2),
       "Cr": 0,
       "Location": Accountinglocation,
-      "Narration": ""
+      "Narration": this.tableData[0].Narration
     };
     FinalListOfCreditVoucher.push(PayableData)
 
@@ -490,7 +498,9 @@ export class CreditVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.SubmitRequest(FinalListOfCreditVoucher)
+
+        const updatedData = this.replaceLedgerFields(FinalListOfCreditVoucher);
+        this.SubmitRequest(updatedData)
       }
     });
   }
@@ -498,7 +508,7 @@ export class CreditVoucherComponent implements OnInit {
   async SubmitRequest(FinalListOfCreditVoucher) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        console.log(FinalListOfCreditVoucher);
+        // console.log(FinalListOfCreditVoucher);
 
         const companyCode = this.storage.companyCode;
         const Branch = this.storage.branch;
@@ -536,8 +546,7 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.accountName = this.creditVoucherPaymentDetailsForm.value.DepositBank.name;
         this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
-
-
+        this.creditVoucherDataRequestModel.onAccount = this.creditVoucherPaymentDetailsForm.value.onAccount;
 
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
@@ -567,13 +576,9 @@ export class CreditVoucherComponent implements OnInit {
 
         var VoucherlineitemList = Accountdata;
 
-
-
         this.creditVoucherRequestModel.details = VoucherlineitemList
         this.creditVoucherRequestModel.data = this.creditVoucherDataRequestModel;
         this.creditVoucherRequestModel.debitAgainstDocumentList = [];
-
-        console.log(this.creditVoucherRequestModel);
 
         this.voucherServicesService
           .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
@@ -646,7 +651,7 @@ export class CreditVoucherComponent implements OnInit {
                   },
                 });
 
-              console.log(reqBody);
+              //console.log(reqBody);
             },
             error: (err: any) => {
               this.snackBarUtilityService.ShowCommonSwal("error", err);
@@ -656,9 +661,34 @@ export class CreditVoucherComponent implements OnInit {
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }
 
-
     }, "Credit Voucher Generating..!");
 
+  }
+  //#endregion
+  //#region to set on account value
+  SetOnAccountValue() {
+    const PaymentMode = this.creditVoucherPaymentDetailsForm.get("ReceiptMode").value;
+    const Preparedfor = this.creditVoucherSummaryForm.value.Receivedfrom;
+    if (PaymentMode !== "Cash" && Preparedfor == "Customer" && this.tableData[0].LedgerHdn == "AST001002") {
+      this.creditVoucherPaymentDetailsForm.get("onAccount").setValue(true);
+    } else {
+      this.creditVoucherPaymentDetailsForm.get("onAccount").setValue(false);
+    }
+  }
+  //#endregion
+  //#region to get ledger data
+  replaceLedgerFields(data) {
+    return data.map(item => {
+      let newItem = { ...item };
+      if ('LedgerCode' in newItem && 'LedgerName' in newItem) {
+        newItem.Ledgercode = newItem.LedgerCode;
+        newItem.Ledgername = newItem.LedgerName;
+        delete newItem.LedgerCode;
+        delete newItem.LedgerName;
+        delete newItem.partyName;
+      }
+      return newItem;
+    });
   }
   //#endregion
 }

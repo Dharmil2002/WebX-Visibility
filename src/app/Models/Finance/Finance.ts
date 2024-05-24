@@ -60,6 +60,7 @@ export class VoucherDataRequestModel {
   mANNUM: string
   mREFNUM: string
   nAR: string;
+  onAccount: boolean = false;
 }
 
 export class DebitVoucherdetailsRequestModel {

@@ -103,7 +103,7 @@ export function GetDebitLedgerPreviewcolumnHeader() {
         partyName: {
             Title: "Sub Ledger",
             class: "matcolumncenter",
-            Style: "max-width:150px",
+            Style: "min-width:180px",
         },
         Dr: {
             Title: "Dr. ₹",
@@ -120,7 +120,7 @@ export function GetDebitLedgerPreviewcolumnHeader() {
         Location: {
             Title: "Location",
             class: "matcolumncenter",
-            Style: "min-width:100px",
+            Style: "max-width:100px",
         },
         Narration: {
             Title: "Narration",

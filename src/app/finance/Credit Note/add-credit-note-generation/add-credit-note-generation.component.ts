@@ -661,7 +661,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
             }
           }
         };
-
         const res = await firstValueFrom(
           this.masterService.masterPut("generic/update", Body))
 

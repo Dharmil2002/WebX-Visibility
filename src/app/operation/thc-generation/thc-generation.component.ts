@@ -1283,19 +1283,19 @@ export class ThcGenerationComponent implements OnInit {
       this.rakeForm.controls['rakeDate'].setValue(thcDetail.data.thcDetails.rAKE.dT);
       this.rakeForm.controls['fnrNo'].setValue(thcDetail.data.thcDetails.rAKE.fNRNO);
       this.rakeForm.controls['noOfContrainer'].setValue(thcDetail.data.thcDetails.rAKE?.cONT || "");
-      if (thcDetail.data.thcDetails.rAKE.iNV) {
-        const invoiceData = thcDetail.data.thcDetails.rAKE.iNV.map(element => {
-          return {
-            invNum: element.nO,
-            invDate: element.dT,
-            orrInvDt: element.dT,
-            invAmt: element.aMT,
-            actions: []
-          }
-        });
-        this.tableRakeInvoice = invoiceData;
-        this.rrInvoice = false
-      }
+      // if (thcDetail.data.thcDetails.rAKE.iNV) {
+      //   const invoiceData = thcDetail.data.thcDetails.rAKE.iNV.map(element => {
+      //     return {
+      //       invNum: element.nO,
+      //       invDate: element.dT,
+      //       orrInvDt: element.dT,
+      //       invAmt: element.aMT,
+      //       actions: []
+      //     }
+      //   });
+      //   this.tableRakeInvoice = invoiceData;
+      //   this.rrInvoice = false
+      // }
       if (thcDetail.data.thcDetails.rAKE.rR) {
         const invoiceData = thcDetail.data.thcDetails.rAKE.rR.map(element => {
           return {
@@ -1312,7 +1312,20 @@ export class ThcGenerationComponent implements OnInit {
     }
     this.thcTableForm.controls['manualThc'].setValue(this.thcDetail?.mTHC||"");
     this.thcTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM||0);
-    this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG, thcNestedDetails)
+    if (this.ChargeAllow.includes(thcDetail.data.thcDetails.tMODENM.toUpperCase())) {
+      this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG, thcNestedDetails)
+    }
+    else{
+      const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
+      const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
+      this.chargeForm.controls["advPdAt"].setValue(location);
+      this.chargeForm.controls["balAmtAt"].setValue(balAmtAt);
+      this.chargeForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
+      this.chargeForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
+      this.chargeForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
+      this.chargeForm.controls["totAmt"].setValue(thcNestedDetails?.thcDetails.tOTAMT || 0);
+      this.balanceAmount = thcNestedDetails?.thcDetails.bALAMT || 0;
+    }
     // this.getShipmentDetails();
   }
   /*End*/
@@ -1420,7 +1433,7 @@ export class ThcGenerationComponent implements OnInit {
   transModeChanged() {
     const transMode = this.thcTableForm.getRawValue().transMode;
     const transModeDetail = this.products.find((x) => x.value == transMode);
-    const roadControl = ['vehicle']
+    const roadControl = ['vehicle'];
     if (transModeDetail.name == "Rail") {
       this.isRail = true
       // vehicle.clearValidators(); // Remove all validators from this control
@@ -1431,17 +1444,21 @@ export class ThcGenerationComponent implements OnInit {
       //     x.disable =true
       //   }
       // })
+
       this.jsonControlBasicArray = this.allBasicJsonArray.filter((x) => !roadControl.includes(x.name));
       this.jsonControlVehLoadArray.forEach(element => {
+        this.thcTableForm.controls[element.name].setValue("");
         this.thcTableForm.controls[element.name].clearValidators();
         this.thcTableForm.controls[element.name].updateValueAndValidity();
 
       });
       this.jsonControlDriverArray.forEach(element => {
+        this.thcTableForm.controls[element.name].setValue("");
         this.thcTableForm.controls[element.name].clearValidators();
         this.thcTableForm.controls[element.name].updateValueAndValidity();
 
       });
+      this.VehicleTableForm.reset();
     }
     else {
       this.jsonControlBasicArray = this.allBasicJsonArray.filter((x) => !this.market.includes(x.name));

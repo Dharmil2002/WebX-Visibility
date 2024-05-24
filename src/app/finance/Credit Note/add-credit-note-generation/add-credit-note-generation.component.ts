@@ -371,7 +371,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       return;
     }
 
-    if (Gsttype == "SGST" || Gsttype == "CGST") {
+    if (Gsttype == "CGST,SGST") {
       var TaxableAmt = (CreditnoteAmount) / (1 + (this.Gstrate / 100));
       this.GstAmount = parseFloat(((TaxableAmt * (this.Gstrate / 100))).toFixed(2));
       this.SgstRate = (this.Gstrate / 2);
@@ -661,7 +661,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
             }
           }
         };
-
         const res = await firstValueFrom(
           this.masterService.masterPut("generic/update", Body))
 
@@ -876,7 +875,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
     const response = [
       createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, 0, TotalAmount),
-      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, ledgerInfo['INC001015'].LeadgerCategory, TXBLAMTAmount, 0),
+      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM,"INCOME", TXBLAMTAmount, 0),
     ];
 
     if (this.DataResponseDetails.data[0].gST.cGST > 0) {

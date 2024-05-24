@@ -115,5 +115,16 @@ export class DeliveryMrResponseModalComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
 
+  openviewprint(event){
+    const req = {
+      templateName: "DeliveryMr",
+      partyCode: "CUST00028",
+      DocNo: event.dLMRNO,
+    };
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, "", "width=1300,height=800");
+
+  }
   //#endregion
 }

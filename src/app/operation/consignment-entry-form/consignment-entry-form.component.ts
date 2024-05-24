@@ -71,8 +71,7 @@ import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/clu
 /*Please organize the code in order of priority, with the code that is used first placed at the top.*/
 export class ConsignmentEntryFormComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
-{
+  implements OnInit {
   breadscrums = [
     {
       title: "Consignment Entry",
@@ -134,6 +133,7 @@ export class ConsignmentEntryFormComponent
   dcrDetail = {};
   conLoc: boolean;
   pageLoad: boolean;
+  LoadType: any;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -260,6 +260,7 @@ export class ConsignmentEntryFormComponent
       "WTUNIT",
       "RISKTYP",
       "PROD",
+      "LT"
     ]);
 
     this.packagingTypes = gmData.filter((x) => x.type == "PKGS");
@@ -270,6 +271,7 @@ export class ConsignmentEntryFormComponent
     this.rateTypes = gmData.filter((x) => x.type == "RTTYP");
     this.wtUnits = gmData.filter((x) => x.type == "WTUNIT");
     this.riskTypes = gmData.filter((x) => x.type == "RISKTYP");
+    this.LoadType = gmData.filter((x) => x.type == "LT");
     // this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
     this.products = await this.generalService.getDataForAutoComplete(
       "product_detail",
@@ -594,7 +596,7 @@ export class ConsignmentEntryFormComponent
     isNameValue: boolean = false,
     valueField: string = "",
     nameField: string = "",
-    callback: () => void = () => {}
+    callback: () => void = () => { }
   ) {
     if (isNameValue) {
       formGroup.controls[controlId].setValue({
@@ -685,9 +687,8 @@ export class ConsignmentEntryFormComponent
   async getDestination() {
     const destinationMapping = await this.locationService.locationFromApi({
       locCode: {
-        D$regex: `^${
-          this.model.consignmentTableForm.get("destination")?.value
-        }`,
+        D$regex: `^${this.model.consignmentTableForm.get("destination")?.value
+          }`,
         D$options: "i",
       },
     });
@@ -1375,12 +1376,10 @@ export class ConsignmentEntryFormComponent
     if (doc && doc.dOCNO == dktNo) {
       Swal.fire({
         icon: "warning",
-        title: `${this.DocCalledAs.Docket} No is ${
-          doc.sTS == 2 ? "declared void" : "already used"
-        }`,
-        text: `${this.DocCalledAs.Docket} No is ${
-          doc.sTS == 2 ? "declared void" : "already used"
-        }`,
+        title: `${this.DocCalledAs.Docket} No is ${doc.sTS == 2 ? "declared void" : "already used"
+          }`,
+        text: `${this.DocCalledAs.Docket} No is ${doc.sTS == 2 ? "declared void" : "already used"
+          }`,
         showConfirmButton: true,
         confirmButtonText: "OK",
         timer: 5000,
@@ -1939,8 +1938,8 @@ export class ConsignmentEntryFormComponent
         this.model.tableData.length > 0
           ? containerlist
           : container
-          ? containerFromData.value
-          : [],
+            ? containerFromData.value
+            : [],
     };
 
     const controltabNames = [
@@ -2157,21 +2156,21 @@ export class ConsignmentEntryFormComponent
 
       const Pkg = invoiceDetails
         ? invoiceDetails.invoiceDetails.reduce(
-            (a, c) => a + (parseInt(c.noofPkts) || 0),
-            0
-          )
+          (a, c) => a + (parseInt(c.noofPkts) || 0),
+          0
+        )
         : 0;
       const Wt = invoiceDetails
         ? invoiceDetails.invoiceDetails.reduce(
-            (a, c) => a + (parseFloat(c.actualWeight) || 0),
-            0
-          )
+          (a, c) => a + (parseFloat(c.actualWeight) || 0),
+          0
+        )
         : 0;
       const CWt = invoiceDetails
         ? invoiceDetails.invoiceDetails.reduce(
-            (a, c) => a + (parseFloat(c.chargedWeight) || 0),
-            0
-          )
+          (a, c) => a + (parseFloat(c.chargedWeight) || 0),
+          0
+        )
         : 0;
 
       docketDetails["pKGS"] = Pkg;
@@ -2186,9 +2185,8 @@ export class ConsignmentEntryFormComponent
       docketDetails["oSTSN"] = "Booked";
       docketDetails["fSTS"] = 0;
       docketDetails["fSTSN"] = "Pending";
-      docketDetails["status"] = `Booked at ${
-        docketDetails["origin"]
-      } on ${moment(docketDetails["docketDate"]).format("DD MMM YY HH:mm:ss")}`;
+      docketDetails["status"] = `Booked at ${docketDetails["origin"]
+        } on ${moment(docketDetails["docketDate"]).format("DD MMM YY HH:mm:ss")}`;
       docketDetails["cONTRACT"] = "";
       docketDetails["eNTDT"] = new Date();
       docketDetails["eNTLOC"] = this.storage.branch;
@@ -2263,8 +2261,8 @@ export class ConsignmentEntryFormComponent
         cHG: "",
         nFCHG: this.model.NonFreightTableForm?.value
           ? Object.entries(this.model.NonFreightTableForm.value)
-              .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
-              .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
+            .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
+            .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
           : [],
 
         tOTAMT: this.model.FreightTableForm.controls["totalAmount"].value,
@@ -2429,17 +2427,17 @@ export class ConsignmentEntryFormComponent
         ),
         invDet && invDet.length > 0
           ? this.docketService.updateManyDockets(
-              invDet,
-              filter,
-              "docket_invoices"
-            )
+            invDet,
+            filter,
+            "docket_invoices"
+          )
           : null,
         contDet && contDet.length > 0
           ? this.docketService.updateManyDockets(
-              contDet,
-              filter,
-              "docket_containers"
-            )
+            contDet,
+            filter,
+            "docket_containers"
+          )
           : null,
         this.docketService.addEventData(docketDetails),
         this.docketService.updateOperationData(docketDetails),
@@ -2463,17 +2461,17 @@ export class ConsignmentEntryFormComponent
     // Assuming invoiceDetails might be null or an empty array
     const totalPkg = invoiceDetails
       ? invoiceDetails.invoiceDetails.reduce(
-          (accumulator, currentValue) =>
-            accumulator + (parseInt(currentValue.noofPkts) || 0),
-          0
-        )
+        (accumulator, currentValue) =>
+          accumulator + (parseInt(currentValue.noofPkts) || 0),
+        0
+      )
       : 0;
     const totalWt = invoiceDetails
       ? invoiceDetails.invoiceDetails.reduce(
-          (accumulator, currentValue) =>
-            accumulator + (parseFloat(currentValue.actualWeight) || 0),
-          0
-        )
+        (accumulator, currentValue) =>
+          accumulator + (parseFloat(currentValue.actualWeight) || 0),
+        0
+      )
       : 0;
 
     const data = {
@@ -2618,9 +2616,9 @@ export class ConsignmentEntryFormComponent
       ConvertToNumber(
         (parseFloat(this.model.FreightTableForm.get("freight_amount")?.value) ||
           0) +
-          (parseFloat(this.model.FreightTableForm.get("otherAmount")?.value) ||
-            0) +
-          TotalNonFreight,
+        (parseFloat(this.model.FreightTableForm.get("otherAmount")?.value) ||
+          0) +
+        TotalNonFreight,
         2
       )
     );
@@ -2628,9 +2626,9 @@ export class ConsignmentEntryFormComponent
       ConvertToNumber(
         (parseFloat(this.model.FreightTableForm.get("grossAmount")?.value) ||
           0) +
-          (parseFloat(
-            this.model.FreightTableForm.get("gstChargedAmount")?.value
-          ) || 0)
+        (parseFloat(
+          this.model.FreightTableForm.get("gstChargedAmount")?.value
+        ) || 0)
       )
     );
   }
@@ -2965,6 +2963,16 @@ export class ConsignmentEntryFormComponent
 
   //Contract Invoked Section
   InvockedContract() {
+    // get current mode
+    const loadType = this.storage.mode;
+    let SelectedLoadTypeCode;
+    if (this.LoadType.find((x) => x.codeDesc == loadType)) {
+      SelectedLoadTypeCode = this.LoadType.find((x) => x.codeDesc == loadType).codeId;
+    }
+    else {
+      SelectedLoadTypeCode = "LT-0001";
+    }
+
     const paymentBasesName = this.paymentBases.find(
       (x) => x.value == this.model.consignmentTableForm.value.payType
     ).name;
@@ -3005,6 +3013,7 @@ export class ConsignmentEntryFormComponent
       from: this.model.consignmentTableForm.value.fromCity.value,
       to: this.model.consignmentTableForm.value.toCity.value,
       capacity: containerCode,
+      LoadType: SelectedLoadTypeCode,
       matches: matches,
     };
     firstValueFrom(
@@ -3352,12 +3361,11 @@ export class ConsignmentEntryFormComponent
             finYear: financialYear,
             branch: this.storage.branch,
             accCode: ledgerInfo["INC001003"].LeadgerCode,
-            accName: `${ledgerInfo["INC001003"].LeadgerName} - ${
-              this.products.find(
-                (x) =>
-                  x.value == this.model.consignmentTableForm.value.transMode
-              ).name
-            }`,
+            accName: `${ledgerInfo["INC001003"].LeadgerName} - ${this.products.find(
+              (x) =>
+                x.value == this.model.consignmentTableForm.value.transMode
+            ).name
+              }`,
             accCategory: ledgerInfo["INC001003"].LeadgerCategory,
             sacCode: "",
             sacName: "",

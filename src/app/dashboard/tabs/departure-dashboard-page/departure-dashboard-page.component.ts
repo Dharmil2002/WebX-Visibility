@@ -110,11 +110,11 @@ export class DepartureDashboardPageComponent
       Style: "min-width:100px",
       datatype: "datetime",
     },
-    Hrs: {
-      Title: "Hrs",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
+    // Hrs: {
+    //   Title: "Hrs",
+    //   class: "matcolumnleft",
+    //   Style: "min-width:100px",
+    // },
     Action: {
       Title: "Action",
       class: "matcolumnleft",
@@ -127,7 +127,7 @@ export class DepartureDashboardPageComponent
     "VehicleNo",
     "Scheduled",
     "Expected",
-    "Hrs"
+    // "Hrs"
   ];
   //#endregion
 

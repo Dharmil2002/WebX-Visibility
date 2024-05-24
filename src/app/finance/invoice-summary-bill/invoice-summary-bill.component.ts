@@ -13,6 +13,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { ShipmentSelectionComponent } from './shipment-selection/shipment-selection.component';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 
 @Component({
   selector: 'app-invoice-summary-bill',
@@ -175,7 +176,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.tableData.map((x) => {
       const extraData = x.extraData.filter((x) => x.isSelected);
       x.subTotalAmount = calculateTotalField(extraData, 'amount');
-      x.gstCharged = calculateTotalField(extraData, 'gst');
+      x.gstCharged = ConvertToNumber(calculateTotalField(extraData, 'gst'), 2);
       x.totalBillingAmount = parseFloat(x.subTotalAmount) + parseFloat(x.gstCharged);
       return x
     })
@@ -291,7 +292,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
         // Make sure to use setValue to update the FormControl
         const subTotalAmount = invoice ? calculateTotalField(invoice, 'subTotalAmount') : 0;
         formGroup.shipmentTotal.setValue(subTotalAmount);
-        const gstCharged = invoice ? calculateTotalField(invoice, 'gstCharged') : 0;
+        const gstCharged = ConvertToNumber(invoice ? calculateTotalField(invoice, 'gstCharged') : 0, 2);
         formGroup.gst.setValue(gstCharged);
       }
       //#endregion
@@ -328,7 +329,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
           class: `color-Daisy-light`,
         },
         {
-          count: this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.gstCharged, 0),
+          count: ConvertToNumber(gstCharged, 2),
           title: "Total GST Charged",
           class: `color-Success-light`,
         },
@@ -345,7 +346,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     const gstType = Object.keys(this.gstTypeValue);
     const totBillingAmt = this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.totalBillingAmount, 0);
     // Set IGST, SGST, CGST, and UTGST based on gstType
-    this.invoiceSummaryTableForm.controls['igst'].setValue(gstType.includes("IGST") ? gstCharged : 0);
+    this.invoiceSummaryTableForm.controls['igst'].setValue(gstType.includes("IGST") ? ConvertToNumber(gstCharged, 2) : 0);
     ['SGST', 'CGST', 'UTGST'].forEach(type => {
       this.invoiceSummaryTableForm.controls[type.toLowerCase()].setValue(gstType.includes(type) ? parseFloat(gstCharged) / 2 : 0);
     });
@@ -418,11 +419,11 @@ export class InvoiceSummaryBillComponent implements OnInit {
     const totBillingAmt = shipmentTotal + gstCharged;
 
     // Set IGST, SGST, CGST, and UTGST based on gstType
-    this.invoiceSummaryTableForm.controls['igst'].setValue(gstType.includes("IGST") ? gstCharged : 0);
+    this.invoiceSummaryTableForm.controls['igst'].setValue(gstType.includes("IGST") ? ConvertToNumber(gstCharged, 2) : 0);
     ['SGST', 'CGST', 'UTGST'].forEach(type => {
       this.invoiceSummaryTableForm.controls[type.toLowerCase()].setValue(gstType.includes(type) ? parseFloat(gstCharged) / 2 : 0);
     });
-    this.invoiceSummaryTableForm.controls['gst'].setValue(gstCharged || 0);
+    this.invoiceSummaryTableForm.controls['gst'].setValue(ConvertToNumber(gstCharged, 2) || 0);
 
     this.invoiceSummaryTableForm.controls['invoiceTotal'].setValue(totBillingAmt);
     this.roundOffChange();

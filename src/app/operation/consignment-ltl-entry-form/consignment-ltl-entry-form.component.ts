@@ -197,7 +197,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
     this.consigmentControls = new ConsignmentLtl(this.generalService);
-
     this.consigmentControls.applyFieldRules(this.storage.companyCode).then(() => {
       this.initializeFormControl();
 
@@ -236,7 +235,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       [this.freightControlArray]
     );
     // Set initial values for the form controls
-    this.getDataFromGeneralMaster();
+
     this.bindQuickdocketData();
     this.commonDropDownMapping();
     this.getVolControls();
@@ -245,6 +244,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     this.freightForm.controls['gstRate'].disable();
     this.freightForm.controls['gstChargedAmount'].disable();
+    this.getDataFromGeneralMaster();
   }
   /*end*/
 
@@ -1340,6 +1340,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
+    const form=this.consignmentForm.value
     const payType = this.consignmentForm.get('payType').value;
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {

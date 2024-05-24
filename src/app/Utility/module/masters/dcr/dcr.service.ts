@@ -24,26 +24,27 @@ export class DCRService {
       collectionName: "dcr_header",
       filter: filter,
     };
-    const res = await firstValueFrom(
-      this.operation.operationMongoPost("generic/get", req)
-    );
+    const res = await firstValueFrom(this.operation.operationMongoPost("generic/get", req));
     return res.data;
   }
   async fetchData(
-    masterService,
     collectionName,
     filterCondition,
     nameKey,
-    valueKey
+    valueKey,
+    extraFilter={}
   ) {
     try {
       const companyCode = this.storage.companyCode;
-      const req = { companyCode, collectionName , filter: {
-        companyCode: this.storage.companyCode,
-        isActive:true}};
-      const res = await masterService
-        .masterPost("generic/get", req)
-        .toPromise();
+      let req = {
+        companyCode,
+        collectionName ,
+         filter: {companyCode: this.storage.companyCode}
+        };
+        if (extraFilter && Object.keys(extraFilter).length > 0) {
+          req["filter"] = { ...req.filter, ...extraFilter };
+        }
+      const res = await firstValueFrom(this.masterServices.masterPost("generic/get", req));
       if (res && res.data) {
         return res.data.filter(filterCondition).map((x) => ({
           name: x[nameKey],
@@ -56,40 +57,40 @@ export class DCRService {
     return [];
   }
 
-  async CustomerDetail(masterService) {
+  async CustomerDetail(masterServices) {
     return this.fetchData(
-      masterService,
       "customer_detail",
       () => true,
       "customerName",
-      "customerCode"
+      "customerCode",
+      {activeFlag:true}
     );
   }
-  async userDetail(masterService) {
+  async userDetail(masterServices) {
     return this.fetchData(
-      masterService,
       "user_master",
       (x) => x.userType === "Employee",
       "name",
-      "userId"
+      "userId",
+      {isActive:true}
     );
   }
-  async vendorDetail(masterService) {
+  async vendorDetail(masterServices) {
     return this.fetchData(
-      masterService,
       "vendor_detail",
       (x) => x.vendorType === 3,
       "vendorName",
-      "vendorCode"
+      "vendorCode",
+      {isActive:true}
     );
   }
-  async LocationDetail(masterService) {
+  async LocationDetail(masterServices) {
     return this.fetchData(
-      masterService,
       "location_detail",
       () => true,
       "locCode",
-      "locName"
+      "locName",
+      {activeFlag:true}
     );
   }
 

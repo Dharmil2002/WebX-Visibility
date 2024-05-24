@@ -54,7 +54,7 @@ export class DepartureService {
       const adHocDetails = formatDetails(adHoc, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Create Trip' });
       return [...departureDetails, ...routeDetails, ...adHocDetails];
     } catch (error) {
-      console.error('Error fetching route schedule:', error);
+      console.error('Error  fetching route schedule:', error);
       throw error; // Re-throw the error to handle it further up the chain
     }
   }

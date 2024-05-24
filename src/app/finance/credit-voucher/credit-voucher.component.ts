@@ -397,7 +397,7 @@ export class CreditVoucherComponent implements OnInit {
   saveCreditData() {
 
     const Accountinglocation = this.creditVoucherSummaryForm.value.Accountinglocation?.name
-    const partyName = this.creditVoucherSummaryForm.value.PartyName.name;
+    const partyName = `${this.creditVoucherSummaryForm.value.PartyName.value} : ${this.creditVoucherSummaryForm.value.PartyName.name}`;
 
     let FinalListOfCreditVoucher = [];
     // Calculate debit voucher
@@ -498,7 +498,9 @@ export class CreditVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.SubmitRequest(FinalListOfCreditVoucher)
+
+        const updatedData = this.replaceLedgerFields(FinalListOfCreditVoucher);
+        this.SubmitRequest(updatedData)
       }
     });
   }
@@ -545,7 +547,6 @@ export class CreditVoucherComponent implements OnInit {
         this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
         this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
         this.creditVoucherDataRequestModel.onAccount = this.creditVoucherPaymentDetailsForm.value.onAccount;
-        // console.log(FinalListOfCreditVoucher);
 
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
@@ -575,95 +576,90 @@ export class CreditVoucherComponent implements OnInit {
 
         var VoucherlineitemList = Accountdata;
 
-
-
         this.creditVoucherRequestModel.details = VoucherlineitemList
         this.creditVoucherRequestModel.data = this.creditVoucherDataRequestModel;
         this.creditVoucherRequestModel.debitAgainstDocumentList = [];
 
-        // console.log(this.creditVoucherRequestModel);
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+              var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {
+                return {
+                  "accCode": `${item.Ledgercode}`,
+                  "accName": item.Ledgername,
+                  "amount": item.Cr,
+                  "accCategory": item.SubLedger,
+                  "narration": item.Narration ? item.Narration : item.Ledgername,
+                };
+              })
+              var DebitData = FinalListOfCreditVoucher.filter(item => item.Cr == "").map(function (item) {
+                return {
+                  "accCode": `${item.Ledgercode}`,
+                  "accName": item.Ledgername,
+                  "amount": item.Dr,
+                  "accCategory": item.SubLedger,
+                  "narration": item.Narration ? item.Narration : item.Ledgername,
+                };
+              })
+              let reqBody = {
+                companyCode: companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.getItem(StoreKeys.Branch),
+                transCode: VoucherInstanceType.CreditVoucherCreation,
+                transType: VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
+                voucherCode: VoucherType.CreditVoucher,
+                voucherType: VoucherType[VoucherType.CreditVoucher],
+                docType: "Voucher",
+                partyType: this.creditVoucherSummaryForm.value.Preparedfor,
+                docNo: "",
+                partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
+                entryBy: this.storage.getItem(StoreKeys.UserId),
+                entryDate: Date(),
+                debit: DebitData,
+                credit: CreditData,
+              };
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Voucher Created Successfully",
+                      text: "Voucher No: " + reqBody.voucherNo,
+                      showConfirmButton: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        Swal.hideLoading();
+                        setTimeout(() => {
+                          Swal.close();
+                        }, 2000);
+                        this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                      }
+                    });
+                  },
+                  error: (err: any) => {
 
-        // this.voucherServicesService
-        //   .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
-        //   .subscribe({
-        //     next: (res: any) => {
-        //       var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {
-        //         return {
-        //           "accCode": `${item.Ledgercode}`,
-        //           "accName": item.Ledgername,
-        //           "amount": item.Cr,
-        //           "accCategory": item.SubLedger,
-        //           "narration": item.Narration ? item.Narration : item.Ledgername,
-        //         };
-        //       })
-        //       var DebitData = FinalListOfCreditVoucher.filter(item => item.Cr == "").map(function (item) {
-        //         return {
-        //           "accCode": `${item.Ledgercode}`,
-        //           "accName": item.Ledgername,
-        //           "amount": item.Dr,
-        //           "accCategory": item.SubLedger,
-        //           "narration": item.Narration ? item.Narration : item.Ledgername,
-        //         };
-        //       })
-        //       let reqBody = {
-        //         companyCode: companyCode,
-        //         voucherNo: res?.data?.mainData?.ops[0].vNO,
-        //         transDate: Date(),
-        //         finYear: financialYear,
-        //         branch: this.storage.getItem(StoreKeys.Branch),
-        //         transCode: VoucherInstanceType.CreditVoucherCreation,
-        //         transType: VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation],
-        //         voucherCode: VoucherType.CreditVoucher,
-        //         voucherType: VoucherType[VoucherType.CreditVoucher],
-        //         docType: "Voucher",
-        //         partyType: this.creditVoucherSummaryForm.value.Preparedfor,
-        //         docNo: "",
-        //         partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
-        //         partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
-        //         entryBy: this.storage.getItem(StoreKeys.UserId),
-        //         entryDate: Date(),
-        //         debit: DebitData,
-        //         credit: CreditData,
-        //       };
-        //       this.voucherServicesService
-        //         .FinancePost("fin/account/posting", reqBody)
-        //         .subscribe({
-        //           next: (res: any) => {
-        //             Swal.fire({
-        //               icon: "success",
-        //               title: "Voucher Created Successfully",
-        //               text: "Voucher No: " + reqBody.voucherNo,
-        //               showConfirmButton: true,
-        //             }).then((result) => {
-        //               if (result.isConfirmed) {
-        //                 Swal.hideLoading();
-        //                 setTimeout(() => {
-        //                   Swal.close();
-        //                 }, 2000);
-        //                 this.navigationService.navigateTotab("Voucher", "dashboard/Index");
-        //               }
-        //             });
-        //           },
-        //           error: (err: any) => {
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
 
-        //             if (err.status === 400) {
-        //               this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
-        //             } else {
-        //               this.snackBarUtilityService.ShowCommonSwal("error", err);
-        //             }
-        //           },
-        //         });
-
-        //       //console.log(reqBody);
-        //     },
-        //     error: (err: any) => {
-        //       this.snackBarUtilityService.ShowCommonSwal("error", err);
-        //     },
-        //   });
+              //console.log(reqBody);
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }
-
 
     }, "Credit Voucher Generating..!");
 
@@ -678,6 +674,21 @@ export class CreditVoucherComponent implements OnInit {
     } else {
       this.creditVoucherPaymentDetailsForm.get("onAccount").setValue(false);
     }
+  }
+  //#endregion
+  //#region to get ledger data
+  replaceLedgerFields(data) {
+    return data.map(item => {
+      let newItem = { ...item };
+      if ('LedgerCode' in newItem && 'LedgerName' in newItem) {
+        newItem.Ledgercode = newItem.LedgerCode;
+        newItem.Ledgername = newItem.LedgerName;
+        delete newItem.LedgerCode;
+        delete newItem.LedgerName;
+        delete newItem.partyName;
+      }
+      return newItem;
+    });
   }
   //#endregion
 }

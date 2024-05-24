@@ -96,23 +96,26 @@ export function GetDebitLedgerPreviewcolumnHeader() {
         },
         Ledgername: {
             Title: "Ledger name",
-            class: "matcolumncenter",
+            class: "matcolumnleft",
             Style: "max-width:200px",
+            datatype:"string"
         },
-        SubLedger: {
+        partyName: {
             Title: "Sub Ledger",
             class: "matcolumncenter",
             Style: "max-width:150px",
         },
         Dr: {
             Title: "Dr. ₹",
-            class: "matcolumncenter",
+            class: "matcolumnright",
             Style: "max-width:100px",
+            datatype:"currency"
         },
         Cr: {
             Title: "Cr. ₹",
-            class: "matcolumncenter",
+            class: "matcolumnright",
             Style: "max-width:100px",
+            datatype:"currency"
         },
         Location: {
             Title: "Location",

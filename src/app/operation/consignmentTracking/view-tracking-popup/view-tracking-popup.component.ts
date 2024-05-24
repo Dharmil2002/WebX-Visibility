@@ -38,22 +38,26 @@ export class ViewTrackingPopupComponent implements OnInit {
       Title: "Additional Details",
       class: "matcolumnleft",
       Style: "min-width:25%",
+      datatype:"string"
     },
 
     Event: {
       Title: "Event",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      datatype:"string"
     },   
     Location: {
       Title: "Current Location",
       class: "matcolumnleft",
       Style: "min-width:7%",
+      datatype:"string"
     },
     DocNo: {
       Title: "Document Number",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      datatype:"string"
     },
     eNTDT: {
       Title: "Entry Date",
@@ -64,6 +68,7 @@ export class ViewTrackingPopupComponent implements OnInit {
       Title: "User",
       class: "matcolumnleft",
       Style: "min-width:5%",
+      datatype:"string"
     },
   };
   staticField = [
@@ -83,10 +88,12 @@ export class ViewTrackingPopupComponent implements OnInit {
     public dialogRef: MatDialogRef<ViewTrackingPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    debugger
     this.CompanyCode = this.storage.companyCode;
     const sortByDate = (a, b) => {
       return new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime();
     };
+    const users=data.TrackingList.map((x)=>x.eNTBY);
     this.FormTitle = this.data.DokNo?this.data.DokNo:'C-Not Tracking List'
     this.TableData = this.data.TrackingList
       ?.map((x) => {

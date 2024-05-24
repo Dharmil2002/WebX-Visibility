@@ -65,16 +65,19 @@ export class InvoiceCollectionComponent implements OnInit {
       Title: "Invoice number",
       class: "matcolumnfirst",
       Style: "min-width:200px",
+      datatype: "string",
     },
     bGNDT: {
       Title: "Invoice date",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype: "datetime",
     },
     bDUEDT: {
       Title: "Due date",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype: "datetime",
     },
     aMT: {
       Title: "Invoice Amount(₹)",

@@ -376,8 +376,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
   async save() {
-    console.log(this.dNoteData)
-    debugger
     this.snackBarUtilityService.commonToast(async () => {
       try {
         this.DebitNoteRequestModel.companyCode = this.storage.companyCode;

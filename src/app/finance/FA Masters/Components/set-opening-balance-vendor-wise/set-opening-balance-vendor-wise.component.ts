@@ -1,23 +1,26 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
-import { catchError, firstValueFrom, forkJoin } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, catchError, firstValueFrom, forkJoin, mergeMap, throwError } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
-import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
-import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { GetGeneralMasterData, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { chunkArray } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { stateFromApi } from 'src/app/operation/pending-billing/filter-billing/filter-utlity';
 import { locationFromApi } from 'src/app/operation/prq-entry-page/prq-utitlity';
+import { CustomerBillStatus } from 'src/app/Models/docStatus';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { VendorService } from 'src/app/Utility/module/masters/vendor-master/vendor.service';
+import { VendorBillEntry } from 'src/app/Models/Finance/VendorPayment';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { VoucherInstanceType, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 
 @Component({
   selector: 'app-set-opening-balance-vendor-wise',
@@ -33,20 +36,49 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
   ];
   fileUploadForm: UntypedFormGroup;
   BranchCode: any;
-  existingData: any;
-  customerList: any;
+  VendorList: any;
   locationDropDown: any;
+  AccountList: any;
+  TDSAccountList: any;
+  CompanyMastersData: any;
+  SachsnList: any[];
+  tableLoad = false;
+  columnHeader = {
+    BillNo: {
+      Title: "Bill No",
+      class: "matcolumnleft",
+      Style: "min-width:25%",
+    },
+    VoucherNo: {
+      Title: "Voucher No",
+      class: "matcolumncenter",
+      Style: "min-width:25%",
+    },
 
-
+    Status: {
+      Title: "Status",
+      class: "matcolumncenter",
+      Style: "min-width:75%",
+    },
+  }
+  staticField = ['BillNo', 'VoucherNo', 'Status',]
+  tableData: any[]
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
   constructor(
-
     private fb: UntypedFormBuilder,
     private xlsxUtils: xlsxutilityService,
     private storage: StorageService,
     private masterService: MasterService,
     private dialog: MatDialog,
-    private objCustomerService: CustomerService,
-
+    private objVendorService: VendorService,
+    private operationService: OperationService,
+    private router: Router,
+    private voucherServicesService: VoucherServicesService,
+    public snackBarUtilityService: SnackBarUtilityService
   ) {
     this.fileUploadForm = fb.group({
       singleUpload: [""],
@@ -56,20 +88,130 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  async fetchVendorsData(VendorCodeList) {
+    const result = this.objVendorService.getVendors({
+      companyCode: this.storage.companyCode,
+      vendorCode: { D$in: VendorCodeList },
+      isActive: true
+    })
+    return result;
+  }
 
-  async fetchAllCustomerData(customerChunks) {
+  async AccountDataBasedOnAccountCode(AccountCodeChunks) {
+    const result = this.getAccountData({
+      cID: this.storage.companyCode,
+      aCCD: { D$in: AccountCodeChunks }
+    }, { _id: 0, aCCD: 1, aCNM: 1, mRPNM: 1 })
+
+    return result;
+  }
+  async AccountDataForTDS(AccountName) {
+    const result = this.getAccountData({
+      cID: this.storage.companyCode,
+      cATNM: AccountName
+    }, { _id: 0, aCCD: 1, aCNM: 1 })
+
+    return result;
+  }
+  async GetCompanmyMastersData() {
+    const Body = {
+      companyCode: this.storage.companyCode,
+      collectionName: "customers_gst_details",
+      filter: { companyCode: this.storage.companyCode },
+    };
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body))
+    if (res.success && res.data.length > 0) {
+
+      res.data.map((element) => {
+        element.StateName = element.stateNM.toUpperCase();
+        element.gstInNumber = element.gstInNumber;
+      });
+      return res.data;
+    }
+    return [];
+  }
+  async getAccountData(filter, project = null): Promise<any | null> {
+
+    let filters = [];
+    filters.push({
+      D$match: filter
+    });
+
+    if (project) {
+      filters.push({ 'D$project': project });
+    }
+
+    const reqBody = {
+      companyCode: this.storage.companyCode, // Get company code from local storage
+      collectionName: 'account_detail',
+      filters: filters
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+    return res?.data || [];
+  }
+
+  async fetchAllSacHsnData(SacCode) {
+    const result = this.getSacHsnData({
+      SHCD: { D$in: SacCode }
+    }, { _id: 0, SHCD: 1, SNM: 1 });
+    return result;
+  }
+
+  async getSacHsnData(filter, project = null): Promise<any | null> {
+
+    let filters = [];
+    filters.push({
+      D$match: filter
+    });
+
+    if (project) {
+      filters.push({ 'D$project': project });
+    }
+
+    const reqBody = {
+      collectionName: 'sachsn_master',
+      filters: filters
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+    return res?.data || [];
+  }
+
+
+  async fetchAllData(customerChunks) {
+    // Define a function to chunk the array into smaller arrays of specified size
+    function chunkArray(array, chunkSize) {
+      const chunks = [];
+      for (let i = 0; i < array.length; i += chunkSize) {
+        chunks.push(array.slice(i, chunkSize + i));
+      }
+      return chunks;
+    }
+    // Chunk the customer chunks into arrays of 50
     const chunks = chunkArray(customerChunks, 50);
 
+    // Map over each chunk to create promises for fetching customer data
     const promises = chunks.map(chunk =>
-      this.objCustomerService.getCustomer({
+      this.objVendorService.getVendors({
         companyCode: this.storage.companyCode,
-        customerCode: { D$in: chunk },
+        // Pass each chunk as a filter for customerCode and StateofSupply
+        $or: chunk.map(customer => ({
+          customerCode: customer.CustomerCode,
+          state: customer.StateofSupply
+        }))
+        ,
         activeFlag: true
       }, { _id: 0, customerCode: 1, customerName: 1 })
     );
+
+    // Wait for all promises to resolve
     const result = await Promise.all(promises);
-    return result.flat();  // This will merge all results into a single array
+
+    // Flatten the result array to get a single array of customer data
+    return result.flat();
   }
+
 
   //#region to select file
   selectedFile(event) {
@@ -77,28 +219,33 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
     if (fileList.length !== 1) {
       throw new Error("Cannot use multiple files");
     }
-    // this.customerList = await this.fetchAllCustomerData(customerItems);
-
     const file = fileList[0];
-
     if (file) {
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
 
+        // Locations Data
         this.locationDropDown = await locationFromApi(this.masterService);
-        const stateDetail = await stateFromApi(this.masterService);
-
         const locationValue = this.locationDropDown.map((x) => x.name);
         const locationName = this.locationDropDown.map((x) => x.value);
-
         const mergelocations = [...locationValue, ...locationName];
 
-        const customer = [...new Set(jsonData.map((x) => x.CustomerCode))];
-        const customerItems = String(customer)
-          .split(",")
-          .map((item) => item.trim().toUpperCase());
+        // Vendors Data
+        const VendorItems = [...new Set(jsonData.map((x) => x.VendorCode.trim().toUpperCase()))];
+        this.VendorList = await this.fetchVendorsData(VendorItems);
 
-        // Fetch data from DB
-        this.customerList = await this.fetchAllCustomerData(customerItems);
+        // Debit Accounts Data And TDS
+        const DebitAccount = [...new Set(jsonData.map((x) => x.DebitAccount.trim().toUpperCase()))];
+        this.AccountList = await this.AccountDataBasedOnAccountCode(DebitAccount);
+        this.TDSAccountList = await this.AccountDataForTDS("TDS");
+
+
+        // SAC Code Data
+        const SACCode = [...new Set(jsonData.map((x) => x.SACCode))];
+        this.SachsnList = await this.fetchAllSacHsnData(SACCode);
+
+        // Company Masters Data
+        this.CompanyMastersData = await this.GetCompanmyMastersData();
+
         const validationRules = [
           {
             ItemsName: "ManualBillNo",
@@ -106,18 +253,18 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           },
           {
             ItemsName: "BillDate",
-            Validations: [{ Required: true }, { Type: "date" }],
+            Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
           },
           {
             ItemsName: "DueDate",
-            Validations: [{ Required: true }, { Type: "date" }],
+            Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
           },
           {
-            ItemsName: "CustomerCode",
+            ItemsName: "VendorCode",
             Validations: [{ Required: true },
             {
-              TakeFromArrayList: this.customerList.map((x) => {
-                return x.customerCode;
+              TakeFromArrayList: this.VendorList.map((x) => {
+                return x.vendorCode;
               }),
             }
             ]
@@ -127,15 +274,11 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
             Validations: [{ Required: true }],
           },
           {
+            ItemsName: "PaymentBranch",
+            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
+          },
+          {
             ItemsName: "BillingBranch",
-            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
-          },
-          {
-            ItemsName: "SubmissionBranch",
-            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
-          },
-          {
-            ItemsName: "CollectionBranch",
             Validations: [{ Required: true }, { TakeFromList: mergelocations }],
           },
           {
@@ -143,8 +286,14 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
             Validations: [{ Required: true }, { Type: "text" }],
           },
           {
-            ItemsName: "CreditAccount",
-            Validations: [{ Required: true }],
+            ItemsName: "DebitAccount",
+            Validations: [{ Required: true },
+            {
+              TakeFromArrayList: this.AccountList.map((x) => {
+                return x.aCCD;
+              }),
+            }
+            ]
           },
           {
             ItemsName: "Amount",
@@ -152,7 +301,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           },
           {
             ItemsName: "GSTApplicable",
-            Validations: [{ Required: true }],
+            Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
           },
           {
             ItemsName: "GSTRate",
@@ -160,85 +309,87 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           },
           {
             ItemsName: "RCM",
-            Validations: [{ Required: true }],
+            Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
           },
           {
             ItemsName: "SACCode",
-            Validations: [{ Required: true }],
+            Validations: [{ Required: true },
+            {
+              TakeFromArrayList: this.SachsnList.map((x) => {
+                return x.SHCD;
+              }),
+            }
+            ]
           },
           {
             ItemsName: "StateofSupply",
-            Validations: [{ Required: true }],
+            Validations: [{ Required: true },
+            {
+              TakeFromArrayList: this.VendorList.map((x) => {
+                return x.vendorState;
+              }),
+            }
+            ]
           },
           {
-            ItemsName: "StateofBilling",
-            Validations: [{ Required: true }],
+            ItemsName: "StateOfBilling",
+            Validations: [{ Required: true },
+            {
+              TakeFromArrayList: this.CompanyMastersData.map((x) => {
+                return x.StateName;
+              }),
+            }
+            ]
           },
           {
-            ItemsName: "CustomerGSTNo",
-            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" }],
+            ItemsName: "VendorGSTNO",
+            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
+            {
+              TakeFromArrayList: this.VendorList.map((x) => {
+                return x.otherdetails[0].gstNumber;
+              }),
+            }
+            ]
           },
           {
             ItemsName: "CompanyGSTNo",
-            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" }],
+            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
+            {
+              TakeFromArrayList: this.CompanyMastersData.map((x) => {
+                return x.gstInNumber;
+              }),
+            }],
           },
+          {
+            ItemsName: "TDSRate",
+            Validations: [{ Required: true }, { Numeric: true }],
+          },
+          {
+            ItemsName: "TDSLedger",
+            Validations: [{ Required: true },
+            {
+              TakeFromArrayList: this.TDSAccountList.map((x) => {
+                return x.aCCD;
+              }),
+            }
+            ]
+          },
+
         ];
 
         const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
 
         rPromise.then(async response => {
-          // STEP 1 : check for the duplicates
-
-          const uniqueEntries = new Set();
-
-          response.forEach(tableEntry => {
-            const key = `${tableEntry['ManualBillNo']}`;
-            // Check if the key is already in the set (duplicate entry)
-            if (uniqueEntries.has(key)) {
-              // Push an error message to the 'error' array
-              tableEntry.error = tableEntry.error || [];
-              tableEntry.error.push(`Duplicate entry`);
-            } else {
-              // Add the key to the set if it's not a duplicate
-              uniqueEntries.add(key);
+          response.forEach((element) => {
+            if (element.DebitAccount == "LIA001001") {
+              element.error.push("Debit Account Should Not Be LIA001001 Account");
             }
           });
 
           // Filter out objects with errors
           const objectsWithoutErrors = response.filter(obj => obj.error == null || obj.error.length === 0);
-
-
-          // STEP 2 : Get the data from the DB if Exist onlu Uniq Records
-          const billNo = objectsWithoutErrors.map((item, index) => {
-            // const _id = `${this.storage.companyCode}-${item.ManualBillNo}-${this.BranchCode}`;
-            const _id = `${this.storage.companyCode}-${item.ManualBillNo}`;
-            return _id;
-          });
-
-
-          const filters = [
-            {
-              "D$match": {
-                "_id": {
-                  "D$in": billNo
-                }
-              }
-            }
-          ];
-
-          this.existingData = await this.fetchExistingData(filters);
-
-          billNo.forEach((element, index) => {
-            const data = this.existingData.find(item => item._id === element);
-            if (data) {
-              objectsWithoutErrors[index]['Operation'] = "Update";
-
-            } else {
-              objectsWithoutErrors[index]['Operation'] = "Insert";
-            }
-          });
-
           const objectsWithErrors = response.filter(obj => obj.error != null);
+
           const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
           this.OpenPreview(sortedValidatedData);
         });
@@ -247,17 +398,6 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
     }
   }
 
-  async fetchExistingData(filters) {
-    debugger
-    const request = {
-      companyCode: this.storage.companyCode,
-      collectionName: "cust_bill_headers",
-      filters
-    };
-
-    const response = await firstValueFrom(this.masterService.masterPost("generic/query", request));
-    return response.data;
-  }
 
   OpenPreview(results) {
     const dialogRef = this.dialog.open(XlsxPreviewPageComponent, {
@@ -270,9 +410,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        console.log("Save Data", result);
-
-        // this.saveData(result)
+        this.BookVendorBill(result)
       }
     });
   }
@@ -282,153 +420,375 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
   //#region to download template file
   Download(): void {
     let link = document.createElement("a");
-    link.download = "CustomerWiseOpeningBalanceUploadFormate";
-    link.href = "assets/Download/CustomerWiseOpeningBalance.xlsx";
+    link.download = "VendorWiseOpeningBalanceUploadFormate";
+    link.href = "assets/Download/VendorWiseOpeningBalanceUploadFormate.xlsx";
     link.click();
   }
 
-  async saveData(result) {
-    try {
-      const DataForUpdate = result.filter(x => x.Operation === "Update");
 
-      if (DataForUpdate.length > 0) {
-        const updateRequests = DataForUpdate.map(element => {
-          const updateData = {
-            // dAMT: element.DebitAmount ? element.DebitAmount : 0,
-            // cAMT: element.CreditAmount ? element.CreditAmount : 0,
-            //mODDT: moment().format("YYYY-MM-DD"),
-            // mODBY: this.storage.userName,
-            // mODLOC: this.storage.branch,
-            bLOC: element.CollectionBranch,
-            cUST: {
-
-              cD: "CUST00014",
-              nM: "DTDC",
-              tEL: 78711411414,
-              aDD: "Ahmedabad",
-              eML: "DTDC@gmail.com",
-              cT: "AHMEDABAD",
-              sT: "Gujarat",
-              gSTIN: "24ABCDE5678F2Z1",
-              cGCD: "CUGR0011",
-              cGNM: "LOGISTICS",
-            }
-          };
-          console.log("updateData", updateData);
-
-          const req = {
-            companyCode: this.storage.companyCode,
-            filter: { _id: `${this.storage.companyCode}-${element.ManualBillNo}` },
-            collectionName: `cust_bill_headers`,
-            update: updateData
-          };
-          console.log("req", req);
-
-          return this.masterService.masterPut("generic/update", req).pipe(
-            catchError(error => {
-              console.error("Error updating account:", error);
-              return []; // Return empty array to continue with forkJoin
-            })
-          );
-        });
-
-        forkJoin(updateRequests).subscribe(
-          (responses: any[]) => {
-            responses.forEach((res, index) => {
-              if (res) {
-                Swal.fire({
-                  icon: "success",
-                  title: "Successful",
-                  text: `Account Opening Updated Successfully`,
-                  showConfirmButton: true,
-                });
-
-                // Update isSelected property to false for the processed item
-              } else {
-                console.error("Failed to update account:", res);
-                // Handle failed update if necessary
-              }
-            });
-          },
-          error => {
-            console.error("Error updating accounts:", error);
-            // Handle error if necessary
-          }
-        );
-      }
-      // const DataForInsert = result.filter(x => x.Operation === "Insert");
-      // if (DataForInsert.length > 0) {
-      //   const insertRequests = DataForInsert.map(element => {
-      //     const insertData = {
-      //       _id: `${this.storage.companyCode}-${element.AccountCode}-${this.BranchCode}`,
-      //       cID: this.storage.companyCode,
-      //       bRCD: this.BranchCode,
-      //       aCCD: element.AccountCode,
-      //       aCNM: element.AccountName,
-      //       mATCD: element.MainGroupCode,
-      //       mRPNM: element.MainGroupName,
-      //       gRPCD: element.GroupCode,
-      //       gRPNM: element.GroupName,
-      //       cATCD: element.CategoryCode,
-      //       cATNM: element.CategoryName,
-      //       dAMT: element.DebitAmount ? element.DebitAmount : 0,
-      //       cAMT: element.CreditAmount ? element.CreditAmount : 0,
-      //       eNTDT: moment().format("YYYY-MM-DD"),
-      //       eNTBY: this.storage.userName,
-      //       eNTLOC: this.storage.branch,
-      //     };
-
-      //     console.log("insertData",insertData);
-
-      //     // const req = {
-      //     //   companyCode: this.storage.companyCode,
-      //     //   collectionName: `acc_opening_${financialYear}`,
-      //     //   data: insertData
-      //     // };
-
-      //     // return this.masterService.masterPost("generic/create", req).pipe(
-      //     //   catchError(error => {
-      //     //     console.error("Error inserting account:", error);
-      //     //     return []; // Return empty array to continue with forkJoin
-      //     //   })
-      //     // );
-      //   });
-
-      //   forkJoin(insertRequests).subscribe(
-      //     (responses: any[]) => {
-      //       responses.forEach((res, index) => {
-      //         if (res) {
-      //           Swal.fire({
-      //             icon: "success",
-      //             title: "Successful",
-      //             text: `Account Opening Inserted Successfully`,
-      //             showConfirmButton: true,
-      //           });
-
-      //           // Update isSelected property to false for the processed item
-      //         } else {
-      //           console.error("Failed to insert account:", res);
-      //           // Handle failed insert if necessary
-      //         }
-      //       });
-      //     },
-      //     error => {
-      //       console.error("Error inserting accounts:", error);
-      //       // Handle error if necessary
-      //     }
-      //   );
-      // }
-
-    } catch (error) {
-      // Handle any errors that occurred during the process
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error,
-        showConfirmButton: true,
-      });
+  cancel(tabIndex: string): void {
+    this.router.navigate(["/dashboard/Index"], {
+      queryParams: { tab: tabIndex },
+      state: [],
+    });
+  }
+  BookVendorBill(jsonData) {
+    if (jsonData.length === 0) {
+      this.snackBarUtilityService.ShowCommonSwal("info", "Please Add Atleast One Record in Upload File");
       return;
     }
+
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const Response = [];
+        for (let i = 0; i < jsonData.length; i++) {
+          const data = jsonData[i];
+          const BillResult = await firstValueFrom(this.createVendorBillRequest(data));
+          const VoucherResult = await firstValueFrom(this.createJournalRequest(data, BillResult?.data.data.ops[0].docNo));
+          const ResultObject = {
+            BillNo: BillResult?.data.data.ops[0].docNo,
+            VoucherNo: VoucherResult.data.ops[0].vNO,
+            Status: "Success"
+          };
+          Response.push(ResultObject);
+        }
+        Swal.hideLoading();
+        Swal.close();
+        this.DisplayResult(Response);
+
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", error);
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 2000);
+      }
+    }, "Opening Balance Voucher Generating..!");
+  }
+
+  DisplayResult(Response) {
+    this.tableData = Response;
+    this.tableLoad = true;
+  }
+  createVendorBillRequest(data: any): Observable<any> {
+    // Get Vendors Details Based on Vendpor Code
+    const VendorDetails = this.VendorList.find((x) => x.vendorCode === data.VendorCode);
+    const TDSExempted = parseFloat(data.TDSRate) === 0 ? true : false;
+    const TDSAmount = TDSExempted ? 0 : (parseFloat(data.Amount) * parseFloat(data.TDSRate)) / 100;
+    const TDSLedger = this.TDSAccountList.find((x) => x.aCCD === data.TDSLedger);
+
+    const SACCode = this.SachsnList.find((x) => x.SHCD === data.SACCode);
+
+    const isSameState = data.StateofSupply.replace(/\s+/g, '').toUpperCase() === data.StateOfBilling.replace(/\s+/g, '').toUpperCase();
+    const gstRate = parseFloat(data.GSTRate) || 0.00;
+    const amount = parseFloat(data.Amount) || 0.00;
+    const gstApplicable = data.GSTApplicable === "Y";
+    const gstAmount = gstApplicable ? (amount * gstRate) / 100 : 0.00;
+
+    // Calculate Total Amount
+    const totalAmount = (amount + gstAmount) - TDSAmount;
+
+
+    const vendorBillEntry: VendorBillEntry = {
+      companyCode: this.storage.companyCode,
+      docType: "VB",
+      branch: this.storage.branch,
+      finYear: financialYear,
+      data: {
+        cID: this.storage.companyCode,
+        docNo: "",
+        bDT: new Date(),
+        tMOD: "",
+        lOC: VendorDetails?.vendorCity,
+        sT: data.StateofSupply,
+        gSTIN: data.VendorGSTNO,
+        tHCAMT: totalAmount,
+        aDVAMT: 0,
+        bALAMT: totalAmount,
+        rOUNOFFAMT: 0,
+        bALPBAMT: totalAmount,
+        bSTAT: 1,
+        bSTATNM: "Awaiting Approval",
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        eNTBY: this.storage.userName,
+        vND: {
+          cD: VendorDetails?.vendorCode,
+          nM: VendorDetails?.vendorName,
+          pAN: VendorDetails?.panNo,
+          aDD: VendorDetails?.vendorAddress,
+          mOB: VendorDetails?.vendorPhoneNo ? VendorDetails?.vendorPhoneNo.toString() : "",
+          eML: VendorDetails?.emailId,
+          gSTREG: VendorDetails?.gstNumber,
+          sT: VendorDetails?.vendorState,
+          gSTIN: VendorDetails?.gstNumber,
+        },
+        tDS: {
+          eXMT: TDSExempted,
+          sEC: !TDSExempted ? TDSLedger.aCCD : "",
+          sECD: !TDSExempted ? TDSLedger.aCNM : "",
+          rATE: !TDSExempted ? parseFloat(data.TDSRate) : 0,
+          aMT: !TDSExempted ? TDSAmount : 0,
+        },
+        gST: {
+          sAC: SACCode?.SHCD || "",
+          sACNM: SACCode?.SNM || "",
+          tYP: gstApplicable ? (isSameState ? "CGST,SGST" : "IGST") : "",
+          rATE: gstRate || 0,
+          iGRT: gstApplicable ? (isSameState ? 0 : gstRate) : 0,
+          cGRT: gstApplicable ? (isSameState ? gstRate / 2 : 0) : 0,
+          sGRT: gstApplicable ? (isSameState ? gstRate / 2 : 0) : 0,
+          uGRT: 0,
+          uGST: 0,
+          iGST: gstApplicable ? (isSameState ? 0.00 : gstAmount) : 0.00,
+          cGST: gstApplicable ? (isSameState ? gstAmount / 2 : 0.00) : 0.00,
+          sGST: gstApplicable ? (isSameState ? gstAmount / 2 : 0.00) : 0.00,
+          aMT: gstAmount,
+        },
+      },
+      BillDetails: []
+    };
+    return this.voucherServicesService.FinancePost("finance/bill/vendor/create", vendorBillEntry).pipe(
+      catchError((error) => {
+        console.error('Error occurred while creating voucher:', error);
+        return throwError(error);
+      }),
+    );
+  }
+  createJournalRequest(data: any, BillNo): Observable<any> {
+    // Get Vendors Details Based on Vendpor Code
+    const VendorDetails = this.VendorList.find((x) => x.vendorCode === data.VendorCode);
+    const TDSExempted = parseFloat(data.TDSRate) === 0 ? true : false;
+    const TDSAmount = TDSExempted ? 0 : (parseFloat(data.Amount) * parseFloat(data.TDSRate)) / 100;
+    const TDSLedger = this.TDSAccountList.find((x) => x.aCCD === data.TDSLedger);
+
+    const isSameState = data.StateofSupply.replace(/\s+/g, '').toUpperCase() === data.StateOfBilling.replace(/\s+/g, '').toUpperCase();
+    const gstRate = parseFloat(data.GSTRate) || 0.00;
+    const amount = parseFloat(data.Amount) || 0.00;
+    const gstApplicable = data.GSTApplicable === "Y";
+    const gstAmount = gstApplicable ? (amount * gstRate) / 100 : 0.00;
+
+    // Calculate Total Amount
+    const totalAmount = (amount + gstAmount) - TDSAmount;
+
+    const voucherRequest = {
+      companyCode: this.storage.companyCode,
+      docType: "VR",
+      branch: data.BillingBranch,
+      finYear: financialYear,
+      details: [],
+      debitAgainstDocumentList: [],
+      data: {
+        transCode: VoucherInstanceType.VendorOpeningBalance,
+        transType: VoucherInstanceType[VoucherInstanceType.VendorOpeningBalance],
+        voucherCode: VoucherType.JournalVoucher,
+        voucherType: VoucherType[VoucherType.JournalVoucher],
+        transDate: new Date(),
+        docType: "VR",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        accLocation: this.storage.branch,
+        preperedFor: "Vendor",
+        partyCode: VendorDetails.vendorCode,
+        partyName: VendorDetails.vendorName,
+        partyState: VendorDetails.vendorState,
+        entryBy: this.storage.userName,
+        entryDate: new Date(),
+        panNo: VendorDetails.panNo,
+        tdsSectionCode: TDSLedger.aCCD,
+        tdsSectionName: TDSLedger.aCNM,
+        tdsRate: parseFloat(data.TDSRate) || 0,
+        tdsAmount: TDSAmount,
+        tdsAtlineitem: false,
+        tcsSectionCode: undefined,
+        tcsSectionName: undefined,
+        tcsRate: 0,
+        tcsAmount: 0,
+        IGST: gstApplicable ? (isSameState ? 0.00 : gstAmount) : 0.00,
+        SGST: gstApplicable ? (isSameState ? gstAmount / 2 : 0.00) : 0.00,
+        CGST: gstApplicable ? (isSameState ? gstAmount / 2 : 0.00) : 0.00,
+        UGST: 0,
+        GSTTotal: gstAmount,
+        GrossAmount: totalAmount,
+        netPayable: totalAmount,
+        roundOff: 0,
+        voucherCanceled: false,
+        paymentMode: "",
+        refNo: "",
+        accountName: "",
+        accountCode: "",
+        date: "",
+        scanSupportingDocument: "",
+        transactionNumber: BillNo,
+        mANNUM: data?.ManualBillNo,
+      }
+    };
+
+    // Retrieve voucher line items
+    const voucherlineItems = this.GetJournalVoucherLedgers(data, BillNo);
+    voucherRequest.details = voucherlineItems;
+
+    // Validate debit and credit amounts
+    if (voucherlineItems.reduce((acc, item) => acc + parseFloat(item.debit), 0) != voucherlineItems.reduce((acc, item) => acc + parseFloat(item.credit), 0)) {
+      this.snackBarUtilityService.ShowCommonSwal("error", "Debit and Credit Amount Should be Equal");
+      // Return an observable with an error
+      return;
+    }
+
+    // Create and return an observable representing the HTTP request
+    return this.voucherServicesService.FinancePost("fin/account/voucherentry", voucherRequest).pipe(
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while creating voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      }),
+      mergeMap((res: any) => {
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          voucherNo: res?.data?.mainData?.ops[0].vNO,
+          transDate: Date(),
+          finYear: financialYear,
+          branch: this.storage.branch,
+          transCode: VoucherInstanceType.VendorOpeningBalance,
+          transType: VoucherInstanceType[VoucherInstanceType.VendorOpeningBalance],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          docType: "Voucher",
+          partyType: "Vendor",
+          docNo: data.THC,
+          partyCode: "" + VendorDetails.vendorCode || "",
+          partyName: VendorDetails.vendorName || "",
+          entryBy: this.storage.userName,
+          entryDate: Date(),
+          debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.debit,
+              "narration": item.narration ?? ""
+            };
+          }),
+          credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.credit,
+              "narration": item.narration ?? ""
+            };
+          }),
+        };
+
+        return this.voucherServicesService.FinancePost("fin/account/posting", reqBody);
+      }),
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while posting voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      })
+    );
+  }
+  GetJournalVoucherLedgers(data, BillNo) {
+    const createVoucher = (
+      accCode,
+      accName,
+      accCategory,
+      debit,
+      credit,
+      RefNo,
+      BillNo,
+      sacCode = "",
+      sacName = ""
+    ) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.VendorOpeningBalance,
+      transType: VoucherInstanceType[VoucherInstanceType.VendorOpeningBalance],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: sacCode,
+      sacName: sacName,
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Vendor Bill Generated For : ${RefNo}  Against Bill No : ${BillNo}`,
+    });
+
+    const Result = [];
+    //const DocumentList
+
+    // Push Debit Account Data
+    const AccountData = this.AccountList.find((x) => x.aCCD == data.DebitAccount);
+    Result.push(createVoucher(AccountData.aCCD, AccountData.aCNM, AccountData.mRPNM, parseFloat(data.Amount), 0, data.ManualBillNo, BillNo));
+
+    //#region Push TDS Sectiond Data
+    if (+data.TDSRate != 0) {
+      // calculate TDS Amount
+      const TDSAmount = (parseFloat(data.TDSRate) / 100) * parseFloat(data.Amount);
+      if (TDSAmount > 0) {
+        // Get TDS Section Code and Name
+        const TDSLedger = this.TDSAccountList.find((x) => x.aCCD == data.TDSLedger);
+        if (TDSLedger) {
+          Result.push(createVoucher(TDSLedger.aCCD, TDSLedger.aCNM, "LIABILITY", 0, TDSAmount, data.ManualBillNo, BillNo));
+        }
+      }
+    }
+    //#endregion
+
+    //#region Push GST Data when GST Applicable
+    if (data.GSTApplicable === "Y") {
+      // Calculate GST Amount
+      const GSTAmount = (parseFloat(data.GSTRate) / 100) * parseFloat(data.Amount);
+      if (GSTAmount > 0) {
+        // Get GST Section Code and Name
+        const GSTLedger = this.AccountList.find((x) => x.aCCD == data.DebitAccount);
+        if (GSTLedger) {
+          const isSameState = data.StateofSupply.replace(/\s+/g, '').toUpperCase() === data.StateOfBilling.replace(/\s+/g, '').toUpperCase();
+          if (isSameState) {
+            Result.push(createVoucher(ledgerInfo["CGST"].LeadgerCode, ledgerInfo["CGST"].LeadgerName, ledgerInfo["CGST"].LeadgerCategory,
+              GSTAmount / 2, 0, data.ManualBillNo, BillNo, GSTLedger.aCCD, GSTLedger.aCNM));
+            Result.push(createVoucher(
+              ledgerInfo["SGST"].LeadgerCode, ledgerInfo["SGST"].LeadgerName, ledgerInfo["SGST"].LeadgerCategory,
+              GSTAmount / 2, 0, data.ManualBillNo, BillNo, GSTLedger.aCCD, GSTLedger.aCNM
+            ));
+          } else {
+            Result.push(createVoucher(ledgerInfo["IGST"].LeadgerCode, ledgerInfo["IGST"].LeadgerName,
+              ledgerInfo["IGST"].LeadgerCategory,
+              GSTAmount, 0, data.ManualBillNo, BillNo, GSTLedger.aCCD, GSTLedger.aCNM));
+          }
+        }
+      }
+    }
+
+    const TotalDebit = Result.reduce((a, b) => a + parseFloat(b.debit), 0);
+    const TotalCredit = Result.reduce((a, b) => a + parseFloat(b.credit), 0);
+
+    let difference = TotalDebit - TotalCredit;
+
+    Result.push(
+      createVoucher(
+        ledgerInfo["LIA001001"].LeadgerCode,
+        ledgerInfo["LIA001001"].LeadgerName,
+        ledgerInfo["LIA001001"].LeadgerCategory,
+        difference > 0 ? 0 : Math.abs(difference),
+        difference < 0 ? 0 : Math.abs(difference),
+        data.ManualBillNo,
+        BillNo
+      )
+    );
+
+    return Result;
   }
 }

@@ -1,5 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
-    <app-generic-bulk-upload [downloadFunction]="Download" [fileName]="'Vendor Wise Opening Balance Upload'">
+    <app-generic-bulk-upload *ngIf="!tableLoad" [downloadFunction]="Download"
+        [fileName]="'Vendor Wise Opening Balance Upload'">
         <div class="row">
             <form [formGroup]="fileUploadForm">
                 <div class="col">
@@ -8,4 +9,12 @@
             </form>
         </div>
     </app-generic-bulk-upload>
+    <div class="row">
+        <div class="col-6">
+            <app-generic-table-v2 *ngIf="tableLoad" [columnHeader]="columnHeader" [tableData]="tableData"
+                [dynamicControls]="dynamicControls" [staticField]="staticField" [FormTitle]="'Result'">
+            </app-generic-table-v2>
+        </div>
+    </div>
+
 </app-common-wrapper-webxpress>

@@ -35,6 +35,7 @@ export class CreditVoucherDataRequestModel {
     mANNUM: string
     mREFNUM: string
     nAR: string;
+    onAccount: boolean = false;
 }
 
 export class CreditVoucherdetailsRequestModel {

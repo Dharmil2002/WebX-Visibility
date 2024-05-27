@@ -40,11 +40,7 @@ export class CustomerContractServiceSelectionComponent
   @Input() contractData: any;
   //#region Form Configration Fields
   ContractServiceSelectionControls: ContractServiceSelectionControl;
-  EventButton = {
-    functionName: "SaveServiceSelection",
-    name: "Save",
-    iconName: "save",
-  };
+
   InsuranceEventButton = {
     functionName: "addInsuranceData",
     name: "Add New",
@@ -54,6 +50,11 @@ export class CustomerContractServiceSelectionComponent
     functionName: "FuelSurchargeAddData",
     name: "Add New",
     iconName: "add",
+  };
+  SaveEventButton = {
+    functionName: "SaveServiceSelection",
+    name: "Save",
+    iconName: "save",
   };
   ProductsForm: UntypedFormGroup;
   jsonControlArrayProductsForm: any;
@@ -107,7 +108,6 @@ export class CustomerContractServiceSelectionComponent
       active: "ConsignmentEntryForm",
     },
   ];
-
   dynamicControls = {
     add: false,
     edit: false,
@@ -937,7 +937,7 @@ export class CustomerContractServiceSelectionComponent
     //#endregion
   }
 
-  async SaveServiceSelection(event) {
+  async SaveServiceSelection() {
 
     let hasError = false; // Initialize the flag
     let contractDetails = {};

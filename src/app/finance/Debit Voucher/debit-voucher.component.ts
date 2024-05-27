@@ -7,13 +7,12 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { SessionService } from 'src/app/core/service/session.service';
 import Swal from 'sweetalert2';
 import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
 import { DriversFromApi, GetAccountDetailFromApi, GetBankDetailFromApi, GetLocationDetailFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, GetsachsnFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
-import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
+import { GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
 import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 import { DebitVoucherPreviewComponent } from '../Modals/debit-voucher-preview/debit-voucher-preview.component';
@@ -173,7 +172,7 @@ export class DebitVoucherComponent implements OnInit {
     );
 
     this.SACCodeList = await GetsachsnFromApi(this.masterService)
-    console.log(this.SACCodeList)
+    // console.log(this.SACCodeList)
   }
   async BindLedger(BindLedger) {
     const account_groupReqBody = {
@@ -512,7 +511,7 @@ export class DebitVoucherComponent implements OnInit {
           SubCategoryName: result?.SubCategoryName,
           actions: ['Edit', 'Remove']
         }
-        console.log(json)
+        // console.log(json)
         this.tableData.push(json);
         this.LoadVoucherDetails = true;
         this.StateChange("");
@@ -597,7 +596,7 @@ export class DebitVoucherComponent implements OnInit {
       case 'RTGS/UTR':
         break;
     }
-
+    this.SetOnAccountValue()
   }
 
   async AccountinglocationFieldChanged() {
@@ -627,10 +626,12 @@ export class DebitVoucherComponent implements OnInit {
   // Submit 
   Submit() {
     const Accountinglocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+    const partyName = `${this.DebitVoucherSummaryForm.value.PartyName.value} : ${this.DebitVoucherSummaryForm.value.PartyName.name}`;
     let FinalListOfDebitVoucher = [];
     // Calculate debit voucher
     var VoucherlineitemList = this.tableData.map(function (item) {
       return {
+        partyName: partyName,
         "Instance": "debit voucher",
         "Value": "Voucher line item",
         "Ledgercode": item.LedgerHdn,
@@ -651,6 +652,7 @@ export class DebitVoucherComponent implements OnInit {
       const isAmountNegative = Amount < 0;
 
       var RoundOffList = {
+        partyName: partyName,
         "Instance": "debit voucher",
         "Value": ledgerInfo['EXP001042'].LeadgerName,
         "Ledgercode": ledgerInfo['EXP001042'].LeadgerCode,
@@ -680,6 +682,7 @@ export class DebitVoucherComponent implements OnInit {
       }
 
       let GSTData = {
+        partyName: partyName,
         "Instance": "debit voucher",
         "Value": LeadgerName,
         "Ledgercode": LeadgerCode,
@@ -698,6 +701,7 @@ export class DebitVoucherComponent implements OnInit {
 
     if (TDSAmount > 0) {
       let TDSData = {
+        partyName: partyName,
         "Instance": "debit voucher",
         "Value": "TDS",
         "Ledgercode": TDSSection.value,
@@ -716,6 +720,7 @@ export class DebitVoucherComponent implements OnInit {
 
     if (TCSAmount > 0) {
       let TCSData = {
+        partyName: partyName,
         "Instance": "debit voucher",
         "Value": "TCS",
         "Ledgercode": TCSSection.value,
@@ -753,17 +758,21 @@ export class DebitVoucherComponent implements OnInit {
         Leadgerdata = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value
         break;
     }
+    const bankName = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value;
 
     let PayableData = {
+      partyName: partyName,
+      "LedgerCode": Leadgerdata?.value,
+      "LedgerName": Leadgerdata?.name,
       "Instance": "debit voucher",
       "Value": PaymentMode,
-      "Ledgercode": Leadgerdata?.value,
-      "Ledgername": Leadgerdata?.name,
+      "Ledgercode": bankName.value,
+      "Ledgername": bankName.name,
       "SubLedger": "BANK",
       "Dr": "",
       "Cr": NetPayable.toFixed(2),
       "Location": Accountinglocation,
-      "Narration": ""
+      "Narration": this.tableData[0].Narration
     };
     FinalListOfDebitVoucher.push(PayableData)
 
@@ -777,7 +786,10 @@ export class DebitVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.SubmitRequest(FinalListOfDebitVoucher)
+
+        const updatedData = this.replaceLedgerFields(FinalListOfDebitVoucher);
+        // console.log(updatedData)
+        this.SubmitRequest(updatedData)
       }
     });
   }
@@ -843,8 +855,8 @@ export class DebitVoucherComponent implements OnInit {
         this.VoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
         this.VoucherDataRequestModel.accountCode = this.DebitVoucherTaxationPaymentDetailsForm.value?.Bank.value;
         this.VoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
-        this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
-
+        this.VoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument;
+        this.VoucherDataRequestModel.onAccount = this.DebitVoucherTaxationPaymentDetailsForm.value.onAccount;
 
         const companyCode = this.storage.getItem(StoreKeys.CompanyCode);
         const Branch = this.storage.getItem(StoreKeys.Branch);
@@ -1039,6 +1051,33 @@ export class DebitVoucherComponent implements OnInit {
       data: { imageUrl: file },
       width: '30%',
       height: '50%',
+    });
+  }
+  //#endregion
+  //#region to set on account value
+  SetOnAccountValue() {
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
+    const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
+
+    if (PaymentMode !== "Cash" && Preparedfor == "Vendor" && this.tableData[0].LedgerHdn == "LIA001002") {
+      this.DebitVoucherTaxationPaymentDetailsForm.get("onAccount").setValue(true);
+    } else {
+      this.DebitVoucherTaxationPaymentDetailsForm.get("onAccount").setValue(false);
+    }
+  }
+  //#endregion
+  //#region to get ledger data
+  replaceLedgerFields(data) {
+    return data.map(item => {
+      let newItem = { ...item };
+      if ('LedgerCode' in newItem && 'LedgerName' in newItem) {
+        newItem.Ledgercode = newItem.LedgerCode;
+        newItem.Ledgername = newItem.LedgerName;
+        delete newItem.LedgerCode;
+        delete newItem.LedgerName;
+        delete newItem.partyName;
+      }
+      return newItem;
     });
   }
   //#endregion

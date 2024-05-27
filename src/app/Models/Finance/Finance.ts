@@ -60,6 +60,7 @@ export class VoucherDataRequestModel {
   mANNUM: string
   mREFNUM: string
   nAR: string;
+  onAccount: boolean = false;
 }
 
 export class DebitVoucherdetailsRequestModel {
@@ -288,7 +289,13 @@ export class DNTDetDataRequestModel {
     sGST: number;
     aMT: number;
   };
-  tdsAMT:number;
+  tDS: {
+    aMT: number;
+    eXMT: boolean;
+    rATE: number;
+    sECD: string;
+    sEC: string;
+  };
   eNTDT: Date;
   eNTLOC: string;
   eNTBY: string;

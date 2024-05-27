@@ -252,7 +252,7 @@ export class ApproveDebitNoteComponent implements OnInit {
           const req = {
             companyCode: this.storage.companyCode,
             collectionName: "vend_bill_summary",
-            filter: { docNo: noteData.docNo },
+            filter: { docNo: noteData.bILLNO },
             update: {
               bALPBAMT: noteData.bAMT + noteData.aMT,
             },
@@ -267,7 +267,7 @@ export class ApproveDebitNoteComponent implements OnInit {
           text: res.message,
           showConfirmButton: true,
         });
-        this.navigationService.navigateTotab("ApproveDebitNote", "dashboard/Index");
+        this.Route.navigate(["Finance/VendorPayment/Dashboard"])
       }
     }
     if (data.label.label == "Approve") {
@@ -309,7 +309,7 @@ export class ApproveDebitNoteComponent implements OnInit {
           this.VoucherDataRequestModel.finYear = financialYear;
 
           this.VoucherDataRequestModel.accLocation = this.DataResponseHeader.data[0].lOC;
-          this.VoucherDataRequestModel.preperedFor = "Customer";
+          this.VoucherDataRequestModel.preperedFor = "Vendor";
           this.VoucherDataRequestModel.partyCode = this.DataResponseHeader.data[0].pARTY.cD;
           this.VoucherDataRequestModel.partyName = this.DataResponseHeader.data[0].pARTY.nM || "";
           this.VoucherDataRequestModel.partyState = "";
@@ -515,7 +515,7 @@ export class ApproveDebitNoteComponent implements OnInit {
     const response = [
 
       createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, TotalAmount, 0),
-      createVoucher(ledgerInfo['EXP002006'].LeadgerCode, ledgerInfo['EXP002006'].LeadgerName, ledgerInfo['EXP002006'].LeadgerCategory, 0, TXBLAMTAmount),
+      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, "EXPENSE", 0, TXBLAMTAmount),
     ]
 
 
@@ -532,7 +532,7 @@ export class ApproveDebitNoteComponent implements OnInit {
     }
 
     if (this.DataResponseHeader.data[0].tdsAMT > 0) {
-      response.push(createVoucher(ledgerInfo['LIA002002'].LeadgerCode, ledgerInfo['LIA002002'].LeadgerName, ledgerInfo['LIA002002'].LeadgerCategory, 0, this.DataResponseHeader.data[0].tdsAMT));
+      response.push(createVoucher(this.DataResponseDetails.data[0].tDS.sEC, this.DataResponseDetails.data[0].tDS.sECD, "TDS", 0, this.DataResponseHeader.data[0].tdsAMT));
     }
 
     return response;

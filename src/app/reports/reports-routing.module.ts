@@ -30,6 +30,7 @@ import { BalanceSheetCriteriaComponent } from './Account Report/Components/Balan
 import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view/balance-sheet-view.component';
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
+import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
 
 
 const routes: Routes = [
@@ -61,7 +62,7 @@ const routes: Routes = [
   { path: "AccountReport/BalanceSheetview", component: BalanceSheetViewComponent },
   { path: "MR-Register-Report", component: MRRegisterReportComponent },
   { path: "CustomerInvoiceRegister", component: CustomerInvoiceRegisterComponent },
-
+  { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent }
 
 ];
 

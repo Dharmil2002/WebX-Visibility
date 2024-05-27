@@ -2686,36 +2686,50 @@ export class ConsignmentEntryFormComponent
   }
   /*getConsignor*/
   getConsignor() {
+    const cust = this.model.consignmentTableForm.value;
     const mobile =
       this.model.consignmentTableForm.controls["consignorName"].value
         ?.otherdetails?.customer_mobile || "";
     this.model.consignmentTableForm.controls["ccontactNumber"].setValue(mobile);
-    const cnogst =
-      this.model.consignmentTableForm.controls["consignorName"].value
-        ?.otherdetails?.GSTdetails[0]?.gstNo || "";
-    this.model.consignmentTableForm.controls["cnogst"].setValue(cnogst);
     this.SetConsignorAndConsigneeAddressDetails(
       this.model.consignmentTableForm.controls["consignorName"].value?.value,
       "consignor"
     );
+    let cnogst = cust.consignorName.otherdetails.GSTdetails.filter(x => x.gstNo.substring(0, 2) == cust.fromCity.st);
+    if (!cnogst || cnogst.length === 0 || cnogst.length > 1) {
+      cnogst = cust.consignorName.otherdetails.GSTdetails.filter(x => x.gstCity === cust.fromCity.ct);
+    }
+    if (!cnogst || cnogst.length === 0) {
+      cnogst = cust.consignorName.otherdetails.GSTdetails[0];
+    } else if (cnogst.length === 1) {
+      cnogst = cnogst[0];
+    }
+    this.model.consignmentTableForm.controls["cnogst"].setValue(cnogst?.gstNo||"");
   }
   /*End*/
   /*getConsignee*/
   getConsignee() {
+    const cust = this.model.consignmentTableForm.value;
     const mobile =
       this.model.consignmentTableForm.controls["consigneeName"].value
         ?.otherdetails?.customer_mobile || "";
     this.model.consignmentTableForm.controls["cncontactNumber"].setValue(
       mobile
     );
-    const cnegst =
-      this.model.consignmentTableForm.controls["consigneeName"].value
-        ?.otherdetails?.GSTdetails[0]?.gstNo || "";
-    this.model.consignmentTableForm.controls["cnegst"].setValue(cnegst);
     this.SetConsignorAndConsigneeAddressDetails(
       this.model.consignmentTableForm.controls["consigneeName"].value?.value,
       "consignee"
     );
+    let cnogst = cust.consignorName.otherdetails.GSTdetails.filter(x => x.gstNo.substring(0, 2) == cust.toCity.st);
+    if (!cnogst || cnogst.length === 0 || cnogst.length > 1) {
+      cnogst = cust.consignorName.otherdetails.GSTdetails.filter(x => x.gstCity === cust.toCity.ct);
+    }
+    if (!cnogst || cnogst.length === 0) {
+      cnogst = cust.consignorName.otherdetails.GSTdetails[0];
+    } else if (cnogst.length === 1) {
+      cnogst = cnogst[0];
+    }
+    this.model.consignmentTableForm.controls["cnegst"].setValue(cnogst?.gstNo||"");
   }
   /*End*/
   //validation for the Actual weight not greater then actual weight

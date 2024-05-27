@@ -154,6 +154,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   isScan: boolean;
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
+  LoadType: AutoComplete[];
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -197,7 +198,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
     this.consigmentControls = new ConsignmentLtl(this.generalService);
-
     this.consigmentControls.applyFieldRules(this.storage.companyCode).then(() => {
       this.initializeFormControl();
 
@@ -236,7 +236,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       [this.freightControlArray]
     );
     // Set initial values for the form controls
-    this.getDataFromGeneralMaster();
+
     this.bindQuickdocketData();
     this.commonDropDownMapping();
     this.getVolControls();
@@ -245,6 +245,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     this.freightForm.controls['gstRate'].disable();
     this.freightForm.controls['gstChargedAmount'].disable();
+    this.getDataFromGeneralMaster();
   }
   /*end*/
 
@@ -330,6 +331,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   async getDataFromGeneralMaster() {
 
+    this.LoadType = await this.generalService.getGeneralMasterData("LT");
     this.paymentType = await this.generalService.getGeneralMasterData("PAYTYP");
     this.riskType = await this.generalService.getGeneralMasterData("RSKTYP");
     this.pkgsType = await this.generalService.getGeneralMasterData("PKGS");
@@ -1340,6 +1342,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
+    const form=this.consignmentForm.value
     const payType = this.consignmentForm.get('payType').value;
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
@@ -1632,6 +1635,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   /*below code is for invoke a contract*/
   InvockedContract() {
+    const loadType = this.storage.mode;
+    let SelectedLoadTypeCode;
+    if (this.LoadType.find((x) => x.name == loadType)) {
+      SelectedLoadTypeCode = this.LoadType.find((x) => x.name == loadType).value;
+    }
+    else {
+      SelectedLoadTypeCode = "LT-0002";
+    }
     const paymentBasesName = this.paymentType.find(x => x.value == this.consignmentForm.value.payType).name;
     const TransMode = this.tranType.find(x => x.value == this.consignmentForm.value.transMode).name;
     // const party = this.docketService.paymentBaseContract[paymentBasesName]
@@ -1666,6 +1677,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       "from": this.consignmentForm.value.fromCity.value,
       "to": this.consignmentForm.value.toCity.value,
       "capacity": 0,
+      "LoadType": SelectedLoadTypeCode,
       "matches": matches
     }
 
@@ -1848,7 +1860,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const matDen = this.invoiceForm.controls['materialDensity'].value;
     if (matDen == "Bulky") {
       const oActualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value)
-      const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value) * 25 / 1000;
+      const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value) * 25 / 100;
       const total = oActualWeight + actualWeight;
       this.invoiceForm.controls['chargedWeight'].setValue(total);
     }

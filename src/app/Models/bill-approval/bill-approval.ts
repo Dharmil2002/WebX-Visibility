@@ -16,16 +16,19 @@ export class BillApproval implements IFieldDefinition {
             Title: "Customer Name",
             class: "matcolumncenter",
             Style: "min-width:180px",
+            datatype: "string",
         },
         bILLNO: {
             Title: "Bill No",
             class: "matcolumncenter",
             Style: "min-width:80px",
+            datatype: "string",
         },
         bGNDT: {
             Title: "Bill Date",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "datetime",
         },
         aMT: {
             Title: "Bill Amount(₹)",

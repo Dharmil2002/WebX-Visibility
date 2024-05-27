@@ -14,26 +14,31 @@ export class invoiceModel implements IFieldDefinition {
             Title: "Shipment",
             class: "matcolumncenter",
             Style: "min-width:180px",
+            datatype: "string",
         },
         bookingdate: {
             Title: "Booking Date",
             class: "matcolumncenter",
             Style: "min-width:80px",
+            datatype: "datetime",
         },
         location: {
             Title: "Location",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "string",
         },
         state: {
             Title: "State",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "string",
         },
         vehicleNo: {
             Title: "Vehicle No",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "string",
         },
         amount: {
             Title: "Amount(₹)",
@@ -69,35 +74,40 @@ export class invoiceModel implements IFieldDefinition {
         ]
     /*below Block are fo edit shipment Selection*/
     public columnShipmentSelection = {
-    checkBoxRequired: {
+        checkBoxRequired: {
             Title: "",
             class: "matcolumncenter",
             Style: "max-width:100px",
-          },
+        },
         shipment: {
             Title: "Shipment",
             class: "matcolumncenter",
             Style: "min-width:180px",
+            datatype: "string",
         },
         bookingdate: {
             Title: "Booking Date",
             class: "matcolumncenter",
             Style: "min-width:80px",
+            datatype: "datetime",
         },
         location: {
             Title: "Location",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "string",
         },
         state: {
             Title: "State",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "string",
         },
         vehicleNo: {
             Title: "Vehicle No",
             class: "matcolumncenter",
             Style: "min-width:2px",
+            datatype: "string",
         },
         amount: {
             Title: "Amount(₹)",

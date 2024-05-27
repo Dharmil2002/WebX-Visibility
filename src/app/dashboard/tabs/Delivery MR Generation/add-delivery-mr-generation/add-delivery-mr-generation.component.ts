@@ -226,7 +226,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     if (docketFindetails.length === 1) {
       this.DocketFinDetails = docketFindetails[0];
       await this.SetExtraBookingTimeCharges();
-      if (this.DocketFinDetails.cHG.length > 0) {
+      if (this.DocketFinDetails.cHG && this.DocketFinDetails.cHG.length > 0) {
         this.ChargesList = await this.SetBookingTimeCharges(this.DocketFinDetails.cHG);
         this.AlljsonControlBookingTimechargesArray = [...this.jsonControlBookingTimechargesArray, ...this.ChargesList,];
 
@@ -297,14 +297,16 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   async SetExtraBookingTimeCharges() {
     this.bookingChargeList.forEach(charge => {
-      if (!this.DocketFinDetails.cHG.find(item => item.cHGID === charge.cHACD)) {
-        this.DocketFinDetails.cHG.push({
-          cHGID: charge.cHACD,
-          cHGNM: charge.sELCHA,
-          aMT: 0,
-          oPS: charge.aDD_DEDU === "+" ? "+" : "-",
-          cHACAT: charge.cHACAT
-        });
+      if (this.DocketFinDetails.cHG && this.DocketFinDetails.cHG.length > 0) {
+        if (!this.DocketFinDetails.cHG.find(item => item.cHGID === charge.cHACD)) {
+          this.DocketFinDetails.cHG.push({
+            cHGID: charge.cHACD,
+            cHGNM: charge.cAPTION,
+            aMT: 0,
+            oPS: charge.aDD_DEDU === "+" ? "+" : "-",
+            cHACAT: charge.cHACAT
+          });
+        }
       }
     });
   }
@@ -323,7 +325,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         .map((element, index) => ({
           id: 1 + index,
           name: element.cHACD || '',
-          label: `${element.sELCHA}(${element.aDD_DEDU})`,
+          label: `${element.cAPTION}(${element.aDD_DEDU})`,
           placeholder: element.cAPTION || '',
           type: 'number',
           value: 0,
@@ -377,18 +379,20 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.TotalDiffrentAmount = 0;
 
     for (let i = 1; i <= 3; i++) {
-      this.DocketFinDetails.cHG.forEach(item => {
-        const value = parseFloat(this.BookingTimechargesForm.get(item.cHGID + i).value);
-        const amountToAdd = isNaN(value) ? 0 : (item.oPS === "+" ? value : -value);
+      if (this.DocketFinDetails.cHG && this.DocketFinDetails.cHG.length > 0) {
+        this.DocketFinDetails.cHG.forEach(item => {
+          const value = parseFloat(this.BookingTimechargesForm.get(item.cHGID + i).value);
+          const amountToAdd = isNaN(value) ? 0 : (item.oPS === "+" ? value : -value);
 
-        if (i === 1) {
-          this.TotalBookingTimeCharges += amountToAdd;
-        } else if (i === 2) {
-          this.TotalEditedAmount += amountToAdd;
-        } else if (i === 3) {
-          this.TotalDiffrentAmount += amountToAdd;
-        }
-      });
+          if (i === 1) {
+            this.TotalBookingTimeCharges += amountToAdd;
+          } else if (i === 2) {
+            this.TotalEditedAmount += amountToAdd;
+          } else if (i === 3) {
+            this.TotalDiffrentAmount += amountToAdd;
+          }
+        });
+      }
     }
 
     // Calculate Delivery Time Charges
@@ -677,16 +681,19 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             GSTAmount = GSTAmount + parseFloat(this.SummaryForm.value[x].value);
           });
 
-          const btChgs = this.DocketFinDetails.cHG.map(item => {
-            let d = {
-              ...item,
-              cHACAT: "B"
-            };
+          let btChgs = [];
+          if (this.DocketFinDetails.cHG && this.DocketFinDetails.cHG.length > 0) {
+            btChgs = this.DocketFinDetails.cHG.map(item => {
+              let d = {
+                ...item,
+                cHACAT: "B"
+              };
 
-            const value = ConvertToNumber(this.BookingTimechargesForm.get(d.cHGID + 2).value, 2);
-            d.aMT = isNaN(value) ? 0 : (d.oPS === "-" ? -value : value);
-            return d;
-          });
+              const value = ConvertToNumber(this.BookingTimechargesForm.get(d.cHGID + 2).value, 2);
+              d.aMT = isNaN(value) ? 0 : (d.oPS === "-" ? -value : value);
+              return d;
+            });
+          }
 
           const dtChgs = this.DeliveryTimeChargesArray.map((d) => {
 
@@ -1133,13 +1140,20 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
 
         if (paybase == 'P01') {
-          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
-            0, VoucherDataRequestModel.GrossAmount, VoucherDataRequestModel.transactionNumber));
-
           Object.keys(gst).forEach(item => {
             Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,
               0, gst[item], VoucherDataRequestModel.transactionNumber));
           });
+
+          let totalGST = 0;
+          Object.keys(gst).forEach(item => {
+            totalGST += gst[item];
+          });
+
+          if (totalGST != 0) {
+            Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
+              0, VoucherDataRequestModel.netPayable - totalGST, VoucherDataRequestModel.transactionNumber));
+          }
         }
         else {
 
@@ -1149,8 +1163,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           Result.push(createVoucher(ledgerInfo["INC001009"].LeadgerCode, ledgerInfo["INC001009"].LeadgerName, ledgerInfo["INC001009"].LeadgerCategory,
             0, this.DocketDetails.tOTAMT, VoucherDataRequestModel.transactionNumber));
 
-          Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
-            0, gross, VoucherDataRequestModel.transactionNumber));
+          if (gross != 0) {
+            Result.push(createVoucher(ledgerInfo["INC001015"].LeadgerCode, ledgerInfo["INC001015"].LeadgerName, ledgerInfo["INC001015"].LeadgerCategory,
+              0, gross, VoucherDataRequestModel.transactionNumber));
+          }
 
           Object.keys(gst).forEach(item => {
             Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,

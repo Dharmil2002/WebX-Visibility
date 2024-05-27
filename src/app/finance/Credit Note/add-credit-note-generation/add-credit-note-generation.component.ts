@@ -93,20 +93,20 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       if (extrasState.data.label.label == "Modify") {
         this.isUpdate = 1;
         this.updatecreditnote = false;
-        this.hdninvoiceno = extrasState.data.data.docNo;
+        this.hdninvoiceno = extrasState.data.data.bILLNO;
         this.hdncreditno = extrasState.data.data.nTNO;
         this.hdncnamt = extrasState.data.data.aMT;
       }
       if (extrasState.data.label.label == "Approve") {
         this.isUpdate = 2;
         this.updatecreditnote = false;
-        this.hdninvoiceno = extrasState.data.data.docNo;
+        this.hdninvoiceno = extrasState.data.data.bILLNO;
         this.hdncreditno = extrasState.data.data.nTNO;
       }
       if (extrasState.data.label.label == "Cancel") {
         this.isUpdate = 3;
         this.updatecreditnote = false;
-        this.hdninvoiceno = extrasState.data.data.docNo;
+        this.hdninvoiceno = extrasState.data.data.bILLNO;
         this.hdncreditno = extrasState.data.data.nTNO;
         this.hdncnamt = extrasState.data.data.aMT;
       }
@@ -371,7 +371,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       return;
     }
 
-    if (Gsttype == "SGST" || Gsttype == "CGST") {
+    if (Gsttype == "CGST,SGST") {
       var TaxableAmt = (CreditnoteAmount) / (1 + (this.Gstrate / 100));
       this.GstAmount = parseFloat(((TaxableAmt * (this.Gstrate / 100))).toFixed(2));
       this.SgstRate = (this.Gstrate / 2);
@@ -410,7 +410,8 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           //Header data 
           this.CNTHdrDataRequestModel._id = "";
           this.CNTHdrDataRequestModel.cID = this.storage.companyCode; // assuming cID is a number, assign 0 for empty
-          this.CNTHdrDataRequestModel.docNo = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
+          this.CNTHdrDataRequestModel.docNo = "";
+          this.CNTHdrDataRequestModel.bILLNO = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
           this.CNTHdrDataRequestModel.tYP = "C";
           this.CNTHdrDataRequestModel.nTNO = "";
           this.CNTHdrDataRequestModel.nTDT = new Date();
@@ -453,7 +454,8 @@ export class AddCreditNoteGenerationComponent implements OnInit {
           //Detasils data
           this.CNTDetDataRequestModel._id = "";
           this.CNTDetDataRequestModel.cID = this.storage.companyCode;
-          this.CNTDetDataRequestModel.docNo = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
+          this.CNTDetDataRequestModel.docNo = "";
+          this.CNTDetDataRequestModel.bILLNO = this.CreditnoteGenerationTableForm.value.InvoiceNumber?.value;
           this.CNTDetDataRequestModel.tYP = "C";
           this.CNTDetDataRequestModel.nTNO = "";
           this.CNTDetDataRequestModel.nTDT = new Date();
@@ -528,7 +530,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
                     };
                     const res = firstValueFrom(
                       this.masterService.masterPut("generic/update", req))
-
 
                     Swal.hideLoading();
                     setTimeout(() => {
@@ -660,7 +661,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
             }
           }
         };
-
         const res = await firstValueFrom(
           this.masterService.masterPut("generic/update", Body))
 
@@ -875,7 +875,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
     const response = [
       createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, 0, TotalAmount),
-      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, ledgerInfo['INC001015'].LeadgerCategory, TXBLAMTAmount, 0),
+      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM,"INCOME", TXBLAMTAmount, 0),
     ];
 
     if (this.DataResponseDetails.data[0].gST.cGST > 0) {

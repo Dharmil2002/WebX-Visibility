@@ -145,6 +145,8 @@ export class DebitNoteDetailsComponent implements OnInit {
   hsnReasonDataResponse: any;
   isUpdate: number;
   reasonvalue: any;
+  hsnSacDataResponse: any;
+  ledgervalue: any;
 
 
   constructor(
@@ -192,7 +194,8 @@ export class DebitNoteDetailsComponent implements OnInit {
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.DebitNoteDetailsForm = formGroupBuilder(this.fb, [this.DebitNoteDetailsJson,]);
     this.checkbox();
-    this. ReasonBind();
+    this.ReasonBind();
+    this.LedgerBind();
   }
 
   functionCallHandler($event) {
@@ -324,6 +327,33 @@ export class DebitNoteDetailsComponent implements OnInit {
     );
   }
 
+
+  async LedgerBind() {
+    const Body = {
+      companyCode: this.storage.companyCode,
+      collectionName: "account_detail",
+      filter: { mRPNM: "EXPENSE" },
+    };
+
+    this.hsnSacDataResponse = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
+    const hsnData = this.hsnSacDataResponse.data.map(x => ({ name: x.aCNM, value: x.aCCD }));
+
+    if (this.isUpdate == 1) {
+      const element = hsnData.find(
+        (x) => x.value == this.ledgervalue
+      );
+      this.DebitNoteDetailsForm.controls["Ledgeraccount"].setValue(element);
+    }
+
+    this.filter.Filter(
+      this.DebitNoteDetailsJson,
+      this.DebitNoteDetailsForm,
+      hsnData,
+      "Ledgeraccount",
+      true
+    );
+
+  }
   
     
   updateTotalAmounts() {
@@ -359,6 +389,7 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTHdrDataRequestModel.docNo = "";
         this.DNTHdrDataRequestModel.tYP = "D";
         this.DNTHdrDataRequestModel.nTNO = "";
+        this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
         this.DNTHdrDataRequestModel.nTDT = new Date();
         this.DNTHdrDataRequestModel.lOC = this.storage.branch;
         //this.DNTHdrDataRequestModel.pARTY = { cD: this.hsnInvoiceDataResponse.data[0].cUST.cD, nM: this.hsnInvoiceDataResponse.data[0].cUST.nM }; // assigning empty objects for PARTY and GST
@@ -374,8 +405,8 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTHdrDataRequestModel.tdsAMT = this.TotalTDSAMOUNT;
         this.DNTHdrDataRequestModel.nTRESCD = this.DebitNoteDetailsForm.value.Reason?.value;
         this.DNTHdrDataRequestModel.nTRESNM = this.DebitNoteDetailsForm.value.Reason?.name,
-        this.DNTHdrDataRequestModel.aCCD = "";
-        this.DNTHdrDataRequestModel.aCNM = "";
+        this.DNTHdrDataRequestModel.aCCD = this.DebitNoteDetailsForm.value.Ledgeraccount?.value;
+        this.DNTHdrDataRequestModel.aCNM = this.DebitNoteDetailsForm.value.Ledgeraccount?.name;
         this.DNTHdrDataRequestModel.sTS = 1;
         this.DNTHdrDataRequestModel.sTSNM = "Generated";
         this.DNTHdrDataRequestModel.sTSBY = this.storage.loginName;
@@ -388,11 +419,11 @@ export class DebitNoteDetailsComponent implements OnInit {
 
         this.DNTDetDataRequestModel._id = "";
         this.DNTDetDataRequestModel.cID = this.storage.companyCode,
-        this.DNTDetDataRequestModel.docNo =this.dNoteData[0].docNo,
-        this.DNTDetDataRequestModel.tYP = "";
-        this.DNTDetDataRequestModel.nTNO = "";
-        this.DNTDetDataRequestModel.nTDT = new Date(),
-        this.DNTDetDataRequestModel.bILLNO = "";
+        this.DNTDetDataRequestModel.docNo ="",
+        this.DNTDetDataRequestModel.tYP = "D";
+        this.DNTDetDataRequestModel.nTNO ="";
+        this.DNTDetDataRequestModel.nTDT = new Date();
+        this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
         this.DNTDetDataRequestModel.bGNDT = "";
         this.DNTDetDataRequestModel.pARTY = {
           cD: this.dNoteData[0].vND.cD,
@@ -418,7 +449,14 @@ export class DebitNoteDetailsComponent implements OnInit {
           sGST: this.dNoteData[0].gST.sGRT > 0 ? this.dNoteData[0].gstRevlAmt / 2 : 0,
           aMT: this.dNoteData[0].gstRevlAmt
         },
-        this.DNTDetDataRequestModel.tdsAMT=this.dNoteData[0].tdsRevlAmt,
+        this.DNTDetDataRequestModel.tDS= {
+          aMT: this.dNoteData[0].tDS.aMT,
+          eXMT: this.dNoteData[0].tDS.eXMT,
+          rATE: this.dNoteData[0].tDS.rATE,
+          sEC: this.dNoteData[0].tDS.sEC,
+          sECD: this.dNoteData[0].tDS.sECD,
+
+        },
         this.DNTDetDataRequestModel.eNTDT= new Date(),
         this.DNTDetDataRequestModel.eNTLOC= this.storage.branch,
         this.DNTDetDataRequestModel.eNTBY= this.storage.loginName,

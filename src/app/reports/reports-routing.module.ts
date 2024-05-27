@@ -31,6 +31,7 @@ import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSh
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
+import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 
 
 const routes: Routes = [
@@ -62,8 +63,8 @@ const routes: Routes = [
   { path: "AccountReport/BalanceSheetview", component: BalanceSheetViewComponent },
   { path: "MR-Register-Report", component: MRRegisterReportComponent },
   { path: "CustomerInvoiceRegister", component: CustomerInvoiceRegisterComponent },
-  { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent }
-
+  { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent },
+  { path: "THC-Register-report", component: ThcRegisterReportComponent }
 ];
 
 @NgModule({

@@ -68,6 +68,7 @@ import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSh
 import { BalanceSheetCriteriaComponent } from './Account Report/Components/BalanceSheet/balance-sheet-criteria/balance-sheet-criteria.component';
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
+import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -141,7 +142,8 @@ import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/cu
     BalanceSheetViewComponent,
     BalanceSheetCriteriaComponent,
     MRRegisterReportComponent,
-    CustomerInvoiceRegisterComponent
+    CustomerInvoiceRegisterComponent,
+    VolumetricShipmentRegisterComponent
   ],
   exports: [],
 

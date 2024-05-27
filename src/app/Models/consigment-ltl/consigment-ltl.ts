@@ -67,6 +67,11 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+    pkgsTypeInv: {
+      Title: "Packaging Type",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
@@ -164,7 +169,11 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-
+    pkgsTypeInv: {
+      Title: "Packaging Type",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",

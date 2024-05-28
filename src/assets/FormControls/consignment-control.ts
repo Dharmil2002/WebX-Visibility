@@ -450,6 +450,13 @@ export class ConsignmentControl extends BaseControl {
           metaData: "Basic",
         },
       },
+      {
+        name: 'spIns', label: 'Special Instructions', placeholder: 'Special Instructions', type: 'text',
+        value: docketDetail?.spIns||"", Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+            metaData: "Basic"
+        }
+    },
       // {
       //   name: 'rake_no', label: 'Rake', placeholder: 'Rake No', type: 'text',
       //   value: docketDetail.rake_no, Validations: [], generatecontrol: true, disable: false,

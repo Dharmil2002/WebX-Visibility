@@ -379,6 +379,7 @@ export class DocketService {
             "inboundNumber": data.iNBNUM,
             "shipment": data.sHIP,
             "rfqNo": data.rFQNO,
+            "spIns": data?.rMK||"",
             "podDoNumber": data.pODONUM,
             "vehicleDetail": null,
             "invoiceDetails": [],
@@ -463,6 +464,7 @@ export class DocketService {
             iNBNUM: docket["inboundNumber"],
             shipment: docket["sHIP"],
             rFQNO: docket["rfqNo"],
+            rMK: docket["spIns"],
             pODONUM: docket["podDoNumber"],
             mODBY: this.storage.userName,
             mODDT: new Date(),
@@ -1303,7 +1305,8 @@ export class DocketService {
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
             "cONTRACT": data?.contract || "",
             "iSSCAN":data?.iSSCAN,
-            "nFCHG": nonfreightAmt
+            "nFCHG": nonfreightAmt,
+            "rMK":data?.spIns||""
         };
 
         let invoiceDetails = invoiceData.map((element) => {

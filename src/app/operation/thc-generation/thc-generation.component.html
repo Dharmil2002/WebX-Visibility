@@ -88,7 +88,7 @@
         [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
       </app-generic-table-v2>
     </div>
-    <div *ngIf="isRail">
+    <!-- <div *ngIf="isRail">
       <form [formGroup]="rakeInvoice">
         <app-form-webxpress [form]="rakeInvoice" [formData]="rakeInvoiceData"
           (callFunction)="functionCallHandler($event)" [EventButton]="rakeInvoice.valid==true?EventButtonInvoice:null"[FormTitle]="'Rake Invoice'"
@@ -96,7 +96,6 @@
         </app-form-webxpress>
       </form>
       <div *ngIf="isLoadInvoice" class="d-flex justify-content-center align-items-center">
-        <!-- Bootstrap loader -->
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
@@ -107,7 +106,7 @@
         [width]="width" [maxWidth]="maxWidth" [TableStyle]="TableStyle" (menuItemClicked)="handleMenuItemClick($event)"
         [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
       </app-generic-table-v2>
-    </div>
+    </div> -->
       <form [formGroup]="chargeForm">
         <app-form-webxpress [form]="chargeForm" [formData]="chargeJsonControl"
           (callFunction)="functionCallHandler($event)" [FormTitle]="'Charges'"

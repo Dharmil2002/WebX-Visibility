@@ -20,6 +20,7 @@ import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-ser
 import Swal from "sweetalert2";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { UserMasterService } from "src/app/Utility/module/masters/user-master/user-master-service";
 
 @Component({
   selector: "app-tracking-page",
@@ -101,6 +102,7 @@ export class TrackingPageComponent implements OnInit {
     private Route: Router,
     private masterService: MasterService,
     public dialog: MatDialog,
+    private userMasterService:UserMasterService,
     private changeDetectorRef: ChangeDetectorRef,
     private fb: UntypedFormBuilder,
     private controlPanel: ControlPanelService,
@@ -204,7 +206,15 @@ export class TrackingPageComponent implements OnInit {
     );
     if (res.success) {
       if (res.data && res.data.length) {
+         const getUser= await this.userMasterService.getUserName({companyCode:this.storage.companyCode,userId:{"D$in":res.data.map(x=>x.eNTBY)}})
         this.trackingData = res.data;
+        if( getUser && getUser.data && getUser.data.length>0){
+          this.trackingData.forEach(x=>{
+            x.DocketTrackingData.forEach(element => {
+              element.eNTBY = `${element.eNTBY}:${getUser.data.find(z=>z.userId == element.eNTBY)?.name}`;
+            });
+          })
+        }
         this.trackingData.forEach((x) => {
           x["GroupColor"] = this.CountCard.find((t) => t.groupId == x.GroupId)?.Color;
         }); 
@@ -212,11 +222,7 @@ export class TrackingPageComponent implements OnInit {
         this.trackingData = this.trackingData.sort(
           (a, b) => new Date(b.sTSTM).getTime() - new Date(a.sTSTM).getTime()
         );
-
-        
-
         this.TableData = this.trackingData;
-        
         this.isTableLode = true;
         this.dataSource = new MatTableDataSource<any>(this.TableData);
         this.ngOnInit();

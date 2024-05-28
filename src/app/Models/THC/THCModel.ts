@@ -16,6 +16,8 @@ export class thcsummaryData {
   branch: string
   closingBranch?: string
   tHCDT: Date
+  manualTHC?:string;
+  startKm?:number=0;
   fromCity: string
   toCity: string;
   via:any;
@@ -224,14 +226,14 @@ export class rakeDetails{
   fNRNO:string
   cONT:number
   rR?:rR[]
-  iNV?:iNV[]
+  //iNV?:iNV[]
 }
 export class rR{
   nO:string;
   dT:Date;
 }
-export class iNV{
-  nO:string;
-  dT:string;
-  aMT:string;
-}
+// export class iNV{
+//   nO:string;
+//   dT:string;
+//   aMT:string;
+// }

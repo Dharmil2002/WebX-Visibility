@@ -14,7 +14,7 @@ export class DeliveryMrGeneration {
                 name: 'ConsignmentNoteNumber',
                 label: 'Consignment Number',
                 placeholder: 'Enter Consignment Note Number',
-                type: 'government-id',
+                type: 'text',
                 value: "",
                 generatecontrol: true,
                 disable: false,
@@ -284,7 +284,7 @@ export class DeliveryMrGeneration {
                 generatecontrol: true,
                 disable: true,
                 Validations: [],
-            },            
+            },
             {
                 name: 'Dockettotal',
                 label: 'Docket Total ₹',
@@ -314,7 +314,7 @@ export class DeliveryMrGeneration {
                 type: 'number',
                 value: "",
                 Validations: [],
-                generatecontrol: true, 
+                generatecontrol: true,
                 disable: true
             },
             {
@@ -324,7 +324,7 @@ export class DeliveryMrGeneration {
                 type: 'number',
                 value: "",
                 Validations: [],
-                generatecontrol: true, 
+                generatecontrol: true,
                 disable: true
             }
         ]
@@ -336,8 +336,8 @@ export class DeliveryMrGeneration {
                 type: 'number',
                 value: 0.00,
                 Validations: [],
-                generatecontrol: true, 
-                disable: true,                
+                generatecontrol: true,
+                disable: true,
             },
             {
                 name: 'CollectionMRNo',
@@ -346,8 +346,8 @@ export class DeliveryMrGeneration {
                 type: 'text',
                 value: "",
                 Validations: [],
-                generatecontrol: true, 
-                disable: true,                
+                generatecontrol: true,
+                disable: true,
             },
             {
                 name: 'NewCollectionAmount',
@@ -356,8 +356,8 @@ export class DeliveryMrGeneration {
                 type: 'number',
                 value: 0.00,
                 Validations: [],
-                generatecontrol: true, 
-                disable: true,                
+                generatecontrol: true,
+                disable: true,
             },
             {
                 name: 'PendingAmount',
@@ -366,8 +366,8 @@ export class DeliveryMrGeneration {
                 type: 'number',
                 value: 0.00,
                 Validations: [],
-                generatecontrol: false, 
-                disable: true,                
+                generatecontrol: false,
+                disable: true,
             },
             // {
             //     name: 'BillingParty',

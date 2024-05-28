@@ -32,6 +32,27 @@ export class thcControl {
                     }
                 },
                 {
+                    name:"manualThc",
+                    label:"Manual THC No",
+                    placeholder:"Manual THC No",
+                    type: "mobile-number",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable:view ? view : update,
+                    maxlength:20,
+                    Validations: [
+                     
+                    ],
+                    functions: {
+                    },
+                    additionalData: {
+                        metaData: "Basic"
+                    },
+                },
+                {
                     name: "tripDate",
                     label: 'Trip Date',
                     placeholder: 'Trip Date',
@@ -328,6 +349,22 @@ export class thcControl {
                     functions: {},
                     additionalData: { metaData: "Basic" }
                 },
+                {
+                    name: "startKm",
+                    label: "Start KM",
+                    placeholder: "Start KM",
+                    type: "number",
+                    value:0,
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : update,
+                    Validations: [
+                    ],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
 
                 // {
                 //     name: 'closingBranch',
@@ -416,12 +453,7 @@ export class thcControl {
                     displaywith: "",
                     generatecontrol: true,
                     disable: view ? view : update ? update : false,
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "ETA Date is required",
-                        },
-                    ],
+                    Validations:[],
                     additionalData: {
                         minDate: maxDate,
                         metaData: "Basic"

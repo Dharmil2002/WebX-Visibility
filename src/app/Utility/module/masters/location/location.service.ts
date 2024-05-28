@@ -27,7 +27,7 @@ export class LocationService {
       const filterMap =
         res?.data?.map((x) => ({
           value: `${x.locCode}`,
-          name: `${x.locCode}`,
+          name: `${x.locName}`,
           city: x.locCity,
           state: x.locState,
           locLevel:x.locLevel,
@@ -88,14 +88,14 @@ export class LocationService {
       filter: filter
     };
 
-    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/getOne', reqBody));    
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/getOne', reqBody));
     return res.data;
   }
 
   async getLocations(filter, project = null): Promise<any | null> {
 
     let filters= [];
-    filters.push({ 
+    filters.push({
       D$match: filter
     });
 
@@ -109,7 +109,7 @@ export class LocationService {
       filters: filters
     };
 
-    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));    
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
     return res?.data || [];
   }
 
@@ -122,7 +122,7 @@ export class LocationService {
       project: { "reportLoc": 1, "locCode": 1, "activeFlag": 1 }
     };
 
-    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/descendants', reqBody));    
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/descendants', reqBody));
     return res.data;
   }
 }

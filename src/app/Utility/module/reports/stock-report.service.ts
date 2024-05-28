@@ -77,7 +77,9 @@ export class StockReportService {
             CurrentLocation: {
               D$ifNull: ["$cLOC", ""],
             },
-            EDD: "",
+            EDD: {
+              D$ifNull: ["$details.eDDDT", ""],
+            },
             Paybas: {
               D$ifNull: ["$details.pAYTYPNM", ""],
             },
@@ -147,15 +149,19 @@ export class StockReportService {
             DocketStatus: {
               D$ifNull: ["$details.oSTSN", ""],
             },
+            PrivateMarka: {
+              D$ifNull: ["$details.pVTMARK", ""],
+            },
           },
         },
       ]
     }
 
     try {
-      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));      
+      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
       res.data.forEach(item => {
         item.CDate = item.CDate ? moment(item.CDate).format('DD MMM YY') : '';
+        item.EDD = item.EDD ? moment(item.EDD).format('DD MMM YY HH:MM') : '';
         item.ArrivedDate = item.ArrivedDate ? moment(item.ArrivedDate).format('DD MMM YY') : '';
       });
       return res.data.filter(item => item.StockTypeId > 0);
@@ -166,7 +172,7 @@ export class StockReportService {
   }
 
   //#endregion
-  
+
   async getStockSummary(data) {
 
     const matchQuery = {
@@ -191,7 +197,7 @@ export class StockReportService {
       data.locationType === 'OriginLocation' ? { 'oRGN': { 'D$in': data.cumulativeLocation } } : { 'cLOC': { 'D$in': data.cumulativeLocation } },
       ...(data.fromLocation ? [{ 'oRGN': { 'D$eq': data.fromLocation } }] : []),
       ...(data.toLocation ? [{ 'dEST': { 'D$eq': data.toLocation } }] : []),
-      ...(data.stockType ? this.getStockTypeQuery(data) : []),      
+      ...(data.stockType ? this.getStockTypeQuery(data) : []),
       ...(data.modeList.length > 0 ? [{ 'D$expr': { D$in:["$details.tRNMOD", data.modeList]} }] : []),
       ...(data.paybasisList.length > 0 ? [{ 'D$expr': { D$in:["$details.pAYTYP", data.paybasisList]} }] : [])
       ]
@@ -266,7 +272,7 @@ export class StockReportService {
     }
 
     try {
-      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));        
+      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
       return res.data.filter(item => item.StockTypeId > 0);
     } catch (error) {
       console.error('Error fetching stock data:', error);
@@ -335,7 +341,7 @@ export class StockReportService {
         break;
       case '5':
         stockTypeQuery.push({
-          sTS: { D$eq: 9 }    
+          sTS: { D$eq: 9 }
         });
         break;
       default:

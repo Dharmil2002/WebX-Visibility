@@ -201,14 +201,14 @@ export class GenericViewPrintComponent implements OnInit {
     function insertElementAtPosition(parent, element, AttributeKey) {
       // Convert the parent's children to an array
       const children = Array.from(parent.children);
-      // Find the index of the first child with the specified attribute
-      const columnIndex = children.findIndex(child => {
+      // Find the child with the specified attribute
+      const column = children.find(child => {
           const childElement = child as HTMLElement; // Cast to HTMLElement
           return childElement.getAttribute(AttributeKey) !== null;
       }) ;
-      // Insert the element at the found index or append if not found
-      if (columnIndex > 0 && columnIndex < children.length) {
-          parent.insertBefore(element, children[columnIndex]);
+      // Insert the element at the found or append if not found
+      if (column) {
+          parent.insertBefore(element, column);
       } else {
           parent.appendChild(element);
       }

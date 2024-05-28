@@ -69,6 +69,7 @@ import { BalanceSheetCriteriaComponent } from './Account Report/Components/Balan
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
+import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
 @NgModule({
   imports: [
@@ -145,6 +146,7 @@ import { DrsRegisterComponent } from './drs-register/drs-register.component';
     MRRegisterReportComponent,
     CustomerInvoiceRegisterComponent,
     VolumetricShipmentRegisterComponent,
+    ThcRegisterReportComponent,
     DrsRegisterComponent
   ],
   exports: [],

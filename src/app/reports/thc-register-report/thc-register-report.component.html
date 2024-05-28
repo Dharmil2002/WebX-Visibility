@@ -1,24 +1,25 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-     <form [formGroup]="thcregisterTableForm">
-       <app-form-webxpress [form]="thcregisterTableForm" [FormTitle]="'THC Register Report'"
-         [formData]="jsonthcregisterFormArray" (functionCallEmitter)="functionCallHandler($event)"
-         (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Download'">
-       </app-form-webxpress>
-     </form>
-     <div *ngIf="showOverlay" class="overlay" (click)="showOverlay = false">
-     <div class="scroll  highlight-popup" (click)="$event.stopPropagation()">
-       <app-generic-ui-grid *ngIf="LoadTable" [formTitle]="formTitle" [showCSVButton]="true" [csvFileName]="csvFileName" [source]="source"
-         [columns]="columns" [sorting]="sorting" [columnMenu]="columnMenu" [paging]="paging" [searching]="searching" [loading]="loading"
-         [theme]="theme">
-       </app-generic-ui-grid>
-     </div>
+  <form [formGroup]="thcregisterTableForm">
+    <app-form-webxpress [form]="thcregisterTableForm" [FormTitle]="'THC Register Report'"
+      [formData]="jsonthcregisterFormArray" (functionCallEmitter)="functionCallHandler($event)"
+      (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'View'">
+    </app-form-webxpress>
+  </form>
+  <div *ngIf="showOverlay" class="overlay" (click)="showOverlay = false">
+    <div class="scroll  highlight-popup" (click)="$event.stopPropagation()">
+      <app-generic-ui-grid *ngIf="LoadTable" [formTitle]="'THC Register Data'" [showCSVButton]="true"
+        [csvFileName]="csvFileName" [source]="source" [columns]="columns" [sorting]="sorting" [columnMenu]="columnMenu"
+        [paging]="paging" [searching]="searching" [loading]="loading" [theme]="theme">
+      </app-generic-ui-grid>
     </div>
+  </div>
 </app-common-wrapper-webxpress>
-   
+
 <style>
   .scroll {
-   overflow-x: auto;
+    overflow-x: auto;
   }
+
   .overlay {
     position: fixed;
     top: 0;
@@ -27,8 +28,9 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
-}
-.highlight-popup {
+  }
+
+  .highlight-popup {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -39,6 +41,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     z-index: 1000;
-    overflow: auto; /* Allows scrolling if content overflows */
-}
+    overflow: auto;
+    /* Allows scrolling if content overflows */
+  }
 </style>

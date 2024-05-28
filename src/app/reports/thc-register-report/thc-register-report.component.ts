@@ -24,12 +24,12 @@ export class ThcRegisterReportComponent implements OnInit {
   jsonthcregisterFormArray: any;
   thcregisterTableForm: UntypedFormGroup
   source: any[] = []; // Array to hold data
-  loading = true // Loading indicator
-  LoadTable=false; 
+  loading:boolean = true // Loading indicator
+  LoadTable:boolean=false; 
   //#region Table 
   columns = [];
   csvFileName: string;
-  showOverlay = false;
+  showOverlay:boolean = false;
   //#endregion
 
   paging: any ;

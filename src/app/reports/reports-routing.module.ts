@@ -34,7 +34,7 @@ import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-regis
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
 import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component'
-
+import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -68,8 +68,8 @@ const routes: Routes = [
   { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent },
   { path: "THC-Register-report", component: ThcRegisterReportComponent },
   { path: "DRS-Register-report", component: DrsRegisterComponent },
-  { path: "manifest-register-report", component: ManifestRegisterReportComponent }
-
+  { path: "manifest-register-report", component: ManifestRegisterReportComponent },
+  { path: "LoadingsheetRegister", component: LoadingsheetRegisterComponent },
 ];
 
 @NgModule({

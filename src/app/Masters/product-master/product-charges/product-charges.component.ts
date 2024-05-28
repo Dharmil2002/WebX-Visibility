@@ -113,7 +113,6 @@ export class ProductChargesComponent implements OnInit {
   HendelFormFunction() {
     this.initializeFormControl();
     this.bindDropdown();
-    this.ChargesListDropdown();
     this.getChargeApplicable();
   }
   initializeFormControl() {
@@ -158,6 +157,7 @@ export class ProductChargesComponent implements OnInit {
         // Set category-related variables
         this.SelectChargesCode = data.name;
         this.SelectChargesStatus = data.additionalData.showNameAndValue;
+        this.ChargesListDropdown();
       }
       if (data.name === "ChargesBehaviour") {
         // Set category-related variables
@@ -409,31 +409,6 @@ export class ProductChargesComponent implements OnInit {
     this.Tabletab = !this.Tabletab;
   }
 
-  async handleChargesCode(event) {
-    if (this.isUpdate) {
-      if (this.customerTableForm.value.ChargesCode == this.UpdatedData.cHACD) {
-        return;
-      }
-    }
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "product_charges_detail",
-      filter: { cHACD: this.customerTableForm.value.ChargesCode },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
-    if (res.success && res.data.length != 0) {
-      this.customerTableForm.controls.ChargesCode.setValue("");
-      Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Charges Code exist",
-        showConfirmButton: true,
-      });
-    }
-  }
-
   async handleSelectCharges() {
     if (this.isUpdate) {
       this.customerTableForm.controls["ChargesCode"].setValue(
@@ -445,11 +420,7 @@ export class ProductChargesComponent implements OnInit {
       ) {
         return;
       }
-    } else {
-      this.customerTableForm.controls["ChargesCode"].setValue(
-        this.customerTableForm.value.SelectCharges.value
-      );
-    }
+    } 
 
     const req = {
       companyCode: this.companyCode,
@@ -468,9 +439,13 @@ export class ProductChargesComponent implements OnInit {
       Swal.fire({
         icon: "info",
         title: "info",
-        text: "Select Charges exist",
+        text: "Please Select Other Charges These Charges Already Used",
         showConfirmButton: true,
       });
+    }else {
+      this.customerTableForm.controls["ChargesCode"].setValue(
+        this.customerTableForm.value.SelectCharges.value
+      );
     }
   }
   //#region to get and set Charge Applicable list

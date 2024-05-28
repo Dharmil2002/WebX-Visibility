@@ -99,7 +99,7 @@ export class CustomerMasterUploadComponent implements OnInit {
             ItemsName: "CustomerName",
             Validations: [
               { Required: true },
-              { Pattern: "^[a-zA-Z0-9& ]{3,200}$" },
+              { Pattern: "^.{3,200}$" },
               {
                 Exists: this.existingData.map((name) => {
                   return name.customerName;
@@ -133,7 +133,7 @@ export class CustomerMasterUploadComponent implements OnInit {
           {
             ItemsName: "CustomerEmailID",
             Validations: [
-              { Pattern: "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
+              { Pattern: "^[a-zA-Z 0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
             ],
           },
           {

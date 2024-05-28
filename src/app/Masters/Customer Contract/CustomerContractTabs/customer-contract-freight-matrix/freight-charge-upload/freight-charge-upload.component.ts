@@ -115,7 +115,9 @@ export class FreightChargeUploadComponent implements OnInit {
         this.arealist = await this.objlocationEntitySearch.GetMergedData(
           pincodeList,
           zonelist,
-          "ST"
+          "ST",
+          this.masterService,
+          true
         );
 
         const validationRules = [
@@ -197,7 +199,7 @@ export class FreightChargeUploadComponent implements OnInit {
           const validateAndFilter = (element, property) => {
             element.error = element.error || [];
 
-            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN'];
+            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN','AR'];
             const foundMatch = this.arealist.find(x =>
               propertiesToCheck.some(prop =>
                 typeof x[prop] === 'string' &&

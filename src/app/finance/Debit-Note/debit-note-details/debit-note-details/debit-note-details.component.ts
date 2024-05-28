@@ -328,7 +328,7 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
 
-  async LedgerBind() {
+  async LedgerBind() { 
     const Body = {
       companyCode: this.storage.companyCode,
       collectionName: "account_detail",

@@ -70,6 +70,7 @@ import { MRRegisterReportComponent } from './mr-register-report/mrregister-repor
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
+import { DrsRegisterComponent } from './drs-register/drs-register.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -145,7 +146,8 @@ import { ThcRegisterReportComponent } from './thc-register-report/thc-register-r
     MRRegisterReportComponent,
     CustomerInvoiceRegisterComponent,
     VolumetricShipmentRegisterComponent,
-    ThcRegisterReportComponent
+    ThcRegisterReportComponent,
+    DrsRegisterComponent
   ],
   exports: [],
 

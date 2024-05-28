@@ -69,7 +69,7 @@
     <form [formGroup]="freightForm">
         <app-form-webxpress [form]="freightForm" [FormTitle]="'Freight Details'"
             [formData]="freightControlArray" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" 
+            [showSaveAndCancelButton]="false"
             [addNewTitle]="addNewTitle"
             [DisplayAddNewButton]=true
             [MatButton]="MatButton"
@@ -94,7 +94,7 @@
         !this.consignmentForm.value?.toCity ||
         !this.consignmentForm.value?.payType ||
         !this.consignmentForm.value?.transMode" (click)="InvockedContract()" mat-raised-button
-        color="primary">Invoked</button>
+        color="primary">Invoke</button>
       </div>
     </div>
   </div>

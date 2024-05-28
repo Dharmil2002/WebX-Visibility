@@ -32,6 +32,7 @@ import { MRRegisterReportComponent } from './mr-register-report/mrregister-repor
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
+import { DrsRegisterComponent } from './drs-register/drs-register.component';
 
 
 const routes: Routes = [
@@ -64,7 +65,9 @@ const routes: Routes = [
   { path: "MR-Register-Report", component: MRRegisterReportComponent },
   { path: "CustomerInvoiceRegister", component: CustomerInvoiceRegisterComponent },
   { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent },
-  { path: "THC-Register-report", component: ThcRegisterReportComponent }
+  { path: "THC-Register-report", component: ThcRegisterReportComponent },
+  { path: "DRS-Register-report", component: DrsRegisterComponent }
+
 ];
 
 @NgModule({

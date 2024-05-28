@@ -1,3 +1,4 @@
+import { DocCalledAs } from './../../../shared/constants/docCalledAs';
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -5,6 +6,7 @@ import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { ConsignmentLtl } from 'src/assets/FormControls/consgiment-ltl-controls';
@@ -18,17 +20,20 @@ export class ConsignmentOtherInfoComponent implements OnInit {
   otherControls:FormControls[];
   otherChargeData: any;
   imageData: any = {};
+  DocCalledAs: any = {};
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     private generalService: GeneralService,
+    private controlPanel: ControlPanelService,
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     private objImageHandling: ImageHandling
-    ) { 
+    ) {
+      this.DocCalledAs = controlPanel.DocCalledAs;
      if(item){
       this.otherChargeData=item
-     }      
+     }
     }
 
   ngOnInit(): void {
@@ -36,7 +41,7 @@ export class ConsignmentOtherInfoComponent implements OnInit {
   }
   /*below function is for initalize formcontrols from Json*/
   initializeFormControls(){
-    const controls = new ConsignmentLtl(this.generalService);
+    const controls = new ConsignmentLtl(this.generalService, this.DocCalledAs);
     this.otherControls = controls.getOtherDetails()
     this.otherInfoForm = formGroupBuilder(this.fb, [this.otherControls]);
     this.autofillData();
@@ -58,7 +63,7 @@ export class ConsignmentOtherInfoComponent implements OnInit {
       console.log("failed");
     }
   }
-  
+
   save(){
     let doc
     if(this.imageData?.invoiceAttech){
@@ -81,7 +86,7 @@ export class ConsignmentOtherInfoComponent implements OnInit {
       "BUSASS":this.otherInfoForm.value.busAssociate,
       "rEMK":this.otherInfoForm.value.remarks
   }
-  
+
     this.dialogRef.close(req);
   }
   autofillData(){

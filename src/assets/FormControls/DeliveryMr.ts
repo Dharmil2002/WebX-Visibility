@@ -87,6 +87,82 @@ export class DeliveryMrGeneration {
                 disable: true,
                 Validations: []
             },
+            {
+              name: 'package',
+              label: 'Package',
+              placeholder: 'Package',
+              type: 'number',
+              value: "",
+              generatecontrol: true,
+              disable: true,
+              Validations: []
+            },
+            {
+              name: 'weight',
+              label: 'Weight',
+              placeholder: 'Weight',
+              type: 'number',
+              value: "",
+              generatecontrol: true,
+              disable: true,
+              Validations: []
+            },
+            {
+              name: 'chargeweight',
+              label: 'Charge Weight',
+              placeholder: 'Charge Weight',
+              type: 'number',
+              value: "",
+              generatecontrol: true,
+              disable: true,
+              Validations: []
+            },
+            {
+              name: 'bookingbranch',
+              label: 'Booking Branch',
+              placeholder: 'Booking Branch',
+              type: 'text',
+              value: "",
+              generatecontrol: true,
+              disable: true,
+              Validations: []
+            },
+            {
+              name: "mrdate",
+              label: "MR Date",
+              placeholder: "MR Date",
+              type: "date",
+              value: new Date(),
+              filterOptions: "",
+              autocomplete: "",
+              displaywith: "",
+              Validations: [],
+              additionalData: {
+                maxDate: new Date(),
+              },
+              generatecontrol: true,
+              disable: false,
+            },
+            {
+              name: 'receivername',
+              label: 'Receiver Name',
+              placeholder: 'Receiver Name',
+              type: 'text',
+              value: "",
+              generatecontrol: true,
+              disable: false,
+              Validations: []
+            },
+            {
+              name: 'mobileno',
+              label: 'Mobile no',
+              placeholder: 'Mobile no',
+              type: 'mobile-number',
+              value: "",
+              generatecontrol: true,
+              disable: false,
+              Validations: []
+            },
 
         ]
         this.deliveryMrDetailsControlArray = [
@@ -376,8 +452,8 @@ export class DeliveryMrGeneration {
             //     type: 'number',
             //     value: 0.00,
             //     Validations: [],
-            //     generatecontrol: true, 
-            //     disable: true,                
+            //     generatecontrol: true,
+            //     disable: true,
             // },
         ]
         this.BookingTimechargesArray = [

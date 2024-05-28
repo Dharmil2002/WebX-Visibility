@@ -167,6 +167,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     try {
       const filter = { "cID": this.storage.companyCode, dEST: this.storage.branch, "dKTNO": DocketNo, pAYTYP: { D$in: ["P01", "P03"] } };
       const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
+      console.log("docketdetails", docketdetails);
+
 
       if (docketdetails.length === 1) {
         this.DocketDetails = docketdetails[0];
@@ -192,6 +194,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.deliveryMrTableForm.get('ConsignorGST').setValue(data.cSGN.gST);
     this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
     this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
+    this.deliveryMrTableForm.get('package').setValue(data.pKGS);
+    this.deliveryMrTableForm.get('weight').setValue(data.aCTWT);
+    this.deliveryMrTableForm.get('chargeweight').setValue(data.cHRWT);
+    this.deliveryMrTableForm.get('bookingbranch').setValue(data.oRGN);
 
     this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM" || data.rCM == "") ? false : true;
     this.deliveryMrTableForm.get('GSTApplicability').setValue(this.isGSTApplicable ? "Yes" : "No");
@@ -536,7 +542,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
   }
 
-  //#endregion 
+  //#endregion
 
   //#region Payment Modes Changes
   async OnPaymentModeChange(event) {
@@ -751,6 +757,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             pRTLYCLCTD: false,
             pRTLYRMGAMT: ConvertToNumber(this.CollectionForm.value.PendingAmount, 2),
             vNO: "",
+            mRDT:  this.deliveryMrTableForm.controls.mrdate.value || "",
+            rECNM:  this.deliveryMrTableForm.controls.receivername.value || "",
+            mOBNO:  this.deliveryMrTableForm.controls.mobileno.value || "",
             lOC: this.storage.branch,
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,

@@ -1057,7 +1057,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "pkgsTypeInv",
         label: "Packaging Type",
         placeholder: "Packaging Type",
-        type: "dropdown",
+        type: "Staticdropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",

@@ -335,7 +335,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   }
   async getDataFromGeneralMaster() {
-   debugger
+   
    const data =this.fieldRules;
 
     this.LoadType = await this.generalService.getGeneralMasterData("LT");
@@ -354,7 +354,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const pkgTypeInv = this.pkgsType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="pkgsTypeInv")?.Default) || "")?.value || "";
     const rskType = this.riskType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="risk")?.Default) || "")?.value || "";
     const delvryType = this.deliveryType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="delivery_type")?.Default) || "")?.value || "";
-
+    const material = this.matrials.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="materialName")?.Default) || "");
 
 
     setGeneralMasterData(this.allFormControls, this.paymentType, "payType");
@@ -365,23 +365,26 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     setGeneralMasterData(this.allFormControls, this.deliveryType, "delivery_type");
     setGeneralMasterData(this.freightControlArray, rateType, "freightRatetype");
     this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.matrials, "materialName", false);
-    this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.pkgsType, "pkgsTypeInv", false);
+    //this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.pkgsType, "pkgsTypeInv", false);
 
 
     this.invoiceForm.controls['materialDensity'].setValue("");
 
-    console.log(this.invoiceForm.controls['pkgsTypeInv'])
+    console.log(material)
 
     this.consignmentForm.controls['risk'].setValue(rskType);
-    this.consignmentForm.controls['pkgsType'].setValue(this.fieldRules.find(f=> f.Field=="pkgsType")?.Default || "");
+    this.consignmentForm.controls['pkgsType'].setValue(pkgType);
     this.freightForm.controls['freightRatetype'].setValue("");
     this.freightForm.controls['rcm'].setValue("");
     this.consignmentForm.controls['payType'].setValue("");
     this.consignmentForm.controls['transMode'].setValue(transMode);
     this.consignmentForm.controls['delivery_type'].setValue(delvryType);
     this.consignmentForm.controls['payType'].setValue(payType);
-    this.invoiceForm.controls['pkgsTypeInv'].setValue(this.fieldRules.find(f=> f.Field=="pkgsTypeInv")?.Default);
+    this.invoiceForm.controls['pkgsTypeInv'].setValue(pkgTypeInv);
     this.consignmentForm.controls["transMode"].setValue(prodCode);
+    if(material) {
+      this.invoiceForm.controls["materialName"].setValue(material);
+    }
 
     this.bindQuickdocketData();
 

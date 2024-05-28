@@ -33,6 +33,7 @@ import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/cu
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
+import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component'
 
 
 const routes: Routes = [
@@ -66,7 +67,8 @@ const routes: Routes = [
   { path: "CustomerInvoiceRegister", component: CustomerInvoiceRegisterComponent },
   { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent },
   { path: "THC-Register-report", component: ThcRegisterReportComponent },
-  { path: "DRS-Register-report", component: DrsRegisterComponent }
+  { path: "DRS-Register-report", component: DrsRegisterComponent },
+  { path: "manifest-register-report", component: ManifestRegisterReportComponent }
 
 ];
 

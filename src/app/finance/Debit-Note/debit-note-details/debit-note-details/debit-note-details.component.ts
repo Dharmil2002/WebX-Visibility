@@ -328,7 +328,7 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
 
-  async LedgerBind() {
+  async LedgerBind() { 
     const Body = {
       companyCode: this.storage.companyCode,
       collectionName: "account_detail",
@@ -376,8 +376,6 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
   async save() {
-    console.log(this.dNoteData)
-    debugger
     this.snackBarUtilityService.commonToast(async () => {
       try {
         this.DebitNoteRequestModel.companyCode = this.storage.companyCode;

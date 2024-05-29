@@ -240,6 +240,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
             this.customerContractDataRequestModel.productId = row.pID;
             this.customerContractDataRequestModel.productName = row.pNM;
             this.customerContractDataRequestModel.payBasis = row.pBAS;
+            this.customerContractDataRequestModel.payBasisCode = row.pBASCD;
             this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
             this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
             this.customerContractDataRequestModel.entryDate = new Date().toString()
@@ -337,6 +338,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
           this.customerContractDataRequestModel.productId = this.ContractForm.value?.Product?.value
           this.customerContractDataRequestModel.productName = this.ContractForm.value?.Product?.name
           this.customerContractDataRequestModel.payBasis = this.ContractForm.value?.PayBasis?.name
+          this.customerContractDataRequestModel.payBasisCode = this.ContractForm.value?.PayBasis?.value;
           this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
           this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
           this.customerContractDataRequestModel.entryDate = new Date().toString()

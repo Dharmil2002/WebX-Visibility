@@ -6,7 +6,7 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ContractNonFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/NonFreightMatrix-control";
-import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
+import { GetGeneralMasterData, GetProductCharges } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { StorageService } from "src/app/core/service/storage.service";
 import { firstValueFrom, map, switchMap } from "rxjs";
@@ -109,6 +109,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     this.ChargesData = data;
     this.getTableData();
     console.log("ChargesData", this.ChargesData);
+    this.GetChargeDetails(this.ChargesData.cHACD);
   }
 
   async getTableData() {
@@ -131,10 +132,16 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       this.isLoad = false;
     }
   }
-
-  ngOnInit(): void {
-    this.initializeFormControl();
-    this.getAllMastersData();
+  async GetChargeDetails(ChargeCode) {
+    const ProductCharges = await GetProductCharges(this.masterService, null, ChargeCode);
+    if (ProductCharges.length > 0) {
+      const Result = ProductCharges[0]?.cRGVB;
+      console.log(Result)
+    }
+  }
+  async ngOnInit() {
+    await this.initializeFormControl();
+    await this.getAllMastersData();
   }
 
   initializeFormControl() {
@@ -204,13 +211,16 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       this.PinCodeList = await firstValueFrom(
         this.masterService.masterPost("generic/get", pincodeReqBody)
       );
-      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
+      this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
         "ST",
         this.masterService,
         true
-      );
+      ).then((data) => {
+        this.PinCodeList.data = data;
+      });
+
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
@@ -343,6 +353,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     const fieldsToSearch = ["PIN", "CT", "STNM", "ZN"];
     const search = this.NonFreightMatrixForm.controls[fieldName].value;
     let data = [];
+    console.log(this.PinCodeList.data)
     if (search.length >= 2) {
       data = this.ObjcontractMethods.GetGenericMappedAria(
         this.PinCodeList.data,
@@ -357,5 +368,26 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
         true
       );
     }
+  }
+  async getCapacityData() {
+    const vehicleData = await GetGeneralMasterData(
+      this.masterService,
+      "VEHSIZE"
+    );
+    const containerDataWithPrefix = vehicleData.map((item) => ({
+      name: `Veh- ${item.name}`,
+      value: item.value,
+    }));
+    this.filter.Filter(
+      this.jsonControlArrayNonFreightMatrix,
+      this.NonFreightMatrixForm,
+      containerDataWithPrefix,
+      "RateType",
+      false
+    );
+    // if (this.isUpdate) {
+    //   const FilterData = data.find((x) => x.name == this.UpdateData.cAP);
+    //   this.FreightMatrixForm.controls["capacity"].setValue(FilterData);
+    // }
   }
 }

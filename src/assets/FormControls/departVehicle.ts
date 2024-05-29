@@ -59,7 +59,7 @@ export class DepartVehicleControl {
                 name: 'Expiry',
                 label: 'Expiry Date',
                 placeholder: '',
-                type: 'date',
+                type: 'text',
                 value: '',
                 Validations: [],
                 generatecontrol: true,

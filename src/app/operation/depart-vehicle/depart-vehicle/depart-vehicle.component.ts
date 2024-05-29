@@ -30,7 +30,6 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
-import moment from "moment";
 
 
 @Component({
@@ -185,6 +184,7 @@ export class DepartVehicleComponent implements OnInit {
     const loadingSheetFormControlsMap = {
       Route: "RouteandSchedule",
       tripID: "TripID",
+      Expected: "Expected",
     };
     // Loop through the control mappings and update form values
     Object.entries(loadingSheetFormControlsMap).forEach(([controlName, dataKey]) => {
@@ -206,9 +206,9 @@ export class DepartVehicleComponent implements OnInit {
     const last = route[route.length - 1]; 
     this.balanceTableForm.controls['balAmtAt'].setValue({name:last,value:last});
     this.balanceTableForm.controls['advPdAt'].setValue({name:first,value:first});
-    const Expected = moment(this.tripData.ExpectedDate).format("DD MMM YY HH:MM");
-    this.loadingSheetTableForm.controls['Expected'].setValue(Expected);
+
   }
+
   async vehicleDetails() {
     try {
       const reqbody = {
@@ -295,6 +295,7 @@ export class DepartVehicleComponent implements OnInit {
       // Handle error appropriately
     }
   }
+
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
     this.jsonControlArray =
@@ -454,6 +455,7 @@ export class DepartVehicleComponent implements OnInit {
     }
     return groupedShipments;
   }
+
   Close() {
 
     this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
@@ -478,6 +480,8 @@ export class DepartVehicleComponent implements OnInit {
     this.addDepartData(mergedData);
 
   }
+
+
   async addDepartData(departData) {
     let charges = []
     this.advanceControlArray.filter((x) => x.hasOwnProperty("id")).forEach(element => {
@@ -494,6 +498,7 @@ export class DepartVehicleComponent implements OnInit {
     this.askTracking(departData);
     //this.goBack('Departures');
   }
+
   async askTracking(departData) {
     //get trip details
     let filter = {
@@ -509,6 +514,7 @@ export class DepartVehicleComponent implements OnInit {
       this.goBack('Departures');
     }
   }
+  
   async pushDeptCT(tripDet){
     let filter= {
       vehicleNo:tripDet.vEHNO 
@@ -792,13 +798,12 @@ export class DepartVehicleComponent implements OnInit {
     }
     // Update departure vehicle form controls with driver details
     if (driverDetail && driverDetail[0]) {
-      debugger
       this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
       this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
       this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
       let convertedDate = driverDetail[0].valdityDt || '';
-      //convertedDate = convertedDate ? formatDate(convertedDate, 'dd MMM yy') : '';
-      this.departvehicleTableForm.controls['Expiry'].setValue(driverDetail[0].valdityDt);
+      convertedDate = convertedDate ? formatDate(convertedDate, 'dd MMM yy') : '';
+      this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
 
     }
     // Rest of your code that depends on loadingSheetDetail

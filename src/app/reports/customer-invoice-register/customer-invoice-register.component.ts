@@ -49,9 +49,9 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
   csvFileName: string; // name of the csv file, when data is downloaded
   source: any[] = []; // Array to hold data
   loading = true // Loading indicator
-  LoadTable=false;  
+  LoadTable=false;
 
-  //#region Table 
+  //#region Table
   columns = [];
   //#endregion
 
@@ -84,7 +84,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     const lastweek = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate() - 100
+      now.getDate() - 10
     );
     this.CustInvREGTableForm.controls["start"].setValue(lastweek);
     this.CustInvREGTableForm.controls["end"].setValue(now);
@@ -152,7 +152,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.CustInvREGTableForm.controls["branch"].setValue(loginBranch);
     this.CustInvREGTableForm.get('Individual').setValue("Y");
 
@@ -189,9 +189,9 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
       this.ReportingBranches = [];
       if (this.CustInvREGTableForm.value.Individual == "N") {
         this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CustInvREGTableForm.value.branch.name);
-        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch.name);
+        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value||"");
       } else {
-        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch.name);
+        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value||"");
       }
       const startDate = new Date(this.CustInvREGTableForm.controls.start.value);
       const endDate = new Date(this.CustInvREGTableForm.controls.end.value);
@@ -208,12 +208,11 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
         startValue, endValue, docNo, state, status, sac, cust, branch, individual
       }
       const result = await this.billdetails.getcustInvRegReportDetail(reqBody);
-      console.log("data", result);
       this.columns = result.grid.columns;
-      this.sorting = result.grid.sorting; 
+      this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
-      
+
       this.source = result.data;
       this.LoadTable = true;
 

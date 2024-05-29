@@ -1,3 +1,4 @@
+import { Dropdown } from './../../core/models/Cnote';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -108,6 +109,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     'chargedWeight',
     'invoiceAmount',
     'materialDensity',
+    'pkgsTypeInv'
   ]
 
   tableData = [];
@@ -155,6 +157,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
   LoadType: AutoComplete[];
+  fieldRules: any[];
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -197,8 +200,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.isUpdate = true
       }
     }
-    this.consigmentControls = new ConsignmentLtl(this.generalService);
-    this.consigmentControls.applyFieldRules(this.storage.companyCode).then(() => {
+    this.consigmentControls = new ConsignmentLtl(this.generalService, this.DocCalledAs);
+    this.consigmentControls.applyFieldRules(this.storage.companyCode).then((rules) => {
+      this.fieldRules = rules;
       this.initializeFormControl();
 
     });
@@ -294,6 +298,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.vehicleNo = this.DocketDetails?.vEHNO;
       this.consignmentForm.controls["docketNumber"].setValue(this.DocketDetails?.dKTNO || "");
       this.consignmentForm.controls["docketDate"].setValue(this.DocketDetails?.dKTDT || "");
+      this.consignmentForm.controls["eddDate"].setValue(this.DocketDetails?.eDDDT || "");
       const billingParties = {
         name: this.DocketDetails?.bPARTYNM || "",
         value: this.DocketDetails?.bPARTY || ""
@@ -331,33 +336,58 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   async getDataFromGeneralMaster() {
 
+   const data =this.fieldRules;
+
     this.LoadType = await this.generalService.getGeneralMasterData("LT");
     this.paymentType = await this.generalService.getGeneralMasterData("PAYTYP");
     this.riskType = await this.generalService.getGeneralMasterData("RSKTYP");
     this.pkgsType = await this.generalService.getGeneralMasterData("PKGS");
     this.deliveryType = await this.generalService.getGeneralMasterData("PKPDL");
     this.rateTypes = await this.generalService.getGeneralMasterData("RTTYP");
-    const rateType = this.rateTypes.filter((x) => x.value != "RTTYP-0007");
     this.matrials = await this.generalService.getGeneralMasterData("PROD");
     this.tranType = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    const transMode =this.fieldRules.find(f=> f.Field=="transMode")?.Default
+    const rateType = this.rateTypes.filter((x) => x.value != "RTTYP-0007");
+    const prodCode = this.tranType.find((x)=>x.value==transMode).value;
+    const payType = this.paymentType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="payType")?.Default) || "")?.value || "";
+    const pkgType = this.pkgsType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="pkgsType")?.Default) || "")?.value || "";
+    const pkgTypeInv = this.pkgsType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="pkgsTypeInv")?.Default) || "")?.value || "";
+    const rskType = this.riskType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="risk")?.Default) || "")?.value || "";
+    const delvryType = this.deliveryType.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="delivery_type")?.Default) || "")?.value || "";
+    const material = this.matrials.find((x) => x.value == (this.fieldRules.find(f=> f.Field=="materialName")?.Default) || "");
+
+
     setGeneralMasterData(this.allFormControls, this.paymentType, "payType");
     setGeneralMasterData(this.allFormControls, this.riskType, "risk");
     setGeneralMasterData(this.allFormControls, this.pkgsType, "pkgsType");
+    setGeneralMasterData(this.allInvoiceControls, this.pkgsType, "pkgsTypeInv");
     setGeneralMasterData(this.allFormControls, this.tranType, "transMode");
     setGeneralMasterData(this.allFormControls, this.deliveryType, "delivery_type");
     setGeneralMasterData(this.freightControlArray, rateType, "freightRatetype");
     this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.matrials, "materialName", false);
-    this.bindQuickdocketData();
+    //this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.pkgsType, "pkgsTypeInv", false);
+
+
     this.invoiceForm.controls['materialDensity'].setValue("");
-    this.consignmentForm.controls['risk'].setValue("");
-    this.consignmentForm.controls['pkgsType'].setValue("");
+
+    console.log(material)
+
+    this.consignmentForm.controls['risk'].setValue(rskType);
+    this.consignmentForm.controls['pkgsType'].setValue(pkgType);
     this.freightForm.controls['freightRatetype'].setValue("");
     this.freightForm.controls['rcm'].setValue("");
     this.consignmentForm.controls['payType'].setValue("");
-    this.consignmentForm.controls['transMode'].setValue("");
-    this.consignmentForm.controls['payType'].setValue("P02");
-    const prodCode = this.tranType.find((x) => x.name == "Road")?.value || "";
+    this.consignmentForm.controls['transMode'].setValue(transMode);
+    this.consignmentForm.controls['delivery_type'].setValue(delvryType);
+    this.consignmentForm.controls['payType'].setValue(payType);
+    this.invoiceForm.controls['pkgsTypeInv'].setValue(pkgTypeInv);
     this.consignmentForm.controls["transMode"].setValue(prodCode);
+    if(material) {
+      this.invoiceForm.controls["materialName"].setValue(material);
+    }
+
+    this.bindQuickdocketData();
+
     const destinationMapping = await this.locationService.locationFromApi({
       locCode: this.storage.branch,
     });
@@ -369,8 +399,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     };
     //this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
     this.consignmentForm.controls["fromCity"].setValue(city);
-
-
+    //this.consigmentControls.assignDefaultValues(this.consignmentForm);
   }
   //#region functionCallHandler
   functionCallHandler($event) {
@@ -869,6 +898,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         'chargedWeight': invoice.chargedWeight,
         "invoiceAmount": invoice.invoiceAmount,
         'materialDensity': invoice.materialDensity,
+        'pkgsTypeInv': invoice.pkgsTypeInv?.name || invoice?.pkgsTypeInv || "",
         'cft': invoice.cft,
         'actions': ["Edit", "Remove"]
       }
@@ -878,6 +908,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.SetInvoiceData();
       this.invoiceForm.reset();
       this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.matrials, "materialName", false);
+      this.filter.Filter(this.invoiceControlArray, this.invoiceForm, this.pkgsType, "pkgsTypeInv", false);
     }
   }
   /*below functions for autofill and remove invoice*/
@@ -937,6 +968,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       'chargedWeight': 'chargedWeight',
       'invoiceAmount': "invoiceAmount",
       'materialDensity': 'materialDensity',
+      'pkgsTypeInv':'pkgsTypeInv',
       'cft': 'cft'
 
     };
@@ -946,6 +978,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.invoiceForm.controls[field].setValue(data.data?.[formFields[field]] || "");
     });
     this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
+    this.invoiceForm.controls['pkgsTypeInv'].setValue({ name: data.data['pkgsTypeInv'], value: data.data['pkgsTypeInv'] })
     //this.invoiceForm.controls['materialName'].setValue({ name: data.data['materialName'], value: data.data['materialName'] })
     // Filter the invoiceData to exclude the entry with the provided data ID
     this.tableData = this.tableData.filter(x => x.invoiceNumber !== data.data.invoiceNumber);
@@ -1477,14 +1510,33 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         icon: "success",
         title: "Booked Successfully",
         text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
-        showConfirmButton: true
+        confirmButtonText: 'OK',
+        showConfirmButton: true,
+        denyButtonText: 'Print',
+        showDenyButton: true,
+        showCancelButton: true,
+        cancelButtonText: 'Close'
       }).then((result) => {
-        // Redirect after the alert is closed, regardless of whether it is confirmed or not.
-        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+        if (result.isConfirmed) {
+          // Redirect after the alert is closed with OK button.
+          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+        } else if (result.isDenied) {
+          // Handle the action for the deny button here.
+          const templateBody = {
+            templateName: "Docket",
+            partyCode: "CONSRAJT58",
+            DocNo: this.consignmentForm.controls["docketNumber"].value,
+          }
+          const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+          window.open(url, '', 'width=1000,height=800');
+          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+        }else if (result.isDismissed) {
+          // Handle the action for the cancel button here.
+          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+        }
       });
     }
   }
-
   /*getConsignor*/
   getConsignor() {
     const payType = this.consignmentForm.get('payType').value;
@@ -1934,9 +1986,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
 
-  // Account Posting When  C Note Booked 	
+  // Account Posting When  C Note Booked
   async AccountPosting(DocketNo) {
-
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0

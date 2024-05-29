@@ -205,9 +205,21 @@ export class GenericTableV2Component
     }
   }
   //#region this function is called when rendering data in table and returns formatted data if required.
-  formatData(val: any, key: string) {   
+  formatData(val: any, key: string) {
+   const field=[
+    "dKTNO",
+    "dOCNO",
+    "docNo",
+    "bOOK",
+    "oBOOK",
+    "fROM",
+    "tO"
+  ]
     const colDef = this.columnHeader[key];
     if (colDef && colDef.datatype) {
+      if (field.includes(key)) {
+        return val;
+      }
       switch (colDef.datatype) {
         case "date":
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY") : "";

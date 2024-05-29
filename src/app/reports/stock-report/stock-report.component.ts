@@ -60,6 +60,7 @@ export class StockReportComponent implements OnInit {
     PackageType: "PackageType",
     PickupDelivery: "PickupDelivery",
     DocketStatus: "DocketStatus",
+    PrivateMarka : "PrivateMarka"
   }
 
   summaryGroup: any[] = [];
@@ -258,7 +259,7 @@ export class StockReportComponent implements OnInit {
           data = await this.stockReportService.getStockSummary(this.filterData);
 
           Swal.hideLoading();
-         
+
           if (!data || (Array.isArray(data) && data.length === 0)) {
 
             Swal.fire({
@@ -267,7 +268,7 @@ export class StockReportComponent implements OnInit {
               text: "Cannot Download CSV",
               showConfirmButton: true,
             });
-  
+
             return;
           }
 
@@ -312,7 +313,7 @@ export class StockReportComponent implements OnInit {
 
       if(columnData.StockTypeId)
         filter.stockType = columnData.StockTypeId;
-      
+
       if(data.LocationCode && data.LocationCode != "")
         filter.cumulativeLocation = [data.LocationCode];
 
@@ -339,7 +340,7 @@ export class StockReportComponent implements OnInit {
 
   /**
    * Generates a pivot table data based on the provided data and locations.
-   * 
+   *
    * @param data - The array of data to be pivoted.
    * @param locations - The array of locations.
    * @returns A promise that resolves to an object containing the static fields, configuration, data, and column groups of the pivot table.

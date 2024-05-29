@@ -11,6 +11,7 @@ import moment from 'moment';
 import Swal from 'sweetalert2';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { DrsService } from 'src/app/Utility/module/reports/drs-register-service';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-drs-register',
@@ -42,6 +43,7 @@ export class DrsRegisterComponent implements OnInit {
   showOverlay = false;
   
   constructor(
+    public snackBarUtilityService: SnackBarUtilityService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
@@ -149,7 +151,7 @@ export class DrsRegisterComponent implements OnInit {
       }
       this.loading = false;
     } catch (error) {
-      // this.snackBarUtilityService.ShowCommonSwal("error", error.message);
+      this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }    
   }
 }

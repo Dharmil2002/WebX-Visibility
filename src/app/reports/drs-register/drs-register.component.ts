@@ -11,6 +11,7 @@ import moment from 'moment';
 import Swal from 'sweetalert2';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { DrsService } from 'src/app/Utility/module/reports/drs-register-service';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-drs-register',
@@ -42,6 +43,7 @@ export class DrsRegisterComponent implements OnInit {
   showOverlay = false;
   
   constructor(
+    public snackBarUtilityService: SnackBarUtilityService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
@@ -98,7 +100,7 @@ export class DrsRegisterComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.Storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.Storage.branch);
     this.drsregisterTableForm.controls["Location"].setValue(loginBranch);
     this.drsregisterTableForm.get('Individual').setValue("Y");
   }
@@ -108,10 +110,10 @@ export class DrsRegisterComponent implements OnInit {
     try {
       this.ReportingBranches = [];
       if (this.drsregisterTableForm.value.Individual == "N") {
-        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.drsregisterTableForm.value.Location.name);
-        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.name);
+        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.drsregisterTableForm.value.Location.value);
+        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.value);
       } else {
-        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.name);
+        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.value);
       }
       const startDate = new Date(this.drsregisterTableForm.controls.start.value);
       const endDate = new Date(this.drsregisterTableForm.controls.end.value);
@@ -149,7 +151,7 @@ export class DrsRegisterComponent implements OnInit {
       }
       this.loading = false;
     } catch (error) {
-      // this.snackBarUtilityService.ShowCommonSwal("error", error.message);
+      this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }    
   }
 }

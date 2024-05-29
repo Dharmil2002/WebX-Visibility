@@ -10,12 +10,14 @@ export class CustInvRegFormControl {
         placeholder: "Select Date Range",
         type: "daterangpicker",
         value: "",
+        filterOptions: "",
+        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
         additionalData: {
-          support: "end",
+             support: "end",
         },
       },
       // {

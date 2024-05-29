@@ -98,7 +98,7 @@ export class DrsRegisterComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.Storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.Storage.branch);
     this.drsregisterTableForm.controls["Location"].setValue(loginBranch);
     this.drsregisterTableForm.get('Individual').setValue("Y");
   }
@@ -108,10 +108,10 @@ export class DrsRegisterComponent implements OnInit {
     try {
       this.ReportingBranches = [];
       if (this.drsregisterTableForm.value.Individual == "N") {
-        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.drsregisterTableForm.value.Location.name);
-        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.name);
+        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.drsregisterTableForm.value.Location.value);
+        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.value);
       } else {
-        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.name);
+        this.ReportingBranches.push(this.drsregisterTableForm.value.Location.value);
       }
       const startDate = new Date(this.drsregisterTableForm.controls.start.value);
       const endDate = new Date(this.drsregisterTableForm.controls.end.value);

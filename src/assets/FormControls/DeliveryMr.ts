@@ -151,17 +151,27 @@ export class DeliveryMrGeneration {
               value: "",
               generatecontrol: true,
               disable: false,
-              Validations: []
+              Validations: [
+                {
+                  name: "required",
+                  message: "Receiver Name is required",
+              },
+              ]
             },
             {
               name: 'mobileno',
-              label: 'Mobile no',
-              placeholder: 'Mobile no',
+              label: 'Receiver Mobile no',
+              placeholder: 'Receiver Mobile no',
               type: 'mobile-number',
               value: "",
               generatecontrol: true,
               disable: false,
-              Validations: []
+              Validations: [
+                {
+                  name: "required",
+                  message: "Receiver Mobile Number is required",
+                },
+              ]
             },
 
         ]

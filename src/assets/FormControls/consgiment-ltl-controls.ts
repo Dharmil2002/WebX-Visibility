@@ -12,8 +12,11 @@ export class ConsignmentLtl extends BaseControl {
   private freightDetails: FormControls[];
   private otherInfo: FormControls[];
 
-  constructor(public generalService: GeneralService, public docCalledAs: any) {
-    super(generalService, "LTL", ["ConsignmentLtl"]);
+  constructor(
+    public generalService: GeneralService, 
+    public docCalledAs: any
+  ) {
+    super(generalService, "LTL", ["ConsignmentLtl"], docCalledAs);
     this.docketFields = [
       {
         name: "docketNumber",
@@ -130,7 +133,7 @@ export class ConsignmentLtl extends BaseControl {
         generatecontrol: true,
         disable: false,
         functions: {
-          onModel: "getCustomer",
+          onModel: "getCustomer"
         },
         Validations: [
           {
@@ -258,7 +261,7 @@ export class ConsignmentLtl extends BaseControl {
         generatecontrol: true,
         disable: false,
         functions: {
-          onSelection: "disableSize",
+          //onSelection: "findContract",
         },
         Validations: [
           {
@@ -409,7 +412,7 @@ export class ConsignmentLtl extends BaseControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         functions: { onChange: "getVolControls" },
         Validations: [],
         additionalData: {

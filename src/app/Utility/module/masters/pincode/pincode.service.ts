@@ -325,15 +325,15 @@ export class PinCodeService {
             .map(ct => {
               // Find the first occurrence of this ct in the original data to get its pincode
               const originalItem = cResponse.data.find(item => item.CT === ct);
-              const getCluster = clusters.find(x => x.pincode.includes(originalItem.PIN));
+              //const getCluster = clusters.find(x => x.pincode.includes(originalItem.PIN));
               return {
                 name: originalItem.PIN,
                 value: ct,
                 ct: ct,
                 pincode: originalItem.PIN, // include pincode here
                 st: originalItem?.ST,
-                clusterName: getCluster?.clusterName,
-                clusterId: getCluster?.clusterCode
+                clusterName: "", //getCluster?.clusterName,
+                clusterId: "" //getCluster?.clusterCode
               };
             });
 

@@ -243,7 +243,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       
     }
 
-    this.ewayBillTab = new EwayBillControls(this.generalService);
+    this.ewayBillTab = new EwayBillControls(this.generalService, this.DocCalledAs);
     
     this.ewayBillTab.applyFieldRules(this.companyCode).then(() => {
       this.initializeFormControl();

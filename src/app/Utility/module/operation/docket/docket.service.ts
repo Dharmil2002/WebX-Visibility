@@ -603,7 +603,7 @@ export class DocketService {
                 // Fetch pincode data from the masterService asynchronously
                 const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
 
-                // Extract the cityCodeData from the response 
+                // Extract the cityCodeData from the response
                 /*here i return one more field other then name value beacuase it  used in Job entry Module*/
                 const codeData = dResponse.data.map((x) => { return { name: x.docNo, value: x.docNo, docketData: x } });
 
@@ -929,6 +929,7 @@ export class DocketService {
                 "mTNM": element?.Invoice_Product || "",
                 "hSN": element?.HSN_CODE || "",
                 "hSNNM": element?.HSN_CODE || "",
+                "pKGTYP":element?.pkgsTypeInv || "",
                 "eWBNO": data?.ewbNo || "",
                 "eWBDT": ConvertToDate(element?.ewbDate),
                 "eXPDT": ConvertToDate(data?.ewbExprired),
@@ -1211,6 +1212,7 @@ export class DocketService {
             "dKTNO": data?.docketNumber || "",
             "pRQNO": data?.prqNo?.value || "",
             "dKTDT": ConvertToDate(data?.docketDate),
+            "eDDDT": ConvertToDate(data?.eddDate),
             "pAYTYP": data?.payType || "",
             "pAYTYPNM": data?.payTypeName || "",
             "bPARTY": data?.billingParty.value || "",
@@ -1284,6 +1286,7 @@ export class DocketService {
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
+            "pVTMARK" : data?.pvtMark || "",
             "wLCN": data?.cnWinCsgn || false,
             "wLCNE": data?.cnWinCsgne || false,
             "iSCEBP": data?.cnebp || false,
@@ -1331,6 +1334,7 @@ export class DocketService {
                 "cURR": "INR",
                 "cUBWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "mATDN": element?.materialDensity || "",
+                "pKGTYP":element?.pkgsTypeInv || "",
                 "pKGS": parseInt(element?.noOfPackage || 0),
                 "cFTWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),

@@ -26,6 +26,8 @@ import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -88,6 +90,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   TotalEditedAmount: number = 0;
   TotalDiffrentAmount: number = 0;
   isInterBranchControl: boolean = false;
+  checkboxChecked: boolean = true; // Checkbox is checked by default
 
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
@@ -103,7 +106,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private invoiceService: InvoiceServiceService,
     private thcService: ThcService,
     private stateService: StateService,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private generalService: GeneralService,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
@@ -151,12 +155,22 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     this.jsonCollectionControlArray = deliveryMrControlsGenerator.getCollectionDetailsControls();
     this.CollectionForm = formGroupBuilder(this.fb, [this.jsonCollectionControlArray]);
-
     this.deliveryMrTableForm.controls['ConsignmentNoteNumber'].setValue(this.docketNo);
     this.docketNo ? await this.ValidateDocketNo() : null;
     await this.GetGSTRate();
     await this.getAccountingRules();
+    this.OnChangeCheckBox({event:{event:{checked: true}}});
   }
+  //#endregion
+
+  //#region
+  // async getGeneralmasterData() {
+  //   const paymentType: AutoComplete[] =
+  //   await this.generalService.getGeneralMasterData("PAYMOD");
+  //   this.setGeneralMasterData(this.allFormGrop, carrierType, "cARTYP");
+  // }
+  //#endregion
+
   //#region to validate docket number
   async ValidateDocketNo() {
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
@@ -167,8 +181,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     try {
       const filter = { "cID": this.storage.companyCode, dEST: this.storage.branch, "dKTNO": DocketNo, pAYTYP: { D$in: ["P01", "P03"] } };
       const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
-      console.log("docketdetails", docketdetails);
-
 
       if (docketdetails.length === 1) {
         this.DocketDetails = docketdetails[0];

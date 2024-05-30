@@ -32,7 +32,7 @@ export class ManifestRegisterReportComponent implements OnInit {
     private ManifestRegServices: ManifestRegService,
     private generalLedgerReportService: GeneralLedgerReportService,
     private Storage:StorageService
-  ) 
+  )
     { }
 
   ngOnInit(): void {
@@ -59,7 +59,7 @@ export class ManifestRegisterReportComponent implements OnInit {
   ];
   manifestRegisterForm: UntypedFormGroup;
   protected _onDestroy = new Subject<void>();
-  LoadTable=false; 
+  LoadTable=false;
   loading = true;
   csvFileName: string; // name of the csv file, when data is downloaded
   source: any;
@@ -79,7 +79,7 @@ export class ManifestRegisterReportComponent implements OnInit {
   }
 
   functionCallHandler($event) {
-    let functionName = $event.functionName;     
+    let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
@@ -115,7 +115,7 @@ export class ManifestRegisterReportComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.Storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.Storage.branch);
     this.manifestRegisterForm.controls["Location"].setValue(loginBranch);
   }
 
@@ -126,16 +126,16 @@ export class ManifestRegisterReportComponent implements OnInit {
       this.ReportingBranches = [];
       if (this.manifestRegisterForm.value.Individual == "N") {
         this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.manifestRegisterForm.value.Location.name);
-        this.ReportingBranches.push(this.manifestRegisterForm.value.Location.name);
+        this.ReportingBranches.push(this.manifestRegisterForm.value.Location.value);
       } else {
-        this.ReportingBranches.push(this.manifestRegisterForm.value.Location.name);
+        this.ReportingBranches.push(this.manifestRegisterForm.value.Location.value);
       }
       const startDate = new Date(this.manifestRegisterForm.controls.start.value);
       const endDate = new Date(this.manifestRegisterForm.controls.end.value);
       const startValue = moment(startDate).startOf('day').toDate();
       const endValue = moment(endDate).endOf('day').toDate();
-      const mFNO = this.manifestRegisterForm.value.Document; 
-      const ManifestArray = mFNO ? mFNO.includes(',') ? mFNO.split(',') : [mFNO] : [];    
+      const mFNO = this.manifestRegisterForm.value.Document;
+      const ManifestArray = mFNO ? mFNO.includes(',') ? mFNO.split(',') : [mFNO] : [];
       const branch = this.ReportingBranches;
       const reqBody = {
         startValue, endValue, mFNO, branch,ManifestArray
@@ -143,10 +143,10 @@ export class ManifestRegisterReportComponent implements OnInit {
       const result = await this.ManifestRegServices.getManifestRegisterReportDetails(reqBody);
       console.log("data", result);
       this.columns = result.grid.columns;
-      this.sorting = result.grid.sorting; 
+      this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
-      
+
       this.source = result.data;
       this.LoadTable = true;
       this.showOverlay = true;
@@ -166,5 +166,5 @@ export class ManifestRegisterReportComponent implements OnInit {
     } catch (error) {
       // this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }
-  }  
+  }
 }

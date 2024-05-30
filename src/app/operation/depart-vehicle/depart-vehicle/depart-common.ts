@@ -79,22 +79,22 @@ export function calculateTotalAdvances(form: FormGroup): void {
 
     // Get values from form controls, defaulting to 0 if not present
     const advance = parseFloat(controls['Advance'].value) || 0;
-    const paidByCash = parseFloat(controls['PaidByCash'].value) || 0;
-    const paidByBank = parseFloat(controls['PaidbyBank'].value) || 0;
-    const paidByFuel = parseFloat(controls['PaidbyFuel'].value) || 0;
-    const paidByCard = parseFloat(controls['PaidbyCard'].value) || 0;
+    //const paidByCash = parseFloat(controls['PaidByCash'].value) || 0;
+    ///const paidByBank = parseFloat(controls['PaidbyBank'].value) || 0;
+    //const paidByFuel = parseFloat(controls['PaidbyFuel'].value) || 0;
+    //const paidByCard = parseFloat(controls['PaidbyCard'].value) || 0;
 
     // Calculate the total advances
-    const totalAdv = advance + paidByCash + paidByBank + paidByFuel + paidByCard;
+    const totalAdv = advance 
+    //+ paidByCash + paidByBank + paidByFuel + paidByCard;
 
     // Set the calculated total advances with 2 decimal places
-    controls['TotalAdv'].setValue(totalAdv.toFixed(2));
+    //controls['TotalAdv'].setValue(totalAdv.toFixed(2));
 }
 
 // Calculates the balance amount based on total trip amount and total advances, and sets it in the form.
 export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
-    const totalAdv = parseFloat(form.controls['TotalAdv'].value) || 0;
-
+    const totalAdv = parseFloat(form.controls['Advance'].value) || 0;
     // Calculate the balance amount
     const balanceAmount = totalTripAmt - totalAdv;
 

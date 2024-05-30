@@ -24,6 +24,7 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { VehicleTypeService } from "src/app/Utility/module/masters/vehicle-type/vehicle-type-service";
 import { AddMarketVehicleComponent } from "../add-market-vehicle/add-market-vehicle.component";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
+import moment from "moment";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -297,8 +298,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     // Set the value of 'Expected' form control with tripData's Expected or getloadingFormData's Expected or an empty string
     setFormControlValue(
       this.loadingSheetTableForm.controls["Expected"],
-      this.tripData?.Expected,
-      this.getloadingFormData?.Expected,
+      moment(this.tripData?.Expected).format("DD MMM YY HH:MM"),
+      moment(this.getloadingFormData?.Expected).format("DD MMM YY HH:MM"),
       ""
     );
 

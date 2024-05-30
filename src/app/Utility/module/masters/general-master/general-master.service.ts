@@ -25,7 +25,8 @@ async getGeneralMasterData(codeType): Promise<AutoComplete[]> {
         collectionName: "General_master",
         filter: { 
             codeType: { D$in: Array.isArray(codeType) ? codeType : [codeType] }, 
-            activeFlag: true }
+            activeFlag: true 
+        }
     };
 
     // Send a POST request to the masterService to retrieve data and await the response.

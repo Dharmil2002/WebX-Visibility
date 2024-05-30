@@ -216,10 +216,10 @@ export class GenericTableV2Component
     "tO"
   ]
     const colDef = this.columnHeader[key];
+    if (field.includes(key)) {
+      return val;
+    }
     if (colDef && colDef.datatype) {
-      if (field.includes(key)) {
-        return val;
-      }
       switch (colDef.datatype) {
         case "date":
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY") : "";

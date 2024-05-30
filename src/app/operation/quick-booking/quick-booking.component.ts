@@ -106,7 +106,7 @@ export class QuickBookingComponent implements OnInit {
 
   initializeFormControl() {
     // Create an instance of QuickBookingControls to get form controls for different sections
-    this.docketControls = new QuickBookingControls(this.generalService);    
+    this.docketControls = new QuickBookingControls(this.generalService, this.DocCalledAs);    
     this.docketControls.applyFieldRules(this.companyCode).then(() => {
         // Get form controls for Quick Booking section
         this.jsonControlDocketArray = this.docketControls.getDocketFieldControls();

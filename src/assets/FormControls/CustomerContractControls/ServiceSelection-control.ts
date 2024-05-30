@@ -219,7 +219,7 @@ export class ContractServiceSelectionControl {
       //   accessallowed: true,
       // },
       {
-        name: "fuelSurcharge",
+        name: "FuelSurcharge",
         label: "Fuel Surcharge",
         placeholder: "Fuel Surcharge",
         type: "toggle",
@@ -233,7 +233,7 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
       },
       {
-        name: "cutofftime",
+        name: "CutOffTime",
         label: "Cut off time",
         placeholder: "Cut off time",
         type: "toggle",

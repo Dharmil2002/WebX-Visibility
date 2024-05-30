@@ -21,8 +21,8 @@ import { updatePending } from "../../../../operation/update-loading-sheet/loadin
 import { MatDialog } from "@angular/material/dialog";
 import { CustomerContractNonFreightChargesPopupComponent } from "../customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component";
 import Swal from "sweetalert2";
-import { GetGeneralMasterData } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
+import { GetProductCharges } from "../../CustomerContractAPIUtitlity";
 
 @Component({
   selector: "app-customer-contract-non-freight-charges",
@@ -107,7 +107,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   UpdateData: any;
   selectChargesCode: any;
   selectChargesStatus: any;
-
+  ProductId: any;
   //#endregion
   constructor(
     private fb: UntypedFormBuilder,
@@ -122,9 +122,16 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   //#endregion
   ngOnInit() {
+
+
+  }
+  async ngOnChanges(changes: SimpleChanges) {
+    this.ProductId = changes.contractData?.currentValue?.pID;
     this.ContractID = this.contractData.cONID;
-    this.initializeFormControl();
-    this.getTableData();
+    if (changes.contractData?.currentValue) {
+      this.initializeFormControl();
+      this.getTableData();
+    }
   }
   /*get all Master Details*/
   async getTableData() {
@@ -180,12 +187,18 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     });
   }
   async getselectChargesDropdown() {
-    const AcGroupdata = await GetGeneralMasterData(this.masterService, "SCH");
-    console.log('AcGroupdata' ,AcGroupdata)
+    const ProductList = await GetProductCharges(this.masterService, this.ProductId);
+    const Result = ProductList.map((x) => {
+      return {
+        name: x.cAPTION,
+        value: x.cHACD,
+        ChargeName: x.sELCHA
+      };
+    });
     this.filter.Filter(
       this.jsonControlArrayNonFreightCharges,
       this.NonFreightChargesForm,
-      AcGroupdata,
+      Result,
       this.selectChargesCode,
       this.selectChargesStatus
     );
@@ -195,7 +208,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       const filterData = this.tableData.filter(
         (x) =>
           x.selectCharges ==
-            this.NonFreightChargesForm.value.selectCharges.name &&
+          this.NonFreightChargesForm.value.selectCharges.name &&
           x._id != this.UpdateData._id
       );
       if (filterData.length != 0) {
@@ -248,6 +261,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   async Save() {
     const body = {
       sCT: this.NonFreightChargesForm.value.selectCharges.name,
+      sCTCD: this.NonFreightChargesForm.value.selectCharges.value,
       cBT: this.NonFreightChargesForm.value.ChargesBehaviour,
       nFC:
         this.NonFreightChargesForm.value.ChargesBehaviour == "Fixed"
@@ -322,8 +336,15 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
 
   async FillMatrixForAll(data: any) {
-    const AcGroupdata = await GetGeneralMasterData(this.masterService, "SCH");
-    const element = AcGroupdata.find((x) => x.name == data.data?.selectCharges);
+    const ProductList = await GetProductCharges(this.masterService, this.ProductId);
+    const Result = ProductList.map((x) => {
+      return {
+        name: x.cAPTION,
+        value: x.cHACD,
+        ChargeName: x.sELCHA
+      };
+    });
+    const element = Result.find((x) => x.name == data.data?.selectCharges);
     this.NonFreightChargesForm.controls["selectCharges"].setValue(
       element || ""
     );

@@ -559,7 +559,7 @@ export class InvoiceCollectionComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['AST002002'].LeadgerCode, ledgerInfo['AST002002'].LeadgerName, ledgerInfo['AST002002'].LeadgerCategory, 0, NetPayable),
+      createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, 0, NetPayable),
     ];
 
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;

@@ -15,7 +15,7 @@ import { firstValueFrom, map, switchMap } from "rxjs";
   selector: "app-customer-contract-non-freight-charges-popup",
   templateUrl: "./customer-contract-non-freight-charges-popup.component.html",
 })
-export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
+export class CustomerContractNonFreightChargesPopupComponent {
   SaveEventButton = {
     functionName: "Save",
     name: "Save",
@@ -29,6 +29,11 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     },
     tO: {
       Title: "To",
+      class: "matcolumncenter",
+      Style: "min-width:20%",
+    },
+    vHCNM: {
+      Title: "Vehicle Capacity",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
@@ -61,7 +66,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       iconName: "edit",
     },
   };
-  staticField = ["fROM", "tO", "rTYPE", "rT", "mINV", "mAXV"];
+  staticField = ["fROM", "tO", "vHCNM", "rTYPE", "rT", "mINV", "mAXV"];
   dynamicControls = {
     add: false,
     edit: false,
@@ -96,6 +101,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   ChargesData: any;
   selectChargesCode: any;
   selectChargesStatus: any;
+  ProductCharges: any[]
   constructor(
     private fb: UntypedFormBuilder,
     public ObjcontractMethods: locationEntitySearch,
@@ -107,92 +113,46 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   ) {
     this.companyCode = this.storage.companyCode;
     this.ChargesData = data;
-    this.getTableData();
-    console.log("ChargesData", this.ChargesData);
-    this.GetChargeDetails(this.ChargesData.cHACD);
+    this.GetChargeDetails(this.ChargesData.sCTCD);
   }
 
-  async getTableData() {
-    this.tableLoad = false;
-    this.isLoad = true;
-    let ChargesDatareq = {
-      companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix_details",
-      filter: { sCT: this.ChargesData.sCT, cONID: this.ChargesData.cONID },
-    };
 
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", ChargesDatareq)
-    );
-    console.log("res", res);
-    if (res.success) {
-      this.tableData = res.data;
-      this.tableData.sort((a, b) => (a.cDID > b.cDID ? -1 : 1));
-      this.tableLoad = true;
-      this.isLoad = false;
-    }
-  }
   async GetChargeDetails(ChargeCode) {
     const ProductCharges = await GetProductCharges(this.masterService, null, ChargeCode);
     if (ProductCharges.length > 0) {
-      const Result = ProductCharges[0]?.cRGVB;
-      console.log(Result)
+      this.ProductCharges = ProductCharges[0]?.cRGVB;
+    } else {
+      this.ProductCharges = ["DL", "VCW"];
     }
-  }
-  async ngOnInit() {
     await this.initializeFormControl();
     await this.getAllMastersData();
+    await this.getTableData();
   }
-
-  initializeFormControl() {
+  async initializeFormControl() {
     this.ContractNonFreightMatrixControls = new ContractNonFreightMatrixControl(
       this.isUpdate,
       this.UpdateData
     );
-    this.jsonControlArrayNonFreightMatrix =
-      this.ContractNonFreightMatrixControls.getContractNonFreightMatrixControlControls();
-    this.NonFreightMatrixForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayNonFreightMatrix,
-    ]);
-    this.bindDropdown();
-  }
-  bindDropdown() {
-    this.jsonControlArrayNonFreightMatrix.forEach((data) => {
-      if (data.name === "rateType") {
-        // Set AcGroupCategory variables
-        this.rateTypeCode = data.name;
-        this.rateTypeStatus = data.additionalData.showNameAndValue;
-        this.getrateTypeDropdown();
-      }
-    });
-  }
-  async getrateTypeDropdown() {
-    let req = {
-      companyCode: this.storage.companyCode,
-      collectionName: "cust_contract",
-      filter: { docNo: this.ChargesData.cONID },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
-    const SelectedData = res.data[0].rTYP;
-    const RatData = await GetGeneralMasterData(this.masterService, "RTTYP");
-    const rateTypedata = SelectedData.map((x, index) => {
-      return RatData.find((t) => t.value == x);
-    });
-    this.filter.Filter(
-      this.jsonControlArrayNonFreightMatrix,
-      this.NonFreightMatrixForm,
-      rateTypedata,
-      this.rateTypeCode,
-      this.rateTypeStatus
-    );
-    if (this.isUpdate) {
-      const element = rateTypedata.find((x) => x.name == this.UpdateData.rTYPE);
-      this.NonFreightMatrixForm.controls["rateType"].setValue(element);
-    }
-  }
+    this.jsonControlArrayNonFreightMatrix = this.ContractNonFreightMatrixControls.getContractNonFreightMatrixControlControls();
 
+    // Filters Arrays Based on ProductCharges Data for DL VCW
+    if (this.ProductCharges.length == 1) {
+      if (this.ProductCharges[0] == "DL") {
+        delete this.columnHeader.vHCNM;
+        this.staticField = ["fROM", "tO", "rTYPE", "rT", "mINV", "mAXV"];
+        this.jsonControlArrayNonFreightMatrix = this.jsonControlArrayNonFreightMatrix.filter((x) => x.name != "capacity");
+      } else if (this.ProductCharges[0] == "VCW") {
+        delete this.columnHeader.fROM;
+        delete this.columnHeader.tO;
+        this.staticField = ["vHCNM", "rTYPE", "rT", "mINV", "mAXV"];
+        this.jsonControlArrayNonFreightMatrix = this.jsonControlArrayNonFreightMatrix.filter((x) => x.name != "From" && x.name != "To");
+      }
+    }
+
+    this.NonFreightMatrixForm = formGroupBuilder(this.fb, [this.jsonControlArrayNonFreightMatrix,]);
+
+    await this.bindDropdown();
+  }
   async getAllMastersData() {
     try {
       const stateReqBody = {
@@ -226,6 +186,68 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       console.error("Error:", error);
     }
   }
+  async getTableData() {
+    this.tableLoad = false;
+    this.isLoad = true;
+    let ChargesDatareq = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_non_freight_charge_matrix_details",
+      filter: { sCTCD: this.ChargesData.sCTCD, cONID: this.ChargesData.cONID },
+    };
+
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", ChargesDatareq)
+    );
+    if (res.success) {
+      this.tableData = res.data;
+      this.tableData.sort((a, b) => (a.cDID > b.cDID ? -1 : 1));
+      this.tableLoad = true;
+      this.isLoad = false;
+    }
+  }
+
+
+  async bindDropdown() {
+    this.jsonControlArrayNonFreightMatrix.forEach(async (data) => {
+      if (data.name === "rateType") {
+        // Set AcGroupCategory variables
+        this.rateTypeCode = data.name;
+        this.rateTypeStatus = data.additionalData.showNameAndValue;
+        await this.getrateTypeDropdown();
+      }
+      if (data.name === "capacity") {
+        await this.getCapacityData()
+      }
+    });
+  }
+  async getrateTypeDropdown() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "cust_contract",
+      filter: { docNo: this.ChargesData.cONID },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    const SelectedData = res.data[0].rTYP;
+    const RatData = await GetGeneralMasterData(this.masterService, "RTTYP");
+    const rateTypedata = SelectedData.map((x, index) => {
+      return RatData.find((t) => t.value == x);
+    });
+    this.filter.Filter(
+      this.jsonControlArrayNonFreightMatrix,
+      this.NonFreightMatrixForm,
+      rateTypedata,
+      this.rateTypeCode,
+      this.rateTypeStatus
+    );
+    if (this.isUpdate) {
+      const element = rateTypedata.find((x) => x.name == this.UpdateData.rTYPE);
+      this.NonFreightMatrixForm.controls["rateType"].setValue(element);
+    }
+  }
+
+
   validateCodDodRates() {
     const MaxValue = +this.NonFreightMatrixForm.value.MaxValue;
     const MinValue = +this.NonFreightMatrixForm.value.MinValue;
@@ -244,12 +266,25 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     }
   }
   async Save() {
+    // Create Filter Based on Product Charges
     const TableFilter = {
-      fROM: this.NonFreightMatrixForm.value.From.name,
-      tO: this.NonFreightMatrixForm.value.To.name,
       cONID: this.ChargesData.cONID,
       nFCID: this.ChargesData.nFCID,
     }
+
+    if (this.ProductCharges.length == 1) {
+      if (this.ProductCharges[0] == "DL") {
+        TableFilter["fROM"] = this.NonFreightMatrixForm.value.From.name;
+        TableFilter["tO"] = this.NonFreightMatrixForm.value.To.name;
+      } else if (this.ProductCharges[0] == "VCW") {
+        TableFilter["vHCCD"] = this.NonFreightMatrixForm.value.capacity.value;
+      }
+    } else {
+      TableFilter["fROM"] = this.NonFreightMatrixForm.value.From.name;
+      TableFilter["tO"] = this.NonFreightMatrixForm.value.To.name;
+      TableFilter["vHCCD"] = this.NonFreightMatrixForm.value.capacity.value;
+    }
+
     let Tablereq = {
       companyCode: this.storage.companyCode,
       collectionName: "cust_contract_non_freight_charge_matrix_details",
@@ -269,10 +304,6 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     }
 
     const body = {
-      fROM: this.NonFreightMatrixForm.value.From.name,
-      fTYPE: this.NonFreightMatrixForm.value.From.value,
-      tO: this.NonFreightMatrixForm.value.To.name,
-      tTYPE: this.NonFreightMatrixForm.value.To.value,
       mAXV: this.NonFreightMatrixForm.value.MaxValue,
       mINV: this.NonFreightMatrixForm.value.MinValue,
       rT: this.NonFreightMatrixForm.value.Rate,
@@ -282,6 +313,26 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       mODLOC: this.storage.branch,
       mODBY: this.storage.userName,
     };
+
+    if (this.ProductCharges.length == 1) {
+      if (this.ProductCharges[0] == "DL") {
+        body["fROM"] = this.NonFreightMatrixForm.value.From.name;
+        body["fTYPE"] = this.NonFreightMatrixForm.value.From.value;
+        body["tO"] = this.NonFreightMatrixForm.value.To.name;
+        body["tTYPE"] = this.NonFreightMatrixForm.value.To.value;
+      } else if (this.ProductCharges[0] == "VCW") {
+        body["vHCCD"] = this.NonFreightMatrixForm.value.capacity.value;
+        body["vHCNM"] = this.NonFreightMatrixForm.value.capacity.name;
+      }
+    } else {
+      body["fROM"] = this.NonFreightMatrixForm.value.From.name;
+      body["fTYPE"] = this.NonFreightMatrixForm.value.From.value;
+      body["tO"] = this.NonFreightMatrixForm.value.To.name;
+      body["tTYPE"] = this.NonFreightMatrixForm.value.To.value;
+      body["vHCCD"] = this.NonFreightMatrixForm.value.capacity.value;
+      body["vHCNM"] = this.NonFreightMatrixForm.value.capacity.name;
+    }
+
     if (!this.isUpdate) {
       let datareq = {
         companyCode: this.storage.companyCode,
@@ -297,6 +348,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       body["_id"] = `${this.companyCode}-${this.ChargesData.cONID}-${Index}`;
       body["cDID"] = Index;
       body["sCT"] = this.ChargesData.sCT;
+      body["sCTCD"] = this.ChargesData.sCTCD;
       body["nFCID"] = this.ChargesData.nFCID;
       body["cONID"] = this.ChargesData.cONID;
       body["cID"] = this.companyCode;
@@ -375,19 +427,19 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       "VEHSIZE"
     );
     const containerDataWithPrefix = vehicleData.map((item) => ({
-      name: `Veh- ${item.name}`,
+      name: `${item.name}`,
       value: item.value,
     }));
     this.filter.Filter(
       this.jsonControlArrayNonFreightMatrix,
       this.NonFreightMatrixForm,
       containerDataWithPrefix,
-      "RateType",
+      "capacity",
       false
     );
-    // if (this.isUpdate) {
-    //   const FilterData = data.find((x) => x.name == this.UpdateData.cAP);
-    //   this.FreightMatrixForm.controls["capacity"].setValue(FilterData);
-    // }
+    if (this.isUpdate) {
+      const FilterData = containerDataWithPrefix.find((x) => x.name == this.UpdateData.vHCNM);
+      this.NonFreightMatrixForm.controls["capacity"].setValue(FilterData);
+    }
   }
 }

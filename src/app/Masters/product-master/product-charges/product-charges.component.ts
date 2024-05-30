@@ -326,9 +326,9 @@ export class ProductChargesComponent implements OnInit {
       cHAPP: this.customerTableForm.value.chargeApplicableHandler.map(
         (x) => x.value
       ),
-      cRGVB: this.customerTableForm.value.VariabilityOnHandler.map(
+      cRGVB: this.customerTableForm.value.Variability == "Y" ? this.customerTableForm.value.VariabilityOnHandler.map(
         (x) => x.value
-      ),
+      ) : [],
       cAPTION: this.customerTableForm.value.cAPTION,
       iSREQ: this.customerTableForm.value.iSChargeMandatory,
       isActive: this.customerTableForm.value.isActive,

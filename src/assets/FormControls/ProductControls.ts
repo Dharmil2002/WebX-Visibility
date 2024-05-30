@@ -220,7 +220,7 @@ export class ProductControls {
         Validations: [],
         additionalData: {
           support: "VariabilityOnHandler",
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
         functions: {
           onToggleAll: "toggleSelectAll",

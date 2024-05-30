@@ -1,3 +1,4 @@
+import { firstValueFrom } from "rxjs";
 import { filter } from "rxjs/operators";
 import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
@@ -52,7 +53,41 @@ export async function GetGeneralMasterData(masterService, filterType?) {
     return null;
   }
 }
-
+export async function GetProductCharges(masterService, ProductCode = null, ChargeCode = null) {
+  const reqBody = {
+    companyCode: StorageService.getItem(StoreKeys.CompanyCode),
+    collectionName: "product_charges_detail",
+    filter: {
+      cID: StorageService.getItem(StoreKeys.CompanyCode),
+      cHATY: "Charges",
+      isActive: true,
+      cHACAT: {
+        "D$in": [
+          "C",
+          "B"
+        ]
+      },
+    },
+  };
+  if (ProductCode) {
+    reqBody.filter["pRCD"] = ProductCode;
+  }
+  if (ChargeCode) {
+    reqBody.filter["cHACD"] = ChargeCode;
+  }
+  try {
+    const Result: any = await firstValueFrom(masterService
+      .masterPost("generic/get", reqBody))
+    if (Result) {
+      const data = Result.data
+      return data;
+    }
+    return [];
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return [];
+  }
+}
 export async function productdetailFromApi(masterService) {
   let req = {
     companyCode: StorageService.getItem(StoreKeys.CompanyCode),

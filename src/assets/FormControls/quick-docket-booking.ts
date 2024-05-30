@@ -1,22 +1,24 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
-import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 /* here i create class for the bind controls in formGrop */
 export class QuickBookingControls extends BaseControl {
   private fieldMapping: FormControls[];
+  
   constructor(
-    generalService: GeneralService
+    public generalService: GeneralService,
+    public docCalledAs: any
   ) {
-    super(generalService, "LTL", ["QuickBookingControls"]);
+    super(generalService, "LTL", ["QuickBookingControls"], docCalledAs);
     
     this.fieldMapping = [
       {
         name: "docketNumber",
-        label: `${DocCalledAs.Docket} No`,
-        placeholder: `${DocCalledAs.Docket} No`,
+        label: `${this.docCalledAs.Docket} No`,
+        placeholder: `${this.docCalledAs.Docket} No`,
         type: "text",
         value: "Computerized",
         filterOptions: "",
@@ -26,7 +28,7 @@ export class QuickBookingControls extends BaseControl {
         disable: true,
         Validations: [   {
           name: "required",
-          message:  `${DocCalledAs.Docket}No required`,
+          message:  `${this.docCalledAs.Docket}No required`,
         }],
         functions: {
           onChange: "docketValidation",
@@ -46,7 +48,7 @@ export class QuickBookingControls extends BaseControl {
         Validations: [
           {
             name: "required",
-            message: `${DocCalledAs.Docket} is required`,
+            message: `${this.docCalledAs.Docket} is required`,
           },
         ],
         additionalData: {

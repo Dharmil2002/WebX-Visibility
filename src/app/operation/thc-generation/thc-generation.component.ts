@@ -1236,7 +1236,7 @@ export class ThcGenerationComponent implements OnInit {
     }
     this.VehicleTableForm.controls["inExdt"].setValue(thcNestedDetails?.thcDetails.iNSEXDT)
     this.VehicleTableForm.controls["fitdt"].setValue(thcNestedDetails?.thcDetails.fITDT)
-    this.thcTableForm.controls["driverLexd"].setValue(thcNestedDetails?.thcDetails.eNGNO);
+    this.thcTableForm.controls["driverLexd"].disable(thcNestedDetails?.thcDetails.eNGNO);
     this.thcTableForm.controls["vendorType"].setValue(`${thcNestedDetails?.thcDetails.vND?.tY}`);
     const hasShipment = thcNestedDetails.shipment?.length > 0;
     const hasCNO = !!thcNestedDetails.shipment?.[0]?.cNO;

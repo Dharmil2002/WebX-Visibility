@@ -220,7 +220,6 @@ export class GenericTableV2Component
       return val;
     }
     if (colDef && colDef.datatype) {
-     
       switch (colDef.datatype) {
         case "date":
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "DD MMM YY") : "";

@@ -11,25 +11,34 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Eway Bill Number",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype: "string",
+      sticky: true
     },
     ewayBillDate: {
       Title: "Eway Bill Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype: "date",
+      sticky: true
     },
     expiryDate: {
       Title: "Eway Bill Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype: "date",
+      sticky: true
     },
     invoiceNumber: {
       Title: "Invoice Number",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype: "string",
+      sticky: true
     },
     invDt: {
       Title: "Invoice Date",
       class: "matcolumncenter",
+      datatype: "date",
       Style: "min-width:2px",
     },
     invoiceAmount: {
@@ -51,6 +60,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Material Name",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string",
     },
     actualWeight: {
       Title: "Actual Weight (Kg)",
@@ -66,16 +76,19 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Material Density",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string",
     },
-    pkgsTypeInv: {
+    pkgsTypeInvNM: {
       Title: "Packaging Type",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:100px",
+      stickyEnd: true
     },
   };
   columnVolInvoice={
@@ -83,28 +96,35 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Eway Bill Number",
       class: "matcolumncenter",
       Style: "min-width:80px",
-      datatype:"string"
+      datatype:"string",
+      sticky: true
     },
     ewayBillDate: {
       Title: "Eway Bill Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
+      datatype:"date",
+      sticky: true
     },
     expiryDate: {
       Title: "Eway Bill Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"date",
+      sticky: true
     },
     invoiceNumber: {
       Title: "Invoice Number",
       class: "matcolumncenter",
       Style: "min-width:2px",
-      datatype:"string"
+      datatype:"string",
+      sticky: true
     },
     invDt: {
       Title: "Invoice Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"date",
     },
     cftRation: {
       Title: "CFT Ratio",
@@ -144,7 +164,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-        cft: {
+    cft: {
       Title: "CFT Total",
       class: "matcolumncenter",
       Style: "min-width:2px",
@@ -153,6 +173,7 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Material Name",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string",
     },
     actualWeight: {
       Title: "Actual Weight (Kg)",
@@ -168,16 +189,19 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Material Density",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string",
     },
-    pkgsTypeInv: {
+    pkgsTypeInvNM: {
       Title: "Packaging Type",
       class: "matcolumncenter",
       Style: "min-width:2px",
+      datatype:"string",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:100px",
+      stickyEnd: true
     },
   };
   getColumn(columnName: string): any | undefined {

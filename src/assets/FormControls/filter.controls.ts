@@ -6,7 +6,7 @@ export class FilterControl {
     this.filterControlArray = [
       {
         name: "start",
-        label: "SelectDateRange",
+        label: "Date Range",
         placeholder: "Select Date",
         type: "daterangpicker",
         value: "",
@@ -17,9 +17,9 @@ export class FilterControl {
         disable: false,
         Validations: [],
         additionalData: {
-            support: "end",
+          support: "end",
         },
-    }, 
+      },
       {
         name: 'bookLoc',
         label: 'Booking Location',
@@ -67,7 +67,7 @@ export class FilterControl {
         },
         generatecontrol: true, disable: false
       },
-      
+
       {
         name: 'customer', label: "Customer", placeholder: "Select Customer", type: 'multiselect',
         value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
@@ -181,15 +181,15 @@ export class FilterControl {
         generatecontrol: false,
         disable: true,
         Validations: [
-            {
-                name: "Select Data Range",
-            },
-            {
-                name: "required",
-                message: "StartDateRange is Required...!",
-            },
+          {
+            name: "Select Data Range",
+          },
+          {
+            name: "required",
+            message: "StartDateRange is Required...!",
+          },
         ],
-    },
+      },
     ];
 
   }

@@ -28,7 +28,7 @@ export class jobQueryControl {
             },
             {
                 name: "start",
-                label: "SelectDateRange",
+                label: "Date Range",
                 placeholder: "Select Date",
                 type: "daterangpicker",
                 value: "",

@@ -213,13 +213,14 @@ export class ConsignmentEntryFormComponent
     docketDetailsPromise
       .then((docketDetails) => {
         this.model.ConsignmentFormControls = new ConsignmentControl(
-          docketDetails,
-          this.DocCalledAs,
-          this.generalService
+          docketDetails,         
+          this.generalService,
+          this.DocCalledAs
         );
         this.model.FreightFromControl = new FreightControl(
           docketDetails,
-          this.generalService
+          this.generalService,
+          this.DocCalledAs,
         );
         return Promise.all([
           this.model.ConsignmentFormControls.applyFieldRules(

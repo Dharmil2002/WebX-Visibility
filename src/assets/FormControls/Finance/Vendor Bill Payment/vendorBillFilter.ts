@@ -5,7 +5,7 @@ export class vendorBillFilterControl {
         this.vendorBillFilterArray = [
             {
                 name: "StartDate",
-                label: "SelectDateRange",
+                label: "Date Range",
                 placeholder: "Select Date",
                 type: "daterangpicker",
                 value: FormValues?.startdate,

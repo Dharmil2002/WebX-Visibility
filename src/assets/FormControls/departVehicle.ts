@@ -54,12 +54,11 @@ export class DepartVehicleControl {
                 generatecontrol: true,
                 disable: false
             },
-
             {
                 name: 'Expiry',
                 label: 'Expiry Date',
                 placeholder: '',
-                type: 'text',
+                type: 'date',
                 value: '',
                 Validations: [],
                 generatecontrol: true,

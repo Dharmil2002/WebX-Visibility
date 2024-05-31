@@ -170,6 +170,26 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
 
+  //#region
+  async getContractDetails(docketdetails) {
+    debugger
+    const request = {
+        companyCode: this.storage.companyCode,
+        collectionName: "cust_contract",
+        filter: {
+          cID: this.storage.companyCode,
+          docNo: docketdetails.cONTRACT
+        }
+      };
+      const result = await firstValueFrom(this.operation.operationMongoPost(GenericActions.GetOne, request));
+      if (result?.data) {
+        return result?.data;
+      }
+      console.log("data",result)
+      return null;
+    }
+  //#endregion
+
   //#region getGeneralmasterData for PAYMOD
   async getGeneralmasterData() {
     const generalData = await this.generalService.getGeneralMasterData("PAYMOD");
@@ -188,7 +208,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     try {
       const filter = { "cID": this.storage.companyCode, dEST: this.storage.branch, "dKTNO": DocketNo, pAYTYP: { D$in: ["P01", "P03"] } };
       const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
-
+      console.log("docketdetails",docketdetails);
+      this.getContractDetails(docketdetails);
       if (docketdetails.length === 1) {
         this.DocketDetails = docketdetails[0];
         await this.SetDocketsDetails(this.DocketDetails);
@@ -211,9 +232,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   //#region SetDocketsDetails
   async SetDocketsDetails(data) {
+    console.log("data",data);
+
     this.deliveryMrTableForm.get('PayBasis').setValue(data.pAYTYPNM);
     this.deliveryMrTableForm.get('Consignor').setValue(`${data.cSGN.cD}:${data.cSGN.nM}`);
-    this.deliveryMrTableForm.get('ConsignorGST').setValue(data.cSGN.gST);
+    this.deliveryMrTableForm.get('ConsignorGST').setValue(data.cSGN.gST || "");
     this.deliveryMrTableForm.get('Consignee').setValue(`${data.cSGE.cD}:${data.cSGE.nM}`);
     this.deliveryMrTableForm.get('ConsigneeGST').setValue(data.cSGE.gST);
     this.deliveryMrTableForm.get('package').setValue(data.pKGS);
@@ -224,7 +247,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.isGSTApplicable = (data.rCM == "Y" || data.rCM == "RCM" || data.rCM == "") ? false : true;
     this.deliveryMrTableForm.get('GSTApplicability').setValue(this.isGSTApplicable ? "Yes" : "No");
     await this.GetBookingTimeCharges();
-    if (data.cSGN.gST && data.cSGE.gST) {
+    if (data.cSGN.gST && data.cSGE.gST && data.cSGN.gST !="" && data.cSGE.gST !="") {
       const StateCodeList = [parseInt(data.cSGN.gST.substring(0, 2)), parseInt(data.cSGE.gST.substring(0, 2))]
       await this.GetStateCodeWiseStateDetails(StateCodeList);
     }
@@ -859,7 +882,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
           if (res.success) {
             if (headerRequest.cLLCTAMT > 0 && headerRequest.mOD !== "Credit" ) {
-              const vRes: any = await this.GenerateVoucher(res?.data.data.ops[0]);              
+              const vRes: any = await this.GenerateVoucher(res?.data.data.ops[0]);
               if (vRes && vRes.length > 0) {
                 const reqMR = {
                   companyCode: this.storage.companyCode,
@@ -895,7 +918,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                 );
               }
             }
-            else if(headerRequest.mOD === "Credit" ) {           
+            else if(headerRequest.mOD === "Credit" ) {
               // If the branches match, navigate to the DeliveryMrGeneration page
               this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
                 state: {

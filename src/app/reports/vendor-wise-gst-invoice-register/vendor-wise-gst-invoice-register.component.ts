@@ -45,7 +45,18 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
   sacStatus: any;
   stateName: any;
   stateStatus: any;
+  formTitle = "Vendor Wise GST Invoice Register Data"
+  csvFileName: string; // name of the csv file, when data is downloaded
+  source: any[] = []; // Array to hold data
+  loading = true // Loading indicator
+  LoadTable = false;
+  columns = [];
 
+  paging: any;
+  sorting: any;
+  searching: any;
+  columnMenu: any;
+  theme: "MATERIAL"
   constructor(
     private storage: StorageService,
     private masterServices: MasterService,
@@ -59,52 +70,6 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     this.initializeFormControl()
   }
 
-  CSVHeader = {
-    "BILLNO": "BILLNO",
-    "BILLDT": "BILLDT",
-    "DocumentType": "DocumentType",
-    "BILLSTATUS": "BILLSTATUS",
-    "BillGenState": "Bill Gen State",
-    "BillBanch": "Bill Banch",
-    "Generation_GSTNO": "Generation GSTNO",
-    "Party": "Party",
-    "PartyType": "PartyType",
-    "Bill_To_State": "Bill To State",
-    "Party_GSTN": "Party GSTN",
-    "Bill_Sub_At": "Bill Sub At",
-    "BusinessType": "Business Type",
-    "Total_Taxable_Value": "Total Taxable Value",
-    "SAC Code": "SAC Code",
-    "SAC Name": "SAC Name",
-    "TCS_Rate": "TCS Rate",
-    "TCS_Amount": "TCS Amount",
-    "GSTRATE": "GSTRATE",
-    "RCM": "RCM",
-    "IGST": "IGST",
-    "CGST": "CGST",
-    "SGST_UGST": "SGST UGST",
-    "Total_Invoice_Value": "Total Invoice Value",
-    "TDS_Rate": "TDS Rate",
-    "TDS_Amount": "TDS Amount",
-    "TDS Ledger ": "TDS Ledger ",
-    "TDS Section Description ": "TDS Section Description ",
-    "REMARK": "REMARK",
-    "ReceiverName": "Receiver Name",
-    "ApplicableTax": "Applicable Tax",
-    "ECommerceGSTIN": "ECommerce GSTIN",
-    "VENDORBILLDT": "VENDOR BILL DATE",
-    "MANUALBILLNO": "MANUAL BILL NO",
-    "Currency": "Currency",
-    "ExchangeRt": "Exchange Rate",
-    "CurrencyAmt": "Currency Amount",
-    "PayBasis": "PayBasis",
-    "Narration": "Narration",
-    "UserId": "UserId",
-    "GSTExemptionCat": "GST Exemption Category",
-    "IrnNo": "IrnNo",
-    "InvNetValue": "Invoice Net Value",
-  }
-
   ngOnInit(): void {
     const now = moment().endOf('day').toDate();
     const lastweek = moment().add(-10, 'days').startOf('day').toDate()
@@ -113,6 +78,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     this.vendorgstregisTableForm.controls["start"].setValue(lastweek);
     this.vendorgstregisTableForm.controls["end"].setValue(now);
     this.getDropDownList()
+    this.csvFileName = `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`
   }
 
   initializeFormControl() {
@@ -257,11 +223,24 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     try {
       // Get data from the service
       let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(reqBody, docNoArray);
+      console.log(data);
 
       // Filter data based on cancelBill
-      data = cancelBill === 'Cancelled' ? data.filter(x => x.BILLSTATUS !== 'Cancelled') : data;
+      //data = cancelBill === 'Cancelled' ? data.data.filter(x => x.BILLSTATUS !== 'Cancelled') : data.data;
+      this.columns = data.grid.columns;
+      console.log(`colums=${this.columns}`);
 
-      if (data.length === 0) {
+      this.sorting = data.grid.sorting;
+      this.searching = data.grid.searching;
+      this.paging = data.grid.paging;
+
+      this.source = data.data;
+      console.log(`source=${this.source}`);
+      this.LoadTable = true;
+
+      if (data.data.length === 0) {
+        this.LoadTable = false;
+        this.loading = false;
         // Display a message or take appropriate action when no records are found
         if (data) {
           Swal.fire({
@@ -273,9 +252,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
         }
         return;
       }
-
-      // Export the record to Excel
-      this.exportService.exportAsCSV(data, `Vendor_Wise_GST_Invoice_Register_Report-${timeString}`, this.CSVHeader);
+      this.loading = false;
 
     } catch (error) {
       console.error('Error fetching data:', error);

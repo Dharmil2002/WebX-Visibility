@@ -1272,9 +1272,7 @@ export class DocketService {
             "iSSCAN":data?.iSSCAN,
             "nFCHG": nonfreightAmt,
             "rMK":data?.spIns||"",
-            "yIELD": ConvertToNumber(data?.yIELD || 0, 2),
-            "bILLED": "N",
-            "pCOLAMT": ConvertToNumber(data?.totAmt || 0, 2),
+            "yIELD": ConvertToNumber(data?.yIELD || 0, 2)
         };
 
         let invoiceDetails = invoiceData.map((element) => {
@@ -1336,7 +1334,8 @@ export class DocketService {
             sTSNM: DocketFinStatus[DocketFinStatus.Pending],
             sTSTM: new Date(),
             isBILLED: false,
-            bILLNO: "",
+            bILLNO: "",            
+            pBILLAMT: ConvertToNumber(data?.totAmt || 0, 2),
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName,

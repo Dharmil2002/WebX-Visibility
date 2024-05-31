@@ -859,8 +859,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
           if (res.success) {
             if (headerRequest.cLLCTAMT > 0 && headerRequest.mOD !== "Credit" ) {
-              const vRes: any = await this.GenerateVoucher(res?.data.data.ops[0]);
-              console.log(vRes)
+              const vRes: any = await this.GenerateVoucher(res?.data.data.ops[0]);              
               if (vRes && vRes.length > 0) {
                 const reqMR = {
                   companyCode: this.storage.companyCode,
@@ -895,6 +894,14 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                   "Fail To Do Account Posting!"
                 );
               }
+            }
+            else if(headerRequest.mOD === "Credit" ) {           
+              // If the branches match, navigate to the DeliveryMrGeneration page
+              this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
+                state: {
+                  data: res.data.chargeDetails
+                },
+              });
             }
             else {
               this.snackBarUtilityService.ShowCommonSwal(

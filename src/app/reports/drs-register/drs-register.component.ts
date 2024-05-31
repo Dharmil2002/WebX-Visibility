@@ -105,7 +105,6 @@ export class DrsRegisterComponent implements OnInit {
     this.drsregisterTableForm.get('Individual').setValue("Y");
   }
   async save(){
-    debugger
     this.loading = true;
     try {
       this.ReportingBranches = [];

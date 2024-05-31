@@ -236,7 +236,7 @@ export class DepartVehicleComponent implements OnInit {
         this.departvehicleTableForm.controls["License"].setValue(data?.lcNo || "");
         this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehType || "");
         this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehTypeCode || "");
-        this.departvehicleTableForm.controls["Expiry"].setValue(formatDocketDate(data?.lcExpireDate));
+        this.departvehicleTableForm.controls["Expiry"].setValue(data?.lcExpireDate);
         this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(data?.capacityVolCFT || 0);
         this.loadingSheetTableForm.controls['Capacity'].setValue(data?.capacity || 0);
         this.loadingSheetTableForm.controls['LoadedKg'].setValue(data?.capacity || 0);
@@ -273,13 +273,13 @@ export class DepartVehicleComponent implements OnInit {
         // this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
         // this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
         // this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
-        this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
-        this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
-        this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
+       // this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
+        //this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
+        ///this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
         this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
-        this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
-        this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
-        this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
+       // this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
+        //this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
+       // this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
         this.balanceTableForm.controls['balAmtAt'].setValue({name:thcData?.bLPAYAT||"",value:thcData?.bLPAYAT ||""});
         this.balanceTableForm.controls['advPdAt'].setValue({name:thcData?.aDPAYAT||"",value:thcData?.aDPAYAT ||""});
         if(thcData.cHG && thcData.cHG.length>0){
@@ -457,7 +457,6 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
-
     this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
     const loadingArray = [this.loadingSheetTableForm.value];
@@ -601,6 +600,7 @@ export class DepartVehicleComponent implements OnInit {
     const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,cHATY:"Charges","cHAPP":{D$in:["THC"] },isActive:true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
+      debugger
       const invoiceList = [];
       result.forEach((element, index) => {
         if (element) {
@@ -629,7 +629,15 @@ export class DepartVehicleComponent implements OnInit {
         }
       });
       const chargeControl = [...invoiceList, ...this.advanceControlArray]
-      this.advanceControlArray = chargeControl;
+      this.advanceControlArray = chargeControl.sort((a, b) => {
+        // First, ensure "contAmt" always comes first
+        if (a.name === "ContractAmt") return -1;
+        if (b.name === "ContractAmt") return 1;
+        if (a.additionalData  && a.additionalData.metaData === '+') return -1;
+        if (a.additionalData && a.additionalData.metaData === '-') return 1;
+      
+        return 0;
+      });
       this.advanceTableForm = formGroupBuilder(this.fb, [chargeControl]);
     }
   }
@@ -665,7 +673,16 @@ export class DepartVehicleComponent implements OnInit {
         }
       });
       const chargeControl = [...invoiceList, ...this.advanceControlArray]
-      this.advanceControlArray = chargeControl;
+      this.advanceControlArray = chargeControl.sort((a, b) => {
+        // First, ensure "contAmt" always comes first
+        if (a.name === "ContractAmt") return -1;
+        if (b.name === "ContractAmt") return 1;
+        if (a.oPS  && a.additionalData.oPS === '+') return -1;
+        if (a.oPS && a.additionalData.oPS === '-') return 1;
+      
+        return 0;
+      });
+     // this.advanceControlArray = chargeControl;
       this.advanceTableForm= formGroupBuilder(this.fb, [chargeControl]);
       this.advanceTableForm.controls['ContractAmt'].setValue(thcData?.cONTAMT || 0);
       this.advanceTableForm.controls['TotalTripAmt'].setValue(thcData?.tOTAMT || 0);
@@ -689,6 +706,7 @@ export class DepartVehicleComponent implements OnInit {
     }, 0);
     const totalAmt = ConvertToNumber(total, 2) + ConvertToNumber(this.advanceTableForm.controls["ContractAmt"].value, 2);
     this.advanceTableForm.controls['TotalTripAmt'].setValue(totalAmt);
+    this.onCalculateTotal();
     // Now set this calculated percentageValue to advAmt
   }
   updateTrip() {
@@ -751,7 +769,7 @@ export class DepartVehicleComponent implements OnInit {
    * Fetches loading sheet details from the API and updates the form fields.
    */
   async fetchLoadingSheetDetailFromApi() {
-
+    
     // Fetch loading sheet details
     const loadingSheetDetail = await getLoadingSheetDetail(
       this.companyCode,
@@ -813,7 +831,6 @@ export class DepartVehicleComponent implements OnInit {
     // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm
     // Step 2: Calculate the total advances and set TotalAdv in the balanceTableForm
     calculateTotalAdvances(this.balanceTableForm);
-
     // Step 3: Calculate the balance amount as the difference between TotalAdv and TotalTripAmt,
     // and set it in the BalanceAmount control of the balanceTableForm
     const totalTripAmt = parseFloat(this.advanceTableForm.controls['TotalTripAmt'].value) || 0;

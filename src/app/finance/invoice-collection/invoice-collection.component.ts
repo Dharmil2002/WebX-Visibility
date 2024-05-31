@@ -155,7 +155,6 @@ export class InvoiceCollectionComponent implements OnInit {
 
     this.backPath = "/dashboard/Index?tab=Management​";
 
-    this.initializeFormControl();
   }
   alertForTheZeroAmt() {
     Swal.fire({
@@ -170,7 +169,7 @@ export class InvoiceCollectionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getBilligDetails();
+    this.getBilligDetails()
   }
 
   functionCallHandler($event) {
@@ -184,8 +183,11 @@ export class InvoiceCollectionComponent implements OnInit {
       console.log("failed");
     }
   }
-  initializeFormControl() {
-    this.invocieCollectionFormControls = new InvoiceCollectionControl();
+  initializeFormControl(MinDate) {
+    const RequestData = {
+      MinDate: MinDate
+    }
+    this.invocieCollectionFormControls = new InvoiceCollectionControl(RequestData);
     this.jsonControlArray = this.invocieCollectionFormControls.getCustomerGSTArrayControls();
     //this.CollectionSummaryjsonControlArray = this.invocieCollectionFormControls.getCollectionSummaryArrayControls();
     this.CustomerGSTTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -206,6 +208,8 @@ export class InvoiceCollectionComponent implements OnInit {
     const result = await this.invoiceService.getCollectionInvoiceDetails(this.invoiceDetail?.bILLNO || "");
     this.tableData = result;
     this.tableLoad = false;
+    const MinDate = result[0]?.sUB?.dTM || new Date();
+    this.initializeFormControl(MinDate);
     // this.getDropdown()
   }
   // async getDropdown() {
@@ -555,7 +559,7 @@ export class InvoiceCollectionComponent implements OnInit {
     });
 
     const response = [
-      createVoucher(ledgerInfo['AST002002'].LeadgerCode, ledgerInfo['AST002002'].LeadgerName, ledgerInfo['AST002002'].LeadgerCategory, 0, NetPayable),
+      createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, 0, NetPayable),
     ];
 
     const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;

@@ -34,8 +34,7 @@ interface CurrentAccessListType {
   templateUrl: "./customer-contract-service-selection.component.html",
 })
 export class CustomerContractServiceSelectionComponent
-  extends UnsubscribeOnDestroyAdapter
-  implements OnInit {
+  extends UnsubscribeOnDestroyAdapter {
   companyCode: number | null;
   @Input() contractData: any;
   //#region Form Configration Fields
@@ -85,6 +84,7 @@ export class CustomerContractServiceSelectionComponent
 
   //#endregion
 
+  ProductId: any;
   //#region Table Configration Fields
   isCalledFirstTime = false;
   isLoad: boolean = false;
@@ -253,23 +253,7 @@ export class CustomerContractServiceSelectionComponent
   ) {
     super();
     this.companyCode = this.sessionService.getCompanyCode();
-    this.CurrentAccessList = {
-      ServicesSelectionAccess: [
-        "Volumetric",
-        "ODA",
-        "DACC",
-        "fuelSurcharge",
-        "cutofftime",
-        "COD/DOD",
-        "Demurrage",
-        "DPH",
-        "Insurance",
-        "YieldProtection",
-      ],
-      productAccess: ["loadType", "rateTypeDetails", "rateTypecontrolHandler"], //'originRateOption', 'destinationRateOption'
-    } as CurrentAccessListType;
-    this.initializeFormControl();
-    this.BindDataFromAPI();
+
   }
 
   //#endregion
@@ -347,11 +331,7 @@ export class CustomerContractServiceSelectionComponent
         );
       });
   }
-  //#endregion
-  //#endregion
-  ngOnInit() {
-    this.getAllMastersData();
-  }
+
   async BindDataFromAPI() {
     this.LoadtypedetailFromAPI = await GetGeneralMasterData(
       this.masterService,
@@ -562,13 +542,13 @@ export class CustomerContractServiceSelectionComponent
         this.DisplayInsuranceSection = checked;
         this.onSelectrateTypeProduct(eventRateData);
         break;
-      case "cutofftime":
+      case "CutOffTime":
         this.DisplayCutOfftimeSection = checked;
         break;
       case "YieldProtection":
         this.DisplayYieldProtectionSection = checked;
         break;
-      case "fuelSurcharge":
+      case "FuelSurcharge":
         this.DisplayFuelSurchargeSection = checked;
         this.onSelectrateTypeProduct(eventRateData);
         break;
@@ -751,7 +731,44 @@ export class CustomerContractServiceSelectionComponent
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) { }
+  async ngOnChanges(changes: SimpleChanges) {
+    this.ProductId = changes.contractData?.currentValue?.pID;
+    if (changes.contractData?.currentValue) {
+      const Result = await this.GetProductServicesBasedOnProductCode(this.ProductId);
+      const ServiceList = Result.map((x) => x.ServicesName);
+      this.CurrentAccessList = {
+        ServicesSelectionAccess: ServiceList,
+        // [
+        //   "Volumetric",
+        //   "ODA",
+        //   "DACC",
+        //   "FuelSurcharge",
+        //   "CutOffTime",
+        //   "COD/DOD",
+        //   "Demurrage",
+        //   "DPH",
+        //   "Insurance",
+        //   "YieldProtection",
+        // ],
+        productAccess: ["loadType", "rateTypeDetails", "rateTypecontrolHandler"], //'originRateOption', 'destinationRateOption'
+      } as CurrentAccessListType;
+      this.initializeFormControl();
+      this.BindDataFromAPI();
+      this.getAllMastersData();
+    }
+  }
+  async GetProductServicesBasedOnProductCode(ProductCode) {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { ProductId: ProductCode },
+      collectionName: "product_Services_detail",
+    };
+    const data: any = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+    if (data) {
+      return data.data;
+    }
+    return []
+  }
 
   async SetDefaultProductsData() {
     //#region  Set Default Products
@@ -784,19 +801,21 @@ export class CustomerContractServiceSelectionComponent
 
     //#region  Set Default Service Selection
 
-    this.contractData?.sERVSELEC.forEach((item) => {
-      const event = {
-        field: {
-          name: item,
-        },
-        eventArgs: {
-          checked: true,
-          firstTime: true,
-        },
-      };
-      this.ServicesForm.get(event.field.name).setValue(event.eventArgs.checked);
-      this.OnChangeServiceSelections(event);
-    });
+    if (this.contractData?.sERVSELEC) {
+      this.contractData?.sERVSELEC.forEach((item) => {
+        const event = {
+          field: {
+            name: item,
+          },
+          eventArgs: {
+            checked: true,
+            firstTime: true,
+          },
+        };
+        this.ServicesForm.get(event.field.name).setValue(event.eventArgs.checked);
+        this.OnChangeServiceSelections(event);
+      });
+    }
     //#endregion
 
     //#region  Set Default serviceHandlers
@@ -885,8 +904,8 @@ export class CustomerContractServiceSelectionComponent
         // Your logic for Insurance
         this.SetDefaultInsuranceCarrierRiskSelectionData();
       },
-      cutofftime: () => {
-        // Your logic for cutofftime
+      CutOffTime: () => {
+        // Your logic for CutOffTime
         this.CutOfftimeForm.get("Timeofday").setValue(this.contractData.tDT);
         this.CutOfftimeForm.get("AdditionalTransitdays").setValue(
           this.contractData.dAYS
@@ -917,19 +936,21 @@ export class CustomerContractServiceSelectionComponent
           )
         );
       },
-      fuelSurcharge: () => {
+      FuelSurcharge: () => {
         this.SetDefaultFuelSurchargeData();
       },
     };
 
     // Iterate over selected services and call the corresponding handler
-    this.contractData.sERVSELEC.forEach((service) => {
-      if (serviceHandlers.hasOwnProperty(service)) {
-        serviceHandlers[service]();
-      } else {
-        // Default case
-      }
-    });
+    if (this.contractData.sERVSELEC) {
+      this.contractData.sERVSELEC.forEach((service) => {
+        if (serviceHandlers.hasOwnProperty(service)) {
+          serviceHandlers[service]();
+        } else {
+          // Default case
+        }
+      });
+    }
 
     setTimeout(() => {
       //this.onSelectrateTypeProduct(eventRateData);
@@ -1015,8 +1036,8 @@ export class CustomerContractServiceSelectionComponent
       Insurance: () => {
         // Your logic for Insurance
       },
-      cutofftime: () => {
-        // Your logic for cutofftime
+      CutOffTime: () => {
+        // Your logic for CutOffTime
         if (this.CutOfftimeForm.valid) {
           contractDetails["tDT"] = this.CutOfftimeForm.value.Timeofday;
           contractDetails["dAYS"] = parseInt(
@@ -1057,8 +1078,8 @@ export class CustomerContractServiceSelectionComponent
           hasError = true;
         }
       },
-      fuelSurcharge: () => {
-        // Your logic for fuelSurcharge
+      FuelSurcharge: () => {
+        // Your logic for FuelSurcharge
       },
     };
 
@@ -1094,9 +1115,9 @@ export class CustomerContractServiceSelectionComponent
       // Check if InsuranceCarrierRiskSelectionSave was successful
       if (insuranceDetails) {
         // Call FuelSurchargeDataSave and wait for it to complete
-        const fuelSurchargeDetails = await this.FuelSurchargeDataSave();
+        const FuelSurchargeDetails = await this.FuelSurchargeDataSave();
         // Check if FuelSurchargeDataSave was successful
-        if (fuelSurchargeDetails) {
+        if (FuelSurchargeDetails) {
           // Display success message
           Swal.fire({
             icon: "success",
@@ -1484,7 +1505,7 @@ export class CustomerContractServiceSelectionComponent
           }
 
           break;
-        case "fuelSurcharge":
+        case "FuelSurcharge":
           this.filter.Filter(
             this.jsonControlArrayFuelSurchargeForm,
             this.FuelSurchargeForm,

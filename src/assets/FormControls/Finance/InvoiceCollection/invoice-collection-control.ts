@@ -5,7 +5,7 @@ export class InvoiceCollectionControl {
   CollectionSummaryArray: FormControls[];
   DebitVoucherTaxationPaymentSummaryArray: FormControls[];
   DebitVoucherTaxationPaymentDetailsArray: FormControls[];
-  constructor() {
+  constructor(RequestData: any) {
     this.CustomerGSTArray = [
       {
         name: "customer",
@@ -27,7 +27,8 @@ export class InvoiceCollectionControl {
         disable: false,
         Validations: [],
         additionalData: {
-          minDate: new Date(),
+          minDate: RequestData?.MinDate || new Date(),
+          maxDate: new Date(),
         },
       },
       // {
@@ -279,7 +280,8 @@ export class InvoiceCollectionControl {
         disable: false,
         Validations: [],
         additionalData: {
-          minDate: new Date(),
+          minDate: RequestData?.MinDate || new Date(),
+          maxDate: new Date(),
         },
       },
 

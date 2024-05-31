@@ -454,13 +454,14 @@ export class ConsignmentLtl extends BaseControl {
         name: "consignorName",
         label: "Consignor Name",
         placeholder: "Consignor Name & Code",
+        displayIndex: 1,
         type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: false,        
         Validations: [
           {
             name: "required",
@@ -472,7 +473,7 @@ export class ConsignmentLtl extends BaseControl {
         functions: {
           onModel: "getCustomer",
           onOptionSelect: "getConsignor",
-          onChange: "GetWalkingAutofill",
+          onChange: "GetWalkingAutofill"         
         },
         additionalData: {
           showNameAndValue: true,
@@ -483,6 +484,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "ccontactNumber",
         label: "Contact Number",
         placeholder: "Contact Number",
+        displayIndex: 2,
         type: "mobile-number",
         value: "",
         Validations: [
@@ -501,6 +503,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "calternateContactNo",
         label: "Alternate Contact No",
         placeholder: "Alternate Contact No",
+        displayIndex: 3,
         type: "mobile-number",
         value: "",
         Validations: [],
@@ -514,6 +517,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "cnoAddress",
         label: "Consignor Address",
         placeholder: "Consignor Address",
+        displayIndex: 4,
         type: "dropdown",
         value: "",
         filterOptions: "",
@@ -536,6 +540,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "cnogst",
         label: "Consignor GST Number",
         placeholder: "Consignor GST Number",
+        displayIndex: 5,
         type: "text",
         value: "",
         generatecontrol: true,
@@ -544,7 +549,7 @@ export class ConsignmentLtl extends BaseControl {
           {
             name: "pattern",
             pattern:
-              "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
+              "^([0-3][0-8]|97|99)[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
             message:
               "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2",
           },
@@ -553,7 +558,9 @@ export class ConsignmentLtl extends BaseControl {
             message: "Consignor GST Number is required",
           },
         ],
-        functions: {},
+        functions: {
+          onChange: "GetWalkingAutofill"
+        },
         additionalData: {
           metaData: "consignor",
         },
@@ -562,6 +569,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "consigneeName",
         label: "Consignee Name",
         placeholder: "Consignee Name",
+        displayIndex: 1,
         type: "dropdown",
         value: "",
         filterOptions: "",
@@ -580,7 +588,7 @@ export class ConsignmentLtl extends BaseControl {
         functions: {
           onModel: "getCustomer",
           onOptionSelect: "getConsignee",
-          onChange: "GetWalkingAutofill",
+          onChange: "GetWalkingAutofill"
         },
         additionalData: {
           showNameAndValue: true,
@@ -591,6 +599,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "cncontactNumber",
         label: "Contact Number",
         placeholder: "Contact Number",
+        displayIndex: 2,
         type: "mobile-number",
         value: "",
         Validations: [
@@ -609,6 +618,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "cnalternateContactNo",
         label: "Alternate Contact No",
         placeholder: "Alternate Contact No",
+        displayIndex: 3,
         type: "mobile-number",
         value: "",
         Validations: [],
@@ -622,6 +632,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "cneAddress",
         label: "Consignee Address",
         placeholder: "Consignee Address",
+        displayIndex: 4,
         type: "dropdown",
         value: "",
         filterOptions: "",
@@ -644,6 +655,7 @@ export class ConsignmentLtl extends BaseControl {
         name: "cnegst",
         label: "Consignee GST Number",
         placeholder: "Consignee GST Number",
+        displayIndex: 5,
         type: "text",
         value: "",
         generatecontrol: true,
@@ -652,7 +664,7 @@ export class ConsignmentLtl extends BaseControl {
           {
             name: "pattern",
             pattern:
-              "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
+              "^([0-3][0-8]|97|99)[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
             message:
               "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2",
           },
@@ -661,7 +673,9 @@ export class ConsignmentLtl extends BaseControl {
             message: "Consignee GST Number",
           },
         ],
-        functions: {},
+        functions: {
+          onChange: "GetWalkingAutofill"
+        },
         additionalData: {
           metaData: "consignee",
         },

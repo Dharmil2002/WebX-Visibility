@@ -120,3 +120,48 @@ export const UploadFieldType = {
     Derived: 'DERIVED',
     Key: 'KEY',
 }
+
+export const RateTypeCalculation = [
+{
+    "codeId": "RTTYP-0004",
+    "codeDesc": "% of Freight",
+    "cD": "",
+    "calculationRatio": 100
+},
+{
+    "codeId": "RTTYP-0005",
+    "codeDesc": "Per Kg",
+    "calculationRatio": 1000,
+    "cD": "kg",
+},
+{
+    "codeId": "RTTYP-0003",
+    "codeDesc": "Per Km",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0006",
+    "codeDesc": "Per Pkg",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0001",
+    "codeDesc": "Flat",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0002",
+    "codeDesc": "Per Ton",
+    "calculationRatio": 1,
+    "cD": "kg",
+},
+{
+    "codeId": "RTTYP-0007",
+    "codeDesc": "Per Container",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0008",
+    "codeDesc": "Per Litre",
+    "calculationRatio": 1000
+}]

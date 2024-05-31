@@ -59,9 +59,10 @@
     </app-generic-table-v2>
     <div *ngIf="NonFreightLoaded">
         <form [formGroup]="NonFreightTableForm">
-            <app-form-webxpress [form]="NonFreightTableForm" [FormTitle]="'Non Freight Details'"
+            <app-form-webxpress [form]="NonFreightTableForm" [FormTitle]="'Service Charges & Other Details'"
                 [formData]="NonFreightjsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
-                [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+                [showSaveAndCancelButton]="false" [MatButton]="MatButton"
+                (callFunction)="functionCallHandler($event)">
             </app-form-webxpress>
         </form>
     </div>
@@ -69,8 +70,13 @@
         <form [formGroup]="freightForm">
             <app-form-webxpress [form]="freightForm" [FormTitle]="'Freight Details'" [formData]="freightControlArray"
                 (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                [addNewTitle]="addNewTitle" [DisplayAddNewButton]=true [MatButton]="MatButton"
-                (AddNewButtonEvent)="ViewCharge()" (callFunction)="functionCallHandler($event)">
+                [addNewTitle]="addNewTitle" [DisplayAddNewButton]=true (AddNewButtonEvent)="ViewCharge()"                 
+                (callFunction)="functionCallHandler($event)"
+                [MatButton]="(this.consignmentForm.value?.docketDate &&
+                this.consignmentForm.value?.toCity &&
+                this.consignmentForm.value?.payType &&
+                this.consignmentForm.value?.transMode && 
+                this.contract?.cONID) ? InvokeContractButton : ''">
             </app-form-webxpress>
         </form>
     </div>
@@ -85,12 +91,12 @@
                 <button class="msr-3" mat-raised-button color="primary" (click)="save()" [disabled]="isSubmit">Generate
                     Docket</button>
                 <button class="msr-3" mat-raised-button color="primary">Back</button>
-                <button class="msr-3" [disabled]="
+                <!-- <button class="msr-3" [disabled]="
                     !this.consignmentForm.value?.docketDate ||
                     !this.consignmentForm.value?.toCity ||
                     !this.consignmentForm.value?.payType ||
                     !this.consignmentForm.value?.transMode" (click)="InvockedContract()" mat-raised-button
-                    color="primary">Calculate Freight</button>
+                    color="primary">Calculate Freight</button> -->
             </div>
         </div>
     </div>

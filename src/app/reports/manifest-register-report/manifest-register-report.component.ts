@@ -120,7 +120,6 @@ export class ManifestRegisterReportComponent implements OnInit {
   }
 
   async save() {
-    debugger
     this.loading = true;
     try {
       this.ReportingBranches = [];

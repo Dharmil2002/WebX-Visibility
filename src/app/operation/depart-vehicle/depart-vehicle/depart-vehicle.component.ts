@@ -30,6 +30,7 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import moment from "moment";
 
 
 @Component({
@@ -227,6 +228,7 @@ export class DepartVehicleComponent implements OnInit {
         firstValueFrom(this._operationService.operationMongoPost("generic/getOne", reqVeh)),
         this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
       ]);
+       const data=thcDetails;
       if (Object.keys(res.data).length > 0) {
         const { data } = res;
         this.departvehicleTableForm.controls["VendorType"].setValue(data?.vendorType || "");
@@ -239,8 +241,8 @@ export class DepartVehicleComponent implements OnInit {
         this.departvehicleTableForm.controls["Expiry"].setValue(data?.lcExpireDate);
         this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(data?.capacityVolCFT || 0);
         this.loadingSheetTableForm.controls['Capacity'].setValue(data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedKg'].setValue(data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(data?.capacityVolCFT || 0);
+        this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED.wT || 0);
+        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED.vOL || 0);
 
       }
       if (Object.keys(resVeh.data).length > 0) {
@@ -267,7 +269,6 @@ export class DepartVehicleComponent implements OnInit {
         this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(thcData?.lOADED.vOL || 0);
         this.loadingSheetTableForm.controls['WeightUtilization'].setValue(thcData?.uTI.wT || 0);
         this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(thcData?.uTI.vOL || 0);
-
         // this.advanceTableForm.controls['OtherChrge'].setValue(thcData?.cHG.oAMT || 0);
         // this.advanceTableForm.controls['Loading'].setValue(thcData?.cHG.lOADING || 0);
         // this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
@@ -282,6 +283,8 @@ export class DepartVehicleComponent implements OnInit {
        // this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
         this.balanceTableForm.controls['balAmtAt'].setValue({name:thcData?.bLPAYAT||"",value:thcData?.bLPAYAT ||""});
         this.balanceTableForm.controls['advPdAt'].setValue({name:thcData?.aDPAYAT||"",value:thcData?.aDPAYAT ||""});
+        const Expected = moment(this.tripData.ExpectedDate).format("DD MMM YY HH:MM");
+        this.loadingSheetTableForm.controls['Expected'].setValue(Expected);
         if(thcData.cHG && thcData.cHG.length>0){
           this.getAutoFillCharges(thcData.cHG,thcData);
         }
@@ -600,7 +603,7 @@ export class DepartVehicleComponent implements OnInit {
     const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,cHATY:"Charges","cHAPP":{D$in:["THC"] },isActive:true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
-      debugger
+      
       const invoiceList = [];
       result.forEach((element, index) => {
         if (element) {

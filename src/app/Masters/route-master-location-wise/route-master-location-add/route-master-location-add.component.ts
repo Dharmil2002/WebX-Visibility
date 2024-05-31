@@ -289,6 +289,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     // Set tableLoad to true after the delay, indicating data processing is complete
     this.tableLoad = true;
     // Fetch all master data
+    this.calRouteKm();
     this.getAllMastersData();
   }
   //#endregion
@@ -345,6 +346,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       // Filter the tableData to exclude the specified Srno
       this.tableData = this.tableData.filter((x) => x.loccd !== data.data.loccd);
     }
+    this.calRouteKm();
   }
   //#endregion
 

@@ -328,7 +328,7 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
 
-  async LedgerBind() {
+  async LedgerBind() { 
     const Body = {
       companyCode: this.storage.companyCode,
       collectionName: "account_detail",
@@ -424,7 +424,7 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTDetDataRequestModel.nTNO ="";
         this.DNTDetDataRequestModel.nTDT = new Date();
         this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
-        this.DNTDetDataRequestModel.bGNDT = "";
+        this.DNTDetDataRequestModel.bGNDT = this.dNoteData[0].bDT;
         this.DNTDetDataRequestModel.pARTY = {
           cD: this.dNoteData[0].vND.cD,
           nM: this.dNoteData[0].vND.nM,

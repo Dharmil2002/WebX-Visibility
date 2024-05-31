@@ -99,7 +99,7 @@ export class ProductShardControls {
 
       {
         name: "ChargesBooktype",
-        label: "",
+        label: "Book Type Charges :",
         placeholder: "",
         type: "radiobutton",
         value: [

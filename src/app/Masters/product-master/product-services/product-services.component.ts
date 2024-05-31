@@ -15,33 +15,7 @@ import { StorageService } from "src/app/core/service/storage.service";
   templateUrl: "./product-services.component.html",
 })
 export class ProductServicesComponent implements OnInit {
-  TableData = [
-    {
-      chargesName: "COD/DOD",
-      chargesType: "Express,Rail",
-      add: "+",
-    },
-    {
-      chargesName: "DACC",
-      chargesType: "Express",
-      add: "+",
-    },
-    {
-      chargesName: "ODA",
-      chargesType: "Express",
-      add: "+",
-    },
-    {
-      chargesName: "Insurance",
-      chargesType: "ALL",
-      add: "+",
-    },
-    {
-      chargesName: "Demurrage",
-      chargesType: "Express,Rail,Air",
-      add: "",
-    },
-  ];
+  TableData = [  ];
   ProductId: any;
   ProductName: any;
   tableTab = false;
@@ -224,7 +198,7 @@ export class ProductServicesComponent implements OnInit {
       Swal.fire({
         icon: "success",
         title: "Successful",
-        text: "!Product add Successful",
+        text: "Services added Successful",
         showConfirmButton: true,
       });
     } else {
@@ -256,26 +230,6 @@ export class ProductServicesComponent implements OnInit {
     }
   }
 
-  async handleServicesCode(event) {
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "product_Services_detail",
-      filter: { ServicesCode: this.customerTableForm.value.ServicesCode },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
-    if (res.success && res.data.length != 0) {
-      this.customerTableForm.controls.ServicesCode.setValue("");
-      Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Services Code exist",
-        showConfirmButton: true,
-      });
-    }
-  }
-
   async handleServicesName() {
     const req = {
       companyCode: this.companyCode,
@@ -293,9 +247,11 @@ export class ProductServicesComponent implements OnInit {
       Swal.fire({
         icon: "info",
         title: "info",
-        text: "Services Name exist",
+        text: "Please Select Other Services These Services Already Used",
         showConfirmButton: true,
       });
+    }else {
+      this.customerTableForm.controls.ServicesCode.setValue(this.customerTableForm.value.ServicesName.value);
     }
   }
 }

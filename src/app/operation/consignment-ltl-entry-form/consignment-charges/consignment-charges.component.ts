@@ -15,14 +15,17 @@ export class ConsignmentChargesComponent implements OnInit {
   chargeForm: UntypedFormGroup;
   chargeControls: FormControls[];
   chargeData:any;
+  contract: any;
   isEdit:boolean=false;
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
+    //@Inject(MAT_DIALOG_DATA) public cont: any,
     private fb: UntypedFormBuilder,
     private thcService:ThcService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog
   ) {
+    //this.contract = cont;
     if (item.length>0) {
        this.chargeData = item;
        this.isEdit=true;
@@ -84,7 +87,7 @@ export class ConsignmentChargesComponent implements OnInit {
               const invoice: InvoiceModel = {
                 id: index + 1,
                 name: element.cHGID || '',
-                label: `${element.cHGNM}(${element.oPS})`,
+                label: `${element.cHGNM} (${element.oPS})`,
                 placeholder:element.cHGNM || '',
                 type: 'text',
                 value:`${Math.abs(element.aMT)}`,
@@ -135,7 +138,8 @@ export class ConsignmentChargesComponent implements OnInit {
           cHGID: element.name,
           cHGNM: element.placeholder,
           aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.chargeForm.controls[element.name].value || 0) : (this.chargeForm.controls[element.name].value || 0),
-          oPS:element?.additionalData.metaData||"",
+          oPS:element?.additionalData.metaData || "+",
+          tY: "nFC"
         }
         charges.push(json);
       });

@@ -28,46 +28,7 @@ export class DocketService {
     }
     vehicleDetail: any;
     docCalledAs: DocCalledAsModel;
-    RateTypeCalculation = [{
-        "codeId": "RTTYP-0004",
-        "codeDesc": "% of Freight",
-        "calculationRatio": 1000
-    },
-    {
-        "codeId": "RTTYP-0005",
-        "codeDesc": "Per Kg",
-        "calculationRatio": 1000
-    },
-    {
-        "codeId": "RTTYP-0003",
-        "codeDesc": "Per Km",
-        "calculationRatio": 1000
-    },
-    {
-        "codeId": "RTTYP-0006",
-        "codeDesc": "Per Pkg",
-        "calculationRatio": 1000
-    },
-    {
-        "codeId": "RTTYP-0001",
-        "codeDesc": "Flat",
-        "calculationRatio": 1000
-    },
-    {
-        "codeId": "RTTYP-0002",
-        "codeDesc": "Per Ton",
-        "calculationRatio": 1
-    },
-    {
-        "codeId": "RTTYP-0007",
-        "codeDesc": "Per Container",
-        "calculationRatio": 1
-    },
-    {
-        "codeId": "RTTYP-0008",
-        "codeDesc": "Per Litre",
-        "calculationRatio": 1000
-    }]
+    
     // Define a mapping object
     statusMapping = {
         default: {
@@ -603,7 +564,7 @@ export class DocketService {
                 // Fetch pincode data from the masterService asynchronously
                 const dResponse = await firstValueFrom(this.operation.operationMongoPost("generic/get", cityBody));
 
-                // Extract the cityCodeData from the response 
+                // Extract the cityCodeData from the response
                 /*here i return one more field other then name value beacuase it  used in Job entry Module*/
                 const codeData = dResponse.data.map((x) => { return { name: x.docNo, value: x.docNo, docketData: x } });
 
@@ -929,6 +890,7 @@ export class DocketService {
                 "mTNM": element?.Invoice_Product || "",
                 "hSN": element?.HSN_CODE || "",
                 "hSNNM": element?.HSN_CODE || "",
+                "pKGTYP":element?.pkgsTypeInv || "",
                 "eWBNO": data?.ewbNo || "",
                 "eWBDT": ConvertToDate(element?.ewbDate),
                 "eXPDT": ConvertToDate(data?.ewbExprired),
@@ -1194,7 +1156,7 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
+    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
         let nonfreightAmt={};
         if (nonfreight) {
           Object.keys(nonfreight).forEach((key) => {
@@ -1211,6 +1173,7 @@ export class DocketService {
             "dKTNO": data?.docketNumber || "",
             "pRQNO": data?.prqNo?.value || "",
             "dKTDT": ConvertToDate(data?.docketDate),
+            "eDDDT": ConvertToDate(data?.eddDate),
             "pAYTYP": data?.payType || "",
             "pAYTYPNM": data?.payTypeName || "",
             "bPARTY": data?.billingParty.value || "",
@@ -1227,9 +1190,10 @@ export class DocketService {
             "tAREA": data?.toCity?.clusterName || "",
             "tAREACD": data?.toCity?.clusterId || "",
             "vEHNO": data?.vehNo?.value || (data?.vehNo || ""),
-            "pKGS": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.noOfPackage, 0)) : 0,
-            "aCTWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.actualWeight, 0)) : 0,
-            "cHRWT": invoiceData.length > 0 ? parseFloat(invoiceData.reduce((c, a) => c + a.chargedWeight, 0)) : 0,
+            "pKGS": chargeBase.Packages || 0,
+            "aCTWT": chargeBase.ActualWeight || 0,
+            "cHRWT": chargeBase.ChargedWeight || 0,
+            "cHPKGS": chargeBase.ChargePackage || 0,
             "iSCOM": true,
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
@@ -1284,13 +1248,14 @@ export class DocketService {
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
+            "pVTMARK" : data?.pvtMark || "",
             "wLCN": data?.cnWinCsgn || false,
             "wLCNE": data?.cnWinCsgne || false,
             "iSCEBP": data?.cnebp || false,
             "iSCNBP": data?.cnbp || false,
             "dELTYPE": data?.delivery_type || "",
             "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
-            "iNVTOT": ConvertToNumber(data?.totAmt || 0, 2),
+            "iNVTOT": ConvertToNumber(chargeBase?.InvoiceAmount || 0, 2),
             "pARTQTY": parseInt(data?.totalPartQuantity || 0),
             "tRNMOD": data?.transMode || "",//check value transMode
             "tRNMODNM": data?.transModeName || "",//check value transMode
@@ -1306,7 +1271,8 @@ export class DocketService {
             "cONTRACT": data?.contract || "",
             "iSSCAN":data?.iSSCAN,
             "nFCHG": nonfreightAmt,
-            "rMK":data?.spIns||""
+            "rMK":data?.spIns||"",
+            "yIELD": ConvertToNumber(data?.yIELD || 0, 2)
         };
 
         let invoiceDetails = invoiceData.map((element) => {
@@ -1331,6 +1297,8 @@ export class DocketService {
                 "cURR": "INR",
                 "cUBWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "mATDN": element?.materialDensity || "",
+                "pKGTY":element?.pkgsTypeInv || "",
+                "pKGTYN":element?.pkgsTypeInvNM || "",
                 "pKGS": parseInt(element?.noOfPackage || 0),
                 "cFTWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),
@@ -1360,14 +1328,14 @@ export class DocketService {
             rCM: data.rcm,
             gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
             gSTCHAMT: ConvertToNumber(data?.gstChargedAmount || 0, 2),
-            cHG: otherData ? otherData.otherCharges : '',
-            nFCHG: 0,
-            tOTAMT: ConvertToNumber(docketField['iNVTOT'] || 0, 2),
+            cHG: otherData ? otherData.otherCharges : '',            
+            tOTAMT: ConvertToNumber(data?.totAmt || 0, 2),
             sTS: DocketFinStatus.Pending,
             sTSNM: DocketFinStatus[DocketFinStatus.Pending],
             sTSTM: new Date(),
             isBILLED: false,
-            bILLNO: "",
+            bILLNO: "",            
+            pBILLAMT: ConvertToNumber(data?.totAmt || 0, 2),
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName,

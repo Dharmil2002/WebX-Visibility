@@ -163,23 +163,7 @@ export class AddProductComponent implements OnInit {
     }
   }
 
-  async handleProductId() {
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "product_detail",
-      filter:{ProductID:this.customerTableForm.value.ProductID}
-    };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-      if(res.success && res.data.length != 0){
-        this.customerTableForm.controls.ProductID.setValue("");
-        Swal.fire({
-          icon: "info",
-          title: "info",
-          text: "Product Id exist",
-          showConfirmButton: true,
-        });
-      }
+  async handleProductId(event) {
+    this.customerTableForm.get('ProductID').setValue(event.eventArgs.option.value.value)
   }
 }

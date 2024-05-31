@@ -327,8 +327,9 @@ export enum VoucherInstanceType {
   DeliveryMR = 10,
   VendorBillPayment = 11,
   THCArrival = 12,
-  CreditNoteApproval=13,
-  DebitNoteApproval=14
+  CreditNoteApproval = 13,
+  DebitNoteApproval = 14,
+  VendorOpeningBalance = 15,
 }
 
 export const ledgerInfo = {
@@ -354,6 +355,7 @@ export const ledgerInfo = {
   "AST006002": GetLeadgerInfoFromLocalStorage("AST006002"),
   "INC001015": GetLeadgerInfoFromLocalStorage("INC001015"),
   "INC001009": GetLeadgerInfoFromLocalStorage("INC001009"),
+  "LIA001001": GetLeadgerInfoFromLocalStorage("LIA001001"),
   "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
   "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
   "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),

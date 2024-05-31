@@ -82,6 +82,7 @@ export class ProductChargesComponent implements OnInit {
   ProductId: any;
   ProductName: any;
   jsonControlArray: any[];
+  AlljsonControlArray: any[];
   customerTableForm: any;
   SelectChargesCode: string;
   SelectChargesStatus: any;
@@ -113,14 +114,15 @@ export class ProductChargesComponent implements OnInit {
   HendelFormFunction() {
     this.initializeFormControl();
     this.bindDropdown();
-    this.ChargesListDropdown();
     this.getChargeApplicable();
+    this.SetVariability();
   }
   initializeFormControl() {
     const customerFormControls = new ProductControls(this.isUpdate);
     this.jsonControlArray = customerFormControls.getChargesControlsArray(
       this.isUpdate
     );
+    this.AlljsonControlArray = this.jsonControlArray;
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.customerTableForm.controls["Add_Deduct"].setValue(
@@ -150,6 +152,15 @@ export class ProductChargesComponent implements OnInit {
       this.customerTableForm.controls["iSChargeMandatory"].setValue(
         this.UpdatedData.iSREQ
       );
+      if (this.UpdatedData.vAR == "N") {
+        this.jsonControlArray = this.jsonControlArray.filter(
+          (x) => x.name !== "VariabilityOn" && x.name !== "VariabilityOnHandler"
+        );
+      }
+    } else {
+      this.jsonControlArray = this.jsonControlArray.filter(
+        (x) => x.name !== "VariabilityOn" && x.name !== "VariabilityOnHandler"
+      );
     }
   }
   bindDropdown() {
@@ -158,6 +169,7 @@ export class ProductChargesComponent implements OnInit {
         // Set category-related variables
         this.SelectChargesCode = data.name;
         this.SelectChargesStatus = data.additionalData.showNameAndValue;
+        this.ChargesListDropdown();
       }
       if (data.name === "ChargesBehaviour") {
         // Set category-related variables
@@ -286,7 +298,7 @@ export class ProductChargesComponent implements OnInit {
 
     const Res = await firstValueFrom(this.masterService
       .masterPost("generic/get", req));
-  
+
     if (Res?.success) {
       this.tableData = Res?.data.map((x, index) => {
         return {
@@ -314,6 +326,9 @@ export class ProductChargesComponent implements OnInit {
       cHAPP: this.customerTableForm.value.chargeApplicableHandler.map(
         (x) => x.value
       ),
+      cRGVB: this.customerTableForm.value.Variability == "Y" ? this.customerTableForm.value.VariabilityOnHandler.map(
+        (x) => x.value
+      ) : [],
       cAPTION: this.customerTableForm.value.cAPTION,
       iSREQ: this.customerTableForm.value.iSChargeMandatory,
       isActive: this.customerTableForm.value.isActive,
@@ -338,7 +353,7 @@ export class ProductChargesComponent implements OnInit {
     const req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
-      filter: this.isUpdate ? { cHACD:this.customerTableForm.value.ChargesCode,cHATY:this.selectedValue} : undefined,
+      filter: this.isUpdate ? { cHACD: this.customerTableForm.value.ChargesCode, cHATY: this.selectedValue } : undefined,
       update: this.isUpdate ? Body : undefined,
       data: this.isUpdate ? undefined : Body,
     };
@@ -409,31 +424,6 @@ export class ProductChargesComponent implements OnInit {
     this.Tabletab = !this.Tabletab;
   }
 
-  async handleChargesCode(event) {
-    if (this.isUpdate) {
-      if (this.customerTableForm.value.ChargesCode == this.UpdatedData.cHACD) {
-        return;
-      }
-    }
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "product_charges_detail",
-      filter: { cHACD: this.customerTableForm.value.ChargesCode },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
-    if (res.success && res.data.length != 0) {
-      this.customerTableForm.controls.ChargesCode.setValue("");
-      Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Charges Code exist",
-        showConfirmButton: true,
-      });
-    }
-  }
-
   async handleSelectCharges() {
     if (this.isUpdate) {
       this.customerTableForm.controls["ChargesCode"].setValue(
@@ -445,10 +435,6 @@ export class ProductChargesComponent implements OnInit {
       ) {
         return;
       }
-    } else {
-      this.customerTableForm.controls["ChargesCode"].setValue(
-        this.customerTableForm.value.SelectCharges.value
-      );
     }
 
     const req = {
@@ -468,9 +454,13 @@ export class ProductChargesComponent implements OnInit {
       Swal.fire({
         icon: "info",
         title: "info",
-        text: "Select Charges exist",
+        text: "Please Select Other Charges These Charges Already Used",
         showConfirmButton: true,
       });
+    } else {
+      this.customerTableForm.controls["ChargesCode"].setValue(
+        this.customerTableForm.value.SelectCharges.value
+      );
     }
   }
   //#region to get and set Charge Applicable list
@@ -520,4 +510,43 @@ export class ProductChargesComponent implements OnInit {
       });
   }
   //#endregion
+
+  OnChangeVariability(event) {
+    if (event.eventArgs.value == "Y") {
+      // Display VariabilityOn field
+      this.jsonControlArray = this.AlljsonControlArray;
+      this.SetVariability()
+    }
+    else {
+      // Hide VariabilityOn field
+      this.jsonControlArray = this.jsonControlArray.filter(
+        (x) => x.name !== "VariabilityOn" && x.name !== "VariabilityOnHandler"
+      );
+    }
+  }
+  //#region to get and set Charge Applicable list
+  SetVariability() {
+    const Variabilitylist = [
+      { name: "Delivery Location Wise", value: "DL" },
+      { name: "Vehicle Capacity Wise", value: "VCW" },
+    ];
+
+    if (this.isUpdate && this.UpdatedData?.cRGVB) {
+      const updatedValue = this.UpdatedData.cRGVB;
+      const selectedChargeApplicables = Variabilitylist.filter((x) =>
+        updatedValue.includes(x.value)
+      );
+      this.customerTableForm.controls["VariabilityOnHandler"].patchValue(
+        selectedChargeApplicables
+      );
+    }
+
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.customerTableForm,
+      Variabilitylist,
+      "VariabilityOn",
+      false
+    );
+  }
 }

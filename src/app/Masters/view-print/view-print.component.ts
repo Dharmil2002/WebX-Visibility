@@ -205,7 +205,7 @@ export class ViewPrintComponent implements OnInit {
       {
         name: "Voucher View-Print",
         partyCode: "CUST00029",
-        viewName: "Voucher",
+        viewName: "VoucherV2",
       },
       {
         name: "DRS View-Print",

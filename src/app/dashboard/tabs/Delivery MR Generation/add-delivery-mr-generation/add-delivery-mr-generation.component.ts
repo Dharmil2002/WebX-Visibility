@@ -28,6 +28,8 @@ import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
+import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
+import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -91,6 +93,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   TotalDiffrentAmount: number = 0;
   isInterBranchControl: boolean = false;
   checkboxChecked: boolean = true; // Checkbox is checked by default
+  paymentMode: AutoComplete[];
 
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
@@ -120,6 +123,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeDeliveryMrFormControls();
+    this.getGeneralmasterData();
   }
   //#region to call handler function
   functionCallHandler($event) {
@@ -132,6 +136,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
   }
   //#endregion
+
   //#region to initializes the form controls for the Delivery MR table.
   async initializeDeliveryMrFormControls() {
     // Create an instance of the DeliveryMrGeneration class to generate form controls.
@@ -160,15 +165,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     await this.GetGSTRate();
     await this.getAccountingRules();
     this.OnChangeCheckBox({event:{event:{checked: true}}});
+    this.PaymentSummaryFilterForm.controls.PaymentMode.setValue("Cash");
+    this.OnPaymentModeChange(event);
   }
   //#endregion
 
-  //#region
-  // async getGeneralmasterData() {
-  //   const paymentType: AutoComplete[] =
-  //   await this.generalService.getGeneralMasterData("PAYMOD");
-  //   this.setGeneralMasterData(this.allFormGrop, carrierType, "cARTYP");
-  // }
+  //#region getGeneralmasterData for PAYMOD
+  async getGeneralmasterData() {
+    const generalData = await this.generalService.getGeneralMasterData("PAYMOD");
+    this.paymentMode = generalData.filter(f => f.type == "PAYMOD");
+    setGeneralMasterData(this.AlljsonControlPaymentSummaryFilterArray, this.paymentMode, "PaymentMode");
+  }
   //#endregion
 
   //#region to validate docket number
@@ -200,6 +207,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       // Handle error gracefully, maybe show an error message to the user
     }
   }
+  //#endregion
+
+  //#region SetDocketsDetails
   async SetDocketsDetails(data) {
     this.deliveryMrTableForm.get('PayBasis').setValue(data.pAYTYPNM);
     this.deliveryMrTableForm.get('Consignor').setValue(`${data.cSGN.cD}:${data.cSGN.nM}`);
@@ -220,6 +230,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
     await this.fetchAndProcessCharges("DeliveryMR", data.tRNMOD);
   }
+  //#endregion
+
+  //#region GetBookingTimeCharges
   async GetBookingTimeCharges() {
 
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
@@ -270,7 +283,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
     }
   }
+  //#endregion
 
+  //#region SetBookingTimeCharges & generateCharges
   async SetBookingTimeCharges(chargesList) {
 
     const generateCharges = (charge) => {
@@ -313,6 +328,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     return combinedCharges;
   }
+  //#endregion
+
+  //#region SetExtraBookingTimeCharges
   async SetExtraBookingTimeCharges() {
     this.bookingChargeList.forEach(charge => {
       if (this.DocketFinDetails.cHG && this.DocketFinDetails.cHG.length > 0) {
@@ -328,7 +346,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
     });
   }
+  //#endregion
 
+  //#region Fetch and Process Charges
   private async fetchAndProcessCharges(ChargeName, ProductCode) {
     this.chargeList = await this.thcService.getCharges({
       "cHAPP": { 'D$eq': ChargeName },
@@ -377,7 +397,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.OnChangeBookingTimeCharges(null);
     }
   }
+  //#endregion
 
+  //#region  OnChangeBookingTimeCharges
   OnChangeBookingTimeCharges(event) {
     // Set Diffrent Amount
     if (event) {
@@ -437,8 +459,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     this.OnChangeCheckBox(null);
   }
+  //#endregion
 
-  // Function to calculate and update summary form values
+   //#region  Function to calculate and update summary form values
   updateSummaryForm(total, eventCheck) {
     const roundedValue = eventCheck ? Math.ceil(total) : total;
     const diff = ConvertToNumber(roundedValue - total, 2);
@@ -446,8 +469,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.SummaryForm.get("RoundOffAmount").setValue(diff.toFixed(2));
     this.SummaryForm.get("RoundedOff").setValue(roundedValue.toFixed(2));
   }
+  //#endregion
 
-  // Function to calculate and update collection form values
+  //#region  Function to calculate and update collection form values
   updateCollectionForm(total) {
     let collectedAmount = this.DocketDetails.pAYTYP === "P01" ? this.DocketDetails.tOTAMT || 0 : 0;
     if (this.VoucherDetails) {
@@ -460,8 +484,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     this.CollectionForm.get("NewCollectionAmount").setValue(collectionAmount.toFixed(2));
     this.CollectionForm.get("PendingAmount").setValue(0.00);
   }
+  //#endregion
 
-  // Handler for checkbox change
+  //#region  Handler for checkbox change
   OnChangeCheckBox(event) {
     const total = ConvertToNumber(this.SummaryForm.get("Dockettotal").value, 2);
     this.updateSummaryForm(total, event?.event?.checked);
@@ -469,8 +494,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const roundedValue = ConvertToNumber(this.SummaryForm.get("RoundedOff").value, 2);
     this.updateCollectionForm(roundedValue);
   }
+  //#endregion
 
-  // Handler for toggle up/down
+  //#region  Handler for toggle up/down
   toggleUpDown(event) {
     const total = ConvertToNumber(this.SummaryForm.get("Dockettotal").value, 2);
     const isUpDown = event.isUpDown;
@@ -479,7 +505,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const roundedValue = ConvertToNumber(this.SummaryForm.get("RoundedOff").value, 2);
     this.updateCollectionForm(roundedValue);
   }
+  //#endregion
 
+  //#region GetStateCodeWiseStateDetails
   async GetStateCodeWiseStateDetails(GSTCodeList) {
     let req = {
       companyCode: this.storage.companyCode,
@@ -510,7 +538,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     this.jsonSummaryControlArray = this.jsonSummaryControlArray.filter(x => !gstToRemove.includes(x.name));
   }
+  //#endregion
 
+  //#region GetAccountingRules
   async getAccountingRules() {
     const filter = {
       cID: this.storage.companyCode,
@@ -523,7 +553,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL || false;
     }
   }
+  //#endregion
 
+  //#region GetGSTRate
   async GetGSTRate() {
     let req = {
       companyCode: this.storage.companyCode,
@@ -539,7 +571,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.GSTRate = res.data.GSTRT || 12;
     }
   }
+  //#endregion
 
+  //#region Voucher Generation
   async getVoucherDetails() {
     let req = {
       companyCode: this.storage.companyCode,
@@ -553,7 +587,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       this.VoucherDetails = res.data;
     }
   }
-
   //#endregion
 
   //#region Payment Modes Changes
@@ -571,6 +604,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         break;
       case "RTGS/UTR":
         filterFunction = (x) => x.name !== "CashAccount";
+        break;
+      case "Credit":
+        this.PaymentSummaryFilterForm.controls["CashAccount"].disable();
         break;
     }
 
@@ -674,12 +710,16 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         CashAccountRTGS.clearValidators();
         CashAccountRTGS.updateValueAndValidity();
         break;
+      case "Credit":
+        this.PaymentSummaryFilterForm.controls["CashAccount"].disable();
+        break;
     }
   }
+  //#endregion
 
-
-
+  //#region Generate MR
   async GenerateMR() {
+    debugger;
     const DocketNo = this.deliveryMrTableForm.value.ConsignmentNoteNumber;
     if (!DocketNo) {
       Swal.fire({
@@ -818,7 +858,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           //Send a POST request to create the job detail in the MongoDB collection.
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
           if (res.success) {
-            if (headerRequest.cLLCTAMT > 0) {
+            if (headerRequest.cLLCTAMT > 0 && headerRequest.mOD !== "Credit" ) {
               const vRes: any = await this.GenerateVoucher(res?.data.data.ops[0]);
               console.log(vRes)
               if (vRes && vRes.length > 0) {
@@ -855,6 +895,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
                   "Fail To Do Account Posting!"
                 );
               }
+            }
+            else {
+              this.snackBarUtilityService.ShowCommonSwal(
+                "success",
+                "Delivery MR Generating..!"
+              );
             }
             Swal.hideLoading();
             setTimeout(() => {
@@ -902,8 +948,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
 
   }
-
   //#endregion
+
+  //#region Generate Voucher
   async GenerateVoucher(data) {
 
     let Result = [];
@@ -941,7 +988,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       );
     }
   }
+  //#endregion
 
+  //#region Account Posting
   async accountPosting(res, branch, requestModel) {
     let reqBody = {
       companyCode: this.storage.companyCode,
@@ -991,6 +1040,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       console.log("Error in Account Posting", resPosting);
     }
   }
+  //#endregion
+
+  //#region Prepare Voucher
   PrepareVoucher(type, branch, dmr, paybase): any {
 
     let voucherRequestModel = new VoucherRequestModel();
@@ -1073,6 +1125,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     return voucherRequestModel;
   }
+  //#endregion
+
   //#region to disable submit btn
   isSubmitDisabled(): boolean {
     return (
@@ -1082,6 +1136,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     );
   }
   //#endregion
+
   //#region Navigation to Delivery tab
   cancel(): void {
     this.navigateWithTabIndex('Delivery');
@@ -1094,6 +1149,9 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   navigateWithTabIndex(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
+  //#endregion
+
+  //#region Get Journal Voucher Ledgers
   GetJournalVoucherLedgers(type, VoucherDataRequestModel, gst, paybase) {
     const createVoucher = (
       accCode,

@@ -5,7 +5,6 @@ import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { ExportService } from 'src/app/Utility/module/export.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { VendorGSTInvoiceService } from 'src/app/Utility/module/reports/vendor-gst-invoice';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -64,8 +63,6 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private vendorGSTInvoiceService: VendorGSTInvoiceService,
     private objStateService: StateService,
-    private exportService: ExportService
-
   ) {
     this.initializeFormControl()
   }
@@ -198,15 +195,11 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     const endValue = moment(endDate).endOf('day').toDate();
 
     const docummentNo = this.vendorgstregisTableForm.value.docNo;
-    let cancelBill = this.vendorgstregisTableForm.value.cannon || [];
-    cancelBill = cancelBill.length < 2 ? cancelBill : [];
+    const cancelBill = this.vendorgstregisTableForm.value.cannon || [];
+
     // Check if a comma is present in docNo
     const docNoArray = docummentNo.includes(',') ? docummentNo.split(',') : [docummentNo];
 
-    // Extract vendor names from vennmcdHandler if it's an array
-    // const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
-    //   ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => parseInt(x.value))
-    //   : [];
     const vendrnm = Array.isArray(this.vendorgstregisTableForm.value.vennmcdHandler)
       ? this.vendorgstregisTableForm.value.vennmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
       : [];
@@ -221,21 +214,15 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
 
     const reqBody = { startValue, endValue, sacData, vendrnm, cancelBill, stateData }
     try {
+
       // Get data from the service
-      let data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(reqBody, docNoArray);
-      console.log(data);
+      const data = await this.vendorGSTInvoiceService.getvendorGstRegisterReportDetail(reqBody, docNoArray);
 
-      // Filter data based on cancelBill
-      //data = cancelBill === 'Cancelled' ? data.data.filter(x => x.BILLSTATUS !== 'Cancelled') : data.data;
       this.columns = data.grid.columns;
-      console.log(`colums=${this.columns}`);
-
       this.sorting = data.grid.sorting;
       this.searching = data.grid.searching;
       this.paging = data.grid.paging;
-
       this.source = data.data;
-      console.log(`source=${this.source}`);
       this.LoadTable = true;
 
       if (data.data.length === 0) {

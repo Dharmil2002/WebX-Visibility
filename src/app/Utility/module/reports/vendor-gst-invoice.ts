@@ -20,7 +20,6 @@ export class VendorGSTInvoiceService {
         const isEmptyDocNo = docNo.every(value => value === "");
         let matchQuery
         if (isEmptyDocNo) {
-
             matchQuery = {
                 'D$and': [
                     { bDT: { 'D$gte': data.startValue } }, // Convert start date to ISO format
@@ -28,6 +27,8 @@ export class VendorGSTInvoiceService {
                     ...(data.stateData.length > 0 ? [{ 'sT': { 'D$in': data.stateData } }] : []), // State names condition
                     ...(data.vendrnm.length > 0 ? [{ 'D$expr': { 'D$in': ['$vND.cD', vendorNames] } }] : []), // State names condition
                     ...(data.sacData.length > 0 ? [{ 'D$expr': { 'D$in': ['$gST.sAC', data.sacData] } }] : []), // State names condition              
+                    ...(data.cancelBill === 'Cancelled' ? [{ 'bSTAT': { 'D$eq': 7 } }] : []), // cancelBill condition
+                    ...(data.cancelBill === 'Non-Cancelled' ? [{ 'bSTAT': { 'D$ne': 7 } }] : []), // cancelBill condition
                 ],
             };
         }
@@ -49,22 +50,27 @@ export class VendorGSTInvoiceService {
         }
         const states = await this.objStateService.getState();
         const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/getReportData", reqBody));
-        console.log(res.data.data);
+        // console.log(res.data.data);
         const details = res.data.data.map((item) => ({
             ...item,
             blDt: item.blDt ? moment(item.blDt).format("DD MMM YYYY") : "",
             vBlDt: item.vBlDt ? moment(item.vBlDt).format("DD MMM YYYY") : "",
+            pmntDt: item.pmntDt ? moment(item.pmntDt).format("DD MMM YYYY") : "",
             vGSTSts: item.vGSTSts ? "Registered" : "UnRegistered",
             blFromSt: states.find(a => a.value == item.blFromSt)?.name || item.blFromSt,
             blTSt: states.find(a => a.value == item.blTSt)?.name || item.blTSt,
             bLTP: "Transaction Bill",
             TCSRate: 0,
             TCSAmount: 0,
-            bLAMT: item.ntPybl - (item.pdAmnt + item.dbtNtAmt),
             nRTN: Array.isArray(item.nRTN) ? item.nRTN.join(", ") : item.nRTN,
             dNtNo: Array.isArray(item.dNtNo) ? item.dNtNo.join(", ") : item.dNtNo,
-            dNtDt: Array.isArray(item.dNtDt) ? item.dNtDt.map(dt => moment(dt).format("DD MMM YYYY")).join(", ") : moment(item.dNtDt).format("DD MMM YYYY"),
-            dbNtBrc: Array.isArray(item.dbNtBrc) ? item.dbNtBrc.join(", ") : item.dbNtBrc
+            dNtDt: item.dNtDt ? Array.isArray(item.dNtDt) ? item.dNtDt.map(dt => moment(dt).format("DD MMM YYYY")).join(", ") : moment(item.dNtDt).format("DD MMM YYYY") : '',
+            dbNtBrc: Array.isArray(item.dbNtBrc) ? item.dbNtBrc.join(", ") : item.dbNtBrc,
+            ttlInvAmt: item.ttlInvAmt ? item.ttlInvAmt.toFixed(2) : 0,
+            ntPybl: (item.ttlInvAmt - item.tDSAmt).toFixed(2),
+            pdAmnt: item.pdAmnt ? item.pdAmnt.toFixed(2) : 0,
+            bLAMT: (item.ntPybl - (item.pdAmnt + item.dbtNtAmt)).toFixed(2),
+            dbtNtAmt: item.dbtNtAmt ? item.dbtNtAmt.toFixed(2) : 0,
         }));
 
         return {

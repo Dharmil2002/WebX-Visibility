@@ -29,7 +29,7 @@ export class ManifestRegister {
                 displaywith: "",
                 Validations: [],
                 additionalData: {
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
 
                 generatecontrol: true, disable: false

@@ -249,7 +249,7 @@ export class VoucherRegisterReportComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.voucherRegTableForm.controls["branch"].setValue(loginBranch);
     this.voucherRegTableForm.get('Individual').setValue("Y");
   }
@@ -260,9 +260,9 @@ export class VoucherRegisterReportComponent implements OnInit {
         this.ReportingBranches = [];
         if (this.voucherRegTableForm.value.Individual == "N") {
           this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.voucherRegTableForm.value.branch.name);
-          this.ReportingBranches.push(this.voucherRegTableForm.value.branch.name);
+          this.ReportingBranches.push(this.voucherRegTableForm.value.branch.value);
         } else {
-          this.ReportingBranches.push(this.voucherRegTableForm.value.branch.name);
+          this.ReportingBranches.push(this.voucherRegTableForm.value.branch.value);
         }
         const cheqNo = this.voucherRegTableForm.value.cheq;
         const vouchamt = this.voucherRegTableForm.value.vAmt;

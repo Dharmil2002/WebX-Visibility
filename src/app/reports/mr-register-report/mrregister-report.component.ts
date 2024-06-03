@@ -129,7 +129,7 @@ export class MRRegisterReportComponent implements OnInit {
     this.filter.Filter(this.jsonControlArray, this.mRRegisterForm, customerList, "customer", false);
     this.filter.Filter(this.jsonControlArray, this.mRRegisterForm, locationList, "branch", false);
 
-    const loginBranch = locationList.find(x => x.name === this.storage.branch);
+    const loginBranch = locationList.find(x => x.value === this.storage.branch);
     this.mRRegisterForm.controls["branch"].setValue(loginBranch);
   }
   //#endregion
@@ -181,7 +181,7 @@ export class MRRegisterReportComponent implements OnInit {
 
         const MRNOs = this.mRRegisterForm.value.MRNO;
 
-        // Check if a comma is present in docNo      
+        // Check if a comma is present in docNo
         let docNoArray;
 
         if (Array.isArray(MRNOs) && MRNOs.length === 0) {
@@ -194,7 +194,7 @@ export class MRRegisterReportComponent implements OnInit {
 
         const Cnotenos = this.mRRegisterForm.value.Cnote;
 
-        // Check if a comma is present in docNo      
+        // Check if a comma is present in docNo
         let CnotenosArray;
 
         if (Array.isArray(Cnotenos) && Cnotenos.length === 0) {

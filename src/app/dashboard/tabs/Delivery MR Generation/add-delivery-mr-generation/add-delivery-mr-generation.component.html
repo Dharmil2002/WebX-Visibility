@@ -28,7 +28,7 @@
         <div class="col">
             <form [formGroup]="SummaryForm">
                 <app-form-webxpress [form]="SummaryForm" [FormTitle]="'Summary'" [DisplayCheckbox]="true"
-                    [CheckBoxMessage]="'Round Off'" [formData]="jsonSummaryControlArray"
+                    [CheckBoxMessage]="'Round Off'"[checkboxValue]="checkboxChecked" [formData]="jsonSummaryControlArray"
                     [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"
                     (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                     [showSaveAndCancelButton]="false">
@@ -39,11 +39,11 @@
             <form [formGroup]="CollectionForm">
                 <app-form-webxpress [form]="CollectionForm" [FormTitle]="'Collection Details'"
                     [formData]="jsonCollectionControlArray"
-                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"                    
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-3 mb-2'"
                     [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
-        </div>       
+        </div>
     </div>
     <div class="row">
         <div class="col-6">

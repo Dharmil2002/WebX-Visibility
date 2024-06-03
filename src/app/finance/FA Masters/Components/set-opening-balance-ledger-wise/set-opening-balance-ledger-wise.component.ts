@@ -174,7 +174,7 @@ export class SetOpeningBalanceLedgerWiseComponent implements OnInit {
       this.filterDropdown(this.categoryName, this.categoryStatus, categorylist);
 
 
-      const loginBranch = branchList.find(x => x.name === this.storage.branch);
+      const loginBranch = branchList.find(x => x.value === this.storage.branch);
       this.setOpeningBalanceForm.controls["branch"].setValue(loginBranch);
 
     } catch (error) {

@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { nextKeyCode } from 'src/app/Utility/commonFunction/stringFunctions';
 import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
+import { UploadFieldType } from 'src/app/config/myconstants';
 import { customerModel } from 'src/app/core/models/Masters/customerMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
@@ -25,7 +26,150 @@ export class CustomerMasterUploadComponent implements OnInit {
   locationList: any;
   zonelist: any;
   countryList: any;
+  validationRules: any[] = [
+    {
+      ItemsName: "CustomerName",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        { Pattern: "^.{3,200}$" },
+        { DuplicateFromList: true }
+      ],
+    },
+    // {
+    //   ItemsName: "CustomerCategory",
+    //   Validations: [
+    //     { Required: true },
+    //     {
+    //       TakeFromList: this.CustomerCategoryList.map((x) => {
+    //         return x.name;
+    //       }),
+    //     }
+    //   ],
+    // },
+    {
+      ItemsName: "CustomerLocation",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        {
+          ExistsInLocationMaster: true,
+          IsComaSeparated: true
+        }
+      ],
+    },
+    {
+      ItemsName: "CustomerEmailID",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
+      ],
+    },
+    {
+      ItemsName: "CustomerMobileNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[1-9][0-9]{9}$" }
+      ],
+    },
+    {
+      ItemsName: "ERPCode",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z0-9]{4,100}$" },
+        {
+          Unique: true,
+          From: "customer_detail",
+          Field: "ERPcode",
+        },
+      ],
+    },
 
+    {
+      ItemsName: "PANNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" },
+        {
+          Unique: true,
+          From: "customer_detail",
+          Field: "PANnumber",
+        },
+        //{ DuplicateFromList: true }
+      ],
+    },
+    {
+      ItemsName: "CINNo",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Pattern: "^[a-zA-Z0-9]{4,100}$" },
+        {
+          Unique: true,
+          From: "customer_detail",
+          Field: "CINnumber",
+        },
+      ],
+    },
+    {
+      ItemsName: "RegisteredAddress",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        { Pattern: "^.{4,500}$" }
+      ]
+    },
+    {
+      ItemsName: "PinCode",
+      Type: UploadFieldType.Upload,
+      Validations: [
+        { Required: true },
+        {
+          ExistsInPincodeMaster: true,
+          IsComaSeparated: false,
+        }
+      ],
+    },
+    {
+      ItemsName: "City",
+      Type: UploadFieldType.Derived,
+      BasedOn: "PinCode",
+      From: "Pincode",
+      Field: "CT",
+      Validations: [],
+    },
+    {
+      ItemsName: "StateId",
+      Type: UploadFieldType.Derived,
+      BasedOn: "PinCode",
+      From: "Pincode",
+      Field: "ST",
+      Validations: [],
+    },
+    {
+      ItemsName: "State",
+      Type: UploadFieldType.Derived,
+      BasedOn: "StateId",
+      From: "State",
+      Field: "STNM",
+      Validations: [],
+    },
+    {
+      ItemsName: "CountryId",
+      Type: UploadFieldType.Derived,
+      BasedOn: "VendorStateId",
+      From: "State",
+      Field: "CNTR",
+      Validations: [],
+    },
+    {
+      ItemsName: "Country",
+      Type: UploadFieldType.Derived,
+      BasedOn: "CountryId",
+      From: "Country",
+      Field: "Country",
+      Validations: [],
+    },
+  ];
   constructor(
     private fb: UntypedFormBuilder,
     private xlsxUtils: xlsxutilityService,
@@ -83,141 +227,125 @@ export class CustomerMasterUploadComponent implements OnInit {
         this.countryList = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"));
 
         // Fetch state details by state name
-        const validationRules = [
-          {
-            ItemsName: "CustomerGroup",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromList: this.customerGrpList.map((x) => {
-                  return x.name;
-                }),
-              }
-            ],
-          },
-          {
-            ItemsName: "CustomerName",
-            Validations: [
-              { Required: true },
-              { Pattern: "^.{3,200}$" },
-              {
-                Exists: this.existingData.map((name) => {
-                  return name.customerName;
-                })
-              },
-              { DuplicateFromList: true }
-            ],
-          },
-          {
-            ItemsName: "CustomerCategory",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromList: this.CustomerCategoryList.map((x) => {
-                  return x.name;
-                }),
-              }
-            ],
-          },
-          {
-            ItemsName: "CustomerLocation",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromArrayList: this.locationList.map((x) => {
-                  return x.name;
-                }),
-              }
-            ],
-          },
-          {
-            ItemsName: "CustomerEmailID",
-            Validations: [
-              { Pattern: "^[a-zA-Z 0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
-            ],
-          },
-          {
-            ItemsName: "CustomerMobileNo",
-            Validations: [
-              { Numeric: true },
-              { Pattern: "^[1-9][0-9]{9}$" }
-            ],
-          },
-          {
-            ItemsName: "ERPCode",
-            Validations: [
-              { Pattern: "^[a-zA-Z0-9]{4,100}$" },
-              {
-                Exists: this.existingData
-                  .filter(item => item.ERPcode !== null && item.ERPcode !== "" && item.ERPcode !== undefined)
-                  .map((item) => {
-                    return item.ERPcode;
-                  })
-              },
-              { DuplicateFromList: true }
-            ],
-          },
-          {
-            ItemsName: "PANNo",
-            Validations: [
-              { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" }
-            ],
-          },
-          {
-            ItemsName: "CINNo",
-            Validations: [
-              { Pattern: "^[a-zA-Z0-9]{4,100}$" },
-              {
-                Exists: this.existingData
-                  .filter(item => item.CINnumber !== null && item.CINnumber !== "" && item.CINnumber !== undefined)
-                  .map((item) => {
-                    return item.CINnumber;
-                  })
-              },
-              { DuplicateFromList: true }
-            ],
-          },
-          {
-            ItemsName: "RegisteredAddress",
-            Validations: [
-              { Required: true },
-              { Pattern: "^.{4,500}$" }
-            ],
-          },
-          {
-            ItemsName: "PinCode",
-            Validations: [
-              { Required: true },
-              {
-                TakeFromList: this.pincodeList.map((x) => {
-                  return x.PIN;
-                }),
-              }
-            ],
-          },
-          {
-            ItemsName: "MSMENo",
-            Validations: [
-              { Pattern: "^[a-zA-Z0-9]{4,100}$" }
-            ],
-          },
-          {
-            ItemsName: "BlackListed",
-            Validations: [
-              { Required: true },
-            ],
-          },
-          {
-            ItemsName: "Active",
-            Validations: [
-              { Required: true },
-            ],
-          },
+        // const validationRules = [
+        //   {
+        //     ItemsName: "CustomerGroup",
+        //     Validations: [
+        //       { Required: true },
+        //       {
+        //         TakeFromList: this.customerGrpList.map((x) => {
+        //           return x.name;
+        //         }),
+        //       }
+        //     ],
+        //   },
+        //   // {
+        //   //   ItemsName: "CustomerName",
+        //   //   Validations: [
+        //   //     { Required: true },
+        //   //     { Pattern: "^.{3,200}$" },
+        //   //     {
+        //   //       Exists: this.existingData.map((name) => {
+        //   //         return name.customerName;
+        //   //       })
+        //   //     },
+        //   //     { DuplicateFromList: true }
+        //   //   ],
+        //   // },
 
-        ];
+        //   {
+        //     ItemsName: "CustomerLocation",
+        //     Validations: [
+        //       { Required: true },
+        //       {
+        //         TakeFromArrayList: this.locationList.map((x) => {
+        //           return x.name;
+        //         }),
+        //       }
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "CustomerEmailID",
+        //     Validations: [
+        //       { Pattern: "^[a-zA-Z 0-9+_.-]+@[a-zA-Z0-9.-]+$" } //for one email id
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "CustomerMobileNo",
+        //     Validations: [
+        //       { Numeric: true },
+        //       { Pattern: "^[1-9][0-9]{9}$" }
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "ERPCode",
+        //     Validations: [
+        //       { Pattern: "^[a-zA-Z0-9]{4,100}$" },
+        //       {
+        //         Exists: this.existingData
+        //           .filter(item => item.ERPcode !== null && item.ERPcode !== "" && item.ERPcode !== undefined)
+        //           .map((item) => {
+        //             return item.ERPcode;
+        //           })
+        //       },
+        //       { DuplicateFromList: true }
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "PANNo",
+        //     Validations: [
+        //       { Pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" }
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "CINNo",
+        //     Validations: [
+        //       { Pattern: "^[a-zA-Z0-9]{4,100}$" },
+        //       {
+        //         Exists: this.existingData
+        //           .filter(item => item.CINnumber !== null && item.CINnumber !== "" && item.CINnumber !== undefined)
+        //           .map((item) => {
+        //             return item.CINnumber;
+        //           })
+        //       },
+        //       { DuplicateFromList: true }
+        //     ],
+        //   },
+
+        //   {
+        //     ItemsName: "PinCode",
+        //     Validations: [
+        //       { Required: true },
+        //       {
+        //         TakeFromList: this.pincodeList.map((x) => {
+        //           return x.PIN;
+        //         }),
+        //       }
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "MSMENo",
+        //     Validations: [
+        //       { Pattern: "^[a-zA-Z0-9]{4,100}$" }
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "BlackListed",
+        //     Validations: [
+        //       { Required: true },
+        //     ],
+        //   },
+        //   {
+        //     ItemsName: "Active",
+        //     Validations: [
+        //       { Required: true },
+        //     ],
+        //   },
+
+        // ];
 
         try {
-          const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
+          const response = await firstValueFrom(this.xlsxUtils.validateData(jsonData, this.validationRules));
 
           const filteredData = await Promise.all(response.map(async (element) => {
 

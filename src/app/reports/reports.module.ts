@@ -73,6 +73,7 @@ import { ThcRegisterReportComponent } from './thc-register-report/thc-register-r
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
 import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component';
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
+import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -151,7 +152,8 @@ import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsh
     ThcRegisterReportComponent,
     DrsRegisterComponent,
     ManifestRegisterReportComponent,
-    LoadingsheetRegisterComponent
+    LoadingsheetRegisterComponent,
+    GenerateTdsRegisterReportComponent
   ],
   exports: [],
 

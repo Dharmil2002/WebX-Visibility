@@ -221,6 +221,7 @@ export class DNTHdrDataRequestModel {
   docNo: string;
   tYP: string;
   nTNO: string;
+  bILLNO: string;
   nTDT: Date;
   lOC: string;
   pARTY: {

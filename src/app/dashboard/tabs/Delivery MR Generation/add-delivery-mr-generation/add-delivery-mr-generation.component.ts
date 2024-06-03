@@ -197,11 +197,11 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   }
   //#endregion
 
-  //#region 
+  //#region
   calculateDemurrage( docket, demurrage) {
 
     // Calculate the number of days from arrival date to current date
-    const arrivalDate = new Date(docket.dKTDT);
+    const arrivalDate = new Date(docket.aRRDT);
     const currentDate = new Date();
     const diffTime = Math.abs(currentDate.getTime() - arrivalDate.getTime());
     const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -214,10 +214,10 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
     // Calculate the charges based on rate per kg or rate per package per day
     let charge = 0;
-    if (demurrage.dRTYP === "RTTYP-0005" && demurrage.dMRTPD !== null) { // Per Kg 
+    if (demurrage.dRTYP === "RTTYP-0005" && demurrage.dMRTPD !== null) { // Per Kg
       charge = docket.cHRWT * demurrage.dMRTPD * demurrageDays;
     }
-    else if (demurrage.dRTYP === "RTTYP-0006" && demurrage.dMRTPD !== null) { // Per Pkg        
+    else if (demurrage.dRTYP === "RTTYP-0006" && demurrage.dMRTPD !== null) { // Per Pkg
       charge = docket.pKGS * demurrage.dMRTPD * demurrageDays;
     }
     else {
@@ -238,6 +238,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const gmData = await this.generalService.getGeneralMasterData(["PAYMOD", "RTTYP"]);
     this.paymentMode = gmData.filter((x) => x.type == "PAYMOD");
     this.rateType = gmData.filter((x) => x.type == "RTTYP");
+    console.log("this.rateType",this.rateType);
     setGeneralMasterData(this.AlljsonControlPaymentSummaryFilterArray, this.paymentMode, "PaymentMode");
   }
   //#endregion

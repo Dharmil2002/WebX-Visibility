@@ -394,6 +394,15 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       this.creditnotedetailTableForm.controls["TaxableAmt"].setValue(parseFloat(TaxableAmt.toFixed(2)));
       this.creditnotedetailTableForm.controls["CreditNoteAmt"].setValue(parseFloat(CreditnoteAmount));
     }
+    if (Gsttype == "") {
+      this.creditnotedetailTableForm.controls["SGSTAmt"].setValue(0);
+      this.creditnotedetailTableForm.controls["IGSTAmt"].setValue(0);
+      this.creditnotedetailTableForm.controls["TaxableAmt"].setValue(parseFloat(CreditnoteAmount));
+      this.creditnotedetailTableForm.controls["CreditNoteAmt"].setValue(parseFloat(CreditnoteAmount));
+    }
+
+
+
 
   }
 

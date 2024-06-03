@@ -109,7 +109,8 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
     this.getRunSheetDetails();
   }
   async getRunSheetDetails() {
-     const res= await this.runSheetService.getRunSheetData({dEST:this.storage.branch,sTS:7,iSDEL:false});
+    debugger
+     const res= await this.runSheetService.getRunSheetData({dEST:this.storage.branch,sTS:{D$in:[7,11]},iSDEL:false});
      const fieldMapping=await this.runSheetService.fieldMappingRunSheet(res)
       // Store the pickUpData in csv property
       this.csv = fieldMapping;

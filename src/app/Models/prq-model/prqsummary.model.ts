@@ -34,6 +34,12 @@ export class PrqSummaryModel implements IFieldDefinition {
       Style: "min-width:8%",
       datatype:"string",
     },
+    oDRDT: {
+      Title: "Order Date",
+      class: "matcolumncenter",
+      Style: "min-width:16%",
+      datatype: "datetime",
+    },
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
@@ -70,6 +76,7 @@ export class PrqSummaryModel implements IFieldDefinition {
     "pickUpDate",
     "billingParty",
     "oDRNO",
+    "oDRDT",
     "fromToCity",
     "status",
     "createdDate",

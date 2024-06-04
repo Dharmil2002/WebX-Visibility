@@ -104,9 +104,9 @@ export class ChequeRegisterComponent implements OnInit {
         let ReportingBranches = [];
         if (this.chequeRegisterForm.value.Individual == "N") {
           ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.chequeRegisterForm.value.branch.name);
-          ReportingBranches.push(this.chequeRegisterForm.value.branch.name);
+          ReportingBranches.push(this.chequeRegisterForm.value.branch.value);
         } else {
-          ReportingBranches.push(this.chequeRegisterForm.value.branch.name);
+          ReportingBranches.push(this.chequeRegisterForm.value.branch.value);
         }
 
         const startDate = new Date(this.chequeRegisterForm.controls.start.value);
@@ -123,7 +123,7 @@ export class ChequeRegisterComponent implements OnInit {
 
         const docummentNo = this.chequeRegisterForm.value.ChequeNo;
 
-        // Check if a comma is present in docNo      
+        // Check if a comma is present in docNo
         let docNoArray;
 
         if (Array.isArray(docummentNo) && docummentNo.length === 0) {
@@ -237,7 +237,7 @@ export class ChequeRegisterComponent implements OnInit {
       const branchList = await this.locationService.locationFromApi();
 
       // Find the login branch from the list
-      const loginBranch = branchList.find(x => x.name === this.storage.branch);
+      const loginBranch = branchList.find(x => x.value === this.storage.branch);
 
       // Set the login branch in the form controls
       this.chequeRegisterForm.controls["branch"].setValue(loginBranch);

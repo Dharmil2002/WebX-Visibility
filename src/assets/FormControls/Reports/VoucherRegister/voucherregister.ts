@@ -162,7 +162,7 @@ export class vouchRegControl {
                          message: "Choose proper value",
                     },],
                     additionalData: {
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     generatecontrol: true, disable: false
                },

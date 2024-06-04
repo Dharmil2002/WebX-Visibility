@@ -28,7 +28,7 @@ export class SetOpeningBalanceLedgerWise {
                     }
                 ],
                 additionalData: {
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
                 functions: {
                     onOptionSelect: "OnChangeDropDown"

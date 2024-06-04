@@ -160,7 +160,7 @@ export class ChequeRegister {
                     }
                 ],
                 additionalData: {
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
 
                 generatecontrol: true, disable: false

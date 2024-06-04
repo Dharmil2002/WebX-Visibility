@@ -147,7 +147,7 @@ export class VolumetricShipmentRegisterComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.volumetricShipRegisterTableForm.controls["branch"].setValue(loginBranch);
     this.volumetricShipRegisterTableForm.get('Individual').setValue("Y");
   }
@@ -177,9 +177,9 @@ export class VolumetricShipmentRegisterComponent implements OnInit {
       this.ReportingBranches = [];
       if (this.volumetricShipRegisterTableForm.value.Individual == "N") {
         this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.volumetricShipRegisterTableForm.value.branch.name);
-        this.ReportingBranches.push(this.volumetricShipRegisterTableForm.value.branch.name);
+        this.ReportingBranches.push(this.volumetricShipRegisterTableForm.value.branch.value);
       } else {
-        this.ReportingBranches.push(this.volumetricShipRegisterTableForm.value.branch.name);
+        this.ReportingBranches.push(this.volumetricShipRegisterTableForm.value.branch.value);
       }
       const branch = this.ReportingBranches;
       const individual = this.volumetricShipRegisterTableForm.value.Individual;

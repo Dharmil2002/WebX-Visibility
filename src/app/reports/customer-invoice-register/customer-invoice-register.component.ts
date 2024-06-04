@@ -97,6 +97,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     this.CustInvREGFormControl = new CustInvRegFormControl();
     this.jsonCustInvREGFormArray =
       this.CustInvREGFormControl.getCustInvRegFormControls();
+
     this.stateName = this.jsonCustInvREGFormArray.find(
       (data) => data.name === "gSTE"
     )?.name;
@@ -112,6 +113,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     this.CustInvREGTableForm = formGroupBuilder(this.fb, [
       this.jsonCustInvREGFormArray,
     ]);
+    this.CustInvREGTableForm.controls["Individual"].setValue('Cumulative');
   }
   //#endregion
 
@@ -184,6 +186,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
 
   //#region save
   async save() {
+    debugger;
     this.loading = true;
     try {
       this.ReportingBranches = [];

@@ -70,7 +70,7 @@ export class TrialBalanceReport {
                          message: "Branch is required",
                     },],
                     additionalData: {
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     generatecontrol: true, disable: false
                },

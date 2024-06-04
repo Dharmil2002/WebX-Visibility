@@ -296,7 +296,7 @@ export class DriverMasterUploadComponent implements OnInit {
             Swal.fire({
               icon: "success",
               title: "Success",
-              text: "Valid Vendor Data Uploaded",
+              text: "Valid Driver Data Uploaded",
               showConfirmButton: true,
             });
           }

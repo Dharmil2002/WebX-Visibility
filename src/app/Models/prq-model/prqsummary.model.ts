@@ -9,7 +9,7 @@ import { StoreKeys } from "src/app/config/myconstants";
 export class PrqSummaryModel implements IFieldDefinition {
   constructor() {}
 
-  public columnHeader = {   
+  public columnHeader = {
     prqNo: {
       Title: "PRQ No",
       class: "matcolumnleft",
@@ -27,6 +27,12 @@ export class PrqSummaryModel implements IFieldDefinition {
       Title: "Billing Party",
       class: "matcolumnleft",
       Style: "min-width:8%",
+    },
+    oDRNO: {
+      Title: "Order No",
+      class: "matcolumnleft",
+      Style: "min-width:8%",
+      datatype:"string",
     },
     fromToCity: {
       Title: "From-To City",
@@ -63,6 +69,7 @@ export class PrqSummaryModel implements IFieldDefinition {
     // "prqNo",
     "pickUpDate",
     "billingParty",
+    "oDRNO",
     "fromToCity",
     "status",
     "createdDate",

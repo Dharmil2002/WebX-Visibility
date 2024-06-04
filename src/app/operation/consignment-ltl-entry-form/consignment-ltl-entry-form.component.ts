@@ -1529,7 +1529,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
-    debugger
     const payType = this.consignmentForm.get('payType').value;
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
@@ -2191,7 +2190,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
             break;
 
         case "FuelSurcharge":
-          debugger;
             let fuelCharge = 0;
             if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
                 const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);

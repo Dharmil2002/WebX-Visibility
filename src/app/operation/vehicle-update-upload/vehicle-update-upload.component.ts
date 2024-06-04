@@ -38,6 +38,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   currentBranch: string = '';
   companyCode: number = 0;
   userName: string = '';
+  //isDisbled:boolean=false;
   columnHeader = {
     "Shipment": "Shipment",
     "Suffix": "Suffix",

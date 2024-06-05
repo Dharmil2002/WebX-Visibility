@@ -1529,7 +1529,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
-    const form = this.consignmentForm.value
     const payType = this.consignmentForm.get('payType').value;
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
@@ -1582,8 +1581,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     data['delivery_typeNm'] = this.deliveryType.find(x => x.value == data?.delivery_type)?.name ?? '';
     data['freightRatetypeNm'] = this.rateTypes.find(x => x.value == data?.freightRatetype)?.name ?? '';
     data["yIELD"] = yieldValue;
-    
-    const serviceCharges = this.NonFreightjsonControlArray.map(x => {
+    let serviceCharges=[];
+    if(this.NonFreightjsonControlArray && this.NonFreightjsonControlArray.length>0){
+     serviceCharges = this.NonFreightjsonControlArray.map(x => {
       return {
         cHGID: x.additionalData.metaData.ServicesCode,
         cHGNM: x.additionalData.metaData.ServicesName,
@@ -1592,14 +1592,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         tY: "sC"
       };
     });
+  }
 
-    const otherData = { 
-      otherCharges: [ 
-        ... (this.otherCharges.map(x => { x["tY"] = "nFC"; return x; })), 
-        ... serviceCharges
-      ],      
-      otherInfo: this.otherInfo 
-    }
+  const otherData = {
+    otherCharges: [...(this.otherCharges?.map(x => ({ ...x, tY: "nFC" })) ?? []), ...serviceCharges],
+    otherInfo: this.otherInfo
+  };
     const reqDkt = await this.docketService.consgimentFieldMapping(data, this.chargeBase, tableData, this.isUpdate, otherData);
     let docketDetails = {}
     docketDetails = reqDkt?.docketsDetails || {};
@@ -2192,7 +2190,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
             break;
 
         case "FuelSurcharge":
-          debugger;
             let fuelCharge = 0;
             if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
                 const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);

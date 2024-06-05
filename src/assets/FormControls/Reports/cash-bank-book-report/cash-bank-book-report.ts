@@ -31,7 +31,7 @@ export class cashbankbookReport {
                          message: "Choose proper value",
                     },],
                     additionalData: {
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     generatecontrol: true, disable: false
                },

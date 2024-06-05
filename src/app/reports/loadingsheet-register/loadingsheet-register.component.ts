@@ -95,7 +95,7 @@ export class LoadingsheetRegisterComponent implements OnInit {
 
     //#region save
     async save() {
-      debugger;
+    
       this.loading = true;
       try {
         const startDate = new Date(this.loadingsheetRegisterForm.controls.start.value);

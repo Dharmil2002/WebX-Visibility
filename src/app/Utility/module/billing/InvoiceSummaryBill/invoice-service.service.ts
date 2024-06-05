@@ -288,18 +288,18 @@ export class InvoiceServiceService {
   }
   /*End*/
   /*below function is for update the billing data*/
-  async updateBillingInvoice(data) {
+  async updateBillingInvoice(data,tMODE) {
 
     const reqbody = {
       companyCode: this.storage.companyCode,
-      collectionName: "dockets",
+      collectionName:tMODE=="FTL"?"dockets":"dockets_ltl",
       filter: { docNo: data.dktNo },
       update: data.dockets
     }
     await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqbody));
     const reqFin = {
       companyCode: this.storage.companyCode,
-      collectionName: "docket_fin_det",
+      collectionName:tMODE=="FTL"?"docket_fin_det":"docket_fin_det_ltl",
       filter: { dKTNO: data.dktNo },
       update: data.finance
     }

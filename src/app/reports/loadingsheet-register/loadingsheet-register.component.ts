@@ -159,14 +159,4 @@ export class LoadingsheetRegisterComponent implements OnInit {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);
       }
     }
-    //#endregion
-    // OpenCnote(data) {
-    //   const templateBody = {
-    //     templateName: "Docket",
-    //     partyCode: "CONSRAJT58",
-    //     DocNo: data.docNo,
-    //   }
-    //   const url = `${window.location.origin}/#/Reports/LoadingsheetRegister?templateBody=${JSON.stringify(templateBody)}`;
-    //   window.open(url, '', 'width=1000,height=800');
-    // }
 }

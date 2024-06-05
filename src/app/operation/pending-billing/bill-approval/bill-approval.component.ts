@@ -350,14 +350,15 @@ export class BillApprovalComponent implements OnInit {
     };
 
     const gstType = data?.gST?.tYP;
-
-    if (gstType && gstTypeMapping[gstType]) {
-      const { accCode, accName, accCategory, prop } = gstTypeMapping[gstType];
-      if (data?.gST?.[prop] > 0) {
-        response.push(createVoucher(accCode, accName, accCategory, 0, data?.gST?.[prop], '996511'));
+    const GSTTypeList = gstType.split(',');
+    GSTTypeList.forEach(element => {
+      if (gstType && gstTypeMapping[element]) {
+        const { accCode, accName, accCategory, prop } = gstTypeMapping[element];
+        if (data?.gST?.[prop] > 0) {
+          response.push(createVoucher(accCode, accName, accCategory, 0, data?.gST?.[prop], '996511'));
+        }
       }
-    }
-
+    });
     return response;
   }
 

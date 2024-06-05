@@ -791,7 +791,32 @@ export class ContractServiceSelectionControl {
         generatecontrol: true,
         disable: false,
         accessallowed: true,
-      }
+      },
+      {
+        name: "InsuranceCarrierRisk",
+        label: "Insurance Carrier Risk",
+        placeholder: "Insurance Carrier Risk",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        functions: {
+          onSelection: "ChargeInsuranceCarrierRisk"
+        },
+        generatecontrol: true,
+        disable: false,
+        accessallowed: true,
+        Validations: [
+          {
+            name: "required",
+            message: "Insurance Carrier Risk is required",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
     ];
     this.ContractCutOfftimeControlArray = [
       {
@@ -1017,7 +1042,33 @@ export class ContractServiceSelectionControl {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'OnInsuranceRateTypeSelect'
+        },
       },
+      // {
+      //   name: "FRate%",
+      //   label: "Threshold limit",
+      //   placeholder: "Threshold limit",
+      //   type: "text",
+      //   value: isUpdate ? UpdateData.Thresholdlimit : "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "Threshold limit is required",
+      //     },
+      //     {
+      //       name: "pattern",
+      //       message: "Please Enter only numeric length 1 to 100",
+      //       pattern: "^[0-9]{1,100}$",
+      //     },
+      //   ],
+      //   functions: {
+
+      //   },
+      // },
       {
         name: "FRate",
         label: "Rate(₹)",
@@ -1031,6 +1082,11 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "required",
+            message: "Rate is required",
+          },
+
         ],
         functions: {
           onOptionSelect: 'getLocBasedOnCity'

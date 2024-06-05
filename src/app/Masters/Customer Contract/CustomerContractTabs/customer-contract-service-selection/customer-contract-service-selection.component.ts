@@ -81,6 +81,7 @@ export class CustomerContractServiceSelectionComponent
 
   FuelSurchargeForm: UntypedFormGroup;
   jsonControlArrayFuelSurchargeForm: any;
+  AlljsonControlArrayFuelSurchargeForm: any;
 
   //#endregion
 
@@ -123,12 +124,12 @@ export class CustomerContractServiceSelectionComponent
 
   InsurancecolumnHeader = {
     InvoiceValueFrom: {
-      Title: "Invoice Value From(₹)",
+      Title: "Invoice  From (₹)",
       class: "matcolumnfirst",
       Style: "min-width:80px",
     },
     tovalue: {
-      Title: "Invoice value To (₹)",
+      Title: "Invoice  To (₹)",
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
@@ -151,6 +152,11 @@ export class CustomerContractServiceSelectionComponent
       Title: "Max Charge (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
+    },
+    InsuranceCarrierRiskName: {
+      Title: "Carrier Risk",
+      class: "matcolumnfirst",
+      Style: "min-width:80px",
     },
     actionsItems: {
       Title: "Action",
@@ -197,6 +203,7 @@ export class CustomerContractServiceSelectionComponent
     "Rate",
     "IMinCharge",
     "IMaxCharge",
+    "InsuranceCarrierRiskName",
   ];
   FstaticField = ["FuelType", "FRateType", "FRate", "FMinCharge", "FMaxCharge"];
 
@@ -458,6 +465,13 @@ export class CustomerContractServiceSelectionComponent
       "rateType",
       false
     );
+    this.filter.Filter(
+      this.jsonControlArrayInsuranceCarrierRiskForm,
+      this.InsuranceCarrierRiskForm,
+      InsuranceList,
+      "InsuranceCarrierRisk",
+      false
+    );
   }
   /*get all Master Details*/
 
@@ -587,6 +601,8 @@ export class CustomerContractServiceSelectionComponent
       Rate: this.InsuranceCarrierRiskForm.value.Rate,
       IMinCharge: this.InsuranceCarrierRiskForm.value.IMinCharge,
       IMaxCharge: this.InsuranceCarrierRiskForm.value.IMaxCharge,
+      InsuranceCarrierRiskName: this.InsuranceCarrierRiskForm.value.InsuranceCarrierRisk.name,
+      InsuranceCarrierRiskValue: this.InsuranceCarrierRiskForm.value.InsuranceCarrierRisk.value,
       actions: ["Edit", "Remove"],
     };
     this.tableData.push(json);
@@ -596,6 +612,7 @@ export class CustomerContractServiceSelectionComponent
     this.InsuranceCarrierRiskForm.controls["Rate"].setValue("");
     this.InsuranceCarrierRiskForm.controls["IMinCharge"].setValue("");
     this.InsuranceCarrierRiskForm.controls["IMaxCharge"].setValue("");
+    this.InsuranceCarrierRiskForm.controls["InsuranceCarrierRisk"].setValue("");
     // Remove all validation
     // Add the "required" validation rule
     const controls = [
@@ -605,6 +622,7 @@ export class CustomerContractServiceSelectionComponent
       "Rate",
       "IMinCharge",
       "IMaxCharge",
+      "InsuranceCarrierRisk",
     ];
     controls.forEach((element) => {
       this.InsuranceCarrierRiskForm.controls[element].setValue("");
@@ -696,6 +714,13 @@ export class CustomerContractServiceSelectionComponent
       this.InsuranceCarrierRiskForm.controls["IMaxCharge"].setValue(
         data.data?.IMaxCharge || ""
       );
+      const InsuranceCarrierRiskFilterData = InsuranceList.find(
+        (x) => x.value == data.data?.InsuranceCarrierRiskValue
+      );
+      this.InsuranceCarrierRiskForm.controls["InsuranceCarrierRisk"].setValue(
+        InsuranceCarrierRiskFilterData
+      );
+
       this.UpdateData = this.tableData.find((x) => x.id == data.data.id);
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
       this.isUpdate = true;
@@ -1166,10 +1191,12 @@ export class CustomerContractServiceSelectionComponent
           cONID: this.contractData.cONID,
           iVFROM: parseInt(element.InvoiceValueFrom),
           iVTO: parseInt(element.tovalue),
-          rtType: element.ratetypevalue,
+          rTTYPE: element.ratetypevalue,
           rT: parseInt(element.Rate),
           mIN: parseInt(element.IMinCharge),
           mAX: parseInt(element.IMaxCharge),
+          iCRNM: element.InsuranceCarrierRiskName,
+          iCRCD: element.InsuranceCarrierRiskValue,
           eNTDT: new Date(),
           eNTLOC: this.storage.branch,
           eNTBY: this.storage.userName,
@@ -1266,19 +1293,17 @@ export class CustomerContractServiceSelectionComponent
       this.tableData = res.data;
       this.isInsuranceExist = this.tableData.length > 0 ? true : false;
       this.tableData.forEach((item) => {
-        (item.id = item._id),
-          (item.InvoiceValueFrom = item.iVFROM),
-          (item.tovalue = item.iVTO),
-          (item.rateType = InsuranceFromAPI.find(
-            (x) => x.value == item.rtType
-          ).name),
-          (item.ratetypevalue = InsuranceFromAPI.find(
-            (x) => x.value == item.rtType
-          ).value),
-          (item.Rate = item.rT),
-          (item.IMinCharge = item.mIN),
-          (item.IMaxCharge = item.mAX),
-          (item.actions = ["Edit", "Remove"]);
+        item.id = item._id,
+          item.InvoiceValueFrom = item.iVFROM,
+          item.tovalue = item.iVTO,
+          item.rateType = InsuranceFromAPI.find((x) => x.value == item.rTTYPE).name,
+          item.ratetypevalue = InsuranceFromAPI.find((x) => x.value == item.rTTYPE).value,
+          item.Rate = item.rT,
+          item.IMinCharge = item.mIN,
+          item.IMaxCharge = item.mAX,
+          item.InsuranceCarrierRiskName = item.iCRNM,
+          item.InsuranceCarrierRiskValue = item.iCRCD,
+          item.actions = ["Edit", "Remove"];
       });
       this.tableLoad = false;
     }
@@ -1543,4 +1568,40 @@ export class CustomerContractServiceSelectionComponent
       }
     });
   }
+  OnInsuranceRateTypeSelect(event) {
+    if (event?.eventArgs.option.value.name == "Per Kg") {
+
+      this.jsonControlArrayFuelSurchargeForm.find(
+        (item) => item.name == "FRate"
+      ).label = "Rate(₹)";
+
+      this.FuelSurchargeForm.get("FRate").setValidators([
+        Validators.required,
+        Validators.pattern("^[0-9]*$"),
+      ]);
+      this.FuelSurchargeForm.get("FRate").updateValueAndValidity();
+    } else {
+
+      this.jsonControlArrayFuelSurchargeForm.find(
+        (item) => item.name == "FRate"
+      ).label = "Rate(%)";
+
+      console.log(this.jsonControlArrayFuelSurchargeForm.find((item) => item.name == "FRate"));
+      this.FuelSurchargeForm.get("FRate").setValidators([
+        Validators.required,
+        Validators.pattern("^([0-9]|[1-9][0-9]|100)$"),
+      ]);
+      this.FuelSurchargeForm.get("FRate").updateValueAndValidity();
+    }
+  }
 }
+const InsuranceList = [
+  {
+    value: "OR",
+    name: "Owner Risk",
+  },
+  {
+    value: "CR",
+    name: "Carrier Risk",
+  },
+]

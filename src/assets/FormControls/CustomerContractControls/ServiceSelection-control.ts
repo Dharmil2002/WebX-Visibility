@@ -347,6 +347,9 @@ export class ContractServiceSelectionControl {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'OnRateTypeSelect'
+        },
       },
       {
         name: "Rate",
@@ -724,12 +727,15 @@ export class ContractServiceSelectionControl {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'OnRateTypeSelect'
+        },
       },
       {
         name: "Rate",
         label: "Rate(₹)",
         placeholder: "Rate",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -1043,32 +1049,10 @@ export class ContractServiceSelectionControl {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect: 'OnInsuranceRateTypeSelect'
+          onOptionSelect: 'OnRateTypeSelect'
         },
       },
-      // {
-      //   name: "FRate%",
-      //   label: "Threshold limit",
-      //   placeholder: "Threshold limit",
-      //   type: "text",
-      //   value: isUpdate ? UpdateData.Thresholdlimit : "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [
-      //     {
-      //       name: "required",
-      //       message: "Threshold limit is required",
-      //     },
-      //     {
-      //       name: "pattern",
-      //       message: "Please Enter only numeric length 1 to 100",
-      //       pattern: "^[0-9]{1,100}$",
-      //     },
-      //   ],
-      //   functions: {
 
-      //   },
-      // },
       {
         name: "FRate",
         label: "Rate(₹)",
@@ -1088,9 +1072,7 @@ export class ContractServiceSelectionControl {
           },
 
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
+
         additionalData: {
           showNameAndValue: false,
         },

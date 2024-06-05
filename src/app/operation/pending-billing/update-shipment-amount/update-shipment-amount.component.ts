@@ -79,7 +79,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
   }
   /*Below the function are mainly for the edit the shipment*/
   async updateShipment() {
-     debugger
+   
      const extraCharge=  this.extraCharges;
      const group =this.accountDetail
     const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight, edited } = this.accountDetail.controls;
@@ -135,7 +135,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
     }
   }
   async getCharges() {
-    debugger
+
     const filter = { "pRNm": this.shipmentDetails.extraData.tRNMODNM, aCTV: true, cHBTY: { D$in: ["Booking", "Both"] } };
     const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": this.shipmentDetails.extraData.tRNMODNM, cHATY: "Charges", "cHAPP": { D$in: ["GCN"] }, isActive: true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
@@ -171,7 +171,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
         }
       });
       if (getbillingDetail.length > 0) {
-        debugger
+   
         const lastIdx = invoiceList[invoiceList.length - 1];
         getbillingDetail.forEach((element, index) => {
           if (element) {

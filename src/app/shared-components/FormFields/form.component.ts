@@ -37,6 +37,7 @@ export class FormComponent {
   @Input() submit: string = "Save";
   @Output() callFunction = new EventEmitter();
   @Input() showSaveAndCancelButton: boolean;
+  @Input() Disabled: boolean=true;
   @Input() showSaveButton: boolean;
   @Output() functionCallEmitter = new EventEmitter();
   @Output() AddNewButtonEvent = new EventEmitter();

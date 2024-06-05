@@ -15,6 +15,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { de } from 'date-fns/locale';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: "app-cluster-master-add",
@@ -44,6 +45,7 @@ export class ClusterMasterAddComponent implements OnInit {
   submit = "Save";
   clusterTypeStatus: any;
   clusterType: any;
+  isSubmit: boolean = false
   //#endregion
 
   ngOnInit() {
@@ -57,9 +59,11 @@ export class ClusterMasterAddComponent implements OnInit {
     private filter: FilterUtils,
     private storage: StorageService,
     private generalService: GeneralService,
-    private pinCodeService: PinCodeService
+    private pinCodeService: PinCodeService,
+    public snackBarUtilityService: SnackBarUtilityService,
+
   ) {
-    this.companyCode= this.storage.companyCode;
+    this.companyCode = this.storage.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
@@ -87,7 +91,7 @@ export class ClusterMasterAddComponent implements OnInit {
           items: ["Home"],
           active: "Add Cluster",
           generatecontrol: true,
-          toggle: false,
+          toggle: true,
         },
       ];
       this.clusterTabledata = new ClusterMaster({});
@@ -95,7 +99,7 @@ export class ClusterMasterAddComponent implements OnInit {
     this.initializeFormControl();
   }
   initializeFormControl() {
-    this.clusterTabledata.clusterType = {name:this.clusterTabledata['cLSTYPNM'],value:this.clusterTabledata['cLSTYP']};
+    this.clusterTabledata.clusterType = { name: this.clusterTabledata['cLSTYPNM'], value: this.clusterTabledata['cLSTYP'] };
     this.clusterFormControls = new ClusterControl(
       this.clusterTabledata,
       this.isUpdate
@@ -122,10 +126,10 @@ export class ClusterMasterAddComponent implements OnInit {
   }
 
   //#region
-  async getdata(){
-    if(this.isUpdate){
-      const pincode=this.clusterTabledata.pincode.map(m => {
-        return { name: m, value: m}
+  async getdata() {
+    if (this.isUpdate) {
+      const pincode = this.clusterTabledata.pincode.map(m => {
+        return { name: m, value: m }
       });
       this.clusterTableForm.controls["pincodeDropdown"].patchValue(
         pincode
@@ -168,7 +172,7 @@ export class ClusterMasterAddComponent implements OnInit {
       // Filter cityCodeData for partial matches
       if (codeData.length >= 0) {
 
-        if(Array.isArray(selectedPincodes)){
+        if (Array.isArray(selectedPincodes)) {
           codeData = codeData.filter(f => !selectedPincodes.includes(f.value));
           codeData.push(...selectedPincodes);
         }
@@ -181,7 +185,7 @@ export class ClusterMasterAddComponent implements OnInit {
         );
       }
     }
-    else{
+    else {
       this.filter.Filter(
         this.jsonControlArray,
         this.clusterTableForm,
@@ -200,86 +204,118 @@ export class ClusterMasterAddComponent implements OnInit {
   }
   //#region Save Function
   async save() {
-    const pincodeDropdown =
-      this.clusterTableForm.value.pincodeDropdown == ""
-        ? []
-        : this.clusterTableForm.value.pincodeDropdown.map(
-          (item: any) => item.name
-        );
-    this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
-    this.clusterTableForm.removeControl("pincodeDropdown");
 
-    // Clear any errors in the form controls
-    Object.values(this.clusterTableForm.controls).forEach((control) =>
-      control.setErrors(null)
-    );
-    let data = this.clusterTableForm.value;
-    if (this.isUpdate) {
-      let id = this.clusterTableForm.value._id;
-      this.clusterTableForm.removeControl("_id");
-      data['cLSTYP']= this.clusterTableForm.value.clusterType.value,
-      data['cLSTYPNM']= this.clusterTableForm.value.clusterType.name,
-      data["mODDT"] = new Date();
-      data['mODLOC'] = this.storage.branch;
-      data['mODBY:'] = this.storage.userName;
-      delete data["clusterType"];
-      delete data["entryDate"];
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "cluster_detail",
-        filter: { _id: id },
-        update: data,
-      };
+    if (!this.clusterTableForm.valid) {
+      this.clusterTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
 
-      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.Route.navigateByUrl(
-          "/Masters/ClusterMaster/ClusterMasterList"
-        );
-      }
+      });
+      return false;
+    }
 
-    } else {
-      // Use the generated code
-      this.newClusterCode = await this.getNewClusterCode();
-      const body = {
-        clusterCode: this.newClusterCode,
-        clusterName: this.clusterTableForm.value.clusterName,
-        pincode: this.clusterTableForm.value.pincode,
-        cLSTYP: this.clusterTableForm.value.clusterType.value,
-        cLSTYPNM: this.clusterTableForm.value.clusterType.name,
-        activeFlag: this.clusterTableForm.value.activeFlag,
-        _id: this.newClusterCode,
-        companyCode: this.companyCode,
-        eNTDT: new Date(),
-        eNTLOC: this.storage.branch,
-        eNTBY: this.storage.userName
-      };
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "cluster_detail",
-        data: body,
-      };
-      const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
+    else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          this.isSubmit = true
 
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.Route.navigateByUrl(
-          "/Masters/ClusterMaster/ClusterMasterList"
-        );
-      }
+          const pincodeDropdown =
+            this.clusterTableForm.value.pincodeDropdown == ""
+              ? []
+              : this.clusterTableForm.value.pincodeDropdown.map(
+                (item: any) => item.name
+              );
+          this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
+          this.clusterTableForm.removeControl("pincodeDropdown");
+
+          // Clear any errors in the form controls
+          Object.values(this.clusterTableForm.controls).forEach((control) =>
+            control.setErrors(null)
+          );
+          let data = this.clusterTableForm.value;
+          if (this.isUpdate) {
+            let id = this.clusterTableForm.value._id;
+            this.clusterTableForm.removeControl("_id");
+            data['cLSTYP'] = this.clusterTableForm.value.clusterType.value,
+              data['cLSTYPNM'] = this.clusterTableForm.value.clusterType.name,
+              data["mODDT"] = new Date();
+            data['mODLOC'] = this.storage.branch;
+            data['mODBY:'] = this.storage.userName;
+            delete data["clusterType"];
+            delete data["entryDate"];
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "cluster_detail",
+              filter: { _id: id },
+              update: data,
+            };
+
+            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+            if (res) {
+              // Display success message
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+              });
+              this.Route.navigateByUrl(
+                "/Masters/ClusterMaster/ClusterMasterList"
+              );
+            }
+
+          } else {
+            // Use the generated code
+            this.newClusterCode = await this.getNewClusterCode();
+            const body = {
+              clusterCode: this.newClusterCode,
+              clusterName: this.clusterTableForm.value.clusterName,
+              pincode: this.clusterTableForm.value.pincode,
+              cLSTYP: this.clusterTableForm.value.clusterType.value,
+              cLSTYPNM: this.clusterTableForm.value.clusterType.name,
+              activeFlag: this.clusterTableForm.value.activeFlag,
+              _id: this.newClusterCode,
+              companyCode: this.companyCode,
+              eNTDT: new Date(),
+              eNTLOC: this.storage.branch,
+              eNTBY: this.storage.userName
+            };
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "cluster_detail",
+              data: body,
+            };
+            const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
+
+            if (res) {
+              // Display success message
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+              });
+              this.Route.navigateByUrl(
+                "/Masters/ClusterMaster/ClusterMasterList"
+              );
+            }
+          }
+        }
+        catch (error) {
+          console.error("Error fetching data:", error);
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+        }
+      }, "Cluster Adding...");
     }
   }
   //#endregion

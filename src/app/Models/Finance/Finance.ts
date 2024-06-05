@@ -330,6 +330,7 @@ export enum VoucherInstanceType {
   CreditNoteApproval = 13,
   DebitNoteApproval = 14,
   VendorOpeningBalance = 15,
+  TdsPaymentSlipApproval = 16,
 }
 
 export const ledgerInfo = {

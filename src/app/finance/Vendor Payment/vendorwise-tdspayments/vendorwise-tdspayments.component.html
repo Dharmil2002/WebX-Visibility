@@ -1,0 +1,58 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <div class="row">
+        <form [formGroup]="PaymentHeaderFilterForm">
+            <app-form-webxpress [form]="PaymentHeaderFilterForm" 
+            [FormTitle]="'Vendor ' + PaymentData.Vendor"
+                [formData]="jsonControlPaymentHeaderFilterArray" (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
+        <div>
+            <div>
+                <div *ngIf="isTableLode">
+                    <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+                        [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)"
+                        [metaData]="metaData" [FormTitle]="'Vendor Bill Detail'" [menuItems]="menuItems" [Link]="linkArray"
+                        [staticField]="staticField" (onFlagChange)="selectCheckBox($event)" [EventButton]="EventButton"
+                        [TitleBoxData]="this.TotalAmountList" [onFlagChangeGetAll]="true">
+                    </app-generic-table-v2>
+                </div>
+            </div>
+            <div *ngIf="isFormLode">
+                <form [formGroup]="PaymentSummaryFilterForm">
+                    <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
+                        [formData]="jsonPaymentSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+                        [className]="'col-xl-4 col-lg-4 col-md-6 col-sm-6 '"
+                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+                    </app-form-webxpress>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</app-common-wrapper-webxpress>
+
+<style>
+    .hover {
+        text-decoration: underline;
+        font-weight: 700;
+        color: blue;
+        transition-duration: 0.5s;
+        border-radius: 50px;
+        cursor: pointer;
+    }
+
+    .hover:hover {
+        text-decoration: none;
+        color: white;
+        background-color: blue;
+    }
+
+    .flex-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>

@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 
 @Component({
   selector: "app-add-account",
@@ -26,6 +27,7 @@ export class AddAccountComponent implements OnInit {
   //     active: "Ledger Master",
   //   },
   // ];
+  isSubmit: boolean = false;
   jsonControlAccountArray: any;
   AccountForm: any;
   GroupCodeCode: any;
@@ -73,6 +75,7 @@ export class AddAccountComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   constructor(
     private Route: Router,
+    public snackBarUtilityService: SnackBarUtilityService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -86,11 +89,11 @@ export class AddAccountComponent implements OnInit {
         items: ["Home"],
         active: "Ledger Master",
         generatecontrol: true,
-        toggle: false
+        toggle: true
       },
     ];
     if (this.Route.getCurrentNavigation().extras?.state) {
-      this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
+      this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;      
       this.isUpdate = true;
       this.breadScrums = [
         {
@@ -111,6 +114,7 @@ export class AddAccountComponent implements OnInit {
     this.bindDropdown();
     this.GetTableData();
     this.backPath = "/Masters/AccountMaster/AccountMasterList";
+    this.AccountForm.controls["ActiveFlag"].value=this.UpdateData.iSSYS;
   }
 
   // --Ledger detail Function--
@@ -548,6 +552,23 @@ export class AddAccountComponent implements OnInit {
   }
 
   async save() {
+    this.snackBarUtilityService.commonToast(async () => {
+    if (!this.AccountForm.valid || this.isSubmit) {
+      this.AccountForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
+      });
+      return false;
+    }
+    this.isSubmit = true;
     const groupCode = this.AccountForm.value.GroupCode.value;
 
     const commonBody = {
@@ -625,6 +646,7 @@ export class AddAccountComponent implements OnInit {
         showConfirmButton: true,
       });
     }
+  }, "Adding Account Please Wait..!");
   }
 
   cancel() {

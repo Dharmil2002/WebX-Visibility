@@ -216,7 +216,7 @@ export class AccountBankControls {
         label: "Active flag",
         placeholder: "",
         type: "toggle",
-        value: isUpdate ? UpdateData.isActive : false,
+        value: isUpdate ? UpdateData.isActive : true,
         generatecontrol: true,
         disable: false,
         Validations: [],

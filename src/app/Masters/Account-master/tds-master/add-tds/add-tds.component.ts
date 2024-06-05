@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AccountTdsControls } from "src/assets/FormControls/Account/account-tds-controls";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
@@ -21,6 +22,7 @@ export class AddTdsComponent implements OnInit {
       active: "Account",
     },
   ];
+  isSubmit: boolean = false;
   CompanyCode = 0;
   UpdateData: any;
   isUpdate: boolean = false;
@@ -30,6 +32,7 @@ export class AddTdsComponent implements OnInit {
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
+    public snackBarUtilityService: SnackBarUtilityService,
     private filter: FilterUtils,
     private masterService: MasterService,
     private storage: StorageService
@@ -130,6 +133,23 @@ export class AddTdsComponent implements OnInit {
   }
 
   async save() {
+    this.snackBarUtilityService.commonToast(async () => {
+    if (!this.TdsForm.valid || this.isSubmit) {
+      this.TdsForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
+      });
+      return false;
+    }
+    this.isSubmit = true;
     const commonBody = {
       PaymentType: this.TdsForm.value.PaymentType,
       RateForHUF: this.TdsForm.value.RateForHUF,
@@ -180,6 +200,7 @@ export class AddTdsComponent implements OnInit {
       };
       await this.handleRequest(req);
     }
+  }, "Adding TDS Please Wait..!");
   }
 
   async handleRequest(req: any) {

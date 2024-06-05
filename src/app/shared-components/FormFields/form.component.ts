@@ -51,6 +51,7 @@ export class FormComponent {
   @Input() DisplayAddNewButton: boolean = false;
   @Input() CheckBoxMessage: string = "";
   @Input() Expanded: boolean = true;
+  @Input() Disabled: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.

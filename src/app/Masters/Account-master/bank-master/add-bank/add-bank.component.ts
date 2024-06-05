@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -22,6 +23,7 @@ export class AddBankComponent implements OnInit {
       active: "Account",
     },
   ];
+  isSubmit: boolean = false;
   isUpdate: any = false;
   jsonControlArray: any;
   BankForm: any;
@@ -37,6 +39,7 @@ export class AddBankComponent implements OnInit {
   AccountTypeStatus: any;
   constructor(
     private Route: Router,
+    public snackBarUtilityService: SnackBarUtilityService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -262,6 +265,24 @@ export class AddBankComponent implements OnInit {
   }
 
   async save() {
+    this.snackBarUtilityService.commonToast(async () => {
+    if (!this.BankForm.valid || this.isSubmit) {
+      this.BankForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
+      });
+      return false;
+    }
+
+    this.isSubmit = true;
     const commonBody = {
       Bankname: this.BankForm.value.Bankname.name,
       Accountnumber: this.BankForm.value.Accountnumber,
@@ -319,6 +340,7 @@ export class AddBankComponent implements OnInit {
       };
       await this.handleRequest(req);
     }
+  }, "Adding Bank Please Wait..!");
   }
 
   async handleRequest(req: any) {

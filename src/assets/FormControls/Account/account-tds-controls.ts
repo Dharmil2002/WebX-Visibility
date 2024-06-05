@@ -181,7 +181,7 @@ export class AccountTdsControls {
         label: "TDS Active",
         placeholder: "",
         type: "toggle",
-        value: isUpdate? UpdateData.isActive:false,
+        value: isUpdate? UpdateData.isActive:true,
         generatecontrol: true,
         disable: false,
         Validations: [],

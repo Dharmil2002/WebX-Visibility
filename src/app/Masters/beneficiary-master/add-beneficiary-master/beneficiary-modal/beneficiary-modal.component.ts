@@ -68,23 +68,23 @@ export class BeneficiaryModalComponent implements OnInit {
   }
   //#region to send data to parent component using dialogRef
   save() {
-    
 
-    if(!this.beneficiaryDetailForm.valid)
-      {
-        this.beneficiaryDetailForm.markAllAsTouched();
-        Swal.fire({
-          icon: "error",
-          title: "Missing Information",
-          text: "Please ensure all required fields are filled out.",
-          showConfirmButton: true,
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#d33',
-          timer: 5000,
-          timerProgressBar: true,
-        });
-        return false;
-      }
+
+    if (!this.beneficiaryDetailForm.valid) {
+      this.beneficiaryDetailForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
+    this.isSubmit = true;
     let file = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
     file = file ? file : this.url
     const data = this.beneficiaryDetailForm.value;

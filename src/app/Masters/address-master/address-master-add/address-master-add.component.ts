@@ -10,6 +10,8 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+
 @Component({
   selector: "app-address-master-add",
   templateUrl: "./address-master-add.component.html",
@@ -43,6 +45,7 @@ export class AddressMasterAddComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
   customerName: any;
   customerNameStatus: any;
+  isSubmit: boolean = false;
 
   //#endregion
   constructor(
@@ -52,6 +55,8 @@ export class AddressMasterAddComponent implements OnInit {
     private filter: FilterUtils,
     public StorageServiceI: StorageService,
     private objPinCodeService: PinCodeService,
+    public snackBarUtilityService: SnackBarUtilityService,
+
   ) {
     this.companyCode = this.StorageServiceI.companyCode;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -66,18 +71,28 @@ export class AddressMasterAddComponent implements OnInit {
     if (this.action === "edit") {
       this.isUpdate = true;
       this.addressTabledata = this.data;
+      this.breadScrums = [
+        {
+          generatecontrol: true,
+          toggle: this.data.activeFlag,
+          title: "Modify Address",
+          items: ["Home"],
+          active: "Modify Address",
+        },
+      ];
     } else {
+      this.breadScrums = [
+        {
+          generatecontrol: true,
+          toggle: true,
+          title: "Add Address",
+          items: ["Home"],
+          active: "Add Address",
+        },
+      ];
       this.addressTabledata = new AddressMaster({});
     }
-    this.breadScrums = [
-      {
-        generatecontrol: true,
-        toggle: this.data && this.data.activeFlag ? this.data.activeFlag : "",
-        title: this.action === "edit" ? "Modify Address" : "Add Address",
-        items: ["Home"],
-        active: this.action === "edit" ? "Modify Address" : "Add Address",
-      },
-    ];
+
     this.initializeFormControl();
   }
 
@@ -125,10 +140,10 @@ export class AddressMasterAddComponent implements OnInit {
       }
     });
   }
-  async getdata(){
-    if(this.isUpdate){
+  async getdata() {
+    if (this.isUpdate) {
       this.addressTableForm.controls["pincode"].patchValue(
-        {name:this.addressTabledata.pincode,value:this.addressTabledata.pincode}
+        { name: this.addressTabledata.pincode, value: this.addressTabledata.pincode }
       );
     }
   }
@@ -239,96 +254,128 @@ export class AddressMasterAddComponent implements OnInit {
 
   //#region Save Data
   save() {
-    this.addressTableForm.controls["pincode"].setValue(
-      this.addressTableForm.value.pincode.name
-    );
-    // Clear any errors in the form controls
-    Object.values(this.addressTableForm.controls).forEach((control) =>
-      control.setErrors(null)
-    );
-    const customerName = this.addressTableForm.value.customerNameDropdown?.map(
-      (x) => {
-        return {
-          code: x.value,
-          name: x.name,
-        };
-      }
-    );
-    this.addressTableForm.removeControl("customerNameDropdown");
-    this.addressTableForm.controls["customer"].setValue(customerName);
-    if (this.isUpdate) {
-      let id = this.addressTableForm.value._id;
-      this.addressTableForm.removeControl("_id");
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "address_detail",
-        filter: { _id: id },
-        update: {
-          ...this.addressTableForm.value,
-          mODDT: new Date(),
-          mODLOC: this.StorageServiceI.branch,
-          mODBY: this.StorageServiceI.userName,
-        },
-      };
-      this.masterService.masterPut("generic/update", req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl(
-              "/Masters/AddressMaster/AddressMasterList"
-            );
-          }
-        },
+
+    if (!this.addressTableForm.valid || this.isSubmit) {
+      this.addressTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required  fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
       });
-    } else {
-      const lastCode = this.addressData[this.addressData.length - 1];
-      const lastAddressCode = lastCode
-        ? parseInt(lastCode.addressCode.substring(1))
-        : 0;
-      // Function to generate a new address code
-      function generateAddressCode(initialCode: number = 0) {
-        const nextAddressCode = initialCode + 1;
-        const addressNumber = nextAddressCode.toString().padStart(4, "0");
-        const addressCode = `A${addressNumber}`;
-        return addressCode;
-      }
-      this.newAddressCode = generateAddressCode(lastAddressCode);
-      this.addressTableForm.controls["_id"].setValue(this.newAddressCode);
-      this.addressTableForm.controls["addressCode"].setValue(
-        this.newAddressCode
-      );
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "address_detail",
-        data: {
-          ...this.addressTableForm.value,
-          eNTDT: new Date(),
-          eNTLOC: this.StorageServiceI.branch,
-          eNTBY: this.StorageServiceI.userName,
-        },
-      };
-      this.masterService.masterPost("generic/create", req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
+      return false;
+    }
+    else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+
+          this.isSubmit = true
+
+          this.addressTableForm.controls["pincode"].setValue(
+            this.addressTableForm.value.pincode.name
+          );
+          // Clear any errors in the form controls
+          Object.values(this.addressTableForm.controls).forEach((control) =>
+            control.setErrors(null)
+          );
+          const customerName = this.addressTableForm.value.customerNameDropdown?.map(
+            (x) => {
+              return {
+                code: x.value,
+                name: x.name,
+              };
+            }
+          );
+          this.addressTableForm.removeControl("customerNameDropdown");
+          this.addressTableForm.controls["customer"].setValue(customerName);
+          if (this.isUpdate) {
+            let id = this.addressTableForm.value._id;
+            this.addressTableForm.removeControl("_id");
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "address_detail",
+              filter: { _id: id },
+              update: {
+                ...this.addressTableForm.value,
+                mODDT: new Date(),
+                mODLOC: this.StorageServiceI.branch,
+                mODBY: this.StorageServiceI.userName,
+              },
+            };
+            this.masterService.masterPut("generic/update", req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.Route.navigateByUrl(
+                    "/Masters/AddressMaster/AddressMasterList"
+                  );
+                }
+              },
             });
-            this.Route.navigateByUrl(
-              "/Masters/AddressMaster/AddressMasterList"
+          } else {
+            const lastCode = this.addressData[this.addressData.length - 1];
+            const lastAddressCode = lastCode
+              ? parseInt(lastCode.addressCode.substring(1))
+              : 0;
+            // Function to generate a new address code
+            function generateAddressCode(initialCode: number = 0) {
+              const nextAddressCode = initialCode + 1;
+              const addressNumber = nextAddressCode.toString().padStart(4, "0");
+              const addressCode = `A${addressNumber}`;
+              return addressCode;
+            }
+            this.newAddressCode = generateAddressCode(lastAddressCode);
+            this.addressTableForm.controls["_id"].setValue(this.newAddressCode);
+            this.addressTableForm.controls["addressCode"].setValue(
+              this.newAddressCode
             );
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "address_detail",
+              data: {
+                ...this.addressTableForm.value,
+                eNTDT: new Date(),
+                eNTLOC: this.StorageServiceI.branch,
+                eNTBY: this.StorageServiceI.userName,
+              },
+            };
+            this.masterService.masterPost("generic/create", req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.Route.navigateByUrl(
+                    "/Masters/AddressMaster/AddressMasterList"
+                  );
+                }
+              },
+            });
           }
-        },
-      });
+        }
+        catch (error) {
+          console.error("Error fetching data:", error);
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+        }
+      }, "Address Adding...");
     }
   }
   //#endregion

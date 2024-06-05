@@ -416,12 +416,12 @@ export class AddUserMasterComponent implements OnInit {
   async save() {
 
 
-    if (!this.userTableForm.valid) {
+    if (!this.userTableForm.valid ||  this.isSubmit) {
       this.userTableForm.markAllAsTouched()
       Swal.fire({
         icon: "error",
         title: "Missing Information",
-        text: "Please ensure all required fields are filled out.",
+        text: "Please ensure all required fields are filled out...",
         showConfirmButton: true,
         confirmButtonText: 'OK',
         confirmButtonColor: '#d33',
@@ -429,14 +429,17 @@ export class AddUserMasterComponent implements OnInit {
         timerProgressBar: true,
 
       });
+      alert(this.isSubmit);
+
+
       return false;
     }
     else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
-
           this.isSubmit = true
-
+          alert(this.isSubmit);
+          
           this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
           this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
           this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
@@ -468,7 +471,8 @@ export class AddUserMasterComponent implements OnInit {
 
           if (this.isUpdate) {
             this.newUserCode = this.userTable.userId;
-          } else {
+          } 
+          else {
             if (['Customer', 'Vendor', 'Business associate'].includes(this.userTableForm.value.userType.name)) {
               this.newUserCode = this.userTableForm.controls["name"].value?.value || "";
               this.userTableForm.controls["name"].setValue(this.userTableForm.value.name?.name || "");
@@ -497,18 +501,18 @@ export class AddUserMasterComponent implements OnInit {
               },
               update: data,
             };
-
-            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Record updated Successfully",
-                showConfirmButton: true,
-              });
-              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            }
+            this.isSubmit=true
+            // const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+            // if (res) {
+            //   // Display success message
+            //   Swal.fire({
+            //     icon: "success",
+            //     title: "Successful",
+            //     text: "Record updated Successfully",
+            //     showConfirmButton: true,
+            //   });
+            //   this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+            // }
           } else {
             data["eNTDT"] = new Date();
             data['eNTLOC'] = this.storage.branch;
@@ -521,34 +525,33 @@ export class AddUserMasterComponent implements OnInit {
               data: mergedObject,
             };
 
-            const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Record added Successfully",
-                showConfirmButton: true,
-              });
-
-
-              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+            // const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+            // if (res) {
+            //   // Display success message
+            //   Swal.fire({
+            //     icon: "success",
+            //     title: "Successful",
+            //     text: "Record added Successfully",
+            //     showConfirmButton: true,
+            //   });
+              // this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
             }
           }
-        }
-        catch (error) {
-          console.error("Error fetching data:", error);
-          this.snackBarUtilityService.ShowCommonSwal(
-            "error",
-            "Fail To Submit Data..!"
-          );
-        }
-      }, "Loading....");
-    }
+          catch (error) {
+            console.error("Error fetching data:", error);
+            this.snackBarUtilityService.ShowCommonSwal(
+              "error",
+              "Fail To Submit Data..!"
+            );
+          }
+        }, "Address Adding...");
+      }
   }
 
   cancel() {
-    this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+    this.isSubmit=false;
+
+    // this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
   }
 
   functionCallHandler($event) {

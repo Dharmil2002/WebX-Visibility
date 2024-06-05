@@ -211,7 +211,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
-
+         
           if (this.tableData.length === 0) {
             Swal.fire({
               text: 'Please Fill Beneficiary Details',

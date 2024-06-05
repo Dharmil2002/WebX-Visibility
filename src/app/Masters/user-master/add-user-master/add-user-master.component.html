@@ -2,7 +2,7 @@
  (toggleChange)="onToggleChange($event)">
   <form [formGroup]="userTableForm">
     <app-form-webxpress [form]="userTableForm" [formData]="jsonControlUserArray"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true" [Disabled]="isSubmit"
       (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'User Details'">
     </app-form-webxpress>
   </form>

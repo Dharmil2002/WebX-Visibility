@@ -8,6 +8,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { ViewPrintControl } from "src/assets/FormControls/view-print";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import Swal from "sweetalert2";
+import { ViewName } from "src/app/config/myconstants";
 @Component({
   selector: "app-view-print",
   templateUrl: "./view-print.component.html",

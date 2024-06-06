@@ -14,7 +14,6 @@ export class thcreportService {
         private storage: StorageService
     ) { }
     async getthcReportDetail(reqBody) {
-        debugger
         const matchQuery = (isLTL) => ( {
             ...(reqBody.THCArray != "" ? { docNo: { D$in: reqBody.THCArray } }:
             {D$and: [

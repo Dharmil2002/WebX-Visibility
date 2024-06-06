@@ -162,7 +162,7 @@ export class GeneralLedgerReport {
                 },],
                 additionalData: {
                     // support: "branchHandler",
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
                 // functions: {
                 //     onToggleAll: "toggleSelectAll",

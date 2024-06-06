@@ -216,6 +216,7 @@ export class ArrivalVehicleService {
                     update: {
                         "sTS": DocketStatus.Arrived,
                         "sTSNM": DocketStatus[DocketStatus.Arrived],
+                        "aRRDT":new Date(),
                         "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
                         "mODBY": this.storage.userName,
                         "mODDT": new Date(),

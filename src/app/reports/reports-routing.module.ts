@@ -31,10 +31,12 @@ import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSh
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
+
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
 import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component'
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
+import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -70,6 +72,7 @@ const routes: Routes = [
   { path: "DRS-Register-report", component: DrsRegisterComponent },
   { path: "manifest-register-report", component: ManifestRegisterReportComponent },
   { path: "LoadingsheetRegister", component: LoadingsheetRegisterComponent },
+  { path: "TDSRegister", component: GenerateTdsRegisterReportComponent },
 ];
 
 @NgModule({

@@ -13,6 +13,7 @@ export class CustInvoiceRegService {
   ) {}
 
   async getcustInvRegReportDetail(data) {
+    debugger;
     let matchQuery = {
       ...(data.docNo != "" ? { bILLNO: { D$eq: data.docNo } }:
       {D$and: [
@@ -34,7 +35,8 @@ export class CustInvoiceRegService {
         ...(data.sac && data.sac.length > 0
           ? [{ D$expr: { D$in: ["$voucher_trans_details.sCOD", data.sac] } }]
           : []),
-        ...[{ bLOC: { D$in: data.branch } }],
+        // ...[{ bLOC: { D$in: data.branch } }],
+        ...(data.individual =="Y" ? [{ bLOC : { D$in : data.branch } }] : [{}]),
       ]}
       ),
     };
@@ -44,7 +46,7 @@ export class CustInvoiceRegService {
     //   jonFilters.push({
     //     collectionName: "voucher_trans_details",
     //     filter: {
-    //       D$expr: { D$in: ["$sCOD", data.sac] } 
+    //       D$expr: { D$in: ["$sCOD", data.sac] }
     //     }
     //   });
     // }
@@ -58,7 +60,7 @@ export class CustInvoiceRegService {
         }
       }
     }
-        
+
     const res = await firstValueFrom(
       this.masterServices.masterMongoPost("generic/getReportData", reqBody)
     );
@@ -313,7 +315,7 @@ export class CustInvoiceRegService {
     //   dOCTYP: item?.dOCTYP || "Transaction",
     // }));
 
-    return { 
+    return {
       data: details,
       grid: res.data.grid
     };

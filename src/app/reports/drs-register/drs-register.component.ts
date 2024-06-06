@@ -72,7 +72,7 @@ export class DrsRegisterComponent implements OnInit {
     this.drsregisterFormControl = new DrsReportControl();
     this.jsondrsregisterFormArray = this.drsregisterFormControl.drsReportControlArray;    
     this.drsregisterTableForm = formGroupBuilder(this.fb, [this.jsondrsregisterFormArray]);
-    this.drsregisterTableForm.controls["ReportType"].setValue('CUmulative');
+    this.drsregisterTableForm.controls["ReportType"].setValue('Cumulative');
     this.drsregisterTableForm.controls['DocumentStatus'].setValue(5);
     this.branchName = this.jsondrsregisterFormArray.find(
       (data) => data.name === "Location"
@@ -90,8 +90,8 @@ export class DrsRegisterComponent implements OnInit {
     }
   }
   async getDropdownData() {
-    const locationList = await this.locationService.locationFromApi();
-    this.filter.Filter(this.jsondrsregisterFormArray, this.drsregisterTableForm, locationList, "Location", false);
+    // const locationList = await this.locationService.locationFromApi();
+    // this.filter.Filter(this.jsondrsregisterFormArray, this.drsregisterTableForm, locationList, "Location", false);
     const branchList = await this.locationService.locationFromApi();
     this.filter.Filter(
       this.jsondrsregisterFormArray,
@@ -105,7 +105,6 @@ export class DrsRegisterComponent implements OnInit {
     this.drsregisterTableForm.get('Individual').setValue("Y");
   }
   async save(){
-    debugger
     this.loading = true;
     try {
       this.ReportingBranches = [];

@@ -19,7 +19,6 @@ export class RunSheetService {
 
     /*below method is for the getting data and displayed in runSheet Dashboard*/
     async getRunSheetData(filter) {
-
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,

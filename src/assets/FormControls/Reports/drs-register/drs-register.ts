@@ -32,7 +32,7 @@ export class DrsReportControl {
                     Validations: [
                     ],
                     additionalData: {
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     generatecontrol: true, disable: false
                },
@@ -58,7 +58,7 @@ export class DrsReportControl {
                     type: 'radiobutton',
                     value: [
                         { value: "Individual", name: "Individual" },
-                        { value: "CUmulative", name: "CUmulative" }
+                        { value: "Cumulative", name: "Cumulative" }
                     ],
                     Validations: [],
                     generatecontrol: true, disable: false

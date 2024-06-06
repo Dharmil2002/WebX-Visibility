@@ -378,6 +378,7 @@ export class DebitNoteDetailsComponent implements OnInit {
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
+        debugger
         this.DebitNoteRequestModel.companyCode = this.storage.companyCode;
         this.DebitNoteRequestModel.docType = "DBNT";
         this.DebitNoteRequestModel.branch = this.storage.branch;
@@ -389,7 +390,7 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTHdrDataRequestModel.docNo = "";
         this.DNTHdrDataRequestModel.tYP = "D";
         this.DNTHdrDataRequestModel.nTNO = "";
-        this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
+        this.DNTHdrDataRequestModel.bILLNO = this.dNoteData[0].docNo;
         this.DNTHdrDataRequestModel.nTDT = new Date();
         this.DNTHdrDataRequestModel.lOC = this.storage.branch;
         //this.DNTHdrDataRequestModel.pARTY = { cD: this.hsnInvoiceDataResponse.data[0].cUST.cD, nM: this.hsnInvoiceDataResponse.data[0].cUST.nM }; // assigning empty objects for PARTY and GST
@@ -424,7 +425,7 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTDetDataRequestModel.nTNO ="";
         this.DNTDetDataRequestModel.nTDT = new Date();
         this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
-        this.DNTDetDataRequestModel.bGNDT = "";
+        this.DNTDetDataRequestModel.bGNDT = this.dNoteData[0].bDT;
         this.DNTDetDataRequestModel.pARTY = {
           cD: this.dNoteData[0].vND.cD,
           nM: this.dNoteData[0].vND.nM,

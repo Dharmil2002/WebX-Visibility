@@ -18,7 +18,7 @@
                   <mat-icon>{{isUpDown ?
                     'arrow_upward' : 'arrow_downward'}}</mat-icon>
                 </button>
-                <mat-checkbox (change)="OnChangeCheckBox($event)">
+                <mat-checkbox (change)="OnChangeCheckBox($event)"[(ngModel)]="checkboxValue">
                   {{CheckBoxMessage}} &nbsp;
                 </mat-checkbox>
               </section>

@@ -1,8 +1,8 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-     <form [formGroup]="vendorgstregisTableForm">
-          <app-form-webxpress [form]="vendorgstregisTableForm" [FormTitle]="'Vendor Wise GST Invoice Register Report'"
-               [formData]="jsonvendgstregisFormArray" (functionCallEmitter)="functionCallHandler($event)"
-               (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Submit'">
+     <form [formGroup]="tdsRegisterTableForm">
+          <app-form-webxpress [form]="tdsRegisterTableForm" [FormTitle]="'Generate TDS Register Report'"
+               [formData]="jsonTDSRegisterFormArray" (functionCallEmitter)="functionCallHandler($event)"
+               (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Download'">
           </app-form-webxpress>
      </form>
 

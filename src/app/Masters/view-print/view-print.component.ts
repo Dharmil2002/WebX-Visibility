@@ -8,6 +8,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { ViewPrintControl } from "src/assets/FormControls/view-print";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import Swal from "sweetalert2";
+import { ViewName } from "src/app/config/myconstants";
 @Component({
   selector: "app-view-print",
   templateUrl: "./view-print.component.html",
@@ -109,140 +110,72 @@ export class ViewPrintComponent implements OnInit {
       showError("Please select a View Type");
       return;
     }
- 
+
     // Form is complete, proceed with generating URL
     const BillingViewArray = [
       {
-        name: "Dabour View-Print",
-        partyCode: "CUST00014",
-        viewName: "CustomerBill",
-      },
-      {
-        name: "Godrej View-Print",
-        partyCode: "CONSRAJT23",
-        viewName: "CustomerBill",
-      },
-      {
-        name: "Adani View-Print",
-        partyCode: "CUST00018",
-        viewName: "CustomerBill",
-      },
-      {
-        name: "AsianPaint View-Print",
-        partyCode: "CONSRAJT22",
-        viewName: "CustomerBill",
-      },
-      {
-        name: "Polycab View-Print",
-        partyCode: "CONSRAJT20",
-        viewName: "CustomerBill",
+        name: "Customer Invoice",
+        PartyField: "cUST.cD",
+        viewName: ViewName.CB,
       },
       {
         name: "Docket View-Print",
-        partyCode: "CONSRAJT58",
-        viewName: "Docket",
+        viewName: ViewName.DKT,
       },
       {
         name: "Job View-Print",
-        partyCode: "CONSRAJT25",
-        viewName: "job",
+        viewName: ViewName.JOB,
       },
       {
         name: "PRQ View-Print",
-        partyCode: "CONSRAJT25",
-        viewName: "prq",
+        viewName: ViewName.PRQ,
       },
       {
         name: "THC View-Print",
-        partyCode: "CONSRAJ19",
-        viewName: "thc1",
-      },
-      {
-        name: "THC View-Print",
-        partyCode: "CONSRAJ19",
-        viewName: "thc",
+        viewName: ViewName.THC,
       },
       {
         name: "LoadingSheet View-Print",
-        partyCode: "CONSRAJT26",
-        viewName: "LS1",
+        viewName: ViewName.LS,
       },
-      {
-        name: "LoadingSheet View-Print",
-        partyCode: "CONSRAJT26",
-        viewName: "loadingSheet",
-      },
+
       {
         name: "Manifest View-Print",
-        partyCode: "CONSRAJ24",
-        viewName: "MF1",
+        viewName: ViewName.MF,
       },
-      {
-        name: "Manifest View-Print",
-        partyCode: "CONSRAJT27",
-        viewName: "Manifest",
-      },
-      {
-        name: "DocketJC View-Print",
-        partyCode: "CONSRAJT24",
-        viewName: "Docket"
-      },
+
       {
         name: "MR View-Print",
-        partyCode: "CUST00028",
-        viewName: "DeliveryMr"
-      },
-      {
-        name: "DocketATC View-Print",
-        partyCode: "CON0025",
-        viewName: "Docket",
-      },
-      {
-        name: "GatePassATC View-Print",
-        partyCode: "CON0025",
-        viewName: "DeliveryMr",
+        viewName: ViewName.MR,
       },
       {
         name: "Voucher View-Print",
-        partyCode: "CUST00029",
-        viewName: "VoucherV2",
+        viewName: ViewName.VR,
       },
       {
         name: "DRS View-Print",
-        partyCode: "CONSRAJ22",
-        viewName: "drs",
+        viewName: ViewName.DRS,
       },
       {
         name: "Credit Note View-Print",
-        partyCode: "CON0027",
-        viewName: "CreditNote",
+        viewName: ViewName.CDN,
       },
       {
         name: "Money Receipt View-Print",
-        partyCode: "CG00045",
-        viewName: "MoneyReceipt",
+        viewName: ViewName.MR,
       },
-      {
-        name: "General invoice View-Print",
-        partyCode: "CG0000174",
-        viewName: "BillInvoice",
-      },
-      {
-        name: "Freight Invoice View-Print",
-        partyCode: "CG0214574K",
-        viewName: "BillInvoice",
-      },
-    ]; 
+
+    ];
     const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {
-      templateName: FindBillView?.viewName || viewType.name,
-      partyCode: FindBillView?.partyCode,
+      templateName: FindBillView?.viewName,
+      PartyField: FindBillView?.PartyField || "",
       DocNo: docNo,
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1300,height=800");
-  } 
+  }
 
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call

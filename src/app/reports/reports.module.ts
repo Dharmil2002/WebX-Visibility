@@ -159,7 +159,17 @@ import { GenericReportViewComponent } from './generic-report-view/generic-report
   ],
   exports: [],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService]
+  providers: [
+    DatePipe, 
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, 
+    { provide: MAT_DIALOG_DATA, useValue: {} }, 
+    jsonDataServiceService, 
+    FilterUtils, 
+    SnackBarUtilityService, 
+    utilityService, 
+    SessionService, 
+    EncryptionService
+  ]
 })
 
 export class ReportsModule { }

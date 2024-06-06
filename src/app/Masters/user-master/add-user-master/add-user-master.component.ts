@@ -416,7 +416,7 @@ export class AddUserMasterComponent implements OnInit {
   async save() {
 
 
-    if (!this.userTableForm.valid ||  this.isSubmit) {
+    if (!this.userTableForm.valid) {
       this.userTableForm.markAllAsTouched()
       Swal.fire({
         icon: "error",
@@ -429,17 +429,16 @@ export class AddUserMasterComponent implements OnInit {
         timerProgressBar: true,
 
       });
-      alert(this.isSubmit);
-
-
+      
       return false;
+
     }
     else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
+
           this.isSubmit = true
-          alert(this.isSubmit);
-          
+
           this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
           this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
           this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
@@ -501,18 +500,17 @@ export class AddUserMasterComponent implements OnInit {
               },
               update: data,
             };
-            this.isSubmit=true
-            // const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
-            // if (res) {
-            //   // Display success message
-            //   Swal.fire({
-            //     icon: "success",
-            //     title: "Successful",
-            //     text: "Record updated Successfully",
-            //     showConfirmButton: true,
-            //   });
-            //   this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            // }
+            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+            if (res) {
+              // Display success message
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: "Record updated Successfully",
+                showConfirmButton: true,
+              });
+              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+            }
           } else {
             data["eNTDT"] = new Date();
             data['eNTLOC'] = this.storage.branch;
@@ -534,9 +532,10 @@ export class AddUserMasterComponent implements OnInit {
             //     text: "Record added Successfully",
             //     showConfirmButton: true,
             //   });
-              // this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            }
+            //   this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+            // }
           }
+        }
           catch (error) {
             console.error("Error fetching data:", error);
             this.snackBarUtilityService.ShowCommonSwal(

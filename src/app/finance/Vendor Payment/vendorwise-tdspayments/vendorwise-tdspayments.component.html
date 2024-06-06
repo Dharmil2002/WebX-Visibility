@@ -24,12 +24,23 @@
                     <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
                         [formData]="jsonPaymentSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
                         [className]="'col-xl-4 col-lg-4 col-md-6 col-sm-6 '"
-                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+                        (callFunction)="functionCallHandler($event)"
+                         [showSaveAndCancelButton]="false">
                     </app-form-webxpress>
                 </form>
             </div>
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+                    <div class="example-button-row  d-flex justify-content-end">
+                        <button [disabled]="!PaymentSummaryFilterForm.valid
+                         ||
+                         tableData.length==0" class="msr-3" mat-raised-button color="primary"
+                            (click)="Submit()">Submit</button>
+                        <button mat-button (click)="RedirectToTDSPayment()">Back</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </div>
 
 </app-common-wrapper-webxpress>

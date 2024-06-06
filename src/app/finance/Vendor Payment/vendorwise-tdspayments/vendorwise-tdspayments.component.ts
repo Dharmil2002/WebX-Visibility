@@ -261,65 +261,35 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
   }
 
   async GettdsPaymentList(vendorCode) {
-    // const today = new Date();
-    // const currentYear = today.getFullYear(); // Get the current year
-    // let financialYearStartDate = new Date;
     const { financialYearStartDate, financialYearEndDate } = this.getFinancialYearDates();
     this.isTableLode = false;
+    console.log(financialYearStartDate);
     const BodyDataHeader = {
       companyCode: this.storage.companyCode,
       collectionName: "vend_bill_summary",
-      filter: {
-        'D$expr': {
-          'D$and': [
+      filter:{
+        "D$expr": {
+          "D$and": [
             // Check if bALAMT is greater than 0
-            { 'D$gt': ['$tDS.aMT', 0] },
+            { "D$gt": ["$tDS.aMT", 0] },
             // Check if Value is defined before checking cUST.cD
-            { 'D$eq': ['$vND.cD', vendorCode] },
+            { "D$eq": ["$vND.cD", vendorCode] },
             // Cancel Flag Check 
-            // {
-            //   'D$or': [
-            //     { 'D$eq': ['$tDspaid', false] },
-            //     { 'D$not': { 'D$exists': ["$tDspaid"] } }
-            //   ]
-            // },
+            {
+              "D$or": [
+                { "D$eq": ["$tDSPAID", false] },
+                { "D$eq": [{ "D$ifNull": ["$tDSPAID", false] }, false] }
+              ]
+            },
             // Check if bDT is greater than financialYearStartDate
-            // { 'D$gt': ['$bDT', 'ISODate+'+'('+(financialYearStartDate.toString())+')'] },
+            // { "D$gt": ["$bDT", financialYearStartDate] },
             // // Check if bDT is less than financialYearEndDate
-            // { 'D$lt': ['$bDT','ISODate+'+'('+(financialYearEndDate.toString())+')'] },
-          ].filter(Boolean) // Remove undefined elements from the array
+            // { "D$lt": ["$bDT", financialYearEndDate] }
+          ] // Remove undefined elements from the array
         }
       }
     };
 
-
-    filter: {
-      $expr: {
-        $and: [
-          // Check if bALAMT is greater than 0
-          { $gt: ['$tDS.aMT', 0] },
-          
-          // Check if Value is defined before checking cUST.cD
-          { $eq: ['$vND.cD', vendorCode] },
-          
-          // Cancel Flag Check 
-          {
-            $or: [
-              { $eq: ['$tDspaid', false] },
-              { $not: { $exists: ['$tDspaid'] } }
-            ]
-          },
-          
-          // Uncomment these lines if you need to filter by date range
-          // Check if bDT is greater than financialYearStartDate
-          // { $gt: ['$bDT', new ISODate(financialYearStartDate.toString())] },
-          // Check if bDT is less than financialYearEndDate
-          // { $lt: ['$bDT', new ISODate(financialYearEndDate.toString())] },
-        ].filter(Boolean) // Remove undefined elements from the array
-      }
-    };
-
-    
     this.DataResponseHeader = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataHeader));
 
     this.tableData = this.DataResponseHeader.data.map((x) => {
@@ -346,9 +316,12 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
     this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(
       this.tdsPaymentData?.vendPanno
     );
-
   }
 
+
+  RedirectToTDSPayment() {
+    this.route.navigate(["/Finance/VendorPayment/TDS-Payment"]);
+  }
 
   // Payment Modes Changes
   async OnPaymentModeChange(event) {
@@ -359,7 +332,6 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
     switch (PaymentMode) {
       case "Cheque":
         filterFunction = (x) => x.name !== "CashAccount";
-
         break;
       case "Cash":
         filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank";
@@ -436,7 +408,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
         break;
     }
   }
-  async save() {
+  async Submit() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         this.TDSRequestModel.companyCode = this.storage.companyCode;
@@ -517,7 +489,6 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
         )
           .then((res: any) => {
             if (res.success) {
-  
               Swal.fire({
                 icon: "success",
                 title: "TDS Payment slip Created Successfully",
@@ -530,6 +501,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
                   Swal.hideLoading();
                   setTimeout(() => {
                     Swal.close();
+                    this.route.navigate(["Finance/VendorPayment/Dashboard"]);
                   }, 2000);
                 }
               });
@@ -545,7 +517,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
     }, "TDS Payment Slip Generating..!");
   }
 
-  // Approval Credit Note
+  // Approval Tds Payment 
   async approval(Data, Tpsno) {
     const firstSelectedRecord = Data.find(tdsData => tdsData.isSelected);
 
@@ -671,7 +643,6 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
               const res = await firstValueFrom(
                 this.masterService.masterPut("generic/update", req))
 
-
               this.tableData.forEach(noteData => {
                 if (noteData.isSelected) {
                   // Check if the current noteData is selected
@@ -688,7 +659,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
                 }
               });
 
-              this.route.navigate(["Finance/VendorPayment/Dashboard"])
+             // this.route.navigate(["Finance/VendorPayment/Dashboard"]);
             } else {
               this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Do Account Posting..!");
             }

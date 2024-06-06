@@ -107,13 +107,28 @@ export class TdsPaymentsComponent implements OnInit {
   }
 
   async GetTHCData() {
-    const currentYear = new Date().getFullYear();
+    const { financialYearStartDate, financialYearEndDate } = this.getFinancialYearDates();
     const BodyDataHeader = {
       companyCode: this.storageService.companyCode,
       collectionName: "vend_bill_summary",
       filter: {
-        // Existing filter
-        "tDS.aMT": { $gt: 0 },
+        "D$expr": {
+          "D$and": [
+            // Check if bALAMT is greater than 0
+            { "D$gt": ["$tDS.aMT", 0] },
+            // Cancel Flag Check 
+            {
+              "D$or": [
+                { "D$eq": ["$tDSPAID", false] },
+                { "D$eq": [{ "D$ifNull": ["$tDSPAID", false] }, false] }
+              ]
+            },
+            // Check if bDT is greater than financialYearStartDate
+            // { "D$gt": ["$bDT", financialYearStartDate] },
+            // // Check if bDT is less than financialYearEndDate
+            // { "D$lt": ["$bDT", financialYearEndDate] }
+          ] // Remove undefined elements from the array
+        }
       }
     };
     this.DataResponseHeader = await firstValueFrom(this.masterService.masterPost("generic/get", BodyDataHeader));
@@ -123,8 +138,8 @@ export class TdsPaymentsComponent implements OnInit {
       if (!acc[vendorCode]) {
         acc[vendorCode] = {
           vendorCode: vendorCode + ':' + item.vND.nM,
-          vendorCd:vendorCode,
-          vendPanno:item.vND.pAN,
+          vendorCd: vendorCode,
+          vendPanno: item.vND.pAN,
           totalBALAMT: 0,
           totalTDSAMT: 0,
           invoiceCount: 0
@@ -149,6 +164,23 @@ export class TdsPaymentsComponent implements OnInit {
     this.tableData = dataWithSrno;
   }
 
+  // Function to calculate financial year start and end dates
+  getFinancialYearDates() {
+    const today = new Date();
+    const year = today.getFullYear();
+    let financialYearStartDate;
+    let financialYearEndDate;
+
+    if (today.getMonth() >= 3) { // April (3) to December (11)
+      financialYearStartDate = new Date(Date.UTC(year, 3, 1)).toISOString(); // April 1st of the current year
+      financialYearEndDate = new Date(Date.UTC(year + 1, 2, 31, 23, 59, 59)).toISOString(); // March 31st of the next year
+    } else { // January (0) to March (2)
+      financialYearStartDate = new Date(Date.UTC(year - 1, 3, 1)).toISOString(); // April 1st of the previous year
+      financialYearEndDate = new Date(Date.UTC(year, 2, 31, 23, 59, 59)).toISOString(); // March 31st of the current year
+    }
+
+    return { financialYearStartDate, financialYearEndDate };
+  }
 
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance

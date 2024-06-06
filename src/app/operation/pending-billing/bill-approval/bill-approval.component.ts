@@ -335,8 +335,29 @@ export class BillApprovalComponent implements OnInit {
 
     const response = [
       createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, TotalAmount, 0),
-      createVoucher(ledgerInfo['INC001003'].LeadgerCode, ledgerInfo['INC001003'].LeadgerName, ledgerInfo['INC001003'].LeadgerCategory, 0, DocketAmount),
     ];
+    let LeadgerDetails;
+    switch (data?.tRNMODE) {
+      case "P1":
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+      case "P2":
+        LeadgerDetails = ledgerInfo['INC001004'];
+        break;
+      case "P3":
+        LeadgerDetails = ledgerInfo['INC001002'];
+        break;
+      case "P4":
+        LeadgerDetails = ledgerInfo['INC001001'];
+        break;
+      default:
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+    }
+    // Income Ledger
+    if (LeadgerDetails) {
+      response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, DocketAmount));
+    }
     if (data?.rOUNOFFAMT > 0) {
       response.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName, ledgerInfo['EXP001042'].LeadgerCategory, data?.rOUNOFFAMT, 0));
     }

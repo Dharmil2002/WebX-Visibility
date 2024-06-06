@@ -96,6 +96,7 @@ export class CustomerGroupAddComponent implements OnInit {
       return false;
     }
     else {
+      
       this.snackBarUtilityService.commonToast(async () => {
         try {
           this.isSubmit = true

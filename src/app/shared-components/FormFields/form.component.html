@@ -479,7 +479,7 @@
                 <div class="row" style="margin-top: 10px; margin-left: 10px;">
                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                     <div class="example-button-row">
-                      <button type="button" [disabled]="Disabled ? !form.valid : Disabled" mat-raised-button color="primary" (click)="save()">
+                      <button type="button" [disabled]="!form.valid" mat-raised-button color="primary" (click)="save()">
                         {{submit}}
                       </button>
                       <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
@@ -487,6 +487,20 @@
                   </div>
                 </div>
               </ng-container>
+
+              <ng-container *ngIf="modifyAndSaveButton">
+                <div class="row" style="margin-top: 10px; margin-left: 10px;">
+                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                    <div class="example-button-row">
+                      <button type="button" [disabled]="Disabled" mat-raised-button color="primary" (click)="save()">
+                        {{submit}}
+                      </button>
+                      <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
               <ng-container *ngIf="showSaveButton">
                 <div class="row" style="margin-top: 10px; margin-left: 10px;">
                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">

@@ -124,7 +124,7 @@ export class UpdateRunSheetComponent implements OnInit {
     this.getShipmentData();
   }
   async getShipmentData() {
-    const res = await this.runSheetService.drsShipmentDetails({ cID: this.storage.companyCode, dRSNO: this.tripData.columnData.RunSheet });
+    const res = await this.runSheetService.drsShipmentDetails(this.tripData.columnData.RunSheet);
     const dktNo = res?.map((x) => x.dKTNO);
     this.packageList = await this.runSheetService.drsShipmetPkgs({ cID: this.storage.companyCode, dKTNO: { "D$in": dktNo }, sFX: 0 });
     const shipmentData = await this.runSheetService.FieldMappingRunSheetdkts(res);
@@ -202,10 +202,11 @@ export class UpdateRunSheetComponent implements OnInit {
     }
   }
   async CompleteScan() {
+    debugger
     let packageChecked = false;
     const exists = this.csv.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
-      packageChecked = this.csv.every(obj => obj.packages === obj.loaded);
+      packageChecked = this.csv.some(obj => obj.packages === obj.loaded);
     }
     if (packageChecked) {
       await this.DepartDelivery();
@@ -253,7 +254,7 @@ export class UpdateRunSheetComponent implements OnInit {
   }
   async DepartDelivery() {
     this.snackBarUtilityService.commonToast(async () => {
-      const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList);
+      const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList,this.isScan);
       Swal.fire({
         icon: "success",
         title: "RunSheet Update Successfully",

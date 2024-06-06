@@ -170,23 +170,23 @@ export class VehicleService {
         }
     }
     /*End*/
-    async updateVehicleCap(data) {
+    async updateVehicleCap(data, isRunSheet = false) {
         if (data && Object.keys(data).length > 0) {
             const updateRequest = {
                 companyCode: this.storage.companyCode,
                 collectionName: "vehicle_status",
                 filter: { vehNo: data.vehNo },
                 update: {
-                    "capacity": data?.Capacity || 0,
-                    "capacityVolCFT": data?.CapacityVolumeCFT || 0,
-                    "vehType":data?.vehicleType||0,
-                    "vehTypeCode":data?.vehicleTypeCode||0
+                    "capacity": isRunSheet ? data?.vehicleSize : data?.Capacity || 0,
+                    "capacityVolCFT": isRunSheet ? data?.vehicleSizeVol : data?.CapacityVolumeCFT || 0,
+                    "vehType": isRunSheet ? data?.vehicleType.name : data?.vehicleType || "",
+                    "vehTypeCode": isRunSheet ? data?.vehicleType.value : data?.vehicleTypeCode || ""
                 }
             };
             await firstValueFrom(this.masterService.masterMongoPut("generic/update", updateRequest));
         }
     }
-  
+    
     async getVehicleOne(vehicleNo) {
         const request = {
           companyCode: this.storage.companyCode,

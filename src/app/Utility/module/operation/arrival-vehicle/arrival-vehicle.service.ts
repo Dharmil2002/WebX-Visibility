@@ -1048,11 +1048,11 @@ export class ArrivalVehicleService {
             const dktOps = {
                 "aRR":{
                     dT: new Date(),
-                    pKG: element?.unloadedPkg || 0,
+                    pKGS: element?.unloadedPkg || 0,
                     wT: element?.unloadedWT || 0
                 },
                 "pEND":{
-                    pKG: element?.unloadedPkg || 0,
+                    pKGS: element?.unloadedPkg || 0,
                     wT: element?.unloadedWT || 0
                 },
                 "tOTCWT": element?.unloadctWeight || 0,

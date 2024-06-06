@@ -2632,8 +2632,24 @@ export class ConsignmentEntryFormComponent
         ) || 0)
       )
     );
+    if (this.model.FreightTableForm.controls['rcm'].value == "Y") {
+      this.model.FreightTableForm.get("totAmt")?.setValue(this.model.FreightTableForm.get("grossAmount")?.value);
+    }
+    this.calculateRate();
   }
-
+  calculateRate() {
+    if (this.model.FreightTableForm.controls['rcm'].value == "N") {
+      const gstRate = parseFloat(this.model.FreightTableForm.controls['gstAmount'].value);
+      const grossAmt = parseFloat(this.model.FreightTableForm.controls['grossAmount'].value);
+      const gstAmt = (grossAmt * gstRate) / 100;
+      const totalgst = gstAmt ? parseFloat(gstAmt.toFixed(2)) : gstAmt
+      this.model.FreightTableForm.controls["gstChargedAmount"].setValue(totalgst);
+      this.model.FreightTableForm.get("totAmt")?.setValue(ConvertToNumber(
+        (parseFloat(this.model.FreightTableForm.get("grossAmount")?.value) || 0) +
+        (parseFloat(this.model.FreightTableForm.get("gstChargedAmount")?.value) || 0))
+      );
+    }
+  }
   containorCsvDetail() {
     if (this.model.previewResult.length > 0) {
       this.tableLoad = true;

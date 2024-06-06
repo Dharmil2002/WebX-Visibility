@@ -181,6 +181,8 @@ export const ViewName = {
     CDN: 'CDN',
     MR: 'MR',
     VB: "VB",
+    DGP: "DGP",
+    GP: "GP",
 }
 // export const ViewPrintPartyCode = {
 //     CUST00014: 'CUST00014',

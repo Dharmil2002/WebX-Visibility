@@ -119,49 +119,52 @@ export class ViewPrintComponent implements OnInit {
         viewName: ViewName.CB,
       },
       {
-        name: "Docket View-Print",
+        name: "Docket",
         viewName: ViewName.DKT,
       },
       {
-        name: "Job View-Print",
+        name: "Job (Export/Import)",
         viewName: ViewName.JOB,
       },
       {
-        name: "PRQ View-Print",
+        name: "PRQ",
         viewName: ViewName.PRQ,
       },
       {
-        name: "THC View-Print",
+        name: "THC",
         viewName: ViewName.THC,
       },
       {
-        name: "LoadingSheet View-Print",
+        name: "Loading Sheet",
         viewName: ViewName.LS,
       },
 
       {
-        name: "Manifest View-Print",
+        name: "Manifest",
         viewName: ViewName.MF,
       },
-
       {
-        name: "MR View-Print",
-        viewName: ViewName.MR,
+        name: "Delivery MR",
+        viewName: ViewName.DMR,
       },
       {
-        name: "Voucher View-Print",
+        name: "Delivery Gatepass",
+        viewName: ViewName.DGP,
+      },
+      {
+        name: "Voucher",
         viewName: ViewName.VR,
       },
       {
-        name: "DRS View-Print",
+        name: "Delivery Run Sheet",
         viewName: ViewName.DRS,
       },
       {
-        name: "Credit Note View-Print",
+        name: "Credit Note",
         viewName: ViewName.CDN,
       },
       {
-        name: "Money Receipt View-Print",
+        name: "Money Receipt",
         viewName: ViewName.MR,
       },
 

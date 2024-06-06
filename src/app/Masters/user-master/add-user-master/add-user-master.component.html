@@ -1,7 +1,7 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="userTableForm">
     <app-form-webxpress [form]="userTableForm" [formData]="jsonControlUserArray"
-      (functionCallEmitter)="functionCallHandler($event)" [modifySaveButton]="true"
+      (functionCallEmitter)="functionCallHandler($event)" [modifyAndSaveButton]="true"
       (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'User Details'" [Disabled]="isSubmit">
     </app-form-webxpress>
   </form>

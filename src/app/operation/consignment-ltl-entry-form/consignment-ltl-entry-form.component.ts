@@ -2214,7 +2214,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
 
-
   /*below function is for the */
   onMaterialDensity() {
     const matDen = this.invoiceForm.controls['materialDensity'].value;
@@ -2279,7 +2278,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
   }
-
   async GetGSTRate() {
     let req = {
       companyCode: this.storage.companyCode,
@@ -2294,7 +2292,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.GSTRate = res.data.GSTRT || 12;
     }
   }
-
   // Account Posting When  C Note Booked
   async AccountPosting(DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {

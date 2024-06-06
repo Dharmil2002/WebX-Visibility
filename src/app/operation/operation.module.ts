@@ -77,6 +77,7 @@ import { ConsignmentChargesComponent } from './consignment-ltl-entry-form/consig
 import { ConsignmentOtherInfoComponent } from './consignment-ltl-entry-form/consignment-other-info/consignment-other-info.component';
 import { EditShipmentDetailsComponent } from "./vehicle-update-upload/edit-shipment-details/edit-shipment-details.component";
 import { PrqTrackingComponent } from './prq-tracking/prq-tracking.component';
+import { EditRunsheetShipmentsComponent } from './update-run-sheet/edit-runsheet-shipments/edit-runsheet-shipments.component';
 
 @NgModule({
   declarations: [
@@ -136,7 +137,8 @@ import { PrqTrackingComponent } from './prq-tracking/prq-tracking.component';
     ConsignmentChargesComponent,
     ConsignmentOtherInfoComponent,
     EditShipmentDetailsComponent,
-    PrqTrackingComponent
+    PrqTrackingComponent,
+    EditRunsheetShipmentsComponent
   ],
   imports: [
     CommonModule,

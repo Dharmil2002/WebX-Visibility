@@ -40,7 +40,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     private storage:StorageService,
     private manifestService:ManifestService
   ) {
-    console.log(item);
+    debugger;
     this.shipmentDetails = item;
   }
 

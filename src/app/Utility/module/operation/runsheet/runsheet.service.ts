@@ -389,8 +389,12 @@ export class RunSheetService {
                     "oRGN": item?.oRGN || "",
                     "dEST": item?.dEST || "",
                     "packages": item?.pKGS || 0,
-                    "loaded": 0,
-                    "pending": item?.pKGS,
+                    "loadedPkg": 0,
+                    "loadedWT":0,
+                    "pendPkg": item?.pKGS,
+                    "pendWt": item?.aCTWT,
+                    "loaded":0,
+                    "pending":item?.pKGS || 0,
                     "cFTTOT": item?.cFTTOT || 0,
                     "aCTWT": item?.aCTWT || 0,
                     "cNE": `${item?.partyCode || ""}-${item?.partyName || ""}`,
@@ -398,8 +402,14 @@ export class RunSheetService {
                     "pinCode": item?.pinCode || "",
                     "city": item?.city || "",
                     "cluster": item?.cluster || "",
-                    "isSelected": false
+                    "isSelected": false,
+                    "actions": ["Edit"]
                 }
+                // "weight",
+                // "loadedPkg",
+                // "loadedWT",
+                // "pendPkg",
+                // "pendWt"
             })
         }
 
@@ -499,8 +509,11 @@ export class RunSheetService {
     /*End*/
     /*below the method is for field mapping Update RunSheet*/
     async UpdateRunSheet(formData, shipmentdata, scanPackage) {
-        if(shipmentdata.length>0){
-        const evnData = shipmentdata.map(element => {
+        debugger
+        const selected= shipmentdata.filter((x)=>x.isSelected);
+        const notSelected= shipmentdata.filter((x)=>!x.isSelected);
+        if(selected.length>0){
+        const selectedEvnt = selected.map(element => {
             const eventJson = {
                 _id:`${this?.storage.companyCode}-${formData?.Runsheet}-${element?.dKTNO}-${element.sFX}-${DocketEvents.DRS_Upload}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
                 cID: this.storage.companyCode,
@@ -523,6 +536,30 @@ export class RunSheetService {
             }
             return eventJson;
         });
+        const unSelectedEvnt=notSelected.map(element => {
+            const eventJson = {
+                _id:`${this?.storage.companyCode}-${formData?.Runsheet}-${element?.dKTNO}-${element.sFX}-${DocketEvents.DRS_Upload}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+                cID: this.storage.companyCode,
+                dKTNO: element?.dKTNO || "",
+                sFX: element.sFX,
+                cNO: null,
+                lOC: this.storage.branch,
+                eVNID:  DocketEvents.Arrival_Scan,
+                eVNDES: getEnumName(DocketEvents, DocketEvents.Arrival_Scan)?.replace(/_/g, " "),
+                eVNDT: new Date(),
+                eVNSRC: 'Create RunSheet',
+                dOCTY: 'DRS',
+                dOCNO:formData?.Runsheet||"",
+                sTS: DocketStatus.In_Delivery_Stock,
+                sTSNM: DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
+                oPSSTS: `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                eNTDT: new Date(),
+                eNTLOC: this.storage.branch,
+                eNTBY: this.storage.userName,
+            }
+            return eventJson;
+        });
+        let evnData=[...selectedEvnt,...unSelectedEvnt]
         formData.mODBY = this.storage.userName;
         formData.mODDT = new Date();
         formData.mODLOC = this.storage.branch;
@@ -532,8 +569,9 @@ export class RunSheetService {
             data: {
                  timeZone: this.storage.timeZone,
                  formData: formData,
-                 shipmentdata: shipmentdata,
+                 shipmentdata: selected,
                  scanPackage: scanPackage,
+                 notSelected:notSelected,
                  evnData:evnData
                  }
         }

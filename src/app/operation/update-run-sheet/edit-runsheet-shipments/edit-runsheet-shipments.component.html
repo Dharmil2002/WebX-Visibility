@@ -1,0 +1,16 @@
+<mat-dialog-content>
+    <!-- Title -->
+    <div class="paddingdiv">
+            <form [formGroup]="EditShipmentForm">
+                <app-form-webxpress [form]="EditShipmentForm" [FormTitle]="'Shipment Edit'" [formData]="jsonControlArray"
+                  (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="false"
+                  (callFunction)="functionCaller($event)">
+                </app-form-webxpress>
+              </form>
+    </div>
+          <div class="example-button-row d-flex justify-content-end">
+            <button class="msr-3" mat-raised-button color="primary" 
+              (click)="save()" [disabled]="!EditShipmentForm.valid">Save</button>
+            <button class="msr-3" mat-raised-button color="primary"   (click)="cancel()">Back</button>
+          </div>
+</mat-dialog-content>

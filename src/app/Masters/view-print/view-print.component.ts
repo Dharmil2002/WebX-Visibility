@@ -22,6 +22,7 @@ export class ViewPrintComponent implements OnInit {
       active: "View Print",
     },
   ];
+  ViewPrintList: any;
   viewTableForm: UntypedFormGroup;
   jsonControlViewArray: any;
   viewprintFormControls: ViewPrintControl;
@@ -59,32 +60,24 @@ export class ViewPrintComponent implements OnInit {
   async getDropDownList() {
     // Resetting the value of the 'dOCNO' control to an empty string
     this.viewTableForm.controls.dOCNO.setValue("");
-    // Retrieving view types from the 'General_master' collection
-    const viewType: AutoComplateCommon[] =
-      await this.generalService.getDataForMultiAutoComplete(
-        "General_master",
-        { codeType: "View Print" },
-        "codeDesc",
-        "_id"
-      );
+    const viewType = await this.generalService.getData("viewprint_fields", { cID: this.storage.companyCode });
+
+    this.ViewPrintList = viewType.map((x) => {
+      return {
+        name: x.vNM, value: x.vTYPE, FieldName: x.pFIELD
+      };
+    });
     // Filtering the data and updating the viewTableForm
     this.filter.Filter(
       this.jsonControlViewArray,
       this.viewTableForm,
-      viewType,
+      this.ViewPrintList,
       this.viewName,
       this.viewStatus
     );
   }
 
-  // async save() {
-  //   const req = {
-  //     templateName: this.viewTableForm.value.vIEWTYPE.name,
-  //     DocNo: this.viewTableForm.value.dOCNO,
-  //   };
-  //   const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
-  //   window.open(url, '', 'width=1000,height=800');
-  // }
+
   async save() {
     // Function to display error message
     const showError = (errorMessage) => {
@@ -111,68 +104,9 @@ export class ViewPrintComponent implements OnInit {
       return;
     }
 
-    // Form is complete, proceed with generating URL
-    const BillingViewArray = [
-      {
-        name: "Customer Invoice",
-        PartyField: "cUST.cD",
-        viewName: ViewName.CB,
-      },
-      {
-        name: "Docket",
-        viewName: ViewName.DKT,
-      },
-      {
-        name: "Job (Export/Import)",
-        viewName: ViewName.JOB,
-      },
-      {
-        name: "PRQ",
-        viewName: ViewName.PRQ,
-      },
-      {
-        name: "THC",
-        viewName: ViewName.THC,
-      },
-      {
-        name: "Loading Sheet",
-        viewName: ViewName.LS,
-      },
-
-      {
-        name: "Manifest",
-        viewName: ViewName.MF,
-      },
-      {
-        name: "Delivery MR",
-        viewName: ViewName.DMR,
-      },
-      {
-        name: "Delivery Gatepass",
-        viewName: ViewName.DGP,
-      },
-      {
-        name: "Voucher",
-        viewName: ViewName.VR,
-      },
-      {
-        name: "Delivery Run Sheet",
-        viewName: ViewName.DRS,
-      },
-      {
-        name: "Credit Note",
-        viewName: ViewName.CDN,
-      },
-      {
-        name: "Money Receipt",
-        viewName: ViewName.MR,
-      },
-
-    ];
-    const FindBillView = BillingViewArray.find((x) => x.name == viewType.name);
     const req = {
-      templateName: FindBillView?.viewName,
-      PartyField: FindBillView?.PartyField || "",
+      templateName: this.viewTableForm.value.vIEWTYPE?.value,
+      PartyField: this.viewTableForm.value.vIEWTYPE?.FieldName || "",
       DocNo: docNo,
     };
     const url = `${window.location.origin

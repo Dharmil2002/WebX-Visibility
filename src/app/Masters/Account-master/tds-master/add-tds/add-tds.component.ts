@@ -133,7 +133,6 @@ export class AddTdsComponent implements OnInit {
   }
 
   async save() {
-    this.snackBarUtilityService.commonToast(async () => {
     if (!this.TdsForm.valid || this.isSubmit) {
       this.TdsForm.markAllAsTouched();
       Swal.fire({
@@ -141,66 +140,68 @@ export class AddTdsComponent implements OnInit {
         title: "Missing Information",
         text: "Please ensure all required fields are filled out.",
         showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#d33',
+        confirmButtonText: "OK",
+        confirmButtonColor: "#d33",
         timer: 5000,
         timerProgressBar: true,
-
       });
       return false;
     }
-    this.isSubmit = true;
-    const commonBody = {
-      PaymentType: this.TdsForm.value.PaymentType,
-      RateForHUF: this.TdsForm.value.RateForHUF,
-      Thresholdlimit: this.TdsForm.value.Thresholdlimit,
-      RateForOthers: this.TdsForm.value.RateForOthers,
-      RateForITR: parseInt(this.TdsForm.value.RateForITR) || 0,
-      RateForWithoutITR: parseInt(this.TdsForm.value.RateForWithoutITR) || 0,
-      LowRate: parseInt(this.TdsForm.value.LowRate) || 0,
-      HighRate: parseInt(this.TdsForm.value.HighRate) || 0,
-      isActive: this.TdsForm.value.isActive,
-    };
-    if (this.isUpdate) {
-      const req = {
-        companyCode: this.CompanyCode,
-        collectionName: "tds_detail",
-        filter: { TDScode: this.UpdateData.TDScode },
-        update: commonBody,
-      };
-      await this.handleRequest(req);
-    } else {
-      const tabledata = await firstValueFrom(
-        this.masterService.masterPost("generic/get", {
-          companyCode: this.CompanyCode,
-          collectionName: "tds_detail",
-          filter: {},
-        })
-      );
-      const index =
-        parseInt(
-          tabledata.data.length === 0
-            ? 0
-            : tabledata.data[tabledata.data.length - 1].TDScode
-        ) + 1;
-      // const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
-      const body = {
-        _id: index,
-        TDScode: index,
-        TDSsection: this.TdsForm.value.TDSsection,
-        eNTBY: this.storage.userName,
-        eNTDT: new Date(),
-        companyCode: this.CompanyCode,
-        ...commonBody,
-      };
-      const req = {
-        companyCode: this.CompanyCode,
-        collectionName: "tds_detail",
-        data: body,
-      };
-      await this.handleRequest(req);
-    }
-  }, "Adding TDS Please Wait..!");
+    this.isSubmit=true  
+      this.snackBarUtilityService.commonToast(async () => {
+        const commonBody = {
+          PaymentType: this.TdsForm.value.PaymentType,
+          RateForHUF: this.TdsForm.value.RateForHUF,
+          Thresholdlimit: this.TdsForm.value.Thresholdlimit,
+          RateForOthers: this.TdsForm.value.RateForOthers,
+          RateForITR: parseInt(this.TdsForm.value.RateForITR) || 0,
+          RateForWithoutITR:
+            parseInt(this.TdsForm.value.RateForWithoutITR) || 0,
+          LowRate: parseInt(this.TdsForm.value.LowRate) || 0,
+          HighRate: parseInt(this.TdsForm.value.HighRate) || 0,
+          isActive: this.TdsForm.value.isActive,
+        };
+        if (this.isUpdate) {
+          const req = {
+            companyCode: this.CompanyCode,
+            collectionName: "tds_detail",
+            filter: { TDScode: this.UpdateData.TDScode },
+            update: commonBody,
+          };
+          await this.handleRequest(req);
+        } else {
+          const tabledata = await firstValueFrom(
+            this.masterService.masterPost("generic/get", {
+              companyCode: this.CompanyCode,
+              collectionName: "tds_detail",
+              filter: {},
+            })
+          );
+          const index =
+            parseInt(
+              tabledata.data.length === 0
+                ? 0
+                : tabledata.data[tabledata.data.length - 1].TDScode
+            ) + 1;
+          // const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
+          const body = {
+            _id: index,
+            TDScode: index,
+            TDSsection: this.TdsForm.value.TDSsection,
+            eNTBY: this.storage.userName,
+            eNTDT: new Date(),
+            companyCode: this.CompanyCode,
+            ...commonBody,
+          };
+          const req = {
+            companyCode: this.CompanyCode,
+            collectionName: "tds_detail",
+            data: body,
+          };
+          await this.handleRequest(req);
+        }
+      }, "Adding TDS Please Wait..!");
+      console.log(this.isSubmit);
   }
 
   async handleRequest(req: any) {

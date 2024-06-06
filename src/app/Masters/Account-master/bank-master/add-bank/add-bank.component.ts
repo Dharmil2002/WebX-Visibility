@@ -45,7 +45,7 @@ export class AddBankComponent implements OnInit {
     private masterService: MasterService,
     private storageService: StorageService
   ) {
-    this.CompanyCode = this.storageService.companyCode;  
+    this.CompanyCode = this.storageService.companyCode;
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
@@ -250,8 +250,10 @@ export class AddBankComponent implements OnInit {
         value: "5",
       },
     ];
-    if(this.isUpdate){
-      const element = data.find(x => x.name == this.UpdateData.AccountTypeName)
+    if (this.isUpdate) {
+      const element = data.find(
+        (x) => x.name == this.UpdateData.AccountTypeName
+      );
       this.BankForm.controls["AccountType"].setValue(element);
     }
     this.filter.Filter(
@@ -261,11 +263,10 @@ export class AddBankComponent implements OnInit {
       this.AccountTypeCode,
       this.AccountTypeStatus
     );
-    this.AccountTypeFunction()
+    this.AccountTypeFunction();
   }
 
   async save() {
-    this.snackBarUtilityService.commonToast(async () => {
     if (!this.BankForm.valid || this.isSubmit) {
       this.BankForm.markAllAsTouched();
       Swal.fire({
@@ -273,74 +274,75 @@ export class AddBankComponent implements OnInit {
         title: "Missing Information",
         text: "Please ensure all required fields are filled out.",
         showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#d33',
+        confirmButtonText: "OK",
+        confirmButtonColor: "#d33",
         timer: 5000,
         timerProgressBar: true,
-
       });
       return false;
+    } else { 
+      this.isSubmit = true;
+      this.snackBarUtilityService.commonToast(async () => {
+        const commonBody = {
+          Bankname: this.BankForm.value.Bankname.name,
+          Accountnumber: this.BankForm.value.Accountnumber,
+          IFSCcode: this.BankForm.value.IFSCcode,
+          MICRcode: this.BankForm.value.MICRcode,
+          SWIFTcode:
+            this.BankForm.value.SWIFTcode === 0
+              ? ""
+              : this.BankForm.value.SWIFTcode,
+          ApplicationLocations: this.BankForm.value.LocationsDrop.map(
+            (x) => x.value
+          ),
+          BankAddress: this.BankForm.value.BankAddress,
+          AccountTypeName: this.BankForm.value.AccountType.name,
+          CreditLimit: parseInt(this.BankForm.value.CreditLimit) || 0,
+          isActive: this.BankForm.value.isActive,
+        };
+        if (this.isUpdate) {
+          const req = {
+            companyCode: this.CompanyCode,
+            collectionName: "Bank_detail",
+            filter: { Bankcode: this.UpdateData.Bankcode },
+            update: commonBody,
+          };
+          await this.handleRequest(req);
+        } else {
+          const tabledata = await firstValueFrom(
+            this.masterService.masterPost("generic/get", {
+              companyCode: this.CompanyCode,
+              collectionName: "Bank_detail",
+              filter: {},
+            })
+          );
+          const index =
+            parseInt(
+              tabledata.data.length === 0
+                ? 0
+                : tabledata.data[tabledata.data.length - 1].Bankcode
+            ) + 1;
+          const bankcode = `BAN${
+            index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
+          }${index}`;
+          const body = {
+            _id: `${this.CompanyCode}-${bankcode}`,
+            Bankcode: bankcode,
+            entryBy: this.storageService.userName,
+            entryDate: new Date(),
+            companyCode: this.CompanyCode,
+            ...commonBody,
+          };
+          const req = {
+            companyCode: this.CompanyCode,
+            collectionName: "Bank_detail",
+            data: body,
+          };
+          await this.handleRequest(req);
+        }
+      }, "Adding Bank Please Wait..!");
+      console.log(this.isSubmit);
     }
-
-    this.isSubmit = true;
-    const commonBody = {
-      Bankname: this.BankForm.value.Bankname.name,
-      Accountnumber: this.BankForm.value.Accountnumber,
-      IFSCcode: this.BankForm.value.IFSCcode,
-      MICRcode: this.BankForm.value.MICRcode,
-      SWIFTcode:
-        this.BankForm.value.SWIFTcode === 0
-          ? ""
-          : this.BankForm.value.SWIFTcode,
-      ApplicationLocations: this.BankForm.value.LocationsDrop.map(
-        (x) => x.value
-      ),
-      BankAddress:this.BankForm.value.BankAddress,
-      AccountTypeName:this.BankForm.value.AccountType.name,
-      CreditLimit: parseInt(this.BankForm.value.CreditLimit) || 0,
-      isActive:this.BankForm.value.isActive,
-    };
-    if (this.isUpdate) {
-      const req = {
-        companyCode: this.CompanyCode,
-        collectionName: "Bank_detail",
-        filter: { Bankcode: this.UpdateData.Bankcode },
-        update: commonBody,
-      };
-      await this.handleRequest(req);
-    } else {
-      const tabledata = await firstValueFrom(
-        this.masterService.masterPost("generic/get", {
-          companyCode: this.CompanyCode,
-          collectionName: "Bank_detail",
-          filter: {},
-        })
-      );
-      const index =
-        parseInt(
-          tabledata.data.length === 0
-            ? 0
-            : tabledata.data[tabledata.data.length - 1].Bankcode
-        ) + 1;
-      const bankcode = `BAN${
-        index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
-      }${index}`;
-      const body = {
-        _id: `${this.CompanyCode}-${bankcode}`,
-        Bankcode: bankcode,
-        entryBy: this.storageService.userName,
-        entryDate: new Date(),
-        companyCode: this.CompanyCode,
-        ...commonBody,
-      };
-      const req = {
-        companyCode: this.CompanyCode,
-        collectionName: "Bank_detail",
-        data: body,
-      };
-      await this.handleRequest(req);
-    }
-  }, "Adding Bank Please Wait..!");
   }
 
   async handleRequest(req: any) {

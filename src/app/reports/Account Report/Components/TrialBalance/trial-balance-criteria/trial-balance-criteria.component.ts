@@ -232,7 +232,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
   //#endregion
   //#region to set party name according to received from data
   async reportSubTypeChanged() {
-    if (this.TrialBalanceForm.controls.ReportType.value === 'Sub Ledger') {
+    // if (this.TrialBalanceForm.controls.ReportType.value === 'Sub Ledger') {
       const reportSubType = this.TrialBalanceForm.value.reportSubType;
 
       this.TrialBalanceForm.controls.subLedger.setValue("");
@@ -271,16 +271,15 @@ export class TrialBalanceCriteriaComponent implements OnInit {
         default:
 
       }
-    } else {
-      Swal.fire({
-        icon: "warning",
-        title: "Warning",
-        text: `Select Report Type as Sub Ledger`,
-        showConfirmButton: true,
-      });
-      this.TrialBalanceForm.controls["reportSubType"].setValue("");
-    }
-
+    // } else {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Warning",
+    //     text: `Select Report Type as Sub Ledger`,
+    //     showConfirmButton: true,
+    //   });
+    //   this.TrialBalanceForm.controls["reportSubType"].setValue("");
+    // }
   }
   //#endregion
   async save() {

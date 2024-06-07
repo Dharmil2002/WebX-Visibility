@@ -466,7 +466,8 @@ export class AccountReportService {
                                                                  'D$gte': [
                                                                       '$vDT', request.startdate
                                                                  ]
-                                                            }, {
+                                                            }, 
+                                                            {
                                                                  'D$lte': [
                                                                       '$vDT', request.enddate
                                                                  ]

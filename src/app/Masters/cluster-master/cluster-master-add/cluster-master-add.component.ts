@@ -69,33 +69,47 @@ export class ClusterMasterAddComponent implements OnInit {
       this.action = "edit";
       this.submit = "Modify";
       this.isUpdate = true;
+      this.clusterTabledata = this.data;
     } else {
       this.action = "Add";
-    }
-    if (this.action === "edit") {
-      this.isUpdate = true;
-      this.clusterTabledata = this.data;
-      this.breadScrums = [
-        {
-          title: "Modify Cluster",
-          items: ["Home"],
-          active: "Modify Cluster",
-          generatecontrol: true,
-          toggle: this.data.activeFlag,
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Add Cluster",
-          items: ["Home"],
-          active: "Add Cluster",
-          generatecontrol: true,
-          toggle: true,
-        },
-      ];
       this.clusterTabledata = new ClusterMaster({});
     }
+    // if (this.action === "edit") {
+    //   this.isUpdate = true;
+    //   this.clusterTabledata = this.data;
+    //   this.breadScrums = [
+    //     {
+    //       title: "Modify Cluster",
+    //       items: ["Home"],
+    //       active: "Modify Cluster",
+    //       generatecontrol: true,
+    //       toggle: this.data.activeFlag,
+    //     },
+    //   ];
+    // } else {
+    //   this.breadScrums = [
+    //     {
+    //       title: "Add Cluster",
+    //       items: ["Home"],
+    //       active: "Add Cluster",
+    //       generatecontrol: true,
+    //       toggle: true,
+    //     },
+    //   ];
+    //   this.clusterTabledata = new ClusterMaster({});
+    // }
+
+    this.breadScrums = [
+      {
+        title: this.action === "edit" ? "Modify Cluster" : "Add Cluster",
+        items: ["Home"],
+        active: this.action === "edit" ? "Modify Cluster" : "Add Cluster",
+        generatecontrol: true,
+        toggle: this.action === "edit" ? this.clusterTabledata.activeFlag : true
+      }
+    ];
+
+
     this.initializeFormControl();
   }
   initializeFormControl() {

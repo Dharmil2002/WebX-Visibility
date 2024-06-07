@@ -43,29 +43,43 @@ export class CustomerGroupAddComponent implements OnInit {
       this.isUpdate = true;
     } else {
       this.action = "Add";
-    }
-    if (this.action === 'edit') {
-      this.breadScrums = [
-        {
-          title: "Modify Customer Group",
-          items: ["Home"],
-          active: "Modify Customer Group",
-          generatecontrol: true,
-          toggle: this.groupTabledata.activeFlag
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Add Customer Group",
-          items: ["Home"],
-          active: "Add Customer Group",
-          generatecontrol: true,
-          toggle: true,
-        },
-      ];
       this.groupTabledata = new CustomerGroupMaster({});
     }
+
+    // if (this.action === 'edit') {
+    //   this.breadScrums = [
+    //     {
+    //       title: "Modify Customer Group",
+    //       items: ["Home"],
+    //       active: "Modify Customer Group",
+    //       generatecontrol: true,
+    //       toggle: this.groupTabledata.activeFlag
+    //     },
+    //   ];
+    // } else {
+    //   this.breadScrums = [
+    //     {
+    //       title: "Add Customer Group",
+    //       items: ["Home"],
+    //       active: "Add Customer Group",
+    //       generatecontrol: true,
+    //       toggle: true,
+    //     },
+    //   ];
+    //   this.groupTabledata = new CustomerGroupMaster({});
+    // }
+
+    this.breadScrums = [
+      {
+        title: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
+        items: ["Home"],
+        active: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
+        generatecontrol: true,
+        toggle: this.action === "edit" ? this.groupTabledata.activeFlag : true
+      }
+    ];
+
+
     this.initializeFormControl();
   }
   initializeFormControl() {

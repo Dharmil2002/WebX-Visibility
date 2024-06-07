@@ -64,34 +64,46 @@ export class AddressMasterAddComponent implements OnInit {
       this.action = "edit";
       this.submit = "Modify";
       this.isUpdate = true;
+      this.addressTabledata = this.data;
     } else {
       this.action = "Add";
-    }
-
-    if (this.action === "edit") {
-      this.isUpdate = true;
-      this.addressTabledata = this.data;
-      this.breadScrums = [
-        {
-          generatecontrol: true,
-          toggle: this.data.activeFlag,
-          title: "Modify Address",
-          items: ["Home"],
-          active: "Modify Address",
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          generatecontrol: true,
-          toggle: true,
-          title: "Add Address",
-          items: ["Home"],
-          active: "Add Address",
-        },
-      ];
       this.addressTabledata = new AddressMaster({});
     }
+
+    // if (this.action === "edit") {
+    //   this.isUpdate = true;
+    //   this.addressTabledata = this.data;
+    //   this.breadScrums = [
+    //     {
+    //       generatecontrol: true,
+    //       toggle: this.data.activeFlag,
+    //       title: "Modify Address",
+    //       items: ["Home"],
+    //       active: "Modify Address",
+    //     },
+    //   ];
+    // } else {
+    //   this.breadScrums = [
+    //     {
+    //       generatecontrol: true,
+    //       toggle: true,
+    //       title: "Add Address",
+    //       items: ["Home"],
+    //       active: "Add Address",
+    //     },
+    //   ];
+    //   this.addressTabledata = new AddressMaster({});
+    // }
+
+    this.breadScrums = [
+      {
+        title: this.action === "edit" ? "Modify Address" : "Add Address",
+        items: ["Home"],
+        active: this.action === "edit" ? "Modify Address" : "Add Address",
+        generatecontrol: true,
+        toggle: this.action === "edit" ? this.addressTabledata.activeFlag : true
+      }
+    ];
 
     this.initializeFormControl();
   }

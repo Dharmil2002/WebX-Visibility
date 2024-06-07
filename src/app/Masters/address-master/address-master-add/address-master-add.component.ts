@@ -70,31 +70,6 @@ export class AddressMasterAddComponent implements OnInit {
       this.addressTabledata = new AddressMaster({});
     }
 
-    // if (this.action === "edit") {
-    //   this.isUpdate = true;
-    //   this.addressTabledata = this.data;
-    //   this.breadScrums = [
-    //     {
-    //       generatecontrol: true,
-    //       toggle: this.data.activeFlag,
-    //       title: "Modify Address",
-    //       items: ["Home"],
-    //       active: "Modify Address",
-    //     },
-    //   ];
-    // } else {
-    //   this.breadScrums = [
-    //     {
-    //       generatecontrol: true,
-    //       toggle: true,
-    //       title: "Add Address",
-    //       items: ["Home"],
-    //       active: "Add Address",
-    //     },
-    //   ];
-    //   this.addressTabledata = new AddressMaster({});
-    // }
-
     this.breadScrums = [
       {
         title: this.action === "edit" ? "Modify Address" : "Add Address",

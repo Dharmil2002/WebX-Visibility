@@ -84,6 +84,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     this.salesregisterTableForm.controls["start"].setValue(lastweek);
     this.salesregisterTableForm.controls["end"].setValue(now);
     this.getDropDownList();
+    this.csvFileName = `Sales_Register_Report-${moment().format("YYYYMMDD-HHmmss")}`;
   }
 
   initializeFormControl() {
@@ -262,19 +263,19 @@ export class SalesRegisterAdvancedComponent implements OnInit {
         this.source = data.data;
         this.LoadTable = true;
 
-        // if (data.length === 0) {
-        // this.LoadTable = false;
-        // this.loading = false;
-        //   if (data) {
-        //     Swal.fire({
-        //       icon: "error",
-        //       title: "No Records Found",
-        //       text: "Cannot Download CSV",
-        //       showConfirmButton: true,
-        //     });
-        //   }
-        //   return;
-        // }
+        if (data.data.length === 0) {
+          this.LoadTable = false;
+          this.loading = false;
+          if (data) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          return;
+        }
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();

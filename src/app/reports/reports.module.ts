@@ -74,6 +74,7 @@ import { DrsRegisterComponent } from './drs-register/drs-register.component';
 import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component';
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
+import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -153,7 +154,8 @@ import { GenerateTdsRegisterReportComponent } from './generate-tds-register-repo
     DrsRegisterComponent,
     ManifestRegisterReportComponent,
     LoadingsheetRegisterComponent,
-    GenerateTdsRegisterReportComponent
+    GenerateTdsRegisterReportComponent,
+    GenericReportViewComponent
   ],
   exports: [],
 

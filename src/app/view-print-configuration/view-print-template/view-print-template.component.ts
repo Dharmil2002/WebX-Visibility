@@ -8,6 +8,9 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import Swal from "sweetalert2";
 import { ViewPrint_Template } from "src/app/core/models/viewPrint/viewPrintTemplate";
 import { AngularEditorModule } from "@kolkov/angular-editor";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { firstValueFrom } from "rxjs";
 const document: any = window.document;
 
 @Component({
@@ -48,11 +51,14 @@ export class ViewPrintTemplateComponent implements OnInit {
   backgroundColor: string;
   name = "Angular 6";
   tHTML = "";
+  ViewPrintList: any;
 
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private storage: StorageService,
+    private generalService: GeneralService,
+    private filter: FilterUtils,
     private renderer: Renderer2, private elementRef: ElementRef
   ) {
     this.companyCode = this.storage.companyCode;
@@ -61,8 +67,39 @@ export class ViewPrintTemplateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.GetDropDownDataFromAPI();
   }
-
+  async GetDropDownDataFromAPI() {
+    const viewType = await this.generalService.getData("viewprint_fields", { cID: this.storage.companyCode });
+    this.ViewPrintList = viewType.map((x) => {
+      return {
+        name: x.vNM, value: x.vTYPE, FieldName: x.pFIELD
+      };
+    });
+    // Filtering the data and updating the viewTableForm
+    this.filter.Filter(
+      this.jsonControlqueryArray,
+      this.queryTableForm,
+      this.ViewPrintList,
+      "vTYPE",
+      true
+    );
+  }
+  async onChangeViewType(event) {
+    const viewType = event?.eventArgs?.option?.value?.value || "";
+    if (viewType) {
+      // Get the template data from the API
+      const req = {
+        companyCode: this.companyCode,
+        collectionName: "viewprint_template",
+        filter: { cID: this.companyCode, vTYPE: viewType },
+      };
+      const Result: any = await firstValueFrom(this.masterService.masterPost("generic/getOne", req))
+      if (Result) {
+        this.tHTML = Result.data.tHTML;
+      }
+    }
+  }
   initializeFormControl() {
     //throw new Error("Method not implemented.");
     this.queryFormControls = new QueryControl(
@@ -103,7 +140,7 @@ export class ViewPrintTemplateComponent implements OnInit {
       },
     ]
   };
-  cancel() {}
+  cancel() { }
 
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -129,28 +166,24 @@ export class ViewPrintTemplateComponent implements OnInit {
   async save() {
     const controls = this.queryTableForm;
     clearValidatorsAndValidate(controls);
-    const id = `${this.storage.companyCode}-${this.queryTableForm.value.vTYPE}`;
-    this.queryTableForm.controls["_id"].setValue(id);
-    const Data ={
-      ...this.queryTableForm.value,
-      tHTML:this.tHTML
+
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "collectionName": "viewprint_template",
+      "filter": { cID: this.companyCode, vTYPE: this.queryTableForm.value.vTYPE.value },
+      "update": {
+        tHTML: this.tHTML,
+        mODBY: this.storage.userName,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch,
+      }
     }
-    // const html = this.getDecodedHTML(this.queryTableForm.value.tHTML);
-    // this.queryTableForm.controls["tHTML"].setValue(html);
-     //API FOR ADD
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "viewprint_template",
-      data: Data,
-    };
-    const res = await this.masterService
-      .masterPost("generic/create", req)
-      .toPromise();
-    if (res) {
+    const Result = await firstValueFrom(this.masterService.masterPut("generic/update", reqBody))
+    if (Result) {
       Swal.fire({
         icon: "success",
         title: "Successful",
-        text: res.message,
+        text: Result.message,
         showConfirmButton: true,
       });
     }

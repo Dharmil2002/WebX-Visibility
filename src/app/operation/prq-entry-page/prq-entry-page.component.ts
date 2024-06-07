@@ -357,7 +357,7 @@ export class PrqEntryPageComponent implements OnInit {
     prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode || "";
     prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode || "";
     prqDetails["cONTRACT"] =this.contract?.cONID||"";
-    
+
     const cntrNames = [
       { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
       { controlName: "vEHSIZE", name: "vEHSIZENM", value: "vEHSIZE" },

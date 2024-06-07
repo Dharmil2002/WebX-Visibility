@@ -1,4 +1,3 @@
-import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import moment from 'moment';
@@ -6,9 +5,9 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { loadingsheetRegister } from 'src/assets/FormControls/Reports/loadingsheet-Register/loadingsheet-register';
-import { LoadingSheetRegService } from "src/app/Utility/module/reports/loadingsheet-register-service";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import Swal from 'sweetalert2';
+import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
 
 @Component({
   selector: 'app-loadingsheet-register',
@@ -52,8 +51,9 @@ export class LoadingsheetRegisterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private locationService: LocationService,
     private filter: FilterUtils,
-    private loadingsheetdetails: LoadingSheetRegService,
-  ) { }
+    private reportService: ReportService,
+  ) {
+  }
 
   ngOnInit(): void {
     this.initializeFormControl()
@@ -92,10 +92,34 @@ export class LoadingsheetRegisterComponent implements OnInit {
       this.loadingsheetRegisterForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     }
     //#endregion
+    async getloadingsheetReportDetail(data) {
+      debugger
+      let matchQuery = {
+        ...(data.DocNO != "" ? { lSNO: { D$in: data.DocumentArray } }:
+        {D$and: [
+          { eNTDT: { D$gte: data.startValue } }, // Convert start date to ISO format
+          { eNTDT: { D$lte: data.endValue } }, // Bill date less than or equal to end date
+          ...(data.DocNO != "" ? [{ lSNO: { D$in: data.DocumentArray } }] : []),
+          ...(data.Location && data.Location != ""
+            ? [{ lOC: { D$eq: data.Location } }]
+            : []),
+        ]}
+        ),
+      };
+      const res = await this.reportService.fetchReportData("LoadingsheetRegister", matchQuery);
+      const details = res.data.data.map((item) => ({
+        ...item,
+        LSDateTime : item.LSDateTime ? moment(item.LSDateTime).format("DD MMM YY HH:MM") : "",
+        Datetime : item.Datetime ? moment(item.Datetime).format("DD MMM YY HH:MM") : "",
+      }));
 
+      return {
+        data: details,
+        grid: res.data.grid
+      };
+    }
     //#region save
     async save() {
-    
       this.loading = true;
       try {
         const startDate = new Date(this.loadingsheetRegisterForm.controls.start.value);
@@ -108,8 +132,7 @@ export class LoadingsheetRegisterComponent implements OnInit {
         const reqBody = {
           startValue, endValue, Location, DocumentArray, DocNO
         }
-        const result = await this.loadingsheetdetails.getloadingsheetReportDetail(reqBody);
-        console.log("data", result);
+        const result = await this.getloadingsheetReportDetail(reqBody);
         this.columns = result.grid.columns;
         this.sorting = result.grid.sorting;
         this.searching = result.grid.searching;
@@ -136,5 +159,4 @@ export class LoadingsheetRegisterComponent implements OnInit {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);
       }
     }
-    //#endregion
 }

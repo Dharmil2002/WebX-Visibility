@@ -54,12 +54,11 @@ export class DepartVehicleControl {
                 generatecontrol: true,
                 disable: false
             },
-
             {
                 name: 'Expiry',
                 label: 'Expiry Date',
                 placeholder: '',
-                type: 'text',
+                type: 'date',
                 value: '',
                 Validations: [],
                 generatecontrol: true,
@@ -124,7 +123,7 @@ export class BalanceControl {
         this.BalanceControlArray = [
             {
                 name: 'Advance',
-                label: 'Advance(₹)',
+                label: 'Advance Amount(₹)',
                 placeholder: '',
                 type: 'number',
                 value: 0,
@@ -135,69 +134,68 @@ export class BalanceControl {
                     onModel:'onCalculateTotal'
                 }
             },
-            {
-                name: 'PaidByCash',
-                label: 'Paid by Cash(₹)',
-                placeholder: '',
-                type: 'number',
-                value: 0,
-                Validations: [],
-                generatecontrol: true, disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-            {
-                name: "PaidbyBank",
-                label: "Paid by Bank/Cheque(₹)",
-                placeholder: '',
-                type: "number",
-                value: 0,
-                Validations: [],
-                generatecontrol: true, disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
+            // {
+            //     name: 'PaidByCash',
+            //     label: 'Paid by Cash(₹)',
+            //     placeholder: '',
+            //     type: 'number',
+            //     value: 0,
+            //     Validations: [],
+            //     generatecontrol: true, disable: false,
+            //     functions:{
+            //         onModel:'onCalculateTotal'
+            //     }
+            // },
+            // {
+            //     name: "PaidbyBank",
+            //     label: "Paid by Bank/Cheque(₹)",
+            //     placeholder: '',
+            //     type: "number",
+            //     value: 0,
+            //     Validations: [],
+            //     generatecontrol: true, disable: false,
+            //     functions:{
+            //         onModel:'onCalculateTotal'
+            //     }
+            // },
 
-            {
-                name: 'PaidbyFuel',
-                label: 'Paid by Fuel(₹)',
-                placeholder: '',
-                type: 'number',
-                value: 0,
-                Validations: [],
-                generatecontrol: true,
-                disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
+            // {
+            //     name: 'PaidbyFuel',
+            //     label: 'Paid by Fuel(₹)',
+            //     placeholder: '',
+            //     type: 'number',
+            //     value: 0,
+            //     Validations: [],
+            //     generatecontrol: true,
+            //     disable: false,
+            //     functions:{
+            //         onModel:'onCalculateTotal'
+            //     }
+            // },
 
-            {
-                name: "PaidbyCard",
-                label: "Paid by Card(₹)",
-                placeholder: '',
-                type: "number",
-                value: 0,
-                Validations: [],
-                generatecontrol: true,
-                disable: false,
-                functions:{
-                    onModel:'onCalculateTotal'
-                }
-            },
-
-            {
-                name: 'TotalAdv',
-                label: 'Total Advance(₹)',
-                placeholder: '',
-                type: 'number',
-                value: 0,
-                Validations: [],
-                generatecontrol: true,
-                disable: true
-            },
+            // {
+            //     name: "PaidbyCard",
+            //     label: "Paid by Card(₹)",
+            //     placeholder: '',
+            //     type: "number",
+            //     value: 0,
+            //     Validations: [],
+            //     generatecontrol: true,
+            //     disable: false,
+            //     functions:{
+            //         onModel:'onCalculateTotal'
+            //     }
+            // },
+            // {
+            //     name: 'TotalAdv',
+            //     label: 'Total Advance(₹)',
+            //     placeholder: '',
+            //     type: 'number',
+            //     value: 0,
+            //     Validations: [],
+            //     generatecontrol: true,
+            //     disable: true
+            // },
             {
                 name: 'advPdAt',
                 label: 'Advance Payable At',

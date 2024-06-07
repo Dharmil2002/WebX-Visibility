@@ -95,7 +95,7 @@ export class BalanceSheetCriteriaComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.BalanceSheetForm.controls["branch"].setValue(loginBranch);
     this.BalanceSheetForm.get('Individual').setValue("Y");
 

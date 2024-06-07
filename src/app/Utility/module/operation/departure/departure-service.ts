@@ -127,11 +127,11 @@ export class DepartureService {
         "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
         "aDV": {
           "aAMT": ConvertToNumber(data?.Advance || 0, 2),
-          "pCASH": ConvertToNumber(data?.PaidByCash || 0, 2),
-          "pBANK": ConvertToNumber(data?.PaidbyBank || 0, 2),
-          "pFUEL": ConvertToNumber(data?.PaidbyFuel || 0, 2),
-          "pCARD": ConvertToNumber(data?.PaidbyCard || 0, 2),
-          "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
+          "pCASH":0,
+          "pBANK":0,
+          "pFUEL":0,
+          "pCARD":0,
+          "tOTAMT":ConvertToNumber(data?.Advance || 0, 2)
         },
         "bALAMT": data?.BalanceAmt || 0,
         "aDPAYAT": data?.advPdAt?.value || "",

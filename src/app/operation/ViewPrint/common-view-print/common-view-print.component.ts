@@ -1,14 +1,13 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { StorageService } from 'src/app/core/service/storage.service';
+import { Component, OnInit, Renderer2 } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { firstValueFrom } from "rxjs";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
-  selector: 'app-common-view-print',
-  templateUrl: './common-view-print.component.html'
+  selector: "app-common-view-print",
+  templateUrl: "./common-view-print.component.html",
 })
-
 export class CommonViewPrintComponent implements OnInit {
   showView = false;
   HtmlTemplate;
@@ -43,27 +42,23 @@ export class CommonViewPrintComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.GetviewPrint() // Template Data
+    this.GetviewPrint(); // Template Data
   }
 
-  
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
       docType: this.templateBody.templateName,
-      partyCode: this.templateBody?.partyCode,
+      PartyField: this.templateBody?.PartyField,
       DocNo: this.templateBody.DocNo,
     };
-    const Res = await this.masterService
-      .masterPost("viewprint/ViewV2", req)
-      .toPromise();
+    const Res = await firstValueFrom(this.masterService.masterPost("viewprint/ViewV2", req));
     if (Res.success) {
-      this.JsonData = Res.data.jsonData;
-      this.FieldMapping = Res.data.fieldMapping;
-      this.HtmlTemplate = Res.data.Template;
-      this.copyName = Res.data?.copyName || ['Primary Copy']
+      this.JsonData = Res.data.jsonData || {};
+      this.FieldMapping = Res.data.fieldMapping || [];
+      this.HtmlTemplate = Res.data.Template || '';
+      this.copyName = Res.data?.copyName || ["Primary Copy"];
       this.showView = true;
     }
-
   }
 }

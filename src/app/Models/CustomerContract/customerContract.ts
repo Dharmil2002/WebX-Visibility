@@ -17,6 +17,7 @@ export class CustomerContractDataRequestModel {
   productId: string
   productName: string
   payBasis: string
+  payBasisCode: string
   ContractStartDate: string
   Expirydate: string
   entryBy: string

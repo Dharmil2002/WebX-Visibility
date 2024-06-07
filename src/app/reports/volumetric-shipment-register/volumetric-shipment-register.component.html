@@ -1,0 +1,12 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+     <form [formGroup]="volumetricShipRegisterTableForm">
+          <app-form-webxpress [form]="volumetricShipRegisterTableForm" [FormTitle]="'Volumetric Shipment Report'" [formData]="jsonVolumetricShipRegisterFormArray"
+               (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+               [showSaveButton]="true" [submit]="'Download'">
+          </app-form-webxpress>
+     </form>
+  <app-generic-ui-grid *ngIf="LoadTable" [formTitle]="formTitle" [showCSVButton]="true" [csvFileName]="csvFileName"
+  [source]="source" [columns]="columns" [sorting]="sorting" [columnMenu]="columnMenu" [paging]="paging"
+  [searching]="searching" [loading]="loading" [theme]="theme">
+</app-generic-ui-grid>
+</app-common-wrapper-webxpress>

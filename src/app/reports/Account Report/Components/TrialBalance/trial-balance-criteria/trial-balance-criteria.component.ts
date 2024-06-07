@@ -124,7 +124,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.TrialBalanceForm.controls["branch"].setValue(loginBranch);
     this.TrialBalanceForm.get('Individual').setValue("Y");
     const financialYearlist = this.generalLedgerReportService.getFinancialYear();

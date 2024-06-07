@@ -197,6 +197,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
         pID: this.ProductsForm.value?.Product?.value,
         pNM: this.ProductsForm.value?.Product?.name,
         pBAS: this.ProductsForm.value?.PayBasis?.name,
+        pBASCD: this.ProductsForm.value?.PayBasis?.value,
         cSTARTDT: this.ProductsForm.value?.ContractStartDate,
         cENDDT: this.ProductsForm.value?.Expirydate,
         eDT: this.contractData.eDT,

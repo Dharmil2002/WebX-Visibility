@@ -99,7 +99,7 @@ export class StocksComponent
   async getDocketDetails() {
     try {
 
-      let matches = { 
+      let matches = {
         cID: this.storage.companyCode,
         cLOC: this.storage.branch ,
         sTS: { 'D$nin': [DocketStatus.Delivered,DocketStatus.Cancelled, DocketStatus.Del_MR_Generated]}
@@ -116,6 +116,8 @@ export class StocksComponent
     }
   }
 
+
+
   getControlConfig() {
     return {
     columnHeader: {
@@ -123,6 +125,8 @@ export class StocksComponent
         Title: this.DocCalledAs.Docket,
         class: "matcolumnleft",
         Style: "min-width:15%",
+        type:'windowLink',
+        functionName:'OpenCnote',
         sticky: true
       },
       sfx: {
@@ -183,7 +187,7 @@ export class StocksComponent
         stickyEnd: true,
       },
     } ,
- 
+
     headerForCsv: {
       no: this.DocCalledAs.Docket,
       date: `${this.DocCalledAs.Docket} Date`,
@@ -196,9 +200,8 @@ export class StocksComponent
       chargedWeight: "Charged Weight",
       status: "Status",
       //"Action": "Action"
-    }, 
+    },
     staticField: [
-      "no",
       "date",
       "sfx",
       "paymentType",
@@ -210,5 +213,23 @@ export class StocksComponent
       "status"
     ]
   };
+  }
+
+  OpenCnote(modifiedData) {
+    const templateBody = {
+      templateName: "DKT",
+      partyCode: "",
+      PartyField:"",
+      DocNo:modifiedData.no,
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
+  }
+    functionCallHandler(event) {
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
   }
 }

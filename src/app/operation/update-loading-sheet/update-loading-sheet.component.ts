@@ -18,6 +18,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { StockUpdate } from 'src/app/Models/stock-update/stock-update';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -46,7 +47,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   columnHeader = {
     "Shipment": "Shipment",
-    "Suffix":"Suffix",
+    "Suffix": "Suffix",
     "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
@@ -63,7 +64,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",
-    "Suffix":"Suffix",
+    "Suffix": "Suffix",
     "Origin": "Origin",
     "Destination": "Destination",
     "Packages": "Packages",
@@ -97,7 +98,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingData: any;
   formdata: any;
   arrivalData: any;
-  scanPkgs:string[]=[];
+  scanPkgs: string[] = [];
   boxData: { count: any; title: any; class: string; }[];
   updateListData: any;
   Scan: any;
@@ -107,31 +108,33 @@ export class UpdateLoadingSheetComponent implements OnInit {
   mfNos: string[];
   rules: any;
   scanMessage: string = '';
-  isScan:boolean=false;
-  menuItemflag:boolean=true;
-  selectAllRequired:boolean=true;
+  isScan: boolean = false;
+  isDisbled: boolean = false;
+  menuItemflag: boolean = true;
+  selectAllRequired: boolean = true;
   metaData = {};
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
 
   constructor(
     private Route: Router,
-    private definition:StockUpdate,
+    private definition: StockUpdate,
     public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private controlPanel: ControlPanelService,
     private _operation: OperationService,
     private cdr: ChangeDetectorRef,
-    private storage:StorageService,
-    private arrivalService: ArrivalVehicleService
+    private storage: StorageService,
+    private arrivalService: ArrivalVehicleService,
+    private snackBarUtilityService: SnackBarUtilityService
   ) {
-    this.metaData={
+    this.metaData = {
       checkBoxRequired: true,
       noColumnSort: Object.keys(this.definition.columnHeader),
     }
     this.currentBranch = this.storage.branch;
     this.companyCode = this.storage.companyCode;
-    
+
     // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
 
@@ -145,29 +148,29 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async getLoadingSheetDetail() {
-    const shipmentData = await this.arrivalService.getThcWiseMeniFest({tHC:this.arrivalData?.TripID,dEST:this.storage.branch,"D$or":[{iSDEL:{"D$exists":false}},{iSDEL:""}]});
-    if(!shipmentData)
+    const shipmentData = await this.arrivalService.getThcWiseMeniFest({ tHC: this.arrivalData?.TripID, dEST: this.storage.branch, "D$or": [{ iSDEL: { "D$exists": false } }, { iSDEL: "" }] });
+    if (!shipmentData)
       return;
-    this.mfNos = shipmentData.map((x)=>x.mFNO);
+    this.mfNos = shipmentData.map((x) => x.mFNO);
 
     this.csv = shipmentData.map((shipment) => ({
-      Shipment: shipment.dKTNO||"",
-      Origin: shipment.oRG||"",
-      Destination: shipment?.dEST||"",
-      Suffix: shipment?.sFX||0,
+      Shipment: shipment.dKTNO || "",
+      Origin: shipment.oRG || "",
+      Destination: shipment?.dEST || "",
+      Suffix: shipment?.sFX || 0,
       Packages: parseInt(shipment.pKGS),
       weight: parseInt(shipment.wT),
       cWeight: parseInt(shipment.cWT),
-      unloadedPkg:0,
-      unloadedWT:0,
+      unloadedPkg: 0,
+      unloadedWT: 0,
       pendPkg: parseInt(shipment.pKGS),
-      pendWt:parseInt(shipment.wT),
-      pendCwt:parseInt(shipment.cWT),
-      Leg: shipment?.lEG||"",
-      KgWt: shipment?.wT||"",
-      mfNo:shipment?.docNo||"",
+      pendWt: parseInt(shipment.wT),
+      pendCwt: parseInt(shipment.cWT),
+      Leg: shipment?.lEG || "",
+      KgWt: shipment?.wT || "",
+      mfNo: shipment?.docNo || "",
       CftVolume: shipment?.vOL || "",
-      actions:["Edit"]
+      actions: ["Edit"]
     }));
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
     this.tableload = false;
@@ -180,7 +183,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.shipingDataTable = shipingTableDataArray;
     this.getPackagesData();
   }
-  onDailogClose(event){
+  onDailogClose(event) {
     this.shipmentsEdit(event)
   }
 
@@ -194,17 +197,17 @@ export class UpdateLoadingSheetComponent implements OnInit {
       const pendPkg = data.Packages - unloadedPkg;
       const pendWt = data.weight - parseFloat(actualWeight);
       const pendCwt = data.cWeight - parseFloat(ctWeight);
-      Object.assign(data, { unloadedPkg, unloadedWT,unloadctWeight, pendPkg, pendWt, pendCwt });
+      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt });
       this.cdr.detectChanges();
     }
   }
-  async getPackagesData() {    
+  async getPackagesData() {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "docket_pkgs_ltl",
-      "filter": {"mFNO":{"D$in": this.mfNos}}
+      "filter": { "mFNO": { "D$in": this.mfNos } }
     }
-    const res= await firstValueFrom(this._operation.operationMongoPost('generic/get', reqBody));
+    const res = await firstValueFrom(this._operation.operationMongoPost('generic/get', reqBody));
     this.packageData = res.data;
   }
 
@@ -217,14 +220,14 @@ export class UpdateLoadingSheetComponent implements OnInit {
       let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
       // Call kpiData function
       if (PackageUpdate) {
-        const { status, ...options}  = PackageUpdate;
-        if(!status) {
-          this.scanMessage = options.text;         
+        const { status, ...options } = PackageUpdate;
+        if (!status) {
+          this.scanMessage = options.text;
         }
-        else {          
+        else {
           this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
           this.scanPkgs.push(scanValue);
-          this.scanMessage = '';          
+          this.scanMessage = '';
         }
       }
       this.cdr.detectChanges(); // Trigger change detection
@@ -243,9 +246,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
       // })
     }
   }
-  
-  clearAndFocusOnScan() {    
-    this.scanPackage = '';    
+
+  clearAndFocusOnScan() {
+    this.scanPackage = '';
     this.scanPackageInput.nativeElement.focus();
   }
 
@@ -274,26 +277,26 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   ngOnInit(): void {
-    this.getRules(); 
+    this.getRules();
   }
-  async getRules(){
-    const filter={
-      cID:this.storage.companyCode,
-      mODULE:"Scanning",
-      aCTIVE:true
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "Scanning",
+      aCTIVE: true
     }
-    const res=await this.controlPanel.getModuleRules(filter);
-    if(res.length>0){
-      this.rules=res;
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
       this.checkDocketRules();
     }
-    
+
   }
-  checkDocketRules(){
-    const scan = this.rules.find(x=>x.rULEID=="SCAN" && x.aCTIVE);
-    this.isScan=scan.vAL=="Y"?true:false;
+  checkDocketRules() {
+    const scan = this.rules.find(x => x.rULEID == "SCAN" && x.aCTIVE);
+    this.isScan = scan.vAL == "Y" ? true : false;
   }
-  
+
   /**
    * Function to initialize form controls for the loading sheet table
    */
@@ -339,56 +342,61 @@ export class UpdateLoadingSheetComponent implements OnInit {
       console.log("failed");
     }
   }
-  onSelectAllClicked(event){
+  onSelectAllClicked(event) {
 
   }
 
   async CompleteScan() {
-    let packageChecked = false;
-    let locationWiseData = this.csv;
-    const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
-    if (exists) {
-      packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
-    }
-    if (packageChecked && this.isScan) {
-      const res=await this.arrivalService.fieldMappingArrivalScan(this.arrivalData,locationWiseData,this.packageData);
-      if(res){
-        this.dialogRef.close(this.loadingSheetTableForm.value)
-        this.goBack('Departures')
-      }
-     // this.updateTripStatus();
-    }
-    else if(!this.isScan){
-      let selectedData= this.csv.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-      let checkPend = selectedData.filter((x)=>x.pendPkg == x.Packages);
-      if (selectedData.length == 0) {
-        showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
-        return false;
-    } else if (selectedData.length == checkPend.length) {
-        showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
-        return false;
-    }
-      let notSelectedData= this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
-        const res=await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData,selectedData,notSelectedData,this.packageData,this.isScan);
-        if(res){
-          this.dialogRef.close(this.loadingSheetTableForm.value)
-          this.goBack('Departures')
+    this.snackBarUtilityService.commonToast(
+      async () => {
+        let packageChecked = false;
+        let locationWiseData = this.csv;
+        const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
+        if (exists) {
+          packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
         }
-       // this.updateTripStatus();
-    }
-     else {
-      Swal.fire({
-        icon: "error",
-        title: "Unload Package",
-        text: `Please Unload All Your Package`,
-        showConfirmButton: true,
-      });
-    }
+        if (packageChecked && this.isScan) {
+          this.isDisbled=true
+          const res = await this.arrivalService.fieldMappingArrivalScan(this.arrivalData, locationWiseData, this.packageData);
+          if (res) {
+            this.dialogRef.close(this.loadingSheetTableForm.value)
+            this.goBack('Departures')
+          }
+          // this.updateTripStatus();
+        }
+        else if (!this.isScan) {
+          let selectedData = this.csv.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
+          let checkPend = selectedData.filter((x) => x.pendPkg == x.Packages);
+          if (selectedData.length == 0) {
+            showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
+            return false;
+          } else if (selectedData.length == checkPend.length) {
+            showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
+            return false;
+          }
+          this.isDisbled=true
+          let notSelectedData = this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+          const res = await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData, selectedData, notSelectedData, this.packageData, this.isScan);
+          if (res) {
+            this.dialogRef.close(this.loadingSheetTableForm.value)
+            this.goBack('Departures')
+          }
+          // this.updateTripStatus();
+        }
+        else {
+          Swal.fire({
+            icon: "error",
+            title: "Unload Package",
+            text: `Please Unload All Your Package`,
+            showConfirmButton: true,
+          });
+        }
+      }, "Scanning");
   }
 
   async UpdateDocketDetail(dkt) {
     if (dkt) {
-      await updateTracking(this.companyCode, this._operation, dkt,this.arrivalData?.TripID);
+      await updateTracking(this.companyCode, this._operation, dkt, this.arrivalData?.TripID);
     }
     const reqbody = {
       "companyCode": this.companyCode,
@@ -501,10 +509,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
             text: `Arrival Scan done Successfully`,
             showConfirmButton: true,
           })
-       
+
         }
       }
     })
   }
- 
+
 }

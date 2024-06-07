@@ -9,6 +9,7 @@ import { UpdateShipmentDeliveryControl } from 'src/assets/FormControls/update.de
 import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
 import Swal from 'sweetalert2';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
+import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 @Component({
   selector: 'app-update-delivery-modal',
   templateUrl: './update-delivery-modal.component.html'
@@ -39,7 +40,7 @@ export class UpdateDeliveryModalComponent implements OnInit {
     public generalService:GeneralService,
     private objImageHandling: ImageHandling
   ) {
-    this.shipmentDetails = item;
+      this.shipmentDetails = item;
   }
 
   functionCaller($event) {
@@ -90,19 +91,100 @@ export class UpdateDeliveryModalComponent implements OnInit {
     );
 
   }
-  deliveryPkgsChange(){
-    const bookedPkgs = parseInt(this.deliveryForm.controls['bookedPkgs'].value);
-    const deliveryPkgs = this.deliveryForm.controls['deliveryPkgs'].value;
-    if(bookedPkgs < deliveryPkgs){
-    Swal.fire("Error","Delivery Pkgs should not be greater than Booked Pkgs","error");
-    this.deliveryForm.controls['deliveryPkgs'].setValue(0);
-    return false
+  // deliveryPkgsChange(){
+  //   const arrivedPkgs = parseInt(this.deliveryForm.controls['arrivedPkgs'].value);
+  //   const deliveryPkgs = this.deliveryForm.controls['deliveryPkgs'].value;
+  //   const arrivedWeight = this.deliveryForm.controls['arrivedWeight'].value;
+  //   const deliveryWeight = this.deliveryForm.controls['deliveryWeight'].value;
+  //   if (arrivedPkgs < deliveryPkgs) {
+  //     Swal.fire("Error", "Delivery Pkgs should not be greater than Arrived Pkgs", "error");
+  //     this.deliveryForm.controls['deliveryPkgs'].setValue(0);
+  //     return false
+  //   }
+  //   if (arrivedWeight < deliveryWeight) {
+  //     Swal.fire("Error", "Delivery Weight should not be greater than Arrived Pkgs", "error");
+  //     this.deliveryForm.controls['deliveryPkgs'].setValue(0);
+  //     return false
+  //   }
+  // }
+  deliveryPkgsChange(event) {     
+    const fm = {
+      pkgs: {
+        name: 'deliveryPkgs',
+        ctrl: this.deliveryForm.controls['deliveryPkgs'] ,
+        field: 'pKGS'
+      },
+      actWeight: {
+        name: 'deliveryWeight',
+        ctrl: this.deliveryForm.controls['deliveryWeight'],
+        field: 'wT'
+      },  
+     
+    }
+
+    function setFieldValues(values) {
+      fm.pkgs.ctrl.setValue(values.pkgs);
+      fm.actWeight.ctrl.setValue(values.actWeight);
+    }
+  
+    function proportionalWeightCalculation(pkg, total, totalWeight) {
+      return ConvertToNumber(pkg * (totalWeight / total), 2);
+    }
+  
+
+    const pkg = parseInt(fm.pkgs.ctrl.value);
+    const actWT = parseFloat(fm.actWeight.ctrl.value);
+    const totPkg = this.shipmentDetails[fm.pkgs.field] || 0;
+    const totActWT = this.shipmentDetails[fm.actWeight.field] || 0;
+
+    let result = { isValid: true, message: ''};
+    switch(event.field.name) {
+      case fm.pkgs.name: 
+        if(pkg > totPkg) {
+          result.isValid = false;
+          result.message = `Number of packages should be less than or equal to ${totPkg}`;
+          setFieldValues({ pkgs: totPkg, actWeight: totActWT });          
+        }
+        else if( pkg < totPkg ) {        
+          const aWT = proportionalWeightCalculation(pkg, totPkg, totActWT);
+          setFieldValues({ pkgs: pkg, actWeight: aWT});     
+        }
+        else if( pkg == 0) {
+          setFieldValues({ pkgs: 0, actWeight: 0});
+        }
+        break;
+      case fm.actWeight.name: 
+        const aWT = proportionalWeightCalculation(pkg, totPkg, totActWT);
+        if(actWT > totActWT) {
+          result.isValid = false;
+          result.message = `Actual weight should be less than or equal to ${totActWT}`;
+          fm.actWeight.ctrl.setValue(totActWT);
+        }
+        else if(actWT == 0 && pkg > 0) {
+          result.isValid = false;
+          result.message = `Actual weight should be greter than 0`;
+          fm.actWeight.ctrl.setValue(aWT);
+        }
+        else if(actWT == totActWT && pkg < totPkg) {
+          result.isValid = false;
+          result.message = `Actual weight should be less than total weight [${totActWT}] if number of packages are less than total packages`;
+          fm.actWeight.ctrl.setValue(aWT);
+        }
+        break;
+    }
+
+    if (!result.isValid) {
+      Swal.fire('Warning', result.message, 'warning');
     }
   }
+
   autoPopulateForm(){
     this.deliveryForm.controls['dKTNO'].setValue(this.shipmentDetails.shipment);
-    this.deliveryForm.controls['bookedPkgs'].setValue(this.shipmentDetails.packages);
-    this.deliveryForm.controls['arrivedPkgs'].setValue(this.shipmentDetails.packages);
+    this.deliveryForm.controls['bookedPkgs'].setValue(this.shipmentDetails?.dockets.pKGS||0);
+    this.deliveryForm.controls['arrivedPkgs'].setValue(this.shipmentDetails.dockets?.pEND?.pKGS !== undefined ? this.shipmentDetails.dockets?.pEND?.pKGS : this.shipmentDetails.dockets?.pKGS);
+    this.deliveryForm.controls['arrivedWeight'].setValue( this.shipmentDetails.dockets?.pEND?.wT !== undefined ? this.shipmentDetails.dockets?.pEND?.wT : this.shipmentDetails.dockets?.wT);
+    this.deliveryForm.controls['bookWeight'].setValue(this.shipmentDetails?.dockets.aCTWT||0);
+   
   }
   cancel() {
     this.dialogRef.close()

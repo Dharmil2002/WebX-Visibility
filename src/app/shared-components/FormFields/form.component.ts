@@ -57,6 +57,7 @@ export class FormComponent {
   showPassword: boolean = false;
   ConfirmshowPassword: boolean = false;
   checkboxChecked: boolean = false;
+  @Input() checkboxValue:boolean=false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   @Input() url: string;
   isExpanded;
@@ -65,7 +66,7 @@ export class FormComponent {
   //   this.formData=changes.formData.currentValue
   //   }
   constructor(private rootFormGroup: FormGroupDirective) {
-    this.form = this.rootFormGroup.control; // get parent form control    
+    this.form = this.rootFormGroup.control; // get parent form control
     // some data we want , for date fiels, that are required most of the time.
     this.minDate = new Date("01 Jan 1900");
     const today = new Date();
@@ -89,13 +90,13 @@ export class FormComponent {
     context["functionName"] = "toggleUpDown";
     this.functionCallEmitter.emit(context);
   }
-  functionCalled(context) {    
+  functionCalled(context) {
     // console.log(context , "from form components");
     if (
       (context.functionName !== undefined || context.functionName != null) &&
       context.functionName?.length > 0
     ) {
-      this.callFunction.emit(context); 
+      this.callFunction.emit(context);
     }
   }
 
@@ -144,7 +145,7 @@ export class FormComponent {
   }
   OnChangeCheckBox(event) {
     this.checkboxChecked = event.checked;
-
+   let check=this.checkboxValue
     let context = { event };
     context["functionName"] = "OnChangeCheckBox";
     this.functionCallEmitter.emit(context);
@@ -176,7 +177,7 @@ export class FormComponent {
     this.functionCallEmitter.emit(context);
   }
 
-  intigerOnly(event): boolean {    
+  intigerOnly(event): boolean {
     console.log(event);
     const charCode = event.eventArgs.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {

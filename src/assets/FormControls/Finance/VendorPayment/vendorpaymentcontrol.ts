@@ -9,7 +9,7 @@ export class VendorPaymentControl {
 
       {
         name: "StartDate",
-        label: "SelectDateRange",
+        label: "Date Range",
         placeholder: "Select Date",
         type: "daterangpicker",
         value: FormValues?.StartDate,

@@ -11,23 +11,11 @@ export class ProductControls {
         label: "Product ID",
         placeholder: "Product ID",
         type: "text",
-        value: "",
-        Validations: [
-          {
-            name: "required",
-            message: "Required",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter only alpha numeric length 2 to 10 Ex:- A1",
-            pattern: "^[a-zA-Z]{1,5}[0-9]{1,5}$",
-          },
-        ],
+        value: "System Generated",
+        Validations: [],
         generatecontrol: true,
-        disable: false,
-        functions: {
-          onChange: "handleProductId",
-        },
+        disable: true,
+        functions: {},
       },
       {
         name: "ProductName",
@@ -54,7 +42,7 @@ export class ProductControls {
           showNameAndValue: false,
         },
         functions: {
-          // onOptionSelect: "handleProductId",
+          onOptionSelect: "handleProductId",
         },
       },
     ];
@@ -65,23 +53,11 @@ export class ProductControls {
         label: "Charges Code",
         placeholder: "Charges Code",
         type: "text",
-        value: "",
-        Validations: [
-          {
-            name: "required",
-            message: "Required Charges Code",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter only alpha numeric length 2 to 10 Ex:- A1",
-            pattern: "^[a-zA-Z]{1,5}[0-9]{1,5}$",
-          },
-        ],
+        value: "System Generated",
+        Validations: [],
         generatecontrol: true,
         disable: true,
-        functions: {
-          onChange: "handleChargesCode",
-        },
+        functions: {},
       },
       {
         name: "SelectCharges",
@@ -228,6 +204,29 @@ export class ProductControls {
         Validations: [],
         generatecontrol: true,
         disable: false,
+        functions: {
+          onChange: "OnChangeVariability",
+        },
+      },
+      {
+        name: "VariabilityOn",
+        label: "Charge Variability",
+        placeholder: "Select Charge Variability",
+        type: "multiselect",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [],
+        additionalData: {
+          support: "VariabilityOnHandler",
+          showNameAndValue: false,
+        },
+        functions: {
+          onToggleAll: "toggleSelectAll",
+        },
+        generatecontrol: true,
+        disable: false,
       },
       {
         name: "Add_Deduct",
@@ -276,6 +275,16 @@ export class ProductControls {
         generatecontrol: false,
         disable: false,
       },
+      {
+        name: "VariabilityOnHandler",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
     ];
 
     this.ServicesControlsArray = [
@@ -284,23 +293,11 @@ export class ProductControls {
         label: "Services Code",
         placeholder: "Services Code",
         type: "text",
-        value: "",
-        Validations: [
-          {
-            name: "required",
-            message: "Required Services Code",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter only alpha numeric length 2 to 10 Ex:- A1",
-            pattern: "^[a-zA-Z]{1,5}[0-9]{1,5}$",
-          },
-        ],
+        value: "System Generated",
+        Validations: [],
         generatecontrol: true,
-        disable: false,
-        functions: {
-          onChange: "handleServicesCode",
-        },
+        disable: true,
+        functions: {},
       },
       {
         name: "ServicesName",

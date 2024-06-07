@@ -349,22 +349,6 @@ export class thcControl {
                     functions: {},
                     additionalData: { metaData: "Basic" }
                 },
-                {
-                    name: "startKm",
-                    label: "Start KM",
-                    placeholder: "Start KM",
-                    type: "number",
-                    value:0,
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: view ? view : update,
-                    Validations: [
-                    ],
-                    functions: {},
-                    additionalData: { metaData: "Basic" }
-                },
 
                 // {
                 //     name: 'closingBranch',
@@ -1102,6 +1086,22 @@ export class thcControl {
                 additionalData: {
                     showNameAndValue: false,
                 },
+            },
+            {
+                name: "startKm",
+                label: "Start KM",
+                placeholder: "Start KM",
+                type: "number",
+                value:0,
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: view ? view : update,
+                Validations: [
+                ],
+                functions: {},
+                additionalData: { metaData: "Basic" }
             },
             {
                 name: "chasisNo",

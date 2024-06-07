@@ -16,9 +16,10 @@ export class EwayBillControls extends BaseControl {
   private ewayBillControlArray: FormControls[];
   private EWayDetailControlArray: FormControls[];
   constructor(
-    generalService: GeneralService
+    generalService: GeneralService,
+    docCalledAs: any
   ) {
-    super(generalService, "LTL", ["EwayBillControls"]);
+    super(generalService, "LTL", ["EwayBillControls"], docCalledAs);
 
     this.docketFields = [
       {

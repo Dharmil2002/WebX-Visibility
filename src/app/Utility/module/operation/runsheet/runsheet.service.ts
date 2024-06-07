@@ -19,7 +19,7 @@ export class RunSheetService {
 
     /*below method is for the getting data and displayed in runSheet Dashboard*/
     async getRunSheetData(filter) {
-
+        debugger
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,
@@ -83,6 +83,7 @@ export class RunSheetService {
                                 city: "$dockets.cSGN.cT",
                                 oRGN: "$oRGN",
                                 cLOC: "$cLOC",
+                                pEND: { "D$ifNull": ["$pEND", ""] },
                                 dEST: "$dEST",
                                 aCTWT: "$aCTWT",
                                 sFX: "$sFX",
@@ -112,7 +113,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for the getting data and Runsheet Managment Dashboard */
     async getRunSheetManagementData(filter) {
-        
+
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "drs_headers",
@@ -163,6 +164,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for the field mapping*/
     async shipmentFieldMapping(data) {
+        debugger
         return data.map((item) => {
             return {
                 ...item,
@@ -171,8 +173,8 @@ export class RunSheetService {
                 "customer": `${item?.partyCode || ""}-${item?.partyName || ""}`,
                 "address": item?.address || "",
                 "pincode": item?.pinCode || "",
-                "packages": item?.pKGS || 0,
-                "weight": item?.cHRWT || 0,
+                "packages": item?.pEND?.pKGS !== undefined ? item.pEND.pKGS : item?.pKGS,
+                "weight": item?.pEND?.wT !== undefined ? item.pEND.wT : item?.aCTWT,
                 "volume": item?.cFTTOT || 0
             }
         });
@@ -180,7 +182,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for the field mapping to Create runSheet*/
     async drsFieldMapping(data, tableData) {
-        
+
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "vendor_detail",
@@ -197,8 +199,8 @@ export class RunSheetService {
             "cID": this.storage.companyCode,
             "dRSNO": "",
             "dRSDT": new Date(),
-            "dELTYP":data.deliveryType,
-            "dELTYPNM":data.deliveryTypeName,
+            "dELTYP": data.deliveryType,
+            "dELTYPNM": data.deliveryTypeName,
             "lOC": this.storage.branch,
             "cLUCD": data?.Cluster.split('-')[0] || "",
             "cLUNM": data?.Cluster.split('-')[1] || "",
@@ -369,38 +371,91 @@ export class RunSheetService {
     }
     /*End*/
     /*below method is for Shipment*/
-    async drsShipmentDetails(filter = {}) {
+    async drsShipmentDetails(drsNo) {
+        debugger
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "drs_details",
-            filter: filter
+            filters:[
+                {
+                  D$match: {
+                    cID: this.storage.companyCode,dRSNO:drsNo
+                  }
+                },
+                {
+                    D$lookup: {
+                      from: "docket_ops_det_ltl",
+                      let: {
+                        localDKTNO: "$dKTNO",
+                        sFX: "$sFX"
+                      }, 
+                      pipeline: [
+                        {
+                          D$match: {
+                            D$expr: {
+                              D$and: [
+                                {
+                                  D$eq: ["$dKTNO", "$$localDKTNO"]
+                                },
+                                {
+                                  D$eq: [
+                                    "$sFX",
+                                    "$$sFX"
+                                  ]
+                                } 
+                              ]
+                            }
+                          }
+                        }
+                      ],
+                      as: "dockets"
+                    }
+                  },
+                {
+                  D$unwind: {
+                    path: "$dockets",
+                    preserveNullAndEmptyArrays: true
+                  }
+                }
+              ]
         }
-        const res = await firstValueFrom(this.operations.operationPost("generic/get", req));
+        const res = await firstValueFrom(this.operations.operationPost("generic/query", req));
         return res.data.length > 0 ? res.data : [];
     }
     /*End*/
     /*below method is for Update RunSheet*/
     async FieldMappingRunSheetdkts(data) {
+        debugger
         if (data.length > 0) {
             return data.map((item) => {
                 return {
                     ...item,
                     "shipment": item?.dKTNO || "",
-                    "sFX": item?.sFX||0,
+                    "sFX": item?.sFX || 0,
                     "oRGN": item?.oRGN || "",
                     "dEST": item?.dEST || "",
-                    "packages": item?.pKGS || 0,
+                    "packages":item.dockets?.pEND?.pKGS !== undefined ? item.dockets?.pEND?.pKGS : item?.pKGS,
+                    "loadedPkg": 0,
+                    "loadedWT": 0,
+                    "pendPkg":item.dockets?.pEND?.pKGS !== undefined ? item.dockets?.pEND?.pKGS : item?.pKGS,
+                    "pendWt":item.dockets?.pEND?.wT !== undefined ? item.dockets?.pEND.wT : item?.aCTWT,
                     "loaded": 0,
-                    "pending": item?.pKGS,
+                    "pending":item.dockets?.pEND?.pKGS !== undefined ? item.dockets?.pEND?.pKGS : item?.pKGS,
                     "cFTTOT": item?.cFTTOT || 0,
-                    "aCTWT": item?.aCTWT || 0,
+                    "aCTWT":item.dockets?.pEND?.wT !== undefined ? item.dockets?.pEND.wT : item?.aCTWT,
                     "cNE": `${item?.partyCode || ""}-${item?.partyName || ""}`,
                     "address": item?.address || "",
                     "pinCode": item?.pinCode || "",
                     "city": item?.city || "",
                     "cluster": item?.cluster || "",
-                    "isSelected": false
+                    "isSelected": false,
+                    "actions": ["Edit"]
                 }
+                // "weight",
+                // "loadedPkg",
+                // "loadedWT",
+                // "pendPkg",
+                // "pendWt"
             })
         }
 
@@ -499,53 +554,80 @@ export class RunSheetService {
     }
     /*End*/
     /*below the method is for field mapping Update RunSheet*/
-    async UpdateRunSheet(formData, shipmentdata, scanPackage) {
-        if(shipmentdata.length>0){
-        const evnData = shipmentdata.map(element => {
-            const eventJson = {
-                _id:`${this?.storage.companyCode}-${formData?.Runsheet}-${element?.dKTNO}-${element.sFX}-${DocketEvents.DRS_Upload}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
-                cID: this.storage.companyCode,
-                dKTNO: element?.dKTNO || "",
-                sFX: element.sFX,
-                cNO: null,
-                lOC: this.storage.branch,
-                eVNID: DocketEvents.DRS_Upload,
-                eVNDES: getEnumName(DocketEvents, DocketEvents.DRS_Upload)?.replace(/_/g, " "),
-                eVNDT: new Date(),
-                eVNSRC: 'Create RunSheet',
-                dOCTY: 'DRS',
-                dOCNO:formData?.Runsheet||"",
-                sTS: DocketStatus.Out_For_Delivery,
-                sTSNM: DocketStatus[DocketStatus.Out_For_Delivery].replace(/_/g, " "),
-                oPSSTS:`Out For Delivery with DRS ${formData?.Runsheet} from ${this.storage.branch} since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
-                eNTDT: new Date(),
-                eNTLOC: this.storage.branch,
-                eNTBY: this.storage.userName,
+    async UpdateRunSheet(formData, shipmentdata, scanPackage,isScan) {
+           debugger
+        const selected = shipmentdata.filter((x) => x.isSelected);
+        const notSelected = shipmentdata.filter((x) => !x.isSelected);
+        if (selected.length > 0) {
+            const selectedEvnt = selected.map(element => {
+                const eventJson = {
+                    _id: `${this?.storage.companyCode}-${formData?.Runsheet}-${element?.dKTNO}-${element.sFX}-${DocketEvents.DRS_Upload}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+                    cID: this.storage.companyCode,
+                    dKTNO: element?.dKTNO || "",
+                    sFX: element.sFX,
+                    cNO: null,
+                    lOC: this.storage.branch,
+                    eVNID: DocketEvents.DRS_Upload,
+                    eVNDES: getEnumName(DocketEvents, DocketEvents.DRS_Upload)?.replace(/_/g, " "),
+                    eVNDT: new Date(),
+                    eVNSRC: 'Create RunSheet',
+                    dOCTY: 'DRS',
+                    dOCNO: formData?.Runsheet || "",
+                    sTS: DocketStatus.Out_For_Delivery,
+                    sTSNM: DocketStatus[DocketStatus.Out_For_Delivery].replace(/_/g, " "),
+                    oPSSTS: `Out For Delivery with DRS ${formData?.Runsheet} from ${this.storage.branch} since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                    eNTDT: new Date(),
+                    eNTLOC: this.storage.branch,
+                    eNTBY: this.storage.userName,
+                }
+                return eventJson;
+            });
+            const unSelectedEvnt = notSelected.map(element => {
+                const eventJson = {
+                    _id: `${this?.storage.companyCode}-${formData?.Runsheet}-${element?.dKTNO}-${element.sFX}-${DocketEvents.DRS_Upload}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+                    cID: this.storage.companyCode,
+                    dKTNO: element?.dKTNO || "",
+                    sFX: element.sFX,
+                    cNO: null,
+                    lOC: this.storage.branch,
+                    eVNID: DocketEvents.Arrival_Scan,
+                    eVNDES: getEnumName(DocketEvents, DocketEvents.Arrival_Scan)?.replace(/_/g, " "),
+                    eVNDT: new Date(),
+                    eVNSRC: 'Create RunSheet',
+                    dOCTY: 'DRS',
+                    dOCNO: formData?.Runsheet || "",
+                    sTS: DocketStatus.In_Delivery_Stock,
+                    sTSNM: DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " "),
+                    oPSSTS: `In stock at ${this.storage.branch} and available for delivery since ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}`,
+                    eNTDT: new Date(),
+                    eNTLOC: this.storage.branch,
+                    eNTBY: this.storage.userName,
+                }
+                return eventJson;
+            });
+            let evnData = [...selectedEvnt, ...unSelectedEvnt]
+            formData.mODBY = this.storage.userName;
+            formData.mODDT = new Date();
+            formData.mODLOC = this.storage.branch;
+            const req = {
+                companyCode: this.storage.companyCode,
+                branch: this.storage.branch,
+                data: {
+                    timeZone: this.storage.timeZone,
+                    formData: formData,
+                    shipmentdata: selected,
+                    dRSNO:"",
+                    scanPackage:isScan? scanPackage:[],
+                    notSelected: notSelected,
+                    evnData: evnData
+                }
             }
-            return eventJson;
-        });
-        formData.mODBY = this.storage.userName;
-        formData.mODDT = new Date();
-        formData.mODLOC = this.storage.branch;
-        const req = {
-            companyCode: this.storage.companyCode,
-            branch: this.storage.branch,
-            data: {
-                 timeZone: this.storage.timeZone,
-                 formData: formData,
-                 shipmentdata: shipmentdata,
-                 scanPackage: scanPackage,
-                 evnData:evnData
-                 }
+            const res = await firstValueFrom(this.operations.operationMongoPost("operation/drs/update", req));
+            return res.data;
         }
-        const res = await firstValueFrom(this.operations.operationMongoPost("operation/drs/update",req));
-        return res.data;
-    }
 
     }
-
-
-
     /*End*/
+    
 
 }

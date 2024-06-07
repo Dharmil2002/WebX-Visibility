@@ -21,8 +21,8 @@ export class ConsignmentControl extends BaseControl {
   private invoiceDetail: FormControls[];
   private ewayBillDetail: FormControls[];
   private marketVehicle: FormControls[];
-  constructor(docketDetail, docCalledAs,public generalService: GeneralService) {
-    super(generalService, "FTL", ["ConsignmentControl"]);
+  constructor(docketDetail, public generalService: GeneralService, docCalledAs) {
+    super(generalService, "FTL", ["ConsignmentControl"], docCalledAs);
     this.ConsignmentControlArray = [
       {
         name: "docketNumber",label: `${docCalledAs.Docket} No`,
@@ -1230,8 +1230,12 @@ export class ConsignmentControl extends BaseControl {
 export class FreightControl extends BaseControl {
   private FreightControlArray: FormControls[];
   
-  constructor(docketDetail: DocketDetail,public generalService: GeneralService) {
-    super(generalService, "FTL", ["FreightControl"]);
+  constructor( 
+    public docketDetail: DocketDetail,
+    public generalService: GeneralService,
+    public docCalledAs: any
+  ) {
+    super(generalService, "FTL", ["FreightControl"], docCalledAs);
     this.FreightControlArray = [
       {
         name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'mobile-number',
@@ -1298,7 +1302,10 @@ export class FreightControl extends BaseControl {
       },
       {
         name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
-        value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false,
+        functions: {
+          onChange: "calculateRate"
+        }
       },
       {
         name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',

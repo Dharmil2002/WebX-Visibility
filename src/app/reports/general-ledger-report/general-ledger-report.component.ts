@@ -238,7 +238,7 @@ export class GeneralLedgerReportComponent implements OnInit {
 
 
       // Set default values for 'branch' and 'Fyear' controls
-      const loginBranch = branchList.find(x => x.name === this.storage.branch);
+      const loginBranch = branchList.find(x => x.value === this.storage.branch);
       const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
 
       this.generalLedgerForm.controls["branch"].setValue(loginBranch);
@@ -447,7 +447,7 @@ export class GeneralLedgerReportComponent implements OnInit {
 
   }
   //#endregion
-  //#region to get ledger data to show in table 
+  //#region to get ledger data to show in table
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -488,9 +488,9 @@ export class GeneralLedgerReportComponent implements OnInit {
     this.ReportingBranches = [];
     if (this.generalLedgerForm.value.Individual == "N") {
       this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.generalLedgerForm.value.branch.name);
-      this.ReportingBranches.push(this.generalLedgerForm.value.branch.name);
+      this.ReportingBranches.push(this.generalLedgerForm.value.branch.value);
     } else {
-      this.ReportingBranches.push(this.generalLedgerForm.value.branch.name);
+      this.ReportingBranches.push(this.generalLedgerForm.value.branch.value);
     }
 
     const startDate = new Date(this.generalLedgerForm.controls.start.value);

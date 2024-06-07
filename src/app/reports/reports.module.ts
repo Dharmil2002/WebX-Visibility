@@ -68,6 +68,13 @@ import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSh
 import { BalanceSheetCriteriaComponent } from './Account Report/Components/BalanceSheet/balance-sheet-criteria/balance-sheet-criteria.component';
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
+import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
+import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
+import { DrsRegisterComponent } from './drs-register/drs-register.component';
+import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component';
+import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
+import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
+import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -141,11 +148,28 @@ import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/cu
     BalanceSheetViewComponent,
     BalanceSheetCriteriaComponent,
     MRRegisterReportComponent,
-    CustomerInvoiceRegisterComponent
+    CustomerInvoiceRegisterComponent,
+    VolumetricShipmentRegisterComponent,
+    ThcRegisterReportComponent,
+    DrsRegisterComponent,
+    ManifestRegisterReportComponent,
+    LoadingsheetRegisterComponent,
+    GenerateTdsRegisterReportComponent,
+    GenericReportViewComponent
   ],
   exports: [],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService]
+  providers: [
+    DatePipe, 
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, 
+    { provide: MAT_DIALOG_DATA, useValue: {} }, 
+    jsonDataServiceService, 
+    FilterUtils, 
+    SnackBarUtilityService, 
+    utilityService, 
+    SessionService, 
+    EncryptionService
+  ]
 })
 
 export class ReportsModule { }

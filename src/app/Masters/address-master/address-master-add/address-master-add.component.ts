@@ -209,7 +209,7 @@ export class AddressMasterAddComponent implements OnInit {
     const Body = {
       companyCode: this.companyCode,
       collectionName: "customer_detail",
-      filter: {},
+      filter: { companyCode: this.companyCode },
     };
 
     const res = await firstValueFrom(
@@ -392,7 +392,7 @@ export class AddressMasterAddComponent implements OnInit {
     let req = {
       companyCode: this.companyCode,
       collectionName: "address_detail",
-      filter: {},
+      filter: {companyCode: this.companyCode},
     };
     this.masterService.masterPost("generic/get", req).subscribe({
       next: (res: any) => {

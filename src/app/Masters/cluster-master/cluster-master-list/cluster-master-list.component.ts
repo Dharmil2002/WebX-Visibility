@@ -103,7 +103,7 @@ export class ClusterMasterListComponent implements OnInit {
   async getClusterDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "filter": {},
+      "filter": { companyCode: this.companyCode },
       "collectionName": "cluster_detail"
     };
 

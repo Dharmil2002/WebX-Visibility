@@ -362,7 +362,7 @@ export class ClusterMasterAddComponent implements OnInit {
     let req = {
       companyCode: this.companyCode,
       collectionName: "cluster_detail",
-      filter: {},
+      filter: {companyCode: this.companyCode},
     };
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     return res.data.sort((a, b) => a._id.localeCompare(b._id));

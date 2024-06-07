@@ -112,8 +112,9 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   viewLoadingSheet(event){
       const req = {
         DocNo: event.data?.LoadingSheet,
-        partyCode: "CONSRAJT26",
-        templateName: "loadingSheet",
+        partyCode: "",
+        templateName: "LS",
+        PartyField:""
       };
       const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
       window.open(url, '', 'width=1000,height=800');

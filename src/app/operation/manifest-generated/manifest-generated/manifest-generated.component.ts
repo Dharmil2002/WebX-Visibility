@@ -155,7 +155,6 @@ export class ManifestGeneratedComponent implements OnInit {
   viewMFview(event) {
     const req = {
       DocNo: event.data?.MFNumber,
-      partyCode: "",
       templateName: "MF",
       PartyField:"",
     };

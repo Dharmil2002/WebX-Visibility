@@ -280,7 +280,6 @@ export class TrackingPageComponent implements OnInit {
       DocNo: DockNo,
       templateName: "DKT",
       PartyField:"",
-      partyCode: "",
     };
     const url = `${
       window.location.origin

@@ -186,7 +186,6 @@ export class DocketListComponent implements OnInit {
   OpenCnote(data) {
     const templateBody = {
       templateName: "DKT",
-      partyCode: "",
       PartyField:"",
       DocNo: data.docNo,
     }

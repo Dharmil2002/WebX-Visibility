@@ -118,11 +118,8 @@ export class DeliveryMrResponseModalComponent implements OnInit {
   openviewprint(event){
     const DocNo = event.data.dLMRNO
     const req = {
-      // templateName: "DeliveryMr",
       templateName: "DMR",
       PartyField:"",
-      // partyCode: "CUST00028",
-      partyCode: "",
       DocNo: DocNo,
     };
     const url = `${window.location.origin

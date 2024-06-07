@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="'/Masters/AccountMaster/BankAccountMasterList'">
     <form [formGroup]="BankForm">
-        <app-form-webxpress [form]="BankForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
+        <app-form-webxpress [form]="BankForm" [formData]="jsonControlArray" [modifyAndSaveButton]="true"
             [FormTitle]="FormTitle" (callFunction)="functionCallHandler($event)"
             (functionCallEmitter)="functionCallHandler($event)" [Disabled]="isSubmit">
         </app-form-webxpress>

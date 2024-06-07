@@ -213,8 +213,9 @@ export class ThcSummaryComponent implements OnInit {
   openExternalWindow(data) {
     const templateBody = {
       DocNo: data.docNo,
-      templateName: "thc1",
-      partyCode: "CONSRAJ19",
+      templateName: "THC",
+      partyCode: "",
+      PartyField:"",
     }
 
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

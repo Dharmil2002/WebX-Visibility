@@ -635,8 +635,9 @@ export class BalancePaymentComponent implements OnInit {
   BalanceUnbilledFunction(event) {
     const templateBody = {
       DocNo: event.data.THC,
-      partyCode: "CONSRAJ19",
-      templateName: "thc",
+      partyCode: "",
+      PartyField:"",
+      templateName: "THC",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

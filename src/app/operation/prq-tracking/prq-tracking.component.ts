@@ -184,7 +184,6 @@ export class PrqTrackingComponent implements OnInit {
     const prqNo = res.data.pRQNO;
     const templateBody = {
       DocNo: prqNo,
-      partyCode: "",
       templateName: "PRQ",
       PartyField:"",
     };

@@ -112,7 +112,6 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   viewLoadingSheet(event){
       const req = {
         DocNo: event.data?.LoadingSheet,
-        partyCode: "",
         templateName: "LS",
         PartyField:""
       };

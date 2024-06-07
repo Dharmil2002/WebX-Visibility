@@ -1706,10 +1706,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         } else if (result.isDenied) {
           // Handle the action for the deny button here.
           const templateBody = {
-            // templateName: "Docket",
-            // partyCode: "CONSRAJT58",
             templateName: "DKT",
-            partyCode: "",
             PartyField:"",
             DocNo: this.consignmentForm.controls["docketNumber"].value,
           }

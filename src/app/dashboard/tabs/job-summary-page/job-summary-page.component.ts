@@ -122,7 +122,6 @@ export class JobSummaryPageComponent implements OnInit {
   OpenJob(data) {
     const templateBody = {
       DocNo: data.jobNo,
-      partyCode: "",
       PartyField:"",
       templateName: "JOB",
     }

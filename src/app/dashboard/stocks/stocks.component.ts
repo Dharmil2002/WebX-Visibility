@@ -218,7 +218,6 @@ export class StocksComponent
   OpenCnote(modifiedData) {
     const templateBody = {
       templateName: "DKT",
-      partyCode: "",
       PartyField:"",
       DocNo:modifiedData.no,
     }

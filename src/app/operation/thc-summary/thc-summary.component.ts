@@ -214,7 +214,6 @@ export class ThcSummaryComponent implements OnInit {
     const templateBody = {
       DocNo: data.docNo,
       templateName: "THC",
-      partyCode: "",
       PartyField:"",
     }
 

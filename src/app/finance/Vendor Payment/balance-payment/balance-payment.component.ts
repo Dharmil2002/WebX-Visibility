@@ -635,7 +635,6 @@ export class BalancePaymentComponent implements OnInit {
   BalanceUnbilledFunction(event) {
     const templateBody = {
       DocNo: event.data.THC,
-      partyCode: "",
       PartyField:"",
       templateName: "THC",
     };

@@ -168,7 +168,6 @@ export class PrqSummaryPageComponent implements OnInit {
     const prqNo = data.prqNo;
     const templateBody = {
       DocNo: prqNo,
-      partyCode: "",
       templateName: "PRQ",
       PartyField:"",
     };

@@ -274,7 +274,6 @@ export class AdvancePaymentsComponent implements OnInit {
       DocNo: event.data.THC,
       templateName: "THC",
       PartyField:"",
-      partyCode: "",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

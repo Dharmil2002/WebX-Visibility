@@ -1,8 +1,9 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="groupTableForm">
-        <app-form-webxpress [form]="groupTableForm" [formData]="jsonControlGroupArray" [Disabled]="isSubmit"
-            [modifyAndSaveButton]="true" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'Customer Group Details'">
+        <app-form-webxpress [form]="groupTableForm" [formData]="jsonControlGroupArray" [modifyAndSaveButton]="true" 
+            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'Customer Group Details'"
+            [Disabled]="isSubmit"
+            >
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

@@ -1,14 +1,14 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import {Router } from '@angular/router';
 import moment from 'moment';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { loadingsheetRegister } from 'src/assets/FormControls/Reports/loadingsheet-Register/loadingsheet-register';
+import { LoadingSheetRegService } from "src/app/Utility/module/reports/loadingsheet-register-service";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
-import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
-import { NavDataService } from 'src/app/core/service/navdata.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-loadingsheet-register',
@@ -24,25 +24,25 @@ export class LoadingsheetRegisterComponent implements OnInit {
     },
   ];
   loadingsheetRegisterForm: UntypedFormGroup;
-  jsonControlArray: any;
+  jsonControlArray : any;
   loading = true // Loading indicator
   submit = "Save";
   showOverlay = false;
-  data: any;
-  formTitle: string;
-  csvFileName: string;
+
   //#region GRID PROPERTIES
-  LoadTable = false;
+  LoadTable=false;
+  formTitle="LoadingSheet Register Data";
+  csvFileName: string; // name of the csv file, when data is downloaded
   source: any[] = []; // Array to hold data
 
   //#region Table
   columns = [];
   //#endregion
 
-  paging: any;
-  sorting: any;
-  columnMenu: any;
-  searching: any;
+  paging: any ;
+  sorting: any ;
+  columnMenu: any ;
+  searching: any ;
   theme: "MATERIAL"
 
   //#endregion GRID PROPERTIES
@@ -52,14 +52,12 @@ export class LoadingsheetRegisterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private locationService: LocationService,
     private filter: FilterUtils,
-    private reportService: ReportService,
-    private router: Router,
-    private nav: NavDataService
-  ) {
-  }
+    private loadingsheetdetails: LoadingSheetRegService,
+  ) { }
 
   ngOnInit(): void {
     this.initializeFormControl()
+
     const now = moment().endOf('day').toDate();
     const lastweek = moment().add(-10, 'days').startOf('day').toDate()
 
@@ -85,79 +83,58 @@ export class LoadingsheetRegisterComponent implements OnInit {
       console.log("failed");
     }
   }
-  //#region to initialize form control
-  initializeFormControl() {
-    const controls = new loadingsheetRegister();
-    this.jsonControlArray = controls.loadingsheetRegisterControlArray;
+    //#region to initialize form control
+    initializeFormControl() {
+      const controls = new loadingsheetRegister();
+      this.jsonControlArray = controls.loadingsheetRegisterControlArray;
 
-    // Build the form using formGroupBuilder
-    this.loadingsheetRegisterForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-  }
-  //#endregion
-  async getloadingsheetReportDetail(data) {
-
-    let matchQuery = {
-      ...(data.DocNO != "" ? { lSNO: { D$in: data.DocumentArray } } :
-        {
-          D$and: [
-            { eNTDT: { D$gte: data.startValue } }, // Convert start date to ISO format
-            { eNTDT: { D$lte: data.endValue } }, // Bill date less than or equal to end date
-            ...(data.DocNO != "" ? [{ lSNO: { D$in: data.DocumentArray } }] : []),
-            ...(data.Location && data.Location != ""
-              ? [{ lOC: { D$eq: data.Location } }]
-              : []),
-          ]
-        }
-      ),
-    };
-    const res = await this.reportService.fetchReportData("LoadingsheetRegister", matchQuery);
-    const details = res.data.data.map((item) => ({
-      ...item,
-      LSDateTime: item.LSDateTime ? moment(item.LSDateTime).format("DD MMM YY HH:MM") : "",
-      Datetime: item.Datetime ? moment(item.Datetime).format("DD MMM YY HH:MM") : "",
-    }));
-
-    return {
-      data: details,
-      grid: res.data.grid
-    };
-  }
-  //#region save
-  async save() {
-    this.loading = true;
-    try {
-      const startDate = new Date(this.loadingsheetRegisterForm.controls.start.value);
-      const endDate = new Date(this.loadingsheetRegisterForm.controls.end.value);
-      const startValue = moment(startDate).startOf('day').toDate();
-      const endValue = moment(endDate).endOf('day').toDate();
-      const Location = this.loadingsheetRegisterForm.value.Location.value;
-      const DocNO = this.loadingsheetRegisterForm.value.DocumentNO;
-      const DocumentArray = DocNO ? DocNO.includes(',') ? DocNO.split(',') : [DocNO] : [];
-      const reqBody = {
-        startValue, endValue, Location, DocumentArray, DocNO
-      };
-      const result = await this.getloadingsheetReportDetail(reqBody);
-      this.columns = result.grid.columns;
-      this.sorting = result.grid.sorting;
-      this.searching = result.grid.searching;
-      this.paging = result.grid.paging;
-
-      // Prepare the state data to include all necessary properties
-      const stateData = {
-        data: result,
-        formTitle: 'LoadingSheet Register Report',
-        csvFileName: this.csvFileName
-      };
-      // Convert the state data to a JSON string and encode it
-      const stateString = encodeURIComponent(JSON.stringify(stateData));
-      this.nav.setData(stateData);
-      // Create the new URL with the state data as a query parameter
-      const url = `/#/Reports/generic-report-view`;
-      // Open the URL in a new tab
-      window.open(url, '_blank');
-
-    } catch (error) {
-      this.snackBarUtilityService.ShowCommonSwal("error", error.message);
+      // Build the form using formGroupBuilder
+      this.loadingsheetRegisterForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     }
-  }
+    //#endregion
+
+    //#region save
+    async save() {
+      debugger;
+      this.loading = true;
+      try {
+        const startDate = new Date(this.loadingsheetRegisterForm.controls.start.value);
+        const endDate = new Date(this.loadingsheetRegisterForm.controls.end.value);
+        const startValue = moment(startDate).startOf('day').toDate();
+        const endValue = moment(endDate).endOf('day').toDate();
+        const Location = this.loadingsheetRegisterForm.value.Location.value;
+        const DocNO = this.loadingsheetRegisterForm.value.DocumentNO;
+        const DocumentArray = DocNO ? DocNO.includes(',') ? DocNO.split(',') : [DocNO] : [];
+        const reqBody = {
+          startValue, endValue, Location, DocumentArray, DocNO
+        }
+        const result = await this.loadingsheetdetails.getloadingsheetReportDetail(reqBody);
+        console.log("data", result);
+        this.columns = result.grid.columns;
+        this.sorting = result.grid.sorting;
+        this.searching = result.grid.searching;
+        this.paging = result.grid.paging;
+
+        this.source = result.data;
+        this.LoadTable = true;
+        this.showOverlay = true;
+
+        if (this.source.length === 0) {
+          if (this.source) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
+          this.loading = false;
+          return;
+        }
+        this.loading = false;
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", error.message);
+      }
+    }
+    //#endregion
 }

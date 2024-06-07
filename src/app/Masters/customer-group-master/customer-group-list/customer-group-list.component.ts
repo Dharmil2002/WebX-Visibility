@@ -60,7 +60,7 @@ export class CustomerGroupListComponent implements OnInit {
     "groupCode": "Group Code",
     "groupName": "Group Name",
     "activeFlag": "Active Status"
-    }
+  }
   breadScrums = [
     {
       title: "Customer Group Master",
@@ -88,7 +88,7 @@ export class CustomerGroupListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "customerGroup_detail",
-      "filter": {}
+      "filter": { companyCode: this.companyCode }
     }
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {

@@ -11,7 +11,7 @@
     <form [formGroup]="beneficiaryDetailForm">
         <app-form-webxpress [form]="beneficiaryDetailForm" [formData]="jsonDetailControl"
             [FormTitle]="'Beneficiary Other Details'" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [modifyAndSaveButton]="true" [Disabled]="isSubmit">           
+            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </div>

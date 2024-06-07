@@ -30,7 +30,7 @@ export class customerModel {
   }[];
   customer_mobile: number;
   TANNumber: string;
-  _id: string;
+
   constructor(customerMaster: any) {
     this.customerGroup = customerMaster.customerGroup || '';
     this.customerName = customerMaster.customerName || '';
@@ -39,7 +39,7 @@ export class customerModel {
     this.Customer_Emails = customerMaster.Customer_Emails || '';
     this.ERPcode = customerMaster.ERPcode || '';
     this.PANnumber = customerMaster.PANnumber || '';
-    this.uplodPANcard = customerMaster.uplodPANcard || null;
+    this.uplodPANcard = customerMaster.uplodPANcard || '';
     this.CINnumber = customerMaster.CINnumber || '';
     this.RegisteredAddress = customerMaster.RegisteredAddress || '';
     this.PinCode = customerMaster.PinCode || 0;
@@ -47,7 +47,7 @@ export class customerModel {
     this.state = customerMaster.state || '';
     this.Country = customerMaster.Country || '';
     this.MSMENumber = customerMaster.MSMENumber || '';
-    this.MSMEscan = customerMaster.MSMEscan || null;
+    this.MSMEscan = customerMaster.MSMEscan || '';
     this.BlackListed = customerMaster.BlackListed || false;
     this.activeFlag = customerMaster.activeFlag || false;
     this.customerCode = customerMaster.customerCode || '';

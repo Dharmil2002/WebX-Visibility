@@ -213,7 +213,7 @@ export class ConsignmentEntryFormComponent
     docketDetailsPromise
       .then((docketDetails) => {
         this.model.ConsignmentFormControls = new ConsignmentControl(
-          docketDetails,
+          docketDetails,         
           this.generalService,
           this.DocCalledAs
         );
@@ -2632,24 +2632,8 @@ export class ConsignmentEntryFormComponent
         ) || 0)
       )
     );
-    if (this.model.FreightTableForm.controls['rcm'].value == "Y") {
-      this.model.FreightTableForm.get("totAmt")?.setValue(this.model.FreightTableForm.get("grossAmount")?.value);
-    }
-    this.calculateRate();
   }
-  calculateRate() {
-    if (this.model.FreightTableForm.controls['rcm'].value == "N") {
-      const gstRate = parseFloat(this.model.FreightTableForm.controls['gstAmount'].value);
-      const grossAmt = parseFloat(this.model.FreightTableForm.controls['grossAmount'].value);
-      const gstAmt = (grossAmt * gstRate) / 100;
-      const totalgst = gstAmt ? parseFloat(gstAmt.toFixed(2)) : gstAmt
-      this.model.FreightTableForm.controls["gstChargedAmount"].setValue(totalgst);
-      this.model.FreightTableForm.get("totAmt")?.setValue(ConvertToNumber(
-        (parseFloat(this.model.FreightTableForm.get("grossAmount")?.value) || 0) +
-        (parseFloat(this.model.FreightTableForm.get("gstChargedAmount")?.value) || 0))
-      );
-    }
-  }
+
   containorCsvDetail() {
     if (this.model.previewResult.length > 0) {
       this.tableLoad = true;
@@ -2721,7 +2705,7 @@ export class ConsignmentEntryFormComponent
     } else if (cnogst.length === 1) {
       cnogst = cnogst[0];
     }
-    this.model.consignmentTableForm.controls["cnogst"].setValue(cnogst?.gstNo || "");
+    this.model.consignmentTableForm.controls["cnogst"].setValue(cnogst?.gstNo||"");
   }
   /*End*/
   /*getConsignee*/
@@ -2746,7 +2730,7 @@ export class ConsignmentEntryFormComponent
     } else if (cnogst.length === 1) {
       cnogst = cnogst[0];
     }
-    this.model.consignmentTableForm.controls["cnegst"].setValue(cnogst?.gstNo || "");
+    this.model.consignmentTableForm.controls["cnegst"].setValue(cnogst?.gstNo||"");
   }
   /*End*/
   //validation for the Actual weight not greater then actual weight
@@ -3357,8 +3341,58 @@ export class ConsignmentEntryFormComponent
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = DocketNo;
-        var VoucherlineitemList = this.GetVouchersLedgers(TotalAmount, DocketNo);
-
+        var VoucherlineitemList = [
+          {
+            companyCode: this.storage.companyCode,
+            voucherNo: "",
+            transCode: VoucherInstanceType.CNoteBooking,
+            transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
+            transDate: new Date(),
+            finYear: financialYear,
+            branch: this.storage.branch,
+            accCode: ledgerInfo["AST001001"].LeadgerCode,
+            accName: ledgerInfo["AST001001"].LeadgerName,
+            accCategory: ledgerInfo["AST001001"].LeadgerCategory,
+            sacCode: "",
+            sacName: "",
+            debit: TotalAmount,
+            credit: 0,
+            GSTRate: 0,
+            GSTAmount: 0,
+            Total: TotalAmount,
+            TDSApplicable: false,
+            narration: `when C note No ${DocketNo} Is Booked`,
+          },
+          {
+            companyCode: this.storage.companyCode,
+            voucherNo: "",
+            transCode: VoucherInstanceType.CNoteBooking,
+            transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
+            transDate: new Date(),
+            finYear: financialYear,
+            branch: this.storage.branch,
+            accCode: ledgerInfo["INC001003"].LeadgerCode,
+            accName: `${ledgerInfo["INC001003"].LeadgerName} - ${this.products.find(
+              (x) =>
+                x.value == this.model.consignmentTableForm.value.transMode
+            ).name
+              }`,
+            accCategory: ledgerInfo["INC001003"].LeadgerCategory,
+            sacCode: "",
+            sacName: "",
+            debit: 0,
+            credit: TotalAmount,
+            GSTRate: 0,
+            GSTAmount: 0,
+            Total: TotalAmount,
+            TDSApplicable: false,
+            narration: `when C note No ${DocketNo} Is Booked`,
+          },
+        ];
 
         this.VoucherRequestModel.details = VoucherlineitemList;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
@@ -3388,24 +3422,24 @@ export class ConsignmentEntryFormComponent
                   this.model.consignmentTableForm.value?.billingParty?.name,
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
-                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.debit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
-                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.credit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
+                debit: [
+                  {
+                    accCode: ledgerInfo["AST001001"].LeadgerCode,
+                    accName: ledgerInfo["AST001001"].LeadgerName,
+                    accCategory: ledgerInfo["AST001001"].LeadgerCategory,
+                    amount: TotalAmount,
+                    narration: `when C note No ${DocketNo} Is Booked`,
+                  },
+                ],
+                credit: [
+                  {
+                    accCode: ledgerInfo["INC001003"].LeadgerCode,
+                    accName: ledgerInfo["INC001003"].LeadgerName + " - Road",
+                    accCategory: ledgerInfo["INC001003"].LeadgerCategory,
+                    amount: TotalAmount,
+                    narration: `when C note No ${DocketNo} Is Booked`,
+                  },
+                ],
               };
 
               this.voucherServicesService
@@ -3472,61 +3506,6 @@ export class ConsignmentEntryFormComponent
       this.model.FreightTableForm.controls["gstChargedAmount"].enable();
       this.calculateFreight();
     }
-  }
-  GetVouchersLedgers(TotalAmount, DocketNo) {
-
-    const createVoucher = (accCode, accName, accCategory, debit, credit) => ({
-      companyCode: this.storage.companyCode,
-      voucherNo: "",
-      transCode: VoucherInstanceType.CNoteBooking,
-      transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-      voucherCode: VoucherType.JournalVoucher,
-      voucherType: VoucherType[VoucherType.JournalVoucher],
-      transDate: new Date(),
-      finYear: financialYear,
-      branch: this.storage.branch,
-      accCode,
-      accName,
-      accCategory,
-      sacCode: "",
-      sacName: "",
-      debit,
-      credit,
-      GSTRate: 0,
-      GSTAmount: 0,
-      Total: TotalAmount,
-      TDSApplicable: false,
-      narration: `when C note No ${DocketNo} Is Booked`,
-    });
-
-    const response = [];
-    // Freight Ledger
-    response.push(createVoucher(ledgerInfo['AST001001'].LeadgerCode, ledgerInfo['AST001001'].LeadgerName,
-      ledgerInfo['AST001001'].LeadgerCategory, TotalAmount, 0));
-
-    let LeadgerDetails;
-    switch (this.model.consignmentTableForm.value.transMode) {
-      case "P1":
-        LeadgerDetails = ledgerInfo['INC001003'];
-        break;
-      case "P2":
-        LeadgerDetails = ledgerInfo['INC001004'];
-        break;
-      case "P3":
-        LeadgerDetails = ledgerInfo['INC001002'];
-        break;
-      case "P4":
-        LeadgerDetails = ledgerInfo['INC001001'];
-        break;
-      default:
-        LeadgerDetails = ledgerInfo['INC001003'];
-        break;
-    }
-    // Income Ledger
-    if (LeadgerDetails) {
-      response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, TotalAmount));
-    }
-    return response;
   }
 }
 

@@ -35,20 +35,17 @@ export class CustomerGroupAddComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
 
   ) {
-
     this.companyCode = this.storage.companyCode;
-    const extrasState = this.Route.getCurrentNavigation()?.extras?.state;
-
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
       this.submit = 'Modify';
       this.isUpdate = true;
-      this.groupTabledata = extrasState.data;
     } else {
       this.action = "Add";
-      this.groupTabledata = new CustomerGroupMaster({})
+      this.groupTabledata = new CustomerGroupMaster({});
     }
+
     this.breadScrums = [
       {
         title: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
@@ -58,6 +55,8 @@ export class CustomerGroupAddComponent implements OnInit {
         toggle: this.action === "edit" ? this.groupTabledata.activeFlag : true
       }
     ];
+
+
     this.initializeFormControl();
   }
   initializeFormControl() {
@@ -72,8 +71,7 @@ export class CustomerGroupAddComponent implements OnInit {
   }
   //#region Save Function
   async save() {
-    if (!this.groupTableForm.valid || this.isSubmit) {
-
+    if (!this.groupTableForm.valid) {
       this.groupTableForm.markAllAsTouched();
       Swal.fire({
         icon: "error",
@@ -89,9 +87,11 @@ export class CustomerGroupAddComponent implements OnInit {
       return false;
     }
     else {
+      
       this.snackBarUtilityService.commonToast(async () => {
         try {
-          this.isSubmit = true;
+          this.isSubmit = true
+
           if (this.isUpdate) {
             let id = this.groupTableForm.value._id;
             // Remove the "id" field from the form controls
@@ -116,12 +116,11 @@ export class CustomerGroupAddComponent implements OnInit {
                 }
               }
             });
-          }
-          else {
+          } else {
             const tableReq = {
               companyCode: this.companyCode,
               collectionName: "customerGroup_detail",
-              filter: { companyCode: this.companyCode }
+              filter: {companyCode: this.companyCode}
             }
             const tableRes = await firstValueFrom(this.masterService.masterPost('generic/get', tableReq))
             const tableData = tableRes.data
@@ -158,7 +157,6 @@ export class CustomerGroupAddComponent implements OnInit {
             "error",
             "Fail To Submit Data..!"
           );
-          this.isSubmit = false;
         }
       }, "Customer Group Adding...");
     }
@@ -186,7 +184,7 @@ export class CustomerGroupAddComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "customerGroup_detail",
-      "filter": {}
+      "filter": {companyCode:this.companyCode}
     }
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {

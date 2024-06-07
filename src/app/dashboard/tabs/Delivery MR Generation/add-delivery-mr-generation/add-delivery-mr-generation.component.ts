@@ -190,34 +190,18 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         "dMIN": result?.data.dMIN,
         "dMAX": result?.data.dMAX
       }
-      const arrivalData = await this.getArrivalDate(docketdetails);
-      this.calculateDemurrage(  docketdetails, demurrage,arrivalData);
+      this.calculateDemurrage(  docketdetails, demurrage);
       return result?.data;
     }
     return null;
   }
   //#endregion
-  async getArrivalDate(docketdetails) {
-    const request = {
-      companyCode: this.storage.companyCode,
-      collectionName: "docket_ops_det_ltl",
-      filter: {
-        dKTNO: docketdetails.dKTNO
-      }
-    };
-    const result = await firstValueFrom(this.operation.operationMongoPost(GenericActions.GetOne, request));
-  
-    if (result?.data) {
-      return result?.data;
 
-    }
-    return null;
-  }
   //#region
-  calculateDemurrage( docket, demurrage, arrivalData) {
+  calculateDemurrage( docket, demurrage) {
 
     // Calculate the number of days from arrival date to current date
-    const arrivalDate = new Date(arrivalData?.aRRDT);
+    const arrivalDate = new Date(docket.aRRDT);
     const currentDate = new Date();
     const diffTime = Math.abs(currentDate.getTime() - arrivalDate.getTime());
     const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -270,7 +254,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       const filter = { "cID": this.storage.companyCode, dEST: this.storage.branch, "dKTNO": DocketNo, pAYTYP: { D$in: ["P01", "P03"] } };
       const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
       this.getContractDetails(docketdetails[0]);
-      this.getArrivalDate(docketdetails[0]);
       if (docketdetails.length === 1) {
         this.DocketDetails = docketdetails[0];
         await this.SetDocketsDetails(this.DocketDetails);
@@ -1349,5 +1332,4 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     return Result;
   }
   //#endregion
-
 }

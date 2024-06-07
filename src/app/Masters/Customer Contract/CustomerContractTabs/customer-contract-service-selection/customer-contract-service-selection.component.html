@@ -6,8 +6,7 @@
 <form [formGroup]="ProductsForm">
     <app-form-webxpress [form]="ProductsForm" [FormTitle]="'PRODUCT'" [formData]="jsonControlArrayProductsForm"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)" [EventButton]="ProductsForm.valid==true ? SaveEventButton : false"
-        [className]="className">
+        (callFunction)="functionCallHandler($event)"  [EventButton]="ProductsForm.valid==true ? SaveEventButton : false" [className]="className">
     </app-form-webxpress>
 
 </form>

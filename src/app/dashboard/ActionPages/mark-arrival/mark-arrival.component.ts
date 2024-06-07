@@ -127,7 +127,6 @@ export class MarkArrivalComponent implements OnInit {
     this.mfList = shipment
   }
   async save() {
-    this.ObjSnackBarUtility.commonToast(async () => {
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -140,7 +139,6 @@ export class MarkArrivalComponent implements OnInit {
     if (res) {
       this.updateTripData()
     }
-  }," Vehicle Arrival");
   }
 
   async updateTripData() {

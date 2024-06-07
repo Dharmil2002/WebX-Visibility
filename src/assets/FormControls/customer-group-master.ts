@@ -11,7 +11,7 @@ export class CustomerGroupControl {
         name: 'groupCode', label: "Group Code",
         placeholder: "",
         type: 'text',
-        value: isUpdate?customerGroupTable.groupCode:"System Generated",
+        value: isUpdate ? customerGroupTable.groupCode : "System Generated",
         generatecontrol: true, disable: true,
         Validations: [],
         functions: {},
@@ -55,7 +55,7 @@ export class CustomerGroupControl {
         label: "Active Flag",
         placeholder: "",
         type: "toggle",
-        value: isUpdate ? customerGroupTable.activeFlag : false,
+        value: customerGroupTable.activeFlag,
         generatecontrol: false,
         disable: false,
         Validations: [
@@ -93,5 +93,4 @@ export class CustomerGroupControl {
   getFormControls() {
     return this.customerGroupControlArray;
   }
-
 }

@@ -18,7 +18,7 @@
                   <mat-icon>{{isUpDown ?
                     'arrow_upward' : 'arrow_downward'}}</mat-icon>
                 </button>
-                <mat-checkbox (change)="OnChangeCheckBox($event)" [(ngModel)]="checkboxValue">
+                <mat-checkbox (change)="OnChangeCheckBox($event)"[(ngModel)]="checkboxValue">
                   {{CheckBoxMessage}} &nbsp;
                 </mat-checkbox>
               </section>
@@ -117,14 +117,17 @@
                           (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
                       </ng-template>
                     </ng-template>
+
                     <!-- error  -->
                     <mat-error *ngFor="let error of formItem.Validations">
-                      <ng-container *ngIf="form.get(formItem.name)?.hasError(error.name)">
+                      <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+
                         <!-- made change by Harshad to display custom message set on runtime -->
                         {{ error.name == 'pattern' && form.get(formItem.name).getError('pattern').message
                         ? form.get(formItem.name).getError('pattern').message
                         : error.message
                         }}
+
                       </ng-container>
                     </mat-error>
 
@@ -484,6 +487,7 @@
                   </div>
                 </div>
               </ng-container>
+
               <ng-container *ngIf="modifyAndSaveButton">
                 <div class="row" style="margin-top: 10px; margin-left: 10px;">
                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -496,6 +500,7 @@
                   </div>
                 </div>
               </ng-container>
+
               <ng-container *ngIf="showSaveButton">
                 <div class="row" style="margin-top: 10px; margin-left: 10px;">
                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">

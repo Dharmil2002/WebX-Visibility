@@ -13,7 +13,6 @@ import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { VendorService } from "src/app/Utility/module/masters/vendor-master/vendor.service";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
-import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: "app-add-user-master",
@@ -41,7 +40,6 @@ export class AddUserMasterComponent implements OnInit {
   userName: any;
   countryCodeStatus: any;
   countryCode: any;
-  isSubmit: boolean = false;
   userTypeStatus: any;
   locationStatus: any;
   UserFormControls: UserControl;
@@ -73,33 +71,40 @@ export class AddUserMasterComponent implements OnInit {
     private masterService: MasterService,
     private storage: StorageService,
     private customerService: CustomerService,
-    private vendorService: VendorService,
-    public snackBarUtilityService: SnackBarUtilityService,
-
+    private vendorService: VendorService
 
   ) {
     this.companyCode = this.storage.companyCode;
     const extrasState = this.route.getCurrentNavigation()?.extras?.state;
-    if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.data = route.getCurrentNavigation().extras.state.data;
-      this.action = "edit";
-      this.submit = "Modify";
-      this.isUpdate = true;
+    this.isUpdate = false;
+    this.action = extrasState ? "edit" : "add";
+    if (this.action === "edit") {
       this.userTable = extrasState.data;
+      // console.log(this.userTable);
+
+      this.isUpdate = true;
+      this.submit = 'Modify';
+      this.breadScrums = [
+        {
+          title: "Modify Master",
+          items: ["Master"],
+          active: "Modify User",
+          generatecontrol: true,
+          toggle: this.userTable.isActive
+        },
+      ];
     } else {
-      this.action = "Add";
+      this.breadScrums = [
+        {
+          title: "Add User",
+          items: ["Master"],
+          active: "Add User",
+          generatecontrol: true,
+          toggle: true
+        },
+      ];
       this.userTable = new UserMaster({});
     }
-    this.breadScrums = [
-      {
-        title: this.action === "edit" ? "Modify User Master" : "Add User",
-        items: ["Master"],
-        active: this.action === "edit" ? "Modify User Master" : "Add User",
-        generatecontrol: true,
-        toggle: this.action === "edit" ? this.userTable.isActive : true
-      }
-    ];
-
     this.initializeFormControl();
     //set value on edit
     this.userTableForm.controls["userpassword"].setValue(
@@ -405,130 +410,101 @@ export class AddUserMasterComponent implements OnInit {
     }
   }
   async save() {
-    if (!this.userTableForm.valid) {
-      this.userTableForm.markAllAsTouched()
-      Swal.fire({
-        icon: "error",
-        title: "Missing Information",
-        text: "Please ensure all required fields are filled out...",
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#d33',
-        timer: 5000,
-        timerProgressBar: true,
-      });
-      return false;
+    this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
+    this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
+    this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
+    //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
+    const division = this.userTableForm.value.division ? this.userTableForm.value.division.map(
+      (item: any) => item.name
+    ) : [];
+    this.userTableForm.controls["multiDivisionAccess"].setValue(division);
+
+    const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map(
+      (item: any) => item.value
+    );
+    this.userTableForm.controls["multiLocation"].setValue(multiLoc);
+
+    //remove unwanted controlName
+    const controlsToRemove = [
+      "confirmpassword",
+      "division",
+      "CompanyCode",
+      "controlHandler",
+      "userLocationscontrolHandler",
+    ];
+
+    controlsToRemove.forEach((controlName) => {
+      this.userTableForm.removeControl(controlName);
+    });
+    const lastUser = await this.getListId();
+    const lastUserCode = lastUser?.userId || "USR0000";
+
+    if (this.isUpdate) {
+      this.newUserCode = this.userTable.userId;
+    } else {
+      if (['Customer', 'Vendor', 'Business associate'].includes(this.userTableForm.value.userType.name)) {
+        this.newUserCode = this.userTableForm.controls["name"].value?.value || "";
+        this.userTableForm.controls["name"].setValue(this.userTableForm.value.name?.name || "");
+      }
+      else {
+        this.newUserCode = nextKeyCode(lastUserCode);
+      }
     }
-    else {
-      this.snackBarUtilityService.commonToast(async () => {
-        try {
-          this.isSubmit = true
+    //generate unique userId
+    this.userTableForm.value.userType ? this.userTableForm.controls["userType"].setValue(this.userTableForm.value.userType.name) : '';
+    this.userTableForm.controls["userId"].setValue(this.newUserCode);
+    // Clear any errors in the form controls
+    Object.values(this.userTableForm.controls).forEach((control) =>
+      control.setErrors(null)
+    );
+    let data = this.userTableForm.value;
+    if (this.isUpdate) {
+      data["mODDT"] = new Date();
+      data['mODLOC'] = this.storage.branch;
+      data['mODBY'] = this.storage.userName;
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "user_master",
+        filter: {
+          emailId: this.userTable.emailId,
+        },
+        update: data,
+      };
 
-          this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
-          this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
-          this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
-          //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
-          const division = this.userTableForm.value.division ? this.userTableForm.value.division.map(
-            (item: any) => item.name
-          ) : [];
-          this.userTableForm.controls["multiDivisionAccess"].setValue(division);
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Record updated Successfully",
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+      }
+    } else {
+      data["eNTDT"] = new Date();
+      data['eNTLOC'] = this.storage.branch;
+      data['eNTBY'] = this.storage.userName;
+      const id = { _id: this.userTableForm.controls["emailId"].value };
+      const mergedObject = { ...data, ...id };
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "user_master",
+        data: mergedObject,
+      };
 
-          const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map(
-            (item: any) => item.value
-          );
-          this.userTableForm.controls["multiLocation"].setValue(multiLoc);
-
-          //remove unwanted controlName
-          const controlsToRemove = [
-            "confirmpassword",
-            "division",
-            "CompanyCode",
-            "controlHandler",
-            "userLocationscontrolHandler",
-          ];
-
-          controlsToRemove.forEach((controlName) => {
-            this.userTableForm.removeControl(controlName);
-          });
-          const lastUser = await this.getListId();
-          const lastUserCode = lastUser?.userId || "USR0000";
-
-          if (this.isUpdate) {
-            this.newUserCode = this.userTable.userId;
-          }
-          else {
-            if (['Customer', 'Vendor', 'Business associate'].includes(this.userTableForm.value.userType.name)) {
-              this.newUserCode = this.userTableForm.controls["name"].value?.value || "";
-              this.userTableForm.controls["name"].setValue(this.userTableForm.value.name?.name || "");
-            }
-            else {
-              this.newUserCode = nextKeyCode(lastUserCode);
-            }
-          }
-          //generate unique userId
-          this.userTableForm.value.userType ? this.userTableForm.controls["userType"].setValue(this.userTableForm.value.userType.name) : '';
-          this.userTableForm.controls["userId"].setValue(this.newUserCode);
-          // Clear any errors in the form controls
-          Object.values(this.userTableForm.controls).forEach((control) =>
-            control.setErrors(null)
-          );
-          let data = this.userTableForm.value;
-          if (this.isUpdate) {
-            data["mODDT"] = new Date();
-            data['mODLOC'] = this.storage.branch;
-            data['mODBY'] = this.storage.userName;
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "user_master",
-              filter: {
-                emailId: this.userTable.emailId,
-              },
-              update: data,
-            };
-            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Record updated Successfully",
-                showConfirmButton: true,
-              });
-              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            }
-          } else {
-            data["eNTDT"] = new Date();
-            data['eNTLOC'] = this.storage.branch;
-            data['eNTBY'] = this.storage.userName;
-            const id = { _id: this.userTableForm.controls["emailId"].value };
-            const mergedObject = { ...data, ...id };
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "user_master",
-              data: mergedObject,
-            };
-            const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Record added Successfully",
-                showConfirmButton: true,
-              });
-              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            }
-          }
-        }
-        catch (error) {
-          console.error("Error fetching data:", error);
-          this.snackBarUtilityService.ShowCommonSwal(
-            "error",
-            "Fail To Submit Data..!"
-          );
-          this.isSubmit = false;
-        }
-      }, "User Adding...");
+      const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Record added Successfully",
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+      }
     }
   }
 

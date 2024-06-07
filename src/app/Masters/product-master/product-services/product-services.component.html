@@ -74,7 +74,7 @@
             </form>
         </div>
         <div style="display: flex;">
-            <button type="button" style="margin-right: 20px;" [disabled]="isSubmit" mat-raised-button color="primary"
+            <button type="button" style="margin-right: 20px;" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
                 (click)="save()">
                 Submit
             </button>

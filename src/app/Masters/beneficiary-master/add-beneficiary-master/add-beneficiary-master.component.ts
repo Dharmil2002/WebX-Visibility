@@ -12,8 +12,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { BeneficiaryModalComponent } from './beneficiary-modal/beneficiary-modal.component';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { firstValueFrom } from 'rxjs';
-import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-
 
 @Component({
   selector: 'app-add-beneficiary-master',
@@ -28,7 +26,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   backPath: string;
   beneficiaryTabledata: any;
   action: string;
-  isSubmit: boolean = false;
   tableLoad: boolean = true;
   tableData: any = [];
   breadScrums: { title: string; items: string[]; active: string; }[];
@@ -128,7 +125,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private dialog: MatDialog,
-    public snackBarUtilityService: SnackBarUtilityService,
     private storage: StorageService,
   ) {
     this.companyCode = this.storage.companyCode;
@@ -155,13 +151,13 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       }));
     } else {
       this.action = 'Add';
-
     }
+    const activeTitle = this.action === 'edit' ? 'Modify Beneficiary' : 'Add Beneficiary';
     this.breadScrums = [
       {
-        title: this.action === 'edit' ? 'Modify Beneficiary' : 'Add Beneficiary',
+        title: activeTitle,
         items: ['Home'],
-        active: this.action === 'edit' ? 'Modify Beneficiary' : 'Add Beneficiary',
+        active: activeTitle,
       },
     ];
     this.initializeFormControl();
@@ -193,140 +189,108 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   //#endregion
   //#region to save data
   async save() {
-    if (!this.beneficiaryHeaderForm.valid) {
-      this.beneficiaryHeaderForm.markAllAsTouched()
+    if (this.tableData.length === 0) {
       Swal.fire({
-        icon: "error",
-        title: "Missing Information",
-        text: "Please ensure all required fields are filled out.",
+        text: 'Please Fill Beneficiary Details',
+        icon: "warning",
+        title: 'Warning',
         showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#d33',
-        timer: 5000,
-        timerProgressBar: true,
-
       });
-      return false;
+      return false
+    }
+    clearValidatorsAndValidate(this.beneficiaryHeaderForm)
+    this.tableData = this.tableData.map(item => ({
+      ...item,
+      uploadKYC: this.urlList[item.accountCode]
+    }));
+    const newData = this.tableData.map(x => {
+      const { actions, id, ...rest } = x;
+      return rest;
+    });
+    const beneficiaryData = this.beneficiaryHeaderForm.value.beneficiary.value
+    if (this.beneficiaryHeaderForm.value.beneficiaryType === 'customer_detail') {
+      this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Customer');
+    }
+    if (this.beneficiaryHeaderForm.value.beneficiaryType === 'vendor_detail') {
+      this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Vendor');
+    }
+    if (this.beneficiaryHeaderForm.value.beneficiaryType === 'driver_detail') {
+      this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Driver');
+    }
+    if (this.beneficiaryHeaderForm.value.beneficiaryType === 'user_master') {
+      this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Employee');
+    }
+    this.beneficiaryHeaderForm.controls['beneficiary'].setValue(beneficiaryData);
+    this.beneficiaryHeaderForm.value.otherdetails = newData;
+    // console.log(this.beneficiaryHeaderForm.value);
+    let data = convertNumericalStringsToInteger(this.beneficiaryHeaderForm.value)
+    if (this.isUpdate) {
+      let id = this.beneficiaryTabledata._id;
+      data["mODDT"] = new Date();
+      data['mODLOC'] = this.storage.branch;
+      data['mODBY:'] = this.storage.userName;
+      data.otherdetails = newData;
+      // Remove the "id" field from the form controls
+      delete data._id;
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "beneficiary_detail",
+        filter: { _id: id },
+        update: data
+      };
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl('/Masters/BeneficiaryMaster/BeneficiaryMasterList');
+      }
     }
     else {
-      this.snackBarUtilityService.commonToast(async () => {
-        try {
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "beneficiary_detail",
+        filter: {},
+      }
+      const response = await firstValueFrom(this.masterService.masterPost("generic/get", req))
+      if (response) {
+        const sortedData = response.data.sort((a, b) => a._id.localeCompare(b._id));
+        const lastCode = sortedData[sortedData.length - 1];
+        const last_id = lastCode ? parseInt(lastCode._id.substring(1)) : 0;
+        // Function to generate a new route code
+        function generateVendorCode(initialCode: number = 0) {
+          const nextCode = initialCode + 1;
+          const Number = nextCode.toString().padStart(4, '0');
+          const Code = `B${Number}`;
+          return Code;
+        }
+        this.newVendorCode = generateVendorCode(last_id);
+        data._id = this.newVendorCode;
+        data["eNTDT"] = new Date();
+        data['eNTLOC'] = this.storage.branch;
+        data['eNTBY:'] = this.storage.userName;
 
-          if (this.tableData.length === 0) {
-            Swal.fire({
-              text: 'Please Fill Beneficiary Details',
-              icon: "warning",
-              title: 'Warning',
-              showConfirmButton: true,
-            });
-            return false;
-          }
-          this.isSubmit = true;
-          clearValidatorsAndValidate(this.beneficiaryHeaderForm)
-          this.tableData = this.tableData.map(item => ({
-            ...item,
-            uploadKYC: this.urlList[item.accountCode]
-          }));
-          const newData = this.tableData.map(x => {
-            const { actions, id, ...rest } = x;
-            return rest;
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "beneficiary_detail",
+          data: data
+        };
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
           });
-          const beneficiaryData = this.beneficiaryHeaderForm.value.beneficiary.value
-          if (this.beneficiaryHeaderForm.value.beneficiaryType === 'customer_detail') {
-            this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Customer');
-          }
-          if (this.beneficiaryHeaderForm.value.beneficiaryType === 'vendor_detail') {
-            this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Vendor');
-          }
-          if (this.beneficiaryHeaderForm.value.beneficiaryType === 'driver_detail') {
-            this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Driver');
-          }
-          if (this.beneficiaryHeaderForm.value.beneficiaryType === 'user_master') {
-            this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue('Employee');
-          }
-          this.beneficiaryHeaderForm.controls['beneficiary'].setValue(beneficiaryData);
-          this.beneficiaryHeaderForm.value.otherdetails = newData;
-          // console.log(this.beneficiaryHeaderForm.value);
-          let data = convertNumericalStringsToInteger(this.beneficiaryHeaderForm.value)
-          if (this.isUpdate) {
-            let id = this.beneficiaryTabledata._id;
-            data["mODDT"] = new Date();
-            data['mODLOC'] = this.storage.branch;
-            data['mODBY:'] = this.storage.userName;
-            data.otherdetails = newData;
-            // Remove the "id" field from the form controls
-            delete data._id;
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "beneficiary_detail",
-              filter: { _id: id },
-              update: data
-            };
-            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
-            if (res) {
-              // Display success message
-              Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: res.message,
-                showConfirmButton: true,
-              });
-              this.route.navigateByUrl('/Masters/BeneficiaryMaster/BeneficiaryMasterList');
-            }
-          }
-          else {
-            let req = {
-              companyCode: this.companyCode,
-              collectionName: "beneficiary_detail",
-              filter: { companyCode: this.companyCode },
-            }
-            const response = await firstValueFrom(this.masterService.masterPost("generic/get", req))
-            if (response) {
-              const sortedData = response.data.sort((a, b) => a._id.localeCompare(b._id));
-              const lastCode = sortedData[sortedData.length - 1];
-              const last_id = lastCode ? parseInt(lastCode._id.substring(1)) : 0;
-              // Function to generate a new route code
-              function generateVendorCode(initialCode: number = 0) {
-                const nextCode = initialCode + 1;
-                const Number = nextCode.toString().padStart(4, '0');
-                const Code = `B${Number}`;
-                return Code;
-              }
-              this.newVendorCode = generateVendorCode(last_id);
-              data._id = this.newVendorCode;
-              data["eNTDT"] = new Date();
-              data['eNTLOC'] = this.storage.branch;
-              data['eNTBY:'] = this.storage.userName;
-
-              let req = {
-                companyCode: this.companyCode,
-                collectionName: "beneficiary_detail",
-                data: data
-              };
-              const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
-              if (res) {
-                // Display success message
-                Swal.fire({
-                  icon: "success",
-                  title: "Successful",
-                  text: res.message,
-                  showConfirmButton: true,
-                });
-                this.route.navigateByUrl('/Masters/BeneficiaryMaster/BeneficiaryMasterList');
-              }
-            }
-          }
-
+          this.route.navigateByUrl('/Masters/BeneficiaryMaster/BeneficiaryMasterList');
         }
-        catch (error) {
-          console.error("Error fetching data:", error);
-          this.snackBarUtilityService.ShowCommonSwal(
-            "error",
-            "Fail To Submit Data..!"
-          );
-          this.isSubmit = false;
-        }
-      }, "Beneficiary Adding...");
+      }
     }
   }
   //#endregion
@@ -467,7 +431,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       // Create a request object to fetch data from "beneficiary_detail" collection
       const req = {
         companyCode: this.companyCode,
-        filter: { companyCode: this.companyCode },
+        filter: {},
         collectionName: "beneficiary_detail",
       };
 

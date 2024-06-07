@@ -42,12 +42,12 @@ export class CustomerService {
 
   async getCustomer(filter, project = null): Promise<any | null> {
 
-    let filters = [];
+    let filters= [];
     filters.push({
       D$match: filter
     });
 
-    if (project) {
+    if(project) {
       filters.push({ 'D$project': project });
     }
 
@@ -210,7 +210,7 @@ export class CustomerService {
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: this.storage.companyCode,
+          companyCode:this.storage.companyCode,
           collectionName: "walkin_customers",
           filter,
         };
@@ -247,25 +247,4 @@ export class CustomerService {
       console.error("Error fetching data:", error);
     }
   }
-  //#region to get customer Group list
-  async getCustomerGroupData(filter = {}) {
-    filter = { ...filter, activeFlag: true }; // Add activeFlag filter to the request
-
-    const request = {
-      companyCode: this.storage.companyCode,
-      collectionName: 'customerGroup_detail',
-      filter: filter, // You can specify additional filters here if needed
-    };
-
-    try {
-      const response = await firstValueFrom(this.masterService.masterPost('generic/get', request));
-      return response?.success && response?.data ?
-        response.data.map(
-          ({ groupName, groupCode }) => ({ name: groupName, value: groupCode })) : [];
-    } catch (error) {
-      console.error('Error fetching dropdown data:', error);
-      return [];
-    }
-  }
-  //#endregion
 }

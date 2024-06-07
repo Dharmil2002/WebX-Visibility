@@ -30,17 +30,13 @@ export class locationEntitySearch {
     return Result;
   }
 
-  async GetMergedData(PinCodeList, StateList, mergeField, masterService = null, ArialWise = false, LocationWise = false) {
+  async GetMergedData(PinCodeList, StateList, mergeField, masterService = null, ArialWise = false) {
     const stateListLookup = this.createStateListLookup(StateList, mergeField);
     let mergedArray = this.mergeArrays(PinCodeList.data, stateListLookup, mergeField);
 
     if (ArialWise) {
       const ariaList = await this.getAriaList(masterService);
       mergedArray = [...mergedArray, ...ariaList];
-    }
-    if (LocationWise) {
-      const LocationList = await this.getLocationList(masterService);
-      mergedArray = [...mergedArray, ...LocationList];
     }
 
     return mergedArray;
@@ -56,7 +52,7 @@ export class locationEntitySearch {
   mergeArrays(pinCodeList, stateListLookup, mergeField) {
     return pinCodeList.map(pinCodeItem => {
       const stateItem = stateListLookup[pinCodeItem[mergeField]];
-      return stateItem ? { ...pinCodeItem, ...stateItem, AR: '', LOC: '' } : pinCodeItem;
+      return stateItem ? { ...pinCodeItem, ...stateItem, AR: '' } : pinCodeItem;
     });
   }
 
@@ -84,38 +80,11 @@ export class locationEntitySearch {
       "CNTR": "",
       "ZN": "",
       "ISUT": false,
-      "LOC": "",
     }));
 
     return ariaList;
   }
 
-  async getLocationList(masterService) {
-    const LocationRequestBody = {
-      companyCode: StorageService.getItem(StoreKeys.CompanyCode),
-      filter: {
-        companyCode: StorageService.getItem(StoreKeys.CompanyCode),
-        activeFlag: true,
-      },
-      collectionName: "location_detail",
-    };
 
-    const clusterdetail: any = await firstValueFrom(masterService.masterPost("generic/get", LocationRequestBody));
-    const LocationList = clusterdetail.data.map(cluster => ({
-      "LOC": `${cluster.locCode}`,
-      "_id": "",
-      "PIN": 0,
-      "ST": "",
-      "CT": "",
-      "STSN": "",
-      "STNM": "",
-      "CNTR": "",
-      "ZN": "",
-      "ISUT": false,
-      "AR": "",
-    }));
-
-    return LocationList;
-  }
 
 }

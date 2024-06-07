@@ -117,7 +117,6 @@ export class FreightChargeUploadComponent implements OnInit {
           zonelist,
           "ST",
           this.masterService,
-          true,
           true
         );
 
@@ -199,8 +198,7 @@ export class FreightChargeUploadComponent implements OnInit {
 
           const validateAndFilter = (element, property) => {
             element.error = element.error || [];
-
-            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN', 'AR', 'LOC'];
+            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN','AR'];
             const foundMatch = this.arealist.find(x =>
               propertiesToCheck.some(prop =>
                 typeof x[prop] !== 'undefined' && // Check if the property exists
@@ -213,7 +211,7 @@ export class FreightChargeUploadComponent implements OnInit {
 
               // Find the matched property
               const matchedProperty = propertiesToCheck.find(prop =>
-                typeof foundMatch[prop] !== 'undefined' &&
+                typeof foundMatch[prop]  !== 'undefined' &&
                 foundMatch[prop].toString().toLowerCase() === element[property].toString().toLowerCase()
               );
 

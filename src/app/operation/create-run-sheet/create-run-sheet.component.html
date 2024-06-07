@@ -2,7 +2,7 @@
     <form [formGroup]="RunSheetTableForm">
       <app-form-webxpress [form]="RunSheetTableForm" [FormTitle]="'Create Run Sheet'"
         [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
-        (callFunction)="functionCallHandler($event)"[DisplayAddNewButton]="isDisplay"  (AddNewButtonEvent)="addMarket()" [showSaveAndCancelButton]="false" [addNewTitle]="addNewTitle">
+        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
       </app-form-webxpress>
     </form>
     <!-- <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"

@@ -15,60 +15,14 @@ export class DeliveryService {
     private storage: StorageService
   ) { }
 
-  async getDeliveryDetail(dRSNO) {
+  async getDeliveryDetail(filter) {
+    
     const req = {
       companyCode: this.storage.companyCode,
       collectionName: "drs_details",
-      filters:[
-        {
-          D$match: {
-            dRSNO:dRSNO,
-            D$or: [
-              { iSCAN: false },
-              { iSCAN: { D$exists: false } }
-            ]
-          }
-        },
-        {
-          D$lookup: {
-            from: "docket_ops_det_ltl",
-            let: {
-              localDKTNO: "$dKTNO",
-              sFX: "$sFX"
-            }, 
-            pipeline: [
-              {
-                D$match: {
-                  D$expr: {
-                    D$and: [
-                      {
-                        D$eq: ["$dKTNO", "$$localDKTNO"]
-                      },
-                      {
-                        D$eq: [
-                          "$sFX",
-                          "$$sFX"
-                        ]
-                      } 
-                    ]
-                  }
-                }
-              }
-            ],
-            as: "dockets"
-          }
-        },
-        {
-          D$unwind: {
-            path: "$dockets",
-            preserveNullAndEmptyArrays: true
-          }
-        }
-      ]
-      
-      
+      filter: filter
     }
-    const res = await firstValueFrom(this.operation.operationMongoPost('generic/query', req));
+    const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
     return res.data;
   }
   async deliveryUpdate(data, shipment) {

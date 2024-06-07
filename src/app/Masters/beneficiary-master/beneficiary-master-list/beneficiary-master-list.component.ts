@@ -55,7 +55,7 @@ export class BeneficiaryMasterListComponent implements OnInit {
       // Create a request object to fetch data from "beneficiary_detail" collection
       const req = {
         companyCode: this.companyCode,
-        filter: { companyCode: this.companyCode },
+        filter: {},
         collectionName: "beneficiary_detail"
       };
 

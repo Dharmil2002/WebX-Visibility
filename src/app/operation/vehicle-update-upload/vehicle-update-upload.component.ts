@@ -15,7 +15,6 @@ import { ControlPanelService } from 'src/app/core/service/control-panel/control-
 import { Manifest } from 'src/app/Models/vehicle-loading/manifest';
 import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipment-details.component';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
-import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -38,7 +37,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   currentBranch: string = '';
   companyCode: number = 0;
   userName: string = '';
-  //isDisbled:boolean=false;
   columnHeader = {
     "Shipment": "Shipment",
     "Suffix": "Suffix",
@@ -129,7 +127,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   rules: any;
   selectAllRequired: boolean = true;
   metaData = {};
-  isDisble: boolean=false;
   constructor(
     private Route: Router,
     private mfService: ManifestService,
@@ -141,8 +138,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     private controlPanel: ControlPanelService,
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
-    private storage: StorageService,
-    public snackBarUtilityService: SnackBarUtilityService
+    private storage: StorageService
   ) {
     this.metaData = {
       checkBoxRequired: true,
@@ -418,7 +414,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   async CompleteScan() {
     let menifest = []
     let resMf = ""
-    this.snackBarUtilityService.commonToast(async () => {
     if (this.isScan) {
       let packageChecked = this.loadingTableData.every(obj => obj.Pending > 0);
       if (packageChecked) {
@@ -431,10 +426,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
         return;
       }
       const fieldMapping = await this.mfService.getFieldMapping(this.loadingTableData, this.shipingDataTable, this.vehicelLoadData, this.packageData);
-      this.isDisble=true;
       menifest = await this.getMFGrouping(fieldMapping.filteredMfDetails);
       resMf = await this.mfService.createMfDetails(fieldMapping);
     }
+
     else {
       let selectedData = this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
       let checkPend = selectedData.filter((x) => x.pendPkg == x.Packages);
@@ -445,7 +440,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
         return false;
       }
-      this.isDisble=true;
+
       let notSelectedData = this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
       const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData, this.isScan, notSelectedData);
       menifest = await this.getMFGrouping(fieldMapping.filteredMfDetails);
@@ -483,7 +478,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         this.dialogRef.close("");
       }
     }
-  },"Manifest");
+
   }
   Close(): void {
     this.dialogRef.close()

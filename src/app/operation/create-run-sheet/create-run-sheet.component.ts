@@ -14,6 +14,10 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { MatDialog } from '@angular/material/dialog';
+import { AddMarketVehicleComponent } from '../add-market-vehicle/add-market-vehicle.component';
+import { LoadingSheetService } from 'src/app/Utility/module/operation/loadingSheet/loadingsheet-service';
+import { VehicleService } from 'src/app/Utility/module/masters/vehicle-master/vehicle-master-service';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -40,6 +44,11 @@ export class CreateRunSheetComponent implements OnInit {
   csv: any[];
   runSheetData: any;
   delType:AutoComplete[];
+  addNewTitle: string = "Add Market";
+  isMarket: boolean;
+  MarketData: any;
+  isDisplay: boolean;
+
   constructor(
     private Route: Router,
     private runSheetService: RunSheetService,
@@ -49,7 +58,10 @@ export class CreateRunSheetComponent implements OnInit {
     private generalService:GeneralService,
     private vehicleTypeService: VehicleTypeService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private storage: StorageService
+    private storage: StorageService,
+    private dialog: MatDialog,
+    private loadingSheetService: LoadingSheetService,
+    private vehicleService: VehicleService
   ) {
     this.orgBranch = this.storage.branch;
 
@@ -74,6 +86,11 @@ export class CreateRunSheetComponent implements OnInit {
     },
     documentId: {
       Title: "Document",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    sFX: {
+      Title: "suffix",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
@@ -117,6 +134,7 @@ export class CreateRunSheetComponent implements OnInit {
 
   staticField = [
     "documentId",
+    "sFX",
     "type",
     "customer",
     "address",
@@ -144,6 +162,7 @@ export class CreateRunSheetComponent implements OnInit {
   async getShipment() {
     const res = await this.runSheetService.shipmentFieldMapping(this.RunSheetTable?.columnData.dktList || "");
     this.csv = res;
+    this.isDisplay = true;
     this.autoBindData();
     this.getVehicle();
   }
@@ -342,6 +361,18 @@ export class CreateRunSheetComponent implements OnInit {
     }
     this.snackBarUtilityService.commonToast(async () => {
       const formData=this.RunSheetTableForm.getRawValue();
+      if (formData.VenType == "Market") {
+        try {
+          if (this.isMarket && this.MarketData) {
+            const reqBody = await this.loadingSheetService.requestVehicle(this.MarketData)
+            await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
+          }
+          else {
+            await this.vehicleService.updateVehicleCap(formData,true);
+          }
+        } catch (e) {
+        }
+      }
       formData['deliveryTypeName']=this.delType.find((x)=>x.value==formData.deliveryType).name;
       const res = await this.runSheetService.drsFieldMapping(this.RunSheetTableForm.value, this.csv);
       const runSheetNo=await this.runSheetService.addRunSheet(res);
@@ -366,4 +397,40 @@ export class CreateRunSheetComponent implements OnInit {
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
+  /*Add Market Vehicle */
+  addMarket() {
+    const dialogref = this.dialog.open(AddMarketVehicleComponent, {
+      data: "ltl",
+    });
+    dialogref.afterClosed().subscribe((result) => {
+      console.log(result)
+      if (result) {
+        this.isMarket = true;
+        this.MarketData = result;
+        this.autoBindMarketVehicleData(result);
+      }
+      else {
+        this.isMarket = false;
+        this.MarketData = null;
+      }
+    });
+  }
+    //#region bind Vehicle Data if it is market 
+    autoBindMarketVehicleData(result) {
+      if (result) {
+        this.RunSheetTableForm.controls['Vehicle'].setValue({ name: result?.vehicelNo || "", value: result?.vehicelNo || "" });
+        this.RunSheetTableForm.controls['VehType'].setValue(result.vehicleType.name);
+        this.RunSheetTableForm.controls['VenType'].setValue("Market");
+        this.RunSheetTableForm.controls['Vendor'].setValue(result?.vendor||"");
+        this.RunSheetTableForm.controls['vendPan'].setValue(result?.venPan||"");
+        this.RunSheetTableForm.controls['driverNm'].setValue(result?.driver||"");
+        this.RunSheetTableForm.controls['driverMobile'].setValue(result?.dmobileNo||"");
+        this.RunSheetTableForm.controls['lsNo'].setValue(result?.lcNo||"");
+        this.RunSheetTableForm.controls['lcExpireDate'].setValue(result?.lcExpireDate||"");
+        this.RunSheetTableForm.controls['CapVol'].setValue(result.vehicleSizeVol);
+        this.RunSheetTableForm.controls['CapacityKg'].setValue(result.vehicleSize);
+      
+      }
+    }
+    //#end region
 }

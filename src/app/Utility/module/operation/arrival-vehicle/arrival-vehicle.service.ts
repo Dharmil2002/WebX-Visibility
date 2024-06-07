@@ -216,7 +216,7 @@ export class ArrivalVehicleService {
                     update: {
                         "sTS": DocketStatus.Arrived,
                         "sTSNM": DocketStatus[DocketStatus.Arrived],
-                        "aRRDT":new Date(),
+                        //"aRRDT":new Date(),
                         "oPSSTS": `Arrived at ${this.storage.branch} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
                         "mODBY": this.storage.userName,
                         "mODDT": new Date(),
@@ -1046,6 +1046,15 @@ export class ArrivalVehicleService {
             }
             const dockets = [`${element.Shipment}-${element.Suffix}`];
             const dktOps = {
+                "aRR":{
+                    dT: new Date(),
+                    pKGS: element?.unloadedPkg || 0,
+                    wT: element?.unloadedWT || 0
+                },
+                "pEND":{
+                    pKGS: element?.unloadedPkg || 0,
+                    wT: element?.unloadedWT || 0
+                },
                 "tOTCWT": element?.unloadctWeight || 0,
                 "tOTWT": element?.unloadedWT || 0,
                 "tOTPKG": element?.unloadedPkg || 0,

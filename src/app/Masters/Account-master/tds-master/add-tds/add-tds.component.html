@@ -1,8 +1,8 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" (toggleChange)="onToggleChange($event)" [backPath]="'/Masters/AccountMaster/ListTds'">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="'/Masters/AccountMaster/ListTds'">
     <form [formGroup]="TdsForm">
-        <app-form-webxpress [form]="TdsForm" [formData]="jsonControlArray" [modifyAndSaveButton]="true"
+        <app-form-webxpress [form]="TdsForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
             [FormTitle]="FormTitle" (callFunction)="functionCallHandler($event)"
-            (functionCallEmitter)="functionCallHandler($event)" [Disabled]="isSubmit">
+            (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

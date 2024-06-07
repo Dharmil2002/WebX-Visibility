@@ -1157,6 +1157,7 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
+   
         let nonfreightAmt={};
         if (nonfreight) {
           Object.keys(nonfreight).forEach((key) => {

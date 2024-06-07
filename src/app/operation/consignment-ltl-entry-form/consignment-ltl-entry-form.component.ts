@@ -1102,7 +1102,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*End*/
   SetInvoiceData() {
-
     const yieldPkgs = this.contract?.mPKGNO || 0;
     const yieldWt = this.contract?.mWKG || 0;
 
@@ -1529,7 +1528,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.controls['cftRatio'].setValue(this.cftRation);
   }
   async save() {
-    const form = this.consignmentForm.value
     const payType = this.consignmentForm.get('payType').value;
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name
     if (!this.consignmentForm.valid || !this.freightForm.valid || this.isSubmit) {
@@ -1582,8 +1580,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     data['delivery_typeNm'] = this.deliveryType.find(x => x.value == data?.delivery_type)?.name ?? '';
     data['freightRatetypeNm'] = this.rateTypes.find(x => x.value == data?.freightRatetype)?.name ?? '';
     data["yIELD"] = yieldValue;
-    
-    const serviceCharges = this.NonFreightjsonControlArray.map(x => {
+    let serviceCharges=[];
+    if(this.NonFreightjsonControlArray && this.NonFreightjsonControlArray.length>0){
+     serviceCharges = this.NonFreightjsonControlArray.map(x => {
       return {
         cHGID: x.additionalData.metaData.ServicesCode,
         cHGNM: x.additionalData.metaData.ServicesName,
@@ -1592,14 +1591,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         tY: "sC"
       };
     });
+  }
 
-    const otherData = { 
-      otherCharges: [ 
-        ... (this.otherCharges.map(x => { x["tY"] = "nFC"; return x; })), 
-        ... serviceCharges
-      ],      
-      otherInfo: this.otherInfo 
-    }
+  const otherData = {
+    otherCharges: [...(this.otherCharges?.map(x => ({ ...x, tY: "nFC" })) ?? []), ...serviceCharges],
+    otherInfo: this.otherInfo
+  };
     const reqDkt = await this.docketService.consgimentFieldMapping(data, this.chargeBase, tableData, this.isUpdate, otherData);
     let docketDetails = {}
     docketDetails = reqDkt?.docketsDetails || {};
@@ -1709,8 +1706,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         } else if (result.isDenied) {
           // Handle the action for the deny button here.
           const templateBody = {
-            templateName: "Docket",
-            partyCode: "CONSRAJT58",
+            // templateName: "Docket",
+            // partyCode: "CONSRAJT58",
+            templateName: "DKT",
+            partyCode: "",
+            PartyField:"",
             DocNo: this.consignmentForm.controls["docketNumber"].value,
           }
           const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
@@ -2070,6 +2070,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         text: "Contract Not Found",
         showConfirmButton: false,
       });
+            this.SetInvoiceData();
     }
   }
   /*Emd*/
@@ -2192,7 +2193,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
             break;
 
         case "FuelSurcharge":
-          debugger;
             let fuelCharge = 0;
             if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
                 const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);
@@ -2216,7 +2216,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
             break;
     }
   }
-
 
   /*below function is for the */
   onMaterialDensity() {
@@ -2282,7 +2281,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     }
   }
-
   async GetGSTRate() {
     let req = {
       companyCode: this.storage.companyCode,
@@ -2297,7 +2295,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.GSTRate = res.data.GSTRT || 12;
     }
   }
-
   // Account Posting When  C Note Booked
   async AccountPosting(DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {

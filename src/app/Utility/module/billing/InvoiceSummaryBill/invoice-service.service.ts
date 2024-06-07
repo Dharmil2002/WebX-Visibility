@@ -107,6 +107,7 @@ export class InvoiceServiceService {
     const custList = await this.customerService.customerFromFilter({ customerCode: customerCode }, false);
     const custGroup = await this.customerService.customerGroupFilter(custList[0]?.customerGroup);
 
+    let TransportMode = "";
     let jsonBillingList = [];
     bill.forEach((element) => {
       element?.extraData.filter(item => item.isSelected == true).forEach(nested => {
@@ -142,6 +143,7 @@ export class InvoiceServiceService {
           eNTBY: this.storage?.userName || "",
         }
         jsonBillingList.push(jsonBilling);
+        TransportMode = nested?.extraData?.tRNMOD || "";
       });
     })
     const billData = {
@@ -149,12 +151,14 @@ export class InvoiceServiceService {
       "cID": this.storage.companyCode,
       "companyCode": this.storage.companyCode,
       "dOCTYP": "Transaction",
+      "dOCCD": "T",
       "bUSVRT": data?.tMode || "",
       "bILLNO": data?.invoiceNo,
       "bGNDT": data?.invoiceDate || new Date(),
       "bDUEDT": data?.dueDate || new Date(),
       "bLOC": this.storage.branch,
       "pAYBAS": data?.pAYBAS || "",
+      "tRNMODE": TransportMode || "",
       "bSTS": CustomerBillStatus.Generated,
       "bSTSNM": CustomerBillStatus[CustomerBillStatus.Generated],
       "bSTSDT": new Date(),
@@ -288,18 +292,18 @@ export class InvoiceServiceService {
   }
   /*End*/
   /*below function is for update the billing data*/
-  async updateBillingInvoice(data) {
+  async updateBillingInvoice(data, tMODE) {
 
     const reqbody = {
       companyCode: this.storage.companyCode,
-      collectionName: "dockets",
+      collectionName: tMODE == "FTL" ? "dockets" : "dockets_ltl",
       filter: { docNo: data.dktNo },
       update: data.dockets
     }
     await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqbody));
     const reqFin = {
       companyCode: this.storage.companyCode,
-      collectionName: "docket_fin_det",
+      collectionName: tMODE == "FTL" ? "docket_fin_det" : "docket_fin_det_ltl",
       filter: { dKTNO: data.dktNo },
       update: data.finance
     }

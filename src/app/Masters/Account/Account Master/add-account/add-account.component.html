@@ -1,8 +1,8 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
    <form [formGroup]="AccountForm">
-      <app-form-webxpress [form]="AccountForm" [formData]="jsonControlAccountArray" [modifyAndSaveButton]="true"
+      <app-form-webxpress [form]="AccountForm" [formData]="jsonControlAccountArray" [showSaveAndCancelButton]="true"
          [FormTitle]="FormTitle" [MatButton]="EventButton"  [className]="'col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2'"
-         (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)" [Disabled]="isSubmit">
+         (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
       </app-form-webxpress>
    </form>
 </app-common-wrapper-webxpress>

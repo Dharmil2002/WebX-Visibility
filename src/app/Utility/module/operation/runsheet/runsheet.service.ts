@@ -19,7 +19,7 @@ export class RunSheetService {
 
     /*below method is for the getting data and displayed in runSheet Dashboard*/
     async getRunSheetData(filter) {
-        debugger
+    
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,
@@ -164,7 +164,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for the field mapping*/
     async shipmentFieldMapping(data) {
-        debugger
+  
         return data.map((item) => {
             return {
                 ...item,
@@ -372,7 +372,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for Shipment*/
     async drsShipmentDetails(drsNo) {
-        debugger
+  
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "drs_details",
@@ -425,7 +425,7 @@ export class RunSheetService {
     /*End*/
     /*below method is for Update RunSheet*/
     async FieldMappingRunSheetdkts(data) {
-        debugger
+     
         if (data.length > 0) {
             return data.map((item) => {
                 return {
@@ -555,7 +555,6 @@ export class RunSheetService {
     /*End*/
     /*below the method is for field mapping Update RunSheet*/
     async UpdateRunSheet(formData, shipmentdata, scanPackage,isScan) {
-           debugger
         const selected = shipmentdata.filter((x) => x.isSelected);
         const notSelected = shipmentdata.filter((x) => !x.isSelected);
         if (selected.length > 0) {

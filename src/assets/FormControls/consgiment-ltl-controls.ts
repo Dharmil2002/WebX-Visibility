@@ -276,8 +276,8 @@ export class ConsignmentLtl extends BaseControl {
       },
       {
         name: "eddDate",
-        label: `${docCalledAs.Docket} Date`,
-        placeholder: `${docCalledAs.Docket} Date`,
+        label: `EDD Date`,
+        placeholder: `EDD Date`,
         type: "datetimerpicker",
         value: new Date(),
         filterOptions: "",

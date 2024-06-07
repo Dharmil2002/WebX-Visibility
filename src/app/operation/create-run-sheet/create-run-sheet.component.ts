@@ -428,7 +428,8 @@ export class CreateRunSheetComponent implements OnInit {
         this.RunSheetTableForm.controls['lsNo'].setValue(result?.lcNo||"");
         this.RunSheetTableForm.controls['lcExpireDate'].setValue(result?.lcExpireDate||"");
         this.RunSheetTableForm.controls['CapVol'].setValue(result.vehicleSizeVol);
-        this.RunSheetTableForm.controls['CapacityKg'].setValue(result.vehicleSize);
+        const vehicleSizeKG = result.vehicleSize ? parseInt(result.vehicleSize) * 1000 : 0;
+        this.RunSheetTableForm.controls['CapacityKg'].setValue(vehicleSizeKG);
       
       }
     }

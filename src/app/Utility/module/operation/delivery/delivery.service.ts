@@ -22,7 +22,11 @@ export class DeliveryService {
       filters:[
         {
           D$match: {
-            dRSNO:dRSNO
+            dRSNO:dRSNO,
+            D$or: [
+              { iSCAN: false },
+              { iSCAN: { D$exists: false } }
+            ]
           }
         },
         {

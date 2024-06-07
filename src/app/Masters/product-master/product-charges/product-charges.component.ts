@@ -227,7 +227,7 @@ export class ProductChargesComponent implements OnInit {
   async ChargesBehaviourDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: { companyCode: this.companyCode },
       collectionName: "charge_behaviours",
     };
     const Res = await this.masterService

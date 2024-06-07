@@ -278,7 +278,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
             let req = {
               companyCode: this.companyCode,
               collectionName: "beneficiary_detail",
-              filter: {},
+              filter: { companyCode: this.companyCode },
             }
             const response = await firstValueFrom(this.masterService.masterPost("generic/get", req))
             if (response) {
@@ -467,7 +467,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       // Create a request object to fetch data from "beneficiary_detail" collection
       const req = {
         companyCode: this.companyCode,
-        filter: {},
+        filter: { companyCode: this.companyCode },
         collectionName: "beneficiary_detail",
       };
 

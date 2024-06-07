@@ -121,7 +121,7 @@ export class CustomerGroupAddComponent implements OnInit {
             const tableReq = {
               companyCode: this.companyCode,
               collectionName: "customerGroup_detail",
-              filter: {}
+              filter: { companyCode: this.companyCode }
             }
             const tableRes = await firstValueFrom(this.masterService.masterPost('generic/get', tableReq))
             const tableData = tableRes.data

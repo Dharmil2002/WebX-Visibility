@@ -124,7 +124,7 @@ export class ProductServicesComponent implements OnInit {
   async ServicesTypeDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: { companyCode: this.companyCode },
       collectionName: "products",
     };
     const Res = await this.masterService
@@ -194,7 +194,6 @@ export class ProductServicesComponent implements OnInit {
       this.snackBarUtilityService.commonToast(async () => {
         try {
           this.isSubmit = true;
-
           const Body = {
             _id: `${this.companyCode}-${this.customerTableForm.value.ServicesCode}`,
             ProductName: this.ProductName,
@@ -241,6 +240,7 @@ export class ProductServicesComponent implements OnInit {
             "error",
             "Fail To Submit Data..!"
           );
+          this.isSubmit = false;
         }
       }, "Service Adding....");
     }

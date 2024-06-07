@@ -26,7 +26,7 @@ export class AddressMaster {
           this.pincode = AddressMaster.pincode || '';
           this.customer = AddressMaster.customer || "";
           this.companyCode = AddressMaster.companyCode || '';
-          this.activeFlag = AddressMaster.activeFlag || true;
+          this.activeFlag = AddressMaster.activeFlag || false;
       }
   }
 }

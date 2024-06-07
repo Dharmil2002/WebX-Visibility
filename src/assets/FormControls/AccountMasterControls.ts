@@ -404,7 +404,7 @@ export class AccountMasterControls {
         label: "Active Flag",
         placeholder: "",
         type: "toggle",
-        value:true,
+        value: false,
         generatecontrol: false,
         disable: false,
         Validations: [],

@@ -96,7 +96,7 @@ export class ClusterControl {
               label: "Active Flag",
               placeholder: "",
               type: "toggle",
-              value: clusterMasterTable.activeFlag,
+              value: isUpdate ? clusterMasterTable.activeFlag : false,
               generatecontrol: false,
               disable: false,
               Validations: [

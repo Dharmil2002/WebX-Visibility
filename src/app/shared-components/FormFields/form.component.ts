@@ -37,7 +37,6 @@ export class FormComponent {
   @Input() submit: string = "Save";
   @Output() callFunction = new EventEmitter();
   @Input() showSaveAndCancelButton: boolean;
-  @Input() modifyAndSaveButton: boolean;
   @Input() showSaveButton: boolean;
   @Output() functionCallEmitter = new EventEmitter();
   @Output() AddNewButtonEvent = new EventEmitter();
@@ -52,7 +51,6 @@ export class FormComponent {
   @Input() DisplayAddNewButton: boolean = false;
   @Input() CheckBoxMessage: string = "";
   @Input() Expanded: boolean = true;
-  @Input() Disabled: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.

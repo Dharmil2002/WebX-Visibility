@@ -1311,7 +1311,7 @@ export class ThcGenerationComponent implements OnInit {
       }
     }
     this.thcTableForm.controls['manualThc'].setValue(this.thcDetail?.mTHC||"");
-    this.thcTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM||0);
+    this.VehicleTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM||0);
     if (this.ChargeAllow.includes(thcDetail.data.thcDetails.tMODENM.toUpperCase())) {
       this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG, thcNestedDetails)
     }
@@ -1546,7 +1546,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.Vendor_pAN = getValueOrDefault(this.thcTableForm, "panNo") || "";
     this.thcsummaryData.status = 1;
     this.thcsummaryData.manualTHC = getValueOrDefault(this.thcTableForm, "manualThc") || "";
-    this.thcsummaryData.startKm = getValueOrDefault(this.thcTableForm, "startKm") || "";
+    this.thcsummaryData.startKm = getValueOrDefault(this.VehicleTableForm, "startKm") || "";
     this.thcsummaryData.statusName = "Intransit";
     this.thcsummaryData.financialStatus = 0;
     this.thcsummaryData.financialStatusName = "";

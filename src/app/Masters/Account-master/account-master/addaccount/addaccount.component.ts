@@ -15,6 +15,13 @@ import Swal from "sweetalert2";
   templateUrl: "./addaccount.component.html",
 })
 export class AddaccountComponent implements OnInit {
+  breadScrums = [
+    {
+      title: "Account Master",
+      items: ["Home"],
+      active: "Account",
+    },
+  ];
   isUpdate: any;
   jsonControlArray: any;
   AccountForm: any;
@@ -33,8 +40,6 @@ export class AddaccountComponent implements OnInit {
   CompanyCode: any = 0;
   FirstUpdate: any = false;
   AlljsonControlArray: any;
-  action: string;
-  breadScrums:any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -46,19 +51,8 @@ export class AddaccountComponent implements OnInit {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
-      this.action="edit"
-    } else{
-      this.action="Add"
+      this.FormTitle = "Edit Account";
     }
-    this.breadScrums = [
-      {
-        title: this.action==="edit"?"Edit Account Master":"Add Account Master",
-        items: ["Home"],
-        active:this.action==="edit"?"Edit Account Master":"Add Account Master",
-        generatecontrol:true,
-        toggle: this.action === "edit" ? this.UpdateData.isActive : true
-      },
-    ];
   }
 
   ngOnInit(): void {
@@ -240,7 +234,7 @@ export class AddaccountComponent implements OnInit {
     const req = {
       companyCode: this.CompanyCode,
       collectionName: "tds_detail",
-      filter: {CompanyCode: this.CompanyCode},
+      filter: {},
     };
     const res = await this.masterService
       .masterPost("generic/get", req)
@@ -270,13 +264,6 @@ export class AddaccountComponent implements OnInit {
 
     }
   }
-
-  onToggleChange(event: boolean) {
-    // Handle the toggle change event in the parent component
-    this.AccountForm.controls['isActive'].setValue(event);
-    // console.log("Toggle value :", event);
-  }
-
   async save() {
     const commonBody = {
       AcGroupName: this.AccountForm.value.AcGroup.name,
@@ -301,7 +288,7 @@ export class AddaccountComponent implements OnInit {
         .masterPost("generic/get", {
           companyCode: this.CompanyCode,
           collectionName: "accountdetail",
-          filter: {CompanyCode: this.CompanyCode},
+          filter: {},
         })
         .toPromise();
       const body = {

@@ -11,15 +11,8 @@ export class QueryControl {
         name: "vTYPE",
         label: "View Type",
         placeholder: "Search And Select View Type",
-        type: "Staticdropdown",
-        value: [
-          { value: "VB", name: "Vendor Bill" },
-          { value: "CB", name: "Customer Bill" },
-          { value: "TD", name: "THC" },
-          { value: "PD", name: "PRQ" },
-          { value: "DD", name: "Docket" },
-          { value: "VD", name: "Voucher" },
-        ],
+        type: "dropdown",
+        value: "",
         Validations: [
           {
             name: "required",
@@ -30,6 +23,12 @@ export class QueryControl {
             message: "Choose proper value",
           },
         ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {
+          onOptionSelect: 'onChangeViewType'
+        },
         generatecontrol: true,
         disable: false,
       },

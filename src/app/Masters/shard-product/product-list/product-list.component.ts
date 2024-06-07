@@ -96,7 +96,7 @@ export class ProductListComponent implements OnInit {
     this.isTableLode = false;
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: {companyCode: this.companyCode},
       collectionName: "products",
     };
     const Res = await this.masterService

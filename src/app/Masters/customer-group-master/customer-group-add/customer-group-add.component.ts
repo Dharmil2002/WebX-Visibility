@@ -8,13 +8,14 @@ import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { firstValueFrom } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 
 @Component({
   selector: 'app-customer-group-add',
   templateUrl: './customer-group-add.component.html',
 })
 export class CustomerGroupAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any;}[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   companyCode: any = 0;
   action: string;
   isUpdate = false;
@@ -22,46 +23,41 @@ export class CustomerGroupAddComponent implements OnInit {
   groupTableForm: UntypedFormGroup;
   customerGroupFormControls: CustomerGroupControl;
   jsonControlGroupArray: any;
-  backPath:string;
+  backPath: string;
+  isSubmit: boolean = false;
   submit = 'Save';
   ngOnInit() {
     this.backPath = "/Masters/CustomerGroupMaster/CustomerGroupMasterList";
   }
 
   constructor(private Route: Router, private fb: UntypedFormBuilder,
-    private masterService: MasterService, private storage: StorageService
+    private masterService: MasterService, private storage: StorageService,
+    public snackBarUtilityService: SnackBarUtilityService,
+
   ) {
+
     this.companyCode = this.storage.companyCode;
+    const extrasState = this.Route.getCurrentNavigation()?.extras?.state;
+
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
       this.submit = 'Modify';
       this.isUpdate = true;
+      this.groupTabledata = extrasState.data;
     } else {
       this.action = "Add";
+      this.groupTabledata = new CustomerGroupMaster({})
     }
-    if (this.action === 'edit') {
-      this.breadScrums = [
-        {
-          title: "Modify Customer Group",
-          items: ["Home"],
-          active: "Modify Customer Group",
-          generatecontrol: true,
-          toggle: this.groupTabledata.activeFlag
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Add Customer Group",
-          items: ["Home"],
-          active: "Add Customer Group",
-          generatecontrol: true,
-          toggle: false
-        },
-      ];
-      this.groupTabledata = new CustomerGroupMaster({});
-    }
+    this.breadScrums = [
+      {
+        title: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
+        items: ["Home"],
+        active: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
+        generatecontrol: true,
+        toggle: this.action === "edit" ? this.groupTabledata.activeFlag : true
+      }
+    ];
     this.initializeFormControl();
   }
   initializeFormControl() {
@@ -76,61 +72,95 @@ export class CustomerGroupAddComponent implements OnInit {
   }
   //#region Save Function
   async save() {
-    if (this.isUpdate) {
-      let id = this.groupTableForm.value._id;
-      // Remove the "id" field from the form controls
-      this.groupTableForm.removeControl("_id");
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "customerGroup_detail",
-        filter: { _id: id },
-        update: this.groupTableForm.value
-      };
-      this.masterService.masterPut('generic/update', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
+    if (!this.groupTableForm.valid || this.isSubmit) {
+
+      this.groupTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
+      });
+      return false;
+    }
+    else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          this.isSubmit = true;
+          if (this.isUpdate) {
+            let id = this.groupTableForm.value._id;
+            // Remove the "id" field from the form controls
+            this.groupTableForm.removeControl("_id");
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "customerGroup_detail",
+              filter: { _id: id },
+              update: this.groupTableForm.value
+            };
+            this.masterService.masterPut('generic/update', req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
+                }
+              }
             });
-            this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
+          }
+          else {
+            const tableReq = {
+              companyCode: this.companyCode,
+              collectionName: "customerGroup_detail",
+              filter: { companyCode: this.companyCode }
+            }
+            const tableRes = await firstValueFrom(this.masterService.masterPost('generic/get', tableReq))
+            const tableData = tableRes.data
+            const index = tableData.length == 0 ? 0 : parseInt(tableData[tableData.length - 1].groupCode.substring(4));
+            const code = `CUGR${(index + 1).toString().padStart(4, '0')}`
+            this.groupTableForm.controls["_id"].setValue(`${this.companyCode}-${code}`);
+            this.groupTableForm.controls["groupCode"].setValue(code);
+            // this.groupTableForm.controls['activeFlag'].setValue(true);
+
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "customerGroup_detail",
+              data: this.groupTableForm.value
+            };
+            this.masterService.masterPost('generic/create', req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
+                }
+              }
+            });
           }
         }
-      });
-    } else {
-      const tableReq ={
-        companyCode: this.companyCode,
-        collectionName: "customerGroup_detail",
-        filter:{}
-      }
-      const tableRes = await firstValueFrom(this.masterService.masterPost('generic/get', tableReq))
-      const tableData = tableRes.data
-      const index =tableData.length==0?0:parseInt(tableData[tableData.length-1].groupCode.substring(4));
-      const code = `CUGR${(index+1).toString().padStart(4, '0')}`
-      this.groupTableForm.controls["_id"].setValue(`${this.companyCode}-${code}`);
-      this.groupTableForm.controls["groupCode"].setValue(code);
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "customerGroup_detail",
-        data: this.groupTableForm.value
-      };
-      this.masterService.masterPost('generic/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
-          }
+        catch (error) {
+          console.error("Error fetching data:", error);
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+          this.isSubmit = false;
         }
-      });
+      }, "Customer Group Adding...");
     }
   }
   //#endregion

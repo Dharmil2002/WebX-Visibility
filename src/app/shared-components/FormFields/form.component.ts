@@ -37,6 +37,7 @@ export class FormComponent {
   @Input() submit: string = "Save";
   @Output() callFunction = new EventEmitter();
   @Input() showSaveAndCancelButton: boolean;
+  @Input() modifyAndSaveButton: boolean;
   @Input() showSaveButton: boolean;
   @Output() functionCallEmitter = new EventEmitter();
   @Output() AddNewButtonEvent = new EventEmitter();
@@ -44,6 +45,7 @@ export class FormComponent {
   @Input() AddNewButton;
   @Input() EventButton;
   @Input() MatButton;
+  @Input() Disabled: boolean = true;
   @Input() toggle;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
@@ -57,7 +59,7 @@ export class FormComponent {
   showPassword: boolean = false;
   ConfirmshowPassword: boolean = false;
   checkboxChecked: boolean = false;
-  @Input() checkboxValue:boolean=false;
+  @Input() checkboxValue: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   @Input() url: string;
   isExpanded;
@@ -145,7 +147,7 @@ export class FormComponent {
   }
   OnChangeCheckBox(event) {
     this.checkboxChecked = event.checked;
-   let check=this.checkboxValue
+    let check = this.checkboxValue
     let context = { event };
     context["functionName"] = "OnChangeCheckBox";
     this.functionCallEmitter.emit(context);

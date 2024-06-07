@@ -25,7 +25,6 @@ import { VehicleTypeService } from "src/app/Utility/module/masters/vehicle-type/
 import { AddMarketVehicleComponent } from "../add-market-vehicle/add-market-vehicle.component";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import moment from "moment";
-import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -37,7 +36,7 @@ Currently, all flows are working together without proper separation.
   So, no need to worry about it for now.*/
 export class CreateLoadingSheetComponent implements OnInit {
   tableload = true;
-  isDisplay = false;
+  isDisplay=false;
   addAndEditPath: string;
   uploadComponent: any;
   loadingSheetData: any;
@@ -184,7 +183,6 @@ export class CreateLoadingSheetComponent implements OnInit {
   };
 
   isSubmit: boolean = false;
-  isDisbled: boolean = false;
   loadingData: any;
   shippingData: any;
   listDepartueDetail: any;
@@ -219,15 +217,14 @@ export class CreateLoadingSheetComponent implements OnInit {
     private generalService: GeneralService,
     private loadingSheetService: LoadingSheetService,
     private vehicleTypeService: VehicleTypeService,
-    private vehicleService: VehicleService,
-    public snackBarUtilityService: SnackBarUtilityService
+    private vehicleService:VehicleService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
     this.userName = this.storage.userName;
 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.isDisplay = true;
+      this.isDisplay=true;
       // Retrieve tripData and shippingData from the navigation state
       this.tripData =
         this.Route.getCurrentNavigation()?.extras?.state.data?.columnData ||
@@ -247,7 +244,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.navigationService.navigateTo(route, this.tripData);
       }
       if (this.tripData.Action == "Update Trip") {
-        this.isDisplay = false;
+        this.isDisplay=false;
         this.isUpdate = true;
       }
 
@@ -520,68 +517,60 @@ export class CreateLoadingSheetComponent implements OnInit {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
       return false;
     }
-    this.isDisbled = true;
-    try {
-      this.snackBarUtilityService.commonToast(async () => {
-        const lsForm = this.loadingSheetTableForm.value;
-        if (lsForm.vendorType == "Market" || !this.isUpdate) {
-          try {
-            if (this.isMarket && this.MarketData) {
-              const reqBody = await this.loadingSheetService.requestVehicle(this.MarketData)
-              await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
-            }
-            else {
-              await this.vehicleService.updateVehicleCap(this.loadingSheetTableForm.value);
-            }
-          } catch (e) {
-          }
+    const lsForm = this.loadingSheetTableForm.value;
+    if (lsForm.vendorType == "Market" || !this.isUpdate) {
+      try {
+        if (this.isMarket&&this.MarketData) {
+          const reqBody = await this.loadingSheetService.requestVehicle(this.MarketData)
+          await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
         }
-        if (this.isUpdate && this.tripData.TripID) {
-          const tripData = await this.loadingSheetService.updatetripFieldMapping(lsForm, shipment);
-          const lsDetails = await this.loadingSheetService.updateLoadingSheet(tripData);
-          this.tableData.forEach((ls) => {
-            const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
-            // Check if a matching detail was found
-            if (matchingDetail) {
-              // If found, update the LoadingSheet and Action for the current ls
-              ls.LoadingSheet = matchingDetail.lSNO;
-              ls.Action = "Print";
-            }
-          });
+        else{
+          await this.vehicleService.updateVehicleCap(this.loadingSheetTableForm.value);
         }
-        else {
-          let lsData = lsForm
-          lsData['transMode'] = this.products.find((x) => x.value == lsForm.transMode)?.value ?? '';
-          lsData['transModeName'] = this.products.find((x) => x.name == "Road")?.name ?? '';
-          const tripData = await this.loadingSheetService.tripFieldMapping(lsData, shipment);
-          const lsDetails = await this.loadingSheetService.createLoadingSheet(tripData);
-          this.tableData.forEach((ls) => {
-            const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
-            // Check if a matching detail was found
-            if (matchingDetail) {
-              // If found, update the LoadingSheet and Action for the current ls
-              ls.LoadingSheet = matchingDetail.lSNO;
-              ls.Action = "Print";
-            }
-          });
-
-        }
-        const data = this.tableData.filter((x) => x.LoadingSheet != "")
-        const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
-          this.dialog.open(LodingSheetGenerateSuccessComponent, {
-            width: "100%", // Set the desired width
-            data: this.tableData.filter((x) => x.hasOwnProperty('LoadingSheet')), // Pass the data object
-          });
-
-        dialogRef.afterClosed().subscribe((result) => {
-          this.goBack('Departures');
-          // Handle the result after the dialog is closed
-        });
-      }, "Loading Sheet Processing")
+      } catch (e) {
+      }
     }
-    catch (err) {
-      this.snackBarUtilityService.ShowCommonSwal("error", err);
+    if (this.isUpdate && this.tripData.TripID) {
+      const tripData = await this.loadingSheetService.updatetripFieldMapping(lsForm, shipment);
+      const lsDetails = await this.loadingSheetService.updateLoadingSheet(tripData);
+      this.tableData.forEach((ls) => {
+        const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
+        // Check if a matching detail was found
+        if (matchingDetail) {
+          // If found, update the LoadingSheet and Action for the current ls
+          ls.LoadingSheet = matchingDetail.lSNO;
+          ls.Action = "Print";
+        }
+      });
     }
+    else {
+      let lsData = lsForm
+      lsData['transMode'] = this.products.find((x) => x.value == lsForm.transMode)?.value ?? '';
+      lsData['transModeName'] = this.products.find((x) => x.name == "Road")?.name ?? '';
+      const tripData = await this.loadingSheetService.tripFieldMapping(lsData, shipment);
+      const lsDetails = await this.loadingSheetService.createLoadingSheet(tripData);
+      this.tableData.forEach((ls) => {
+        const matchingDetail = lsDetails.data.find((x) => x.leg === ls.leg);
+        // Check if a matching detail was found
+        if (matchingDetail) {
+          // If found, update the LoadingSheet and Action for the current ls
+          ls.LoadingSheet = matchingDetail.lSNO;
+          ls.Action = "Print";
+        }
+      });
+
+    }
+    const data = this.tableData.filter((x) => x.LoadingSheet != "")
+    const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+      this.dialog.open(LodingSheetGenerateSuccessComponent, {
+        width: "100%", // Set the desired width
+        data: this.tableData.filter((x) => x.hasOwnProperty('LoadingSheet')), // Pass the data object
+      });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.goBack('Departures');
+      // Handle the result after the dialog is closed
+    });
     // this.isSubmit = true;
     // const loadedData = this.tableData.filter((x) => x.isSelected)
     // this.loadingData = loadedData;
@@ -643,7 +632,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         return x;
       });
     }
-
+    
 
   }
   checkVehicle() {
@@ -884,10 +873,10 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
       const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
       if (vehicleData) {
-        this.isMarket = false;
+        this.isMarket=false;
         this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
         this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
-        this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData?.vendorType || "Market");
+        this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData?.vendorType||"Market");
         this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
         this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
       }
@@ -992,9 +981,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   async departVehicle() {
     const vehicleValue = this.loadingSheetTableForm.controls["vehicle"].value.value;
     if (vehicleValue) {
-   
       try {
-        this.snackBarUtilityService.commonToast(async () => {
         if (this.isUpdate) {
           const lsForm = this.loadingSheetTableForm.value;
           await this.loadingSheetService.departUpdate(lsForm);
@@ -1010,11 +997,10 @@ export class CreateLoadingSheetComponent implements OnInit {
           text: "Vehicle is ready to depart",
           showConfirmButton: true,
         });
-      },"Vehicle is ready to depart");
+
         this.goBack('Departures');
       } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", error);
-        //console.error('Error occurred during the API call:', error);
+        console.error('Error occurred during the API call:', error);
       }
     } else {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
@@ -1051,12 +1037,12 @@ export class CreateLoadingSheetComponent implements OnInit {
       console.log(result)
       if (result) {
         this.isMarket = true;
-        this.MarketData = result;
+        this.MarketData=result;
         this.autoBindMarketVehicleData(result);
       }
-      else {
+      else{
         this.isMarket = false;
-        this.MarketData = null;
+        this.MarketData=null;
       }
     });
   }
@@ -1064,7 +1050,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   //#region bind Vehicle Data if it is market 
   autoBindMarketVehicleData(result) {
     if (result) {
-      this.loadingSheetTableForm.controls['vehicle'].setValue({ name: result?.vehicelNo || "", value: result?.vehicelNo || "" });
+      this.loadingSheetTableForm.controls['vehicle'].setValue({name:result?.vehicelNo||"",value:result?.vehicelNo||""});
       this.loadingSheetTableForm.controls['vehicleType'].setValue(result.vehicleType.name);
       this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(result.vehicleType.value);
       this.loadingSheetTableForm.controls['vendorType'].setValue("Market");

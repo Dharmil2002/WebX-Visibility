@@ -49,10 +49,13 @@ export class CommonViewPrintComponent implements OnInit {
     let req = {
       companyCode: this.companyCode,
       docType: this.templateBody.templateName,
-      PartyField: this.templateBody?.PartyField,
+      partyCode: this.templateBody?.partyCode,
       DocNo: this.templateBody.DocNo,
     };
-    const Res = await firstValueFrom(this.masterService.masterPost("viewprint/ViewV2", req));
+    const Res = await this.masterService
+      .masterPost("viewprint/ViewV2", req)
+      .toPromise();
+      console.log('Res' ,Res)
     if (Res.success) {
       this.JsonData = Res.data.jsonData || {};
       this.FieldMapping = Res.data.fieldMapping || [];

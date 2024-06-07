@@ -27,15 +27,15 @@ export const MY_DATE_FORMAT = {
 
 export const MY_DATETIME_FORMAT: NgxMatDateFormats = {
     parse: {
-        dateInput: 'DD MMM YY HH:mm'
+      dateInput: 'DD MMM YY HH:mm'
     },
     display: {
-        dateInput: 'DD MMM YY HH:mm',
-        monthYearLabel: "MMM YYYY",
-        dateA11yLabel: "LL",
-        monthYearA11yLabel: "MMMM YYYY"
+      dateInput: 'DD MMM YY HH:mm',
+      monthYearLabel: "MMM YYYY",
+      dateA11yLabel: "LL",
+      monthYearA11yLabel: "MMMM YYYY"
     }
-};
+  };
 
 
 
@@ -93,8 +93,8 @@ export const Collections = {
     route_details: 'route_schedules_details',
     thc_summary_ltl: 'thc_summary_ltl',
     Doccument_names: 'doc_names',
-    route_Master_LocWise: 'routeMasterLocWise',
-    adhoc_routes: "adhoc_routes"
+    route_Master_LocWise:'routeMasterLocWise',
+    adhoc_routes:"adhoc_routes"
 };
 
 export const GenericActions = {
@@ -122,72 +122,46 @@ export const UploadFieldType = {
 }
 
 export const RateTypeCalculation = [
-    {
-        "codeId": "RTTYP-0004",
-        "codeDesc": "% of Freight",
-        "cD": "",
-        "calculationRatio": 100
-    },
-    {
-        "codeId": "RTTYP-0005",
-        "codeDesc": "Per Kg",
-        "calculationRatio": 1000,
-        "cD": "kg",
-    },
-    {
-        "codeId": "RTTYP-0003",
-        "codeDesc": "Per Km",
-        "calculationRatio": 1
-    },
-    {
-        "codeId": "RTTYP-0006",
-        "codeDesc": "Per Pkg",
-        "calculationRatio": 1
-    },
-    {
-        "codeId": "RTTYP-0001",
-        "codeDesc": "Flat",
-        "calculationRatio": 1
-    },
-    {
-        "codeId": "RTTYP-0002",
-        "codeDesc": "Per Ton",
-        "calculationRatio": 1,
-        "cD": "kg",
-    },
-    {
-        "codeId": "RTTYP-0007",
-        "codeDesc": "Per Container",
-        "calculationRatio": 1
-    },
-    {
-        "codeId": "RTTYP-0008",
-        "codeDesc": "Per Litre",
-        "calculationRatio": 1000
-    }]
-
-// View-Print
-export const ViewName = {
-    CB: 'CB',
-    DKT: 'DKT',
-    JOB: 'JOB',
-    PRQ: 'PRQ',
-    THC: 'THC',
-    LS: 'LS',
-    MF: 'MF',
-    DMR: 'DMR',
-    VR: 'VR',
-    DRS: 'DRS',
-    CDN: 'CDN',
-    MR: 'MR',
-    VB: "VB",
-    DGP: "DGP",
-    GP: "GP",
-}
-// export const ViewPrintPartyCode = {
-//     CUST00014: 'CUST00014',
-//     CONSRAJT23: 'CONSRAJT23',
-//     CUST00018: 'CUST00018',
-//     CONSRAJT22: 'CONSRAJT22',
-//     CONSRAJT20: 'CONSRAJT20',
-// } 
+{
+    "codeId": "RTTYP-0004",
+    "codeDesc": "% of Freight",
+    "cD": "",
+    "calculationRatio": 100
+},
+{
+    "codeId": "RTTYP-0005",
+    "codeDesc": "Per Kg",
+    "calculationRatio": 1000,
+    "cD": "kg",
+},
+{
+    "codeId": "RTTYP-0003",
+    "codeDesc": "Per Km",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0006",
+    "codeDesc": "Per Pkg",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0001",
+    "codeDesc": "Flat",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0002",
+    "codeDesc": "Per Ton",
+    "calculationRatio": 1,
+    "cD": "kg",
+},
+{
+    "codeId": "RTTYP-0007",
+    "codeDesc": "Per Container",
+    "calculationRatio": 1
+},
+{
+    "codeId": "RTTYP-0008",
+    "codeDesc": "Per Litre",
+    "calculationRatio": 1000
+}]

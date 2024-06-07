@@ -27,18 +27,15 @@ export class ConsigmentUtility {
     return res;
   }
 
-  async getBillingData(filter={},mODE){
+  async getBillingData(filter={}){
     const req={
       companyCode: this.storage.companyCode,
-      collectionName:mODE=="FTL" ?"docket_fin_det":"docket_fin_det_ltl",
+      collectionName: "docket_fin_det",
       filter:filter,
     }
-    const res=await firstValueFrom(this.operationService.operationPost("generic/getOne",req));
-    let resultArray=[]
-    if(res.data && res.data.dKTNO){
-    const mappedValues = res.data.cHG;
-     resultArray = mappedValues[0] !== undefined ? mappedValues : [];
-    }
+    const res=await firstValueFrom(this.operationService.operationPost("generic/get",req));
+    const mappedValues = res.data.map((x) => x.cHG);
+    const resultArray = mappedValues[0] !== undefined ? mappedValues : [];
     return resultArray;
 
   }

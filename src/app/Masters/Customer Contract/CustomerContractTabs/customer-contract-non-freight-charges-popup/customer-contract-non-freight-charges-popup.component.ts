@@ -176,7 +176,6 @@ export class CustomerContractNonFreightChargesPopupComponent {
         this.StateList,
         "ST",
         this.masterService,
-        true,
         true
       ).then((data) => {
         this.PinCodeList.data = data;
@@ -403,9 +402,10 @@ export class CustomerContractNonFreightChargesPopupComponent {
   }
   SetOptions(event) {
     let fieldName = event.field.name;
-    const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "LOC"];
+    const fieldsToSearch = ["PIN", "CT", "STNM", "ZN"];
     const search = this.NonFreightMatrixForm.controls[fieldName].value;
     let data = [];
+    console.log(this.PinCodeList.data)
     if (search.length >= 2) {
       data = this.ObjcontractMethods.GetGenericMappedAria(
         this.PinCodeList.data,

@@ -116,14 +116,10 @@ export class DeliveryMrResponseModalComponent implements OnInit {
   }
 
   openviewprint(event){
-    const DocNo = event.data.dLMRNO
     const req = {
-      // templateName: "DeliveryMr",
-      templateName: "DMR",
-      PartyField:"",
-      // partyCode: "CUST00028",
-      partyCode: "",
-      DocNo: DocNo,
+      templateName: "DeliveryMr",
+      partyCode: "CUST00028",
+      DocNo: event.dLMRNO,
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;

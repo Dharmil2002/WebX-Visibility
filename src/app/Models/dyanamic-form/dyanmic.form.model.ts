@@ -13,7 +13,6 @@ export class InvoiceModel {
     additionalData?: {
       showNameAndValue?: boolean;
       metaData?: string;
-      tY?:string;
     };
     functions?: any; // Replace 'any' with a more specific type for functions
   

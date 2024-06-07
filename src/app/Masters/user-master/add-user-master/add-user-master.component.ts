@@ -414,8 +414,6 @@ export class AddUserMasterComponent implements OnInit {
     }
   }
   async save() {
-
-
     if (!this.userTableForm.valid) {
       this.userTableForm.markAllAsTouched()
       Swal.fire({
@@ -427,16 +425,12 @@ export class AddUserMasterComponent implements OnInit {
         confirmButtonColor: '#d33',
         timer: 5000,
         timerProgressBar: true,
-
       });
-      
       return false;
-
     }
     else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
-
           this.isSubmit = true
 
           this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
@@ -470,7 +464,7 @@ export class AddUserMasterComponent implements OnInit {
 
           if (this.isUpdate) {
             this.newUserCode = this.userTable.userId;
-          } 
+          }
           else {
             if (['Customer', 'Vendor', 'Business associate'].includes(this.userTableForm.value.userType.name)) {
               this.newUserCode = this.userTableForm.controls["name"].value?.value || "";
@@ -522,35 +516,33 @@ export class AddUserMasterComponent implements OnInit {
               collectionName: "user_master",
               data: mergedObject,
             };
-
-            // const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
-            // if (res) {
-            //   // Display success message
-            //   Swal.fire({
-            //     icon: "success",
-            //     title: "Successful",
-            //     text: "Record added Successfully",
-            //     showConfirmButton: true,
-            //   });
-            //   this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
-            // }
+            const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+            if (res) {
+              // Display success message
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: "Record added Successfully",
+                showConfirmButton: true,
+              });
+              this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+            }
           }
         }
-          catch (error) {
-            console.error("Error fetching data:", error);
-            this.snackBarUtilityService.ShowCommonSwal(
-              "error",
-              "Fail To Submit Data..!"
-            );
-          }
-        }, "User Adding...");
-      }
+        catch (error) {
+          console.error("Error fetching data:", error);
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+          this.isSubmit = false;
+        }
+      }, "User Adding...");
+    }
   }
 
   cancel() {
-    this.isSubmit=false;
-
-    // this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
+    this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
   }
 
   functionCallHandler($event) {

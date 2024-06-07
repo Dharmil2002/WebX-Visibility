@@ -211,7 +211,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
-         
+
           if (this.tableData.length === 0) {
             Swal.fire({
               text: 'Please Fill Beneficiary Details',
@@ -221,7 +221,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
             });
             return false;
           }
-          this.isSubmit=true;
+          this.isSubmit = true;
           clearValidatorsAndValidate(this.beneficiaryHeaderForm)
           this.tableData = this.tableData.map(item => ({
             ...item,
@@ -316,7 +316,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
               }
             }
           }
-        
+
         }
         catch (error) {
           console.error("Error fetching data:", error);
@@ -324,6 +324,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
             "error",
             "Fail To Submit Data..!"
           );
+          this.isSubmit = false;
         }
       }, "Beneficiary Adding...");
     }

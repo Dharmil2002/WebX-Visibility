@@ -337,7 +337,7 @@ export class ProductChargesComponent implements OnInit {
     else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
-          this.isSubmit=true;
+          this.isSubmit = true;
           const Body = {
             sELCHA: this.customerTableForm.value.SelectCharges.name,
             cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
@@ -397,6 +397,7 @@ export class ProductChargesComponent implements OnInit {
               text: "Charges add Successful",
               showConfirmButton: true,
             });
+            this.isSubmit = false;
           } else {
             Swal.fire({
               icon: "error",
@@ -412,6 +413,7 @@ export class ProductChargesComponent implements OnInit {
             "error",
             "Fail To Submit Data..!"
           );
+          this.isSubmit = false;
         }
       }, "Product Charges Adding....");
     }

@@ -80,7 +80,7 @@ export class CustomerGroupAddComponent implements OnInit {
   }
   //#region Save Function
   async save() {
-    if(!this.groupTableForm.valid || this.isSubmit){
+    if (!this.groupTableForm.valid || this.isSubmit) {
 
       this.groupTableForm.markAllAsTouched();
       Swal.fire({
@@ -100,7 +100,6 @@ export class CustomerGroupAddComponent implements OnInit {
       this.snackBarUtilityService.commonToast(async () => {
         try {
           this.isSubmit = true;
-          // alert(this.isSubmit)
           if (this.isUpdate) {
             let id = this.groupTableForm.value._id;
             // Remove the "id" field from the form controls
@@ -126,8 +125,6 @@ export class CustomerGroupAddComponent implements OnInit {
               }
             });
           }
-
-          
           else {
             const tableReq = {
               companyCode: this.companyCode,
@@ -169,6 +166,7 @@ export class CustomerGroupAddComponent implements OnInit {
             "error",
             "Fail To Submit Data..!"
           );
+          this.isSubmit = false;
         }
       }, "Customer Group Adding...");
     }

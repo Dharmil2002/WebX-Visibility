@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -35,6 +36,7 @@ export class AddBankComponent implements OnInit {
   CompanyCode = 0;
   AccountTypeCode: any;
   AccountTypeStatus: any;
+  newBankCode: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -261,6 +263,18 @@ export class AddBankComponent implements OnInit {
     this.AccountTypeFunction()
   }
 
+  async getListId() {
+    try {
+      let query = { companyCode: this.CompanyCode };
+      const req = { companyCode: this.CompanyCode, collectionName: "Bank_detail", filter: query, sorting: { Bankcode: -1 } };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
+
+      return response?.data;
+    } catch (error) {
+      console.error("Error fetching user list:", error);
+      throw error;
+    }
+  }
   async save() {
     const commonBody = {
       Bankname: this.BankForm.value.Bankname.name,
@@ -279,6 +293,8 @@ export class AddBankComponent implements OnInit {
       CreditLimit: parseInt(this.BankForm.value.CreditLimit) || 0,
       isActive:this.BankForm.value.isActive,
     };
+    const lastbank = await this.getListId();
+    const lastBankCode = lastbank?.Bankcode || "BAN000";
     if (this.isUpdate) {
       const req = {
         companyCode: this.CompanyCode,
@@ -288,21 +304,10 @@ export class AddBankComponent implements OnInit {
       };
       await this.handleRequest(req);
     } else {
-      const tabledata = await firstValueFrom(
-        this.masterService.masterPost("generic/get", {
-          companyCode: this.CompanyCode,
-          collectionName: "Bank_detail",
-          filter: {},
-        })
-      );
-      const index = tabledata.data.length === 0
-        ? 1  // Start with 1 if no data present
-      : parseInt(tabledata.data[tabledata.data.length - 1].Bankcode.replace("BAN", "")) + 1;
-
-      const bankcode = `BAN${index.toString().padStart(3, "0")}`;
+      this.newBankCode = nextKeyCode(lastBankCode);
       const body = {
-        _id: `${this.CompanyCode}-${bankcode}`,
-        Bankcode: bankcode,
+        _id: `${this.CompanyCode}-${ this.newBankCode}`,
+        Bankcode:  this.newBankCode,
         entryBy: this.storageService.userName,
         entryDate: new Date(),
         companyCode: this.CompanyCode,

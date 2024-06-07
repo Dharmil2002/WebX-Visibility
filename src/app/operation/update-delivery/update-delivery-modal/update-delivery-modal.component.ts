@@ -91,22 +91,7 @@ export class UpdateDeliveryModalComponent implements OnInit {
     );
 
   }
-  // deliveryPkgsChange(){
-  //   const arrivedPkgs = parseInt(this.deliveryForm.controls['arrivedPkgs'].value);
-  //   const deliveryPkgs = this.deliveryForm.controls['deliveryPkgs'].value;
-  //   const arrivedWeight = this.deliveryForm.controls['arrivedWeight'].value;
-  //   const deliveryWeight = this.deliveryForm.controls['deliveryWeight'].value;
-  //   if (arrivedPkgs < deliveryPkgs) {
-  //     Swal.fire("Error", "Delivery Pkgs should not be greater than Arrived Pkgs", "error");
-  //     this.deliveryForm.controls['deliveryPkgs'].setValue(0);
-  //     return false
-  //   }
-  //   if (arrivedWeight < deliveryWeight) {
-  //     Swal.fire("Error", "Delivery Weight should not be greater than Arrived Pkgs", "error");
-  //     this.deliveryForm.controls['deliveryPkgs'].setValue(0);
-  //     return false
-  //   }
-  // }
+
   deliveryPkgsChange(event) {     
     const fm = {
       pkgs: {
@@ -131,7 +116,7 @@ export class UpdateDeliveryModalComponent implements OnInit {
       return ConvertToNumber(pkg * (totalWeight / total), 2);
     }
   
-
+    const data=this.shipmentDetails;
     const pkg = parseInt(fm.pkgs.ctrl.value);
     const actWT = parseFloat(fm.actWeight.ctrl.value);
     const totPkg = this.shipmentDetails[fm.pkgs.field] || 0;
@@ -146,6 +131,10 @@ export class UpdateDeliveryModalComponent implements OnInit {
           setFieldValues({ pkgs: totPkg, actWeight: totActWT });          
         }
         else if( pkg < totPkg ) {        
+          const aWT = proportionalWeightCalculation(pkg, totPkg, totActWT);
+          setFieldValues({ pkgs: pkg, actWeight: aWT});     
+        }
+        else if( pkg == totPkg) {        
           const aWT = proportionalWeightCalculation(pkg, totPkg, totActWT);
           setFieldValues({ pkgs: pkg, actWeight: aWT});     
         }
@@ -182,7 +171,7 @@ export class UpdateDeliveryModalComponent implements OnInit {
     this.deliveryForm.controls['dKTNO'].setValue(this.shipmentDetails.shipment);
     this.deliveryForm.controls['bookedPkgs'].setValue(this.shipmentDetails?.dockets.pKGS||0);
     this.deliveryForm.controls['arrivedPkgs'].setValue(this.shipmentDetails.dockets?.pEND?.pKGS !== undefined ? this.shipmentDetails.dockets?.pEND?.pKGS : this.shipmentDetails.dockets?.pKGS);
-    this.deliveryForm.controls['arrivedWeight'].setValue( this.shipmentDetails.dockets?.pEND?.wT !== undefined ? this.shipmentDetails.dockets?.pEND?.wT : this.shipmentDetails.dockets?.wT);
+    this.deliveryForm.controls['arrivedWeight'].setValue(this.shipmentDetails.dockets?.pEND?.wT !== undefined ? this.shipmentDetails.dockets?.pEND?.wT : this.shipmentDetails.dockets?.aCTWT);
     this.deliveryForm.controls['bookWeight'].setValue(this.shipmentDetails?.dockets.aCTWT||0);
    
   }

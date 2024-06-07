@@ -35,37 +35,29 @@ export class CustomerGroupAddComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
 
   ) {
+
     this.companyCode = this.storage.companyCode;
+    const extrasState = this.Route.getCurrentNavigation()?.extras?.state;
+
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
       this.submit = 'Modify';
       this.isUpdate = true;
+      this.groupTabledata = extrasState.data;
     } else {
       this.action = "Add";
+      this.groupTabledata = new CustomerGroupMaster({})
     }
-    if (this.action === 'edit') {
-      this.breadScrums = [
-        {
-          title: "Modify Customer Group",
-          items: ["Home"],
-          active: "Modify Customer Group",
-          generatecontrol: true,
-          toggle: this.groupTabledata.activeFlag
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Add Customer Group",
-          items: ["Home"],
-          active: "Add Customer Group",
-          generatecontrol: true,
-          toggle: true,
-        },
-      ];
-      this.groupTabledata = new CustomerGroupMaster({});
-    }
+    this.breadScrums = [
+      {
+        title: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
+        items: ["Home"],
+        active: this.action === "edit" ? "Modify Customer Group" : "Add Customer Group",
+        generatecontrol: true,
+        toggle: this.action === "edit" ? this.groupTabledata.activeFlag : true
+      }
+    ];
     this.initializeFormControl();
   }
   initializeFormControl() {

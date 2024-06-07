@@ -155,13 +155,13 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       }));
     } else {
       this.action = 'Add';
+
     }
-    const activeTitle = this.action === 'edit' ? 'Modify Beneficiary' : 'Add Beneficiary';
     this.breadScrums = [
       {
-        title: activeTitle,
+        title: this.action === 'edit' ? 'Modify Beneficiary' : 'Add Beneficiary',
         items: ['Home'],
-        active: activeTitle,
+        active: this.action === 'edit' ? 'Modify Beneficiary' : 'Add Beneficiary',
       },
     ];
     this.initializeFormControl();

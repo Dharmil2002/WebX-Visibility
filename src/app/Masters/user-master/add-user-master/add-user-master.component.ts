@@ -80,35 +80,26 @@ export class AddUserMasterComponent implements OnInit {
   ) {
     this.companyCode = this.storage.companyCode;
     const extrasState = this.route.getCurrentNavigation()?.extras?.state;
-    this.isUpdate = false;
-    this.action = extrasState ? "edit" : "add";
-    if (this.action === "edit") {
-      this.userTable = extrasState.data;
-      // console.log(this.userTable);
-
+    if (this.route.getCurrentNavigation()?.extras?.state != null) {
+      this.data = route.getCurrentNavigation().extras.state.data;
+      this.action = "edit";
+      this.submit = "Modify";
       this.isUpdate = true;
-      this.submit = 'Modify';
-      this.breadScrums = [
-        {
-          title: "Modify Master",
-          items: ["Master"],
-          active: "Modify User",
-          generatecontrol: true,
-          toggle: this.userTable.isActive
-        },
-      ];
+      this.userTable = extrasState.data;
     } else {
-      this.breadScrums = [
-        {
-          title: "Add User",
-          items: ["Master"],
-          active: "Add User",
-          generatecontrol: true,
-          toggle: true
-        },
-      ];
+      this.action = "Add";
       this.userTable = new UserMaster({});
     }
+    this.breadScrums = [
+      {
+        title: this.action === "edit" ? "Modify User Master" : "Add User",
+        items: ["Master"],
+        active: this.action === "edit" ? "Modify User Master" : "Add User",
+        generatecontrol: true,
+        toggle: this.action === "edit" ? this.userTable.isActive : true
+      }
+    ];
+
     this.initializeFormControl();
     //set value on edit
     this.userTableForm.controls["userpassword"].setValue(

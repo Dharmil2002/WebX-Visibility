@@ -15,7 +15,7 @@ export class ClusterMaster {
         this.pincode = ClusterMaster.pinCode || [];
         this.cLSTYP = ClusterMaster.cLSTYP || '';
         this.cLSTYPNM = ClusterMaster.cLSTYPNM || '';
-        this.activeFlag = ClusterMaster.activeFlag || false;
+        this.activeFlag = ClusterMaster.activeFlag || true;
         this.companyCode = ClusterMaster.companyCode || 0;
       }
     }

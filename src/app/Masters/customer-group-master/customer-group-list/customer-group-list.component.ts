@@ -13,18 +13,54 @@ export class CustomerGroupListComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   linkArray = []
+  // columnHeader = {
+  //   "srNo": "Sr No",
+  //   "groupCode": "Group Code",
+  //   "groupName": "Group Name",
+  //   "activeFlag": "Active Status",
+  //   "actions": "Actions"
+  // };
+
   columnHeader = {
-    "srNo": "Sr No",
-    "groupCode": "Group Code",
-    "groupName": "Group Name",
-    "activeFlag": "Active Status",
-    "actions": "Actions"
-  };
+    srNo: {
+      Title: "Sr No",
+      class: "matcolumncenter",
+      Style: "min-width:150px",
+      sticky: true,
+
+    },
+    groupCode: {
+      Title: "Group Code",
+      class: "matcolumnleft",
+      Style: "min-width:150px",
+      sticky: true,
+
+    },
+    groupName: {
+      Title: "Group Name",
+      class: "matcolumnleft",
+      Style: "min-width:150px",
+      sticky: true,
+
+    },
+    activeFlag: {
+      Title: "Active Status",
+      class: "matcolumncenter",
+      Style: "min-width:150px",
+
+    },
+    actions: {
+      Title: "Actions",
+      class: "matcolumncenter",
+      Style: "min-width:150px",
+      stickyEnd: true
+    }
+  }
   headerForCsv = {
     "groupCode": "Group Code",
     "groupName": "Group Name",
     "activeFlag": "Active Status"
-    }
+  }
   breadScrums = [
     {
       title: "Customer Group Master",
@@ -52,7 +88,7 @@ export class CustomerGroupListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "customerGroup_detail",
-      "filter": {}
+      "filter": { companyCode: this.companyCode }
     }
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {

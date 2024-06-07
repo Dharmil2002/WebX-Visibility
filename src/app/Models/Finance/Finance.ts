@@ -221,6 +221,7 @@ export class DNTHdrDataRequestModel {
   docNo: string;
   tYP: string;
   nTNO: string;
+  bILLNO: string;
   nTDT: Date;
   lOC: string;
   pARTY: {
@@ -356,6 +357,9 @@ export const ledgerInfo = {
   "INC001015": GetLeadgerInfoFromLocalStorage("INC001015"),
   "INC001009": GetLeadgerInfoFromLocalStorage("INC001009"),
   "LIA001001": GetLeadgerInfoFromLocalStorage("LIA001001"),
+  "INC001004": GetLeadgerInfoFromLocalStorage("INC001004"),
+  "INC001002": GetLeadgerInfoFromLocalStorage("INC001002"),
+  "INC001001": GetLeadgerInfoFromLocalStorage("INC001001"),
   "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
   "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
   "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),

@@ -1302,7 +1302,10 @@ export class FreightControl extends BaseControl {
       },
       {
         name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
-        value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false,
+        functions: {
+          onChange: "calculateRate"
+        }
       },
       {
         name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',

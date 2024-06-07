@@ -41,7 +41,7 @@ export class RunSheetControl {
                 },
                 functions:{
                   onOptionSelect:'getVehicleDetails',
-                  onChange:'checkIsMarketVehicle'
+                 // onChange:'checkIsMarketVehicle'
                   //"onChange":""
                 },
                 generatecontrol: true, disable: false

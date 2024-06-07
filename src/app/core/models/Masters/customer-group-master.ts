@@ -11,7 +11,7 @@ export class CustomerGroupMaster {
             this.groupCode = CustomerGroupMaster.groupCode || '';
             this.groupName = CustomerGroupMaster.groupName || '';
             this.groupPassword = CustomerGroupMaster.groupPassword || '';
-            this.activeFlag = CustomerGroupMaster.activeFlag || true;
+            this.activeFlag = CustomerGroupMaster.activeFlag || false;
         }
     }
 }

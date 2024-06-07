@@ -31,6 +31,7 @@ import { LocationService } from "src/app/Utility/module/masters/location/locatio
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import moment from "moment";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 
 
 @Component({
@@ -130,6 +131,7 @@ export class DepartVehicleComponent implements OnInit {
   products:AutoComplete[];
   isSysCEVB: boolean = true;
   rules: any;
+  isDisble:boolean=false;
 
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
@@ -145,7 +147,8 @@ export class DepartVehicleComponent implements OnInit {
     private storage:StorageService,
     private locationService:LocationService,
     private filter: FilterUtils,
-    private controlPanel: ControlPanelService
+    private controlPanel: ControlPanelService,
+    private snackBarUtilityService:SnackBarUtilityService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
@@ -460,6 +463,8 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
+    this.snackBarUtilityService.commonToast(async () => {
+    this.isDisble=true;
     this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
     const loadingArray = [this.loadingSheetTableForm.value];
@@ -480,7 +485,7 @@ export class DepartVehicleComponent implements OnInit {
     mergedData['lsno'] = this.lsDetails?.lsno || '';
     mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);
-
+  },"Depart Vehicle");
   }
 
 

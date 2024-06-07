@@ -28,6 +28,9 @@ export class BalanceSheetReport {
                     additionalData: {
                          showNameAndValue: false,
                     },
+                    functions: {
+                         onOptionSelect: "resetDateRange"
+                     },
                     generatecontrol: true, disable: false
                },
                {
@@ -43,6 +46,7 @@ export class BalanceSheetReport {
                     additionalData: {
                          support: "end",
                     },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'branch',

@@ -160,6 +160,9 @@ export class GeneralLedgerReportComponent implements OnInit {
   tableLoad: boolean = false;
   drillDownData: any[];
   csvFileName: string;
+  now = moment().endOf('day').toDate();
+  lastweek = moment().add(-10, 'days').startOf('day').toDate();
+
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
@@ -174,12 +177,9 @@ export class GeneralLedgerReportComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl()
 
-    const now = moment().endOf('day').toDate();
-    const lastweek = moment().add(-10, 'days').startOf('day').toDate()
-
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
-    this.generalLedgerForm.controls["start"].setValue(lastweek);
-    this.generalLedgerForm.controls["end"].setValue(now);
+    this.generalLedgerForm.controls["start"].setValue(this.lastweek);
+    this.generalLedgerForm.controls["end"].setValue(this.now);
     this.getDropdownData();
     this.csvFileName = `General_Ledger_Report-${timeString}`;
   }
@@ -556,8 +556,17 @@ export class GeneralLedgerReportComponent implements OnInit {
   //#endregion
   //#region to reset date range
   resetDateRange() {
-    this.generalLedgerForm.controls["start"].setValue("");
-    this.generalLedgerForm.controls["end"].setValue("");
+    const selectedFinancialYear = this.generalLedgerForm.controls.Fyear.value;
+    const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+    const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+    let maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+    if (maxDate >= this.now) {
+      maxDate = this.now;
+    }
+
+    this.generalLedgerForm.controls["start"].setValue(minDate);
+    this.generalLedgerForm.controls["end"].setValue(maxDate);
   }
   //#endregion
 }

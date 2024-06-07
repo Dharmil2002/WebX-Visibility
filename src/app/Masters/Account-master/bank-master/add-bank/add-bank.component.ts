@@ -295,15 +295,11 @@ export class AddBankComponent implements OnInit {
           filter: {},
         })
       );
-      const index =
-        parseInt(
-          tabledata.data.length === 0
-            ? 0
-            : tabledata.data[tabledata.data.length - 1].Bankcode
-        ) + 1;
-      const bankcode = `BAN${
-        index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
-      }${index}`;
+      const index = tabledata.data.length === 0
+        ? 1  // Start with 1 if no data present
+      : parseInt(tabledata.data[tabledata.data.length - 1].Bankcode.replace("BAN", "")) + 1;
+
+      const bankcode = `BAN${index.toString().padStart(3, "0")}`;
       const body = {
         _id: `${this.CompanyCode}-${bankcode}`,
         Bankcode: bankcode,

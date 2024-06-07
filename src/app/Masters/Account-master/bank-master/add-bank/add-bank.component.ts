@@ -16,13 +16,7 @@ import Swal from "sweetalert2";
   templateUrl: "./add-bank.component.html",
 })
 export class AddBankComponent implements OnInit {
-  breadScrums = [
-    {
-      title: "Bank Account Master",
-      items: ["Home"],
-      active: "Account",
-    },
-  ];
+
   isSubmit: boolean = false;
   isUpdate: any = false;
   jsonControlArray: any;
@@ -37,6 +31,8 @@ export class AddBankComponent implements OnInit {
   CompanyCode = 0;
   AccountTypeCode: any;
   AccountTypeStatus: any;
+  action: string;
+  breadScrums:any;
   constructor(
     private Route: Router,
     public snackBarUtilityService: SnackBarUtilityService,
@@ -49,8 +45,21 @@ export class AddBankComponent implements OnInit {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
-      this.FormTitle = "Edit Bank";
+      this.action="edit"
+    } else{
+      this.action="Add"
     }
+   this.breadScrums = [
+      {
+        title: this.action==="edit"?"Edit Bank Account Master ":"Add Bank Account Master",
+        items: ["Home"],
+        active:this.action==="edit"?"Edit Bank Account Master ":"Add Bank Account Master",
+        generatecontrol:true,
+        // toggle:this.action==="edit"? this.UpdateData.isActive : true
+        toggle: this.action === "edit" ? this.UpdateData.isActive : true
+
+      },
+    ];
   }
 
   ngOnInit(): void {
@@ -227,6 +236,12 @@ export class AddBankComponent implements OnInit {
     }
   }
 
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.BankForm.controls['isActive'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
+
   getAccountTypeDropdown() {
     const data = [
       {
@@ -288,32 +303,32 @@ export class AddBankComponent implements OnInit {
           Accountnumber: this.BankForm.value.Accountnumber,
           IFSCcode: this.BankForm.value.IFSCcode,
           MICRcode: this.BankForm.value.MICRcode,
+          isActive:this.BankForm.value.isActive,
           SWIFTcode:
             this.BankForm.value.SWIFTcode === 0
               ? ""
               : this.BankForm.value.SWIFTcode,
-          ApplicationLocations: this.BankForm.value.LocationsDrop.map(
-            (x) => x.value
-          ),
+              ApplicationLocations: this.BankForm.value.LocationsDrop.map(
+                (x) => x.value
+              ),
           BankAddress: this.BankForm.value.BankAddress,
           AccountTypeName: this.BankForm.value.AccountType.name,
           CreditLimit: parseInt(this.BankForm.value.CreditLimit) || 0,
-          isActive: this.BankForm.value.isActive,
-        };
-        if (this.isUpdate) {
+        };        
+        if (this.isUpdate) {    
           const req = {
             companyCode: this.CompanyCode,
             collectionName: "Bank_detail",
             filter: { Bankcode: this.UpdateData.Bankcode },
             update: commonBody,
-          };
+          };          
           await this.handleRequest(req);
         } else {
           const tabledata = await firstValueFrom(
             this.masterService.masterPost("generic/get", {
               companyCode: this.CompanyCode,
               collectionName: "Bank_detail",
-              filter: {},
+              filter: {CompanyCode: this.CompanyCode},
             })
           );
           const index =
@@ -341,7 +356,6 @@ export class AddBankComponent implements OnInit {
           await this.handleRequest(req);
         }
       }, "Adding Bank Please Wait..!");
-      console.log(this.isSubmit);
     }
   }
 

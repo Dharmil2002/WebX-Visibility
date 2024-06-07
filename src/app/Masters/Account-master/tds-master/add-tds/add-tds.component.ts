@@ -15,13 +15,6 @@ import { StorageService } from "src/app/core/service/storage.service";
   templateUrl: "./add-tds.component.html",
 })
 export class AddTdsComponent implements OnInit {
-  breadScrums = [
-    {
-      title: "TDS Master",
-      items: ["Home"],
-      active: "Account",
-    },
-  ];
   isSubmit: boolean = false;
   CompanyCode = 0;
   UpdateData: any;
@@ -29,6 +22,8 @@ export class AddTdsComponent implements OnInit {
   FormTitle: string = "Add TDS";
   jsonControlArray: any;
   TdsForm: any;
+  action: string;
+  breadScrums:any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -41,8 +36,19 @@ export class AddTdsComponent implements OnInit {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
-      this.FormTitle = "Edit TDS";
+      this.action="edit"
+    } else{
+      this.action="Add"
     }
+    this.breadScrums = [
+      {
+        title: this.action==="edit"?"Edit TDS Master":"Add TDS Master",
+        items: ["Home"],
+        active:this.action==="edit"?"Edit TDS Master":"Add TDS Master",
+        generatecontrol:true,
+        toggle: this.action === "edit" ? this.UpdateData.isActive : true
+      },
+    ];
   }
 
   ngOnInit(): void {
@@ -132,6 +138,12 @@ export class AddTdsComponent implements OnInit {
     }
   }
 
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.TdsForm.controls['isActive'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
+
   async save() {
     if (!this.TdsForm.valid || this.isSubmit) {
       this.TdsForm.markAllAsTouched();
@@ -174,7 +186,7 @@ export class AddTdsComponent implements OnInit {
             this.masterService.masterPost("generic/get", {
               companyCode: this.CompanyCode,
               collectionName: "tds_detail",
-              filter: {},
+              filter: {CompanyCode: this.CompanyCode},
             })
           );
           const index =

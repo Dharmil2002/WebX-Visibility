@@ -93,7 +93,7 @@ export class AddressMasterListComponent implements OnInit {
     const request = {
       companyCode: this.companyCode,
       collectionName: "address_detail",
-      filter: {}
+      filter: {companyCode: this.companyCode}
     };
     this.masterService.masterPost('generic/get', request).subscribe({
       next: (response: any) => {

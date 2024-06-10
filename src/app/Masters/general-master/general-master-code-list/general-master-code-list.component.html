@@ -9,11 +9,14 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-    <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
-        [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [backPath]="backPath" [metaData]="METADATA"
-        [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"
-        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [headercode]="headerCode"
-        [viewComponent]="viewComponent" (dialogClosed)="onDialogClosed($event)" [dynamicControls]="dynamicControls"
-        (onFlagChange)="IsActiveFuntion($event)" [height]="height" [width]="width">
-    </generic-table-webxpress>
+    <app-generic-table-v2
+    *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
+     [menuItems]="menuItems"[addAndEditPath]="addAndEditPath"
+    (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [headercode]="headerCode"
+   (dialogClosed)="onDialogClosed($event)" [dynamicControls]="dynamicControls"
+    [staticField]="staticField"  [viewComponent]="viewComponent"  (onFlagChange)="IsActiveFuntion($event)"
+    (functionCallEmitter)="functionCallHandler($event)" [csvHeaders]="headerForCsv"  [csvFileName]="csvFileName" 
+    [refreshbtn]="true"
+  >
+  </app-generic-table-v2>
 </app-common-wrapper-webxpress>

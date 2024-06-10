@@ -3,8 +3,8 @@
     (toggleChange)="onToggleChange($event)">
     <form [formGroup]="fleetTableForm">
       <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray" [FormTitle]="'Fleet Master'"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-        (callFunction)="functionCallHandler($event)" [submit]="submit">
+        (functionCallEmitter)="functionCallHandler($event)" [modifyAndSaveButton]="true"
+        (callFunction)="functionCallHandler($event)" [submit]="submit"  [Disabled]="isSubmit">
       </app-form-webxpress>
     </form>
   </app-common-wrapper-webxpress>

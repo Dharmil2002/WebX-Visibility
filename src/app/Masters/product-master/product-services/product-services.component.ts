@@ -9,39 +9,15 @@ import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { StorageService } from "src/app/core/service/storage.service";
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+
 
 @Component({
   selector: "app-product-services",
   templateUrl: "./product-services.component.html",
 })
 export class ProductServicesComponent implements OnInit {
-  TableData = [
-    {
-      chargesName: "COD/DOD",
-      chargesType: "Express,Rail",
-      add: "+",
-    },
-    {
-      chargesName: "DACC",
-      chargesType: "Express",
-      add: "+",
-    },
-    {
-      chargesName: "ODA",
-      chargesType: "Express",
-      add: "+",
-    },
-    {
-      chargesName: "Insurance",
-      chargesType: "ALL",
-      add: "+",
-    },
-    {
-      chargesName: "Demurrage",
-      chargesType: "Express,Rail,Air",
-      add: "",
-    },
-  ];
+  TableData = [];
   ProductId: any;
   ProductName: any;
   tableTab = false;
@@ -58,6 +34,7 @@ export class ProductServicesComponent implements OnInit {
   tableData: any;
   isTable: boolean;
   isTableEmt: boolean;
+  isSubmit: boolean = false;
   ServicesTypeData: any[];
   ServicesNameData: any[];
   protected _onDestroy = new Subject<void>();
@@ -67,6 +44,7 @@ export class ProductServicesComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private storage: StorageService,
+    public snackBarUtilityService: SnackBarUtilityService,
     public dialogRef: MatDialogRef<ProductServicesComponent>
   ) {
     this.companyCode = this.storage.companyCode;
@@ -146,7 +124,7 @@ export class ProductServicesComponent implements OnInit {
   async ServicesTypeDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: { companyCode: this.companyCode },
       collectionName: "products",
     };
     const Res = await this.masterService
@@ -197,43 +175,74 @@ export class ProductServicesComponent implements OnInit {
     }
   }
   async save() {
-    const Body = {
-      _id: `${this.companyCode}-${this.customerTableForm.value.ServicesCode}`,
-      ProductName: this.ProductName,
-      ProductId: this.ProductId,
-      ServicesType: this.customerTableForm.value.ServicesType.map((x) => {
-        return x.name;
-      }).join(","),
-      ServicesName: this.customerTableForm.value.ServicesName.name,
-      ServicesCode: this.customerTableForm.value.ServicesCode,
-      companyCode: this.companyCode,
-      updatedDate: new Date(),
-      updatedBy: this.storage.userName,
-    };
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "product_Services_detail",
-      data: Body,
-    };
-    const res = await this.masterService
-      .masterPost("generic/create", req)
-      .toPromise();
-    if (res?.success) {
-      this.GetTableData();
-      this.tableTab = !this.tableTab;
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: "!Product add Successful",
-        showConfirmButton: true,
-      });
-    } else {
+    if (!this.customerTableForm.valid) {
+      this.customerTableForm.markAllAsTouched()
       Swal.fire({
         icon: "error",
-        title: "Data not inserted",
-        text: res.message,
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
         showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
       });
+      return false;
+    }
+    else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          this.isSubmit = true;
+          const Body = {
+            _id: `${this.companyCode}-${this.customerTableForm.value.ServicesCode}`,
+            ProductName: this.ProductName,
+            ProductId: this.ProductId,
+            ServicesType: this.customerTableForm.value.ServicesType.map((x) => {
+              return x.name;
+            }).join(","),
+            ServicesName: this.customerTableForm.value.ServicesName.name,
+            ServicesCode: this.customerTableForm.value.ServicesCode,
+            companyCode: this.companyCode,
+            updatedDate: new Date(),
+            updatedBy: this.storage.userName,
+          };
+          let req = {
+            companyCode: this.companyCode,
+            collectionName: "product_Services_detail",
+            data: Body,
+          };
+          const res = await this.masterService
+            .masterPost("generic/create", req)
+            .toPromise();
+          if (res?.success) {
+            this.GetTableData();
+            this.tableTab = !this.tableTab;
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: "Services added Successful",
+              showConfirmButton: true,
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Data not inserted",
+              text: res.message,
+              showConfirmButton: true,
+            });
+          }
+
+        }
+        catch (error) {
+          console.error("Error fetching data:", error);
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+          this.isSubmit = false;
+        }
+      }, "Service Adding....");
     }
   }
   close() {
@@ -256,26 +265,6 @@ export class ProductServicesComponent implements OnInit {
     }
   }
 
-  async handleServicesCode(event) {
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "product_Services_detail",
-      filter: { ServicesCode: this.customerTableForm.value.ServicesCode },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
-    if (res.success && res.data.length != 0) {
-      this.customerTableForm.controls.ServicesCode.setValue("");
-      Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Services Code exist",
-        showConfirmButton: true,
-      });
-    }
-  }
-
   async handleServicesName() {
     const req = {
       companyCode: this.companyCode,
@@ -293,9 +282,11 @@ export class ProductServicesComponent implements OnInit {
       Swal.fire({
         icon: "info",
         title: "info",
-        text: "Services Name exist",
+        text: "Please Select Other Services These Services Already Used",
         showConfirmButton: true,
       });
+    } else {
+      this.customerTableForm.controls.ServicesCode.setValue(this.customerTableForm.value.ServicesName.value);
     }
   }
 }

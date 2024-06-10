@@ -4,6 +4,32 @@ export class ProfitAndLossReport {
      constructor() {
           this.ProfitAndLossControlArray = [
                {
+                    name: 'Fyear',
+                    label: 'Financial Year ',
+                    placeholder: 'Financial Year ',
+                    type: 'dropdown',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                        {
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        },
+                    ],
+                    additionalData: {
+                        showNameAndValue: false,
+                    },
+                    functions: {
+                        onOptionSelect: "resetDateRange"
+                    },
+                    generatecontrol: true, disable: false
+                },
+               {
                     name: "start",
                     label: "Select Date Range",
                     placeholder: "Select Date Range",
@@ -16,6 +42,7 @@ export class ProfitAndLossReport {
                     additionalData: {
                          support: "end",
                     },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'branch',
@@ -31,7 +58,7 @@ export class ProfitAndLossReport {
                          message: "Choose proper value",
                     },],
                     additionalData: {
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     generatecontrol: true, disable: false
                },

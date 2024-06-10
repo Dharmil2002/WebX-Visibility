@@ -515,7 +515,7 @@ export class ApproveDebitNoteComponent implements OnInit {
     const response = [
 
       createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, TotalAmount, 0),
-      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, ledgerInfo['EXP002006'].LeadgerCategory, 0, TXBLAMTAmount),
+      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, "EXPENSE", 0, TXBLAMTAmount),
     ]
 
 
@@ -532,7 +532,7 @@ export class ApproveDebitNoteComponent implements OnInit {
     }
 
     if (this.DataResponseHeader.data[0].tdsAMT > 0) {
-      response.push(createVoucher(this.DataResponseDetails.data[0].tDS.sEC, this.DataResponseDetails.data[0].tDS.sECD, ledgerInfo['LIA002002'].LeadgerCategory, 0, this.DataResponseHeader.data[0].tdsAMT));
+      response.push(createVoucher(this.DataResponseDetails.data[0].tDS.sEC, this.DataResponseDetails.data[0].tDS.sECD, "TDS", 0, this.DataResponseHeader.data[0].tdsAMT));
     }
 
     return response;

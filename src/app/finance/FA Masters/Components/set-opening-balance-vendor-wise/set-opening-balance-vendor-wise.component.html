@@ -1,0 +1,20 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <app-generic-bulk-upload *ngIf="!tableLoad" [downloadFunction]="Download"
+        [fileName]="'Vendor Wise Opening Balance Upload'">
+        <div class="row">
+            <form [formGroup]="fileUploadForm">
+                <div class="col">
+                    <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+                </div>
+            </form>
+        </div>
+    </app-generic-bulk-upload>
+    <div class="row">
+        <div class="col-6">
+            <app-generic-table-v2 *ngIf="tableLoad" [columnHeader]="columnHeader" [tableData]="tableData"
+                [dynamicControls]="dynamicControls" [staticField]="staticField" [FormTitle]="'Result'">
+            </app-generic-table-v2>
+        </div>
+    </div>
+
+</app-common-wrapper-webxpress>

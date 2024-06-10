@@ -263,6 +263,16 @@ export class AddDcrSeriesComponent
     this.addDcrTableForm.controls.seriesTo.setValue(toCode);
 
     this.isSeriesExists();
+    this.onSeriesFromChange();
+  }
+  //#endregion
+
+  //#region to get series from
+  onSeriesFromChange(): void {
+    this.addDcrTableForm.controls.seriesFrom.valueChanges.subscribe(() => {
+      this.addDcrTableForm.controls.totalLeaf.setValue("");
+      this.addDcrTableForm.controls.seriesTo.setValue("");
+    });
   }
   //#endregion
 

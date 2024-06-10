@@ -1,6 +1,9 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
-    <!-- Loading Generic table as parent component and passing  required data-->
-    <!--
+<app-common-wrapper-webxpress
+  [breadscrums]="breadScrums"
+  [loadTable]="tableLoad"
+>
+  <!-- Loading Generic table as parent component and passing  required data-->
+  <!--
         columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.
         tableData : api Response.
         addAndEditPath : path of the page where Add and edit is handled.
@@ -9,11 +12,25 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-    <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [uploadComponent]=true
-        (uploadEvent)="upload()" [columnWidths]="columnWidths" [tableData]="csv" [centerAligned]="centerAlignedData"
-        [csvFileName]="csvFileName" [csvHeaders]="headerForCsv" [addAndEditPath]="addAndEditPath" [metaData]="METADATA"
-        [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"
-        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
-        [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
-    </generic-table-webxpress>
+  <app-generic-table-v2
+    *ngIf="!tableLoad"
+    [columnHeader]="columnHeader"
+    (uploadEvent)="upload()"
+    [columnWidths]="columnWidths"
+    [tableData]="csv"
+    [staticField]="staticField"
+    [centerAligned]="centerAlignedData"
+    [csvFileName]="csvFileName"
+    [csvHeaders]="headerForCsv"
+    [addAndEditPath]="addAndEditPath"
+    [menuItems]="menuItems"
+    (menuItemClicked)="handleMenuItemClick($event)"
+    [menuItemFlag]="menuItemflag"
+    [dynamicControls]="dynamicControls"
+    [uploadComponent]="uploadComponent"
+    (functionCallEmitter)="functionCallHandler($event)"
+    (onFlagChange)="IsActiveFuntion($event)"
+  >
+    >
+  </app-generic-table-v2>
 </app-common-wrapper-webxpress>

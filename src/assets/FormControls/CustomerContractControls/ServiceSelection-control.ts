@@ -219,7 +219,7 @@ export class ContractServiceSelectionControl {
       //   accessallowed: true,
       // },
       {
-        name: "fuelSurcharge",
+        name: "FuelSurcharge",
         label: "Fuel Surcharge",
         placeholder: "Fuel Surcharge",
         type: "toggle",
@@ -233,7 +233,7 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
       },
       {
-        name: "cutofftime",
+        name: "CutOffTime",
         label: "Cut off time",
         placeholder: "Cut off time",
         type: "toggle",
@@ -346,6 +346,9 @@ export class ContractServiceSelectionControl {
         ],
         additionalData: {
           showNameAndValue: false,
+        },
+        functions: {
+          onOptionSelect: 'OnRateTypeSelect'
         },
       },
       {
@@ -724,12 +727,15 @@ export class ContractServiceSelectionControl {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'OnRateTypeSelect'
+        },
       },
       {
         name: "Rate",
         label: "Rate(₹)",
         placeholder: "Rate",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -791,7 +797,32 @@ export class ContractServiceSelectionControl {
         generatecontrol: true,
         disable: false,
         accessallowed: true,
-      }
+      },
+      {
+        name: "InsuranceCarrierRisk",
+        label: "Insurance Carrier Risk",
+        placeholder: "Insurance Carrier Risk",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        functions: {
+          onSelection: "ChargeInsuranceCarrierRisk"
+        },
+        generatecontrol: true,
+        disable: false,
+        accessallowed: true,
+        Validations: [
+          {
+            name: "required",
+            message: "Insurance Carrier Risk is required",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
     ];
     this.ContractCutOfftimeControlArray = [
       {
@@ -1017,7 +1048,11 @@ export class ContractServiceSelectionControl {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'OnRateTypeSelect'
+        },
       },
+
       {
         name: "FRate",
         label: "Rate(₹)",
@@ -1031,10 +1066,13 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "required",
+            message: "Rate is required",
+          },
+
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
+
         additionalData: {
           showNameAndValue: false,
         },

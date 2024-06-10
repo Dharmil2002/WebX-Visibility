@@ -20,6 +20,8 @@ import { TrialBalanceReport } from 'src/assets/FormControls/Reports/Account Repo
   templateUrl: './trial-balance-criteria.component.html'
 })
 export class TrialBalanceCriteriaComponent implements OnInit {
+  TrialBalanceFormControl: TrialBalanceReport;
+  jsonproftandlossArray: any;
 
   breadScrums = [
     {
@@ -30,8 +32,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
   ];
   protected _onDestroy = new Subject<void>();
   TrialBalanceForm: UntypedFormGroup;
-  jsonproftandlossArray: any;
-  TrialBalanceFormControl: TrialBalanceReport;
+
   branchName: any;
   branchStatus: any;
   report: string[] = [];
@@ -54,7 +55,8 @@ export class TrialBalanceCriteriaComponent implements OnInit {
   EndDate: any = moment().format("DD MMM YY");
   financYrName: any;
   financYrStatus: any;
-
+  now = moment().endOf('day').toDate();
+  lastweek = moment().add(-10, 'days').startOf('day').toDate();
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -122,42 +124,13 @@ export class TrialBalanceCriteriaComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.TrialBalanceForm.controls["branch"].setValue(loginBranch);
     this.TrialBalanceForm.get('Individual').setValue("Y");
     const financialYearlist = this.generalLedgerReportService.getFinancialYear();
     const accountList = await this.generalLedgerReportService.getAccountDetail();
     this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
     this.filterDropdown(this.accountName, this.accountStatus, accountList);
-    this.filterDropdown("ReportType", false, [
-      {
-        value: "G",
-        name: "Group Wise",
-      },
-      {
-        value: "L",
-        name: "Location Wise",
-      },
-      {
-        value: "C",
-        name: "Customer Wise",
-      },
-      {
-        value: "V",
-        name: "Vendor Wise",
-      },
-      {
-        value: "E",
-        name: "Employee Wise",
-      },
-      // {
-      //   value: "D",
-      //   name: "Driver Wise",
-      // },
-
-    ]);
-
-
   }
 
   functionCallHandler($event) {
@@ -185,7 +158,130 @@ export class TrialBalanceCriteriaComponent implements OnInit {
         );
       });
   }
+  //#region to validate date range according to financial year
+  validateDateRange(event): void {
 
+    // Get the values from the form controls
+    const startControlValue = this.TrialBalanceForm.controls.start.value;
+    const endControlValue = this.TrialBalanceForm.controls.end.value;
+    const selectedFinancialYear = this.TrialBalanceForm.controls.Fyear.value;
+
+    // Check if both start and end dates are selected
+    if (!startControlValue || !endControlValue) {
+      // Exit the function if either start or end date is not selected
+      return;
+    }
+
+    // Convert the control values to Date objects
+    const startDate = new Date(startControlValue);
+    const endDate = new Date(endControlValue);
+
+    // Determine the financial year based on the start date
+    const startYear = startDate.getFullYear(); // Extract the year from the start date
+
+    // Determine the financial year start
+    // If the month of the start date is less than March (0-based index, so 3 is April),
+    // it means the financial year started in the previous year.
+    // For example, if the start date is February 2024, the financial year started in April 2023.
+    const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
+
+    // Calculate the financial year string in the format 'YYYYYYYY'
+    // The financial year string is a combination of the last two digits of the start year and the last two digits of the next year.
+    // For example, if the financial year started in 2023, the financial year string will be '2324'.
+    const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
+
+    // Check if the selected financial year matches the calculated financial year
+    if (selectedFinancialYear.value === calculatedFnYr) {
+
+      // Define the financial year date range
+      // Parse the selected financial year to get the start year (e.g., '2324' -> 2023)
+      const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+      const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+      const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+      // Check if both dates fall within the specified financial year range
+      if (startDate >= minDate && startDate <= maxDate && endDate >= minDate && endDate <= maxDate) {
+        // Both dates are within the valid range
+        console.log('Both dates are within the valid range.');
+      } else {
+        // Show a warning if the date range is not within the financial year
+        this.dateRangeWarning(selectedFinancialYear);
+        this.clearDateControls();
+      }
+    }
+    else {
+      // Show a warning if the date range is not within the financial year
+      this.dateRangeWarning(selectedFinancialYear);
+      this.clearDateControls();
+    }
+  }
+  // Function to display a warning message if the date range is not within the selected financial year
+  dateRangeWarning(selectedFinancialYear): void {
+    Swal.fire({
+      icon: "warning",
+      title: "Warning",
+      text: `Date range not within FY ${selectedFinancialYear.name}`,
+      showConfirmButton: true,
+    });
+  }
+  // Function to clear the date range controls
+  clearDateControls(): void {
+    this.TrialBalanceForm.controls["start"].setValue("");
+    this.TrialBalanceForm.controls["end"].setValue("");
+  }
+  //#endregion
+  //#region to set party name according to received from data
+  async reportSubTypeChanged() {
+    // if (this.TrialBalanceForm.controls.ReportType.value === 'Sub Ledger') {
+      const reportSubType = this.TrialBalanceForm.value.reportSubType;
+
+      this.TrialBalanceForm.controls.subLedger.setValue("");
+      this.TrialBalanceForm.controls.subLedgerHandler.setValue("");
+
+      let responseFromAPI = [];
+      switch (reportSubType) {
+        case 'Location':
+          responseFromAPI = await this.locationService.getLocations(
+            { companyCode: this.storage.companyCode, activeFlag: true },
+            { _id: 0, locCode: 1, locName: 1 })
+          responseFromAPI = responseFromAPI.map(x => (
+            {value: x.locCode,name: x.locName}));
+          this.filter.Filter(this.jsonproftandlossArray, this.TrialBalanceForm, responseFromAPI, "subLedger", true);
+          break;
+        case 'Customer':
+          responseFromAPI = await this.generalLedgerReportService.customersData()
+          this.filter.Filter(this.jsonproftandlossArray, this.TrialBalanceForm, responseFromAPI, "subLedger", true);
+          break;
+        case 'Vendor':
+          responseFromAPI = await this.generalLedgerReportService.vendorsData();
+          this.filter.Filter(this.jsonproftandlossArray, this.TrialBalanceForm, responseFromAPI, "subLedger", true);
+          break;
+        case 'Employee':
+          responseFromAPI = await this.generalLedgerReportService.usersData()
+          this.filter.Filter(this.jsonproftandlossArray, this.TrialBalanceForm, responseFromAPI, "subLedger", true);
+          break;
+        case 'Driver':
+          responseFromAPI = await this.generalLedgerReportService.driversData()
+          this.filter.Filter(this.jsonproftandlossArray, this.TrialBalanceForm, responseFromAPI, "subLedger", true);
+          break;
+        case 'Vehicle':
+          responseFromAPI = await this.generalLedgerReportService.vehicleData()
+          this.filter.Filter(this.jsonproftandlossArray, this.TrialBalanceForm, responseFromAPI, "subLedger", true);
+          break;
+        default:
+
+      }
+    // } else {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Warning",
+    //     text: `Select Report Type as Sub Ledger`,
+    //     showConfirmButton: true,
+    //   });
+    //   this.TrialBalanceForm.controls["reportSubType"].setValue("");
+    // }
+  }
+  //#endregion
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -263,5 +359,20 @@ export class TrialBalanceCriteriaComponent implements OnInit {
     }, "Trial Balance Statement Is Generating Please Wait..!");
   }
 
+  //#region to reset date range
+  resetDateRange() {
+    const selectedFinancialYear = this.TrialBalanceForm.controls.Fyear.value;
+    const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+    const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+    let maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+    if (maxDate >= this.now) {
+      maxDate = this.now;
+    }
+
+    this.TrialBalanceForm.controls["start"].setValue(minDate);
+    this.TrialBalanceForm.controls["end"].setValue(maxDate);
+  }
+  //#endregion
 }
 

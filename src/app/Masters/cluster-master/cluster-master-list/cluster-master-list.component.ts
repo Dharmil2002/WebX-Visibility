@@ -40,20 +40,20 @@ export class ClusterMasterListComponent implements OnInit {
         class: "matcolumncenter",
         Style: "max-width:300px; max-width:600px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;"
       },
-      activeFlag: {
+      "activeFlag": {
         type: "Activetoggle",
         Title: "Active",
         class: "matcolumncenter",
         Style: "min-width:80px; max-width:80px",
         functionName: "IsActiveFuntion",
       },
-      eNTDT: {
+      "eNTDT": {
         Title: "Created Date",
         class: "matcolumncenter",
         Style: "min-width:150px; max-width:150px",
         datatype: "datetime",
       },
-      EditAction: {
+      "EditAction": {
         type: "iconClick",
         Title: "",
         class: "matcolumncenter",
@@ -71,7 +71,7 @@ export class ClusterMasterListComponent implements OnInit {
     "eNTDT": "Created Date",
     "activeFlag": "Active Status",
   }
-  staticField = ["clusterCode","clusterName","pincodeDisplay","eNTDT"];
+  staticField = ["clusterCode", "clusterName", "pincodeDisplay", "eNTDT"];
 
   breadScrums = [
     {
@@ -91,7 +91,7 @@ export class ClusterMasterListComponent implements OnInit {
   uploadComponent = ClusterMasterUploadComponent
   constructor(
     private route: Router,
-    private masterService: MasterService, private storage: StorageService,private dialog: MatDialog) {
+    private masterService: MasterService, private storage: StorageService, private dialog: MatDialog) {
     this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
@@ -103,7 +103,7 @@ export class ClusterMasterListComponent implements OnInit {
   async getClusterDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "filter": {},
+      "filter": { companyCode: this.companyCode },
       "collectionName": "cluster_detail"
     };
 
@@ -129,21 +129,21 @@ export class ClusterMasterListComponent implements OnInit {
   }
   //#endregion
 
-  AddNew(){
+  AddNew() {
     this.route.navigateByUrl(this.addAndEditPath);
   }
 
-  EditFunction(event){
+  EditFunction(event) {
     this.route.navigate([this.addAndEditPath], { state: { data: event?.data } });
   }
 
   //#region to manage flag
   async IsActiveFuntion(det) {
-    let id = det._id;
+    let id = det.data._id;
     // Remove the "id" field from the form controls
-    delete det._id;
-    delete det.eNTDT;
-    delete det.pincode;
+    delete det.data._id;
+    delete det.data.eNTDT;
+    delete det.data.pincode;
     det['mODDT'] = new Date();
     det['mODBY'] = this.storage.userName;
     det['mODLOC'] = this.storage.branch;
@@ -151,7 +151,7 @@ export class ClusterMasterListComponent implements OnInit {
       companyCode: this.companyCode,
       collectionName: "cluster_detail",
       filter: { _id: id },
-      update: det
+      update: det.data
     };
     const res = await firstValueFrom(this.masterService.masterPut('generic/update', req))
     if (res) {
@@ -165,6 +165,9 @@ export class ClusterMasterListComponent implements OnInit {
       this.getClusterDetails();
     }
   }
+  //#endregion
+
+
   functionCallHandler($event) {
     let functionName = $event.functionName;
     try {
@@ -175,15 +178,15 @@ export class ClusterMasterListComponent implements OnInit {
   }
   //#endregion
 
-    //#region to call upload function
-    upload() {
-      const dialogRef = this.dialog.open(this.uploadComponent, {
-        width: "800px",
-        height: "500px",
-      });
-      dialogRef.afterClosed().subscribe(() => {
-        this.getClusterDetails();
-      });
-    }
-    //#endregion
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getClusterDetails();
+    });
+  }
+  //#endregion
 }

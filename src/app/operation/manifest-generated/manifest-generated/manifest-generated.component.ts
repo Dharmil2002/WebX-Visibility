@@ -1,9 +1,9 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import {UntypedFormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { CnoteService } from '../../../core/service/Masters/CnoteService/cnote.service';
 import { ViewPrintComponent } from '../../view-print/view-print.component';
-import { runningNumber } from 'src/app/Utility/date/date-utils';
+import { DocCalledAs, DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { StorageService } from 'src/app/core/service/storage.service';
 @Component({
   selector: 'app-manifest-generated',
@@ -19,12 +19,13 @@ export class ManifestGeneratedComponent implements OnInit {
   manifestgeneratedTableForm: UntypedFormGroup
   manifestControlArray: any;
   orgBranch: string = "";
+  DocCalledAs: DocCalledAsModel;
   columnHeader = {
     "hyperlink": "MF Number",
     "Leg": "Leg",
-    "ShipmentsLoadedBooked": "Shipments- Loaded/Booked",
+    "ShipmentsLoadedBooked": `${DocCalledAs.Docket} Loaded/Booked`,
     "PackagesLoadedBooked": "Packages Loaded/Booked",
-    "WeightKg": "Weight Kg",
+    "WeightKg": "Weight Kg- Loaded/Booked",
     "VolumeCFT": "Volume CFT",
   }
   hyperlinkControls = {
@@ -72,17 +73,16 @@ export class ManifestGeneratedComponent implements OnInit {
     public dialogRef: MatDialogRef<ManifestGeneratedComponent>,
     private cnoteService: CnoteService,
     private storage: StorageService
-    ) {
-      this.orgBranch = this.storage.branch;
+  ) {
+    this.orgBranch = this.storage.branch;
     if (item) {
-      this.mfNo=item?.mfNo||"";
+      this.mfNo = item?.mfNo || "";
       this.menifest = item.loadingSheetData;
       this.getMenifest();
 
     }
   }
   getMenifest() {
-   
     let groupedDataWithoutKey;
     const groupedData = this.menifest.reduce((acc, element) => {
       const leg = element.Leg;
@@ -106,13 +106,19 @@ export class ManifestGeneratedComponent implements OnInit {
     groupedDataWithoutKey = Object.values(groupedData);
     let MeniFestDetails: any[] = [];
     groupedDataWithoutKey.forEach(element => {
-
+      let loadedWt = element.Data.reduce((acc, nestedElement) =>
+        acc + (Array.isArray(nestedElement.Data) ? nestedElement.Data.reduce((innerAcc, innerElement) => innerAcc + innerElement.lDWT, 0) : 0),
+        0);
+      let loadedPkgs = element.Data.reduce((acc, nestedElement) =>
+        acc + (Array.isArray(nestedElement.Data) ? nestedElement.Data.reduce((innerAcc, innerElement) => innerAcc + innerElement.lDPKG, 0) : 0),
+        0);
       let meniFestjson = {
         MFNumber: this.mfNo,
         Leg: element?.Leg || '',
         ShipmentsLoadedBooked: element.ShipmentCount + "/" + element.ShipmentCount,
-        PackagesLoadedBooked: element?.TotalPackages || '' + "/" + element?.TotalPackages || '',
-        WeightKg: element.TotalWeightKg,
+        PackagesLoadedBooked: `${element?.TotalPackages}` + "/" + `${loadedPkgs}`,
+        WeightKg: `${element?.TotalWeightKg}` + "/" + `${loadedWt}`,
+        // loadedPkg:`${element?.TotalPackages}`+"/"+`${loadedPkgs}`,
         VolumeCFT: element.TotalVolumeCFT,
         Action: "Print"
       }
@@ -146,14 +152,14 @@ export class ManifestGeneratedComponent implements OnInit {
     this.dialogRef.close(this.csv)
   }
 
-  viewMFview(event){
-      const req = {
-        DocNo: event.data?.MFNumber,
-        partyCode: "CONSRAJT27",
-        templateName: "Manifest",
-      };
-      const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
-      window.open(url, '', 'width=1000,height=800');
+  viewMFview(event) {
+    const req = {
+      DocNo: event.data?.MFNumber,
+      templateName: "MF",
+      PartyField:"",
+    };
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, '', 'width=1000,height=800');
   }
 
 }

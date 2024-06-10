@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 
 @Component({
   selector: "app-add-account",
@@ -26,6 +27,7 @@ export class AddAccountComponent implements OnInit {
   //     active: "Ledger Master",
   //   },
   // ];
+  isSubmit: boolean = false;
   jsonControlAccountArray: any;
   AccountForm: any;
   GroupCodeCode: any;
@@ -70,9 +72,16 @@ export class AddAccountComponent implements OnInit {
   BalanceSheetStatus: any;
   BalanceSheetCode: any;
   tdsData: any;
-  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
+  breadScrums: {
+    title: string;
+    items: string[];
+    active: string;
+    generatecontrol: boolean;
+    toggle: any;
+  }[];
   constructor(
     private Route: Router,
+    public snackBarUtilityService: SnackBarUtilityService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -86,7 +95,7 @@ export class AddAccountComponent implements OnInit {
         items: ["Home"],
         active: "Ledger Master",
         generatecontrol: true,
-        toggle: false
+        toggle: true,
       },
     ];
     if (this.Route.getCurrentNavigation().extras?.state) {
@@ -98,7 +107,7 @@ export class AddAccountComponent implements OnInit {
           items: ["Home"],
           active: "Ledger Master",
           generatecontrol: true,
-          toggle: this.UpdateData.iSSYS
+          toggle: this.UpdateData.iSSYS,
         },
       ];
       this.FormTitle = "Edit Ledger";
@@ -111,6 +120,9 @@ export class AddAccountComponent implements OnInit {
     this.bindDropdown();
     this.GetTableData();
     this.backPath = "/Masters/AccountMaster/AccountMasterList";
+    if (this.isUpdate) {
+      this.AccountForm.controls["ActiveFlag"].value = this.UpdateData.iSSYS;
+    }
   }
 
   // --Ledger detail Function--
@@ -548,83 +560,110 @@ export class AddAccountComponent implements OnInit {
   }
 
   async save() {
-    const groupCode = this.AccountForm.value.GroupCode.value;
-
-    const commonBody = {
-      aCNM: this.AccountForm.value.AccountDescription,
-      mATCD: this.AccountForm.value.MainCategory.value,
-      mRPNM: this.AccountForm.value.MainCategory.name,
-      gRPCD: this.AccountForm.value.GroupCode.value,
-      gRPNM: this.AccountForm.value.GroupCode.name,
-      cATCD: this.AccountForm.value.AccountCategory.value,
-      cATNM: this.AccountForm.value.AccountCategory.name,
-      bCATCD: this.AccountForm.value.BalanceSheet.value,
-      bCATNM: this.AccountForm.value.BalanceSheet.name,
-      bANCD: this.AccountForm.value.bank.value || "",
-      bANM: this.AccountForm.value.bank.name || "",
-      isTDS: this.AccountForm.value.isTDSapplicable,
-      bSSCH: this.AccountForm.value.bSSCH,
-      iSTRUEPST: this.AccountForm.value.iSTRUEPST,
-      tSEC: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection?.name || ""
-        : "",
-      iSSYS: this.AccountForm.value.ActiveFlag,
-      pARTNM: this.AccountForm.value.PartySelection.name,
-      rHUF: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection?.data?.RateForHUF || ""
-        : "",
-      rOTHER: this.AccountForm.value.isTDSapplicable
-        ? this.AccountForm.value.TDSsection?.data?.RateForOthers || ""
-        : "",
-    };
-    if (!this.isUpdate) {
-
-      const idReq = {
-        companyCode: this.CompanyCode,
-        collectionName: "account_detail",
-        filter: { 
-          cID: this.CompanyCode,
-          gRPCD: commonBody.gRPCD
-        },
-        sorting: { aCCD: -1 },
-      };
-
-      const idRes = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", idReq));
-      const lastId = idRes?.data?.aCCD ?? `${commonBody.gRPCD}000`;
-      const accountcode = nextKeyCode(lastId);
-
-      commonBody["_id"] = `${this.CompanyCode}-${accountcode}`;
-      commonBody["aCCD"] = accountcode;
-      commonBody["cID"] = this.CompanyCode;
-      commonBody["eNTDT"] = new Date();
-      commonBody["eNTLOC"] = this.storage.branch;
-      commonBody["eNTBY"] = this.storage.userName;
-    } else {
-      commonBody["mODDT"] = new Date();
-      commonBody["mODLOC"] = this.storage.branch;
-      commonBody["mODBY"] = this.storage.userName;
-    }
-    const req = {
-      companyCode: this.CompanyCode,
-      collectionName: "account_detail",
-      filter: this.isUpdate ? { aCCD: this.UpdateData.aCCD } : undefined,
-      update: this.isUpdate ? commonBody : undefined,
-      data: this.isUpdate ? undefined : commonBody,
-    };
-
-    const res = this.isUpdate
-      ? await firstValueFrom(this.masterService.masterPut("generic/update", req))
-      : await firstValueFrom(this.masterService.masterPost("generic/create", req));
-
-    if (res.success) {
-      this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: res.message,
-        showConfirmButton: true,
-      });
-    }
+    this.snackBarUtilityService.commonToast(async () => {
+      if (!this.AccountForm.valid || this.isSubmit) {
+        this.AccountForm.markAllAsTouched();
+        Swal.fire({
+          icon: "error",
+          title: "Missing Information",
+          text: "Please ensure all required fields are filled out.",
+          showConfirmButton: true,
+          confirmButtonText: "OK",
+          confirmButtonColor: "#d33",
+          timer: 5000,
+          timerProgressBar: true,
+        });
+        return false;
+      }
+      try {
+        this.isSubmit = true;
+        const groupCode = this.AccountForm.value.GroupCode.value;
+        const commonBody = {
+          aCNM: this.AccountForm.value.AccountDescription,
+          mATCD: this.AccountForm.value.MainCategory.value,
+          mRPNM: this.AccountForm.value.MainCategory.name,
+          gRPCD: this.AccountForm.value.GroupCode.value,
+          gRPNM: this.AccountForm.value.GroupCode.name,
+          cATCD: this.AccountForm.value.AccountCategory.value,
+          cATNM: this.AccountForm.value.AccountCategory.name,
+          bCATCD: this.AccountForm.value.BalanceSheet.value,
+          bCATNM: this.AccountForm.value.BalanceSheet.name,
+          bANCD: this.AccountForm.value.bank.value || "",
+          bANM: this.AccountForm.value.bank.name || "",
+          isTDS: this.AccountForm.value.isTDSapplicable,
+          bSSCH: this.AccountForm.value.bSSCH,
+          iSTRUEPST: this.AccountForm.value.iSTRUEPST,
+          tSEC: this.AccountForm.value.isTDSapplicable
+            ? this.AccountForm.value.TDSsection?.name || ""
+            : "",
+          iSSYS: this.AccountForm.value.ActiveFlag,
+          pARTNM: this.AccountForm.value.PartySelection.name,
+          rHUF: this.AccountForm.value.isTDSapplicable
+            ? this.AccountForm.value.TDSsection?.data?.RateForHUF || ""
+            : "",
+          rOTHER: this.AccountForm.value.isTDSapplicable
+            ? this.AccountForm.value.TDSsection?.data?.RateForOthers || ""
+            : "",
+        };
+        if (!this.isUpdate) {
+          const idReq = {
+            companyCode: this.CompanyCode,
+            collectionName: "account_detail",
+            filter: {
+              cID: this.CompanyCode,
+              gRPCD: commonBody.gRPCD,
+            },
+            sorting: { aCCD: -1 },
+          };
+  
+          const idRes = await firstValueFrom(
+            this.masterService.masterPost("generic/findLastOne", idReq)
+          );
+          const lastId = idRes?.data?.aCCD ?? `${commonBody.gRPCD}000`;
+          const accountcode = nextKeyCode(lastId);
+  
+          commonBody["_id"] = `${this.CompanyCode}-${accountcode}`;
+          commonBody["aCCD"] = accountcode;
+          commonBody["cID"] = this.CompanyCode;
+          commonBody["eNTDT"] = new Date();
+          commonBody["eNTLOC"] = this.storage.branch;
+          commonBody["eNTBY"] = this.storage.userName;
+        } else {
+          commonBody["mODDT"] = new Date();
+          commonBody["mODLOC"] = this.storage.branch;
+          commonBody["mODBY"] = this.storage.userName;
+        }
+  
+        const req = {
+          companyCode: this.CompanyCode,
+          collectionName: "account_detail",
+          filter: this.isUpdate ? { aCCD: this.UpdateData.aCCD } : undefined,
+          update: this.isUpdate ? commonBody : undefined,
+          data: this.isUpdate ? undefined : commonBody,
+        };
+  
+        const res = this.isUpdate
+          ? await firstValueFrom(
+              this.masterService.masterPut("generic/update", req)
+            )
+          : await firstValueFrom(
+              this.masterService.masterPost("generic/create", req)
+            );
+  
+        if (res.success) {
+          this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+        }
+      } catch (error) {
+        console.error("Error saving account", error);
+      }
+      console.log(this.isSubmit);
+    }, "Adding Account Please Wait..!");
   }
 
   cancel() {
@@ -643,6 +682,6 @@ export class AddAccountComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     // console.log("Toggle value :", event);
-    this.AccountForm.controls['ActiveFlag'].setValue(event);
+    this.AccountForm.controls["ActiveFlag"].setValue(event);
   }
 }

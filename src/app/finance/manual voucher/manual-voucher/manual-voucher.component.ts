@@ -190,7 +190,8 @@ export class ManualVoucherComponent implements OnInit {
   VoucherNoFunction(event) {
     const templateBody = {
       DocNo: event.data.vNO,
-      templateName: "Voucher",
+      templateName: "VR",
+      PartyField:""
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

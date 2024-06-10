@@ -36,7 +36,7 @@ export class ContractNonFreightMatrixControl {
         },
 
       },
-      
+
       {
         name: "ChargesBehaviour",
         label: "Charges Behaviour",
@@ -160,6 +160,32 @@ export class ContractNonFreightMatrixControl {
         generatecontrol: true,
         disable: false,
         accessallowed: true,
+      },
+      {
+        name: "capacity",
+        label: "Capacity",
+        placeholder: "Capacity",
+        type: "dropdown",
+        value: isUpdate ? { name: UpdateData.vHCCD, value: UpdateData.vHCNM } : "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Capacity is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
       },
       {
         name: "rateType",

@@ -177,7 +177,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
       const extraData = x.extraData.filter((x) => x.isSelected);
       x.subTotalAmount = calculateTotalField(extraData, 'amount');
       x.gstCharged = ConvertToNumber(calculateTotalField(extraData, 'gst'), 2);
-      x.totalBillingAmount = parseFloat(x.subTotalAmount) + parseFloat(x.gstCharged);
+      x.totalBillingAmount = ConvertToNumber(parseFloat(x.subTotalAmount) + parseFloat(x.gstCharged), 2);
       return x
     })
 
@@ -317,6 +317,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
         .reduce((sum, item) => sum + item.countSelected, 0);
       formGroup.shipmentCount.setValue(selectedShipmentSum);
       const gstCharged = this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.gstCharged, 0);
+      const TotalCustomerBill = this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.totalBillingAmount, 0)
       this.KPICountData = [
         {
           count: this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.countSelected, 0),
@@ -334,7 +335,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
           class: `color-Success-light`,
         },
         {
-          count: this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.totalBillingAmount, 0),
+          count: ConvertToNumber(TotalCustomerBill, 2),
           title: "Total Billing Amount",
           class: `color-Grape-light`,
         },
@@ -350,8 +351,8 @@ export class InvoiceSummaryBillComponent implements OnInit {
     ['SGST', 'CGST', 'UTGST'].forEach(type => {
       this.invoiceSummaryTableForm.controls[type.toLowerCase()].setValue(gstType.includes(type) ? parseFloat(gstCharged) / 2 : 0);
     });
-    this.invoiceSummaryTableForm.controls['invoiceTotal'].setValue(totBillingAmt);
-    this.invoiceSummaryTableForm.controls['finalInvoice'].setValue(totBillingAmt);
+    this.invoiceSummaryTableForm.controls['invoiceTotal'].setValue(ConvertToNumber(totBillingAmt, 2));
+    this.invoiceSummaryTableForm.controls['finalInvoice'].setValue(ConvertToNumber(totBillingAmt, 2));
 
   }
 

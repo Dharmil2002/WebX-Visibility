@@ -13,7 +13,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { FleetControls } from 'src/assets/FormControls/fleet-control';
 import Swal from 'sweetalert2';
-
+import { SnackBarUtilityService } from "../../../Utility/SnackBarUtility.service"
 @Component({
   selector: 'app-add-fleet-master',
   templateUrl: './add-fleet-master.component.html',
@@ -41,6 +41,7 @@ export class AddFleetMasterComponent implements OnInit {
   submit = 'Save';
   imageData: any = {};
   companyCode: number;
+  isSubmit: boolean=false;
 
   constructor(
     private filter: FilterUtils,
@@ -49,7 +50,8 @@ export class AddFleetMasterComponent implements OnInit {
     private masterService: MasterService,
     private dialog: MatDialog,
     private objImageHandling: ImageHandling,
-    private storage: StorageService
+    private storage: StorageService,
+    private snackBarUtilityService: SnackBarUtilityService,
   ) {
     this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
@@ -64,30 +66,17 @@ export class AddFleetMasterComponent implements OnInit {
       this.action = "edit";
     } else {
       this.action = "Add";
-    }
-    if (this.action === "edit") {
-      this.isUpdate = true;
-      this.breadScrums = [
-        {
-          title: "Modify Master",
-          items: ["Masters"],
-          active: "Modify Fleet",
-          generatecontrol: true,
-          toggle: this.fleetTableData.activeFlag
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Fleet Master",
-          items: ["Masters"],
-          active: "Add Fleet",
-          generatecontrol: true,
-          toggle: false
-        },
-      ];
       this.fleetTableData = new fleetModel({});
     }
+    this.breadScrums = [
+      {
+        title: "Fleet Master" ,
+        items: ["Masters"],
+        active:  this.action ==="edit" ? "Modify Fleet" : "Add Fleet",
+        generatecontrol: true,
+        toggle:  this.action ==="edit" ?  this.fleetTableData.activeFlag : true
+      }
+    ];  
   }
 
   ngOnInit(): void {
@@ -172,7 +161,7 @@ export class AddFleetMasterComponent implements OnInit {
   async fetchMasterData(collectionName: string) {
     const req = {
       "companyCode": this.companyCode,
-      "filter": {},
+      "filter": { companyCode: this.companyCode},
       "collectionName": collectionName,
     };
     const res = await this.masterService.masterPost('generic/get', req).toPromise();
@@ -221,100 +210,124 @@ export class AddFleetMasterComponent implements OnInit {
 
   //#region Function for save data
   async save() {
-    const commonBody = {
-      vehicleNo: this.fleetTableForm.value.vehicleNo.value,
-      vehicleTypeNM: this.fleetTableForm.value.vehicleType.name,
-      vehicleType: this.fleetTableForm.value.vehicleType.value,
-      RCBookNo: this.fleetTableForm.value.RCBookNo,
-      registrationNo: this.fleetTableForm.value.registrationNo,
-      RegistrationDate: this.fleetTableForm.value.RegistrationDate,
-      vehicleInsurancePolicy: this.fleetTableForm.value.vehicleInsurancePolicy,
-      insuranceProvider: this.fleetTableForm.value.insuranceProvider,
-      insuranceExpiryDate: this.fleetTableForm.value.insuranceExpiryDate,
-      fitnessValidityDate: this.fleetTableForm.value.fitnessValidityDate,
-      chassisNo: this.fleetTableForm.value.chassisNo,
-      engineNo: this.fleetTableForm.value.engineNo,
-      activeFlag: this.fleetTableForm.value.activeFlag,
-      _id: this.fleetTableForm.value.vehicleNo.name,
-      cID: this.storage.companyCode,
-      eNTBY: this.storage.userName,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch,
-      mODDT: new Date(),
-      mODBY: this.storage.userName,
-      mODLOC: this.storage.branch,
+    if (!this.fleetTableForm.valid || this.isSubmit ) {
+      this.fleetTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
+      });
+      return false;
     }
-
-    // const controls = this.fleetTableForm;
-    // clearValidatorsAndValidate(controls);
-    // // Correct way to set values in form controls
-    // this.fleetTableForm.get('vehicleNo').setValue(this.fleetTableForm.value.vehicleNo.value);
-    // this.fleetTableForm.get('vehicleType').setValue(this.fleetTableForm.value.vehicleType.value);
-
-    // // Define an array of control names
-    const imageControlNames = ['fitnesscertificateScan', 'insuranceScan', 'registrationScan'];
-    // let data = { ...this.fleetTableForm.value };
-
-    imageControlNames.forEach(controlName => {
-      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
-
-      // Set the URL in the corresponding control name
-      commonBody[controlName] = file;
-    });
-
-    if (this.isUpdate) {
-      let id = this.fleetTableData._id;
-      // Remove the "id" field from the form controls
-      delete commonBody._id;
-      delete commonBody.eNTDT
-      delete commonBody.eNTBY
-      delete commonBody.eNTLOC
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "fleet_master",
-        filter: { _id: id },
-        update: commonBody,
-      };
-
-      //API FOR UPDATE
-      const res = await this.masterService
-        .masterPut("generic/update", req)
-        .toPromise();
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.route.navigateByUrl("/Masters/FleetMaster/FleetMasterList");
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+      this.isSubmit=true
+      const commonBody = {
+        vehicleNo: this.fleetTableForm.value.vehicleNo.value,
+        vehicleTypeNM: this.fleetTableForm.value.vehicleType.name,
+        vehicleType: this.fleetTableForm.value.vehicleType.value,
+        RCBookNo: this.fleetTableForm.value.RCBookNo,
+        registrationNo: this.fleetTableForm.value.registrationNo,
+        RegistrationDate: this.fleetTableForm.value.RegistrationDate,
+        vehicleInsurancePolicy: this.fleetTableForm.value.vehicleInsurancePolicy,
+        insuranceProvider: this.fleetTableForm.value.insuranceProvider,
+        insuranceExpiryDate: this.fleetTableForm.value.insuranceExpiryDate,
+        fitnessValidityDate: this.fleetTableForm.value.fitnessValidityDate,
+        chassisNo: this.fleetTableForm.value.chassisNo,
+        engineNo: this.fleetTableForm.value.engineNo,
+        activeFlag: this.fleetTableForm.value.activeFlag,
+        _id: this.fleetTableForm.value.vehicleNo.name,
+        cID: this.storage.companyCode,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODDT: new Date(),
+        mODBY: this.storage.userName,
+        mODLOC: this.storage.branch,
       }
-    } else 
-    {
-      // commonBody._id = this.fleetTableForm.value.vehicleNo;
-      delete commonBody.mODBY
-      delete commonBody.mODDT
-      delete commonBody.mODLOC
-      //API FOR ADD
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "fleet_master",
-        data: commonBody,
-      };
-      const res = await this.masterService
-        .masterPost("generic/create", req)
-        .toPromise();
-      if (res) {
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.route.navigateByUrl("/Masters/FleetMaster/FleetMasterList");
+  
+      // const controls = this.fleetTableForm;
+      // clearValidatorsAndValidate(controls);
+      // // Correct way to set values in form controls
+      // this.fleetTableForm.get('vehicleNo').setValue(this.fleetTableForm.value.vehicleNo.value);
+      // this.fleetTableForm.get('vehicleType').setValue(this.fleetTableForm.value.vehicleType.value);
+  
+      // // Define an array of control names
+      const imageControlNames = ['fitnesscertificateScan', 'insuranceScan', 'registrationScan'];
+      // let data = { ...this.fleetTableForm.value };
+  
+      imageControlNames.forEach(controlName => {
+        const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+  
+        // Set the URL in the corresponding control name
+        commonBody[controlName] = file;
+      });
+  
+      if (this.isUpdate) {
+        let id = this.fleetTableData._id;        
+        // Remove the "id" field from the form controls
+        delete commonBody._id;
+        delete commonBody.eNTDT
+        delete commonBody.eNTBY
+        delete commonBody.eNTLOC
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "fleet_master",
+          filter: { _id: id },
+          update: commonBody,
+        };
+  
+        //API FOR UPDATE
+        const res = await this.masterService
+          .masterPut("generic/update", req)
+          .toPromise();
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl("/Masters/FleetMaster/FleetMasterList");
+        }
+      } else 
+      {
+        // commonBody._id = this.fleetTableForm.value.vehicleNo;
+        delete commonBody.mODBY
+        delete commonBody.mODDT
+        delete commonBody.mODLOC
+        //API FOR ADD
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "fleet_master",
+          data: commonBody,
+          filter:{}
+        };
+        const res = await this.masterService
+          .masterPost("generic/create", req)
+          .toPromise();
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl("/Masters/FleetMaster/FleetMasterList");
+        }
       }
-    }
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", error.message);
+      }
+    }, "Saving Fleet Master..!");
+     
   }
   //#endregion
 

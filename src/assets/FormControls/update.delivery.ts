@@ -51,20 +51,50 @@ export class UpdateShipmentDeliveryControl {
                 generatecontrol: true, disable: true
             },
             {
+                name:'bookWeight',
+                label:'Book Weight',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: true, disable: true
+            },
+            {
                 name: 'arrivedPkgs',
                 label: 'Arrived Pkgs',
                 placeholder: '',
                 type: 'number',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
+            },
+            {
+                name: 'arrivedWeight',
+                label: 'Arrived Weight',
+                placeholder: '',
+                type: 'number',
+                value: '',
+                Validations: [],
+                generatecontrol: true, disable: true
             },
             {
                 name: 'deliveryPkgs',
                 label: 'Delivery Pkgs',
                 placeholder: '',
                 type: 'number',
-                value: '',
+                value:0,
+                Validations: [],
+                functions:{
+                    onChange:"deliveryPkgsChange"
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'deliveryWeight',
+                label: 'Delivery Weight',
+                placeholder: '',
+                type: 'number',
+                value:0,
                 Validations: [],
                 functions:{
                     onChange:"deliveryPkgsChange"

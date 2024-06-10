@@ -450,10 +450,10 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VendorBillTaxationGSTFilterForm.controls.GSTAmount.value
       ) || 0;
 
-    const CalculatedSumWithTDS = Total - parseFloat(TDSAmount.toFixed(2));
-    const CalculatedSum =
-      CalculatedSumWithTDS + parseFloat(GSTAmount.toFixed(2));
-    const formattedCalculatedSum = CalculatedSum.toFixed(2);
+    const CalculatedSum = Total + parseFloat(GSTAmount.toFixed(2));
+    const CalculatedSumWithTDS = CalculatedSum - parseFloat(TDSAmount.toFixed(2));
+
+    const formattedCalculatedSum = CalculatedSumWithTDS.toFixed(2);
 
     this.TotalAmountList.forEach((x) => {
       if (x.title == "Balance Pending") {
@@ -475,7 +475,9 @@ export class GeneralBillDetailComponent implements OnInit {
       const IsStateTypeUT =
         this.AllStateList.find((item) => item.STNM === Vendorbillstate.name)
           .ISUT == true;
-      const GSTAmount = this.TotalAmountList.find((x) => x.title == "Total Amount").count;
+      // calculate GSTAmount on TableData
+      const GSTAmount = this.tableData.reduce((sum, x) => sum + parseFloat(x.Amount), 0);
+      //const GSTAmount = this.TotalAmountList.find((x) => x.title == "Total Amount").count;
       const GSTdata = { GSTAmount, GSTRate: SACcode.GSTRT };
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {

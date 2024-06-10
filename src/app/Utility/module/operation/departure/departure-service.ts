@@ -54,7 +54,7 @@ export class DepartureService {
       const adHocDetails = formatDetails(adHoc, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Create Trip' });
       return [...departureDetails, ...routeDetails, ...adHocDetails];
     } catch (error) {
-      console.error('Error fetching route schedule:', error);
+      console.error('Error  fetching route schedule:', error);
       throw error; // Re-throw the error to handle it further up the chain
     }
   }
@@ -127,11 +127,11 @@ export class DepartureService {
         "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
         "aDV": {
           "aAMT": ConvertToNumber(data?.Advance || 0, 2),
-          "pCASH": ConvertToNumber(data?.PaidByCash || 0, 2),
-          "pBANK": ConvertToNumber(data?.PaidbyBank || 0, 2),
-          "pFUEL": ConvertToNumber(data?.PaidbyFuel || 0, 2),
-          "pCARD": ConvertToNumber(data?.PaidbyCard || 0, 2),
-          "tOTAMT": ConvertToNumber(data?.TotalAdv || 0, 2)
+          "pCASH":0,
+          "pBANK":0,
+          "pFUEL":0,
+          "pCARD":0,
+          "tOTAMT":ConvertToNumber(data?.Advance || 0, 2)
         },
         "bALAMT": data?.BalanceAmt || 0,
         "aDPAYAT": data?.advPdAt?.value || "",

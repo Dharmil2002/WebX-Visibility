@@ -29,7 +29,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 interface CurrentAccessListType {
   productAccess: string[];
 }
-const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "AR"];
+const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "AR", "LOC"];
 @Component({
   selector: "app-customer-contract-freight-matrix",
   templateUrl: "./customer-contract-freight-matrix.component.html",
@@ -349,6 +349,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         this.StateList,
         "ST",
         this.masterService,
+        true,
         true
       );
     } catch (error) {

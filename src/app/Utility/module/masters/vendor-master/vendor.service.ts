@@ -9,7 +9,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 })
 export class VendorService {
 
-  constructor(private masterService: MasterService, private storage: StorageService,private filter: FilterUtils,) { }
+  constructor(private masterService: MasterService, private storage: StorageService, private filter: FilterUtils,) { }
   async getVendorDetail(filter) {
     // Prepare the request object
     const request = {
@@ -79,5 +79,25 @@ export class VendorService {
     } catch (error) {
       // Handle any errors that may occur during the asynchronous operation
     }
+  }
+  async getVendors(filter, project = null): Promise<any | null> {
+
+    let filters = [];
+    filters.push({
+      D$match: filter
+    });
+
+    if (project) {
+      filters.push({ 'D$project': project });
+    }
+
+    const reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: 'vendor_detail',
+      filters: filters
+    };
+
+    var res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+    return res?.data || [];
   }
 }

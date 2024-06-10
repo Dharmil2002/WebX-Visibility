@@ -29,15 +29,74 @@ export class UserMasterListComponent implements OnInit {
             active: "User Master",
         },
     ];
-    columnHeader = {
-        "eNTDT": "Created Date",
-        "userId": "User Code",
-        "name": "User Name",
-        "multiLocation": "Locations",
-        "role": "User Role",
-        "isActive": "Active Flag",
-        "actions": "Action"
-    };
+    // columnHeader = {
+    //     "eNTDT": "Created Date",
+    //     "userId": "User Code",
+    //     "name": "User Name",
+    //     "multiLocation": "Locations",
+    //     "role": "User Role",
+    //     "isActive": "Active Flag",
+    //     "actions": "Action"
+    // };
+
+        columnHeader = {
+            eNTDT: {
+              Title: "Created Date",
+              class: "matcolumnleft",
+              Style: "min-width:200px",
+              sticky: true,
+            
+            },
+            userId: {
+              Title: "User Code",
+              class: "matcolumnleft",
+              Style: "min-width:100px",
+              sticky: true,
+         
+            },
+            name: {
+              Title: "User Name",
+              class: "matcolumnleft",
+              Style: "min-width:150px",
+              sticky: true,
+              
+            },
+            multiLocation: {
+              Title: "Locations",
+              class: "matcolumnleft",
+              Style: "max-width:300px ",
+            
+            },
+            role: {
+              Title: "User Role",
+              class: "matcolumnleft",
+              Style: "min-width:100px",
+           
+            },
+            isActive: {
+              Title: "Active Status",
+              class: "matcolumncenter",
+              Style: "min-width:100px",
+           
+            },
+            actions: {
+              Title: "Action",
+              class: "matcolumncenter",
+              Style: "min-width:100px",
+              stickyEnd: true
+            }
+        
+            // "Route": "Route",
+            // "VehicleNo": "Veh No",
+            // "TripID": "Trip ID",
+            // "Location": "Location",
+            // "Scheduled": "STA",
+            // "Expected": "ETA",
+            // "Status": "Status",
+            // "Hrs": "Hrs.",
+            // "Action": "Action"
+          }
+    
     headerForCsv = {
         // "internalId": 'InternalID',
         "userId": 'UserId',

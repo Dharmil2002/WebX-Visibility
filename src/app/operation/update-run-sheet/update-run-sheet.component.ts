@@ -2,20 +2,21 @@ import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@an
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { UpdateloadingRunControl } from '../../../assets/FormControls/UpdateRunsheet';
 import Swal from 'sweetalert2';
 import { RunSheetService } from 'src/app/Utility/module/operation/runsheet/runsheet.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import { RunSheet } from 'src/app/Models/Run-sheet/run-sheet';
 
 @Component({
   selector: 'app-update-run-sheet',
   templateUrl: './update-run-sheet.component.html'
 })
+
 export class UpdateRunSheetComponent implements OnInit {
-  jsonUrl = '../../../assets/data/create-runsheet-data.json'
   tableload = true;
   csv: any[];
   branch = "";
@@ -24,9 +25,12 @@ export class UpdateRunSheetComponent implements OnInit {
   scanPackage: string;
   scanMessage: string = '';
   tabledata: any;
+  isScan: boolean = true;
   backPath: string;
+  containerWidth = '50%';
   updateSheetTableForm: UntypedFormGroup
   UpdaterunControlArray: any;
+  selectAllRequired: boolean = true;
   centerAlignedData = ['packages', 'loaded', 'pending'];
   columnHeader = {
     shipment: {
@@ -82,15 +86,24 @@ export class UpdateRunSheetComponent implements OnInit {
   updateRunSheetData: any;
   Scan: any;
   packageList: any;
+  menuItemflag: boolean = true;
+  rules: any;
+  metaData: { checkBoxRequired: boolean; noColumnSort: string[]; };
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private cdr: ChangeDetectorRef,
     private runSheetService: RunSheetService,
+    private controlPanel: ControlPanelService,
     private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private definition: RunSheet
   ) {
+    this.metaData = {
+      checkBoxRequired: true,
+      noColumnSort: Object.keys(this.definition.columnHeader),
+    }
     this.branch = this.storage.branch;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -112,18 +125,34 @@ export class UpdateRunSheetComponent implements OnInit {
     this.getShipmentData();
   }
   async getShipmentData() {
-    const res = await this.runSheetService.drsShipmentDetails({ cID: this.storage.companyCode, dRSNO: this.tripData.columnData.RunSheet });
+    const res = await this.runSheetService.drsShipmentDetails(this.tripData.columnData.RunSheet);
     const dktNo = res?.map((x) => x.dKTNO);
     this.packageList = await this.runSheetService.drsShipmetPkgs({ cID: this.storage.companyCode, dKTNO: { "D$in": dktNo }, sFX: 0 });
     const shipmentData = await this.runSheetService.FieldMappingRunSheetdkts(res);
     this.csv = shipmentData;
     this.tableload = false;
-    this.kpiData("")
+    this.kpiData()
   }
   ngOnInit(): void {
     this.backPath = "/dashboard/Index";
   }
-  kpiData(event) {
+  async getRules() {
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "Scanning",
+      aCTIVE: true
+    }
+    const res = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.rules = res;
+      this.checkDocketRules();
+    }
+
+  }
+  checkDocketRules() {
+    this.isScan = this.rules.find(x => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y" ? true : false;
+  }
+  kpiData() {
     let packages = 0;
     let shipingloaded = 0;
     this.csv.forEach((element, index) => {
@@ -135,12 +164,13 @@ export class UpdateRunSheetComponent implements OnInit {
       title,
       class: `info-box7 ${className} order-info-box7`
     });
-
+   const selected= this.csv.filter((x)=>x.isSelected);
+    const pkgs = selected.length > 0 ? selected.reduce((x, y) => x + y.packages, 0) : 0;
     const shipData = [
       createShipDataObject(this.csv.length, "Shipments", "bg-c-Bottle-light"),
       createShipDataObject(packages, "Packages", "bg-c-Grape-light"),
-      createShipDataObject(event?.shipment || 0, "Shipments Loaded", "bg-c-Daisy-light"),
-      createShipDataObject(event?.Package || 0, "Packages Loaded", "bg-c-Grape-light"),
+      createShipDataObject(selected.length || 0, "Shipments Loaded", "bg-c-Daisy-light"),
+      createShipDataObject(pkgs || 0, "Packages Loaded", "bg-c-Grape-light"),
     ];
 
     this.boxData = shipData;
@@ -152,7 +182,8 @@ export class UpdateRunSheetComponent implements OnInit {
     this.updateRunSheetData = this.UpdaterunControlArray.filter((x) => x.name != "Scan");
     // Get only the "Scan" control
     this.Scan = this.UpdaterunControlArray.filter((x) => x.name == "Scan");
-    this.updateSheetTableForm = formGroupBuilder(this.fb, [this.UpdaterunControlArray])
+    this.updateSheetTableForm = formGroupBuilder(this.fb, [this.UpdaterunControlArray]);
+    this.getRules();
   }
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -175,7 +206,7 @@ export class UpdateRunSheetComponent implements OnInit {
     let packageChecked = false;
     const exists = this.csv.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
-      packageChecked = this.csv.every(obj => obj.packages === obj.loaded);
+      packageChecked = this.csv.some(obj => obj.packages === obj.loaded);
     }
     if (packageChecked) {
       await this.DepartDelivery();
@@ -204,7 +235,7 @@ export class UpdateRunSheetComponent implements OnInit {
         }
         else {
           this.scanMessage = '';
-          this.kpiData(loading);
+          this.kpiData();
         }
       }
       this.cdr.detectChanges(); // Trigger change detection
@@ -223,7 +254,7 @@ export class UpdateRunSheetComponent implements OnInit {
   }
   async DepartDelivery() {
     this.snackBarUtilityService.commonToast(async () => {
-      const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList);
+      const res = await this.runSheetService.UpdateRunSheet(this.updateSheetTableForm.value, this.csv, this.packageList,this.isScan);
       Swal.fire({
         icon: "success",
         title: "RunSheet Update Successfully",
@@ -231,11 +262,31 @@ export class UpdateRunSheetComponent implements OnInit {
         showConfirmButton: true,
       })
       this.goBack('Delivery');
-    },"RunSheet Departure Successfully");
-   
-  
+    }, "RunSheet Departure Successfully");
+
+
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
+  /*below is the code for the non-scanning block*/
+  OnLoading() {
+    if (this.csv && this.csv.length > 0) {
+      this.csv.forEach(element => {
+        if (element.isSelected) {
+          element.loaded = element.packages;
+          element.pending = 0;
+        }
+        else{
+          element.pending = element.packages;
+          element.loaded = 0;
+        }
+      });
+    }
+    this.tableload=true;
+    this.tableload=false;
+    this.cdr?.detectChanges();
+    this.kpiData();
+  }
+  /*End*/
 }

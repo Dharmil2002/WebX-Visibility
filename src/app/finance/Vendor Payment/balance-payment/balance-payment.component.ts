@@ -635,8 +635,8 @@ export class BalancePaymentComponent implements OnInit {
   BalanceUnbilledFunction(event) {
     const templateBody = {
       DocNo: event.data.THC,
-      partyCode: "CONSRAJ19",
-      templateName: "thc",
+      PartyField: "",
+      templateName: "THC",
     };
     const url = `${window.location.origin
       }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
@@ -868,6 +868,9 @@ export class BalancePaymentComponent implements OnInit {
       const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
       const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
       const RoundOffAmount = NetPayable - PaymentAmount;
+      let dUEDT = new Date();
+      let currentDate = new Date();
+      dUEDT.setDate(currentDate.getDate() + 7);
       this.snackBarUtilityService.commonToast(async () => {
         try {
           const vendorBillEntry: VendorBillEntry = {
@@ -881,8 +884,9 @@ export class BalancePaymentComponent implements OnInit {
               bDT: new Date(),
               tMOD: this.BillPaymentData?.Mode || "",
               lOC: this.VendorDetails?.vendorCity,
-              sT: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
-              gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.VGSTNumber.value,
+              sT: this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.value?.value,
+              sTNM: this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.value?.name,
+              gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.value,
               tHCAMT: this.THCamount,
               aDVAMT: this.AdvanceTotal,
               bALAMT: NetPayable,
@@ -890,6 +894,10 @@ export class BalancePaymentComponent implements OnInit {
               bALPBAMT: generateDebitVoucher == true ? 0 : NetPayable,
               bSTAT: generateDebitVoucher == true ? 3 : 1,
               bSTATNM: generateDebitVoucher == true ? "Paid" : "Awaiting Approval",
+              dOCTYP: "Transaction",
+              dOCCD: "T",
+              dUEDT: dUEDT,
+              mANNUM: "",
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
@@ -901,8 +909,9 @@ export class BalancePaymentComponent implements OnInit {
                 mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
                 eML: this.VendorDetails?.emailId,
                 gSTREG: this.VendorBalanceTaxationGSTFilterForm.controls.VendorGSTRegistered.value,
-                sT: this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.value?.value,
-                gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.value,
+                sT: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
+                sTNM: this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.name,
+                gSTIN: this.VendorBalanceTaxationGSTFilterForm.controls.VGSTNumber.value
               },
               tDS: {
                 eXMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted,
@@ -987,7 +996,8 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherDataRequestModel.preperedFor = "Vendor";
         this.VoucherDataRequestModel.partyCode = this.tableData[0].OthersData?.vND?.cD || "";
         this.VoucherDataRequestModel.partyName = this.tableData[0].OthersData?.vND?.nM || "";
-        this.VoucherDataRequestModel.partyState = this.VendorDetails?.vendorState;
+        this.VoucherDataRequestModel.partyState = this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.name || "";
+        this.VoucherDataRequestModel.paymentState = this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.value?.name || "";
         this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
         this.VoucherDataRequestModel.panNo = this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
@@ -1034,7 +1044,6 @@ export class BalancePaymentComponent implements OnInit {
           if (generateDebitVoucher) {
             this.SubmitDebitVoucherData(PaymenDetails, BillNo)
           } else {
-
             Swal.fire({
               icon: "success",
               title: "Bill Generated Successfully",
@@ -1096,6 +1105,7 @@ export class BalancePaymentComponent implements OnInit {
             };
             firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then((res: any) => {
               if (res) {
+                this.voucherServicesService.UpdateVoucherNumbersInVendBillSummary(BillNo, reqBody.voucherNo);
                 if (generateDebitVoucher) {
                   this.SubmitDebitVoucherData(PaymenDetails, BillNo)
                 } else {
@@ -1256,6 +1266,7 @@ export class BalancePaymentComponent implements OnInit {
           };
           firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then((res: any) => {
             if (res) {
+              this.voucherServicesService.UpdateVoucherNumbersInVendBillSummary(BillNo, reqBody.voucherNo);
               this.DoVendorBillPayment(BillNo, reqBody.voucherNo, PaymenDetails)
             }
           });

@@ -58,9 +58,9 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   CustomerGeneralInvoiceForm: UntypedFormGroup;
   jsonControlCustomerGeneralInvoiceArray: any;
 
-  CustomerGeneralInvoiceTaxationTDSFilterForm: UntypedFormGroup;
-  jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray: any;
-  AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray: any;
+  // CustomerGeneralInvoiceTaxationTDSFilterForm: UntypedFormGroup;
+  // jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray: any;
+  // AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray: any;
 
   CustomerGeneralInvoiceTaxationGSTFilterForm: UntypedFormGroup;
   jsonControlCustomerGeneralInvoiceTaxationGSTFilterArray: any;
@@ -164,7 +164,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl();
     this.BindDataFromApi();
-    this.getTDSSectionDropdown();
+    //  this.getTDSSectionDropdown();
     this.CalculatePaymentAmount();
   }
   initializeFormControl() {
@@ -176,13 +176,13 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
     ]);
 
 
-    this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
-      this.CustomerGeneralInvoiceControl.getCustomerGeneralInvoiceTaxationTDSArrayControls();
-    this.AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
-      this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray;
-    this.CustomerGeneralInvoiceTaxationTDSFilterForm = formGroupBuilder(this.fb, [
-      this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray,
-    ]);
+    // this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
+    //   this.CustomerGeneralInvoiceControl.getCustomerGeneralInvoiceTaxationTDSArrayControls();
+    // this.AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
+    //   this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray;
+    // this.CustomerGeneralInvoiceTaxationTDSFilterForm = formGroupBuilder(this.fb, [
+    //   this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray,
+    // ]);
 
     this.AlljsonControlCustomerGeneralInvoiceTaxationGSTFilterArray =
       this.CustomerGeneralInvoiceControl.getCustomerGeneralInvoiceTaxationGSTArrayControls();
@@ -333,91 +333,91 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
       this.CalculatePaymentAmount();
     });
   }
-  toggleTDSExempted() {
-    const TDSExemptedValue =
-      this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSExempted;
+  // toggleTDSExempted() {
+  //   const TDSExemptedValue =
+  //     this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSExempted;
 
-    if (TDSExemptedValue) {
-      this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
-        this.AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray.filter(
-          (x) => x.name == "TDSExempted"
-        );
-      const TDSSection = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSSection");
-      TDSSection.setValue("");
-      TDSSection.clearValidators();
-      const TDSRate = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSRate");
-      TDSRate.setValue("");
-      TDSRate.clearValidators();
-      const TDSAmount = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSAmount");
-      TDSAmount.setValue("");
-      TDSAmount.clearValidators();
-      TDSAmount.updateValueAndValidity();
-    } else {
-      this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
-        this.AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray;
-      const TDSSection = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSSection");
-      TDSSection.setValidators([
-        Validators.required,
-        autocompleteObjectValidator(),
-      ]);
-      const TDSRate = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSRate");
-      TDSRate.setValidators([Validators.required]);
-      const TDSAmount = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSAmount");
-      TDSAmount.setValidators([Validators.required]);
-      TDSAmount.updateValueAndValidity();
-      this.getTDSSectionDropdown();
-    }
-  }
-  async getTDSSectionDropdown() {
-    let Accountinglocation = this.storage.branch;
-    let responseFromAPITDS = await GetAccountDetailFromApi(
-      this.masterService,
-      "TDS",
-      Accountinglocation
-    );
-    //this.TDSdata = responseFromAPITDS;
-    this.filter.Filter(
-      this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray,
-      this.CustomerGeneralInvoiceTaxationTDSFilterForm,
-      responseFromAPITDS,
-      "TDSSection",
-      false
-    );
-  }
-  TDSSectionFieldChanged() {
-    if (this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSSection.value) {
-      const TDSrate =
-        this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSSection?.rOTHER || 0;
-      const TotalTHCamount = this.tableData.reduce(
-        (sum, x) => sum + parseFloat(x.Amount),
-        0
-      );
-      const TDSamount = ((TDSrate * TotalTHCamount) / 100 || 0).toFixed(2);
-      this.CustomerGeneralInvoiceTaxationTDSFilterForm.controls["TDSRate"].setValue(
-        TDSrate
-      );
-      this.CustomerGeneralInvoiceTaxationTDSFilterForm.controls["TDSAmount"].setValue(
-        TDSamount
-      );
-      this.CalculatePaymentAmount();
-    }
-  }
+  //   if (TDSExemptedValue) {
+  //     this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
+  //       this.AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray.filter(
+  //         (x) => x.name == "TDSExempted"
+  //       );
+  //     const TDSSection = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSSection");
+  //     TDSSection.setValue("");
+  //     TDSSection.clearValidators();
+  //     const TDSRate = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSRate");
+  //     TDSRate.setValue("");
+  //     TDSRate.clearValidators();
+  //     const TDSAmount = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSAmount");
+  //     TDSAmount.setValue("");
+  //     TDSAmount.clearValidators();
+  //     TDSAmount.updateValueAndValidity();
+  //   } else {
+  //     this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray =
+  //       this.AlljsonControlCustomerGeneralInvoiceTaxationTDSFilterArray;
+  //     const TDSSection = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSSection");
+  //     TDSSection.setValidators([
+  //       Validators.required,
+  //       autocompleteObjectValidator(),
+  //     ]);
+  //     const TDSRate = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSRate");
+  //     TDSRate.setValidators([Validators.required]);
+  //     const TDSAmount = this.CustomerGeneralInvoiceTaxationTDSFilterForm.get("TDSAmount");
+  //     TDSAmount.setValidators([Validators.required]);
+  //     TDSAmount.updateValueAndValidity();
+  //     this.getTDSSectionDropdown();
+  //   }
+  // }
+  // async getTDSSectionDropdown() {
+  //   let Accountinglocation = this.storage.branch;
+  //   let responseFromAPITDS = await GetAccountDetailFromApi(
+  //     this.masterService,
+  //     "TDS",
+  //     Accountinglocation
+  //   );
+  //   //this.TDSdata = responseFromAPITDS;
+  //   this.filter.Filter(
+  //     this.jsonControlCustomerGeneralInvoiceTaxationTDSFilterArray,
+  //     this.CustomerGeneralInvoiceTaxationTDSFilterForm,
+  //     responseFromAPITDS,
+  //     "TDSSection",
+  //     false
+  //   );
+  // }
+  // TDSSectionFieldChanged() {
+  //   if (this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSSection.value) {
+  //     const TDSrate =
+  //       this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSSection?.rOTHER || 0;
+  //     const TotalTHCamount = this.tableData.reduce(
+  //       (sum, x) => sum + parseFloat(x.Amount),
+  //       0
+  //     );
+  //     const TDSamount = ((TDSrate * TotalTHCamount) / 100 || 0).toFixed(2);
+  //     this.CustomerGeneralInvoiceTaxationTDSFilterForm.controls["TDSRate"].setValue(
+  //       TDSrate
+  //     );
+  //     this.CustomerGeneralInvoiceTaxationTDSFilterForm.controls["TDSAmount"].setValue(
+  //       TDSamount
+  //     );
+  //     this.CalculatePaymentAmount();
+  //   }
+  // }
   CalculatePaymentAmount() {
     const Total = this.tableData.reduce(
       (sum, x) => sum + parseFloat(x.Amount),
       0
     );
 
-    let TDSAmount =
-      parseFloat(
-        this.CustomerGeneralInvoiceTaxationTDSFilterForm.controls.TDSAmount.value
-      ) || 0;
+    // let TDSAmount =
+    //   parseFloat(
+    //     this.CustomerGeneralInvoiceTaxationTDSFilterForm.controls.TDSAmount.value
+    //   ) || 0;
     let GSTAmount =
       parseFloat(
         this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls.GSTAmount.value
       ) || 0;
 
-    const CalculatedSumWithTDS = Total - parseFloat(TDSAmount.toFixed(2));
+    const CalculatedSumWithTDS = Total //- parseFloat(TDSAmount.toFixed(2));
     const CalculatedSum =
       CalculatedSumWithTDS + parseFloat(GSTAmount.toFixed(2));
     const formattedCalculatedSum = CalculatedSum.toFixed(2);
@@ -572,9 +572,9 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   isFormValid() {
     let isValid = this.CustomerGeneralInvoiceForm.valid && this.tableData.length > 0;
 
-    if (!this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSExempted) {
-      isValid = isValid && this.CustomerGeneralInvoiceTaxationTDSFilterForm.valid;
-    }
+    // if (!this.CustomerGeneralInvoiceTaxationTDSFilterForm.value.TDSExempted) {
+    //   isValid = isValid && this.CustomerGeneralInvoiceTaxationTDSFilterForm.valid;
+    // }
     if (this.CustomerGeneralInvoiceTaxationGSTFilterForm.value.CustomerGSTRegistered) {
       isValid = isValid && this.CustomerGeneralInvoiceTaxationGSTFilterForm.valid;
     }
@@ -636,12 +636,14 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
         "cID": this.storage.companyCode,
         "companyCode": this.storage.companyCode,
         "dOCTYP": "General",
+        "dOCCD": "G",
         "bUSVRT": "",
         "bILLNO": "",
         "bGNDT": this.CustomerGeneralInvoiceForm.value.CustomerBillDate || new Date(),
         "bDUEDT": this.CustomerGeneralInvoiceForm.value.DueDate || new Date(),
         "bLOC": this.storage.branch,
         "pAYBAS": "",
+        "tRNMODE": "",
         "bSTS": CustomerBillStatus.Generated,
         "bSTSNM": CustomerBillStatus[CustomerBillStatus.Generated],
         "bSTSDT": new Date(),
@@ -673,7 +675,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
           "eML": this.CustomerDetails?.Customer_Emails || "",
           "cT": this.CustomerDetails?.city || "",
           "sT": this.CustomerDetails?.state || "",
-          "gSTIN": this.CustomerDetails?.GSTdetails[0].gstNo || "",
+          "gSTIN": this.CustomerDetails?.GSTdetails ? this.CustomerDetails?.GSTdetails?.[0]?.gstNo : "",
           "cGCD": custGroup?.groupCode || "",
           "cGNM": custGroup?.groupName || "",
         },

@@ -6,7 +6,7 @@ export class AdviceAcknowledgeControl {
     this.AdviceAcknowledgeFilter = [
       {
         name: "StartDate",
-        label: "SelectDateRange",
+        label: "Date Range",
         placeholder: "Select Date",
         type: "daterangpicker",
         value: FormValues?.StartDate,

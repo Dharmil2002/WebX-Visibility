@@ -70,11 +70,12 @@ export class ShardProductAddComponent implements OnInit {
     const LastCode = resVendor.data?.product_id || "PR0000";
     const code = nextKeyCode(LastCode);
     const Body = {
-      _id: code,
+      _id: `${this.companyCode}-${code}`,
       product_name: this.ProductShardTableForm.value.ProductName,
+      companyCode:this.companyCode,
       product_id: code,
-      updatedDate: new Date(),
-      updatedBy: this.storage.userName,
+      entryDate: new Date(),
+      entryBy: this.storage.userName,
     };
     const req = {
       companyCode: this.companyCode,

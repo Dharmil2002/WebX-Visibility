@@ -15,31 +15,76 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 export class LocationMasterComponent implements OnInit {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["activeFlag"]
-  linkArray = []
   companyCode: any = 0;
   columnHeader = {
-    'eNTDT': 'Created Date',
-    'locCode': 'Code',
-    'locName': 'Name',
-    'ownership': 'Ownership',
-    'reportLoc': 'Report To',
-    'locCity': 'City',
-    'locPincode': 'Pincode',
-    "activeFlag": "Active",
-    "actions": "Actions"
+    eNTDT: {
+      Title: "Created Date",
+      class: "matcolumncenter",
+      Style: "max-width: 50%",
+    },
+    locCode: {
+      Title: "Code",
+      class: "matcolumnleft",
+      Style: "max-width:10%",
+    },
+    locName: {
+      Title: "Name",
+      class: "matcolumnleft",
+      Style: "max-width:13%",
+    },
+    ownership: {
+      Title: "Ownership",
+      class: "matcolumnleft",
+      Style: "max-width:12%",
+    },
+    reportLoc: {
+      Title: "Report To",
+      class: "matcolumnleft",
+      Style: "max-width:10%",
+    },
+    locCity: {
+      Title: "City",
+      class: "matcolumnleft",
+      Style: "max-width:15%",
+    },
+    locPincode: {
+      Title: "Pincode",
+      class: "matcolumnleft",
+      Style: "max-width:10%",
+    },
+    activeFlag: {
+      Title: "Active",
+      class: "matcolumncenter",
+      Style: "max-width:8%",
+      type: "Activetoggle",
+      functionName: "IsActiveFuntion",
+    },
+    actions: {
+      Title: "Actions",
+      class: "matcolumnleft",
+      Style: "max-width:8%",
+    },
+    // 'eNTDT': 'Created Date',
+    // 'locCode': 'Code',
+    // 'locName': 'Name',
+    // 'ownership': 'Ownership',
+    // 'reportLoc': 'Report To',
+    // 'locCity': 'City',
+    // 'locPincode': 'Pincode',
+    // "activeFlag": "Active",
+    // "actions": "Actions"
   };
-  columnWidths = {
-    'eNTDT': 'max-width: 50%',
-    'locCode': 'max-width:10%',
-    'locName': 'max-width:13%',
-    'ownership': 'max-width:12%',
-    'locPincode': 'align-self: center;max-width:10%;',
-    'locCity': 'max-width:15%',
-    'reportLoc': 'max-width:10%',
-    'activeFlag': 'max-width:8%',
-    'actions': 'max-width:8%'
-  };
+  // columnWidths = {
+  //   'eNTDT': 'max-width: 50%',
+  //   'locCode': 'max-width:10%',
+  //   'locName': 'max-width:13%',
+  //   'ownership': 'max-width:12%',
+  //   'locPincode': 'align-self: center;max-width:10%;',
+  //   'locCity': 'max-width:15%',
+  //   'reportLoc': 'max-width:10%',
+  //   'activeFlag': 'max-width:8%',
+  //   'actions': 'max-width:8%'
+  // };
   headerForCsv = {
     'locCode': 'Location Code',
     'locName': 'Location Name',
@@ -61,9 +106,16 @@ export class LocationMasterComponent implements OnInit {
     'gstNumber': 'GST Number',
     'eNTBY': "Uploaded By",
     'eNTDT': "Uploaded on"
-
-
   }
+  staticField=[
+    "eNTDT",
+    "locCode",
+    "locName",
+    "ownership",
+    "reportLoc",
+    "locCity",
+    "locPincode",
+    ]
   breadScrums = [
     {
       title: "Location Master",
@@ -153,23 +205,23 @@ export class LocationMasterComponent implements OnInit {
   }
   //#endregion
 
-  async IsActiveFuntion(det) {
-    let locCode = det.locCode;
+  async IsActiveFuntion(det) {    
+    let locCode = det.data.locCode;
     // Remove the "id" field from the form controls
-    delete det._id;
-    delete det.eNTDT;
-    delete det.ownership;
-    delete det.reportingto;
-    delete det.locHirarchay;
-    det['mODDT'] = new Date()
-    det['mODBY'] = this.storage.userName
-    det['mODLOC'] = this.storage.branch
+    delete det.data._id;
+    delete det.data.eNTDT;
+    delete det.data.ownership;
+    delete det.data.reportingto;
+    delete det.data.locHirarchay;
+    det.data['mODDT'] = new Date()
+    det.data['mODBY'] = this.storage.userName
+    det.data['mODLOC'] = this.storage.branch
 
     let req = {
       companyCode: this.storage.companyCode,
       collectionName: "location_detail",
       filter: { companyCode: this.companyCode, locCode: locCode },
-      update: det
+      update: det.data
     };
     const res = await firstValueFrom(this.masterService.masterPut('generic/update', req))
     if (res) {
@@ -192,6 +244,14 @@ export class LocationMasterComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       this.getLocationDetails();
     });
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
   }
   //#endregion
 }

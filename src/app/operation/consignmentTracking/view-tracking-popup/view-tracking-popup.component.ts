@@ -38,22 +38,26 @@ export class ViewTrackingPopupComponent implements OnInit {
       Title: "Additional Details",
       class: "matcolumnleft",
       Style: "min-width:25%",
+      datatype:"string"
     },
 
     Event: {
       Title: "Event",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      datatype:"string"
     },   
     Location: {
       Title: "Current Location",
       class: "matcolumnleft",
       Style: "min-width:7%",
+      datatype:"string"
     },
     DocNo: {
       Title: "Document Number",
       class: "matcolumnleft",
       Style: "min-width:15%",
+      datatype:"string"
     },
     eNTDT: {
       Title: "Entry Date",
@@ -64,6 +68,7 @@ export class ViewTrackingPopupComponent implements OnInit {
       Title: "User",
       class: "matcolumnleft",
       Style: "min-width:5%",
+      datatype:"string"
     },
   };
   staticField = [

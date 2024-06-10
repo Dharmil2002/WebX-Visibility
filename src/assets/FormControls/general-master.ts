@@ -5,7 +5,7 @@ import * as StorageService from "src/app/core/service/storage.service";
 
 export class GeneralMasterControl {
   generalControlArray: FormControls[];
-  constructor(generalTable: GeneralMaster, IsUpdate: boolean) {
+  constructor(generalTable: GeneralMaster, IsUpdate: boolean) {    
     this.generalControlArray = [
       {
         name: 'codeId', label: "Code ID",

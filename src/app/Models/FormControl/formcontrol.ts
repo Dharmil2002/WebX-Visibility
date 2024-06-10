@@ -18,6 +18,7 @@ export class FormControls {
     functions?: any;
     accessallowed?: boolean = true;
     visible?: boolean = true;
+    displayIndex?: number = 0;
 
     constructor(FormControlcc) {
         {

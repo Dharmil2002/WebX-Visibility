@@ -78,8 +78,8 @@ export class AccountBankControls {
           },
           {
             name: "pattern",
-            message: "Please Enter alphanumeric EX. ABCD1234567",
-            pattern: "^[A-Z]{3,4}[0-9]{7}$",
+            message: "Please Enter alphanumeric EX. AAAA0BBBBBB",
+            pattern: "^[A-Z]{4}0[A-Z0-9]{6}$",
           },
         ],
         functions: {
@@ -217,7 +217,7 @@ export class AccountBankControls {
         placeholder: "",
         type: "toggle",
         value: isUpdate ? UpdateData.isActive : false,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [],
         functions: {},

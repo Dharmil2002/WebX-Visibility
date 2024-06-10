@@ -28,6 +28,9 @@ export class TrialBalanceReport {
                     additionalData: {
                          showNameAndValue: false,
                     },
+                    functions: {
+                         onOptionSelect: "resetDateRange"
+                    },
                     generatecontrol: true, disable: false
                },
                {
@@ -70,7 +73,7 @@ export class TrialBalanceReport {
                          message: "Branch is required",
                     },],
                     additionalData: {
-                         showNameAndValue: false,
+                         showNameAndValue: true,
                     },
                     generatecontrol: true, disable: false
                },
@@ -78,11 +81,15 @@ export class TrialBalanceReport {
                     name: "ReportType",
                     label: "Report Type",
                     placeholder: "Report Type",
-                    type: "dropdown",
-                    value: "",
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
+                    type: "Staticdropdown",
+                    value: [
+                         { value: "G", name: "Group Wise" },
+                         { value: "L", name: "Location Wise" },
+                         { value: "C", name: "Customer Wise" },
+                         { value: "V", name: "Vendor Wise" },
+                         { value: "E", name: "Employee Wise" },
+                         //{ value: "D", name: "Driver Wise" }
+                    ],
                     generatecontrol: true,
                     disable: false,
                     Validations: [
@@ -98,7 +105,49 @@ export class TrialBalanceReport {
                          onSelection: "ReportTypeFieldChanged"
                     },
                },
-
+               {
+                    name: 'reportSubType',
+                    label: 'Report Sub Type',
+                    placeholder: 'Report Sub Type',
+                    type: 'Staticdropdown',
+                    value: [
+                         { value: "Location", name: "Location" },
+                         { value: "Customer", name: "Customer" },
+                         { value: "Vendor", name: "Vendor" },
+                         { value: "Employee", name: "Employee" },
+                         { value: "Driver", name: "Driver" },
+                         { value: "Vehicle", name: "Vehicle" },
+                    ],
+                    functions: {
+                         onSelection: "reportSubTypeChanged"
+                    },
+                    Validations: [],
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: 'subLedger',
+                    label: 'Sub Ledger',
+                    placeholder: 'Sub Ledger',
+                    type: 'multiselect',
+                    value: [],
+                    Validations: [
+                         {
+                              name: "autocomplete",
+                         },
+                         {
+                              name: "invalidAutocomplete",
+                              message: "Choose proper value",
+                         },
+                    ],
+                    additionalData: {
+                         support: "subLedgerHandler",
+                         showNameAndValue: true,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
                {
                     name: "Individual",
                     label: "",
@@ -112,9 +161,6 @@ export class TrialBalanceReport {
                     disable: false,
                     Validations: []
                },
-
-
-
                {
                     name: 'aCCONTCD',
                     label: 'Select Account Code ',
@@ -135,9 +181,6 @@ export class TrialBalanceReport {
                     },
                     generatecontrol: true, disable: false
                },
-
-
-
                {
                     name: "end",
                     label: "",
@@ -157,6 +200,15 @@ export class TrialBalanceReport {
                {
                     name: 'accountHandler',
                     label: 'accountHandler',
+                    placeholder: ' ',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'subLedgerHandler',
+                    label: '',
                     placeholder: ' ',
                     type: '',
                     value: '',

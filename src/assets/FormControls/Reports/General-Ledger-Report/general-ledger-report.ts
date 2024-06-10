@@ -84,13 +84,15 @@ export class GeneralLedgerReport {
                 placeholder: 'Sub Ledger',
                 type: 'multiselect',
                 value: [],
-                Validations: [{
-                    name: "autocomplete",
-                },
-                {
-                    name: "invalidAutocomplete",
-                    message: "Choose proper value",
-                },],
+                Validations: [
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
+                ],
                 additionalData: {
                     support: "subLedgerHandler",
                     showNameAndValue: true,
@@ -162,15 +164,13 @@ export class GeneralLedgerReport {
                 },],
                 additionalData: {
                     // support: "branchHandler",
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                 },
                 // functions: {
                 //     onToggleAll: "toggleSelectAll",
                 // },
                 generatecontrol: true, disable: false
             },
-
-
             {
                 name: "Individual",
                 label: "",

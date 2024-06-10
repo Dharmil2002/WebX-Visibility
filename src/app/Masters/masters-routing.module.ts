@@ -202,7 +202,6 @@ const routes: Routes = [
   { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },
   { path: "VendorContract/AddNewVendorContract", component: AddNewVendorContractComponent },
 
-
   { path: "ContainerMaster/AddContainer", component: AddContainerComponent },
   { path: "ContainerMaster/ListContainer", component: ListContainerComponent },
   { path: "Container/Status/Add", component: AddContainerStatusComponent },

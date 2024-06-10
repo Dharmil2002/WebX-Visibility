@@ -149,7 +149,7 @@ export class CreditVoucherControl {
                 label: "Prepared by",
                 placeholder: "Prepared by",
                 type: "text",
-                value: StorageService.getItem(StoreKeys.UserId),
+                value: `${StorageService.getItem(StoreKeys.UserId)} : ${StorageService.getItem(StoreKeys.UserName)}`,
                 generatecontrol: true,
                 disable: true,
                 Validations: [],
@@ -399,7 +399,17 @@ export class CreditVoucherControl {
                 additionalData: {
                     minDate: new Date(),
                 },
-            }
+            },
+            {
+                name: "onAccount",
+                label: "On Account",
+                placeholder: " On Account",
+                type: "toggle",
+                value: false,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+              },
 
         ];
     }

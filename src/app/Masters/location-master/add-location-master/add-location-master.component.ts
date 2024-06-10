@@ -24,6 +24,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { latLongValidator } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { SnackBarUtilityService } from "../../../Utility/SnackBarUtility.service"
 @Component({
   selector: "app-add-location-master",
   templateUrl: "./add-location-master.component.html",
@@ -86,7 +87,7 @@ export class AddLocationMasterComponent implements OnInit {
   StateList: any;
   isChecked = false;
   submit = "Save";
-  isSubmit=true;
+  isSubmit:boolean=false;
   //#endregion
 
   constructor(
@@ -99,7 +100,8 @@ export class AddLocationMasterComponent implements OnInit {
     private locationService:LocationService,
     private objState: StateService,
     private storage: StorageService,
-    private generalService: GeneralService
+    private generalService: GeneralService,
+    private snackBarUtilityService: SnackBarUtilityService,
   ) {
     this.companyCode = this.storage.companyCode;
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
@@ -121,29 +123,17 @@ export class AddLocationMasterComponent implements OnInit {
       this.action = "edit";
     } else {
       this.action = "Add";
-    }
-    if (this.action === "edit") {
-      this.breadScrums = [
-        {
-          title: "Modify Location",
-          items: ["Masters"],
-          active: "Modify Location",
-          generatecontrol: true,
-          toggle: this.locationTable.activeFlag,
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Add Location",
-          items: ["Masters"],
-          active: "Add Location",
-          generatecontrol: true,
-          toggle: false,
-        },
-      ];
       this.locationTable = new LocationMaster({});
     }
+    this.breadScrums = [
+      {
+        title: this.action ==="edit" ? "Modify Location" : "Add Location",
+        items: ["Masters"],
+        active:  this.action ==="edit" ? "Modify Location" : "Add Location",
+        generatecontrol: true,
+        toggle:  this.action ==="edit" ?  this.locationTable.activeFlag : true
+      }
+    ];  
     this.initializeFormControl();
   }
 
@@ -198,138 +188,161 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region Save function
   async save() {
-    this.isSubmit=false;
-    const { mappedPinCode, mappedCity, mappedState } =
-      this.locationTableForm.value;
-
-    if (
-      (mappedPinCode.length === 0 || mappedPinCode === "") &&
-      (mappedCity.length === 0 || mappedCity === "") &&
-      (mappedState.length === 0 || mappedState === "")
-    ) {
+    if (!this.locationTableForm.valid  || this.isSubmit) {
+      this.locationTableForm.markAllAsTouched();
       Swal.fire({
-        icon: "warning",
-        title: "Warning",
-        text: "Please fill at least one mapped area pincode/city/state",
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
         showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
       });
-      return;
+      return false;
     }
-    const locValue = this.locationTableForm.value;
-    const { locLevel, reportLevel } = locValue;
-    const formValue = this.locationTableForm.value;
-    // Prepare a list of control names to process
-    const controlNames = [
-      "locLevel",
-      "reportLevel",
-      "reportLoc",
-      "locPincode",
-      "ownership",
-    ];
-    const extractControlValue = (controlName) => formValue[controlName]?.value;
-    const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode
-      ? this.locationTableForm.value.mappedPinCode.split(",")
-      : [];
-    const resultArraycityList = this.locationTableForm.value.mappedCity
-      ? this.locationTableForm.value.mappedCity.split(",")
-      : [];
-    const resultArraystateList = this.locationTableForm.value.mappedState
-      ? this.locationTableForm.value.mappedState.split(",")
-      : [];
-
-    controlNames.forEach((controlName) => {
-      const controlValue = extractControlValue(controlName);
-      this.locationTableForm.controls[controlName].setValue(controlValue);
-    });
-    // Extract latitude and longitude from comma-separated string
-    const latLng = this.locationTableForm.value.Latitude.split(",");
-    this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
-    this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
-    this.locationTableForm.controls["mappedPinCode"].setValue(
-      resultArraypinCodeList
-    );
-    this.locationTableForm.controls["mappedCity"].setValue(resultArraycityList);
-    this.locationTableForm.controls["mappedState"].setValue(
-      resultArraystateList
-    );
-    Object.values(this.locationTableForm.controls).forEach((control) =>
-      control.setErrors(null)
-    );
-
-    if (this.isUpdate) {
-      const locCode=this.locationTableForm.controls["locCode"].value;
-      this.locationTableForm.removeControl("mappedPincode");
-      this.locationTableForm.removeControl("pincodeHandler");
-      let data = this.locationTableForm.value;
-      data["mODDT"] = new Date();
-      data["mODLOC"] = this.storage.branch;
-      data["mODBY"] = this.storage.userName;
-      const req = {
-        companyCode: this.companyCode,
-        collectionName: "location_detail",
-        filter: {companyCode:this.companyCode,locCode: locCode },
-        update: data,
-      };
-      const res = await firstValueFrom(
-        this.masterService.masterPut("generic/update", req)
-      );
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: "Record updated Successfully",
-          showConfirmButton: true,
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        this.isSubmit=true;
+        const { mappedPinCode, mappedCity, mappedState } =
+          this.locationTableForm.value;
+        if (
+          (mappedPinCode.length === 0 || mappedPinCode === "") &&
+          (mappedCity.length === 0 || mappedCity === "") &&
+          (mappedState.length === 0 || mappedState === "")
+        ) {
+          Swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "Please fill at least one mapped area pincode/city/state",
+            showConfirmButton: true,
+          });
+          this.isSubmit=false;
+          return ;
+        }
+        const locValue = this.locationTableForm.value;
+        const { locLevel, reportLevel } = locValue;
+        const formValue = this.locationTableForm.value;
+        // Prepare a list of control names to process
+        const controlNames = [
+          "locLevel",
+          "reportLevel",
+          "reportLoc",
+          "locPincode",
+          "ownership",
+        ];
+        const extractControlValue = (controlName) => formValue[controlName]?.value;
+        const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode
+          ? this.locationTableForm.value.mappedPinCode.split(",")
+          : [];
+        const resultArraycityList = this.locationTableForm.value.mappedCity
+          ? this.locationTableForm.value.mappedCity.split(",")
+          : [];
+        const resultArraystateList = this.locationTableForm.value.mappedState
+          ? this.locationTableForm.value.mappedState.split(",")
+          : [];
+    
+        controlNames.forEach((controlName) => {
+          const controlValue = extractControlValue(controlName);
+          this.locationTableForm.controls[controlName].setValue(controlValue);
         });
-        this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+        // Extract latitude and longitude from comma-separated string
+        const latLng = this.locationTableForm.value.Latitude.split(",");
+        this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
+        this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
+        this.locationTableForm.controls["mappedPinCode"].setValue(
+          resultArraypinCodeList
+        );
+        this.locationTableForm.controls["mappedCity"].setValue(resultArraycityList);
+        this.locationTableForm.controls["mappedState"].setValue(
+          resultArraystateList
+        );
+        Object.values(this.locationTableForm.controls).forEach((control) =>
+          control.setErrors(null)
+        );
+    
+        if (this.isUpdate) {
+          const locCode=this.locationTableForm.controls["locCode"].value;
+          this.locationTableForm.removeControl("mappedPincode");
+          this.locationTableForm.removeControl("pincodeHandler");
+          let data = this.locationTableForm.value;
+          data["mODDT"] = new Date();
+          data["mODLOC"] = this.storage.branch;
+          data["mODBY"] = this.storage.userName;
+          const req = {
+            companyCode: this.companyCode,
+            collectionName: "location_detail",
+            filter: {companyCode:this.companyCode,locCode: locCode },
+            update: data,
+          };
+          const res = await firstValueFrom(
+            this.masterService.masterPut("generic/update", req)
+          );
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: "Record updated Successfully",
+              showConfirmButton: true,
+            });
+            this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+          }
+        } else {
+          this.locationTableForm.removeControl("pincodeHandler");
+          if ( locLevel.value === 1 ) {
+            // Reset form controls and show an error message
+            this.locationTableForm.patchValue({
+              locLevel: 1,
+              reportLevel: "",
+            });
+            Swal.fire({
+              icon: "warning",
+              title: "Warning",
+              text: "You cannot add Multiple Location as Head Office. Please try with another location.",
+              showConfirmButton: true,
+            });
+            this.isSubmit=false
+            return;
+          }
+          this.locationTableForm.removeControl("mappedPincode");
+          let data = this.locationTableForm.value;
+          data["eNTDT"] = new Date();
+          data["eNTLOC"] = this.storage.branch;
+          data["eNTBY"] = this.storage.userName;
+    
+          // Create a new record
+          data["_id"] = `${this.companyCode}-${data["locCode"]}`;
+          if(data["locLevel"] == 1 ){
+            data["reportLevel"] = "";
+            data["reportLoc"] = "";
+          }
+          const createReq = {
+            companyCode: this.companyCode,
+            collectionName: "location_detail",
+            data: data,
+            filter:{companyCode: this.companyCode,}
+          };
+          const res = await firstValueFrom(
+            this.masterService.masterPost("generic/create", createReq)
+          );
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: "Record added Successfully",
+              showConfirmButton: true,
+            });
+            this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+          }
+        }
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", error.message);
       }
-    } else {
-      this.locationTableForm.removeControl("pincodeHandler");
-      if ( locLevel.value === 1 ) {
-        // Reset form controls and show an error message
-        this.locationTableForm.patchValue({
-          locLevel: 1,
-          reportLevel: "",
-        });
-        Swal.fire({
-          icon: "warning",
-          title: "Warning",
-          text: "You cannot add Multiple Location as Head Office. Please try with another location.",
-          showConfirmButton: true,
-        });
-        return;
-      }
-      this.locationTableForm.removeControl("mappedPincode");
-      let data = this.locationTableForm.value;
-      data["eNTDT"] = new Date();
-      data["eNTLOC"] = this.storage.branch;
-      data["eNTBY"] = this.storage.userName;
-
-      // Create a new record
-      data["_id"] = `${this.companyCode}-${data["locCode"]}`;
-      if(data["locLevel"] == 1 ){
-        data["reportLevel"] = "";
-        data["reportLoc"] = "";
-      }
-      const createReq = {
-        companyCode: this.companyCode,
-        collectionName: "location_detail",
-        data: data,
-      };
-      const res = await firstValueFrom(
-        this.masterService.masterPost("generic/create", createReq)
-      );
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: "Record added Successfully",
-          showConfirmButton: true,
-        });
-        this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
-      }
-    }
+    }, "Saving Location Master..!");
+   
   }
   //#endregion
 

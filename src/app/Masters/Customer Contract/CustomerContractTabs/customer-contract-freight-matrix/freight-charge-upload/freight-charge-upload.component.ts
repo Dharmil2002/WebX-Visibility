@@ -115,7 +115,10 @@ export class FreightChargeUploadComponent implements OnInit {
         this.arealist = await this.objlocationEntitySearch.GetMergedData(
           pincodeList,
           zonelist,
-          "ST"
+          "ST",
+          this.masterService,
+          true,
+          true
         );
 
         const validationRules = [
@@ -197,22 +200,21 @@ export class FreightChargeUploadComponent implements OnInit {
           const validateAndFilter = (element, property) => {
             element.error = element.error || [];
 
-            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN'];
+            const propertiesToCheck = ['PIN', 'CT', 'STNM', 'ZN', 'AR', 'LOC'];
             const foundMatch = this.arealist.find(x =>
               propertiesToCheck.some(prop =>
-                typeof x[prop] === 'string' &&
-                x[prop].toLowerCase() === element[property].toLowerCase()
+                typeof x[prop] !== 'undefined' && // Check if the property exists
+                x[prop].toString().toLowerCase() === element[property].toString().toLowerCase()
               )
             );
-
             if (!foundMatch) {
               element.error.push(`${property} is not in the allowed list.`);
             } else {
 
               // Find the matched property
               const matchedProperty = propertiesToCheck.find(prop =>
-                typeof foundMatch[prop] === 'string' &&
-                foundMatch[prop].toLowerCase() === element[property].toLowerCase()
+                typeof foundMatch[prop] !== 'undefined' &&
+                foundMatch[prop].toString().toLowerCase() === element[property].toString().toLowerCase()
               );
 
               // Set element[property] and element[property + 'TYPE']

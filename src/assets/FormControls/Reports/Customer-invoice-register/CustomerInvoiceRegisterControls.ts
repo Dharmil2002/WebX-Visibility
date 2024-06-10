@@ -10,12 +10,14 @@ export class CustInvRegFormControl {
         placeholder: "Select Date Range",
         type: "daterangpicker",
         value: "",
+        filterOptions: "",
+        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
         additionalData: {
-          support: "end",
+             support: "end",
         },
       },
       // {
@@ -146,7 +148,7 @@ export class CustInvRegFormControl {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
         generatecontrol: true,
         disable: false,
@@ -157,7 +159,7 @@ export class CustInvRegFormControl {
         placeholder: "Individual",
         type: "radiobutton",
         value: [
-          { value: "Y", name: "Individual", checked: true },
+          { value: "Y", name: "Individual"},
           { value: "N", name: "Cumulative" },
         ],
         generatecontrol: true,

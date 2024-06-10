@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { StoreKeys } from 'src/app/config/myconstants';
+import { GenericActions, StoreKeys } from 'src/app/config/myconstants';
 import { environment } from 'src/environments/environment';
 import * as StorageService from '../storage.service';
 import { MasterService } from '../Masters/master.service';
@@ -69,6 +69,50 @@ export class VoucherServicesService {
     } catch (error) {
       console.error('An error occurred:', error);
       return [];
+    }
+  }
+  // Update Voucher Numbers in vend_bill_summary 
+  async UpdateVoucherNumbersInVendBillSummary(bILLNO, vNO) {
+    try {
+
+      // Retrive vNOLST from vend_bill_summary based on bILLNO and push vNO to vNOLST
+      const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
+      const filter = { docNo: bILLNO };
+      const req = { companyCode, collectionName: 'vend_bill_summary', filter };
+      const res = await firstValueFrom(this.masterService.masterPost(GenericActions.GetOne, req));
+      if (res && res.data) {
+        const vendBillSummary = res.data;
+        if (vendBillSummary && vendBillSummary.vNOLST) {
+          vendBillSummary.vNOLST.push(vNO);
+        }
+        else {
+          vendBillSummary.vNOLST = [vNO];
+        }
+
+        // Update vend_bill_summary with new vNOLST
+        const updateReq = {
+          companyCode: companyCode,
+          collectionName: 'vend_bill_summary',
+          filter: { docNo: bILLNO },
+          update: { vNOLST: vendBillSummary.vNOLST }
+        };
+        const updateRes = await firstValueFrom(this.masterService.masterPut(GenericActions.Update, updateReq));
+
+        if (updateRes) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        return false;
+      }
+
+
+
+    } catch (error) {
+      console.error('An error occurred:', error);
     }
   }
 }

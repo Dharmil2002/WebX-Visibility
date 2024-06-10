@@ -184,6 +184,7 @@ export class GeneralBillDetailComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl();
     this.BindDataFromApi();
+    this.getStateDropdown();
     this.getTDSSectionDropdown();
     this.CalculatePaymentAmount();
     this.GetVendorInformation();
@@ -249,7 +250,7 @@ export class GeneralBillDetailComponent implements OnInit {
     );
 
     this.BindLedger();
-    this.getStateDropdown();
+
   }
   async BindLedger() {
     const account_groupReqBody = {
@@ -285,21 +286,22 @@ export class GeneralBillDetailComponent implements OnInit {
     if (res.success && res.data.length != 0) {
       this.VendorDetails = res.data[0];
 
-      // if (this.VendorDetails?.otherdetails) {
-      //   this.VendorBillTaxationGSTFilterForm.controls.VendorGSTRegistered.setValue(
-      //     true
-      //   );
-      //   this.VendorBillTaxationGSTFilterForm.controls.GSTNumber.setValue(
-      //     this.VendorDetails?.otherdetails[0]?.gstNumber
-      //   );
-      //   const getValue = this.StateList.find(
-      //     (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
-      //   );
-      //   console.log("getValue", getValue);
-      //   this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.setValue(
-      //     getValue || ""
-      //   );
-      // }
+      if (this.VendorDetails?.otherdetails) {
+        this.VendorBillTaxationGSTFilterForm.controls.VendorGSTRegistered.setValue(
+          true
+        );
+        this.VendorBillTaxationGSTFilterForm.controls.VGSTNumber.setValue(
+          this.VendorDetails?.otherdetails[0]?.gstNumber
+        );
+        const getValue = this.StateList.find(
+          (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
+        );
+        console.log("getValue", getValue);
+        this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.setValue(
+          getValue || ""
+        );
+        await this.toggleVendorGSTRegistered();
+      }
     }
   }
   handleMenuItemClick(data) {
@@ -619,8 +621,9 @@ export class GeneralBillDetailComponent implements OnInit {
               bDT: new Date(),
               tMOD: "",
               lOC: this.VendorDetails?.vendorCity,
-              sT: this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
-              gSTIN: this.VendorBillTaxationGSTFilterForm.controls.VGSTNumber.value,
+              sT: this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.value?.value,
+              sTNM: this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.value?.name,
+              gSTIN: this.VendorBillTaxationGSTFilterForm.controls.GSTNumber.value,
               tHCAMT: PaymentAmount,
               aDVAMT: 0,
               bALAMT: NetPayable,
@@ -628,6 +631,10 @@ export class GeneralBillDetailComponent implements OnInit {
               bALPBAMT: NetPayable,
               bSTAT: 1,
               bSTATNM: "Awaiting Approval",
+              dOCTYP: "General",
+              dOCCD: "G",
+              mANNUM: this.VendorBillForm.controls.VendorManualBillNo.value || "",
+              dUEDT: this.VendorBillForm.controls.DueDate.value || new Date(),
               eNTDT: new Date(),
               eNTLOC: this.storage.branch,
               eNTBY: this.storage.userName,
@@ -639,8 +646,9 @@ export class GeneralBillDetailComponent implements OnInit {
                 mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
                 eML: this.VendorDetails?.emailId,
                 gSTREG: this.VendorBillTaxationGSTFilterForm.controls.VendorGSTRegistered.value,
-                sT: this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.value?.value,
-                gSTIN: this.VendorBillTaxationGSTFilterForm.controls.GSTNumber.value,
+                sT: this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.value?.value,
+                sTNM: this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.value?.name,
+                gSTIN: this.VendorBillTaxationGSTFilterForm.controls.VGSTNumber.value,
               },
               tDS: {
                 eXMT: this.VendorBillTaxationTDSFilterForm.value.TDSExempted,
@@ -718,39 +726,27 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VoucherRequestModel.finYear = financialYear;
 
         this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode =
-          VoucherInstanceType.BalancePayment;
-        this.VoucherDataRequestModel.transType =
-          VoucherInstanceType[VoucherInstanceType.BalancePayment];
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BalancePayment;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BalancePayment];
         this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType =
-          VoucherType[VoucherType.JournalVoucher];
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
 
         this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
         this.VoucherDataRequestModel.branch = this.storage.branch;
         this.VoucherDataRequestModel.finYear = financialYear;
 
-        this.VoucherDataRequestModel.accLocation =
-          this.tableData[0].OthersData?.cLOC || this.storage.branch;
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode =
-          this.tableData[0].OthersData?.vND?.cD || "";
-        this.VoucherDataRequestModel.partyName =
-          this.tableData[0].OthersData?.vND?.nM || "";
-        this.VoucherDataRequestModel.partyState =
-          this.VendorDetails?.vendorState;
+        this.VoucherDataRequestModel.partyCode = this.VendorDetails?.vendorCode || "";
+        this.VoucherDataRequestModel.partyName = this.VendorDetails?.vendorName || "";
+        this.VoucherDataRequestModel.partyState = this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.value?.name || "";
+        this.VoucherDataRequestModel.paymentState = this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.value?.name || "";
         this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
         this.VoucherDataRequestModel.panNo = this.VendorDetails?.panNo;
-        this.VoucherDataRequestModel.tdsSectionCode = !this
-          .VendorBillTaxationTDSFilterForm.value.TDSExempted
-          ? this.VendorBillTaxationTDSFilterForm.value.TDSSection.value
-          : "";
-        this.VoucherDataRequestModel.tdsSectionName = !this
-          .VendorBillTaxationTDSFilterForm.value.TDSExempted
-          ? this.VendorBillTaxationTDSFilterForm.value.TDSSection.name
-          : "";
+        this.VoucherDataRequestModel.tdsSectionCode = !this.VendorBillTaxationTDSFilterForm.value.TDSExempted ? this.VendorBillTaxationTDSFilterForm.value.TDSSection.value : "";
+        this.VoucherDataRequestModel.tdsSectionName = !this.VendorBillTaxationTDSFilterForm.value.TDSExempted ? this.VendorBillTaxationTDSFilterForm.value.TDSSection.name : "";
         this.VoucherDataRequestModel.tdsRate = !this
           .VendorBillTaxationTDSFilterForm.value.TDSExempted
           ? +this.VendorBillTaxationTDSFilterForm.value.TDSRate
@@ -765,20 +761,11 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VoucherDataRequestModel.tcsRate = 0;
         this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST =
-          parseFloat(this.VendorBillTaxationGSTFilterForm.value.IGSTAmount) ||
-          0;
-        this.VoucherDataRequestModel.SGST =
-          parseFloat(this.VendorBillTaxationGSTFilterForm.value.SGSTAmount) ||
-          0;
-        this.VoucherDataRequestModel.CGST =
-          parseFloat(this.VendorBillTaxationGSTFilterForm.value.CGSTAmount) ||
-          0;
-        this.VoucherDataRequestModel.UGST =
-          parseFloat(this.VendorBillTaxationGSTFilterForm.value.UGSTAmount) ||
-          0;
-        this.VoucherDataRequestModel.GSTTotal =
-          parseFloat(this.VendorBillTaxationGSTFilterForm.value.GSTAmount) || 0;
+        this.VoucherDataRequestModel.IGST = parseFloat(this.VendorBillTaxationGSTFilterForm.value.IGSTAmount) || 0;
+        this.VoucherDataRequestModel.SGST = parseFloat(this.VendorBillTaxationGSTFilterForm.value.SGSTAmount) || 0;
+        this.VoucherDataRequestModel.CGST = parseFloat(this.VendorBillTaxationGSTFilterForm.value.CGSTAmount) || 0;
+        this.VoucherDataRequestModel.UGST = parseFloat(this.VendorBillTaxationGSTFilterForm.value.UGSTAmount) || 0;
+        this.VoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBillTaxationGSTFilterForm.value.GSTAmount) || 0;
 
         this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
         this.VoucherDataRequestModel.netPayable = NetPayable;
@@ -792,7 +779,6 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = BillNo;
-        const SelectedData = this.tableData;
         const voucherlineItems = this.GetJournalVoucherLedgers(BillNo);
 
         this.VoucherRequestModel.details = voucherlineItems;
@@ -806,7 +792,7 @@ export class GeneralBillDetailComponent implements OnInit {
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transDate: Date(),
                 finYear: financialYear,
-                branch: this.tableData[0].OthersData?.cLOC || this.storage.branch,
+                branch: this.storage.branch,
                 transCode: VoucherInstanceType.BalancePayment,
                 transType:
                   VoucherInstanceType[VoucherInstanceType.BalancePayment],
@@ -815,8 +801,8 @@ export class GeneralBillDetailComponent implements OnInit {
                 docType: "Voucher",
                 partyType: "Vendor",
                 docNo: BillNo,
-                partyCode: "" + this.tableData[0].OthersData?.vND?.cD || "",
-                partyName: this.tableData[0].OthersData?.vND?.nM || "",
+                partyCode: this.VendorDetails?.vendorCode || "",
+                partyName: this.VendorDetails?.vendorName || "",
                 entryBy: this.storage.userName,
                 entryDate: Date(),
                 debit: voucherlineItems
@@ -844,6 +830,7 @@ export class GeneralBillDetailComponent implements OnInit {
               };
               firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then((res: any) => {
                 if (res.success) {
+                  this.voucherServicesService.UpdateVoucherNumbersInVendBillSummary(BillNo, reqBody.voucherNo);
                   Swal.fire({
                     icon: "success",
                     title: "Voucher And Bill Generated Successfully",
@@ -903,7 +890,9 @@ export class GeneralBillDetailComponent implements OnInit {
       THC,
       BillNo,
       sacCode = "",
-      sacName = ""
+      sacName = "",
+      GSTRate = 0,
+      GSTAmount = 0
     ) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
@@ -921,8 +910,8 @@ export class GeneralBillDetailComponent implements OnInit {
       sacName: sacName,
       debit,
       credit,
-      GSTRate: 0,
-      GSTAmount: 0,
+      GSTRate,
+      GSTAmount,
       Total: debit + credit,
       TDSApplicable: false,
       narration: `When Vendor Bill Generated For : ${THC}  Against Bill No : ${BillNo}`,
@@ -960,7 +949,9 @@ export class GeneralBillDetailComponent implements OnInit {
             DocumentList,
             BillNo,
             this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(),
-            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()
+            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString(),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.IGSTRate),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.IGSTAmount)
           )
         );
       } else if (
@@ -977,7 +968,9 @@ export class GeneralBillDetailComponent implements OnInit {
             DocumentList,
             BillNo,
             this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(),
-            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()
+            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString(),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.CGSTRate),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.CGSTAmount)
           )
         );
         Result.push(
@@ -990,7 +983,9 @@ export class GeneralBillDetailComponent implements OnInit {
             DocumentList,
             BillNo,
             this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(),
-            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()
+            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString(),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.SGSTRate),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.SGSTAmount)
           )
         );
       } else if (this.VendorBillTaxationGSTFilterForm.value.UGSTAmount != 0) {
@@ -1004,7 +999,9 @@ export class GeneralBillDetailComponent implements OnInit {
             DocumentList,
             BillNo,
             this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(),
-            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()
+            this.VendorBillTaxationGSTFilterForm.value?.GSTSACcode?.name.toString(),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.UGSTRate),
+            parseFloat(this.VendorBillTaxationGSTFilterForm.value.UGSTAmount)
           )
         );
       }

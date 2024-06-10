@@ -12,7 +12,6 @@ import { SalesRegisterService } from 'src/app/Utility/module/reports/sales-regis
 import { salesRegisterControl } from 'src/assets/FormControls/Reports/sales-register/sales-register-advance';
 import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { ExportService } from 'src/app/Utility/module/export.service';
 @Component({
   selector: 'app-sales-register-advanced',
   templateUrl: './sales-register-advanced.component.html'
@@ -68,7 +67,6 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     private customerService: CustomerService,
     private salesRegisterService: SalesRegisterService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private exportService: ExportService,
   ) {
     this.initializeFormControl();
   }
@@ -255,12 +253,17 @@ export class SalesRegisterAdvancedComponent implements OnInit {
           : [];
         const flowType = this.salesregisterTableForm.value.flowType;
         const status = this.salesregisterTableForm.value.status;
-        let data = await this.salesRegisterService.getsalesRegisterReportDetail(startDate, endDate, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status);
-        this.columns = data.grid.columns;
+
+        const data = await this.salesRegisterService.getsalesRegisterReportDetail(startDate, endDate, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status);
+        const transformedHeader = this.addChargesToColumns(data.data, data.grid.columns);
+        const newdata = this.setCharges(data.data);
+
+        this.columns = transformedHeader;
+        // this.columns = data.grid.columns;
         this.sorting = data.grid.sorting;
         this.searching = data.grid.searching;
         this.paging = data.grid.paging;
-        this.source = data.data;
+        this.source = newdata;
         this.LoadTable = true;
 
         if (data.data.length === 0) {
@@ -281,9 +284,6 @@ export class SalesRegisterAdvancedComponent implements OnInit {
           Swal.close();
         }, 1000);
         this.loading = false;
-        // const transformedHeader = this.setcharges(data, this.CSVHeader); // Set the header for the CSV file
-        //const finalData = this.setCsvData(data); // Set the data for the CSV file
-        //this.exportService.exportAsCSV(finalData, `Sales_Register_Report-${moment().format("YYYYMMDD-HHmmss")}`, transformedHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
@@ -292,45 +292,46 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       }
     }, "Sales Register Advance Generating Please Wait..!");
   }
-
   // function to set charges
-  setcharges(chargeList: any[], headers) {
-    const columnHeader = { ...headers };
-    this.chargesKeys = [];
+  setCharges(data) {
+    const existingCharges = new Set();
 
-    chargeList.forEach((item) => {
-      if (item.chargeList && item.chargeList.length > 0) {
-        item.chargeList.forEach((charge) => {
-          const key = charge["cHGNM"]; // Use "cHGNM" as the header
-
-          if (!this.chargesKeys.includes(key)) {
-            this.chargesKeys.push(key);
+    data.forEach((item) => {
+      if (item.chgLst && Array.isArray(item.chgLst) && item.chgLst.length > 0) {
+        item.chgLst.forEach((charge) => {
+          if (!existingCharges.has(charge.cHGNM)) {
+            item[charge.cHGNM] = charge.aMT;
+            existingCharges.add(charge.cHGNM);
           }
-          columnHeader[key] = key; // Add "aMT" as the value for the header
         });
       }
     });
 
-    return columnHeader; // Return the transformed data
+    return data;
   }
+  // function to set charges
+  addChargesToColumns(data, columns) {
 
-  // function to set csv data
-  setCsvData(data: any[]) {
-    const transformed = data.map((item) => {
-      if (item.chargeList && item.chargeList.length > 0) {
-        item.chargeList.forEach((x) => {
-          item[x.cHGNM] = x.aMT
-        })
-        delete item.chargeList
-        return item;
-      }
-      else {
-        return item;
+    const existingCharges = new Set();
+
+    // Add predefined columns if they don't already exist
+    data.forEach((item) => {
+      if (item.chgLst && Array.isArray(item.chgLst) && item.chgLst.length > 0) {
+        item.chgLst.forEach((charge) => {
+          if (!existingCharges.has(charge.cHGNM)) {
+            columns.push({
+              header: charge.cHGNM,
+              field: charge.cHGNM,
+              width: 200
+            });
+            existingCharges.add(charge.cHGNM);
+          }
+        });
       }
     });
-    return transformed;
-  }
 
+    return columns;
+  }
 
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call

@@ -30,7 +30,7 @@ export class fleetModel {
       this.insuranceExpiryDate = FleetMaster.insuranceExpiryDate || new Date();
       this.RegistrationDate = FleetMaster.RegistrationDate || new Date();
       this.fitnessValidityDate = FleetMaster.fitnessValidityDate || new Date();
-      this.activeFlag = FleetMaster.activeFlag || false;
+      this.activeFlag = FleetMaster.activeFlag || true;
 
     }
   }

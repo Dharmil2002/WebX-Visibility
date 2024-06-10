@@ -1,7 +1,9 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="clusterTableForm">
-        <app-form-webxpress [form]="clusterTableForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
-            (callFunction)="functionCallHandler($event)" [submit]="submit" (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'Cluster Details'">
+        <app-form-webxpress [form]="clusterTableForm" [formData]="jsonControlArray" [modifyAndSaveButton]="true"
+            (callFunction)="functionCallHandler($event)" [submit]="submit" (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'Cluster Details'"
+            [Disabled]="isSubmit"
+            >
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

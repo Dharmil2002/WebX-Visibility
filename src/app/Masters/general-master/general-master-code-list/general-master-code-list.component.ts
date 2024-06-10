@@ -13,35 +13,59 @@ export class GeneralMasterCodeListComponent {
   data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["activeFlag"]
   companyCode: any = 0;
-  linkArray = [];
   addAndEditPath: string;
+  csvFileName:any;
   headerCode: string;
-  columnHeader = {
-    "srNo": "Sr No",
-    "codeId": "Code ID",
-    "codeDesc": "Description",
-    "activeFlag": "Active Status",
-    "View": "Actions"
+    columnHeader = {
+      srNo: {
+        Title: "Sr No",
+        class: "matcolumncenter",
+        Style: "max-width:200px",
+      },
+      codeId: {
+        Title: "Code ID",
+        class: "matcolumnleft",
+        Style: "max-width:150px",
+      },
+      codeDesc: {
+        Title: "Description",
+        class: "matcolumnleft",
+        Style: "max-width:150px",
+      },
+      activeFlag: {
+        type: "Activetoggle",
+        Title: "Active",
+        class: "matcolumncenter",
+        Style: "min-width:80px; max-width:80px",
+        functionName: "IsActiveFuntion",
+      },
+      view: {                
+        Title: "Edit",
+        class: "matcolumncenter",
+        Style: "min-width:80px; max-width:80px;",         
+        iconName: "edit",      
+        stickyEnd: true,
+      }
   };
+  staticField = ["srNo","codeId","codeDesc"];
   headerForCsv = {
-    "srNo": "Sr No",
-    "general": "Code ID",
-    "description": "Description",
-    "activeFlag": "Active Status",
+    srNo: "Sr No",
+    codeId: "Code ID",
+    codeDesc: "Description",
+    activeFlag: "Active Status",
   }
   breadScrums = [
     {
-      title: this.route.getCurrentNavigation()?.extras?.state?.data.headerDesc + " General Master",
+      title: this.route.getCurrentNavigation()?.extras?.state?.data.headerDesc + "General Master",
       items: ["Home"],
-      active: this.route.getCurrentNavigation()?.extras?.state?.data.headerDesc + " General Master",
+      active: this.route.getCurrentNavigation()?.extras?.state?.data.headerDesc + "General Master",
     },
   ];
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: false,
   }
   viewComponent: any;
   height = '300px';
@@ -50,23 +74,23 @@ export class GeneralMasterCodeListComponent {
   constructor(private masterService: MasterService, private route: Router, private storage: StorageService) {
     this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
-      this.data = route.getCurrentNavigation().extras.state.data;
-    }
+  
+    }      this.data = route.getCurrentNavigation().extras.state.data;        
   }
-  public onDialogClosed(result: any): void {
+  public onDialogClosed(result: any): void {    
     if (typeof result === 'string') {
-      this.data.headerCode = result;
-    } else {
+      this.data.headerCode = result;            
+    } else {      
       this.data.headerCode = result.value.codeType;
     }
     this.getGeneralDetails();
   }
   ngOnInit(): void {
     this.getGeneralDetails();
-    this.addAndEditPath = "/Masters/GeneralMaster/AddGeneralMaster";
-    this.backPath = "/Masters/GeneralMaster/GeneralMasterList";
+    //this.addAndEditPath = "/Masters/GeneralMaster/AddGeneralMaster";
     this.headerCode = this.data?.headerCode;
     this.viewComponent = GeneralMasterAddComponent;
+    this.csvFileName=`${this.headerCode}.csv`    
   }
   getGeneralDetails() {
     // Assuming tableData contains the array of objects
@@ -95,17 +119,17 @@ export class GeneralMasterCodeListComponent {
     });
   }
 
-  IsActiveFuntion(det) {
-    let id = det._id;
+ async IsActiveFuntion(det) {
+    let id = det.data._id;
     // Remove the "id" field from the form controls
-    delete det._id;
-    delete det.srNo;
+    delete det.data._id;
+    delete det.data.srNo;
     let req = {
       companyCode: this.storage.companyCode,
       type: "masters",
       collectionName: "General_master",
       filter: { _id: id },
-      update: det
+      update: {activeFlag:det.data.activeFlag}
     };
     this.masterService.masterPut('generic/update', req).subscribe({
       next: (res: any) => {
@@ -121,5 +145,13 @@ export class GeneralMasterCodeListComponent {
         }
       }
     });
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
   }
 }

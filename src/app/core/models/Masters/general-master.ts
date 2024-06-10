@@ -9,13 +9,12 @@ export class GeneralMaster {
     headerCode: string;
     headerDesc: string;
     codeType: string;
-    isActive: any;
     item: any;
     constructor(GeneralMaster) {
         {
             this.codeId = GeneralMaster.codeDesc || '';
             this.codeDesc = GeneralMaster.codeDesc || '';
-            this.activeFlag = GeneralMaster.activeFlag || false;
+            this.activeFlag = GeneralMaster.activeFlag || true;
         }
     }
 }

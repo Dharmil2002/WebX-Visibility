@@ -217,7 +217,7 @@ export class AccountBankControls {
         placeholder: "",
         type: "toggle",
         value: isUpdate ? UpdateData.isActive : false,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [],
         functions: {},

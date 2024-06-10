@@ -203,7 +203,6 @@ export class UpdateRunSheetComponent implements OnInit {
     }
   }
   async CompleteScan() {
-    debugger
     let packageChecked = false;
     const exists = this.csv.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {

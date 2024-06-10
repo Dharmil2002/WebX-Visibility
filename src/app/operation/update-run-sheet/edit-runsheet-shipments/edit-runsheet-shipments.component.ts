@@ -22,7 +22,6 @@ export class EditRunsheetShipmentsComponent implements OnInit {
   private fb: UntypedFormBuilder,
   public dialogRef: MatDialogRef<EditShipmentDetailsComponent>,
   public dialog: MatDialog,) {
-    debugger
     this.shipmentDetails = item;
   }
 

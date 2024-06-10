@@ -14,49 +14,17 @@ export class VehicleMasterListComponent implements OnInit {
     csv: any[];
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
-    columnHeader = {
-        eNTDT: {
-            Title: "Created Date",
-            class: "matcolumncenter",
-            Style: "min-width:15%",
-            datatype: "datetime"
-        },
-        vehicleNo: {
-            Title: "Vehicle No.",
-            class: "matcolumnleft",
-            Style: "min-width:15%",
-        },
-        vehicleType: {
-            Title: "Vehicle Type",
-            class: "matcolumnleft",
-            Style: "min-width:15%",
-            datatype: "string"
-        },
-        vendorName: {
-            Title: "Vendor Name",
-            class: "matcolumnleft",
-            Style: "min-width:15%",
-        },
-        vendorType: {
-            Title: "Vendor Type",
-            class: "matcolumnleft",
-            Style: "min-width:15%",
-        },
-        isActive: {
-            type: "Activetoggle",
-            Title: "Active Flag",
-            class: "matcolumncenter",
-            Style: "min-width:15%",
-            functionName: "isActiveFuntion"
-        },
-        actions: {
-            Title: "Actions",
-            class: "matcolumncenter",
-            Style: "min-width:15%",
-        },
-    }
-    staticField = ["eNTDT", "vehicleNo", "vehicleType", "vendorName", "vendorType"]
-
+    columnHeader =
+        {
+            // "srNo": "Sr No",
+            "eNTDT": "Created Date",
+            "vehicleNo": "Vehicle No.",
+            "vehicleType": "Vehicle Type",
+            "vendorName": "Vendor Name",
+            "vendorType": "Vendor Type",
+            "isActive": "Active Flag",
+            "actions": "Actions",
+        }
     headerForCsv = {
         // "srNo": "Sr No",
         "vehicleNo": "Vehicle Number",
@@ -82,7 +50,7 @@ export class VehicleMasterListComponent implements OnInit {
     addAndEditPath: string;
     csvFileName: string;
     tableData: any;
-    constructor(private masterService: MasterService, private storage: StorageService) {
+    constructor(private masterService: MasterService, private storage: StorageService) {        
         this.addAndEditPath = "/Masters/VehicleMaster/AddVehicle";
     }
     ngOnInit(): void {
@@ -95,7 +63,7 @@ export class VehicleMasterListComponent implements OnInit {
         let req = {
             "companyCode": this.storage.companyCode,
             "collectionName": "vehicle_detail",
-            "filter": { companyCode: this.storage.companyCode }
+            "filter": {}
         }
         const res = await firstValueFrom(this.masterService.masterPost('generic/get', req))
         if (res && res.data) {
@@ -123,18 +91,18 @@ export class VehicleMasterListComponent implements OnInit {
     }
     //#endregion
     async isActiveFuntion(det) {
-        let id = det.data._id;
+        let id = det._id;
         // Remove the "id" field from the form controls
-        delete det.data._id;
-        delete det.data.eNTDT;
-        det.data['mODDT'] = new Date()
-        det.data['mODBY'] = this.storage.userName
-        det.data['mODLOC'] = this.storage.branch
+        delete det._id;
+        delete det.eNTDT;
+        det['mODDT'] = new Date()
+        det['mODBY'] = this.storage.userName
+        det['mODLOC'] = this.storage.branch
         let req = {
             companyCode: this.storage.companyCode,
             collectionName: "vehicle_detail",
             filter: { _id: id },
-            update: det.data
+            update: det
         };
         const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
         if (res) {
@@ -146,15 +114,6 @@ export class VehicleMasterListComponent implements OnInit {
                 showConfirmButton: true,
             });
             this.getVehicleDetails();
-        }
-    }
-
-    functionCallHandler($event) {
-        let functionName = $event.functionName;
-        try {
-            this[functionName]($event);
-        } catch (error) {
-            console.log("failed");
         }
     }
 }

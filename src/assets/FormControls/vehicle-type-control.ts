@@ -1,7 +1,5 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-import { StoreKeys } from "src/app/config/myconstants";
 import { VehicleTypeMaster } from "src/app/core/models/Masters/vehicle-type-master/vehicle-type-master";
-import * as StorageService from "src/app/core/service/storage.service";
 
 export class VehicleTypeControl {
     private vehicleTypeControlArray: FormControls[];
@@ -144,15 +142,7 @@ export class VehicleTypeControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false
-            },
-            {
-                name: 'companyCode', 
-                label: 'companyCode', 
-                placeholder: '', 
-                type: 'text', 
-                value: StorageService.getItem((StoreKeys.CompanyCode)), 
-                generatecontrol: false, disable: false,
-                Validations: []
+
             },
 
         ]

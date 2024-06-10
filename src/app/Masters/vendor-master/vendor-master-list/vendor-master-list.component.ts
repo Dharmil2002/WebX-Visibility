@@ -14,51 +14,20 @@ import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-mast
 export class VendorMasterListComponent implements OnInit {
   data: [] | any;
   csv: any[];
-  companyCode: any = 0;
+  companyCode: any =0;
   csvFileName: string;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   // Define column headers for the table
-  columnHeader = {
-    eNTDT: {
-      Title: "Created Date",
-      class: "matcolumncenter",
-      Style: "min-width:15%",
-      datatype: "datetime"
-    },
-    vendorCode: {
-      Title: "Vendor Code",
-      class: "matcolumncenter",
-      Style: "min-width:15%",
-    },
-    vendorName: {
-      Title: "Vendor Name",
-      class: "matcolumnleft",
-      Style: "min-width:15%",
-      datatype: "string"
-    },
-    vendorType: {
-      Title: "Vendor Type",
-      class: "matcolumnleft",
-      Style: "min-width:15%",
-      datatype: "string"
-    },
-    isActive: {
-      type: "Activetoggle",
-      Title: "Active Flag",
-      class: "matcolumncenter",
-      Style: "min-width:15%",
-      functionName: "isActiveFuntion"
-    },
-    actions: {
-      Title: "Actions",
-      class: "matcolumncenter",
-      Style: "min-width:15%",
-    },
-    //"view": "View"
-  }
-
-  staticField = ["eNTDT", "vendorCode", "vendorName", "vendorType"]
-
+  columnHeader =
+    {
+      'eNTDT': 'Created Date',
+      "vendorCode": "Vendor Code",
+      "vendorName": "Vendor Name",
+      "vendorType": "Vendor Type",
+      "isActive": "Active",
+      "actions": "Actions",
+      //"view": "View"
+    }
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "vendorCode": "Vendor Code",
@@ -155,20 +124,20 @@ export class VendorMasterListComponent implements OnInit {
   //#endregion
 
   async isActiveFuntion(det) {
-    let vendorCode = det.data.vendorCode;
+    let vendorCode = det.vendorCode;
     // Remove the "_id" field from the form controls
-    delete det.data._id;
-    delete det.data.srNo;
-    delete det.data.eNTDT;
-    delete det.data.vendorType;
-    det.data['mODDT'] = new Date()
-    det.data['mODBY'] = this.storage.userName
-    det.data['mODLOC'] = this.storage.branch
+    delete det._id;
+    delete det.srNo;
+    delete det.eNTDT;
+    delete det.vendorType;
+    det['mODDT'] = new Date()
+    det['mODBY'] = this.storage.userName
+    det['mODLOC'] = this.storage.branch
     let req = {
       companyCode: this.storage.companyCode,
       collectionName: "vendor_detail",
       filter: { vendorCode: vendorCode },
-      update: det.data
+      update: det
     };
     const res = await this.masterService.masterPut("generic/update", req).toPromise()
     if (res) {
@@ -193,13 +162,4 @@ export class VendorMasterListComponent implements OnInit {
     });
   }
   //#endregion
-
-  functionCallHandler($event) {
-    let functionName = $event.functionName;
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      console.log("failed");
-    }
-  }
 }

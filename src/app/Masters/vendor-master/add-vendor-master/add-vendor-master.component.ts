@@ -19,7 +19,6 @@ import { LocationService } from "src/app/Utility/module/masters/location/locatio
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { TdsMasterService } from "src/app/Utility/module/masters/tds-master/tds-master-Service";
 import { StorageService } from "src/app/core/service/storage.service";
-import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 @Component({
   selector: "app-add-vendor-master",
   templateUrl: "./add-vendor-master.component.html",
@@ -146,8 +145,7 @@ export class AddVendorMasterComponent implements OnInit {
     private dialog: MatDialog,
     private locationService: LocationService,
     private storage: StorageService,
-    private tdsMasterService: TdsMasterService,
-    private snackBarUtilityService: SnackBarUtilityService
+    private tdsMasterService: TdsMasterService
   ) {
     this.companyCode = this.storage.companyCode;
     // this.vendorTabledata.companyCode = this.storage.companyCode;
@@ -181,13 +179,14 @@ export class AddVendorMasterComponent implements OnInit {
     } else {
       this.action = "Add";
     }
+    const activeTitle = this.action === "edit" ? "Modify Vendor" : "Add Vendor";
     this.breadScrums = [
       {
-        title: this.action === "edit" ? "Modify Vendor" : "Add Vendor",
-        items: ["Masters"],
-        active: this.action === "edit" ? "Modify Vendor" : "Add Vendor",
+        title: activeTitle,
+        items: ["Home"],
+        active: activeTitle,
         generatecontrol: true,
-        toggle: this.action === 'edit' ? this.vendorTabledata.isActive : true,
+        toggle: this.isUpdate ? this.vendorTabledata.isActive : false,
       },
     ];
 
@@ -521,71 +520,26 @@ export class AddVendorMasterComponent implements OnInit {
     this.isCalledFirstTime = true;
   }
   async save() {
-    this.snackBarUtilityService.commonToast(async () => {
-      if (this.otherDetailForm.valid) {
-        Swal.fire({
-          icon: "warning",
-          title: "Pending Data",
-          text: "There is pending data for the GST. Are you sure you want to continue?",
-          showCancelButton: true,
-          confirmButtonText: "Continue",
-          cancelButtonText: "Cancel",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            await this.saveVendorDetails();
-          } else {
-            return false;
-          }
-        });
-      } else {
-        await this.saveVendorDetails();
-      }
-    }, "Vendor data is Generating Please wait...!")
+    if (this.otherDetailForm.valid) {
+      Swal.fire({
+        icon: "warning",
+        title: "Pending Data",
+        text: "There is pending data for the GST. Are you sure you want to continue?",
+        showCancelButton: true,
+        confirmButtonText: "Continue",
+        cancelButtonText: "Cancel",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await this.saveVendorDetails();
+        } else {
+          return false;
+        }
+      });
+    } else {
+      await this.saveVendorDetails();
+    }
   }
   async saveVendorDetails() {
-    let isValid = true;
-
-    const formChecks = [
-      { form: this.vendorTableForm, condition: true },
-      { form: this.MSMETableForm, condition: this.vendorTableForm.controls["msmeRegistered"].value },
-      { form: this.lowTDSTableForm, condition: this.vendorTableForm.controls["isLowRateApplicable"].value },
-      { form: this.vendorBankDetailForm, condition: this.vendorTableForm.controls["isBankregistered"].value }
-    ];
-
-    formChecks.forEach(({ form, condition }) => {
-      if (condition && !form.valid) {
-        form.markAllAsTouched();
-        isValid = false;
-      }
-    });
-
-    if (this.vendorTableForm.controls["hTDSRA"].value) {
-      if (this.HighTDSTableForm.controls["isTDSDeclaration"].value) {
-        if (!this.HighTDSTableForm.valid) {
-          this.HighTDSTableForm.markAllAsTouched();
-          isValid = false;
-        }
-      } else {
-        this.HighTDSTableForm.controls["uTDSD"].clearValidators();
-        this.HighTDSTableForm.controls["uTDSD"].updateValueAndValidity();
-        this.imageData["uTDSD"] = "";
-      }
-    }
-
-    if (!isValid) {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Information",
-        text: "Please ensure all required fields are filled out.",
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#d33',
-        timer: 5000,
-        timerProgressBar: true,
-      });
-      return false;
-    }
-
     this.isSubmit = true;
     clearValidatorsAndValidate(this.otherDetailForm);
     clearValidatorsAndValidate(this.vendorTableForm);
@@ -602,10 +556,11 @@ export class AddVendorMasterComponent implements OnInit {
       vendorLocationDropdown1
     );
     this.vendorTableForm.removeControl("vendorLocationDropdown");
+    this.vendorTableForm.removeControl("");
     Object.values(this.vendorTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
-    this.otherDetailForm =
+    this.vendorTableForm.value.otherdetails =
       this.tableData.length > 0
         ? this.tableData.map(({ actions, id, ...rest }) => rest)
         : [];
@@ -619,42 +574,22 @@ export class AddVendorMasterComponent implements OnInit {
     this.vendorTableForm.controls["vendorPinCode"].setValue(
       this.vendorTableForm.value.vendorPinCode.value
     );
-
     let body = {};
     if (this.vendorTableForm.valid) {
       body = { ...body, ...this.vendorTableForm.value };
     }
-
     if (this.vendorTableForm.controls["msmeRegistered"].value) {
       body["msmeTypeName"] = this.MSMETableForm.value.msmeType.name;
       this.MSMETableForm.controls["msmeType"].setValue(
         this.MSMETableForm.value.msmeType.value
       );
       body = { ...body, ...this.MSMETableForm.value };
-    } else {
-      body["msmeTypeName"] = "";
-      body["msmeType"] = "";
-      body["msmeNumber"] = "";
-      this.imageData["msmeScan"] = "";
     }
-
     if (this.vendorTableForm.controls["isBankregistered"].value) {
       this.vendorBankDetailForm.controls["city"].setValue(
         this.vendorBankDetailForm.value.city.value
       );
       body = { ...body, ...this.vendorBankDetailForm.value };
-    } else {
-      body["bankACNumber"] = "";
-      body["ifscCode"] = "";
-      body["bankName"] = "";
-      body["bankBrachName"] = "";
-      body["city"] = "";
-      body["upiId"] = "";
-      body["contactPerson"] = "";
-      body["mobileNumber"] = "";
-      body["emails"] = "";
-      this.imageData["uploadKYC"] = "";
-      this.imageData["uCC"] = "";
     }
 
     if (this.vendorTableForm.controls["isLowRateApplicable"].value) {
@@ -663,29 +598,11 @@ export class AddVendorMasterComponent implements OnInit {
         this.lowTDSTableForm.value.tdsSection.value
       );
       body = { ...body, ...this.lowTDSTableForm.value };
-    } else {
-      body["effectiveFrom"] = "";
-      body["validUpto"] = "";
-      body["lowTDSLimit"] = "";
-      body["tdsSection"] = "";
-      body["tdsSectionName"] = "";
-      this.imageData["uPRC"] = "";
     }
 
     if (this.vendorTableForm.controls["hTDSRA"].value) {
-      body["isTDSDeclaration"] = true;
       body = { ...body, ...this.HighTDSTableForm.value };
-    } else {
-      body["isTDSDeclaration"] = false;
-      this.imageData["uTDSD"] = "";
     }
-
-    if (this.vendorTableForm.controls["isGSTregistered"].value) {
-      body["otherdetails"] = this.otherDetailForm
-    } else {
-      body["otherdetails"] = [];
-    }
-
     let data = body;
 
     const imageControlNames = [
@@ -704,7 +621,6 @@ export class AddVendorMasterComponent implements OnInit {
       // Set the URL in the corresponding control name
       data[controlName] = file ? file : "";
     });
-
     if (this.isUpdate) {
       let vendorCode = data["vendorCode"];
       delete data["_id"];
@@ -720,6 +636,7 @@ export class AddVendorMasterComponent implements OnInit {
         filter: { vendorCode: vendorCode },
         update: data,
       };
+
       const res = await firstValueFrom(
         this.masterService.masterPut("generic/update", req)
       );
@@ -737,7 +654,7 @@ export class AddVendorMasterComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         collectionName: "vendor_detail",
-        filter: { companyCode: this.companyCode },
+        filter: {},
         sorting: { vendorCode: -1 },
       };
       const Vendor = await firstValueFrom(

@@ -44,7 +44,6 @@ export class vehicleModel {
   gpsProviderCode:any;
 
   constructor(vehicleModel) {
-    this.isActive = vehicleModel.isActive || true;
     this.id = vehicleModel._id || this.getRandomID();
     this.vehicleType = vehicleModel.vehicleType || '';
     this.division = vehicleModel.division || '';

@@ -75,6 +75,7 @@ import { ManifestRegisterReportComponent } from './manifest-register-report/mani
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
+import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -155,7 +156,8 @@ import { GenericReportViewComponent } from './generic-report-view/generic-report
     ManifestRegisterReportComponent,
     LoadingsheetRegisterComponent,
     GenerateTdsRegisterReportComponent,
-    GenericReportViewComponent
+    GenericReportViewComponent,
+    DebitNoteRegisterReportComponent
   ],
   exports: [],
 

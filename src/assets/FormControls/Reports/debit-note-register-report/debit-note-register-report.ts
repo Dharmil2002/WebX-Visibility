@@ -44,6 +44,7 @@ export class DebitNoteRegister {
                 additionalData: {
                     support: "end",
                 },
+                functions: { onDate: "validateDateRange" }
             },
             {
                 name: 'branch',

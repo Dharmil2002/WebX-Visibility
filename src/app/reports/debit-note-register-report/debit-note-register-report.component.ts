@@ -5,14 +5,14 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { DebitNoteRegisterService } from 'src/app/Utility/module/reports/debit-note-register-service';
-import Swal from 'sweetalert2';
+import { NavDataService } from 'src/app/core/service/navdata.service';
 import moment from 'moment';
-import { finYear } from 'src/app/Utility/date/date-utils';
+import { Subject,firstValueFrom, take, takeUntil } from 'rxjs';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-debit-note-register-report',
   templateUrl: './debit-note-register-report.component.html'
@@ -28,14 +28,6 @@ export class DebitNoteRegisterReportComponent implements OnInit {
       active: "Debit Note Register Report",
     },
   ];
-
-  reqBody: {
-    startdate: Date;
-    enddate: Date;
-    branch: string;
-    FinanceYear: string;
-   
-  };
   venNameDet: any;
   loading = true ;
   columns = [];
@@ -44,10 +36,9 @@ export class DebitNoteRegisterReportComponent implements OnInit {
   searching: any ;
   source: any[] = [];
   columnMenu: any ;
-  theme: "MATERIAL"
   LoadTable=false;
-  csvFileName: string;
   ReportingBranches: string[] = [];
+  protected _onDestroy = new Subject<void>();
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
@@ -55,7 +46,8 @@ export class DebitNoteRegisterReportComponent implements OnInit {
     private masterServices: MasterService,
     private generalLedgerReportService: GeneralLedgerReportService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private debitNoteRegisterService:DebitNoteRegisterService
+    private debitNoteRegisterService:DebitNoteRegisterService,
+    private nav: NavDataService
   ) { }
 
   ngOnInit(): void {
@@ -64,9 +56,7 @@ export class DebitNoteRegisterReportComponent implements OnInit {
     this.DebitNoteForm.controls["start"].setValue(now);
     this.DebitNoteForm.controls["end"].setValue(now);
     this.getDropDownList();
-    this.csvFileName = "DebitNote_Register_Report";
   }
-  // 
   async getDropDownList() {
     let venNameReq = {
       "companyCode": this.storage.companyCode,
@@ -84,13 +74,13 @@ export class DebitNoteRegisterReportComponent implements OnInit {
       "branch",
       false
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(branch => branch.value === this.storage.branch);
     this.DebitNoteForm.controls["branch"].setValue(loginBranch);
     const DebitNoteStatusList = [
       { name: "All", value: "All" },
-      { name: "Generated", value: "G"},
-      { name: "Approved", value: "A" },
-      { name: "Cancelled", value: "C" }
+      { name: "Generated", value: "1"},
+      { name: "Approved", value: "2" },
+      { name: "Cancelled", value: "3" }
     ]
     this.filter.Filter(
       this.jsonControlArray,
@@ -99,22 +89,19 @@ export class DebitNoteRegisterReportComponent implements OnInit {
       "documnetstatus",
       false
     );
-  
-    const venNameData = venNameRes?.data; // Retrieve the data from the response
-    const venNameDet = Array.isArray(venNameData) ? // Check if it's an array
-      venNameData.map(element => ({ // If it's an array, map over it
+    const venNameData = venNameRes?.data; 
+    const venNameDet = Array.isArray(venNameData) ? 
+      venNameData.map(element => ({ 
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),
-        type: element.vendorType.toString(),
-      })) : []; // If not an array, set venNameDet as an empty array
-    
-    this.venNameDet = venNameDet; // Update venNameDet with the mapped array or empty array
+      })) : [];
+    this.venNameDet = venNameDet; 
   
     this.DebitNoteForm.get('documnetstatus').setValue(DebitNoteStatusList[0]);
     this.filter.Filter(
       this.jsonControlArray,
       this.DebitNoteForm,
-      venNameDet, // Pass the updated venNameDet here
+      venNameDet, 
      "vennmcd",
       false
     );
@@ -131,25 +118,80 @@ export class DebitNoteRegisterReportComponent implements OnInit {
   initializeFormControl() {
     const controls = new DebitNoteRegister();
     this.jsonControlArray = controls.DebitNoteControlArray;
-
     // Build the form using formGroupBuilder
     this.DebitNoteForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-   
   }
+
   functionCallHandler($event) {
     let functionName = $event.functionName;     
     try {
       this[functionName]($event);
     } catch (error) {
-      
       console.log("failed");
     }
   }
 
+  validateDateRange(event): void {
+    const startControlValue = this.DebitNoteForm.controls.start.value;
+    const endControlValue = this.DebitNoteForm.controls.end.value;
+    const selectedFinancialYear = this.DebitNoteForm.controls.Fyear.value;
+    if (!startControlValue || !endControlValue) {
+      return;
+    }
+    const startDate = new Date(startControlValue);
+    const endDate = new Date(endControlValue);
+    const startYear = startDate.getFullYear(); 
+    const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
+    const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
+    if (selectedFinancialYear.value === calculatedFnYr) {
+      const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; 
+      const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+      const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+      if (startDate >= minDate && startDate <= maxDate && endDate >= minDate && endDate <= maxDate) {
+        console.log('Both dates are within the valid range.');
+      } else {
+        this.dateRangeWarning(selectedFinancialYear);
+        this.clearDateControls();
+      }
+    }
+    else {
+      this.dateRangeWarning(selectedFinancialYear);
+      this.clearDateControls();
+    }
+  }
+  // Function to display a warning message if the date range is not within the selected financial year
+  dateRangeWarning(selectedFinancialYear): void {
+    Swal.fire({
+      icon: "warning",
+      title: "Warning",
+      text: `Date range not within FY ${selectedFinancialYear.name}`,
+      showConfirmButton: true,
+    });
+  }
+  // Function to clear the date range controls
+  clearDateControls(): void {
+    this.DebitNoteForm.controls["start"].setValue("");
+    this.DebitNoteForm.controls["end"].setValue("");
+  }
+
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonControlArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.DebitNoteForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
   async save() {
     this.loading = true;
       try {
-        
         this.ReportingBranches = [];
         if (this.DebitNoteForm.value.Individual == "N") {
           this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.DebitNoteForm.value.branch.value);
@@ -172,29 +214,33 @@ export class DebitNoteRegisterReportComponent implements OnInit {
         const DocNo=this.DebitNoteForm.value.docNo;
         const DocNos = DocNo ? DocNo.includes(',') ? DocNo.split(',') : [DocNo] : [];
         const VoucherNo=this.DebitNoteForm.value.voucherNo;
+        const VoucherNos = VoucherNo ? VoucherNo.includes(',') ? VoucherNo.split(',') : [VoucherNo] : [];
         const reqBody = {
-          startValue, endValue, finYear, Branch, Individual, DocStatus, MSME, vendData, DocNos,DocNo,VoucherNo
+          startValue, endValue, finYear, Branch, Individual, DocStatus, MSME, vendData, DocNos,DocNo,VoucherNo,VoucherNos
         }
         const result = await this.debitNoteRegisterService.GetDebitNoteDetails(reqBody);
         this.columns = result.grid.columns;
         this.sorting = result.grid.sorting;
         this.searching = result.grid.searching;
         this.paging = result.grid.paging;
-        this.source = result.data.data.data;
-        this.LoadTable = true;
-
-        if (this.source.length === 0) {
-          if (this.source) {
-            Swal.fire({
-              icon: "error",
-              title: "No Records Found",
-              text: "Cannot Download CSV",
-              showConfirmButton: true,
-            });
+        if (result.data.length === 0) {
+          let message = "No Data Found!";
+          if (DocNos.length > 0) {
+            message = "There is No Debit note has been Generated against this Document!";
+          } else if (VoucherNos.length > 0) {
+            message = "This voucher is not generated against Debit note!";
           }
+          this.snackBarUtilityService.ShowCommonSwal("error", message);
           return;
         }
-          this.loading = false;
+        const Details = {
+          data: result,
+          formTitle: 'Debit Note Register Details',
+          csvFileName: 'DebitNoteRegisterReport'
+        };
+        this.nav.setData(Details);
+        const url = `/#/Reports/generic-report-view`;
+        window.open(url, '_blank')
       }
       catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);

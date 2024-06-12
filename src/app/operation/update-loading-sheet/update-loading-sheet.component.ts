@@ -38,6 +38,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   jsonControlArray: any;
   jsonscanControlArray: any;
   scanPackage: string;
+  width="70%"
+  height="60%";
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -134,16 +136,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this.currentBranch = this.storage.branch;
     this.companyCode = this.storage.companyCode;
-
-    // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
-
-    // Assign the item to the arrivalData property
     this.arrivalData = item;
-
-    // Call the getShippningData() function to fetch shipping data
     this.getLoadingSheetDetail();
-    // Initialize form controls for the loading sheet table
     this.IntializeFormControl();
   }
 
@@ -188,7 +183,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   shipmentsEdit(event) {
-    const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
+     debugger
+    const { shipment, suffix, noofPkts, actualWeight, ctWeight,depsOptions,fileUpload,isDeps,depsPkgs } = event;
     const data = this.csv.find(x => x.Shipment === shipment && x.Suffix === suffix);
     if (data) {
       const unloadedPkg = parseInt(noofPkts, 10);
@@ -197,7 +193,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
       const pendPkg = data.Packages - unloadedPkg;
       const pendWt = data.weight - parseFloat(actualWeight);
       const pendCwt = data.cWeight - parseFloat(ctWeight);
-      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt });
+      const  depsType = depsOptions?.value||'';
+      const  file = fileUpload?fileUpload:'';
+      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,isDeps,file,depsPkgs });
       this.cdr.detectChanges();
     }
   }

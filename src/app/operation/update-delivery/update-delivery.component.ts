@@ -256,4 +256,5 @@ export class UpdateDeliveryComponent implements OnInit {
       },"Delivery Update Successfull");
     }
   }
+  
 }

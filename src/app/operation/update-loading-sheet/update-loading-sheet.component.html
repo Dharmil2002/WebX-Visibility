@@ -36,7 +36,7 @@
     <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
     [tableData]="csv" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
     [menuItems]="definition.menuItems"  [columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
-    [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
+    [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"[width]="width"[height]="height"
     [maxWidth]="maxWidth"(dialogClosed)="onDailogClose($event)" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
     [menuItemFlag]="menuItemflag"[selectAllRequired]="selectAllRequired" (onFlagChange)="IsActiveFuntion($event)" [uploadComponent]= true  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
     </app-generic-table-v2>

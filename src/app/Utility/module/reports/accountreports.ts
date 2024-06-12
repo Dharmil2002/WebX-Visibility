@@ -240,7 +240,6 @@ export class AccountReportService {
                                    return 0;
                               });
                               const totalRows = {};
-
                               const processedData = SortedData.flatMap(item => {
                                    const mainCategory = item.MainCategory;
 
@@ -429,6 +428,9 @@ export class AccountReportService {
                               });
                               break;
                     }
+               } else {
+                    return []
+
                }
           } catch (error) {
                console.error("Error:", error);
@@ -466,7 +468,7 @@ export class AccountReportService {
                                                                  'D$gte': [
                                                                       '$vDT', request.startdate
                                                                  ]
-                                                            }, 
+                                                            },
                                                             {
                                                                  'D$lte': [
                                                                       '$vDT', request.enddate

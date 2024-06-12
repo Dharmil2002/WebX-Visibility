@@ -48,6 +48,17 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
     }));
 
     const dataArray = [newdata, ...result];
+
+    dataArray.map((item) => {
+      if (item.AccountName === "Total") {
+        item["FontWeight"] = "bold";
+      }
+      const currentAmount = Number(item.AmountCurrentFinYear);
+      if (!isNaN(currentAmount)) {
+        item.AmountCurrentFinYear = currentAmount.toLocaleString('en-US');
+      }
+    });
+
     this.JsonData = {
       "CompanyIMG": JsonData.CompanyIMG,
       "finYear": finYear,

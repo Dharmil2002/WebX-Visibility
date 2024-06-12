@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
-import { timeString } from 'src/app/Utility/date/date-utils';
+import { formatAmount, timeString } from 'src/app/Utility/date/date-utils';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { GetCSVDataBasedOnReportType, GetCSVHeadersBasedOnReportType, GetHTMLBasedOnReportType } from '../TrialBalanceUtitlity';
@@ -34,6 +34,20 @@ export class TrialBalanceViewComponent implements OnInit {
     if (!this.JsonData) {
       this.router.navigate(["/Reports/AccountReport/TrialBalance"]);
     }
+
+    this.JsonData.Data = this.JsonData.Data.map(item => {
+      return {
+        ...item,
+        TransactionDebit: formatAmount(item.TransactionDebit),
+        TransactionCredit: formatAmount(item.TransactionCredit),
+        OpeningDebit: formatAmount(item.OpeningDebit),
+        OpeningCredit: formatAmount(item.OpeningCredit),
+        ClosingDebit: formatAmount(item.ClosingDebit),
+        ClosingCredit: formatAmount(item.ClosingCredit),
+        BalanceAmount: formatAmount(item.BalanceAmount),
+      };
+    });
+
     this.FieldMapping = [
 
       {

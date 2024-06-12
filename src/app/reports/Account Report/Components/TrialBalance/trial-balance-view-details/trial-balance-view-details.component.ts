@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { timeString } from 'src/app/Utility/date/date-utils';
+import { formatAmount, timeString } from 'src/app/Utility/date/date-utils';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 
@@ -80,6 +80,13 @@ export class TrialBalanceViewDetailsComponent implements OnInit {
       "Data": Result
     }
     if (Result) {
+      this.JsonData.Data = this.JsonData.Data.map(item => {
+        return {
+          ...item,
+          cR: formatAmount(item.cR),
+          dR: formatAmount(item.dR),
+        };
+      });
       this.RenderHTMLData();
     }
   }

@@ -13,7 +13,6 @@ export class AccountReportService {
      constructor(private masterService: MasterService,
           private storage: StorageService,) { }
      async ProfitLossStatement(request) {
-
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "account_detail",
@@ -39,7 +38,7 @@ export class AccountReportService {
                     },
                     {
                          "D$lookup": {
-                              "from": "acc_trans_2425",
+                              "from": "acc_trans_" + request.FinanceYear,
                               "let": { "aCCCD": "$aCCD" },
                               "pipeline": [
                                    {
@@ -166,7 +165,10 @@ export class AccountReportService {
                               MainCategoryWithoutIndex: entry.MainCategory,
                               SubCategory: 'Total',
                               SubCategoryWithoutIndex: '',
-                              TotalAmountCurrentFinYear: (entry.Details.reduce((acc, item) => acc + item.TotalCredit, 0) - entry.Details.reduce((acc, item) => acc + item.TotalDebit, 0)).toFixed(2),
+                              TotalAmountCurrentFinYear: Number(
+                                   (entry.Details.reduce((acc, item) => acc + parseFloat(item.TotalCredit), 0) -
+                                        entry.Details.reduce((acc, item) => acc + parseFloat(item.TotalDebit), 0)).toFixed(2)
+                              ),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: '',
                               AccountDetails: '',

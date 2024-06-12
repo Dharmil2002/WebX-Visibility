@@ -13,22 +13,22 @@ export class ProfitAndLossReport {
                     autocomplete: "",
                     displaywith: "",
                     Validations: [
-                        {
-                            name: "autocomplete",
-                        },
-                        {
-                            name: "invalidAutocomplete",
-                            message: "Choose proper value",
-                        },
+                         {
+                              name: "autocomplete",
+                         },
+                         {
+                              name: "invalidAutocomplete",
+                              message: "Choose proper value",
+                         },
                     ],
                     additionalData: {
-                        showNameAndValue: false,
+                         showNameAndValue: false,
                     },
                     functions: {
-                        onOptionSelect: "resetDateRange"
+                         onOptionSelect: "resetDateRange"
                     },
                     generatecontrol: true, disable: false
-                },
+               },
                {
                     name: "start",
                     label: "Select Date Range",
@@ -56,7 +56,15 @@ export class ProfitAndLossReport {
                     Validations: [{
                          name: "invalidAutocomplete",
                          message: "Choose proper value",
-                    },],
+                    },
+                    {
+                         name: "autocomplete",
+                    },
+                    {
+                         name: "required",
+                         message: "Branch is required",
+                    }
+                    ],
                     additionalData: {
                          showNameAndValue: true,
                     },
@@ -87,6 +95,7 @@ export class ProfitAndLossReport {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
+                    functions: { onDate: "validateDateRange" }
                }
           ]
      }

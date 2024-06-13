@@ -448,7 +448,6 @@ export class AccountReportService {
      }
 
      GetTypeWiseFilter(request) {
-
           switch (request.ReportType) {
                case "G":
                     return [
@@ -482,8 +481,25 @@ export class AccountReportService {
                                                                  'D$lte': [
                                                                       '$vDT', request.enddate
                                                                  ]
-                                                            }
-
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
                                                        ]
                                                   }
                                              }
@@ -597,7 +613,25 @@ export class AccountReportService {
                                                                  '$lte': [
                                                                       '$vDT', request.enddate
                                                                  ]
-                                                            }
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -717,7 +751,25 @@ export class AccountReportService {
                                                                  'D$eq': [
                                                                       '$pARTYTY', 'Vendor'
                                                                  ]
-                                                            }
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -845,7 +897,25 @@ export class AccountReportService {
                                                                  'D$eq': [
                                                                       '$pARTYTY', 'Customer'
                                                                  ]
-                                                            }
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -969,6 +1039,24 @@ export class AccountReportService {
                                                                       '$vDT', request.enddate
                                                                  ]
                                                             },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }

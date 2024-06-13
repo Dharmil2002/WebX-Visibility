@@ -51,6 +51,8 @@ export class TrialBalanceCriteriaComponent implements OnInit {
     enddate: Date;
     branch: string[];
     accountCode: string[];
+    ReportSubType: string;
+    subLedger: string[];
   };
   EndDate: any = moment().format("DD MMM YY");
   financYrName: any;
@@ -142,6 +144,14 @@ export class TrialBalanceCriteriaComponent implements OnInit {
       "ReportType",
       false
     );
+    this.filter.Filter(
+      this.jsonproftandlossArray,
+      this.TrialBalanceForm,
+      ReportSubType,
+      "reportSubType",
+      false
+    );
+
     this.TrialBalanceForm.get('ReportType').setValue(ReportType[0]);
   }
 
@@ -232,8 +242,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
   //#endregion
   //#region to set party name according to received from data
   async reportSubTypeChanged() {
-    // if (this.TrialBalanceForm.controls.ReportType.value === 'Sub Ledger') {
-    const reportSubType = this.TrialBalanceForm.value.reportSubType;
+    const reportSubType = this.TrialBalanceForm.value.reportSubType.value;
 
     this.TrialBalanceForm.controls.subLedger.setValue("");
     this.TrialBalanceForm.controls.subLedgerHandler.setValue("");
@@ -271,15 +280,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
       default:
 
     }
-    // } else {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Warning",
-    //     text: `Select Report Type as Sub Ledger`,
-    //     showConfirmButton: true,
-    //   });
-    //   this.TrialBalanceForm.controls["reportSubType"].setValue("");
-    // }
+
   }
   //#endregion
   async save() {
@@ -304,7 +305,9 @@ export class TrialBalanceCriteriaComponent implements OnInit {
           branch,
           ReportType: this.TrialBalanceForm.value.ReportType.value,
           FinanceYear: this.TrialBalanceForm.value.Fyear.value,
-          accountCode: this.TrialBalanceForm.value.accountHandler != '' ? this.TrialBalanceForm.value.accountHandler.map(x => x.value) : []
+          accountCode: this.TrialBalanceForm.value.accountHandler != '' ? this.TrialBalanceForm.value.accountHandler.map(x => x.value) : [],
+          ReportSubType: this.TrialBalanceForm.value.reportSubType?.value || "",
+          subLedger: this.TrialBalanceForm.value.subLedgerHandler != '' ? this.TrialBalanceForm.value.subLedgerHandler.map(x => x.value) : [],
 
         }
         const Result: any[] = await this.accountReportService.GetTrialBalanceStatement(this.reqBody);
@@ -384,3 +387,11 @@ const ReportType = [
   { value: "E", name: "Employee Wise" },
   //{ value: "D", name: "Driver Wise" }
 ];
+const ReportSubType = [
+  // { value: "Location", name: "Location" },
+  { value: "Customer", name: "Customer" },
+  { value: "Driver", name: "Driver" },
+  { value: "Employee", name: "Employee" },
+  { value: "Vendor", name: "Vendor" },
+  { value: "Vehicle", name: "Vehicle" },
+]

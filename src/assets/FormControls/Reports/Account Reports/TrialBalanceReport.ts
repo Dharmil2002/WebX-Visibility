@@ -94,27 +94,24 @@ export class TrialBalanceReport {
                          showNameAndValue: false,
                     },
                     functions: {
-                         onSelection: "ReportTypeFieldChanged"
+                         onOptionSelect: "ReportTypeFieldChanged"
                     },
                },
                {
                     name: 'reportSubType',
                     label: 'Report Sub Type',
                     placeholder: 'Report Sub Type',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Location", name: "Location" },
-                         { value: "Customer", name: "Customer" },
-                         { value: "Vendor", name: "Vendor" },
-                         { value: "Employee", name: "Employee" },
-                         { value: "Driver", name: "Driver" },
-                         { value: "Vehicle", name: "Vehicle" },
-                    ],
+                    type: 'dropdown',
+                    value: "",
                     functions: {
-                         onSelection: "reportSubTypeChanged"
+                         onOptionSelect: "reportSubTypeChanged"
+                    },
+                    additionalData: {
+                         showNameAndValue: false,
                     },
                     Validations: [],
-                    generatecontrol: true, disable: false
+                    generatecontrol: true,
+                    disable: false
                },
                {
                     name: 'subLedger',

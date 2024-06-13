@@ -1,16 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 import { formatAmount, timeString } from 'src/app/Utility/date/date-utils';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
-  selector: 'app-trial-balance-view-details',
-  templateUrl: './trial-balance-view-details.component.html'
+  selector: 'app-profit-and-loss-view-details-vouchers-list',
+  templateUrl: './profit-and-loss-view-details-vouchers-list.component.html',
 })
-export class TrialBalanceViewDetailsComponent implements OnInit {
+export class ProfitAndLossViewDetailsVouchersListComponent implements OnInit {
   HtmlTemplate: any;
   showView = false;
   FieldMapping: any;
@@ -42,7 +41,7 @@ export class TrialBalanceViewDetailsComponent implements OnInit {
   async ngOnInit() {
 
     if (!this.ParamRequest) {
-      this.router.navigate(["/Reports/AccountReport/TrialBalanceview"]);
+      this.router.navigate(["/Reports/AccountReport/ProfitAndLossviewdetails"]);
     }
     if (this.voucherNo) {
       const templateBody = {
@@ -55,10 +54,11 @@ export class TrialBalanceViewDetailsComponent implements OnInit {
         }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
       window.open(url, "", "width=1000,height=800");
     }
-    const RequestData = JSON.parse(this.accountReportService.getDataForTrialBalance("TrialBalanceRequest"));
+
+    const RequestData = JSON.parse(this.accountReportService.getRequestData());
 
     RequestData["AccountCode"] = this.ParamRequest.split(":")[0];
-
+    console.log(RequestData);
     const MatchFilter = {
       'D$match': {
         'aCCCD': RequestData.AccountCode,
@@ -71,13 +71,7 @@ export class TrialBalanceViewDetailsComponent implements OnInit {
         }
       }
     }
-    // switch (RequestData.ReportType) {
-    //   case "C":
-    //     MatchFilter['D$match']['cUST'] = {
-    //       'D$in': RequestData.branch
-    //     }
-    //     break;
-    // }
+
     const Result = await this.accountReportService.GetTrialBalanceDetailsStatement(RequestData, MatchFilter);
 
     this.JsonData = {
@@ -127,7 +121,7 @@ export class TrialBalanceViewDetailsComponent implements OnInit {
       Narration: "Narration",
       Branch: "Branch"
     }
-    this.exportService.exportAsCSV(this.JsonData.Data, `TrialBalance_Report_Details-${timeString}`, CSVHeader);
+    this.exportService.exportAsCSV(this.JsonData.Data, `Profit_Loss_View_Report_Details_Voucher-${timeString}`, CSVHeader);
   }
 
 }

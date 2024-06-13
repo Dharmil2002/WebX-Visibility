@@ -323,16 +323,16 @@ export class TrialBalanceCriteriaComponent implements OnInit {
           if (x.AccountCode == OpeningBalanceResult.find(y => y.AccountCode == x.AccountCode)?.AccountCode) {
             x.OpeningDebit = parseFloat(OpeningBalanceResult.find(y => y.AccountCode == x.AccountCode)?.DebitAmount).toFixed(2);
             x.OpeningCredit = parseFloat(OpeningBalanceResult.find(y => y.AccountCode == x.AccountCode)?.CreditAmount).toFixed(2);
-            x.ClosingDebit = (parseFloat(x.OpeningDebit) - parseFloat(x.TransactionDebit)).toFixed(2);
-            x.ClosingCredit = (parseFloat(x.OpeningCredit) - parseFloat(x.TransactionCredit)).toFixed(2);
+            x.ClosingDebit = (parseFloat(x.OpeningDebit) + parseFloat(x.TransactionDebit)).toFixed(2);
+            x.ClosingCredit = (parseFloat(x.OpeningCredit) + parseFloat(x.TransactionCredit)).toFixed(2);
             x.BalanceAmount = (parseFloat(x.ClosingCredit) - parseFloat(x.ClosingDebit)).toFixed(2);
           }
         });
         Result.filter(item => item.MainCategory == "Total").forEach(x => {
           x.OpeningDebit = Result.filter(item => item.MainCategory == x.Category).reduce((total, item) => total + parseFloat(item.OpeningDebit), 0).toFixed(2);
           x.OpeningCredit = Result.filter(item => item.MainCategory == x.Category).reduce((total, item) => total + parseFloat(item.OpeningCredit), 0).toFixed(2);
-          x.ClosingDebit = (parseFloat(x.OpeningDebit) - parseFloat(x.TransactionDebit)).toFixed(2);
-          x.ClosingCredit = (parseFloat(x.OpeningCredit) - parseFloat(x.TransactionCredit)).toFixed(2);
+          x.ClosingDebit = (parseFloat(x.OpeningDebit) + parseFloat(x.TransactionDebit)).toFixed(2);
+          x.ClosingCredit = (parseFloat(x.OpeningCredit) + parseFloat(x.TransactionCredit)).toFixed(2);
           x.BalanceAmount = (parseFloat(x.ClosingCredit) - parseFloat(x.ClosingDebit)).toFixed(2);
         });
 

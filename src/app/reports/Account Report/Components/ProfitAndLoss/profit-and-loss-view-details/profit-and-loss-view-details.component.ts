@@ -34,7 +34,7 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
     const newdata = {
       "Notes": SingleData.Notes,
       "SubCategory": SingleData.SubCategory,
-      "AccountName": "Total",
+      "Description": "",
       "AmountCurrentFinYear": TotalAmountCurrentFinYear.toFixed(2),
       "AmountLastFinYear": TotalAmountLastFinYear.toFixed(2)
     };
@@ -42,7 +42,7 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
     const result = SingleData.AccountDetails.map(item => ({
       Notes: '',
       SubCategory: '',
-      AccountName: item.AccountName,
+      Description: item.AccountCode + ":" + item.AccountName,
       AmountCurrentFinYear: (item.Credit - item.Debit).toFixed(2),
       AmountLastFinYear: TotalAmountLastFinYear.toFixed(2)
     }));
@@ -50,9 +50,6 @@ export class ProfitAndLossViewDetailsComponent implements OnInit {
     const dataArray = [newdata, ...result];
 
     dataArray.map((item) => {
-      if (item.AccountName === "Total") {
-        item["FontWeight"] = "bold";
-      }
       const currentAmount = Number(item.AmountCurrentFinYear);
       if (!isNaN(currentAmount)) {
         item.AmountCurrentFinYear = currentAmount.toLocaleString('en-US');

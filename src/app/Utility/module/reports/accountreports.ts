@@ -160,7 +160,7 @@ export class AccountReportService {
                     });
                     const TotalAmountLastFinYear = 0.00;
                     const NewTableList = reportData.flatMap((entry, index) => {
-                         const mainRow = {
+                         let mainRow = {
                               MainCategory: `${index + 1}. ${entry.MainCategory}`,
                               MainCategoryWithoutIndex: entry.MainCategory,
                               SubCategory: 'Total',
@@ -207,6 +207,13 @@ export class AccountReportService {
 
      getData() {
           return this.storage.getItem("PLReportsData");
+     }
+     setRequestData(data: any) {
+          this.storage.setItem("PLReportsRequestData", JSON.stringify(data));
+     }
+
+     getRequestData() {
+          return this.storage.getItem("PLReportsRequestData");
      }
 
      async GetTrialBalanceStatement(request) {
@@ -1224,6 +1231,9 @@ export class AccountReportService {
                               },
                               'TotalDebit': {
                                    'D$sum': '$transactions.dR'
+                              },
+                              'VoucherNoList': {
+                                   'D$addToSet': "$transactions.vNO"
                               }
                          }
                     }, {
@@ -1241,6 +1251,9 @@ export class AccountReportService {
                               },
                               'TotalDebit': {
                                    'D$sum': '$TotalDebit'
+                              },
+                              'VoucherNoList': {
+                                   'D$addToSet': "$VoucherNoList"
                               },
                               'AccountDetails': {
                                    'D$push': {
@@ -1263,6 +1276,18 @@ export class AccountReportService {
                                         'BSSchedule': '$_id.BSSchedule',
                                         'TotalCredit': '$TotalCredit',
                                         'TotalDebit': '$TotalDebit',
+                                        'VoucherNoList': {
+                                             'D$reduce': {
+                                                  'input': "$VoucherNoList",
+                                                  'initialValue': [],
+                                                  'in': {
+                                                       'D$concatArrays': [
+                                                            "$$value",
+                                                            "$$this"
+                                                       ]
+                                                  }
+                                             }
+                                        },
                                         'AccountDetails': '$AccountDetails'
                                    }
                               }
@@ -1308,7 +1333,8 @@ export class AccountReportService {
                               TotalAmountCurrentFinYear: totalAmountCurrentFinYear.toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: '',
-                              AccountDetails: ''
+                              AccountDetails: '',
+                              VouchersList: []
                          };
 
                          const subCategoryRows = entry.Details.map((detail, detailIndex) => ({
@@ -1317,7 +1343,8 @@ export class AccountReportService {
                               TotalAmountCurrentFinYear: (detail.TotalCredit - detail.TotalDebit).toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: detail.BSSchedule || '',
-                              AccountDetails: detail.AccountDetails
+                              AccountDetails: detail.AccountDetails,
+                              VouchersList: detail.VoucherNoList
                          }));
 
                          // Collect unique BalanceCategoryName values

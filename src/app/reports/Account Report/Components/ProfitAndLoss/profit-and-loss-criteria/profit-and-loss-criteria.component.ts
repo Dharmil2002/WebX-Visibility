@@ -279,7 +279,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           return item.SubCategoryWithoutIndex !== 'Extraordinary items' && item.SubCategoryWithoutIndex !== 'Exceptional Items';
         });
 
-        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear);
+        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear || 0) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear || 0);
         UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear = (UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear - TotalOfexceptionalItemsAndextraordinaryItems).toFixed(2);
         // Push 3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]
         const income = UpdatedData.find(x => x.MainCategoryWithoutIndex === "INCOME")?.TotalAmountCurrentFinYear ?? 0;
@@ -391,6 +391,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           "ProfitAndLossDetails": UpdatedData
         }
         this.accountReportService.setData(RequestData);
+        this.accountReportService.setRequestData(this.reqBody);
         window.open('/#/Reports/AccountReport/ProfitAndLossview', '_blank');
 
 

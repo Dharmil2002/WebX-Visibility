@@ -36,7 +36,7 @@ export class GenericViewPrintComponent implements OnInit {
   @Input() CopysName: any[] = ['Primary Copy']; // MULTIPLE COPY ARRAY
   @Output() functionCallEmitter = new EventEmitter();
 
-  printStyles = { '@page': { size: `${this.isLandscape?'landscape':'portrait'} !important` } }
+  printStyles = { '@page': { size: `${this.isLandscape ? 'landscape' : 'portrait'} !important` } }
   constructor(private renderer: Renderer2) {
     this.renderer.setStyle(
       document.querySelector("nav.navbar"),
@@ -54,8 +54,8 @@ export class GenericViewPrintComponent implements OnInit {
     this.updateTableHtml();
   }
 
-  onToggleChange(event){
-    this.printStyles = { '@page': { size: `${event?'landscape':'portrait'} !important` } }
+  onToggleChange(event) {
+    this.printStyles = { '@page': { size: `${event ? 'landscape' : 'portrait'} !important` } }
   }
   private async updateTableHtml(): Promise<void> {
     const template = this.HtmlTemplate;
@@ -82,7 +82,7 @@ export class GenericViewPrintComponent implements OnInit {
                 for (const f of innerFields) {
                   const val = f.Value.replace(".[#].", `.${i}.`);
                   if (val.endsWith("{index}")) {
-                    row = row.replace(f.Key, `${i+1}`);
+                    row = row.replace(f.Key, `${i + 1}`);
                   } else {
                     row = row.replace(f.Key, await this.getValueByFieldName(this.JsonData, val, f.type || ""));
                   }
@@ -126,14 +126,14 @@ export class GenericViewPrintComponent implements OnInit {
             element.style.textAlign = "center";
             element.className = header.className;
             insertElementAtPosition(parent, element, "data-header");
-          }  
+          }
         } else {
           // Create and insert an empty element if data array is empty
           const element = document.createElement(header.tagName.toLowerCase());
           element.textContent = "";
           element.style.textAlign = "center";
           element.className = header.className;
-          insertElementAtPosition(parent, element, "data-header");  
+          insertElementAtPosition(parent, element, "data-header");
         }
       }
       // Remove the original header element
@@ -166,7 +166,7 @@ export class GenericViewPrintComponent implements OnInit {
             element.style.textAlign = "center";
             element.className = coll.className;
             insertElementAtPosition(parent, element, "data-column");
-          }    
+          }
         } else {
           // Create and insert empty element
           const element = document.createElement(coll.tagName.toLowerCase());
@@ -174,15 +174,15 @@ export class GenericViewPrintComponent implements OnInit {
           element.style.textAlign = "center";
           element.className = coll.className;
           insertElementAtPosition(parent, element, "data-column");
-        }  
+        }
       }
       // Remove original element
       coll.remove();
-    }    
+    }
 
     let updatedTemplate = doc.documentElement.innerHTML;
     for (const f of this.FieldMapping.filter((f) => !f.Value.includes(".[#].") && !f.Value.includes(".[##]."))) {
-      if(f.type == "qrCode") {
+      if (f.type == "qrCode") {
         const qrCode = "";
       }
       let val = await this.getValueByFieldName(this.JsonData, f.Value, f.type || "");
@@ -191,7 +191,7 @@ export class GenericViewPrintComponent implements OnInit {
     // MULTIPLE COPY PROCESS
     let TempletCopys = ''
     for (const item of this.CopysName) {
-      TempletCopys += `\n<div class="page-break" style="page-break-before: always;margin-top:25px;">\n${updatedTemplate.replace('[[copyName]]',item)}\n</div>`
+      TempletCopys += `\n<div class="page-break" style="page-break-before: always;margin-top:25px;">\n${updatedTemplate.replace('[[copyName]]', item)}\n</div>`
     }
     //SET TEMPLET 
     document.getElementById("TemplateData").innerHTML = TempletCopys;
@@ -203,14 +203,14 @@ export class GenericViewPrintComponent implements OnInit {
       const children = Array.from(parent.children);
       // Find the child with the specified attribute
       const column = children.find(child => {
-          const childElement = child as HTMLElement; // Cast to HTMLElement
-          return childElement.getAttribute(AttributeKey) !== null;
-      }) ;
+        const childElement = child as HTMLElement; // Cast to HTMLElement
+        return childElement.getAttribute(AttributeKey) !== null;
+      });
       // Insert the element at the found or append if not found
       if (column) {
-          parent.insertBefore(element, column);
+        parent.insertBefore(element, column);
       } else {
-          parent.appendChild(element);
+        parent.appendChild(element);
       }
     }
   }
@@ -233,7 +233,7 @@ export class GenericViewPrintComponent implements OnInit {
     for (const field of fieldNames) {
       const toWords = new ToWords();
       //console.log(`${fieldName} -> ${field}`, value[field]);
-      if (value && typeof value === "object" && field in value) {        
+      if (value && typeof value === "object" && field in value) {
         if (type) {
           switch (type) {
             case 'date':
@@ -261,7 +261,7 @@ export class GenericViewPrintComponent implements OnInit {
               value = value[field] ? "Yes" : "No";
               break;
             case "qrCode":
-              value =  typeof value[field] == 'string' ? await generateQR(value[field]) : value[field];
+              value = typeof value[field] == 'string' ? await generateQR(value[field]) : value[field];
               break;
             default:
               value = value[field];
@@ -271,10 +271,9 @@ export class GenericViewPrintComponent implements OnInit {
           value = value[field];
         }
       }
-      else 
-      {
+      else {
         value = "";
-      } 
+      }
     }
 
     return value;

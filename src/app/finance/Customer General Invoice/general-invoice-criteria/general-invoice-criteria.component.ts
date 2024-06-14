@@ -583,6 +583,12 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   }
   async PartyNameFieldChanged(event) {
     this.CustomerDetails = event.eventArgs.option.value.details;
+    if (this.CustomerDetails?.GSTdetails) {
+      this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls.CustomerGSTRegistered.setValue(
+        true
+      );
+
+    }
   }
   async BookCustomerGeneralInvoice() {
 

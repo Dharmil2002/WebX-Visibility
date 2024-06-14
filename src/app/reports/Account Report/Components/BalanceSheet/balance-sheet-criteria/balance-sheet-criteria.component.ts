@@ -12,6 +12,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { Router } from '@angular/router';
 import { BalanceSheetReport } from 'src/assets/FormControls/Reports/Account Reports/BalanceSheetReport';
+import { financialYear } from 'src/app/Utility/date/date-utils';
 @Component({
   selector: 'app-balance-sheet-criteria',
   templateUrl: './balance-sheet-criteria.component.html'
@@ -122,6 +123,9 @@ export class BalanceSheetCriteriaComponent implements OnInit {
       "Fyear",
       false
     );
+    // set Deafult Fin Year
+    const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
+    this.BalanceSheetForm.controls["Fyear"].setValue(selectedFinancialYear);
   }
 
   functionCallHandler($event) {
@@ -155,22 +159,12 @@ export class BalanceSheetCriteriaComponent implements OnInit {
     // Determine the financial year based on the start date
     const startYear = startDate.getFullYear(); // Extract the year from the start date
 
-    // Determine the financial year start
-    // If the month of the start date is less than March (0-based index, so 3 is April),
-    // it means the financial year started in the previous year.
-    // For example, if the start date is February 2024, the financial year started in April 2023.
     const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
-
-    // Calculate the financial year string in the format 'YYYYYYYY'
-    // The financial year string is a combination of the last two digits of the start year and the last two digits of the next year.
-    // For example, if the financial year started in 2023, the financial year string will be '2324'.
     const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
 
     // Check if the selected financial year matches the calculated financial year
     if (selectedFinancialYear.value === calculatedFnYr) {
 
-      // Define the financial year date range
-      // Parse the selected financial year to get the start year (e.g., '2324' -> 2023)
       const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
       const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
       const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year

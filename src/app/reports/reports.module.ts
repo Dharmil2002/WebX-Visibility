@@ -76,6 +76,8 @@ import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsh
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
 import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
+import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
+import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -157,7 +159,9 @@ import { DebitNoteRegisterReportComponent } from './debit-note-register-report/d
     LoadingsheetRegisterComponent,
     GenerateTdsRegisterReportComponent,
     GenericReportViewComponent,
-    DebitNoteRegisterReportComponent
+    DebitNoteRegisterReportComponent,
+    BalanceSheetViewDetailsComponent,
+    ProfitAndLossViewDetailsVouchersListComponent
   ],
   exports: [],
 

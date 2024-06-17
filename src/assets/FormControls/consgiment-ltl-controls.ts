@@ -296,8 +296,8 @@ export class ConsignmentLtl extends BaseControl {
       },
       {
         name: "pkgsType",
-        label: "Packaging Type",
-        placeholder: "Packaging Type",
+        label:  `${docCalledAs.Docket} Packaging Type`,
+        placeholder: `${docCalledAs.Docket} Packaging Type`,
         type: "Staticdropdown",
         value: [],
         Validations: [],

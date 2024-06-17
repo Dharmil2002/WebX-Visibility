@@ -2326,7 +2326,7 @@ export class ConsignmentEntryFormComponent
               Swal.fire({
                 icon: "success",
                 title: "Booked Successfully",
-                text: "DocketNo: " + dockNo,
+                text: "GCN No: " + dockNo,
                 showConfirmButton: true,
               }).then((result) => {
                 if (result.isConfirmed) {
@@ -2448,7 +2448,7 @@ export class ConsignmentEntryFormComponent
         icon: "success",
         title: "Docket Update Successfully",
         text:
-          "DocketNo: " +
+          "GCN No: " +
           this.model.consignmentTableForm.controls["docketNumber"].value,
         showConfirmButton: true,
       }).then((result) => {
@@ -2509,7 +2509,7 @@ export class ConsignmentEntryFormComponent
     Swal.fire({
       icon: "success",
       title: "Booked Successfully",
-      text: "DocketNo: " + dkt,
+      text: "GCN No: " + dkt,
       showConfirmButton: true,
     }).then((result) => {
       if (result.isConfirmed) {

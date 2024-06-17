@@ -8,8 +8,9 @@
        </div>
        <div *ngIf="isTableLode">
          <app-generic-table-v2  [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-           [tableData]="TableData" [EventButton]="EventButton" [FilterButton]="FilterButton" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData" 
-           [Link]="linkArray" [addAndEditPath]="'Masters/AccountMaster/AddAccountMaster'" [FormTitle]="'Accounts List'" [staticField]="staticField" >
+           [tableData]="TableData" [EventButton]="EventButton" [FilterButton]="FilterButton" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+           [Link]="linkArray" [addAndEditPath]="'Masters/AccountMaster/AddAccountMaster'" [FormTitle]="'Accounts List'" [staticField]="staticField"
+           [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" >
          </app-generic-table-v2>
        </div>
    </div>

@@ -495,6 +495,31 @@ export class InvoiceServiceService {
     const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
     return res
   }
+
+  async updateTHC(filter, data) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "thc_summary",
+      filter: filter,
+      update: data
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+    return res
+  }
+
+  async updateTHCLTL(filter, data) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "thc_summary_ltl",
+      filter: filter,
+      update: data
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+    return res
+  }
+
   /*end */
   /*below method for Update docket*/
   async updateDocketStatus(filter) {

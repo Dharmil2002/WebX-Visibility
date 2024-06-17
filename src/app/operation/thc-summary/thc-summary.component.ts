@@ -6,6 +6,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { StorageService } from 'src/app/core/service/storage.service';
 import moment from 'moment';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import Swal from 'sweetalert2';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 
 @Component({
   selector: 'app-thc-summary',
@@ -92,18 +96,21 @@ export class ThcSummaryComponent implements OnInit {
   // ]
   addAndEditPath: string;
   menuItemflag: boolean = true;
-  menuItems = [{ label: "Update THC" }, { label: "Delivered" }, { label: "View" }];
+  menuItems = [{ label: "Update THC" }, { label: "Delivered" }, { label: "View" }, { label: "Cancel THC" }];
 
   //here declare varible for the KPi
   boxData: { count: number; title: string; class: string; }[];
   rules: any[] = [];
   connectedLoc: boolean = false;
+  location: any;
   constructor(
     private router: Router,
     public dialog: MatDialog,
     private thcService: ThcService,
     private storage: StorageService,
     private controlPanel: ControlPanelService,
+    private objGeneralService: GeneralService,
+    private invoiceService: InvoiceServiceService,
   ) {
 
     this.getThcDetails();
@@ -134,6 +141,7 @@ export class ThcSummaryComponent implements OnInit {
     }
     const branch = this.storage.branch;
     const locData = await this.thcService.getLocationDetail(branch);
+    this.location=locData;
     let  filter = {
       cID: this.storage.companyCode,
       D$or: [
@@ -160,7 +168,7 @@ export class ThcSummaryComponent implements OnInit {
         item.createOn = item.eNTDT;
         item.statusAction = item?.oPSSTNM
         item.loadedKg = item?.uTI?.wT
-        item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] : (dest && item.oPSST !== 2) ? ["Update THC", "View"] : item.oPSST === 1 || [2, 3].includes(item.oPSST) ? ["View"] : ["Delivered", "View"];
+        item.actions = item.oPSST === 1 && action ? ["Update THC", "View","Cancel THC"] : (dest && item.oPSST !== 2) ? ["Update THC", "View"] : item.oPSST === 1 || [2, 3].includes(item.oPSST) ? ["View"] : ["Delivered", "View"];
       }
       return item;
     });
@@ -172,7 +180,55 @@ export class ThcSummaryComponent implements OnInit {
   ngOnInit(): void {
   }
   async handleMenuItemClick(data) {
+    debugger;
     const thcDetail = this.tableData.find((x) => x._id === data.data._id);
+    const locs = this.storage.branch;
+    if(thcDetail.oPSST == 1)
+      {
+        if(thcDetail.cLOC == locs || thcDetail.dEST == locs)
+          {
+            if (data.label.label === "Cancel THC") 
+            {
+              const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
+              const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+
+              Swal.fire({
+                title: 'Reason For Cancel?',
+                html: `<select id="swal-select1" class="swal2-select">${options}</select>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                width:"auto",
+                cancelButtonText: 'Cancel', // Optional: Customize the cancel button text
+                preConfirm: () => {
+                  return (document.getElementById('swal-select1') as HTMLInputElement).value;
+                }
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  // Handle the input value if the user clicks the confirm button
+                  const filter = {
+                    docNo: thcDetail.docNo
+                  }
+                  const status = {
+                    cNL: true,
+                    cNLDT: new Date(),
+                    cNBY: this.storage.userName,
+                    oPSSTNM: "Cancelled",
+                    oPSST: "9",
+                    cNRES: result.value//required cancel reason in popup
+                  }
+                  const res = await this.invoiceService.updateTHC(filter, status);
+                  if (res) {
+                    SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
+                    this.getThcDetails();
+                  }
+                  // Your code to handle the input value
+                } else if (result.isDismissed) {
+                  this.getThcDetails();
+                }
+              });
+            }
+          }
+      }
     if (data.label.label === "Update THC") {
       this.router.navigate([this.addAndEditPath], {
         state: {

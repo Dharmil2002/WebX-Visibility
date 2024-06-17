@@ -5,6 +5,7 @@ import { DepartureService } from "src/app/Utility/module/operation/departure/dep
 import { StorageService } from "src/app/core/service/storage.service";
 import { AddHocRouteComponent } from "./add-hoc-route/add-hoc-route.component";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-departure-dashboard-page",
@@ -47,8 +48,12 @@ export class DepartureDashboardPageComponent
    want hyper link and add Path which you want to redirect*/
   linkArray = [{ Row: "Action", Path: "Operation/CreateLoadingSheet" }];
   menuItems = [
-    { label: "Create Trip" },
+    { label: "Create Trip",},
     { label: "Update Trip" },
+    { label:"Vehicle Loading"},
+    { label:"Depart Vehicle" },
+    { label: "Update Trip" },
+    { label: "Cancel THC" }
     // Add more menu items as needed
   ];
   //Warning--It`s Used is not compasary if you does't add any link you just pass blank array
@@ -115,11 +120,17 @@ export class DepartureDashboardPageComponent
     //   class: "matcolumnleft",
     //   Style: "min-width:100px",
     // },
-    Action: {
+    // Action: {
+    //   Title: "Action",
+    //   class: "matcolumnleft",
+    //   Style: "min-width:100px",
+    //   stickyEnd: true,
+    // },
+    actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-      stickyEnd: true,
+      class: "matcolumncenter",
+      Style: "max-width:80px; width:80px",
+      stickyEnd: true
     },
   };
   staticField = [
@@ -146,6 +157,7 @@ export class DepartureDashboardPageComponent
     private departureService: DepartureService,
     private storage: StorageService,
     private dialog: MatDialog,
+    private  router:Router,
     public dialogRef: MatDialogRef<AddHocRouteComponent>
   ) {
     super();
@@ -222,6 +234,7 @@ const shipData = [
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1000,height=800');
   }
+  handole
   /*below is the function for add Hoc routes*/
   addHocRoute() {
     const dialogref = this.dialog.open(AddHocRouteComponent, {
@@ -236,4 +249,30 @@ const shipData = [
   }
 
   /*End*/
+  handleMenuItemClick(evnt){
+    debugger
+    console.log(evnt)
+    const {label}=evnt.label
+    switch (label) {
+      case "Create trip":
+      ;
+          break;
+      case "Vehicle Loading":
+          // Code for vehicle loading
+          break;
+      case "Depart Vehicle":
+          // Code for departing vehicle
+          break;
+      case "Update trip":
+          // Code for updating a trip
+          break;
+      case "Cancel THC":
+          // Code for cancelling THC
+          break;
+      default:
+          // Code for an unrecognized label
+          break;
+  }
+  
+  }
 } 

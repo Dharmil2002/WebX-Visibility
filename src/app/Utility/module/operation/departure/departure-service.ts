@@ -15,13 +15,14 @@ import { DocketEvents, DocketStatus, ThcStatus, VehicleStatus, getEnumName } fro
   providedIn: "root"
 })
 export class DepartureService {
+
   statusActions = {
-    "1": "Create Trip",
-    "2": "Vehicle Loading",
-    "3": "Depart Vehicle",
+    "1": ["Create Trip"],
+    "2": ["Vehicle Loading","Cancel THC"],
+    "3": ["Depart Vehicle","Cancel THC"],
     //"4": "Mark Arrival",
-    "6": "Update Trip",
-    "7": "Create Trip",
+    "6": ["Update Trip","Cancel THC"],
+    "7": ["Create Trip"],
     "default": [""]
   };
 
@@ -32,6 +33,7 @@ export class DepartureService {
   ) {
   }
   async getRouteSchedule() {
+    debugger;
     // Utility function to format route details with configurable keys
     const formatDetails = (data, keys) => data.map(element => ({
       id: element?._id || "",
@@ -42,7 +44,7 @@ export class DepartureService {
       Expected: new Date(new Date().getTime() + 10 * 60000).toISOString(),
       Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2),
       status: element.sTS || "1",
-      Action: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
+      actions: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
       location: element?.cLOC || element?.controlLoc || ""
     }));
     try {

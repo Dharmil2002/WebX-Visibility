@@ -14,15 +14,16 @@ import { DocketService } from 'src/app/Utility/module/operation/docket/docket.se
 import moment from 'moment';
 import Swal from 'sweetalert2';
 import { debug } from 'console';
+import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 
 @Component({
   selector: 'app-add-deps-details',
   templateUrl: './add-deps-details.component.html'
 })
 export class AddDepsDetailsComponent implements OnInit {
-  shipmentDetails:any="";
-  jsonControlArray:any;
-  depsFormGroup:UntypedFormGroup;
+  shipmentDetails: any = "";
+  jsonControlArray: any;
+  depsFormGroup: UntypedFormGroup;
   jsonControlAllArray: FormControls[];
   imageData: any = {};
   DocCalledAs: any;
@@ -32,10 +33,11 @@ export class AddDepsDetailsComponent implements OnInit {
     private controlPanel: ControlPanelService,
     public dialogRef: MatDialogRef<AddDepsDetailsComponent>,
     public dialog: MatDialog,
-    private storage:StorageService,
-    private filter:FilterUtils,
-    public generalService:GeneralService,
-    public docketService:DocketService,
+    private storage: StorageService,
+    private filter: FilterUtils,
+    private depsService: DepsService,
+    public generalService: GeneralService,
+    public docketService: DocketService,
     private objImageHandling: ImageHandling
   ) {
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -43,7 +45,6 @@ export class AddDepsDetailsComponent implements OnInit {
   }
 
   functionCaller($event) {
-    debugger
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -66,16 +67,26 @@ export class AddDepsDetailsComponent implements OnInit {
 
   IntializeFormControl() {
     const depsControls = new DepsControls(this.DocCalledAs);
-    this.jsonControlAllArray =depsControls.getDepsControls();
-    this.jsonControlArray=this.jsonControlAllArray.filter((x)=>x.additionalData?.require)
+    this.jsonControlAllArray = depsControls.getDepsControls();
+    this.jsonControlArray = this.jsonControlAllArray.filter((x) => x.additionalData?.require)
     this.depsFormGroup = formGroupBuilder(this.fb, [this.jsonControlAllArray]);
-  }  
+  }
   cancel() {
     this.dialogRef.close()
   }
-  async getDocketDetails(){
-    const resDockets=await this.docketService.getOneDocketLtl({cID:this.storage.companyCode,dKTNO:this.depsFormGroup.controls['docketNumber'].value})
-     if(resDockets){
+  async getDocketDetails() {
+    const deps = await this.depsService.getDepsOne({ dKTNO: this.depsFormGroup.controls['docketNumber'].value, cID: this.storage.companyCode })
+    if (deps) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'A deps ticket has already been generated for this docket!',
+      });
+      this.depsFormGroup.controls['docketNumber'].setValue("");
+      return;
+    }
+    const resDockets = await this.docketService.getOneDocketLtl({ cID: this.storage.companyCode, dKTNO: this.depsFormGroup.controls['docketNumber'].value })
+    if (resDockets) {
       this.depsFormGroup.controls['docketNumber'].setValue(resDockets[0].dKTNO);
       this.depsFormGroup.controls['docketDate'].setValue(moment(resDockets[0].dKTDT).tz(this.storage.timeZone).format("DD MMM YYYY hh:mm A"));
       this.depsFormGroup.controls['paytyp'].setValue(resDockets[0].pAYTYPNM);
@@ -86,24 +97,35 @@ export class AddDepsDetailsComponent implements OnInit {
       this.depsFormGroup.controls['cHRWT'].setValue(resDockets[0].cHRWT);
       this.depsFormGroup.controls['bookingPkgs'].setValue(resDockets[0].pKGS);
       this.depsFormGroup.controls['suffix'].setValue(resDockets[0].sFX);
-     }
+    }
   }
-  onExtraPkgs(){
-    const extraPkgs = parseInt(this.depsFormGroup.controls['extraPkgs']?.value || 0);
+  onExtraPkgs() {
+    const extraPkgs = parseInt(this.depsFormGroup.controls['depsPkgs']?.value || 0);
     const bookedPkgs = parseInt(this.depsFormGroup.controls['bookingPkgs']?.value || 0);
-    if(extraPkgs > bookedPkgs){
-       // Display a Swal message if extra packages are greater than booked packages
+    if (extraPkgs > bookedPkgs) {
+      // Display a Swal message if extra packages are greater than booked packages
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
         text: 'Extra packages cannot be greater than booked packages!',
       });
-       this.depsFormGroup.controls['extraPkgs'].setValue(0);
-       return ;
+      this.depsFormGroup.controls['depsPkgs'].setValue(0);
+      return;
     }
- }
- 
-  save(){
+  }
 
+  async save() {
+    const getallData = this.depsService.fieldMappingDeps([this.shipmentDetails.extraDetails], this.depsFormGroup.getRawValue());
+    const res = await this.depsService.createDeps(getallData)
+    if (res) {
+      Swal.fire({
+        icon: "success",
+        title: "DEPS Generated Successfully",
+        text: `DEPS Number is ${res?.data?.data?.depsHeader[0].dEPSNO}`,
+        showConfirmButton: true,
+      }).then((result) => {
+        this.dialogRef.close(res);
+      });
+    }
   }
 }

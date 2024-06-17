@@ -27,6 +27,11 @@ export enum DeliveryStatus {
   Part_Delivered=12,
 
 }
+export enum depsStatus{
+  Generated=1,
+  Update=2,
+  Closed=3,
+}
 export enum CustomerBillStatus {
   Generated = 1,
   Approved = 2,

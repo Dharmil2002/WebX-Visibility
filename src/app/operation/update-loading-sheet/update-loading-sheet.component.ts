@@ -19,6 +19,7 @@ import { ControlPanelService } from 'src/app/core/service/control-panel/control-
 import { StockUpdate } from 'src/app/Models/stock-update/stock-update';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -128,7 +129,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private storage: StorageService,
     private arrivalService: ArrivalVehicleService,
-    private snackBarUtilityService: SnackBarUtilityService
+    private snackBarUtilityService: SnackBarUtilityService,
+    private depsService:DepsService
   ) {
     this.metaData = {
       checkBoxRequired: true,
@@ -165,6 +167,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       KgWt: shipment?.wT || "",
       mfNo: shipment?.docNo || "",
       CftVolume: shipment?.vOL || "",
+      extraDetails:shipment,
       actions: ["Edit"]
     }));
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
@@ -181,10 +184,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   onDailogClose(event) {
     this.shipmentsEdit(event)
   }
-
   shipmentsEdit(event) {
-     debugger
-    const { shipment, suffix, noofPkts, actualWeight, ctWeight,depsOptions,fileUpload,isDeps,depsPkgs } = event;
+    const { shipment, suffix, noofPkts, actualWeight, ctWeight,depsOptions,fileUpload,isDeps,depsPkgs,depsOptionsName} = event;
     const data = this.csv.find(x => x.Shipment === shipment && x.Suffix === suffix);
     if (data) {
       const unloadedPkg = parseInt(noofPkts, 10);
@@ -193,9 +194,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
       const pendPkg = data.Packages - unloadedPkg;
       const pendWt = data.weight - parseFloat(actualWeight);
       const pendCwt = data.cWeight - parseFloat(ctWeight);
-      const  depsType = depsOptions?.value||'';
+      const depsType = depsOptions||'';
+      const depsTypeName=depsOptionsName||'';
       const  file = fileUpload?fileUpload:'';
-      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,isDeps,file,depsPkgs });
+      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,isDeps,file,depsPkgs,depsTypeName});
       this.cdr.detectChanges();
     }
   }
@@ -294,11 +296,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const scan = this.rules.find(x => x.rULEID == "SCAN" && x.aCTIVE);
     this.isScan = scan.vAL == "Y" ? true : false;
   }
-
   /**
    * Function to initialize form controls for the loading sheet table
    */
-
   IntializeFormControl() {
     // Create an instance of UpdateloadingControl
     const ManifestGeneratedFormControl = new UpdateloadingControl();
@@ -321,11 +321,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     // Set the arrival data binding
     this.setArrivalDataBindData();
   }
-
   IsActiveFuntion($event) {
     this.loadingData = $event
   }
-
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
@@ -343,7 +341,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   onSelectAllClicked(event) {
 
   }
-
   async CompleteScan() {
     this.snackBarUtilityService.commonToast(
       async () => {
@@ -374,7 +371,19 @@ export class UpdateLoadingSheetComponent implements OnInit {
           }
           this.isDisbled=true
           let notSelectedData = this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+          const requestBody=await this.depsService.fieldArrivalDeps(selectedData); 
           const res = await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData, selectedData, notSelectedData, this.packageData, this.isScan);
+          if(requestBody){
+            const res = await this.depsService.createDeps(requestBody);
+            if (res) {
+              Swal.fire({
+                icon: "success",
+                title: "DEPS Generated Successfully",
+                text: `DEPS Number is ${res?.data?.data?.depsHeader[0].dEPSNO}`,
+                showConfirmButton: true,
+              })
+            }
+          }
           if (res) {
             this.dialogRef.close(this.loadingSheetTableForm.value)
             this.goBack('Departures')
@@ -418,7 +427,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
       });
     });
   }
-
   Close(): void {
     this.dialogRef.close()
     this.goBack('Departures')
@@ -484,7 +492,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
     })
   }
-
   tripHistoryUpdate() {
 
     let tripDetails = {

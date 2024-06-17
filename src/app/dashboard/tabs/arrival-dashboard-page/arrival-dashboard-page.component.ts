@@ -201,7 +201,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   // }
 
   async getArrivalDetails() {
-  
+     debugger
     const reqbody =
     {
       "companyCode": this.companyCode,

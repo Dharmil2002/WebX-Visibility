@@ -66,6 +66,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     private objImageHandling: ImageHandling,
     public generalService: GeneralService,
   ) {
+
     this.shipmentDetails = item;
   }
 
@@ -126,7 +127,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   toggleChanges(event) {
     const fieldsPkgs = ['shortPkgs'];
     const podBasesFiled = ['pilferagePkts', 'DamagePkts'];
-    const allField = ['depsPkgs', 'reason', 'upload','remarks'];
+    const allField = ['depsPkgs', 'reason', 'upload', 'remarks'];
     const updateJsonData = (fieldNames, requireValue, event) => {
       return this.allJsonControlArray.map((x) => {
         if (fieldNames.includes(x.name)) {
@@ -146,7 +147,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     } else if (podBasesFiled.includes(fieldName)) {
       this.jsonControlArray = updateJsonData(allField, requireValue, event);
     }
-    if(fieldName=='extraPkts' && isChecked){
+    if (fieldName == 'extraPkts' && isChecked) {
       this.onDepsSelect();
     }
     this.updateValidators();
@@ -222,7 +223,7 @@ export class EditShipmentDetailsComponent implements OnInit {
           setFieldValues({ pkgs: pkg, actWeight: aWT, chgWeight: cWT });
           this.EditShipmentForm.controls['shortPkgs'].setValue(true);
           this.toggleChanges(this.requestdata);
-          const shortPkgs= parseInt(totPkg)- pkg;
+          const shortPkgs = parseInt(totPkg) - pkg;
           this.EditShipmentForm.controls['depsPkgs'].setValue(shortPkgs);
         }
         else if (pkg == 0) {
@@ -271,29 +272,29 @@ export class EditShipmentDetailsComponent implements OnInit {
       Swal.fire('Warning', result.message, 'warning');
     }
   }
-
   save() {
     let allFormData = { ...this.EditShipmentForm.getRawValue() };
-    if (this.depsDetails) {
-      allFormData = { ...allFormData, ...this.depsDetails };
-    }
+    allFormData.depsOptions = (allFormData.shortPkgs ? "S" : "") +
+      (allFormData.pilferagePkts ? "P" : "") +
+      (allFormData.DamagePkts ? "D" : "");
+    allFormData.depsOptionsName = {
+      "S": "Shortage",
+      "P": "Pilferage",
+      "D": "Damage"
+    }[allFormData.depsOptions] || "";
+    allFormData.isDeps = !!(allFormData.shortPkgs || allFormData.pilferagePkts || allFormData.DamagePkts);
     this.dialogRef.close(allFormData);
-
   }
-
   onDepsSelect() {
-    debugger
     const dialogref = this.dialog.open(AddDepsDetailsComponent, {
       width: "70%",
       height: "80%",
-      data: this.EditShipmentForm.getRawValue(),
+      data: { ...this.EditShipmentForm.getRawValue(), ...this.shipmentDetails },
       disableClose: true
 
     });
     dialogref.afterClosed().subscribe((result) => {
-      if (result) {
-        this.depsDetails = result;
-      }
+      this.dialogRef.close();
     });
   }
 

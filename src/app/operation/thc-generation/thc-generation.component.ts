@@ -443,6 +443,7 @@ export class ThcGenerationComponent implements OnInit {
   /*End*/
   //#region GetRules
   async getRules() {
+    debugger
     const filter = {
       cID: this.storage.companyCode,
       mODULE: { "D$in": ["CNOTE", "THC"] },
@@ -1431,6 +1432,7 @@ export class ThcGenerationComponent implements OnInit {
 
   /*below function called when the tranMode Dropdown has any event occur*/
   transModeChanged() {
+    debugger
     const transMode = this.thcTableForm.getRawValue().transMode;
     const transModeDetail = this.products.find((x) => x.value == transMode);
     const roadControl = ['vehicle'];

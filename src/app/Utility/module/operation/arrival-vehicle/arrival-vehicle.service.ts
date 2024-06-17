@@ -30,63 +30,101 @@ export class ArrivalVehicleService {
                 },
                 {
                     "D$lookup": {
-                        "from": "mf_headers_ltl",
-                        "let": { "docNumber": "$docNo" }, // Renamed for clarity
-                        "pipeline": [
-                            {
-                                "D$match": {
-                                    "D$expr": {
-                                        "D$eq": ["$docNo", "$$docNumber"] // Correct comparison between lookup collection and current doc
-                                    }
-                                }
+                      "from": "mf_headers_ltl",
+                      "let": {
+                        "docNumber": "$docNo"
+                      },
+                      "pipeline": [
+                        {
+                          "D$match": {
+                            "D$expr": {
+                              "D$eq": ["$docNo", "$$docNumber"]
                             }
-                        ],
-                        "as": "mfHeader"
-                    }
-                },
-                {
-                    "D$unwind": { "path": "$mfHeader", "preserveNullAndEmptyArrays": true }
-                },
-                {
-                    "D$lookup": {
-                        "from": "mf_details_ltl",
-                        "let": { "mFNumber": "$mfHeader.docNo" }, // Use the correct variable from mfHeader
-                        "pipeline": [
-                            {
-                                "D$match": {
-                                    "D$expr": {
-                                        "D$eq": ["$mFNO", "$$mFNumber"] // Correct comparison between mf_details_ltl and mfHeader
-                                    }
-                                }
-                            }
-                        ],
-                        "as": "md"
-                    }
-                },
-                {
-                    "D$unwind": { "path": "$md", "preserveNullAndEmptyArrays": false }
-                },
-                {
-                    "D$project": {
-                        "docNo": 1,
-                        "mFNO": "$mfHeader.docNo",
-                        "dKTNO": "$md.dKTNO",
-                        "tHCNO": "$mfHeader.tHC",
-                        "pKGS": "$md.lDPKG",
-                        "sFX": "$md.sFX",
-                        "dkt": "$mfHeader.dKTS",
-                        "lEG": "$mfHeader.leg",
-                        "oRG": "$md.oRGN",
-                        "dEST": "$md.dEST",
-                        "wT": "$md.lDWT",
-                        "cWT": "$md.lDCWT",
-                        "vOL": "$md.lDVOL",
-                        "iSARR": "$mfHeader.iSARR",
-                        "rUTCD": "$mfHeader.rUTCD",
-                        "rUTNM": "$mfHeader.rUTNM",
-                        "mFDT": {
-                            "D$ifNull": ["$mfHeader.mFDT", "$mfHeader.eNTDT"]
+                          }
                         }
+                      ],
+                      "as": "mfHeader"
+                    }
+                  },
+                  {
+                    "D$unwind": {
+                      "path": "$mfHeader",
+                      "preserveNullAndEmptyArrays": true
+                    }
+                  },
+                  {
+                    "D$lookup": {
+                      "from": "mf_details_ltl",
+                      "let": {
+                        "mFNumber": "$mfHeader.docNo"
+                      },
+                      "pipeline": [
+                        {
+                          "D$match": {
+                            "D$expr": {
+                              "D$eq": ["$mFNO", "$$mFNumber"]
+                            }
+                          }
+                        }
+                      ],
+                      "as": "md"
+                    }
+                  },
+                  {
+                    "D$unwind": {
+                      "path": "$md",
+                      "preserveNullAndEmptyArrays": false
+                    }
+                  },
+                  {
+                    "D$lookup": {
+                      "from": "thc_summary_ltl",
+                      "localField": "tHC",
+                      "foreignField": "tHC",
+                      "as": "thdDetails"
+                    }
+                  },
+                  {
+                    "D$unwind": {
+                      "path": "$thdDetails",
+                      "preserveNullAndEmptyArrays": true
+                    }
+                  },
+                  {
+                    "D$project": {
+                      "docNo": 1,
+                      "mFNO": {
+                        "D$ifNull": ["$mfHeader.docNo", null]
+                      },
+                      "dKTNO": { "D$ifNull": ["$md.dKTNO", null] },
+                      "tHCNO": { "D$ifNull": ["$mfHeader.tHC", null] },
+                      "tHCDT": {
+                        "D$ifNull": ["$thdDetails.tHCDT", null]
+                      },
+                      "pKGS": { "D$ifNull": ["$md.lDPKG", null] },
+                      "sFX": { "D$ifNull": ["$md.sFX", null] },
+                      "dkt": { "D$ifNull": ["$mfHeader.dKTS", null] },
+                      "lEG": { "D$ifNull": ["$mfHeader.leg", null] },
+                      "oRG": { "D$ifNull": ["$md.oRGN", null] },
+                      "dEST": { "D$ifNull": ["$md.dEST", null] },
+                      "wT": { "D$ifNull": ["$md.lDWT", null] },
+                      "cWT": { "D$ifNull": ["$md.lDCWT", null] },
+                      "vOL": { "D$ifNull": ["$md.lDVOL", null] },
+                      "iSARR": {
+                        "D$ifNull": ["$mfHeader.iSARR", null]
+                      },
+                      "rUTCD": {
+                        "D$ifNull": ["$mfHeader.rUTCD", null]
+                      },
+                      "rUTNM": {
+                        "D$ifNull": ["$mfHeader.rUTNM", null]
+                      },
+                      "mFDT": {
+                        "D$ifNull": [
+                          "$mfHeader.mFDT",
+                          "$mfHeader.eNTDT"
+                        ]
+                      }
                     }
                 }
             ]
@@ -486,7 +524,6 @@ export class ArrivalVehicleService {
     /*End*/
     /*below code is for the withoutScan*/
     async fieldMappingWithoutScanArrival(data, dktList, notSelectedData, scanDkt, isScan) {
-
         let legID = `${this.storage.companyCode}-${data.TripID}-${data.cLOC}-${data.nXTLOC}`;
         let lagData = await this.getCheckOnce({
             "_id": legID,

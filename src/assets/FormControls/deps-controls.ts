@@ -166,7 +166,7 @@ export class DepsControls {
         disable: true
       },
       {
-        name: 'extraPkgs',
+        name: 'depsPkgs',
         label: `Extra Package`,
         placeholder: `Extra Package`,
         type: 'number',
@@ -185,6 +185,30 @@ export class DepsControls {
         },
         generatecontrol: true,
         disable: false
+      },
+      {
+        name: 'depsType',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: 'E',
+        Validations: [],
+        additionalData: {
+          require: true
+        },
+        generatecontrol: false, disable: false
+      },
+      {
+        name: 'depsTypeName',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: 'Excess',
+        Validations: [],
+        additionalData: {
+          require: true
+        },
+        generatecontrol: false, disable: false
       },
       {
         name: 'shipment',

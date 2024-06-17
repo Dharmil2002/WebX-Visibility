@@ -1712,7 +1712,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           }
           const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
           window.open(url, '', 'width=1000,height=800');
-          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+          this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+            window.location.reload();
+          });
         } else if (result.isDismissed) {
           // Handle the action for the cancel button here.
           this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");

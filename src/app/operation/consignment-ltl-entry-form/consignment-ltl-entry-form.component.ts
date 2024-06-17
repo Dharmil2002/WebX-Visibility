@@ -407,8 +407,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     this.invoiceForm.controls['materialDensity'].setValue("");
 
-    console.log(material)
-
     this.consignmentForm.controls['risk'].setValue(rskType);
     this.consignmentForm.controls['pkgsType'].setValue(pkgType);
     this.freightForm.controls['freightRatetype'].setValue("");
@@ -514,8 +512,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async destionationDropDown() {
     if (this.consignmentForm.controls.destination.value.length > 2) {
       const destinationMapping = await this.locationService.locationFromApi({
+        D$or:[
+        {
         locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-      });
+        },
+        {
+        locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+        }
+        ]});
       this.filter.Filter(
         this.allFormControls,
         this.consignmentForm,
@@ -1692,7 +1696,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       Swal.fire({
         icon: "success",
         title: "Booked Successfully",
-        text: "DocketNo: " + this.consignmentForm.controls["docketNumber"].value,
+        text: "GCN No: " + this.consignmentForm.controls["docketNumber"].value,
         confirmButtonText: 'OK',
         showConfirmButton: true,
         denyButtonText: 'Print',
@@ -2515,7 +2519,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                     Swal.fire({
                       icon: "success",
                       title: "Booked Successfully And Voucher Created",
-                      text: "DocketNo: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
+                      text: "GCN No: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
                       showConfirmButton: true,
                     }).then((result) => {
                       if (result.isConfirmed) {

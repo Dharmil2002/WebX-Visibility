@@ -281,10 +281,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     this.NonFreightLoaded = true
     this.NonFreightTableForm = formGroupBuilder(this.fb, []);
-     // Subscribe to invoiceAmount changes to dynamically update validators
-  this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
-    this.updateInvoiceValidators(value);
-  });
+    // Subscribe to invoiceAmount changes to dynamically update validators
+    this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
+      this.updateInvoiceValidators(value);
+    });
   }
   /*end*/
 
@@ -534,14 +534,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async destionationDropDown() {
     if (this.consignmentForm.controls.destination.value.length > 2) {
       const destinationMapping = await this.locationService.locationFromApi({
-        D$or:[
-        {
-        locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-        },
-        {
-        locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-        }
-        ]});
+        D$or: [
+          {
+            locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+          },
+          {
+            locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+          }
+        ]
+      });
       this.filter.Filter(
         this.allFormControls,
         this.consignmentForm,
@@ -807,7 +808,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         }
         if (element.name.includes("Name")) {
           element.functions = event.event.checked
-            ? {}
+            ? { onChange: "GetWalkingAutofill" }
             : {
               onModel: "getCustomer",
               onOptionSelect: "getConsignor",

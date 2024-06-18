@@ -88,7 +88,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
-      console.log(this.vehicleTable);
+      // console.log(this.vehicleTable);
 
       this.isUpdate = true;
       this.submit = "Modify";
@@ -188,7 +188,6 @@ export class AddVehicleMasterComponent implements OnInit {
         // Set category-related variables
         this.vendorType = data.name;
         this.vendorTypeStatus = data.additionalData.showNameAndValue;
-        this.getVendorType();
       }
     });
   }
@@ -255,41 +254,6 @@ export class AddVehicleMasterComponent implements OnInit {
       );
     }
   }
-  async getVendorType() {
-    const Body = {
-      companyCode: this.companyCode,
-      collectionName: "General_master",
-      filter: { codeType: "VT", activeFlag: true },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", Body)
-    );
-
-    if (res.success && res.data.length > 0) {
-      const VendorTypeData = res.data.map((x) => {
-        return {
-          name: x.codeDesc,
-          value: x.codeId,
-        };
-      });
-      //console.log("VendorTypeData", VendorTypeData);
-      if (this.isUpdate) {
-        const element = VendorTypeData.find(
-          (x) => x.name == this.vehicleTable.vendorType
-        );
-        this.vehicleTableForm.controls.vendorType.setValue(element);
-        this.vendorFieldChanged();
-      }
-      this.filter.Filter(
-        this.jsonControlVehicleArray,
-        this.vehicleTableForm,
-        VendorTypeData,
-        this.vendorType,
-        this.vendorTypeStatus
-      );
-    }
-  }
-
   //#endregion
 
   findDropdownItemByName(dropdownData, name) {
@@ -441,6 +405,13 @@ export class AddVehicleMasterComponent implements OnInit {
         "codeDesc",
         "codeId"
       );
+    if (this.isUpdate) {
+      const element = vendorType.find(
+        (x) => x.name == this.vehicleTable.vendorType
+      );
+      this.vehicleTableForm.controls.vendorType.setValue(element);
+      this.vendorFieldChanged();
+    }
     this.filter.Filter(
       this.jsonControlVehicleArray,
       this.vehicleTableForm,

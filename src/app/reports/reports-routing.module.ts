@@ -41,6 +41,7 @@ import { GenericReportViewComponent } from './generic-report-view/generic-report
 import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
 import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
+import { AdviceRegisterComponent } from './advice-register/advice-register.component';
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -81,6 +82,7 @@ const routes: Routes = [
   { path: "TDSRegister", component: GenerateTdsRegisterReportComponent },
   { path: "generic-report-view", component: GenericReportViewComponent },
   { path: "debit-note-register-report", component: DebitNoteRegisterReportComponent },
+  { path: "advice-register-report", component: AdviceRegisterComponent },
 ];
 
 @NgModule({

@@ -67,7 +67,7 @@ export class ThcGenerationComponent implements OnInit {
   mfheaderDetails = new MfheaderDetails();
   mfdetailsList: MfdetailsList[] = [];
   rakeData: rR[] = [];
-//  invoiceData: iNV[] = [];
+  //  invoiceData: iNV[] = [];
   isRail: boolean = false;
   rrLoad: boolean = true;
   rrInvoice: boolean = true;
@@ -497,7 +497,7 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
-    //   debugger
+    //   
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {
@@ -1229,7 +1229,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["venMobNo"].setValue(thcNestedDetails?.thcDetails.vND?.mNO);
     this.VehicleTableForm.controls["engineNo"].setValue(thcNestedDetails?.thcDetails.eNGNO)
     this.VehicleTableForm.controls["chasisNo"].setValue(thcNestedDetails?.thcDetails.cHASNO),
-    this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
+      this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
     if (thcNestedDetails?.thcDetails.vIA) {
       const via = thcNestedDetails?.thcDetails.vIA.join(",");
       this.thcTableForm.controls["via"].setValue(via);
@@ -1310,12 +1310,12 @@ export class ThcGenerationComponent implements OnInit {
 
       }
     }
-    this.thcTableForm.controls['manualThc'].setValue(this.thcDetail?.mTHC||"");
-    this.VehicleTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM||0);
+    this.thcTableForm.controls['manualThc'].setValue(this.thcDetail?.mTHC || "");
+    this.VehicleTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM || 0);
     if (this.ChargeAllow.includes(thcDetail.data.thcDetails.tMODENM.toUpperCase())) {
       this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG, thcNestedDetails)
     }
-    else{
+    else {
       const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
       const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
       this.chargeForm.controls["advPdAt"].setValue(location);
@@ -1488,7 +1488,7 @@ export class ThcGenerationComponent implements OnInit {
       chargeFilter.forEach(({ name, data, status }) => {
         this.filter.Filter(this.chargeJsonControl, this.chargeForm, data, name, status);
       });
-      
+
     }
     this.vendorFieldChanged();
   }

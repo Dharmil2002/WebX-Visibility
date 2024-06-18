@@ -186,7 +186,7 @@ export class TreeViewComponent implements OnInit {
   // If all descendants are selected, the descAllSelected variable will be true; otherwise, it will be false.
   // Finally, the function returns the value of descAllSelected.
   descendantsAllSelected(node: TreeItemFlatNode): boolean {
-    //debugger
+    //
     const descendants = this.treeControl.getDescendants(node);
     // const descAllSelected = descendants.length > 0 && descendants.every(child =>
     //   this.checklistSelection.isSelected(child)
@@ -336,9 +336,8 @@ export class TreeViewComponent implements OnInit {
         uniqueParentNodes.add(parent);
       }
     });
-    uniqueParentNodes.forEach(node=>{
-      if(node!=null)
-      {
+    uniqueParentNodes.forEach(node => {
+      if (node != null) {
         const parenthasparent = this.getParentNode(node);
         if (parenthasparent && !this.checklistSelection.isSelected(parenthasparent)) {
           uniqueParentNodes.add(parenthasparent);

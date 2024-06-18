@@ -193,7 +193,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   //#endregion
   //#region to save data
   async save() {
-    debugger
+
     if (!this.beneficiaryHeaderForm.valid) {
       this.beneficiaryHeaderForm.markAllAsTouched()
       Swal.fire({

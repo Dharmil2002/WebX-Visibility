@@ -16,7 +16,7 @@ export class SalesRegisterService {
      ) { }
 
      async getsalesRegisterReportDetail(start, end, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status) {
-          debugger
+
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const location = toloc ? toloc.map(x => x.locCD) || [] : [];
           const paymentBasis = payment ? payment.map(x => x.payNm) || [] : [];

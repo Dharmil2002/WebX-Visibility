@@ -24,7 +24,7 @@ export class AccountMasterComponent implements OnInit {
   ];
   linkArray = [];
   menuItems = [];
-  csvFileName : string;
+  csvFileName: string;
   EventButton = {
     functionName: 'AddFunction',
     name: "Add New",
@@ -73,7 +73,7 @@ export class AccountMasterComponent implements OnInit {
     "bCATNM": 'Balance Sheet Category',
     "bSSCH": 'BS Schedule',
     "iSTRUEPST": 'Activeflag'
-};
+  };
 
   FilterButton = {
     name: "Filter List",
@@ -128,7 +128,7 @@ export class AccountMasterComponent implements OnInit {
   }
 
   async GetTableData(filterQuery) {
-    debugger;
+    ;
     this.isTableLode = false;
     this.TableData = []
     const Body = {
@@ -136,7 +136,7 @@ export class AccountMasterComponent implements OnInit {
       collectionName: "account_detail",
       filter: filterQuery,
     };
-    debugger;
+    ;
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x, index) => {

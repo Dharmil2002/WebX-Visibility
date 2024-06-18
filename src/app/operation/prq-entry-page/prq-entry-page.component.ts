@@ -361,7 +361,7 @@ export class PrqEntryPageComponent implements OnInit {
     prqDetails["fPIN"] = this.prqEntryTableForm.value.fCITY?.pincode || "";
     prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode || "";
     prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode || "";
-    prqDetails["cONTRACT"] =this.contract?.cONID||"";
+    prqDetails["cONTRACT"] = this.contract?.cONID || "";
 
     const cntrNames = [
       { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
@@ -593,7 +593,7 @@ export class PrqEntryPageComponent implements OnInit {
     const vehcileSize = this.prqEntryTableForm.value.vEHSIZE;
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
- 
+
   getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
     const fieldKey = isOrigin ? "fCITY" : "tCITY";
@@ -679,16 +679,16 @@ export class PrqEntryPageComponent implements OnInit {
     {
       "companyCode": this.storage.companyCode,
       "contractId": contractId,
-      "contractDate":moment(this.prqEntryTableForm.value.pICKDT).startOf('day').toDate(),
+      "contractDate": moment(this.prqEntryTableForm.value.pICKDT).startOf('day').toDate(),
       "LoadType": opsMode,
       "matches": matches,
       "capacity": this.ChargedWeight
     }
     const result = await firstValueFrom(this.operationService.operationMongoPost("contract/findContract", reqBody));
     if (result?.data?.cONID == contractId) {
-      debugger
+
       this.contract = { ...result?.data };
-      const calculateValue = (rateType, weight,rt) => {
+      const calculateValue = (rateType, weight, rt) => {
         const actualWeight = (rateType == "Per Kg") ? convert(weight).from('mt').to('kg') : weight;
         return Math.min(Math.max(rt * actualWeight));
       };
@@ -696,8 +696,8 @@ export class PrqEntryPageComponent implements OnInit {
         return rateType == "Per Pkg" ? (this.pkgs || 0) : (this.ChargedWeight || 0);
       };
       const codWeight = calculateWeight(this.contract.FreightChargeMatrixDetails.rTYP);
-      calculateValue(this.contract.FreightChargeMatrixDetails.rTYP, codWeight,this.contract.rT)
-      const codValue = calculateValue(this.contract.FreightChargeMatrixDetails.rTYP, codWeight,this.contract.FreightChargeMatrixDetails.rT);
+      calculateValue(this.contract.FreightChargeMatrixDetails.rTYP, codWeight, this.contract.rT)
+      const codValue = calculateValue(this.contract.FreightChargeMatrixDetails.rTYP, codWeight, this.contract.FreightChargeMatrixDetails.rT);
       this.prqEntryTableForm.controls['cONTRAMT'].setValue(codValue);
 
     }
@@ -705,7 +705,7 @@ export class PrqEntryPageComponent implements OnInit {
 
 
   async getContractDetails(party, transMode, payBase, dt) {
-    debugger
+
     const request = {
       companyCode: this.storage.companyCode,
       collectionName: "cust_contract",

@@ -34,12 +34,13 @@ import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } f
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { GenericActions, RateTypeCalculation, StoreKeys } from 'src/app/config/myconstants';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { GetLeadgerInfoFromLocalStorage, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { debug } from 'console';
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -280,10 +281,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     this.NonFreightLoaded = true
     this.NonFreightTableForm = formGroupBuilder(this.fb, []);
-     // Subscribe to invoiceAmount changes to dynamically update validators
-  this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
-    this.updateInvoiceValidators(value);
-  });
+    // Subscribe to invoiceAmount changes to dynamically update validators
+    this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
+      this.updateInvoiceValidators(value);
+    });
   }
   /*end*/
 
@@ -533,14 +534,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async destionationDropDown() {
     if (this.consignmentForm.controls.destination.value.length > 2) {
       const destinationMapping = await this.locationService.locationFromApi({
-        D$or:[
-        {
-        locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-        },
-        {
-        locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-        }
-        ]});
+        D$or: [
+          {
+            locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+          },
+          {
+            locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+          }
+        ]
+      });
       this.filter.Filter(
         this.allFormControls,
         this.consignmentForm,
@@ -719,7 +721,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     let transModeName = this.tranType.find(x => x.value == data.transMode) ? this.tranType.find(x => x.value == data.transMode).name : 'Default Transaction Mode Name';
 
     const filter = { "pRNm": transModeName, aCTV: true, cHBTY: { D$in: ["Booking", "Both"] } };
-    const productFilter = { "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": transModeName, cHATY: "Charges", "cHAPP": { D$in: ["GCN"] }, isActive: true }
+    const productFilter = {
+      "cHACAT": { "D$in": ['C', 'B'] }, "pRNM": transModeName, cHATY: "Charges",
+      "cHAPP": { D$in: ["GCN"] }, isActive: true, "aCCD": { "D$ne": "" }
+    }
     return await this.thcService.getChargesV2(filter, productFilter);
   }
 
@@ -728,19 +733,21 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     let total = 0;
     const chargeMapping = this.otherCharges.map((x) => { return { name: x.cHGNM, operation: x.oPS, aMT: x.aMT } });
     total = chargeMapping.reduce((acc, curr) => {
+      const amount = parseFloat(curr.aMT);
       if (curr.operation === "+") {
-        return acc + parseFloat(curr.aMT);
+        return acc + amount;
       } else if (curr.operation === "-") {
-        return acc - parseFloat(curr.aMT);
-      } else {
-        return acc; // In case of an unknown operation
+        return acc - Math.abs(amount);  // Ensure subtraction
       }
+      return acc; // In case of an unknown operation
     }, 0);
 
     let serviceCharges = 0;
-    this.NonFreightjsonControlArray.forEach((x) => {
-      serviceCharges += ConvertToNumber(this.NonFreightTableForm.controls[x.name]?.value) || 0
-    });
+    if (this.NonFreightjsonControlArray) {
+      this.NonFreightjsonControlArray.forEach((x) => {
+        serviceCharges += ConvertToNumber(this.NonFreightTableForm.controls[x.name]?.value) || 0
+      });
+    }
 
     this.freightForm.controls['otherAmount'].setValue(total + serviceCharges);
     this.calculateFreight();
@@ -762,7 +769,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     });
   }
   /*below function call when Consgine or Consginor would be walkin*/
-  walkin(event) {    
+  walkin(event) {
     const name = event.name;
     this.consignmentForm.controls[name].setValue(event.event.checked)
     const value = this.consignmentForm.controls[name].value;
@@ -793,50 +800,50 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       let jsonControls = controlMap.get(mapping.controlName);
       jsonControls.forEach(element => {
         this.consignmentForm.controls[element.name].setValue("");
-        if(element.name.includes("gst")) {
+        if (element.name.includes("gst")) {
           element.displayIndex = event.event.checked ? 0 : 5;
-          element.functions = event.event.checked 
-            ? { onChange: "OnGSTChange" } 
+          element.functions = event.event.checked
+            ? { onChange: "OnGSTChange" }
             : {}
         }
-        if(element.name.includes("Name")) {
-          element.functions = event.event.checked 
-            ? {} 
+        if (element.name.includes("Name")) {
+          element.functions = event.event.checked
+            ? { onChange: "GetWalkingAutofill" }
             : {
               onModel: "getCustomer",
               onOptionSelect: "getConsignor",
-              onChange: "GetWalkingAutofill"         
+              onChange: "GetWalkingAutofill"
             }
         }
       });
-      
+
       jsonControls.sort((a, b) => a.displayIndex - b.displayIndex);
 
-      this.filter.Filter( jsonControls, this.consignmentForm, [], mapping.controlName, false );
+      this.filter.Filter(jsonControls, this.consignmentForm, [], mapping.controlName, false);
 
     }
   }
 
-  async OnGSTChange($event){
-    const name =  $event.field.name;
+  async OnGSTChange($event) {
+    const name = $event.field.name;
     const gst = this.consignmentForm.controls[name].value;
-    
+
     const gstData = await this.findWalkinGST(gst);
-    
+
     const fieldMap = new Map([
-      ['cnogst', { 
-          'cUSTNM': 'consignorName',
-          'cUSTPH': 'ccontactNumber' ,
-          'aLTPH': 'calternateContactNo',
-          'aDD': 'cnoAddress' 
-        }
+      ['cnogst', {
+        'cUSTNM': 'consignorName',
+        'cUSTPH': 'ccontactNumber',
+        'aLTPH': 'calternateContactNo',
+        'aDD': 'cnoAddress'
+      }
       ],
-      ['cnegst', 
-        { 
-          'cUSTNM': 'consigneeName' ,
+      ['cnegst',
+        {
+          'cUSTNM': 'consigneeName',
           'cUSTPH': 'cncontactNumber',
-          'aLTPH': 'cnalternateContactNo' ,
-          'aDD': 'cneAddress' 
+          'aLTPH': 'cnalternateContactNo',
+          'aDD': 'cneAddress'
         }
       ]
     ]);
@@ -857,7 +864,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         gSTNO: gstno
       }
     };
-    const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));    
+    const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));
     return res?.data
   }
   /*End*/
@@ -1174,12 +1181,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       let chargedWeight = 0;
       if (this.consignmentForm.controls['f_vol'].value) {
         //const chargeWt = this.getInvoiceAggValue("chargedWeight");
-        const chargeWt = this.chargeBase.ChargedWeight  || 0;
+        const chargeWt = this.chargeBase.ChargedWeight || 0;
         const cubicWeight = this.getInvoiceAggValue("cubWT");
         chargedWeight = parseFloat(cubicWeight) > parseFloat(chargeWt) ? cubicWeight : chargeWt;
       } else {
         //chargedWeight = this.getInvoiceAggValue("chargedWeight");
-        chargedWeight = this.chargeBase.ChargedWeight  || 0;
+        chargedWeight = this.chargeBase.ChargedWeight || 0;
       }
 
       rateTypeMap = {
@@ -1585,17 +1592,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     let yieldOn = this.contract?.cYIELDON || "CYO-0002";
     let yieldValue = ConvertToNumber(((yieldOn == "CYO-0001" ? data?.freight_amount : data?.grossAmount) || 0) / this.chargeBase.ChargedWeight, 2);
 
-    if(this.contract?.sERVSELEC.includes("YieldProtection") && yieldValue < this.contract?.mYIELD) {      
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: `Yield amount ${yieldValue} is less than the minimum yield amount ${this.contract?.mYIELD} configured on yield protection. Please ensure the yield amount meets the minimum requirement.`,
-          showConfirmButton: false,
-        });
-        return false
+    if (this.contract?.sERVSELEC.includes("YieldProtection") && yieldValue < this.contract?.mYIELD) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `Yield amount ${yieldValue} is less than the minimum yield amount ${this.contract?.mYIELD} configured on yield protection. Please ensure the yield amount meets the minimum requirement.`,
+        showConfirmButton: false,
+      });
+      return false
     }
 
-    this.isSubmit = true;    
+    this.isSubmit = true;
     const tableData = this.tableData
     data['iSSCAN'] = this.rules.find((x) => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y";
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
@@ -1605,23 +1612,25 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     data['delivery_typeNm'] = this.deliveryType.find(x => x.value == data?.delivery_type)?.name ?? '';
     data['freightRatetypeNm'] = this.rateTypes.find(x => x.value == data?.freightRatetype)?.name ?? '';
     data["yIELD"] = yieldValue;
-    let serviceCharges=[];
-    if(this.NonFreightjsonControlArray && this.NonFreightjsonControlArray.length>0){
-     serviceCharges = this.NonFreightjsonControlArray.map(x => {
-      return {
-        cHGID: x.additionalData.metaData.ServicesCode,
-        cHGNM: x.additionalData.metaData.ServicesName,
-        aMT: this.NonFreightTableForm.controls[x.name]?.value || 0,
-        oPS: "",
-        tY: "sC"
-      };
-    });
-  }
+    let serviceCharges = [];
+    if (this.NonFreightjsonControlArray && this.NonFreightjsonControlArray.length > 0) {
+      serviceCharges = this.NonFreightjsonControlArray.map(x => {
+        return {
+          cHGID: x.additionalData.metaData.ServicesCode,
+          cHGNM: x.additionalData.metaData.ServicesName,
+          aMT: this.NonFreightTableForm.controls[x.name]?.value || 0,
+          oPS: "",
+          tY: "sC",
+          aCCD: "",
+          aCNM: ""
+        };
+      });
+    }
 
-  const otherData = {
-    otherCharges: [...(this.otherCharges?.map(x => ({ ...x, tY: "nFC" })) ?? []), ...serviceCharges],
-    otherInfo: this.otherInfo
-  };
+    const otherData = {
+      otherCharges: [...(this.otherCharges?.map(x => ({ ...x, tY: "nFC" })) ?? []), ...serviceCharges],
+      otherInfo: this.otherInfo
+    };
     const reqDkt = await this.docketService.consgimentFieldMapping(data, this.chargeBase, tableData, this.isUpdate, otherData);
     let docketDetails = {}
     docketDetails = reqDkt?.docketsDetails || {};
@@ -1710,7 +1719,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   async toPayAccouting() {
     const payType = this.consignmentForm.get('payType').value;
-    if (payType === "P01") {
+    if (payType === "P01" || payType === "P02" || payType === "P03" || payType === "P04") {
       this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
     }
     else {
@@ -1732,7 +1741,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           // Handle the action for the deny button here.
           const templateBody = {
             templateName: "DKT",
-            PartyField:"",
+            PartyField: "",
             DocNo: this.consignmentForm.controls["docketNumber"].value,
           }
           const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
@@ -1907,9 +1916,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           return {
             cHGID: c.cHACD,
             cHGNM: `${c.cAPTION || c.sELCHA || ""}`,
-            aMT: (c.oPS === "-") ? -Math.abs(0) : 0,
-            oPS: c.oPS || "+",
-            tY: "nFC"
+            aMT: (c.aDD_DEDU === "-") ? -Math.abs(0) : 0,
+            oPS: c.aDD_DEDU || "+",
+            tY: "nFC",
+            aCCD: c.aCCD,
+            aCNM: c.aCNM,
           }
         });
       }
@@ -1982,15 +1993,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       return null;
     }).filter(x => x != null);
 
-    matches.push( { D$and: [
-      { "D$in": ['$fTYPE', [null, ""]] },
-      { "D$in": ['$ffROM', [null, ""]] }]
+    matches.push({
+      D$and: [
+        { "D$in": ['$fTYPE', [null, ""]] },
+        { "D$in": ['$ffROM', [null, ""]] }]
     });
-    matches.push( { D$and: [
-      { "D$in": ['$tTYPE', [null, ""]] },
-      { "D$in": ['$tfROM', [null, ""]] }]
+    matches.push({
+      D$and: [
+        { "D$in": ['$tTYPE', [null, ""]] },
+        { "D$in": ['$tfROM', [null, ""]] }]
     });
-    
+
     let reqBody =
     {
       "companyCode": this.storage.companyCode,
@@ -2077,7 +2090,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       });
       this.CalculateCharges();
       this.calucatedCharges();
-      
+
       // Swal.fire({
       //   icon: "success",
       //   title: "Contract Invoked Successfully",
@@ -2092,7 +2105,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         text: "Contract Not Found",
         showConfirmButton: false,
       });
-            this.SetInvoiceData();
+      this.SetInvoiceData();
     }
   }
   /*Emd*/
@@ -2148,23 +2161,23 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   GetServiceWiseCalculatedData(data) {
     const getServiceData = (name, label) => ({
-        "functionName": "calucatedCharges",
-        "value": 0,
-        "name": name,
-        "label": label,
-        "placeholder": label,
-        "additionalData": {
-            metaData: data
-        }
+      "functionName": "calucatedCharges",
+      "value": 0,
+      "name": name,
+      "label": label,
+      "placeholder": label,
+      "additionalData": {
+        metaData: data
+      }
     });
 
     switch (data.ServicesName) {
-        case "COD/DOD":
-            return getServiceData("CODDOD", "COD/DOD");
-        case "FuelSurcharge":
-            return getServiceData("FuelSurcharge", "Fuel Surcharge");
-        case "Insurance":
-            return getServiceData("Insurance", "FOV Charge");
+      case "COD/DOD":
+        return getServiceData("CODDOD", "COD/DOD");
+      case "FuelSurcharge":
+        return getServiceData("FuelSurcharge", "Fuel Surcharge");
+      case "Insurance":
+        return getServiceData("Insurance", "FOV Charge");
     }
   }
 
@@ -2176,7 +2189,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           if (cn.cBT == "Fixed" && cn.nFC) {
             x.aMT = (x?.oPS === "-") ? -Math.abs(cn.nFC || 0) : cn.nFC;
           }
-          else if(cn.cBT == "Variable" && cn.Details) {            
+          else if (cn.cBT == "Variable" && cn.Details) {
             const rateType = RateTypeCalculation.find(x => x.codeId == cn.Details.rTYPCD);
             let weight = 0;
             if (rateType.codeDesc == "Per Pkg") {
@@ -2185,7 +2198,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
             else {
               weight = this.chargeBase.ChargedWeight || 0;
             }
-            const actualWeight =  (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') :  weight;
+            const actualWeight = (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') : weight;
             const value = Math.min(Math.max(cn.Details.mINV, cn.Details.rT * actualWeight), cn.Details.mAXV) || 0;
             x.aMT = (x?.oPS === "-") ? -Math.abs(value) : value;
           }
@@ -2196,46 +2209,46 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   CalculateServiceCharge(name, x) {
     const getRateType = (codeId) => RateTypeCalculation.find(rt => rt.codeId == codeId);
-    
+
     const calculateWeight = (rateType) => {
-        return rateType.codeDesc == "Per Pkg" ? (this.chargeBase.ChargePackage || 0) : (this.chargeBase.ChargedWeight || 0);
+      return rateType.codeDesc == "Per Pkg" ? (this.chargeBase.ChargePackage || 0) : (this.chargeBase.ChargedWeight || 0);
     };
 
     const calculateValue = (rateType, weight, min, rt, max) => {
-        const actualWeight =  (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') :  weight;
-        return Math.min(Math.max(min, rt * actualWeight), max);
+      const actualWeight = (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') : weight;
+      return Math.min(Math.max(min, rt * actualWeight), max);
     };
 
     switch (x.ServicesName) {
-        case "COD/DOD":
-            const codRateType = getRateType(this.contract.cODDODRTYP);
-            const codWeight = calculateWeight(codRateType);
-            const codValue = calculateValue(codRateType, codWeight, this.contract.mIN, this.contract.rT, this.contract.mAX);
-            this.NonFreightTableForm.controls[name].setValue(codValue);
-            break;
+      case "COD/DOD":
+        const codRateType = getRateType(this.contract.cODDODRTYP);
+        const codWeight = calculateWeight(codRateType);
+        const codValue = calculateValue(codRateType, codWeight, this.contract.mIN, this.contract.rT, this.contract.mAX);
+        this.NonFreightTableForm.controls[name].setValue(codValue);
+        break;
 
-        case "FuelSurcharge":
-            let fuelCharge = 0;
-            if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
-                const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);
-                const fuelWeight = calculateWeight(fuelRateType);
-                fuelCharge = calculateValue(fuelRateType, fuelWeight, this.contract.FuelSurcharge.fmIN, this.contract.FuelSurcharge.frT, this.contract.FuelSurcharge.fmAX);
-            }
-            this.NonFreightTableForm.controls[name].setValue(fuelCharge);
-            break;
+      case "FuelSurcharge":
+        let fuelCharge = 0;
+        if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
+          const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);
+          const fuelWeight = calculateWeight(fuelRateType);
+          fuelCharge = calculateValue(fuelRateType, fuelWeight, this.contract.FuelSurcharge.fmIN, this.contract.FuelSurcharge.frT, this.contract.FuelSurcharge.fmAX);
+        }
+        this.NonFreightTableForm.controls[name].setValue(fuelCharge);
+        break;
 
-        case "Insurance":
-            let insuranceValue = 0;
-            const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
-                ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
-            );
-            if (insuranceDetails) {
-                const insuranceRateType = getRateType(insuranceDetails.rtType);
-                const insuranceWeight = calculateWeight(insuranceRateType);
-                insuranceValue = calculateValue(insuranceRateType, insuranceWeight, insuranceDetails.mIN, insuranceDetails.rT, insuranceDetails.mAX);
-            }
-            this.NonFreightTableForm.controls[name].setValue(insuranceValue);
-            break;
+      case "Insurance":
+        let insuranceValue = 0;
+        const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
+          ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
+        );
+        if (insuranceDetails) {
+          const insuranceRateType = getRateType(insuranceDetails.rtType);
+          const insuranceWeight = calculateWeight(insuranceRateType);
+          insuranceValue = calculateValue(insuranceRateType, insuranceWeight, insuranceDetails.mIN, insuranceDetails.rT, insuranceDetails.mAX);
+        }
+        this.NonFreightTableForm.controls[name].setValue(insuranceValue);
+        break;
     }
   }
 
@@ -2322,7 +2335,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0
-        const TotalAmount = this.freightForm.controls['totAmt'].value;
+        const freight_amount = this.freightForm.controls['freight_amount'].value;
 
         this.VoucherRequestModel.companyCode = this.storage.companyCode;
         this.VoucherRequestModel.docType = "VR";
@@ -2365,8 +2378,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherDataRequestModel.UGST = 0;
         this.VoucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.VoucherDataRequestModel.GrossAmount = TotalAmount;
-        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.GrossAmount = freight_amount;
+        this.VoucherDataRequestModel.netPayable = freight_amount;
         this.VoucherDataRequestModel.roundOff = 0;
         this.VoucherDataRequestModel.voucherCanceled = false
 
@@ -2376,106 +2389,21 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = DocketNo;
-        var VoucherlineitemList = [{
+        var VoucherlineitemList = this.GetVouchersLedgers(freight_amount, DocketNo);
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['AST003001'].LeadgerCode,
-          "accName": ledgerInfo['AST003001'].LeadgerName,
-          "accCategory": ledgerInfo['AST003001'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": ConvertToNumber(TotalAmount, 2),
-          "credit": 0,
-          "GSTRate": 0,
-          "GSTAmount": 0,
-          "Total": ConvertToNumber(TotalAmount, 2),
-          "TDSApplicable": false,
-          "narration": `When paid docket ${DocketNo} generated `
-        },
-        {
+        // Remove Credit and Debit Amount if both are zero
+        const filteredVoucherlineitemList = VoucherlineitemList.filter(transaction => !(transaction.debit === 0 && transaction.credit === 0));
 
-          "companyCode": this.storage.companyCode,
-          "voucherNo": "",
-          "transCode": VoucherInstanceType.CNoteBooking,
-          "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-          "voucherCode": VoucherType.JournalVoucher,
-          "voucherType": VoucherType[VoucherType.JournalVoucher],
-          "transDate": new Date(),
-          "finYear": financialYear,
-          "branch": this.storage.branch,
-          "accCode": ledgerInfo['INC001008'].LeadgerCode,
-          "accName": `${ledgerInfo['INC001008'].LeadgerName}`,
-          "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
-          "sacCode": "",
-          "sacName": "",
-          "debit": 0,
-          "credit": ConvertToNumber(TotalAmount - GSTAmount, 2),
-          "GSTRate": 0,
-          "GSTAmount": 0,
-          "Total": ConvertToNumber(TotalAmount - GSTAmount, 2),
-          "TDSApplicable": false,
-          "narration": `When paid docket ${DocketNo} generated `
-        },
-        ];
-        if (GSTAmount > 0) {
-          VoucherlineitemList.push({
-
-            "companyCode": this.storage.companyCode,
-            "voucherNo": "",
-            "transCode": VoucherInstanceType.CNoteBooking,
-            "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-            "voucherCode": VoucherType.JournalVoucher,
-            "voucherType": VoucherType[VoucherType.JournalVoucher],
-            "transDate": new Date(),
-            "finYear": financialYear,
-            "branch": this.storage.branch,
-            "accCode": ledgerInfo['SGST'].LeadgerCode,
-            "accName": `${ledgerInfo['SGST'].LeadgerName}`,
-            "accCategory": ledgerInfo['SGST'].LeadgerCategory,
-            "sacCode": "",
-            "sacName": "",
-            "debit": 0,
-            "credit": ConvertToNumber(GSTAmount / 2, 2),
-            "GSTRate": 6,
-            "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
-            "Total": ConvertToNumber(GSTAmount / 2, 2),
-            "TDSApplicable": false,
-            "narration": `When paid docket ${DocketNo} generated `
-          });
-          VoucherlineitemList.push({
-
-            "companyCode": this.storage.companyCode,
-            "voucherNo": "",
-            "transCode": VoucherInstanceType.CNoteBooking,
-            "transType": VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-            "voucherCode": VoucherType.JournalVoucher,
-            "voucherType": VoucherType[VoucherType.JournalVoucher],
-            "transDate": new Date(),
-            "finYear": financialYear,
-            "branch": this.storage.branch,
-            "accCode": ledgerInfo['CGST'].LeadgerCode,
-            "accName": `${ledgerInfo['CGST'].LeadgerName}`,
-            "accCategory": ledgerInfo['CGST'].LeadgerCategory,
-            "sacCode": "",
-            "sacName": "",
-            "debit": 0,
-            "credit": ConvertToNumber(GSTAmount / 2, 2),
-            "GSTRate": 6,
-            "GSTAmount": ConvertToNumber(GSTAmount / 2, 2),
-            "Total": ConvertToNumber(GSTAmount / 2, 2),
-            "TDSApplicable": false,
-            "narration": `When paid docket ${DocketNo} generated `
-          });
+        // #region Update Invoice Status when account posting credit and debit in equal amount
+        var CreditAmount = filteredVoucherlineitemList.filter(item => item.credit > 0).map(item => item.credit).reduce((a, b) => a + b, 0);
+        var DebitAmount = filteredVoucherlineitemList.filter(item => item.debit > 0).map(item => item.debit).reduce((a, b) => a + b, 0);
+        if (CreditAmount != DebitAmount) {
+          console.log(filteredVoucherlineitemList);
+          SwalerrorMessage("error", "Error", "Credit and Debit Amount Should be Equal for Account Posting..!", false);
+          return;
         }
-        this.VoucherRequestModel.details = VoucherlineitemList
+
+        this.VoucherRequestModel.details = filteredVoucherlineitemList
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
 
@@ -2501,37 +2429,56 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                 partyName: this.consignmentForm.value?.billingParty?.name,
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
-                debit: [{
-                  "accCode": ledgerInfo['AST003001'].LeadgerCode,
-                  "accName": ledgerInfo['AST003001'].LeadgerName,
-                  "accCategory": ledgerInfo['AST003001'].LeadgerCategory,
-                  "amount": ConvertToNumber(TotalAmount, 2),
-                  "narration": `When paid docket ${DocketNo} generated `
-                }],
-                credit: [{
-                  "accCode": ledgerInfo['INC001008'].LeadgerCode,
-                  "accName": ledgerInfo['INC001008'].LeadgerName,
-                  "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
-                  "amount": ConvertToNumber(TotalAmount - GSTAmount, 2),
-                  "narration": `When paid docket ${DocketNo} generated `
-                }]
+                debit: filteredVoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.debit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                credit: filteredVoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.credit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                // debit: 
+                // [{
+                //   "accCode": ledgerInfo['AST003001'].LeadgerCode,
+                //   "accName": ledgerInfo['AST003001'].LeadgerName,
+                //   "accCategory": ledgerInfo['AST003001'].LeadgerCategory,
+                //   "amount": ConvertToNumber(TotalAmount, 2),
+                //   "narration": `When paid docket ${DocketNo} generated `
+                // }],
+                // credit: [{
+                //   "accCode": ledgerInfo['INC001008'].LeadgerCode,
+                //   "accName": ledgerInfo['INC001008'].LeadgerName,
+                //   "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
+                //   "amount": ConvertToNumber(TotalAmount - GSTAmount, 2),
+                //   "narration": `When paid docket ${DocketNo} generated `
+                // }]
               };
-              if (GSTAmount > 0) {
-                reqBody.credit.push({
-                  "accCode": ledgerInfo['SGST'].LeadgerCode,
-                  "accName": ledgerInfo['SGST'].LeadgerName,
-                  "accCategory": ledgerInfo['SGST'].LeadgerCategory,
-                  "amount": ConvertToNumber(GSTAmount / 2, 2),
-                  "narration": `When paid docket ${DocketNo} generated `
-                });
-                reqBody.credit.push({
-                  "accCode": ledgerInfo['CGST'].LeadgerCode,
-                  "accName": ledgerInfo['CGST'].LeadgerName,
-                  "accCategory": ledgerInfo['CGST'].LeadgerCategory,
-                  "amount": ConvertToNumber(GSTAmount / 2, 2),
-                  "narration": `When paid docket ${DocketNo} generated `
-                });
-              }
+              // if (GSTAmount > 0) {
+              //   reqBody.credit.push({
+              //     "accCode": ledgerInfo['SGST'].LeadgerCode,
+              //     "accName": ledgerInfo['SGST'].LeadgerName,
+              //     "accCategory": ledgerInfo['SGST'].LeadgerCategory,
+              //     "amount": ConvertToNumber(GSTAmount / 2, 2),
+              //     "narration": `When paid docket ${DocketNo} generated `
+              //   });
+              //   reqBody.credit.push({
+              //     "accCode": ledgerInfo['CGST'].LeadgerCode,
+              //     "accName": ledgerInfo['CGST'].LeadgerName,
+              //     "accCategory": ledgerInfo['CGST'].LeadgerCategory,
+              //     "amount": ConvertToNumber(GSTAmount / 2, 2),
+              //     "narration": `When paid docket ${DocketNo} generated `
+              //   });
+              // }
 
               this.voucherServicesService
                 .FinancePost("fin/account/posting", reqBody)
@@ -2574,5 +2521,92 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     }, "C-Note Booking Voucher Generating..!");
 
+  }
+  GetVouchersLedgers(TotalAmount, DocketNo) {
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.CNoteBooking,
+      transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: TotalAmount,
+      TDSApplicable: false,
+      narration: `when C note No ${DocketNo} Is Booked`,
+    });
+
+    // Get Field Values
+    const freight_amount = this.freightForm.controls['freight_amount'].value;
+    const otherAmount = this.freightForm.controls['otherAmount'].value;
+    const grossAmount = this.freightForm.controls['grossAmount'].value;
+
+    const response = [];
+    // Freight Ledger Unbilled debtors 
+    response.push(createVoucher(ledgerInfo['AST001001'].LeadgerCode, ledgerInfo['AST001001'].LeadgerName,
+      ledgerInfo['AST001001'].LeadgerCategory, grossAmount, 0));
+
+    let LeadgerDetails;
+    switch (this.consignmentForm.value.payType) {
+      case "P01": //Paid
+        LeadgerDetails = GetLeadgerInfoFromLocalStorage("INC001008")
+        break;
+      case "P02": //TBB
+        LeadgerDetails = GetLeadgerInfoFromLocalStorage("INC001010")
+        break;
+      case "P03": //To Pay
+        LeadgerDetails = GetLeadgerInfoFromLocalStorage("INC001009")
+        break;
+      case "P04": //FOC
+        LeadgerDetails = GetLeadgerInfoFromLocalStorage("INC001008")
+        break;
+    }
+    // Income Ledger
+    if (LeadgerDetails) {
+      response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, freight_amount));
+    }
+
+    // charges Ledger
+    this.otherCharges.forEach(x => {
+      if (parseFloat(x.aMT) !== 0) {
+        const ledger = GetLeadgerInfoFromLocalStorage(x.aCCD)
+        if (ledger) {
+          // check amount is positive or negative
+          if (x.oPS === "-") {
+            response.push(createVoucher(ledger.LeadgerCode, ledger.LeadgerName, ledger.LeadgerCategory, Math.abs(x.aMT), 0));
+          } else {
+            response.push(createVoucher(ledger.LeadgerCode, ledger.LeadgerName, ledger.LeadgerCategory, 0, parseFloat(x.aMT)));
+          }
+        }
+      }
+    });
+    // Freight income - Misc
+    const TotalDebit = response.reduce((a, b) => a + parseFloat(b.debit), 0);
+    const TotalCredit = response.reduce((a, b) => a + parseFloat(b.credit), 0);
+
+    let difference = TotalDebit - TotalCredit;
+
+    response.push(
+      createVoucher(
+        ledgerInfo["INC001015"].LeadgerCode,
+        ledgerInfo["INC001015"].LeadgerName,
+        ledgerInfo["INC001015"].LeadgerCategory,
+        difference > 0 ? 0 : Math.abs(difference),
+        difference < 0 ? 0 : Math.abs(difference),
+      )
+    );
+    return response;
   }
 }

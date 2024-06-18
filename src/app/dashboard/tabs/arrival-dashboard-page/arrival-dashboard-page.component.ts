@@ -13,6 +13,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import Swal from 'sweetalert2';
+import { DepartureService } from 'src/app/Utility/module/operation/departure/departure-service';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -179,6 +180,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     private _operation: OperationService,
     private datePipe: DatePipe,
     private storage:StorageService,
+    private departureService: DepartureService,
     private depatureService: ArrivalVehicleService,
     private objGeneralService: GeneralService,
     private invoiceService: InvoiceServiceService,
@@ -313,10 +315,12 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         const shipmentStatus = shipment.length <= 0 ? 'noDkt' : 'dktAvail';
         this._operation.setShipmentStatus(shipmentStatus);
   }
+
   updateDepartureData(event) {
     this.tableload=true
     this.getArrivalDetails()
   }
+
   async handleMenuItemClick(label, element) {
     debugger;
     
@@ -350,7 +354,10 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
               oPSST: "9",
               cNRES: result.value//required cancel reason in popup
             }
-            const res = await this.invoiceService.updateTHCLTL(filter, status);
+            const res = await this.departureService.updateTHCLTL(filter, status);
+            await this.departureService.deleteTrip({ cID: this.storage.companyCode, tHC: Data.label.data.TripID });
+            Data.label.data.reason= result.value;
+          this.departureService.updateDocket(Data.label.data.data);
             if (res) {
               SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
               this.getArrivalDetails();
@@ -361,7 +368,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
           }
         });
       }
-
       
     //  this.menuItemClicked.emit(Data);
     this.advancdeDetails = {

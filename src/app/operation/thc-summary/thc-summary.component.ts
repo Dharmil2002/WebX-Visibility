@@ -216,7 +216,10 @@ export class ThcSummaryComponent implements OnInit {
                     oPSST: "9",
                     cNRES: result.value//required cancel reason in popup
                   }
-                  const res = await this.invoiceService.updateTHC(filter, status);
+                  const res = await this.thcService.updateTHC(filter, status);
+                  await this.thcService.deleteTrip({ cID: this.storage.companyCode, tHC: thcDetail.docNo });
+                  thcDetail.reason= result.value;
+               this.thcService.updateDocket(thcDetail.data);
                   if (res) {
                     SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
                     this.getThcDetails();

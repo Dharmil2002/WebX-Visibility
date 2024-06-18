@@ -6,6 +6,10 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { AddHocRouteComponent } from "./add-hoc-route/add-hoc-route.component";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
+import Swal from "sweetalert2";
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { InvoiceServiceService } from "src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service";
+import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
 
 @Component({
   selector: "app-departure-dashboard-page",
@@ -156,6 +160,8 @@ export class DepartureDashboardPageComponent
     private CnoteService: CnoteService,
     private departureService: DepartureService,
     private storage: StorageService,
+    private objGeneralService: GeneralService,
+    private invoiceService: InvoiceServiceService,
     private dialog: MatDialog,
     private  router:Router,
     public dialogRef: MatDialogRef<AddHocRouteComponent>
@@ -249,30 +255,68 @@ const shipData = [
   }
 
   /*End*/
-  handleMenuItemClick(evnt){
-    debugger
-    console.log(evnt)
+ async handleMenuItemClick(evnt){
     const {label}=evnt.label
     switch (label) {
-      case "Create trip":
-      ;
-          break;
+      case "Create Trip":
       case "Vehicle Loading":
-          // Code for vehicle loading
-          break;
       case "Depart Vehicle":
-          // Code for departing vehicle
-          break;
-      case "Update trip":
-          // Code for updating a trip
-          break;
+        evnt.data.Action=label
+       this.router.navigate(['Operation/CreateLoadingSheet'], {
+        state: {
+          data:evnt.data,
+        },
+      });
+      break;
       case "Cancel THC":
+debugger;
+      const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
+      const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+
+      Swal.fire({
+        title: 'Reason For Cancel?',
+        html: `<select id="swal-select1" class="swal2-select">${options}</select>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        width:"auto",
+        cancelButtonText: 'Cancel', // Optional: Customize the cancel button text
+        preConfirm: () => {
+          return (document.getElementById('swal-select1') as HTMLInputElement).value;
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Handle the input value if the user clicks the confirm button
+          const filter = {
+            docNo: evnt.data.TripID
+          }
+          const status = {
+            cNL: true,
+            cNLDT: new Date(),
+            cNBY: this.storage.userName,
+            oPSSTNM: "Cancelled",
+            oPSST: "9",
+            cNRES: result.value//required cancel reason in popup
+          }
+          const res = await this.departureService.updateTHCLTL(filter, status);
+          await this.departureService.deleteTrip({ cID: this.storage.companyCode, tHC: evnt.data.TripID });
+          evnt.data.reason= result.value;
+          this.departureService.updateDocket(evnt.data);
+          if (res) {
+            SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
+            this.getdepartureDetail();
+          }
+          // Your code to handle the input value
+        } else if (result.isDismissed) {
+          this.getdepartureDetail();
+        }
+      });
+
           // Code for cancelling THC
           break;
       default:
           // Code for an unrecognized label
           break;
   }
-  
+ 
   }
 } 

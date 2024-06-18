@@ -447,10 +447,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const destinationMapping = await this.locationService.locationFromApi({
       locCode: this.storage.branch,
     });
+    const cityData=await this.pinCodeService.getOneCity({CT:destinationMapping[0].city});
     const city = {
       name: destinationMapping[0].pincode,
       value: destinationMapping[0].city,
       ct: destinationMapping[0].city,
+      st: cityData?cityData.ST:"",
       pincode: destinationMapping[0].pincode.toString()
     };
     //this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
@@ -496,6 +498,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*pincode based city*/
   async getPincodeDetail(event) {
     const value = this.consignmentForm.controls[event.field.name].value;
+    this.validategst(value);
+    console.log("value", value);
     if (typeof (value) == "string" || typeof (value) == "number") {
       if (isValidNumber(value)) {
         await this.pinCodeService.getCityPincode(
@@ -520,6 +524,33 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*end*/
   /*below is function for the get Pincode Based on city*/
+   validategst(value) {
+    // Assuming value has 'gst' and 'st' properties
+    const gstNumber = this.consignmentForm.controls['cnogst'].value;
+    let stateCode = value.st;
+
+    if (!gstNumber || stateCode === undefined) {
+        console.error("GST number or state code is missing.");
+        return false;
+    }
+
+    // Ensure stateCode is a string
+    stateCode = String(stateCode);
+
+    // Extract the first two characters of the GST number
+    const gstStateCode = gstNumber.substring(0, 2);
+
+    // Check if the first two characters of the GST number match the state code
+    if (gstStateCode !== stateCode) {
+        console.error(`GST number ${gstNumber} does not match with state code ${stateCode}.`);
+        return false;
+    }
+
+    // If everything is correct
+    console.log("GST number is valid.");
+    return true;
+}
+
 
   /*End*/
   /*below function is for the get city based on pincode*/

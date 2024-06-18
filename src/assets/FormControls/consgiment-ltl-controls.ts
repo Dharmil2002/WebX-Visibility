@@ -3,6 +3,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+import { on } from "events";
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -559,7 +560,8 @@ export class ConsignmentLtl extends BaseControl {
           },
         ],
         functions: {
-          onChange: "GetWalkingAutofill"
+          onChange: "GetWalkingAutofill",
+          onModel: "validategst",
         },
         additionalData: {
           metaData: "consignor",

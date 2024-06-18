@@ -280,10 +280,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     this.NonFreightLoaded = true
     this.NonFreightTableForm = formGroupBuilder(this.fb, []);
-     // Subscribe to invoiceAmount changes to dynamically update validators
-  this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
-    this.updateInvoiceValidators(value);
-  });
+    // Subscribe to invoiceAmount changes to dynamically update validators
+    this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
+      this.updateInvoiceValidators(value);
+    });
   }
   /*end*/
 
@@ -304,6 +304,20 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   //#endregion
 
+  /*below code is added for a set a locattion*/
+  async getPinCodeBasedOnCity(){
+    const toCity = this.consignmentForm.controls['toCity'].value.value;
+    const locationData=await this.locationService.locationFromApi({companyCode:this.storage.companyCode,D$or:[{locCity:toCity},{mappedCity:{D$in:[toCity]}}]});
+    if(locationData.length>0){
+      this.consignmentForm.controls['destination'].setValue(locationData[0]);
+      if(locationData.length>1){
+        this.filter.Filter(this.allFormControls, this.consignmentForm,locationData, "destination", true);
+        this.pinCodeLoc=locationData;
+      }
+    }
+
+  }
+  /*end*/
   // Common drop-down mapping
   commonDropDownMapping() {
     const mapControlArray = (controlArray, mappings) => {
@@ -447,12 +461,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const destinationMapping = await this.locationService.locationFromApi({
       locCode: this.storage.branch,
     });
-    const cityData=await this.pinCodeService.getOneCity({CT:destinationMapping[0].city});
+    const cityData = await this.pinCodeService.getOneCity({ CT: destinationMapping[0].city });
     const city = {
       name: destinationMapping[0].pincode,
       value: destinationMapping[0].city,
       ct: destinationMapping[0].city,
-      st: cityData?cityData.ST:"",
+      st: cityData ? cityData.ST : "",
       pincode: destinationMapping[0].pincode.toString()
     };
     //this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
@@ -498,8 +512,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   /*pincode based city*/
   async getPincodeDetail(event) {
     const value = this.consignmentForm.controls[event.field.name].value;
-    this.validategst(value);
-    console.log("value", value);
     if (typeof (value) == "string" || typeof (value) == "number") {
       if (isValidNumber(value)) {
         await this.pinCodeService.getCityPincode(
@@ -523,36 +535,56 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   /*end*/
-  /*below is function for the get Pincode Based on city*/
-   validategst(value) {
-    // Assuming value has 'gst' and 'st' properties
-    const gstNumber = this.consignmentForm.controls['cnogst'].value;
-    let stateCode = value.st;
 
-    if (!gstNumber || stateCode === undefined) {
-        console.error("GST number or state code is missing.");
+  //#region Function to get city based for consignor and consignee validated by GST number
+  validateGST(gstNumber, stateCode, city, gstControlName) {
+    if (gstNumber.length > 1) {
+      if (!gstNumber || stateCode === undefined) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'GST number or state code is missing.',
+        }).then(() => {
+          // Clear the GST number field value
+          this.consignmentForm.controls[gstControlName].setValue('');
+        });
         return false;
-    }
-
-    // Ensure stateCode is a string
-    stateCode = String(stateCode);
-
-    // Extract the first two characters of the GST number
-    const gstStateCode = gstNumber.substring(0, 2);
-
-    // Check if the first two characters of the GST number match the state code
-    if (gstStateCode !== stateCode) {
-        console.error(`GST number ${gstNumber} does not match with state code ${stateCode}.`);
+      }
+      // Ensure stateCode is a string and pad with leading zero if it's a single digit
+      stateCode = String(stateCode).padStart(2, '0');
+      // Extract the first two characters of the GST number
+      const gstStateCode = gstNumber.substring(0, 2);
+      // Check if the first two characters of the GST number match the state code
+      if (gstStateCode !== stateCode) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `GST number ${gstNumber} does not match with City - ${city}.`,
+        }).then(() => {
+          // Clear the GST number field value
+          this.consignmentForm.controls[gstControlName].setValue('');
+        });
         return false;
+      }
+      return true;
     }
-
     // If everything is correct
-    console.log("GST number is valid.");
     return true;
-}
-
-
-  /*End*/
+  }
+  validategst() {
+    const gstNumber = this.consignmentForm.controls['cnogst'].value;
+    const stateCode = this.consignmentForm.controls['fromCity'].value.st;
+    const city = this.consignmentForm.controls['fromCity'].value.ct;
+    return this.validateGST(gstNumber, stateCode, city, 'cnogst');
+  }
+  validatetogst() {
+    const gstNumber = this.consignmentForm.controls['cnegst'].value;
+    const stateCode = this.consignmentForm.controls['toCity'].value.st;
+    const city = this.consignmentForm.controls['toCity'].value.ct;
+    return this.validateGST(gstNumber, stateCode, city, 'cnegst');
+  }
+   //#endregion
+  
   /*below function is for the get city based on pincode*/
   async getDestinationBasedOnPincode(event) {
     const locations = await this.locationService.locationFromApi({ D$or: [{ locPincode: parseInt(event.eventArgs.option.value.value), mappedPinCode: { D$in: [parseInt(event.eventArgs.option.value.value)] } }] });
@@ -564,14 +596,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async destionationDropDown() {
     if (this.consignmentForm.controls.destination.value.length > 2) {
       const destinationMapping = await this.locationService.locationFromApi({
-        D$or:[
-        {
-        locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-        },
-        {
-        locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
-        }
-        ]});
+        D$or: [
+          {
+            locCode: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+          },
+          {
+            locName: { 'D$regex': `^${this.consignmentForm.controls.destination.value}`, 'D$options': 'i' },
+          }
+        ]
+      });
       this.filter.Filter(
         this.allFormControls,
         this.consignmentForm,
@@ -725,7 +758,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     data['paymentTypeName'] = this.paymentType.find(x => x.value == data.payType) ? this.paymentType.find(x => x.value == data.payType).name : 'Default Payment Name';
     data['transModeName'] = this.tranType.find(x => x.value == data.transMode) ? this.tranType.find(x => x.value == data.transMode).name : 'Default Transaction Mode Name';
     this.otherCharges = this.otherCharges ? this.otherCharges : [];
-    console.log(this.otherCharges);
     if (this.otherCharges.length > 0) {
       data = this.otherCharges
     }
@@ -793,7 +825,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     });
   }
   /*below function call when Consgine or Consginor would be walkin*/
-  walkin(event) {    
+  walkin(event) {
     const name = event.name;
     this.consignmentForm.controls[name].setValue(event.event.checked)
     const value = this.consignmentForm.controls[name].value;
@@ -824,50 +856,50 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       let jsonControls = controlMap.get(mapping.controlName);
       jsonControls.forEach(element => {
         this.consignmentForm.controls[element.name].setValue("");
-        if(element.name.includes("gst")) {
+        if (element.name.includes("gst")) {
           element.displayIndex = event.event.checked ? 0 : 5;
-          element.functions = event.event.checked 
-            ? { onChange: "OnGSTChange" } 
+          element.functions = event.event.checked
+            ? { onChange: "OnGSTChange" }
             : {}
         }
-        if(element.name.includes("Name")) {
-          element.functions = event.event.checked 
-            ? {} 
+        if (element.name.includes("Name")) {
+          element.functions = event.event.checked
+            ? {}
             : {
               onModel: "getCustomer",
               onOptionSelect: "getConsignor",
-              onChange: "GetWalkingAutofill"         
+              onChange: "GetWalkingAutofill"
             }
         }
       });
-      
+
       jsonControls.sort((a, b) => a.displayIndex - b.displayIndex);
 
-      this.filter.Filter( jsonControls, this.consignmentForm, [], mapping.controlName, false );
+      this.filter.Filter(jsonControls, this.consignmentForm, [], mapping.controlName, false);
 
     }
   }
 
-  async OnGSTChange($event){
-    const name =  $event.field.name;
+  async OnGSTChange($event) {
+    const name = $event.field.name;
     const gst = this.consignmentForm.controls[name].value;
-    
+
     const gstData = await this.findWalkinGST(gst);
-    
+
     const fieldMap = new Map([
-      ['cnogst', { 
-          'cUSTNM': 'consignorName',
-          'cUSTPH': 'ccontactNumber' ,
-          'aLTPH': 'calternateContactNo',
-          'aDD': 'cnoAddress' 
-        }
+      ['cnogst', {
+        'cUSTNM': 'consignorName',
+        'cUSTPH': 'ccontactNumber',
+        'aLTPH': 'calternateContactNo',
+        'aDD': 'cnoAddress'
+      }
       ],
-      ['cnegst', 
-        { 
-          'cUSTNM': 'consigneeName' ,
+      ['cnegst',
+        {
+          'cUSTNM': 'consigneeName',
           'cUSTPH': 'cncontactNumber',
-          'aLTPH': 'cnalternateContactNo' ,
-          'aDD': 'cneAddress' 
+          'aLTPH': 'cnalternateContactNo',
+          'aDD': 'cneAddress'
         }
       ]
     ]);
@@ -888,7 +920,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         gSTNO: gstno
       }
     };
-    const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));    
+    const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));
     return res?.data
   }
   /*End*/
@@ -1205,12 +1237,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       let chargedWeight = 0;
       if (this.consignmentForm.controls['f_vol'].value) {
         //const chargeWt = this.getInvoiceAggValue("chargedWeight");
-        const chargeWt = this.chargeBase.ChargedWeight  || 0;
+        const chargeWt = this.chargeBase.ChargedWeight || 0;
         const cubicWeight = this.getInvoiceAggValue("cubWT");
         chargedWeight = parseFloat(cubicWeight) > parseFloat(chargeWt) ? cubicWeight : chargeWt;
       } else {
         //chargedWeight = this.getInvoiceAggValue("chargedWeight");
-        chargedWeight = this.chargeBase.ChargedWeight  || 0;
+        chargedWeight = this.chargeBase.ChargedWeight || 0;
       }
 
       rateTypeMap = {
@@ -1616,17 +1648,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     let yieldOn = this.contract?.cYIELDON || "CYO-0002";
     let yieldValue = ConvertToNumber(((yieldOn == "CYO-0001" ? data?.freight_amount : data?.grossAmount) || 0) / this.chargeBase.ChargedWeight, 2);
 
-    if(this.contract?.sERVSELEC.includes("YieldProtection") && yieldValue < this.contract?.mYIELD) {      
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: `Yield amount ${yieldValue} is less than the minimum yield amount ${this.contract?.mYIELD} configured on yield protection. Please ensure the yield amount meets the minimum requirement.`,
-          showConfirmButton: false,
-        });
-        return false
+    if (this.contract?.sERVSELEC.includes("YieldProtection") && yieldValue < this.contract?.mYIELD) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `Yield amount ${yieldValue} is less than the minimum yield amount ${this.contract?.mYIELD} configured on yield protection. Please ensure the yield amount meets the minimum requirement.`,
+        showConfirmButton: false,
+      });
+      return false
     }
 
-    this.isSubmit = true;    
+    this.isSubmit = true;
     const tableData = this.tableData
     data['iSSCAN'] = this.rules.find((x) => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y";
     data['payTypeName'] = this.paymentType.find(x => x.value == data?.payType)?.name ?? '';
@@ -1636,23 +1668,23 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     data['delivery_typeNm'] = this.deliveryType.find(x => x.value == data?.delivery_type)?.name ?? '';
     data['freightRatetypeNm'] = this.rateTypes.find(x => x.value == data?.freightRatetype)?.name ?? '';
     data["yIELD"] = yieldValue;
-    let serviceCharges=[];
-    if(this.NonFreightjsonControlArray && this.NonFreightjsonControlArray.length>0){
-     serviceCharges = this.NonFreightjsonControlArray.map(x => {
-      return {
-        cHGID: x.additionalData.metaData.ServicesCode,
-        cHGNM: x.additionalData.metaData.ServicesName,
-        aMT: this.NonFreightTableForm.controls[x.name]?.value || 0,
-        oPS: "",
-        tY: "sC"
-      };
-    });
-  }
+    let serviceCharges = [];
+    if (this.NonFreightjsonControlArray && this.NonFreightjsonControlArray.length > 0) {
+      serviceCharges = this.NonFreightjsonControlArray.map(x => {
+        return {
+          cHGID: x.additionalData.metaData.ServicesCode,
+          cHGNM: x.additionalData.metaData.ServicesName,
+          aMT: this.NonFreightTableForm.controls[x.name]?.value || 0,
+          oPS: "",
+          tY: "sC"
+        };
+      });
+    }
 
-  const otherData = {
-    otherCharges: [...(this.otherCharges?.map(x => ({ ...x, tY: "nFC" })) ?? []), ...serviceCharges],
-    otherInfo: this.otherInfo
-  };
+    const otherData = {
+      otherCharges: [...(this.otherCharges?.map(x => ({ ...x, tY: "nFC" })) ?? []), ...serviceCharges],
+      otherInfo: this.otherInfo
+    };
     const reqDkt = await this.docketService.consgimentFieldMapping(data, this.chargeBase, tableData, this.isUpdate, otherData);
     let docketDetails = {}
     docketDetails = reqDkt?.docketsDetails || {};
@@ -1763,7 +1795,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           // Handle the action for the deny button here.
           const templateBody = {
             templateName: "DKT",
-            PartyField:"",
+            PartyField: "",
             DocNo: this.consignmentForm.controls["docketNumber"].value,
           }
           const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
@@ -2013,15 +2045,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       return null;
     }).filter(x => x != null);
 
-    matches.push( { D$and: [
-      { "D$in": ['$fTYPE', [null, ""]] },
-      { "D$in": ['$ffROM', [null, ""]] }]
+    matches.push({
+      D$and: [
+        { "D$in": ['$fTYPE', [null, ""]] },
+        { "D$in": ['$ffROM', [null, ""]] }]
     });
-    matches.push( { D$and: [
-      { "D$in": ['$tTYPE', [null, ""]] },
-      { "D$in": ['$tfROM', [null, ""]] }]
+    matches.push({
+      D$and: [
+        { "D$in": ['$tTYPE', [null, ""]] },
+        { "D$in": ['$tfROM', [null, ""]] }]
     });
-    
+
     let reqBody =
     {
       "companyCode": this.storage.companyCode,
@@ -2033,8 +2067,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const result = await firstValueFrom(this.operationService.operationMongoPost("contract/findContract", reqBody));
     if (result?.data?.cONID == contractId) {
       this.contract = { ...result?.data };
-      console.log(this.contract)
-
       this.freightForm.controls["freight_rate"].setValue(this.contract.FreightChargeMatrixDetails?.rT);
       this.freightForm.controls["freightRatetype"].setValue(this.contract.FreightChargeMatrixDetails?.rTYPCD);
 
@@ -2108,7 +2140,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       });
       this.CalculateCharges();
       this.calucatedCharges();
-      
+
       // Swal.fire({
       //   icon: "success",
       //   title: "Contract Invoked Successfully",
@@ -2123,7 +2155,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         text: "Contract Not Found",
         showConfirmButton: false,
       });
-            this.SetInvoiceData();
+      this.SetInvoiceData();
     }
   }
   /*Emd*/
@@ -2179,23 +2211,23 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   GetServiceWiseCalculatedData(data) {
     const getServiceData = (name, label) => ({
-        "functionName": "calucatedCharges",
-        "value": 0,
-        "name": name,
-        "label": label,
-        "placeholder": label,
-        "additionalData": {
-            metaData: data
-        }
+      "functionName": "calucatedCharges",
+      "value": 0,
+      "name": name,
+      "label": label,
+      "placeholder": label,
+      "additionalData": {
+        metaData: data
+      }
     });
 
     switch (data.ServicesName) {
-        case "COD/DOD":
-            return getServiceData("CODDOD", "COD/DOD");
-        case "FuelSurcharge":
-            return getServiceData("FuelSurcharge", "Fuel Surcharge");
-        case "Insurance":
-            return getServiceData("Insurance", "FOV Charge");
+      case "COD/DOD":
+        return getServiceData("CODDOD", "COD/DOD");
+      case "FuelSurcharge":
+        return getServiceData("FuelSurcharge", "Fuel Surcharge");
+      case "Insurance":
+        return getServiceData("Insurance", "FOV Charge");
     }
   }
 
@@ -2207,7 +2239,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           if (cn.cBT == "Fixed" && cn.nFC) {
             x.aMT = (x?.oPS === "-") ? -Math.abs(cn.nFC || 0) : cn.nFC;
           }
-          else if(cn.cBT == "Variable" && cn.Details) {            
+          else if (cn.cBT == "Variable" && cn.Details) {
             const rateType = RateTypeCalculation.find(x => x.codeId == cn.Details.rTYPCD);
             let weight = 0;
             if (rateType.codeDesc == "Per Pkg") {
@@ -2216,7 +2248,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
             else {
               weight = this.chargeBase.ChargedWeight || 0;
             }
-            const actualWeight =  (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') :  weight;
+            const actualWeight = (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') : weight;
             const value = Math.min(Math.max(cn.Details.mINV, cn.Details.rT * actualWeight), cn.Details.mAXV) || 0;
             x.aMT = (x?.oPS === "-") ? -Math.abs(value) : value;
           }
@@ -2227,46 +2259,46 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   CalculateServiceCharge(name, x) {
     const getRateType = (codeId) => RateTypeCalculation.find(rt => rt.codeId == codeId);
-    
+
     const calculateWeight = (rateType) => {
-        return rateType.codeDesc == "Per Pkg" ? (this.chargeBase.ChargePackage || 0) : (this.chargeBase.ChargedWeight || 0);
+      return rateType.codeDesc == "Per Pkg" ? (this.chargeBase.ChargePackage || 0) : (this.chargeBase.ChargedWeight || 0);
     };
 
     const calculateValue = (rateType, weight, min, rt, max) => {
-        const actualWeight =  (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') :  weight;
-        return Math.min(Math.max(min, rt * actualWeight), max);
+      const actualWeight = (rateType.codeDesc == "Per Ton") ? convert(weight).from('kg').to('mt') : weight;
+      return Math.min(Math.max(min, rt * actualWeight), max);
     };
 
     switch (x.ServicesName) {
-        case "COD/DOD":
-            const codRateType = getRateType(this.contract.cODDODRTYP);
-            const codWeight = calculateWeight(codRateType);
-            const codValue = calculateValue(codRateType, codWeight, this.contract.mIN, this.contract.rT, this.contract.mAX);
-            this.NonFreightTableForm.controls[name].setValue(codValue);
-            break;
+      case "COD/DOD":
+        const codRateType = getRateType(this.contract.cODDODRTYP);
+        const codWeight = calculateWeight(codRateType);
+        const codValue = calculateValue(codRateType, codWeight, this.contract.mIN, this.contract.rT, this.contract.mAX);
+        this.NonFreightTableForm.controls[name].setValue(codValue);
+        break;
 
-        case "FuelSurcharge":
-            let fuelCharge = 0;
-            if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
-                const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);
-                const fuelWeight = calculateWeight(fuelRateType);
-                fuelCharge = calculateValue(fuelRateType, fuelWeight, this.contract.FuelSurcharge.fmIN, this.contract.FuelSurcharge.frT, this.contract.FuelSurcharge.fmAX);
-            }
-            this.NonFreightTableForm.controls[name].setValue(fuelCharge);
-            break;
+      case "FuelSurcharge":
+        let fuelCharge = 0;
+        if (this.contract.FuelSurcharge && this.contract.FuelSurcharge.cONID) {
+          const fuelRateType = getRateType(this.contract.FuelSurcharge.fRTYPE);
+          const fuelWeight = calculateWeight(fuelRateType);
+          fuelCharge = calculateValue(fuelRateType, fuelWeight, this.contract.FuelSurcharge.fmIN, this.contract.FuelSurcharge.frT, this.contract.FuelSurcharge.fmAX);
+        }
+        this.NonFreightTableForm.controls[name].setValue(fuelCharge);
+        break;
 
-        case "Insurance":
-            let insuranceValue = 0;
-            const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
-                ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
-            );
-            if (insuranceDetails) {
-                const insuranceRateType = getRateType(insuranceDetails.rtType);
-                const insuranceWeight = calculateWeight(insuranceRateType);
-                insuranceValue = calculateValue(insuranceRateType, insuranceWeight, insuranceDetails.mIN, insuranceDetails.rT, insuranceDetails.mAX);
-            }
-            this.NonFreightTableForm.controls[name].setValue(insuranceValue);
-            break;
+      case "Insurance":
+        let insuranceValue = 0;
+        const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
+          ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
+        );
+        if (insuranceDetails) {
+          const insuranceRateType = getRateType(insuranceDetails.rtType);
+          const insuranceWeight = calculateWeight(insuranceRateType);
+          insuranceValue = calculateValue(insuranceRateType, insuranceWeight, insuranceDetails.mIN, insuranceDetails.rT, insuranceDetails.mAX);
+        }
+        this.NonFreightTableForm.controls[name].setValue(insuranceValue);
+        break;
     }
   }
 

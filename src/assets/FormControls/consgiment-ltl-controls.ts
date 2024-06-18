@@ -186,8 +186,7 @@ export class ConsignmentLtl extends BaseControl {
           { name: "invalidAutocompleteObject", message: "Choose proper value" },
         ],
         functions: {
-          onModel: "getPincodeDetail",
-          onOptionSelect: "getPinCodeBasedOnCity",
+          onModel: "getPincodeDetail"
         },
         additionalData: {
           metaData: "Basic",
@@ -676,7 +675,8 @@ export class ConsignmentLtl extends BaseControl {
           },
         ],
         functions: {
-          onChange: "GetWalkingAutofill"
+          onChange: "GetWalkingAutofill",
+          onModel: "validatetogst",
         },
         additionalData: {
           metaData: "consignee",

@@ -45,6 +45,7 @@ import { GetStateListFromAPI } from "src/app/finance/Vendor Payment/VendorPaymen
 import { EncryptionService } from "src/app/core/service/encryptionService.service";
 import { VendorBillEntry } from "src/app/Models/Finance/VendorPayment";
 import { financialYear } from "src/app/Utility/date/date-utils";
+import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
 @Component({
   selector: "app-general-bill-detail",
   templateUrl: "./general-bill-detail.component.html",
@@ -138,6 +139,7 @@ export class GeneralBillDetailComponent implements OnInit {
   StateList: any;
   AccountGroupList: any;
   AllLocationsList: any;
+  CompanyDetails: any;
   Request = {
     VendorName: "",
     VendorCode: "",
@@ -213,6 +215,8 @@ export class GeneralBillDetailComponent implements OnInit {
     this.VendorBillTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBillTaxationGSTFilterArray,
     ]);
+
+    
   }
   async BindDataFromApi() {
     const DocumentsList = [
@@ -250,7 +254,7 @@ export class GeneralBillDetailComponent implements OnInit {
     );
 
     this.BindLedger();
-
+    this.CompanyDetails=await getApiCompanyDetail(this.masterService);
   }
   async BindLedger() {
     const account_groupReqBody = {
@@ -284,6 +288,7 @@ export class GeneralBillDetailComponent implements OnInit {
     );
 
     if (res.success && res.data.length != 0) {
+      
       this.VendorDetails = res.data[0];
 
       if (this.VendorDetails?.otherdetails) {
@@ -466,6 +471,7 @@ export class GeneralBillDetailComponent implements OnInit {
   }
 
   StateChange() {
+    
     const formValues = this.VendorBillTaxationGSTFilterForm.value;
     const Billbookingstate = formValues.Billbookingstate;
     const Vendorbillstate = formValues.Vendorbillstate;
@@ -496,6 +502,10 @@ export class GeneralBillDetailComponent implements OnInit {
         );
       }
     }
+    
+    this.VendorBillTaxationGSTFilterForm.controls.GSTNumber.setValue(this.CompanyDetails?.data.find(detail => detail.state === Billbookingstate.name)?.gstNo ?? '');
+    this.VendorBillTaxationGSTFilterForm.controls.VGSTNumber.setValue(this.VendorDetails?.otherdetails.find(detail => detail.gstState === Vendorbillstate.name)?.gstNumber ?? '');
+
   }
   ShowOrHideBasedOnSameOrDifferentState(Check, GSTdata) {
     const filterFunctions = {
@@ -534,7 +544,7 @@ export class GeneralBillDetailComponent implements OnInit {
 
     if (VendorGSTRegistered) {
       // this.jsonControlVendorBillTaxationGSTFilterArray = this.AlljsonControlVendorBillTaxationGSTFilterArray;
-
+      
       const GSTSACcode = this.VendorBillTaxationGSTFilterForm.get("GSTSACcode");
       GSTSACcode.setValidators([
         Validators.required,
@@ -786,7 +796,7 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = BillNo;
         const voucherlineItems = this.GetJournalVoucherLedgers(BillNo);
-
+        
         this.VoucherRequestModel.details = voucherlineItems;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];

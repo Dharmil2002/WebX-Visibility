@@ -1,0 +1,10 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="CreditNoteReportRegisterForm">
+      <app-form-webxpress [form]="CreditNoteReportRegisterForm"
+        [FormTitle]="'Credit Note Register Report'"
+        [formData]="jsonControlArray"(functionCallEmitter)="functionCallHandler($event)"
+        (callFunction)="functionCallHandler($event)"
+        [showSaveButton]="true" [submit]="'Download'">
+      </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

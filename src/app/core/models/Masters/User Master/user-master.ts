@@ -39,6 +39,8 @@ export class UserMaster {
   internalID: any;
   country: any;
   division: any;
+  multiMode:any;
+  mode:any;
   multiDivisionAccess: any;
   multiLocation: any;
   locationName: any;

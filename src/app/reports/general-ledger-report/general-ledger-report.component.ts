@@ -509,12 +509,16 @@ export class GeneralLedgerReportComponent implements OnInit {
       ? this.generalLedgerForm.value.accountHandler.map(x => x.value)
       : [];
 
-    const partyName = Array.isArray(this.generalLedgerForm.value.subLedgerHandler)
+    const partyCode = Array.isArray(this.generalLedgerForm.value.subLedgerHandler)
       ? this.generalLedgerForm.value.subLedgerHandler.map(x => x.value)
+      : [];
+
+    const partyName = Array.isArray(this.generalLedgerForm.value.subLedgerHandler)
+      ? this.generalLedgerForm.value.subLedgerHandler.map(x => x.name)
       : [];
     const reqBody = {
       startValue, endValue, reportTyp, fnYear: parseInt(fnYear),
-      category, branch, individual, accountCode, partyName
+      category, branch, individual, accountCode, partyCode, partyName
     }
     return reqBody
   }

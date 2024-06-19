@@ -33,7 +33,7 @@ export class AddUserMasterComponent implements OnInit {
   userDetails: any;
   breadScrums = [{}];
   location: any;
-  divisionStatus: any;
+  modeStatus: any;
   locationName: any;
   userLocationStatus: any;
   userRoleStatus: any;
@@ -45,14 +45,14 @@ export class AddUserMasterComponent implements OnInit {
   userTypeStatus: any;
   locationStatus: any;
   UserFormControls: UserControl;
-  divisionAccess: any;
+  modeAccess: any;
   locationList: any;
   userList: any;
   roleId: any;
   countryList: any;
   userData: any;
-  divisionList: any;
-  division: any;
+  modeList: any;
+  mode: any;
   data: any;
   confirmpassword: any;
   newUserCode: any;
@@ -123,9 +123,9 @@ export class AddUserMasterComponent implements OnInit {
         property: "locationName",
         statusProperty: "userLocationStatus",
       },
-      multiDivisionAccess: {
-        property: "division",
-        statusProperty: "divisionStatus",
+      multiMode: {
+        property: "mode",
+        statusProperty: "modeStatus",
       },
       name: {
         property: "name",
@@ -175,9 +175,9 @@ export class AddUserMasterComponent implements OnInit {
         ],
         [
           this.jsonControlUserArray,
-          this.divisionList,
-          this.division,
-          this.divisionStatus,
+          this.modeList,
+          this.mode,
+          this.modeStatus,
         ],
       ];
       filterParams.forEach(
@@ -225,7 +225,7 @@ export class AddUserMasterComponent implements OnInit {
       const generalReqBody = {
         companyCode: this.companyCode,
         collectionName: "General_master",
-        filter: { codeType: { "D$in": ["usertyp", "USERROLE", "DIVIS"] } }
+        filter: { codeType: { "D$in": ["usertyp", "USERROLE", "MODE"] } }
       };
 
       const locationsResponse = await firstValueFrom(this.masterService.masterPost("generic/get", locationReq));
@@ -252,8 +252,8 @@ export class AddUserMasterComponent implements OnInit {
           }
         });
       //Code Type = 'DIVIS'
-      this.divisionList = userStatusResponse.data
-        .filter((item) => item.codeType === "DIVIS" && item.activeFlag)
+      this.modeList = userStatusResponse.data
+        .filter((item) => item.codeType === "MODE" && item.activeFlag)
         .map((x) => {
           {
             return { name: x.codeDesc, value: x.codeId };
@@ -292,9 +292,9 @@ export class AddUserMasterComponent implements OnInit {
       this.filter.Filter(
         this.jsonControlUserArray,
         this.userTableForm,
-        this.divisionList,
-        this.division,
-        this.divisionStatus
+        this.modeList,
+        this.mode,
+        this.modeStatus
       );
       if (this.isUpdate) {
         const userLocation = locations.find(
@@ -308,10 +308,10 @@ export class AddUserMasterComponent implements OnInit {
         this.userTableForm.controls["userType"].setValue(userType);
 
         // Patches the Div control value of UserTableForm with filter
-        if (this.userTable.multiDivisionAccess.length > 0) {
-          this.userTableForm.controls["division"].patchValue(
-            this.divisionList.filter((element) =>
-              this.userTable.multiDivisionAccess.includes(element.name)
+        if (this.userTable.multiMode.length > 0) {
+          this.userTableForm.controls["mode"].patchValue(
+            this.modeList.filter((element) =>
+              this.userTable.multiMode.includes(element.name)
             )
           );
         }
@@ -428,10 +428,10 @@ export class AddUserMasterComponent implements OnInit {
           this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.value);
           this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
           //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
-          const division = this.userTableForm.value.division ? this.userTableForm.value.division.map(
+          const multiMode = this.userTableForm.value.mode ? this.userTableForm.value.mode.map(
             (item: any) => item.name
           ) : [];
-          this.userTableForm.controls["multiDivisionAccess"].setValue(division);
+          this.userTableForm.controls["multiMode"].setValue(multiMode);
 
           const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map(
             (item: any) => item.value
@@ -441,7 +441,7 @@ export class AddUserMasterComponent implements OnInit {
           //remove unwanted controlName
           const controlsToRemove = [
             "confirmpassword",
-            "division",
+            "mode",
             "CompanyCode",
             "controlHandler",
             "userLocationscontrolHandler",

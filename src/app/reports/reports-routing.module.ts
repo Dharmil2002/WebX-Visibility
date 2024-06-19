@@ -39,6 +39,9 @@ import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsh
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
 import { CreditNoteRegisterReportComponent } from './credit-note-register-report/credit-note-register-report.component';
+import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
+import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
+import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -58,6 +61,7 @@ const routes: Routes = [
   { path: "AccountReport/ProfitAndLoss", component: ProfitAndLossCriteriaComponent },
   { path: "AccountReport/ProfitAndLossview", component: ProfitAndLossViewComponent },
   { path: "AccountReport/ProfitAndLossviewdetails", component: ProfitAndLossViewDetailsComponent },
+  { path: "AccountReport/ProfitAndLossviewdetailsvouchersList", component: ProfitAndLossViewDetailsVouchersListComponent },
   { path: "Dashboard", component: DashboardComponent },
   { path: "ControlTower", component: ControlTowerDashboardComponent },
   { path: "AccountReport/TrialBalance", component: TrialBalanceCriteriaComponent },
@@ -67,6 +71,7 @@ const routes: Routes = [
   { path: "DCRRegister", component: DcrRegisterComponent },
   { path: "AccountReport/BalanceSheet", component: BalanceSheetCriteriaComponent },
   { path: "AccountReport/BalanceSheetview", component: BalanceSheetViewComponent },
+  { path: "AccountReport/BalanceSheetviewdetails", component: BalanceSheetViewDetailsComponent },
   { path: "MR-Register-Report", component: MRRegisterReportComponent },
   { path: "CustomerInvoiceRegister", component: CustomerInvoiceRegisterComponent },
   { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent },
@@ -77,7 +82,7 @@ const routes: Routes = [
   { path: "TDSRegister", component: GenerateTdsRegisterReportComponent },
   { path: "generic-report-view", component: GenericReportViewComponent },
   { path: "credit-note-register-report", component: CreditNoteRegisterReportComponent },
-  
+  { path: "debit-note-register-report", component: DebitNoteRegisterReportComponent },
 ];
 
 @NgModule({

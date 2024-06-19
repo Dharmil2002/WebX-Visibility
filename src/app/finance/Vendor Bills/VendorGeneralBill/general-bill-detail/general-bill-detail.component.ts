@@ -450,10 +450,10 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VendorBillTaxationGSTFilterForm.controls.GSTAmount.value
       ) || 0;
 
-    const CalculatedSumWithTDS = Total - parseFloat(TDSAmount.toFixed(2));
-    const CalculatedSum =
-      CalculatedSumWithTDS + parseFloat(GSTAmount.toFixed(2));
-    const formattedCalculatedSum = CalculatedSum.toFixed(2);
+    const CalculatedSum = Total + parseFloat(GSTAmount.toFixed(2));
+    const CalculatedSumWithTDS = CalculatedSum - parseFloat(TDSAmount.toFixed(2));
+
+    const formattedCalculatedSum = CalculatedSumWithTDS.toFixed(2);
 
     this.TotalAmountList.forEach((x) => {
       if (x.title == "Balance Pending") {
@@ -475,22 +475,24 @@ export class GeneralBillDetailComponent implements OnInit {
       const IsStateTypeUT =
         this.AllStateList.find((item) => item.STNM === Vendorbillstate.name)
           .ISUT == true;
-      const GSTAmount = this.TotalAmountList.find((x) => x.title == "Total Amount").count;
+      // calculate GSTAmount on TableData
+      const GSTAmount = this.tableData.reduce((sum, x) => sum + parseFloat(x.Amount), 0);
+      //const GSTAmount = this.TotalAmountList.find((x) => x.title == "Total Amount").count;
       const GSTdata = { GSTAmount, GSTRate: SACcode.GSTRT };
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTdata);
-        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("IGST");
+        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("CGST/SGS");
       } else if (IsStateTypeUT) {
         this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTdata);
-        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("IGST");
+        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("UGST");
       } else if (
         !IsStateTypeUT &&
         Billbookingstate.name != Vendorbillstate.name
       ) {
         this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTdata);
         this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue(
-          "CGST/SGST"
+          "IGST"
         );
       }
     }
@@ -499,8 +501,7 @@ export class GeneralBillDetailComponent implements OnInit {
     const filterFunctions = {
       UT: (x) => x.name !== "IGSTRate" && x.name !== "SGSTRate",
       SAME: (x) => x.name !== "IGSTRate" && x.name !== "UGSTRate",
-      DIFF: (x) =>
-        x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate",
+      DIFF: (x) => x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate"
     };
 
     const GSTinputType = ["SGSTRate", "UGSTRate", "CGSTRate", "IGSTRate"];
@@ -511,12 +512,17 @@ export class GeneralBillDetailComponent implements OnInit {
     const GSTCalculateAmount = ((GSTdata.GSTAmount * GSTdata.GSTRate) / (100 * GSTinput.length)).toFixed(2);
     const GSTCalculateRate = (GSTdata.GSTRate / GSTinput.length).toFixed(2);
 
-    const calculateValues = (rateKey, amountKey) => {
-      this.VendorBillTaxationGSTFilterForm.get(rateKey).setValue(GSTCalculateRate);
-      this.VendorBillTaxationGSTFilterForm.get(amountKey).setValue(GSTCalculateAmount);
+    const calculateValues = (rateKey, amountKey, rateValue, amountValue) => {
+      this.VendorBillTaxationGSTFilterForm.get(rateKey).setValue(rateValue);
+      this.VendorBillTaxationGSTFilterForm.get(amountKey).setValue(amountValue);
     };
 
-    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount"));
+    // Update the rate and amount fields for each GST input type
+    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount", GSTCalculateRate, GSTCalculateAmount));
+
+    // Set the rate and amount to 0 for fields not in GSTinput
+    GSTinputType.filter(type => !GSTinput.includes(type)).forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount", "0.00", "0.00"));
+
 
     this.VendorBillTaxationGSTFilterForm.get("TotalGSTRate").setValue((+GSTCalculateRate * GSTinput.length).toFixed(2));
     this.VendorBillTaxationGSTFilterForm.get("GSTAmount").setValue((+GSTCalculateAmount * GSTinput.length).toFixed(2));

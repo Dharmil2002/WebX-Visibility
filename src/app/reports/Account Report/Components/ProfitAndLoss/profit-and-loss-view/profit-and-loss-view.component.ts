@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { exportAsExcelFileV2, } from '../../../../../Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
-import { timeString } from 'src/app/Utility/date/date-utils';
+import { GetLastFinYearEndDate, timeString } from 'src/app/Utility/date/date-utils';
 import { map } from 'rxjs/operators';
 import { StorageService } from 'src/app/core/service/storage.service';
 
@@ -28,6 +28,15 @@ export class ProfitAndLossViewComponent implements OnInit {
   async ngOnInit(): Promise<void> {
 
     this.JsonData = JSON.parse(this.accountReportService.getData())
+    this.JsonData.ProfitAndLossDetails.map((item) => {
+      if (item.SubCategory === "Total") {
+        item["FontWeight"] = "bold";
+      }
+      const currentAmount = Number(item.TotalAmountCurrentFinYear);
+      if (!isNaN(currentAmount)) {
+        item.TotalAmountCurrentFinYear = currentAmount.toLocaleString('en-US');
+      }
+    });
     const filterCritera = {
       cID: this.storage.companyCode,
       vTYPE: "ProfitAndLossView",
@@ -54,7 +63,7 @@ export class ProfitAndLossViewComponent implements OnInit {
       "SubCategory": "Description",
       "Notes": "Note No",
       "TotalAmountCurrentFinYear": "Amount As on " + this.JsonData.EndDate,
-      "TotalAmountLastFinYear": "Amount As on 31 Mar 23"
+      "TotalAmountLastFinYear": "Amount As on " + GetLastFinYearEndDate(this.JsonData.EndDate),
     }
 
     const Result = this.JsonData.ProfitAndLossDetails.map((item) => {
@@ -104,7 +113,7 @@ export class ProfitAndLossViewComponent implements OnInit {
       "SubCategory": "Particular",
       "AccountName": "Descriptions",
       "AmountCurrentFinYear": "Amount As on " + this.JsonData.EndDate,
-      "AmountLastFinYear": "Amount As on 31 Mar 23"
+      "AmountLastFinYear": "Amount As on " + GetLastFinYearEndDate(this.JsonData.EndDate),
 
     }
     const mappedJsonResult = NewArrayData.map((item) => {

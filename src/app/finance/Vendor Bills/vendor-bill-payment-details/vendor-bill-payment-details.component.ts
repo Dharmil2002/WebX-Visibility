@@ -493,7 +493,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         this.VoucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "";
         this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name;
         this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value;
-        this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "";
+        this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Date : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 
         var VoucherlineitemList = this.GetDebitVoucherLedgers(NetPayable, BillNo, PaymenDetails);

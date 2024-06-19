@@ -96,7 +96,7 @@ export class ProductListComponent implements OnInit {
     this.isTableLode = false;
     let req = {
       companyCode: this.companyCode,
-      filter: {companyCode: this.companyCode},
+      filter: {},
       collectionName: "products",
     };
     const Res = await this.masterService
@@ -119,7 +119,7 @@ export class ProductListComponent implements OnInit {
     const dialogref = this.dialog.open(ShardProductAddComponent, {
       width: "600px",
       height: "300px",
-      disableClose:true,
+      disableClose: true,
       data: {},
     });
     dialogref.afterClosed().subscribe((result) => {
@@ -140,7 +140,7 @@ export class ProductListComponent implements OnInit {
       height: "80%",
       data: { element: event },
     });
-    dialogref.afterClosed().subscribe((result) => {});
+    dialogref.afterClosed().subscribe((result) => { });
   }
   addServices(event) {
     const dialogref = this.dialog.open(ShardProductServicesComponent, {
@@ -148,7 +148,7 @@ export class ProductListComponent implements OnInit {
       height: "80%",
       data: { element: event },
     });
-    dialogref.afterClosed().subscribe((result) => {});
+    dialogref.afterClosed().subscribe((result) => { });
   }
   functionCallHandler(event) {
     try {

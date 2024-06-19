@@ -50,10 +50,9 @@ export class TrialBalanceReport {
                     ],
                     additionalData: {
                          support: "end",
-                         minDate: new Date(), // Set the minimum date to the current date
-                         maxDate: new Date() // Allow selection of dates in the current year and future years
 
                     },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'branch',
@@ -81,15 +80,8 @@ export class TrialBalanceReport {
                     name: "ReportType",
                     label: "Report Type",
                     placeholder: "Report Type",
-                    type: "Staticdropdown",
-                    value: [
-                         { value: "G", name: "Group Wise" },
-                         { value: "L", name: "Location Wise" },
-                         { value: "C", name: "Customer Wise" },
-                         { value: "V", name: "Vendor Wise" },
-                         { value: "E", name: "Employee Wise" },
-                         //{ value: "D", name: "Driver Wise" }
-                    ],
+                    type: "dropdown",
+                    value: "",
                     generatecontrol: true,
                     disable: false,
                     Validations: [
@@ -102,27 +94,24 @@ export class TrialBalanceReport {
                          showNameAndValue: false,
                     },
                     functions: {
-                         onSelection: "ReportTypeFieldChanged"
+                         onOptionSelect: "ReportTypeFieldChanged"
                     },
                },
                {
                     name: 'reportSubType',
                     label: 'Report Sub Type',
                     placeholder: 'Report Sub Type',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "Location", name: "Location" },
-                         { value: "Customer", name: "Customer" },
-                         { value: "Vendor", name: "Vendor" },
-                         { value: "Employee", name: "Employee" },
-                         { value: "Driver", name: "Driver" },
-                         { value: "Vehicle", name: "Vehicle" },
-                    ],
+                    type: 'dropdown',
+                    value: "",
                     functions: {
-                         onSelection: "reportSubTypeChanged"
+                         onOptionSelect: "reportSubTypeChanged"
+                    },
+                    additionalData: {
+                         showNameAndValue: false,
                     },
                     Validations: [],
-                    generatecontrol: true, disable: false
+                    generatecontrol: true,
+                    disable: false
                },
                {
                     name: 'subLedger',
@@ -192,10 +181,7 @@ export class TrialBalanceReport {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
-                    additionalData: {
-                         minDate: new Date(), // Set the minimum date to the current date
-                         maxDate: new Date()
-                    },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'accountHandler',

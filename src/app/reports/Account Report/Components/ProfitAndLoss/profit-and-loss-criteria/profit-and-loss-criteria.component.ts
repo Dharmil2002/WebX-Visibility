@@ -4,7 +4,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { finYear, timeString } from 'src/app/Utility/date/date-utils';
+import { GetLastFinYearEndDate, finYear, financialYear, timeString } from 'src/app/Utility/date/date-utils';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -48,6 +48,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
     startdate: Date;
     enddate: Date;
     branch: string[];
+    FinanceYear: any;
   };
   EndDate: any = moment().format("DD MMM YY");
   tableLoad = true;
@@ -85,7 +86,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
     },
     TotalAmountLastFinYear: {
       id: 5,
-      Title: " Amount	As on 31 Mar 23",
+      Title: " Amount	As on " + GetLastFinYearEndDate(this.EndDate),
       class: "matcolumncenter"
     }
   }
@@ -158,10 +159,13 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
       this.branchName,
       this.branchStatus
     );
-    const loginBranch = branchList.find(x => x.name === this.storage.branch);
+    const loginBranch = branchList.find(x => x.value === this.storage.branch);
     this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
     this.proftandlossForm.controls["branch"].setValue(loginBranch);
     this.proftandlossForm.get('Individual').setValue("Y");
+    // set Deafult Fin Year
+    const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
+    this.proftandlossForm.controls["Fyear"].setValue(selectedFinancialYear);
   }
 
   functionCallHandler($event) {
@@ -194,23 +198,10 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
 
     // Determine the financial year based on the start date
     const startYear = startDate.getFullYear(); // Extract the year from the start date
-
-    // Determine the financial year start
-    // If the month of the start date is less than March (0-based index, so 3 is April),
-    // it means the financial year started in the previous year.
-    // For example, if the start date is February 2024, the financial year started in April 2023.
     const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
-
-    // Calculate the financial year string in the format 'YYYYYYYY'
-    // The financial year string is a combination of the last two digits of the start year and the last two digits of the next year.
-    // For example, if the financial year started in 2023, the financial year string will be '2324'.
     const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
-
-    // Check if the selected financial year matches the calculated financial year
     if (selectedFinancialYear.value === calculatedFnYr) {
 
-      // Define the financial year date range
-      // Parse the selected financial year to get the start year (e.g., '2324' -> 2023)
       const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
       const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
       const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
@@ -254,7 +245,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         const endDate = new Date(this.proftandlossForm.controls.end.value);
         const startdate = moment(startDate).startOf('day').toDate();
         const enddate = moment(endDate).endOf('day').toDate();
-
+        const FinanceYear = this.proftandlossForm.controls.Fyear.value.value;
         let branch = [];
         if (this.proftandlossForm.value.Individual == "N") {
           branch = await this.generalLedgerReportService.GetReportingLocationsList(this.proftandlossForm.value.branch.value);
@@ -264,7 +255,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         }
 
         this.reqBody = {
-          startdate, enddate, branch
+          startdate, enddate, branch, FinanceYear,
         }
         this.EndDate = moment(endDate).format("DD MMM YY");
 
@@ -288,7 +279,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           return item.SubCategoryWithoutIndex !== 'Extraordinary items' && item.SubCategoryWithoutIndex !== 'Exceptional Items';
         });
 
-        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear);
+        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear || 0) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear || 0);
         UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear = (UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear - TotalOfexceptionalItemsAndextraordinaryItems).toFixed(2);
         // Push 3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]
         const income = UpdatedData.find(x => x.MainCategoryWithoutIndex === "INCOME")?.TotalAmountCurrentFinYear ?? 0;
@@ -400,6 +391,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           "ProfitAndLossDetails": UpdatedData
         }
         this.accountReportService.setData(RequestData);
+        this.accountReportService.setRequestData(this.reqBody);
         window.open('/#/Reports/AccountReport/ProfitAndLossview', '_blank');
 
 

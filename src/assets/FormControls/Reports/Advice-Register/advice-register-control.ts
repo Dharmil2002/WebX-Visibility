@@ -25,9 +25,6 @@ export class AdviceRegisterControl {
                 placeholder: '',
                 type: "dropdown",
                 value: [],
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
                 Validations: [{
                     name: "autocomplete",
                 },
@@ -55,6 +52,31 @@ export class AdviceRegisterControl {
                 Validations: []
             },
             {
+                name: 'Advicetype',
+                label: 'Advice type ',
+                placeholder: '',
+                type: 'Staticdropdown',
+                value: [
+                    { value: "C", name: "Credit" },
+                    { value: "D", name: "Debt" },
+                    { value: ["C", "D"], name: "Both" },
+                ],
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'Status',
+                label: 'Status',
+                placeholder: '',
+                type: 'Staticdropdown',
+                value: [
+                    { value: 1, name: "Generated" },
+                    { value: 2, name: "Acknowledge" },
+                ],
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
                 name: '',
                 label: "",
                 placeholder: "",
@@ -63,7 +85,18 @@ export class AdviceRegisterControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: []
-            }, {
+            },
+            {
+                name: '',
+                label: "",
+                placeholder: "",
+                type: '',
+                value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            {
                 name: 'OR',
                 label: "",
                 placeholder: "",
@@ -87,16 +120,20 @@ export class AdviceRegisterControl {
                 name: 'PaymentMode',
                 label: "Payment Mode",
                 placeholder: "Please select Payment Mode",
-                type: 'text',
-                value: [],
-                generatecontrol: true,
-                disable: false,
-                Validations: []
+                type: 'Staticdropdown',
+                value: [
+                    { value: ["Cash", "Cheque", "RTGS/UTR"], name: "All" },
+                    { value: "Cash", name: "Cash" },
+                    { value: "Cheque", name: "Bank" },
+                    { value: "RTGS/UTR", name: "NEFT RTGS " },
+                ],
+                Validations: [],
+                generatecontrol: true, disable: false
             },
             {
                 name: 'AdviceNo',
                 label: "Advice No",
-                placeholder: "Please Enter MR. NO. comma(,) separated",
+                placeholder: "Please Enter Advice. NO. comma(,) separated",
                 type: 'text',
                 value: [],
                 generatecontrol: true,

@@ -15,19 +15,21 @@ import { DocketEvents, DocketStatus, ThcStatus, VehicleStatus, getEnumName } fro
   providedIn: "root"
 })
 export class DepartureService {
+
   statusActions = {
-    "1": "Create Trip",
-    "2": "Vehicle Loading",
-    "3": "Depart Vehicle",
+    "1": ["Create Trip"],
+    "2": ["Vehicle Loading", "Cancel THC"],
+    "3": ["Depart Vehicle", "Cancel THC"],
     //"4": "Mark Arrival",
-    "6": "Update Trip",
-    "7": "Create Trip",
+    "6": ["Update Trip", "Cancel THC"],
+    "7": ["Create Trip"],
     "default": [""]
   };
 
   constructor(
     private operation: OperationService,
     private storage: StorageService,
+    private operationService: OperationService,
     private vendor: VendorService
   ) {
   }
@@ -42,7 +44,7 @@ export class DepartureService {
       Expected: new Date(new Date().getTime() + 10 * 60000).toISOString(),
       Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2),
       status: element.sTS || "1",
-      Action: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
+      actions: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
       location: element?.cLOC || element?.controlLoc || ""
     }));
     try {
@@ -69,16 +71,18 @@ export class DepartureService {
     const { data } = await firstValueFrom(this.operation.operationPost(GenericActions.Get, req));
     return data;
   }
+  
   // Utility function to compute the difference in hours between two dates
   computeHoursDifference(startDate, endDate) {
     return (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
   }
+
   async getFieldDepartureMapping(data, shipment) {
     const vendorCode = await this.vendor.getVendorDetail(
       {
-      companyCode:this.storage.companyCode,
-      vendorName: {'D$regex' : `^${data?.Vendor}`,'D$options' : 'i'}
-    });
+        companyCode: this.storage.companyCode,
+        vendorName: { 'D$regex': `^${data?.Vendor}`, 'D$options': 'i' }
+      });
     const dktNoList = shipment ? shipment.map((x) => x.dKTNO) : [];
     const dktSfx = shipment ? shipment.map((x) => `${x.dKTNO}-${x.sFX}`) : [];
     let eventJson = dktNoList;
@@ -127,11 +131,11 @@ export class DepartureService {
         "tOTAMT": ConvertToNumber(data?.TotalTripAmt || 0, 2),
         "aDV": {
           "aAMT": ConvertToNumber(data?.Advance || 0, 2),
-          "pCASH":0,
-          "pBANK":0,
-          "pFUEL":0,
-          "pCARD":0,
-          "tOTAMT":ConvertToNumber(data?.Advance || 0, 2)
+          "pCASH": 0,
+          "pBANK": 0,
+          "pFUEL": 0,
+          "pCARD": 0,
+          "tOTAMT": ConvertToNumber(data?.Advance || 0, 2)
         },
         "bALAMT": data?.BalanceAmt || 0,
         "aDPAYAT": data?.advPdAt?.value || "",
@@ -378,4 +382,83 @@ export class DepartureService {
     });
     return data.tripID;
   }
+
+  async getDocketDetails(filter){
+    const req={
+      companyCode:this.storage.companyCode,
+      collectionName:"docket_ops_det_ltl",
+      filter:filter
+    }
+    const res= await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
+    return res.data;
+  }
+  
+  async updateDocket(data) {
+    const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.TripID});
+    if(dockets && dockets.length>0){
+      dockets.forEach(async (x)=>{
+    let evnData = {
+      _id: `${this.storage.companyCode}-${x.dKTNO}-0-EVN0001-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+      cID: this.storage.companyCode,
+      dKTNO: x?.dKTNO || "",
+      sFX: x?.sFX,
+      lOC: this.storage.branch,
+      eVNID: 'EVN0001',
+      eVNDES: 'Booking',
+      eVNDT: new Date(),
+      eVNSRC: 'Booking',
+      dOCTY: 'CN',
+      dOCNO: x?.dKTNO || "",
+      sTS: DocketStatus.Booked,
+      sTSNM: DocketStatus[DocketStatus.Booked],
+      oPSSTS: `Booked at ${x?.oRGN} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+      eNTDT: x?.eNTDT,
+      eNTLOC: x?.eNTLOC || "",
+      eNTBY: x?.eNTBY || ""
+    }
+    let reqEvent = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_events_ltl",
+      data: evnData
+    };
+    await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
+    let reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_ops_det_ltl",
+      filter:{dKTNO:x.dKTNO,sFX:x.sFX},
+      update:{
+        sTS: DocketStatus.Booked,
+        sTSNM: DocketStatus[DocketStatus.Booked],
+        mODDT:new Date(),
+        mODBY:this.storage.userName,
+        mODLOC:this.storage.branch,
+        oPSSTS:`Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+    }
+    }
+    await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
+  });
+ 
+  }
+  }
+
+  async updateTHCLTL(filter, data) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "thc_summary_ltl",
+      filter: filter,
+      update: data
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+    return res
+  }
+
+  async deleteTrip(filter) {
+    const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "trip_Route_Schedule",
+        filter: filter
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoRemove("generic/remove", req));
+    return res;
+}
 }

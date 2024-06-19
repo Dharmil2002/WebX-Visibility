@@ -10,34 +10,36 @@ export class CustInvoiceRegService {
   constructor(
     private masterServices: MasterService,
     private storage: StorageService
-  ) {}
+  ) { }
 
   async getcustInvRegReportDetail(data) {
-    debugger;
+    ;
     let matchQuery = {
-      ...(data.docNo != "" ? { bILLNO: { D$eq: data.docNo } }:
-      {D$and: [
-        { bGNDT: { D$gte: data.startValue } }, // Convert start date to ISO format
-        { bGNDT: { D$lte: data.endValue } }, // Bill date less than or equal to end date
+      ...(data.docNo != "" ? { bILLNO: { D$eq: data.docNo } } :
         {
-          D$or: [{ cNL: false }, { cNL: { D$exists: false } }],
-        },
-        ...(data.docNo != "" ? [{ bILLNO: { D$eq: data.docNo } }] : []),
-        ...(data.state && data.state.length > 0
-          ? [{ D$expr: { D$in: ["$gEN.sT", data.state] } }]
-          : []),
-        ...(data.status && data.status != ""
-          ? [{ bSTS: { D$eq: data.status } }]
-          : []),
-        ...(data.cust && data.cust.length > 0
-          ? [{ D$expr: { D$eq: ["$cUST.nM", data.cust] } }]
-          : []),
-        ...(data.sac && data.sac.length > 0
-          ? [{ D$expr: { D$in: ["$voucher_trans_details.sCOD", data.sac] } }]
-          : []),
-        // ...[{ bLOC: { D$in: data.branch } }],
-        ...(data.individual =="Y" ? [{ bLOC : { D$in : data.branch } }] : [{}]),
-      ]}
+          D$and: [
+            { bGNDT: { D$gte: data.startValue } }, // Convert start date to ISO format
+            { bGNDT: { D$lte: data.endValue } }, // Bill date less than or equal to end date
+            {
+              D$or: [{ cNL: false }, { cNL: { D$exists: false } }],
+            },
+            ...(data.docNo != "" ? [{ bILLNO: { D$eq: data.docNo } }] : []),
+            ...(data.state && data.state.length > 0
+              ? [{ D$expr: { D$in: ["$gEN.sT", data.state] } }]
+              : []),
+            ...(data.status && data.status != ""
+              ? [{ bSTS: { D$eq: data.status } }]
+              : []),
+            ...(data.cust && data.cust.length > 0
+              ? [{ D$expr: { D$eq: ["$cUST.nM", data.cust] } }]
+              : []),
+            ...(data.sac && data.sac.length > 0
+              ? [{ D$expr: { D$in: ["$voucher_trans_details.sCOD", data.sac] } }]
+              : []),
+            // ...[{ bLOC: { D$in: data.branch } }],
+            ...(data.individual == "Y" ? [{ bLOC: { D$in: data.branch } }] : [{}]),
+          ]
+        }
       ),
     };
 
@@ -66,7 +68,7 @@ export class CustInvoiceRegService {
     );
     const details = res.data.data.map((item) => ({
       ...item,
-      sDTM : item.sDTM ? moment(item.sDTM).format("DD MMM YY HH:MM") : "",
+      sDTM: item.sDTM ? moment(item.sDTM).format("DD MMM YY HH:MM") : "",
       partyType: item.eXMT ? "Registered" : "UnRegistered",
       dOCTYP: item?.dOCTYP || "Transaction",
     }));

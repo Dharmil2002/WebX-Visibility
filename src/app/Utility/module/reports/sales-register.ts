@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { set } from "lodash";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -16,6 +15,7 @@ export class SalesRegisterService {
      ) { }
 
      async getsalesRegisterReportDetail(start, end, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status) {
+ 
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const location = toloc ? toloc.map(x => x.locCD) || [] : [];
           const paymentBasis = payment ? payment.map(x => x.payNm) || [] : [];

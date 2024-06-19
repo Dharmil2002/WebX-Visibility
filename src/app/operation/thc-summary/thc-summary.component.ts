@@ -180,7 +180,6 @@ export class ThcSummaryComponent implements OnInit {
   ngOnInit(): void {
   }
   async handleMenuItemClick(data) {
-    debugger;
     const thcDetail = this.tableData.find((x) => x._id === data.data._id);
     const locs = this.storage.branch;
     if(thcDetail.oPSST == 1)
@@ -217,9 +216,8 @@ export class ThcSummaryComponent implements OnInit {
                     cNRES: result.value//required cancel reason in popup
                   }
                   const res = await this.thcService.updateTHC(filter, status);
-                  await this.thcService.deleteTrip({ cID: this.storage.companyCode, tHC: thcDetail.docNo });
                   thcDetail.reason= result.value;
-               this.thcService.updateDocket(thcDetail.data);
+               this.thcService.updateDocket(thcDetail);
                   if (res) {
                     SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
                     this.getThcDetails();

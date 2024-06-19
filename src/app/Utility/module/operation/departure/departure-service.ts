@@ -384,7 +384,6 @@ export class DepartureService {
   }
 
   async getDocketDetails(filter){
-    debugger;
     const req={
       companyCode:this.storage.companyCode,
       collectionName:"docket_ops_det_ltl",
@@ -395,7 +394,6 @@ export class DepartureService {
   }
   
   async updateDocket(data) {
-    debugger;
     const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.TripID});
     if(dockets && dockets.length>0){
       dockets.forEach(async (x)=>{
@@ -403,7 +401,7 @@ export class DepartureService {
       _id: `${this.storage.companyCode}-${x.dKTNO}-0-EVN0001-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
       cID: this.storage.companyCode,
       dKTNO: x?.dKTNO || "",
-      sFX: 0,
+      sFX: x?.sFX,
       lOC: this.storage.branch,
       eVNID: 'EVN0001',
       eVNDES: 'Booking',
@@ -427,7 +425,7 @@ export class DepartureService {
     let reqBody = {
       companyCode: this.storage.companyCode,
       collectionName: "docket_ops_det_ltl",
-      filter:{dKTNO:x.dKTNO},
+      filter:{dKTNO:x.dKTNO,sFX:x.sFX},
       update:{
         sTS: DocketStatus.Booked,
         sTSNM: DocketStatus[DocketStatus.Booked],

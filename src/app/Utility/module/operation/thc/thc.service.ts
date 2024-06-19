@@ -325,7 +325,6 @@ export class ThcService {
   }
 
   async getDocketDetails(filter){
-    debugger;
     const req={
       companyCode:this.storage.companyCode,
       collectionName:"docket_ops_det",
@@ -336,8 +335,7 @@ export class ThcService {
   }
   
   async updateDocket(data) {
-    debugger;
-    const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.TripID});
+    const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.docNo});
     if(dockets && dockets.length>0){
       dockets.forEach(async (x)=>{
     let evnData = {
@@ -361,19 +359,20 @@ export class ThcService {
     }
     let reqEvent = {
       companyCode: this.storage.companyCode,
-      collectionName: "docket_events_ltl",
+      collectionName: "docket_events",
       data: evnData
     };
     await firstValueFrom(this.operationService.operationMongoPost('generic/create', reqEvent));
     let reqBody = {
       companyCode: this.storage.companyCode,
-      collectionName: "docket_ops_det_ltl",
+      collectionName: "docket_ops_det",
       filter:{dKTNO:x.dKTNO},
       update:{
         sTS: DocketStatus.Booked,
         sTSNM: DocketStatus[DocketStatus.Booked],
         mODDT:new Date(),
         mODBY:this.storage.userName,
+        tHC:"",
         mODLOC:this.storage.branch,
         oPSSTS:`Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
     }
@@ -383,13 +382,4 @@ export class ThcService {
  
   }
   }
-  async deleteTrip(filter) {
-    const req = {
-        companyCode: this.storage.companyCode,
-        collectionName: "trip_Route_Schedule",
-        filter: filter
-    }
-    const res = await firstValueFrom(this.operationService.operationMongoRemove("generic/remove", req));
-    return res;
-}
 }

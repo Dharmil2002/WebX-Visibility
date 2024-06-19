@@ -269,7 +269,6 @@ const shipData = [
       });
       break;
       case "Cancel THC":
-debugger;
       const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
       const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
 

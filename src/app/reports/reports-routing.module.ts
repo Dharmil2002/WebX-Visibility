@@ -38,6 +38,7 @@ import { ManifestRegisterReportComponent } from './manifest-register-report/mani
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
+import { CreditNoteRegisterReportComponent } from './credit-note-register-report/credit-note-register-report.component';
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -75,6 +76,8 @@ const routes: Routes = [
   { path: "LoadingsheetRegister", component: LoadingsheetRegisterComponent },
   { path: "TDSRegister", component: GenerateTdsRegisterReportComponent },
   { path: "generic-report-view", component: GenericReportViewComponent },
+  { path: "credit-note-register-report", component: CreditNoteRegisterReportComponent },
+  
 ];
 
 @NgModule({

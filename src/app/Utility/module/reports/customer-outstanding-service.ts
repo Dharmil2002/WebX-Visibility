@@ -159,7 +159,7 @@ export class CustOutstandingService {
                                    //      D$sum: "$cOL.aMT",
                                    // },
                                    collectedAmt: {
-                                        D$sum: "$coll.aMT",
+                                        D$sum: "$cOL.aMT",
                                    },
                               },
                          },

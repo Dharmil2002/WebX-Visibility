@@ -112,6 +112,33 @@ export class VendorWiseOutService {
           },
           {
             D$lookup: {
+              from: "cd_note_header",
+              let: {
+                docNo: "$docNo",
+              },
+              pipeline: [
+                {
+                  D$match: {
+                    D$and: [
+                      {
+                        D$expr: {
+                          D$eq: ["$bILLNO", "$$docNo"],
+                        },
+                      },
+                      {
+                        cNL: {
+                          D$in: [false, null],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              as: "debitnote",
+            },
+          },
+          {
+            D$lookup: {
               from: "vendor_detail",
               let: {
                 vendorCode: "$vND.cD",
@@ -180,11 +207,14 @@ export class VendorWiseOutService {
                 },
               },
               paidAmount: {
-                //D$sum: "$billpay.aMT",
-                D$sum: {
-                  D$subtract: ["$bALAMT", "$bALPBAMT"]
-                }
+               D$sum: "$billpay.aMT",
+                // D$sum: {
+                //   D$subtract: ["$bALAMT", "$bALPBAMT"]
+                // }
               },
+              debitNoteAmt: {
+                D$sum: "$debitnote.aMT",
+           },
             },
           },
           {
@@ -193,7 +223,13 @@ export class VendorWiseOutService {
                 D$max: [
                   0,
                   {
-                    D$subtract: ["$bALAMT", "$paidAmount"],
+                    //D$subtract: ["$bALAMT", "$paidAmount"],
+                    D$subtract: [
+                      {
+                           D$subtract: ["$bALAMT", "$paidAmount"]
+                      },
+                      "$debitNoteAmt"
+                 ]
                   },
                 ],
               },
@@ -216,6 +252,9 @@ export class VendorWiseOutService {
               },
               totalBillAmt: {
                 D$sum: "$bALAMT",
+              },
+              debitNoteAmt: {
+                D$sum: "$debitNoteAmt",
               },
               paidAmt: {
                 D$sum: "$paidAmount",

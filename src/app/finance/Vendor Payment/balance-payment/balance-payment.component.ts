@@ -1381,7 +1381,6 @@ export class BalancePaymentComponent implements OnInit {
     const Result = [];
 
     SelectedData.forEach((DataItem) => {
-      debugger
       let OtherChargePositiveAmt = 0;
       let OtherChargeNegativeAmt = 0;
       const ModifiedData = this.ModifiedTHCList.find(x => x.THC === DataItem.THC)

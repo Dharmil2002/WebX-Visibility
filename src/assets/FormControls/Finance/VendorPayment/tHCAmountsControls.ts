@@ -4,7 +4,7 @@ export class THCAmountsControl {
   THCAmountsLESSArray: FormControls[];
   THCAmountsArray: FormControls[];
   THCAmountsDetailsArray: FormControls[];
-  constructor(Type ,THCData) {
+  constructor(Type, THCData) {
     this.THCAmountsADDArray = [
       {
         name: "ContractAmount",
@@ -157,7 +157,7 @@ export class THCAmountsControl {
         type: "number",
         value: 0.0,
         generatecontrol: true,
-        disable: Type == "balance" ? true : false,
+        disable: Type == "balance" ? true : true,
         Validations: [
           {
             name: "pattern",
@@ -168,6 +168,26 @@ export class THCAmountsControl {
         ],
         functions: {
           onChange: "OnChangeAdvanceAmount",
+        },
+      },
+      {
+        name: "AdvancePaymentAmt",
+        label: "Advance Payment Amount",
+        placeholder: "Handling ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: Type == "balance" ? false : true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        functions: {
+          onChange: "OnChangeAdvancePaymentAmt",
         },
       },
       {
@@ -233,7 +253,7 @@ export class THCAmountsControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }, 
+          },
         ],
         additionalData: {
           showNameAndValue: true,

@@ -822,7 +822,7 @@ export class DebitVoucherComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
         this.VoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
-        this.VoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
+        this.VoucherDataRequestModel.partyCode = "" + this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
         this.VoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName;
         this.VoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
         this.VoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
@@ -977,7 +977,7 @@ export class DebitVoucherComponent implements OnInit {
                 docType: "Voucher",
                 partyType: this.DebitVoucherSummaryForm.value.Preparedfor,
                 docNo: "",
-                partyCode: this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                partyCode: "" + this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),

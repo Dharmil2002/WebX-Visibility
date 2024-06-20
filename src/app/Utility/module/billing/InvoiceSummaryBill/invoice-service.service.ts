@@ -44,6 +44,7 @@ export class InvoiceServiceService {
 
       try {
         let locDetails = await firstValueFrom(this.operationService.operationPost('generic/get', req));
+        const gst = isShipment ? (element?.gSTAMT ?? 0.00) : 0.00;
         const shipment = {
           shipment: element?.docNo || "",
           bookingdate: element?.dKTDT,
@@ -51,9 +52,9 @@ export class InvoiceServiceService {
           state: locDetails.data[0].locState || "", // Assuming locState is the state you want to assign
           vehicleNo: element?.vEHNO || "",
           amount: element?.gROAMT || "",
-          gst: isShipment ? element.gSTAMT : 0.00,
+          gst: isShipment ? gst : 0.00,
           gstChrgAmt: element?.gSTCHAMT || "",
-          total: isShipment ? element.gROAMT + element.gSTAMT : element.gROAMT,
+          total: isShipment ? element.gROAMT + gst : element.gROAMT,
           noOfpkg: element?.pKGS || 0.00,
           weight: element?.aCTWT || 0.00,
           isSelected: false,
@@ -496,7 +497,7 @@ export class InvoiceServiceService {
     return res
   }
 
-  
+
 
   /*end */
   /*below method for Update docket*/

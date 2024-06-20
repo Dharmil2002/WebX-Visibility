@@ -37,6 +37,7 @@ import { GetStateListFromAPI } from "../../Vendor Payment/VendorPaymentAPIUtitli
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { CustomerBillStatus } from "src/app/Models/docStatus";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import { getApiCompanyDetail } from "../../invoice-summary-bill/invoice-utility";
 @Component({
   selector: 'app-general-invoice-criteria',
   templateUrl: './general-invoice-criteria.component.html'
@@ -132,6 +133,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   AllLocationsList: any;
 
   CustomerDetails;
+  tranDetail;
   TotalAmountList: { count: any; title: string; class: string }[];
   constructor(
     private fb: UntypedFormBuilder,
@@ -245,6 +247,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
 
     this.BindLedger();
     this.getStateDropdown();
+    this.tranDetail = await getApiCompanyDetail(this.masterService);
   }
   async BindLedger() {
     const account_groupReqBody = {
@@ -437,6 +440,14 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
     const Billbookingstate = formValues.Billbookingstate;
     const CustomerGeneralInvoicestate = formValues.CustomerGeneralInvoicestate;
     const SACcode = formValues.GSTSACcode;
+
+    this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls["VGSTNumber"].setValue(
+      this.CustomerDetails.GSTdetails.find(detail => detail.gstState === CustomerGeneralInvoicestate.name)?.gstNo || ""
+    );
+
+    this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls["GSTNumber"].setValue(
+      this.tranDetail.data.find(detail => detail.state  === Billbookingstate.name)?.gstNo || ""
+    );
 
     if (Billbookingstate && CustomerGeneralInvoicestate && SACcode) {
       const IsStateTypeUT =

@@ -212,7 +212,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       .filter(x => x.pendingAmount != 0)
       .map(x => ({
         ...x,
-        debitNote: 0,
+        debitNote: (x.TotalTHCAmount) - (x.pendingAmount + x.PayedAmount),
         payment: 0,
         isSelected: false,
         Date: x.Date,

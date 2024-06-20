@@ -79,6 +79,7 @@ import { CreditNoteRegisterReportComponent } from './credit-note-register-report
 import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
 import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
+import { AdviceRegisterComponent } from './advice-register/advice-register.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -163,7 +164,8 @@ import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/
     CreditNoteRegisterReportComponent,
     DebitNoteRegisterReportComponent,
     BalanceSheetViewDetailsComponent,
-    ProfitAndLossViewDetailsVouchersListComponent
+    ProfitAndLossViewDetailsVouchersListComponent,
+    AdviceRegisterComponent
   ],
   exports: [],
 

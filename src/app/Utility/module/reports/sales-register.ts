@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { set } from "lodash";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -16,7 +15,7 @@ export class SalesRegisterService {
      ) { }
 
      async getsalesRegisterReportDetail(start, end, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status) {
-
+ 
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const location = toloc ? toloc.map(x => x.locCD) || [] : [];
           const paymentBasis = payment ? payment.map(x => x.payNm) || [] : [];
@@ -92,7 +91,7 @@ export class SalesRegisterService {
           }
 
           const resftl = await firstValueFrom(this.masterServices.masterMongoPost("generic/getReportData", reqBodyftl));
-          console.log(resftl.data);
+          // console.log(resftl.data);
 
           const reqBodyltl = {
                companyCode: this.storage.companyCode,
@@ -132,7 +131,7 @@ export class SalesRegisterService {
                }
           }
           const resLtl = await firstValueFrom(this.masterServices.masterMongoPost("generic/getReportData", reqBodyltl));
-          console.log(resLtl.data);
+          // console.log(resLtl.data);
 
           const data = [...resftl.data.data, ...resLtl.data.data]
 

@@ -495,6 +495,9 @@ export class InvoiceServiceService {
     const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
     return res
   }
+
+  
+
   /*end */
   /*below method for Update docket*/
   async updateDocketStatus(filter) {

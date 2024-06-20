@@ -121,6 +121,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     "loc": "Location",
     "openingBal": "Opening Balance",
     "totalBill": "Total Bill",
+    "debitNoteAmt":"Debit Note Amount",
     "totalBillAmt": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
     "paidAmt": "Paid Amount From 01 Apr 2023 To 11 Dec 2023",
     "finalized": "Finalized",

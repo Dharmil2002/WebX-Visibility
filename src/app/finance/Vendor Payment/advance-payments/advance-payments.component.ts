@@ -95,7 +95,7 @@ export class AdvancePaymentsComponent implements OnInit {
       Style: "min-width:15%",
     },
     AdvancePaymentAmount: {
-      Title: "Advance Payment ⟨₹⟩",
+      Title: "Advance Pending ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
@@ -366,11 +366,11 @@ export class AdvancePaymentsComponent implements OnInit {
     const TDSAmount = parseFloat(this.VendorAdvanceTaxationTDSFilterForm.get("TDSAmount").value) || 0;
     this.TotalAmountList.forEach((x) => {
       if (x.title === "Total Advance Payment") {
-        x.count = (totalAdvancePayment + TDSAmount).toFixed(2);
+        x.count = (totalAdvancePayment - TDSAmount).toFixed(2);
       }
     });
     this.PayableSummaryFilterForm.get("AdvancePaymentAmount").setValue(
-      (totalAdvancePayment + TDSAmount).toFixed(2)
+      (totalAdvancePayment - TDSAmount).toFixed(2)
     );
 
   }
@@ -866,7 +866,7 @@ export class AdvancePaymentsComponent implements OnInit {
         finYear: financialYear,
         accLocation: this.storage.branch,
         preperedFor: "Vendor",
-        partyCode: data?.OthersData?.vND?.cD || "",
+        partyCode: "" + data?.OthersData?.vND?.cD || "",
         partyName: data?.OthersData?.vND?.nM,
         partyState: this.VendorDetails?.vendorState || "",
         entryBy: this.storage.userName,
@@ -999,15 +999,15 @@ export class AdvancePaymentsComponent implements OnInit {
       data: {
         transCode: VoucherInstanceType.AdvancePayment,
         transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
-        voucherCode: VoucherType.DebitVoucher,
-        voucherType: VoucherType[VoucherType.DebitVoucher],
+        voucherCode: PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher,
+        voucherType: PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher],
         transDate: new Date(),
         docType: "VR",
         branch: this.storage.branch,
         finYear: financialYear,
         accLocation: this.storage.branch,
         preperedFor: "Vendor",
-        partyCode: data?.OthersData?.vND?.cD || "",
+        partyCode: "" + data?.OthersData?.vND?.cD || "",
         partyName: data?.OthersData?.vND?.nM,
         partyState: this.VendorDetails?.vendorState || "",
         entryBy: this.storage.userName,
@@ -1069,8 +1069,8 @@ export class AdvancePaymentsComponent implements OnInit {
           branch: this.storage.branch,
           transCode: VoucherInstanceType.AdvancePayment,
           transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
-          voucherCode: VoucherType.DebitVoucher,
-          voucherType: VoucherType[VoucherType.DebitVoucher],
+          voucherCode: PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher,
+          voucherType: PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher],
           docType: "Voucher",
           partyType: "Vendor",
           docNo: data.THC,
@@ -1111,14 +1111,14 @@ export class AdvancePaymentsComponent implements OnInit {
 
 
   GetDebitVoucherLedgers(thc, AdvancePaymentAmount) {
-
+    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     const createVoucher = (accCode, debit, credit, THCNo, accName = null, accCategory = null) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.AdvancePayment,
       transType: VoucherInstanceType[VoucherInstanceType.AdvancePayment],
-      voucherCode: VoucherType.DebitVoucher,
-      voucherType: VoucherType[VoucherType.DebitVoucher],
+      voucherCode: PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher,
+      voucherType: PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher],
       transDate: new Date(),
       finYear: financialYear,
       branch: this.storage.branch,
@@ -1139,7 +1139,7 @@ export class AdvancePaymentsComponent implements OnInit {
     const Result = [];
     let TDSAmount = parseFloat(this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount) || 0;
     const balAMT = ConvertToNumber(thc.THCamount - thc.AdvancePaymentAmount, 3);
-    const THCAmount = parseFloat(thc.THCamount) + TDSAmount;
+    const THCAmount = parseFloat(thc.THCamount) - TDSAmount;
     /*In case of Inter Branch Control
      Debit thc.THCamount to LIA003004
      Credit thc.Advance to AST003001
@@ -1154,7 +1154,7 @@ export class AdvancePaymentsComponent implements OnInit {
     else {
       Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount), 0, thc.THC));
     }
-    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+
     const PaymentAmountWithoutTDS = parseFloat((AdvancePaymentAmount - TDSAmount).toString());
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;

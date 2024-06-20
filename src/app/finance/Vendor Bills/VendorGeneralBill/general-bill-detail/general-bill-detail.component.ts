@@ -744,7 +744,7 @@ export class GeneralBillDetailComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode = this.VendorDetails?.vendorCode || "";
+        this.VoucherDataRequestModel.partyCode = "" + this.VendorDetails?.vendorCode || "";
         this.VoucherDataRequestModel.partyName = this.VendorDetails?.vendorName || "";
         this.VoucherDataRequestModel.partyState = this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.value?.name || "";
         this.VoucherDataRequestModel.paymentState = this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.value?.name || "";
@@ -807,7 +807,7 @@ export class GeneralBillDetailComponent implements OnInit {
                 docType: "Voucher",
                 partyType: "Vendor",
                 docNo: BillNo,
-                partyCode: this.VendorDetails?.vendorCode || "",
+                partyCode: "" + this.VendorDetails?.vendorCode || "",
                 partyName: this.VendorDetails?.vendorName || "",
                 entryBy: this.storage.userName,
                 entryDate: Date(),

@@ -596,7 +596,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         finYear: financialYear,
         accLocation: this.storage.branch,
         preperedFor: "Vendor",
-        partyCode: VendorDetails.vendorCode,
+        partyCode: "" + VendorDetails.vendorCode || "",
         partyName: VendorDetails.vendorName,
         partyState: VendorDetails.vendorState,
         paymentState: data?.StateOfBilling || "",

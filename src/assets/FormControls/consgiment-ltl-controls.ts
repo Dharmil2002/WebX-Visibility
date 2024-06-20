@@ -549,7 +549,7 @@ export class ConsignmentLtl extends BaseControl {
           {
             name: "pattern",
             pattern:
-              "^([0-3][0-8]|97|99)[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
+              "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
             message:
               "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2",
           },
@@ -665,7 +665,7 @@ export class ConsignmentLtl extends BaseControl {
           {
             name: "pattern",
             pattern:
-              "^([0-3][0-8]|97|99)[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
+              "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
             message:
               "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2",
           },

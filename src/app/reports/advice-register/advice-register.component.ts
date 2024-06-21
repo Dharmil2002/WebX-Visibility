@@ -5,8 +5,9 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
-import { AdviceRegisterReportService } from 'src/app/Utility/module/reports/advice-register-report.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
+import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
+import { NavDataService } from 'src/app/core/service/navdata.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { AdviceRegisterControl } from 'src/assets/FormControls/Reports/Advice-Register/advice-register-control';
 import Swal from 'sweetalert2';
@@ -46,7 +47,8 @@ export class AdviceRegisterComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private storage: StorageService,
     private generalLedgerReportService: GeneralLedgerReportService,
-    private adviceRegisterReportService: AdviceRegisterReportService) { }
+    private reportService: ReportService,
+    private nav: NavDataService) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -153,7 +155,7 @@ export class AdviceRegisterComponent implements OnInit {
         const optionalRequest = { PaymentMode, docNoArray }
 
         // Call the service to get the advice register report
-        const data = await this.adviceRegisterReportService.getAdviceRegister(reqBody, optionalRequest)
+        const data = await this.getAdviceRegister(reqBody, optionalRequest)
 
         // Update the UI with the data received from the report
         this.columns = data.grid.columns;
@@ -162,7 +164,18 @@ export class AdviceRegisterComponent implements OnInit {
         this.paging = data.grid.paging;
         this.source = data.data;
         this.LoadTable = true;
-
+        // Prepare the state data to include all necessary properties
+        const stateData = {
+          data: data,
+          formTitle: 'Advice Register Report',
+          csvFileName: this.csvFileName
+        };
+        // Convert the state data to a JSON string and encode it        
+        this.nav.setData(stateData);
+        // Create the new URL with the state data as a query parameter
+        const url = `/#/Reports/generic-report-view`;
+        // Open the URL in a new tab
+        window.open(url, '_blank');
         // If no data is returned, show an error message and do not load the table
         if (data.data.length === 0) {
           this.LoadTable = false;
@@ -193,4 +206,62 @@ export class AdviceRegisterComponent implements OnInit {
     }, "Advice Register Report Generating Please Wait..!");
   }
   //#endregion  
+  //#region to made query for report and get data
+  async getAdviceRegister(data, optionalRequest) {
+    const hasPaymentMode = optionalRequest.PaymentMode !== '' && optionalRequest.PaymentMode !== undefined;
+    const hasDocNo = optionalRequest.docNoArray.some(value => value !== '' && value !== undefined);
+
+    const isEmptyDocNo = !hasPaymentMode && !hasDocNo;
+
+    let matchQuery;
+
+    if (isEmptyDocNo) {
+      matchQuery = {
+        'D$and': [
+          { aDDT: { 'D$gte': data.startValue } }, // Start date condition
+          { aDDT: { 'D$lte': data.endValue } }, // End date condition       
+          ...(data.location ? [{ 'rBRANCH': { 'D$in': data.location } }] : []), // Location condition
+          ...(data.advicetype ? [{ 'aDTYP': { 'D$in': [data.advicetype] } }] : []), // Advice type condition
+          ...(data.Status ? [{ 'sTCD': { 'D$in': [data.Status] } }] : []), // Status condition
+        ],
+      };
+    } else {
+      matchQuery = { 'D$and': [] };
+
+      // Condition: docNo in optionalRequest.docNoArray
+      if (optionalRequest.docNoArray && optionalRequest.docNoArray.length > 0) {
+        matchQuery['D$and'].push({ 'docNo': { 'D$in': optionalRequest.docNoArray } });
+      }
+
+      // Condition: pMODE in optionalRequest.PaymentMode
+      if (optionalRequest.PaymentMode !== "") {
+        matchQuery['D$and'].push({ 'pMODE': { 'D$in': [optionalRequest.PaymentMode] } });
+      }
+    }
+
+    const reqBody = {
+      companyCode: this.storage.companyCode,
+      reportName: "AdviceRegister",
+      filters: {
+        filter: {
+          ...matchQuery,
+        }
+      }
+    };
+
+    const res = await this.reportService.fetchReportData("AdviceRegister", matchQuery);
+    const details = res.data.data.map((item) => ({
+      ...item,
+      aDVDT: item.aDVDT ? moment(item.aDVDT).format("DD MMM YY HH:mm") : "",
+      aCKDT: item.aCKDT ? moment(item.aCKDT).format("DD MMM YY HH:mm") : "",
+      dT: item.dT ? moment(item.dT).format("DD MMM YY HH:mm") : "",
+      aMT: item.aMT ? item.aMT.toFixed(2) : 0,
+    }));
+
+    return {
+      data: details,
+      grid: res.data.grid
+    };
+  }
+  //#endregion
 }

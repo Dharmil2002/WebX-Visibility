@@ -86,6 +86,7 @@ import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit
 import { ModifyDebitNoteDetailsComponent } from './Debit-Note/modify-debit-note-details/modify-debit-note-details/modify-debit-note-details.component';
 import { FilterDebitNoteDetailsComponent } from './Debit-Note/filter-debit-note-details/filter-debit-note-details/filter-debit-note-details.component';
 import { SetOpeningBalanceVendorWiseComponent } from './FA Masters/Components/set-opening-balance-vendor-wise/set-opening-balance-vendor-wise.component';
+import { ManualVoucherFilterComponent } from './manual voucher/manual-voucher/manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
 
 @NgModule({
     declarations: [
@@ -138,6 +139,7 @@ import { SetOpeningBalanceVendorWiseComponent } from './FA Masters/Components/se
         ModifyDebitNoteDetailsComponent,
         FilterDebitNoteDetailsComponent,
         SetOpeningBalanceVendorWiseComponent,
+        ManualVoucherFilterComponent,
     ],
     imports: [
         CommonModule,

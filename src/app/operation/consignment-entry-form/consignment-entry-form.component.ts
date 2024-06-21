@@ -427,6 +427,7 @@ export class ConsignmentEntryFormComponent
       this.getRules();
     }
     this.onRcmChange();
+    this.model.FreightTableForm.controls["rcm"].setValue('Y');
     this.model.FreightTableForm.controls["gstAmount"].disable();
     this.model.FreightTableForm.controls["gstChargedAmount"].disable();
   }
@@ -2026,8 +2027,8 @@ export class ConsignmentEntryFormComponent
       };
 
       let docketDetails = {
-        ...this.model.consignmentTableForm.value,
-        ...this.model.FreightTableForm.value,
+        ...this.model.consignmentTableForm.getRawValue(),
+        ...this.model.FreightTableForm.getRawValue(),
         ...invoiceDetails,
         ...containerDetail,
         ...id,

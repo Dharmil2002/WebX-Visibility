@@ -533,7 +533,7 @@ export class CreditVoucherComponent implements OnInit {
 
         this.creditVoucherDataRequestModel.accLocation = this.creditVoucherSummaryForm.value.Accountinglocation?.name;
         this.creditVoucherDataRequestModel.receivedfrom = this.creditVoucherSummaryForm.value.Receivedfrom;
-        this.creditVoucherDataRequestModel.partyCode = this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888";
+        this.creditVoucherDataRequestModel.partyCode = "" + this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888";
         this.creditVoucherDataRequestModel.partyName = this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName;
         this.creditVoucherDataRequestModel.entryBy = this.creditVoucherSummaryForm.value.Preparedby;
         this.creditVoucherDataRequestModel.entryDate = new Date();
@@ -615,7 +615,7 @@ export class CreditVoucherComponent implements OnInit {
                 docType: "Voucher",
                 partyType: this.creditVoucherSummaryForm.value.Preparedfor,
                 docNo: "",
-                partyCode: this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                partyCode: "" + this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName,
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),

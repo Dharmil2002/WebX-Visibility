@@ -63,20 +63,21 @@ export class BlancePaymentPopupComponent implements OnInit {
   }
 
   async OnPaymentModeChange(event) {
-    console.log("event", event);
     const PaymentMode =
       this.VendorBalancePaymentFilterForm.get("PaymentMode").value;
     let filterFunction;
     switch (PaymentMode) {
       case "Cheque":
-        filterFunction = (x) => x.name !== "CashAccount";
-
+        filterFunction = (x) => x.name !== "CashAccount" && x.name !== "JournalAccount";
         break;
       case "Cash":
-        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank";
+        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank" && x.name !== "JournalAccount";
         break;
       case "RTGS/UTR":
-        filterFunction = (x) => x.name !== "CashAccount";
+        filterFunction = (x) => x.name !== "CashAccount" && x.name !== "JournalAccount";
+        break;
+      case "Journal":
+        filterFunction = (x) => x.name !== "CashAccount" && x.name !== "Bank" && x.name !== "ChequeOrRefNo";
         break;
     }
     this.jsonControlVendorBalancePaymentFilterArray =
@@ -116,6 +117,12 @@ export class BlancePaymentPopupComponent implements OnInit {
         CashAccount.clearValidators();
         CashAccount.updateValueAndValidity();
 
+        // Remove Journal Account
+        const JournalAccount = this.VendorBalancePaymentFilterForm.get("JournalAccount");
+        JournalAccount.setValue("");
+        JournalAccount.clearValidators();
+        JournalAccount.updateValueAndValidity();
+
         break;
       case "Cash":
         const responseFromAPICash = await GetAccountDetailFromApi(
@@ -150,8 +157,48 @@ export class BlancePaymentPopupComponent implements OnInit {
         ChequeOrRefNoS.clearValidators();
         ChequeOrRefNoS.updateValueAndValidity();
 
+        // Remove Journal Account
+        const JournalAccounts = this.VendorBalancePaymentFilterForm.get("JournalAccount");
+        JournalAccounts.setValue("");
+        JournalAccounts.clearValidators();
+        JournalAccounts.updateValueAndValidity();
+
         break;
       case "RTGS/UTR":
+        break;
+      case "Journal":
+        const responseFromAPIJournal = await GetAccountDetailFromApi(
+          this.masterService);
+        this.filter.Filter(
+          this.jsonControlVendorBalancePaymentFilterArray,
+          this.VendorBalancePaymentFilterForm,
+          responseFromAPIJournal,
+          "JournalAccount",
+          false
+        );
+
+        const JournalAccountS = this.VendorBalancePaymentFilterForm.get("JournalAccount");
+        JournalAccountS.setValidators([
+          Validators.required,
+          autocompleteObjectValidator(),
+        ]);
+        JournalAccountS.updateValueAndValidity();
+
+        const BankSS = this.VendorBalancePaymentFilterForm.get("Bank");
+        BankSS.setValue("");
+        BankSS.clearValidators();
+        BankSS.updateValueAndValidity();
+
+        const ChequeOrRefNoSS =
+          this.VendorBalancePaymentFilterForm.get("ChequeOrRefNo");
+        ChequeOrRefNoSS.setValue("");
+        ChequeOrRefNoSS.clearValidators();
+        ChequeOrRefNoSS.updateValueAndValidity();
+
+        const CashAccountSS = this.VendorBalancePaymentFilterForm.get("CashAccount");
+        CashAccountSS.setValue("");
+        CashAccountSS.clearValidators();
+        CashAccountSS.updateValueAndValidity();
         break;
     }
   }

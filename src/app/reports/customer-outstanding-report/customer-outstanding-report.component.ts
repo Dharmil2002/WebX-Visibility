@@ -79,6 +79,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
     "loc": "Location",
     "openingBal": "Opening Balance",
     "billAmt": "Bill Amount",
+    "creditNoteAmt":"Credit Note Amount",
     "unsubmittedAmt": "Un Submitted Amount",
     "submittedAmt": "Submitted Amount",
     "collectedAmt": "Collected Amount",

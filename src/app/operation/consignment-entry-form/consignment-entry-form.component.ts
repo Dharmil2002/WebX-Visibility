@@ -2054,8 +2054,7 @@ export class ConsignmentEntryFormComponent
       docketDetails["cnogst"] =
         this.model.consignmentTableForm.controls["cnogst"]?.value;
       docketDetails["cneAddress"] =
-        this.model.consignmentTableForm.controls["cneAddress"].value?.name ||
-        "";
+        this.model.consignmentTableForm.controls["cneAddress"].value?.name || "";
       docketDetails["cnegst"] =
         this.model.consignmentTableForm.controls["cnegst"]?.value;
       docketDetails["billingParty"] = bParty?.value;

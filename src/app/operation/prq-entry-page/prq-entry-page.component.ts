@@ -690,6 +690,9 @@ export class PrqEntryPageComponent implements OnInit {
       this.contract = { ...result?.data };
       const calculateValue = (rateType, weight, rt) => {
         const actualWeight = (rateType == "Per Kg") ? convert(weight).from('mt').to('kg') : weight;
+        if(rateType == "Flat"){
+          return rt
+        }
         return Math.min(Math.max(rt * actualWeight));
       };
       const calculateWeight = (rateType) => {

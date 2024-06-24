@@ -7,17 +7,15 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VoucherControlControl } from 'src/assets/FormControls/Finance/VoucherEntry/Vouchercontrol';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import moment from 'moment';
-import { da } from 'date-fns/locale';
-import { financialYear } from 'src/app/Utility/date/date-utils';
-import { ManualVoucherFilterComponent } from './manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
 import { MatDialog } from '@angular/material/dialog';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { firstValueFrom } from 'rxjs';
 import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType } from 'src/app/Models/Finance/Finance';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import Swal from 'sweetalert2';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
+import Swal from 'sweetalert2';
+import { getFinancialYear } from 'src/app/Utility/datetime/datetime';
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { ManualVoucherFilterComponent } from './manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
 
 @Component({
   selector: 'app-manual-voucher',
@@ -252,13 +250,65 @@ export class ManualVoucherComponent implements OnInit {
   }
   async handleMenuItemClick(data) {
     debugger
+    const voucherDetail = this.tableData.find((x) => x._id === data.data._id);
+    const locs = this.StorageService.branch;
     if (data.label.label === "Delete") {
-      this.router.navigate(['Finance/DebitVoucher'], {
-        state: {
-          data: data.data
-        },
+      //const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
+      //const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+
+      Swal.fire({
+        title: 'Reason For Cancel?',
+        html: `<input type="text" id="swal-input1" class="swal2-input" placeholder="Additional comments">`,
+        focusConfirm: false,
+        showCancelButton: true,
+        width: "auto",
+        cancelButtonText: 'Cancel', // Optional: Customize the cancel button text
+        preConfirm: () => {
+          return (document.getElementById('swal-input1') as HTMLInputElement).value;
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          if (voucherDetail.docNo) {
+            // Reverse the accounting entry for the THC
+            if (voucherDetail.docNo) {
+              this.voucherServicesService.VoucherReverseAccountingEntry(voucherDetail?.vNO, getFinancialYear(voucherDetail.eNTDT),
+              voucherDetail.docNo, "When : " + voucherDetail.docNo + "  Is Cancelled"
+              ).then((res) => {
+                if (res) {
+                  if (res.success) {
+                    const filter = {
+                      docNo: voucherDetail.docNo,
+                      cID: this.StorageService.companyCode
+                    }
+                    const VoucherNoList = {
+                      vNO: [voucherDetail?.vNO, res.data.ops[0].vNO]
+                    }
+                   // this.thcService.updateTHC(filter, VoucherNoList);
+                    SwalerrorMessage("success", "Voucher Reverse Accounting Entry Done Successfully And THC has been Cancelled", "Voucher No: " + res.data.ops[0].vNO, true)
+                    this.getVoucherList();
+                  } else {
+                    SwalerrorMessage("error", res.message, "", true)
+                  }
+                }
+                else {
+                  SwalerrorMessage("error", "Error in Voucher Reverse Accounting Entry", "", true)
+                }
+              }).catch((error) => {
+                SwalerrorMessage("error", error.message, "", true)
+              });
+            } else {
+              SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
+              this.getVoucherList();
+            }
+
+          }
+          // Your code to handle the input value
+        } else if (result.isDismissed) {
+          this.getVoucherList();
+        }
       });
     }
+   
     if (data.label.label === "Modify") {
       this.router.navigate(['Finance/DebitVoucher'], {
         state: {

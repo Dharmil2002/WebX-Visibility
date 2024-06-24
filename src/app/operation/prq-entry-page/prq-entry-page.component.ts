@@ -28,7 +28,7 @@ import { rules } from "src/app/Utility/commonFunction/rules/rule";
 import { generateCombinations } from "src/app/Utility/commonFunction/common";
 import { CustomerContractService } from "src/app/core/service/customerContract/customerContract-services.service";
 import convert from 'convert-units';
-import { GenericActions, RateTypeCalculation } from "src/app/config/myconstants";
+import { GenericActions } from "src/app/config/myconstants";
 import moment from "moment";
 @Component({
   selector: "app-prq-entry-page",

@@ -53,6 +53,7 @@ export class AdvancePaymentsComponent implements OnInit {
   ];
   linkArray = [];
   menuItems = [];
+  accountingOnThc = false;
 
   dynamicControls = {
     add: false,
@@ -191,11 +192,12 @@ export class AdvancePaymentsComponent implements OnInit {
       cID: this.storage.companyCode,
       mODULE: "THC",
       aCTIVE: true,
-      rULEID: { D$in: ["THCIBC"] }
+      rULEID: { D$in: ["THCIBC","THCACONGEN"] }
     }
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
       this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC").vAL
+      this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN").vAL
     }
   }
   async GetVendorInformation() {
@@ -799,7 +801,8 @@ export class AdvancePaymentsComponent implements OnInit {
             Response.push(ResultObject);
           }
         } else {
-          for (let i = 0; i < selectedData.length; i++) {
+          if(!this.accountingOnThc){
+            for (let i = 0; i < selectedData.length; i++) {
             const data = selectedData[i];
             const result = await firstValueFrom(this.createJournalRequest(data));
 
@@ -815,8 +818,8 @@ export class AdvancePaymentsComponent implements OnInit {
 
 
             Response.push(ResultObject);
+            }
           }
-
           // Process Debit Requests
           for (let i = 0; i < selectedData.length; i++) {
             const data = selectedData[i];
@@ -989,6 +992,7 @@ export class AdvancePaymentsComponent implements OnInit {
     }
 
     const AdvancePaymentAmount = this.PayableSummaryFilterForm.get("AdvancePaymentAmount").value;
+    let TDSAmount = parseFloat(this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount) || 0;
     const voucherRequest = {
       companyCode: this.companyCode,
       docType: "VR",
@@ -1027,8 +1031,8 @@ export class AdvancePaymentsComponent implements OnInit {
         CGST: 0,
         UGST: 0,
         GSTTotal: 0,
-        GrossAmount: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount),
-        netPayable: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount),
+        GrossAmount: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount+TDSAmount),
+        netPayable: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount+TDSAmount),
         roundOff: 0,
         voucherCanceled: false,
         paymentMode: PaymentMode,
@@ -1152,10 +1156,10 @@ export class AdvancePaymentsComponent implements OnInit {
       }
     }
     else {
-      Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount), 0, thc.THC));
+     Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount +TDSAmount ), 0, thc.THC));
     }
-
-    const PaymentAmountWithoutTDS = parseFloat((AdvancePaymentAmount - TDSAmount).toString());
+  
+    const PaymentAmountWithoutTDS = parseFloat((AdvancePaymentAmount).toString());
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;
       Result.push(createVoucher(CashAccount.aCCD, 0, PaymentAmountWithoutTDS, thc.THC, CashAccount.aCNM, "ASSET"));

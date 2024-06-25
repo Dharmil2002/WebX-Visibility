@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { manualvoucharDetail } from './manual-voucher-utility';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -15,7 +14,6 @@ import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-ser
 import Swal from 'sweetalert2';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { ManualVoucherFilterComponent } from './manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
-import { getFinancialYear } from 'src/app/Utility/datetime/datetime';
 
 @Component({
   selector: 'app-manual-voucher',
@@ -120,7 +118,6 @@ export class ManualVoucherComponent implements OnInit {
     private matDialog: MatDialog,
     public StorageService: StorageService,
     private masterService: MasterService,
-    private datePipe: DatePipe,
     private router: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -152,7 +149,6 @@ export class ManualVoucherComponent implements OnInit {
 
   }
   async getVoucherList() {
-    debugger
     const detail = await manualvoucharDetail(this.masterService);
     this.AllTableData = detail.map((x) => {
       return {
@@ -185,7 +181,6 @@ export class ManualVoucherComponent implements OnInit {
     );
   }
   filterFunction() {
-    debugger
     const dialogRef = this.matDialog.open(ManualVoucherFilterComponent, {
       data: { DefaultData: this.filterRequest },
       width: "60%",
@@ -195,10 +190,8 @@ export class ManualVoucherComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      debugger
+      
       if (result != undefined) {
-        // this.filterRequest.StatusNames = result.statussupport.map(item => item.name)
-        // this.filterRequest.StatusCode = result.statussupport.map(item => +item.value)
          this.filterRequest.voucherNo = result.VoucherNo,
          this.filterRequest.vouchertype = result.VoucherType,
         this.filterRequest.startdate = result.StartDate,
@@ -208,7 +201,6 @@ export class ManualVoucherComponent implements OnInit {
     });
   }
   async getFilterVoucherList() {
-    debugger
     this.tableData = this.AllTableData.filter(item => {
       const itemDate = new Date(item.eNTDT);
       itemDate.setHours(0, 0, 0, 0);
@@ -231,18 +223,12 @@ export class ManualVoucherComponent implements OnInit {
       case "DebitVoucher":
         this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
         break;
-      // case "VendorBillPayment":
-      //   this.addAndEditPath = "Finance/VendorPayment/VendorBillPayment";
-      //   break;
       case "JournalVoucher":
         this.addAndEditPath = "Finance/VoucherEntry/JournalVoucher";
         break;
       case "ContraVoucher":
         this.addAndEditPath = "Finance/VoucherEntry/ContraVoucher";
         break;
-      // case "Delivery MR Voucher":
-      //   this.addAndEditPath = "dashboard/Index";
-      //   break;
       default:
         this.addAndEditPath = "Finance/VoucherEntry/DebitVoucher";
         break;
@@ -251,9 +237,7 @@ export class ManualVoucherComponent implements OnInit {
 
   }
   async handleMenuItemClick(data) {
-    debugger
     const voucherDetail = this.tableData.find((x) => x._id === data.data._id);
-    const locs = this.StorageService.branch;
     if (data.label.label === "Delete") {
       Swal.fire({
         title: 'Reason For Cancel?',
@@ -269,37 +253,23 @@ export class ManualVoucherComponent implements OnInit {
         if (result.isConfirmed) {
           if (voucherDetail.docNo) {
             // Reverse the accounting entry for the THC
-            if (voucherDetail.docNo) {
-                this.voucherServicesService.VoucherReverseAccountingEntry(voucherDetail?.vNO, getFinancialYear(voucherDetail.eNTDT),
-                voucherDetail.docNo, "When Voucher No: " + voucherDetail.docNo + " Is Cancelled"
-                  ).then((res) => {
-                if (res) {
-                  if (res.success) {
-                    const filter = {
-                      docNo: voucherDetail.docNo,
-                      cID: this.StorageService.companyCode
-                    }
-                    const VoucherNoList = {
-                      vNO: [voucherDetail?.vNO, res.data.ops[0].vNO]
-                    }
-                   // this.thcService.updateTHC(filter, VoucherNoList);
-                    SwalerrorMessage("success", "Voucher Reverse Accounting Entry Done Successfully And THC has been Cancelled", "Voucher No: " + res.data.ops[0].vNO, true)
-                    this.getVoucherList();
-                  } else {
-                    SwalerrorMessage("error", res.message, "", true)
-                  }
+            this.voucherServicesService.VoucherReverseAccountingEntry(voucherDetail?.vNO, voucherDetail.fYEAR,
+            voucherDetail.docNo, "When Voucher No: " + voucherDetail.docNo + " Is Cancelled"
+              ).then((res) => {
+              if (res) {
+                if (res.success) {
+                  SwalerrorMessage("success", "Voucher Reverse Accounting Entry Done Successfully", "Voucher No: " + res.data.ops[0].vNO, true)
+                  this.getVoucherList();
+                } else {
+                  SwalerrorMessage("error", res.message, "", true)
                 }
-                else {
-                  SwalerrorMessage("error", "Error in Voucher Reverse Accounting Entry", "", true)
-                }
-              }).catch((error) => {
-                SwalerrorMessage("error", error.message, "", true)
-              });
-            } else {
-              SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
-              this.getVoucherList();
-            }
-
+              }
+              else {
+                SwalerrorMessage("error", "Error in Voucher Reverse Accounting Entry", "", true)
+              }
+            }).catch((error) => {
+              SwalerrorMessage("error", error.message, "", true)
+            });
           }
           // Your code to handle the input value
         } else if (result.isDismissed) {

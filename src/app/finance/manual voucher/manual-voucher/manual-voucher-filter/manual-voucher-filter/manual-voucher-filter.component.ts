@@ -57,7 +57,6 @@ export class ManualVoucherFilterComponent implements OnInit {
     this.getVoucherList();
   }
   async getVoucherList(): Promise<void> {
-  debugger
     const voucherdetailList = await manualvoucharDetail(this.masterService);
 
     if (this.objResult.DefaultData) {
@@ -66,12 +65,6 @@ export class ManualVoucherFilterComponent implements OnInit {
         voucherNo.includes(x.name)
       );
       this.VoucherFilterForm.controls['VoucherNo'].setValue(selectedData);
-
-      // const status = this.objResult?.DefaultData?.StatusNames;
-      // const selectedStatusData = statusList.filter((x) =>
-      //   status.includes(x.name)
-      // );
-      // this.VoucherFilterForm.controls['statussupport'].setValue(selectedStatusData);
 
     }
     this.filter.Filter(
@@ -96,21 +89,5 @@ export class ManualVoucherFilterComponent implements OnInit {
   cancel(): void {
     this.dialogRef.close();
   }
-  // toggleSelectAll(argData: any): void {
-  //   const fieldName = argData.field.name;
-  //   const autocompleteSupport = argData.field.additionalData.support;
-  //   const isSelectAll = argData.eventArgs;
-
-  //   const index = this.jsonControlArray.findIndex(
-  //     (obj) => obj.name === fieldName
-  //   );
-  //   this.jsonControlArray[index].filterOptions
-  //     .pipe(take(1), takeUntil(this._onDestroy))
-  //     .subscribe((val) => {
-  //       this.VendorBillFilterForm.controls[autocompleteSupport].patchValue(
-  //         isSelectAll ? val : []
-  //       );
-  //     });
-  // }
 }
 

@@ -9,7 +9,7 @@ export class VehicleTypeMaster {
   constructor(vehicleTypeMaster) {
     {
       this.vehicleTypeCode = vehicleTypeMaster.vehicleTypeCode || '';
-      this.isActive = vehicleTypeMaster.isActive || false;
+      this.isActive = vehicleTypeMaster.isActive || true;
     }
   }
 }

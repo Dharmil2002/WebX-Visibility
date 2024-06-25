@@ -399,7 +399,6 @@ export class ThcGenerationComponent implements OnInit {
       this.isView || false,
       this.prqFlag || false
     );
-
     this.jsonVehicleControl = loadingControlForm.getVehicleDetails();
     const thcFormControls = loadingControlForm.getThcFormControls();
     const rakeDetails = loadingControlForm.getRakeDetailsControls();

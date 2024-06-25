@@ -1163,7 +1163,7 @@ export class ThcGenerationComponent implements OnInit {
     let propertiesToSet = [
 
       { Key: 'route', Name: 'rUTNM' },
-      { Key: 'tripDate', Name: 'eNTDT' },
+      { Key: 'tripDate', Name: 'tHCDT' },
       { Key: 'etaDate', Name: 'eTADT' },
       { Key: 'tripId', Name: 'docNo' },
       { Key: 'capacity', Name: 'cAP.wT' },

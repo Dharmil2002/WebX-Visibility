@@ -488,7 +488,7 @@ export class GeneralBillDetailComponent implements OnInit {
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTdata);
-        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("CGST/SGS");
+        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("CGST/SGST");
       } else if (IsStateTypeUT) {
         this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTdata);
         this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("UGST");

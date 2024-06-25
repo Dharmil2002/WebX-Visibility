@@ -207,12 +207,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   }
   async getBillDetail(TableData) {
     this.isTableLode = false;
-
+    
     let data = TableData
       .filter(x => x.pendingAmount != 0)
       .map(x => ({
         ...x,
-        debitNote: (x.TotalTHCAmount) - (x.pendingAmount + x.PayedAmount),
+        debitNote: Number(x.TotalTHCAmount) - (Number(x.pendingAmount) + Number(x.PayedAmount)),
         payment: 0,
         isSelected: false,
         Date: x.Date,

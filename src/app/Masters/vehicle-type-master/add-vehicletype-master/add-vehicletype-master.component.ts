@@ -29,6 +29,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   updateVehicleTypeCategory: any;
   vehicleTypeCategory: any;
   submit = 'Save';
+  isSubmit: boolean = false;
   newVehicleTypeCode: any;
   ngOnInit(): void {
     //this.getVehicleTypeCategoryList();
@@ -65,14 +66,13 @@ export class AddVehicletypeMasterComponent implements OnInit {
       this.action = 'Add';
       this.vehicleTypeTableData = new VehicleTypeMaster({});
     }
-    this.isUpdate = this.action === 'edit';
     this.breadScrums = [
       {
         generatecontrol: true,
-        toggle: this.data && this.data.isActive ? this.data.isActive : "",
-        title: this.isUpdate ? 'Modify Vehicle Type' : 'Add Vehicle Type',
-        items: ['Home'],
-        active: this.isUpdate ? 'Modify Vehicle Type' : 'Add Vehicle Type',
+        toggle: this.action === 'edit' ? this.data.isActive : true,
+        title: this.action === 'edit' ? 'Modify Vehicle Type' : 'Add Vehicle Type',
+        items: ['Masters'],
+        active: this.action === 'edit' ? 'Modify Vehicle Type' : 'Add Vehicle Type',
       },
     ];
     this.initializeFormControl();
@@ -117,76 +117,97 @@ export class AddVehicletypeMasterComponent implements OnInit {
 
   }
   async save() {
-    let data = this.vehicleTypeTableForm.value
-    const sortedData = await this.getVehicleTypeList();
-    if (sortedData) {
-      const lastUsedVehicleTypeCode = sortedData[sortedData.length - 1];
-      const lastVehicleTypeCode = lastUsedVehicleTypeCode ? parseInt(lastUsedVehicleTypeCode.vehicleTypeCode.substring(3)) : 0;
-      // Function to generate a new route code
-      function generateVehicleCode(initialCode: number = 0) {
-        const nextVehicleTypeCode = initialCode + 1;
-        const vehicleTypeNumber = nextVehicleTypeCode.toString().padStart(4, '0');
-        const vehicleTypeCode = `VT${vehicleTypeNumber}`;
-        return vehicleTypeCode;
-      }
-      if (this.isUpdate) {
-        this.newVehicleTypeCode = this.vehicleTypeTableData._id
-      } else {
-        this.newVehicleTypeCode = generateVehicleCode(lastVehicleTypeCode);
-      }
-      //generate unique vehicleTypeCode
-      this.vehicleTypeTableForm.controls["vehicleTypeCode"].setValue(this.newVehicleTypeCode);
-      if (this.isUpdate) {
-        let id = this.vehicleTypeTableForm.value._id;
-        // Remove the "_id" field from the form controls
-        this.vehicleTypeTableForm.removeControl("_id");
-        data["mODDT"] = new Date();
-        data['mODLOC'] = this.storage.branch;
-        data['mODBY:'] = this.storage.userName;
-        let req = {
-          companyCode: this.companyCode,
-          collectionName: "vehicleType_detail",
-          filter: { _id: id },
-          update: data
-        };
-        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
-        }
-      }
-      else {
-        const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value };
-        data["eNTDT"] = new Date();
-        data['eNTLOC'] = this.storage.branch;
-        data['eNTBY:'] = this.storage.userName;
-        data.vehicleTypeCode = id._id;
-        const mergedObject = { ...data, ...id };
-        let req = {
-          companyCode: this.companyCode,
-          collectionName: "vehicleType_detail",
-          data: mergedObject
-        };
-        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
-        }
-      }
+    if (!this.vehicleTypeTableForm.valid || this.isSubmit) {
+      this.vehicleTypeTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      })
+      return false;
     }
+      this.isSubmit = true;
+      this.ObjSnackBarUtility.commonToast(async () => {
+        let data = this.vehicleTypeTableForm.value
+        const sortedData = await this.getVehicleTypeList();
+        if (sortedData) {
+          const lastUsedVehicleTypeCode = sortedData[sortedData.length - 1];
+          const lastVehicleTypeCode = lastUsedVehicleTypeCode ? parseInt(lastUsedVehicleTypeCode.vehicleTypeCode.substring(3)) : 0;
+          // Function to generate a new route code
+          function generateVehicleCode(initialCode: number = 0) {
+            const nextVehicleTypeCode = initialCode + 1;
+            const vehicleTypeNumber = nextVehicleTypeCode.toString().padStart(4, '0');
+            const vehicleTypeCode = `VT${vehicleTypeNumber}`;
+            return vehicleTypeCode;
+          }
+          if (this.isUpdate) {
+            this.newVehicleTypeCode = this.vehicleTypeTableData._id
+          } else {
+
+            this.newVehicleTypeCode = generateVehicleCode(lastVehicleTypeCode);
+          }
+          //generate unique vehicleTypeCode
+          this.vehicleTypeTableForm.controls["vehicleTypeCode"].setValue(this.newVehicleTypeCode);
+          if (this.isUpdate) {
+            let id = this.vehicleTypeTableForm.value._id;
+            // Remove the "_id" field from the form controls
+            this.vehicleTypeTableForm.removeControl("_id");
+            data["mODDT"] = new Date();
+            data['mODLOC'] = this.storage.branch;
+            data['mODBY:'] = this.storage.userName;
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "vehicleType_detail",
+              filter: { _id: id },
+              update: data
+            };
+            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+            if (res) {
+              // Display success message
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+              });
+              this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
+            }
+          }
+          else {
+            const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value };
+            data["eNTDT"] = new Date();
+            data['eNTLOC'] = this.storage.branch;
+            data['eNTBY:'] = this.storage.userName;
+            data['companyCode'] = this.storage.companyCode;
+            data.vehicleTypeCode = id._id;
+            const mergedObject = { ...data, ...id };
+            let req = {
+              companyCode: this.companyCode,
+              collectionName: "vehicleType_detail",
+              data: mergedObject
+            };
+            const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+            if (res) {
+              // Display success message
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+              });
+              this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
+            }
+          }
+        }
+      }, "Vehicle Type is Generating Please wait...!")
+    
   }
+
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.vehicleTypeTableForm.controls['isActive'].setValue(event);
@@ -197,7 +218,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
       let req = {
         "companyCode": this.companyCode,
         "collectionName": "vehicleType_detail",
-        "filter": {}
+        "filter": { companyCode:this.companyCode }
       };
       const response = await firstValueFrom(this.masterService.masterPost("generic/get", req));
 

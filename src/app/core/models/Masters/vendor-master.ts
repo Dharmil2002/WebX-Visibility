@@ -66,7 +66,7 @@ export class VendorMaster {
       this.vendorCode = VendorMaster.vendorCode || "System Genrated";
       this.vendorName = VendorMaster.vendorName || "";
       this.bankACNumber = VendorMaster.bankACNumber || "";
-      this.isActive = VendorMaster.isActive || false;
+      this.isActive = VendorMaster.isActive || true;
       this.noPANRegistration = VendorMaster.noPANRegistration || false;
       this.isBlackListed = VendorMaster.isBlackListed || false;
       this.isLowRateApplicable = VendorMaster.isLowRateApplicable || false;

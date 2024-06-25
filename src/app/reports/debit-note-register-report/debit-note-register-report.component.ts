@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DebitNoteRegister } from 'src/assets/FormControls/Reports/debit-note-register-report/debit-note-register-report';
 import { UntypedFormGroup,UntypedFormBuilder } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import {  financialYear } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -113,6 +114,8 @@ export class DebitNoteRegisterReportComponent implements OnInit {
       "Fyear",
       false
     );
+    const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
+    this.DebitNoteForm.controls["Fyear"].setValue(selectedFinancialYear);
   }
   
   initializeFormControl() {

@@ -407,7 +407,9 @@ export class ConsignmentEntryFormComponent
     ]);
     this.commonDropDownMapping();
     this.model.consignmentTableForm.controls["payType"].setValue("P02");
-    //this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    this.model.consignmentTableForm.controls["risk"].setValue("O");
+    this.model.consignmentTableForm.controls["delivery_type"].setValue("DD");
 
     const filteredMode = this.model.movementType.find(
       (item) => item.name == this.storage.mode
@@ -2328,13 +2330,28 @@ export class ConsignmentEntryFormComponent
                 title: "Booked Successfully",
                 text: "GCN No: " + dockNo,
                 showConfirmButton: true,
+                denyButtonText: 'Print',
+                showDenyButton: true,
+                showCancelButton: true,
+                cancelButtonText: 'Close'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                  }, 2000);
                   this.navService.navigateTotab("docket", "dashboard/Index");
+                }else if (result.isDenied) {
+                  // Handle the action for the deny button here.
+                  const templateBody = {
+                    templateName: "DKT",
+                    PartyField: "",
+                    DocNo: dockNo,
+                  };
+                  const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                  window.open(url, '', 'width=1000,height=800');
+                  this.route.navigateByUrl('Operation/ConsignmentEntry').then(() => {
+                    window.location.reload();
+                  });
+                }else if (result.isDismissed) {
+                  // Handle the action for the cancel button here.
+                  this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
                 }
               });
             }

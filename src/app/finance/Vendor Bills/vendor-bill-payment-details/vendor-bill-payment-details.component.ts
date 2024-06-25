@@ -195,7 +195,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     ]);
 
     this.jsonPaymentSummaryArray =
-      this.vendorBillPaymentControl.getPaymentSummaryControl();
+      //this.vendorBillPaymentControl.getPaymentSummaryControl();
     this.AlljsonControlPaymentSummaryFilterArray = this.jsonPaymentSummaryArray;
     this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [
       this.jsonPaymentSummaryArray,

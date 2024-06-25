@@ -222,7 +222,7 @@ export class CreditNoteRegisterReportComponent implements OnInit {
     try {
       this.ReportingBranches = [];
       if (this.CreditNoteReportRegisterForm.value.Individual == "N") {
-        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CreditNoteReportRegisterForm.value.branch.name);
+        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CreditNoteReportRegisterForm.value.Branch.value);
         this.ReportingBranches.push(this.CreditNoteReportRegisterForm.value.Branch?.value||"");
       } else {
         this.ReportingBranches.push(this.CreditNoteReportRegisterForm.value.Branch?.value||"");

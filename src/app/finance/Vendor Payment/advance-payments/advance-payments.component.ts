@@ -192,12 +192,12 @@ export class AdvancePaymentsComponent implements OnInit {
       cID: this.storage.companyCode,
       mODULE: "THC",
       aCTIVE: true,
-      rULEID: { D$in: ["THCIBC","THCACONGEN"] }
+      rULEID: { D$in: ["THCIBC", "THCACONGEN"] }
     }
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
-      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC").vAL
-      this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN").vAL
+      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false;
+      this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN")?.vAL === true ? true : false;
     }
   }
   async GetVendorInformation() {
@@ -801,23 +801,23 @@ export class AdvancePaymentsComponent implements OnInit {
             Response.push(ResultObject);
           }
         } else {
-          if(!this.accountingOnThc){
+          if (!this.accountingOnThc) {
             for (let i = 0; i < selectedData.length; i++) {
-            const data = selectedData[i];
-            const result = await firstValueFrom(this.createJournalRequest(data));
+              const data = selectedData[i];
+              const result = await firstValueFrom(this.createJournalRequest(data));
 
-            const { docNo: THCNo, vNO: VoucherNo } = result.data.ops[0];
-            const AdvancePendingAmount = (parseFloat(data.AdvancePending) - parseFloat(data.AdvancePaymentAmount)).toFixed(2);
+              const { docNo: THCNo, vNO: VoucherNo } = result.data.ops[0];
+              const AdvancePendingAmount = (parseFloat(data.AdvancePending) - parseFloat(data.AdvancePaymentAmount)).toFixed(2);
 
-            const ResultObject = {
-              THCNo,
-              VoucherNo,
-              AdvancePendingAmount,
-              data
-            };
+              const ResultObject = {
+                THCNo,
+                VoucherNo,
+                AdvancePendingAmount,
+                data
+              };
 
 
-            Response.push(ResultObject);
+              Response.push(ResultObject);
             }
           }
           // Process Debit Requests
@@ -1031,8 +1031,8 @@ export class AdvancePaymentsComponent implements OnInit {
         CGST: 0,
         UGST: 0,
         GSTTotal: 0,
-        GrossAmount: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount+TDSAmount),
-        netPayable: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount+TDSAmount),
+        GrossAmount: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount + TDSAmount),
+        netPayable: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount + TDSAmount),
         roundOff: 0,
         voucherCanceled: false,
         paymentMode: PaymentMode,
@@ -1156,9 +1156,9 @@ export class AdvancePaymentsComponent implements OnInit {
       }
     }
     else {
-     Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount +TDSAmount ), 0, thc.THC));
+      Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
     }
-  
+
     const PaymentAmountWithoutTDS = parseFloat((AdvancePaymentAmount).toString());
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;

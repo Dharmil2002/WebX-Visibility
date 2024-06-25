@@ -128,19 +128,19 @@ export class MarkArrivalComponent implements OnInit {
   }
   async save() {
     this.ObjSnackBarUtility.commonToast(async () => {
-    this.MarkArrivalTableForm.controls['LateReason']
-      .setValue(
-        this.MarkArrivalTableForm.controls['LateReason']?.
-          value.name || ""
-      )
-    const pod = this.imageData?.Upload || ""
-    this.MarkArrivalTableForm.controls['pod'].setValue(pod);
-    let tripDetailForm = this.MarkArrivalTableForm.value
-    const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
-    if (res) {
-      this.updateTripData()
-    }
-  }," Vehicle Arrival");
+      this.MarkArrivalTableForm.controls['LateReason']
+        .setValue(
+          this.MarkArrivalTableForm.controls['LateReason']?.
+            value.name || ""
+        )
+      const pod = this.imageData?.Upload || ""
+      this.MarkArrivalTableForm.controls['pod'].setValue(pod);
+      let tripDetailForm = this.MarkArrivalTableForm.value
+      const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
+      if (res) {
+        this.updateTripData()
+      }
+    }, " Vehicle Arrival");
   }
 
   async updateTripData() {
@@ -154,7 +154,7 @@ export class MarkArrivalComponent implements OnInit {
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
       this.Request = {
-        isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+        isInterBranchControl: res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false,
         thcNo: this.MarkArrivalTableForm.value?.TripID,
         thc: {
           collation: "thc_summary_ltl",

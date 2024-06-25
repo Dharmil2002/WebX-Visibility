@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import moment from "moment";
-import { firstValueFrom } from "rxjs";
+import { Observable, catchError, firstValueFrom, mergeMap, throwError } from "rxjs";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { ConvertToDate, ConvertToNumber } from "src/app/Utility/commonFunction/common";
@@ -10,6 +10,11 @@ import { StorageService } from "src/app/core/service/storage.service";
 import Swal from "sweetalert2";
 import { VendorService } from "../../masters/vendor-master/vendor.service";
 import { DocketEvents, DocketStatus, ThcStatus, VehicleStatus, getEnumName } from "src/app/Models/docStatus";
+import { GetLeadgerInfoFromLocalStorage, VoucherInstanceType, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
+import { financialYear } from "src/app/Utility/date/date-utils";
+import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Injectable({
   providedIn: "root"
@@ -25,12 +30,18 @@ export class DepartureService {
     "7": ["Create Trip"],
     "default": [""]
   };
+  snackBarUtilityService: any;
+  accountingOnThc = false;
+  vendCode;
 
   constructor(
     private operation: OperationService,
     private storage: StorageService,
     private operationService: OperationService,
-    private vendor: VendorService
+    private vendor: VendorService,
+    private voucherServicesService: VoucherServicesService,
+    private masterService: MasterService,
+    private controlPanel: ControlPanelService,
   ) {
   }
   async getRouteSchedule() {
@@ -71,7 +82,7 @@ export class DepartureService {
     const { data } = await firstValueFrom(this.operation.operationPost(GenericActions.Get, req));
     return data;
   }
-  
+
   // Utility function to compute the difference in hours between two dates
   computeHoursDifference(startDate, endDate) {
     return (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
@@ -83,6 +94,7 @@ export class DepartureService {
         companyCode: this.storage.companyCode,
         vendorName: { 'D$regex': `^${data?.Vendor}`, 'D$options': 'i' }
       });
+    this.vendCode = vendorCode[0]?.vendorCode;
     const dktNoList = shipment ? shipment.map((x) => x.dKTNO) : [];
     const dktSfx = shipment ? shipment.map((x) => `${x.dKTNO}-${x.sFX}`) : [];
     let eventJson = dktNoList;
@@ -96,6 +108,15 @@ export class DepartureService {
     }
     let isLegExist = false;
     let thc_movment = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", getLeg));
+
+    const getstatus= {
+      companyCode: this.storage.companyCode,
+      collectionName: "thc_summary_ltl",
+      filter: { docNo: data.tripID },
+    }
+    let status = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", getstatus));
+
+
     let legData = thc_movment.data;
     isLegExist = (legData?._id == legID);
 
@@ -314,6 +335,47 @@ export class DepartureService {
         data: legData
       }
       await firstValueFrom(this.operation.operationMongoPost("generic/create", reqthc));
+      const filter = {
+        cID: this.storage.companyCode,
+        mODULE: "THC",
+        aCTIVE: true,
+        rULEID: { D$in: ["THCACONGEN"] }
+      }
+      const res: any = await this.controlPanel.getModuleRules(filter);
+      if (res.length > 0) {
+        this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN").vAL
+      }
+
+      if (this.accountingOnThc) {
+        if (status.data.oPSST == 1) {
+          let result = await firstValueFrom(this.createJournalRequest(data, data.tripID));
+          console.log(result);
+          if (result) {
+            let commonBody;
+            commonBody = {
+              vNO: result.data.ops[0].vNO
+            }
+            const reqBody = {
+              companyCode: this.storage.companyCode,
+              collectionName: 'thc_summary_ltl',
+              filter: {
+                cID: this.storage.companyCode,
+                docNo: data.tripID
+              },
+              update: commonBody,
+            };
+            firstValueFrom(this.masterService.masterPut('generic/update', reqBody)).then((res: any) => {
+              if (res.success) {
+              }
+            })
+              .catch((error: any) => {
+                // Handle any errors here
+                console.error(error);
+              });
+          }
+        }
+      }
+
     }
 
     const tripDetails = {
@@ -392,53 +454,53 @@ export class DepartureService {
     const res= await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
     return res.data;
   }
-  
+
   async updateDocket(data) {
     const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.TripID});
     if(dockets && dockets.length>0){
       dockets.forEach(async (x)=>{
-    let evnData = {
-      _id: `${this.storage.companyCode}-${x.dKTNO}-0-EVN0001-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
-      cID: this.storage.companyCode,
-      dKTNO: x?.dKTNO || "",
-      sFX: x?.sFX,
-      lOC: this.storage.branch,
-      eVNID: 'EVN0001',
-      eVNDES: 'Booking',
-      eVNDT: new Date(),
-      eVNSRC: 'Booking',
-      dOCTY: 'CN',
-      dOCNO: x?.dKTNO || "",
-      sTS: DocketStatus.Booked,
-      sTSNM: DocketStatus[DocketStatus.Booked],
-      oPSSTS: `Booked at ${x?.oRGN} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
-      eNTDT: x?.eNTDT,
-      eNTLOC: x?.eNTLOC || "",
-      eNTBY: x?.eNTBY || ""
-    }
-    let reqEvent = {
-      companyCode: this.storage.companyCode,
-      collectionName: "docket_events_ltl",
-      data: evnData
-    };
-    await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
-    let reqBody = {
-      companyCode: this.storage.companyCode,
-      collectionName: "docket_ops_det_ltl",
+        let evnData = {
+          _id: `${this.storage.companyCode}-${x.dKTNO}-0-EVN0001-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+          cID: this.storage.companyCode,
+          dKTNO: x?.dKTNO || "",
+          sFX: x?.sFX,
+          lOC: this.storage.branch,
+          eVNID: 'EVN0001',
+          eVNDES: 'Booking',
+          eVNDT: new Date(),
+          eVNSRC: 'Booking',
+          dOCTY: 'CN',
+          dOCNO: x?.dKTNO || "",
+          sTS: DocketStatus.Booked,
+          sTSNM: DocketStatus[DocketStatus.Booked],
+          oPSSTS: `Booked at ${x?.oRGN} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+          eNTDT: x?.eNTDT,
+          eNTLOC: x?.eNTLOC || "",
+          eNTBY: x?.eNTBY || ""
+        }
+        let reqEvent = {
+          companyCode: this.storage.companyCode,
+          collectionName: "docket_events_ltl",
+          data: evnData
+        };
+        await firstValueFrom(this.operation.operationMongoPost('generic/create', reqEvent));
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          collectionName: "docket_ops_det_ltl",
       filter:{dKTNO:x.dKTNO,sFX:x.sFX},
       update:{
-        sTS: DocketStatus.Booked,
-        sTSNM: DocketStatus[DocketStatus.Booked],
+            sTS: DocketStatus.Booked,
+            sTSNM: DocketStatus[DocketStatus.Booked],
         mODDT:new Date(),
         mODBY:this.storage.userName,
         mODLOC:this.storage.branch,
         oPSSTS:`Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+          }
+        }
+        await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
+      });
+
     }
-    }
-    await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
-  });
- 
-  }
   }
 
   async updateTHCLTL(filter, data) {
@@ -454,11 +516,191 @@ export class DepartureService {
 
   async deleteTrip(filter) {
     const req = {
-        companyCode: this.storage.companyCode,
-        collectionName: "trip_Route_Schedule",
-        filter: filter
+      companyCode: this.storage.companyCode,
+      collectionName: "trip_Route_Schedule",
+      filter: filter
     }
     const res = await firstValueFrom(this.operationService.operationMongoRemove("generic/remove", req));
     return res;
-}
+  }
+
+
+  //Voucher Create Thc Generation
+  createJournalRequest(data: any, tripID: any): Observable<any> {
+    // Construct the voucher request payload
+
+    const voucherRequest = {
+      companyCode: this.storage.companyCode,
+      docType: "VR",
+      branch: this.storage.branch,
+      finYear: financialYear,
+      details: [],
+      debitAgainstDocumentList: [],
+      data: {
+        transCode: VoucherInstanceType.THCGeneration,
+        transType: VoucherInstanceType[VoucherInstanceType.THCGeneration],
+        voucherCode: VoucherType.JournalVoucher,
+        voucherType: VoucherType[VoucherType.JournalVoucher],
+        transDate: new Date(),
+        docType: "VR",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        accLocation: this.storage.branch,
+        preperedFor: "Vendor",
+        partyCode: this.vendCode,
+        partyName: data?.Vendor || "",
+        partyState: "" || "",
+        entryBy: this.storage.userName,
+        entryDate: new Date(),
+        panNo: "",
+        tdsSectionCode: undefined,
+        tdsSectionName: undefined,
+        tdsRate: 0,
+        tdsAmount: 0,
+        tdsAtlineitem: false,
+        tcsSectionCode: undefined,
+        tcsSectionName: undefined,
+        tcsRate: 0,
+        tcsAmount: 0,
+        IGST: 0,
+        SGST: 0,
+        CGST: 0,
+        UGST: 0,
+        GSTTotal: 0,
+        GrossAmount: parseFloat(data?.TotalTripAmt || 0),
+        netPayable: parseFloat(data?.TotalTripAmt || 0),
+        roundOff: 0,
+        voucherCanceled: false,
+        paymentMode: "",
+        refNo: "",
+        accountName: "",
+        accountCode: "",
+        date: "",
+        scanSupportingDocument: "",
+        transactionNumber: tripID
+      }
+    };
+
+    // Retrieve voucher line items
+    const voucherlineItems = this.GetJournalVoucherLedgers(data, tripID);
+    voucherRequest.details = voucherlineItems;
+
+    // Create and return an observable representing the HTTP request
+    return this.voucherServicesService.FinancePost("fin/account/voucherentry", voucherRequest).pipe(
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while creating voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      }),
+      mergeMap((res: any) => {
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          voucherNo: res?.data?.mainData?.ops[0].vNO,
+          transDate: Date(),
+          finYear: financialYear,
+          branch: this.storage.branch,
+          transCode: VoucherInstanceType.THCGeneration,
+          transType: VoucherInstanceType[VoucherInstanceType.THCGeneration],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          docType: "Voucher",
+          partyType: this.vendCode || "V8888",
+          docNo: data.tripID,
+          partyCode: "",
+          partyName: data?.Vendor || "",
+          entryBy: this.storage.userName,
+          entryDate: Date(),
+          debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.debit,
+              "narration": item.narration ?? ""
+            };
+          }),
+          credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.credit,
+              "narration": item.narration ?? ""
+            };
+          }),
+        };
+        return this.voucherServicesService.FinancePost("fin/account/posting", reqBody);
+      }),
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while posting voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      })
+    );
+  }
+
+  // Get Voucher Details
+  GetJournalVoucherLedgers(SelectedData, tripID) {
+    const createVoucher = (accCode, accName, accCategory, debit, credit, THCNo) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.THCGeneration,
+      transType: VoucherInstanceType[VoucherInstanceType.THCGeneration],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Expense Booked against THC NO : ${tripID}`,
+    });
+
+    const Result = [];
+
+    let OtherChargePositiveAmt = 0;
+    let OtherChargeNegativeAmt = 0;
+    const AllCharges: any[] = SelectedData?.cHG;
+    AllCharges.forEach((item) => {
+      if (item.aMT != 0) {
+        const ledger = GetLeadgerInfoFromLocalStorage(item.aCCD)
+        if (item.oPS == "+") {
+          if (ledger) {
+            Result.push(createVoucher(ledger.LeadgerCode, ledger.LeadgerName, ledger.LeadgerCategory, +item.aMT, 0, SelectedData.THC));
+          } else {
+            OtherChargePositiveAmt += parseFloat(item.aMT);
+          }
+        }
+        if (item.oPS == "-") {
+          if (ledger) {
+            Result.push(createVoucher(ledger.LeadgerCode, ledger.LeadgerName, ledger.LeadgerCategory, 0, (+item.aMT * -1), SelectedData.THC));
+          } else {
+            OtherChargeNegativeAmt += (parseFloat(item.aMT) * -1);
+          }
+        }
+      }
+    });
+
+    if (OtherChargePositiveAmt != 0) {
+      Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, OtherChargePositiveAmt, 0, SelectedData.tripID));
+    }
+    if (OtherChargeNegativeAmt != 0) {
+      Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, 0, OtherChargeNegativeAmt, SelectedData.tripID));
+    }
+    Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode, ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, parseFloat(SelectedData?.ContractAmt), 0, SelectedData.tripID));
+    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, 0, parseFloat(SelectedData?.TotalTripAmt), SelectedData.tripID));
+    return Result;
+  }
+
 }

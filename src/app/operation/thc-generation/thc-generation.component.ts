@@ -1057,6 +1057,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is for getting docket details using thc*/
   async getDocketsForTHC() {
+    const tripDate=this.thcTableForm.controls['tripDate'].value;
     const pRQNO = this.thcTableForm.controls['prqNo'].value;
     const fromCity = this.thcTableForm.controls['fromCity'].value?.value || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.value || ''
@@ -1064,7 +1065,7 @@ export class ThcGenerationComponent implements OnInit {
     this.tableData = [];
 
     //this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, fromCity.toUpperCase(), null, null, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
-    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
+    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT, tripDate, this.DocketFilterData.eDT, this.DocketsContainersWise);
     const filteredShipments = this.allShipment;
     const addEditAction = (shipments) => {
       return shipments.map((shipment) => {
@@ -1142,7 +1143,6 @@ export class ThcGenerationComponent implements OnInit {
   /*end*/
   /* below function was the call when */
   async getLocBasedOnCity() {
-
     const fromCity = this.thcTableForm.controls['fromCity'].value?.ct || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.ct || ''
     const fromTo = `${fromCity}-${toCity}`

@@ -342,6 +342,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
+    
     this.iSShow = false;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };

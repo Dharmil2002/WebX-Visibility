@@ -191,7 +191,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         "dMAX": result?.data.dMAX
       }
       const arrivalData = await this.getArrivalDate(docketdetails);
-      this.calculateDemurrage(  docketdetails, demurrage,arrivalData);
+      this.calculateDemurrage(docketdetails, demurrage, arrivalData);
       return result?.data;
     }
     return null;
@@ -206,7 +206,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }
     };
     const result = await firstValueFrom(this.operation.operationMongoPost(GenericActions.GetOne, request));
-  
+
     if (result?.data) {
       return result?.data;
 
@@ -214,7 +214,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     return null;
   }
   //#region
-  calculateDemurrage( docket, demurrage, arrivalData) {
+  calculateDemurrage(docket, demurrage, arrivalData) {
 
     // Calculate the number of days from arrival date to current date
     const arrivalDate = new Date(arrivalData?.aRRDT);
@@ -254,7 +254,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     const gmData = await this.generalService.getGeneralMasterData(["PAYMOD", "RTTYP"]);
     this.paymentMode = gmData.filter((x) => x.type == "PAYMOD");
     this.rateType = gmData.filter((x) => x.type == "RTTYP");
-    console.log("this.rateType",this.rateType);
+    console.log("this.rateType", this.rateType);
     setGeneralMasterData(this.AlljsonControlPaymentSummaryFilterArray, this.paymentMode, "PaymentMode");
   }
   //#endregion
@@ -635,7 +635,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
-      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL || false;
+      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false;
     }
   }
   //#endregion

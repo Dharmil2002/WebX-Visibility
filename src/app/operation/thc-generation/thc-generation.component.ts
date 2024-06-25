@@ -2295,7 +2295,7 @@ export class ThcGenerationComponent implements OnInit {
         const res: any = await this.controlPanel.getModuleRules(filter);
         if (res.length > 0) {
           this.Request = {
-            isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+            isInterBranchControl: res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false,
             thcNo: this.thcTableForm.get("tripId").value,
             thc: {
               collation: "thc_summary",
@@ -2452,7 +2452,7 @@ export class ThcGenerationComponent implements OnInit {
           let voucherNumber = result.data.ops[0].vNO;
           let htmlContent;
           if (this.accountingOnThc) {
-            htmlContent = "THC Number is " + thcNumber + "<br>Voucher Number is " + voucherNumber;  
+            htmlContent = "THC Number is " + thcNumber + "<br>Voucher Number is " + voucherNumber;
           } else {
             htmlContent = "THC Number is " + thcNumber;
           }

@@ -147,8 +147,20 @@ export class SalesRegisterService {
                gSTAmnt: item.gSTAmnt ? item.gSTAmnt.toFixed(2) : 0,
           }));
 
+          const getDistinctByProperty = <T, K extends keyof T>(array: T[], key: K): T[] => {
+               const seen = new Set();
+               return array.filter(item => {
+                    const value = item[key];
+                    if (seen.has(value)) {
+                         return false;
+                    } else {
+                         seen.add(value);
+                         return true;
+                    }
+               });
+          };
           return {
-               data: details,
+               data: getDistinctByProperty(details, 'GCNNo'),
                grid: resLtl.data.grid
           };
      }

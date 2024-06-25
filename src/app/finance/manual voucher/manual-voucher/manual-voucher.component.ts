@@ -13,9 +13,9 @@ import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, Vouc
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import Swal from 'sweetalert2';
-import { getFinancialYear } from 'src/app/Utility/datetime/datetime';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { ManualVoucherFilterComponent } from './manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
+import { getFinancialYear } from 'src/app/Utility/datetime/datetime';
 
 @Component({
   selector: 'app-manual-voucher',
@@ -152,11 +152,13 @@ export class ManualVoucherComponent implements OnInit {
 
   }
   async getVoucherList() {
+    debugger
     const detail = await manualvoucharDetail(this.masterService);
     this.AllTableData = detail.map((x) => {
       return {
         ...x, vCAN: "Generated",
-        actions: ["Modify", "Delete"]
+        //actions: ["Modify", "Delete"]
+         actions: (x.vTYPNM === "DebitVoucher" || x.vTYPNM === "CreditVoucher" )  ? ["Delete"] : ["Modify"]
       };
     });
 
@@ -253,9 +255,6 @@ export class ManualVoucherComponent implements OnInit {
     const voucherDetail = this.tableData.find((x) => x._id === data.data._id);
     const locs = this.StorageService.branch;
     if (data.label.label === "Delete") {
-      //const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
-      //const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
-
       Swal.fire({
         title: 'Reason For Cancel?',
         html: `<input type="text" id="swal-input1" class="swal2-input" placeholder="Additional comments">`,
@@ -271,9 +270,9 @@ export class ManualVoucherComponent implements OnInit {
           if (voucherDetail.docNo) {
             // Reverse the accounting entry for the THC
             if (voucherDetail.docNo) {
-              this.voucherServicesService.VoucherReverseAccountingEntry(voucherDetail?.vNO, getFinancialYear(voucherDetail.eNTDT),
-              voucherDetail.docNo, "When : " + voucherDetail.docNo + "  Is Cancelled"
-              ).then((res) => {
+                this.voucherServicesService.VoucherReverseAccountingEntry(voucherDetail?.vNO, getFinancialYear(voucherDetail.eNTDT),
+                voucherDetail.docNo, "When Voucher No: " + voucherDetail.docNo + " Is Cancelled"
+                  ).then((res) => {
                 if (res) {
                   if (res.success) {
                     const filter = {

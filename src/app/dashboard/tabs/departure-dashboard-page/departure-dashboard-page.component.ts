@@ -53,7 +53,6 @@ export class DepartureDashboardPageComponent
   linkArray = [{ Row: "Action", Path: "Operation/CreateLoadingSheet" }];
   menuItems = [
     { label: "Create Trip",},
-    { label: "Update Trip" },
     { label:"Vehicle Loading"},
     { label:"Depart Vehicle" },
     { label: "Update Trip" },
@@ -191,6 +190,7 @@ export class DepartureDashboardPageComponent
     const statusesToExclude = new Set([4,5]);
     // Filter departureTableData to exclude items with statuses in the Set
     this.tableData = departureTableData.filter(item => !statusesToExclude.has(item.status));
+    const tabledata= this.tableData;
     // Set tableload to false to indicate that the table loading is complete
     this.tableload = false;
     this.fetchShipmentData();
@@ -261,6 +261,7 @@ const shipData = [
       case "Create Trip":
       case "Vehicle Loading":
       case "Depart Vehicle":
+      case "Update Trip":
         evnt.data.Action=label
        this.router.navigate(['Operation/CreateLoadingSheet'], {
         state: {
@@ -297,6 +298,7 @@ const shipData = [
             cNRES: result.value//required cancel reason in popup
           }
           const res = await this.departureService.updateTHCLTL(filter, status);
+          await this.departureService.updateVehicleStatus({vehNo:evnt.data.VehicleNo});
           await this.departureService.deleteTrip({ cID: this.storage.companyCode, tHC: evnt.data.TripID });
           evnt.data.reason= result.value;
           this.departureService.updateDocket(evnt.data);

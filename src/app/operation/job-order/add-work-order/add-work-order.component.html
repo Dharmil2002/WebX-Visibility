@@ -1,0 +1,211 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
+  <form [formGroup]="WorkOrderForm">
+    <app-form-webxpress
+      [form]="WorkOrderForm"
+      [FormTitle]="'Work Order Summary'"
+      [formData]="jsonControlWorkOrderArray"
+      (functionCallEmitter)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)"
+    >
+    </app-form-webxpress>
+  </form>
+  <div *ngIf="selectedcategory === 'Maintenance'">
+    <app-generic-table-v2
+      *ngIf="tableLoad"
+      [FormTitle]="'Work Cost Summary'"
+      [dynamicControls]="dynamicControls"
+      [columnHeader]="columnHeader"
+      [tableData]="tableData"
+      [staticField]="staticFields"
+      [addAndEditPath]="addAndEditPath"
+    >
+    </app-generic-table-v2>
+
+    <button
+      matTooltip="Add Maintenance Service Details"
+      mat-stroked-button
+      class="filter_btn"
+      [ngStyle]="{
+        'margin-left': '85%',
+        top: '50px',
+        position: 'relative',
+        'z-index': '1'
+      }"
+      (click)="addDetail('ServiceDetails')"
+      [disabled]="!this.ServiceDetailsForm.valid"
+    >
+      <mat-icon>add</mat-icon>
+      Add New
+    </button>
+    <form [formGroup]="ServiceDetailsForm">
+      <app-form-webxpress
+        [form]="ServiceDetailsForm"
+        [FormTitle]="'Service Details'"
+        [formData]="jsonControlServiceDetailsArray"
+        (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)"
+      >
+      </app-form-webxpress>
+    </form>
+    <app-generic-table-v2
+      *ngIf="isServiceDetailsLoad"
+      [FormTitle]="''"
+      [dynamicControls]="dynamicControls"
+      [columnHeader]="ServiceDetailsColumnHeader"
+      [tableData]="tableData1"
+      [boxData]="this.KPICountData"
+      [staticField]="ServiceDetailsStaticFields"
+      [addAndEditPath]="addAndEditPath"
+      [menuItems]="menuItems"
+      [menuItemFlag]="menuItemflag"
+      (menuItemClicked)="handleMenuItemClick($event)"
+    >
+    </app-generic-table-v2>
+    <button
+      matTooltip="Add Maintenance Spare Details"
+      mat-stroked-button
+      class="filter_btn"
+      [ngStyle]="{
+        'margin-left': '85%',
+        top: '50px',
+        position: 'relative',
+        'z-index': '1'
+      }"
+      (click)="addDetail('SpareDetails')"
+      [disabled]="!this.SpareDetailsForm.valid"
+    >
+      <mat-icon>add</mat-icon>
+      Add New
+    </button>
+    <form [formGroup]="SpareDetailsForm">
+      <app-form-webxpress
+        [form]="SpareDetailsForm"
+        [FormTitle]="'Spare Details'"
+        [formData]="jsonControlSpareDetailsArray"
+        (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)"
+      >
+      </app-form-webxpress>
+    </form>
+    <app-generic-table-v2
+      *ngIf="isSpareDetailsLoad"
+      [FormTitle]="''"
+      [dynamicControls]="dynamicControls"
+      [columnHeader]="SpareDetailsColumnHeader"
+      [tableData]="tableData2"
+      [boxData]="this.KPICountData2"
+      [staticField]="SpareDetailsStaticFields"
+      [addAndEditPath]="addAndEditPath"
+      [menuItems]="menuItems"
+      [menuItemFlag]="menuItemflag"
+      (menuItemClicked)="handleMenuItemClick($event)"
+    >
+    </app-generic-table-v2>
+  </div>
+  <div *ngIf="selectedcategory === 'Battery management'">
+    <form [formGroup]="BatteryChangeForm">
+      <app-form-webxpress
+        [form]="BatteryChangeForm"
+        [FormTitle]="'Battery Details'"
+        [formData]="jsonControlBatteryChangeArray"
+        [className]="'col-xl-6 col-lg-6 col-md-4 col-sm-4 mb-2'"
+        (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)"
+      >
+      </app-form-webxpress>
+    </form>
+    <form [formGroup]="LabourDetailsForm">
+      <app-form-webxpress
+        [form]="LabourDetailsForm"
+        [FormTitle]="'Labour Details'"
+        [formData]="jsonControlLabourDetailsArray"
+        (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)"
+      >
+      </app-form-webxpress>
+    </form>
+  </div>
+  <div *ngIf="selectedcategory === 'Tyre management'">
+    <button
+      matTooltip="Add Maintenance Tyre Details"
+      mat-stroked-button
+      class="filter_btn"
+      [ngStyle]="{
+        'margin-left': '85%',
+        top: '50px',
+        position: 'relative',
+        'z-index': '1'
+      }"
+      (click)="addDetail('TyreDetails')"
+      [disabled]="!this.TyreDetailsForm.valid"
+    >
+      <mat-icon>add</mat-icon>
+      Add New
+    </button>
+    <form [formGroup]="TyreDetailsForm">
+      <app-form-webxpress
+        [form]="TyreDetailsForm"
+        [FormTitle]="'Tyre Details'"
+        [formData]="jsonControlTyreDetailsArray"
+        (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)"
+      >
+      </app-form-webxpress>
+    </form>
+    <app-generic-table-v2
+      *ngIf="isTyreDetailsLoad"
+      [FormTitle]="'Tyre Details'"
+      [dynamicControls]="dynamicControls"
+      [columnHeader]="TyreDetailsColumnHeader"
+      [tableData]="tableData3"
+      [staticField]="TyreDetailsStaticFields"
+      [addAndEditPath]="addAndEditPath"
+      [menuItems]="menuItems"
+      [menuItemFlag]="menuItemflag"
+      (menuItemClicked)="handleMenuItemClick($event)"
+    >
+    </app-generic-table-v2>
+    <form [formGroup]="LabourDetailsForm">
+      <app-form-webxpress
+        [form]="LabourDetailsForm"
+        [FormTitle]="'Labour Details'"
+        [formData]="jsonControlLabourDetailsArray"
+        (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)"
+      >
+      </app-form-webxpress>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+      <div class="example-button-row d-flex justify-content-end">
+        <button mat-button (click)="cancel()">Back</button>
+        <button
+          class="msr-3"
+          mat-raised-button
+          color="primary"
+          (click)="save()"
+          [disabled]="
+            !(
+              WorkOrderForm.valid &&
+              (selectedcategory === 'Maintenance'
+                ? tableData1.length > 0 
+                : selectedcategory === 'Battery management'
+                ? BatteryChangeForm.valid && LabourDetailsForm.valid
+                : tableData3.length > 0 && LabourDetailsForm.valid)
+            )
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</app-common-wrapper-webxpress>

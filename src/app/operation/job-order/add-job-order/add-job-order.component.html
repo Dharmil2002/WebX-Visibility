@@ -1,0 +1,13 @@
+
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <form class="register-form m-4" [formGroup]="JobOrderForm">
+    <app-form-webxpress [form]="JobOrderForm" 
+    [FormTitle]="'Job Summary'" 
+    [formData]="jsonControlJobOrderArray"
+    [showSaveAndCancelButton]="true"
+    [submit]="submit"
+    (callFunction)="functionCallHandler($event)"
+    (functionCallEmitter)="functionCallHandler($event)"
+    ></app-form-webxpress>
+</form>
+</app-common-wrapper-webxpress>

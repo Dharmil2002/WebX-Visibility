@@ -1,0 +1,20 @@
+<div class="paddingdiv">
+  <app-generic-table-v2
+    *ngIf="!tableLoad"
+    [tableData]="tableData"
+    [dynamicControls]="dynamicControls"
+    [columnHeader]="columnHeader"
+    [staticField]="staticField"
+    [filterColumn]="filterColumn"
+    [allColumnFilter]="allColumnFilter"
+    [addAndEditPath]="addAndEditPath"
+    (functionCallEmitter)="functionCallHandler($event)"
+    [menuItems]="menuItems"
+    [menuItemFlag]="menuItemflag"
+    (menuItemClicked)="handleMenuItemClick($event)"
+
+  >
+  </app-generic-table-v2>
+ 
+  <!-- [EventButtons]="EventButton" -->
+</div>

@@ -80,6 +80,7 @@ import { DebitNoteRegisterReportComponent } from './debit-note-register-report/d
 import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
+import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -165,7 +166,8 @@ import { AdviceRegisterComponent } from './advice-register/advice-register.compo
     DebitNoteRegisterReportComponent,
     BalanceSheetViewDetailsComponent,
     ProfitAndLossViewDetailsVouchersListComponent,
-    AdviceRegisterComponent
+    AdviceRegisterComponent,
+    GcnFlowReportComponent
   ],
   exports: [],
 

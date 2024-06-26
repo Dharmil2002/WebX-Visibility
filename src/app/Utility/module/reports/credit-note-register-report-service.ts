@@ -13,7 +13,6 @@ export class CreditNoteRegisterReportService {
   ) {}
 
   async getcustomerGstRegisterReportDetail(data) {
-    debugger;
     let matchQuery = {
       ... {tYP:{D$eq:'C'}},
       ...(data.DocNos && data.DocNos.length > 0

@@ -190,7 +190,6 @@ export class ThcSummaryComponent implements OnInit {
         if (data.label.label === "Cancel THC") {
           const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
           const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
-
           Swal.fire({
             title: 'Reason For Cancel?',
             html: `<select id="swal-select1" class="swal2-select">${options}</select>`,
@@ -218,6 +217,7 @@ export class ThcSummaryComponent implements OnInit {
               const res = await this.thcService.updateTHC(filter, status);
               thcDetail.reason = result.value;
               this.thcService.updateDocket(thcDetail);
+              this.thcService.updateVehicle({status:"Available"},{vehNo:thcDetail.vEHNO});
               if (res) {
                 // Reverse the accounting entry for the THC
                 if (thcDetail?.vNO) {

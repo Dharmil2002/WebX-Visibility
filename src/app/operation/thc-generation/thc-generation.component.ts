@@ -1065,7 +1065,7 @@ export class ThcGenerationComponent implements OnInit {
     this.tableData = [];
 
     //this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, fromCity.toUpperCase(), null, null, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
-    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT, tripDate, this.DocketFilterData.eDT, this.DocketsContainersWise);
+    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT,  this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
     const filteredShipments = this.allShipment;
     const addEditAction = (shipments) => {
       return shipments.map((shipment) => {

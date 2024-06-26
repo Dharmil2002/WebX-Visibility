@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { firstValueFrom } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { DataService } from "src/app/core/service/job-order.service";
 @Component({
   selector: "app-job-orders",
   templateUrl: "./job-orders.component.html",
@@ -30,28 +31,33 @@ export class JobOrdersComponent implements OnInit {
     jOBNO: {
       Title: "Job Order",
       class: "matcolumnleft",
-      Style: "max-width:100px",
+      // Style: "max-width:100px",
+      Style: "min-width:80px",
       sticky: true,
     },
     wCNO: {
       Title: "Work Orders",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      // Style: "max-width:100px",
+      Style: "min-width:80px",
     },
     vEHNO: {
       Title: "Vehicle ",
       class: "matcolumnleft",
-      Style: "max-width:100px",
+      // Style: "max-width:100px",
+      Style: "min-width:80px",
     },
     jDT: {
       Title: "Job Order Date",
       class: "matcolumncenter",
-      Style: "max-width:100px",
+      // Style: "max-width:100px",
+      Style: "min-width:80px",
     },
     sTS: {
       Title: "Status",
       class: "matcolumnleft",
-      Style: "max-width:100px",
+      // Style: "max-width:100px",
+      Style: "min-width:80px",
     },
     actionsItems: {
       Title: "Action",
@@ -66,7 +72,8 @@ export class JobOrdersComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private operation: OperationService,
-    private storage: StorageService
+    private storage: StorageService,
+    private dataService: DataService,
   ) {
     this.addAndEditPath = "Operation/AddJobOrder";
     this.allColumnFilter = this.columnHeader;
@@ -76,7 +83,14 @@ export class JobOrdersComponent implements OnInit {
   }
   async handleMenuItemClick(data) {
     if (data.label.label == "Add work order") {
-      this.router.navigateByUrl("/Operation/AddWorkOrder");
+      this.dataService.setMenuItemData(data); // Set data in DataService
+      this.router.navigateByUrl("/Operation/AddWorkOrder")
+      // this.router.navigate(["/Operation/AddWorkOrder"], {
+      //   state: {
+      //     data: data,
+      //   },
+      // });
+      
     }
   }
   async getJobOrdersData() {
@@ -87,11 +101,11 @@ export class JobOrdersComponent implements OnInit {
     const res = await firstValueFrom(
       this.operation.operationPost("generic/get", requestObject)
     );
-    if(res.success){
+    if (res.success) {
       const data = res.data;
       const newArray = data.map((data) => ({
         ...data,
-        vEHNO:data.vEHD.vEHNO,
+        vEHNO: data.vEHD.vEHNO,
         actions: ["Add work order", "Close Job Order"],
       }));
       this.tableData = newArray;

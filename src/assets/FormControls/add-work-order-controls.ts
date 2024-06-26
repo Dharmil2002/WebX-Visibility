@@ -14,17 +14,17 @@ export class WorkOrderFormControls {
         name: "vehiclenumber",
         label: "Vehicle Number",
         placeholder: "Vehicle Number",
-        type: "dropdown",
-        value: WorkOrder?.vehiclenumber,
+        type: "text",
+        value:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [
         ],
         generatecontrol: true,
-        disable: false,
+        disable: true,
         additionalData: {
-          showNameAndValue: false,
+          // showNameAndValue: false,
         },
       },
       {
@@ -37,7 +37,7 @@ export class WorkOrderFormControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
         ],
       },
@@ -52,7 +52,7 @@ export class WorkOrderFormControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
         ],
       },
@@ -66,7 +66,7 @@ export class WorkOrderFormControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
       },
       {
@@ -79,7 +79,7 @@ export class WorkOrderFormControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
         // additionalData: {
         //     maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),

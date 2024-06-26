@@ -24,6 +24,7 @@ import { HttpClient } from "@angular/common/http";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { calculateTotalField } from "../../unbilled-prq/unbilled-utlity";
+import { DataService } from "src/app/core/service/job-order.service";
 @Component({
   selector: "app-add-work-order",
   templateUrl: "./add-work-order.component.html",
@@ -78,21 +79,24 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
   menuItemflag = true;
   KPICountData: { count: any; title: string; class: string }[];
   KPICountData2: { count: any; title: string; class: string }[];
+  menuItemData: any;
   constructor(
     private http: HttpClient,
     private fb: UntypedFormBuilder,
     private storage: StorageService,
     private router: Router,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private dataService: DataService
   ) {
     this.companyCode = this.storage.companyCode;
     this.WorkOrderModel = new WorkOrderModel({});
+    this.menuItemData = this.dataService.getMenuItemData();    
   }
   ngOnInit(): void {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.WorkOrderModel =
-        this.router.getCurrentNavigation().extras.state.data;
+        this.router.getCurrentNavigation().extras.state.data;        
       this.isUpdate = true;
       this.breadscrums[0].active = "Work Order Modify";
       this.breadscrums[0].title = "Work Order Modify";
@@ -143,12 +147,23 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     ]);
   }
   ngAfterViewInit(): void {
+    this.WorkOrderForm.controls["orderdate"].disable()
     this.http.get(this.jsonUrl).subscribe((res) => {
       this.data = res;
       let tableArray = this.data["data"];
       this.tableData = tableArray;
       this.tableLoad = false;
     });
+    if(!this.menuItemData){
+      this.router.navigateByUrl("Operation/JobOrder")
+    } else{
+    const data=this.menuItemData.data
+      this.WorkOrderForm.controls["vehiclenumber"].patchValue(data.vEHNO)    
+      this.WorkOrderForm.controls["oem"].patchValue(data.vEHD.oEM) 
+      this.WorkOrderForm.controls["model"].patchValue(data.vEHD.mODEL) 
+      this.WorkOrderForm.controls["orderNo"].patchValue(data.jOBNO) 
+      this.WorkOrderForm.controls["orderdate"].patchValue(data.jDT) 
+    }
   }
 
   SelectedCategory() {

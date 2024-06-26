@@ -33,7 +33,7 @@ export class JobOrderFormControls {
         },
         functions:{
           onModel:"Reset",
-          onOptionSelect: "getVehicleTypeDetail",
+          onOptionSelect: "getVehicleData",
         }
       },
       {

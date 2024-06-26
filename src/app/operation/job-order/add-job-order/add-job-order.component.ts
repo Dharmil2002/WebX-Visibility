@@ -39,7 +39,7 @@ export class AddJobOrderComponent implements OnInit {
     private router: Router,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private operation: OperationService,
+    private operation: OperationService
   ) {
     this.companyCode = this.storage.companyCode;
     this.JobOrderModel = new JobOrderModel({});
@@ -53,8 +53,8 @@ export class AddJobOrderComponent implements OnInit {
       this.submit = "Modify";
     }
     this.initializeFormControl();
-    this.getVehicleData();
-    this.getJobOrdersData()
+    this.getVehicleStatus();
+    this.getJobOrdersData();
   }
   initializeFormControl() {
     this.JobOrderFormControls = new JobOrderFormControls(
@@ -73,58 +73,95 @@ export class AddJobOrderComponent implements OnInit {
       this.jsonControlJobOrderArray,
     ]);
   }
-  async getVehicleData() {
+
+  async getVehicleStatus() {
     const req = {
       companyCode: this.companyCode,
-      filter: {},
-      collectionName: "vehicle_detail",
+      collectionName: "vehicle_status",
+      filter: { vendorType: "Own" },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-    const vehicledata = res?.data;
-    const filteredvehicledata = this.getFilteredVehicleDetails(vehicledata);
+    const data = res?.data;
+    const vehicledata = data.map((x) => {
+      return {
+        name: x.vehNo,
+        value: x.vehNo,
+      };
+    });
     this.filter.Filter(
       this.jsonControlJobOrderArray,
       this.JobOrderForm,
-      filteredvehicledata,
+      vehicledata,
       this.vehicleNo,
       this.vehicleNoStatus
     );
   }
-  getFilteredVehicleDetails(data: any) {
-    return data
-      .filter((element) => element.isActive)
-      .map((element) => ({
-        name: element.vehicleNo,
-        value: element.vehicleType,
-      }));
-  }
-  Reset(){
-    if(!this.JobOrderForm.controls["vehicleNo"].value){
-      this.JobOrderForm.controls["oem"].reset()
-      this.JobOrderForm.controls["model"].reset()
+  async getVehicleData() {
+    const vehicleNovalue = this.JobOrderForm.controls["vehicleNo"].value;
+    const request = {
+      companyCode: this.storage.companyCode,
+      collectionName: "job_order_headers",
+      filter: { vEHNO: vehicleNovalue.name },
+    };
+    const joborderdata = await firstValueFrom(
+      this.operation.operationPost("generic/get", request)
+    );
+    if (joborderdata.success && joborderdata.data.length > 0) {
+      // Display an error message
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `This ${vehicleNovalue.name} Number Vehicle is already  in Maintenance! Please try with another!`,
+        showConfirmButton: true,
+      });
+      this.JobOrderForm.controls["vehicleNo"].setValue("");
+      return;
+    } else {
+      const req = {
+        companyCode: this.companyCode,
+        filter: { vehicleNo: vehicleNovalue.name },
+        collectionName: "vehicle_detail",
+      };
+      const res = await firstValueFrom(
+        this.masterService.masterPost("generic/get", req)
+      );
+      const data = res?.data;
+      const vehicledata = data.map((x) => {
+        return {
+          name: x.vehicleNo,
+          value: x.vehicleType,
+        };
+      });
+      if (vehicledata.length > 0) {
+        this.VehicleTypeDetail(vehicledata);
+      }
     }
   }
-  async getVehicleTypeDetail(){
-    const vehicleNovalue=this.JobOrderForm.controls["vehicleNo"].value;
-    console.log(vehicleNovalue);
+  async VehicleTypeDetail(data) {
+    const dataObject = Object.fromEntries(
+      data.flatMap(({ name, value }) => [
+        ["name", name],
+        ["value", value],
+      ])
+    );
     const req = {
       companyCode: this.companyCode,
-      filter: {vehicleTypeName:vehicleNovalue.value},
       collectionName: "vehicleType_detail",
+      filter: { vehicleTypeName: dataObject.value },
     };
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-    const vehicletypedata = res?.data;
     const vehicleobject = Object.fromEntries(
-      vehicletypedata.flatMap(({ oem, oemmodel }) => [
-          ['oem', oem], ['oemmodel', oemmodel]
+      res.data.flatMap(({ oem, oemmodel }) => [
+        ["oem", oem],
+        ["oemmodel", oemmodel],
       ])
-  ); 
-  this.JobOrderForm.controls["oem"].setValue(vehicleobject.oem)
-  this.JobOrderForm.controls["model"].setValue(vehicleobject.oemmodel)
+    );
+    this.JobOrderForm.controls["oem"].setValue(vehicleobject.oem);
+    this.JobOrderForm.controls["model"].setValue(vehicleobject.oemmodel);
   }
   async getJobOrdersData() {
     const requestObject = {
@@ -134,12 +171,12 @@ export class AddJobOrderComponent implements OnInit {
     const res = await firstValueFrom(
       this.operation.operationPost("generic/get", requestObject)
     );
-    if(res.success){
+    if (res.success) {
       const data = res.data;
       const lastJobOrder = data[data.length - 1];
       const lastJobNo = lastJobOrder.jOBNO;
-      const lastFiveDigits = lastJobNo.split('/').pop();
-      this.counter=parseInt(lastFiveDigits)
+      const lastFiveDigits = lastJobNo.split("/").pop();
+      this.counter = parseInt(lastFiveDigits);
     }
   }
   async save() {
@@ -149,31 +186,51 @@ export class AddJobOrderComponent implements OnInit {
     const currentYearShort = currentYear.toString().slice(-2);
     const nextYearShort = nextYear.toString().slice(-2);
     const yearSegment = `${currentYearShort}_${nextYearShort}`;
-    const randomNumber = "JS/" + this.storage.branch + "/" + yearSegment + "/" + `0000${newNumberString}`;
-    const data={
-      cID:this.storage.companyCode,
-      docNo:randomNumber,
-      jOBNO:randomNumber,
-      vEHD:{
-        vEHNO:this.JobOrderForm.controls["vehicleNo"].value.name,
-        oEM:this.JobOrderForm.controls["oem"].value,
-        mODEL:this.JobOrderForm.controls["model"].value,
+    const randomNumber =
+      "JS/" +
+      this.storage.branch +
+      "/" +
+      yearSegment +
+      "/" +
+      `0000${newNumberString}`;
+    const data = {
+      _id: `${this.storage.companyCode}-${randomNumber}`,
+      cID: this.storage.companyCode,
+      docNo: randomNumber,
+      jOBNO: randomNumber,
+      vEHD: {
+        vEHNO: this.JobOrderForm.controls["vehicleNo"].value.name,
+        oEM: this.JobOrderForm.controls["oem"].value,
+        mODEL: this.JobOrderForm.controls["model"].value,
       },
-      jDT:this.JobOrderForm.controls["orderdate"].value,
-      wNO:0,
-      tCST:"",
-      sTS:"Generated",
-      sKM:this.JobOrderForm.controls["startKm"].value,
-      lOC:this.storage.branch,
-      eNTBY:this.storage.userName,
-      eNTDT:new Date(),
-      eNTLOC:this.storage.branch,
-    }
+      vEHNO: this.JobOrderForm.controls["vehicleNo"].value.name,
+      jDT: this.JobOrderForm.controls["orderdate"].value,
+      jCDT: null,
+      wNO: 0,
+      wCNO: 0,
+      sKM: this.JobOrderForm.controls["startKm"].value,
+      cKM: 0,
+      tCST: 0,
+      sTS: "Generated",
+      lOC: this.storage.branch,
+      cLTP: null,
+      cL: null,
+      cLDT: null,
+      cLACDT: null,
+      cRMRK: null,
+      cLBY: null,
+      eNTBY: this.storage.userName,
+      eNTDT: new Date(),
+      eNTLOC: this.storage.branch,
+      mODBY: null,
+      mODDT: null,
+      mODLOC: null,
+    };
     const createReq = {
       companyCode: this.companyCode,
       collectionName: "job_order_headers",
       data: data,
-      filter:{companyCode: this.companyCode,}
+      filter: { companyCode: this.companyCode },
     };
     const res = await firstValueFrom(
       this.operation.operationPost("generic/create", createReq)
@@ -187,6 +244,12 @@ export class AddJobOrderComponent implements OnInit {
         showConfirmButton: true,
       });
       this.router.navigateByUrl("/Operation/JobOrder");
+    }
+  }
+  Reset() {
+    if (!this.JobOrderForm.controls["vehicleNo"].value) {
+      this.JobOrderForm.controls["oem"].reset();
+      this.JobOrderForm.controls["model"].reset();
     }
   }
   cancel() {

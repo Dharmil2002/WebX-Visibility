@@ -56,13 +56,13 @@ export class DepartureService {
       Hrs: this.computeHoursDifference(new Date(), new Date(new Date().getTime() + 10 * 60000)).toFixed(2),
       status: element.sTS || "1",
       actions: this.statusActions[`${element.sTS}`] || keys.defaultAction || "Create Trip",
-      location: element?.cLOC || element?.controlLoc || ""
+      location: element?.cLOC || element?.controlLoc || "",
     }));
     try {
       const tripDetails = await this.fetchData(Collections.trip_Route_Schedule, { cLOC: this.storage.branch, iSACT: true });
       const route = await this.fetchData(Collections.route_Master_LocWise, { controlLoc: this.storage.branch, isActive: true });
       const adHoc = await this.fetchData(Collections.adhoc_routes, { cLOC: this.storage.branch, iSACT: true });
-      const departureDetails = formatDetails(tripDetails, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Update Status' });
+      const departureDetails = formatDetails(tripDetails, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Update Trip' });
       const routeDetails = formatDetails(route, { routeCodeKey: 'routeId', routeNameKey: 'routeName', defaultAction: 'Create Trip' });
       const adHocDetails = formatDetails(adHoc, { routeCodeKey: 'rUTCD', routeNameKey: 'rUTNM', defaultAction: 'Create Trip' });
       return [...departureDetails, ...routeDetails, ...adHocDetails];
@@ -109,7 +109,7 @@ export class DepartureService {
     let isLegExist = false;
     let thc_movment = await firstValueFrom(this.operation.operationMongoPost("generic/getOne", getLeg));
 
-    const getstatus= {
+    const getstatus = {
       companyCode: this.storage.companyCode,
       collectionName: "thc_summary_ltl",
       filter: { docNo: data.tripID },
@@ -445,20 +445,20 @@ export class DepartureService {
     return data.tripID;
   }
 
-  async getDocketDetails(filter){
-    const req={
-      companyCode:this.storage.companyCode,
-      collectionName:"docket_ops_det_ltl",
-      filter:filter
+  async getDocketDetails(filter) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_ops_det_ltl",
+      filter: filter
     }
-    const res= await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
+    const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
     return res.data;
   }
 
   async updateDocket(data) {
-    const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.TripID});
-    if(dockets && dockets.length>0){
-      dockets.forEach(async (x)=>{
+    const dockets = await this.getDocketDetails({ cID: this.storage.companyCode, tHC: data.TripID });
+    if (dockets && dockets.length > 0) {
+      dockets.forEach(async (x) => {
         let evnData = {
           _id: `${this.storage.companyCode}-${x.dKTNO}-0-EVN0001-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
           cID: this.storage.companyCode,
@@ -487,14 +487,17 @@ export class DepartureService {
         let reqBody = {
           companyCode: this.storage.companyCode,
           collectionName: "docket_ops_det_ltl",
-      filter:{dKTNO:x.dKTNO,sFX:x.sFX},
-      update:{
+          filter: { dKTNO: x.dKTNO, sFX: x.sFX },
+          update: {
+            tHC: "",
+            mFNO: "",
+            lSNO:"",
             sTS: DocketStatus.Booked,
             sTSNM: DocketStatus[DocketStatus.Booked],
-        mODDT:new Date(),
-        mODBY:this.storage.userName,
-        mODLOC:this.storage.branch,
-        oPSSTS:`Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+            mODDT: new Date(),
+            mODBY: this.storage.userName,
+            mODLOC: this.storage.branch,
+            oPSSTS: `Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
           }
         }
         await firstValueFrom(this.operation.operationMongoPut('generic/update', reqBody));
@@ -509,6 +512,16 @@ export class DepartureService {
       collectionName: "thc_summary_ltl",
       filter: filter,
       update: data
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+    return res
+  }
+  async updateVehicleStatus(filter) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "vehicle_status",
+      filter: filter,
+      update:{status:"Available"}
     }
     const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
     return res

@@ -371,7 +371,8 @@ export class ThcService {
         sTSNM: DocketStatus[DocketStatus.Booked],
         mODDT:new Date(),
         mODBY:this.storage.userName,
-        tHC:"",
+        tHC:null,
+        mF:null,
         mODLOC:this.storage.branch,
         oPSSTS:`Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
     }
@@ -381,4 +382,5 @@ export class ThcService {
  
   }
   }
+  
 }

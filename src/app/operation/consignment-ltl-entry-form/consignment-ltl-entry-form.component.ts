@@ -184,6 +184,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     InvoiceAmount: 0.00,
     Yield: 0.00,
   }
+  isBoth: boolean;
+  checkboxChecked: boolean;
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -446,7 +448,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.consignmentForm.controls['risk'].setValue(rskType);
     this.consignmentForm.controls['pkgsType'].setValue(pkgType);
     this.freightForm.controls['freightRatetype'].setValue("");
-    this.freightForm.controls['rcm'].setValue("");
+    this.freightForm.controls['rcm'].setValue("Y");
     this.consignmentForm.controls['payType'].setValue("");
     this.consignmentForm.controls['transMode'].setValue(transMode);
     this.consignmentForm.controls['delivery_type'].setValue(delvryType);
@@ -911,23 +913,23 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     ]);
 
     let fields = fieldMap.get(name);
-
-    this.consignmentForm.controls[fields['cUSTNM']].setValue({ name: gstData.cUSTNM, value: gstData.cUSTCD, otherdetails: gstData });
-    this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData.cUSTPH);
-    this.consignmentForm.controls[fields['aLTPH']].setValue(gstData.aLTPH);
-    this.consignmentForm.controls[fields['aDD']].setValue({ name: gstData.aDD, value: gstData.aDD, otherdetails: gstData });
+   
+    this.consignmentForm.controls[fields['cUSTNM']].setValue(gstData?{ name: gstData.cUSTNM, value: gstData.cUSTCD, otherdetails: gstData }:"");
+    this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData?.cUSTPH||"");
+    this.consignmentForm.controls[fields['aLTPH']].setValue(gstData?.aLTPH||"");
+    this.consignmentForm.controls[fields['aDD']].setValue(gstData?{ name: gstData.aDD, value: gstData.aDD, otherdetails: gstData }:"");
   }
 
   async findWalkinGST(gstno) {
     const request = {
       companyCode: this.storage.companyCode,
       collectionName: "walkin_customers",
-      filters: {
+      filter: {
         gSTNO: gstno
       }
     };
     const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));
-    return res?.data
+    return Object.keys(res.data).length>0 ? res.data : null;
   }
   /*End*/
   async AddressDetails() {
@@ -1593,14 +1595,29 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   /*End*/
+  OnChangeCheckBox(event) {
+    this.checkboxChecked=event.event.checked;
+    this.isManual=this.checkboxChecked==true?false:true;
+    this.isUpdate=this.checkboxChecked==true?false:true;
+    this.consignmentForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
+  }
   checkDocketRules() {
     const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
     if (STYP) {
       const isManual = STYP.vAL === "M";
+      if(STYP.vAL!="B"){
       this.allFormControls.find(x => x.name == "docketNumber").disable = !isManual;
       this.consignmentForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
       this.isManual = isManual;
       this.isUpdate = isManual;
+      }
+      else{
+        this.isBoth= STYP.vAL === "B"
+        this.checkboxChecked=true
+        this.isManual=false;
+        this.consignmentForm.controls['docketNumber'].setValue("Computerized");
+      }
+     
     }
 
     const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
@@ -1741,7 +1758,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         await this.toPayAccouting();
       }
     }
-    else if (this.isManual) {
+    else if (this.isManual ) {
       await this.docketService.addDcrDetails(reqDkt?.docketsDetails, this.dcrDetail);
       let reqBody = {
         companyCode: this.storage.companyCode,

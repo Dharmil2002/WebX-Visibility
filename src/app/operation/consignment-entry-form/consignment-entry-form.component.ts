@@ -130,10 +130,12 @@ export class ConsignmentEntryFormComponent
   mseq: boolean;
   lastDoc: string;
   isManual: boolean;
+  checkboxChecked: boolean = true; // Checkbox is checked by default
   dcrDetail = {};
   conLoc: boolean;
   pageLoad: boolean;
   LoadType: any;
+  isBoth: boolean;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -1460,16 +1462,30 @@ export class ConsignmentEntryFormComponent
     }
   }
   /*End*/
+  OnChangeCheckBox(event) {
+    this.checkboxChecked=event.event.checked;
+    this.isManual=this.checkboxChecked==true?false:true;
+    this.isUpdate=this.checkboxChecked==true?false:true;
+    this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
+  }
   checkDocketRules() {
     const STYP = this.rules.find((x) => x.rULEID == "STYP" && x.aCTIVE);
     if (STYP) {
       const isManual = STYP.vAL === "M";
+      if(STYP.vAL!="B"){
       this.model.allformControl.find((x) => x.name == "docketNumber").disable =
         !isManual;
       this.model.consignmentTableForm.controls["docketNumber"].setValue(
         isManual ? "" : "Computerized"
       );
       this.isManual = isManual;
+    } 
+    else{
+      this.isBoth= STYP.vAL === "B"
+      this.checkboxChecked=true
+      this.isManual=false;
+      this.model.consignmentTableForm.controls['docketNumber'].setValue("Computerized");
+    }
     }
     const ELOC = this.rules.find((x) => x.rULEID == "ELOC" && x.aCTIVE);
     if (ELOC) {

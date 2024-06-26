@@ -2,6 +2,7 @@
     <div *ngIf="basicFormControls">
         <form [formGroup]="consignmentForm">
             <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Basic Detail'" [formData]="basicFormControls"
+                [DisplayCheckbox]="isBoth"[CheckBoxMessage]="'Computerized'"[checkboxValue]="checkboxChecked"
                 (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
                 (callFunction)="functionCallHandler($event)" [MatButton]="(this.consignmentForm.value?.docketDate &&
                 this.consignmentForm.value?.toCity &&

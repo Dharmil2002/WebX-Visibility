@@ -13,9 +13,6 @@ export class DriverStatusRegisterService {
           private storage: StorageService,
      ) { }
      async getdriverRegisterReportDetail(data) {
-          debugger
-          // const loc = data.driverLoc.length > 0 ? { D$in: data.driverLoc } : []
-
           let statusArray = [];
           if (data.status === "1") {
                statusArray = [{ 'activeFlag': { 'D$eq': true } }];
@@ -47,12 +44,11 @@ export class DriverStatusRegisterService {
                          ...matchQuery,
                     },
                     projectFilters: {
-                         ...(data.status ? (data.status === "3" ? { ASSstatus: "In-Transit" } : data.status === "4" ? { ASSstatus: "Available" } : {}) : {}),
+                         ...(data.status ? (data.status === "3" ? { ASSstatus: {D$in:["In-Transit","In Transit"] }} : data.status === "4" ? { ASSstatus: "Available" } : {}) : {}),
                          ...(data.driverLoc.length>0 ? (data.driverLoc? { controllBranch:{D$in:data.driverLoc}} : {}) : {})
                     }
                }
           }
-          console.log(reqBody);
 
           const res = await firstValueFrom(
                this.masterServices.masterMongoPost("generic/getReportData", reqBody)

@@ -96,6 +96,7 @@ export class PrqEntryPageComponent implements OnInit {
     name: "Find Contract",
     iconName: "search",
   };
+  isDisbled: boolean=false;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -342,8 +343,34 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
-    
+    if (!this.prqEntryTableForm.valid) {
+      this.prqEntryTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
+    if(this.isDisbled){
+      Swal.fire({
+        icon: "info",
+        title: "Processing",
+        text: "Your data is being processed, please wait...",
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
     this.iSShow = false;
+    this.isDisbled=true;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
     prqDetails["cID"] = this.storage.companyCode;

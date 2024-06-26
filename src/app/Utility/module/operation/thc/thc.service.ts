@@ -18,7 +18,6 @@ export class ThcService {
     ) { }
 
     async getShipmentFiltered(prqNo = null, fromCity = null, toCity = null, stockCity = "", fromDate = null, toDate = null, containersWise = false) {
-
         let matchQuery = {
             'D$and': [
                 { sTS: { D$in: [1, 4] } },

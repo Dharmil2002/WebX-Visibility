@@ -2556,7 +2556,7 @@ export class ThcGenerationComponent implements OnInit {
         preperedFor: "Vendor",
         partyCode: "" + data?.Vendor_Code || "",
         partyName: data?.Vendor_Name || "",
-        partyState: "H" || "",
+        partyState: "",
         entryBy: this.storage.userName,
         entryDate: new Date(),
         panNo: data?.Vendor_pAN || "",

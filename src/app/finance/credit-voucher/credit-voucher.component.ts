@@ -11,11 +11,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 import { Router } from '@angular/router';
 import { DriversFromApi, GetAccountDetailFromApi, GetBankDetailFromApi, GetLocationDetailFromApi, UsersFromApi, customerFromApi, vendorFromApi } from '../Debit Voucher/debitvoucherAPIUtitlity';
-import { VoucherInstanceType, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { CreditVoucherPreviewComponent } from './credit-voucher-preview/credit-voucher-preview.component';
 import { financialYear } from 'src/app/Utility/date/date-utils';
-import { CreditVoucherDataRequestModel, CreditVoucherRequestModel } from 'src/app/Models/Finance/CreditVoucher';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import Swal from 'sweetalert2';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
@@ -82,8 +81,8 @@ export class CreditVoucherComponent implements OnInit {
   AlljsonControlCreditVoucherPaymentDetailsArray: any;
   AccountsBanksList: any;
   LoadVoucherDetails = true;
-  creditVoucherRequestModel = new CreditVoucherRequestModel();
-  creditVoucherDataRequestModel = new CreditVoucherDataRequestModel();
+  VoucherRequestModel = new VoucherRequestModel();
+  VoucherDataRequestModel = new VoucherDataRequestModel();
   creditAgainstDocumentList: any = [];
   constructor(
     private fb: UntypedFormBuilder,
@@ -516,37 +515,58 @@ export class CreditVoucherComponent implements OnInit {
         const PaymentAmount = parseFloat(this.creditVoucherPaymentSummaryForm.get("PaymentAmount").value);
         const NetPayable = parseFloat(this.creditVoucherPaymentSummaryForm.get("NetPayable").value);
 
-        this.creditVoucherRequestModel.companyCode = this.storage.companyCode;
-        this.creditVoucherRequestModel.docType = "VR";
-        this.creditVoucherRequestModel.branch = this.creditVoucherSummaryForm.value.Accountinglocation?.name
-        this.creditVoucherRequestModel.finYear = financialYear
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.creditVoucherSummaryForm.value.Accountinglocation?.name
+        this.VoucherRequestModel.finYear = financialYear
 
-        this.creditVoucherDataRequestModel.voucherNo = "";
-        this.creditVoucherDataRequestModel.transCode = VoucherInstanceType.CreditVoucherCreation;
-        this.creditVoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation];
-        this.creditVoucherDataRequestModel.voucherCode = VoucherType.CreditVoucher;
-        this.creditVoucherDataRequestModel.voucherType = VoucherType[VoucherType.CreditVoucher];
-        this.creditVoucherDataRequestModel.transDate = this.creditVoucherSummaryForm.value.TransactionDate
-        this.creditVoucherDataRequestModel.docType = "VR";
-        this.creditVoucherDataRequestModel.branch = Branch;
-        this.creditVoucherDataRequestModel.finYear = financialYear
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.CreditVoucherCreation;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.CreditVoucherCreation];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.CreditVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.CreditVoucher];
+        this.VoucherDataRequestModel.transDate = this.creditVoucherSummaryForm.value.TransactionDate
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = Branch;
+        this.VoucherDataRequestModel.finYear = financialYear
 
-        this.creditVoucherDataRequestModel.accLocation = this.creditVoucherSummaryForm.value.Accountinglocation?.name;
-        this.creditVoucherDataRequestModel.receivedfrom = this.creditVoucherSummaryForm.value.Receivedfrom;
-        this.creditVoucherDataRequestModel.partyCode = "" + this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888";
-        this.creditVoucherDataRequestModel.partyName = this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName;
-        this.creditVoucherDataRequestModel.entryBy = this.creditVoucherSummaryForm.value.Preparedby;
-        this.creditVoucherDataRequestModel.entryDate = new Date();
-        this.creditVoucherDataRequestModel.netPayable = NetPayable;
-        this.creditVoucherDataRequestModel.roundOff = +(NetPayable - PaymentAmount).toFixed(2);
-        this.creditVoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.accLocation = this.creditVoucherSummaryForm.value.Accountinglocation?.name;
+        this.VoucherDataRequestModel.preperedFor = this.creditVoucherSummaryForm.value.Receivedfrom;
+        this.VoucherDataRequestModel.partyCode = "" + this.creditVoucherSummaryForm.value.PartyName?.value ?? "8888";
+        this.VoucherDataRequestModel.partyName = this.creditVoucherSummaryForm.value.PartyName?.name ?? this.creditVoucherSummaryForm.value.PartyName;
+        this.VoucherDataRequestModel.partyState = '';
+        this.VoucherDataRequestModel.entryBy = this.storage.getItem(StoreKeys.UserId);
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = "";
 
-        this.creditVoucherDataRequestModel.paymentMode = this.creditVoucherPaymentDetailsForm.value.ReceiptMode;
-        this.creditVoucherDataRequestModel.refNo = this.creditVoucherPaymentDetailsForm.value.ChequeOrRefNo;
-        this.creditVoucherDataRequestModel.accountName = this.creditVoucherPaymentDetailsForm.value.DepositBank.name;
-        this.creditVoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
-        this.creditVoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
-        this.creditVoucherDataRequestModel.onAccount = this.creditVoucherPaymentDetailsForm.value.onAccount;
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = 0;
+        this.VoucherDataRequestModel.SGST = 0;
+        this.VoucherDataRequestModel.CGST = 0;
+        this.VoucherDataRequestModel.UGST = 0;
+        this.VoucherDataRequestModel.GSTTotal = 0;
+
+        this.VoucherDataRequestModel.GrossAmount = NetPayable;
+        this.VoucherDataRequestModel.netPayable = NetPayable;
+        this.VoucherDataRequestModel.roundOff = +(NetPayable - PaymentAmount).toFixed(2);
+        this.VoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.transactionNumber = '';
+        this.VoucherDataRequestModel.paymentMode = this.creditVoucherPaymentDetailsForm.value.ReceiptMode;
+        this.VoucherDataRequestModel.refNo = this.creditVoucherPaymentDetailsForm.value.ChequeOrRefNo;
+        this.VoucherDataRequestModel.accountName = this.creditVoucherPaymentDetailsForm.value.DepositBank.name;
+        this.VoucherDataRequestModel.accountCode = this.creditVoucherPaymentDetailsForm.value.DepositBank.value;
+        this.VoucherDataRequestModel.date = this.creditVoucherPaymentDetailsForm.value.ChequeDate;
+        this.VoucherDataRequestModel.onAccount = this.creditVoucherPaymentDetailsForm.value.onAccount;
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
 
         let Accountdata = FinalListOfCreditVoucher.map(function (item) {
           return {
@@ -576,12 +596,12 @@ export class CreditVoucherComponent implements OnInit {
 
         var VoucherlineitemList = Accountdata;
 
-        this.creditVoucherRequestModel.details = VoucherlineitemList
-        this.creditVoucherRequestModel.data = this.creditVoucherDataRequestModel;
-        this.creditVoucherRequestModel.debitAgainstDocumentList = [];
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
 
         this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.creditVoucherRequestModel)
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
           .subscribe({
             next: (res: any) => {
               var CreditData = FinalListOfCreditVoucher.filter(item => item.Dr == "").map(function (item) {

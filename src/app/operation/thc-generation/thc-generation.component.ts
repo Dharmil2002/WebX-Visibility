@@ -2449,9 +2449,9 @@ export class ThcGenerationComponent implements OnInit {
           }
 
           let thcNumber = resThc.data?.mainData?.ops[0].docNo;
-          let voucherNumber = result.data.ops[0].vNO;
           let htmlContent;
           if (this.accountingOnThc) {
+            let voucherNumber = result.data.ops[0].vNO; 
             htmlContent = "THC Number is " + thcNumber + "<br>Voucher Number is " + voucherNumber;
           } else {
             htmlContent = "THC Number is " + thcNumber;
@@ -2555,7 +2555,7 @@ export class ThcGenerationComponent implements OnInit {
         preperedFor: "Vendor",
         partyCode: "" + data?.Vendor_Code || "",
         partyName: data?.Vendor_Name || "",
-        partyState: "H" || "",
+        partyState: "",
         entryBy: this.storage.userName,
         entryDate: new Date(),
         panNo: data?.Vendor_pAN || "",

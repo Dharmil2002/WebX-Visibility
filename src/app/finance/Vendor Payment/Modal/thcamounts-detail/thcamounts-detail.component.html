@@ -37,7 +37,7 @@
     <form *ngIf="THCAmountsForm" [formGroup]="THCAmountsForm">
         <app-form-webxpress [form]="THCAmountsForm" [formData]="THCAmountsArray"
             (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="''"
-            [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
+            [className]="'col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>

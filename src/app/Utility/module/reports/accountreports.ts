@@ -13,7 +13,6 @@ export class AccountReportService {
      constructor(private masterService: MasterService,
           private storage: StorageService,) { }
      async ProfitLossStatement(request) {
-
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "account_detail",
@@ -39,7 +38,7 @@ export class AccountReportService {
                     },
                     {
                          "D$lookup": {
-                              "from": "acc_trans_2425",
+                              "from": "acc_trans_" + request.FinanceYear,
                               "let": { "aCCCD": "$aCCD" },
                               "pipeline": [
                                    {
@@ -161,12 +160,15 @@ export class AccountReportService {
                     });
                     const TotalAmountLastFinYear = 0.00;
                     const NewTableList = reportData.flatMap((entry, index) => {
-                         const mainRow = {
+                         let mainRow = {
                               MainCategory: `${index + 1}. ${entry.MainCategory}`,
                               MainCategoryWithoutIndex: entry.MainCategory,
                               SubCategory: 'Total',
                               SubCategoryWithoutIndex: '',
-                              TotalAmountCurrentFinYear: (entry.Details.reduce((acc, item) => acc + item.TotalCredit, 0) - entry.Details.reduce((acc, item) => acc + item.TotalDebit, 0)).toFixed(2),
+                              TotalAmountCurrentFinYear: Number(
+                                   (entry.Details.reduce((acc, item) => acc + parseFloat(item.TotalCredit), 0) -
+                                        entry.Details.reduce((acc, item) => acc + parseFloat(item.TotalDebit), 0)).toFixed(2)
+                              ),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: '',
                               AccountDetails: '',
@@ -206,6 +208,13 @@ export class AccountReportService {
      getData() {
           return this.storage.getItem("PLReportsData");
      }
+     setRequestData(data: any) {
+          this.storage.setItem("PLReportsRequestData", JSON.stringify(data));
+     }
+
+     getRequestData() {
+          return this.storage.getItem("PLReportsRequestData");
+     }
 
      async GetTrialBalanceStatement(request) {
 
@@ -240,7 +249,6 @@ export class AccountReportService {
                                    return 0;
                               });
                               const totalRows = {};
-
                               const processedData = SortedData.flatMap(item => {
                                    const mainCategory = item.MainCategory;
 
@@ -429,6 +437,9 @@ export class AccountReportService {
                               });
                               break;
                     }
+               } else {
+                    return []
+
                }
           } catch (error) {
                console.error("Error:", error);
@@ -437,7 +448,6 @@ export class AccountReportService {
      }
 
      GetTypeWiseFilter(request) {
-
           switch (request.ReportType) {
                case "G":
                     return [
@@ -466,13 +476,30 @@ export class AccountReportService {
                                                                  'D$gte': [
                                                                       '$vDT', request.startdate
                                                                  ]
-                                                            }, 
+                                                            },
                                                             {
                                                                  'D$lte': [
                                                                       '$vDT', request.enddate
                                                                  ]
-                                                            }
-
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
                                                        ]
                                                   }
                                              }
@@ -586,7 +613,25 @@ export class AccountReportService {
                                                                  '$lte': [
                                                                       '$vDT', request.enddate
                                                                  ]
-                                                            }
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -706,7 +751,25 @@ export class AccountReportService {
                                                                  'D$eq': [
                                                                       '$pARTYTY', 'Vendor'
                                                                  ]
-                                                            }
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -834,7 +897,25 @@ export class AccountReportService {
                                                                  'D$eq': [
                                                                       '$pARTYTY', 'Customer'
                                                                  ]
-                                                            }
+                                                            },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -958,6 +1039,24 @@ export class AccountReportService {
                                                                       '$vDT', request.enddate
                                                                  ]
                                                             },
+                                                            request.ReportSubType != "" ? {
+                                                                 'D$eq': [
+                                                                      '$pARTYTY',
+                                                                      request.ReportSubType
+                                                                 ]
+                                                            } : "",
+                                                            request.subLedger.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$pARTYCD',
+                                                                      request.subLedger
+                                                                 ]
+                                                            } : "",
+                                                            request.accountCode.length > 0 ? {
+                                                                 'D$in': [
+                                                                      '$aCCCD',
+                                                                      request.accountCode
+                                                                 ]
+                                                            } : "",
 
                                                        ]
                                                   }
@@ -1220,6 +1319,9 @@ export class AccountReportService {
                               },
                               'TotalDebit': {
                                    'D$sum': '$transactions.dR'
+                              },
+                              'VoucherNoList': {
+                                   'D$addToSet': "$transactions.vNO"
                               }
                          }
                     }, {
@@ -1237,6 +1339,9 @@ export class AccountReportService {
                               },
                               'TotalDebit': {
                                    'D$sum': '$TotalDebit'
+                              },
+                              'VoucherNoList': {
+                                   'D$addToSet': "$VoucherNoList"
                               },
                               'AccountDetails': {
                                    'D$push': {
@@ -1259,6 +1364,18 @@ export class AccountReportService {
                                         'BSSchedule': '$_id.BSSchedule',
                                         'TotalCredit': '$TotalCredit',
                                         'TotalDebit': '$TotalDebit',
+                                        'VoucherNoList': {
+                                             'D$reduce': {
+                                                  'input': "$VoucherNoList",
+                                                  'initialValue': [],
+                                                  'in': {
+                                                       'D$concatArrays': [
+                                                            "$$value",
+                                                            "$$this"
+                                                       ]
+                                                  }
+                                             }
+                                        },
                                         'AccountDetails': '$AccountDetails'
                                    }
                               }
@@ -1304,7 +1421,8 @@ export class AccountReportService {
                               TotalAmountCurrentFinYear: totalAmountCurrentFinYear.toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: '',
-                              AccountDetails: ''
+                              AccountDetails: '',
+                              VouchersList: []
                          };
 
                          const subCategoryRows = entry.Details.map((detail, detailIndex) => ({
@@ -1313,7 +1431,8 @@ export class AccountReportService {
                               TotalAmountCurrentFinYear: (detail.TotalCredit - detail.TotalDebit).toFixed(2),
                               TotalAmountLastFinYear: TotalAmountLastFinYear.toFixed(2),
                               Notes: detail.BSSchedule || '',
-                              AccountDetails: detail.AccountDetails
+                              AccountDetails: detail.AccountDetails,
+                              VouchersList: detail.VoucherNoList
                          }));
 
                          // Collect unique BalanceCategoryName values

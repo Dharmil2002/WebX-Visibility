@@ -407,7 +407,9 @@ export class ConsignmentEntryFormComponent
     ]);
     this.commonDropDownMapping();
     this.model.consignmentTableForm.controls["payType"].setValue("P02");
-    //this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    this.model.consignmentTableForm.controls["risk"].setValue("O");
+    this.model.consignmentTableForm.controls["delivery_type"].setValue("DD");
 
     const filteredMode = this.model.movementType.find(
       (item) => item.name == this.storage.mode
@@ -427,6 +429,7 @@ export class ConsignmentEntryFormComponent
       this.getRules();
     }
     this.onRcmChange();
+    this.model.FreightTableForm.controls["rcm"].setValue('Y');
     this.model.FreightTableForm.controls["gstAmount"].disable();
     this.model.FreightTableForm.controls["gstChargedAmount"].disable();
   }
@@ -2026,8 +2029,8 @@ export class ConsignmentEntryFormComponent
       };
 
       let docketDetails = {
-        ...this.model.consignmentTableForm.value,
-        ...this.model.FreightTableForm.value,
+        ...this.model.consignmentTableForm.getRawValue(),
+        ...this.model.FreightTableForm.getRawValue(),
         ...invoiceDetails,
         ...containerDetail,
         ...id,
@@ -2054,8 +2057,7 @@ export class ConsignmentEntryFormComponent
       docketDetails["cnogst"] =
         this.model.consignmentTableForm.controls["cnogst"]?.value;
       docketDetails["cneAddress"] =
-        this.model.consignmentTableForm.controls["cneAddress"].value?.name ||
-        "";
+        this.model.consignmentTableForm.controls["cneAddress"].value?.name || "";
       docketDetails["cnegst"] =
         this.model.consignmentTableForm.controls["cnegst"]?.value;
       docketDetails["billingParty"] = bParty?.value;
@@ -2326,15 +2328,30 @@ export class ConsignmentEntryFormComponent
               Swal.fire({
                 icon: "success",
                 title: "Booked Successfully",
-                text: "DocketNo: " + dockNo,
+                text: "GCN No: " + dockNo,
                 showConfirmButton: true,
+                denyButtonText: 'Print',
+                showDenyButton: true,
+                showCancelButton: true,
+                cancelButtonText: 'Close'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                  }, 2000);
                   this.navService.navigateTotab("docket", "dashboard/Index");
+                }else if (result.isDenied) {
+                  // Handle the action for the deny button here.
+                  const templateBody = {
+                    templateName: "DKT",
+                    PartyField: "",
+                    DocNo: dockNo,
+                  };
+                  const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                  window.open(url, '', 'width=1000,height=800');
+                  this.route.navigateByUrl('Operation/ConsignmentEntry').then(() => {
+                    window.location.reload();
+                  });
+                }else if (result.isDismissed) {
+                  // Handle the action for the cancel button here.
+                  this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
                 }
               });
             }
@@ -2448,7 +2465,7 @@ export class ConsignmentEntryFormComponent
         icon: "success",
         title: "Docket Update Successfully",
         text:
-          "DocketNo: " +
+          "GCN No: " +
           this.model.consignmentTableForm.controls["docketNumber"].value,
         showConfirmButton: true,
       }).then((result) => {
@@ -2509,7 +2526,7 @@ export class ConsignmentEntryFormComponent
     Swal.fire({
       icon: "success",
       title: "Booked Successfully",
-      text: "DocketNo: " + dkt,
+      text: "GCN No: " + dkt,
       showConfirmButton: true,
     }).then((result) => {
       if (result.isConfirmed) {

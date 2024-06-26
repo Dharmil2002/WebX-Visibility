@@ -195,7 +195,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     ]);
 
     this.jsonPaymentSummaryArray =
-      this.vendorBillPaymentControl.getPaymentSummaryControl();
+      //this.vendorBillPaymentControl.getPaymentSummaryControl();
     this.AlljsonControlPaymentSummaryFilterArray = this.jsonPaymentSummaryArray;
     this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [
       this.jsonPaymentSummaryArray,
@@ -207,12 +207,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   }
   async getBillDetail(TableData) {
     this.isTableLode = false;
-
+    
     let data = TableData
       .filter(x => x.pendingAmount != 0)
       .map(x => ({
         ...x,
-        debitNote: 0,
+        debitNote: Number(x.TotalTHCAmount) - (Number(x.pendingAmount) + Number(x.PayedAmount)),
         payment: 0,
         isSelected: false,
         Date: x.Date,
@@ -287,14 +287,16 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.PaymentSummaryFilterForm.value.BalancePaymentlocation?.name;
     switch (PaymentMode) {
       case "Cheque":
-        filterFunction = (x) => x.name !== "CashAccount";
-
+        filterFunction = (x) => x.name !== "CashAccount" && x.name !== "JournalAccount";
         break;
       case "Cash":
-        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank";
+        filterFunction = (x) => x.name !== "ChequeOrRefNo" && x.name !== "Bank" && x.name !== "JournalAccount";
         break;
       case "RTGS/UTR":
-        filterFunction = (x) => x.name !== "CashAccount";
+        filterFunction = (x) => x.name !== "CashAccount" && x.name !== "JournalAccount";
+        break;
+      case "Journal":
+        filterFunction = (x) => x.name !== "CashAccount" && x.name !== "Bank" && x.name !== "ChequeOrRefNo";
         break;
     }
 
@@ -329,6 +331,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         CashAccount.clearValidators();
         CashAccount.updateValueAndValidity();
 
+        // Remove Journal Account
+        const JournalAccount = this.PaymentSummaryFilterForm.get("JournalAccount");
+        JournalAccount.setValue("");
+        JournalAccount.clearValidators();
+        JournalAccount.updateValueAndValidity();
+
         break;
       case "Cash":
         const responseFromAPICash = await GetAccountDetailFromApi(
@@ -360,8 +368,48 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         ChequeOrRefNoS.clearValidators();
         ChequeOrRefNoS.updateValueAndValidity();
 
+        // Remove Journal Account
+        const JournalAccounts = this.PaymentSummaryFilterForm.get("JournalAccount");
+        JournalAccounts.setValue("");
+        JournalAccounts.clearValidators();
+        JournalAccounts.updateValueAndValidity();
+
         break;
       case "RTGS/UTR":
+        break;
+      case "Journal":
+        const responseFromAPIJournal = await GetAccountDetailFromApi(
+          this.masterService);
+        this.filter.Filter(
+          this.jsonPaymentSummaryArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPIJournal,
+          "JournalAccount",
+          false
+        );
+
+        const JournalAccountS = this.PaymentSummaryFilterForm.get("JournalAccount");
+        JournalAccountS.setValidators([
+          Validators.required,
+          autocompleteObjectValidator(),
+        ]);
+        JournalAccountS.updateValueAndValidity();
+
+        const BankSS = this.PaymentSummaryFilterForm.get("Bank");
+        BankSS.setValue("");
+        BankSS.clearValidators();
+        BankSS.updateValueAndValidity();
+
+        const ChequeOrRefNoSS =
+          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        ChequeOrRefNoSS.setValue("");
+        ChequeOrRefNoSS.clearValidators();
+        ChequeOrRefNoSS.updateValueAndValidity();
+
+        const CashAccountSS = this.PaymentSummaryFilterForm.get("CashAccount");
+        CashAccountSS.setValue("");
+        CashAccountSS.clearValidators();
+        CashAccountSS.updateValueAndValidity();
         break;
     }
   }
@@ -449,7 +497,14 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
             return;
           }
         }
-
+        let
+          LeadgerDetails;
+        if (PaymentMode == "Cash") {
+          LeadgerDetails = PaymenDetails.CashAccount;
+        }
+        if (PaymentMode == "Journal") {
+          LeadgerDetails = PaymenDetails.JournalAccount;
+        }
         const NetPayable = parseFloat(
           this.TotalPaymentAmount.toFixed(2)
         );
@@ -461,8 +516,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.VendorBillPayment;
         this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.VendorBillPayment];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.DebitVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
+        this.VoucherDataRequestModel.voucherCode = PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher];
 
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transDate = new Date();
@@ -472,7 +527,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode = this.billData[0]?.vnCode ? this.billData[0]?.vnCode.toString() : '';
+        this.VoucherDataRequestModel.partyCode = "" + this.billData[0]?.vnCode ? this.billData[0]?.vnCode.toString() : '';
         this.VoucherDataRequestModel.partyName = this.billData[0]?.vnName ? this.billData[0]?.vnName : '';
         this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
@@ -491,9 +546,9 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
         this.VoucherDataRequestModel.paymentMode = PaymenDetails.PaymentMode;
         this.VoucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "";
-        this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name;
-        this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value;
-        this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "";
+        this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : LeadgerDetails?.name || "";
+        this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : LeadgerDetails?.value || "";
+        this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Date : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
 
         var VoucherlineitemList = this.GetDebitVoucherLedgers(NetPayable, BillNo, PaymenDetails);
@@ -512,8 +567,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
             branch: this.storage.branch,
             transCode: VoucherInstanceType.VendorBillPayment,
             transType: VoucherInstanceType[VoucherInstanceType.VendorBillPayment],
-            voucherCode: VoucherType.DebitVoucher,
-            voucherType: VoucherType[VoucherType.DebitVoucher],
+            voucherCode: PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher,
+            voucherType: PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher],
             docType: "Voucher",
             partyType: "Vendor",
             docNo: BillNo,
@@ -574,12 +629,19 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   }
   GenerateVendorBills(voucherno, PaymenDetails) {
     const PaymentMode = PaymenDetails.PaymentMode;
+    let LeadgerDetails;
+    if (PaymentMode == "Cash") {
+      LeadgerDetails = PaymenDetails.CashAccount;
+    }
+    if (PaymentMode == "Journal") {
+      LeadgerDetails = PaymenDetails.JournalAccount;
+    }
     const GenerateVendorBill: GenerateVendorBill = {
       companyCode: this.companyCode,
       VocuherNo: voucherno,
       paymentMode: PaymentMode,
       refNo: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "",
-      accountName: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name,
+      accountName: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : LeadgerDetails?.name || "",
       date: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "",
       paymentAmount: this.TotalPendingAmount,
       branch: this.storage.branch,
@@ -696,6 +758,10 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     if (PaymentMode == "Cash") {
       const CashAccount = paymentData.CashAccount;
       Result.push(createVoucher(CashAccount.aCCD, CashAccount.aCNM, "ASSET", 0, NetPayable, BillNo));
+    }
+    if (PaymentMode == "Journal") {
+      const JournalAccount = paymentData.JournalAccount;
+      Result.push(createVoucher(JournalAccount.value, JournalAccount.name, "ASSET", 0, NetPayable, BillNo));
     }
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = paymentData.Bank;

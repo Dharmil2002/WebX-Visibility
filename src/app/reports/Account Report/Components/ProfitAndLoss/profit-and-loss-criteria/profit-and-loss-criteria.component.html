@@ -2,7 +2,8 @@
     <form [formGroup]="proftandlossForm">
         <app-form-webxpress [form]="proftandlossForm" [FormTitle]="'Profit & Loss Statement'"
             [formData]="jsonproftandlossArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Submit'">
+            (callFunction)="functionCallHandler($event)" [showSaveButton]="proftandlossForm.valid==true ? true : false"
+            [submit]="'Submit'">
         </app-form-webxpress>
     </form>
 

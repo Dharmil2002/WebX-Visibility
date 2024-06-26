@@ -11,5 +11,5 @@ export async function manualvoucharDetail(masterService) {
         delete req.filter.bRC;
     }
     const res = await masterService.masterPost("generic/get", req).toPromise();
-    return res.data; // Filter items where invoiceNo is empty (falsy)
+    return res.data; 
 }

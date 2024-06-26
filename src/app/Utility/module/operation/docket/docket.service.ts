@@ -804,7 +804,7 @@ export class DocketService {
             },
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
-            "cSGE": {
+            "cSGN": {
                 "cD": data?.consignorName?.value || "",
                 "nM": data?.consignorName?.name || "",
                 "cT": data?.consignorCity?.value || "",
@@ -815,7 +815,7 @@ export class DocketService {
                 "mOB": data?.consignorMobileNo || "",
                 "tEL": data?.consignorTelephoneNo || "",
             },
-            "cSGN": {
+            "cSGE": {
                 "cD": data?.consigneeName?.value || "",
                 "nM": data?.consigneeName?.name || "",
                 "cT": data?.consigneeCity?.value || "",
@@ -1153,13 +1153,13 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData, nonfreight = "") {
+    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
 
-        let nonfreightAmt = {};
+        let nonfreightAmt={};
         if (nonfreight) {
             Object.keys(nonfreight).forEach((key) => {
                 let modifiedKey = key.replace(/./g, (match, index) => {
-                    return index > 0 ? match.toUpperCase() : match.toLowerCase();
+              return index >0 ? match.toUpperCase() : match.toLowerCase();
                 });
                 nonfreightAmt[modifiedKey] = nonfreight[key];
             });
@@ -1195,7 +1195,7 @@ export class DocketService {
             "iSCOM": true,
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
-            "cSGE": {
+            "cSGN": {
                 "cD": data?.consignorName?.value || "C8888",
                 "nM": data?.consignorName?.name || data?.consignorName,
                 "cT": data?.fromCity?.value || "",
@@ -1206,7 +1206,7 @@ export class DocketService {
                 "mOB": data?.ccontactNumber || "",
                 "aLMOB": data?.calternateContactNo || "",
             },
-            "cSGN": {
+            "cSGE": {
                 "cD": data?.consigneeName?.value || "C8888",
                 "nM": data?.consigneeName?.name || data?.consigneeName,
                 "cT": data?.toCity?.value || "",
@@ -1283,7 +1283,7 @@ export class DocketService {
                 "cID": this.storage.companyCode,
                 "dKTNO": isUpdate ? data?.docketNumber : "",
                 "iNVNO": element?.invoiceNumber || "",
-                "iNVDT": ConvertToDate(element?.invDt),
+                "iNVDT": moment(element?.invDt),
                 "vOL": {
                     "uNIT": "FT",
                     "l": roundToNumber(l, 3),
@@ -1303,8 +1303,8 @@ export class DocketService {
                 "cHRWT": ConvertToNumber(element?.chargedWeight || 0, 2),
                 "mTNM": element?.materialName || "",
                 "eWBNO": element?.ewayBillNo || "",
-                "eWBDT": ConvertToDate(element?.ewayBillDate),
-                "eXPDT": ConvertToDate(data?.expiryDate),
+                "eWBDT": moment(element?.ewayBillDate),
+                "eXPDT": moment(data?.expiryDate),
                 "eNTBY": this.storage.userName,
                 "eNTDT": new Date(),
                 "eNTLOC": this.storage.branch,

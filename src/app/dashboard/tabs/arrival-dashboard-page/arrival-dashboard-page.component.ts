@@ -9,6 +9,11 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { firstValueFrom } from 'rxjs';
 import { ArrivalVehicleService } from 'src/app/Utility/module/operation/arrival-vehicle/arrival-vehicle.service';
 import { da } from 'date-fns/locale';
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import Swal from 'sweetalert2';
+import { DepartureService } from 'src/app/Utility/module/operation/departure/departure-service';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -109,10 +114,16 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     //   class: "matcolumnright",
     //   Style: "min-width:100px"
     // },
-    Action: {
+    // Action: {
+    //   Title: "Action",
+    //   class: "matcolumnleft",
+    //   Style: "min-width:100px",
+    //   stickyEnd: true
+    // },
+    actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
+      class: "matcolumncenter",
+      Style: "max-width:80px; width:80px",
       stickyEnd: true
     }
 
@@ -154,7 +165,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     { label: 'Vehicle Arrival', componentDetails: MarkArrivalComponent, function: "GeneralMultipleView" },
     { label: 'Arrival Scan', componentDetails: UpdateLoadingSheetComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
+    {label: 'Cancel THC'}
   ];
+
   IscheckBoxRequired: boolean;
   boxData: { count: any; title: any; class: string; }[];
   departureDetails: any;
@@ -167,7 +180,10 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     private _operation: OperationService,
     private datePipe: DatePipe,
     private storage:StorageService,
-    private depatureService: ArrivalVehicleService
+    private departureService: DepartureService,
+    private depatureService: ArrivalVehicleService,
+    private objGeneralService: GeneralService,
+    private invoiceService: InvoiceServiceService,
   ) {
 
     super();
@@ -227,10 +243,23 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
             const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
             const statusToActionMap = {
                4: "Vehicle Arrival",
-               5: "Arrival Scan"
+               5: "Arrival Scan",
+               6: "Cancel THC"
             };
           
             if (element.sTS==4||element.sTS ==5) {
+              let actions = [];
+    
+    // Add the primary action based on the status
+    if (statusToActionMap[element?.sTS]) {
+        actions.push(statusToActionMap[element.sTS]);
+    }
+    
+    // Add "Cancel THC" if the status is 5
+    if (element.sTS == 4) {
+        actions.push(statusToActionMap[4]);  
+        actions.push(statusToActionMap[6]);  // Assuming 6 maps to "Cancel THC"
+    }
               let arrivalData = {
                 "id": element?._id || "",
                 "Route":element?.rUTCD + ":" + element?.rUTNM,
@@ -243,7 +272,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
                 "Hrs": timeDifferenceInHours.toFixed(2),                
                 "cLOC": element?.cLOC,
                 "nXTLOC": element?.nXTLOC,
-                "Action": statusToActionMap[element?.sTS]
+                 "actions": actions
+                // "actions": ["Vehicle Arrival", "Arrival Scan"]
               };
               tableData.push(arrivalData);
               // Display or use arrivalData as needed
@@ -284,13 +314,59 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         const shipmentStatus = shipment.length <= 0 ? 'noDkt' : 'dktAvail';
         this._operation.setShipmentStatus(shipmentStatus);
   }
+
   updateDepartureData(event) {
     this.tableload=true
     this.getArrivalDetails()
   }
-  handleMenuItemClick(label: string, element) {
+
+  async handleMenuItemClick(label, element) {
     
     let Data = { label: label, data: element }
+    if (label.label.label == "Cancel THC") 
+      {
+        const rejectionData = await this.objGeneralService.getGeneralMasterData("THCCAN");
+        const options = rejectionData.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+
+        Swal.fire({
+          title: 'Reason For Cancel?',
+          html: `<select id="swal-select1" class="swal2-select">${options}</select>`,
+          focusConfirm: false,
+          showCancelButton: true,
+          width:"auto",
+          cancelButtonText: 'Cancel', // Optional: Customize the cancel button text
+          preConfirm: () => {
+            return (document.getElementById('swal-select1') as HTMLInputElement).value;
+          }
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // Handle the input value if the user clicks the confirm button
+            const filter = {
+              docNo: Data.label.data.TripID
+            }
+            const status = {
+              cNL: true,
+              cNLDT: new Date(),
+              cNBY: this.storage.userName,
+              oPSSTNM: "Cancelled",
+              oPSST: "9",
+              cNRES: result.value//required cancel reason in popup
+            }
+            const res = await this.departureService.updateTHCLTL(filter, status);
+            //await this.departureService.deleteTrip({ cID: this.storage.companyCode, tHC: Data.label.data.TripID });
+            Data.label.data.reason= result.value;
+          this.departureService.updateDocket(Data.label.data);
+            if (res) {
+              SwalerrorMessage("success", "Success", "The THC has been successfully Cancelled.", true)
+              this.getArrivalDetails();
+            }
+            // Your code to handle the input value
+          } else if (result.isDismissed) {
+            this.getArrivalDetails();
+          }
+        });
+      }
+      
     //  this.menuItemClicked.emit(Data);
     this.advancdeDetails = {
       data: Data,

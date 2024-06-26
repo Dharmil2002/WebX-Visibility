@@ -49,16 +49,16 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
   csvFileName: string; // name of the csv file, when data is downloaded
   source: any[] = []; // Array to hold data
   loading = true // Loading indicator
-  LoadTable=false;
+  LoadTable = false;
 
   //#region Table
   columns = [];
   //#endregion
 
-  paging: any ;
-  sorting: any ;
-  searching: any ;
-  columnMenu: any ;
+  paging: any;
+  sorting: any;
+  searching: any;
+  columnMenu: any;
   theme: "MATERIAL"
 
   constructor(
@@ -186,15 +186,15 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
 
   //#region save
   async save() {
-    debugger;
+    ;
     this.loading = true;
     try {
       this.ReportingBranches = [];
       if (this.CustInvREGTableForm.value.Individual == "N") {
         this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CustInvREGTableForm.value.branch.name);
-        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value||"");
+        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value || "");
       } else {
-        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value||"");
+        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value || "");
       }
       const startDate = new Date(this.CustInvREGTableForm.controls.start.value);
       const endDate = new Date(this.CustInvREGTableForm.controls.end.value);

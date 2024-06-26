@@ -45,6 +45,7 @@ import { GetStateListFromAPI } from "src/app/finance/Vendor Payment/VendorPaymen
 import { EncryptionService } from "src/app/core/service/encryptionService.service";
 import { VendorBillEntry } from "src/app/Models/Finance/VendorPayment";
 import { financialYear } from "src/app/Utility/date/date-utils";
+import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
 @Component({
   selector: "app-general-bill-detail",
   templateUrl: "./general-bill-detail.component.html",
@@ -138,6 +139,7 @@ export class GeneralBillDetailComponent implements OnInit {
   StateList: any;
   AccountGroupList: any;
   AllLocationsList: any;
+  CompanyDetails: any;
   Request = {
     VendorName: "",
     VendorCode: "",
@@ -213,6 +215,8 @@ export class GeneralBillDetailComponent implements OnInit {
     this.VendorBillTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBillTaxationGSTFilterArray,
     ]);
+
+    
   }
   async BindDataFromApi() {
     const DocumentsList = [
@@ -250,7 +254,7 @@ export class GeneralBillDetailComponent implements OnInit {
     );
 
     this.BindLedger();
-
+    this.CompanyDetails=await getApiCompanyDetail(this.masterService);
   }
   async BindLedger() {
     const account_groupReqBody = {
@@ -284,6 +288,7 @@ export class GeneralBillDetailComponent implements OnInit {
     );
 
     if (res.success && res.data.length != 0) {
+      
       this.VendorDetails = res.data[0];
 
       if (this.VendorDetails?.otherdetails) {
@@ -466,6 +471,7 @@ export class GeneralBillDetailComponent implements OnInit {
   }
 
   StateChange() {
+    
     const formValues = this.VendorBillTaxationGSTFilterForm.value;
     const Billbookingstate = formValues.Billbookingstate;
     const Vendorbillstate = formValues.Vendorbillstate;
@@ -482,27 +488,30 @@ export class GeneralBillDetailComponent implements OnInit {
 
       if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTdata);
-        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("IGST");
+        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("CGST/SGST");
       } else if (IsStateTypeUT) {
         this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTdata);
-        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("IGST");
+        this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue("UGST");
       } else if (
         !IsStateTypeUT &&
         Billbookingstate.name != Vendorbillstate.name
       ) {
         this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTdata);
         this.VendorBillTaxationGSTFilterForm.get("GSTType").setValue(
-          "CGST/SGST"
+          "IGST"
         );
       }
     }
+    
+    this.VendorBillTaxationGSTFilterForm.controls.GSTNumber.setValue(this.CompanyDetails?.data.find(detail => detail.state === Billbookingstate.name)?.gstNo ?? '');
+    this.VendorBillTaxationGSTFilterForm.controls.VGSTNumber.setValue(this.VendorDetails?.otherdetails.find(detail => detail.gstState === Vendorbillstate.name)?.gstNumber ?? '');
+
   }
   ShowOrHideBasedOnSameOrDifferentState(Check, GSTdata) {
     const filterFunctions = {
       UT: (x) => x.name !== "IGSTRate" && x.name !== "SGSTRate",
       SAME: (x) => x.name !== "IGSTRate" && x.name !== "UGSTRate",
-      DIFF: (x) =>
-        x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate",
+      DIFF: (x) => x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate"
     };
 
     const GSTinputType = ["SGSTRate", "UGSTRate", "CGSTRate", "IGSTRate"];
@@ -513,12 +522,17 @@ export class GeneralBillDetailComponent implements OnInit {
     const GSTCalculateAmount = ((GSTdata.GSTAmount * GSTdata.GSTRate) / (100 * GSTinput.length)).toFixed(2);
     const GSTCalculateRate = (GSTdata.GSTRate / GSTinput.length).toFixed(2);
 
-    const calculateValues = (rateKey, amountKey) => {
-      this.VendorBillTaxationGSTFilterForm.get(rateKey).setValue(GSTCalculateRate);
-      this.VendorBillTaxationGSTFilterForm.get(amountKey).setValue(GSTCalculateAmount);
+    const calculateValues = (rateKey, amountKey, rateValue, amountValue) => {
+      this.VendorBillTaxationGSTFilterForm.get(rateKey).setValue(rateValue);
+      this.VendorBillTaxationGSTFilterForm.get(amountKey).setValue(amountValue);
     };
 
-    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount"));
+    // Update the rate and amount fields for each GST input type
+    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount", GSTCalculateRate, GSTCalculateAmount));
+
+    // Set the rate and amount to 0 for fields not in GSTinput
+    GSTinputType.filter(type => !GSTinput.includes(type)).forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount", "0.00", "0.00"));
+
 
     this.VendorBillTaxationGSTFilterForm.get("TotalGSTRate").setValue((+GSTCalculateRate * GSTinput.length).toFixed(2));
     this.VendorBillTaxationGSTFilterForm.get("GSTAmount").setValue((+GSTCalculateAmount * GSTinput.length).toFixed(2));
@@ -530,7 +544,7 @@ export class GeneralBillDetailComponent implements OnInit {
 
     if (VendorGSTRegistered) {
       // this.jsonControlVendorBillTaxationGSTFilterArray = this.AlljsonControlVendorBillTaxationGSTFilterArray;
-
+      
       const GSTSACcode = this.VendorBillTaxationGSTFilterForm.get("GSTSACcode");
       GSTSACcode.setValidators([
         Validators.required,
@@ -740,7 +754,7 @@ export class GeneralBillDetailComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode = this.VendorDetails?.vendorCode || "";
+        this.VoucherDataRequestModel.partyCode = "" + this.VendorDetails?.vendorCode || "";
         this.VoucherDataRequestModel.partyName = this.VendorDetails?.vendorName || "";
         this.VoucherDataRequestModel.partyState = this.VendorBillTaxationGSTFilterForm.controls.Vendorbillstate.value?.name || "";
         this.VoucherDataRequestModel.paymentState = this.VendorBillTaxationGSTFilterForm.controls.Billbookingstate.value?.name || "";
@@ -782,7 +796,7 @@ export class GeneralBillDetailComponent implements OnInit {
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = BillNo;
         const voucherlineItems = this.GetJournalVoucherLedgers(BillNo);
-
+        
         this.VoucherRequestModel.details = voucherlineItems;
         this.VoucherRequestModel.data = this.VoucherDataRequestModel;
         this.VoucherRequestModel.debitAgainstDocumentList = [];
@@ -803,7 +817,7 @@ export class GeneralBillDetailComponent implements OnInit {
                 docType: "Voucher",
                 partyType: "Vendor",
                 docNo: BillNo,
-                partyCode: this.VendorDetails?.vendorCode || "",
+                partyCode: "" + this.VendorDetails?.vendorCode || "",
                 partyName: this.VendorDetails?.vendorName || "",
                 entryBy: this.storage.userName,
                 entryDate: Date(),

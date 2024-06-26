@@ -331,6 +331,7 @@ export enum VoucherInstanceType {
   CreditNoteApproval = 13,
   DebitNoteApproval = 14,
   VendorOpeningBalance = 15,
+  THCGeneration = 16,
 }
 
 export const ledgerInfo = {
@@ -378,11 +379,29 @@ export const SACInfo = {
   }
 };
 
-function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
-  // Get Data From Local Storage
-  const LeadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));
+export function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
+  try {
+    // Get Data From Local Storage
+    const leadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));
 
-  // Get Leadger Info
-  return LeadgerInfo.find((x) => x.LeadgerCode == LeadgerCode);
+    // Check if leadgerInfo is an array
+    if (!Array.isArray(leadgerInfo)) {
+      throw new Error('LeadgerInfo is not an array');
+    }
 
+    // Get Leadger Info
+    const result = leadgerInfo.find((x) => x.LeadgerCode === LeadgerCode);
+
+    // Handle the case when the LeadgerCode is not found
+    if (!result) {
+      console.warn(`LeadgerCode ${LeadgerCode} not found`);
+    }
+
+    return result;
+
+  } catch (error) {
+    // Log the error
+    console.error('Error getting Leadger Info from Local Storage:', error);
+    return null; // Return null or handle the error as needed
+  }
 }

@@ -163,7 +163,6 @@ export class GcnFlowReportComponent implements OnInit {
   }
 
   async save() {
-    debugger;
     this.loading = true;
     try {
       const startValue = new Date(this.GcnFlowFormRegisterForm.controls.start.value);
@@ -186,7 +185,7 @@ export class GcnFlowReportComponent implements OnInit {
         startDate, endDate, fromloc, payment,transitmode,loadtype,ReportType
       }
       const result = await this.GCNFlowRegServices.getGCNRegisterReportDetails(reqBody)
-      debugger;
+ 
       this.columns = result.grid.columns;
       this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;

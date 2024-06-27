@@ -59,7 +59,6 @@ export class GCNFlowRegService {
   // }
 
   async getGCNRegisterReportDetails(data) {
-    debugger;
     const loads = data.loadtype
     const loc = data.fromloc ? data.fromloc.map(x => x.locCD) || [] : [];
     const payBasis = data.payment ? data.payment.map(x => x.payNM) || [] : [];

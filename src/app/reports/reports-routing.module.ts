@@ -43,6 +43,7 @@ import { DebitNoteRegisterReportComponent } from './debit-note-register-report/d
 import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
+import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-but-not-collected-register-report/to-pay-paid-but-not-collected-register-report.component';
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -85,6 +86,7 @@ const routes: Routes = [
   { path: "credit-note-register-report", component: CreditNoteRegisterReportComponent },
   { path: "debit-note-register-report", component: DebitNoteRegisterReportComponent },
   { path: "advice-register-report", component: AdviceRegisterComponent },
+  { path: "to-pay-paid-but-not-collected-register-report", component: ToPayPaidButNotCollectedRegisterReportComponent },
 ];
 
 @NgModule({

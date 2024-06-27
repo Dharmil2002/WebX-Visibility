@@ -59,8 +59,7 @@ export class ThcRegisterReportComponent implements OnInit {
     this.getDropdownData();
   }
   async getDropdownData() {
-    let locationList = [];
-    locationList = await this.locationService.locationFromApi();
+    const locationList = await this.locationService.locationFromApi();
     this.filter.Filter(this.jsonthcregisterFormArray, this.thcregisterTableForm, locationList, "Location", true);
   }
   initializeFormControl() {

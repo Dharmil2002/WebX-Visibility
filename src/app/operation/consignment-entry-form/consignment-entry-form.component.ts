@@ -130,7 +130,7 @@ export class ConsignmentEntryFormComponent
   mseq: boolean;
   lastDoc: string;
   isManual: boolean;
-  checkboxChecked: boolean = true; // Checkbox is checked by default
+  checkboxChecked: boolean; // Checkbox is checked by default
   dcrDetail = {};
   conLoc: boolean;
   pageLoad: boolean;

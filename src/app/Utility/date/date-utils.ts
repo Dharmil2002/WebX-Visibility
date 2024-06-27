@@ -49,4 +49,19 @@ export function runningNumber() {
   return `${moment().format("YYMMDDHH")}${Math.floor(1000 + Math.random() * 9000)}`
 };
 
-export const timeZone='Asia/Kolkata'
+export function GetLastFinYearEndDate(dateString: string) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+
+  // If the month is April or later, last financial year ends on March 31st of the same year
+  // If the month is January, February, or March, last financial year ends on March 31st of the previous year
+  const lastYear = date.getMonth() >= 3 ? year : year - 1;
+
+  return formatDate(new Date(lastYear, 2, 31).toISOString(), 'dd MMM yy');
+}
+export function formatAmount(value: string | number): string {
+  const num = Number(value);
+  return !isNaN(num) ? num.toLocaleString('en-US') : value.toString();
+}
+
+export const timeZone = 'Asia/Kolkata'

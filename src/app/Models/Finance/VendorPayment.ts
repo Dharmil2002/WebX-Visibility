@@ -11,6 +11,7 @@ export class VendorBillEntry {
     bDT?: Date;
     lOC?: string;
     sT?: string;
+    sTNM?: string;
     gSTIN?: string;
     vND: {
       cD?: string;
@@ -21,6 +22,7 @@ export class VendorBillEntry {
       eML?: string;
       gSTREG?: boolean;
       sT?: string;
+      sTNM?: string;
       gSTIN?: string;
     };
     tHCAMT?: number;
@@ -52,6 +54,10 @@ export class VendorBillEntry {
       sGST?: number;
       aMT?: number;
     };
+    dOCTYP: string;
+    dOCCD: string;
+    dUEDT: Date;
+    mANNUM?: string;
     // cNL?: boolean;
     // cNLDT?: Date;
     // cNBY?: string;
@@ -161,6 +167,9 @@ const vendorBillEntry: VendorBillEntry = {
       sGST: 25.25,
       aMT: 50.50,
     },
+    dOCTYP: "Transaction",
+    dOCCD: "T",
+    dUEDT: new Date("2023-12-06T12:30:00.000Z"),
     // cNL: false,
     //  cNLDT: new Date("2023-01-25T04:05:29.012Z"),
     // cNBY: "CreatedByXYZ",

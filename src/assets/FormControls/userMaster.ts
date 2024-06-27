@@ -364,9 +364,9 @@ export class UserControl {
         },
       },
       {
-        name: "multiDivisionAccess",
-        label: "Multi Division Access",
-        placeholder: "Multi Division Access",
+        name: "multiMode",
+        label: "Multi Mode",
+        placeholder: "Multi Mode",
         type: "multiselect",
         value: "",
         filterOptions: "",
@@ -381,7 +381,7 @@ export class UserControl {
         additionalData: {
           isIndeterminate: false,
           isChecked: false,
-          support: "division",
+          support: "mode",
           showNameAndValue: false,
           Validations: [
             {
@@ -402,9 +402,9 @@ export class UserControl {
         Validations: [],
       },
       {
-        name: "division",
-        label: "Multi Division Access",
-        placeholder: "Multi Division Access",
+        name: "mode",
+        label: "Multi Mode",
+        placeholder: "Multi Mode",
         type: "",
         value: "",
         Validations: [

@@ -4,6 +4,32 @@ export class ProfitAndLossReport {
      constructor() {
           this.ProfitAndLossControlArray = [
                {
+                    name: 'Fyear',
+                    label: 'Financial Year ',
+                    placeholder: 'Financial Year ',
+                    type: 'dropdown',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                         {
+                              name: "autocomplete",
+                         },
+                         {
+                              name: "invalidAutocomplete",
+                              message: "Choose proper value",
+                         },
+                    ],
+                    additionalData: {
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onOptionSelect: "resetDateRange"
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
                     name: "start",
                     label: "Select Date Range",
                     placeholder: "Select Date Range",
@@ -16,6 +42,7 @@ export class ProfitAndLossReport {
                     additionalData: {
                          support: "end",
                     },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'branch',
@@ -29,7 +56,15 @@ export class ProfitAndLossReport {
                     Validations: [{
                          name: "invalidAutocomplete",
                          message: "Choose proper value",
-                    },],
+                    },
+                    {
+                         name: "autocomplete",
+                    },
+                    {
+                         name: "required",
+                         message: "Branch is required",
+                    }
+                    ],
                     additionalData: {
                          showNameAndValue: true,
                     },
@@ -60,6 +95,7 @@ export class ProfitAndLossReport {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
+                    functions: { onDate: "validateDateRange" }
                }
           ]
      }

@@ -298,7 +298,7 @@ export class JournalVoucherCreationComponent implements OnInit {
 
           this.VoucherDataRequestModel.accLocation = this.storage.branch;
           this.VoucherDataRequestModel.preperedFor = this.JournalVoucherSummaryForm.value.Preparedfor;
-          this.VoucherDataRequestModel.partyCode = this.JournalVoucherSummaryForm.value.PartyName?.value;
+          this.VoucherDataRequestModel.partyCode = "" + this.JournalVoucherSummaryForm.value.PartyName?.value;
           this.VoucherDataRequestModel.partyName = this.JournalVoucherSummaryForm.value.PartyName?.name;
           this.VoucherDataRequestModel.partyState = ""
           this.VoucherDataRequestModel.entryBy = this.storage.userName;
@@ -403,7 +403,7 @@ export class JournalVoucherCreationComponent implements OnInit {
                   docType: "Voucher",
                   partyType: this.JournalVoucherSummaryForm.value.Preparedfor,
                   docNo: "",
-                  partyCode: this.JournalVoucherSummaryForm.value.PartyName?.value ?? "V8888",
+                  partyCode: "" + this.JournalVoucherSummaryForm.value.PartyName?.value ?? "V8888",
                   partyName: this.JournalVoucherSummaryForm.value.PartyName?.name ?? this.JournalVoucherSummaryForm.value.PartyName,
                   entryBy: this.storage.userName,
                   entryDate: Date(),

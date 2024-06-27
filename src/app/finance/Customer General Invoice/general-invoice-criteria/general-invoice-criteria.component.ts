@@ -37,6 +37,7 @@ import { GetStateListFromAPI } from "../../Vendor Payment/VendorPaymentAPIUtitli
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { CustomerBillStatus } from "src/app/Models/docStatus";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import { getApiCompanyDetail } from "../../invoice-summary-bill/invoice-utility";
 @Component({
   selector: 'app-general-invoice-criteria',
   templateUrl: './general-invoice-criteria.component.html'
@@ -132,6 +133,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   AllLocationsList: any;
 
   CustomerDetails;
+  tranDetail;
   TotalAmountList: { count: any; title: string; class: string }[];
   constructor(
     private fb: UntypedFormBuilder,
@@ -245,6 +247,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
 
     this.BindLedger();
     this.getStateDropdown();
+    this.tranDetail = await getApiCompanyDetail(this.masterService);
   }
   async BindLedger() {
     const account_groupReqBody = {
@@ -438,6 +441,14 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
     const CustomerGeneralInvoicestate = formValues.CustomerGeneralInvoicestate;
     const SACcode = formValues.GSTSACcode;
 
+    this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls["VGSTNumber"].setValue(
+      this.CustomerDetails.GSTdetails.find(detail => detail.gstState === CustomerGeneralInvoicestate.name)?.gstNo || ""
+    );
+
+    this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls["GSTNumber"].setValue(
+      this.tranDetail.data.find(detail => detail.state  === Billbookingstate.name)?.gstNo || ""
+    );
+
     if (Billbookingstate && CustomerGeneralInvoicestate && SACcode) {
       const IsStateTypeUT =
         this.AllStateList.find((item) => item.STNM === CustomerGeneralInvoicestate.name)
@@ -445,50 +456,61 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
       const GSTAmount = this.TotalAmountList.find((x) => x.title == "Total Amount").count;
       const GSTdata = { GSTAmount, GSTRate: SACcode.GSTRT };
 
-      if (!IsStateTypeUT && Billbookingstate.name == CustomerGeneralInvoicestate.name) {
+      if (!IsStateTypeUT && Billbookingstate.name === CustomerGeneralInvoicestate.name) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTdata);
-        this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTType").setValue("IGST");
+        this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTType").setValue("CGST/SGST");
       } else if (IsStateTypeUT) {
         this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTdata);
-        this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTType").setValue("IGST");
-      } else if (
-        !IsStateTypeUT &&
-        Billbookingstate.name != CustomerGeneralInvoicestate.name
-      ) {
+        this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTType").setValue("UGST");
+      } else if (Billbookingstate.name !== CustomerGeneralInvoicestate.name) {
         this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTdata);
-        this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTType").setValue(
-          "CGST/SGST"
-        );
+        this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTType").setValue("IGST");
       }
+
     }
   }
   ShowOrHideBasedOnSameOrDifferentState(Check, GSTdata) {
     const filterFunctions = {
       UT: (x) => x.name !== "IGSTRate" && x.name !== "SGSTRate",
       SAME: (x) => x.name !== "IGSTRate" && x.name !== "UGSTRate",
-      DIFF: (x) =>
-        x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate",
+      DIFF: (x) => x.name !== "SGSTRate" && x.name !== "UGSTRate" && x.name !== "CGSTRate"
     };
 
     const GSTinputType = ["SGSTRate", "UGSTRate", "CGSTRate", "IGSTRate"];
 
-    this.jsonControlCustomerGeneralInvoiceTaxationGSTFilterArray = this.AlljsonControlCustomerGeneralInvoiceTaxationGSTFilterArray.filter(filterFunctions[Check]);
-    const GSTinput = this.jsonControlCustomerGeneralInvoiceTaxationGSTFilterArray.filter((item) => GSTinputType.includes(item.name)).map((item) => item.name);
+    // Filter controls based on the Check parameter
+    this.jsonControlCustomerGeneralInvoiceTaxationGSTFilterArray =
+      this.AlljsonControlCustomerGeneralInvoiceTaxationGSTFilterArray.filter(filterFunctions[Check]);
 
+    // Get the input fields for GST rates
+    const GSTinput = this.jsonControlCustomerGeneralInvoiceTaxationGSTFilterArray
+      .filter((item) => GSTinputType.includes(item.name))
+      .map((item) => item.name);
+
+    // Calculate the GST amount and rate per input type
     const GSTCalculateAmount = ((GSTdata.GSTAmount * GSTdata.GSTRate) / (100 * GSTinput.length)).toFixed(2);
     const GSTCalculateRate = (GSTdata.GSTRate / GSTinput.length).toFixed(2);
 
-    const calculateValues = (rateKey, amountKey) => {
-      this.CustomerGeneralInvoiceTaxationGSTFilterForm.get(rateKey).setValue(GSTCalculateRate);
-      this.CustomerGeneralInvoiceTaxationGSTFilterForm.get(amountKey).setValue(GSTCalculateAmount);
+    // Function to set the calculated values in the form
+    const calculateValues = (rateKey, amountKey, rateValue, amountValue) => {
+      this.CustomerGeneralInvoiceTaxationGSTFilterForm.get(rateKey).setValue(rateValue);
+      this.CustomerGeneralInvoiceTaxationGSTFilterForm.get(amountKey).setValue(amountValue);
     };
 
-    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount"));
+    // Update the rate and amount fields for each GST input type
+    GSTinput.forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount", GSTCalculateRate, GSTCalculateAmount));
 
+    // Set the rate and amount to 0 for fields not in GSTinput
+    GSTinputType.filter(type => !GSTinput.includes(type)).forEach((x) => calculateValues(x, x.substring(0, 4) + "Amount", "0.00", "0.00"));
+
+    // Update the total GST rate and amount in the form
     this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("TotalGSTRate").setValue((+GSTCalculateRate * GSTinput.length).toFixed(2));
     this.CustomerGeneralInvoiceTaxationGSTFilterForm.get("GSTAmount").setValue((+GSTCalculateAmount * GSTinput.length).toFixed(2));
+
+    // Recalculate the payment amount
     this.CalculatePaymentAmount();
   }
+
   toggleCustomerGSTRegistered() {
     const CustomerGSTRegistered =
       this.CustomerGeneralInvoiceTaxationGSTFilterForm.value.CustomerGSTRegistered;
@@ -583,6 +605,12 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
   }
   async PartyNameFieldChanged(event) {
     this.CustomerDetails = event.eventArgs.option.value.details;
+    if (this.CustomerDetails?.GSTdetails) {
+      this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls.CustomerGSTRegistered.setValue(
+        true
+      );
+
+    }
   }
   async BookCustomerGeneralInvoice() {
 
@@ -636,12 +664,14 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
         "cID": this.storage.companyCode,
         "companyCode": this.storage.companyCode,
         "dOCTYP": "General",
+        "dOCCD": "G",
         "bUSVRT": "",
         "bILLNO": "",
         "bGNDT": this.CustomerGeneralInvoiceForm.value.CustomerBillDate || new Date(),
         "bDUEDT": this.CustomerGeneralInvoiceForm.value.DueDate || new Date(),
         "bLOC": this.storage.branch,
         "pAYBAS": "",
+        "tRNMODE": "",
         "bSTS": CustomerBillStatus.Generated,
         "bSTSNM": CustomerBillStatus[CustomerBillStatus.Generated],
         "bSTSDT": new Date(),

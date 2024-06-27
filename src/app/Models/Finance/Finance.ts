@@ -221,6 +221,7 @@ export class DNTHdrDataRequestModel {
   docNo: string;
   tYP: string;
   nTNO: string;
+  bILLNO: string;
   nTDT: Date;
   lOC: string;
   pARTY: {
@@ -330,7 +331,8 @@ export enum VoucherInstanceType {
   CreditNoteApproval = 13,
   DebitNoteApproval = 14,
   VendorOpeningBalance = 15,
-  TdsPaymentSlipApproval = 16,
+  TdsPaymentSlipApproval = 17,
+  THCGeneration = 16,
 }
 
 export const ledgerInfo = {
@@ -357,6 +359,9 @@ export const ledgerInfo = {
   "INC001015": GetLeadgerInfoFromLocalStorage("INC001015"),
   "INC001009": GetLeadgerInfoFromLocalStorage("INC001009"),
   "LIA001001": GetLeadgerInfoFromLocalStorage("LIA001001"),
+  "INC001004": GetLeadgerInfoFromLocalStorage("INC001004"),
+  "INC001002": GetLeadgerInfoFromLocalStorage("INC001002"),
+  "INC001001": GetLeadgerInfoFromLocalStorage("INC001001"),
   "IGST": GetLeadgerInfoFromLocalStorage("LIA002004"),
   "UGST": GetLeadgerInfoFromLocalStorage("LIA002002"),
   "SGST": GetLeadgerInfoFromLocalStorage("LIA002001"),
@@ -375,11 +380,29 @@ export const SACInfo = {
   }
 };
 
-function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
-  // Get Data From Local Storage
-  const LeadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));
+export function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
+  try {
+    // Get Data From Local Storage
+    const leadgerInfo = JSON.parse(Storage.getItem(StoreKeys.AccountMaster));
 
-  // Get Leadger Info
-  return LeadgerInfo.find((x) => x.LeadgerCode == LeadgerCode);
+    // Check if leadgerInfo is an array
+    if (!Array.isArray(leadgerInfo)) {
+      throw new Error('LeadgerInfo is not an array');
+    }
 
+    // Get Leadger Info
+    const result = leadgerInfo.find((x) => x.LeadgerCode === LeadgerCode);
+
+    // Handle the case when the LeadgerCode is not found
+    if (!result) {
+      console.warn(`LeadgerCode ${LeadgerCode} not found`);
+    }
+
+    return result;
+
+  } catch (error) {
+    // Log the error
+    console.error('Error getting Leadger Info from Local Storage:', error);
+    return null; // Return null or handle the error as needed
+  }
 }

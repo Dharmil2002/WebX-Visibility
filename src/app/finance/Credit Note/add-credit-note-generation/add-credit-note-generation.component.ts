@@ -140,7 +140,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
     this.CreditnoteGenerationFormTableForm.controls["InvoiceBranch"].setValue(this.hsnInvoiceDataResponse?.data[0].bLOC || "");
     this.CreditnoteGenerationFormTableForm.controls["GSTRate"].setValue(this.hsnInvoiceDataResponse?.data[0].gST.rATE || "");
     this.CreditnoteGenerationFormTableForm.controls["InvoiceAmt"].setValue(this.hsnInvoiceDataResponse?.data[0].aMT || "");
-    this.CreditnoteGenerationFormTableForm.controls["InvoiceType"].setValue(this.hsnInvoiceDataResponse?.data[0].bUSVRT || "");
+    this.CreditnoteGenerationFormTableForm.controls["InvoiceType"].setValue(this.hsnInvoiceDataResponse?.data[0].dOCTYP || "");
     this.CreditnoteGenerationFormTableForm.controls["GSTType"].setValue(this.hsnInvoiceDataResponse?.data[0].gST.tYP || "");
     this.CreditnoteGenerationFormTableForm.controls["PendingAmt"].setValue(this.hsnInvoiceDataResponse?.data[0].cOL.bALAMT || "");
     this.CreditnoteGenerationFormTableForm.controls["InvoiceStatus"].setValue(this.hsnInvoiceDataResponse?.data[0].bSTSNM || "");
@@ -401,9 +401,6 @@ export class AddCreditNoteGenerationComponent implements OnInit {
       this.creditnotedetailTableForm.controls["CreditNoteAmt"].setValue(parseFloat(CreditnoteAmount));
     }
 
-
-
-
   }
 
   // Submit Credit Note
@@ -521,7 +518,8 @@ export class AddCreditNoteGenerationComponent implements OnInit {
                 Swal.fire({
                   icon: "success",
                   title: "Credit Note Created Successfully",
-                  text: "Credit Note No: " + res?.data?.mainData + "Customer Name:" + res?.data?.details.ops[0].pARTY.cD + ":" + res?.data?.details.ops[0].pARTY.nM,
+                  // text: "Credit Note No: " + res?.data?.mainData + "Customer Name:" + res?.data?.details.ops[0].pARTY.cD + ":" + res?.data?.details.ops[0].pARTY.nM,
+                  html: "Credit Note No: " + res?.data?.mainData + "<br>Customer Name: " + res?.data?.details.ops[0].pARTY.cD + ": " + res?.data?.details.ops[0].pARTY.nM,
                   showConfirmButton: true,
                 }).then((result) => {
                   if (result.isConfirmed) {
@@ -726,7 +724,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
           this.VoucherDataRequestModel.accLocation = this.DataResponseHeader.data[0].lOC;
           this.VoucherDataRequestModel.preperedFor = "Customer";
-          this.VoucherDataRequestModel.partyCode = this.DataResponseHeader.data[0].pARTY.cD;
+          this.VoucherDataRequestModel.partyCode = "" + this.DataResponseHeader.data[0].pARTY.cD || "";
           this.VoucherDataRequestModel.partyName = this.DataResponseHeader.data[0].pARTY.nM || "";
           this.VoucherDataRequestModel.partyState = "";
           this.VoucherDataRequestModel.entryBy = this.storage.userName;
@@ -884,7 +882,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
     const response = [
       createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, 0, TotalAmount),
-      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM,"INCOME", TXBLAMTAmount, 0),
+      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, "INCOME", TXBLAMTAmount, 0),
     ];
 
     if (this.DataResponseDetails.data[0].gST.cGST > 0) {

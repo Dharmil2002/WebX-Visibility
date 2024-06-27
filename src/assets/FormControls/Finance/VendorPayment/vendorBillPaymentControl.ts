@@ -54,7 +54,10 @@ export class vendorBillPaymentControl {
             value: "RTGS/UTR",
             name: "RTGS/UTR",
           },
-
+          {
+            value: "Journal",
+            name: "Journal",
+          }
         ],
         filterOptions: "",
         autocomplete: "",
@@ -122,6 +125,34 @@ export class vendorBillPaymentControl {
         name: "CashAccount",
         label: "Cash Account",
         placeholder: "Cash Account",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Account is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "JournalAccount",
+        label: "Journal Account",
+        placeholder: "Journal Account",
         type: "dropdown",
         value: "",
         filterOptions: "",

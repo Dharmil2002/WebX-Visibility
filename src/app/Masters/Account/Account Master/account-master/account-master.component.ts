@@ -24,6 +24,7 @@ export class AccountMasterComponent implements OnInit {
   ];
   linkArray = [];
   menuItems = [];
+  csvFileName: string;
   EventButton = {
     functionName: 'AddFunction',
     name: "Add New",
@@ -32,7 +33,7 @@ export class AccountMasterComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: false,
+    csv: true,
   };
   columnHeader = {
     Account: {
@@ -61,6 +62,19 @@ export class AccountMasterComponent implements OnInit {
       stickyEnd: true
     }
   };
+
+  headerForCsv = {
+    "aCCD": 'Account Code',
+    "mRPNM": 'Main Category',
+    "gRPCD": 'Group Code',
+    "aCNM": 'Account Description',
+    "cATNM": 'Account Category',
+    "pARTNM": 'Party Selection',
+    "bCATNM": 'Balance Sheet Category',
+    "bSSCH": 'BS Schedule',
+    "iSTRUEPST": 'Activeflag'
+  };
+
   FilterButton = {
     name: "Filter List",
     functionName: "FilterList",
@@ -87,6 +101,7 @@ export class AccountMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.GetTableData({});
+    this.csvFileName = "Account Details";
   }
 
   FilterList(event) {
@@ -113,6 +128,7 @@ export class AccountMasterComponent implements OnInit {
   }
 
   async GetTableData(filterQuery) {
+    ;
     this.isTableLode = false;
     this.TableData = []
     const Body = {
@@ -120,6 +136,7 @@ export class AccountMasterComponent implements OnInit {
       collectionName: "account_detail",
       filter: filterQuery,
     };
+    ;
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x, index) => {

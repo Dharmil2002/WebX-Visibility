@@ -44,18 +44,14 @@ export class CommonViewPrintComponent implements OnInit {
   ngOnInit(): void {
     this.GetviewPrint(); // Template Data
   }
-
   async GetviewPrint() {
     let req = {
       companyCode: this.companyCode,
       docType: this.templateBody.templateName,
-      partyCode: this.templateBody?.partyCode,
+      PartyField: this.templateBody?.PartyField,
       DocNo: this.templateBody.DocNo,
     };
-    const Res = await this.masterService
-      .masterPost("viewprint/ViewV2", req)
-      .toPromise();
-      console.log('Res' ,Res)
+    const Res = await firstValueFrom(this.masterService.masterPost("viewprint/ViewV2", req));
     if (Res.success) {
       this.JsonData = Res.data.jsonData || {};
       this.FieldMapping = Res.data.fieldMapping || [];

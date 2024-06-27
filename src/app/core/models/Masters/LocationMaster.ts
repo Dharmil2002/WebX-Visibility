@@ -41,7 +41,7 @@ export class LocationMaster {
       this.locCity = LocationMaster.locCity || '';
       this.ownership = LocationMaster.ownership || '';
       //this.locZone = LocationMaster.locZone || '';
-      this.activeFlag = LocationMaster.activeFlag || false;
+      this.activeFlag = LocationMaster.activeFlag || true;
       this.Latitude = LocationMaster.latitude || '';
       this.Longitude = LocationMaster.longitude || '';
       this.mappedCity = LocationMaster.mappedCity || '';

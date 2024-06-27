@@ -278,8 +278,8 @@ export class TrackingPageComponent implements OnInit {
   OpenDocketView(DockNo) {
     const req = {
       DocNo: DockNo,
-      templateName: "Docket",
-      partyCode: "CONSRAJT58",
+      templateName: "DKT",
+      PartyField:"",
     };
     const url = `${
       window.location.origin

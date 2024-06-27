@@ -487,7 +487,9 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
 
     // Calculate Total Amount
     const totalAmount = (amount + gstAmount) - TDSAmount;
-
+    let dUEDT = new Date();
+    let currentDate = new Date();
+    dUEDT.setDate(currentDate.getDate() + 7);
 
     const vendorBillEntry: VendorBillEntry = {
       companyCode: this.storage.companyCode,
@@ -501,7 +503,8 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         tMOD: "",
         lOC: VendorDetails?.vendorCity,
         sT: data.StateofSupply,
-        gSTIN: data.VendorGSTNO,
+        sTNM: data.StateofSupply,
+        gSTIN: VendorDetails?.gstNumber,
         tHCAMT: totalAmount,
         aDVAMT: 0,
         bALAMT: totalAmount,
@@ -509,6 +512,9 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         bALPBAMT: totalAmount,
         bSTAT: 1,
         bSTATNM: "Awaiting Approval",
+        dOCTYP: "Upload",
+        dOCCD: "U",
+        dUEDT: dUEDT,
         eNTDT: new Date(),
         eNTLOC: this.storage.branch,
         eNTBY: this.storage.userName,
@@ -519,9 +525,10 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           aDD: VendorDetails?.vendorAddress,
           mOB: VendorDetails?.vendorPhoneNo ? VendorDetails?.vendorPhoneNo.toString() : "",
           eML: VendorDetails?.emailId,
-          gSTREG: VendorDetails?.gstNumber,
+          gSTREG: VendorDetails?.gstNumber ? true : false,
           sT: VendorDetails?.vendorState,
-          gSTIN: VendorDetails?.gstNumber,
+          sTNM: VendorDetails?.vendorState,
+          gSTIN: data.VendorGSTNO,
         },
         tDS: {
           eXMT: TDSExempted,
@@ -589,9 +596,10 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         finYear: financialYear,
         accLocation: this.storage.branch,
         preperedFor: "Vendor",
-        partyCode: VendorDetails.vendorCode,
+        partyCode: "" + VendorDetails.vendorCode || "",
         partyName: VendorDetails.vendorName,
         partyState: VendorDetails.vendorState,
+        paymentState: data?.StateOfBilling || "",
         entryBy: this.storage.userName,
         entryDate: new Date(),
         panNo: VendorDetails.panNo,
@@ -680,7 +688,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
             };
           }),
         };
-
+        this.voucherServicesService.UpdateVoucherNumbersInVendBillSummary(BillNo, reqBody.voucherNo);
         return this.voucherServicesService.FinancePost("fin/account/posting", reqBody);
       }),
       catchError((error) => {

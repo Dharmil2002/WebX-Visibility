@@ -28,6 +28,9 @@ export class TrialBalanceReport {
                     additionalData: {
                          showNameAndValue: false,
                     },
+                    functions: {
+                         onOptionSelect: "resetDateRange"
+                    },
                     generatecontrol: true, disable: false
                },
                {
@@ -47,10 +50,9 @@ export class TrialBalanceReport {
                     ],
                     additionalData: {
                          support: "end",
-                         minDate: new Date(), // Set the minimum date to the current date
-                         maxDate: new Date() // Allow selection of dates in the current year and future years
 
                     },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'branch',
@@ -80,9 +82,6 @@ export class TrialBalanceReport {
                     placeholder: "Report Type",
                     type: "dropdown",
                     value: "",
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
                     generatecontrol: true,
                     disable: false,
                     Validations: [
@@ -95,10 +94,49 @@ export class TrialBalanceReport {
                          showNameAndValue: false,
                     },
                     functions: {
-                         onSelection: "ReportTypeFieldChanged"
+                         onOptionSelect: "ReportTypeFieldChanged"
                     },
                },
-
+               {
+                    name: 'reportSubType',
+                    label: 'Report Sub Type',
+                    placeholder: 'Report Sub Type',
+                    type: 'dropdown',
+                    value: "",
+                    functions: {
+                         onOptionSelect: "reportSubTypeChanged"
+                    },
+                    additionalData: {
+                         showNameAndValue: false,
+                    },
+                    Validations: [],
+                    generatecontrol: true,
+                    disable: false
+               },
+               {
+                    name: 'subLedger',
+                    label: 'Sub Ledger',
+                    placeholder: 'Sub Ledger',
+                    type: 'multiselect',
+                    value: [],
+                    Validations: [
+                         {
+                              name: "autocomplete",
+                         },
+                         {
+                              name: "invalidAutocomplete",
+                              message: "Choose proper value",
+                         },
+                    ],
+                    additionalData: {
+                         support: "subLedgerHandler",
+                         showNameAndValue: true,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
                {
                     name: "Individual",
                     label: "",
@@ -112,9 +150,6 @@ export class TrialBalanceReport {
                     disable: false,
                     Validations: []
                },
-
-
-
                {
                     name: 'aCCONTCD',
                     label: 'Select Account Code ',
@@ -135,9 +170,6 @@ export class TrialBalanceReport {
                     },
                     generatecontrol: true, disable: false
                },
-
-
-
                {
                     name: "end",
                     label: "",
@@ -149,14 +181,20 @@ export class TrialBalanceReport {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
-                    additionalData: {
-                         minDate: new Date(), // Set the minimum date to the current date
-                         maxDate: new Date()
-                    },
+                    functions: { onDate: "validateDateRange" }
                },
                {
                     name: 'accountHandler',
                     label: 'accountHandler',
+                    placeholder: ' ',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'subLedgerHandler',
+                    label: '',
                     placeholder: ' ',
                     type: '',
                     value: '',

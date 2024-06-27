@@ -29,7 +29,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 interface CurrentAccessListType {
   productAccess: string[];
 }
-const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "AR"];
+const fieldsToSearch = ["PIN", "CT", "STNM", "ZN", "AR", "LOC"];
 @Component({
   selector: "app-customer-contract-freight-matrix",
   templateUrl: "./customer-contract-freight-matrix.component.html",
@@ -349,6 +349,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         this.StateList,
         "ST",
         this.masterService,
+        true,
         true
       );
     } catch (error) {
@@ -501,7 +502,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const req = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_freight_charge_matrix",
-      filter: this.isUpdate ? { fCID: this.UpdateData.fCID } : undefined,
+      filter: this.isUpdate ? {
+        _id: this.UpdateData._id
+      } : undefined,
       update: this.isUpdate ? json : undefined,
       data: !this.isUpdate ? json : undefined,
     };

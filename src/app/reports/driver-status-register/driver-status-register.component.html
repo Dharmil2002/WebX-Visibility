@@ -1,0 +1,11 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+     <form [formGroup]="driverstatusRegisterForm">
+       <app-form-webxpress [form]="driverstatusRegisterForm"
+         [FormTitle]="'Driver Status Register Report'"
+         [formData]="driverStatusjsonControlArray"
+         (functionCallEmitter)="functionCallHandler($event)"
+         (callFunction)="functionCallHandler($event)"
+         [showSaveButton]="true" [submit]="'View'">
+       </app-form-webxpress>
+     </form>
+   </app-common-wrapper-webxpress>

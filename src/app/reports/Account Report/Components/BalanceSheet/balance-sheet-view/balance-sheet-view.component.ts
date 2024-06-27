@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { exportAsExcelFileV2 } from 'src/app/Utility/commonFunction/xlsxCommonFunction/xlsxCommonFunction';
-import { timeString } from 'src/app/Utility/date/date-utils';
+import { GetLastFinYearEndDate, timeString } from 'src/app/Utility/date/date-utils';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { StorageService } from 'src/app/core/service/storage.service';
 
@@ -25,6 +25,15 @@ export class BalanceSheetViewComponent implements OnInit {
   async ngOnInit(): Promise<void> {
 
     this.JsonData = JSON.parse(this.accountReportService.getDataForTrialBalance("BalanceSheet"));
+    this.JsonData.BalanceSheetDetails.map((item) => {
+      if (item.SubCategory === "Total") {
+        item["FontWeight"] = "bold";
+      }
+      const currentAmount = Number(item.TotalAmountCurrentFinYear);
+      if (!isNaN(currentAmount)) {
+        item.TotalAmountCurrentFinYear = currentAmount.toLocaleString('en-US');
+      }
+    });
     const filterCritera = {
       cID: this.storage.companyCode,
       vTYPE: "BalanceSheetView",
@@ -34,7 +43,6 @@ export class BalanceSheetViewComponent implements OnInit {
     this.HtmlTemplate = TemplateInfo.tHTML
 
     this.showView = true;
-
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -52,7 +60,7 @@ export class BalanceSheetViewComponent implements OnInit {
       "SubCategory": "Description",
       "Notes": "Note No",
       "TotalAmountCurrentFinYear": "Amount As on " + this.JsonData.EndDate,
-      "TotalAmountLastFinYear": "Amount As on 31 Mar 23"
+      "TotalAmountLastFinYear": "Amount As on " + GetLastFinYearEndDate(this.JsonData.EndDate)
     }
 
     const Result = this.JsonData.BalanceSheetDetails.map((item) => {
@@ -99,7 +107,7 @@ export class BalanceSheetViewComponent implements OnInit {
       "SubCategory": "Particular",
       "AccountName": "Descriptions",
       "AmountCurrentFinYear": "Amount As on " + this.JsonData.EndDate,
-      "AmountLastFinYear": "Amount As on 31 Mar 23"
+      "AmountLastFinYear": "Amount As on " + GetLastFinYearEndDate(this.JsonData.EndDate)
 
     }
     const mappedJsonResult = NewArrayData.map((item) => {

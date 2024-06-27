@@ -217,8 +217,8 @@ export class StocksComponent
 
   OpenCnote(modifiedData) {
     const templateBody = {
-      templateName: "Docket",
-      partyCode: "CONSRAJT58",
+      templateName: "DKT",
+      PartyField:"",
       DocNo:modifiedData.no,
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

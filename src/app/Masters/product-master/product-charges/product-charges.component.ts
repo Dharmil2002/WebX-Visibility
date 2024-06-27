@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { StorageService } from "src/app/core/service/storage.service";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 @Component({
   selector: "app-product-charges",
   templateUrl: "./product-charges.component.html",
@@ -27,6 +28,7 @@ export class ProductChargesComponent implements OnInit {
   addTitle = "+ Add Product Charges";
   selectedValue = "Charges";
   Tabletab = false;
+  isSubmit: boolean = false
   TableLoad = false;
   columnHeader = {
     SrNo: {
@@ -101,7 +103,9 @@ export class ProductChargesComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     public dialogRef: MatDialogRef<ProductChargesComponent>,
-    private storage: StorageService
+    private storage: StorageService,
+    public snackBarUtilityService: SnackBarUtilityService,
+
   ) {
     this.companyCode = this.storage.companyCode;
     this.ProductId = data.element.ProductID;
@@ -205,8 +209,10 @@ export class ProductChargesComponent implements OnInit {
 
       if (this.isUpdate) {
         const element = this.ChargesList.find(
-          (x) => x.name == this.UpdatedData.sELCHA
+          (x) => x.value == this.UpdatedData.cHACD
         );
+        console.log(this.UpdatedData.cHACD);
+        console.log("element", element);
         this.ChargesData.push(element);
         this.customerTableForm.controls["SelectCharges"].setValue(element);
       }
@@ -223,7 +229,9 @@ export class ProductChargesComponent implements OnInit {
   async ChargesBehaviourDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: {},
+      filter: {
+        active: true
+      },
       collectionName: "charge_behaviours",
     };
     const Res = await this.masterService
@@ -315,72 +323,103 @@ export class ProductChargesComponent implements OnInit {
   }
 
   async save() {
-    const Body = {
-      sELCHA: this.customerTableForm.value.SelectCharges.name,
-      cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
-      aCCD: this.customerTableForm.value.Ledger?.value || "",
-      aCNM: this.customerTableForm.value.Ledger?.name || "",
-      cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
-      vAR: this.customerTableForm.value.Variability,
-      aDD_DEDU: this.customerTableForm.value.Add_Deduct,
-      cHAPP: this.customerTableForm.value.chargeApplicableHandler.map(
-        (x) => x.value
-      ),
-      cRGVB: this.customerTableForm.value.Variability == "Y" ? this.customerTableForm.value.VariabilityOnHandler.map(
-        (x) => x.value
-      ) : [],
-      cAPTION: this.customerTableForm.value.cAPTION,
-      iSREQ: this.customerTableForm.value.iSChargeMandatory,
-      isActive: this.customerTableForm.value.isActive,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch,
-      eNTBY: this.storage.userName,
-      mODDT: new Date(),
-      mODLOC: this.storage.branch,
-      mODBY: this.storage.userName,
-    };
-
-    if (!this.isUpdate) {
-      Body["cHACD"] = this.customerTableForm.value.ChargesCode;
-      Body[
-        "_id"
-      ] = `${this.companyCode}-${this.ProductId}-${this.selectedValue}-${this.customerTableForm.value.ChargesCode}`;
-      Body["cID"] = this.companyCode;
-      Body["pRNM"] = this.ProductName;
-      Body["pRCD"] = this.ProductId;
-      Body["cHATY"] = this.selectedValue;
-    }
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "product_charges_detail",
-      filter: this.isUpdate ? { cHACD: this.customerTableForm.value.ChargesCode, cHATY: this.selectedValue } : undefined,
-      update: this.isUpdate ? Body : undefined,
-      data: this.isUpdate ? undefined : Body,
-    };
-
-    const res = this.isUpdate
-      ? await firstValueFrom(
-        this.masterService.masterPut("generic/update", req)
-      )
-      : await firstValueFrom(
-        this.masterService.masterPost("generic/create", req)
-      );
-    if (res?.success) {
-      this.GetTableData();
-      this.Tabletab = !this.Tabletab;
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: "Charges add Successful",
-        showConfirmButton: true,
-      });
-    } else {
+    if (!this.customerTableForm.valid) {
+      this.customerTableForm.markAllAsTouched()
       Swal.fire({
         icon: "error",
-        title: "Data not inserted",
-        text: res.message,
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
         showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+
       });
+      return false;
+    }
+    else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
+          this.isSubmit = true;
+          const Body = {
+            sELCHA: this.customerTableForm.value.SelectCharges.name,
+            cHACAT: this.customerTableForm.value.SelectCharges.cHTY,
+            aCCD: this.customerTableForm.value.Ledger?.value || "",
+            aCNM: this.customerTableForm.value.Ledger?.name || "",
+            cHABEH: this.customerTableForm.value.ChargesBehaviour.name,
+            vAR: this.customerTableForm.value.Variability,
+            aDD_DEDU: this.customerTableForm.value.Add_Deduct,
+            cHAPP: this.customerTableForm.value.chargeApplicableHandler.map(
+              (x) => x.value
+            ),
+            cRGVB: this.customerTableForm.value.Variability == "Y" ? this.customerTableForm.value.VariabilityOnHandler.map(
+              (x) => x.value
+            ) : [],
+            cAPTION: this.customerTableForm.value.cAPTION,
+            iSREQ: this.customerTableForm.value.iSChargeMandatory,
+            isActive: this.customerTableForm.value.isActive,
+            eNTDT: new Date(),
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName,
+            mODDT: new Date(),
+            mODLOC: this.storage.branch,
+            mODBY: this.storage.userName,
+          };
+
+          if (!this.isUpdate) {
+            Body["cHACD"] = this.customerTableForm.value.ChargesCode;
+            Body[
+              "_id"
+            ] = `${this.companyCode}-${this.ProductId}-${this.selectedValue}-${this.customerTableForm.value.ChargesCode}`;
+            Body["cID"] = this.companyCode;
+            Body["pRNM"] = this.ProductName;
+            Body["pRCD"] = this.ProductId;
+            Body["cHATY"] = this.selectedValue;
+          }
+          const req = {
+            companyCode: this.companyCode,
+            collectionName: "product_charges_detail",
+            filter: this.isUpdate ? { cHACD: this.customerTableForm.value.ChargesCode, cHATY: this.selectedValue } : undefined,
+            update: this.isUpdate ? Body : undefined,
+            data: this.isUpdate ? undefined : Body,
+          };
+
+          const res = this.isUpdate
+            ? await firstValueFrom(
+              this.masterService.masterPut("generic/update", req)
+            )
+            : await firstValueFrom(
+              this.masterService.masterPost("generic/create", req)
+            );
+          if (res?.success) {
+            this.GetTableData();
+            this.Tabletab = !this.Tabletab;
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: "Charges add Successful",
+              showConfirmButton: true,
+            });
+            this.isSubmit = false;
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Data not inserted",
+              text: res.message,
+              showConfirmButton: true,
+            });
+          }
+        }
+        catch (error) {
+          console.error("Error fetching data:", error);
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            "Fail To Submit Data..!"
+          );
+          this.isSubmit = false;
+        }
+      }, "Product Charges Adding....");
     }
   }
   chargesSectionFunction() {
@@ -430,8 +469,8 @@ export class ProductChargesComponent implements OnInit {
         this.customerTableForm.value.SelectCharges.value
       );
       if (
-        this.customerTableForm.value.SelectCharges.name ==
-        this.UpdatedData.sELCHA
+        this.customerTableForm.value.SelectCharges.value ==
+        this.UpdatedData.cHACD
       ) {
         return;
       }
@@ -441,7 +480,7 @@ export class ProductChargesComponent implements OnInit {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
       filter: {
-        sELCHA: this.customerTableForm.value.SelectCharges.name,
+        cHACD: this.customerTableForm.value.SelectCharges.value,
         cHATY: this.selectedValue,
         pRCD: this.ProductId,
       },

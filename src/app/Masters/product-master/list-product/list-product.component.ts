@@ -114,7 +114,7 @@ export class ListProductComponent implements OnInit {
       this.isTableLode = true;
     }
   }
-  AddNew(){
+  AddNew() {
     this.getProductNameList()
   }
 
@@ -129,17 +129,17 @@ export class ListProductComponent implements OnInit {
       .toPromise();
     if (Res.success && Res.data.length > 0) {
       let isAddList = []
-      const ProductNameList = this.tableData.map((x)=>{
+      const ProductNameList = this.tableData.map((x) => {
         return x.ProductName;
       })
-      Res.data.forEach((x)=>{
-        if(!ProductNameList.includes(x.product_name)){
+      Res.data.forEach((x) => {
+        if (!ProductNameList.includes(x.product_name)) {
           isAddList.push(x)
         }
       })
-      if(isAddList.length != 0){
+      if (isAddList.length != 0) {
         this.AddNewPopUp()
-      }else{
+      } else {
         Swal.fire({
           icon: "info",
           title: "info",
@@ -173,7 +173,7 @@ export class ListProductComponent implements OnInit {
       height: "80%",
       data: { element: event },
     });
-    dialogref.afterClosed().subscribe((result) => {});
+    dialogref.afterClosed().subscribe((result) => { });
   }
   addServices(event) {
     const dialogref = this.dialog.open(ProductServicesComponent, {
@@ -181,7 +181,7 @@ export class ListProductComponent implements OnInit {
       height: "80%",
       data: { element: event },
     });
-    dialogref.afterClosed().subscribe((result) => {});
+    dialogref.afterClosed().subscribe((result) => { });
   }
 
   functionCallHandler(event) {

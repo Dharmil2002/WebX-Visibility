@@ -375,4 +375,16 @@ export class PinCodeService {
     }
   }
   /*End*/
+  /*below code is addded by manan Sanghani*/
+  async getOneCity(filter){
+    const req={
+      companyCode:this.storage.companyCode,
+      collectionName:"pincode_master",
+      filter:filter
+    }
+    const res=await firstValueFrom(this.masterService.masterPost("generic/getOne",req));
+    return  Object.keys(res.data).length>0?res.data:null;
+
+  }
+  /* End */
 }

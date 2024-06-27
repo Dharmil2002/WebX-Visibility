@@ -4,7 +4,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { finYear, timeString } from 'src/app/Utility/date/date-utils';
+import { GetLastFinYearEndDate, finYear, financialYear, timeString } from 'src/app/Utility/date/date-utils';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -48,9 +48,14 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
     startdate: Date;
     enddate: Date;
     branch: string[];
+    FinanceYear: any;
   };
   EndDate: any = moment().format("DD MMM YY");
   tableLoad = true;
+  financYrName: any;
+  financYrStatus: any;
+  now = moment().endOf('day').toDate();
+  lastweek = moment().add(-10, 'days').startOf('day').toDate();
   dynamicControls = {
     add: false,
     edit: false,
@@ -81,7 +86,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
     },
     TotalAmountLastFinYear: {
       id: 5,
-      Title: " Amount	As on 31 Mar 23",
+      Title: " Amount	As on " + GetLastFinYearEndDate(this.EndDate),
       class: "matcolumncenter"
     }
   }
@@ -113,16 +118,28 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
   initializeFormControl() {
     this.proftandlossFormControl = new ProfitAndLossReport();
     this.jsonproftandlossArray = this.proftandlossFormControl.ProfitAndLossControlArray;
-    this.branchName = this.jsonproftandlossArray.find(
-      (data) => data.name === "branch"
-    )?.name;
-    this.branchStatus = this.jsonproftandlossArray.find(
-      (data) => data.name === "branch"
-    )?.additionalData.showNameAndValue;
+    this.branchName = this.jsonproftandlossArray.find((data) => data.name === "branch")?.name;
+    this.branchStatus = this.jsonproftandlossArray.find((data) => data.name === "branch")?.additionalData.showNameAndValue;
 
+    // Retrieve and set details for the 'Fyear' control
+    this.financYrName = this.getControlDetails("Fyear")?.name;
+    this.financYrStatus = this.getControlDetails("Fyear")?.status;
     this.proftandlossForm = formGroupBuilder(this.fb, [this.jsonproftandlossArray]);
   }
+  filterDropdown(name: string, status: any, dataList: any[]) {
+    this.filter.Filter(this.jsonproftandlossArray, this.proftandlossForm, dataList, name, status);
+  }
+  getControlDetails = (name: string) => {
 
+    // Find the control in jsonGeneralLedgerArray
+    const control = this.jsonproftandlossArray.find(data => data.name === name);
+
+    // Return an object with control name and status (if found)
+    return {
+      name: control?.name,
+      status: control?.additionalData.showNameAndValue,
+    };
+  };
   ngOnInit(): void {
     const now = moment().endOf('day').toDate();
     const lastYearAprilFirst = moment().subtract(1, 'year').startOf('year').month(3).date(1).toDate();
@@ -132,6 +149,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
   }
 
   async getDropDownList() {
+    const financialYearlist = this.generalLedgerReportService.getFinancialYear();
     const branchList = await this.locationService.locationFromApi();
 
     this.filter.Filter(
@@ -142,8 +160,12 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
       this.branchStatus
     );
     const loginBranch = branchList.find(x => x.value === this.storage.branch);
+    this.filterDropdown(this.financYrName, this.financYrStatus, financialYearlist);
     this.proftandlossForm.controls["branch"].setValue(loginBranch);
     this.proftandlossForm.get('Individual').setValue("Y");
+    // set Deafult Fin Year
+    const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
+    this.proftandlossForm.controls["Fyear"].setValue(selectedFinancialYear);
   }
 
   functionCallHandler($event) {
@@ -156,7 +178,65 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
       console.log("failed");
     }
   }
+  //#region to validate date range according to financial year
+  validateDateRange(event): void {
 
+    // Get the values from the form controls
+    const startControlValue = this.proftandlossForm.controls.start.value;
+    const endControlValue = this.proftandlossForm.controls.end.value;
+    const selectedFinancialYear = this.proftandlossForm.controls.Fyear.value;
+
+    // Check if both start and end dates are selected
+    if (!startControlValue || !endControlValue) {
+      // Exit the function if either start or end date is not selected
+      return;
+    }
+
+    // Convert the control values to Date objects
+    const startDate = new Date(startControlValue);
+    const endDate = new Date(endControlValue);
+
+    // Determine the financial year based on the start date
+    const startYear = startDate.getFullYear(); // Extract the year from the start date
+    const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
+    const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
+    if (selectedFinancialYear.value === calculatedFnYr) {
+
+      const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+      const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+      const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+      // Check if both dates fall within the specified financial year range
+      if (startDate >= minDate && startDate <= maxDate && endDate >= minDate && endDate <= maxDate) {
+        // Both dates are within the valid range
+        console.log('Both dates are within the valid range.');
+      } else {
+        // Show a warning if the date range is not within the financial year
+        this.dateRangeWarning(selectedFinancialYear);
+        this.clearDateControls();
+      }
+    }
+    else {
+      // Show a warning if the date range is not within the financial year
+      this.dateRangeWarning(selectedFinancialYear);
+      this.clearDateControls();
+    }
+  }
+  // Function to display a warning message if the date range is not within the selected financial year
+  dateRangeWarning(selectedFinancialYear): void {
+    Swal.fire({
+      icon: "warning",
+      title: "Warning",
+      text: `Date range not within FY ${selectedFinancialYear.name}`,
+      showConfirmButton: true,
+    });
+  }
+  // Function to clear the date range controls
+  clearDateControls(): void {
+    this.proftandlossForm.controls["start"].setValue("");
+    this.proftandlossForm.controls["end"].setValue("");
+  }
+  //#endregion
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -165,7 +245,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         const endDate = new Date(this.proftandlossForm.controls.end.value);
         const startdate = moment(startDate).startOf('day').toDate();
         const enddate = moment(endDate).endOf('day').toDate();
-
+        const FinanceYear = this.proftandlossForm.controls.Fyear.value.value;
         let branch = [];
         if (this.proftandlossForm.value.Individual == "N") {
           branch = await this.generalLedgerReportService.GetReportingLocationsList(this.proftandlossForm.value.branch.value);
@@ -175,7 +255,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
         }
 
         this.reqBody = {
-          startdate, enddate, branch
+          startdate, enddate, branch, FinanceYear,
         }
         this.EndDate = moment(endDate).format("DD MMM YY");
 
@@ -199,7 +279,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           return item.SubCategoryWithoutIndex !== 'Extraordinary items' && item.SubCategoryWithoutIndex !== 'Exceptional Items';
         });
 
-        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear);
+        const TotalOfexceptionalItemsAndextraordinaryItems = parseFloat(exceptionalItems?.TotalAmountCurrentFinYear || 0) + parseFloat(extraordinaryItems?.TotalAmountCurrentFinYear || 0);
         UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear = (UpdatedData.find(x => x.MainCategoryWithoutIndex === "EXPENSE").TotalAmountCurrentFinYear - TotalOfexceptionalItemsAndextraordinaryItems).toFixed(2);
         // Push 3. Profit / [Loss] before Exceptional and Extraordinary items and Tax [1 - 2]
         const income = UpdatedData.find(x => x.MainCategoryWithoutIndex === "INCOME")?.TotalAmountCurrentFinYear ?? 0;
@@ -311,6 +391,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           "ProfitAndLossDetails": UpdatedData
         }
         this.accountReportService.setData(RequestData);
+        this.accountReportService.setRequestData(this.reqBody);
         window.open('/#/Reports/AccountReport/ProfitAndLossview', '_blank');
 
 
@@ -329,5 +410,21 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
   ViewNotes(data) {
     console.log(data?.data);
   }
+
+  //#region to reset date range
+  resetDateRange() {
+    const selectedFinancialYear = this.proftandlossForm.controls.Fyear.value;
+    const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+    const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+    let maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+    if (maxDate >= this.now) {
+      maxDate = this.now;
+    }
+
+    this.proftandlossForm.controls["start"].setValue(minDate);
+    this.proftandlossForm.controls["end"].setValue(maxDate);
+  }
+  //#endregion
 }
 

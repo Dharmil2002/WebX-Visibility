@@ -12,6 +12,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { AccountReportService } from 'src/app/Utility/module/reports/accountreports';
 import { Router } from '@angular/router';
 import { BalanceSheetReport } from 'src/assets/FormControls/Reports/Account Reports/BalanceSheetReport';
+import { financialYear } from 'src/app/Utility/date/date-utils';
 @Component({
   selector: 'app-balance-sheet-criteria',
   templateUrl: './balance-sheet-criteria.component.html'
@@ -48,7 +49,8 @@ export class BalanceSheetCriteriaComponent implements OnInit {
     DateType: string;
   };
   EndDate: any = moment().format("DD MMM YY");
-
+  now = moment().endOf('day').toDate();
+  lastweek = moment().add(-10, 'days').startOf('day').toDate();
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -121,6 +123,9 @@ export class BalanceSheetCriteriaComponent implements OnInit {
       "Fyear",
       false
     );
+    // set Deafult Fin Year
+    const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
+    this.BalanceSheetForm.controls["Fyear"].setValue(selectedFinancialYear);
   }
 
   functionCallHandler($event) {
@@ -133,7 +138,68 @@ export class BalanceSheetCriteriaComponent implements OnInit {
       console.log("failed");
     }
   }
+  //#region to validate date range according to financial year
+  validateDateRange(event): void {
 
+    // Get the values from the form controls
+    const startControlValue = this.BalanceSheetForm.controls.start.value;
+    const endControlValue = this.BalanceSheetForm.controls.end.value;
+    const selectedFinancialYear = this.BalanceSheetForm.controls.Fyear.value;
+
+    // Check if both start and end dates are selected
+    if (!startControlValue || !endControlValue) {
+      // Exit the function if either start or end date is not selected
+      return;
+    }
+
+    // Convert the control values to Date objects
+    const startDate = new Date(startControlValue);
+    const endDate = new Date(endControlValue);
+
+    // Determine the financial year based on the start date
+    const startYear = startDate.getFullYear(); // Extract the year from the start date
+
+    const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
+    const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
+
+    // Check if the selected financial year matches the calculated financial year
+    if (selectedFinancialYear.value === calculatedFnYr) {
+
+      const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+      const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+      const maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+      // Check if both dates fall within the specified financial year range
+      if (startDate >= minDate && startDate <= maxDate && endDate >= minDate && endDate <= maxDate) {
+        // Both dates are within the valid range
+        console.log('Both dates are within the valid range.');
+      } else {
+        // Show a warning if the date range is not within the financial year
+        this.dateRangeWarning(selectedFinancialYear);
+        this.clearDateControls();
+      }
+    }
+    else {
+      // Show a warning if the date range is not within the financial year
+      this.dateRangeWarning(selectedFinancialYear);
+      this.clearDateControls();
+    }
+  }
+  // Function to display a warning message if the date range is not within the selected financial year
+  dateRangeWarning(selectedFinancialYear): void {
+    Swal.fire({
+      icon: "warning",
+      title: "Warning",
+      text: `Date range not within FY ${selectedFinancialYear.name}`,
+      showConfirmButton: true,
+    });
+  }
+  // Function to clear the date range controls
+  clearDateControls(): void {
+    this.BalanceSheetForm.controls["start"].setValue("");
+    this.BalanceSheetForm.controls["end"].setValue("");
+  }
+  //#endregion
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -195,5 +261,20 @@ export class BalanceSheetCriteriaComponent implements OnInit {
       }
     }, "Balance Sheet Statement Is Generating Please Wait..!");
   }
+  //#region to reset date range
+  resetDateRange() {
+    const selectedFinancialYear = this.BalanceSheetForm.controls.Fyear.value;
+    const year = parseInt(selectedFinancialYear.value.slice(0, 2), 10) + 2000; // Get the full year from the financial year string
+    const minDate = new Date(year, 3, 1);  // April 1 of the calculated year
+    let maxDate = new Date(year + 1, 2, 31); // March 31 of the next year
+
+    if (maxDate >= this.now) {
+      maxDate = this.now;
+    }
+
+    this.BalanceSheetForm.controls["start"].setValue(minDate);
+    this.BalanceSheetForm.controls["end"].setValue(maxDate);
+  }
+  //#endregion
 }
 

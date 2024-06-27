@@ -19,8 +19,9 @@
             [width]="width"
             [maxWidth]="maxWidth"
             [FilterButton]="FilterButton"
+            (menuItemClicked)="handleMenuItemClick($event)"
             [metaData]="metaData" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" (selectAllClicked)="onSelectAllClicked($event)"
-            [menuItems]="menuItems" [headercode]="headerCode"  [viewComponent]="viewComponent" [staticField]="staticField" [Link]="linkArray">
+            [menuItems]="menuItems" [headercode]="headerCode"  [viewComponent]="viewComponent" [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag">
         </app-generic-table-v2>
     </div>
 </div>

@@ -3,8 +3,8 @@
   <form [formGroup]="locationTableForm">
     <app-form-webxpress [form]="locationTableForm" [formData]="jsonControlLocationArray"
       (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-      [showSaveAndCancelButton]="isSubmit" [FormTitle]="'Location Details'"
-      [submit]="submit">
+      [modifyAndSaveButton]="true" [FormTitle]="'Location Details'"
+      [submit]="submit" [Disabled]="isSubmit">
     </app-form-webxpress>
   </form>
 </app-common-wrapper-webxpress>

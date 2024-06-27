@@ -213,10 +213,10 @@ export class DebitNoteDetailsComponent implements OnInit {
     // Calculate totals based on table data
     this.dNoteData.forEach(item => {
       //if (item.isSelected) {
-        totalAMT += parseFloat(item.dNAMT);
-        totalSAMT += parseFloat(item.gstRevlAmt);
-        totalGSTAMT += parseFloat(item.tdsRevlAmt);
-     // }
+      totalAMT += parseFloat(item.dNAMT);
+      totalSAMT += parseFloat(item.gstRevlAmt);
+      totalGSTAMT += parseFloat(item.tdsRevlAmt);
+      // }
     });
     // Update total amounts in the list
     this.TotalAmountList[0].count = totalAMT;
@@ -224,7 +224,7 @@ export class DebitNoteDetailsComponent implements OnInit {
     this.TotalAmountList[2].count = totalGSTAMT;
     this.TotalAMOUNT = totalAMT;
     this.TotalGSTAMOUNT = totalSAMT;
-    this.TotalTDSAMOUNT =totalGSTAMT;
+    this.TotalTDSAMOUNT = totalGSTAMT;
 
   }
   async handleMenuItemClick(data) {
@@ -250,7 +250,7 @@ export class DebitNoteDetailsComponent implements OnInit {
             this.dNoteData.gstRevlAmt = result.GstRevAmount;
             this.dNoteData.dNAMT = result.DebitAmount;
             this.dNoteData.tdsRevlAmt = result.TdsRevAmount;
-            this.checkbox() ;
+            this.checkbox();
           } else {
             // Handle the case where the object with the specified _id is not found
             console.log("Editable item not found!");
@@ -271,8 +271,8 @@ export class DebitNoteDetailsComponent implements OnInit {
             this.hdnbillno !== "" && { 'D$eq': ['$docNo', this.hdnbillno] },
             // Check if bALAMT is greater than 0
             { 'D$gt': ['$bALPBAMT', 0] }
-              // && { 'D$eq': ['$vND.cD', this.vendorcode] }
-            
+            // && { 'D$eq': ['$vND.cD', this.vendorcode] }
+
           ].filter(Boolean) // Remove undefined elements from the array
         }
       }
@@ -328,7 +328,7 @@ export class DebitNoteDetailsComponent implements OnInit {
   }
 
 
-  async LedgerBind() { 
+  async LedgerBind() {
     const Body = {
       companyCode: this.storage.companyCode,
       collectionName: "account_detail",
@@ -354,8 +354,8 @@ export class DebitNoteDetailsComponent implements OnInit {
     );
 
   }
-  
-    
+
+
   updateTotalAmounts() {
     // Initialize total amounts
     let totalAMT = 0, totalSAMT = 0, totalGSTAMT = 0, total = 0;
@@ -378,6 +378,7 @@ export class DebitNoteDetailsComponent implements OnInit {
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
+
         this.DebitNoteRequestModel.companyCode = this.storage.companyCode;
         this.DebitNoteRequestModel.docType = "DBNT";
         this.DebitNoteRequestModel.branch = this.storage.branch;
@@ -389,7 +390,7 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTHdrDataRequestModel.docNo = "";
         this.DNTHdrDataRequestModel.tYP = "D";
         this.DNTHdrDataRequestModel.nTNO = "";
-        this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
+        this.DNTHdrDataRequestModel.bILLNO = this.dNoteData[0].docNo;
         this.DNTHdrDataRequestModel.nTDT = new Date();
         this.DNTHdrDataRequestModel.lOC = this.storage.branch;
         //this.DNTHdrDataRequestModel.pARTY = { cD: this.hsnInvoiceDataResponse.data[0].cUST.cD, nM: this.hsnInvoiceDataResponse.data[0].cUST.nM }; // assigning empty objects for PARTY and GST
@@ -405,7 +406,7 @@ export class DebitNoteDetailsComponent implements OnInit {
         this.DNTHdrDataRequestModel.tdsAMT = this.TotalTDSAMOUNT;
         this.DNTHdrDataRequestModel.nTRESCD = this.DebitNoteDetailsForm.value.Reason?.value;
         this.DNTHdrDataRequestModel.nTRESNM = this.DebitNoteDetailsForm.value.Reason?.name,
-        this.DNTHdrDataRequestModel.aCCD = this.DebitNoteDetailsForm.value.Ledgeraccount?.value;
+          this.DNTHdrDataRequestModel.aCCD = this.DebitNoteDetailsForm.value.Ledgeraccount?.value;
         this.DNTHdrDataRequestModel.aCNM = this.DebitNoteDetailsForm.value.Ledgeraccount?.name;
         this.DNTHdrDataRequestModel.sTS = 1;
         this.DNTHdrDataRequestModel.sTSNM = "Generated";
@@ -419,9 +420,9 @@ export class DebitNoteDetailsComponent implements OnInit {
 
         this.DNTDetDataRequestModel._id = "";
         this.DNTDetDataRequestModel.cID = this.storage.companyCode,
-        this.DNTDetDataRequestModel.docNo ="",
-        this.DNTDetDataRequestModel.tYP = "D";
-        this.DNTDetDataRequestModel.nTNO ="";
+          this.DNTDetDataRequestModel.docNo = "",
+          this.DNTDetDataRequestModel.tYP = "D";
+        this.DNTDetDataRequestModel.nTNO = "";
         this.DNTDetDataRequestModel.nTDT = new Date();
         this.DNTDetDataRequestModel.bILLNO = this.dNoteData[0].docNo;
         this.DNTDetDataRequestModel.bGNDT = this.dNoteData[0].bDT;
@@ -430,95 +431,95 @@ export class DebitNoteDetailsComponent implements OnInit {
           nM: this.dNoteData[0].vND.nM,
           tEL: this.dNoteData[0].vND.mOB
         };
-        this.DNTDetDataRequestModel.bAMT= this.dNoteData[0].bALPBAMT - this.dNoteData[0].dNAMT,
-        this.DNTDetDataRequestModel.bALAMT= this.dNoteData[0].bALAMT,
-        this.DNTDetDataRequestModel.tXBLAMT=this.dNoteData[0].dNAMT - this.dNoteData[0].gstRevlAmt,
-        this.DNTDetDataRequestModel.aMT= this.dNoteData[0].dNAMT,
-        this.DNTDetDataRequestModel.eXMT= false,
-        this.DNTDetDataRequestModel.eXMTRES= "",
-        this.DNTDetDataRequestModel.gST= {
-          hSCD: this.dNoteData[0].gST.sAC,
-          hSNM: this.dNoteData[0].gST.sACNM,
-          tYP: this.dNoteData[0].gST.tYP,
-          rATE: this.dNoteData[0].gST.rATE,
-          iGRT: this.dNoteData[0].gST.iGRT,
-          cGRT: this.dNoteData[0].gST.cGRT,
-          sGRT: this.dNoteData[0].gST.sGRT,
-          iGST: this.dNoteData[0].gST.iGRT > 0 ? this.dNoteData[0].gstRevlAmt : 0,
-          cGST: this.dNoteData[0].gST.cGRT > 0 ? this.dNoteData[0].gstRevlAmt / 2 : 0,
-          sGST: this.dNoteData[0].gST.sGRT > 0 ? this.dNoteData[0].gstRevlAmt / 2 : 0,
-          aMT: this.dNoteData[0].gstRevlAmt
-        },
-        this.DNTDetDataRequestModel.tDS= {
-          aMT: this.dNoteData[0].tDS.aMT,
-          eXMT: this.dNoteData[0].tDS.eXMT,
-          rATE: this.dNoteData[0].tDS.rATE,
-          sEC: this.dNoteData[0].tDS.sEC,
-          sECD: this.dNoteData[0].tDS.sECD,
+        this.DNTDetDataRequestModel.bAMT = this.dNoteData[0].bALPBAMT - this.dNoteData[0].dNAMT,
+          this.DNTDetDataRequestModel.bALAMT = this.dNoteData[0].bALAMT,
+          this.DNTDetDataRequestModel.tXBLAMT = this.dNoteData[0].dNAMT - this.dNoteData[0].gstRevlAmt,
+          this.DNTDetDataRequestModel.aMT = this.dNoteData[0].dNAMT,
+          this.DNTDetDataRequestModel.eXMT = false,
+          this.DNTDetDataRequestModel.eXMTRES = "",
+          this.DNTDetDataRequestModel.gST = {
+            hSCD: this.dNoteData[0].gST.sAC,
+            hSNM: this.dNoteData[0].gST.sACNM,
+            tYP: this.dNoteData[0].gST.tYP,
+            rATE: this.dNoteData[0].gST.rATE,
+            iGRT: this.dNoteData[0].gST.iGRT,
+            cGRT: this.dNoteData[0].gST.cGRT,
+            sGRT: this.dNoteData[0].gST.sGRT,
+            iGST: this.dNoteData[0].gST.iGRT > 0 ? this.dNoteData[0].gstRevlAmt : 0,
+            cGST: this.dNoteData[0].gST.cGRT > 0 ? this.dNoteData[0].gstRevlAmt / 2 : 0,
+            sGST: this.dNoteData[0].gST.sGRT > 0 ? this.dNoteData[0].gstRevlAmt / 2 : 0,
+            aMT: this.dNoteData[0].gstRevlAmt
+          },
+          this.DNTDetDataRequestModel.tDS = {
+            aMT: this.dNoteData[0].tDS.aMT,
+            eXMT: this.dNoteData[0].tDS.eXMT,
+            rATE: this.dNoteData[0].tDS.rATE,
+            sEC: this.dNoteData[0].tDS.sEC,
+            sECD: this.dNoteData[0].tDS.sECD,
 
-        },
-        this.DNTDetDataRequestModel.eNTDT= new Date(),
-        this.DNTDetDataRequestModel.eNTLOC= this.storage.branch,
-        this.DNTDetDataRequestModel.eNTBY= this.storage.loginName,
-        this.DNTDetDataRequestModel.mODDT= null,
-        this.DNTDetDataRequestModel.mODLOC= "",
-        this.DNTDetDataRequestModel.mODBY= "",
-        this.DNTDetDataRequestModel.remark= this.DebitNoteDetailsForm.value.Remarks,
+          },
+          this.DNTDetDataRequestModel.eNTDT = new Date(),
+          this.DNTDetDataRequestModel.eNTLOC = this.storage.branch,
+          this.DNTDetDataRequestModel.eNTBY = this.storage.loginName,
+          this.DNTDetDataRequestModel.mODDT = null,
+          this.DNTDetDataRequestModel.mODLOC = "",
+          this.DNTDetDataRequestModel.mODBY = "",
+          this.DNTDetDataRequestModel.remark = this.DebitNoteDetailsForm.value.Remarks,
 
-        //Detasils data
-        // Assuming this.dNoteData is an array of objects
-        // this.dntDetDataRequestList = [];
-        // this.dNoteData.forEach(noteData => {
-        //   // Check if the current noteData is selected
-        //     let DNTDetDataRequestModel = {
-        //       _id: "",
-        //       cID: this.storage.companyCode,
-        //       docNo: noteData.docNo,
-        //       tYP: "D",
-        //       nTNO: "",
-        //       nTDT: new Date(),
-        //       lOC: this.storage.branch,
-        //       bILLNO: noteData.docNo,
-        //       bGNDT: noteData.bDT,
-        //       pARTY: {
-        //         cD: noteData.vND.cD,
-        //         nM: noteData.vND.nM,
-        //         tEL: noteData.vND.mOB,
-        //       },
-        //       bAMT: noteData.bALPBAMT - noteData.dNAMT,
-        //       bALAMT: noteData.bALAMT,
-        //       tXBLAMT: noteData.dNAMT - noteData.gstRevlAmt,
-        //       aMT: noteData.dNAMT,
-        //       eXMT: 1,
-        //       eXMTRES: "",
-        //       gST: {
-        //         hSCD: noteData.gST.sAC,
-        //         hSNM: noteData.gST.sACNM,
-        //         tYP: noteData.gST.tYP,
-        //         rATE: noteData.gST.rATE,
-        //         iGRT: noteData.gST.iGRT,
-        //         cGRT: noteData.gST.cGRT,
-        //         sGRT: noteData.gST.sGRT,
-        //         iGST: noteData.gST.iGRT > 0 ? noteData.gstRevlAmt : 0,
-        //         cGST: noteData.gST.cGRT > 0 ? noteData.gstRevlAmt / 2 : 0,
-        //         sGST: noteData.gST.sGRT > 0 ? noteData.gstRevlAmt / 2 : 0,
-        //         aMT: noteData.gstRevlAmt
-        //       },
-        //       tdsAMT:noteData.tdsRevlAmt,
-        //       eNTDT: new Date(),
-        //       eNTLOC: this.storage.branch,
-        //       eNTBY: this.storage.loginName,
-        //       mODDT: null,
-        //       mODLOC: "",
-        //       mODBY: ""
-        //    };
+          //Detasils data
+          // Assuming this.dNoteData is an array of objects
+          // this.dntDetDataRequestList = [];
+          // this.dNoteData.forEach(noteData => {
+          //   // Check if the current noteData is selected
+          //     let DNTDetDataRequestModel = {
+          //       _id: "",
+          //       cID: this.storage.companyCode,
+          //       docNo: noteData.docNo,
+          //       tYP: "D",
+          //       nTNO: "",
+          //       nTDT: new Date(),
+          //       lOC: this.storage.branch,
+          //       bILLNO: noteData.docNo,
+          //       bGNDT: noteData.bDT,
+          //       pARTY: {
+          //         cD: noteData.vND.cD,
+          //         nM: noteData.vND.nM,
+          //         tEL: noteData.vND.mOB,
+          //       },
+          //       bAMT: noteData.bALPBAMT - noteData.dNAMT,
+          //       bALAMT: noteData.bALAMT,
+          //       tXBLAMT: noteData.dNAMT - noteData.gstRevlAmt,
+          //       aMT: noteData.dNAMT,
+          //       eXMT: 1,
+          //       eXMTRES: "",
+          //       gST: {
+          //         hSCD: noteData.gST.sAC,
+          //         hSNM: noteData.gST.sACNM,
+          //         tYP: noteData.gST.tYP,
+          //         rATE: noteData.gST.rATE,
+          //         iGRT: noteData.gST.iGRT,
+          //         cGRT: noteData.gST.cGRT,
+          //         sGRT: noteData.gST.sGRT,
+          //         iGST: noteData.gST.iGRT > 0 ? noteData.gstRevlAmt : 0,
+          //         cGST: noteData.gST.cGRT > 0 ? noteData.gstRevlAmt / 2 : 0,
+          //         sGST: noteData.gST.sGRT > 0 ? noteData.gstRevlAmt / 2 : 0,
+          //         aMT: noteData.gstRevlAmt
+          //       },
+          //       tdsAMT:noteData.tdsRevlAmt,
+          //       eNTDT: new Date(),
+          //       eNTLOC: this.storage.branch,
+          //       eNTBY: this.storage.loginName,
+          //       mODDT: null,
+          //       mODLOC: "",
+          //       mODBY: ""
+          //    };
 
-        //     // Add the initialized model to the list
-        //     this.dntDetDataRequestList.push(DNTDetDataRequestModel);
-        //   //}
-        // });
+          //     // Add the initialized model to the list
+          //     this.dntDetDataRequestList.push(DNTDetDataRequestModel);
+          //   //}
+          // });
 
-        this.DebitNoteRequestModel.data = this.DNTHdrDataRequestModel;
+          this.DebitNoteRequestModel.data = this.DNTHdrDataRequestModel;
         this.DebitNoteRequestModel.Headerdata = this.DNTHdrDataRequestModel;
         this.DebitNoteRequestModel.Detailsdata = this.DNTDetDataRequestModel;
         firstValueFrom(
@@ -531,16 +532,16 @@ export class DebitNoteDetailsComponent implements OnInit {
             if (res.success) {
               this.dNoteData.forEach(noteData => {
                 // Check if the current noteData is selected
-                  const req = {
-                    companyCode: this.storage.companyCode,
-                    collectionName: "vend_bill_summary",
-                    filter: { docNo:  noteData.docNo },
-                    update: {
-                      bALPBAMT: noteData.bALPBAMT - noteData.dNAMT,
-                    },
-                  };
-                  const res = firstValueFrom(
-                    this.masterService.masterPut("generic/update", req))
+                const req = {
+                  companyCode: this.storage.companyCode,
+                  collectionName: "vend_bill_summary",
+                  filter: { docNo: noteData.docNo },
+                  update: {
+                    bALPBAMT: noteData.bALPBAMT - noteData.dNAMT,
+                  },
+                };
+                const res = firstValueFrom(
+                  this.masterService.masterPut("generic/update", req))
               });
 
               Swal.fire({

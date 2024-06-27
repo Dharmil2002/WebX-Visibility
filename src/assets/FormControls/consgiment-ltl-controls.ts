@@ -3,6 +3,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { BaseControl } from "./base-control";
 import * as StorageService from "src/app/core/service/storage.service";
 import { StoreKeys } from "src/app/config/myconstants";
+import { on } from "events";
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
@@ -185,8 +186,7 @@ export class ConsignmentLtl extends BaseControl {
           { name: "invalidAutocompleteObject", message: "Choose proper value" },
         ],
         functions: {
-          onModel: "getPincodeDetail",
-          onOptionSelect: "getPinCodeBasedOnCity",
+          onModel: "getPincodeDetail"
         },
         additionalData: {
           metaData: "Basic",
@@ -276,8 +276,8 @@ export class ConsignmentLtl extends BaseControl {
       },
       {
         name: "eddDate",
-        label: `${docCalledAs.Docket} Date`,
-        placeholder: `${docCalledAs.Docket} Date`,
+        label: `EDD Date`,
+        placeholder: `EDD Date`,
         type: "datetimerpicker",
         value: new Date(),
         filterOptions: "",
@@ -296,8 +296,8 @@ export class ConsignmentLtl extends BaseControl {
       },
       {
         name: "pkgsType",
-        label: "Packaging Type",
-        placeholder: "Packaging Type",
+        label:  `${docCalledAs.Docket} Packaging Type`,
+        placeholder: `${docCalledAs.Docket} Packaging Type`,
         type: "Staticdropdown",
         value: [],
         Validations: [],
@@ -549,7 +549,7 @@ export class ConsignmentLtl extends BaseControl {
           {
             name: "pattern",
             pattern:
-              "^([0-3][0-8]|97|99)[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
+              "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
             message:
               "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2",
           },
@@ -559,7 +559,8 @@ export class ConsignmentLtl extends BaseControl {
           },
         ],
         functions: {
-          onChange: "GetWalkingAutofill"
+          onChange: "GetWalkingAutofill",
+          onModel: "validategst",
         },
         additionalData: {
           metaData: "consignor",
@@ -664,7 +665,7 @@ export class ConsignmentLtl extends BaseControl {
           {
             name: "pattern",
             pattern:
-              "^([0-3][0-8]|97|99)[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
+              "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
             message:
               "Please enter valid GST Number alphanumeric characters like 01BZAHM6385P6Z2",
           },
@@ -674,7 +675,8 @@ export class ConsignmentLtl extends BaseControl {
           },
         ],
         functions: {
-          onChange: "GetWalkingAutofill"
+          onChange: "GetWalkingAutofill",
+          onModel: "validatetogst",
         },
         additionalData: {
           metaData: "consignee",

@@ -497,6 +497,8 @@ export class DepartVehicleComponent implements OnInit {
         cHGNM: element.placeholder,
         aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.advanceTableForm.controls[element.name].value || 0) : (this.advanceTableForm.controls[element.name].value || 0),
         oPS: element?.additionalData.metaData || "",
+        aCCD: element.additionalData.AccountDetails.aCCD,
+        aCNM: element.additionalData.AccountDetails.aCNM,
       }
       charges.push(json);
     });
@@ -626,7 +628,11 @@ export class DepartVehicleComponent implements OnInit {
             Validations: [],
             additionalData: {
               showNameAndValue: false,
-              metaData: element.aDD_DEDU
+              metaData: element.aDD_DEDU,
+              AccountDetails: {
+                aCCD: element.aCCD || "",
+                aCNM: element.aCNM || "",
+              }
             },
             functions: {
               onChange: 'calucatedCharges',
@@ -651,7 +657,7 @@ export class DepartVehicleComponent implements OnInit {
   }
   /*below code is for getting a Chages from Charge Master*/
   async getAutoFillCharges(charges,thcData) {
-
+    
     if (charges && charges.length > 0) {
       const invoiceList = [];
 
@@ -671,6 +677,10 @@ export class DepartVehicleComponent implements OnInit {
             Validations: [],
             additionalData: {
               showNameAndValue: false,
+              AccountDetails: {
+                aCCD: element.aCCD || "",
+                aCNM: element.aCNM || "",
+              }
             },
             functions: {
               onChange: 'calucatedCharges',
@@ -877,8 +887,8 @@ export class DepartVehicleComponent implements OnInit {
   viewMenifest(event) {
     const req = {
       DocNo: event.data?.manifest,
-      templateName: "MF1",
-      partyCode: "CONSRAJT27",
+      templateName: "MF",
+      PartyField:""
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, '', 'width=1000,height=800');

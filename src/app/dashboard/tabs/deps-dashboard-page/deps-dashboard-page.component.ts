@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DepsModel } from 'src/app/Models/deps/deps';
 import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { DepsUpdateComponent } from '../../ActionPages/deps-update/deps-update.component';
 
 @Component({
   selector: 'app-deps-dashboard-page',
@@ -25,7 +26,6 @@ export class DepsDashboardPageComponent implements OnInit {
     edit: true,
     csv: false
   }
-  menuItems=[]
   linkArray = []
   toggleArray = []
   METADATA = {
@@ -33,13 +33,18 @@ export class DepsDashboardPageComponent implements OnInit {
     // selectAllorRenderedData : false,
     noColumnSort: ['checkBoxRequired']
   }
+  width="70%"
+  height="70%";
+  menuItems = [
+    { label: 'Update', componentDetails: DepsUpdateComponent, function: "GeneralMultipleView" },
+  ];
+
   //#endregion
   constructor(
     private storage:StorageService,
     private definition:DepsModel,
     private depsService:DepsService
   ) {
-    console.log(definition);
    }
 
   ngOnInit(): void {

@@ -38,8 +38,9 @@ export class DepsModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:16%",
       datatype: "datetime",
+      type:"view"
     },
-    Reason: {
+    rES: {
       Title: "Reason",
       class: "matcolumnleft",
       Style: "min-width:10%",
@@ -58,9 +59,10 @@ export class DepsModel implements IFieldDefinition {
     "dEPSNO",
     "dEPSDT",
     "dKTNO",
-    "pKGS",
+    "pKGS", 
+    "rES",
     "dEPIMG",
-    "Reason",
+
   ];
 
   public menuItems = [

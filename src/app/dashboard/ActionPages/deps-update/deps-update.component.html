@@ -1,0 +1,13 @@
+            <form [formGroup]="depsFormGroup">
+                <app-form-webxpress [form]="depsFormGroup" [className]="className"[FormTitle]="'DEPS Ticket Updation'" [formData]="allJsonControlArray"
+                  (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="false"
+                  (callFunction)="functionCaller($event)">
+                </app-form-webxpress>
+              </form>
+          <div class="example-button-row d-flex justify-content-end">
+            <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
+              (click)="save()">Update</button>
+              <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
+              (click)="close()">Close</button>
+            <button class="msr-3" mat-raised-button color="primary"   (click)="cancel()">Cancel</button>
+          </div>

@@ -66,6 +66,7 @@ import { AddHocRouteComponent } from './tabs/departure-dashboard-page/add-hoc-ro
 import { CreditnoteManagementComponent } from "../operation/creditnote-management/creditnote-management.component";
 import { GeneralInvoiceDashboardComponent } from "../finance/Customer General Invoice/general-invoice-dashboard/general-invoice-dashboard.component";
 import { DepsDashboardPageComponent } from './tabs/deps-dashboard-page/deps-dashboard-page.component';
+import { DepsUpdateComponent } from './ActionPages/deps-update/deps-update.component';
 
 @NgModule({
   declarations: [
@@ -105,7 +106,8 @@ import { DepsDashboardPageComponent } from './tabs/deps-dashboard-page/deps-dash
     AddHocRouteComponent,
     CreditnoteManagementComponent,
     GeneralInvoiceDashboardComponent,
-    DepsDashboardPageComponent
+    DepsDashboardPageComponent,
+    DepsUpdateComponent
   ],
   imports: [
     CommonModule,

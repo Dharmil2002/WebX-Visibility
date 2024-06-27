@@ -7,7 +7,8 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import { depsStatus } from "src/app/Models/docStatus";
 import convert from 'convert-units';
 import moment from "moment";
-import { OperationActions } from "src/app/config/myconstants";
+import { Collections, OperationActions } from "src/app/config/myconstants";
+import { debug } from "console";
 
 @Injectable({
     providedIn: "root",
@@ -125,14 +126,22 @@ export class DepsService {
     }
 
     fieldArrivalDeps(docketsList) {
+        debugger
         const docketsDetails = Array.isArray(docketsList) ? docketsList : [docketsList];
         let depsHeader = []
         let depsDetails = []
+        let depsdMG = []
+        let depsdMGDet = []
+        let depsExtra = []
+        let depsExtraDet = []
+        let depspF = []
+        let depspFDet=[]
+        let depsShort = []
+        let depsShortDetails = []
         if (docketsDetails && docketsDetails.length > 0) {
             docketsDetails.forEach((dk) => {
                 if (dk.isDeps) {
-                    const depsHeaderJson =
-                    {
+                    const createDepsHeaderJson = (typeSpecificData) => ({
                         "cID": this.storage.companyCode,
                         "dEPSNO": "",
                         "dEPSDT": new Date(),
@@ -149,24 +158,7 @@ export class DepsService {
                             "pKGS": dk.extraDetails.pKGS,
                             "wT": dk.extraDetails.wT
                         },
-                        "dMG": {
-                            "pKGS": dk.depsType == "D" ? ConvertToNumber(dk?.depsPkgs || 0) : 0,
-                            "wT": dk.depsType == "D" ? ConvertToNumber(dk?.depsWt || 0) : 0,
-                            "rES": dk.depsType == "D" ? dk?.depsRes || "" : "",
-                            "rMK": dk.depsType == "D" ? dk?.rMK || "" : 0
-                        },
-                        "pF": {
-                            "pKGS": dk.depsType == "P" ? ConvertToNumber(dk?.depsPkgs || 0) : 0,
-                            "wT": dk.depsType == "P" ? ConvertToNumber(dk?.depsWt || 0) : 0,
-                            "rES": dk.depsType == "P" ? dk?.depsRes || "" : "",
-                            "rMK": dk.depsType == "P" ? dk?.rMK || "" : ""
-                        },
-                        "sHORT": {
-                            "pKGS": dk.depsType == "S" ? ConvertToNumber(dk?.depsPkgs || 0) : 0,
-                            "wT": dk.depsType == "S" ? ConvertToNumber(dk?.depsWt || 0) : 0,
-                            "rES": dk.depsType == "S" ? dk?.depsRes : "",
-                            "rMK": dk.depsType == "S" ? dk?.rMK : ""
-                        },
+                        ...typeSpecificData,
                         "dEPSUPT": {
                             "iSUPT": false,
                             "bY": "",
@@ -177,8 +169,6 @@ export class DepsService {
                             "bY": "",
                             "dT": null
                         },
-                        "dEPTYP": dk?.depsType || "",
-                        "dEPTYPNM": dk?.depsTypeName || "",
                         "cLOSE": {
                             "iSCLOSE": false,
                             "bY": "",
@@ -187,22 +177,19 @@ export class DepsService {
                         "sTS": depsStatus.Generated,
                         "sTSNM": depsStatus[depsStatus.Generated],
                         "rUTTYP": "",
-                        "dEPIMG": "",
                         "eXEC": {
-                            "pKGS": dk.depsType == "E" ? ConvertToNumber(dk?.depsPkgs || 0) : 0,
-                            "wT": dk.depsType == "E" ? ConvertToNumber(dk?.depsWt || 0) : 0,
-                            "rES": dk.depsType == "E" ? dk?.depsRes || "" : 0,
-                            "rMK": dk.depsType == "E" ? dk?.rMK || "" : ""
+                            "pKGS": 0,
+                            "wT": 0,
+                            "rES": 0,
+                            "rMK": ""
                         },
                         "lOSSVAL": 0,
                         "eNTBY": this.storage.userName,
                         "eNTDT": new Date(),
                         "eNTLOC": this.storage.branch
-
-                    }
-                    depsHeader.push(depsHeaderJson)
-                    const depsDetailsJson =
-                    {
+                    });
+            
+                    const createDepsDetailsJson = () => ({
                         "cID": this.storage.companyCode,
                         "dEPSNO": "",
                         "dKTNO": dk.dKTNO,
@@ -222,15 +209,104 @@ export class DepsService {
                         "eNTBY": this.storage.userName,
                         "eNTDT": new Date(),
                         "eNTLOC": this.storage.branch
-                    }
-                    depsDetails.push(depsDetailsJson);
+                    });
+            
+                    dk.depsType.forEach((type) => {
+                        let typeSpecificData;
+                        switch (type.value) {
+                            case "D":
+                                typeSpecificData = {
+                                    "dEPTYP": "D",
+                                    "dEPTYPNM": "Damage",
+                                    "dEPIMG":dk?.extra?.demageUpload||"",
+                                    "dMG": {
+                                        "pKGS": ConvertToNumber(dk?.depsPkgs || 0),
+                                        "wT": ConvertToNumber(dk?.depsWt || 0),
+                                        "rES": dk?.depsRes || "",
+                                        "rMK": dk?.rMK || ""
+                                    },
+                                    "pF": {
+                                        "pKGS": 0,
+                                        "wT": 0,
+                                        "rES": "",
+                                        "rMK": ""
+                                    },
+                                    "sHORT": {
+                                        "pKGS": 0,
+                                        "wT": 0,
+                                        "rES": "",
+                                        "rMK": ""
+                                    }
+                                };
+                                depsdMG.push(createDepsHeaderJson(typeSpecificData));
+                                depsdMGDet.push(createDepsDetailsJson());
+                                break;
+                            case "S":
+                                typeSpecificData = {
+                                    "dEPTYP": "S",
+                                    "dEPTYPNM": "Shortage",
+                                    "dEPIMG":dk?.extra?.shortUpload||"",
+                                    "dMG": {
+                                        "pKGS": 0,
+                                        "wT": 0,
+                                        "rES": "",
+                                        "rMK": ""
+                                    },
+                                    "pF": {
+                                        "pKGS": 0,
+                                        "wT": 0,
+                                        "rES": "",
+                                        "rMK": ""
+                                    },
+                                    "sHORT": {
+                                        "pKGS": ConvertToNumber(dk?.depsPkgs || 0),
+                                        "wT": ConvertToNumber(dk?.depsWt || 0),
+                                        "rES": "",
+                                        "rMK": ""
+                                    }
+                                };
+                                depsShort.push(createDepsHeaderJson(typeSpecificData));
+                                depsShortDetails.push(createDepsDetailsJson());
+                                break;
+                            case "P":
+                                typeSpecificData = {
+                                    "dEPTYP": "P",
+                                    "dEPTYPNM": "Pilferage",
+                                    "dEPIMG":dk?.extra?.pilferageUpload||"",
+                                    "dMG": {
+                                        "pKGS": 0,
+                                        "wT": 0,
+                                        "rES": "",
+                                        "rMK": ""
+                                    },
+                                    "pF": {
+                                        "pKGS": ConvertToNumber(dk?.depsPkgs || 0),
+                                        "wT": ConvertToNumber(dk?.depsWt || 0),
+                                        "rES": "",
+                                        "rMK": ""
+                                    },
+                                    "sHORT": {
+                                        "pKGS": 0,
+                                        "wT": 0,
+                                        "rES": "",
+                                        "rMK": ""
+                                    }
+                                };
+                                depspF.push(createDepsHeaderJson(typeSpecificData));
+                                depspFDet.push(createDepsDetailsJson());
+                                break;
+                        }
+                    });
                 }
-            })
+            });
+            
         }
-        if(depsHeader.length>0 && depsDetails.length>0){
-        return { depsHeader, depsDetails }
+         depsHeader=[...depsdMG,...depsExtra,...depspF,...depsShort]
+         depsDetails=[...depsdMGDet,...depsExtraDet,...depsShortDetails]
+        if (depsHeader.length > 0 && depsDetails.length > 0) {
+            return { depsHeader, depsDetails }
         }
-        else{
+        else {
             return null
         }
     }
@@ -243,28 +319,98 @@ export class DepsService {
         const res = await firstValueFrom(this.operationService.operationMongoPost("generic/getOne", req));
         return Object.keys(res.data).length > 0 ? res.data : null;
     }
-    async getDepsAllData(filter){
+    async getDepsAllData(filter) {
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: "deps_headers",
-            filter: filter
+            filters: [
+                {
+                    D$match: filter
+                }, {
+                    D$lookup: {
+                        from: "deps_details",
+                        localField: "dEPSNO",
+                        foreignField: "dEPSNO",
+                        as: "deps_details"
+                    }
+                }, {
+                    D$project: {
+                        "_id": 1,
+                        "cID": 1,
+                        "dEPSNO": 1,
+                        "dEPSDT": 1,
+                        "rASNTO": 1,
+                        "rASNDT": 1,
+                        "rASLOC": 1,
+                        "dKTNO": 1,
+                        "mFNO": 1,
+                        "tHC": 1,
+                        "tHCDT": 1,
+                        "sFX": 1,
+                        "lOC": 1,
+                        "aRR": 1,
+                        "dMG": 1,
+                        "pF": 1,
+                        "sHORT": 1,
+                        "dEPSUPT": 1,
+                        "cAN": 1,
+                        "dEPTYP": 1,
+                        "dEPTYPNM": 1,
+                        "cLOSE": 1,
+                        "rUTTYP": 1,
+                        "dEPIMG": 1,
+                        "eXEC": 1,
+                        "lOSSVAL": 1,
+                        "eNTBY": 1,
+                        "eNTDT": 1,
+                        "eNTLOC": 1,
+                        "docNo": 1,
+                        "sTS": 1,
+                        "sTSNM": 1,
+                        "lSDDEPS": { D$last: "$deps_details" }
+                    }
+                }
+            ]
         }
-        const res = await firstValueFrom(this.operationService.operationMongoPost("generic/get", req));
-        return res.data.length > 0 ? res.data :[];
+        const res = await firstValueFrom(this.operationService.operationMongoPost("generic/query", req));
+        return res.data.length > 0 ? res.data : [];
+    }
+    async getDepsCount(filter) {
+        const req =
+        {
+            companyCode: this.storage.companyCode,
+            collectionName: "deps_details",
+            filters: [
+                {
+                    D$match: filter
+                },
+                {
+                    D$group: {
+                        _id: "$dEPSNO",
+                        count: { D$sum: 1 }
+                    }
+                }
+            ]
+        }
+        const res = await firstValueFrom(this.operationService.operationMongoPost("generic/query", req));
+        return res.data.length > 0 ? res.data : [];
     }
     async bindData(data) {
         let deps = [];
+        let sTS = [1, 2]
         if (data && data.length > 0) {
             for (const element of data) {
+                let reason = await this.getValuesIfKeyExists(element, ['sHORT', 'eXEC', 'pF', 'dMG'], 'rES');
                 let depsJson = {
                     "dEPSNO": element.dEPSNO,
                     "dEPSDT": element.dEPSDT,
                     "dKTNO": element.dKTNO,
                     "pKGS": null,
-                    "sTS":element.sTS,
-                    "dEPIMG": element.dEPIMG,
-                    "Reason": null,
-                    "actions":['']
+                    "sTS": element.sTS,
+                    "dEPIMG": element?.dEPIMG,
+                    "rES": reason,
+                    "extra": element,
+                    "actions": [sTS.includes(element.sTS) ? 'Update' : ""]
                 };
                 // Extract and filter data from dMG, pF, sHORT, eXEC
                 let dataKeys = ["dMG", "pF", "sHORT", "eXEC"];
@@ -272,18 +418,29 @@ export class DepsService {
                     for (const key of dataKeys) {
                         if ((element[key] && element[key].pKGS) || (element[key] && element[key].rMK)) {
                             depsJson.pKGS = element[key].pKGS;
-                            depsJson.Reason = element[key].rMK;
                             break; // Break out of the loop once the values are found
                         }
                     }
-                    
+
                 }
-                    deps.push(depsJson);
+                deps.push(depsJson);
             }
         }
         return deps;
     }
-    
+    getValuesIfKeyExists(data: any, keysToCheck: string[], keyOfInterest: string): any {
+        let result = {};
+        let res = ""
+        keysToCheck.forEach(key => {
+            if (data[key] && data[key][keyOfInterest] !== undefined) {
+                result[key] = data[key];
+                if (data[key][keyOfInterest]) {
+                    res = data[key][keyOfInterest];
+                }
+            }
+        });
+        return res;
+    }
     async createDeps(data) {
         try {
             const req = {
@@ -300,6 +457,72 @@ export class DepsService {
         }
         catch (err) {
             return null;
+        }
+    }
+    async depsUpdateOne(depsFilter, data, tableName) {
+        debugger
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: tableName,
+            filter: depsFilter,
+            update: data
+        }
+
+        const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+        return res
+    }
+    async depsUpdate(data, status) {
+        /*first i prepare a request filter that use that filter on two api body first is for getting allDeps Data then update deps headers*/
+        const filter = {
+            cID: this.storage.companyCode,
+            dEPSNO: data.dEPSNO,
+            dKTNO: data.dKTNO,
+            sFX: data.suffix,
+        }
+        const depCount = await this.getDepsCount(filter);
+        await this.depsUpdateOne(filter, status, 'deps_headers');
+        /*End*/
+        /*below filter is for the for geting a deps id which is use to update a req add in Deps Details*/
+        const depsData = await this.getDepsId(filter)
+        /*End */
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "deps_details",
+            data: {
+                "_id": `${this.storage.companyCode}-${data.dEPSNO}-${data.dKTNO}-${data.suffix}-${parseInt(depCount[0]?.count || 0) + 1}`,
+                "cID": this.storage.companyCode,
+                "dEPSNO": data.dEPSNO,
+                "dKTNO": data.dKTNO,
+                "sFX": data.suffix,
+                "dEPSDT": depsData?.dEPSDT || new Date(),
+                "rASNTO": this.storage.userName,
+                "rASNDT": new Date(),
+                "rASLOC": this.storage.branch,
+                "rMK": data?.rMK || "",
+                "lST": {
+                    "rASNTO": depsData?.rASNTO || "",
+                    "rASNDT": depsData?.rASNDT || "",
+                },
+                "sTS": status?.sTS,
+                "sTSNM": status?.sTSNM,
+                "dOC": data?.dOC || "",
+                "eNTBY": this.storage.userName,
+                "eNTDT": new Date(),
+                "eNTLOC": this.storage.branch
+            }
+        }
+        await firstValueFrom(this.operationService.operationMongoPost("generic/create", req));
+        return true
+
+    }
+    async getDepsId(query) {
+        try {
+            const req = { companyCode: this.storage.companyCode, collectionName: "deps_details", filter: query, sorting: { dEPSNO: -1 } };
+            const response = await firstValueFrom(this.operationService.operationMongoPost("generic/findLastOne", req));
+            return response?.data;
+        } catch (error) {
+            console.error("Error fetching Deps list:", error);
+            throw error;
         }
     }
 }

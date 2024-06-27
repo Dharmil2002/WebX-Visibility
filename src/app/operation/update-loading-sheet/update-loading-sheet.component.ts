@@ -184,20 +184,21 @@ export class UpdateLoadingSheetComponent implements OnInit {
   onDailogClose(event) {
     this.shipmentsEdit(event)
   }
+
   shipmentsEdit(event) {
-    const { shipment, suffix, noofPkts, actualWeight, ctWeight,depsOptions,fileUpload,isDeps,depsPkgs,depsOptionsName} = event;
-    const data = this.csv.find(x => x.Shipment === shipment && x.Suffix === suffix);
+
+    const data = this.csv.find(x => x.Shipment === event.shipment && x.Suffix === event.suffix);
     if (data) {
-      const unloadedPkg = parseInt(noofPkts, 10);
-      const unloadedWT = parseFloat(actualWeight).toFixed(2);
-      const unloadctWeight = parseFloat(ctWeight).toFixed(2);
+      const unloadedPkg = parseInt(event.noofPkts, 10);
+      const unloadedWT = parseFloat(event.actualWeight).toFixed(2);
+      const unloadctWeight = parseFloat(event.ctWeight).toFixed(2);
       const pendPkg = data.Packages - unloadedPkg;
-      const pendWt = data.weight - parseFloat(actualWeight);
-      const pendCwt = data.cWeight - parseFloat(ctWeight);
-      const depsType = depsOptions||'';
-      const depsTypeName=depsOptionsName||'';
-      const  file = fileUpload?fileUpload:'';
-      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,isDeps,file,depsPkgs,depsTypeName});
+      const pendWt = data.weight - parseFloat(event.actualWeight);
+      const pendCwt = data.cWeight - parseFloat(event.ctWeight);
+      const depsType = event.depsOptions||'';
+      const isDeps = event.isDeps||'';
+      const extra=event;
+      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,extra,isDeps});
       this.cdr.detectChanges();
     }
   }
@@ -342,6 +343,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   async CompleteScan() {
+    debugger
     this.snackBarUtilityService.commonToast(
       async () => {
         let packageChecked = false;

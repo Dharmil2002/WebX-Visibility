@@ -31,7 +31,7 @@ export class thcReportControl {
                     displaywith: "",
                     Validations: [],
                     additionalData: {
-                        showNameAndValue: false,
+                        showNameAndValue: true,
                     },
     
                     generatecontrol: true, disable: false

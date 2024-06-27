@@ -38,7 +38,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       active: "Arrival Details"
     }
   ]
-  height = '100vw';
+  height = '120vw';
   width = '100vw';
   maxWidth: '232vw'
   dynamicControls = {
@@ -217,7 +217,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   // }
 
   async getArrivalDetails() {
-     debugger
     const reqbody =
     {
       "companyCode": this.companyCode,

@@ -10,7 +10,7 @@
             [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
             [menuItems]="menuItems" [staticField]="definition.staticField" [Link]="linkArray" 
             [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
-            [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
-            [menuItemFlag]="menuItemflag" [uploadComponent]= false  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
+            [maxWidth]="maxWidth"[width]="width"[height]="height" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+            [menuItemFlag]="menuItemflag" (dialogClosed)="getDepsDetails()"[uploadComponent]= false  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
         </app-generic-table-v2>
 </div>

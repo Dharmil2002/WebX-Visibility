@@ -66,7 +66,7 @@ export class ShipmentEditControls {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'shortPkgs',
+                name: 'shortPkts',
                 label: 'Is Short Package',
                 placeholder: '',
                 type: 'toggle',
@@ -129,31 +129,23 @@ export class ShipmentEditControls {
                 Validations: [],
                 generatecontrol: true, disable: false
             },
+            //demange
             {
-                name: 'depsPkgs',
-                label: 'Package',
+                name: 'demagePkgs',
+                label: 'Damage Package',
                 placeholder: '',
                 type: 'number',
-                value: '',
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Package  is Required"
-                    }
-                ],
-
-                functions: {
-                    onChange: "",
-                },
                 additionalData: {
-                    require: false
+                    require: false,
+                    name: "Damage Package"
                 },
-                generatecontrol: true,
-                disable: false
+                value: false,
+                Validations: [],
+                generatecontrol: true, disable: false
             },
             {
-                name: 'reason',
-                label: 'Reason',
+                name: 'demageReason',
+                label: 'Demage Reason',
                 placeholder: '',
                 type: 'dropdown',
                 value: "",
@@ -176,16 +168,12 @@ export class ShipmentEditControls {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'upload',
-                label: 'File Upload',
+                name: 'demageUpload',
+                label: 'Demage  File Upload',
                 placeholder: '',
                 type: 'file',
                 value: '',
                 Validations: [
-                    {
-                        name: "required",
-                        message: "Please Upload File"
-                    }
                 ],
                 functions: {
                     onChange: "getFilePod"
@@ -196,8 +184,8 @@ export class ShipmentEditControls {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'remarks',
-                label: 'Remarks',
+                name: 'demageRemarks',
+                label: 'Demage  Remarks',
                 placeholder: '',
                 type: 'text',
                 value: '',
@@ -207,6 +195,141 @@ export class ShipmentEditControls {
                 },
                 generatecontrol: true, disable: false
             },
+            /*End*/
+            //Pilferage 
+            {
+                name: 'pilferagePkgs',
+                label: 'Pilferage Package',
+                placeholder: '',
+                type:  'number',
+                additionalData: {
+                    require: false,
+                    name: "Pilferage Package"
+                },
+                value: false,
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'pilferageReason',
+                label: 'Pilferage Reason',
+                placeholder: '',
+                type: 'dropdown',
+                value: "",
+                Validations: [
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
+                ],
+                functions: {
+                    onOptionSelect: ""
+                },
+                additionalData: {
+                    showNameAndValue: false,
+                    require: false
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'pilferageUpload',
+                label: 'Pilferage File Upload',
+                placeholder: '',
+                type: 'file',
+                value: '',
+                Validations: [
+                ],
+                functions: {
+                    onChange: "getFilePod"
+                },
+                additionalData: {
+                    require: false
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'pilferageRemarks',
+                label: 'Pilferage Remarks',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                additionalData: {
+                    require: false
+                },
+                generatecontrol: true, disable: false
+            },
+            /*End*/
+            //Shorteage
+            {
+                name: 'shortPkgs',
+                label: 'Short Package',
+                placeholder: '',
+                type:'number',
+                additionalData: {
+                    require: false,
+                    name: "Short Package"
+                },
+                value: false,
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'shortReason',
+                label: 'Short Reason',
+                placeholder: '',
+                type: 'dropdown',
+                value: "",
+                Validations: [
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocomplete",
+                        message: "Choose proper value",
+                    },
+                ],
+                functions: {
+                    onOptionSelect: ""
+                },
+                additionalData: {
+                    showNameAndValue: false,
+                    require: false
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'shortUpload',
+                label: 'Short File Upload',
+                placeholder: '',
+                type: 'file',
+                value: '',
+                Validations: [
+                ],
+                functions: {
+                    onChange: "getFilePod"
+                },
+                additionalData: {
+                    require: false
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'shortRemarks',
+                label: 'Short Remarks',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                additionalData: {
+                    require: false
+                },
+                generatecontrol: true, disable: false
+            },
+            /*End*/
             {
                 name: 'shipment',
                 label: '',

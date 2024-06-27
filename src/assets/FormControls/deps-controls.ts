@@ -199,18 +199,6 @@ export class DepsControls {
         generatecontrol: false, disable: false
       },
       {
-        name: 'depsTypeName',
-        label: '',
-        placeholder: '',
-        type: '',
-        value: 'Excess',
-        Validations: [],
-        additionalData: {
-          require: true
-        },
-        generatecontrol: false, disable: false
-      },
-      {
         name: 'shipment',
         label: '',
         placeholder: '',

@@ -37,7 +37,7 @@ export class EditShipmentDetailsComponent implements OnInit {
       "checked": true
     },
     "field": {
-      "name": "shortPkgs",
+      "name": "shortPkts",
       "label": "Is Short Package",
       "placeholder": "",
       "type": "toggle",
@@ -108,33 +108,32 @@ export class EditShipmentDetailsComponent implements OnInit {
     this.dialogRef.close()
   }
   async getFilePod(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "upload", this.
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, data.field.name, this.
       EditShipmentForm, this.imageData, "Delivery", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
   }
   async bindDropDown() {
     const partialDelivery = await this.generalService.getGeneralMasterData("PART_D");
     const unDelivery = await this.generalService.getGeneralMasterData("UNDELY");
-    this.filter.Filter(
-      this.jsonControlArray,
-      this.EditShipmentForm,
-      [...unDelivery, ...partialDelivery],
-      'reason',
-      false
-    );
-
+    const reasons = ['shortReason', 'demageReason', 'pilferageReason'];
+    reasons.forEach((x) => {
+      this.filter.Filter(
+        this.allJsonControlArray,
+        this.EditShipmentForm,
+        [...unDelivery, ...partialDelivery],
+        x,
+        false
+      );
+    });
 
   }
   toggleChanges(event) {
-    const fieldsPkgs = ['shortPkgs'];
-    const podBasesFiled = ['pilferagePkts', 'DamagePkts'];
-    const allField = ['depsPkgs', 'reason', 'upload', 'remarks'];
     const updateJsonData = (fieldNames, requireValue, event) => {
       return this.allJsonControlArray.map((x) => {
         if (fieldNames.includes(x.name)) {
-          if (x.name == "depsPkgs") {
-            x.label = event.field.additionalData?.name || x.label
-          }
           x.additionalData.require = requireValue;
+          if (!requireValue) {
+            this.EditShipmentForm.controls[x.name].setValue("");
+          }
         }
         return x;
       }).filter((d) => d.additionalData?.require === true);
@@ -142,14 +141,30 @@ export class EditShipmentDetailsComponent implements OnInit {
     const fieldName = event.field.name;
     const isChecked = event.eventArgs.checked;
     const requireValue = isChecked ? true : false;
-    if (fieldsPkgs.includes(fieldName)) {
-      this.jsonControlArray = updateJsonData(['depsPkgs'], requireValue, event);
-    } else if (podBasesFiled.includes(fieldName)) {
-      this.jsonControlArray = updateJsonData(allField, requireValue, event);
-    }
-    if (fieldName == 'extraPkts' && isChecked) {
+
+    if (fieldName === 'extraPkts' && isChecked) {
       this.onDepsSelect();
+    } else {
+      let fieldsToUpdate;
+      switch (fieldName) {
+        case 'shortPkts':
+          fieldsToUpdate = ['shortReason', 'shortUpload', 'shortRemarks','shortPkgs'];
+          break;
+        case 'pilferagePkts':
+          fieldsToUpdate = ['pilferageReason', 'pilferageUpload', 'pilferageRemarks','pilferagePkgs'];
+          break;
+        case 'DamagePkts':
+          fieldsToUpdate = ['demageReason', 'demageUpload', 'demageRemarks','demagePkgs'];
+          break;
+        default:
+          fieldsToUpdate = [];
+      }
+
+      if (fieldsToUpdate.length > 0) {
+        this.jsonControlArray = updateJsonData(fieldsToUpdate, requireValue, event);
+      }
     }
+
     this.updateValidators();
   }
   updateValidators() {
@@ -201,7 +216,6 @@ export class EditShipmentDetailsComponent implements OnInit {
       return ConvertToNumber(pkg * (totalWeight / total), 2);
     }
 
-
     const pkg = parseInt(fm.pkgs.ctrl.value);
     const actWT = parseFloat(fm.actWeight.ctrl.value);
     const chgWT = parseFloat(fm.chgWeight.ctrl.value);
@@ -221,10 +235,10 @@ export class EditShipmentDetailsComponent implements OnInit {
           const aWT = proportionalWeightCalculation(pkg, totPkg, totActWT);
           const cWT = proportionalWeightCalculation(pkg, totPkg, totChgWT);
           setFieldValues({ pkgs: pkg, actWeight: aWT, chgWeight: cWT });
-          this.EditShipmentForm.controls['shortPkgs'].setValue(true);
+          this.EditShipmentForm.controls['shortPkts'].setValue(true);
           this.toggleChanges(this.requestdata);
           const shortPkgs = parseInt(totPkg) - pkg;
-          this.EditShipmentForm.controls['depsPkgs'].setValue(shortPkgs);
+          this.EditShipmentForm.controls['shortPkgs'].setValue(shortPkgs);
         }
         else if (pkg == 0) {
           setFieldValues({ pkgs: 0, actWeight: 0, chgWeight: 0 });
@@ -273,16 +287,16 @@ export class EditShipmentDetailsComponent implements OnInit {
     }
   }
   save() {
+    debugger
     let allFormData = { ...this.EditShipmentForm.getRawValue() };
-    allFormData.depsOptions = (allFormData.shortPkgs ? "S" : "") +
-      (allFormData.pilferagePkts ? "P" : "") +
-      (allFormData.DamagePkts ? "D" : "");
-    allFormData.depsOptionsName = {
-      "S": "Shortage",
-      "P": "Pilferage",
-      "D": "Damage"
-    }[allFormData.depsOptions] || "";
-    allFormData.isDeps = !!(allFormData.shortPkgs || allFormData.pilferagePkts || allFormData.DamagePkts);
+    allFormData.isDeps = allFormData.shortPkts || allFormData.DamagePkts||allFormData.pilferagePkts || false;
+    allFormData.depsOptions = []
+    allFormData.demageUpload=this.imageData?.demageUpload||"";
+    allFormData.pilferageUpload=this.imageData?.pilferageUpload||"";
+    allFormData.shortUpload=this.imageData?.shortUpload||"";
+    allFormData.shortPkts && allFormData.depsOptions.push({name:"Shortage",value:'S'});
+    allFormData.DamagePkts && allFormData.depsOptions.push({name:"Damage",value:'D'});
+    allFormData.pilferagePkts && allFormData.depsOptions.push({name:"Pilferage",value:'D'});
     this.dialogRef.close(allFormData);
   }
   onDepsSelect() {

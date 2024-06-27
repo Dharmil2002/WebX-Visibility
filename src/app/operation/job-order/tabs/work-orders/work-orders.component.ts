@@ -4,6 +4,10 @@ import { Router } from "@angular/router";
 import { StorageService } from "src/app/core/service/storage.service";
 import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import Swal from "sweetalert2";
+import { GenericActions } from "src/app/config/myconstants";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
 @Component({
   selector: "app-work-orders",
   templateUrl: "./work-orders.component.html",
@@ -94,7 +98,8 @@ export class WorkOrdersComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private operation: OperationService,
-    private storage: StorageService
+    private storage: StorageService,
+    private masterService: MasterService,
   ) {
     this.addAndEditPath = "Operation/AddJobOrder";
     this.allColumnFilter = this.columnHeader;
@@ -103,8 +108,93 @@ export class WorkOrdersComponent implements OnInit {
     this.getWorkOrderData();
   }
   async handleMenuItemClick(data) {
+    debugger
+    const label = data.label.label;
+
     if (data.label.label == "New Work Order") {
       this.router.navigateByUrl("/Operation/AddWorkOrder");
+    }
+    let details = {};
+    let successMessage = "";
+  
+    switch (label) {
+      case "Approve":
+        details = {
+          sTATUS: "Approved",
+          // aPBY: this.storage.loginName,
+          // aPDT: new Date(),
+        };
+        successMessage = "Successfully Approved";
+        break;
+      case "Update":
+        details = {
+          sTATUS: "Updated",
+          mODBY: this.storage.loginName,
+          mODDT: new Date(),
+          mODLOC: this.storage.branch,
+        };
+        successMessage = "Successfully Updated";
+        break;
+      case "Close":
+        details = {
+          sTATUS: "Closed",
+          cSBY: this.storage.loginName,
+          cSDT: new Date(),
+        };
+        successMessage = "Successfully Closed";
+        break;
+      case "Cancel":
+    
+      const result = await Swal.fire({
+        title: 'Reason For Cancel?',
+        html: `<input type="text" id="swal-input1" class="swal2-input" placeholder="Additional comments">`,
+        focusConfirm: false,
+        showCancelButton: true,
+        width: "auto",
+        cancelButtonText: 'Cancel',
+        preConfirm: () => {
+          return (document.getElementById('swal-input1') as HTMLInputElement).value;
+        }
+      });
+
+      if (result.isConfirmed) {
+        if (data.data.docNo) {
+           details = {
+            sTATUS: "Cancel",
+            cL: true,
+            cLDT: new Date(),
+            cREMARKS: result.value
+          };
+          successMessage = "Successfully Cancelled";
+        }
+      } else {
+        Swal.fire("Error", "Error in Voucher Reverse Accounting Entry", "error");
+      }
+      break;
+      default:
+        return;
+    }
+    try {
+       const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "work_order_headers",
+        filter: { docNo: data.data.docNo },
+        update: details,
+      };
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      if (res.success) {
+        this.getWorkOrderData();
+        Swal.fire({
+          icon: "success",
+          title: successMessage,
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.router.navigateByUrl("/Operation/JobOrder");
+      }
+    } catch (error) {
+      console.error("Error updating work order:", error);
     }
   }
   async getWorkOrderData() {

@@ -596,7 +596,7 @@ export class WorkOrderFormControls {
           metaData: ""
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -786,7 +786,7 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
         ]
       }
@@ -819,15 +819,15 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "New Serial No  is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "New Serial No  is required..",
+          // },
         ],
         functions:{
-          onChange:"validateCurrentAndNewValues"
+          // onChange:"validateCurrentAndNewValues"
         }
       },
       {
@@ -856,15 +856,15 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "New OEM No is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "New OEM No is required..",
+          // },
         ],
          functions:{
-          onChange:"validateCurrentAndNewValues"
+          // onChange:"validateCurrentAndNewValues"
         }
       },
       {
@@ -893,15 +893,15 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "New Model is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "New Model is required..",
+          // },
         ],
         functions:{
-          onChange:"validateCurrentAndNewValues"
+          // onChange:"validateCurrentAndNewValues"
         }
       },
       {
@@ -926,7 +926,7 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
         ]
       },
@@ -977,21 +977,21 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "New Tyre ID  is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "New Tyre ID  is required..",
+          // },
         ],
         functions:{
-          onChange:"validateCurrentAndNewValues"
+          // onChange:"validateCurrentAndNewValues"
         }
       },
       {
-        name: "OEMandModel",
+        name: "COEMandModel",
         label: "OEM and Model",
-        placeholder: "OEM and Model",
+        placeholder: "Current OEM and Model",
         type: "text",
         value: "",
         additionalData: {
@@ -1006,6 +1006,26 @@ export class WorkOrderFormControls {
         ]
       },
       {
+        name: "NOEMandModel",
+        label: "OEM and Model",
+        placeholder: "New OEM and Model",
+        type: "text",
+        value: "",
+        additionalData: {
+        },
+        generatecontrol: true,
+        disable: true,
+        Validations: [
+          // {
+          //   name: "required",
+          //   message: "OEM and Model is required..",
+          // },
+        ],
+        functions:{
+          // onChange:"validateCurrentAndNewValues"
+        }
+      },
+      {
         name: "ChangeReason",
         label: "Change reason",
         placeholder: "Change reason",
@@ -1014,12 +1034,12 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "Change reason  is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "Change reason  is required..",
+          // },
         ]
       },
       {
@@ -1031,7 +1051,7 @@ export class WorkOrderFormControls {
         additionalData: {
         },
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
         ]
       },

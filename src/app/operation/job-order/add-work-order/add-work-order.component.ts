@@ -25,6 +25,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import { calculateTotalField } from "../../unbilled-prq/unbilled-utlity";
 import { DataService } from "src/app/core/service/job-order.service";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 @Component({
   selector: "app-add-work-order",
   templateUrl: "./add-work-order.component.html",
@@ -80,6 +81,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
   KPICountData: { count: any; title: string; class: string }[];
   KPICountData2: { count: any; title: string; class: string }[];
   menuItemData: any;
+  counter: number;
   constructor(
     private http: HttpClient,
     private fb: UntypedFormBuilder,
@@ -87,16 +89,18 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     private router: Router,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private dataService: DataService
+    private dataService: DataService,
+    private operation: OperationService
+
   ) {
     this.companyCode = this.storage.companyCode;
     this.WorkOrderModel = new WorkOrderModel({});
-    this.menuItemData = this.dataService.getMenuItemData();    
+    this.menuItemData = this.dataService.getMenuItemData();
   }
   ngOnInit(): void {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.WorkOrderModel =
-        this.router.getCurrentNavigation().extras.state.data;        
+        this.router.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
       this.breadscrums[0].active = "Work Order Modify";
       this.breadscrums[0].title = "Work Order Modify";
@@ -104,6 +108,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     }
     this.backPath = "/Operation/AddJobOrder";
     this.initializeFormControl();
+    this.getWorkOrdersData()
     this.WorkOrderForm.controls["ordercategory"].valueChanges.subscribe(
       (value) => {
         this.resetFormFields();
@@ -154,20 +159,21 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       this.tableData = tableArray;
       this.tableLoad = false;
     });
-    if(!this.menuItemData){
+    if (!this.menuItemData) {
       this.router.navigateByUrl("Operation/JobOrder")
-    } else{
-    const data=this.menuItemData.data
-      this.WorkOrderForm.controls["vehiclenumber"].patchValue(data.vEHNO)    
-      this.WorkOrderForm.controls["oem"].patchValue(data.vEHD.oEM) 
-      this.WorkOrderForm.controls["model"].patchValue(data.vEHD.mODEL) 
-      this.WorkOrderForm.controls["orderNo"].patchValue(data.jOBNO) 
-      this.WorkOrderForm.controls["orderdate"].patchValue(data.jDT) 
+    } else {
+      const data = this.menuItemData.data
+      this.WorkOrderForm.controls["vehiclenumber"].patchValue(data.vEHNO)
+      this.WorkOrderForm.controls["oem"].patchValue(data.vEHD.oEM)
+      this.WorkOrderForm.controls["model"].patchValue(data.vEHD.mODEL)
+      this.WorkOrderForm.controls["orderNo"].patchValue(data.jOBNO)
+      this.WorkOrderForm.controls["orderdate"].patchValue(data.jDT)
     }
   }
 
   SelectedCategory() {
     this.selectedcategory = this.WorkOrderForm.controls["ordercategory"].value;
+
   }
   CalculateTotalServiceCost() {
     const estimatedhoursvalue =
@@ -281,21 +287,22 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       entry
         ? (entry.Ordergeneration = (previousValue + valueToAdd).toString())
         : this.tableData.push({
-            staticfields,
-            Ordergeneration: valueToAdd.toString(),
-          });
+          staticfields,
+          Ordergeneration: valueToAdd.toString(),
+        });
     } else if (operation === "subtract") {
       entry
         ? (entry.Ordergeneration = (previousValue - valueToRemove).toString())
         : this.tableData.push({
-            staticfields,
-            Ordergeneration: (-valueToRemove).toString(),
-          });
+          staticfields,
+          Ordergeneration: (-valueToRemove).toString(),
+        });
     }
   }
   async addServiceDetails() {
     this.tableLoad = true;
     this.isServiceDetailsLoad = true;
+    this.ServiceDetailsForm.controls["EndDTM"].disable()
     const value = this.ServiceDetailsForm.value;
     const newEntry = {
       ...value,
@@ -340,6 +347,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
   async addSpareDetails() {
     this.tableLoad = true;
     this.isSpareDetailsLoad = true;
+    this.SpareDetailsForm.controls["EndDTM"].disable()
     const value = this.SpareDetailsForm.value;
     const newEntry = {
       ...value,
@@ -663,6 +671,22 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  async getWorkOrdersData() {
+    const requestObject = {
+      companyCode: this.storage.companyCode,
+      collectionName: "work_order_headers",
+    };
+    const res = await firstValueFrom(
+      this.operation.operationPost("generic/get", requestObject)
+    );
+    if (res.success) {
+      const data = res.data;
+      const lastWorkOrder = data[data.length - 1];
+      const lastWorkNo = lastWorkOrder.wORKNO;
+      const lastFiveDigits = lastWorkNo.split("/").pop();
+      this.counter = parseInt(lastFiveDigits);
+    }
+  }
   resetFormFields() {
     this.ServiceDetailsForm.reset({
       StartDTM: new Date(),
@@ -685,7 +709,353 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     this.tableData3 = [];
   }
   async save() {
-    console.log("data saved");
+    const newNumberString = this.counter + 1;
+    const currentYear = new Date().getFullYear();
+    const nextYear = currentYear + 1;
+    const currentYearShort = currentYear.toString().slice(-2);
+    const nextYearShort = nextYear.toString().slice(-2);
+    const yearSegment = `${currentYearShort}_${nextYearShort}`;
+    const randomNumber =
+      "WO/" +
+      this.storage.branch +
+      "/" +
+      yearSegment +
+      "/" +
+      `0000${newNumberString}`;
+    const data = {
+      _id: `${this.storage.companyCode}-${randomNumber}`,
+      cID: this.storage.companyCode,
+      jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+      docNo: randomNumber,
+      wORKNO: randomNumber,
+      cATEGORY: this.WorkOrderForm.controls["ordercategory"].value,
+      sCATEGORY: "Accident",
+      tYPE: 'Internal',
+      vEND: this.WorkOrderForm.controls["vendor"].value,
+      lOC: this.storage.branch,
+      sDT: null,
+      eRDT: null,
+      aRDT: null,
+      sKM: this.WorkOrderForm.controls["startKmRead"].value,
+      cKM: this.WorkOrderForm.controls["closeKmRead"].value,
+      sVCKM: this.WorkOrderForm.controls["ServiceKm"].value,
+      hOBY: this.WorkOrderForm.controls["handedover"].value,
+      sUPV: this.WorkOrderForm.controls["supervisor"].value,
+      rTRNTO: this.WorkOrderForm.controls["returnto"].value,
+      sTATUS: "Generated",
+      cLTP: null,
+      vHNO: this.WorkOrderForm.controls["vehiclenumber"].value,
+      cL: null,
+      cLDT: null,
+      cLACDT: null,
+      cREMARKS: null,
+      cLBY: null,
+      eNTBY: this.storage.userName,
+      eNTDT: new Date(),
+      eNTLOC: this.storage.branch,
+      mODBY: null,
+      mODDT: null,
+      mODLOC: null,
+      aPBY: null,
+      aPDT: null,
+      uPBY: null,
+      uPDT: null,
+      cSBY: null,
+      cSDT: null,
+    }
+    if (this.selectedcategory === "Maintenance") {
+      const maintenancedata = {
+        _id: `${this.storage.companyCode}-${randomNumber}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        sMRY: {
+          lBH: {
+            gEN: this.tableData[0].Ordergeneration,
+            aPV: null,
+            aPDT: null,
+            aPBY: null,
+            cLS: null,
+            cLSV: null,
+            cLSDT: null,
+            cLSBY: null,
+          },
+          lBC: {
+            gEN: this.tableData[1].Ordergeneration,
+            aPV: null,
+            aPDT: null,
+            aPBY: null,
+            cLS: null,
+            cLSV: null,
+            cLSDT: null,
+            cLSBY: null,
+          },
+          sPC: {
+            gEN: this.tableData[2].Ordergeneration,
+            aPV: null,
+            aPDT: null,
+            aPBY: null,
+            cLS: null,
+            cLSV: null,
+            cLSDT: null,
+            cLSBY: null,
+          }
+        },
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+      }
+      const servicedata = this.tableData1.map((x, i) => {
+        return {
+          _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
+          cID: this.storage.companyCode,
+          jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+          wORKNO: randomNumber,
+          tSGRP: x.TaskGroup,
+          tASK: x.Task,
+          mAINTP: x.MaintenanceType,
+          eSTHRS: x.Estimatedhours,
+          hCST: x.Hourlycost,
+          cST: x.Cost,
+          aPCST: x.ApprovedCost,
+          mECNIC: x.Mechanic,
+          sDTM: x.StartDTM,
+          eDTM: null,
+          eNTBY: this.storage.userName,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch,
+          mODBY: null,
+          mODDT: null,
+          mODLOC: null,
+        }
+      })
+      for (const x of servicedata) {
+        const createServiceReq = {
+          companyCode: this.companyCode,
+          collectionName: "work_maintenance_service",
+          data: x,
+          filter: { companyCode: this.companyCode },
+        };
+        const res = await firstValueFrom(
+          this.operation.operationPost("generic/create", createServiceReq)
+        );
+        if (res.success) {
+          console.log("data created");
+        }
+      }
+      if (this.tableData2.length > 0) {
+        const sparedata = this.tableData2.map((x, i) => {
+          return {
+            _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
+            cID: this.storage.companyCode,
+            jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+            wORKNO: randomNumber,
+            tSGRP: x.TaskGroup,
+            tASK: x.Task,
+            mAINTP: x.MaintenanceType,
+            eSTHRS: x.Estimatedhours,
+            hCST: x.Hourlycost,
+            cST: x.Cost,
+            aPCST: x.ApprovedCost,
+            mECNIC: x.Mechanic,
+            sDTM: x.StartDTM,
+            eDTM: null,
+            eNTBY: this.storage.userName,
+            eNTDT: new Date(),
+            eNTLOC: this.storage.branch,
+            mODBY: null,
+            mODDT: null,
+            mODLOC: null,
+          }
+        })
+        for (const x of sparedata) {
+          const createServiceReq = {
+            companyCode: this.companyCode,
+            collectionName: "work_maintenance_spair",
+            data: x,
+            filter: { companyCode: this.companyCode },
+          };
+          const res = await firstValueFrom(
+            this.operation.operationPost("generic/create", createServiceReq)
+          );
+          if (res.success) {
+            console.log("data created");
+          }
+        }
+      }
+      const createReq = {
+        companyCode: this.companyCode,
+        collectionName: "work_maintenance",
+        data: maintenancedata,
+        filter: { companyCode: this.companyCode },
+      };
+      const res = await firstValueFrom(
+        this.operation.operationPost("generic/create", createReq)
+      );
+      if (res.success) {
+        console.log("data created");
+      }
+    } else if (this.selectedcategory === "Battery management") {
+      const BatterData = {
+        _id: `${this.storage.companyCode}-${randomNumber}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        sRL: {
+          cRT: this.BatteryChangeForm.controls["CSerial"].value,
+          rPL: null,
+        },
+        oEM: {
+          cRT: this.BatteryChangeForm.controls["COEM"].value,
+          rPL: null,
+        },
+        mDL: {
+          cRT: this.BatteryChangeForm.controls["CModel"].value,
+          rPL: null,
+        },
+        rESN: {
+          cRT: this.BatteryChangeForm.controls["CReason"].value,
+          rPL: null,
+        },
+        mECNIC: this.LabourDetailsForm.controls["Mechanic"].value,
+        cOSTPHRS: this.LabourDetailsForm.controls["CostH"].value,
+        lBH: this.LabourDetailsForm.controls["LabourH"].value,
+        lBCST: this.LabourDetailsForm.controls["LabourC"].value,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+      }
+      const createBatteryReq = {
+        companyCode: this.companyCode,
+        collectionName: "work_battery",
+        data: BatterData,
+        filter: { companyCode: this.companyCode },
+      };
+      const res = await firstValueFrom(
+        this.operation.operationPost("generic/create", createBatteryReq)
+      );
+      if (res.success) {
+        console.log("data");
+
+      }
+
+    } else if (this.selectedcategory === "Tyre management") {
+      const TyreData = this.tableData3.map((x, i) => {
+        return {
+        _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        pSN: x.position,
+        cTID: x.CTyreID,
+        oNMODL:x.OEMandModel,
+        nTID: null,
+        nONMODL: null,
+        cREASON:null,
+        cMT: null,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+        }
+      })
+      for (const x of TyreData) {
+        const createTyreReq = {
+          companyCode: this.companyCode,
+          collectionName: "work_tyre",
+          data: x,
+          filter: { companyCode: this.companyCode },
+        };
+        const res = await firstValueFrom(
+          this.operation.operationPost("generic/create", createTyreReq)
+        );
+        if (res.success) {
+          console.log("data created");
+        }
+      }
+      const LabourData = {
+        _id: `${this.storage.companyCode}-${randomNumber}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        mECNIC: this.LabourDetailsForm.controls["Mechanic"].value,
+        cSTH: this.LabourDetailsForm.controls["CostH"].value,
+        lBH: this.LabourDetailsForm.controls["LabourH"].value,
+        lBCST: this.LabourDetailsForm.controls["LabourC"].value,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+      }
+      const createReq = {
+        companyCode: this.companyCode,
+        collectionName: "work_tyre_details",
+        data: LabourData,
+        filter: { companyCode: this.companyCode },
+      };
+      const res = await firstValueFrom(
+        this.operation.operationPost("generic/create", createReq)
+      );
+      if(res.success){
+        console.log("data added");     
+      }
+    }
+    const createReq = {
+      companyCode: this.companyCode,
+      collectionName: "work_order_headers",
+      data: data,
+      filter: { companyCode: this.companyCode },
+    };
+    const res = await firstValueFrom(
+      this.operation.operationPost("generic/create", createReq)
+    );
+    this.getJobOrderData()
+    if (res) {
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: "Record added Successfully",
+        showConfirmButton: true,
+      });
+      this.router.navigateByUrl("/Operation/JobOrder");
+    }
+  }
+  async getJobOrderData(){
+    const value=this.WorkOrderForm.controls["orderNo"].value;
+    const requestObject = {
+      companyCode: this.storage.companyCode,
+      collectionName: "job_order_headers",
+      filter:{jOBNO:value},
+    };
+    const res = await firstValueFrom(
+      this.operation.operationPost("generic/get", requestObject)
+    );
+    if(res.success && res.data){
+      debugger
+      console.log(res.data);
+      const data=await this.UpdateWorkOrderCount(res.data[0])
+    }
+  }
+  async UpdateWorkOrderCount(data){
+    const requestObject = {
+      companyCode: this.storage.companyCode,
+      collectionName: "job_order_headers",
+      update: {wCNO:data.wCNO + 1},  
+    };
+    const res = await firstValueFrom(
+      this.operation.operationMongoPut("generic/get", requestObject)
+    );
   }
   cancel() {
     this.router.navigateByUrl("Operation/JobOrder");

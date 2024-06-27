@@ -209,8 +209,13 @@ export const TyreDetailsColumnHeader = {
     class: "matcolumnleft",
     Style: "min-width:100px",
   },
-  OEMandModel: {
-    Title: "OEM and Model",
+  COEMandModel: {
+    Title: "Current OEM and Model",
+    class: "matcolumnleft",
+    Style: "min-width:100px",
+  },
+  NOEMandModel: {
+    Title: "New OEM and Model",
     class: "matcolumnleft",
     Style: "min-width:100px",
   },
@@ -239,7 +244,8 @@ export const TyreDetailsColumnHeader = {
 export const TyreDetailsStaticFields = [
   "position",
   "CTyreID",
-  "OEMandModel",
+  "COEMandModel",
+  "NOEMandModel",
   "NTyreID",
   "ChangeReason",
   "Comment",

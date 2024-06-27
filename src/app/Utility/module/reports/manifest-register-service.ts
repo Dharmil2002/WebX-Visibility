@@ -37,7 +37,6 @@ export class ManifestRegService {
         }
       }
     }
-        
     const res = await firstValueFrom(
       this.masterServices.masterMongoPost("generic/getReportData", reqBody)
     );

@@ -28,7 +28,7 @@ export class DocketService {
     }
     vehicleDetail: any;
     docCalledAs: DocCalledAsModel;
-    
+
     // Define a mapping object
     statusMapping = {
         default: {
@@ -807,7 +807,7 @@ export class DocketService {
             },
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
-            "cSGE": {
+            "cSGN": {
                 "cD": data?.consignorName?.value || "",
                 "nM": data?.consignorName?.name || "",
                 "cT": data?.consignorCity?.value || "",
@@ -818,7 +818,7 @@ export class DocketService {
                 "mOB": data?.consignorMobileNo || "",
                 "tEL": data?.consignorTelephoneNo || "",
             },
-            "cSGN": {
+            "cSGE": {
                 "cD": data?.consigneeName?.value || "",
                 "nM": data?.consigneeName?.name || "",
                 "cT": data?.consigneeCity?.value || "",
@@ -1157,15 +1157,15 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
-   
+
         let nonfreightAmt={};
         if (nonfreight) {
-          Object.keys(nonfreight).forEach((key) => {
-            let modifiedKey = key.replace(/./g, (match, index) => {
+            Object.keys(nonfreight).forEach((key) => {
+                let modifiedKey = key.replace(/./g, (match, index) => {
               return index >0 ? match.toUpperCase() : match.toLowerCase();
+                });
+                nonfreightAmt[modifiedKey] = nonfreight[key];
             });
-            nonfreightAmt[modifiedKey] = nonfreight[key];
-          });
         }
         let docketField = {
             "_id": data?.id || "",
@@ -1198,7 +1198,7 @@ export class DocketService {
             "iSCOM": true,
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
-            "cSGE": {
+            "cSGN": {
                 "cD": data?.consignorName?.value || "C8888",
                 "nM": data?.consignorName?.name || data?.consignorName,
                 "cT": data?.fromCity?.value || "",
@@ -1209,7 +1209,7 @@ export class DocketService {
                 "mOB": data?.ccontactNumber || "",
                 "aLMOB": data?.calternateContactNo || "",
             },
-            "cSGN": {
+            "cSGE": {
                 "cD": data?.consigneeName?.value || "C8888",
                 "nM": data?.consigneeName?.name || data?.consigneeName,
                 "cT": data?.toCity?.value || "",
@@ -1286,7 +1286,7 @@ export class DocketService {
                 "cID": this.storage.companyCode,
                 "dKTNO": isUpdate ? data?.docketNumber : "",
                 "iNVNO": element?.invoiceNumber || "",
-                "iNVDT": ConvertToDate(element?.invDt),
+                "iNVDT": moment(element?.invDt),
                 "vOL": {
                     "uNIT": "FT",
                     "l": roundToNumber(l, 3),
@@ -1306,8 +1306,8 @@ export class DocketService {
                 "cHRWT": ConvertToNumber(element?.chargedWeight || 0, 2),
                 "mTNM": element?.materialName || "",
                 "eWBNO": element?.ewayBillNo || "",
-                "eWBDT": ConvertToDate(element?.ewayBillDate),
-                "eXPDT": ConvertToDate(data?.expiryDate),
+                "eWBDT": moment(element?.ewayBillDate),
+                "eXPDT": moment(data?.expiryDate),
                 "eNTBY": this.storage.userName,
                 "eNTDT": new Date(),
                 "eNTLOC": this.storage.branch,
@@ -1329,13 +1329,13 @@ export class DocketService {
             rCM: data.rcm,
             gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
             gSTCHAMT: ConvertToNumber(data?.gstChargedAmount || 0, 2),
-            cHG: otherData ? otherData.otherCharges : '',            
+            cHG: otherData ? otherData.otherCharges : '',
             tOTAMT: ConvertToNumber(data?.totAmt || 0, 2),
             sTS: DocketFinStatus.Pending,
             sTSNM: DocketFinStatus[DocketFinStatus.Pending],
             sTSTM: new Date(),
             isBILLED: false,
-            bILLNO: "",            
+            bILLNO: "",
             pBILLAMT: ConvertToNumber(data?.totAmt || 0, 2),
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,

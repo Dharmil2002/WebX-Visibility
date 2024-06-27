@@ -28,7 +28,7 @@ import { rules } from "src/app/Utility/commonFunction/rules/rule";
 import { generateCombinations } from "src/app/Utility/commonFunction/common";
 import { CustomerContractService } from "src/app/core/service/customerContract/customerContract-services.service";
 import convert from 'convert-units';
-import { GenericActions, RateTypeCalculation } from "src/app/config/myconstants";
+import { GenericActions } from "src/app/config/myconstants";
 import moment from "moment";
 @Component({
   selector: "app-prq-entry-page",
@@ -96,6 +96,7 @@ export class PrqEntryPageComponent implements OnInit {
     name: "Find Contract",
     iconName: "search",
   };
+  isDisbled: boolean=false;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -342,7 +343,34 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
+    if (!this.prqEntryTableForm.valid) {
+      this.prqEntryTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
+    if(this.isDisbled){
+      Swal.fire({
+        icon: "info",
+        title: "Processing",
+        text: "Your data is being processed, please wait...",
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
     this.iSShow = false;
+    this.isDisbled=true;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
     prqDetails["cID"] = this.storage.companyCode;
@@ -690,6 +718,9 @@ export class PrqEntryPageComponent implements OnInit {
       this.contract = { ...result?.data };
       const calculateValue = (rateType, weight, rt) => {
         const actualWeight = (rateType == "Per Kg") ? convert(weight).from('mt').to('kg') : weight;
+        if(rateType == "Flat"){
+          return rt
+        }
         return Math.min(Math.max(rt * actualWeight));
       };
       const calculateWeight = (rateType) => {

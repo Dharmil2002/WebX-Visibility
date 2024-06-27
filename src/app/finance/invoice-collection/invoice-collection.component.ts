@@ -389,10 +389,10 @@ export class InvoiceCollectionComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Customer";
-        this.VoucherDataRequestModel.partyCode = data?.cUST?.cD || "",
-          this.VoucherDataRequestModel.partyName = data?.cUST?.nM || "",
-          this.VoucherDataRequestModel.partyState = data?.cUST?.sT || "",
-          this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.partyCode = "" + data?.cUST?.cD || "";
+        this.VoucherDataRequestModel.partyName = data?.cUST?.nM || "";
+        this.VoucherDataRequestModel.partyState = data?.cUST?.sT || "";
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
         this.VoucherDataRequestModel.entryDate = new Date();
         this.VoucherDataRequestModel.panNo = ""
 
@@ -446,7 +446,7 @@ export class InvoiceCollectionComponent implements OnInit {
                 docType: "Voucher",
                 partyType: "Customer",
                 docNo: mRNO,
-                partyCode: data?.cUST?.cD || "",
+                partyCode: "" + data?.cUST?.cD || "",
                 partyName: data?.cUST?.nM || "",
                 entryBy: this.storage.userName,
                 entryDate: Date(),

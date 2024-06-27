@@ -23,6 +23,14 @@
                 </app-generic-table-v2>
             </div>
         </div>
+        <form [formGroup]="VendorAdvanceTaxationTDSFilterForm">
+            <app-form-webxpress [form]="VendorAdvanceTaxationTDSFilterForm" [FormTitle]="'TDS Deduction'"
+                [formData]="jsonControlVendorAdvanceTaxationTDSFilterArray"
+                (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1'" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
         <div class="row">
             <div class="col-6">
                 <form [formGroup]="PayableSummaryFilterForm">
@@ -49,8 +57,7 @@
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row  d-flex justify-content-end">
-                <button [disabled]="!PaymentSummaryFilterForm.valid || !PayableSummaryFilterForm.valid ||
-                    tableData.length==0" class="msr-3" mat-raised-button color="primary"
+                <button [disabled]="!isFormValid()" class="msr-3" mat-raised-button color="primary"
                     (click)="Submit()">Submit</button>
                 <button mat-button (click)="RedirectToTHCPayment()">Back</button>
             </div>

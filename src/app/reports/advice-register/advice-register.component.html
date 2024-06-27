@@ -1,14 +1,11 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <form [formGroup]="adviceRegisterForm">
-        <app-form-webxpress [form]="adviceRegisterForm" [FormTitle]="'Advice Register Report'"
-            [formData]="jsonControlFormArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'Submit'">
+        <app-form-webxpress [form]="adviceRegisterForm" 
+            [FormTitle]="'Advice Register Report'"
+            [formData]="jsonControlFormArray" 
+            (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)"
+            [showSaveButton]="true" [submit]="'View'">
         </app-form-webxpress>
-    </form>
-
-    <app-generic-ui-grid *ngIf="LoadTable" [formTitle]="formTitle" [showCSVButton]="true" [csvFileName]="csvFileName"
-        [source]="source" [columns]="columns" [sorting]="sorting" [columnMenu]="columnMenu" [paging]="paging"
-        [searching]="searching" [loading]="loading" [theme]="theme">
-    </app-generic-ui-grid>
-
+    </form> 
 </app-common-wrapper-webxpress>

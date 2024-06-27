@@ -111,7 +111,6 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       filter: {},
       collectionName: "customer_detail"
     };
-    debugger
     const financialYearlist = this.generalLedgerReportService.getFinancialYear();
     this.filter.Filter(
       this.jsonControlArray,
@@ -222,7 +221,7 @@ export class CreditNoteRegisterReportComponent implements OnInit {
     try {
       this.ReportingBranches = [];
       if (this.CreditNoteReportRegisterForm.value.Individual == "N") {
-        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CreditNoteReportRegisterForm.value.branch.name);
+        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CreditNoteReportRegisterForm.value.Branch.value);
         this.ReportingBranches.push(this.CreditNoteReportRegisterForm.value.Branch?.value||"");
       } else {
         this.ReportingBranches.push(this.CreditNoteReportRegisterForm.value.Branch?.value||"");

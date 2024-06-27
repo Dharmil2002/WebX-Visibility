@@ -81,6 +81,7 @@ import { BalanceSheetViewDetailsComponent } from './Account Report/Components/Ba
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
+import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -167,7 +168,8 @@ import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.compon
     BalanceSheetViewDetailsComponent,
     ProfitAndLossViewDetailsVouchersListComponent,
     AdviceRegisterComponent,
-    GcnFlowReportComponent
+    GcnFlowReportComponent,
+    DriverStatusRegisterComponent
   ],
   exports: [],
 

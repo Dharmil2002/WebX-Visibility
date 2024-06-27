@@ -4,6 +4,7 @@ export class VendorPaymentControl {
   THCPaymentFilterArray: FormControls[];
   PayableSummaryFilterArray: FormControls[];
   PaymentSummaryFilterArray: FormControls[];
+  VendorAdvanceTaxationTDSArray: FormControls[];
   constructor(FormValues) {
     this.THCPaymentFilterArray = [
 
@@ -106,6 +107,19 @@ export class VendorPaymentControl {
         },],
       },
       {
+        name: "AdvancePaymentAmount",
+        label: "Advance Payment Amount ₹",
+        placeholder: "Advance Payment Amount ₹",
+        type: "number",
+        value: FormValues?.AdvancePaymentAmount,
+        generatecontrol: true,
+        disable: true,
+        Validations: [{
+          name: "required",
+          message: "Advance Amount ₹ is required"
+        },],
+      },
+      {
         name: "BalancePayable",
         label: "Balance Payable ₹",
         placeholder: "Balance Payable ₹",
@@ -170,7 +184,10 @@ export class VendorPaymentControl {
             value: "RTGS/UTR",
             name: "RTGS/UTR",
           },
-
+          {
+            value: "Journal",
+            name: "Journal",
+          }
         ],
         filterOptions: "",
         autocomplete: "",
@@ -238,6 +255,34 @@ export class VendorPaymentControl {
         name: "CashAccount",
         label: "Cash Account",
         placeholder: "Cash Account",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Account is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "JournalAccount",
+        label: "Journal Account",
+        placeholder: "Journal Account",
         type: "dropdown",
         value: "",
         filterOptions: "",
@@ -340,6 +385,83 @@ export class VendorPaymentControl {
         },
       },
     ]
+    this.VendorAdvanceTaxationTDSArray = [
+      {
+        name: "TDSExempted",
+        label: "TDS Exempted",
+        placeholder: "TDS Exempted",
+        type: "toggle",
+        value: false,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        functions: {
+          onChange: "toggleTDSExempted",
+        },
+      },
+      {
+        name: "TDSSection",
+        label: "TDS Section",
+        placeholder: "TDS Section",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "TDS Section is required",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        },
+        functions: {
+          onOptionSelect: "TDSSectionFieldChanged",
+        },
+      },
+      {
+        name: "TDSRate",
+        label: "TDS Rate %",
+        placeholder: "TDS Rate",
+        type: "number",
+        value: "",
+        Validations: [
+          {
+            name: "required",
+            message: "TDS Rate is required",
+          },
+        ],
+
+        generatecontrol: true,
+        disable: true,
+      },
+      {
+        name: "TDSAmount",
+        label: "TDS Amount ₹",
+        placeholder: "TDS Amount ₹",
+        type: "number",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [
+          {
+            name: "required",
+            message: "TDS Amount is required",
+          }
+        ],
+      },
+    ];
   }
 
 
@@ -354,5 +476,8 @@ export class VendorPaymentControl {
   }
   getTPaymentHeaderFilterArrayControls() {
     return this.PaymentHeaderFilterArray;
+  }
+  getVendorAdvanceTaxationTDSArrayControls() {
+    return this.VendorAdvanceTaxationTDSArray;
   }
 }

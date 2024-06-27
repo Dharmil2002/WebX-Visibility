@@ -189,16 +189,16 @@ export class DepsService {
                         "eNTLOC": this.storage.branch
                     });
             
-                    const createDepsDetailsJson = () => ({
+                    const createDepsDetailsJson = (remarks) => ({
                         "cID": this.storage.companyCode,
                         "dEPSNO": "",
-                        "dKTNO": dk.dKTNO,
-                        "sFX": dk.sFX,
+                        "dKTNO": dk.extraDetails.dKTNO,
+                        "sFX": dk.extraDetails.sFX,
                         "dEPSDT": new Date(),
                         "rASNTO": this.storage.userName,
                         "rASNDT": new Date(),
                         "rASLOC": this.storage.branch,
-                        "rMK": dk?.rMK || "",
+                        "rMK":remarks || "",
                         "lST": {
                             "rASNTO": this.storage.userName,
                             "rASNDT": new Date()
@@ -220,10 +220,10 @@ export class DepsService {
                                     "dEPTYPNM": "Damage",
                                     "dEPIMG":dk?.extra?.demageUpload||"",
                                     "dMG": {
-                                        "pKGS": ConvertToNumber(dk?.depsPkgs || 0),
+                                        "pKGS": ConvertToNumber(dk?.extra?.demagePkgs || 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
-                                        "rES": dk?.depsRes || "",
-                                        "rMK": dk?.rMK || ""
+                                        "rES":dk?.extra?.demageReason?.name || "",
+                                        "rMK":dk?.extra?.demageRemarks || ""
                                     },
                                     "pF": {
                                         "pKGS": 0,
@@ -239,7 +239,7 @@ export class DepsService {
                                     }
                                 };
                                 depsdMG.push(createDepsHeaderJson(typeSpecificData));
-                                depsdMGDet.push(createDepsDetailsJson());
+                                depsdMGDet.push(createDepsDetailsJson(dk?.extra?.demageRemarks));
                                 break;
                             case "S":
                                 typeSpecificData = {
@@ -259,14 +259,14 @@ export class DepsService {
                                         "rMK": ""
                                     },
                                     "sHORT": {
-                                        "pKGS": ConvertToNumber(dk?.depsPkgs || 0),
+                                        "pKGS": ConvertToNumber(dk?.extra?.shortPkgs|| 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
-                                        "rES": "",
-                                        "rMK": ""
+                                        "rES":dk?.extra?.shortReason.name,
+                                        "rMK":dk?.extra?.shortRemarks
                                     }
                                 };
                                 depsShort.push(createDepsHeaderJson(typeSpecificData));
-                                depsShortDetails.push(createDepsDetailsJson());
+                                depsShortDetails.push(createDepsDetailsJson(dk?.extra?.shortRemarks));
                                 break;
                             case "P":
                                 typeSpecificData = {
@@ -280,10 +280,10 @@ export class DepsService {
                                         "rMK": ""
                                     },
                                     "pF": {
-                                        "pKGS": ConvertToNumber(dk?.depsPkgs || 0),
+                                        "pKGS": ConvertToNumber(dk?.extra?.pilferagePkgs || 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
-                                        "rES": "",
-                                        "rMK": ""
+                                        "rES":dk?.extra?.pilferageReason?.name||"",
+                                        "rMK":dk?.extra?.pilferageRemarks||""
                                     },
                                     "sHORT": {
                                         "pKGS": 0,
@@ -293,7 +293,7 @@ export class DepsService {
                                     }
                                 };
                                 depspF.push(createDepsHeaderJson(typeSpecificData));
-                                depspFDet.push(createDepsDetailsJson());
+                                depspFDet.push(createDepsDetailsJson(dk?.extra?.pilferageRemarks||""));
                                 break;
                         }
                     });
@@ -302,7 +302,7 @@ export class DepsService {
             
         }
          depsHeader=[...depsdMG,...depsExtra,...depspF,...depsShort]
-         depsDetails=[...depsdMGDet,...depsExtraDet,...depsShortDetails]
+         depsDetails=[...depsdMGDet,...depsExtraDet,...depsShortDetails,...depspFDet]
         if (depsHeader.length > 0 && depsDetails.length > 0) {
             return { depsHeader, depsDetails }
         }
@@ -407,7 +407,7 @@ export class DepsService {
                     "dKTNO": element.dKTNO,
                     "pKGS": null,
                     "sTS": element.sTS,
-                    "dEPIMG": element?.dEPIMG,
+                    "pod": element?.dEPIMG,
                     "rES": reason,
                     "extra": element,
                     "actions": [sTS.includes(element.sTS) ? 'Update' : ""]

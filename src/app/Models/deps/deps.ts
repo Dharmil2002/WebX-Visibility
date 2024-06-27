@@ -33,7 +33,7 @@ export class DepsModel implements IFieldDefinition {
       Style: "min-width:8%",
       datatype:"string",
     },
-    dEPIMG: {
+    pod: {
       Title: "Image",
       class: "matcolumncenter",
       Style: "min-width:16%",

@@ -296,7 +296,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     allFormData.shortUpload=this.imageData?.shortUpload||"";
     allFormData.shortPkts && allFormData.depsOptions.push({name:"Shortage",value:'S'});
     allFormData.DamagePkts && allFormData.depsOptions.push({name:"Damage",value:'D'});
-    allFormData.pilferagePkts && allFormData.depsOptions.push({name:"Pilferage",value:'D'});
+    allFormData.pilferagePkts && allFormData.depsOptions.push({name:"Pilferage",value:'P'});
     this.dialogRef.close(allFormData);
   }
   onDepsSelect() {

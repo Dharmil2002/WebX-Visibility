@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -58,8 +59,11 @@ export class ThcRegisterReportComponent implements OnInit {
     this.getDropdownData();
   }
   async getDropdownData() {
-    const locationList = await this.locationService.locationFromApi();
-    this.filter.Filter(this.jsonthcregisterFormArray, this.thcregisterTableForm, locationList, "Location", false);
+    let locationList = [];
+    locationList = await this.locationService.locationFromApi();
+    locationList = locationList.map(x => (
+      { value: x.value, name: x.value + " : " + x.name  }));
+    this.filter.Filter(this.jsonthcregisterFormArray, this.thcregisterTableForm, locationList, "Location", true);
   }
   initializeFormControl() {
     this.thcregisterFormControl = new thcReportControl();

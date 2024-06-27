@@ -762,9 +762,26 @@ export class AddLocationMasterComponent implements OnInit {
         let mappedCity = event.eventArgs.value.filter(
           (items) => items.value == "CT"
         );
-        this.locationTableForm.controls.mappedCity.patchValue(
-          mappedCity.map((item) => item.name).toString()
-        );
+
+        if (this.isUpdate) {
+          // Split existingMappedCityNames into an array of names
+          const existingMappedCityNames = this.locationTable.mappedCity
+            ? this.locationTable.mappedCity.split(',').map(name => name.trim())
+            : [];
+
+          // Map newMappedCityNames to get an array of names
+          const newMappedCityNames = mappedCity
+            .map((item) => item.name)
+            .filter((name) => !existingMappedCityNames.includes(name)); // Filter out duplicates
+
+          // Concatenate the two arrays
+          mappedCity = [...newMappedCityNames, ...existingMappedCityNames];
+        } else {
+          // Map to get an array of names
+          mappedCity = mappedCity.map((item) => item.name);
+        }
+
+        this.locationTableForm.controls.mappedCity.patchValue(mappedCity.toString());
       }
       if (item == "ST") {
         let mappedState = event.eventArgs.value.filter(

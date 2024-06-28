@@ -184,6 +184,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     InvoiceAmount: 0.00,
     Yield: 0.00,
   }
+  isBoth: boolean=false;
+  checkboxChecked: boolean;
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -446,7 +448,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.consignmentForm.controls['risk'].setValue(rskType);
     this.consignmentForm.controls['pkgsType'].setValue(pkgType);
     this.freightForm.controls['freightRatetype'].setValue("");
-    this.freightForm.controls['rcm'].setValue("");
+    this.freightForm.controls['rcm'].setValue("Y");
     this.consignmentForm.controls['payType'].setValue("");
     this.consignmentForm.controls['transMode'].setValue(transMode);
     this.consignmentForm.controls['delivery_type'].setValue(delvryType);
@@ -584,8 +586,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const city = this.consignmentForm.controls['toCity'].value.ct;
     return this.validateGST(gstNumber, stateCode, city, 'cnegst');
   }
-   //#endregion
-  
+  //#endregion
+
   /*below function is for the get city based on pincode*/
   async getDestinationBasedOnPincode(event) {
     const locations = await this.locationService.locationFromApi({ D$or: [{ locPincode: parseInt(event.eventArgs.option.value.value), mappedPinCode: { D$in: [parseInt(event.eventArgs.option.value.value)] } }] });
@@ -911,23 +913,23 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     ]);
 
     let fields = fieldMap.get(name);
-
-    this.consignmentForm.controls[fields['cUSTNM']].setValue({ name: gstData.cUSTNM, value: gstData.cUSTCD, otherdetails: gstData });
-    this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData.cUSTPH);
-    this.consignmentForm.controls[fields['aLTPH']].setValue(gstData.aLTPH);
-    this.consignmentForm.controls[fields['aDD']].setValue({ name: gstData.aDD, value: gstData.aDD, otherdetails: gstData });
+   
+    this.consignmentForm.controls[fields['cUSTNM']].setValue(gstData?{ name: gstData.cUSTNM, value: gstData.cUSTCD, otherdetails: gstData }:"");
+    this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData?.cUSTPH||"");
+    this.consignmentForm.controls[fields['aLTPH']].setValue(gstData?.aLTPH||"");
+    this.consignmentForm.controls[fields['aDD']].setValue(gstData?{ name: gstData.aDD, value: gstData.aDD, otherdetails: gstData }:"");
   }
 
   async findWalkinGST(gstno) {
     const request = {
       companyCode: this.storage.companyCode,
       collectionName: "walkin_customers",
-      filters: {
+      filter: {
         gSTNO: gstno
       }
     };
     const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));
-    return res?.data
+    return Object.keys(res.data).length>0 ? res.data : null;
   }
   /*End*/
   async AddressDetails() {
@@ -1593,14 +1595,29 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   /*End*/
+  OnChangeCheckBox(event) {
+    this.checkboxChecked=event.event.checked;
+    this.isManual=this.checkboxChecked==true?false:true;
+    this.isUpdate=this.checkboxChecked==true?false:true;
+    this.consignmentForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
+  }
   checkDocketRules() {
     const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
     if (STYP) {
       const isManual = STYP.vAL === "M";
+      if(STYP.vAL!="B"){
       this.allFormControls.find(x => x.name == "docketNumber").disable = !isManual;
       this.consignmentForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
       this.isManual = isManual;
       this.isUpdate = isManual;
+      }
+      else{
+        this.isBoth= STYP.vAL == "B"
+        this.checkboxChecked=true
+        this.isManual=false;
+        this.consignmentForm.controls['docketNumber'].setValue("Computerized");
+      }
+     
     }
 
     const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
@@ -1741,7 +1758,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         await this.toPayAccouting();
       }
     }
-    else if (this.isManual) {
+    else if (this.isManual ) {
       await this.docketService.addDcrDetails(reqDkt?.docketsDetails, this.dcrDetail);
       let reqBody = {
         companyCode: this.storage.companyCode,
@@ -1808,7 +1825,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           }
           const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
           window.open(url, '', 'width=1000,height=800');
-          this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+          this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+            window.location.reload();
+          });
         } else if (result.isDismissed) {
           // Handle the action for the cancel button here.
           this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
@@ -2507,38 +2526,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                     "narration": item.narration ?? ""
                   };
                 }),
-                // debit: 
-                // [{
-                //   "accCode": ledgerInfo['AST003001'].LeadgerCode,
-                //   "accName": ledgerInfo['AST003001'].LeadgerName,
-                //   "accCategory": ledgerInfo['AST003001'].LeadgerCategory,
-                //   "amount": ConvertToNumber(TotalAmount, 2),
-                //   "narration": `When paid docket ${DocketNo} generated `
-                // }],
-                // credit: [{
-                //   "accCode": ledgerInfo['INC001008'].LeadgerCode,
-                //   "accName": ledgerInfo['INC001008'].LeadgerName,
-                //   "accCategory": ledgerInfo['INC001008'].LeadgerCategory,
-                //   "amount": ConvertToNumber(TotalAmount - GSTAmount, 2),
-                //   "narration": `When paid docket ${DocketNo} generated `
-                // }]
               };
-              // if (GSTAmount > 0) {
-              //   reqBody.credit.push({
-              //     "accCode": ledgerInfo['SGST'].LeadgerCode,
-              //     "accName": ledgerInfo['SGST'].LeadgerName,
-              //     "accCategory": ledgerInfo['SGST'].LeadgerCategory,
-              //     "amount": ConvertToNumber(GSTAmount / 2, 2),
-              //     "narration": `When paid docket ${DocketNo} generated `
-              //   });
-              //   reqBody.credit.push({
-              //     "accCode": ledgerInfo['CGST'].LeadgerCode,
-              //     "accName": ledgerInfo['CGST'].LeadgerName,
-              //     "accCategory": ledgerInfo['CGST'].LeadgerCategory,
-              //     "amount": ConvertToNumber(GSTAmount / 2, 2),
-              //     "narration": `When paid docket ${DocketNo} generated `
-              //   });
-              // }
 
               this.voucherServicesService
                 .FinancePost("fin/account/posting", reqBody)
@@ -2549,18 +2537,31 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                       title: "Booked Successfully And Voucher Created",
                       text: "GCN No: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
                       showConfirmButton: true,
+                      denyButtonText: 'Print',
+                      showDenyButton: true,
+                      showCancelButton: true,
+                      cancelButtonText: 'Close'
                     }).then((result) => {
                       if (result.isConfirmed) {
-                        Swal.hideLoading();
-                        setTimeout(() => {
-                          Swal.close();
-                        }, 2000);
+                        // Redirect after the alert is closed with OK button.
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                      } else if (result.isDenied) {
+                        // Handle the action for the deny button here.
+                        const templateBody = {
+                          templateName: "DKT",
+                          PartyField: "",
+                          DocNo: this.consignmentForm.controls["docketNumber"].value,
+                        };
+                        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                        window.open(url, '', 'width=1000,height=800');
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                      } else if (result.isDismissed) {
+                        // Handle the action for the cancel button here.
                         this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
                       }
                     });
                   },
                   error: (err: any) => {
-
                     if (err.status === 400) {
                       this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
                     } else {
@@ -2568,7 +2569,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                     }
                   },
                 });
-
+              try {
+                // Additional logic here
+              } catch (error) {
+                this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+              }
             },
             error: (err: any) => {
               this.snackBarUtilityService.ShowCommonSwal("error", err);
@@ -2577,10 +2582,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }
-
-
     }, "C-Note Booking Voucher Generating..!");
-
   }
   GetVouchersLedgers(TotalAmount, DocketNo) {
 

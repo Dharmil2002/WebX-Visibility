@@ -63,6 +63,7 @@ import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/cluster.master.service";
+import { debug } from "console";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -130,10 +131,12 @@ export class ConsignmentEntryFormComponent
   mseq: boolean;
   lastDoc: string;
   isManual: boolean;
+  checkboxChecked: boolean; // Checkbox is checked by default
   dcrDetail = {};
   conLoc: boolean;
   pageLoad: boolean;
   LoadType: any;
+  isBoth: boolean=false;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -1460,16 +1463,30 @@ export class ConsignmentEntryFormComponent
     }
   }
   /*End*/
+  OnChangeCheckBox(event) {
+    this.checkboxChecked=event.event.checked;
+    this.isManual=this.checkboxChecked==true?false:true;
+    this.isUpdate=this.checkboxChecked==true?false:true;
+    this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
+  }
   checkDocketRules() {
     const STYP = this.rules.find((x) => x.rULEID == "STYP" && x.aCTIVE);
     if (STYP) {
       const isManual = STYP.vAL === "M";
+      if(STYP.vAL!="B"){
       this.model.allformControl.find((x) => x.name == "docketNumber").disable =
         !isManual;
       this.model.consignmentTableForm.controls["docketNumber"].setValue(
         isManual ? "" : "Computerized"
       );
       this.isManual = isManual;
+    } 
+    else{
+      this.isBoth= STYP.vAL == "B"
+      this.checkboxChecked=true
+      this.isManual=false;
+      this.model.consignmentTableForm.controls['docketNumber'].setValue("Computerized");
+    }
     }
     const ELOC = this.rules.find((x) => x.rULEID == "ELOC" && x.aCTIVE);
     if (ELOC) {

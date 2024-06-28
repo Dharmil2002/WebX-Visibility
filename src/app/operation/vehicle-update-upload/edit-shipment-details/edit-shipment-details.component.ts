@@ -23,6 +23,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   EditShipmentForm: UntypedFormGroup;
   jsonControlArray: any;
   imageData: any = {};
+  className: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   @Output() notifyParent: EventEmitter<string> = new EventEmitter();
   METADATA = {
     checkBoxRequired: true,
@@ -111,6 +112,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, data.field.name, this.
       EditShipmentForm, this.imageData, "Delivery", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
   }
+
   async bindDropDown() {
     const partialDelivery = await this.generalService.getGeneralMasterData("PART_D");
     const unDelivery = await this.generalService.getGeneralMasterData("UNDELY");
@@ -126,6 +128,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     });
 
   }
+
   toggleChanges(event) {
     const updateJsonData = (fieldNames, requireValue, event) => {
       return this.allJsonControlArray.map((x) => {
@@ -167,6 +170,7 @@ export class EditShipmentDetailsComponent implements OnInit {
 
     this.updateValidators();
   }
+
   updateValidators() {
     this.allJsonControlArray.forEach((control) => {
       const formControl = this.EditShipmentForm.get(control.name);
@@ -286,6 +290,52 @@ export class EditShipmentDetailsComponent implements OnInit {
       Swal.fire('Warning', result.message, 'warning');
     }
   }
+  getPkgsCheck(){
+    const arrivalPkgs = this.EditShipmentForm.get('noofPkts')?.value||0;
+    const shortPkgs = this.EditShipmentForm.get('shortPkgs')?.value||0;
+    const philoPkgs = this.EditShipmentForm.get('pilferagePkgs')?.value||0;
+    const demangePkgs = this.EditShipmentForm.get('demagePkgs')?.value||0;
+    const result = this.validatePackages(arrivalPkgs, shortPkgs, philoPkgs, demangePkgs);
+    if (result) {
+        Swal.fire('Error', result.message, 'error');
+        this.EditShipmentForm.get(result.field).setValue(0);
+    } else {
+        Swal.fire('Success', 'All package values are valid.', 'success');
+    }
+  
+  }
+   validatePackages(arrivalPkgs, shortPkgs, philoPkgs, demangePkgs) {
+    switch (true) {
+        // Case 1: Any individual package count should not exceed the arrival package count
+        case shortPkgs > arrivalPkgs:
+            return { message: `Short packages (${shortPkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'shortPkgs' };
+
+        case philoPkgs > arrivalPkgs:
+            return { message: `Philo packages (${philoPkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'philoPkgs' };
+
+        case demangePkgs > arrivalPkgs:
+            return { message: `Demange packages (${demangePkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'demangePkgs' };
+
+        // Case 2: Philo or Demange packages cannot exceed remaining packages after accounting for Short packages
+        case philoPkgs > (arrivalPkgs - shortPkgs):
+            return { message: `Philo packages (${philoPkgs}) cannot be greater than remaining packages after short packages (${arrivalPkgs - shortPkgs}).`, field: 'philoPkgs' };
+
+        case demangePkgs > (arrivalPkgs - shortPkgs):
+            return { message: `Demange packages (${demangePkgs}) cannot be greater than remaining packages after short packages (${arrivalPkgs - shortPkgs}).`, field: 'demangePkgs' };
+
+        // Case 3: Demange packages cannot exceed remaining packages after accounting for Short and Philo packages
+        case demangePkgs > (arrivalPkgs - shortPkgs - philoPkgs):
+            return { message: `Demange packages (${demangePkgs}) cannot be greater than remaining packages after short and philo packages (${arrivalPkgs - shortPkgs - philoPkgs}).`, field: 'demangePkgs' };
+
+        // Case 4: Philo packages cannot exceed remaining packages after accounting for Short and Demange packages
+        case philoPkgs > (arrivalPkgs - shortPkgs - demangePkgs):
+            return { message: `Philo packages (${philoPkgs}) cannot be greater than remaining packages after short and demange packages (${arrivalPkgs - shortPkgs - demangePkgs}).`, field: 'philoPkgs' };
+
+        // No errors
+        default:
+            return null;
+    }
+}
   save() {
     debugger
     let allFormData = { ...this.EditShipmentForm.getRawValue() };

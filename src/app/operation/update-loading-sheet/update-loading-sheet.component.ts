@@ -39,8 +39,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   jsonControlArray: any;
   jsonscanControlArray: any;
   scanPackage: string;
-  width="70%"
-  height="60%";
+  width: "20%"
+  height: "90%"
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -343,7 +343,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   async CompleteScan() {
-    debugger
     this.snackBarUtilityService.commonToast(
       async () => {
         let packageChecked = false;
@@ -435,7 +434,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
-  }
+  } 
+  
   async updateTripStatus() {
     const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);
     let tripDetails

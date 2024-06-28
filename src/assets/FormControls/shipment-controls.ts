@@ -139,6 +139,9 @@ export class ShipmentEditControls {
                     require: false,
                     name: "Damage Package"
                 },
+                functions: {
+                    onChange: "getPkgsCheck",
+                },
                 value: false,
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -206,6 +209,9 @@ export class ShipmentEditControls {
                     require: false,
                     name: "Pilferage Package"
                 },
+                functions: {
+                    onChange: "getPkgsCheck",
+                },
                 value: false,
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -272,6 +278,9 @@ export class ShipmentEditControls {
                 additionalData: {
                     require: false,
                     name: "Short Package"
+                },
+                functions: {
+                    onChange: "getPkgsCheck",
                 },
                 value: false,
                 Validations: [],

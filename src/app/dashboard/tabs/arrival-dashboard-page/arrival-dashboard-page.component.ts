@@ -31,6 +31,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
   companyCode: number = 0;
   menuItemflag: boolean = true;
+  
   breadscrums = [
     {
       title: "Arrival Details",
@@ -164,7 +165,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   menuItems = [
     { label: 'Vehicle Arrival', componentDetails: MarkArrivalComponent, function: "GeneralMultipleView" },
     { label: 'Arrival Scan', componentDetails: UpdateLoadingSheetComponent, function: "GeneralMultipleView" },
-    // Add more menu items as needed
     {label: 'Cancel THC'}
   ];
 

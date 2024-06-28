@@ -14,6 +14,7 @@ import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-ser
 import Swal from 'sweetalert2';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { ManualVoucherFilterComponent } from './manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-manual-voucher',
@@ -111,6 +112,7 @@ export class ManualVoucherComponent implements OnInit {
   VoucherSummaryForm: UntypedFormGroup;
   jsonControlVoucherSummaryArray: any;
   DataResponseHeader: any;
+  updatedVoucherNo: any;
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
   DeatisData = []
@@ -153,8 +155,7 @@ export class ManualVoucherComponent implements OnInit {
     this.AllTableData = detail.map((x) => {
       return {
         ...x, vCAN: "Generated",
-        //actions: ["Modify", "Delete"]
-         actions: (x.vTYPNM === "DebitVoucher" || x.vTYPNM === "CreditVoucher" )  ? ["Delete"] : ["Modify"]
+        actions: ["Modify", "Delete"]
       };
     });
 
@@ -200,6 +201,7 @@ export class ManualVoucherComponent implements OnInit {
       }
     });
   }
+  
   async getFilterVoucherList() {
     this.tableData = this.AllTableData.filter(item => {
       const itemDate = new Date(item.eNTDT);
@@ -258,7 +260,16 @@ export class ManualVoucherComponent implements OnInit {
               ).then((res) => {
               if (res) {
                 if (res.success) {
-                  SwalerrorMessage("success", "Voucher Reverse Accounting Entry Done Successfully", "Voucher No: " + res.data.ops[0].vNO, true)
+                  const filter = {
+                    _id : data.data._id
+                  }
+                  const VoucherNoList = {
+                    rEVFLAG:"Y",
+                    rEVREM: result.value +  res.data.ops[0].vNO
+                    
+                  }
+                  this.UpdateData(filter,VoucherNoList);
+                    SwalerrorMessage("success", "Voucher Reverse Accounting Entry Done Successfully", "Voucher No: " + res.data.ops[0].vNO, true)
                   this.getVoucherList();
                 } else {
                   SwalerrorMessage("error", res.message, "", true)
@@ -285,6 +296,16 @@ export class ManualVoucherComponent implements OnInit {
         },
       });
     }
+  }
+  async UpdateData(filter,VoucherNoList) {
+    const req = {
+      companyCode: this.StorageService.companyCode,
+      collectionName: "voucher_trans",
+      filter: filter,
+      update: VoucherNoList
+    }
+   firstValueFrom(this.masterService.masterPut("generic/update", req)) 
+
   }
   VoucherNoFunction(event) {
     const templateBody = {

@@ -1470,7 +1470,6 @@ export class ConsignmentEntryFormComponent
     this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
   }
   checkDocketRules() {
-    debugger;
     const STYP = this.rules.find((x) => x.rULEID == "STYP" && x.aCTIVE);
     if (STYP) {
       const isManual = STYP.vAL === "M";

@@ -5,9 +5,9 @@ export class WorkOrderFormControls {
   WorkOrderArray: FormControls[];
   ServiceDetailsArray: FormControls[];
   SpareDetailsArray: FormControls[];
-  BatteryChangeArray:FormControls[];
-  TyreDetailsArray:FormControls[];
-  LabourDetailsArray:FormControls[];
+  BatteryChangeArray: FormControls[];
+  TyreDetailsArray: FormControls[];
+  LabourDetailsArray: FormControls[];
   constructor(WorkOrder: WorkOrderModel, IsUpdate: boolean) {
     this.WorkOrderArray = [
       {
@@ -15,12 +15,11 @@ export class WorkOrderFormControls {
         label: "Vehicle Number",
         placeholder: "Vehicle Number",
         type: "text",
-        value:WorkOrder?.vehiclenumber,
+        value: WorkOrder?.vehiclenumber,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [
-        ],
+        Validations: [],
         generatecontrol: true,
         disable: true,
         additionalData: {
@@ -38,8 +37,7 @@ export class WorkOrderFormControls {
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
 
       {
@@ -53,8 +51,7 @@ export class WorkOrderFormControls {
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
       {
         name: "orderNo",
@@ -86,16 +83,16 @@ export class WorkOrderFormControls {
         //     minDate: new Date("01 Jan 1900")
         // }
       },
-      {
-        name: '',
-        label: "",
-        placeholder: "",
-        type: '',
-        value: '',
-        generatecontrol: true,
-        disable: false,
-        Validations: []
-      },
+      // {
+      //   name: '',
+      //   label: "",
+      //   placeholder: "",
+      //   type: '',
+      //   value: '',
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: []
+      // },
       {
         name: "ordercategory",
         label: "Work Order category",
@@ -113,41 +110,55 @@ export class WorkOrderFormControls {
         disable: false,
         Validations: [],
         functions: {
-          onSelection: "CheckForSelectedCategory"
-        }
+          onSelection: "CheckForSelectedCategory",
+        },
       },
       {
         name: "subcategory",
         label: "Sub-category",
         placeholder: "Sub-category",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        generatecontrol: true,
-        disable: false,
         Validations: [
+          {
+            name: "required",
+            message: "Sub Category is required..",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-      },
-      {
-        name: '',
-        label: "",
-        placeholder: "",
-        type: '',
-        value: '',
         generatecontrol: true,
         disable: false,
-        Validations: []
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
+      // {
+      //   name: '',
+      //   label: "",
+      //   placeholder: "",
+      //   type: '',
+      //   value: '',
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: []
+      // },
       {
         name: "workshoptype",
         label: "Workshop type",
         placeholder: "Workshop type",
         type: "Staticdropdown",
         value: [
-          { name: "Internal" ,value: "Internal" },
-          { name: "External" ,value: "External" },
+          { name: "Internal", value: "Internal" },
+          { name: "External", value: "External" },
         ],
         filterOptions: "",
         autocomplete: "",
@@ -163,16 +174,16 @@ export class WorkOrderFormControls {
         additionalData: {
           showNameAndValue: true,
         },
-        functions:{
-          onSelection: "checkForWorkshopType"
-        }
+        functions: {
+          onSelection: "checkForWorkshopType",
+        },
       },
       {
         name: "vendor",
         label: "Vendor",
         placeholder: "Vendor",
-        type: "text",
-        value:"",
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -189,17 +200,21 @@ export class WorkOrderFormControls {
             message: "Choose proper value",
           },
         ],
-        generatecontrol: false,
+        generatecontrol: true,
         disable: false,
         additionalData: {
-          // showNameAndValue: false,
+          showNameAndValue: true,
+        },
+        functions: {
+          onOptionSelect: "getVendorLocation",
+          onChange: "Reset",
         },
       },
       {
         name: "location",
         label: "Location",
         placeholder: "Location",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -217,10 +232,10 @@ export class WorkOrderFormControls {
             message: "Choose proper value",
           },
         ],
-        generatecontrol: false,
+        generatecontrol: true,
         disable: false,
         additionalData: {
-          // showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
       {
@@ -282,7 +297,7 @@ export class WorkOrderFormControls {
         label: "Start Km Reading",
         placeholder: "Start Km Reading",
         type: "number",
-        value:"",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -335,57 +350,56 @@ export class WorkOrderFormControls {
         name: "handedover",
         label: "Handed over by",
         placeholder: "Handed over by",
-        type: "text",
-        value:"",
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        generatecontrol: true,
-        disable: false,
         Validations: [
           {
             name: "required",
-            message: "Handed Over By is required..",
+            message: "Handed Over by is required..",
           },
-          // {
-          //   name: "autocomplete",
-          // },
-          // {
-          //   name: "invalidAutocomplete",
-          //   message: "Choose proper value",
-          // },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
+        generatecontrol: true,
+        disable: false,
         additionalData: {
-          // showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
       {
         name: "supervisor",
         label: "Supervisor",
         placeholder: "Supervisor",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        generatecontrol: true,
-        disable: false,
         Validations: [
-
           {
             name: "required",
-            message: "Supevisor is required..",
+            message: "Supervisor is required..",
           },
-          // {
-          //   name: "autocomplete",
-          // },
-          // {
-          //   name: "invalidAutocomplete",
-          //   message: "Choose proper value",
-          // },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
+        generatecontrol: true,
+        disable: false,
         additionalData: {
-          // showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
       {
@@ -416,7 +430,6 @@ export class WorkOrderFormControls {
           // showNameAndValue: false,
         },
       },
-
     ];
     this.ServiceDetailsArray = [
       {
@@ -426,7 +439,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -435,8 +448,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Task Group is required..",
           },
-
-        ]
+        ],
       },
       {
         name: "Task",
@@ -445,7 +457,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -454,7 +466,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Task is required..",
           },
-        ]
+        ],
       },
       {
         name: "MaintenanceType",
@@ -463,7 +475,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -472,7 +484,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Maintenance Type is required..",
           },
-        ]
+        ],
       },
       {
         name: "Estimatedhours",
@@ -481,7 +493,7 @@ export class WorkOrderFormControls {
         type: "number",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -490,11 +502,10 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Estimated hours is required..",
           },
-
         ],
-        functions:{
-          onChange:"CalculateTotalServiceCost"
-        }
+        functions: {
+          onChange: "CalculateTotalServiceCost",
+        },
       },
       {
         name: "Hourlycost",
@@ -503,7 +514,7 @@ export class WorkOrderFormControls {
         type: "number",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -513,9 +524,9 @@ export class WorkOrderFormControls {
             message: "Hourly Cost is required..",
           },
         ],
-        functions:{
-          onChange:"CalculateTotalServiceCost"
-        }
+        functions: {
+          onChange: "CalculateTotalServiceCost",
+        },
       },
       {
         name: "Cost",
@@ -524,7 +535,7 @@ export class WorkOrderFormControls {
         type: "number",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: true,
@@ -533,7 +544,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Cost  is required..",
           },
-        ]
+        ],
       },
       {
         name: "ApprovedCost",
@@ -542,12 +553,11 @@ export class WorkOrderFormControls {
         type: "number",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ]
+        Validations: [],
       },
       {
         name: "Mechanic",
@@ -556,7 +566,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -565,7 +575,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Mechanic is required..",
           },
-        ]
+        ],
       },
       {
         name: "StartDTM",
@@ -574,7 +584,7 @@ export class WorkOrderFormControls {
         type: "datetimerpicker",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -583,7 +593,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Star DTM is required..",
           },
-        ]
+        ],
       },
       {
         name: "EndDTM",
@@ -601,10 +611,10 @@ export class WorkOrderFormControls {
           //   name: "required",
           //   message: "End DTM is required..",
           // },
-        ]
-      }
+        ],
+      },
     ];
-    this.SpareDetailsArray=[
+    this.SpareDetailsArray = [
       {
         name: "TaskGroup",
         label: "Task Group",
@@ -612,7 +622,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -621,8 +631,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Task Group is required..",
           },
-
-        ]
+        ],
       },
       {
         name: "SparePart",
@@ -631,7 +640,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -640,7 +649,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Spare Part is required..",
           },
-        ]
+        ],
       },
       {
         name: "MaintenanceType",
@@ -649,7 +658,7 @@ export class WorkOrderFormControls {
         type: "text",
         value: "",
         additionalData: {
-          metaData: ""
+          metaData: "",
         },
         generatecontrol: true,
         disable: false,
@@ -658,7 +667,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Maintenance Type is required..",
           },
-        ]
+        ],
       },
       {
         name: "Stock",
@@ -666,8 +675,7 @@ export class WorkOrderFormControls {
         placeholder: "Stock",
         type: "number",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -675,7 +683,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Stock is required..",
           },
-        ]
+        ],
       },
       {
         name: "Quantity",
@@ -683,8 +691,7 @@ export class WorkOrderFormControls {
         placeholder: "Quantity",
         type: "number",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -693,9 +700,9 @@ export class WorkOrderFormControls {
             message: "Quantity is required..",
           },
         ],
-        functions:{
-          onChange:"CalculateTotalSpareCost"
-        }
+        functions: {
+          onChange: "CalculateTotalSpareCost",
+        },
       },
       {
         name: "CostOrUnit",
@@ -703,8 +710,7 @@ export class WorkOrderFormControls {
         placeholder: "Cost",
         type: "number",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -712,11 +718,10 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Cost is required..",
           },
-          
         ],
-        functions:{
-          onChange:"CalculateTotalSpareCost"
-        }
+        functions: {
+          onChange: "CalculateTotalSpareCost",
+        },
       },
       {
         name: "Cost",
@@ -724,13 +729,10 @@ export class WorkOrderFormControls {
         placeholder: "Cost",
         type: "number",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
-        
+        Validations: [],
       },
       {
         name: "ApprovedCost",
@@ -738,13 +740,10 @@ export class WorkOrderFormControls {
         placeholder: "Approved Cost",
         type: "number",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
-        Validations: [
-
-        ]
+        Validations: [],
       },
       {
         name: "Mechanic",
@@ -752,8 +751,7 @@ export class WorkOrderFormControls {
         placeholder: "Mechanic",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -761,7 +759,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Mechanic is required..",
           },
-        ]
+        ],
       },
       {
         name: "StartDTM",
@@ -769,12 +767,10 @@ export class WorkOrderFormControls {
         placeholder: "Start DTM",
         type: "datetimerpicker",
         value: new Date(),
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
-        Validations: [
-        ]
+        Validations: [],
       },
       {
         name: "EndDTM",
@@ -782,23 +778,20 @@ export class WorkOrderFormControls {
         placeholder: "End DTM",
         type: "datetimerpicker",
         value: new Date(),
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ]
-      }
-    ]
-    this.BatteryChangeArray=[
+        Validations: [],
+      },
+    ];
+    this.BatteryChangeArray = [
       {
         name: "CSerial",
         label: "Current Serial No",
         placeholder: "Current Serial No",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -807,7 +800,6 @@ export class WorkOrderFormControls {
             message: "Current Serial No  is required..",
           },
         ],
-        
       },
       {
         name: "NSerial",
@@ -815,8 +807,7 @@ export class WorkOrderFormControls {
         placeholder: "New Serial No",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -825,9 +816,9 @@ export class WorkOrderFormControls {
           //   message: "New Serial No  is required..",
           // },
         ],
-        functions:{
+        functions: {
           // onChange:"validateCurrentAndNewValues"
-        }
+        },
       },
       {
         name: "COEM",
@@ -835,8 +826,7 @@ export class WorkOrderFormControls {
         placeholder: "Current Serial No",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -844,7 +834,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Current OEM is required..",
           },
-        ]
+        ],
       },
       {
         name: "NOEM",
@@ -852,8 +842,7 @@ export class WorkOrderFormControls {
         placeholder: "New OEM No",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -862,9 +851,9 @@ export class WorkOrderFormControls {
           //   message: "New OEM No is required..",
           // },
         ],
-         functions:{
+        functions: {
           // onChange:"validateCurrentAndNewValues"
-        }
+        },
       },
       {
         name: "CModel",
@@ -872,8 +861,7 @@ export class WorkOrderFormControls {
         placeholder: "Current Model",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -881,7 +869,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Current Model is required..",
           },
-        ]
+        ],
       },
       {
         name: "NModel",
@@ -889,8 +877,7 @@ export class WorkOrderFormControls {
         placeholder: "New Model",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -899,9 +886,9 @@ export class WorkOrderFormControls {
           //   message: "New Model is required..",
           // },
         ],
-        functions:{
+        functions: {
           // onChange:"validateCurrentAndNewValues"
-        }
+        },
       },
       {
         name: "CReason",
@@ -909,12 +896,10 @@ export class WorkOrderFormControls {
         placeholder: "Current Reason",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
-        Validations: [
-        ]
+        Validations: [],
       },
       {
         name: "NReason",
@@ -922,23 +907,20 @@ export class WorkOrderFormControls {
         placeholder: "New Reason",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ]
+        Validations: [],
       },
-    ]
-    this.TyreDetailsArray=[
+    ];
+    this.TyreDetailsArray = [
       {
         name: "position",
         label: "Position",
         placeholder: "Position ",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -946,8 +928,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Position  is required..",
           },
-        ]
-        
+        ],
       },
       {
         name: "CTyreID",
@@ -955,8 +936,7 @@ export class WorkOrderFormControls {
         placeholder: "Current Tyre ID",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -965,7 +945,6 @@ export class WorkOrderFormControls {
             message: "Current Tyre ID  is required..",
           },
         ],
-        
       },
       {
         name: "NTyreID",
@@ -973,8 +952,7 @@ export class WorkOrderFormControls {
         placeholder: "New Tyre ID",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -983,9 +961,9 @@ export class WorkOrderFormControls {
           //   message: "New Tyre ID  is required..",
           // },
         ],
-        functions:{
+        functions: {
           // onChange:"validateCurrentAndNewValues"
-        }
+        },
       },
       {
         name: "COEMandModel",
@@ -993,8 +971,7 @@ export class WorkOrderFormControls {
         placeholder: "Current OEM and Model",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -1002,7 +979,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "OEM and Model is required..",
           },
-        ]
+        ],
       },
       {
         name: "NOEMandModel",
@@ -1010,8 +987,7 @@ export class WorkOrderFormControls {
         placeholder: "New OEM and Model",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -1020,9 +996,9 @@ export class WorkOrderFormControls {
           //   message: "OEM and Model is required..",
           // },
         ],
-        functions:{
+        functions: {
           // onChange:"validateCurrentAndNewValues"
-        }
+        },
       },
       {
         name: "ChangeReason",
@@ -1030,8 +1006,7 @@ export class WorkOrderFormControls {
         placeholder: "Change reason",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -1039,7 +1014,7 @@ export class WorkOrderFormControls {
           //   name: "required",
           //   message: "Change reason  is required..",
           // },
-        ]
+        ],
       },
       {
         name: "Comment",
@@ -1047,23 +1022,20 @@ export class WorkOrderFormControls {
         placeholder: "Comment",
         type: "textarea",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ]
+        Validations: [],
       },
-    ]
-    this.LabourDetailsArray=[
+    ];
+    this.LabourDetailsArray = [
       {
         name: "Mechanic",
         label: "Mechanic",
         placeholder: "Mechanic",
         type: "text",
         value: "",
-        additionalData: {
-        },
+        additionalData: {},
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -1071,7 +1043,7 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Mechanic is required..",
           },
-        ]
+        ],
       },
       {
         name: "CostH",
@@ -1090,9 +1062,9 @@ export class WorkOrderFormControls {
             message: "Cost Hour is required..",
           },
         ],
-        functions:{
-          onChange:"CalculateTotalLabourCost"
-       }
+        functions: {
+          onChange: "CalculateTotalLabourCost",
+        },
       },
       {
         name: "LabourH",
@@ -1111,9 +1083,9 @@ export class WorkOrderFormControls {
             message: "Labour Hour is required..",
           },
         ],
-        functions:{
-           onChange:"CalculateTotalLabourCost"
-        }
+        functions: {
+          onChange: "CalculateTotalLabourCost",
+        },
       },
       {
         name: "LabourC",
@@ -1126,10 +1098,9 @@ export class WorkOrderFormControls {
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
-    ]
+    ];
   }
 
   getWorkOrderFormControls() {
@@ -1138,16 +1109,16 @@ export class WorkOrderFormControls {
   getServiceDetailsArrayControls() {
     return this.ServiceDetailsArray;
   }
-  getSpareDetailsArrayControls(){
+  getSpareDetailsArrayControls() {
     return this.SpareDetailsArray;
   }
-  getBatteryChangeArrayControls(){
+  getBatteryChangeArrayControls() {
     return this.BatteryChangeArray;
   }
-  getTyreDetailsArrayControls(){
+  getTyreDetailsArrayControls() {
     return this.TyreDetailsArray;
   }
-  getLabourDetailsArrayControls(){
+  getLabourDetailsArrayControls() {
     return this.LabourDetailsArray;
   }
 }

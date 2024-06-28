@@ -1,10 +1,18 @@
 import { AfterViewInit, Component, OnInit } from "@angular/core";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from "@angular/forms";
 import { StorageService } from "src/app/core/service/storage.service";
 import { Router } from "@angular/router";
 import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
-import { autocompleteValidator, formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+import {
+  autocompleteValidator,
+  formGroupBuilder,
+} from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { firstValueFrom } from "rxjs";
 import { WorkOrderFormControls } from "src/assets/FormControls/add-work-order-controls";
@@ -30,7 +38,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
   selector: "app-add-work-order",
   templateUrl: "./add-work-order.component.html",
 })
-export class AddWorkOrderComponent implements OnInit, AfterViewInit {
+export class AddWorkOrderComponent implements OnInit {
   jsonUrl = "../../../assets/data/work-order-table-data.json";
   breadscrums = [
     {
@@ -81,8 +89,19 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
   KPICountData: { count: any; title: string; class: string }[];
   KPICountData2: { count: any; title: string; class: string }[];
   menuItemData: any;
-  counter: number;
+  counter: number = 0;
   originalJsonControlWorkOrderArray: any;
+  vendorStatus: any;
+  vendor: string;
+  location: string;
+  locationStatus: any;
+  valuechanged: boolean = false;
+  jobsubCategory: string;
+  jobsubCategoryStatus: any;
+  handedover: string;
+  handedoverStatus: any;
+  supervisor: string;
+  supervisorStatus: any;
   constructor(
     private http: HttpClient,
     private fb: UntypedFormBuilder,
@@ -90,7 +109,8 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     private router: Router,
     private filter: FilterUtils,
     private dataService: DataService,
-    private operation: OperationService
+    private operation: OperationService,
+    private masterService: MasterService
   ) {
     this.companyCode = this.storage.companyCode;
     this.menuItemData = this.dataService.getMenuItemData();
@@ -119,16 +139,14 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     });
     this.initializeFormControl();
     this.getWorkOrdersData();
+    this.getJobSubCategorydata();
+    this.getUserData()
     this.WorkOrderForm.controls["actualreturndate"].disable();
     this.WorkOrderForm.controls["workshoptype"].setValue("Internal");
-    this.checkForWorkshopType()
-    this.WorkOrderForm.controls["ordercategory"].valueChanges.subscribe(
-      (value) => {
-        this.resetFormFields();
-      }
-    );
-  }
-  ngAfterViewInit(): void {
+    this.checkForWorkshopType();
+    this.WorkOrderForm.controls["workshoptype"].valueChanges.subscribe((x) => {
+      this.valuechanged = true;
+    });
   }
   initializeFormControl() {
     this.WorkOrderFormControls = new WorkOrderFormControls(
@@ -147,6 +165,28 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       this.WorkOrderFormControls.getTyreDetailsArrayControls();
     this.jsonControlLabourDetailsArray =
       this.WorkOrderFormControls.getLabourDetailsArrayControls();
+    this.jsonControlWorkOrderArray.forEach((data) => {
+      if (data.name === "vendor") {
+        this.vendor = data.name;
+        this.vendorStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === "location") {
+        this.location = data.name;
+        this.locationStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === "subcategory") {
+        this.jobsubCategory = data.name;
+        this.jobsubCategoryStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === "handedover") {
+        this.handedover = data.name;
+        this.handedoverStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === "supervisor") {
+        this.supervisor = data.name;
+        this.supervisorStatus = data.additionalData.showNameAndValue;
+      }
+    });
     this.originalJsonControlWorkOrderArray = [
       ...this.jsonControlWorkOrderArray,
     ];
@@ -173,32 +213,171 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     control.clearValidators();
     control.updateValueAndValidity();
   }
-  setControlValidators(control, validators) {
+  applyValidators(control, validators) {
     if (control) {
-        control.setValidators(validators);
-        control.updateValueAndValidity();
+      control.setValidators(validators);
+      control.updateValueAndValidity();
     }
-}
+  }
   CheckForSelectedCategory() {
     this.selectedcategory = this.WorkOrderForm.controls["ordercategory"].value;
+    this.resetFormFields();
     if (this.selectedcategory === "Maintenance") {
       this.ServiceDetailsForm.controls["EndDTM"].disable();
       this.SpareDetailsForm.controls["EndDTM"].disable();
     }
   }
-  checkForWorkshopType() {
-  const WorkshopTypevalue = this.WorkOrderForm.controls["workshoptype"].value;
+  async getUserData() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "user_master",
+      filter: { companyCode: this.storage.companyCode },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data) {
+      const data = res.data;
+      const userdata = data.map((x) => {
+        return {
+          name: x.name,
+          value: x.userId,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlWorkOrderArray,
+        this.WorkOrderForm,
+        userdata,
+        this.handedover,
+        this.handedoverStatus
+      );
+      this.filter.Filter(
+        this.jsonControlWorkOrderArray,
+        this.WorkOrderForm,
+        userdata,
+        this.supervisor,
+        this.supervisorStatus
+      );
+    }
+  }
+  async getJobSubCategorydata() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "General_master",
+      filter: { companyCode: this.storage.companyCode, codeType: "JOBSCAT" },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data) {
+      const data = res.data;
+      const JobSubCData = data.map((x) => {
+        return {
+          name: x.codeDesc,
+          value: x.codeDesc,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlWorkOrderArray,
+        this.WorkOrderForm,
+        JobSubCData,
+        this.jobsubCategory,
+        this.jobsubCategoryStatus
+      );
+    }
+  }
+  async checkForWorkshopType() {
+    if (this.valuechanged) {
+      this.WorkOrderForm.controls["vendor"].reset();
+      this.WorkOrderForm.controls["location"].reset();
+    }
+    const WorkshopTypevalue = this.WorkOrderForm.controls["workshoptype"].value;
     if (WorkshopTypevalue === "Internal") {
       this.jsonControlWorkOrderArray =
         this.originalJsonControlWorkOrderArray.filter(
           (item) => item.name !== "vendor" && item.name !== "location"
         );
-        this.clearControlValidators(this.WorkOrderForm.get("vendor"));
-        this.clearControlValidators(this.WorkOrderForm.get("location"));
+      this.clearControlValidators(this.WorkOrderForm.get("vendor"));
+      this.clearControlValidators(this.WorkOrderForm.get("location"));
     } else {
-      this.jsonControlWorkOrderArray = [...this.originalJsonControlWorkOrderArray];
-      this.setControlValidators(this.WorkOrderForm.get("vendor"), [Validators.required]);
-      this.setControlValidators(this.WorkOrderForm.get("location"), [Validators.required]);
+      this.jsonControlWorkOrderArray = [
+        ...this.originalJsonControlWorkOrderArray,
+      ];
+      this.applyValidators(this.WorkOrderForm.get("vendor"), [
+        Validators.required,
+        autocompleteValidator(),
+      ]);
+      this.applyValidators(this.WorkOrderForm.get("location"), [
+        Validators.required,
+        autocompleteValidator(),
+      ]);
+      await this.getVendorData();
+    }
+  }
+  async getVendorData() {
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "vendor_detail",
+      filter: { companyCode: this.storage.companyCode },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data) {
+      const data = res.data;
+      const vendordata = data.map((x) => {
+        return {
+          name: x.vendorName,
+          value: x.vendorCode,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlWorkOrderArray,
+        this.WorkOrderForm,
+        vendordata,
+        this.vendor,
+        this.vendorStatus
+      );
+    }
+  }
+  async getVendorLocation() {
+    const value = this.WorkOrderForm.controls["vendor"].value;
+    let req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "vendor_detail",
+      filter: { companyCode: this.storage.companyCode, vendorName: value.name },
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    if (res.success && res.data) {
+      const data = res.data;
+      const vendordata = data[0];
+      const vendorlocation = vendordata.vendorLocation;
+      let locreq = {
+        companyCode: this.storage.companyCode,
+        collectionName: "location_detail",
+        filter: { locCode: { D$in: vendorlocation } },
+      };
+      const locRes = await firstValueFrom(
+        this.masterService.masterPost("generic/get", locreq)
+      );
+      if (locRes.success && locRes.data) {
+        const locdata = locRes.data;
+        const dropdowndata = locdata.map((x) => {
+          return {
+            name: x.locCode,
+            value: x.locName,
+          };
+        });
+        this.filter.Filter(
+          this.jsonControlWorkOrderArray,
+          this.WorkOrderForm,
+          dropdowndata,
+          this.location,
+          this.locationStatus
+        );
+      }
     }
   }
   CalculateTotalServiceCost() {
@@ -303,7 +482,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     const newEntry = {
       ...value,
       StartDTM: moment(value.StartDTM).format("DD-MM-yy HH:mm"),
-      EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
+      // EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
       actions: ["Edit", "Remove"],
     };
     this.updateTotalTableValues(
@@ -348,7 +527,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
     const newEntry = {
       ...value,
       StartDTM: moment(value.StartDTM).format("DD-MM-yy HH:mm"),
-      EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
+      // EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
       actions: ["Edit", "Remove"],
     };
     this.updateTotalTableValues(
@@ -465,7 +644,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       Comment,
     };
     this.TyreDetailsForm.setValue(formValues);
-    this.tableData3 = this.tableData3.filter((x) => x.NTyreID !== NTyreID);
+    this.tableData3 = this.tableData3.filter((x) => x.CTyreID !== CTyreID);
   }
   handleMenuItemClick(data) {
     if (data.label.label === "Remove" && data.data.Task) {
@@ -481,7 +660,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
         "subtract"
       );
       this.updateTotalTableValues("Labour Cost", 0, removedCost, "subtract");
-      // this.updateTableData("Spare Cost", 0, 0, "add"); // Assuming no change for Spare Cost
+      this.updateTotalTableValues("Spare Cost", 0, 0, "add"); // Assuming no change for Spare Cost
       const Estimatedhours = calculateTotalField(
         this.tableData1,
         "Estimatedhours"
@@ -510,7 +689,7 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
         "subtract"
       );
       this.updateTotalTableValues("Labour Cost", 0, removedCost, "subtract");
-      // this.updateTableData("Spare Cost", 0, 0, "add"); // Assuming no change for Spare Cost
+      this.updateTotalTableValues("Spare Cost", 0, 0, "add"); // Assuming no change for Spare Cost
       this.fillServiceDetails(data);
     }
     if (data.label.label === "Remove" && data.data.SparePart) {
@@ -518,6 +697,8 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
         (x) => x.TaskGroup !== data.data.TaskGroup
       );
       const removedCost = parseFloat(data.data.Cost || "0");
+      this.updateTotalTableValues("Labour Hours", 0, 0, "add");
+      this.updateTotalTableValues("Labour Cost", 0, 0, "add");
       this.updateTotalTableValues("Spare Cost", 0, removedCost, "subtract");
       const TotalCost = calculateTotalField(this.tableData2, "Cost");
       this.KPICountData2 = [
@@ -529,16 +710,16 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       ];
     } else if (data.data.SparePart) {
       const removedCost = parseFloat(data.data.Cost || "0");
-      // this.updateTotalTableValues("Labour Hours", 0, 0, "add");
-      // this.updateTotalTableValues("Labour Cost", 0, 0, "add");
+      this.updateTotalTableValues("Labour Hours", 0, 0, "add");
+      this.updateTotalTableValues("Labour Cost", 0, 0, "add");
       this.updateTotalTableValues("Spare Cost", 0, removedCost, "subtract");
       this.fillSpareDetails(data);
     }
     if (data.label.label === "Remove" && data.data.NTyreID) {
       this.tableData3 = this.tableData3.filter(
-        (x) => x.NTyreID !== data.data.NTyreID
+        (x) => x.CTyreID !== data.data.CTyreID
       );
-    } else if (data.data.NTyreID) {
+    } else if (data.data.CTyreID) {
       this.fillTyreDetails(data);
     }
   }
@@ -557,6 +738,9 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       const lastFiveDigits = lastWorkNo.split("/").pop();
       this.counter = parseInt(lastFiveDigits);
     }
+  }
+  Reset() {
+    this.WorkOrderForm.controls["location"].reset();
   }
   resetFormFields() {
     this.ServiceDetailsForm.reset({
@@ -831,8 +1015,8 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       jDT: this.WorkOrderForm.controls["orderdate"].value,
       cATEGORY: this.WorkOrderForm.controls["ordercategory"].value,
       sCATEGORY: "Accident",
-      tYPE: "Internal",
-      vEND: this.WorkOrderForm.controls["vendor"].value,
+      tYPE: this.WorkOrderForm.controls["workshoptype"].value,
+      vEND: null,
       lOC: this.storage.branch,
       sDT: null,
       eRDT: null,
@@ -840,8 +1024,8 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       sKM: this.WorkOrderForm.controls["startKmRead"].value,
       cKM: this.WorkOrderForm.controls["closeKmRead"].value,
       sVCKM: this.WorkOrderForm.controls["ServiceKm"].value,
-      hOBY: this.WorkOrderForm.controls["handedover"].value,
-      sUPV: this.WorkOrderForm.controls["supervisor"].value,
+      hOBY: this.WorkOrderForm.controls["handedover"].value.name,
+      sUPV: this.WorkOrderForm.controls["supervisor"].value.name,
       rTRNTO: this.WorkOrderForm.controls["returnto"].value,
       sTATUS: "Generated",
       cLTP: null,
@@ -869,6 +1053,12 @@ export class AddWorkOrderComponent implements OnInit, AfterViewInit {
       cSBY: null,
       cSDT: null,
     };
+    if (this.WorkOrderForm.controls["workshoptype"].value === "External") {
+      data.vEND = {
+        vCD: this.WorkOrderForm.controls["vendor"].value.value,
+        vNM: this.WorkOrderForm.controls["vendor"].value.name,
+      };
+    }
     const createReq = {
       companyCode: this.companyCode,
       collectionName: "work_order_headers",

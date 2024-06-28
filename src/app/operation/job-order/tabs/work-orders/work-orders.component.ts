@@ -61,7 +61,7 @@ export class WorkOrdersComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:150px",
     },
-    IssuedTo: {
+    tYPE: {
       Title: "Issued To",
       class: "matcolumnleft",
       Style: "min-width:150px",
@@ -93,7 +93,7 @@ export class WorkOrdersComponent implements OnInit {
     "jDT",
     "vEHNO",
     "cATEGORY",
-    "IssuedTo",
+    "tYPE",
     "Vendor",
     "jOBNO",
     "sTATUS",
@@ -105,7 +105,7 @@ export class WorkOrdersComponent implements OnInit {
     private operation: OperationService,
     private storage: StorageService,
     private masterService: MasterService,
-    private dataService: DataService,
+    private dataService: DataService
   ) {
     this.addAndEditPath = "Operation/AddJobOrder";
     this.allColumnFilter = this.columnHeader;
@@ -121,7 +121,7 @@ export class WorkOrdersComponent implements OnInit {
     // }
     let details = {};
     let successMessage = "";
-  
+
     switch (label) {
       case "Approve":
         details = {
@@ -149,45 +149,51 @@ export class WorkOrdersComponent implements OnInit {
         successMessage = "Successfully Closed";
         break;
       case "Cancel":
-    
-      const result = await Swal.fire({
-        title: 'Reason For Cancel?',
-        html: `<input type="text" id="swal-input1" class="swal2-input" placeholder="Additional comments">`,
-        focusConfirm: false,
-        showCancelButton: true,
-        width: "auto",
-        cancelButtonText: 'Cancel',
-        preConfirm: () => {
-          return (document.getElementById('swal-input1') as HTMLInputElement).value;
-        }
-      });
+        const result = await Swal.fire({
+          title: "Reason For Cancel?",
+          html: `<input type="text" id="swal-input1" class="swal2-input" placeholder="Additional comments">`,
+          focusConfirm: false,
+          showCancelButton: true,
+          width: "auto",
+          cancelButtonText: "Cancel",
+          preConfirm: () => {
+            return (document.getElementById("swal-input1") as HTMLInputElement)
+              .value;
+          },
+        });
 
-      if (result.isConfirmed) {
-        if (data.data.docNo) {
-           details = {
-            sTATUS: "Cancel",
-            cL: true,
-            cLDT: new Date(),
-            cREMARKS: result.value
-          };
-          successMessage = "Successfully Cancelled";
+        if (result.isConfirmed) {
+          if (data.data.docNo) {
+            details = {
+              sTATUS: "Cancel",
+              cL: true,
+              cLDT: new Date(),
+              cREMARKS: result.value,
+            };
+            successMessage = "Successfully Cancelled";
+          }
+        } else {
+          Swal.fire(
+            "Error",
+            "Error in Voucher Reverse Accounting Entry",
+            "error"
+          );
         }
-      } else {
-        Swal.fire("Error", "Error in Voucher Reverse Accounting Entry", "error");
-      }
-      break;
+        break;
       default:
         return;
     }
     try {
-       const req = {
+      const req = {
         companyCode: this.storage.companyCode,
         collectionName: "work_order_headers",
         filter: { docNo: data.data.docNo },
         update: details,
       };
 
-      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
+      const res = await firstValueFrom(
+        this.masterService.masterPut("generic/update", req)
+      );
       if (res.success) {
         this.getWorkOrderData();
         Swal.fire({
@@ -202,24 +208,56 @@ export class WorkOrdersComponent implements OnInit {
       console.error("Error updating work order:", error);
     }
   }
+  // async getWorkOrderData() {
+  //   const requestObject = {
+  //     companyCode: this.storage.companyCode,
+  //     collectionName: "work_order_headers",
+  //   };
+  //   const res = await firstValueFrom(
+  //     this.operation.operationPost("generic/get", requestObject)
+  //   );
+  //   if (res.success) {
+  //     const data = res.data;
+  //     const newArray = data.map((data) => ({
+  //       ...data,
+  //       Vendor:`${data?.vEND?.vCD}:${data?.vEND?.vNM}`,
+  //       // actions: ["New Work Order", "Approve", "Update", "Close", "Cancel"],
+  //       actions: ["Approve", "Update", "Close", "Cancel"],
+  //     }));
+  //     this.tableData = newArray;
+  //     this.tableLoad = false;
+  //   }
+  // }
   async getWorkOrderData() {
     const requestObject = {
       companyCode: this.storage.companyCode,
       collectionName: "work_order_headers",
     };
-    const res = await firstValueFrom(
-      this.operation.operationPost("generic/get", requestObject)
-    );
-    if (res.success) {
-      const data = res.data;
-      const newArray = data.map((data) => ({
-        ...data,
-        Vendor:`${data.vEND.vCD}:${data.vEND.vNM}`,
-        // actions: ["New Work Order", "Approve", "Update", "Close", "Cancel"],
-        actions: ["Approve", "Update", "Close", "Cancel"],
-      }));
-      this.tableData = newArray;
-      this.tableLoad = false;
+    try {
+      const res = await firstValueFrom(
+        this.operation.operationPost("generic/get", requestObject)
+      );
+      if (res.success) {
+        const data = res.data;
+        const newArray = data.map((item) => {
+          // Create the base object with common properties
+          const newItem = {
+            ...item,
+            actions: ["Approve", "Update", "Close", "Cancel"],
+          };
+          // Conditionally add the Vendor property
+          if (item?.vEND?.vCD && item?.vEND?.vNM) {
+            newItem.Vendor = `${item.vEND.vCD}:${item.vEND.vNM}`;
+          }
+          return newItem;
+        });
+
+        this.tableData = newArray;
+        this.tableLoad = false;
+      }
+    } catch (error) {
+      console.error("Error fetching work order data:", error);
+      // Handle error appropriately (e.g., show error message to user)
     }
   }
 }

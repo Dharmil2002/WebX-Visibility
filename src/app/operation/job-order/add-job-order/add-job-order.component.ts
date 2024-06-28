@@ -32,7 +32,7 @@ export class AddJobOrderComponent implements OnInit {
   companyCode: any;
   vehicleNo: string;
   vehicleNoStatus: any;
-  counter: number;
+  counter: number = 0;
   constructor(
     private fb: UntypedFormBuilder,
     private storage: StorageService,

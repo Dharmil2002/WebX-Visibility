@@ -85,11 +85,11 @@ export const ServiceDetailsColumnHeader = {
     class: "matcolumncenter",
     Style: "min-width:4px",
   },
-  EndDTM: {
-    Title: "End DTM",
-    class: "matcolumncenter",
-    Style: "min-width:4px",
-  },
+  // EndDTM: {
+  //   Title: "End DTM",
+  //   class: "matcolumncenter",
+  //   Style: "min-width:4px",
+  // },
   actionsItems: {
     Title: "Action",
     class: "matcolumnleft",
@@ -107,7 +107,7 @@ export const ServiceDetailsStaticFields = [
   "ApprovedCost",
   "Mechanic",
   "StartDTM",
-  "EndDTM",
+  // "EndDTM",
 ];
 export const SpareDetailsColumnHeader = {
   TaskGroup: {
@@ -171,12 +171,12 @@ export const SpareDetailsColumnHeader = {
     // Style: "max-width:150px",
     Style: "min-width:4px",
   },
-  EndDTM: {
-    Title: "End DTM",
-    class: "matcolumncenter",
-    // Style: "max-width:150px",
-    Style: "min-width:4px",
-  },
+  // EndDTM: {
+  //   Title: "End DTM",
+  //   class: "matcolumncenter",
+  //   // Style: "max-width:150px",
+  //   Style: "min-width:4px",
+  // },
   actionsItems: {
     Title: "Action",
     class: "matcolumnleft",
@@ -195,7 +195,7 @@ export const SpareDetailsStaticFields = [
   "ApprovedCost",
   "Mechanic",
   "StartDTM",
-  "EndDTM",
+  // "EndDTM",
 ];
 export const TyreDetailsColumnHeader = {
   position: {

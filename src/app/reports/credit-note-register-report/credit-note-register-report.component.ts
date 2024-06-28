@@ -111,7 +111,6 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       filter: {},
       collectionName: "customer_detail"
     };
-    debugger
     const financialYearlist = this.generalLedgerReportService.getFinancialYear();
     this.filter.Filter(
       this.jsonControlArray,

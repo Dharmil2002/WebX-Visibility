@@ -15,7 +15,8 @@
   <!--  Basic Detail-->
   <div *ngIf="pageLoad">
     <form [formGroup]="model.consignmentTableForm">
-      <app-form-webxpress [form]="model.consignmentTableForm" [FormTitle]="'Basic Detail'"
+      <app-form-webxpress [form]="model.consignmentTableForm" [FormTitle]="'Basic Detail'" [DisplayCheckbox]="isBoth"
+        [CheckBoxMessage]="'Computerized'"[checkboxValue]="checkboxChecked"
         [formData]="jsonControlArrayBasic" (functionCallEmitter)="functionCallHandler($event)"
         [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>

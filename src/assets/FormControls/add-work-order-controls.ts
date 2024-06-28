@@ -15,7 +15,7 @@ export class WorkOrderFormControls {
         label: "Vehicle Number",
         placeholder: "Vehicle Number",
         type: "text",
-        value:"",
+        value:WorkOrder?.vehiclenumber,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -74,7 +74,7 @@ export class WorkOrderFormControls {
         label: "Order date",
         placeholder: "Order date",
         type: "datetimerpicker",
-        value: "",
+        value: WorkOrder?.orderdate,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -113,7 +113,7 @@ export class WorkOrderFormControls {
         disable: false,
         Validations: [],
         functions: {
-          onSelection: "SelectedCategory"
+          onSelection: "CheckForSelectedCategory"
         }
       },
       {
@@ -144,11 +144,11 @@ export class WorkOrderFormControls {
         name: "workshoptype",
         label: "Workshop type",
         placeholder: "Workshop type",
-        type: "text",
-        // value: [
-        //   { value: "OWN", name: "OWN" },
-        // ],
-        value: "",
+        type: "Staticdropdown",
+        value: [
+          { name: "Internal" ,value: "Internal" },
+          { name: "External" ,value: "External" },
+        ],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -157,16 +157,15 @@ export class WorkOrderFormControls {
         Validations: [
           {
             name: "required",
-            message: "Workshop type is required..",
+            message: "Workshop Type is required",
           },
-          // {
-          //   name: "autocomplete",
-          // },
-          // {
-          //   name: "invalidAutocomplete",
-          //   message: "Choose proper value",
-          // },
         ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions:{
+          onSelection: "checkForWorkshopType"
+        }
       },
       {
         name: "vendor",
@@ -182,15 +181,15 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Vendor is required..",
           },
-          // {
-          //   name: "autocomplete",
-          // },
-          // {
-          //   name: "invalidAutocomplete",
-          //   message: "Choose proper value",
-          // },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         additionalData: {
           // showNameAndValue: false,
@@ -201,7 +200,7 @@ export class WorkOrderFormControls {
         label: "Location",
         placeholder: "Location",
         type: "text",
-        value: WorkOrder?.location,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -210,15 +209,15 @@ export class WorkOrderFormControls {
             name: "required",
             message: "Location is required..",
           },
-          // {
-          //   name: "autocomplete",
-          // },
-          // {
-          //   name: "invalidAutocomplete",
-          //   message: "Choose proper value",
-          // },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         additionalData: {
           // showNameAndValue: false,
@@ -229,7 +228,7 @@ export class WorkOrderFormControls {
         label: "Sent to workshop date",
         placeholder: "Location",
         type: "datetimerpicker",
-        value: WorkOrder?.sentdate,
+        value: new Date(),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -247,7 +246,7 @@ export class WorkOrderFormControls {
         label: "Estimated Return date",
         placeholder: "Estimated Return date",
         type: "datetimerpicker",
-        value: WorkOrder?.estimatereturndate,
+        value: new Date(),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -265,17 +264,17 @@ export class WorkOrderFormControls {
         label: "Actual Return date",
         placeholder: "Actual Return date",
         type: "datetimerpicker",
-        value: WorkOrder?.actualreturndate,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "Actual Return Date is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "Actual Return Date is required..",
+          // },
         ],
       },
       {
@@ -283,7 +282,7 @@ export class WorkOrderFormControls {
         label: "Start Km Reading",
         placeholder: "Start Km Reading",
         type: "number",
-        value: WorkOrder?.startKmRead,
+        value:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -301,7 +300,7 @@ export class WorkOrderFormControls {
         label: "Close Km reading",
         placeholder: "Close Km reading",
         type: "number",
-        value: WorkOrder?.closeKmRead,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -319,7 +318,7 @@ export class WorkOrderFormControls {
         label: "Service Km",
         placeholder: "Service Km",
         type: "number",
-        value: WorkOrder?.ServiceKm,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -337,7 +336,7 @@ export class WorkOrderFormControls {
         label: "Handed over by",
         placeholder: "Handed over by",
         type: "text",
-        value: WorkOrder?.handedover,
+        value:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -365,7 +364,7 @@ export class WorkOrderFormControls {
         label: "Supervisor",
         placeholder: "Supervisor",
         type: "text",
-        value: WorkOrder?.supervisor,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -394,7 +393,7 @@ export class WorkOrderFormControls {
         label: "Returned to",
         placeholder: "Returned to",
         type: "text",
-        value: WorkOrder?.returnto,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -593,15 +592,15 @@ export class WorkOrderFormControls {
         type: "datetimerpicker",
         value: "",
         additionalData: {
-          metaData: ""
+          // metaData: ""
         },
         generatecontrol: true,
         disable: true,
         Validations: [
-          {
-            name: "required",
-            message: "End DTM is required..",
-          },
+          // {
+          //   name: "required",
+          //   message: "End DTM is required..",
+          // },
         ]
       }
     ];

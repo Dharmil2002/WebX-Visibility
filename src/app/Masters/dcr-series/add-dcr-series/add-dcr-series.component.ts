@@ -169,7 +169,6 @@ export class AddDcrSeriesComponent
   async isBookCodeUnique(): Promise<boolean> {
     const bookCode = this.addDcrTableForm.value.bookCode;
     const docType = this.addDcrTableForm.value.documentType;
-
     // this.addDcrTableForm.controls.allocateTo.setValue("");
     const reqBook = {
       companyCode: this.companyCode,

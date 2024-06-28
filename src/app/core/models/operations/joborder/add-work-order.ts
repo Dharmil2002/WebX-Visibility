@@ -21,11 +21,11 @@ export class WorkOrderModel {
   maintenancesvcdetails: MaintenanceSvcDetails[];
 
   constructor(Data) {
-    this.vehiclenumber = Data?.vehiclenumber || "";
-    this.oem = Data?.oem || "";
-    this.model = Data?.model || "";
-    this.orderNo = Data?.orderNo || "";
-    this.orderdate = Data?.orderdate || "";
+    this.vehiclenumber = Data?.vEHNO || "";
+    this.oem = Data?.vEHD?.oEM || "";
+    this.model = Data?.vEHD?.mODEL || "";
+    this.orderNo = Data?.jOBNO || "";
+    this.orderdate = Data?.jDT || "";
     this.ordercategory = Data?.ordercategory || "";
     this.subcategory = Data?.subcategory || "";
     this.workshoptype = Data?.workshoptype || "";

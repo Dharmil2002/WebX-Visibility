@@ -5,9 +5,8 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
-import { GenericActions } from "src/app/config/myconstants";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
+import { DataService } from "src/app/core/service/job-order.service";
 @Component({
   selector: "app-work-orders",
   templateUrl: "./work-orders.component.html",
@@ -21,8 +20,14 @@ export class WorkOrdersComponent implements OnInit {
   filterColumn: boolean = true;
   allColumnFilter: any;
   tableData: any;
+  // menuItems = [
+  //   { label: "New Work Order" },
+  //   { label: "Approve" },
+  //   { label: "Update" },
+  //   { label: "Close" },
+  //   { label: "Cancel" },
+  // ];
   menuItems = [
-    { label: "New Work Order" },
     { label: "Approve" },
     { label: "Update" },
     { label: "Close" },
@@ -41,12 +46,12 @@ export class WorkOrdersComponent implements OnInit {
       Style: "min-width:150px",
       sticky: true,
     },
-    JobOrderDate: {
+    jDT: {
       Title: "Job Order Date",
       class: "matcolumncenter",
       Style: "min-width:150px",
     },
-    vHNO: {
+    vEHNO: {
       Title: "Vehicle ",
       class: "matcolumnleft",
       Style: "min-width:150px",
@@ -85,8 +90,8 @@ export class WorkOrdersComponent implements OnInit {
   };
   staticField = [
     "wORKNO",
-    "JobOrderDate",
-    "vHNO",
+    "jDT",
+    "vEHNO",
     "cATEGORY",
     "IssuedTo",
     "Vendor",
@@ -100,6 +105,7 @@ export class WorkOrdersComponent implements OnInit {
     private operation: OperationService,
     private storage: StorageService,
     private masterService: MasterService,
+    private dataService: DataService,
   ) {
     this.addAndEditPath = "Operation/AddJobOrder";
     this.allColumnFilter = this.columnHeader;
@@ -108,12 +114,11 @@ export class WorkOrdersComponent implements OnInit {
     this.getWorkOrderData();
   }
   async handleMenuItemClick(data) {
-    debugger
     const label = data.label.label;
-
-    if (data.label.label == "New Work Order") {
-      this.router.navigateByUrl("/Operation/AddWorkOrder");
-    }
+    // if (data.label.label == "New Work Order") {
+    //   this.dataService.setMenuItemData(data); // Set data in DataService
+    //   this.router.navigateByUrl("/Operation/AddWorkOrder")
+    // }
     let details = {};
     let successMessage = "";
   
@@ -210,10 +215,10 @@ export class WorkOrdersComponent implements OnInit {
       const newArray = data.map((data) => ({
         ...data,
         Vendor:`${data.vEND.vCD}:${data.vEND.vNM}`,
-        actions: ["New Work Order", "Approve", "Update", "Close", "Cancel"],
+        // actions: ["New Work Order", "Approve", "Update", "Close", "Cancel"],
+        actions: ["Approve", "Update", "Close", "Cancel"],
       }));
       this.tableData = newArray;
-      console.log(this.tableData);
       this.tableLoad = false;
     }
   }

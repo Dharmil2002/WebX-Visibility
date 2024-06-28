@@ -38,8 +38,8 @@ export class ToPayPaidReportControl {
                 placeholder: '',
                 type: 'Staticdropdown',
                 value: [
-                    { value: "P03", name: "To Pay" },
-                    { value: "P01", name: "Paid" },
+                    { value: ["P03"], name: "To Pay" },
+                    { value: ["P01"], name: "Paid" },
                     { value: ["P01", "P03"], name: "Both" },
                 ],
                 Validations: [],

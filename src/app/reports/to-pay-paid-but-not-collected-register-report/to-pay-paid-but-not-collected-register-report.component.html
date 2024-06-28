@@ -9,12 +9,15 @@
         </app-form-webxpress>
     </form> 
 
-    <!-- <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" 
+    <app-generic-table-v2 *ngIf="tableLoad"
+        [dynamicControls]="dynamicControls" 
         [columnHeader]="summaryHeader" 
         [csvFileName]="'Stock Summary'"
         [columnGroup]="summaryGroup"
         [stickyHeader]="true" 
-        [tableData]="summaryData" [staticField]="staticField" [Link]="linkArray" 
+        [tableData]="summaryData" 
+        [staticField]="staticField" 
+        [Link]="linkArray" 
         (functionCallEmitter)="functionCallHandler($event)">
-    </app-generic-table-v2> -->
+    </app-generic-table-v2>
 </app-common-wrapper-webxpress>

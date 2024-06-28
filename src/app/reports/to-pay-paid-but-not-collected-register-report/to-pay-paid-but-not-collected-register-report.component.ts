@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { get } from 'lodash';
 import moment from 'moment';
-import { Subject, takeUntil, take } from 'rxjs';
+import { Subject, takeUntil, take, firstValueFrom } from 'rxjs';
 import { productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -43,6 +42,16 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
   tableLoad: false;
   toPayPaidReportForm: UntypedFormGroup;
   protected _onDestroy = new Subject<void>();
+  summaryData: any[];
+  filterData: any;
+
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: true,
+  };
+  summaryGroup: any[] = [];
+  staticField: string[] = ["GCN", "serviceType", "dEST", "pAYTYP", "pAYTYPNM", "tOTL"]
   constructor(private fb: UntypedFormBuilder,
     private locationService: LocationService,
     private filter: FilterUtils,
@@ -82,6 +91,7 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
     this.toPayPaidReportForm.controls["location"].setValue(loginBranch);
     this.toPayPaidReportForm.get('Individual').setValue("Y");
     this.toPayPaidReportForm.get('DateType').setValue("Bookingdate");
+    this.toPayPaidReportForm.get('Paybasis').setValue("P01");
     this.filter.Filter(this.jsonControlFormArray, this.toPayPaidReportForm, modeList, "Transitmode", true);
     this.filter.Filter(this.jsonControlFormArray, this.toPayPaidReportForm, locationList, "location", true);
   }
@@ -136,10 +146,13 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
         // Convert start and end dates to Date objects
         const startDate = new Date(this.toPayPaidReportForm.controls.start.value);
         const endDate = new Date(this.toPayPaidReportForm.controls.end.value);
+        const StatusAson = this.toPayPaidReportForm.controls.StatusAson.value ? new Date(this.toPayPaidReportForm.controls.StatusAson.value) : '';
 
         // Use moment.js to set the start date to the beginning of the day and the end date to the end of the day
         const startValue = moment(startDate).startOf('day').toDate();
-        const endValue = moment(endDate).endOf('day').toDate();
+        let endValue = moment(endDate).endOf('day').toDate();
+        const statusAsOn = StatusAson ? moment(StatusAson).endOf('day').toDate() : '';
+        endValue = statusAsOn ? statusAsOn : endValue;
 
         const modeList = Array.isArray(this.toPayPaidReportForm.value.modeHandler)
           ? this.toPayPaidReportForm.value.modeHandler.map(x => x.value)
@@ -147,13 +160,14 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
 
         const dateType = this.toPayPaidReportForm.value.DateType;
         const serviceType = this.toPayPaidReportForm.value.ServiceType;
-        const statusAsOf = this.toPayPaidReportForm.value.StatusAson;
         const payBasis = this.toPayPaidReportForm.value.Paybasis;
         const location = ReportingBranches;
 
-        const requestbody = { startValue, endValue, location, modeList, dateType, serviceType, statusAsOf, payBasis };
-        console.log(requestbody);
-        const data = this.getReportData(requestbody)
+        const requestbody = { startValue, endValue, location, modeList, dateType, serviceType, payBasis };
+
+        const data = await this.getReportData(requestbody)
+        console.log(data);
+        // this.summaryData=data
         // if (data.data.length === 0) {
         //   this.LoadTable = false;
         //   this.loading = false;
@@ -184,53 +198,90 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
   }
   //#endregion
   //#region to download csv file
-  getReportData(data) {
-    console.log(data);
-    // const requestbody = { startValue, endValue, location, modeList, dateType, serviceType, statusAsOf, payBasis };
+  async getReportData(data) {
 
     const matchQuery = {
       'D$and': [
         { dKTDT: { 'D$gte': data.startValue } }, // Start date condition
-        { aDDT: { 'D$lte': data.endValue } }, // End date condition  
+        { dKTDT: { 'D$lte': data.endValue } }, // End date condition  
         ...(data.location ? [{ 'dEST': { 'D$in': data.location } }] : []), // Location condition
-        ...(data.location ? [{ 'tRNMOD': { 'D$in': data.location } }] : []), // Location condition
-        ...(data.location ? [{ 'pAYTYP': { 'D$in': data.location } }] : []), // Location condition
+        ...(data.modeList.length > 0 ? [{ 'tRNMOD': { 'D$in': data.modeList } }] : []), // Location condition
+        ...(data.payBasis ? [{ 'pAYTYP': { 'D$in': data.payBasis } }] : []), // Location condition
       ]
     }
-    //   {
-    //     $group: {
-    //       _id: {
-    //         pAYTYP: "$pAYTYP", // Group by pAYTYP
-    //         pAYTYPNM: "$pAYTYPNM",
-    //         dEST: "$dEST" // Then group by dEST within each pAYTYP
-    //       },
-    //       GCN: { $sum: 1 }, // Count the number of documents
-    //       tTLAMT: { $sum: "$tOTAMT" }, // Sum the total amount
-    //       tRNMODNM: { $first: "$tRNMODNM" } // Include the first value of tRNMODNM
-    //     }
-    //   },
-    //   {
-    //     $group: {
-    //       _id: "$_id.pAYTYPNM", // Group by pAYTYP
-    //       destinations: {
-    //         $push: {
-    //           dEST: "$_id.dEST",
-    //           GCN: "$GCN",
-    //           tTLAMT: "$tTLAMT"
-    //         }
-    //       }
-    //     }
-    //   },
-    //   {
-    //     $project: {
-    //       pAYTYP: "$_id",
-    //       destinations: 1,
-    //       _id: 0
-    //     }
-    //   }
-    // ]
+    const reqBodyFTL = {
+      companyCode: this.storage.companyCode,
+      collectionName: 'dockets',
+      filters: [
+        { D$match: matchQuery },
+        {
+          "D$group": {
+            "_id": {
+              "pAYTYP": "$pAYTYP",
+              "pAYTYPNM": "$pAYTYPNM",
+              "dEST": "$dEST"
+            },
+            "GCN": {
+              "D$sum": 1
+            },
+            "tTLAMT": {
+              "D$sum": "$tOTAMT"
+            },
+          }
+        },
+        {
+          "D$project": {
+            "_id": 0,
+            "pAYTYP": "$_id.pAYTYP",
+            "pAYTYPNM": "$_id.pAYTYPNM",
+            "dEST": "$_id.dEST",
+            "GCN": 1,
+            "tOTL": "$tTLAMT",
+            "serviceType": "FTL"
+          }
+        }
+      ]
+    }
+    const resFTL = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBodyFTL));
 
+    const reqBodyLTL = {
+      companyCode: this.storage.companyCode,
+      collectionName: 'dockets_ltl',
+      filters: [
+        { D$match: matchQuery },
+        {
+          "D$group": {
+            "_id": {
+              "pAYTYP": "$pAYTYP",
+              "pAYTYPNM": "$pAYTYPNM",
+              "dEST": "$dEST"
+            },
+            "GCN": {
+              "D$sum": 1
+            },
+            "tTLAMT": {
+              "D$sum": "$tOTAMT"
+            },
+          }
+        },
+        {
+          "D$project": {
+            "_id": 0,
+            "pAYTYP": "$_id.pAYTYP",
+            "pAYTYPNM": "$_id.pAYTYPNM",
+            "dEST": "$_id.dEST",
+            "GCN": 1,
+            "tOTL": "$tTLAMT",
+            "serviceType": "LTL"
+          }
+        }
+      ]
+    }
+    const resLTL = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBodyLTL));
 
+    const res = [...resFTL.data, ...resLTL.data];
+    console.log(res);
+    return res;
   }
 
   //#endregion

@@ -21,6 +21,15 @@ export class TDSHdrDataRequestModel {
   aMT: number;
   lOC: string;
   tDSChallanNo: string;
+  pAY:{
+    mOD:string;
+    bANK:string;
+    bANKCD:string;
+    aCCD:string;
+    aCNM:string;
+    dTM:Date;
+    cREFNO:string;
+  };
   sTS: number;
   sTSNM: string;
   sTSBY: string;

@@ -114,15 +114,14 @@ export class EditShipmentDetailsComponent implements OnInit {
   }
 
   async bindDropDown() {
-    const partialDelivery = await this.generalService.getGeneralMasterData("PART_D");
-    const unDelivery = await this.generalService.getGeneralMasterData("UNDELY");
-    const reasons = ['shortReason', 'demageReason', 'pilferageReason'];
+    const depsReason = await this.generalService.getGeneralMasterData(["DREASON",'PLFREASON','SREASON']);
+    const reasons = [{name:'shortReason',value:"SREASON"}, {name:'demageReason',value:"DREASON"},  {name:'pilferageReason',value:"PLFREASON"}];
     reasons.forEach((x) => {
       this.filter.Filter(
         this.allJsonControlArray,
         this.EditShipmentForm,
-        [...unDelivery, ...partialDelivery],
-        x,
+        depsReason.filter((d)=>d.type==x.value),
+        x.name,
         false
       );
     });
@@ -337,7 +336,6 @@ export class EditShipmentDetailsComponent implements OnInit {
     }
 }
   save() {
-    debugger
     let allFormData = { ...this.EditShipmentForm.getRawValue() };
     allFormData.isDeps = allFormData.shortPkts || allFormData.DamagePkts||allFormData.pilferagePkts || false;
     allFormData.depsOptions = []

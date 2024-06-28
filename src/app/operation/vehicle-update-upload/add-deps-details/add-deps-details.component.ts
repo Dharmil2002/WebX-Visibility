@@ -70,6 +70,7 @@ export class AddDepsDetailsComponent implements OnInit {
     this.jsonControlAllArray = depsControls.getDepsControls();
     this.jsonControlArray = this.jsonControlAllArray.filter((x) => x.additionalData?.require)
     this.depsFormGroup = formGroupBuilder(this.fb, [this.jsonControlAllArray]);
+    this.bindDropDown();
   }
   cancel() {
     this.dialogRef.close()
@@ -97,8 +98,21 @@ export class AddDepsDetailsComponent implements OnInit {
       this.depsFormGroup.controls['cHRWT'].setValue(resDockets[0].cHRWT);
       this.depsFormGroup.controls['bookingPkgs'].setValue(resDockets[0].pKGS);
       this.depsFormGroup.controls['suffix'].setValue(resDockets[0].sFX);
+      this.depsFormGroup.controls['Shipment'].setValue(resDockets[0].dKTNO);
     }
   }
+  async bindDropDown() {
+    const depsReason = await this.generalService.getGeneralMasterData("EREASON");
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.depsFormGroup,
+        depsReason,
+       'depsRes',
+        false
+      );
+
+  }
+
   onExtraPkgs() {
     const extraPkgs = parseInt(this.depsFormGroup.controls['depsPkgs']?.value || 0);
     const bookedPkgs = parseInt(this.depsFormGroup.controls['bookingPkgs']?.value || 0);
@@ -115,7 +129,13 @@ export class AddDepsDetailsComponent implements OnInit {
   }
 
   async save() {
+    debugger
+    const shipments=this.shipmentDetails.extraDetails;
+    const deps=this.depsFormGroup.value;
     const getallData = this.depsService.fieldMappingDeps([this.shipmentDetails.extraDetails], this.depsFormGroup.getRawValue());
+    
+    console.log(getallData);
+    return 
     const res = await this.depsService.createDeps(getallData)
     if (res) {
       Swal.fire({

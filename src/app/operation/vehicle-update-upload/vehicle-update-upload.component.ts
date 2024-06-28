@@ -181,7 +181,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   checkDocketRules() {
     this.isScan = this.rules.find(x => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y" ? true : false;
   }
-
   /*below function is call when the partial */
   async getLoadingSheet() {
     const reqBody = {

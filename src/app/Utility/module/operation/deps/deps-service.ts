@@ -4,11 +4,12 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { StorageService } from "src/app/core/service/storage.service";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
 import { financialYear } from "src/app/Utility/date/date-utils";
-import { depsStatus } from "src/app/Models/docStatus";
+import { DocketEvents, DocketStatus, depsStatus, getEnumName } from "src/app/Models/docStatus";
 import convert from 'convert-units';
 import moment from "moment";
 import { Collections, OperationActions } from "src/app/config/myconstants";
 import { debug } from "console";
+import { ArrivalVehicleService } from "../arrival-vehicle/arrival-vehicle.service";
 
 @Injectable({
     providedIn: "root",
@@ -18,7 +19,8 @@ export class DepsService {
     menfiestData: any;
     constructor(
         private storage: StorageService,
-        private operationService: OperationService
+        private operationService: OperationService,
+        private arrivalService: ArrivalVehicleService
     ) { }
 
     fieldMappingDeps(docketsList, otherDetails) {
@@ -27,7 +29,7 @@ export class DepsService {
         let depsDetails = []
         if (docketsDetails && docketsDetails.length > 0) {
             docketsDetails.forEach((dk) => {
-                const depsHeaderJson =
+             const depsHeaderJson =
                 {
                     "cID": this.storage.companyCode,
                     "dEPSNO": "",
@@ -50,7 +52,7 @@ export class DepsService {
                     "dMG": {
                         "pKGS": otherDetails.depsType == "D" ? ConvertToNumber(otherDetails?.depsPkgs || 0) : 0,
                         "wT": otherDetails.depsType == "D" ? ConvertToNumber(otherDetails?.depsWt || 0) : 0,
-                        "rES": otherDetails.depsType == "D" ? otherDetails?.depsRes || "" : "",
+                        "rES": otherDetails.depsType == "D" ? otherDetails?.depsRes?.name || "" : "",
                         "rMK": otherDetails.depsType == "D" ? otherDetails?.rMK || "" : 0
                     },
                     "pF": {
@@ -124,6 +126,136 @@ export class DepsService {
         }
         return { depsHeader, depsDetails }
     }
+    async docketDepsUpdate(docketDetails) {
+        const suffixData = await this.arrivalService.gettingLastSuffix([docketDetails]);
+        let sfxEnvData = [];
+        let sfxDocketsData = [docketDetails].map(docket => {
+            // Parsing and incrementing the suffix safely
+            const dktOps = suffixData.find(x => x.dKTNO == docket.Shipment);
+            if (!dktOps) {
+                throw new Error("No Data Found");
+            }
+            const nextSuffix = Number(dktOps.Suffix) + 1;
+            if (isNaN(nextSuffix)) {
+                throw new Error("Invalid Suffix value: " + docket.Suffix);
+            }
+            // Generating a timestamp with moment.js for consistent formatting
+            const currentTime = moment().tz('Asia/Kolkata').format("DD MMM YYYY @ hh:mm A");
+            const entryTimestamp = new Date();
+            // Calculate the weight per package
+            let weightPerPkg = parseFloat(docket.aCTWT) / parseInt(docket.bookingPkgs);
+            let arrivalPkgsWeight = Math.max(parseInt(docket.depsPkgs) * weightPerPkg, 0);
+            let remainingWeight = Math.max(parseFloat(docket.aCTWT) - arrivalPkgsWeight, 0);
+            let chargeWeightPerPkg = parseFloat(docket.cHRWT) / parseInt(docket.bookingPkgs);
+            let chargeArrivalPkgsWeight = Math.max(parseInt(docket.depsPkgs) * chargeWeightPerPkg, 0);
+            let chargeRemainingWeight = Math.max(parseFloat(docket.cHRWT) - chargeArrivalPkgsWeight, 0);
+            let height = Math.max(suffixData.reduce((a, b) => a + b.vOL.h, 0), 0);
+            let length = Math.max(suffixData.reduce((a, b) => a + b.vOL.l, 0), 0);
+            let breadth = Math.max(suffixData.reduce((a, b) => a + b.vOL.b, 0), 0);
+            let pkgs = Math.max(parseInt(docket.depsPkgs), 0);
+            let Vol = Math.max(convert(height).from('cm').to('ft') *
+                      convert(length).from('cm').to('ft') *
+                      convert(breadth).from('cm').to('ft') * pkgs, 0);
+            const newDocket = {
+                "_id": `${this.storage.companyCode}-${docket.docketNumber}-${nextSuffix}`,
+                "cID": this.storage.companyCode,
+                "dKTNO": docket.docketNumber,
+                "sFX": nextSuffix,
+                "cLOC": this.storage.branch,
+                "oRGN": docket.oRG,
+                "dEST": docket.dEST,
+                "aCTWT": ConvertToNumber(remainingWeight, 3),
+                "cHRWT": ConvertToNumber(chargeRemainingWeight, 3),
+                "tOTCWT": ConvertToNumber(chargeRemainingWeight, 3),
+                "tOTWT": ConvertToNumber(remainingWeight, 3),
+                "tOTPKG": parseInt(docket.depsPkgs) || 0,
+                "pKGS": parseInt(docket.depsPkgs) || 0,
+                "cFTTOT": ConvertToNumber(Vol, 3),
+                "vEHNO": "",
+                "sTS": DocketStatus.Booked,
+                "sTSNM": DocketStatus[DocketStatus.Booked],
+                "sTSTM": entryTimestamp,
+                "oPSSTS": `Booked at ${this.storage.branch} on ${currentTime}`,
+                "iSDEL": false,
+                "eNTDT": entryTimestamp,
+                "eNTLOC": this.storage.branch,
+                "eNTBY": this.storage.userName
+            };
+            let sfxData = {
+                _id: `${this.storage.companyCode}-${docket.Shipment}-${nextSuffix}-${DocketEvents.Booking}-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+                cID: this.storage.companyCode,
+                dKTNO: docket?.Shipment || "",
+                sFX: docket?.Suffix || 0,
+                lOC: docket.Origin,
+                eVNID: DocketEvents.Booking,
+                eVNDES: getEnumName(DocketEvents, DocketEvents.Booking),
+                eVNDT: new Date(),
+                eVNSRC: 'Booking',
+                dOCTY: 'CN',
+                dOCNO: docket?.Shipment || "",
+                sTS: DocketStatus.Booked,
+                sTSNM: DocketStatus[DocketStatus.Booked],
+                oPSSTS: `Booked at ${this.storage.branch} on ${currentTime}`,
+                eNTDT: new Date(),
+                eNTLOC: this.storage.branch,
+                eNTBY: this.storage.userName,
+            };
+            sfxEnvData.push(sfxData);
+            return newDocket;
+        });
+        await this.arrivalService.getArrivalBasesdocket(sfxDocketsData, sfxEnvData);
+        if ([docketDetails] && [docketDetails].length > 0) {
+            const dockets = [docketDetails].map((d) => `${d.Shipment}-${d.Suffix}`)
+            const dktOps = {
+                "tHC": "",
+                "lSNO": "",
+                "mFNO": "",
+                "sTS": DocketStatus.Booked,
+                "sTSNM": DocketStatus[DocketStatus.Booked],
+                "sTSTM": new Date(),
+                "oPSSTS": `Booked at ${this.storage.branch} on${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
+                "mODDT": new Date(),
+                "mODLOC": this.storage.branch,
+                "mODBY": this.storage.userName
+            }
+
+            const reqOps = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_ops_det_ltl",
+                filter: { "D$expr": { "D$in": [{ "D$concat": ["$dKTNO", "-", { "D$toString": "$sFX" }] }, dockets] } },
+                update: dktOps
+            }
+            await firstValueFrom(this.operationService.operationMongoPut("generic/updateAll", reqOps));
+            const eventJson = [docketDetails].map(dkt => {
+                const evn = {
+                    "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
+                    "cID": this.storage.companyCode,
+                    "dKTNO": dkt.Shipment,
+                    "sFX": 0,
+                    "lOC": dkt.oRGN,
+                    "eVNID": DocketEvents.Booking,
+                    "eVNDES": getEnumName(DocketEvents, DocketEvents.Departure),
+                    "eVNDT": new Date(),
+                    "eVNSRC": "DEPS",
+                    "dOCTY": "CN",
+                    "dOCNO": dkt.Shipment,
+                    "sTS": DocketStatus.Booked,
+                    "sTSNM": DocketStatus[DocketStatus.Booked],
+                    "oPSSTS": `Declare Deps at ${this.storage.branch} on${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
+                    "eNTDT": new Date(),
+                    "eNTLOC": this.storage.branch,
+                    "eNTBY": this.storage.userName
+                }
+                return evn
+            });
+            const reqEvent = {
+                companyCode: this.storage.companyCode,
+                collectionName: "docket_events_ltl",
+                data: eventJson
+            }
+            await firstValueFrom(this.operationService.operationMongoPost("generic/create", reqEvent));
+        }
+    }
 
     fieldArrivalDeps(docketsList) {
         const docketsDetails = Array.isArray(docketsList) ? docketsList : [docketsList];
@@ -134,7 +266,7 @@ export class DepsService {
         let depsExtra = []
         let depsExtraDet = []
         let depspF = []
-        let depspFDet=[]
+        let depspFDet = []
         let depsShort = []
         let depsShortDetails = []
         if (docketsDetails && docketsDetails.length > 0) {
@@ -187,7 +319,7 @@ export class DepsService {
                         "eNTDT": new Date(),
                         "eNTLOC": this.storage.branch
                     });
-            
+
                     const createDepsDetailsJson = (remarks) => ({
                         "cID": this.storage.companyCode,
                         "dEPSNO": "",
@@ -197,7 +329,7 @@ export class DepsService {
                         "rASNTO": this.storage.userName,
                         "rASNDT": new Date(),
                         "rASLOC": this.storage.branch,
-                        "rMK":remarks || "",
+                        "rMK": remarks || "",
                         "lST": {
                             "rASNTO": this.storage.userName,
                             "rASNDT": new Date()
@@ -209,7 +341,7 @@ export class DepsService {
                         "eNTDT": new Date(),
                         "eNTLOC": this.storage.branch
                     });
-            
+
                     dk.depsType.forEach((type) => {
                         let typeSpecificData;
                         switch (type.value) {
@@ -217,12 +349,12 @@ export class DepsService {
                                 typeSpecificData = {
                                     "dEPTYP": "D",
                                     "dEPTYPNM": "Damage",
-                                    "dEPIMG":dk?.extra?.demageUpload||"",
+                                    "dEPIMG": dk?.extra?.demageUpload || "",
                                     "dMG": {
                                         "pKGS": ConvertToNumber(dk?.extra?.demangePkgs || 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
-                                        "rES":dk?.extra?.demageReason?.name || "",
-                                        "rMK":dk?.extra?.demageRemarks || ""
+                                        "rES": dk?.extra?.demageReason?.name || "",
+                                        "rMK": dk?.extra?.demageRemarks || ""
                                     },
                                     "pF": {
                                         "pKGS": 0,
@@ -244,7 +376,7 @@ export class DepsService {
                                 typeSpecificData = {
                                     "dEPTYP": "S",
                                     "dEPTYPNM": "Shortage",
-                                    "dEPIMG":dk?.extra?.shortUpload||"",
+                                    "dEPIMG": dk?.extra?.shortUpload || "",
                                     "dMG": {
                                         "pKGS": 0,
                                         "wT": 0,
@@ -258,10 +390,10 @@ export class DepsService {
                                         "rMK": ""
                                     },
                                     "sHORT": {
-                                        "pKGS": ConvertToNumber(dk?.extra?.shortPkgs|| 0),
+                                        "pKGS": ConvertToNumber(dk?.extra?.shortPkgs || 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
-                                        "rES":dk?.extra?.shortReason.name,
-                                        "rMK":dk?.extra?.shortRemarks
+                                        "rES": dk?.extra?.shortReason.name,
+                                        "rMK": dk?.extra?.shortRemarks
                                     }
                                 };
                                 depsShort.push(createDepsHeaderJson(typeSpecificData));
@@ -271,7 +403,7 @@ export class DepsService {
                                 typeSpecificData = {
                                     "dEPTYP": "P",
                                     "dEPTYPNM": "Pilferage",
-                                    "dEPIMG":dk?.extra?.pilferageUpload||"",
+                                    "dEPIMG": dk?.extra?.pilferageUpload || "",
                                     "dMG": {
                                         "pKGS": 0,
                                         "wT": 0,
@@ -281,8 +413,8 @@ export class DepsService {
                                     "pF": {
                                         "pKGS": ConvertToNumber(dk?.extra?.pilferagePkgs || 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
-                                        "rES":dk?.extra?.pilferageReason?.name||"",
-                                        "rMK":dk?.extra?.pilferageRemarks||""
+                                        "rES": dk?.extra?.pilferageReason?.name || "",
+                                        "rMK": dk?.extra?.pilferageRemarks || ""
                                     },
                                     "sHORT": {
                                         "pKGS": 0,
@@ -292,16 +424,16 @@ export class DepsService {
                                     }
                                 };
                                 depspF.push(createDepsHeaderJson(typeSpecificData));
-                                depspFDet.push(createDepsDetailsJson(dk?.extra?.pilferageRemarks||""));
+                                depspFDet.push(createDepsDetailsJson(dk?.extra?.pilferageRemarks || ""));
                                 break;
                         }
                     });
                 }
             });
-            
+
         }
-         depsHeader=[...depsdMG,...depsExtra,...depspF,...depsShort]
-         depsDetails=[...depsdMGDet,...depsExtraDet,...depsShortDetails,...depspFDet]
+        depsHeader = [...depsdMG, ...depsExtra, ...depspF, ...depsShort]
+        depsDetails = [...depsdMGDet, ...depsExtraDet, ...depsShortDetails, ...depspFDet]
         if (depsHeader.length > 0 && depsDetails.length > 0) {
             return { depsHeader, depsDetails }
         }

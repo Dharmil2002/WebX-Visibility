@@ -571,7 +571,6 @@ export class ArrivalVehicleService {
         await firstValueFrom(this.operation.operationMongoPut("generic/update", req));
 
         if (dktList && dktList.length > 0) {
-
             const destDocket = dktList.filter((x) => x.Destination == this.storage.branch);
             const transDocket = dktList.filter((x) => x.Destination != this.storage.branch);
             /*below code execute for the update In delivery stock Update*/
@@ -581,13 +580,12 @@ export class ArrivalVehicleService {
                 const batchOperations = this.processDockets(destDocket, getInvoice, { code: DocketStatus.In_Delivery_Stock, name: DocketStatus[DocketStatus.In_Delivery_Stock].replace(/_/g, " ") }, stsMessage);
                 // Bulk update database with the new costs
                 await this.updateBulk(batchOperations);
-
                 eventJson = destDocket.map(dkt => {
                     const evn = {
                         "_id": `${this.storage.companyCode}-${dkt.Shipment}-${dkt.Suffix}-${DocketEvents.Arrival_Scan}- ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`, // Safely accessing the ID
                         "cID": this.storage.companyCode,
                         "dKTNO": dkt.Shipment,
-                        "sFX": 0,
+                        "sFX": dkt.Suffix,
                         "lOC": this.storage.branch,
                         "eVNID": DocketEvents.Arrival_Scan,
                         "eVNDES": getEnumName(DocketEvents, DocketEvents.Arrival_Scan).replace(/_/g, " "),

@@ -52,7 +52,8 @@ export enum DocketEvents {
   DRS_Upload = "EVN0008",
   Delivery_Update = "EVN0009",
   Arrival_Scan = "EVN0010",
-  Del_MR_Generation = "EVN0011"
+  Del_MR_Generation = "EVN0011",
+  Deps_Declare = "EVN0012"
 };
 export enum VehicleStatus {
   Available= 1,

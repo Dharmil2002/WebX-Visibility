@@ -166,6 +166,47 @@ export class DepsControls {
         disable: true
       },
       {
+        name: 'rMK',
+        label: 'Remarks',
+        placeholder: '',
+        type: 'text',
+        value: "",
+        Validations: [
+        ],
+        functions: {
+            onOptionSelect: ""
+        },
+        additionalData: {
+            showNameAndValue: false,
+            require: true
+        },
+        generatecontrol: true, disable: false
+    },
+      {
+        name: 'depsRes',
+        label: 'Reason',
+        placeholder: '',
+        type: 'dropdown',
+        value: "",
+        Validations: [
+            {
+                name: "autocomplete",
+            },
+            {
+                name: "invalidAutocomplete",
+                message: "Choose proper value",
+            },
+        ],
+        functions: {
+            onOptionSelect: ""
+        },
+        additionalData: {
+            showNameAndValue: false,
+            require: true
+        },
+        generatecontrol: true, disable: false
+    },
+      {
         name: 'depsPkgs',
         label: `Extra Package`,
         placeholder: `Extra Package`,
@@ -198,8 +239,9 @@ export class DepsControls {
         },
         generatecontrol: false, disable: false
       },
+      
       {
-        name: 'shipment',
+        name: 'Shipment',
         label: '',
         placeholder: '',
         type: '',
@@ -212,6 +254,18 @@ export class DepsControls {
       },
       {
         name: 'suffix',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: '',
+        Validations: [],
+        additionalData: {
+          require: true
+        },
+        generatecontrol: false, disable: false
+      },
+      {
+        name: 'Suffix',
         label: '',
         placeholder: '',
         type: '',

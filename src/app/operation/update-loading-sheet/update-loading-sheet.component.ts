@@ -421,7 +421,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
         }
       }, "Scanning");
   }
-
   async UpdateDocketDetail(dkt) {
     if (dkt) {
       await updateTracking(this.companyCode, this._operation, dkt, this.arrivalData?.TripID);
@@ -514,6 +513,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
     })
   }
+  
   tripHistoryUpdate() {
 
     let tripDetails = {

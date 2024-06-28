@@ -63,6 +63,7 @@ import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/cluster.master.service";
+import { debug } from "console";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -135,7 +136,7 @@ export class ConsignmentEntryFormComponent
   conLoc: boolean;
   pageLoad: boolean;
   LoadType: any;
-  isBoth: boolean;
+  isBoth: boolean=false;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -1469,6 +1470,7 @@ export class ConsignmentEntryFormComponent
     this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
   }
   checkDocketRules() {
+    debugger;
     const STYP = this.rules.find((x) => x.rULEID == "STYP" && x.aCTIVE);
     if (STYP) {
       const isManual = STYP.vAL === "M";
@@ -1481,7 +1483,7 @@ export class ConsignmentEntryFormComponent
       this.isManual = isManual;
     } 
     else{
-      this.isBoth= STYP.vAL === "B"
+      this.isBoth= STYP.vAL == "B"
       this.checkboxChecked=true
       this.isManual=false;
       this.model.consignmentTableForm.controls['docketNumber'].setValue("Computerized");

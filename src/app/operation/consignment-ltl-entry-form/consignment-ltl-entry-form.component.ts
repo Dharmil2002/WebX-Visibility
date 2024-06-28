@@ -184,7 +184,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     InvoiceAmount: 0.00,
     Yield: 0.00,
   }
-  isBoth: boolean;
+  isBoth: boolean=false;
   checkboxChecked: boolean;
   constructor(
     private controlPanel: ControlPanelService,
@@ -1612,7 +1612,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.isUpdate = isManual;
       }
       else{
-        this.isBoth= STYP.vAL === "B"
+        this.isBoth= STYP.vAL == "B"
         this.checkboxChecked=true
         this.isManual=false;
         this.consignmentForm.controls['docketNumber'].setValue("Computerized");

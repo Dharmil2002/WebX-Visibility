@@ -376,14 +376,34 @@ export class UpdateLoadingSheetComponent implements OnInit {
           const res = await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData, selectedData, notSelectedData, this.packageData, this.isScan);
           if(requestBody){
             const res = await this.depsService.createDeps(requestBody);
-            if (res) {
+            try {
+              // Check if depsHeader exists and is an array
+              if (res.data.data.depsHeader && Array.isArray(res.data.data.depsHeader)) {
+                // Extracting dEPSNO values into an array
+                const depNos = res.data.data.depsHeader.map(header => header.dEPSNO);
+                // Joining array elements into a comma-separated string
+                const commaSeparatedDepNos = depNos.join(', ');
+                if (res) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "DEPS Generated Successfully",
+                    text: `DEPS Number is ${commaSeparatedDepNos}`,
+                    showConfirmButton: true,
+                  })
+                }
+              } else {
+                throw new Error('depsHeader is not an array or does not exist.');
+              }
+            } catch (error) {
               Swal.fire({
-                icon: "success",
-                title: "DEPS Generated Successfully",
-                text: `DEPS Number is ${res?.data?.data?.depsHeader[0].dEPSNO}`,
+                icon: "error",
+                title: "DEPS Generation Failed",
+                text: "There was an issue with DEPS generation. Please try again later.",
                 showConfirmButton: true,
-              })
+              });
+              
             }
+          
           }
           if (res) {
             this.dialogRef.close(this.loadingSheetTableForm.value)

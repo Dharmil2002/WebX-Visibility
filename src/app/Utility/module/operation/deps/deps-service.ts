@@ -126,7 +126,6 @@ export class DepsService {
     }
 
     fieldArrivalDeps(docketsList) {
-        debugger
         const docketsDetails = Array.isArray(docketsList) ? docketsList : [docketsList];
         let depsHeader = []
         let depsDetails = []
@@ -220,7 +219,7 @@ export class DepsService {
                                     "dEPTYPNM": "Damage",
                                     "dEPIMG":dk?.extra?.demageUpload||"",
                                     "dMG": {
-                                        "pKGS": ConvertToNumber(dk?.extra?.demagePkgs || 0),
+                                        "pKGS": ConvertToNumber(dk?.extra?.demangePkgs || 0),
                                         "wT": ConvertToNumber(dk?.depsWt || 0),
                                         "rES":dk?.extra?.demageReason?.name || "",
                                         "rMK":dk?.extra?.demageRemarks || ""

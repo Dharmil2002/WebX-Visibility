@@ -205,20 +205,33 @@ export class DepsService {
         });
         await this.arrivalService.getArrivalBasesdocket(sfxDocketsData, sfxEnvData);
         if ([docketDetails] && [docketDetails].length > 0) {
+            const remainingpkgs= parseInt(docketDetails.bookingPkgs)-parseInt(docketDetails.depsPkgs);
+            let weightPerPkg = parseFloat(docketDetails.aCTWT) / parseInt(docketDetails.bookingPkgs);
+            let arrivalPkgsWeight = Math.max(remainingpkgs * weightPerPkg, 0);
+            let remainingWeight = Math.max(parseFloat(docketDetails.aCTWT) - arrivalPkgsWeight, 0);
+            let chargeWeightPerPkg = parseFloat(docketDetails.cHRWT) / parseInt(docketDetails.bookingPkgs);
+            let chargeArrivalPkgsWeight = Math.max(remainingpkgs * chargeWeightPerPkg, 0);
+            let chargeRemainingWeight = Math.max(parseFloat(docketDetails.cHRWT) - chargeArrivalPkgsWeight, 0);
+            let height = Math.max(suffixData.reduce((a, b) => a + b.vOL.h, 0), 0);
+            let length = Math.max(suffixData.reduce((a, b) => a + b.vOL.l, 0), 0);
+            let breadth = Math.max(suffixData.reduce((a, b) => a + b.vOL.b, 0), 0);
+            let pkgs = Math.max(remainingpkgs, 0);
+            let Vol = Math.max(convert(height).from('cm').to('ft') *
+                      convert(length).from('cm').to('ft') *
+                      convert(breadth).from('cm').to('ft') * pkgs, 0);
             const dockets = [docketDetails].map((d) => `${d.Shipment}-${d.Suffix}`)
             const dktOps = {
-                "tHC": "",
-                "lSNO": "",
-                "mFNO": "",
-                "sTS": DocketStatus.Booked,
-                "sTSNM": DocketStatus[DocketStatus.Booked],
-                "sTSTM": new Date(),
-                "oPSSTS": `Booked at ${this.storage.branch} on${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}.`,
+                "aCTWT": ConvertToNumber(remainingWeight, 3),
+                "cHRWT": ConvertToNumber(chargeRemainingWeight, 3),
+                "tOTCWT": ConvertToNumber(chargeRemainingWeight, 3),
+                "tOTWT": ConvertToNumber(remainingWeight, 3),
+                "tOTPKG": remainingpkgs || 0,
+                "pKGS":remainingpkgs || 0,
+                "cFTTOT":Vol,
                 "mODDT": new Date(),
                 "mODLOC": this.storage.branch,
                 "mODBY": this.storage.userName
             }
-
             const reqOps = {
                 companyCode: this.storage.companyCode,
                 collectionName: "docket_ops_det_ltl",
@@ -341,7 +354,6 @@ export class DepsService {
                         "eNTDT": new Date(),
                         "eNTLOC": this.storage.branch
                     });
-
                     dk.depsType.forEach((type) => {
                         let typeSpecificData;
                         switch (type.value) {
@@ -591,7 +603,6 @@ export class DepsService {
         }
     }
     async depsUpdateOne(depsFilter, data, tableName) {
-        debugger
         const req = {
             companyCode: this.storage.companyCode,
             collectionName: tableName,

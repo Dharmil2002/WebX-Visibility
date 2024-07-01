@@ -7,13 +7,11 @@ import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { DepsControls } from 'src/assets/FormControls/deps-controls';
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import moment from 'moment';
 import Swal from 'sweetalert2';
-import { debug } from 'console';
 import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 
 @Component({
@@ -98,6 +96,7 @@ export class AddDepsDetailsComponent implements OnInit {
       this.depsFormGroup.controls['cHRWT'].setValue(resDockets[0].cHRWT);
       this.depsFormGroup.controls['bookingPkgs'].setValue(resDockets[0].pKGS);
       this.depsFormGroup.controls['suffix'].setValue(resDockets[0].sFX);
+      this.depsFormGroup.controls['Suffix'].setValue(resDockets[0].sFX);
       this.depsFormGroup.controls['Shipment'].setValue(resDockets[0].dKTNO);
     }
   }
@@ -133,9 +132,7 @@ export class AddDepsDetailsComponent implements OnInit {
     const shipments=this.shipmentDetails.extraDetails;
     const deps=this.depsFormGroup.value;
     const getallData = this.depsService.fieldMappingDeps([this.shipmentDetails.extraDetails], this.depsFormGroup.getRawValue());
-    
-    console.log(getallData);
-    return 
+   await this.depsService.docketDepsUpdate(this.depsFormGroup.value);
     const res = await this.depsService.createDeps(getallData)
     if (res) {
       Swal.fire({

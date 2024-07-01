@@ -1487,6 +1487,15 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
         return res.data
     }
+    async getdocketFromOpsOne(filter) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filter: filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
+        return Object.keys(res.data).length>0?res.data:null
+    }
     async getDocketsDetails(city) {
 
         const reqBody = {

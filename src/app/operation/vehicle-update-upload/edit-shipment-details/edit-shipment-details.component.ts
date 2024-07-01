@@ -13,6 +13,8 @@ import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
+import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 
 @Component({
   selector: 'app-edit-shipment-details',
@@ -59,6 +61,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
+    private docketService:DocketService,
     public dialogRef: MatDialogRef<EditShipmentDetailsComponent>,
     public dialog: MatDialog,
     private storage: StorageService,
@@ -103,8 +106,46 @@ export class EditShipmentDetailsComponent implements OnInit {
     this.EditShipmentForm.controls['ctWeight'].setValue(this.shipmentDetails.cWeight);
     this.EditShipmentForm.controls['noofPkts'].setValue(this.shipmentDetails.Packages);
     this.bindDropDown();
+    this.getCheckDeps();
   }
 
+  async getCheckDeps(){
+    const deps = await this.docketService.getdocketFromOpsOne({ 
+      dKTNO: this.EditShipmentForm.controls['shipment'].value, 
+      cID: this.storage.companyCode,
+      sFX: this.shipmentDetails.Suffix 
+    });
+    
+    if (deps) {
+      const noOfPkts = parseInt(this.EditShipmentForm.controls['noofPkts'].value);
+      const actualWeight = parseFloat(this.EditShipmentForm.controls['actualWeight'].value);
+      const ctWeight = parseFloat(this.EditShipmentForm.controls['ctWeight'].value);
+      if (deps.pKGS && deps.pKGS < noOfPkts) {
+        this.EditShipmentForm.controls['noofPkts'].setValue(deps.pKGS);
+        this.EditShipmentForm.controls['actualWeight'].setValue(deps.aCTWT);
+        this.EditShipmentForm.controls['ctWeight'].setValue(deps.cHRWT);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `You cannot enter more than ${deps.pKGS} Pkgs because others are declared as Deps.`
+        });
+      } else if (deps.aCTWT && deps.aCTWT < actualWeight) {
+        this.EditShipmentForm.controls['actualWeight'].setValue(deps.aCTWT);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `You cannot enter more than ${deps.aCTWT} Actual Weight because others are declared as Deps.`
+        });
+      } else if (deps.cHRWT && deps.cHRWT < ctWeight) {
+        this.EditShipmentForm.controls['ctWeight'].setValue(deps.cHRWT);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `You cannot enter more than ${deps.cHRWT} Chargeable Weight because others are declared as Deps.`
+        });
+      }
+    }
+  }
   cancel() {
     this.dialogRef.close()
   }
@@ -288,6 +329,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     if (!result.isValid) {
       Swal.fire('Warning', result.message, 'warning');
     }
+    this.getCheckDeps();
   }
   getPkgsCheck(){
     const arrivalPkgs = this.EditShipmentForm.get('noofPkts')?.value||0;

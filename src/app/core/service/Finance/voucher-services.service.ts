@@ -232,6 +232,7 @@ export class VoucherServicesService {
         mREFNUM: data.mREFNUM,
         nAR: data.nAR,
         oNACC: data.oNACC,
+        reverseVoucher: true
       }
     };
 

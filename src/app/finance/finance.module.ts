@@ -89,7 +89,6 @@ import { SetOpeningBalanceVendorWiseComponent } from './FA Masters/Components/se
 import { ManualVoucherFilterComponent } from './manual voucher/manual-voucher/manual-voucher-filter/manual-voucher-filter/manual-voucher-filter.component';
 import { TdsPaymentsComponent } from './Vendor Payment/tds-payments/tds-payments.component';
 import { VendorwiseTdspaymentsComponent } from './Vendor Payment/vendorwise-tdspayments/vendorwise-tdspayments.component';
-import { VendorTdsPaymentReportComponent } from '../reports/vendor-tds-payment-report/vendor-tds-payment-report.component';
 @NgModule({
     declarations: [
         InvoiceSummaryBillComponent,
@@ -143,8 +142,7 @@ import { VendorTdsPaymentReportComponent } from '../reports/vendor-tds-payment-r
         SetOpeningBalanceVendorWiseComponent,
         ManualVoucherFilterComponent,
         VendorwiseTdspaymentsComponent,
-        TdsPaymentsComponent,
-        VendorTdsPaymentReportComponent
+        TdsPaymentsComponent
     ],
     imports: [
         CommonModule,

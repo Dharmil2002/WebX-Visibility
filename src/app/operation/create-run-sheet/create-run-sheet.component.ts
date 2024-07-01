@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddMarketVehicleComponent } from '../add-market-vehicle/add-market-vehicle.component';
 import { LoadingSheetService } from 'src/app/Utility/module/operation/loadingSheet/loadingsheet-service';
 import { VehicleService } from 'src/app/Utility/module/masters/vehicle-master/vehicle-master-service';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -43,7 +44,7 @@ export class CreateRunSheetComponent implements OnInit {
   tableload = false;
   csv: any[];
   runSheetData: any;
-  delType:AutoComplete[];
+  delType: AutoComplete[];
   addNewTitle: string = "Add Market";
   isMarket: boolean;
   MarketData: any;
@@ -55,13 +56,14 @@ export class CreateRunSheetComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private vehStatus: VehicleStatusService,
     private filter: FilterUtils,
-    private generalService:GeneralService,
+    private generalService: GeneralService,
     private vehicleTypeService: VehicleTypeService,
     public snackBarUtilityService: SnackBarUtilityService,
     private storage: StorageService,
     private dialog: MatDialog,
     private loadingSheetService: LoadingSheetService,
-    private vehicleService: VehicleService
+    private vehicleService: VehicleService,
+    private docketService: DocketService,
   ) {
     this.orgBranch = this.storage.branch;
 
@@ -199,7 +201,7 @@ export class CreateRunSheetComponent implements OnInit {
     );
   }
   async getVehicleDetails() {
-    
+
     const fieldName = ["CapacityKg", "CapVol", "Vendor"];
     this.RunSheetTableForm.controls['Vendor'].setValue("")
     this.RunSheetTableForm.controls['CapacityKg'].setValue(0)
@@ -209,14 +211,14 @@ export class CreateRunSheetComponent implements OnInit {
         if (fieldName.includes(x.name)) {
           x.disable = true;
         }
-        if(x.name=="VehType"){
-          x.type="text"
+        if (x.name == "VehType") {
+          x.type = "text"
           x.disable = true
         }
         return x;
       });
       const vehDetails = await this.vehStatus.getVehDetails(this.RunSheetTableForm?.value.Vehicle.value);
-      this.RunSheetTableForm.controls['VehType'].setValue(vehDetails?.vehicleType||"")
+      this.RunSheetTableForm.controls['VehType'].setValue(vehDetails?.vehicleType || "")
       this.RunSheetTableForm.controls['CapVol'].setValue(vehDetails?.cft || "")
       this.RunSheetTableForm.controls['CapacityKg'].setValue(parseFloat(vehDetails?.capacity) * 1000 || 0)
       this.RunSheetTableForm.controls['Vendor'].setValue(vehDetails?.vendorName || "")
@@ -224,20 +226,20 @@ export class CreateRunSheetComponent implements OnInit {
     else {
       const res = await this.vehicleTypeService.getVehicleTypeList();
       const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
-      this.jsonControlArray =this.jsonControlArray.map((x) => {
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
         if (fieldName.includes(x.name)) {
           x.disable = false;
         }
-        if(x.name=="VehType"){
-          x.type="Staticdropdown",
-          x.disable = false,
-          x.value=vehicleType
+        if (x.name == "VehType") {
+          x.type = "Staticdropdown",
+            x.disable = false,
+            x.value = vehicleType
         }
         return x;
       });
-    
+
     }
- 
+
     this.RunSheetTableForm.controls['VenType'].setValue(this.RunSheetTableForm?.value.Vehicle.type || "")
   }
   selectCheckBox(event) {
@@ -322,9 +324,9 @@ export class CreateRunSheetComponent implements OnInit {
 
 
   }
-  async checkIsMarketVehicle(){
-    const fieldName = ["CapacityKg", "CapVol", "Vendor","VenType","vendPan","VehType"];
-    if(typeof(this.RunSheetTableForm.controls['Vehicle'].value)=="string"){
+  async checkIsMarketVehicle() {
+    const fieldName = ["CapacityKg", "CapVol", "Vendor", "VenType", "vendPan", "VehType"];
+    if (typeof (this.RunSheetTableForm.controls['Vehicle'].value) == "string") {
       const res = await this.vehicleTypeService.getVehicleTypeList();
       const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
       this.RunSheetTableForm.controls['VehType'].setValue("");
@@ -339,28 +341,39 @@ export class CreateRunSheetComponent implements OnInit {
         if (fieldName.includes(x.name)) {
           x.disable = false
         }
-        if(fieldName.includes(x.name) && x.name=="VehType"){
-          x.type="Staticdropdown"
-          x.value=vehicleType
+        if (fieldName.includes(x.name) && x.name == "VehType") {
+          x.type = "Staticdropdown"
+          x.value = vehicleType
           x.disable = false
         }
         return x;
       });
       this.RunSheetTableForm.controls['VenType'].setValue("Market");
     }
-   
-    
-  
+
+
+
   }
   async GenerateRunsheet() {
+    // Get Selected Dockets Details from the api
+    const DocketNoList = this.csv.filter(x => x.isSelected).map(x => x.dKTNO);
+    const filter = {
+      dKTNO: {
+        D$in: DocketNoList, pAYTYP: "P03",
+        cID: this.storage.companyCode
+      }
+    };
+    const docketdetails = await this.docketService.getDocketsDetailsLtl(filter);
+
+
     if (!this.csv.some((x) => x.isSelected)) {
       // If no item has isSelected set to true, return or perform any desired action.
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
-     // this.ObjSnackBarUtility.ShowCommonSwal1('error', 'Please select atleast one Cluster to generate Runsheet!', false, false, false);
+      // this.ObjSnackBarUtility.ShowCommonSwal1('error', 'Please select atleast one Cluster to generate Runsheet!', false, false, false);
       return;
     }
     this.snackBarUtilityService.commonToast(async () => {
-      const formData=this.RunSheetTableForm.getRawValue();
+      const formData = this.RunSheetTableForm.getRawValue();
       if (formData.VenType == "Market") {
         try {
           if (this.isMarket && this.MarketData) {
@@ -368,14 +381,14 @@ export class CreateRunSheetComponent implements OnInit {
             await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
           }
           else {
-            await this.vehicleService.updateVehicleCap(formData,true);
+            await this.vehicleService.updateVehicleCap(formData, true);
           }
         } catch (e) {
         }
       }
-      formData['deliveryTypeName']=this.delType.find((x)=>x.value==formData.deliveryType).name;
+      formData['deliveryTypeName'] = this.delType.find((x) => x.value == formData.deliveryType).name;
       const res = await this.runSheetService.drsFieldMapping(this.RunSheetTableForm.value, this.csv);
-      const runSheetNo=await this.runSheetService.addRunSheet(res);
+      const runSheetNo = await this.runSheetService.addRunSheet(res);
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -383,12 +396,12 @@ export class CreateRunSheetComponent implements OnInit {
         showConfirmButton: true,
       })
       this.goBack('Delivery')
-    },"Run Sheet generated Successfully")
- 
+    }, "Run Sheet generated Successfully")
+
   }
-  async generalMaster(){
+  async generalMaster() {
     this.delType = await this.generalService.getGeneralMasterData("RUNDELTYP");
-    const delType=this.delType.find((x)=>x.name=="Delivery");
+    const delType = this.delType.find((x) => x.name == "Delivery");
     setGeneralMasterData(this.jsonControlArray, this.delType, "deliveryType");
     this.RunSheetTableForm.controls['deliveryType'].setValue(delType.value)
     this.RunSheetTableForm.controls['deliveryType'].disable();
@@ -415,23 +428,23 @@ export class CreateRunSheetComponent implements OnInit {
       }
     });
   }
-    //#region bind Vehicle Data if it is market 
-    autoBindMarketVehicleData(result) {
-      if (result) {
-        this.RunSheetTableForm.controls['Vehicle'].setValue({ name: result?.vehicelNo || "", value: result?.vehicelNo || "" });
-        this.RunSheetTableForm.controls['VehType'].setValue(result.vehicleType.name);
-        this.RunSheetTableForm.controls['VenType'].setValue("Market");
-        this.RunSheetTableForm.controls['Vendor'].setValue(result?.vendor||"");
-        this.RunSheetTableForm.controls['vendPan'].setValue(result?.venPan||"");
-        this.RunSheetTableForm.controls['driverNm'].setValue(result?.driver||"");
-        this.RunSheetTableForm.controls['driverMobile'].setValue(result?.dmobileNo||"");
-        this.RunSheetTableForm.controls['lsNo'].setValue(result?.lcNo||"");
-        this.RunSheetTableForm.controls['lcExpireDate'].setValue(result?.lcExpireDate||"");
-        this.RunSheetTableForm.controls['CapVol'].setValue(result.vehicleSizeVol);
-        const vehicleSizeKG = result.vehicleSize ? parseInt(result.vehicleSize) * 1000 : 0;
-        this.RunSheetTableForm.controls['CapacityKg'].setValue(vehicleSizeKG);
-      
-      }
+  //#region bind Vehicle Data if it is market 
+  autoBindMarketVehicleData(result) {
+    if (result) {
+      this.RunSheetTableForm.controls['Vehicle'].setValue({ name: result?.vehicelNo || "", value: result?.vehicelNo || "" });
+      this.RunSheetTableForm.controls['VehType'].setValue(result.vehicleType.name);
+      this.RunSheetTableForm.controls['VenType'].setValue("Market");
+      this.RunSheetTableForm.controls['Vendor'].setValue(result?.vendor || "");
+      this.RunSheetTableForm.controls['vendPan'].setValue(result?.venPan || "");
+      this.RunSheetTableForm.controls['driverNm'].setValue(result?.driver || "");
+      this.RunSheetTableForm.controls['driverMobile'].setValue(result?.dmobileNo || "");
+      this.RunSheetTableForm.controls['lsNo'].setValue(result?.lcNo || "");
+      this.RunSheetTableForm.controls['lcExpireDate'].setValue(result?.lcExpireDate || "");
+      this.RunSheetTableForm.controls['CapVol'].setValue(result.vehicleSizeVol);
+      const vehicleSizeKG = result.vehicleSize ? parseInt(result.vehicleSize) * 1000 : 0;
+      this.RunSheetTableForm.controls['CapacityKg'].setValue(vehicleSizeKG);
+
     }
-    //#end region
+  }
+  //#end region
 }

@@ -991,7 +991,7 @@ export class AdvancePaymentsComponent implements OnInit {
       LeadgerDetails = this.PaymentSummaryFilterForm.get("JournalAccount").value;
     }
 
-    const AdvancePaymentAmount = this.PayableSummaryFilterForm.get("AdvancePaymentAmount").value;
+    const AdvancePaymentAmount = parseFloat(this.PayableSummaryFilterForm.get("AdvancePaymentAmount").value) || 0;
     let TDSAmount = parseFloat(this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount) || 0;
     const voucherRequest = {
       companyCode: this.companyCode,
@@ -1031,8 +1031,8 @@ export class AdvancePaymentsComponent implements OnInit {
         CGST: 0,
         UGST: 0,
         GSTTotal: 0,
-        GrossAmount: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount + TDSAmount),
-        netPayable: InterBranch == true ? parseFloat(data?.THCamount) : parseFloat(AdvancePaymentAmount + TDSAmount),
+        GrossAmount: InterBranch == true ? parseFloat(data?.THCamount) : AdvancePaymentAmount + TDSAmount,
+        netPayable: InterBranch == true ? parseFloat(data?.THCamount) : AdvancePaymentAmount + TDSAmount,
         roundOff: 0,
         voucherCanceled: false,
         paymentMode: PaymentMode,

@@ -40,7 +40,7 @@ export class ToPayPaidReportControl {
                 value: [
                     { value: ["P03"], name: "To Pay" },
                     { value: ["P01"], name: "Paid" },
-                    { value: ["P01", "P03"], name: "Both" },
+                    { value: "Both", name: "Both" },
                 ],
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -81,36 +81,6 @@ export class ToPayPaidReportControl {
                     { value: "Y", name: "Individual", checked: true },
                     { value: "N", name: "Cumulative" },
                 ],
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            },
-            {
-                name: '',
-                label: "",
-                placeholder: "",
-                type: '',
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            },
-            {
-                name: 'OR',
-                label: "",
-                placeholder: "",
-                type: 'OR',
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            },
-            {
-                name: '',
-                label: "",
-                placeholder: "",
-                type: '',
-                value: '',
                 generatecontrol: true,
                 disable: false,
                 Validations: []

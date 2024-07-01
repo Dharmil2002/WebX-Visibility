@@ -7,7 +7,7 @@ export async function manualvoucharDetail(masterService) {
         collectionName: "voucher_trans",
         filter: {
             bRC: StorageService.getItem(StoreKeys.Branch),
-            rEVFLAG: { D$ne: "N" }
+            rV: { D$ne: true }
         }
     }
     if (StorageService.getItem(StoreKeys.Branch) == 'HQTR') {

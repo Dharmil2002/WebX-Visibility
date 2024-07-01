@@ -264,9 +264,8 @@ export class ManualVoucherComponent implements OnInit {
                     _id : data.data._id
                   }
                   const VoucherNoList = {
-                    rEVFLAG:"Y",
+                    rV:true,
                     rEVREM: result.value +  res.data.ops[0].vNO
-                    
                   }
                   this.UpdateData(filter,VoucherNoList);
                     SwalerrorMessage("success", "Voucher Reverse Accounting Entry Done Successfully", "Voucher No: " + res.data.ops[0].vNO, true)

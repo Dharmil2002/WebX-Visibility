@@ -61,6 +61,7 @@ export class VoucherDataRequestModel {
   mREFNUM: string
   nAR: string;
   onAccount: boolean = false;
+  reverseVoucher: boolean = false;
 }
 
 export class DebitVoucherdetailsRequestModel {

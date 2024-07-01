@@ -1660,4 +1660,53 @@ export class DocketService {
     }
 
     /*end*/
+    async getDocketListForBilling(filter) {
+        let matchQuery = filter
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets_ltl",
+            filters: [
+                {
+                    D$match: matchQuery,
+                },
+                {
+                    "D$lookup": {
+                        "from": "docket_fin_det_ltl",
+                        "let": { "dKTNO": "$dKTNO" },
+                        "pipeline": [
+                            {
+                                "D$match": {
+                                    'D$expr': {
+                                        'D$and': [
+                                            {
+                                                'D$eq': [
+                                                    '$dKTNO', '$$dKTNO'
+                                                ]
+                                            },
+                                            {
+                                                'D$eq': [
+                                                    '$isBILLED', false
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "as": "financialDetails"
+                    },
+                },
+                {
+                    'D$unwind': {
+                        path: "$financialDetails",
+                        preserveNullAndEmptyArrays: false,
+                    }
+                },
+            ]
+
+        }
+        // Send request and handle response
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
+        return res.data;
+    }
 }

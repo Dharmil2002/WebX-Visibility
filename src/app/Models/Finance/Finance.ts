@@ -331,6 +331,7 @@ export enum VoucherInstanceType {
   CreditNoteApproval = 13,
   DebitNoteApproval = 14,
   VendorOpeningBalance = 15,
+  TdsPaymentSlipApproval = 17,
   THCGeneration = 16,
 }
 

@@ -34,13 +34,17 @@ import { ConvertToNumber, generateCombinations, isValidNumber, roundToNumber } f
 import { DCRService } from 'src/app/Utility/module/masters/dcr/dcr.service';
 import { GenericActions, RateTypeCalculation, StoreKeys } from 'src/app/config/myconstants';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { GetLeadgerInfoFromLocalStorage, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { GetLeadgerInfoFromLocalStorage, SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { debug } from 'console';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import { getApiCompanyDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { CustomerBillStatus } from 'src/app/Models/docStatus';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -184,7 +188,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     InvoiceAmount: 0.00,
     Yield: 0.00,
   }
-  isBoth: boolean=false;
+  isBoth: boolean = false;
   checkboxChecked: boolean;
   constructor(
     private controlPanel: ControlPanelService,
@@ -208,6 +212,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private voucherServicesService: VoucherServicesService,
     private thcService: ThcService,
+    private invoiceServiceService: InvoiceServiceService,
+    private masterService: MasterService,
+    private stateService: StateService,
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -308,14 +315,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   //#endregion
 
   /*below code is added for a set a locattion*/
-  async getPinCodeBasedOnCity(){
+  async getPinCodeBasedOnCity() {
     const toCity = this.consignmentForm.controls['toCity'].value.value;
-    const locationData=await this.locationService.locationFromApi({companyCode:this.storage.companyCode,D$or:[{locCity:toCity},{mappedCity:{D$in:[toCity]}}]});
-    if(locationData.length>0){
+    const locationData = await this.locationService.locationFromApi({ companyCode: this.storage.companyCode, D$or: [{ locCity: toCity }, { mappedCity: { D$in: [toCity] } }] });
+    if (locationData.length > 0) {
       this.consignmentForm.controls['destination'].setValue(locationData[0]);
-      if(locationData.length>1){
-        this.filter.Filter(this.allFormControls, this.consignmentForm,locationData, "destination", true);
-        this.pinCodeLoc=locationData;
+      if (locationData.length > 1) {
+        this.filter.Filter(this.allFormControls, this.consignmentForm, locationData, "destination", true);
+        this.pinCodeLoc = locationData;
       }
     }
 
@@ -913,11 +920,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     ]);
 
     let fields = fieldMap.get(name);
-   
-    this.consignmentForm.controls[fields['cUSTNM']].setValue(gstData?{ name: gstData.cUSTNM, value: gstData.cUSTCD, otherdetails: gstData }:"");
-    this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData?.cUSTPH||"");
-    this.consignmentForm.controls[fields['aLTPH']].setValue(gstData?.aLTPH||"");
-    this.consignmentForm.controls[fields['aDD']].setValue(gstData?{ name: gstData.aDD, value: gstData.aDD, otherdetails: gstData }:"");
+
+    this.consignmentForm.controls[fields['cUSTNM']].setValue(gstData ? { name: gstData.cUSTNM, value: gstData.cUSTCD, otherdetails: gstData } : "");
+    this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData?.cUSTPH || "");
+    this.consignmentForm.controls[fields['aLTPH']].setValue(gstData?.aLTPH || "");
+    this.consignmentForm.controls[fields['aDD']].setValue(gstData ? { name: gstData.aDD, value: gstData.aDD, otherdetails: gstData } : "");
   }
 
   async findWalkinGST(gstno) {
@@ -929,7 +936,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
     };
     const res = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.GetOne, request));
-    return Object.keys(res.data).length>0 ? res.data : null;
+    return Object.keys(res.data).length > 0 ? res.data : null;
   }
   /*End*/
   async AddressDetails() {
@@ -1596,28 +1603,28 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   /*End*/
   OnChangeCheckBox(event) {
-    this.checkboxChecked=event.event.checked;
-    this.isManual=this.checkboxChecked==true?false:true;
-    this.isUpdate=this.checkboxChecked==true?false:true;
-    this.consignmentForm.controls['docketNumber'].setValue(event.event.checked?"Computerized":"");
+    this.checkboxChecked = event.event.checked;
+    this.isManual = this.checkboxChecked == true ? false : true;
+    this.isUpdate = this.checkboxChecked == true ? false : true;
+    this.consignmentForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
   }
   checkDocketRules() {
     const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
     if (STYP) {
       const isManual = STYP.vAL === "M";
-      if(STYP.vAL!="B"){
-      this.allFormControls.find(x => x.name == "docketNumber").disable = !isManual;
-      this.consignmentForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
-      this.isManual = isManual;
-      this.isUpdate = isManual;
+      if (STYP.vAL != "B") {
+        this.allFormControls.find(x => x.name == "docketNumber").disable = !isManual;
+        this.consignmentForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
+        this.isManual = isManual;
+        this.isUpdate = isManual;
       }
-      else{
-        this.isBoth= STYP.vAL == "B"
-        this.checkboxChecked=true
-        this.isManual=false;
+      else {
+        this.isBoth = STYP.vAL == "B"
+        this.checkboxChecked = true
+        this.isManual = false;
         this.consignmentForm.controls['docketNumber'].setValue("Computerized");
       }
-     
+
     }
 
     const ELOC = this.rules.find(x => x.rULEID == "ELOC" && x.aCTIVE)
@@ -1755,10 +1762,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const resUpdate = await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
       await this.docketService.operationsFieldMapping(reqDkt.docketsDetails, reqDkt.invoiceDetails, reqDkt.docketFin);
       if (resUpdate) {
-        await this.toPayAccouting();
+        await this.toPayAccouting(reqBody);
       }
     }
-    else if (this.isManual ) {
+    else if (this.isManual) {
       await this.docketService.addDcrDetails(reqDkt?.docketsDetails, this.dcrDetail);
       let reqBody = {
         companyCode: this.storage.companyCode,
@@ -1774,7 +1781,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       //await this.docketService.operationsFieldMapping(reqDkt.docketsDetails, reqDkt.invoiceDetails, reqDkt.docketFin, this.isManual);
       const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));
       if (res) {
-        await this.toPayAccouting();
+        await this.toPayAccouting(reqBody);
       }
     }
     else {
@@ -1792,14 +1799,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const res = await firstValueFrom(this.operationService.operationMongoPost("operation/docket/ltl/create", reqBody));
       if (res) {
         this.consignmentForm.controls["docketNumber"].setValue(res.data);
-        await this.toPayAccouting();
+        await this.toPayAccouting(reqBody);
       }
     }
   }
-  async toPayAccouting() {
+  async toPayAccouting(DocketBookingRequestBody) {
     const payType = this.consignmentForm.get('payType').value;
     if (payType === "P01" || payType === "P02" || payType === "P03" || payType === "P04") {
-      this.AccountPosting(this.consignmentForm.controls["docketNumber"].value)
+      this.AccountPosting(DocketBookingRequestBody, this.consignmentForm.controls["docketNumber"].value)
     }
     else {
       Swal.fire({
@@ -2410,7 +2417,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   // Account Posting When  C Note Booked
-  async AccountPosting(DocketNo) {
+  async AccountPosting(DocketBookingRequestBody, DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0
@@ -2532,34 +2539,42 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                 .FinancePost("fin/account/posting", reqBody)
                 .subscribe({
                   next: (res: any) => {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Booked Successfully And Voucher Created",
-                      text: "GCN No: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
-                      showConfirmButton: true,
-                      denyButtonText: 'Print',
-                      showDenyButton: true,
-                      showCancelButton: true,
-                      cancelButtonText: 'Close'
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        // Redirect after the alert is closed with OK button.
-                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                      } else if (result.isDenied) {
-                        // Handle the action for the deny button here.
-                        const templateBody = {
-                          templateName: "DKT",
-                          PartyField: "",
-                          DocNo: this.consignmentForm.controls["docketNumber"].value,
-                        };
-                        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-                        window.open(url, '', 'width=1000,height=800');
-                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                      } else if (result.isDismissed) {
-                        // Handle the action for the cancel button here.
-                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                    if (res.success) {
+                      // If Payment Mode is Paid then Generate Bill
+                      if (this.consignmentForm.value.payType == "P01") {
+                        this.AutoCustomerInvoicing(DocketBookingRequestBody, DocketNo);
+                      } else {
+                        Swal.fire({
+                          icon: "success",
+                          title: "Booked Successfully And Voucher Created",
+                          text: "GCN No: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
+                          showConfirmButton: true,
+                          denyButtonText: 'Print',
+                          showDenyButton: true,
+                          showCancelButton: true,
+                          cancelButtonText: 'Close'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            // Redirect after the alert is closed with OK button.
+                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                          } else if (result.isDenied) {
+                            // Handle the action for the deny button here.
+                            const templateBody = {
+                              templateName: "DKT",
+                              PartyField: "",
+                              DocNo: this.consignmentForm.controls["docketNumber"].value,
+                            };
+                            const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                            window.open(url, '', 'width=1000,height=800');
+                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                          } else if (result.isDismissed) {
+                            // Handle the action for the cancel button here.
+                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                          }
+                        });
                       }
-                    });
+
+                    }
                   },
                   error: (err: any) => {
                     if (err.status === 400) {
@@ -2671,4 +2686,377 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     );
     return response;
   }
+  //#region Auto Customer Invoicing for Paid  GCN WT-930
+  async AutoCustomerInvoicing(RequestData, docketNo) {
+    // STEP 1: Get the required data from the form
+    const DocketNo = docketNo;
+    const customerCode = RequestData?.data?.bPARTY;
+    const customerName = RequestData?.data?.bPARTYNM;
+    // STEP 2: Prepare the request body For For Approve GCN And Call the API
+    const DocketStatusResult = this.invoiceServiceService.updateShipmentStatus(DocketNo, "LTL");
+    if (DocketStatusResult) {
+      // STEP 3: Prepare the request body For Customer Bill Generation And Call the API
+      const custList = await this.customerService.customerFromFilter({ customerCode: customerCode }, false);
+      const CustomerDetails = custList[0];
+      const custGroup = await this.customerService.customerGroupFilter(CustomerDetails?.customerGroup);
+      const tranDetail = await getApiCompanyDetail(this.masterService);
+      const data = RequestData?.data;
+      const gstAppliedList = await this.stateService.checkGst(tranDetail?.data[0].gstNo, data?.cSGN?.gST);
+      const gstTypes = Object.fromEntries(
+        Object.entries(gstAppliedList).filter(([key, value]) => value === true)
+      )
+      let jsonBillingList = [
+        {
+          _id: "",
+          bILLNO: "",
+          dKTNO: DocketNo,
+          cID: this.storage.companyCode,
+          oRGN: data?.oRGN || "",
+          dEST: data?.dEST || "",
+          dKTDT: data?.dKTDT || new Date(),
+          cHRGWT: data?.cHRWT || 0.00,
+          dKTAMT: data?.fRTAMT || 0.00,
+          dKTTOT: data?.gROAMT || 0.00,
+          sUBTOT: data?.gROAMT || 0.00,
+          gSTTOT: data?.gSTCHAMT || 0.00,
+          gSTRT: data?.gSTRT || 0.00,
+          tOTAMT: data?.tOTAMT || 0.00,
+          fCHRG: data?.fRTRT || 0.00,
+          sGST: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) / 2 : 0,
+          sGSTRT: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gSTRT || 0) / 2 : 0,
+          cGST: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) / 2 : 0,
+          cGSTRT: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gSTRT || 0) / 2 : 0,
+          uTGST: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) : 0,
+          uTGSTRT: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gSTRT || 0) : 0,
+          iGST: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) : 0,
+          iGSTRT: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gSTRT || 0) : 0,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch || "",
+          eNTBY: this.storage?.userName || "",
+        }];
+      const billData = {
+        "_id": `${this.storage.companyCode}` || "",
+        "cID": this.storage.companyCode,
+        "companyCode": this.storage.companyCode,
+        "dOCTYP": "Transaction",
+        "dOCCD": "T",
+        "bUSVRT": "LTL",
+        "bILLNO": "",
+        "bGNDT": new Date(),
+        "bDUEDT": new Date(),
+        "bLOC": this.storage.branch,
+        "pAYBAS": data?.pAYTYP,
+        "tRNMODE": data?.tRNMOD,
+        "bSTS": CustomerBillStatus.Submitted,
+        "bSTSNM": CustomerBillStatus[CustomerBillStatus.Submitted],
+        "bSTSDT": new Date(),
+        "eXMT": data?.rCM == "Y" ? true : false,
+        "eXMTRES": "",
+        "gEN": {
+          "lOC": data?.oRGN || "",
+          "cT": data?.fCT || "",
+          "sT": "",
+          "gSTIN": "",
+        },
+        "sUB": {
+          "lOC": this.storage.branch,
+          "tO": customerName,
+          "tOMOB": CustomerDetails?.customer_mobile || "",
+          "dTM": data?.dKTDT || new Date(),
+          "dOC": ""
+        },
+        "cOL": {
+          "lOC": "",
+          "aMT": 0.00,
+          "bALAMT": data?.tOTAMT || 0.00,
+        },
+        "cUST": {
+          "cD": customerCode,
+          "nM": customerName,
+          "tEL": CustomerDetails?.customer_mobile || "",
+          "aDD": CustomerDetails?.RegisteredAddress || "",
+          "eML": CustomerDetails?.Customer_Emails || "",
+          "cT": CustomerDetails?.city || "",
+          "sT": CustomerDetails?.state || "",
+          "gSTIN": CustomerDetails?.GSTdetails ? CustomerDetails?.GSTdetails?.[0]?.gstNo : "",
+          "cGCD": custGroup?.groupCode || "",
+          "cGNM": custGroup?.groupName || "",
+        },
+        "gST": {
+          "tYP": Object.keys(gstTypes).join() || "",
+          "rATE": data?.gSTRT || 0.00,
+          "iGST": 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) : 0,
+          "uTGST": 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) : 0,
+          "cGST": 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) / 2 : 0,
+          "sGST": 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gSTCHAMT) / 2 : 0,
+          "aMT": data?.gSTCHAMT || 0.00,
+        },
+        "aPR": {
+          "loc": this.storage.branch,
+          "aDT": new Date(),
+          "aBY": this.storage.userName,
+        },
+        "sUPDOC": "",
+        "pRODID": data?.tRNMOD || "",
+        "dKTCNT": 1,
+        "CURR": "INR",
+        "dKTTOT": data?.tOTAMT || 0.00,
+        "gROSSAMT": data?.tOTAMT || 0.00,
+        "rOUNOFFAMT": 0.00,
+        "aMT": data?.tOTAMT || 0.00,
+        "custDetails": jsonBillingList,
+        "eNTDT": new Date(),
+        "eNTLOC": this.storage.branch,
+        "eNTBY": this.storage.userName,
+      }
+      const req = {
+        companyCode: this.storage.companyCode,
+        docType: "BILL",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        party: customerName.toUpperCase(),
+        collectionName: "cust_bill_headers",
+        data: billData
+      };
+      const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/create", req));
+      if (res) {
+        if (res.success) {
+          const BillNo = res.data.ops[0].docNo;
+          this.AccountPostingForAutoBilling(billData, BillNo, DocketNo);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: res.message,
+            showConfirmButton: false,
+          });
+        }
+      }
+
+    }
+  }
+  // Account Posting When  When Bill Has been Generated/ Finalized	
+  async AccountPostingForAutoBilling(billData, BillNo, DocketNo) {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const TotalAmount = billData?.aMT || 0;
+        const GstAmount = billData?.gST?.aMT || 0;
+
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = billData?.cUST?.cD || "";
+        this.VoucherDataRequestModel.partyName = billData?.cUST?.nM || "";
+        this.VoucherDataRequestModel.partyState = billData?.cUST?.sT || "";
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
+
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = billData?.gST?.iGST || 0;
+        this.VoucherDataRequestModel.SGST = billData?.gST?.sGST || 0;
+        this.VoucherDataRequestModel.CGST = billData?.gST?.cGST || 0;
+        this.VoucherDataRequestModel.UGST = billData?.gST?.uTGST || 0;
+        this.VoucherDataRequestModel.GSTTotal = GstAmount;
+
+        this.VoucherDataRequestModel.GrossAmount = TotalAmount || 0;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = 0;
+        this.VoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.transactionNumber = BillNo;
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.accountCode = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        var VoucherlineitemList = this.GetVouchersLedgersForAutoBilling(billData, BillNo);
+
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.branch,
+                transCode: VoucherInstanceType.BillApproval,
+                transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
+                docType: "Voucher",
+                partyType: "Customer",
+                docNo: BillNo,
+                partyCode: billData?.cUST?.cD || "",
+                partyName: billData?.cUST?.nM || "",
+                entryBy: this.storage.userName,
+                entryDate: Date(),
+                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.debit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.credit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Booked Successfully",
+                      text: "DocketNo : " + DocketNo,
+                      showConfirmButton: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        Swal.hideLoading();
+                        setTimeout(() => {
+                          Swal.close();
+                        }, 2000);
+                      }
+                    });
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+
+    }, "C-Note Booking Voucher Generating..!");
+
+  }
+  GetVouchersLedgersForAutoBilling(billData, BillNo) {
+    const TotalAmount = billData?.aMT;
+    const GstAmount = billData?.gST?.aMT;
+    const GstRate = billData?.gST?.rATE;
+    const DocketAmount = parseFloat(billData?.dKTTOT) - parseFloat(billData?.gST?.aMT);
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit, sacInfo = "",) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.BillApproval,
+      transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: sacInfo ? SACInfo['996511'].sacCode : "",
+      sacName: sacInfo ? SACInfo['996511'].sacName : "",
+      debit,
+      credit,
+      GSTRate: sacInfo ? GstRate : 0,
+      GSTAmount: sacInfo ? GstAmount : 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Customer Bill freight is Generated :${BillNo}`,
+    });
+
+    const response = [
+      createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, TotalAmount, 0),
+    ];
+    let LeadgerDetails;
+    switch (billData?.pRODID) {
+      case "P1":
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+      case "P2":
+        LeadgerDetails = ledgerInfo['INC001004'];
+        break;
+      case "P3":
+        LeadgerDetails = ledgerInfo['INC001002'];
+        break;
+      case "P4":
+        LeadgerDetails = ledgerInfo['INC001001'];
+        break;
+      default:
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+    }
+    // Income Ledger
+    if (LeadgerDetails) {
+      response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, DocketAmount));
+    }
+
+    const gstTypeMapping = {
+      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
+      cGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
+      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
+      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
+    };
+
+    const gstType = billData?.gST?.tYP;
+    const GSTTypeList = [gstType]
+    GSTTypeList.forEach(element => {
+      if (gstType && gstTypeMapping[element]) {
+        const { accCode, accName, accCategory, prop } = gstTypeMapping[element];
+        if (billData?.gST?.[prop] > 0) {
+          response.push(createVoucher(accCode, accName, accCategory, 0, billData?.gST?.[prop], '996511'));
+        }
+      }
+    });
+    return response;
+  }
+  //#endregion
+
 }

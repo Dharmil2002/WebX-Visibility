@@ -124,6 +124,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
   }
   totalamount: any;
   totalTdsamount: any;
+  voucherno: any;
 
   constructor(private filter: FilterUtils,
     private masterService: MasterService,
@@ -137,7 +138,6 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
     private navigationService: NavigationService,) {
     this.tdsPaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (this.tdsPaymentData) {
-      console.log(this.tdsPaymentData)
       this.PaymentData = {
         Vendor: this.tdsPaymentData.vendorCode // Set the vendor name here
       };
@@ -261,7 +261,6 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
   async GettdsPaymentList(vendorCode) {
     const { financialYearStartDate, financialYearEndDate } = this.getFinancialYearDates();
     this.isTableLode = false;
-    console.log(financialYearStartDate);
     const BodyDataHeader = {
       companyCode: this.storage.companyCode,
       collectionName: "vend_bill_summary",
@@ -279,10 +278,11 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
                 { "D$eq": [{ "D$ifNull": ["$tDSPAID", false] }, false] }
               ]
             },
+            { "D$ne": ["$bSTAT", 7] },
             // Check if bDT is greater than financialYearStartDate
-            // { "D$gt": ["$bDT", financialYearStartDate] },
+            { "D$gt": ["$bDT", financialYearStartDate] },
             // // Check if bDT is less than financialYearEndDate
-            // { "D$lt": ["$bDT", financialYearEndDate] }
+            { "D$lt": ["$bDT", financialYearEndDate] }
           ] // Remove undefined elements from the array
         }
       }
@@ -414,7 +414,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
       );
     }
     else {
-      this.snackBarUtilityService.commonToast(async () => {
+      // this.snackBarUtilityService.commonToast(async () => {
         try {
 
           this.TDSRequestModel.companyCode = this.storage.companyCode;
@@ -433,15 +433,24 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
           this.TDSHdrDataRequestModel.aMT = this.totalTdsamount;
           this.TDSHdrDataRequestModel.lOC = this.storage.branch;
           this.TDSHdrDataRequestModel.tDSChallanNo = this.PaymentSummaryFilterForm.value.TDSChallanNo;
-          this.TDSHdrDataRequestModel.pAY = {
-            mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
-            bANK: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.name : "",
-            bANKCD: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.value.toString() : "",
-            aCCD:(this.PaymentSummaryFilterForm.value.PaymentMode === 'Cash') ? this.PaymentSummaryFilterForm.value.CashAccount?.name : "",
-            aCNM:(this.PaymentSummaryFilterForm.value.PaymentMode === 'Cash') ? this.PaymentSummaryFilterForm.value.CashAccount?.value : "",
-            dTM: this.PaymentSummaryFilterForm.value?.Date || new Date(),
-            cREFNO: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : "",
-          };
+          this.TDSHdrDataRequestModel.vND = {
+            cD: this.tableData[0].vND.cD,
+            nM: this.tableData[0].vND.nM,
+            pAN: this.tableData[0].vND.pAN,
+            aDD: this.tableData[0].vND.aDD,
+            mOB: this.tableData[0].vND.mOB,
+            eML: this.tableData[0].vND.eML,
+            sT: this.tableData[0].vND.sT,
+          },
+            this.TDSHdrDataRequestModel.pAY = {
+              mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
+              bANK: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.name : "",
+              bANKCD: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.value.toString() : "",
+              aCCD: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cash') ? this.PaymentSummaryFilterForm.value.CashAccount?.name : "",
+              aCNM: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cash') ? this.PaymentSummaryFilterForm.value.CashAccount?.value : "",
+              dTM: this.PaymentSummaryFilterForm.value?.Date || new Date(),
+              cREFNO: (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : "",
+            };
           this.TDSHdrDataRequestModel.sTS = 1;
           this.TDSHdrDataRequestModel.sTSNM = "Generated";
           this.TDSHdrDataRequestModel.sTSBY = this.storage.loginName;
@@ -455,7 +464,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
           this.tdsDetDataRequestList = [];
           this.tableData.forEach(tdsData => {
             if (tdsData.isSelected) {
-              // Check if the current noteData is selected
+              // Check if the current tdsData is selected
               let tdsDetDataRequestModel = {
                 _id: "",
                 cID: this.storage.companyCode,
@@ -464,6 +473,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
                 docNo: "",
                 bILLNO: tdsData.docNo,
                 bGNDT: tdsData.bGNDT,
+                bDOCTYP: tdsData.dOCTYP,
                 vND: {
                   cD: tdsData.vND.cD,
                   nM: tdsData.vND.nM,
@@ -504,21 +514,6 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
             .then((res: any) => {
               if (res.success) {
                 this.approval(this.tableData, res?.data?.mainData);
-                Swal.fire({
-                  icon: "success",
-                  title: "TDS Payment slip Created Successfully",
-                  text: "TDS Payment slip No: " + res?.data?.mainData,
-                  showConfirmButton: true,
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    // Pending Bill Aginst Update Tds Payment Done
-                    Swal.hideLoading();
-                    setTimeout(() => {
-                      Swal.close();
-                    }, 2000);
-                    this.route.navigate(["Finance/VendorPayment/Dashboard"]);
-                  }
-                });
               }
             })
             .catch((error) => {
@@ -528,7 +523,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
         } catch (error) {
           this.snackBarUtilityService.ShowCommonSwal("error", error.message);
         }
-      }, "TDS Payment Slip Generating..!");
+      // }, "TDS Payment Slip Generating..!");
     }
   }
 
@@ -536,126 +531,127 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
   async approval(Data, Tpsno) {
     const firstSelectedRecord = Data.find(tdsData => tdsData.isSelected);
 
-    //this.snackBarUtilityService.commonToast(() => {
-      try {
-        const PaymentAmount = parseFloat(this.totalTdsamount);
-        const NetPayable = parseFloat(this.totalTdsamount);
-        this.VoucherRequestModel.companyCode = this.storage.companyCode;
-        this.VoucherRequestModel.docType = "VR";
-        this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear;
+    this.snackBarUtilityService.commonToast(() => {
+    try {
+      const PaymentAmount = parseFloat(this.totalTdsamount);
+      const NetPayable = parseFloat(this.totalTdsamount);
+      this.VoucherRequestModel.companyCode = this.storage.companyCode;
+      this.VoucherRequestModel.docType = "VR";
+      this.VoucherRequestModel.branch = this.storage.branch;
+      this.VoucherRequestModel.finYear = financialYear;
 
-        this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.TdsPaymentSlipApproval;
-        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.TdsPaymentSlipApproval];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+      this.VoucherDataRequestModel.voucherNo = "";
+      this.VoucherDataRequestModel.transCode = VoucherInstanceType.TdsPaymentSlipApproval;
+      this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.TdsPaymentSlipApproval];
+      this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+      this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
 
-        this.VoucherDataRequestModel.transDate = new Date();
-        this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = this.storage.branch;
-        this.VoucherDataRequestModel.finYear = financialYear;
+      this.VoucherDataRequestModel.transDate = new Date();
+      this.VoucherDataRequestModel.docType = "VR";
+      this.VoucherDataRequestModel.branch = this.storage.branch;
+      this.VoucherDataRequestModel.finYear = financialYear;
 
-        this.VoucherDataRequestModel.accLocation = this.storage.branch;
-        this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode = firstSelectedRecord.vND.cD || "";
-        this.VoucherDataRequestModel.partyName = firstSelectedRecord.vND.nM || "";
-        this.VoucherDataRequestModel.partyState = "";
-        this.VoucherDataRequestModel.entryBy = this.storage.userName;
-        this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo = firstSelectedRecord.vND.pAN || "";
-        this.VoucherDataRequestModel.tdsSectionCode = firstSelectedRecord.tDS.sEC || "";
-        this.VoucherDataRequestModel.tdsSectionName = firstSelectedRecord.tDS.sECD || "";
-        this.VoucherDataRequestModel.tdsRate = 0;
-        this.VoucherDataRequestModel.tdsAmount = 0;
-        this.VoucherDataRequestModel.tdsAtlineitem = false;
-        this.VoucherDataRequestModel.tcsSectionCode = undefined;
-        this.VoucherDataRequestModel.tcsSectionName = undefined
-        this.VoucherDataRequestModel.tcsRate = 0;
-        this.VoucherDataRequestModel.tcsAmount = 0;
+      this.VoucherDataRequestModel.accLocation = this.storage.branch;
+      this.VoucherDataRequestModel.preperedFor = "Vendor";
+      this.VoucherDataRequestModel.partyCode = firstSelectedRecord.vND.cD || "";
+      this.VoucherDataRequestModel.partyName = firstSelectedRecord.vND.nM || "";
+      this.VoucherDataRequestModel.partyState = "";
+      this.VoucherDataRequestModel.entryBy = this.storage.userName;
+      this.VoucherDataRequestModel.entryDate = new Date();
+      this.VoucherDataRequestModel.panNo = firstSelectedRecord.vND.pAN || "";
+      this.VoucherDataRequestModel.tdsSectionCode = firstSelectedRecord.tDS.sEC || "";
+      this.VoucherDataRequestModel.tdsSectionName = firstSelectedRecord.tDS.sECD || "";
+      this.VoucherDataRequestModel.tdsRate = 0;
+      this.VoucherDataRequestModel.tdsAmount = 0;
+      this.VoucherDataRequestModel.tdsAtlineitem = false;
+      this.VoucherDataRequestModel.tcsSectionCode = undefined;
+      this.VoucherDataRequestModel.tcsSectionName = undefined
+      this.VoucherDataRequestModel.tcsRate = 0;
+      this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST = 0;
-        this.VoucherDataRequestModel.SGST = 0;
-        this.VoucherDataRequestModel.CGST = 0;
-        this.VoucherDataRequestModel.UGST = 0;
-        this.VoucherDataRequestModel.GSTTotal = 0;
+      this.VoucherDataRequestModel.IGST = 0;
+      this.VoucherDataRequestModel.SGST = 0;
+      this.VoucherDataRequestModel.CGST = 0;
+      this.VoucherDataRequestModel.UGST = 0;
+      this.VoucherDataRequestModel.GSTTotal = 0;
 
-        this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
-        this.VoucherDataRequestModel.netPayable = NetPayable;
-        this.VoucherDataRequestModel.roundOff = 0;
-        this.VoucherDataRequestModel.voucherCanceled = false;
+      this.VoucherDataRequestModel.GrossAmount = PaymentAmount;
+      this.VoucherDataRequestModel.netPayable = NetPayable;
+      this.VoucherDataRequestModel.roundOff = 0;
+      this.VoucherDataRequestModel.voucherCanceled = false;
 
-        this.VoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName =
-          (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.name : this.PaymentSummaryFilterForm.value.CashAccount?.name;
-        this.VoucherDataRequestModel.accountCode =
-          (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.value.toString() : this.PaymentSummaryFilterForm.value.CashAccount?.value;
+      this.VoucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
+      this.VoucherDataRequestModel.refNo = "";
+      this.VoucherDataRequestModel.accountName =
+        (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.name : this.PaymentSummaryFilterForm.value.CashAccount?.name;
+      this.VoucherDataRequestModel.accountCode =
+        (this.PaymentSummaryFilterForm.value.PaymentMode === 'Cheque' || this.PaymentSummaryFilterForm.value.PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.Bank?.value.toString() : this.PaymentSummaryFilterForm.value.CashAccount?.value;
 
-        this.VoucherDataRequestModel.date = ""
-        this.VoucherDataRequestModel.scanSupportingDocument = "";
-        this.VoucherDataRequestModel.transactionNumber = Tpsno || "";
+      this.VoucherDataRequestModel.date = ""
+      this.VoucherDataRequestModel.scanSupportingDocument = "";
+      this.VoucherDataRequestModel.transactionNumber = Tpsno || "";
 
-        const voucherlineItems = this.GetVouchersLedgers(this.VoucherDataRequestModel);
+      const voucherlineItems = this.GetVouchersLedgers(this.VoucherDataRequestModel);
 
-        this.VoucherRequestModel.details = voucherlineItems;
-        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-        this.VoucherRequestModel.debitAgainstDocumentList = [];
-        firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
-          let reqBody = {
-            companyCode: this.storage.companyCode,
-            voucherNo: res?.data?.mainData?.ops[0].vNO,
-            transDate: Date(),
-            finYear: financialYear,
-            branch: this.storage.branch,
-            transCode: VoucherInstanceType.TdsPaymentSlipApproval,
-            transType: VoucherInstanceType[VoucherInstanceType.TdsPaymentSlipApproval],
-            voucherCode: VoucherType.JournalVoucher,
-            voucherType: VoucherType[VoucherType.JournalVoucher],
-            docType: "Voucher",
-            partyType: "Vendor",
-            docNo: Tpsno,
-            partyCode: "" + firstSelectedRecord.vND.cD || "",
-            partyName: firstSelectedRecord.vND.nM || "",
-            entryBy: this.storage.userName,
-            entryDate: Date(),
-            debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
-              return {
-                "accCode": item.accCode,
-                "accName": item.accName,
-                "accCategory": item.accCategory,
-                "amount": item.debit,
-                "narration": item.narration ?? ""
-              };
-            }),
-            credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
-              return {
-                "accCode": item.accCode,
-                "accName": item.accName,
-                "accCategory": item.accCategory,
-                "amount": item.credit,
-                "narration": item.narration ?? ""
-              };
-            }),
-          };
+      this.VoucherRequestModel.details = voucherlineItems;
+      this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+      this.VoucherRequestModel.debitAgainstDocumentList = [];
+      firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.VoucherRequestModel)).then((res: any) => {
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          voucherNo: res?.data?.mainData?.ops[0].vNO,
+          transDate: Date(),
+          finYear: financialYear,
+          branch: this.storage.branch,
+          transCode: VoucherInstanceType.TdsPaymentSlipApproval,
+          transType: VoucherInstanceType[VoucherInstanceType.TdsPaymentSlipApproval],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          docType: "Voucher",
+          partyType: "Vendor",
+          docNo: Tpsno,
+          partyCode: "" + firstSelectedRecord.vND.cD || "",
+          partyName: firstSelectedRecord.vND.nM || "",
+          entryBy: this.storage.userName,
+          entryDate: Date(),
+          debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.debit,
+              "narration": item.narration ?? ""
+            };
+          }),
+          credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.credit,
+              "narration": item.narration ?? ""
+            };
+          }),
+        };
 
-          firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then(async (res: any) => {
+        firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody)).then(async (res: any) => {
+          if (res) {
+            const req = {
+              companyCode: this.storage.companyCode,
+              collectionName: "tps_header",
+              filter: { docNo: Tpsno },
+              update: {
+                sTS: 2,
+                sTSNM: "Approved",
+                sTSDT: new Date(),
+                sTSBY: this.storage.loginName,
+                vNO: reqBody.voucherNo
+              },
+            };
+            this.voucherno = reqBody.voucherNo
+            const res = await firstValueFrom(
+              this.masterService.masterPut("generic/update", req))
             if (res) {
-              const req = {
-                companyCode: this.storage.companyCode,
-                collectionName: "Webx_TPS_Header",
-                filter: { docNo: Tpsno },
-                update: {
-                  sTS: 2,
-                  sTSNM: "Approved",
-                  sTSDT: new Date(),
-                  sTSBY: this.storage.loginName,
-                  vNO: reqBody.voucherNo
-                },
-              };
-              const res = await firstValueFrom(
-                this.masterService.masterPut("generic/update", req))
-
               this.tableData.forEach(noteData => {
                 if (noteData.isSelected) {
                   // Check if the current noteData is selected
@@ -669,27 +665,42 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
                   };
                   const res = firstValueFrom(
                     this.masterService.masterPut("generic/update", req))
-                    if(res){
-                    }
+                  if (res) {
+                  }
                 }
               });
-
-              // this.route.navigate(["Finance/VendorPayment/Dashboard"]);
-            } else {
-              this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Do Account Posting..!");
+              Swal.fire({
+                icon: "success",
+                title: "TDS Payment slip Created Successfully",
+                html: "THC Number is " + Tpsno + "<br>Voucher Number is " + reqBody.voucherNo,
+                showConfirmButton: true,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // Pending Bill Aginst Update Tds Payment Done
+                  Swal.hideLoading();
+                  setTimeout(() => {
+                    Swal.close();
+                  }, 2000);
+                  this.route.navigate(["Finance/VendorPayment/Dashboard"]);
+                }
+              });
             }
-          });
-        }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-          .finally(() => {
-          });
+            // this.route.navigate(["Finance/VendorPayment/Dashboard"]);
+          } else {
+            this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Do Account Posting..!");
+          }
+        });
+      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+        .finally(() => {
+        });
 
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal(
-          "error",
-          "Fail To Submit Data..!"
-        );
-      }
-   // }, "Tds Payment Voucher Generating..!");
+    } catch (error) {
+      this.snackBarUtilityService.ShowCommonSwal(
+        "error",
+        "Fail To Submit Data..!"
+      );
+    }
+     }, "Tds Payment Voucher Generating..!");
 
   }
 
@@ -722,7 +733,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
 
     const response = [
       createVoucher(this.VoucherDataRequestModel.tdsSectionCode, this.VoucherDataRequestModel.tdsSectionName, "LIABILITY", TotalAmount, 0),
-      createVoucher(this.VoucherDataRequestModel.accountName, this.VoucherDataRequestModel.accountCode, "TDS", 0, TotalAmount),
+      createVoucher(this.VoucherDataRequestModel.accountName, this.VoucherDataRequestModel.accountCode, "LIABILITY", 0, TotalAmount),
     ];
 
     return response;

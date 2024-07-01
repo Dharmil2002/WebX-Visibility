@@ -116,17 +116,19 @@ export class TdsPaymentsComponent implements OnInit {
           "D$and": [
             // Check if bALAMT is greater than 0
             { "D$gt": ["$tDS.aMT", 0] },
-            // Cancel Flag Check 
+            // Tds Payment Flag Check 
             {
               "D$or": [
                 { "D$eq": ["$tDSPAID", false] },
                 { "D$eq": [{ "D$ifNull": ["$tDSPAID", false] }, false] }
               ]
             },
+            // Cancel Flag Check 
+            { "D$ne":["$bSTAT", 7]},
             // Check if bDT is greater than financialYearStartDate
-            // { "D$gt": ["$bDT", financialYearStartDate] },
+            { "D$gt": ["$bDT", financialYearStartDate] },
             // // Check if bDT is less than financialYearEndDate
-            // { "D$lt": ["$bDT", financialYearEndDate] }
+            { "D$lt": ["$bDT", financialYearEndDate] }
           ] // Remove undefined elements from the array
         }
       }

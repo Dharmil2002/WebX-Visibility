@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { debug } from "console";
 import { ThcCostUpdateService } from "src/app/Utility/module/operation/thc/thc-cost-update.service";
 import { StoreKeys } from "src/app/config/myconstants";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -88,7 +89,7 @@ export class HomePageComponent implements OnInit {
       title:"Purchase",
       iconName:"shop_two",
       mode: "",
-      route: "",
+      route: "https://webx-tms-po.azurewebsites.net/#/dashboard/Index",
       class: "fa fa-shipping-fast card-icon",
       bgColor: "#fd7e14",
       color: "#ffffff"
@@ -111,6 +112,7 @@ export class HomePageComponent implements OnInit {
       bgColor: "#222222",
       color: "#ffffff"
     },
+    
   ];
   constructor(private router: Router, private masterService: MasterService, private menuService: MenuService, private storage: StorageService
     , private controlPanel: ControlPanelService, private thcCostUpdateService: ThcCostUpdateService
@@ -189,11 +191,16 @@ export class HomePageComponent implements OnInit {
   }
 
   onAppClick(event: MouseEvent, data: any){
+    debugger
     if(data.mode) {
       //this.setMenuToBind(data.mode);      
       this.storage.setItem(StoreKeys.Mode, data.mode);
       this.bindMenu();
       this.router.navigate(['/dashboard/Index']);
+    }
+    else if(data.title=="Purchase"){
+      window.open(data.route)
+      
     }
     else if(data.route) {
       this.router.navigate([data.route]);

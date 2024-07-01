@@ -84,7 +84,7 @@ export class DepsUpdateComponent implements OnInit {
   }
   /*below is the deps close function*/
   async close() {
-        debugger
+    debugger
     if (!this.depsFormGroup.valid || !this.depsFormGroup.valid) {
       this.depsFormGroup.markAllAsTouched();
       Swal.fire({
@@ -111,7 +111,7 @@ export class DepsUpdateComponent implements OnInit {
         sTS: depsStatus.Update
       }
       const depsCount = await this.depsService.getDepsCount(filter)
-      if (depsCount &&depsCount[0].count>0) {
+      if (depsCount.length>0 && depsCount[0].count>0) {
         await this.depsService.depsUpdate(formData, { sTS: depsStatus.Closed, sTSNM: depsStatus[depsStatus.Closed] })
         Swal.fire({
           icon: "success",
@@ -168,7 +168,7 @@ export class DepsUpdateComponent implements OnInit {
       await this.depsService.depsUpdate(formData, { sTS: depsStatus.Update, sTSNM: depsStatus[depsStatus.Update] });
       Swal.fire({
         icon: "success",
-        title: "DEPS Closed Successfully",
+        title: "DEPS Update Successfully",
         text: `DEPS Number: ${this.depsFormGroup.controls['dEPSNO'].value}`,
         showConfirmButton: true,
       }).then((result) => {

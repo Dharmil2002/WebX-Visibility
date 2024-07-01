@@ -29,7 +29,7 @@ export class DepsService {
         let depsDetails = []
         if (docketsDetails && docketsDetails.length > 0) {
             docketsDetails.forEach((dk) => {
-             const depsHeaderJson =
+                const depsHeaderJson =
                 {
                     "cID": this.storage.companyCode,
                     "dEPSNO": "",
@@ -154,8 +154,8 @@ export class DepsService {
             let breadth = Math.max(suffixData.reduce((a, b) => a + b.vOL.b, 0), 0);
             let pkgs = Math.max(parseInt(docket.depsPkgs), 0);
             let Vol = Math.max(convert(height).from('cm').to('ft') *
-                      convert(length).from('cm').to('ft') *
-                      convert(breadth).from('cm').to('ft') * pkgs, 0);
+                convert(length).from('cm').to('ft') *
+                convert(breadth).from('cm').to('ft') * pkgs, 0);
             const newDocket = {
                 "_id": `${this.storage.companyCode}-${docket.docketNumber}-${nextSuffix}`,
                 "cID": this.storage.companyCode,
@@ -205,7 +205,7 @@ export class DepsService {
         });
         await this.arrivalService.getArrivalBasesdocket(sfxDocketsData, sfxEnvData);
         if ([docketDetails] && [docketDetails].length > 0) {
-            const remainingpkgs= parseInt(docketDetails.bookingPkgs)-parseInt(docketDetails.depsPkgs);
+            const remainingpkgs = parseInt(docketDetails.bookingPkgs) - parseInt(docketDetails.depsPkgs);
             let weightPerPkg = parseFloat(docketDetails.aCTWT) / parseInt(docketDetails.bookingPkgs);
             let arrivalPkgsWeight = Math.max(remainingpkgs * weightPerPkg, 0);
             let remainingWeight = Math.max(parseFloat(docketDetails.aCTWT) - arrivalPkgsWeight, 0);
@@ -217,8 +217,8 @@ export class DepsService {
             let breadth = Math.max(suffixData.reduce((a, b) => a + b.vOL.b, 0), 0);
             let pkgs = Math.max(remainingpkgs, 0);
             let Vol = Math.max(convert(height).from('cm').to('ft') *
-                      convert(length).from('cm').to('ft') *
-                      convert(breadth).from('cm').to('ft') * pkgs, 0);
+                convert(length).from('cm').to('ft') *
+                convert(breadth).from('cm').to('ft') * pkgs, 0);
             const dockets = [docketDetails].map((d) => `${d.Shipment}-${d.Suffix}`)
             const dktOps = {
                 "aCTWT": ConvertToNumber(remainingWeight, 3),
@@ -226,8 +226,8 @@ export class DepsService {
                 "tOTCWT": ConvertToNumber(chargeRemainingWeight, 3),
                 "tOTWT": ConvertToNumber(remainingWeight, 3),
                 "tOTPKG": remainingpkgs || 0,
-                "pKGS":remainingpkgs || 0,
-                "cFTTOT":Vol,
+                "pKGS": remainingpkgs || 0,
+                "cFTTOT": Vol,
                 "mODDT": new Date(),
                 "mODLOC": this.storage.branch,
                 "mODBY": this.storage.userName
@@ -284,6 +284,7 @@ export class DepsService {
         let depsShortDetails = []
         if (docketsDetails && docketsDetails.length > 0) {
             docketsDetails.forEach((dk) => {
+
                 if (dk.isDeps) {
                     const createDepsHeaderJson = (typeSpecificData) => ({
                         "cID": this.storage.companyCode,
@@ -358,13 +359,17 @@ export class DepsService {
                         let typeSpecificData;
                         switch (type.value) {
                             case "D":
+                                const remainingpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.demangePkgs);
+                                const weightPerPkg = parseFloat(dk.extra.actualWeight) / parseInt(dk.extra.noofPkts);
+                                const arrivalPkgsWeight = Math.max(remainingpkgs * weightPerPkg, 0);
+                                const remainingWeight = Math.max(parseFloat(dk.extra.actualWeight) - arrivalPkgsWeight, 0);
                                 typeSpecificData = {
                                     "dEPTYP": "D",
                                     "dEPTYPNM": "Damage",
                                     "dEPIMG": dk?.extra?.demageUpload || "",
                                     "dMG": {
                                         "pKGS": ConvertToNumber(dk?.extra?.demangePkgs || 0),
-                                        "wT": ConvertToNumber(dk?.depsWt || 0),
+                                        "wT": ConvertToNumber(remainingWeight || 0),
                                         "rES": dk?.extra?.demageReason?.name || "",
                                         "rMK": dk?.extra?.demageRemarks || ""
                                     },
@@ -385,6 +390,10 @@ export class DepsService {
                                 depsdMGDet.push(createDepsDetailsJson(dk?.extra?.demageRemarks));
                                 break;
                             case "S":
+                                const remaininSgpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.shortPkgs);
+                                const weightPerSPkg = parseFloat(dk.extra.actualWeight) / parseInt(dk.extra.noofPkts);
+                                const arrivalSPkgsWeight = Math.max(remaininSgpkgs * weightPerSPkg, 0);
+                                const remainingSWeight = Math.max(parseFloat(dk.extra.actualWeight) - arrivalSPkgsWeight, 0);
                                 typeSpecificData = {
                                     "dEPTYP": "S",
                                     "dEPTYPNM": "Shortage",
@@ -403,7 +412,7 @@ export class DepsService {
                                     },
                                     "sHORT": {
                                         "pKGS": ConvertToNumber(dk?.extra?.shortPkgs || 0),
-                                        "wT": ConvertToNumber(dk?.depsWt || 0),
+                                        "wT": ConvertToNumber(remainingSWeight || 0),
                                         "rES": dk?.extra?.shortReason.name,
                                         "rMK": dk?.extra?.shortRemarks
                                     }
@@ -412,6 +421,10 @@ export class DepsService {
                                 depsShortDetails.push(createDepsDetailsJson(dk?.extra?.shortRemarks));
                                 break;
                             case "P":
+                                const remaininPgpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.shortPkgs);
+                                const weightPerPPkg = parseFloat(dk.extra.actualWeight) / parseInt(dk.extra.noofPkts);
+                                const arrivalPPkgsWeight = Math.max(remaininPgpkgs * weightPerPPkg, 0);
+                                const remainingPWeight = Math.max(parseFloat(dk.extra.actualWeight) - arrivalPPkgsWeight, 0);
                                 typeSpecificData = {
                                     "dEPTYP": "P",
                                     "dEPTYPNM": "Pilferage",
@@ -424,7 +437,7 @@ export class DepsService {
                                     },
                                     "pF": {
                                         "pKGS": ConvertToNumber(dk?.extra?.pilferagePkgs || 0),
-                                        "wT": ConvertToNumber(dk?.depsWt || 0),
+                                        "wT": ConvertToNumber(remainingPWeight || 0),
                                         "rES": dk?.extra?.pilferageReason?.name || "",
                                         "rMK": dk?.extra?.pilferageRemarks || ""
                                     },

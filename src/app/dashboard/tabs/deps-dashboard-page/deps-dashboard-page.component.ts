@@ -53,7 +53,7 @@ export class DepsDashboardPageComponent implements OnInit {
   async getDepsDetails(){
     const res=await this.depsService.getDepsAllData({cID:this.storage.companyCode,lOC:this.storage.branch});
     const tableList=await this.depsService.bindData(res);
-    this.tableData=tableList;
+    this.tableData=tableList.reverse();
     this.getDrsKpiCount();
     this.tableLoad=false;
   }

@@ -340,10 +340,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     if (result) {
         Swal.fire('Error', result.message, 'error');
         this.EditShipmentForm.get(result.field).setValue(0);
-    } else {
-        Swal.fire('Success', 'All package values are valid.', 'success');
-    }
-  
+    } 
   }
    validatePackages(arrivalPkgs, shortPkgs, philoPkgs, demangePkgs) {
     switch (true) {

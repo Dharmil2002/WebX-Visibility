@@ -41,7 +41,7 @@ export class RunSheetService {
                 {
                     "D$lookup": {
                         from: "cluster_detail",
-                        let: { docketsPin: "$dockets.cSGN.pIN" }, // Single value from dockets
+                        let: { docketsPin: "$dockets.cSGE.pIN" }, // Single value from dockets
                         pipeline: [
                             {
                                 "D$match": {

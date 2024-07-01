@@ -340,7 +340,7 @@ export class DocketService {
             "inboundNumber": data.iNBNUM,
             "shipment": data.sHIP,
             "rfqNo": data.rFQNO,
-            "spIns": data?.rMK||"",
+            "spIns": data?.rMK || "",
             "podDoNumber": data.pODONUM,
             "vehicleDetail": null,
             "invoiceDetails": [],
@@ -890,7 +890,7 @@ export class DocketService {
                 "mTNM": element?.Invoice_Product || "",
                 "hSN": element?.HSN_CODE || "",
                 "hSNNM": element?.HSN_CODE || "",
-                "pKGTYP":element?.pkgsTypeInv || "",
+                "pKGTYP": element?.pkgsTypeInv || "",
                 "eWBNO": data?.ewbNo || "",
                 "eWBDT": ConvertToDate(element?.ewbDate),
                 "eXPDT": ConvertToDate(data?.ewbExprired),
@@ -1055,7 +1055,7 @@ export class DocketService {
     }
     /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
-    async getDocketList(filter,iSMR=false) {
+    async getDocketList(filter, iSMR = false) {
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,
@@ -1156,13 +1156,13 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
+    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData, nonfreight = "") {
 
-        let nonfreightAmt={};
+        let nonfreightAmt = {};
         if (nonfreight) {
             Object.keys(nonfreight).forEach((key) => {
                 let modifiedKey = key.replace(/./g, (match, index) => {
-              return index >0 ? match.toUpperCase() : match.toLowerCase();
+                    return index > 0 ? match.toUpperCase() : match.toLowerCase();
                 });
                 nonfreightAmt[modifiedKey] = nonfreight[key];
             });
@@ -1230,7 +1230,7 @@ export class DocketService {
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
             "gROAMT": ConvertToNumber(data?.grossAmount || 0, 2),
             "rCM": data?.rcm || "N",
-            "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
+            "gSTRT": ConvertToNumber(data?.gstRate || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
             "gST": {
                 "tY": "SGST",
@@ -1249,7 +1249,7 @@ export class DocketService {
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
-            "pVTMARK" : data?.pvtMark || "",
+            "pVTMARK": data?.pvtMark || "",
             "wLCN": data?.cnWinCsgn || false,
             "wLCNE": data?.cnWinCsgne || false,
             "iSCEBP": data?.cnebp || false,
@@ -1270,9 +1270,9 @@ export class DocketService {
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
             "cONTRACT": data?.contract || "",
-            "iSSCAN":data?.iSSCAN,
+            "iSSCAN": data?.iSSCAN,
             "nFCHG": nonfreightAmt,
-            "rMK":data?.spIns||"",
+            "rMK": data?.spIns || "",
             "yIELD": ConvertToNumber(data?.yIELD || 0, 2)
         };
 
@@ -1298,8 +1298,8 @@ export class DocketService {
                 "cURR": "INR",
                 "cUBWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "mATDN": element?.materialDensity || "",
-                "pKGTY":element?.pkgsTypeInv || "",
-                "pKGTYN":element?.pkgsTypeInvNM || "",
+                "pKGTY": element?.pkgsTypeInv || "",
+                "pKGTYN": element?.pkgsTypeInvNM || "",
                 "pKGS": parseInt(element?.noOfPackage || 0),
                 "cFTWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),
@@ -1660,4 +1660,53 @@ export class DocketService {
     }
 
     /*end*/
+    async getDocketListForBilling(filter) {
+        let matchQuery = filter
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets_ltl",
+            filters: [
+                {
+                    D$match: matchQuery,
+                },
+                {
+                    "D$lookup": {
+                        "from": "docket_fin_det_ltl",
+                        "let": { "dKTNO": "$dKTNO" },
+                        "pipeline": [
+                            {
+                                "D$match": {
+                                    'D$expr': {
+                                        'D$and': [
+                                            {
+                                                'D$eq': [
+                                                    '$dKTNO', '$$dKTNO'
+                                                ]
+                                            },
+                                            {
+                                                'D$eq': [
+                                                    '$isBILLED', false
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "as": "financialDetails"
+                    },
+                },
+                {
+                    'D$unwind': {
+                        path: "$financialDetails",
+                        preserveNullAndEmptyArrays: false,
+                    }
+                },
+            ]
+
+        }
+        // Send request and handle response
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
+        return res.data;
+    }
 }

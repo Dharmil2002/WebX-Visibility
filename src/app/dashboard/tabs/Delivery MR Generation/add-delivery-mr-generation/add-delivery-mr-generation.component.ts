@@ -16,7 +16,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { GenericActions, StoreKeys } from 'src/app/config/myconstants';
@@ -30,6 +30,9 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
 import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
+import { getApiCompanyDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
+import { CustomerBillStatus } from 'src/app/Models/docStatus';
 @Component({
   selector: 'app-add-delivery-mr-generation',
   templateUrl: './add-delivery-mr-generation.component.html'
@@ -96,7 +99,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   paymentMode: AutoComplete[];
   rateType: AutoComplete[];
   Demurragecharge: number = 0;
-
+  chargeDetails: any;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -108,11 +111,12 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
     public snackBarUtilityService: SnackBarUtilityService,
     private docketService: DocketService,
-    private invoiceService: InvoiceServiceService,
     private thcService: ThcService,
     private stateService: StateService,
     private controlPanel: ControlPanelService,
     private generalService: GeneralService,
+    private invoiceServiceService: InvoiceServiceService,
+    private customerService: CustomerService,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
@@ -938,7 +942,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             finYear: financialYear,
             data: data
           };
-
           //Send a POST request to create the job detail in the MongoDB collection.
           const res = await firstValueFrom(this.operation.operationPost("operation/delMR/create", reqBody));
           if (res.success) {
@@ -980,12 +983,17 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
               }
             }
             else if (headerRequest.mOD === "Credit") {
-              // If the branches match, navigate to the DeliveryMrGeneration page
-              this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
-                state: {
-                  data: res.data.chargeDetails
-                },
-              });
+              // If Payment Mode is To Pay then Generate Bill 
+              if (this.DocketDetails.pAYTYP == "P03") {
+                this.chargeDetails = res.data.chargeDetails
+                this.AutoCustomerInvoicing();
+              } else {
+                this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
+                  state: {
+                    data: res.data.chargeDetails
+                  },
+                });
+              }
             }
             else {
               this.snackBarUtilityService.ShowCommonSwal(
@@ -1347,6 +1355,383 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     }
 
     return Result;
+  }
+  //#endregion
+
+  //#region Auto Customer Invoicing for Paid  GCN WT-930
+  async AutoCustomerInvoicing() {
+    // STEP 1: Get the required data from the form
+    const DocketNo = this.DocketDetails.dKTNO;
+    const customerCode = this.DocketDetails.cSGE.cD;
+    const customerName = this.DocketDetails.cSGE.nM;
+    // STEP 2: Prepare the request body For For Approve GCN And Call the API
+    const DocketStatusResult = this.invoiceServiceService.updateShipmentStatus(DocketNo, "LTL");
+    if (DocketStatusResult) {
+      // STEP 3: Prepare the request body For Customer Bill Generation And Call the API
+      const custList = await this.customerService.customerFromFilter({ customerCode: customerCode }, false);
+      const CustomerDetails = custList[0];
+      const custGroup = await this.customerService.customerGroupFilter(CustomerDetails?.customerGroup);
+      const tranDetail = await getApiCompanyDetail(this.masterService);
+      const gstAppliedList = await this.stateService.checkGst(tranDetail?.data[0].gstNo, this.DocketDetails?.cSGN?.gST);
+      const gstTypes = Object.fromEntries(
+        Object.entries(gstAppliedList).filter(([key, value]) => value === true)
+      )
+      let jsonBillingList = [
+        {
+          _id: "",
+          bILLNO: "",
+          dKTNO: DocketNo,
+          cID: this.storage.companyCode,
+          oRGN: this.DocketDetails?.oRGN || "",
+          dEST: this.DocketDetails?.dEST || "",
+          dKTDT: this.DocketDetails?.dKTDT || new Date(),
+          cHRGWT: this.DocketDetails?.cHRWT || 0.00,
+          dKTAMT: this.DocketDetails?.fRTAMT || 0.00,
+          dKTTOT: this.DocketDetails?.gROAMT || 0.00,
+          sUBTOT: this.DocketDetails?.gROAMT || 0.00,
+          gSTTOT: this.DocketDetails?.gSTCHAMT || 0.00,
+          gSTRT: this.DocketDetails?.gSTRT || 0.00,
+          tOTAMT: this.DocketDetails?.tOTAMT || 0.00,
+          fCHRG: this.DocketDetails?.fRTRT || 0.00,
+          sGST: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) / 2 : 0,
+          sGSTRT: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails.gSTRT || 0) / 2 : 0,
+          cGST: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) / 2 : 0,
+          cGSTRT: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails.gSTRT || 0) / 2 : 0,
+          uTGST: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) : 0,
+          uTGSTRT: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails.gSTRT || 0) : 0,
+          iGST: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) : 0,
+          iGSTRT: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails.gSTRT || 0) : 0,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch || "",
+          eNTBY: this.storage?.userName || "",
+        }];
+      const billData = {
+        "_id": `${this.storage.companyCode}` || "",
+        "cID": this.storage.companyCode,
+        "companyCode": this.storage.companyCode,
+        "dOCTYP": "Transaction",
+        "dOCCD": "T",
+        "bUSVRT": "LTL",
+        "bILLNO": "",
+        "bGNDT": new Date(),
+        "bDUEDT": new Date(),
+        "bLOC": this.DocketDetails?.dEST || "",
+        "pAYBAS": this.DocketDetails?.pAYTYP,
+        "tRNMODE": this.DocketDetails?.tRNMOD,
+        "bSTS": CustomerBillStatus.Submitted,
+        "bSTSNM": CustomerBillStatus[CustomerBillStatus.Submitted],
+        "bSTSDT": new Date(),
+        "eXMT": this.DocketDetails?.rCM == "Y" ? true : false,
+        "eXMTRES": "",
+        "gEN": {
+          "lOC": this.DocketDetails?.oRGN || "",
+          "cT": this.DocketDetails?.fCT || "",
+          "sT": "",
+          "gSTIN": "",
+        },
+        "sUB": {
+          "lOC": this.storage.branch,
+          "tO": customerName,
+          "tOMOB": CustomerDetails?.customer_mobile || "",
+          "dTM": this.DocketDetails?.dKTDT || new Date(),
+          "dOC": ""
+        },
+        "cOL": {
+          "lOC": "",
+          "aMT": 0.00,
+          "bALAMT": this.DocketDetails?.tOTAMT || 0.00,
+        },
+        "cUST": {
+          "cD": customerCode,
+          "nM": customerName,
+          "tEL": CustomerDetails?.customer_mobile || "",
+          "aDD": CustomerDetails?.RegisteredAddress || "",
+          "eML": CustomerDetails?.Customer_Emails || "",
+          "cT": CustomerDetails?.city || "",
+          "sT": CustomerDetails?.state || "",
+          "gSTIN": CustomerDetails?.GSTdetails ? CustomerDetails?.GSTdetails?.[0]?.gstNo : "",
+          "cGCD": custGroup?.groupCode || "",
+          "cGNM": custGroup?.groupName || "",
+        },
+        "gST": {
+          "tYP": Object.keys(gstTypes).join() || "",
+          "rATE": this.DocketDetails?.gSTRT || 0.00,
+          "iGST": 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) : 0,
+          "uTGST": 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) : 0,
+          "cGST": 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) / 2 : 0,
+          "sGST": 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(this.DocketDetails?.gSTCHAMT) / 2 : 0,
+          "aMT": this.DocketDetails?.gSTCHAMT || 0.00,
+        },
+        "aPR": {
+          "loc": this.storage.branch,
+          "aDT": new Date(),
+          "aBY": this.storage.userName,
+        },
+        "sUPDOC": "",
+        "pRODID": this.DocketDetails?.tRNMOD || "",
+        "dKTCNT": 1,
+        "CURR": "INR",
+        "dKTTOT": this.DocketDetails?.tOTAMT || 0.00,
+        "gROSSAMT": this.DocketDetails?.tOTAMT || 0.00,
+        "rOUNOFFAMT": 0.00,
+        "aMT": this.DocketDetails?.tOTAMT || 0.00,
+        "custDetails": jsonBillingList,
+        "eNTDT": new Date(),
+        "eNTLOC": this.storage.branch,
+        "eNTBY": this.storage.userName,
+      }
+      const req = {
+        companyCode: this.storage.companyCode,
+        docType: "BILL",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        party: customerName.toUpperCase(),
+        collectionName: "cust_bill_headers",
+        data: billData
+      };
+      const res = await firstValueFrom(this.operation.operationPost("finance/bill/cust/create", req));
+      if (res) {
+        if (res.success) {
+          const BillNo = res.data.ops[0].docNo;
+          this.AccountPostingForAutoBilling(billData, BillNo, DocketNo);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: res.message,
+            showConfirmButton: false,
+          });
+        }
+      }
+
+    }
+  }
+  // Account Posting When  When Bill Has been Generated/ Finalized	
+  async AccountPostingForAutoBilling(billData, BillNo, DocketNo) {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const TotalAmount = billData?.aMT || 0;
+        const GstAmount = billData?.gST?.aMT || 0;
+
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = billData?.cUST?.cD || "";
+        this.VoucherDataRequestModel.partyName = billData?.cUST?.nM || "";
+        this.VoucherDataRequestModel.partyState = billData?.cUST?.sT || "";
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
+
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = billData?.gST?.iGST || 0;
+        this.VoucherDataRequestModel.SGST = billData?.gST?.sGST || 0;
+        this.VoucherDataRequestModel.CGST = billData?.gST?.cGST || 0;
+        this.VoucherDataRequestModel.UGST = billData?.gST?.uTGST || 0;
+        this.VoucherDataRequestModel.GSTTotal = GstAmount;
+
+        this.VoucherDataRequestModel.GrossAmount = TotalAmount || 0;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = 0;
+        this.VoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.transactionNumber = BillNo;
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.accountCode = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        var VoucherlineitemList = this.GetVouchersLedgersForAutoBilling(billData, BillNo);
+
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.branch,
+                transCode: VoucherInstanceType.BillApproval,
+                transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
+                docType: "Voucher",
+                partyType: "Customer",
+                docNo: BillNo,
+                partyCode: billData?.cUST?.cD || "",
+                partyName: billData?.cUST?.nM || "",
+                entryBy: this.storage.userName,
+                entryDate: Date(),
+                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.debit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.credit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
+                      state: {
+                        data: this.chargeDetails
+                      },
+                    });
+                    // Swal.fire({
+                    //   icon: "success",
+                    //   title: "Booked Successfully",
+                    //   text: "DocketNo : " + DocketNo,
+                    //   showConfirmButton: true,
+                    // }).then((result) => {
+                    //   if (result.isConfirmed) {
+                    //     Swal.hideLoading();
+                    //     setTimeout(() => {
+                    //       Swal.close();
+                    //     }, 2000);
+                    //   }
+                    // });
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+
+    }, "C-Note Booking Voucher Generating..!");
+
+  }
+  GetVouchersLedgersForAutoBilling(billData, BillNo) {
+    const TotalAmount = billData?.aMT;
+    const GstAmount = billData?.gST?.aMT;
+    const GstRate = billData?.gST?.rATE;
+    const DocketAmount = parseFloat(billData?.dKTTOT) - parseFloat(billData?.gST?.aMT);
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit, sacInfo = "",) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.BillApproval,
+      transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: sacInfo ? SACInfo['996511'].sacCode : "",
+      sacName: sacInfo ? SACInfo['996511'].sacName : "",
+      debit,
+      credit,
+      GSTRate: sacInfo ? GstRate : 0,
+      GSTAmount: sacInfo ? GstAmount : 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Customer Bill freight is Generated :${BillNo}`,
+    });
+
+    const response = [
+      createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, TotalAmount, 0),
+    ];
+    let LeadgerDetails;
+    switch (billData?.pRODID) {
+      case "P1":
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+      case "P2":
+        LeadgerDetails = ledgerInfo['INC001004'];
+        break;
+      case "P3":
+        LeadgerDetails = ledgerInfo['INC001002'];
+        break;
+      case "P4":
+        LeadgerDetails = ledgerInfo['INC001001'];
+        break;
+      default:
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+    }
+    // Income Ledger
+    if (LeadgerDetails) {
+      response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, DocketAmount));
+    }
+
+    const gstTypeMapping = {
+      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
+      cGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
+      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
+      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
+    };
+
+    const gstType = billData?.gST?.tYP;
+    const GSTTypeList = [gstType]
+    GSTTypeList.forEach(element => {
+      if (gstType && gstTypeMapping[element]) {
+        const { accCode, accName, accCategory, prop } = gstTypeMapping[element];
+        if (billData?.gST?.[prop] > 0) {
+          response.push(createVoucher(accCode, accName, accCategory, 0, billData?.gST?.[prop], '996511'));
+        }
+      }
+    });
+    return response;
   }
   //#endregion
 

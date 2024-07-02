@@ -5,11 +5,14 @@ export async function manualvoucharDetail(masterService) {
     const req = {
         companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "voucher_trans",
-        filter: { bRC: StorageService.getItem(StoreKeys.Branch) }
+        filter: {
+            bRC: StorageService.getItem(StoreKeys.Branch),
+            rV: { D$ne: true }
+        }
     }
     if (StorageService.getItem(StoreKeys.Branch) == 'HQTR') {
         delete req.filter.bRC;
     }
     const res = await masterService.masterPost("generic/get", req).toPromise();
-    return res.data; // Filter items where invoiceNo is empty (falsy)
+    return res.data; 
 }

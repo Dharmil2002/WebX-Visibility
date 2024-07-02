@@ -5,6 +5,8 @@ import { Collections, GenericActions, OperationActions } from "src/app/config/my
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { firstValueFrom } from "rxjs";
 import { ConvertToNumber } from "src/app/Utility/commonFunction/common";
+import moment from "moment";
+import { DocketStatus } from "src/app/Models/docStatus";
 
 @Injectable({
     providedIn: "root",
@@ -16,7 +18,6 @@ export class ThcService {
     ) { }
 
     async getShipmentFiltered(prqNo = null, fromCity = null, toCity = null, stockCity = "", fromDate = null, toDate = null, containersWise = false) {
-
         let matchQuery = {
             'D$and': [
                 { sTS: { D$in: [1, 4] } },
@@ -309,4 +310,77 @@ export class ThcService {
         }
         return await firstValueFrom(this.operationService.operationMongoPut(GenericActions.Update, req));
    }
+
+   async updateTHC(filter, data) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "thc_summary",
+      filter: filter,
+      update: data
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+    return res
+  }
+
+  async getDocketDetails(filter){
+    const req={
+      companyCode:this.storage.companyCode,
+      collectionName:"docket_ops_det",
+      filter:filter
+    }
+    const res= await firstValueFrom(this.operationService.operationMongoPost('generic/get', req));
+    return res.data;
+  }
+  
+  async updateDocket(data) {
+    const dockets=await this.getDocketDetails({cID:this.storage.companyCode,tHC:data.docNo});
+    if(dockets && dockets.length>0){
+      dockets.forEach(async (x)=>{
+    let evnData = {
+      _id: `${this.storage.companyCode}-${x.dKTNO}-0-EVN0001-${moment(new Date()).format('YYYYMMDDHHmmss')}`,
+      cID: this.storage.companyCode,
+      dKTNO: x?.dKTNO || "",
+      sFX: 0,
+      lOC: this.storage.branch,
+      eVNID: 'EVN0001',
+      eVNDES: 'Booking',
+      eVNDT: new Date(),
+      eVNSRC: 'Booking',
+      dOCTY: 'CN',
+      dOCNO: x?.dKTNO || "",
+      sTS: DocketStatus.Booked,
+      sTSNM: DocketStatus[DocketStatus.Booked],
+      oPSSTS: `Booked at ${x?.oRGN} on ${moment(new Date()).format("DD MMM YYYY @ hh:mm A")}`,
+      eNTDT: x?.eNTDT,
+      eNTLOC: x?.eNTLOC || "",
+      eNTBY: x?.eNTBY || ""
+    }
+    let reqEvent = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_events",
+      data: evnData
+    };
+    await firstValueFrom(this.operationService.operationMongoPost('generic/create', reqEvent));
+    let reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_ops_det",
+      filter:{dKTNO:x.dKTNO},
+      update:{
+        sTS: DocketStatus.Booked,
+        sTSNM: DocketStatus[DocketStatus.Booked],
+        mODDT:new Date(),
+        mODBY:this.storage.userName,
+        tHC:null,
+        mF:null,
+        mODLOC:this.storage.branch,
+        oPSSTS:`Booked at ${x?.oRGN} on ${moment(new Date()).tz(this.storage.timeZone).format('DD MMM YYYY @ hh:mm A')}.`,
+    }
+    }
+    await firstValueFrom(this.operationService.operationMongoPut('generic/update', reqBody));
+  });
+ 
+  }
+  }
+  
 }

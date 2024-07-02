@@ -33,7 +33,7 @@ export class GeneralMasterAddComponent implements OnInit {
   ) {
     this.companyCode = this.storage.companyCode;
     if (data != null) {
-      this.data = data;
+      this.generalTabledata = data;
       this.isUpdate = this.data.codeId != null ? true : false;
       this.action = this.isUpdate ? "edit" : "Add";
     } else {

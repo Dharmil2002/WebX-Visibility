@@ -1,20 +1,11 @@
-<style>
-    .floatButton {
-        position: fixed;
-        top: 25%;
-        right: 7%;
-        z-index: 1;
-    }
-</style>
-<button class="floatButton" *ngIf="prqEntryTableForm.valid" mat-flat-button matTooltip="Invocked Contract"
-    (click)="findContract()" color="primary">
-    Invoked
-</button>
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">    
     <form [formGroup]="prqEntryTableForm">
         <app-form-webxpress [form]="prqEntryTableForm" [FormTitle]="'PRQ Form'" [formData]="jsonControlPrqArray"
-            [showSaveAndCancelButton]="iSShow" (callFunction)="functionCallHandler($event)"
-            (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
+            [modifyAndSaveButton]="iSShow"  [Disabled]="isDisbled" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)" [submit]="submit" 
+            [MatButton]="(this.prqEntryTableForm.value?.pICKDT &&
+            this.prqEntryTableForm.value?.fCITY &&
+            this.prqEntryTableForm.value?.tCITY) ? ContractButton : ''">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

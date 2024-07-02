@@ -61,6 +61,7 @@ export async function GetAdvancePaymentListFromApi(masterService, Filters) {
             THCContraAmount: (x.cONTAMT || 0).toFixed(2),
             Advance: (x.aDVAMT || 0).toFixed(2),
             AdvancePending: (x.aDVPENAMT || 0).toFixed(2),
+            AdvancePaymentAmount: (x.aDVPENAMT || 0).toFixed(2),
             OthersData: x
         })) ?? null;
         return result
@@ -89,14 +90,16 @@ export async function GetLocationDetailFromApi(masterService) {
     return []; // Return an empty array in case of an error or missing data
 }
 
-export async function GetAccountDetailFromApi(masterService, AccountCategoryName, AccountingLocations) {
+export async function GetAccountDetailFromApi(masterService, AccountCategoryName = null, AccountingLocations = null) {
     try {
         const companyCode = StorageService.getItem(StoreKeys.CompanyCode);
         const filter = {
             iSSYS: true,
-            cATNM: AccountCategoryName,
             //AccountingLocations: AccountingLocations
         };
+        if (AccountCategoryName) {
+            filter['cATNM'] = AccountCategoryName;
+        }
         const req = { companyCode, collectionName: 'account_detail', filter };
         const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
         if (res && res.data) {

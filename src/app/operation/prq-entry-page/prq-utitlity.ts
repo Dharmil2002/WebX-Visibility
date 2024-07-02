@@ -66,7 +66,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
 
         let vehicleDetails = {
             rptLoc,
-            status: isClose ? "In Transit" : "available",
+            status: isClose ? "In Transit" : "Available",
             ...(isClose
                 ? {
                     tripId: prqdata.prqNo,

@@ -502,7 +502,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const req = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_freight_charge_matrix",
-      filter: this.isUpdate ? { fCID: this.UpdateData.fCID } : undefined,
+      filter: this.isUpdate ? {
+        _id: this.UpdateData._id
+      } : undefined,
       update: this.isUpdate ? json : undefined,
       data: !this.isUpdate ? json : undefined,
     };

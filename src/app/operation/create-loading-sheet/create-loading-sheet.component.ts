@@ -992,25 +992,25 @@ export class CreateLoadingSheetComponent implements OnInit {
   async departVehicle() {
     const vehicleValue = this.loadingSheetTableForm.controls["vehicle"].value.value;
     if (vehicleValue) {
-   
+
       try {
         this.snackBarUtilityService.commonToast(async () => {
-        if (this.isUpdate) {
-          const lsForm = this.loadingSheetTableForm.value;
-          await this.loadingSheetService.departUpdate(lsForm);
-        }
-        else {
-          const lsForm = this.loadingSheetTableForm.value;
-          const departField = await this.loadingSheetService.departVehicle(lsForm);
-          await this.loadingSheetService.depart(departField);
-        }
-        Swal.fire({
-          icon: "info",
-          title: "Departure",
-          text: "Vehicle is ready to depart",
-          showConfirmButton: true,
-        });
-      },"Vehicle is ready to depart");
+          if (this.isUpdate) {
+            const lsForm = this.loadingSheetTableForm.value;
+            await this.loadingSheetService.departUpdate(lsForm);
+          }
+          else {
+            const lsForm = this.loadingSheetTableForm.value;
+            const departField = await this.loadingSheetService.departVehicle(lsForm);
+            await this.loadingSheetService.depart(departField);
+          }
+          Swal.fire({
+            icon: "info",
+            title: "Departure",
+            text: "Vehicle is ready to depart",
+            showConfirmButton: true,
+          });
+        }, "Vehicle is ready to depart");
         this.goBack('Departures');
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error);

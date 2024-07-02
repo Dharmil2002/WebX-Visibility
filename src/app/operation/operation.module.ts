@@ -85,6 +85,8 @@ import { JobTrackerComponent } from "./job-order/tabs/job-tracker/job-tracker.co
 import { JobOrdersComponent } from "./job-order/tabs/job-orders/job-orders.component";
 import { AddJobOrderComponent } from './job-order/add-job-order/add-job-order.component';
 import { AddWorkOrderComponent } from './job-order/add-work-order/add-work-order.component';
+import { AddDepsDetailsComponent } from './vehicle-update-upload/add-deps-details/add-deps-details.component';
+
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -151,7 +153,8 @@ import { AddWorkOrderComponent } from './job-order/add-work-order/add-work-order
     JobTrackerComponent,
     JobOrdersComponent,
     AddJobOrderComponent,
-    AddWorkOrderComponent
+    AddWorkOrderComponent,
+    AddDepsDetailsComponent
   ],
   imports: [
     CommonModule,

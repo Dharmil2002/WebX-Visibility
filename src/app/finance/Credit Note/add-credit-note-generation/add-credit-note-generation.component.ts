@@ -724,7 +724,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
           this.VoucherDataRequestModel.accLocation = this.DataResponseHeader.data[0].lOC;
           this.VoucherDataRequestModel.preperedFor = "Customer";
-          this.VoucherDataRequestModel.partyCode = this.DataResponseHeader.data[0].pARTY.cD;
+          this.VoucherDataRequestModel.partyCode = "" + this.DataResponseHeader.data[0].pARTY.cD || "";
           this.VoucherDataRequestModel.partyName = this.DataResponseHeader.data[0].pARTY.nM || "";
           this.VoucherDataRequestModel.partyState = "";
           this.VoucherDataRequestModel.entryBy = this.storage.userName;
@@ -882,7 +882,7 @@ export class AddCreditNoteGenerationComponent implements OnInit {
 
     const response = [
       createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, 0, TotalAmount),
-      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM,"INCOME", TXBLAMTAmount, 0),
+      createVoucher(this.DataResponseHeader.data[0].aCCD, this.DataResponseHeader.data[0].aCNM, "INCOME", TXBLAMTAmount, 0),
     ];
 
     if (this.DataResponseDetails.data[0].gST.cGST > 0) {

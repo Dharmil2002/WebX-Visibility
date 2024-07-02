@@ -557,6 +557,7 @@ export class BalancePaymentComponent implements OnInit {
       TDSAmount.setValidators([Validators.required]);
       TDSAmount.updateValueAndValidity();
       this.getTDSSectionDropdown();
+      this.CalculatePaymentAmount();
 
     } else {
       this.jsonControlVendorBalanceTaxationTDSFilterArray = this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter((x) => x.name == "TDSExempted");
@@ -570,6 +571,8 @@ export class BalancePaymentComponent implements OnInit {
       TDSAmount.setValue("");
       TDSAmount.clearValidators();
       TDSAmount.updateValueAndValidity();
+
+      this.CalculatePaymentAmount();
     }
   }
   toggleVendorGSTRegistered() {
@@ -593,24 +596,33 @@ export class BalancePaymentComponent implements OnInit {
 
       this.getSACcodeDropdown();
       this.getStateDropdown();
-
+      this.CalculatePaymentAmount();
 
     } else {
       // this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter((x) => x.name == "VendorGSTRegistered");
-      const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
-      GSTSACcode.setValue("");
-      GSTSACcode.clearValidators();
-      GSTSACcode.updateValueAndValidity();
+      this.VendorBalanceTaxationGSTFilterForm.reset();
 
-      const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
-      Billbookingstate.setValue("");
-      Billbookingstate.clearValidators();
-      Billbookingstate.updateValueAndValidity();
+      // Clear validators and update value and validity for each form control
+      Object.keys(this.VendorBalanceTaxationGSTFilterForm.controls).forEach(key => {
+        const control = this.VendorBalanceTaxationGSTFilterForm.get(key);
+        control.clearValidators();
+        control.updateValueAndValidity();
+      });
+      // const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
+      // GSTSACcode.setValue("");
+      // GSTSACcode.clearValidators();
+      // GSTSACcode.updateValueAndValidity();
 
-      const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
-      Vendorbillstate.setValue("");
-      Vendorbillstate.clearValidators();
-      Vendorbillstate.updateValueAndValidity();
+      // const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
+      // Billbookingstate.setValue("");
+      // Billbookingstate.clearValidators();
+      // Billbookingstate.updateValueAndValidity();
+
+      // const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
+      // Vendorbillstate.setValue("");
+      // Vendorbillstate.clearValidators();
+      // Vendorbillstate.updateValueAndValidity();
+      this.CalculatePaymentAmount();
     }
   }
   TDSSectionFieldChanged() {
@@ -620,8 +632,8 @@ export class BalancePaymentComponent implements OnInit {
           x.value ==
           this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
       );
-      const TDSrate = FindData.rOTHER.toFixed(2);
-      const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
+      const TDSrate = FindData?.rOTHER?.toFixed(2) || 0;
+      const TDSamount = ((TDSrate * this.BalancePending) / 100 || 0).toFixed(2);
       this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
         TDSrate
       );
@@ -994,7 +1006,7 @@ export class BalancePaymentComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.tableData[0].OthersData?.cLOC || this.storage.branch;
         this.VoucherDataRequestModel.preperedFor = "Vendor";
-        this.VoucherDataRequestModel.partyCode = this.tableData[0].OthersData?.vND?.cD || "";
+        this.VoucherDataRequestModel.partyCode = "" + this.tableData[0].OthersData?.vND?.cD || "";
         this.VoucherDataRequestModel.partyName = this.tableData[0].OthersData?.vND?.nM || "";
         this.VoucherDataRequestModel.partyState = this.VendorBalanceTaxationGSTFilterForm.controls.Vendorbillstate.value?.name || "";
         this.VoucherDataRequestModel.paymentState = this.VendorBalanceTaxationGSTFilterForm.controls.Billbookingstate.value?.name || "";
@@ -1161,7 +1173,14 @@ export class BalancePaymentComponent implements OnInit {
             return;
           }
         }
-
+        let
+          LeadgerDetails;
+        if (PaymentMode == "Cash") {
+          LeadgerDetails = PaymenDetails.CashAccount;
+        }
+        if (PaymentMode == "Journal") {
+          LeadgerDetails = PaymenDetails.JournalAccount;
+        }
         const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
         const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
         const RoundOffAmount = NetPayable - PaymentAmount;
@@ -1174,8 +1193,8 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.BalancePayment;
         this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BalancePayment];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.DebitVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.DebitVoucher];
+        this.VoucherDataRequestModel.voucherCode = PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher];
 
         this.VoucherDataRequestModel.transDate = new Date();
         this.VoucherDataRequestModel.docType = "VR";
@@ -1200,11 +1219,11 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherDataRequestModel.tcsRate = 0;
         this.VoucherDataRequestModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0,
-          this.VoucherDataRequestModel.SGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
-          this.VoucherDataRequestModel.CGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
-          this.VoucherDataRequestModel.UGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0,
-          this.VoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0;
+        this.VoucherDataRequestModel.IGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0;
+        this.VoucherDataRequestModel.SGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0;
+        this.VoucherDataRequestModel.CGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0;
+        this.VoucherDataRequestModel.UGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0;
+        this.VoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0;
 
         this.VoucherDataRequestModel.GrossAmount = NetPayable;
         this.VoucherDataRequestModel.netPayable = NetPayable;
@@ -1213,8 +1232,8 @@ export class BalancePaymentComponent implements OnInit {
 
         this.VoucherDataRequestModel.paymentMode = PaymentMode;
         this.VoucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "";
-        this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name;
-        this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value;
+        this.VoucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : LeadgerDetails?.name || "";
+        this.VoucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : LeadgerDetails?.value || "";
         this.VoucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = BillNo;
@@ -1236,8 +1255,8 @@ export class BalancePaymentComponent implements OnInit {
             branch: this.storage.branch,
             transCode: VoucherInstanceType.BalancePayment,
             transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
-            voucherCode: VoucherType.JournalVoucher,
-            voucherType: VoucherType[VoucherType.JournalVoucher],
+            voucherCode: PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher,
+            voucherType: PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher],
             docType: "Voucher",
             partyType: "Vendor",
             docNo: BillNo,
@@ -1288,6 +1307,13 @@ export class BalancePaymentComponent implements OnInit {
 
     const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
     const PaymentMode = PaymenDetails.PaymentMode;
+    let LeadgerDetails;
+    if (PaymentMode == "Cash") {
+      LeadgerDetails = PaymenDetails.CashAccount;
+    }
+    if (PaymentMode == "Journal") {
+      LeadgerDetails = PaymenDetails.JournalAccount;
+    }
     const vendbillpayment: Vendbillpayment = {
       _id: this.companyCode + "-" + BillNo + "-" + voucherno,
       cID: this.companyCode,
@@ -1300,8 +1326,8 @@ export class BalancePaymentComponent implements OnInit {
       pENDBALAMT: 0,
       aMT: NetPayable,
       mOD: PaymentMode,
-      bANK: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : PaymenDetails.CashAccount.name,
-      bANKCD: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : PaymenDetails.CashAccount.value,
+      bANK: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANM : LeadgerDetails?.name || "",
+      bANKCD: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.Bank.bANCD : LeadgerDetails?.value || "",
       tRNO: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.ChequeOrRefNo : "",
       tDT: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? PaymenDetails.date : "",
       eNTDT: new Date(),
@@ -1367,7 +1393,6 @@ export class BalancePaymentComponent implements OnInit {
     const Result = [];
 
     SelectedData.forEach((DataItem) => {
-
       let OtherChargePositiveAmt = 0;
       let OtherChargeNegativeAmt = 0;
       const ModifiedData = this.ModifiedTHCList.find(x => x.THC === DataItem.THC)
@@ -1469,14 +1494,14 @@ export class BalancePaymentComponent implements OnInit {
     return Result;
   }
   GetDebitVoucherLedgers(NetPayable, BillNo, paymentData) {
-
+    const PaymentMode = paymentData.PaymentMode;
     const createVoucher = (accCode, accName, accCategory, debit, credit, BillNo) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.BalancePayment,
       transType: VoucherInstanceType[VoucherInstanceType.BalancePayment],
-      voucherCode: VoucherType.JournalVoucher,
-      voucherType: VoucherType[VoucherType.JournalVoucher],
+      voucherCode: PaymentMode != "Journal" ? VoucherType.DebitVoucher : VoucherType.JournalVoucher,
+      voucherType: PaymentMode != "Journal" ? VoucherType[VoucherType.DebitVoucher] : VoucherType[VoucherType.JournalVoucher],
       transDate: new Date(),
       finYear: financialYear,
       branch: this.storage.branch,
@@ -1499,10 +1524,13 @@ export class BalancePaymentComponent implements OnInit {
 
 
     Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, NetPayable, 0, BillNo));
-    const PaymentMode = paymentData.PaymentMode;
     if (PaymentMode == "Cash") {
       const CashAccount = paymentData.CashAccount;
       Result.push(createVoucher(CashAccount.aCNM, CashAccount.aCCD, "ASSET", 0, NetPayable, BillNo));
+    }
+    if (PaymentMode == "Journal") {
+      const JournalAccount = paymentData.JournalAccount;
+      Result.push(createVoucher(JournalAccount.value, JournalAccount.name, "ASSET", 0, NetPayable, BillNo));
     }
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = paymentData.Bank;

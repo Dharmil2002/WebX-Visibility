@@ -28,7 +28,8 @@ import { rules } from "src/app/Utility/commonFunction/rules/rule";
 import { generateCombinations } from "src/app/Utility/commonFunction/common";
 import { CustomerContractService } from "src/app/core/service/customerContract/customerContract-services.service";
 import convert from 'convert-units';
-import { GenericActions, RateTypeCalculation } from "src/app/config/myconstants";
+import { GenericActions } from "src/app/config/myconstants";
+import moment from "moment";
 @Component({
   selector: "app-prq-entry-page",
   templateUrl: "./prq-entry-page.component.html",
@@ -90,7 +91,12 @@ export class PrqEntryPageComponent implements OnInit {
   LoadType: AutoComplete[];
   pkgs: any = null;
   ChargedWeight: number;
-
+  ContractButton = {
+    functionName: "findContract",
+    name: "Find Contract",
+    iconName: "search",
+  };
+  isDisbled: boolean=false;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -337,7 +343,34 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
+    if (!this.prqEntryTableForm.valid) {
+      this.prqEntryTableForm.markAllAsTouched();
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please ensure all required fields are filled out.",
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
+    if(this.isDisbled){
+      Swal.fire({
+        icon: "info",
+        title: "Processing",
+        text: "Your data is being processed, please wait...",
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+        timer: 5000,
+        timerProgressBar: true,
+      });
+      return false;
+    }
     this.iSShow = false;
+    this.isDisbled=true;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
     prqDetails["cID"] = this.storage.companyCode;
@@ -356,7 +389,7 @@ export class PrqEntryPageComponent implements OnInit {
     prqDetails["fPIN"] = this.prqEntryTableForm.value.fCITY?.pincode || "";
     prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode || "";
     prqDetails["tPIN"] = this.prqEntryTableForm.value.tCITY?.pincode || "";
-    prqDetails["cONTRACT"] =this.contract?.cONID||"";
+    prqDetails["cONTRACT"] = this.contract?.cONID || "";
 
     const cntrNames = [
       { controlName: "cARTYP", name: "cARTYPNM", value: "cARTYP" },
@@ -588,7 +621,7 @@ export class PrqEntryPageComponent implements OnInit {
     const vehcileSize = this.prqEntryTableForm.value.vEHSIZE;
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
- 
+
   getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
     const fieldKey = isOrigin ? "fCITY" : "tCITY";
@@ -632,7 +665,6 @@ export class PrqEntryPageComponent implements OnInit {
       if (!result?.cONID) {
         result = await this.getContractDetails("CUST00000", transMode, payBase, dt);
       }
-
       if (result?.cONID) {
         this.contract = { ...result };
         if (this.contract?.cONID) {
@@ -643,7 +675,6 @@ export class PrqEntryPageComponent implements OnInit {
     }
   }
   async getContractMatrx() {
-    debugger
     this.ChargedWeight = parseInt(this.prqEntryTableForm.value.sIZE);
     const contractId = this.contract?.cONID;
     const opsMode = this.LoadType.find((x) => x.name == this.storage.mode)?.value || "LTL";
@@ -676,26 +707,28 @@ export class PrqEntryPageComponent implements OnInit {
     {
       "companyCode": this.storage.companyCode,
       "contractId": contractId,
-      "contractDate": this.prqEntryTableForm.value.docketDate,
+      "contractDate": moment(this.prqEntryTableForm.value.pICKDT).startOf('day').toDate(),
       "LoadType": opsMode,
-      "matches": matches
+      "matches": matches,
+      "capacity": this.ChargedWeight
     }
     const result = await firstValueFrom(this.operationService.operationMongoPost("contract/findContract", reqBody));
     if (result?.data?.cONID == contractId) {
-      this.contract = { ...result?.data };
-      const getRateType = (codeId) => RateTypeCalculation.find(rt => rt.codeId == codeId);
-      const calculateValue = (rateType, weight, min, rt, max) => {
-        const actualWeight = (rateType.codeDesc == "Per Kg") ? convert(weight).from('mt').to('kg') : weight;
-        return Math.min(Math.max(min, rt * actualWeight), max);
-      };
-      const codRateType = getRateType(this.contract.cODDODRTYP);
-      const calculateWeight = (rateType) => {
-        return rateType.codeDesc == "Per Pkg" ? (this.pkgs || 0) : (this.ChargedWeight || 0);
-      };
-      const codWeight = calculateWeight(codRateType);
-      calculateValue(codRateType, codWeight, this.contract.mIN, this.contract.rT, this.contract.mAX)
 
-      const codValue = calculateValue(codRateType, codWeight, this.contract.mIN, this.contract.rT, this.contract.mAX);
+      this.contract = { ...result?.data };
+      const calculateValue = (rateType, weight, rt) => {
+        const actualWeight = (rateType == "Per Kg") ? convert(weight).from('mt').to('kg') : weight;
+        if(rateType == "Flat"){
+          return rt
+        }
+        return Math.min(Math.max(rt * actualWeight));
+      };
+      const calculateWeight = (rateType) => {
+        return rateType == "Per Pkg" ? (this.pkgs || 0) : (this.ChargedWeight || 0);
+      };
+      const codWeight = calculateWeight(this.contract.FreightChargeMatrixDetails.rTYP);
+      calculateValue(this.contract.FreightChargeMatrixDetails.rTYP, codWeight, this.contract.rT)
+      const codValue = calculateValue(this.contract.FreightChargeMatrixDetails.rTYP, codWeight, this.contract.FreightChargeMatrixDetails.rT);
       this.prqEntryTableForm.controls['cONTRAMT'].setValue(codValue);
 
     }

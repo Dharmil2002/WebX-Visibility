@@ -209,8 +209,10 @@ export class ProductChargesComponent implements OnInit {
 
       if (this.isUpdate) {
         const element = this.ChargesList.find(
-          (x) => x.name == this.UpdatedData.sELCHA
+          (x) => x.value == this.UpdatedData.cHACD
         );
+        console.log(this.UpdatedData.cHACD);
+        console.log("element", element);
         this.ChargesData.push(element);
         this.customerTableForm.controls["SelectCharges"].setValue(element);
       }
@@ -227,7 +229,9 @@ export class ProductChargesComponent implements OnInit {
   async ChargesBehaviourDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: { companyCode: this.companyCode },
+      filter: {
+        active: true
+      },
       collectionName: "charge_behaviours",
     };
     const Res = await this.masterService
@@ -465,8 +469,8 @@ export class ProductChargesComponent implements OnInit {
         this.customerTableForm.value.SelectCharges.value
       );
       if (
-        this.customerTableForm.value.SelectCharges.name ==
-        this.UpdatedData.sELCHA
+        this.customerTableForm.value.SelectCharges.value ==
+        this.UpdatedData.cHACD
       ) {
         return;
       }
@@ -476,7 +480,7 @@ export class ProductChargesComponent implements OnInit {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
       filter: {
-        sELCHA: this.customerTableForm.value.SelectCharges.name,
+        cHACD: this.customerTableForm.value.SelectCharges.value,
         cHATY: this.selectedValue,
         pRCD: this.ProductId,
       },

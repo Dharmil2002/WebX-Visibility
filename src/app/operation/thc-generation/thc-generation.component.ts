@@ -49,6 +49,10 @@ import { HawkeyeUtilityService } from "src/app/Utility/module/hawkeye/hawkeye-ut
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { ThcCostUpdateService } from "src/app/Utility/module/operation/thc/thc-cost-update.service";
 import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/cluster.master.service";
+import { Observable, catchError, firstValueFrom, mergeMap, throwError } from "rxjs";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
+import { GetLeadgerInfoFromLocalStorage, VoucherInstanceType, VoucherType, ledgerInfo } from "src/app/Models/Finance/Finance";
 @Component({
   selector: "app-thc-generation",
   templateUrl: "./thc-generation.component.html",
@@ -67,11 +71,12 @@ export class ThcGenerationComponent implements OnInit {
   mfheaderDetails = new MfheaderDetails();
   mfdetailsList: MfdetailsList[] = [];
   rakeData: rR[] = [];
-//  invoiceData: iNV[] = [];
+  //  invoiceData: iNV[] = [];
   isRail: boolean = false;
   rrLoad: boolean = true;
   rrInvoice: boolean = true;
   marketData: any;
+  accountingOnThc = false;
   // End Code Of Harikesh
   //FormGrop
   thcDetailGlobal: any;
@@ -291,6 +296,7 @@ export class ThcGenerationComponent implements OnInit {
   rules: any[] = [];
   connectedLoc: boolean = false;
   ChargeAllow: any[] = [];
+  isVia: any;
   //End
   constructor(
     private fb: UntypedFormBuilder,
@@ -315,7 +321,9 @@ export class ThcGenerationComponent implements OnInit {
     private hawkeyeUtilityService: HawkeyeUtilityService,
     private controlPanel: ControlPanelService,
     private thcCostUpdateService: ThcCostUpdateService,
-    private clusterService: ClusterMasterService
+    private clusterService: ClusterMasterService,
+    public snackBarUtilityService: SnackBarUtilityService,
+    private voucherServicesService: VoucherServicesService,
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -386,13 +394,12 @@ export class ThcGenerationComponent implements OnInit {
     this.getRules();
   }
   /*here the function which is use for the intialize a form for thc*/
-  IntializeFormControl() {
+  async IntializeFormControl() {
     const loadingControlForm = new thcControl(
       this.isUpdate || false,
       this.isView || false,
       this.prqFlag || false
     );
-
     this.jsonVehicleControl = loadingControlForm.getVehicleDetails();
     const thcFormControls = loadingControlForm.getThcFormControls();
     const rakeDetails = loadingControlForm.getRakeDetailsControls();
@@ -439,10 +446,21 @@ export class ThcGenerationComponent implements OnInit {
     this.getGeneralMasterData();
     this.getDropDownDetail();
     //this.DocketFilterData.cCT = this.thcTableForm.controls['fromCity'].value?.value || ''
+    const filter = {
+      cID: this.storage.companyCode,
+      mODULE: "THC",
+      aCTIVE: true,
+      rULEID: { D$in: ["THCACONGEN"] }
+    }
+    const res: any = await this.controlPanel.getModuleRules(filter);
+    if (res.length > 0) {
+      this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN").vAL
+    }
   }
   /*End*/
   //#region GetRules
   async getRules() {
+    debugger
     const filter = {
       cID: this.storage.companyCode,
       mODULE: { "D$in": ["CNOTE", "THC"] },
@@ -497,7 +515,7 @@ export class ThcGenerationComponent implements OnInit {
 
     // if (!this.isUpdate && !this.isView) {
     //   let prqNo = this.prqDetail?.prqNo || "";
-    //   debugger
+    //   
     //   const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
     //   this.allShipment = shipmentList;
     //   if (this.addThc) {
@@ -1041,6 +1059,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is for getting docket details using thc*/
   async getDocketsForTHC() {
+    const tripDate=this.thcTableForm.controls['tripDate'].value;
     const pRQNO = this.thcTableForm.controls['prqNo'].value;
     const fromCity = this.thcTableForm.controls['fromCity'].value?.value || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.value || ''
@@ -1048,7 +1067,7 @@ export class ThcGenerationComponent implements OnInit {
     this.tableData = [];
 
     //this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, fromCity.toUpperCase(), null, null, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
-    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
+    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT,  this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
     const filteredShipments = this.allShipment;
     const addEditAction = (shipments) => {
       return shipments.map((shipment) => {
@@ -1126,7 +1145,6 @@ export class ThcGenerationComponent implements OnInit {
   /*end*/
   /* below function was the call when */
   async getLocBasedOnCity() {
-
     const fromCity = this.thcTableForm.controls['fromCity'].value?.ct || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.ct || ''
     const fromTo = `${fromCity}-${toCity}`
@@ -1163,7 +1181,7 @@ export class ThcGenerationComponent implements OnInit {
     let propertiesToSet = [
 
       { Key: 'route', Name: 'rUTNM' },
-      { Key: 'tripDate', Name: 'eNTDT' },
+      { Key: 'tripDate', Name: 'tHCDT' },
       { Key: 'etaDate', Name: 'eTADT' },
       { Key: 'tripId', Name: 'docNo' },
       { Key: 'capacity', Name: 'cAP.wT' },
@@ -1229,7 +1247,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["venMobNo"].setValue(thcNestedDetails?.thcDetails.vND?.mNO);
     this.VehicleTableForm.controls["engineNo"].setValue(thcNestedDetails?.thcDetails.eNGNO)
     this.VehicleTableForm.controls["chasisNo"].setValue(thcNestedDetails?.thcDetails.cHASNO),
-    this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
+      this.VehicleTableForm.controls["vehSize"].setValue(`${thcNestedDetails?.thcDetails.vEHSIZE}`);
     if (thcNestedDetails?.thcDetails.vIA) {
       const via = thcNestedDetails?.thcDetails.vIA.join(",");
       this.thcTableForm.controls["via"].setValue(via);
@@ -1310,12 +1328,12 @@ export class ThcGenerationComponent implements OnInit {
 
       }
     }
-    this.thcTableForm.controls['manualThc'].setValue(this.thcDetail?.mTHC||"");
-    this.VehicleTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM||0);
+    this.thcTableForm.controls['manualThc'].setValue(this.thcDetail?.mTHC || "");
+    this.VehicleTableForm.controls['startKm'].setValue(this.thcDetail?.sTKM || 0);
     if (this.ChargeAllow.includes(thcDetail.data.thcDetails.tMODENM.toUpperCase())) {
       this.getAutoFillCharges(thcNestedDetails?.thcDetails.cHG, thcNestedDetails)
     }
-    else{
+    else {
       const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
       const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
       this.chargeForm.controls["advPdAt"].setValue(location);
@@ -1431,6 +1449,7 @@ export class ThcGenerationComponent implements OnInit {
 
   /*below function called when the tranMode Dropdown has any event occur*/
   transModeChanged() {
+    debugger
     const transMode = this.thcTableForm.getRawValue().transMode;
     const transModeDetail = this.products.find((x) => x.value == transMode);
     const roadControl = ['vehicle'];
@@ -1488,7 +1507,7 @@ export class ThcGenerationComponent implements OnInit {
       chargeFilter.forEach(({ name, data, status }) => {
         this.filter.Filter(this.chargeJsonControl, this.chargeForm, data, name, status);
       });
-      
+
     }
     this.vendorFieldChanged();
   }
@@ -1606,6 +1625,8 @@ export class ThcGenerationComponent implements OnInit {
         cHGNM: element.placeholder,
         aMT: (element?.additionalData.metaData === "-") ? -Math.abs(this.chargeForm.controls[element.name].value || 0) : (this.chargeForm.controls[element.name].value || 0),
         oPS: element?.additionalData.metaData || "",
+        aCCD: element.additionalData.AccountDetails.aCCD,
+        aCNM: element.additionalData.AccountDetails.aCNM,
       }
       charges.push(json);
     });
@@ -1932,7 +1953,11 @@ export class ThcGenerationComponent implements OnInit {
             Validations: [],
             additionalData: {
               showNameAndValue: false,
-              metaData: element.aDD_DEDU
+              metaData: element.aDD_DEDU,
+              AccountDetails: {
+                aCCD: element.aCCD || "",
+                aCNM: element.aCNM || "",
+              }
             },
             functions: {
               onChange: 'calucatedCharges',
@@ -2223,8 +2248,9 @@ export class ThcGenerationComponent implements OnInit {
       const locData = await this.thcService.getLocationDetail(branch);
       // Determine if the destination has been arrived at
       const toCityValue = this.thcTableForm.getRawValue();
-      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase();
-      if (!isArrivedDel) {
+      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase() || locData?.mappedCity.includes(toCityValue.toCity);
+       const isVia=toCityValue.via.includes(locData?.locCity?.toLowerCase()) ||  locData?.mappedCity.some(cityItem => toCityValue.via.includes(cityItem));
+      if (!isArrivedDel || isVia) {
         if (this.tableData.length == podDetails.length) {
           Swal.fire({
             icon: "error",
@@ -2273,7 +2299,7 @@ export class ThcGenerationComponent implements OnInit {
         const res: any = await this.controlPanel.getModuleRules(filter);
         if (res.length > 0) {
           this.Request = {
-            isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+            isInterBranchControl: res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false,
             thcNo: this.thcTableForm.get("tripId").value,
             thc: {
               collation: "thc_summary",
@@ -2321,7 +2347,6 @@ export class ThcGenerationComponent implements OnInit {
       }
     } else {
       //this.thcTableForm.get("docket").setValue(docket.map(x => x.docketNumber));
-
       if (this.prqFlag || this.directPrq) {
         if (this.thcTableForm.get("prqNo").value) {
           const prqData = { prqNo: this.thcTableForm.get("prqNo").value };
@@ -2334,8 +2359,37 @@ export class ThcGenerationComponent implements OnInit {
       }
       const tHCGenerationRequst = await this.GenerateTHCgenerationRequestBody();
       if (tHCGenerationRequst) {
+        let result;
         const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
-        // this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
+        if (this.accountingOnThc) {
+          if (resThc) {
+            result = await firstValueFrom(this.createJournalRequest(tHCGenerationRequst.data, resThc.data?.mainData?.ops[0].docNo));
+            let commonBody;
+            commonBody = {
+              vNO: result.data.ops[0].vNO
+            }
+            const reqBody = {
+              companyCode: this.companyCode,
+              collectionName: 'thc_summary',
+              filter: {
+                cID: this.storage.companyCode,
+                docNo: resThc.data?.mainData?.ops[0].docNo
+              },
+              update: commonBody,
+            };
+
+            firstValueFrom(this.masterService.masterPut('generic/update', reqBody)).then((res: any) => {
+              if (res.success) {
+              }
+            })
+              .catch((error: any) => {
+                // Handle any errors here
+                console.error(error);
+              });
+
+          }
+        }
+        //this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
         if (this.thcsummaryData.tMODENM == "Road") {
           await this.thcService.updateVehicle({
             vehNo: this.thcsummaryData.vehicle,
@@ -2397,10 +2451,20 @@ export class ThcGenerationComponent implements OnInit {
               }
             });
           }
+
+          let thcNumber = resThc.data?.mainData?.ops[0].docNo;
+          let htmlContent;
+          if (this.accountingOnThc) {
+            let voucherNumber = result.data.ops[0].vNO; 
+            htmlContent = "THC Number is " + thcNumber + "<br>Voucher Number is " + voucherNumber;
+          } else {
+            htmlContent = "THC Number is " + thcNumber;
+          }
+
           Swal.fire({
             icon: "success",
             title: "THC Generated Successfully",
-            text: `THC Number is ${resThc.data?.mainData?.ops[0].docNo}`,
+            html: htmlContent,
             showConfirmButton: true,
           }).then((result) => {
             if (result.isConfirmed) {
@@ -2471,4 +2535,189 @@ export class ThcGenerationComponent implements OnInit {
     const balance = parseFloat(this.balanceAmount) - Math.abs(total)
     this.chargeForm.controls["balAmt"].setValue(balance);
   }
+
+  //Voucher Create Thc Generation
+  createJournalRequest(data: any, thcNo): Observable<any> {
+    // Construct the voucher request payload
+    const voucherRequest = {
+      companyCode: this.companyCode,
+      docType: "VR",
+      branch: data.branch,
+      finYear: financialYear,
+      details: [],
+      debitAgainstDocumentList: [],
+      data: {
+        transCode: VoucherInstanceType.THCGeneration,
+        transType: VoucherInstanceType[VoucherInstanceType.THCGeneration],
+        voucherCode: VoucherType.JournalVoucher,
+        voucherType: VoucherType[VoucherType.JournalVoucher],
+        transDate: new Date(),
+        docType: "VR",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        accLocation: this.storage.branch,
+        preperedFor: "Vendor",
+        partyCode: "" + data?.Vendor_Code || "",
+        partyName: data?.Vendor_Name || "",
+        partyState: "",
+        entryBy: this.storage.userName,
+        entryDate: new Date(),
+        panNo: data?.Vendor_pAN || "",
+        tdsSectionCode: undefined,
+        tdsSectionName: undefined,
+        tdsRate: 0,
+        tdsAmount: 0,
+        tdsAtlineitem: false,
+        tcsSectionCode: undefined,
+        tcsSectionName: undefined,
+        tcsRate: 0,
+        tcsAmount: 0,
+        IGST: 0,
+        SGST: 0,
+        CGST: 0,
+        UGST: 0,
+        GSTTotal: 0,
+        GrossAmount: parseFloat(data?.totAmt),
+        netPayable: parseFloat(data?.totAmt),
+        roundOff: 0,
+        voucherCanceled: false,
+        paymentMode: "",
+        refNo: "",
+        accountName: "",
+        accountCode: "",
+        date: "",
+        scanSupportingDocument: "",
+        transactionNumber: thcNo
+      }
+    };
+
+    // Retrieve voucher line items
+    const voucherlineItems = this.GetJournalVoucherLedgers(data, thcNo);
+    voucherRequest.details = voucherlineItems;
+    // Validate debit and credit amounts
+    if (voucherlineItems.reduce((acc, item) => acc + parseFloat(item.debit), 0) != voucherlineItems.reduce((acc, item) => acc + parseFloat(item.credit), 0)) {
+      this.snackBarUtilityService.ShowCommonSwal("error", "Debit and Credit Amount Should be Equal");
+      // Return an observable with an error
+      return;
+    }
+
+    // Create and return an observable representing the HTTP request
+    return this.voucherServicesService.FinancePost("fin/account/voucherentry", voucherRequest).pipe(
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while creating voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      }),
+      mergeMap((res: any) => {
+        let reqBody = {
+          companyCode: this.storage.companyCode,
+          voucherNo: res?.data?.mainData?.ops[0].vNO,
+          transDate: Date(),
+          finYear: financialYear,
+          branch: this.storage.branch,
+          transCode: VoucherInstanceType.THCGeneration,
+          transType: VoucherInstanceType[VoucherInstanceType.THCGeneration],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          docType: "Voucher",
+          partyType: "Vendor",
+          docNo: thcNo,
+          partyCode: "" + data?.Vendor_Code || "",
+          partyName: data?.Vendor_Name || "",
+          entryBy: this.storage.userName,
+          entryDate: Date(),
+          debit: voucherlineItems.filter(item => item.credit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.debit,
+              "narration": item.narration ?? ""
+            };
+          }),
+          credit: voucherlineItems.filter(item => item.debit == 0).map(function (item) {
+            return {
+              "accCode": item.accCode,
+              "accName": item.accName,
+              "accCategory": item.accCategory,
+              "amount": item.credit,
+              "narration": item.narration ?? ""
+            };
+          }),
+        };
+        return this.voucherServicesService.FinancePost("fin/account/posting", reqBody);
+      }),
+      catchError((error) => {
+        // Handle the error here
+        console.error('Error occurred while posting voucher:', error);
+        // Return a new observable with the error
+        return throwError(error);
+      })
+    );
+  }
+
+  // Get Voucher Details
+  GetJournalVoucherLedgers(SelectedData, thcNo) {
+    const createVoucher = (accCode, accName, accCategory, debit, credit, THCNo) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.THCGeneration,
+      transType: VoucherInstanceType[VoucherInstanceType.THCGeneration],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: "",
+      sacName: "",
+      debit,
+      credit,
+      GSTRate: 0,
+      GSTAmount: 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Expense Booked against THC NO : ${thcNo}`,
+    });
+
+    const Result = [];
+
+    let OtherChargePositiveAmt = 0;
+    let OtherChargeNegativeAmt = 0;
+    const AllCharges: any[] = SelectedData?.cHG;
+    AllCharges.forEach((item) => {
+      if (item.aMT != 0) {
+        const ledger = GetLeadgerInfoFromLocalStorage(item.aCCD)
+        if (item.oPS == "+") {
+          const GetLeadgerInfo = ledgerInfo[item.cHGNM];
+          if (ledger) {
+            Result.push(createVoucher(ledger.LeadgerCode, ledger.LeadgerName, ledger.LeadgerCategory, +item.aMT, 0, SelectedData.THC));
+          } else {
+            OtherChargePositiveAmt += parseFloat(item.aMT);
+          }
+        } else {
+          const GetLeadgerInfo = ledgerInfo[item.cHGNM];
+          if (ledger) {
+            Result.push(createVoucher(ledger.LeadgerCode, ledger.LeadgerName, ledger.LeadgerCategory, 0, (+item.aMT * -1), SelectedData.THC));
+          } else {
+            OtherChargeNegativeAmt += (parseFloat(item.aMT) * -1);
+          }
+        }
+      }
+    });
+
+    if (OtherChargePositiveAmt != 0) {
+      Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, OtherChargePositiveAmt, 0, SelectedData.THC));
+    }
+    if (OtherChargeNegativeAmt != 0) {
+      Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, 0, OtherChargeNegativeAmt, SelectedData.THC));
+    }
+    Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode, ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, parseFloat(SelectedData.contAmt), 0, SelectedData.THC));
+    Result.push(createVoucher(ledgerInfo['LIA001002'].LeadgerCode, ledgerInfo['LIA001002'].LeadgerName, ledgerInfo['LIA001002'].LeadgerCategory, 0, parseFloat(SelectedData.totAmt), SelectedData.THC));
+    return Result;
+  }
+
 }

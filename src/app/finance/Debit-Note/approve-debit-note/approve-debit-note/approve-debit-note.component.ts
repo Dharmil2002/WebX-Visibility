@@ -310,7 +310,7 @@ export class ApproveDebitNoteComponent implements OnInit {
 
           this.VoucherDataRequestModel.accLocation = this.DataResponseHeader.data[0].lOC;
           this.VoucherDataRequestModel.preperedFor = "Vendor";
-          this.VoucherDataRequestModel.partyCode = this.DataResponseHeader.data[0].pARTY.cD;
+          this.VoucherDataRequestModel.partyCode = "" + this.DataResponseHeader.data[0].pARTY.cD || "";
           this.VoucherDataRequestModel.partyName = this.DataResponseHeader.data[0].pARTY.nM || "";
           this.VoucherDataRequestModel.partyState = "";
           this.VoucherDataRequestModel.entryBy = this.storage.userName;

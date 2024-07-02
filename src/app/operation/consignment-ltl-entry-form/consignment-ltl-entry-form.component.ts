@@ -2329,12 +2329,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         let rsk = this.consignmentForm.controls['risk'].value || "";
         let rsk2 = (rsk  == "RSKTYP001" ? "OR" : (rsk  == "RSKTYP002" ? "CR" : ""));
 
-        debugger;
         const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
           ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
                  && ( ins.iCRCD == rsk || ins.iCRCD == rsk2)
         );
-        console.log(insuranceDetails);
         if (insuranceDetails) {
           const insuranceRateType = getRateType(insuranceDetails.rTTYPE);
           const insuranceWeight = calculateWeight(insuranceRateType);
@@ -2490,8 +2488,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         // #region Update Invoice Status when account posting credit and debit in equal amount
         var CreditAmount = filteredVoucherlineitemList.filter(item => item.credit > 0).map(item => item.credit).reduce((a, b) => a + b, 0);
         var DebitAmount = filteredVoucherlineitemList.filter(item => item.debit > 0).map(item => item.debit).reduce((a, b) => a + b, 0);
-        if (CreditAmount != DebitAmount) {
-          console.log(filteredVoucherlineitemList);
+        if (CreditAmount != DebitAmount) {          
           SwalerrorMessage("error", "Error", "Credit and Debit Amount Should be Equal for Account Posting..!", false);
           return;
         }
@@ -2670,7 +2667,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       oPS: x.oPS
     }));
 
-debugger;
     // Group by aCCD and oPS
     const grouped = _.groupBy(chgs, c => `${c.aCCD}-${c.oPS}`);
 

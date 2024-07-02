@@ -2,7 +2,6 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
-import * as XLSX from 'xlsx';
 import { GetGeneralMasterData } from "src/app/Masters/Customer Contract/CustomerContractAPIUtitlity";
 import moment from "moment";
 @Injectable({
@@ -90,9 +89,7 @@ export class CustGSTInvoiceService {
                     {
                          D$lookup: {
                               from: "docket_invoices",
-                              let: {
-                                   dKTNO: { D$arrayElemAt: ["$billDetails.dKTNO", 0] } // Assuming there is only one element in the array
-                              },
+                              "let": { "dKTNO": { "D$first": "$billDetails.dKTNO" } },// Assuming there is only one element in the array                          
                               pipeline: [
                                    {
                                         D$match: {
@@ -172,8 +169,8 @@ export class CustGSTInvoiceService {
                               TDSAmount: "",
                               TDSSec: "",
                               ReasonForIssue: "",
-                              InvoiceNo: { D$arrayElemAt: ["$docketInvoices.iNVNO", 0] },
-                              Manualno: { D$arrayElemAt: ["$docketInvoices.iNVNO", 0] },
+                              InvoiceNo: { "D$first": "$docketInvoices.iNVNO" },
+                              Manualno: { "D$first": "$docketInvoices.iNVNO" },
                               Currency: "$CURR",
                               ExchangeRate: "",
                               CurrencyAmount: "",

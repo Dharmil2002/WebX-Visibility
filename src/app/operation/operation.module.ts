@@ -78,6 +78,13 @@ import { ConsignmentOtherInfoComponent } from './consignment-ltl-entry-form/cons
 import { EditShipmentDetailsComponent } from "./vehicle-update-upload/edit-shipment-details/edit-shipment-details.component";
 import { PrqTrackingComponent } from './prq-tracking/prq-tracking.component';
 import { EditRunsheetShipmentsComponent } from './update-run-sheet/edit-runsheet-shipments/edit-runsheet-shipments.component';
+import { JobOrderMainPageComponent } from './job-order/job-order-main-page.component';
+import { WorkOrdersComponent } from './job-order/tabs/work-orders/work-orders.component';
+import { VendorBillsComponent } from './job-order/tabs/vendor-bills/vendor-bills.component';
+import { JobTrackerComponent } from "./job-order/tabs/job-tracker/job-tracker.component";
+import { JobOrdersComponent } from "./job-order/tabs/job-orders/job-orders.component";
+import { AddJobOrderComponent } from './job-order/add-job-order/add-job-order.component';
+import { AddWorkOrderComponent } from './job-order/add-work-order/add-work-order.component';
 import { AddDepsDetailsComponent } from './vehicle-update-upload/add-deps-details/add-deps-details.component';
 
 @NgModule({
@@ -140,6 +147,13 @@ import { AddDepsDetailsComponent } from './vehicle-update-upload/add-deps-detail
     EditShipmentDetailsComponent,
     PrqTrackingComponent,
     EditRunsheetShipmentsComponent,
+    JobOrderMainPageComponent,
+    WorkOrdersComponent,
+    VendorBillsComponent,
+    JobTrackerComponent,
+    JobOrdersComponent,
+    AddJobOrderComponent,
+    AddWorkOrderComponent,
     AddDepsDetailsComponent
   ],
   imports: [

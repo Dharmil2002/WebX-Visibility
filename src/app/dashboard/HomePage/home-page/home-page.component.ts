@@ -191,7 +191,7 @@ export class HomePageComponent implements OnInit {
   }
 
   onAppClick(event: MouseEvent, data: any){
-    debugger
+    
     if(data.mode) {
       //this.setMenuToBind(data.mode);      
       this.storage.setItem(StoreKeys.Mode, data.mode);

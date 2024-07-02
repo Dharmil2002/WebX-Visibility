@@ -692,12 +692,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     switch (name) {
       case "cnebp":
+        this.consignmentForm.controls["cnbp"].disable();
         this.consignmentForm.controls["consigneeName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
         this.consignmentForm.controls["cncontactNumber"].setValue(value ? customer?.customer_mobile || '' : "");
         this.consignmentForm.controls["cneAddress"].setValue(value ? { name: customer?.RegisteredAddress || "", value: "A888" } : "");
         this.consignmentForm.controls["cnegst"].setValue(value ? customer?.GSTdetails[0].gstNo || "" : "");
         break;
       case "cnbp":
+        this.consignmentForm.controls["cnebp"].disable();
         this.consignmentForm.controls["consignorName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
         this.consignmentForm.controls["ccontactNumber"].setValue(value ? customer?.customer_mobile || '' : "");
         this.consignmentForm.controls["calternateContactNo"].setValue("");
@@ -705,6 +707,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.consignmentForm.controls["cnogst"].setValue(value ? customer?.GSTdetails[0].gstNo || "" : "");
         break;
     }
+    this.consignmentForm.controls["cnebp"].enable();
+    this.consignmentForm.controls["cnbp"].enable();
   }
   /*End*/
   /*below function is volumetric function*/

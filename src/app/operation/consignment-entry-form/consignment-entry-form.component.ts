@@ -965,6 +965,7 @@ export class ConsignmentEntryFormComponent
     if (checked) {
       switch (fieldName) {
         case "cnbp":
+          this.model.consignmentTableForm.controls["cnbp"].enable();
           updateForm(
             fieldConsignorName,
             fieldContactNumber,
@@ -975,8 +976,10 @@ export class ConsignmentEntryFormComponent
             gstvalue
           );
           this.expanded = true;
+          this.model.consignmentTableForm.controls["cnebp"].disable();
           break;
         case "cnebp":
+          this.model.consignmentTableForm.controls["cnebp"].enable();
           updateForm(
             fieldConsigneeName,
             fieldConsigneeContactNumber,
@@ -986,11 +989,15 @@ export class ConsignmentEntryFormComponent
             fieldConsigneegst,
             gstvalue
           );
+          this.model.consignmentTableForm.controls["cnbp"].disable();
           break;
         default:
+         
         // Handle other cases or throw an error
       }
     } else {
+      this.model.consignmentTableForm.controls["cnebp"].enable();
+      this.model.consignmentTableForm.controls["cnbp"].enable();
       // done by harikesh
       switch (fieldName) {
         case "cnbp":
@@ -1265,9 +1272,7 @@ export class ConsignmentEntryFormComponent
       const json = {
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
-        expiryDate: this.model.invoiceTableForm.value.expiryDate
-          ? this.model.invoiceTableForm.value.expiryDate
-          : new Date(),
+        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment( this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1474,6 +1479,13 @@ export class ConsignmentEntryFormComponent
     this.isManual = this.checkboxChecked == true ? false : true;
     this.isUpdate = this.checkboxChecked == true ? false : true;
     this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
+    if(this.isManual){
+      this.model.consignmentTableForm.controls['docketNumber'].enable();
+    }
+    else{
+      this.model.consignmentTableForm.controls['docketNumber'].disable();
+    
+    }
   }
   checkDocketRules() {
     const STYP = this.rules.find((x) => x.rULEID == "STYP" && x.aCTIVE);
@@ -1486,12 +1498,14 @@ export class ConsignmentEntryFormComponent
           isManual ? "" : "Computerized"
         );
         this.isManual = isManual;
+        this.model.consignmentTableForm.controls['docketNumber'].enable();
       }
       else {
         this.isBoth = STYP.vAL == "B"
         this.checkboxChecked = true
         this.isManual = false;
         this.model.consignmentTableForm.controls['docketNumber'].setValue("Computerized");
+        this.model.consignmentTableForm.controls['docketNumber'].disable();
       }
     }
     const ELOC = this.rules.find((x) => x.rULEID == "ELOC" && x.aCTIVE);

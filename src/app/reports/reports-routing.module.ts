@@ -44,6 +44,8 @@ import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
+import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -88,6 +90,8 @@ const routes: Routes = [
   { path: "advice-register-report", component: AdviceRegisterComponent },
   { path: "gcn-flow-report", component: GcnFlowReportComponent },
   { path: "driver-status-register-report", component: DriverStatusRegisterComponent },
+  { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
+ 
 ];
 
 @NgModule({

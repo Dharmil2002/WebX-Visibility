@@ -1153,13 +1153,13 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
+    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData, nonfreight = "") {
 
-        let nonfreightAmt={};
+        let nonfreightAmt = {};
         if (nonfreight) {
             Object.keys(nonfreight).forEach((key) => {
                 let modifiedKey = key.replace(/./g, (match, index) => {
-              return index >0 ? match.toUpperCase() : match.toLowerCase();
+                    return index > 0 ? match.toUpperCase() : match.toLowerCase();
                 });
                 nonfreightAmt[modifiedKey] = nonfreight[key];
             });
@@ -1227,7 +1227,7 @@ export class DocketService {
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
             "gROAMT": ConvertToNumber(data?.grossAmount || 0, 2),
             "rCM": data?.rcm || "N",
-            "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
+            "gSTRT": ConvertToNumber(data?.gstRate || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
             "gST": {
                 "tY": "SGST",
@@ -1710,5 +1710,54 @@ export class DocketService {
         }
         const res = await firstValueFrom(this.operation.operationPost("generic/query",reqBody));
         return res.data.length > 0 ? res.data : null;
+    }
+    async getDocketListForBilling(filter) {
+        let matchQuery = filter
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets_ltl",
+            filters: [
+                {
+                    D$match: matchQuery,
+                },
+                {
+                    "D$lookup": {
+                        "from": "docket_fin_det_ltl",
+                        "let": { "dKTNO": "$dKTNO" },
+                        "pipeline": [
+                            {
+                                "D$match": {
+                                    'D$expr': {
+                                        'D$and': [
+                                            {
+                                                'D$eq': [
+                                                    '$dKTNO', '$$dKTNO'
+                                                ]
+                                            },
+                                            {
+                                                'D$eq': [
+                                                    '$isBILLED', false
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "as": "financialDetails"
+                    },
+                },
+                {
+                    'D$unwind': {
+                        path: "$financialDetails",
+                        preserveNullAndEmptyArrays: false,
+                    }
+                },
+            ]
+
+        }
+        // Send request and handle response
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
+        return res.data;
     }
 }

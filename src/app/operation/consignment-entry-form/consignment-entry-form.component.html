@@ -125,7 +125,6 @@
           <button class="msr-3" mat-raised-button color="primary"
             [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit"
             (click)="save()">{{isUpdate?"Edit Docket":"Generate Docket"}} </button>
-          <button class="msr-3" mat-raised-button color="primary">Back</button>
           <button class="msr-3" [disabled]="!this.model.consignmentTableForm.value?.billingParty ||
             !this.model.consignmentTableForm.value?.docketDate ||
             !this.model.consignmentTableForm.value?.toCity ||

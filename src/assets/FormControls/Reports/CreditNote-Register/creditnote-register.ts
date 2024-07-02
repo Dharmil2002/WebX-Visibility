@@ -97,9 +97,6 @@ export class CreditNoteRegister {
                     support: "rptbasisHandler",
                     showNameAndValue: false,
                },
-               functions: {
-                    onToggleAll: "toggleSelectAll",
-               },
                generatecontrol: true, disable: false
           },
           {

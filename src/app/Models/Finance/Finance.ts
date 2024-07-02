@@ -61,6 +61,7 @@ export class VoucherDataRequestModel {
   mREFNUM: string
   nAR: string;
   onAccount: boolean = false;
+  reverseVoucher: boolean = false;
 }
 
 export class DebitVoucherdetailsRequestModel {
@@ -331,6 +332,7 @@ export enum VoucherInstanceType {
   CreditNoteApproval = 13,
   DebitNoteApproval = 14,
   VendorOpeningBalance = 15,
+  TdsPaymentSlipApproval = 17,
   THCGeneration = 16,
 }
 

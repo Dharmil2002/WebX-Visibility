@@ -46,7 +46,7 @@ export class DashboardPageComponent implements OnInit {
       "label": "Tab 5",
       "permission": ["LTL"]
     }, {
-      "id": "POD",
+      "id": "DEPS",
       "label": "Tab 6",
       "permission": ["LTL"]
     }, {
@@ -122,6 +122,7 @@ export class DashboardPageComponent implements OnInit {
       "label": "Tab 22",
       "permission": ['Accounts']
     },
+    
   ];
   tabName: any;
   docCalledAs: any;

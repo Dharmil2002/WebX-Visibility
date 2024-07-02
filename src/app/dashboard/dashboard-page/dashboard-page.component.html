@@ -43,11 +43,13 @@
                     <app-pickup-delivery-planner (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="4"
                         *ngIf="tabName === 'Delivery'"></app-pickup-delivery-planner>
                 </mat-tab>
-                <!-- <mat-tab>
-                              <ng-template mat-tab-label>
-                                  DEPS
-                              </ng-template>
-                          </mat-tab> -->
+                <mat-tab *ngIf="hasPermission('DEPS')" label="DEPS">
+                    <ng-template mat-tab-label>
+                        DEPS
+                    </ng-template>
+                    <app-deps-dashboard-page (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="5"
+                        *ngIf="tabName === 'DEPS'"></app-deps-dashboard-page>
+                </mat-tab>
                 <!-- <mat-tab *ngIf=" hasPermission('POD')" label="POD">
                     <ng-template mat-tab-label>
                         POD/COD

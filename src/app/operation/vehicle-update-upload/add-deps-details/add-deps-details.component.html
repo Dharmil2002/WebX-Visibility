@@ -1,0 +1,12 @@
+<mat-dialog-content>
+    <!-- Title -->
+    <div class="paddingdiv">
+            <form [formGroup]="depsFormGroup">
+                <app-form-webxpress [form]="depsFormGroup" [FormTitle]="'Deps Details'" [formData]="jsonControlArray"
+                  (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="true"
+                  (callFunction)="functionCaller($event)">
+                </app-form-webxpress>
+              </form>
+    </div>
+
+</mat-dialog-content>

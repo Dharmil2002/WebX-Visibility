@@ -125,7 +125,6 @@ export class DocketService {
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
         return result;
     }
-
     async updateDocketSuffix(filter, data) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
@@ -138,7 +137,6 @@ export class DocketService {
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
         return result;
     }
-
     bindData(dataArray, targetArray) {
         if (dataArray.length > 0) {
             const modifiedData = dataArray.map((x, index) => {
@@ -151,7 +149,6 @@ export class DocketService {
             targetArray = modifiedData;
         }
     }
-
     /* below the function  was generated for the mapping of data */
     // Define a common service function
     async processShipmentList(shipmentList) {
@@ -1490,6 +1487,15 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
         return res.data
     }
+    async getdocketFromOpsOne(filter) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filter: filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
+        return Object.keys(res.data).length>0?res.data:null
+    }
     async getDocketsDetails(city) {
 
         const reqBody = {
@@ -1660,6 +1666,51 @@ export class DocketService {
     }
 
     /*end*/
+    async getOneDocketLtl(filter) {
+
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filters: [
+                {
+                    D$match: filter,
+                },
+                {
+                    D$lookup: {
+                        from: "dockets_ltl",
+                        localField: "dKTNO",
+                        foreignField: "dKTNO",
+                        as: "dockets_details"
+                    }
+                },
+                {
+                    D$unwind: {
+                        path: "$dockets_details",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    D$project: {
+                        dKTNO: 1,
+                        dKTDT: "$dockets_details.dKTDT",
+                        pAYTYP: "$dockets_details.pAYTYP",
+                        pAYTYPNM: "$dockets_details.pAYTYPNM",
+                        bPARTY: "$dockets_details.bPARTY",
+                        bPARTYNM: "$dockets_details.bPARTYNM",
+                        cLOC: "$cLOC",
+                        oRGN: "$oRGN",
+                        dEST: "$dEST",
+                        pKGS: "$pKGS",
+                        aCTWT: "$aCTWT",
+                        cHRWT: "$cHRWT",
+                        sFX: 1
+                    }
+                }
+            ]
+        }
+        const res = await firstValueFrom(this.operation.operationPost("generic/query",reqBody));
+        return res.data.length > 0 ? res.data : null;
+    }
     async getDocketListForBilling(filter) {
         let matchQuery = filter
         const reqBody = {

@@ -198,6 +198,21 @@ export class VehicleService {
         );
         return res.data;
       }
-    
-
+    async getVehicleNoWithFilters(filter, isDropdown) {
+        try {
+            const req = {
+                companyCode: this.storage.companyCode,
+                collectionName: "vehicle_status",
+                filters: filter,
+            };
+            // Fetch vehicle data and destructure to get the data property
+            const { data } = await firstValueFrom(this.masterService.masterPost("generic/query", req));
+            // If isDropdown is true, transform data to dropdown format, else return raw data
+            return isDropdown
+                ? data.map(item => ({ value: item.vehNo, name: item.vehNo }))
+                : data;
+        } catch (error) {
+            return isDropdown ? [] : null; // or any other appropriate default value
+        }
+    }
 }

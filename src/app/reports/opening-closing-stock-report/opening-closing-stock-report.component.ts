@@ -53,6 +53,7 @@ export class OpeningClosingStockReportComponent implements OnInit {
     this.jsonControlArray = controls.OpeningClosingStockReportForm;
     this.OpeningClosingStockReportForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
+
   functionCallHandler($event) {
     let functionName = $event.functionName;    
     try {
@@ -61,10 +62,14 @@ export class OpeningClosingStockReportComponent implements OnInit {
       console.log("failed");
     }
   }
+
+  // Get Locaion Bind
   async getDropdownData() {
     const locationList = await this.locationService.locationFromApi();
     this.filter.Filter(this.jsonControlArray, this.OpeningClosingStockReportForm, locationList, "Location", false);
   }
+
+  // Save Method
   async save() {
     this.loading = true;
     try {
@@ -96,6 +101,8 @@ export class OpeningClosingStockReportComponent implements OnInit {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }
   }  
+
+  // Get Opening and closing Stock Details
   async getOpeningClosingStockDetails(data)
   {
     let matchQuery = {

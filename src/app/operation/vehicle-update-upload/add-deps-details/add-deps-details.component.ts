@@ -128,7 +128,7 @@ export class AddDepsDetailsComponent implements OnInit {
   }
 
   async save() {
-    debugger
+    
     const shipments=this.shipmentDetails.extraDetails;
     const deps=this.depsFormGroup.value;
     const getallData = this.depsService.fieldMappingDeps([this.shipmentDetails.extraDetails], this.depsFormGroup.getRawValue());

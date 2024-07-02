@@ -44,7 +44,7 @@ export class DepsUpdateComponent implements OnInit {
   }
 
   IntializeFormControl() {
-    debugger
+    
     const shipmentControls = new DepsUpdateControls();
     this.allJsonControlArray = shipmentControls.getDepsControlsData();
     this.depsFormGroup = formGroupBuilder(this.fb, [this.allJsonControlArray]);
@@ -84,7 +84,7 @@ export class DepsUpdateComponent implements OnInit {
   }
   /*below is the deps close function*/
   async close() {
-    debugger
+    
     if (!this.depsFormGroup.valid || !this.depsFormGroup.valid) {
       this.depsFormGroup.markAllAsTouched();
       Swal.fire({

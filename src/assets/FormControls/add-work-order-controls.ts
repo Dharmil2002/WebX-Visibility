@@ -207,7 +207,7 @@ export class WorkOrderFormControls {
         },
         functions: {
           onOptionSelect: "getVendorLocation",
-          onChange: "Reset",
+          onChange: "ResetLocationFormField",
         },
       },
       {
@@ -584,7 +584,8 @@ export class WorkOrderFormControls {
         type: "datetimerpicker",
         value: "",
         additionalData: {
-          metaData: "",
+        //     maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
+        //     minDate: new Date("01 Jan 1900")
         },
         generatecontrol: true,
         disable: false,
@@ -724,7 +725,7 @@ export class WorkOrderFormControls {
         },
       },
       {
-        name: "Cost",
+        name: "TCost",
         label: "Cost",
         placeholder: "Cost",
         type: "number",
@@ -770,7 +771,12 @@ export class WorkOrderFormControls {
         additionalData: {},
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Star DTM is required..",
+          },
+        ],
       },
       {
         name: "EndDTM",

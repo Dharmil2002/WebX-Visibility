@@ -113,62 +113,52 @@ export const SpareDetailsColumnHeader = {
   TaskGroup: {
     Title: "Task Group",
     class: "matcolumnleft",
-    // Style: "min-width:150px",
     Style: "min-width:80px",
     sticky: true,
   },
   SparePart: {
     Title: "Spare Part",
     class: "matcolumnleft",
-    // Style: "max-width:150px",
     Style: "min-width:80px",
   },
   MaintenanceType: {
     Title: "Maintenance Type",
     class: "matcolumnleft",
-    // Style: "min-width:100px",
     Style: "min-width:80px",
   },
   Stock: {
     Title: "Stock",
     class: "matcolumncenter",
-    // Style: "min-width:100px",
     Style: "min-width:4px",
   },
   Quantity: {
     Title: "Quantity",
     class: "matcolumncenter",
-    // Style: "max-width:150px",
     Style: "min-width:4px",
   },
   CostOrUnit: {
     Title: "Cost/Unit",
     class: "matcolumncenter",
-    // Style: "max-width:150px",
     Style: "min-width:4px",
   },
-  Cost: {
+  TCost: {
     Title: "Cost",
     class: "matcolumncenter",
-    // Style: "max-width:150px",
     Style: "min-width:4px",
   },
   ApprovedCost: {
     Title: "Approved Cost",
     class: "matcolumncenter",
-    // Style: "max-width:150px",
     Style: "min-width:4px",
   },
   Mechanic: {
     Title: "Mechanic",
     class: "matcolumnleft",
-    // Style: "min-width:150px",
     Style: "min-width:80px",
   },
   StartDTM: {
     Title: "Start DTM",
     class: "matcolumncenter",
-    // Style: "max-width:150px",
     Style: "min-width:4px",
   },
   // EndDTM: {
@@ -191,7 +181,7 @@ export const SpareDetailsStaticFields = [
   "Stock",
   "Quantity",
   "CostOrUnit",
-  "Cost",
+  "TCost",
   "ApprovedCost",
   "Mechanic",
   "StartDTM",

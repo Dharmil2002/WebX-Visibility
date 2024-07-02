@@ -31,7 +31,6 @@ import {
 import { HttpClient } from "@angular/common/http";
 import moment from "moment";
 import Swal from "sweetalert2";
-import { calculateTotalField } from "../../unbilled-prq/unbilled-utlity";
 import { DataService } from "src/app/core/service/job-order.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 @Component({
@@ -86,8 +85,6 @@ export class AddWorkOrderComponent implements OnInit {
   data: Object;
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
   menuItemflag = true;
-  KPICountData: { count: any; title: string; class: string }[];
-  KPICountData2: { count: any; title: string; class: string }[];
   menuItemData: any;
   counter: number = 0;
   originalJsonControlWorkOrderArray: any;
@@ -102,6 +99,8 @@ export class AddWorkOrderComponent implements OnInit {
   handedoverStatus: any;
   supervisor: string;
   supervisorStatus: any;
+  ServiceData: { count: any; title: string; class: string }[];
+  SpareData: { count: any; title: string; class: string }[];
   constructor(
     private http: HttpClient,
     private fb: UntypedFormBuilder,
@@ -140,7 +139,7 @@ export class AddWorkOrderComponent implements OnInit {
     this.initializeFormControl();
     this.getWorkOrdersData();
     this.getJobSubCategorydata();
-    this.getUserData()
+    this.getUserData();
     this.WorkOrderForm.controls["actualreturndate"].disable();
     this.WorkOrderForm.controls["workshoptype"].setValue("Internal");
     this.checkForWorkshopType();
@@ -223,6 +222,8 @@ export class AddWorkOrderComponent implements OnInit {
     this.selectedcategory = this.WorkOrderForm.controls["ordercategory"].value;
     this.resetFormFields();
     if (this.selectedcategory === "Maintenance") {
+      const startDTMvalue = this.WorkOrderForm.controls["orderdate"].value;
+      this.ServiceDetailsForm.controls["StartDTM"].setValue(startDTMvalue);
       this.ServiceDetailsForm.controls["EndDTM"].disable();
       this.SpareDetailsForm.controls["EndDTM"].disable();
     }
@@ -392,7 +393,7 @@ export class AddWorkOrderComponent implements OnInit {
     const quantityvalue = this.SpareDetailsForm.controls["Quantity"].value;
     const Unitvalue = this.SpareDetailsForm.controls["CostOrUnit"].value;
     const totalcost = quantityvalue * Unitvalue;
-    this.SpareDetailsForm.controls["Cost"].patchValue(totalcost);
+    this.SpareDetailsForm.controls["TCost"].patchValue(totalcost);
   }
   CalculateTotalLabourCost() {
     const costvalue = this.LabourDetailsForm.controls["CostH"].value;
@@ -400,6 +401,7 @@ export class AddWorkOrderComponent implements OnInit {
     const totalLabourCost = costvalue * labourhoursvalue;
     this.LabourDetailsForm.controls["LabourC"].patchValue(totalLabourCost);
   }
+  // one single method for checking all current values and new values and if same fire valiation.
   validateCurrentAndNewValues() {
     // Determine which form is currently being processed
     let formValues, formControls;
@@ -448,113 +450,86 @@ export class AddWorkOrderComponent implements OnInit {
       handler.call(this); // Use call to ensure 'this' refers to the component instance
     }
   }
-  updateTotalTableValues(
-    staticfields: string,
-    valueToAdd: number,
-    valueToRemove: number,
-    operation: "add" | "subtract"
-  ) {
-    const entry = this.tableData.find(
-      (entry) => entry.staticfields === staticfields
+  updateTotalTableValues(tableData, tableData2 = []) {
+    // Calculate total estimated hours and total cost from tableData1 using reduce
+    const totalEstimatedHours = tableData.reduce(
+      (acc, entry) => acc + (parseFloat(entry.Estimatedhours) || 0),
+      0
     );
-    const previousValue = parseFloat(entry?.Ordergeneration) || 0;
-    if (operation === "add") {
-      entry
-        ? (entry.Ordergeneration = (previousValue + valueToAdd).toString())
-        : this.tableData.push({
-            staticfields,
-            Ordergeneration: valueToAdd.toString(),
-          });
-    } else if (operation === "subtract") {
-      entry
-        ? (entry.Ordergeneration = (previousValue - valueToRemove).toString())
-        : this.tableData.push({
-            staticfields,
-            Ordergeneration: (-valueToRemove).toString(),
-          });
-    }
+    const totalCost = tableData.reduce(
+      (acc, entry) => acc + (parseFloat(entry.Cost) || 0),
+      0
+    );
+    const totalSpareCost = tableData2.reduce(
+      (acc, entry) => acc + (parseFloat(entry.TCost) || 0),
+      0
+    );
+    // Function to update or add static fields in tableData
+    const updateStaticField = (field, value) => {
+      const entry = this.tableData.find(
+        (entry) => entry.staticfields === field
+      );
+      if (entry) {
+        entry.Ordergeneration = value.toString();
+      } else {
+        this.tableData.push({
+          staticfields: field,
+          Ordergeneration: value.toString(),
+        });
+      }
+    };
+    updateStaticField("Labour Hours", totalEstimatedHours);
+    updateStaticField("Labour Cost", totalCost);
+    updateStaticField("Spare Cost", totalSpareCost);
   }
   async addServiceDetails() {
     this.tableLoad = true;
     this.isServiceDetailsLoad = true;
-    this.ServiceDetailsForm.controls["EndDTM"].disable();
+    const ServiceDetailTablelength = this.tableData1.length;
     const value = this.ServiceDetailsForm.value;
     const newEntry = {
       ...value,
+      id: ServiceDetailTablelength + 1,
       StartDTM: moment(value.StartDTM).format("DD-MM-yy HH:mm"),
       // EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
       actions: ["Edit", "Remove"],
     };
-    this.updateTotalTableValues(
-      "Labour Hours",
-      parseFloat(newEntry.Estimatedhours),
-      0,
-      "add"
-    );
-    this.updateTotalTableValues(
-      "Labour Cost",
-      parseFloat(newEntry.Cost),
-      0,
-      "add"
-    );
-    this.updateTotalTableValues("Spare Cost", 0, 0, "add");
     this.tableData1 = [...this.tableData1, newEntry];
-    const Estimatedhours = calculateTotalField(
-      this.tableData1,
-      "Estimatedhours"
-    );
-    const TotalCost = calculateTotalField(this.tableData1, "Cost");
-    this.KPICountData = [
-      {
-        count: Estimatedhours,
-        title: "Total Labour Hours",
-        class: `color-Grape-light`,
-      },
-      {
-        count: TotalCost,
-        title: "Total Cost",
-        class: `color-Grape-light`,
-      },
-    ];
-    this.ServiceDetailsForm.reset({ StartDTM: new Date(), EndDTM: new Date() });
+    this.updateTotalTableValues(this.tableData1,this.tableData2);
+    this.SetServiceData();
+    this.ServiceDetailsForm.reset();
   }
 
   async addSpareDetails() {
     this.tableLoad = true;
     this.isSpareDetailsLoad = true;
-    this.SpareDetailsForm.controls["EndDTM"].disable();
     const value = this.SpareDetailsForm.value;
+    const SpareDetailTablelength = this.tableData2.length;
     const newEntry = {
       ...value,
+      id: SpareDetailTablelength + 1,
       StartDTM: moment(value.StartDTM).format("DD-MM-yy HH:mm"),
       // EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
       actions: ["Edit", "Remove"],
     };
-    this.updateTotalTableValues(
-      "Spare Cost",
-      parseFloat(newEntry.Cost),
-      0,
-      "add"
-    );
     this.tableData2 = [...this.tableData2, newEntry];
-    const TotalCost = calculateTotalField(this.tableData2, "Cost");
-    this.KPICountData2 = [
-      {
-        count: TotalCost,
-        title: "Total Spare Cost",
-        class: `color-Grape-light`,
-      },
-    ];
-    this.SpareDetailsForm.reset({ StartDTM: new Date(), EndDTM: new Date() });
+    this.updateTotalTableValues(this.tableData1, this.tableData2);
+    this.SetSpareData();
+    this.SpareDetailsForm.reset();
   }
   async addTyreDetails() {
     this.isTyreDetailsLoad = true;
     const value = this.TyreDetailsForm.value;
-    const newEntry = { ...value, actions: ["Edit", "Remove"] };
+    const TyreDetailTablelength = this.tableData3.length;
+    const newEntry = {
+      ...value,
+      id: TyreDetailTablelength + 1,
+      actions: ["Edit", "Remove"],
+    };
     this.tableData3 = [...this.tableData3, newEntry];
     this.TyreDetailsForm.reset();
   }
-  fillServiceDetails(data) {
+  fillServiceData(data) {
     const {
       StartDTM,
       EndDTM,
@@ -586,9 +561,10 @@ export class AddWorkOrderComponent implements OnInit {
       EndDTM: parsedEndDTM,
     };
     this.ServiceDetailsForm.setValue(formValues);
-    this.tableData1 = this.tableData1.filter((x) => x.TaskGroup !== TaskGroup);
+    this.tableData1 = this.tableData1.filter((x) => x.id !== data.data.id);
+    this.updateTotalTableValues(this.tableData1,this.tableData2);
   }
-  fillSpareDetails(data) {
+  fillSpareData(data) {
     const {
       StartDTM,
       EndDTM,
@@ -598,7 +574,7 @@ export class AddWorkOrderComponent implements OnInit {
       Stock,
       Quantity,
       CostOrUnit,
-      Cost,
+      TCost,
       ApprovedCost,
       Mechanic,
     } = data.data;
@@ -615,16 +591,17 @@ export class AddWorkOrderComponent implements OnInit {
       Stock,
       Quantity,
       CostOrUnit,
-      Cost,
+      TCost,
       ApprovedCost,
       Mechanic,
       StartDTM: parsedStartDTM,
       EndDTM: parsedEndDTM,
     };
     this.SpareDetailsForm.setValue(formValues);
-    this.tableData2 = this.tableData2.filter((x) => x.TaskGroup !== TaskGroup);
+    this.tableData2 = this.tableData2.filter((x) => x.id !== data.data.id);
+    this.updateTotalTableValues(this.tableData1, this.tableData2);
   }
-  fillTyreDetails(data) {
+  fillTyreData(data) {
     const {
       position,
       CTyreID,
@@ -644,82 +621,156 @@ export class AddWorkOrderComponent implements OnInit {
       Comment,
     };
     this.TyreDetailsForm.setValue(formValues);
-    this.tableData3 = this.tableData3.filter((x) => x.CTyreID !== CTyreID);
+    this.tableData3 = this.tableData3.filter((x) => x.id !== data.data.id);
+  }
+  SetServiceData() {
+    this.ServiceData = [
+      {
+        count: this.tableData1.reduce(
+          (acc, Estimatedhours) =>
+            parseFloat(acc) + parseFloat(Estimatedhours["Estimatedhours"]),
+          0
+        ),
+        title: "Total Labour Hours",
+        class: `color-Success-light`,
+      },
+      {
+        count: this.tableData1.reduce(
+          (acc, Cost) => parseFloat(acc) + parseFloat(Cost["Cost"]),
+          0
+        ),
+        title: "Total Cost",
+        class: `color-Ocean-danger`,
+      },
+    ];
+  }
+  SetSpareData() {
+    this.SpareData = [
+      {
+        count: this.tableData2.reduce(
+          (acc, Cost) => parseFloat(acc) + parseFloat(Cost["TCost"]),
+          0
+        ),
+        title: "Total Cost",
+        class: `color-Success-light`,
+      },
+    ];
+  }
+  fillServiceDetails(data) {
+    if (data.label.label === "Remove") {
+      this.tableData1 = this.tableData1.filter((x) => x.id !== data.data.id);
+      this.updateTotalTableValues(this.tableData1,this.tableData2);
+    } else {
+      const atLeastOneValuePresent = Object.keys(
+        this.ServiceDetailsForm.controls
+      ).some((key) => {
+        const control = this.ServiceDetailsForm.get(key);
+        return (
+          control &&
+          control.value !== null &&
+          control.value !== undefined &&
+          control.value !== ""
+        );
+      });
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Data is already present and being edited. Are you sure you want to discard the changes?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, proceed!",
+          cancelButtonText: "No, cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.fillServiceData(data);
+          }
+        });
+      } else {
+        this.fillServiceData(data);
+      }
+    }
+    this.SetServiceData();
+  }
+  fillSpareDetails(data) {
+    if (data.label.label === "Remove") {
+      this.tableData2 = this.tableData2.filter((x) => x.id !== data.data.id);
+      this.updateTotalTableValues(this.tableData1, this.tableData2);
+    } else {
+      const atLeastOneValuePresent = Object.keys(
+        this.SpareDetailsForm.controls
+      ).some((key) => {
+        const control = this.SpareDetailsForm.get(key);
+        return (
+          control &&
+          control.value !== null &&
+          control.value !== undefined &&
+          control.value !== ""
+        );
+      });
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Data is already present and being edited. Are you sure you want to discard the changes?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, proceed!",
+          cancelButtonText: "No, cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.fillSpareData(data);
+          }
+        });
+      } else {
+        this.fillSpareData(data);
+      }
+    }
+    this.SetSpareData();
+  }
+  fillTyreDetails(data) {
+    if (data.label.label === "Remove") {
+      this.tableData3 = this.tableData3.filter((x) => x.id !== data.data.id);
+    } else {
+      const atLeastOneValuePresent = Object.keys(
+        this.TyreDetailsForm.controls
+      ).some((key) => {
+        const control = this.TyreDetailsForm.get(key);
+        return (
+          control &&
+          control.value !== null &&
+          control.value !== undefined &&
+          control.value !== ""
+        );
+      });
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Data is already present and being edited. Are you sure you want to discard the changes?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, proceed!",
+          cancelButtonText: "No, cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.fillTyreData(data);
+          }
+        });
+      } else {
+        this.fillTyreData(data);
+      }
+    }
   }
   handleMenuItemClick(data) {
-    if (data.label.label === "Remove" && data.data.Task) {
-      const removedEstimatedHours = parseFloat(data.data.Estimatedhours || "0");
-      const removedCost = parseFloat(data.data.Cost || "0");
-      this.tableData1 = this.tableData1.filter(
-        (x) => x.TaskGroup !== data.data.TaskGroup
-      );
-      this.updateTotalTableValues(
-        "Labour Hours",
-        0,
-        removedEstimatedHours,
-        "subtract"
-      );
-      this.updateTotalTableValues("Labour Cost", 0, removedCost, "subtract");
-      this.updateTotalTableValues("Spare Cost", 0, 0, "add"); // Assuming no change for Spare Cost
-      const Estimatedhours = calculateTotalField(
-        this.tableData1,
-        "Estimatedhours"
-      );
-      const TotalCost = calculateTotalField(this.tableData1, "Cost");
-      this.KPICountData = [
-        {
-          count: Estimatedhours,
-          title: "Total Labour Hours",
-          class: `color-Grape-light`,
-        },
-        {
-          count: TotalCost,
-          title: "Total Cost",
-          class: `color-Grape-light`,
-        },
-      ];
-    } else if (data.data.Task) {
-      // this block for the edit menu item
-      const removedEstimatedHours = parseFloat(data.data.Estimatedhours || "0");
-      const removedCost = parseFloat(data.data.Cost || "0");
-      this.updateTotalTableValues(
-        "Labour Hours",
-        0,
-        removedEstimatedHours,
-        "subtract"
-      );
-      this.updateTotalTableValues("Labour Cost", 0, removedCost, "subtract");
-      this.updateTotalTableValues("Spare Cost", 0, 0, "add"); // Assuming no change for Spare Cost
+    if (data.data.Task) {
       this.fillServiceDetails(data);
-    }
-    if (data.label.label === "Remove" && data.data.SparePart) {
-      this.tableData2 = this.tableData2.filter(
-        (x) => x.TaskGroup !== data.data.TaskGroup
-      );
-      const removedCost = parseFloat(data.data.Cost || "0");
-      this.updateTotalTableValues("Labour Hours", 0, 0, "add");
-      this.updateTotalTableValues("Labour Cost", 0, 0, "add");
-      this.updateTotalTableValues("Spare Cost", 0, removedCost, "subtract");
-      const TotalCost = calculateTotalField(this.tableData2, "Cost");
-      this.KPICountData2 = [
-        {
-          count: TotalCost,
-          title: "Total Cost",
-          class: `color-Grape-light`,
-        },
-      ];
     } else if (data.data.SparePart) {
-      const removedCost = parseFloat(data.data.Cost || "0");
-      this.updateTotalTableValues("Labour Hours", 0, 0, "add");
-      this.updateTotalTableValues("Labour Cost", 0, 0, "add");
-      this.updateTotalTableValues("Spare Cost", 0, removedCost, "subtract");
       this.fillSpareDetails(data);
-    }
-    if (data.label.label === "Remove" && data.data.NTyreID) {
-      this.tableData3 = this.tableData3.filter(
-        (x) => x.CTyreID !== data.data.CTyreID
-      );
-    } else if (data.data.CTyreID) {
+    } else {
       this.fillTyreDetails(data);
     }
   }
@@ -739,18 +790,12 @@ export class AddWorkOrderComponent implements OnInit {
       this.counter = parseInt(lastFiveDigits);
     }
   }
-  Reset() {
+  ResetLocationFormField() {
     this.WorkOrderForm.controls["location"].reset();
   }
   resetFormFields() {
-    this.ServiceDetailsForm.reset({
-      StartDTM: new Date(),
-      EndDTM: new Date(),
-    });
-    this.SpareDetailsForm.reset({
-      StartDTM: new Date(),
-      EndDTM: new Date(),
-    });
+    this.ServiceDetailsForm.reset();
+    this.SpareDetailsForm.reset();
     this.BatteryChangeForm.reset();
     this.LabourDetailsForm.reset();
     this.TyreDetailsForm.reset();

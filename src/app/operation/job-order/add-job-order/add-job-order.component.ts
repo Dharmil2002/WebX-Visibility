@@ -11,6 +11,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
+import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 @Component({
   selector: "app-add-job-order",
   templateUrl: "./add-job-order.component.html",
@@ -39,6 +40,7 @@ export class AddJobOrderComponent implements OnInit {
     private router: Router,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private vehicleService: VehicleService,
     private operation: OperationService
   ) {
     this.companyCode = this.storage.companyCode;
@@ -75,28 +77,199 @@ export class AddJobOrderComponent implements OnInit {
   }
 
   async getVehicleStatus() {
-    const req = {
-      companyCode: this.companyCode,
-      collectionName: "vehicle_status",
-      filter: { vendorType: "Own" },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
-    const data = res?.data;
-    const vehicledata = data.map((x) => {
-      return {
-        name: x.vehNo,
-        value: x.vehNo,
-      };
-    });
-    this.filter.Filter(
-      this.jsonControlJobOrderArray,
-      this.JobOrderForm,
-      vehicledata,
-      this.vehicleNo,
-      this.vehicleNoStatus
-    );
+    //   const req = {
+    //     companyCode: this.companyCode,
+    //     collectionName: "vehicle_status",
+    //     filters: [
+    //       {
+    //         $match: {
+    //           "vendorType": "Own"
+    //         }
+    //       },
+    //       {
+    //         $lookup: {
+    //           from: "vehicle_detail",
+    //           localField: "vehNo",
+    //           foreignField: "vehicleNo",
+    //           as: "vehicleData"
+    //         }
+    //       }
+    //   ]
+    // }
+    const filters = [
+      {
+        D$match: {
+          vendorType: "Own",
+        },
+      },
+      {
+        D$lookup: {
+          from: "vehicle_detail",
+          localField: "vehNo",
+          foreignField: "vehicleNo",
+          as: "vehicleData",
+        },
+      },
+      {
+        D$project: {
+          data: "$vehicleData",
+        },
+      },
+    ];
+    //   filters: [
+    //     {
+    //         D$match: matchQuery,
+    //     },
+    //     {
+    //         "D$lookup": {
+    //             "from": "dockets",
+    //             "let": { "pRQNO": "$pRQNO" },
+    //             "pipeline": [
+    //                 {
+    //                     "D$match": {
+    //                         "D$and": [
+    //                             { "D$expr": { "D$eq": ["$pRQNO", "$$pRQNO"] } },
+    //                             { "cNL": { "D$in": [false, null] } }
+    //                         ]
+    //                     }
+    //                 }
+    //             ],
+    //             "as": "dockets"
+    //         }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$dockets", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$lookup": {
+    //             "from": "mf_details",
+    //             "let": { "dKTNO": "$dockets.dKTNO" },
+    //             "pipeline": [
+    //                 {
+    //                     "D$match": {
+    //                         "D$and": [
+    //                             { "D$expr": { "D$eq": ["$dKTNO", "$$dKTNO"] } },
+    //                             { "cNL": { "D$in": [false, null] } }
+    //                         ]
+    //                     }
+    //                 }
+    //             ],
+    //             "as": "md"
+    //         }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$md", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$lookup": {
+    //             "from": "mf_header",
+    //             "let": { "mFNO": "$md.mFNO" },
+    //             "pipeline": [
+    //                 {
+    //                     "D$match": {
+    //                         "D$and": [
+    //                             { "D$expr": { "D$eq": ["$docNo", "$$mFNO"] } },
+    //                             { "cNL": { "D$in": [false, null] } }
+    //                         ]
+    //                     }
+    //                 }
+    //             ],
+    //             "as": "mf"
+    //         }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$mf", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$lookup": {
+    //             "from": "thc_summary",
+    //             "let": { "tHC": "$mf.tHC" },
+    //             "pipeline": [
+    //                 {
+    //                     "D$match": {
+    //                         "D$and": [
+    //                             { "D$expr": { "D$eq": ["$docNo", "$$tHC"] } },
+    //                             { "cNL": { "D$in": [false, null] } }
+    //                         ]
+    //                     }
+    //                 }
+    //             ],
+    //             "as": "trips"
+    //         }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$dockets", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$md", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$mf", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$unwind": { "path": "$trips", "preserveNullAndEmptyArrays": true }
+    //     },
+    //     {
+    //         "D$project": {
+    //             "prqNo": { "D$ifNull": ["$pRQNO", ""] },
+    //             "prqDt": { "D$ifNull": ["$pICKDT", ""] },
+    //             "PickDtTime": { "D$ifNull": ["$pICKDT", ""] },
+    //             "prqStatus": { "D$ifNull": ["$sTSNM", ""] },
+    //             "BillParty": { "D$concat": [{ "D$ifNull": ["$bPARTY", ""] }, " - ", { "D$ifNull": ["$bPARTYNM", ""] }] },
+    //             "from": { "D$ifNull": ["$fCITY", ""] },
+    //             "to": { "D$ifNull": ["$tCITY", ""] },
+    //             "carrierType": { "D$ifNull": ["$cARTYPNM", ""] },
+    //             "Cap": { "D$ifNull": ["$sIZE", ""] },
+    //             "PayMode": { "D$ifNull": ["$pAYTYPNM", ""] },
+    //             "PRQRaiseBranch": { "D$ifNull": ["$bRCD", ""] },
+    //             "ContractAmt": { "D$ifNull": ["$cONTRAMT", ""] },
+    //             "VehNo": { "D$ifNull": ["$vEHNO", ""] },
+    //             "VenType": { "D$ifNull": ["$dockets.vENDTYNM", ""] },
+    //             // "VenNmCd": { "D$concat": [{ "D$ifNull": ["$dockets.vNDCD", ""] }, " - ", { "D$ifNull": ["$dockets.vNDNM", ""] }] },
+    //             "VenCD": { "D$ifNull": ["$dockets.vNDCD", ""] },
+    //             "VenNm": { "D$ifNull": ["$dockets.vNDNM", ""] },
+    //             "ConsigNoteNo": { "D$ifNull": ["$dockets.dKTNO", ""] },
+    //             "ConsigNoteDt": { "D$ifNull": ["$dockets.dKTDT", ""] },
+    //             "ConsigNoteTotAmt": { "D$ifNull": ["$dockets.tOTAMT", ""] },
+    //             "THCNo": { "D$ifNull": ["$trips.docNo", ""] },
+    //             "THCDt": { "D$ifNull": ["$trips.tHCDT", ""] },
+    //             "THCAmt": { "D$ifNull": ["$trips.cONTAMT", ""] }
+    //         }
+    //     }
+    // ]
+    const res = await this.vehicleService.getVehicleNo(filters, true);
+    console.log(res);
+    // if(res){
+    // const res = await firstValueFrom(
+    //   this.vehicleService.getVehicleNo(filters,true)
+    // );
+    // const data = res?.data;
+    // const vehicledata = data.map((x) => {
+    //   return {
+    //     name: x.vehNo,
+    //     value: x.vehNo,
+    //   };
+    // });
+    // this.filter.Filter(
+    //   this.jsonControlJobOrderArray,
+    //   this.JobOrderForm,
+    //   vehicledata,
+    //   this.vehicleNo,
+    //   this.vehicleNoStatus
+    // )
+    // {
+    //   "$match": {
+    //     "vendorType": "Own"
+    //   }
+    // },
+    // {
+    //   "$lookup": {
+    //     "from": "vehicle_detail",
+    //     "localField": "vehNo",
+    //     "foreignField": "vehicleNo",
+    //     "as": "vehicleData"
+    //   }
+    // },
   }
   async getVehicleData() {
     const vehicleNovalue = this.JobOrderForm.controls["vehicleNo"].value;

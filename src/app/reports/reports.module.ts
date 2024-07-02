@@ -82,6 +82,7 @@ import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
+import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -169,7 +170,8 @@ import { DriverStatusRegisterComponent } from './driver-status-register/driver-s
     ProfitAndLossViewDetailsVouchersListComponent,
     AdviceRegisterComponent,
     GcnFlowReportComponent,
-    DriverStatusRegisterComponent
+    DriverStatusRegisterComponent,
+    OpeningClosingStockReportComponent
   ],
   exports: [],
 

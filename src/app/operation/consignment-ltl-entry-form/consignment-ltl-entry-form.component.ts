@@ -25,6 +25,7 @@ import { DocketService } from 'src/app/Utility/module/operation/docket/docket.se
 import moment from 'moment';
 import Swal from 'sweetalert2';
 import convert from 'convert-units';
+import _ from 'lodash';
 import { ConsigmentLtlModel } from 'src/app/Models/consigment-ltl/consigment-ltl';
 import { firstValueFrom } from 'rxjs';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -2325,11 +2326,17 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
       case "Insurance":
         let insuranceValue = 0;
+        let rsk = this.consignmentForm.controls['risk'].value || "";
+        let rsk2 = (rsk  == "RSKTYP001" ? "OR" : (rsk  == "RSKTYP002" ? "CR" : ""));
+
+        debugger;
         const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
           ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
+                 && ( ins.iCRCD == rsk || ins.iCRCD == rsk2)
         );
+        console.log(insuranceDetails);
         if (insuranceDetails) {
-          const insuranceRateType = getRateType(insuranceDetails.rtType);
+          const insuranceRateType = getRateType(insuranceDetails.rTTYPE);
           const insuranceWeight = calculateWeight(insuranceRateType);
           insuranceValue = calculateValue(insuranceRateType, insuranceWeight, insuranceDetails.mIN, insuranceDetails.rT, insuranceDetails.mAX);
         }
@@ -2656,7 +2663,27 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
 
     // charges Ledger
-    this.otherCharges.forEach(x => {
+
+    const chgs = this.otherCharges.map(x => ({
+      aCCD: x.aCCD,
+      aMT: x.aMT,
+      oPS: x.oPS
+    }));
+
+debugger;
+    // Group by aCCD and oPS
+    const grouped = _.groupBy(chgs, c => `${c.aCCD}-${c.oPS}`);
+
+    // Map the grouped results to calculate the total aMT for each group
+    const groupedCharge: any = _.map(grouped, (c, key) => {
+      return {
+        aCCD: c[0].aCCD,
+        oPS: c[0].oPS,
+        aMT: _.sumBy(c, 'aMT')
+      };
+    });
+
+    groupedCharge.forEach(x => {
       if (parseFloat(x.aMT) !== 0) {
         const ledger = GetLeadgerInfoFromLocalStorage(x.aCCD)
         if (ledger) {

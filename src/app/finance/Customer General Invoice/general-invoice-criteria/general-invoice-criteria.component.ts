@@ -249,6 +249,8 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
     this.getStateDropdown();
     this.tranDetail = await getApiCompanyDetail(this.masterService);
   }
+
+  // Bind Ledger Data
   async BindLedger() {
     const account_groupReqBody = {
       companyCode: this.companyCode,

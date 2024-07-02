@@ -25,6 +25,7 @@ import { DocketService } from 'src/app/Utility/module/operation/docket/docket.se
 import moment from 'moment';
 import Swal from 'sweetalert2';
 import convert from 'convert-units';
+import _ from 'lodash';
 import { ConsigmentLtlModel } from 'src/app/Models/consigment-ltl/consigment-ltl';
 import { firstValueFrom } from 'rxjs';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -2325,11 +2326,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
       case "Insurance":
         let insuranceValue = 0;
+        let rsk = this.consignmentForm.controls['risk'].value || "";
+        let rsk2 = (rsk  == "RSKTYP001" ? "OR" : (rsk  == "RSKTYP002" ? "CR" : ""));
+
         const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
           ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
+                 && ( ins.iCRCD == rsk || ins.iCRCD == rsk2)
         );
         if (insuranceDetails) {
-          const insuranceRateType = getRateType(insuranceDetails.rtType);
+          const insuranceRateType = getRateType(insuranceDetails.rTTYPE);
           const insuranceWeight = calculateWeight(insuranceRateType);
           insuranceValue = calculateValue(insuranceRateType, insuranceWeight, insuranceDetails.mIN, insuranceDetails.rT, insuranceDetails.mAX);
         }
@@ -2483,8 +2488,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         // #region Update Invoice Status when account posting credit and debit in equal amount
         var CreditAmount = filteredVoucherlineitemList.filter(item => item.credit > 0).map(item => item.credit).reduce((a, b) => a + b, 0);
         var DebitAmount = filteredVoucherlineitemList.filter(item => item.debit > 0).map(item => item.debit).reduce((a, b) => a + b, 0);
-        if (CreditAmount != DebitAmount) {
-          console.log(filteredVoucherlineitemList);
+        if (CreditAmount != DebitAmount) {          
           SwalerrorMessage("error", "Error", "Credit and Debit Amount Should be Equal for Account Posting..!", false);
           return;
         }
@@ -2656,7 +2660,26 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
 
     // charges Ledger
-    this.otherCharges.forEach(x => {
+
+    const chgs = this.otherCharges.map(x => ({
+      aCCD: x.aCCD,
+      aMT: x.aMT,
+      oPS: x.oPS
+    }));
+
+    // Group by aCCD and oPS
+    const grouped = _.groupBy(chgs, c => `${c.aCCD}-${c.oPS}`);
+
+    // Map the grouped results to calculate the total aMT for each group
+    const groupedCharge: any = _.map(grouped, (c, key) => {
+      return {
+        aCCD: c[0].aCCD,
+        oPS: c[0].oPS,
+        aMT: _.sumBy(c, 'aMT')
+      };
+    });
+
+    groupedCharge.forEach(x => {
       if (parseFloat(x.aMT) !== 0) {
         const ledger = GetLeadgerInfoFromLocalStorage(x.aCCD)
         if (ledger) {

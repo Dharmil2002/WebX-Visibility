@@ -457,7 +457,6 @@ export class GeneralBillDetailComponent implements OnInit {
 
     const CalculatedSum = Total + parseFloat(GSTAmount.toFixed(2));
     const CalculatedSumWithTDS = CalculatedSum - parseFloat(TDSAmount.toFixed(2));
-
     const formattedCalculatedSum = CalculatedSumWithTDS.toFixed(2);
 
     this.TotalAmountList.forEach((x) => {

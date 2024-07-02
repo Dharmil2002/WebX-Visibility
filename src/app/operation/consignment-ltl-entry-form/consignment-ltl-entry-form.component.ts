@@ -2331,11 +2331,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       case "Insurance":
         let insuranceValue = 0;
         let rsk = this.consignmentForm.controls['risk'].value || "";
-        let rsk2 = (rsk  == "RSKTYP001" ? "OR" : (rsk  == "RSKTYP002" ? "CR" : ""));
+        let rsk2 = (rsk == "RSKTYP001" ? "OR" : (rsk == "RSKTYP002" ? "CR" : ""));
 
         const insuranceDetails = this.contract.FreightChargeInsuranceDetails.find(
           ins => ins.iVFROM <= this.chargeBase.InvoiceAmount && ins.iVTO >= this.chargeBase.InvoiceAmount
-                 && ( ins.iCRCD == rsk || ins.iCRCD == rsk2)
+            && (ins.iCRCD == rsk || ins.iCRCD == rsk2)
         );
         if (insuranceDetails) {
           const insuranceRateType = getRateType(insuranceDetails.rTTYPE);
@@ -2430,7 +2430,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0
-        const freight_amount = this.freightForm.controls['freight_amount'].value;
+        const totAmt = parseFloat(this.freightForm.controls['totAmt'].value) || 0;
 
         this.VoucherRequestModel.companyCode = this.storage.companyCode;
         this.VoucherRequestModel.docType = "VR";
@@ -2473,8 +2473,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherDataRequestModel.UGST = 0;
         this.VoucherDataRequestModel.GSTTotal = GSTAmount;
 
-        this.VoucherDataRequestModel.GrossAmount = freight_amount;
-        this.VoucherDataRequestModel.netPayable = freight_amount;
+        this.VoucherDataRequestModel.GrossAmount = totAmt;
+        this.VoucherDataRequestModel.netPayable = totAmt;
         this.VoucherDataRequestModel.roundOff = 0;
         this.VoucherDataRequestModel.voucherCanceled = false
 
@@ -2484,7 +2484,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherDataRequestModel.date = "";
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = DocketNo;
-        var VoucherlineitemList = this.GetVouchersLedgers(freight_amount, DocketNo);
+        var VoucherlineitemList = this.GetVouchersLedgers(totAmt, DocketNo);
 
         // Remove Credit and Debit Amount if both are zero
         const filteredVoucherlineitemList = VoucherlineitemList.filter(transaction => !(transaction.debit === 0 && transaction.credit === 0));
@@ -2492,7 +2492,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         // #region Update Invoice Status when account posting credit and debit in equal amount
         var CreditAmount = filteredVoucherlineitemList.filter(item => item.credit > 0).map(item => item.credit).reduce((a, b) => a + b, 0);
         var DebitAmount = filteredVoucherlineitemList.filter(item => item.debit > 0).map(item => item.debit).reduce((a, b) => a + b, 0);
-        if (CreditAmount != DebitAmount) {          
+        if (CreditAmount != DebitAmount) {
           SwalerrorMessage("error", "Error", "Credit and Debit Amount Should be Equal for Account Posting..!", false);
           return;
         }

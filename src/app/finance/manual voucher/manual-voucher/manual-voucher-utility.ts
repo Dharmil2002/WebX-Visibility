@@ -5,7 +5,10 @@ export async function manualvoucharDetail(masterService) {
     const req = {
         companyCode: StorageService.getItem(StoreKeys.CompanyCode),
         collectionName: "voucher_trans",
-        filter: { bRC: StorageService.getItem(StoreKeys.Branch) }
+        filter: {
+            bRC: StorageService.getItem(StoreKeys.Branch),
+            rV: { D$ne: true }
+        }
     }
     if (StorageService.getItem(StoreKeys.Branch) == 'HQTR') {
         delete req.filter.bRC;

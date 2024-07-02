@@ -5,20 +5,8 @@ export class ToPayPaidReportControl {
     constructor() {
         this.toPayPaidReportControlArray = [
             {
-                name: 'DateType',
-                label: 'Date Type',
-                placeholder: '',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Bookingdate", name: "Booking date" },
-                    { value: "BillDate", name: "Bill date" },
-                ],
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
                 name: "start",
-                label: "From Date",
+                label: "Select Date Range",
                 placeholder: "",
                 type: "daterangpicker",
                 value: "",
@@ -55,6 +43,26 @@ export class ToPayPaidReportControl {
                 generatecontrol: true, disable: false
             },
             {
+                name: 'Transitmode',
+                label: 'Transit mode',
+                placeholder: '',
+                type: 'multiselect',
+                value: [],
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [
+                ],
+                additionalData: {
+                    support: "modeHandler",
+                    showNameAndValue: true,
+                },
+                functions: {
+                    onToggleAll: "toggleSelectAll",
+                },
+                generatecontrol: true, disable: false
+            },
+            {
                 name: 'location',
                 label: 'Select Location',
                 placeholder: '',
@@ -84,26 +92,6 @@ export class ToPayPaidReportControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: []
-            },
-            {
-                name: 'Transitmode',
-                label: 'Transit mode',
-                placeholder: '',
-                type: 'multiselect',
-                value: [],
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [
-                ],
-                additionalData: {
-                    support: "modeHandler",
-                    showNameAndValue: true,
-                },
-                functions: {
-                    onToggleAll: "toggleSelectAll",
-                },
-                generatecontrol: true, disable: false
             },
             {
                 name: 'ServiceType',

@@ -93,7 +93,6 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
 
     this.toPayPaidReportForm.controls["location"].setValue(loginBranch);
     this.toPayPaidReportForm.get('Individual').setValue("Y");
-    this.toPayPaidReportForm.get('DateType').setValue("Bookingdate");
     this.toPayPaidReportForm.get('Paybasis').setValue("Both");
     this.toPayPaidReportForm.get('ServiceType').setValue("Both");
     this.filter.Filter(this.jsonControlFormArray, this.toPayPaidReportForm, modeList, "Transitmode", true);
@@ -163,13 +162,12 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
           ? this.toPayPaidReportForm.value.modeHandler.map(x => x.value)
           : [];
 
-        const dateType = this.toPayPaidReportForm.value.DateType;
         const service = this.toPayPaidReportForm.value.ServiceType;
         let payBasis = this.toPayPaidReportForm.value.Paybasis;
         payBasis === 'Both' ? payBasis = ["P01", "P03"] : payBasis;
         const location = ReportingBranches;
 
-        this.filterData = { startValue, endValue, location, modeList, dateType, service, payBasis };
+        this.filterData = { startValue, endValue, location, modeList, service, payBasis };
 
         const data = await this.getReportData(this.filterData);
         console.log(data);
@@ -468,24 +466,37 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       var filter = { ...this.filterData };
 
       if (columnData.pAYTYP)
-        filter.payBasis = columnData.pAYTYP;
+        filter.payBasis = [columnData.pAYTYP];
+      filter.service = data.ServiceType;
 
       if (data.LocationCode && data.LocationCode != "")
         filter.location = [data.LocationCode];
 
       console.log(filter);
-      //let result = await this.stockReportService.getStockData(filter);
+      const result = await this.getTOPayPaidRegister(filter);
+      console.log(result);
+      if (!result || (Array.isArray(result) && result.length === 0)) {
 
-      // if (!result || (Array.isArray(result) && result.length === 0)) {
-
-      //   Swal.fire({
-      //     icon: "error",
-      //     title: "No Records Found",
-      //     text: "Cannot Download CSV",
-      //     showConfirmButton: true,
-      //   });
-      // }
-
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+      
+      // Prepare the state data to include all necessary properties
+      const stateData = {
+        data: result,
+        formTitle: 'To Pay/Paid But Not Collected Register Report Data',
+        csvFileName: this.csvFileName
+      };
+      // Convert the state data to a JSON string and encode it        
+      this.nav.setData(stateData);
+      // Create the new URL with the state data as a query parameter
+      const url = `/#/Reports/generic-report-view`;
+      // Open the URL in a new tab
+      window.open(url, '_blank');
       setTimeout(() => {
         Swal.close();
       }, 1000);
@@ -494,4 +505,70 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       // this.exportService.exportAsCSV(result, `Stock Register-${data.LocationCode}-${columnData.StockType}-${moment().format("YYYYMMDD-HHmmss")}`, this.detailCSVHeader);
     }
   }
+  //#region to made query for report and get data
+  async getTOPayPaidRegister(data) {
+    const { startValue, endValue, location, modeList, payBasis, service } = data;
+
+    const matchQuery = {
+      'D$and': [
+        { 'dKTDT': { 'D$gte': startValue } },
+        { 'dKTDT': { 'D$lte': endValue } },
+        ...(location ? [{ 'dEST': { 'D$in': location } }] : []),
+        ...(modeList.length > 0 ? [{ 'tRNMOD': { 'D$in': modeList } }] : []),
+        ...(payBasis ? [{ 'pAYTYP': { 'D$in': payBasis } }] : []),
+      ],
+    };
+
+    try {
+      let resFTL = { data: { data: [], grid: null } };
+      let resLTL = { data: { data: [], grid: null } };
+
+      if (service === " ") {
+        resFTL = await this.reportService.fetchReportData("ToPayPaidRegisterFTL", matchQuery);
+        resLTL = await this.reportService.fetchReportData("ToPayPaidRegisterLTL", matchQuery);
+        console.log(resFTL.data.data);
+
+      }
+      if (service === "LTL") {
+        resLTL = await this.reportService.fetchReportData("ToPayPaidRegisterLTL", matchQuery);
+      }
+      if (service === "FTL") {
+        resFTL = await this.reportService.fetchReportData("ToPayPaidRegisterFTL", matchQuery);
+      }
+
+      const combinedData = [...resFTL.data.data, ...resLTL.data.data];
+      const details = combinedData.map((item) => ({
+        ...item,
+        bGNDT: item.bGNDT ? moment(item.bGNDT).format("DD MMM YY HH:mm") : "",
+        dKTDT: item.dKTDT ? moment(item.dKTDT).format("DD MMM YY HH:mm") : "",
+        rCVAMT: item.rCVAMT ? Number(item.rCVAMT).toFixed(2) : "0.00",
+        bLAMT: item.bLAMT ? Number(item.bLAMT).toFixed(2) : "0.00",
+        iNVAMT: item.iNVAMT ? Number(item.iNVAMT).toFixed(2) : "0.00",
+      }));
+
+      const data = this.getDistinctByProperty(details, "dKTNO");
+
+      return {
+        data: data,
+        grid: resFTL.data.grid || resLTL.data.grid, // Assuming grid structure is the same for both responses
+      };
+    } catch (error) {
+      console.error("Error fetching report data:", error.message);
+      throw new Error("Failed to fetch ToPayPaidRegister data");
+    }
+  }
+
+  getDistinctByProperty<T>(arr: T[], prop: keyof T): T[] {
+    const seen = new Set<T[keyof T]>();
+    return arr.reduce((acc: T[], obj: T) => {
+      const value = obj[prop];
+      if (!seen.has(value)) {
+        seen.add(value);
+        acc.push(obj);
+      }
+      return acc;
+    }, []);
+  }
+
+  //#endregion
 }

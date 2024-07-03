@@ -1962,8 +1962,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   // Updated function to handle `isOrigin` condition correctly
   getTermValue(term, isOrigin) {
-    const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
-    const fieldKey = isOrigin ? "fromCity" : "toCity";
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
+    let fieldKey = isOrigin ? "fromCity" : "toCity";
+    if(term == "Location") {
+      fieldKey = isOrigin ? "origin" : "destination";
+    }
     const type = typeMapping[term];
     let valueKey;
 
@@ -1974,7 +1977,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;
+        break;  
+      case "Location":
+          valueKey = "value";
+          break;   
       case "City":
         valueKey = "ct";
         break;
@@ -1984,8 +1990,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       default:
         return [];
     }
-    const controls = this.consignmentForm;
-    const value = this.consignmentForm.controls[fieldKey].value[valueKey];
+    const controls = this.consignmentForm.controls;
+    let value;
+    if(fieldKey == "origin") {
+      value = controls[fieldKey].value;
+    } else { 
+      value = controls[fieldKey].value[valueKey];
+    }
     if (value) {
       return [
         { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
@@ -2070,9 +2081,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const contractId = this.consignmentForm.value.contract;
     const opsMode = this.LoadType.find((x) => x.name == this.storage.mode)?.value || "LTL";
 
-    const terms = ["Area", "Pincode", "City", "State"];
+    const terms = ["Area", "Pincode", "Location", "City", "State"];
 
     const allCombinations = generateCombinations(terms);
+
+    console.log(allCombinations);
 
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
       let match = { "D$and": [] };
@@ -2089,12 +2102,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     matches.push({
       D$and: [
         { "D$in": ['$fTYPE', [null, ""]] },
-        { "D$in": ['$ffROM', [null, ""]] }]
+        { "D$in": ['$fROM', [null, ""]] }]
     });
     matches.push({
       D$and: [
         { "D$in": ['$tTYPE', [null, ""]] },
-        { "D$in": ['$tfROM', [null, ""]] }]
+        { "D$in": ['$tO', [null, ""]] }]
     });
 
     let reqBody =

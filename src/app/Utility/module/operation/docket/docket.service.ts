@@ -1497,7 +1497,6 @@ export class DocketService {
         return Object.keys(res.data).length>0?res.data:null
     }
     async getDocketsDetails(city) {
-
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "dockets",
@@ -1536,11 +1535,6 @@ export class DocketService {
                                         D$and: [
                                             {
                                                 D$expr: { D$eq: ["$docketsOPs.sTS", 2], },
-                                            },
-                                            {
-                                                D$expr: {
-                                                    D$gte: ["$docketsOPs.sTSTM", moment().tz(this.storage.timeZone).startOf('day').toDate()],
-                                                }
                                             }
                                         ],
                                     },

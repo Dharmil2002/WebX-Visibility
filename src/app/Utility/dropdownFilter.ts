@@ -63,9 +63,11 @@ export class FilterUtils {
    */
   private _filterWithName(name: string, dropdownOption: AutoComplateCommon[]): AutoComplateCommon[] {
     const filterValue = name.toLowerCase();
-    const filteredDropdown = dropdownOption.filter((option) =>
-      option.name && option.name.toLowerCase().indexOf(filterValue) === 0
-    );
+    const filteredDropdown = dropdownOption.filter((option) => {
+      const optionName = option.name ? option.name.toString().toLowerCase() : '';
+      const optionValue = option.value ? option.value.toString().toLowerCase() : '';
+      return optionName.indexOf(filterValue) === 0 || optionValue.indexOf(filterValue) === 0;
+    });
     return filteredDropdown;
   }
 }

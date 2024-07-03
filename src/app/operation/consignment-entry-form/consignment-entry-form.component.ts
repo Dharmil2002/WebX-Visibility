@@ -3012,8 +3012,11 @@ export class ConsignmentEntryFormComponent
 
   // Updated function to handle `isOrigin` condition correctly
   getTermValue(term, isOrigin) {
-    const typeMapping = { Area: "AR", Pincode: "PIN", City: "CT", State: "ST" };
-    const fieldKey = isOrigin ? "fromCity" : "toCity";
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
+    let fieldKey = isOrigin ? "fromCity" : "toCity";
+    if(term == "Location") {
+      fieldKey = isOrigin ? "origin" : "destination";
+    }
     const type = typeMapping[term];
     let valueKey;
 
@@ -3024,7 +3027,10 @@ export class ConsignmentEntryFormComponent
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;
+        break;  
+      case "Location":
+          valueKey = "value";
+          break;   
       case "City":
         valueKey = "ct";
         break;
@@ -3034,14 +3040,18 @@ export class ConsignmentEntryFormComponent
       default:
         return [];
     }
-    const controls = this.model.consignmentTableForm;
-    const value =
-      this.model.consignmentTableForm.controls[fieldKey].value[valueKey];
+    const controls = this.model.consignmentTableForm.controls;
+    let value;
+    if(fieldKey == "origin") {
+      value = controls[fieldKey].value;
+    } else { 
+      value = controls[fieldKey].value[valueKey];
+    }
     if (value) {
       return [
-        { D$eq: [`$${isOrigin ? "f" : "t"}TYPE`, type] },
-        { D$eq: [`$${isOrigin ? "fROM" : "tO"}`, value] },
-      ];
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] }];
+
     }
     return [];
   }
@@ -3074,7 +3084,7 @@ export class ConsignmentEntryFormComponent
         0
       );
     }
-    const terms = ["Area", "Pincode", "City", "State"];
+    const terms = ["Area", "Pincode","Location", "City", "State"];
     const allCombinations = generateCombinations(terms);
     let matches = allCombinations
       .map(([fromTerm, toTerm]) => {
@@ -3089,6 +3099,16 @@ export class ConsignmentEntryFormComponent
         return null;
       })
       .filter((x) => x != null);
+      matches.push({
+        D$and: [
+          { "D$in": ['$fTYPE', [null, ""]] },
+          { "D$in": ['$fROM', [null, ""]] }]
+      });
+      matches.push({
+        D$and: [
+          { "D$in": ['$tTYPE', [null, ""]] },
+          { "D$in": ['$tO', [null, ""]] }]
+      });
     let reqBody = {
       companyCode: this.storage.companyCode,
       customerCode: this.model.consignmentTableForm.value.billingParty.value,

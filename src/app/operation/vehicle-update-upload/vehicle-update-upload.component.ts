@@ -13,7 +13,6 @@ import { ManifestGeneratedComponent } from '../manifest-generated/manifest-gener
 import { ManifestService } from 'src/app/Utility/module/operation/mf-service/mf-service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { Manifest } from 'src/app/Models/vehicle-loading/manifest';
-import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipment-details.component';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
@@ -226,6 +225,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "cft": parseFloat(element?.vCFT) || 0,
             "Leg": lsDetails?.lEG.replace(" ", "") || '',
             "extraDetails":element,
+            "Type":"Manifest",
             "actions": ["Edit"]
           };
           if (this.isScan == true) {

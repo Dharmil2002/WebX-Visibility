@@ -361,7 +361,6 @@ export class AddFleetMasterComponent implements OnInit {
   async checkUniqueVehicle() {
     // Get the vehicle number from the form
     const vehicleNumber = this.fleetTableForm.value.vehicleNo.name;
-
     try {
       // Prepare the request to fetch the fleet collection
       const request = {

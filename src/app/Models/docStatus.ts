@@ -27,6 +27,11 @@ export enum DeliveryStatus {
   Part_Delivered=12,
 
 }
+export enum depsStatus{
+  Generated=1,
+  Update=2,
+  Closed=3,
+}
 export enum CustomerBillStatus {
   Generated = 1,
   Approved = 2,
@@ -47,7 +52,8 @@ export enum DocketEvents {
   DRS_Upload = "EVN0008",
   Delivery_Update = "EVN0009",
   Arrival_Scan = "EVN0010",
-  Del_MR_Generation = "EVN0011"
+  Del_MR_Generation = "EVN0011",
+  Deps_Declare = "EVN0012"
 };
 export enum VehicleStatus {
   Available= 1,

@@ -18,14 +18,12 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Eway Bill Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
-      datatype: "date",
       sticky: true
     },
     expiryDate: {
       Title: "Eway Bill Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
-      datatype: "date",
       sticky: true
     },
     invoiceNumber: {
@@ -38,7 +36,6 @@ export class ConsigmentLtlModel implements IFieldDefinition {
     invDt: {
       Title: "Invoice Date",
       class: "matcolumncenter",
-      datatype: "date",
       Style: "min-width:2px",
     },
     invoiceAmount: {
@@ -96,21 +93,18 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Eway Bill Number",
       class: "matcolumncenter",
       Style: "min-width:80px",
-      datatype:"string",
       sticky: true
     },
     ewayBillDate: {
       Title: "Eway Bill Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
-      datatype:"date",
       sticky: true
     },
     expiryDate: {
       Title: "Eway Bill Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
-      datatype:"date",
       sticky: true
     },
     invoiceNumber: {
@@ -124,7 +118,6 @@ export class ConsigmentLtlModel implements IFieldDefinition {
       Title: "Invoice Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
-      datatype:"date",
     },
     cftRation: {
       Title: "CFT Ratio",

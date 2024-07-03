@@ -40,6 +40,9 @@ import { TrackingPageComponent } from "./consignmentTracking/tracking-page/track
 import { ConsignmentLTLEntryFormComponent } from "./consignment-ltl-entry-form/consignment-ltl-entry-form.component";
 import { VehicleUpdateUploadComponent } from "./vehicle-update-upload/vehicle-update-upload.component";
 import { PrqTrackingComponent } from "./prq-tracking/prq-tracking.component";
+import { JobOrderMainPageComponent } from "./job-order/job-order-main-page.component";
+import { AddJobOrderComponent } from "./job-order/add-job-order/add-job-order.component";
+import { AddWorkOrderComponent } from "./job-order/add-work-order/add-work-order.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -201,8 +204,19 @@ const routes: Routes = [
   {
     path: "vehicle-loading",
     component: VehicleUpdateUploadComponent
+  },
+  {
+    path: "JobOrder",
+    component: JobOrderMainPageComponent,
+  },
+  {
+    path: "AddJobOrder",
+    component: AddJobOrderComponent,
+  },
+  {
+    path: "AddWorkOrder",
+    component: AddWorkOrderComponent,
   }
-
 ]
 
 @NgModule({

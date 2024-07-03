@@ -344,9 +344,9 @@ export class ContractBasicInformationControl {
           showNameAndValue: false,
           metaData: "Basic"
         },
-        // functions: {
-        //   onOptionSelect: "GeneralFieldChangedForTableData"
-        // },
+        functions: {
+          onOptionSelect: "GeneralFieldChangedForTableData"
+        },
       },
 
 

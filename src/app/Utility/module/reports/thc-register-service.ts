@@ -19,10 +19,10 @@ export class thcreportService {
             {D$and: [
                 { tHCDT: { 'D$gte': reqBody.startValue } }, // Convert start date to ISO format
                 { tHCDT: { 'D$lte': reqBody.endValue } }, // prq date less than or equal to end date      
-                ...(reqBody.THCArray != "" ? [{ docNo: { D$in: reqBody.THCArray} }] : []),        
-                ...(reqBody.ReportType == "I" ? [{ cLOC: { 'D$in': [reqBody.Location] } }] : []),
+                ...(reqBody.THCArray != "" ? [{ docNo: { D$in: reqBody.THCArray} }] : []), 
+                ...(reqBody.Location && reqBody.Location.length > 0 ? [{ cLOC: { 'D$in': reqBody.Location } }] : []),
                 ...(reqBody.DocumentStatus == "0" ? [] :isLTL ? reqBody.DocumentStatus == "1" ? [{ oPSST: { 'D$in':["1","2"]}}]: [{ oPSST: { 'D$in':[reqBody.DocumentStatus]}}]
-                    : reqBody.DocumentStatus == "4" ? [{ oPSST: { 'D$in':["2"]}}]: [{ oPSST: { 'D$in':[reqBody.DocumentStatus]}}]
+                    : reqBody.DocumentStatus == "4" ? [{ oPSST: { 'D$in':["2"]}}]: [{ oPSST: { 'D$in': [reqBody.DocumentStatus] }}]
                 ),
               ]}
               ),

@@ -271,6 +271,7 @@ export class DepsService {
     }
 
     fieldArrivalDeps(docketsList) {
+        debugger
         const docketsDetails = Array.isArray(docketsList) ? docketsList : [docketsList];
         let depsHeader = []
         let depsDetails = []
@@ -359,7 +360,7 @@ export class DepsService {
                         let typeSpecificData;
                         switch (type.value) {
                             case "D":
-                                const remainingpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.demangePkgs);
+                                const remainingpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.demagePkgs);
                                 const weightPerPkg = parseFloat(dk.extra.actualWeight) / parseInt(dk.extra.noofPkts);
                                 const arrivalPkgsWeight = Math.max(remainingpkgs * weightPerPkg, 0);
                                 const remainingWeight = Math.max(parseFloat(dk.extra.actualWeight) - arrivalPkgsWeight, 0);
@@ -368,7 +369,7 @@ export class DepsService {
                                     "dEPTYPNM": "Damage",
                                     "dEPIMG": dk?.extra?.demageUpload || "",
                                     "dMG": {
-                                        "pKGS": ConvertToNumber(dk?.extra?.demangePkgs || 0),
+                                        "pKGS": ConvertToNumber(dk?.extra?.demagePkgs || 0),
                                         "wT": ConvertToNumber(remainingWeight || 0),
                                         "rES": dk?.extra?.demageReason?.name || "",
                                         "rMK": dk?.extra?.demageRemarks || ""
@@ -421,7 +422,7 @@ export class DepsService {
                                 depsShortDetails.push(createDepsDetailsJson(dk?.extra?.shortRemarks));
                                 break;
                             case "P":
-                                const remaininPgpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.shortPkgs);
+                                const remaininPgpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.pilferagePkgs);
                                 const weightPerPPkg = parseFloat(dk.extra.actualWeight) / parseInt(dk.extra.noofPkts);
                                 const arrivalPPkgsWeight = Math.max(remaininPgpkgs * weightPerPPkg, 0);
                                 const remainingPWeight = Math.max(parseFloat(dk.extra.actualWeight) - arrivalPPkgsWeight, 0);

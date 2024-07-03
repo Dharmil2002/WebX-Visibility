@@ -89,6 +89,7 @@ export class DepartureService {
   }
 
   async getFieldDepartureMapping(data, shipment) {
+    debugger
     const vendorCode = await this.vendor.getVendorDetail(
       {
         companyCode: this.storage.companyCode,
@@ -136,8 +137,8 @@ export class DepartureService {
         "fINST": 0,
         "fINSTNM": "",
         "cONTAMT": ConvertToNumber(data?.ContractAmt || 0, 2),
-        "aDVPENAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
-        "aDVAMT": ConvertToNumber(data?.TotalAdv || 0, 2),
+        "aDVPENAMT": ConvertToNumber(data?.Advance || 0, 2),
+        "aDVAMT": ConvertToNumber(data?.Advance || 0, 2),
         "cAP": {
           "wT": data?.Capacity || 0,
           "vOL": data?.VolumeaddedCFT || 0,

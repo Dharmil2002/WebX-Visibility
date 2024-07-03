@@ -52,7 +52,6 @@ export class VoucherRegisterReportComponent implements OnInit {
   partyNMDet: any;
   branchStatus: any;
   branchName: any;
-  ReportingBranches: string[] = [];
   protected _onDestroy = new Subject<void>();
   constructor(
     private fb: UntypedFormBuilder,
@@ -257,12 +256,16 @@ export class VoucherRegisterReportComponent implements OnInit {
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        this.ReportingBranches = [];
+        let ReportingBranches = [];
+        // Check if the form is for individual or multiple locations
         if (this.voucherRegTableForm.value.Individual == "N") {
-          this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.voucherRegTableForm.value.branch.name);
-          this.ReportingBranches.push(this.voucherRegTableForm.value.branch.value);
+          // If multiple, get the reporting locations list based on the selected location
+          ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.voucherRegTableForm.value.branch.value);
+          // Add the selected location to the reporting branches list
+          ReportingBranches.push(this.voucherRegTableForm.value.branch.value);
         } else {
-          this.ReportingBranches.push(this.voucherRegTableForm.value.branch.value);
+          // If individual, just add the selected branch
+          ReportingBranches.push(this.voucherRegTableForm.value.branch.value);
         }
         const cheqNo = this.voucherRegTableForm.value.cheq;
         const vouchamt = this.voucherRegTableForm.value.vAmt;
@@ -290,7 +293,7 @@ export class VoucherRegisterReportComponent implements OnInit {
         const partyNmData = Array.isArray(this.voucherRegTableForm.value.partynmHandler)
           ? this.voucherRegTableForm.value.partynmHandler.map(x => x.value)
           : [];
-        const branch = this.ReportingBranches;
+        const branch = ReportingBranches;
         const individual = this.voucherRegTableForm.value.Individual;
         const reqBody = {
           individual, branch, startDate, endDate, vNoArray, voucherTpData, tranTpData, partyTpData, partyNmData,

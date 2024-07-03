@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
+import { CustomerBillStatus } from 'src/app/Models/docStatus';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
@@ -22,16 +23,16 @@ export class BillSubmissionComponent implements OnInit {
   isChagesValid: boolean = false;
   imageData: any = {};
   constructor(
-    private fb:UntypedFormBuilder,
-    private objImageHandling: ImageHandling, 
+    private fb: UntypedFormBuilder,
+    private objImageHandling: ImageHandling,
     private invoiceService: InvoiceServiceService,
     private storage: StorageService,
     private dialog: MatDialog,
     public dialogRef: MatDialogRef<GenericViewTableComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-    ) { 
-      this.shipmentDetails = this.data;
-    }
+  ) {
+    this.shipmentDetails = this.data;
+  }
 
   ngOnInit(): void {
     this.IntializeFormControl();
@@ -43,48 +44,48 @@ export class BillSubmissionComponent implements OnInit {
     } catch (error) {
     }
   }
-  
+
   IntializeFormControl() {
     const loadingControlForm = new SubmitionControl();
     this.jsonControlArray = loadingControlForm.getSubmitFormControls();
     this.billSubmition = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
-  
+
   async GetFileList(data) {
     const allowedFormats = ["jpeg", "png", "jpg"];
-    this.imageData =  await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
-    billSubmition, this.imageData, "BillSubmit", 'Finance', this.jsonControlArray, allowedFormats);
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+      billSubmition, this.imageData, "BillSubmit", 'Finance', this.jsonControlArray, allowedFormats);
   }
-    //#region to preview image
-    openImageDialog(control) {
-      const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
-      this.dialog.open(ImagePreviewComponent, {
-        data: { imageUrl: file },
-        width: '30%',
-        height: '50%',
-      });
-    }
-    //#endregion
-  async save(){
-    const filter={
-      bILLNO:this.shipmentDetails?.bILLNO
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
+  async save() {
+    const filter = {
+      bILLNO: this.shipmentDetails?.bILLNO
     }
     const pod = this.imageData?.Upload || ""
-    const status={
-      bSTS:3,
-      bSTSNM:"Bill Submission",
-      sUB:{
-        lOC:this.storage.branch,
-        dTM:this.billSubmition.controls['submitDate'].value,
-        tO:this.billSubmition.controls['submissionTo'].value,
-        tOMOB:this.billSubmition.controls['mobile'].value,
-        dOC:pod
+    const status = {
+      bSTS: CustomerBillStatus.Submitted,
+      bSTSNM: CustomerBillStatus[CustomerBillStatus.Submitted],
+      sUB: {
+        lOC: this.storage.branch,
+        dTM: this.billSubmition.controls['submitDate'].value,
+        tO: this.billSubmition.controls['submissionTo'].value,
+        tOMOB: this.billSubmition.controls['mobile'].value,
+        dOC: pod
       }
     }
-     await this.invoiceService.updateInvoiceStatus(filter,status);
+    await this.invoiceService.updateInvoiceStatus(filter, status);
     this.dialogRef.close('Success');
   }
-  cancel(){
+  cancel() {
     this.dialogRef.close();
   }
 }

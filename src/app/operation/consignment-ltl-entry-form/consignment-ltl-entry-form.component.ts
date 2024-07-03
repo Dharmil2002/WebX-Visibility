@@ -2680,7 +2680,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     const chgs = this.otherCharges.map(x => ({
       aCCD: x.aCCD,
-      aMT: x.aMT,
+      aMT: Number(x.aMT),
       oPS: x.oPS
     }));
 

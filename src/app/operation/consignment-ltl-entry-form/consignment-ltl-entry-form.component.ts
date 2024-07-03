@@ -2587,7 +2587,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                             };
                             const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
                             window.open(url, '', 'width=1000,height=800');
-                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                            this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                              window.location.reload();
+                            });
                           } else if (result.isDismissed) {
                             // Handle the action for the cancel button here.
                             this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
@@ -2988,14 +2990,32 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                     Swal.fire({
                       icon: "success",
                       title: "Booked Successfully",
-                      text: "DocketNo : " + DocketNo,
+                      text: "GCN No: " + DocketNo,
+                      confirmButtonText: 'OK',
                       showConfirmButton: true,
+                      denyButtonText: 'Print',
+                      showDenyButton: true,
+                      showCancelButton: true,
+                      cancelButtonText: 'Close'
                     }).then((result) => {
                       if (result.isConfirmed) {
-                        Swal.hideLoading();
-                        setTimeout(() => {
-                          Swal.close();
-                        }, 2000);
+                        // Redirect after the alert is closed with OK button.
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                      } else if (result.isDenied) {
+                        // Handle the action for the deny button here.
+                        const templateBody = {
+                          templateName: "DKT",
+                          PartyField: "",
+                          DocNo: this.consignmentForm.controls["docketNumber"].value,
+                        }
+                        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                        window.open(url, '', 'width=1000,height=800');
+                        this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                          window.location.reload();
+                        });
+                      } else if (result.isDismissed) {
+                        // Handle the action for the cancel button here.
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
                       }
                     });
                   },

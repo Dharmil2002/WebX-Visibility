@@ -118,4 +118,17 @@ export class StateService {
     }
     return { CGST: false, IGST: true, SGST: false, UGST: false };
   }
+  async checkGst(supplierGstNo: string, consumerGstNo: string): Promise<{ CGST: boolean, IGST: boolean, SGST: boolean, UTGST: boolean }> {
+    const sGstNo = supplierGstNo.trim().substring(0, 2);
+    const cGstNo = consumerGstNo.trim().substring(0, 2);
+    if (sGstNo !== cGstNo) {
+      return { CGST: false, IGST: true, SGST: false, UTGST: false };
+    } else {
+      const gstDetail = await this.fetchStateByFilterId(cGstNo, "ST");
+      if (gstDetail[0].ISUT) {
+        return { CGST: true, IGST: false, SGST: false, UTGST: true };
+      }
+      return { CGST: true, IGST: false, SGST: true, UTGST: false };
+    }
+  }
 }

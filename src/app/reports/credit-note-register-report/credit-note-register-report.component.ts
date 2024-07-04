@@ -56,7 +56,7 @@ export class CreditNoteRegisterReportComponent implements OnInit {
   EndDate: any = moment().format("DD MMM YY");
   now = moment().endOf('day').toDate();
   lastweek = moment().add(-10, 'days').startOf('day').toDate();
-
+  protected _onDestroy = new Subject<void>();
   constructor(
     public snackBarUtilityService: SnackBarUtilityService,
     private fb:UntypedFormBuilder,
@@ -111,7 +111,6 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       filter: {},
       collectionName: "customer_detail"
     };
-    debugger
     const financialYearlist = this.generalLedgerReportService.getFinancialYear();
     this.filter.Filter(
       this.jsonControlArray,
@@ -165,15 +164,8 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       // Determine the financial year based on the start date
       const startYear = startDate.getFullYear(); // Extract the year from the start date
   
-      // Determine the financial year start
-      // If the month of the start date is less than March (0-based index, so 3 is April),
-      // it means the financial year started in the previous year.
-      // For example, if the start date is February 2024, the financial year started in April 2023.
       const financialYearStart = startDate.getMonth() < 3 ? startYear - 1 : startYear;
   
-      // Calculate the financial year string in the format 'YYYYYYYY'
-      // The financial year string is a combination of the last two digits of the start year and the last two digits of the next year.
-      // For example, if the financial year started in 2023, the financial year string will be '2324'.
       const calculatedFnYr = `${financialYearStart.toString().slice(-2)}${(financialYearStart + 1).toString().slice(-2)}`;
   
       // Check if the selected financial year matches the calculated financial year
@@ -217,7 +209,6 @@ export class CreditNoteRegisterReportComponent implements OnInit {
     }
      //#region save
   async save() {
-    debugger;
     this.loading = true;
     try {
       this.ReportingBranches = [];
@@ -270,7 +261,7 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       const stateData = {
         data: result,
         formTitle: 'CreditNote Register Report',
-        csvFileName: this.csvFileName
+        csvFileName: 'CreditNoteRegisterReport'
       };
       // Convert the state data to a JSON string and encode it
       const stateString = encodeURIComponent(JSON.stringify(stateData));
@@ -296,5 +287,20 @@ export class CreditNoteRegisterReportComponent implements OnInit {
   
       this.CreditNoteReportRegisterForm.controls["start"].setValue(minDate);
       this.CreditNoteReportRegisterForm.controls["end"].setValue(maxDate);
+    }
+    toggleSelectAll(argData: any) {
+      let fieldName = argData.field.name;
+      let autocompleteSupport = argData.field.additionalData.support;
+      let isSelectAll = argData.eventArgs;
+      const index = this.jsonControlArray.findIndex(
+        (obj) => obj.name === fieldName
+      );
+      this.jsonControlArray[index].filterOptions
+        .pipe(take(1), takeUntil(this._onDestroy))
+        .subscribe((val) => {
+          this.CreditNoteReportRegisterForm.controls[autocompleteSupport].patchValue(
+            isSelectAll ? val : []
+          );
+        });
     }
 }

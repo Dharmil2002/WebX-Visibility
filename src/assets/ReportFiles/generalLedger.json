@@ -17,9 +17,7 @@
     },
     {
         "FieldName": "eDT",
-        "Caption": "Date",
-        "DataType": "Date",
-        "Format": "DD MMM YYYY"
+        "Caption": "Date"
     },
     {
         "FieldName": "dR",

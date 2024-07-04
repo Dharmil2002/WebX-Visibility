@@ -557,6 +557,7 @@ export class BalancePaymentComponent implements OnInit {
       TDSAmount.setValidators([Validators.required]);
       TDSAmount.updateValueAndValidity();
       this.getTDSSectionDropdown();
+      this.CalculatePaymentAmount();
 
     } else {
       this.jsonControlVendorBalanceTaxationTDSFilterArray = this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter((x) => x.name == "TDSExempted");
@@ -570,6 +571,8 @@ export class BalancePaymentComponent implements OnInit {
       TDSAmount.setValue("");
       TDSAmount.clearValidators();
       TDSAmount.updateValueAndValidity();
+
+      this.CalculatePaymentAmount();
     }
   }
   toggleVendorGSTRegistered() {
@@ -593,24 +596,33 @@ export class BalancePaymentComponent implements OnInit {
 
       this.getSACcodeDropdown();
       this.getStateDropdown();
-
+      this.CalculatePaymentAmount();
 
     } else {
       // this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter((x) => x.name == "VendorGSTRegistered");
-      const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
-      GSTSACcode.setValue("");
-      GSTSACcode.clearValidators();
-      GSTSACcode.updateValueAndValidity();
+      this.VendorBalanceTaxationGSTFilterForm.reset();
 
-      const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
-      Billbookingstate.setValue("");
-      Billbookingstate.clearValidators();
-      Billbookingstate.updateValueAndValidity();
+      // Clear validators and update value and validity for each form control
+      Object.keys(this.VendorBalanceTaxationGSTFilterForm.controls).forEach(key => {
+        const control = this.VendorBalanceTaxationGSTFilterForm.get(key);
+        control.clearValidators();
+        control.updateValueAndValidity();
+      });
+      // const GSTSACcode = this.VendorBalanceTaxationGSTFilterForm.get("GSTSACcode");
+      // GSTSACcode.setValue("");
+      // GSTSACcode.clearValidators();
+      // GSTSACcode.updateValueAndValidity();
 
-      const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
-      Vendorbillstate.setValue("");
-      Vendorbillstate.clearValidators();
-      Vendorbillstate.updateValueAndValidity();
+      // const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.get("Billbookingstate");
+      // Billbookingstate.setValue("");
+      // Billbookingstate.clearValidators();
+      // Billbookingstate.updateValueAndValidity();
+
+      // const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.get("Vendorbillstate");
+      // Vendorbillstate.setValue("");
+      // Vendorbillstate.clearValidators();
+      // Vendorbillstate.updateValueAndValidity();
+      this.CalculatePaymentAmount();
     }
   }
   TDSSectionFieldChanged() {
@@ -620,8 +632,8 @@ export class BalancePaymentComponent implements OnInit {
           x.value ==
           this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
       );
-      const TDSrate = FindData.rOTHER.toFixed(2);
-      const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
+      const TDSrate = FindData?.rOTHER?.toFixed(2) || 0;
+      const TDSamount = ((TDSrate * this.BalancePending) / 100 || 0).toFixed(2);
       this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
         TDSrate
       );

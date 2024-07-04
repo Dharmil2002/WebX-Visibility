@@ -13,9 +13,9 @@ import { ManifestGeneratedComponent } from '../manifest-generated/manifest-gener
 import { ManifestService } from 'src/app/Utility/module/operation/mf-service/mf-service';
 import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 import { Manifest } from 'src/app/Models/vehicle-loading/manifest';
-import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipment-details.component';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -135,6 +135,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     private mfService: ManifestService,
     private definition: Manifest,
     private dialog: MatDialog,
+    private depsService:DepsService,
     public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
@@ -179,7 +180,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   checkDocketRules() {
     this.isScan = this.rules.find(x => x.rULEID == "SCAN" && x.aCTIVE)?.vAL == "Y" ? true : false;
   }
-
   /*below function is call when the partial */
   async getLoadingSheet() {
     const reqBody = {
@@ -224,6 +224,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "cWeight": parseFloat(element?.cWT) || 0,
             "cft": parseFloat(element?.vCFT) || 0,
             "Leg": lsDetails?.lEG.replace(" ", "") || '',
+            "extraDetails":element,
+            "Type":"Manifest",
             "actions": ["Edit"]
           };
           if (this.isScan == true) {
@@ -374,18 +376,19 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.shipmentsEdit(event)
   }
   shipmentsEdit(event) {
-    const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
-    const data = this.loadingTableData.find(x => x.Shipment === shipment && x.Suffix === suffix);
+    const data = this.loadingTableData.find(x => x.Shipment === event.shipment && x.Suffix === event.suffix);
     if (data) {
-      const loadedPkg = parseInt(noofPkts, 10);
-      const loadedWT = parseFloat(actualWeight).toFixed(2);
-      const loadedCWT = parseFloat(ctWeight).toFixed(2);
+      const loadedPkg = parseInt(event.noofPkts, 10);
+      const loadedWT = parseFloat(event.actualWeight).toFixed(2);
+      const loadedCWT = parseFloat(event.ctWeight).toFixed(2);
       const pendPkg = data.Packages - loadedPkg;
-      const pendWt = (data.weight - parseFloat(actualWeight)).toFixed(2);
-      const pendCwt = (data.cWeight - parseFloat(ctWeight)).toFixed(2);
-
+      const pendWt = (data.weight - parseFloat(event.actualWeight)).toFixed(2);
+      const pendCwt = (data.cWeight - parseFloat(event.ctWeight)).toFixed(2);
+      const depsType = event.depsOptions||'';
+      const isDeps = event.isDeps||'';
+      const extra=event;
       // Update the data object directly
-      Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCwt });
+      Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCwt,depsType,extra,isDeps });
 
       this.cdr.detectChanges();
       this.kpiData(data);
@@ -447,10 +450,42 @@ export class VehicleUpdateUploadComponent implements OnInit {
       }
       this.isDisble=true;
       let notSelectedData = this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+      const requestBody=await this.depsService.fieldArrivalDeps(selectedData); 
       const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData, this.isScan, notSelectedData);
       menifest = await this.getMFGrouping(fieldMapping.filteredMfDetails);
       resMf = await this.mfService.createMfDetails(fieldMapping);
       this.shipingDataTable = selectedData
+      if(requestBody){
+        const res = await this.depsService.createDeps(requestBody);
+        try {
+          // Check if depsHeader exists and is an array
+          if (res.data.data.depsHeader && Array.isArray(res.data.data.depsHeader)) {
+            // Extracting dEPSNO values into an array
+            const depNos = res.data.data.depsHeader.map(header => header.dEPSNO);
+            // Joining array elements into a comma-separated string
+            const commaSeparatedDepNos = depNos.join(', ');
+            if (res) {
+              Swal.fire({
+                icon: "success",
+                title: "DEPS Generated Successfully",
+                text: `DEPS Number is ${commaSeparatedDepNos}`,
+                showConfirmButton: true,
+              })
+            }
+          } else {
+            throw new Error('depsHeader is not an array or does not exist.');
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "DEPS Generation Failed",
+            text: "There was an issue with DEPS generation. Please try again later.",
+            showConfirmButton: true,
+          });
+          
+        }
+      
+      }
     }
 
     if (resMf) {

@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { debug } from 'console';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { thcreportService } from 'src/app/Utility/module/reports/thc-register-service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { thcReportControl } from 'src/assets/FormControls/Reports/thc-register/thc-register';
 import Swal from 'sweetalert2';
 
@@ -41,7 +43,9 @@ export class ThcRegisterReportComponent implements OnInit {
     private filter: FilterUtils,
     private locationService: LocationService,
     private thcreportservice: thcreportService,
-    public snackBarUtilityService: SnackBarUtilityService)
+    private storage: StorageService,
+    public snackBarUtilityService: SnackBarUtilityService,
+  )
     {this.initializeFormControl() }
 
   ngOnInit(): void {
@@ -59,12 +63,13 @@ export class ThcRegisterReportComponent implements OnInit {
   }
   async getDropdownData() {
     const locationList = await this.locationService.locationFromApi();
-    this.filter.Filter(this.jsonthcregisterFormArray, this.thcregisterTableForm, locationList, "Location", false);
+    this.filter.Filter(this.jsonthcregisterFormArray, this.thcregisterTableForm, locationList, "Location", true);
   }
   initializeFormControl() {
     this.thcregisterFormControl = new thcReportControl();
     this.jsonthcregisterFormArray = this.thcregisterFormControl.thcReportControlArray;
     this.thcregisterTableForm = formGroupBuilder(this.fb, [this.jsonthcregisterFormArray]);
+    this.thcregisterTableForm.controls["DocumentStatus"].setValue(0);
   }
   async save() {
     try
@@ -74,10 +79,22 @@ export class ThcRegisterReportComponent implements OnInit {
     const THCNo = this.thcregisterTableForm.value.DocumentNo;
     const THCArray = THCNo ? THCNo.includes(',') ? THCNo.split(',') : [THCNo] : [];
     const DocumentStatus = this.thcregisterTableForm.value.DocumentStatus;
+    //.map(m => m.value);
     const ReportType = this.thcregisterTableForm.value.ReportType;
-    const Location = this.thcregisterTableForm.value.Location.value;
+    const Location = this.thcregisterTableForm.value.Location.value || this.storage.branch;
+
+    let cumulativeLocation = [];
+    if(ReportType == "C") {
+      let locations = await this.locationService.findAllDescendants(Location);
+
+      cumulativeLocation = locations.filter(f => f.activeFlag == true).map(x => x.locCode);
+      if (cumulativeLocation.length == 0) { cumulativeLocation.push(Location) }
+    } else {
+      cumulativeLocation.push(Location);
+    } 
+
     const reqBody = {
-      startValue, endValue, THCArray, DocumentStatus, ReportType, Location
+      startValue, endValue, THCArray, DocumentStatus, Location: cumulativeLocation
     }
     const result = await this.thcreportservice.getthcReportDetail(reqBody)
       this.columns = result.grid.columns;

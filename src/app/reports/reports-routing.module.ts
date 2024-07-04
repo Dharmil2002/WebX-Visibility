@@ -31,7 +31,6 @@ import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSh
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
-
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
 import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component'
@@ -44,6 +43,10 @@ import { BalanceSheetViewDetailsComponent } from './Account Report/Components/Ba
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
 import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-but-not-collected-register-report/to-pay-paid-but-not-collected-register-report.component';
+import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
+import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
+import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -87,6 +90,11 @@ const routes: Routes = [
   { path: "debit-note-register-report", component: DebitNoteRegisterReportComponent },
   { path: "advice-register-report", component: AdviceRegisterComponent },
   { path: "to-pay-paid-but-not-collected-register-report", component: ToPayPaidButNotCollectedRegisterReportComponent },
+  { path: "gcn-flow-report", component: GcnFlowReportComponent },
+  { path: "driver-status-register-report", component: DriverStatusRegisterComponent },
+  { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
+ 
+
 ];
 
 @NgModule({

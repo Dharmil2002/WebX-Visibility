@@ -124,7 +124,7 @@ export class ProductServicesComponent implements OnInit {
   async ServicesTypeDropdown() {
     let req = {
       companyCode: this.companyCode,
-      filter: { companyCode: this.companyCode },
+      filter: {},
       collectionName: "products",
     };
     const Res = await this.masterService

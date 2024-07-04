@@ -296,6 +296,7 @@ export class ThcGenerationComponent implements OnInit {
   rules: any[] = [];
   connectedLoc: boolean = false;
   ChargeAllow: any[] = [];
+  isVia: any;
   //End
   constructor(
     private fb: UntypedFormBuilder,
@@ -399,7 +400,6 @@ export class ThcGenerationComponent implements OnInit {
       this.isView || false,
       this.prqFlag || false
     );
-
     this.jsonVehicleControl = loadingControlForm.getVehicleDetails();
     const thcFormControls = loadingControlForm.getThcFormControls();
     const rakeDetails = loadingControlForm.getRakeDetailsControls();
@@ -460,6 +460,7 @@ export class ThcGenerationComponent implements OnInit {
   /*End*/
   //#region GetRules
   async getRules() {
+    debugger
     const filter = {
       cID: this.storage.companyCode,
       mODULE: { "D$in": ["CNOTE", "THC"] },
@@ -1058,6 +1059,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*Below function is for getting docket details using thc*/
   async getDocketsForTHC() {
+    const tripDate=this.thcTableForm.controls['tripDate'].value;
     const pRQNO = this.thcTableForm.controls['prqNo'].value;
     const fromCity = this.thcTableForm.controls['fromCity'].value?.value || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.value || ''
@@ -1065,7 +1067,7 @@ export class ThcGenerationComponent implements OnInit {
     this.tableData = [];
 
     //this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, fromCity.toUpperCase(), null, null, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
-    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT, this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
+    this.allShipment = await this.thcService.getShipmentFiltered(pRQNO, this.DocketFilterData.fCT, this.DocketFilterData.tCT, this.DocketFilterData.cCT,  this.DocketFilterData.sDT, this.DocketFilterData.eDT, this.DocketsContainersWise);
     const filteredShipments = this.allShipment;
     const addEditAction = (shipments) => {
       return shipments.map((shipment) => {
@@ -1143,7 +1145,6 @@ export class ThcGenerationComponent implements OnInit {
   /*end*/
   /* below function was the call when */
   async getLocBasedOnCity() {
-
     const fromCity = this.thcTableForm.controls['fromCity'].value?.ct || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.ct || ''
     const fromTo = `${fromCity}-${toCity}`
@@ -1448,6 +1449,7 @@ export class ThcGenerationComponent implements OnInit {
 
   /*below function called when the tranMode Dropdown has any event occur*/
   transModeChanged() {
+    debugger
     const transMode = this.thcTableForm.getRawValue().transMode;
     const transModeDetail = this.products.find((x) => x.value == transMode);
     const roadControl = ['vehicle'];
@@ -2246,8 +2248,9 @@ export class ThcGenerationComponent implements OnInit {
       const locData = await this.thcService.getLocationDetail(branch);
       // Determine if the destination has been arrived at
       const toCityValue = this.thcTableForm.getRawValue();
-      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase();
-      if (!isArrivedDel) {
+      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase() || locData?.mappedCity.includes(toCityValue.toCity);
+       const isVia=toCityValue.via.includes(locData?.locCity?.toLowerCase()) ||  locData?.mappedCity.some(cityItem => toCityValue.via.includes(cityItem));
+      if (!isArrivedDel || isVia) {
         if (this.tableData.length == podDetails.length) {
           Swal.fire({
             icon: "error",
@@ -2296,7 +2299,7 @@ export class ThcGenerationComponent implements OnInit {
         const res: any = await this.controlPanel.getModuleRules(filter);
         if (res.length > 0) {
           this.Request = {
-            isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+            isInterBranchControl: res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false,
             thcNo: this.thcTableForm.get("tripId").value,
             thc: {
               collation: "thc_summary",
@@ -2450,10 +2453,10 @@ export class ThcGenerationComponent implements OnInit {
           }
 
           let thcNumber = resThc.data?.mainData?.ops[0].docNo;
-          let voucherNumber = result.data.ops[0].vNO;
           let htmlContent;
           if (this.accountingOnThc) {
-            htmlContent = "THC Number is " + thcNumber + "<br>Voucher Number is " + voucherNumber;  
+            let voucherNumber = result.data.ops[0].vNO; 
+            htmlContent = "THC Number is " + thcNumber + "<br>Voucher Number is " + voucherNumber;
           } else {
             htmlContent = "THC Number is " + thcNumber;
           }
@@ -2556,7 +2559,7 @@ export class ThcGenerationComponent implements OnInit {
         preperedFor: "Vendor",
         partyCode: "" + data?.Vendor_Code || "",
         partyName: data?.Vendor_Name || "",
-        partyState: "H" || "",
+        partyState: "",
         entryBy: this.storage.userName,
         entryDate: new Date(),
         panNo: data?.Vendor_pAN || "",

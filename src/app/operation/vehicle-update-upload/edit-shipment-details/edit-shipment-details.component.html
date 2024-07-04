@@ -2,7 +2,7 @@
     <!-- Title -->
     <div class="paddingdiv">
             <form [formGroup]="EditShipmentForm">
-                <app-form-webxpress [form]="EditShipmentForm" [FormTitle]="'Shipment Edit'" [formData]="jsonControlArray"
+                <app-form-webxpress [form]="EditShipmentForm"[className]="className" [FormTitle]="'Shipment Edit'" [formData]="jsonControlArray"
                   (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="false"
                   (callFunction)="functionCaller($event)">
                 </app-form-webxpress>

@@ -31,7 +31,7 @@ export class thcReportControl {
                     displaywith: "",
                     Validations: [],
                     additionalData: {
-                        showNameAndValue: false,
+                        showNameAndValue: true,
                     },
     
                     generatecontrol: true, disable: false
@@ -54,11 +54,11 @@ export class thcReportControl {
                     placeholder: '',
                     type: 'Staticdropdown',
                     value: [
+                        { value: 0, name: "All" },
                         { value: 1, name: "Generated" },
                         { value: 3, name: "Update" },
                         { value: 4, name: "Closed" },
-                        { value: 9, name: "Cancelled" },
-                        { value: 0, name: "All" },
+                        { value: 9, name: "Cancelled" },                        
                     ],
                     Validations: [],
                     generatecontrol: true, disable: false

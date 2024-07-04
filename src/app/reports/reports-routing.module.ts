@@ -42,6 +42,7 @@ import { DebitNoteRegisterReportComponent } from './debit-note-register-report/d
 import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
+import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-but-not-collected-register-report/to-pay-paid-but-not-collected-register-report.component';
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
@@ -88,10 +89,12 @@ const routes: Routes = [
   { path: "credit-note-register-report", component: CreditNoteRegisterReportComponent },
   { path: "debit-note-register-report", component: DebitNoteRegisterReportComponent },
   { path: "advice-register-report", component: AdviceRegisterComponent },
+  { path: "to-pay-paid-but-not-collected-register-report", component: ToPayPaidButNotCollectedRegisterReportComponent },
   { path: "gcn-flow-report", component: GcnFlowReportComponent },
   { path: "driver-status-register-report", component: DriverStatusRegisterComponent },
   { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
  
+
 ];
 
 @NgModule({

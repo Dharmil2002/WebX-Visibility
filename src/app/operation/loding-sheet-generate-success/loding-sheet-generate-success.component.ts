@@ -1,4 +1,4 @@
-import { Component, OnInit,Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -10,8 +10,8 @@ import { StorageService } from 'src/app/core/service/storage.service';
   templateUrl: './loding-sheet-generate-success.component.html'
 })
 export class LodingSheetGenerateSuccessComponent implements OnInit {
-  tableload=false;
-  toggleArray=[]  
+  tableload = false;
+  toggleArray = []
   csv: any[];
   addAndEditPath: string
   drillDownPath: string
@@ -26,14 +26,14 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
   orgBranch: string = "";
-    //declaring breadscrum
-    breadscrums = [
-      {
-        title: "Loading-Sheet",
-        items: ["Loading"],
-        active: "Loading-Sheet"
-      }
-    ]
+  //declaring breadscrum
+  breadscrums = [
+    {
+      title: "Loading-Sheet",
+      items: ["Loading"],
+      active: "Loading-Sheet"
+    }
+  ]
   columnHeader = {
     "hyperlink": "Loading Sheet",
     "leg": "Leg",
@@ -66,7 +66,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     { Row: 'Action', Path: '', componentDetails: "" }
   ]
   menuItems = [
-    { label: 'Print',componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+    { label: 'Print', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
 
@@ -80,16 +80,16 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     private CnoteService: CnoteService,
     private storage: StorageService,
     public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,
-    public Route:Router 
-  ) {  
+    public Route: Router
+  ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
-    
-    console.log('this.data',this.data)
-    this.csv=this.data;
+
+    console.log('this.data', this.data)
+    this.csv = this.data;
     Swal.fire({
       icon: "success",
-      title: "Successfull",
+      title: "Successful",
       text: `Loading Sheet generated Successfully`,//
       showConfirmButton: true,
     })
@@ -97,25 +97,25 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  close(){
+  close() {
     this.dialogRef.close(this.csv);
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;
-    console.log('functionName' ,functionName)
+    console.log('functionName', functionName)
     try {
       this[functionName]($event);
     } catch (error) {
       console.log("failed");
     }
   }
-  viewLoadingSheet(event){
-      const req = {
-        DocNo: event.data?.LoadingSheet,
-        templateName: "LS",
-        PartyField:""
-      };
-      const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
-      window.open(url, '', 'width=1000,height=800');
+  viewLoadingSheet(event) {
+    const req = {
+      DocNo: event.data?.LoadingSheet,
+      templateName: "LS",
+      PartyField: ""
+    };
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    window.open(url, '', 'width=1000,height=800');
   }
 }

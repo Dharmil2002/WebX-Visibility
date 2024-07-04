@@ -271,7 +271,6 @@ export class DepsService {
     }
 
     fieldArrivalDeps(docketsList) {
-        debugger
         const docketsDetails = Array.isArray(docketsList) ? docketsList : [docketsList];
         let depsHeader = []
         let depsDetails = []

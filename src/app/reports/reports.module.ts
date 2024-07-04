@@ -80,9 +80,11 @@ import { DebitNoteRegisterReportComponent } from './debit-note-register-report/d
 import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
 import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
 import { AdviceRegisterComponent } from './advice-register/advice-register.component';
+import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-but-not-collected-register-report/to-pay-paid-but-not-collected-register-report.component';
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+ 
 @NgModule({
   imports: [
     CommonModule,
@@ -169,6 +171,7 @@ import { OpeningClosingStockReportComponent } from './opening-closing-stock-repo
     BalanceSheetViewDetailsComponent,
     ProfitAndLossViewDetailsVouchersListComponent,
     AdviceRegisterComponent,
+    ToPayPaidButNotCollectedRegisterReportComponent,
     GcnFlowReportComponent,
     DriverStatusRegisterComponent,
     OpeningClosingStockReportComponent

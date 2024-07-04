@@ -105,6 +105,8 @@ export class ArrivalVehicleService {
                       "sFX": { "D$ifNull": ["$md.sFX", null] },
                       "dkt": { "D$ifNull": ["$mfHeader.dKTS", null] },
                       "lEG": { "D$ifNull": ["$mfHeader.leg", null] },
+                      "lORGN": { "D$ifNull": ["$mfHeader.oRGN", null] },
+                      "lDEST": { "D$ifNull": ["$mfHeader.dEST", null] },
                       "oRG": { "D$ifNull": ["$md.oRGN", null] },
                       "dEST": { "D$ifNull": ["$md.dEST", null] },
                       "wT": { "D$ifNull": ["$md.lDWT", null] },

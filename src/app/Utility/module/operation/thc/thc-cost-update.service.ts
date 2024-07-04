@@ -164,90 +164,90 @@ export class ThcCostUpdateService {
         thcs.map(async (thc) => {
             await this.calculateCosts(request, thc);
 
-             /*
-            const tripCost = thc.tOTAMT;
+            /*
+           const tripCost = thc.tOTAMT;
 
-            //Need to calculate find total charge weight, currently its done on loaded weight (actual weight) because charge weight is not available
-            const totalWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
-            const totalCWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDCWT || m.cWT || m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
-            let aCPKG = tripCost / totalWT;
-            let cCPKG = tripCost / totalCWT;
+           //Need to calculate find total charge weight, currently its done on loaded weight (actual weight) because charge weight is not available
+           const totalWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
+           const totalCWT = thc.mf_header.map((x) => x.mf_dockets.map(m => m.lDCWT || m.cWT || m.lDWT || m.wT)).flat().reduce((acc, curr) => acc + curr, 0);
+           let aCPKG = tripCost / totalWT;
+           let cCPKG = tripCost / totalCWT;
 
-            let batchOperations = [];
-            thc.mf_header.map((mf) => {
-                mf.mf_dockets.map((mfd) => {
-                    const aCTCOST = ConvertToNumber((mfd.lDWT || mfd.wT) * aCPKG, 3);
-                    const cHGCOST = ConvertToNumber((mfd.lDCWT || mfd.cWT || mfd.lDWT || mfd.wT) * cCPKG, 3);
+           let batchOperations = [];
+           thc.mf_header.map((mf) => {
+               mf.mf_dockets.map((mfd) => {
+                   const aCTCOST = ConvertToNumber((mfd.lDWT || mfd.wT) * aCPKG, 3);
+                   const cHGCOST = ConvertToNumber((mfd.lDCWT || mfd.cWT || mfd.lDWT || mfd.wT) * cCPKG, 3);
 
-                    mfd.aCTCOST = aCTCOST;
-                    mfd.cHGCOST = cHGCOST;
-                });
-            });
+                   mfd.aCTCOST = aCTCOST;
+                   mfd.cHGCOST = cHGCOST;
+               });
+           });
 
-            const tACTCOST = thc.mf_header.map((x) => x.mf_dockets.map(m => m.aCTCOST || 0)).flat().reduce((acc, curr) => acc + curr, 0);
-            const tCHGCOST = thc.mf_header.map((x) => x.mf_dockets.map(m => m.cHGCOST || 0)).flat().reduce((acc, curr) => acc + curr, 0);
+           const tACTCOST = thc.mf_header.map((x) => x.mf_dockets.map(m => m.aCTCOST || 0)).flat().reduce((acc, curr) => acc + curr, 0);
+           const tCHGCOST = thc.mf_header.map((x) => x.mf_dockets.map(m => m.cHGCOST || 0)).flat().reduce((acc, curr) => acc + curr, 0);
 
-            let aDiff = tripCost - tACTCOST;
-            let cDiff = tripCost - tCHGCOST;
+           let aDiff = tripCost - tACTCOST;
+           let cDiff = tripCost - tCHGCOST;
 
-            thc.mf_header[0].mf_dockets[0].aCTCOST += aDiff;
-            thc.mf_header[0].mf_dockets[0].cHGCOST += cDiff;
+           thc.mf_header[0].mf_dockets[0].aCTCOST += aDiff;
+           thc.mf_header[0].mf_dockets[0].cHGCOST += cDiff;
 
-            thc.mf_header.map((mf) => {
-                mf.mf_dockets.map((mfd) => {
-                    batchOperations.push({
-                        filter: { _id: mfd._id },
-                        update: {
-                            aCTCOST: mfd.aCTCOST,
-                            cHGCOST: mfd.cHGCOST
-                        }
-                    });
-                });
-            });
+           thc.mf_header.map((mf) => {
+               mf.mf_dockets.map((mfd) => {
+                   batchOperations.push({
+                       filter: { _id: mfd._id },
+                       update: {
+                           aCTCOST: mfd.aCTCOST,
+                           cHGCOST: mfd.cHGCOST
+                       }
+                   });
+               });
+           });
 
-            //UpdateBulk
-            let chunks = chunkArray(batchOperations, 100);
-            await Promise.all(
-                chunks.map(async (operations) => {
-                    const updateRequest = {
-                        companyCode: this.storage.companyCode,
-                        collectionName: request.mfdetails.collation,
-                        data: operations
-                    };
-                    return firstValueFrom(this.operationService.operationMongoPut(GenericActions.UpdateBulk, updateRequest));
-                })
-            );
+           //UpdateBulk
+           let chunks = chunkArray(batchOperations, 100);
+           await Promise.all(
+               chunks.map(async (operations) => {
+                   const updateRequest = {
+                       companyCode: this.storage.companyCode,
+                       collectionName: request.mfdetails.collation,
+                       data: operations
+                   };
+                   return firstValueFrom(this.operationService.operationMongoPut(GenericActions.UpdateBulk, updateRequest));
+               })
+           );
 
-            //if Inter Branch Control is enabled then need to calculate origin wise cost and do account posting            
-            if (request.isInterBranchControl) {
-                const originWiseCost = thc.mf_header.map(x => {
-                    return x.mf_dockets.map(m => ({
-                        oRGN: m.docket.oRGN,
-                        aCTCOST: m.aCTCOST || 0,
-                        cHGCOST: m.cHGCOST || 0
-                    })).flat();
-                }).flat();
+           //if Inter Branch Control is enabled then need to calculate origin wise cost and do account posting            
+           if (request.isInterBranchControl) {
+               const originWiseCost = thc.mf_header.map(x => {
+                   return x.mf_dockets.map(m => ({
+                       oRGN: m.docket.oRGN,
+                       aCTCOST: m.aCTCOST || 0,
+                       cHGCOST: m.cHGCOST || 0
+                   })).flat();
+               }).flat();
 
-                const sumByOrigin = originWiseCost.reduce((acc: any, curr: any) => {
-                    const { oRGN, aCTCOST, cHGCOST } = curr;
-                    if (!acc[oRGN]) {
-                        acc[oRGN] = { aCTCOST: 0, cHGCOST: 0 };
-                    }
-                    acc[oRGN].aCTCOST += (aCTCOST || 0);
-                    acc[oRGN].cHGCOST += (cHGCOST || 0);
-                    return acc;
-                }, {});
+               const sumByOrigin = originWiseCost.reduce((acc: any, curr: any) => {
+                   const { oRGN, aCTCOST, cHGCOST } = curr;
+                   if (!acc[oRGN]) {
+                       acc[oRGN] = { aCTCOST: 0, cHGCOST: 0 };
+                   }
+                   acc[oRGN].aCTCOST += (aCTCOST || 0);
+                   acc[oRGN].cHGCOST += (cHGCOST || 0);
+                   return acc;
+               }, {});
 
-                const ChargeCost = Object.entries(sumByOrigin).map(([OriginBranch, value]: [string, any]) => ({
-                    OriginBranch,
-                    ChargeCost: value.cHGCOST
-                }));
+               const ChargeCost = Object.entries(sumByOrigin).map(([OriginBranch, value]: [string, any]) => ({
+                   OriginBranch,
+                   ChargeCost: value.cHGCOST
+               }));
 
-                this.AccountPosting(thc, ChargeCost);
-            }
-            */
+               this.AccountPosting(thc, ChargeCost);
+           }
+           */
         });
-       
+
     }
 
     async calculateCosts(request, thc) {
@@ -263,25 +263,25 @@ export class ThcCostUpdateService {
             await this.processInterBranchControl(thc);
         }
     }
-    
+
     calculateWeightsAndCost(thc) {
         const tripCost = thc.tOTAMT;
         const totalWT = this.calculateTotal(thc.mf_header, m => m.lDWT || m.wT);
         const totalCWT = this.calculateTotal(thc.mf_header, m => m.lDCWT || m.cWT || m.lDWT || m.wT);
         return { tripCost, totalWT, totalCWT };
     }
-    
+
     calculateTotal(headers, weightSelector) {
         return headers.map(x => x.mf_dockets.map(weightSelector)).flat().reduce((acc, curr) => acc + curr, 0);
     }
-    
+
     calculateCostPerKg(tripCost, totalWT, totalCWT) {
         return {
             aCPKG: tripCost / totalWT,
             cCPKG: tripCost / totalCWT
         };
     }
-    
+
     processDockets(thc, aCPKG, cCPKG) {
         let batchOperations = [];
         thc.mf_header.map(mf => {
@@ -289,37 +289,37 @@ export class ThcCostUpdateService {
                 const { aCTCOST, cHGCOST } = this.calculateDocketCosts(mfd, aCPKG, cCPKG);
                 mfd.aCTCOST = aCTCOST;
                 mfd.cHGCOST = cHGCOST;
-    
+
                 batchOperations.push({
                     filter: { _id: mfd._id },
                     update: { aCTCOST, cHGCOST }
                 });
             });
         });
-    
+
         // Compensate for any rounding differences in the first docket
         this.compensateRounding(thc, batchOperations[0]);
-    
+
         return batchOperations;
     }
-    
+
     calculateDocketCosts(mfd, aCPKG, cCPKG) {
         const aCTCOST = ConvertToNumber((mfd.lDWT || mfd.wT) * aCPKG, 3);
         const cHGCOST = ConvertToNumber((mfd.lDCWT || mfd.cWT || mfd.lDWT || mfd.wT) * cCPKG, 3);
         return { aCTCOST, cHGCOST };
     }
-    
+
     compensateRounding(thc, firstOperation) {
         const tACTCOST = this.calculateTotal(thc.mf_header, m => m.aCTCOST || 0);
         const tCHGCOST = this.calculateTotal(thc.mf_header, m => m.cHGCOST || 0);
-    
+
         const aDiff = thc.tOTAMT - tACTCOST;
         const cDiff = thc.tOTAMT - tCHGCOST;
-    
+
         firstOperation.update.aCTCOST += aDiff;
         firstOperation.update.cHGCOST += cDiff;
     }
-    
+
     async updateBulk(request, operations) {
         let chunks = chunkArray(operations, 100);
         await Promise.all(
@@ -333,13 +333,13 @@ export class ThcCostUpdateService {
             })
         );
     }
-    
+
     async processInterBranchControl(thc) {
         const originWiseCost = this.calculateOriginWiseCost(thc);
         const ChargeCost = this.aggregateCostsByOrigin(originWiseCost);
         await this.AccountPosting(thc, ChargeCost);
     }
-    
+
     calculateOriginWiseCost(thc) {
         return thc.mf_header.map(x => x.mf_dockets.map(m => ({
             oRGN: m.docket.oRGN,
@@ -347,7 +347,7 @@ export class ThcCostUpdateService {
             cHGCOST: m.cHGCOST || 0
         }))).flat();
     }
-    
+
     aggregateCostsByOrigin(costs) {
         return costs.reduce((acc, { oRGN, aCTCOST, cHGCOST }) => {
             if (!acc[oRGN]) {
@@ -363,9 +363,9 @@ export class ThcCostUpdateService {
         try {
             const Response = [];
 
-            Object.keys(ChargeCost).forEach(async (key) => { 
+            Object.keys(ChargeCost).forEach(async (key) => {
                 const data = ChargeCost[key];
-                const result = await firstValueFrom(this.createJournalRequest(THCInfo, { OriginBranch:key, ChargeCost: data.cHGCOST }));
+                const result = await firstValueFrom(this.createJournalRequest(THCInfo, { OriginBranch: key, ChargeCost: data.cHGCOST }));
 
                 const ResultObject = {
                     THCNo: result.data.ops[0].docNo,
@@ -522,8 +522,9 @@ export class ThcCostUpdateService {
             narration: `when THC No ${THCNo} Is Arrived`
         });
         const Result = [];
-        Result.push(createVoucher(ledgerInfo['LIA003004'].LeadgerCode,
-            ledgerInfo['LIA003004'].LeadgerName, ledgerInfo['LIA003004'].LeadgerCategory, 0, ChargeCost, THCNo));
+        // Made Changes For WT-928 Given by Upen Sir LIA003004 to EXP001003
+        Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode,
+            ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, 0, ChargeCost, THCNo));
         Result.push(createVoucher(ledgerInfo['EXP001003'].LeadgerCode,
             ledgerInfo['EXP001003'].LeadgerName, ledgerInfo['EXP001003'].LeadgerCategory, ChargeCost, 0, THCNo));
 

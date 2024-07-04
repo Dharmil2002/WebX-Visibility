@@ -17,7 +17,6 @@ import Swal from 'sweetalert2';
 import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 import _ from 'lodash';
 
-
 @Component({
   selector: 'app-to-pay-paid-but-not-collected-register-report',
   templateUrl: './to-pay-paid-but-not-collected-register-report.component.html'
@@ -25,27 +24,19 @@ import _ from 'lodash';
 export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
   breadScrums = [
     {
-      title: "To Pay/Paid But Not Collected Register Report",
+      title: "Pending Collection - Paid /Topay Report",
       items: ["Home"],
-      active: "To Pay/Paid But Not Collected Register Report",
+      active: "Pending Collection - Paid /Topay Report",
     },
   ];
   jsonControlFormArray: any
-  formTitle = "To Pay/Paid But Not Collected Register Data"
-  csvFileName: string; // name of the csv file, when data is downloaded
-  source: any[] = []; // Array to hold data
-  columns = []; // Array to hold columns
-  paging: any;
-  sorting: any;
-  searching: any;
-  columnMenu: any;
-  theme: "MATERIAL"
+  formTitle = "Pending Collection - Paid /Topay Data"
+  csvFileName: string; // name of the csv file, when data is downloaded  
   tableLoad: boolean = false;
   toPayPaidReportForm: UntypedFormGroup;
   protected _onDestroy = new Subject<void>();
   summaryData: any[];
   filterData: any;
-
   dynamicControls = {
     add: false,
     edit: false,
@@ -76,7 +67,7 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
     this.toPayPaidReportForm.controls["start"].setValue(lastweek);
     this.toPayPaidReportForm.controls["end"].setValue(now);
     this.getDropDownList();
-    this.csvFileName = `ToPay_Paid_But_Not_Collected_Register_Report-${moment().format("YYYYMMDD-HHmmss")}`;
+    this.csvFileName = `Pending Collection - Paid /Topay Report -${moment().format("YYYYMMDD-HHmmss")}`;
   }
   //#region to initialize form controls
   initFormControls() {
@@ -168,9 +159,7 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
         const location = ReportingBranches;
 
         this.filterData = { startValue, endValue, location, modeList, service, payBasis };
-
         const data = await this.getReportData(this.filterData);
-        console.log(data);
 
         if (data.length === 0) {
           if (data) {
@@ -184,8 +173,6 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
           return;
         }
         const pivotData = await this.pivotData({ data: data });
-        console.log(pivotData);
-
         this.staticField = pivotData.staticFields;
         this.summaryHeader = pivotData.config.display;
         this.summaryData = pivotData.data;
@@ -205,7 +192,7 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
           error.message
         );
       }
-    }, "To Pay/Paid But Not Collected Register Report Generating Please Wait..!");
+    }, "Pending Collection - Paid /Topay Report Generating Please Wait..!");
   }
   //#endregion
   //#region prepare query to get data
@@ -218,7 +205,8 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       const matchQuery = {
         'D$and': [
           { dKTDT: { 'D$gte': startValue } }, // Start date condition
-          { dKTDT: { 'D$lte': endValue } }, // End date condition
+          { dKTDT: { 'D$lte': endValue } }, // End date condition 
+          { "D$expr": { "D$ne": ["$custHeader.bSTS", 4] } },
           ...(location ? [{ 'dEST': { 'D$in': location } }] : []), // Location condition
           ...(modeList.length > 0 ? [{ 'tRNMOD': { 'D$in': modeList } }] : []), // Mode list condition
           ...(payBasis ? [{ 'pAYTYP': { 'D$in': payBasis } }] : []), // Pay basis condition
@@ -230,16 +218,63 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
         companyCode,
         collectionName,
         filters: [
-          { D$match: matchQuery }, // Apply match query
+
           {
-            "D$group": {
-              "_id": {
-                "pAYTYP": "$pAYTYP",
-                "pAYTYPNM": "$pAYTYPNM",
-                "dEST": "$dEST"
+            D$lookup: {
+              from: "cust_bill_details",
+              localField: "dKTNO",
+              foreignField: "dKTNO",
+              as: "custDetails"
+            }
+          },
+          {
+            D$addFields: {
+              firstBillNo: {
+                D$arrayElemAt: ["$custDetails.bILLNO", 0]
+              }
+            }
+          },
+          {
+            D$lookup: {
+              from: "cust_bill_headers",
+              localField: "firstBillNo",
+              foreignField: "bILLNO",
+              as: "custHeader"
+            }
+          },
+          {
+            D$unwind: "$custHeader"
+          },
+          { D$match: matchQuery }, // Apply match query        
+          {
+            D$group: {
+              _id: {
+                pAYTYP: "$pAYTYP",
+                pAYTYPNM: "$pAYTYPNM",
+                dEST: "$dEST",
+                dKTNO: "$dKTNO"
               },
-              "GCN": { "D$sum": 1 }, // Sum of GCN
-              "tTLAMT": { "D$sum": "$tOTAMT" } // Sum of total amount
+              GCN: {
+                D$sum: 1
+              },
+              tTLAMT: {
+                D$sum: "$custHeader.cOL.bALAMT"
+              }
+            }
+          },
+          {
+            D$group: {
+              _id: {
+                pAYTYP: "$_id.pAYTYP",
+                pAYTYPNM: "$_id.pAYTYPNM",
+                dEST: "$_id.dEST"
+              },
+              GCN: {
+                D$sum: "$GCN"
+              },
+              tTLAMT: {
+                D$sum: "$tTLAMT"
+              }
             }
           },
           {
@@ -401,7 +436,7 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
 
     const grandTotal = {
       LocationCode: "Grand Total",
-      ServiceType: "",
+      ServiceType: " ",
       PAID_GCN: 0,
       PAID_Amount: 0,
       TO_PAY_GCN: 0,
@@ -455,10 +490,10 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
   }
 
   //#endregion
-
+  //#region to call drill down report data
   async downloadcsv(event) {
     if (event.value && event.value > 0) {
-      console.log(event);
+      // console.log(event);
 
       const data = event.data;
       const columnData = event.columnData;
@@ -470,13 +505,13 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       filter.service = data.ServiceType;
 
       if (data.LocationCode && data.LocationCode != "")
-        filter.location = [data.LocationCode];
 
-      console.log(filter);
+        data.LocationCode === "Grand Total" ? filter.location = this.filterData.location :
+          filter.location = [data.LocationCode];
+
       const result = await this.getTOPayPaidRegister(filter);
-      console.log(result);
-      if (!result || (Array.isArray(result) && result.length === 0)) {
 
+      if (!result || (Array.isArray(result) && result.length === 0)) {
         Swal.fire({
           icon: "error",
           title: "No Records Found",
@@ -484,11 +519,11 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
           showConfirmButton: true,
         });
       }
-      
+
       // Prepare the state data to include all necessary properties
       const stateData = {
         data: result,
-        formTitle: 'To Pay/Paid But Not Collected Register Report Data',
+        formTitle: 'Pending Collection - Paid /Topay Report Data',
         csvFileName: this.csvFileName
       };
       // Convert the state data to a JSON string and encode it        
@@ -500,15 +535,14 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       setTimeout(() => {
         Swal.close();
       }, 1000);
-      //console.log(result);
-
-      // this.exportService.exportAsCSV(result, `Stock Register-${data.LocationCode}-${columnData.StockType}-${moment().format("YYYYMMDD-HHmmss")}`, this.detailCSVHeader);
     }
   }
+  //#endregion
   //#region to made query for report and get data
   async getTOPayPaidRegister(data) {
     const { startValue, endValue, location, modeList, payBasis, service } = data;
 
+    // Construct the match query with conditional filters
     const matchQuery = {
       'D$and': [
         { 'dKTDT': { 'D$gte': startValue } },
@@ -523,11 +557,10 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       let resFTL = { data: { data: [], grid: null } };
       let resLTL = { data: { data: [], grid: null } };
 
+      // Fetch data based on the service type
       if (service === " ") {
         resFTL = await this.reportService.fetchReportData("ToPayPaidRegisterFTL", matchQuery);
         resLTL = await this.reportService.fetchReportData("ToPayPaidRegisterLTL", matchQuery);
-        console.log(resFTL.data.data);
-
       }
       if (service === "LTL") {
         resLTL = await this.reportService.fetchReportData("ToPayPaidRegisterLTL", matchQuery);
@@ -537,38 +570,54 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
       }
 
       const combinedData = [...resFTL.data.data, ...resLTL.data.data];
-      const details = combinedData.map((item) => ({
-        ...item,
-        bGNDT: item.bGNDT ? moment(item.bGNDT).format("DD MMM YY HH:mm") : "",
-        dKTDT: item.dKTDT ? moment(item.dKTDT).format("DD MMM YY HH:mm") : "",
-        rCVAMT: item.rCVAMT ? Number(item.rCVAMT).toFixed(2) : "0.00",
-        bLAMT: item.bLAMT ? Number(item.bLAMT).toFixed(2) : "0.00",
-        iNVAMT: item.iNVAMT ? Number(item.iNVAMT).toFixed(2) : "0.00",
-      }));
 
-      const data = this.getDistinctByProperty(details, "dKTNO");
+      // Map and format the combined data
+      const details = combinedData.map((item) => {
+        const billDate = moment(item.bGNDT);
+        const dueDate = moment(new Date());
+        const dUEDAYS = dueDate.diff(billDate, 'days');
+
+        return {
+          ...item,
+          rCVAMT: typeof item.rCVAMT === 'number' ? item.rCVAMT.toFixed(2) : "0.00",
+          dUEDAYS: dUEDAYS ? dUEDAYS : 0,
+          bGNDT: item.bGNDT ? moment(item.bGNDT).format("DD MMM YY HH:mm") : "",
+          dKTDT: item.dKTDT ? moment(item.dKTDT).format("DD MMM YY HH:mm") : "",
+          bLAMT: typeof item.bLAMT === 'number' ? item.bLAMT.toFixed(2) : "0.00",
+          iNVAMT: typeof item.iNVAMT === 'number' ? item.iNVAMT.toFixed(2) : "0.00",
+        };
+      });
+
+      // Remove duplicates based on specific criteria
+      const data = this.getDistinctByProperty(details);
+      // console.log(data);
 
       return {
         data: data,
         grid: resFTL.data.grid || resLTL.data.grid, // Assuming grid structure is the same for both responses
       };
     } catch (error) {
-      console.error("Error fetching report data:", error.message);
-      throw new Error("Failed to fetch ToPayPaidRegister data");
+      console.log("Error fetching report data:", error.message);
     }
   }
+  /**
+   * Removes duplicates from an array of objects based on specific criteria.
+   * 
+   * @param {any[]} arr - The array of objects to process.
+   * @returns {any[]} - The array with unique objects based on the criteria.
+   */
+  getDistinctByProperty(arr: any[]) {
+    const seen = new Set<string>(); // Use Set<string> to track unique dKTNO values
+    const uniqueData = [];
 
-  getDistinctByProperty<T>(arr: T[], prop: keyof T): T[] {
-    const seen = new Set<T[keyof T]>();
-    return arr.reduce((acc: T[], obj: T) => {
-      const value = obj[prop];
-      if (!seen.has(value)) {
-        seen.add(value);
-        acc.push(obj);
+    arr.forEach((obj) => {
+      // Check if rCVAMT is "0.00", bILLNO is not "", and dKTNO hasn't been seen before
+      if (obj.rCVAMT === "0.00" && obj.bILLNO !== "" && !seen.has(obj.dKTNO)) {
+        seen.add(obj.dKTNO);
+        uniqueData.push(obj);
       }
-      return acc;
-    }, []);
+    });
+    return uniqueData;
   }
-
   //#endregion
 }

@@ -1,13 +1,16 @@
-<app-generic-bulk-upload 
-    [title]="'Freight Charge Matrix Bulk Upload'" 
-    [downloadFunction]="Download"
-    [fileName]="'Freight Charge Matrix Upload'" 
-    (closeDialog)="Close()">
+<app-generic-bulk-upload [title]="'Freight Charge Matrix Bulk Upload'" [downloadFunction]="Download"
+    [fileName]="'Freight Charge Matrix Upload'" (closeDialog)="Close()">
     <div class="row">
         <form [formGroup]="fileUploadForm">
             <div class="col">
                 <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
             </div>
         </form>
+    </div>
+    <div *ngIf="Processing" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
 </app-generic-bulk-upload>

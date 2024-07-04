@@ -27,7 +27,7 @@ export class FreightChargeUploadComponent implements OnInit {
   rateTypedata: any;
   arealist: any[];
   transportMode: any;
-
+  Processing: boolean = false
   constructor(
     private fb: UntypedFormBuilder,
     private dialog: MatDialog,
@@ -75,6 +75,7 @@ export class FreightChargeUploadComponent implements OnInit {
     const file = fileList[0];
 
     if (file) {
+      this.Processing = true
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
@@ -246,7 +247,7 @@ export class FreightChargeUploadComponent implements OnInit {
             this.ReValidateData(data, this.existingData);
           }
         });
-
+        this.Processing = false
       });
     }
   }
@@ -397,7 +398,6 @@ export class FreightChargeUploadComponent implements OnInit {
 
       // Format the final data with additional information
       const formattedData = this.formatFreightData(freightChargeData, newId);
-
       if (formattedData.length === 0) {
         // Display success message
         Swal.fire({
@@ -498,8 +498,8 @@ export class FreightChargeUploadComponent implements OnInit {
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
 
     // SET Start Date And End Date
-    processedData.vFDT = moment(element.ValidFromDate, 'DD MMM YY').toDate();
-    processedData.vEDT = moment(element.ValidToDate, 'DD MMM YY').toDate();
+    processedData.vFDT = moment(element.ValidFromDate, 'D/M/YYYY').toDate();
+    processedData.vEDT = moment(element.ValidToDate, 'D/M/YYYY').toDate();
 
     // Set timestamp and user information
     processedData.eNTDT = new Date();

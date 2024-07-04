@@ -1964,7 +1964,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
     let fieldKey = isOrigin ? "fromCity" : "toCity";
-    if(term == "Location") {
+    if (term == "Location") {
       fieldKey = isOrigin ? "origin" : "destination";
     }
     const type = typeMapping[term];
@@ -1977,10 +1977,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;  
+        break;
       case "Location":
-          valueKey = "value";
-          break;   
+        valueKey = "value";
+        break;
       case "City":
         valueKey = "ct";
         break;
@@ -1992,9 +1992,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     const controls = this.consignmentForm.controls;
     let value;
-    if(fieldKey == "origin") {
+    if (fieldKey == "origin") {
       value = controls[fieldKey].value;
-    } else { 
+    } else {
       value = controls[fieldKey].value[valueKey];
     }
     if (value) {

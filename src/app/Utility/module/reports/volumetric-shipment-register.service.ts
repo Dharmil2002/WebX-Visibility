@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
@@ -173,6 +174,7 @@ export class VolumetricShipmentReportService {
                          {
                               'D$or': [{ cNL: false }, { cNL: { D$exists: false } }],
                          },
+                         ...(data.mode === "LTL" ? [{ iSVOL: true }] : []),
                          ...([{ oRGN: { 'D$in': data.branch } }]),
                          ...(data.customer.length > 0 ? [{ 'bPARTY': { 'D$in': data.customer } }] : []),
                     ]
@@ -183,7 +185,6 @@ export class VolumetricShipmentReportService {
                     'dKTNO': { 'D$in': data.docNoArray }
                };
           }
-
           const reportName = data.mode === 'FTL' ? 'VolumetricShipmentRegister' : 'VolumetricShipmentRegisterltl';
 
           const reqBody = {
@@ -195,13 +196,16 @@ export class VolumetricShipmentReportService {
                     }
                }
           }
-
           const res = await firstValueFrom(
                this.masterServices.masterMongoPost("generic/getReportData", reqBody)
           );
-          
+          const details = res.data.data.map((item) => ({
+               ...item,
+               dktDt: item.dktDt ? moment(item.dktDt).format("DD MMM YYYY") : "",
+               invDt: item.invDt ? moment(item.invDt).format("DD MMM YYYY") : ""
+          }));
           return {
-               data: res,
+               data: details,
                grid: res.data.grid
           };
      }

@@ -89,7 +89,6 @@ export class DepartureService {
   }
 
   async getFieldDepartureMapping(data, shipment) {
-    debugger
     const vendorCode = await this.vendor.getVendorDetail(
       {
         companyCode: this.storage.companyCode,
@@ -346,7 +345,6 @@ export class DepartureService {
       if (res.length > 0) {
         this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN").vAL
       }
-
       if (this.accountingOnThc) {
         if (status.data.oPSST == 1) {
           let result = await firstValueFrom(this.createJournalRequest(data, data.tripID));

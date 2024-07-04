@@ -37,10 +37,8 @@ import { GenericActions, RateTypeCalculation, StoreKeys } from 'src/app/config/m
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { GetLeadgerInfoFromLocalStorage, SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
-import { ClusterMasterService } from 'src/app/Utility/module/masters/cluster/cluster.master.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
-import { debug } from 'console';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { getApiCompanyDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
@@ -438,8 +436,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const rskType = this.riskType.find((x) => x.value == (this.fieldRules.find(f => f.Field == "risk")?.Default) || "")?.value || "";
     const delvryType = this.deliveryType.find((x) => x.value == (this.fieldRules.find(f => f.Field == "delivery_type")?.Default) || "")?.value || "";
     const material = this.matrials.find((x) => x.value == (this.fieldRules.find(f => f.Field == "materialName")?.Default) || "");
-
-
+     if(payType == "P01" || payType == "P03"||payType == "P04"){
+      this.consignmentForm.controls['billingParty'].disable();
+     }
+     else{
+      this.consignmentForm.controls['billingParty'].enable();
+     }
+  
     setGeneralMasterData(this.allFormControls, this.paymentType, "payType");
     setGeneralMasterData(this.allFormControls, this.riskType, "risk");
     setGeneralMasterData(this.allFormControls, this.pkgsType, "pkgsType");
@@ -692,23 +695,35 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     switch (name) {
       case "cnebp":
-        this.consignmentForm.controls["cnbp"].disable();
+        if(value){
+          this.consignmentForm.controls["cnbp"].disable();
+        }
+        else{
+          this.consignmentForm.controls["cnbp"].enable();
+        }
         this.consignmentForm.controls["consigneeName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
         this.consignmentForm.controls["cncontactNumber"].setValue(value ? customer?.customer_mobile || '' : "");
         this.consignmentForm.controls["cneAddress"].setValue(value ? { name: customer?.RegisteredAddress || "", value: "A888" } : "");
         this.consignmentForm.controls["cnegst"].setValue(value ? customer?.GSTdetails[0].gstNo || "" : "");
+        this.consignmentForm.controls["cnebp"].enable();
+
         break;
       case "cnbp":
-        this.consignmentForm.controls["cnebp"].disable();
+        if(value){
+          this.consignmentForm.controls["cnebp"].disable();
+        }
+        else{
+          this.consignmentForm.controls["cnebp"].enable();
+        }
         this.consignmentForm.controls["consignorName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
         this.consignmentForm.controls["ccontactNumber"].setValue(value ? customer?.customer_mobile || '' : "");
         this.consignmentForm.controls["calternateContactNo"].setValue("");
         this.consignmentForm.controls["cnoAddress"].setValue(value ? { name: customer?.RegisteredAddress || "", value: "A888" } : "");
         this.consignmentForm.controls["cnogst"].setValue(value ? customer?.GSTdetails[0].gstNo || "" : "");
+        this.consignmentForm.controls["cnbp"].enable();
         break;
     }
-    this.consignmentForm.controls["cnebp"].enable();
-    this.consignmentForm.controls["cnbp"].enable();
+  
   }
   /*End*/
   /*below function is volumetric function*/
@@ -930,7 +945,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.consignmentForm.controls[fields['cUSTPH']].setValue(gstData?.cUSTPH || "");
     this.consignmentForm.controls[fields['aLTPH']].setValue(gstData?.aLTPH || "");
     this.consignmentForm.controls[fields['aDD']].setValue(gstData ? { name: gstData.aDD, value: gstData.aDD, otherdetails: gstData } : "");
-  }
+    const payType = this.consignmentForm.get('payType').value;
+    const payTypeNm = this.paymentType.find(x => x.value === payType)?.name;
+    if (payTypeNm == "PAID") {
+      this.consignmentForm.controls['billingParty'].setValue( this.consignmentForm.controls['consignorName'].value)
+    }
+    if (payTypeNm == "TO PAY") {
+      this.consignmentForm.controls['billingParty'].setValue(this.consignmentForm.controls['consigneeName'].value)
+    }
+}
 
   async findWalkinGST(gstno) {
     const request = {
@@ -1461,7 +1484,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name;
     switch (payTypeNm) {
       case "TBB":
-        this.consignmentForm.get('billingParty').setValidators([Validators.required]);
+        this.consignmentForm.get('billingParty').setValidators([Validators.required,autocompleteValidator()]);
         this.consignmentForm.get('billingParty').enable();
         break;
       case "PAID":
@@ -2085,7 +2108,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     const allCombinations = generateCombinations(terms);
 
-    console.log(allCombinations);
 
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
       let match = { "D$and": [] };

@@ -380,7 +380,6 @@ export class EditShipmentDetailsComponent implements OnInit {
     }
   }
   save() {
-    debugger
     let allFormData = { ...this.EditShipmentForm.getRawValue() };
     allFormData.isDeps = allFormData.shortPkts || allFormData.DamagePkts || allFormData.pilferagePkts || false;
     allFormData.depsOptions = []

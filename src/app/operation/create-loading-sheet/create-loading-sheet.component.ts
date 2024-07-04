@@ -208,6 +208,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   products: AutoComplete[];
   vehicleDetails: any;
   MarketData: any;
+  vehicleTypeList: any;
   constructor(
     private Route: Router,
     private _operationService: OperationService,
@@ -553,6 +554,13 @@ export class CreateLoadingSheetComponent implements OnInit {
           let lsData = lsForm
           lsData['transMode'] = this.products.find((x) => x.value == lsForm.transMode)?.value ?? '';
           lsData['transModeName'] = this.products.find((x) => x.name == "Road")?.name ?? '';
+          if (lsData.vendorType == 'Market') {
+            const vehicleData = this.vehicleTypeList?.find(x => 
+              x.value === lsData['vehicleType'] || x.name === lsData['vehicleType']
+            ) ?? { name: "", value: "" };
+            lsData['vehicleType'] = vehicleData?.name ||""
+            lsData['vehicleTypeCode'] =  vehicleData.value || "";
+          }
           const tripData = await this.loadingSheetService.tripFieldMapping(lsData, shipment);
           const lsDetails = await this.loadingSheetService.createLoadingSheet(tripData);
           this.tableData.forEach((ls) => {
@@ -642,6 +650,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         }
         return x;
       });
+      this.vehicleTypeList=vehicleType;
     }
 
 

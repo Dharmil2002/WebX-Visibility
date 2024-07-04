@@ -61,7 +61,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
-    private docketService:DocketService,
+    private docketService: DocketService,
     public dialogRef: MatDialogRef<EditShipmentDetailsComponent>,
     public dialog: MatDialog,
     private storage: StorageService,
@@ -70,7 +70,6 @@ export class EditShipmentDetailsComponent implements OnInit {
     private objImageHandling: ImageHandling,
     public generalService: GeneralService,
   ) {
-
     this.shipmentDetails = item;
   }
 
@@ -106,16 +105,23 @@ export class EditShipmentDetailsComponent implements OnInit {
     this.EditShipmentForm.controls['ctWeight'].setValue(this.shipmentDetails.cWeight);
     this.EditShipmentForm.controls['noofPkts'].setValue(this.shipmentDetails.Packages);
     this.bindDropDown();
-    this.getCheckDeps();
+    if (!this.shipmentDetails.hasOwnProperty('Type')) {
+      this.getCheckDeps();
+    }
+    else {
+      this.EditShipmentForm.controls['shortPkts'].disable();
+      this.EditShipmentForm.controls['extraPkts'].disable();
+      this.EditShipmentForm.controls['pilferagePkts'].disable();
+      this.EditShipmentForm.controls['DamagePkts'].disable();
+    }
   }
 
-  async getCheckDeps(){
-    const deps = await this.docketService.getdocketFromOpsOne({ 
-      dKTNO: this.EditShipmentForm.controls['shipment'].value, 
+  async getCheckDeps() {
+    const deps = await this.docketService.getdocketFromOpsOne({
+      dKTNO: this.EditShipmentForm.controls['shipment'].value,
       cID: this.storage.companyCode,
-      sFX: this.shipmentDetails.Suffix 
+      sFX: this.shipmentDetails.Suffix
     });
-    
     if (deps) {
       const noOfPkts = parseInt(this.EditShipmentForm.controls['noofPkts'].value);
       const actualWeight = parseFloat(this.EditShipmentForm.controls['actualWeight'].value);
@@ -155,13 +161,13 @@ export class EditShipmentDetailsComponent implements OnInit {
   }
 
   async bindDropDown() {
-    const depsReason = await this.generalService.getGeneralMasterData(["DREASON",'PLFREASON','SREASON']);
-    const reasons = [{name:'shortReason',value:"SREASON"}, {name:'demageReason',value:"DREASON"},  {name:'pilferageReason',value:"PLFREASON"}];
+    const depsReason = await this.generalService.getGeneralMasterData(["DREASON", 'PLFREASON', 'SREASON']);
+    const reasons = [{ name: 'shortReason', value: "SREASON" }, { name: 'demageReason', value: "DREASON" }, { name: 'pilferageReason', value: "PLFREASON" }];
     reasons.forEach((x) => {
       this.filter.Filter(
         this.allJsonControlArray,
         this.EditShipmentForm,
-        depsReason.filter((d)=>d.type==x.value),
+        depsReason.filter((d) => d.type == x.value),
         x.name,
         false
       );
@@ -191,13 +197,13 @@ export class EditShipmentDetailsComponent implements OnInit {
       let fieldsToUpdate;
       switch (fieldName) {
         case 'shortPkts':
-          fieldsToUpdate = ['shortReason', 'shortUpload', 'shortRemarks','shortPkgs'];
+          fieldsToUpdate = ['shortReason', 'shortUpload', 'shortRemarks', 'shortPkgs'];
           break;
         case 'pilferagePkts':
-          fieldsToUpdate = ['pilferageReason', 'pilferageUpload', 'pilferageRemarks','pilferagePkgs'];
+          fieldsToUpdate = ['pilferageReason', 'pilferageUpload', 'pilferageRemarks', 'pilferagePkgs'];
           break;
         case 'DamagePkts':
-          fieldsToUpdate = ['demageReason', 'demageUpload', 'demageRemarks','demagePkgs'];
+          fieldsToUpdate = ['demageReason', 'demageUpload', 'demageRemarks', 'demagePkgs'];
           break;
         default:
           fieldsToUpdate = [];
@@ -210,7 +216,6 @@ export class EditShipmentDetailsComponent implements OnInit {
 
     this.updateValidators();
   }
-
   updateValidators() {
     this.allJsonControlArray.forEach((control) => {
       const formControl = this.EditShipmentForm.get(control.name);
@@ -331,59 +336,86 @@ export class EditShipmentDetailsComponent implements OnInit {
     }
     this.getCheckDeps();
   }
-  getPkgsCheck(){
-    const arrivalPkgs = this.EditShipmentForm.get('noofPkts')?.value||0;
-    const shortPkgs = this.EditShipmentForm.get('shortPkgs')?.value||0;
-    const philoPkgs = this.EditShipmentForm.get('pilferagePkgs')?.value||0;
-    const demangePkgs = this.EditShipmentForm.get('demagePkgs')?.value||0;
+  getPkgsCheck() {
+    const arrivalPkgs = this.EditShipmentForm.get('noofPkts')?.value || 0;
+    const shortPkgs = this.EditShipmentForm.get('shortPkgs')?.value || 0;
+    const philoPkgs = this.EditShipmentForm.get('pilferagePkgs')?.value || 0;
+    const demangePkgs = this.EditShipmentForm.get('demagePkgs')?.value || 0;
     const result = this.validatePackages(arrivalPkgs, shortPkgs, philoPkgs, demangePkgs);
     if (result) {
-        Swal.fire('Error', result.message, 'error');
-        this.EditShipmentForm.get(result.field).setValue(0);
-    } 
-  }
-   validatePackages(arrivalPkgs, shortPkgs, philoPkgs, demangePkgs) {
-    switch (true) {
-        // Case 1: Any individual package count should not exceed the arrival package count
-        case shortPkgs > arrivalPkgs:
-            return { message: `Short packages (${shortPkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'shortPkgs' };
-
-        case philoPkgs > arrivalPkgs:
-            return { message: `Philo packages (${philoPkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'philoPkgs' };
-
-        case demangePkgs > arrivalPkgs:
-            return { message: `Demange packages (${demangePkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'demangePkgs' };
-
-        // Case 2: Philo or Demange packages cannot exceed remaining packages after accounting for Short packages
-        case philoPkgs > (arrivalPkgs - shortPkgs):
-            return { message: `Philo packages (${philoPkgs}) cannot be greater than remaining packages after short packages (${arrivalPkgs - shortPkgs}).`, field: 'philoPkgs' };
-
-        case demangePkgs > (arrivalPkgs - shortPkgs):
-            return { message: `Demange packages (${demangePkgs}) cannot be greater than remaining packages after short packages (${arrivalPkgs - shortPkgs}).`, field: 'demangePkgs' };
-
-        // Case 3: Demange packages cannot exceed remaining packages after accounting for Short and Philo packages
-        case demangePkgs > (arrivalPkgs - shortPkgs - philoPkgs):
-            return { message: `Demange packages (${demangePkgs}) cannot be greater than remaining packages after short and philo packages (${arrivalPkgs - shortPkgs - philoPkgs}).`, field: 'demangePkgs' };
-
-        // Case 4: Philo packages cannot exceed remaining packages after accounting for Short and Demange packages
-        case philoPkgs > (arrivalPkgs - shortPkgs - demangePkgs):
-            return { message: `Philo packages (${philoPkgs}) cannot be greater than remaining packages after short and demange packages (${arrivalPkgs - shortPkgs - demangePkgs}).`, field: 'philoPkgs' };
-
-        // No errors
-        default:
-            return null;
+      Swal.fire('Error', result.message, 'error');
+      this.EditShipmentForm.get(result.field).setValue(0);
     }
-}
+  }
+  validatePackages(arrivalPkgs, shortPkgs, philoPkgs, demangePkgs) {
+    switch (true) {
+      // Case 1: Any individual package count should not exceed the arrival package count
+      case shortPkgs > arrivalPkgs:
+        return { message: `Short packages (${shortPkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'shortPkgs' };
+
+      case philoPkgs > arrivalPkgs:
+        return { message: `Philo packages (${philoPkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'philoPkgs' };
+
+      case demangePkgs > arrivalPkgs:
+        return { message: `Demange packages (${demangePkgs}) cannot be greater than arrival packages (${arrivalPkgs}).`, field: 'demangePkgs' };
+
+      // Case 2: Philo or Demange packages cannot exceed remaining packages after accounting for Short packages
+      case philoPkgs > (arrivalPkgs - shortPkgs):
+        return { message: `Philo packages (${philoPkgs}) cannot be greater than remaining packages after short packages (${arrivalPkgs - shortPkgs}).`, field: 'philoPkgs' };
+
+      case demangePkgs > (arrivalPkgs - shortPkgs):
+        return { message: `Demange packages (${demangePkgs}) cannot be greater than remaining packages after short packages (${arrivalPkgs - shortPkgs}).`, field: 'demangePkgs' };
+
+      // Case 3: Demange packages cannot exceed remaining packages after accounting for Short and Philo packages
+      case demangePkgs > (arrivalPkgs - shortPkgs - philoPkgs):
+        return { message: `Demange packages (${demangePkgs}) cannot be greater than remaining packages after short and philo packages (${arrivalPkgs - shortPkgs - philoPkgs}).`, field: 'demangePkgs' };
+
+      // Case 4: Philo packages cannot exceed remaining packages after accounting for Short and Demange packages
+      case philoPkgs > (arrivalPkgs - shortPkgs - demangePkgs):
+        return { message: `Philo packages (${philoPkgs}) cannot be greater than remaining packages after short and demange packages (${arrivalPkgs - shortPkgs - demangePkgs}).`, field: 'philoPkgs' };
+
+      // No errors
+      default:
+        return null;
+    }
+  }
   save() {
+    debugger
     let allFormData = { ...this.EditShipmentForm.getRawValue() };
-    allFormData.isDeps = allFormData.shortPkts || allFormData.DamagePkts||allFormData.pilferagePkts || false;
+    allFormData.isDeps = allFormData.shortPkts || allFormData.DamagePkts || allFormData.pilferagePkts || false;
     allFormData.depsOptions = []
-    allFormData.demageUpload=this.imageData?.demageUpload||"";
-    allFormData.pilferageUpload=this.imageData?.pilferageUpload||"";
-    allFormData.shortUpload=this.imageData?.shortUpload||"";
-    allFormData.shortPkts && allFormData.depsOptions.push({name:"Shortage",value:'S'});
-    allFormData.DamagePkts && allFormData.depsOptions.push({name:"Damage",value:'D'});
-    allFormData.pilferagePkts && allFormData.depsOptions.push({name:"Pilferage",value:'P'});
+    allFormData.demageUpload = this.imageData?.demageUpload || "";
+    allFormData.pilferageUpload = this.imageData?.pilferageUpload || "";
+    allFormData.shortUpload = this.imageData?.shortUpload || "";
+    allFormData.shortPkts && allFormData.depsOptions.push({ name: "Shortage", value: 'S' });
+    allFormData.DamagePkts && allFormData.depsOptions.push({ name: "Damage", value: 'D' });
+    allFormData.pilferagePkts && allFormData.depsOptions.push({ name: "Pilferage", value: 'P' });
+    if (allFormData.shortPkts || allFormData.DamagePkts || allFormData.pilferagePkts) {
+      const packageConditions = [
+          { flag: allFormData.shortPkts, value: this.EditShipmentForm.get('shortPkgs')?.value || 0, message: 'Short packages must be greater than 0.' },
+          { flag: allFormData.DamagePkts, value: this.EditShipmentForm.get('demagePkgs')?.value || 0, message: 'Damaged packages must be greater than 0.' },
+          { flag: allFormData.pilferagePkts, value: this.EditShipmentForm.get('pilferagePkgs')?.value || 0, message: 'Pilferage packages must be greater than 0.' }
+      ];
+  
+      let errorMessage = '';
+  
+      packageConditions.forEach(condition => {
+          if (condition.flag && condition.value <= 0) {
+              errorMessage += condition.message + ' ';
+          }
+      });
+  
+      if (errorMessage) {
+          Swal.fire({
+              icon: 'error',
+              title: 'Validation Error',
+              text: errorMessage
+          });
+          return false;
+      }
+      
+  }
+  
     this.dialogRef.close(allFormData);
   }
   onDepsSelect() {

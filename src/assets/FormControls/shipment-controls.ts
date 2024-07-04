@@ -142,7 +142,7 @@ export class ShipmentEditControls {
                 functions: {
                     onChange: "getPkgsCheck",
                 },
-                value: false,
+                value: 0,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -212,7 +212,7 @@ export class ShipmentEditControls {
                 functions: {
                     onChange: "getPkgsCheck",
                 },
-                value: false,
+                value: 0,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -282,7 +282,7 @@ export class ShipmentEditControls {
                 functions: {
                     onChange: "getPkgsCheck",
                 },
-                value: false,
+                value: 0,
                 Validations: [],
                 generatecontrol: true, disable: false
             },

@@ -11,6 +11,7 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { CustomerBillStatus } from 'src/app/Models/docStatus';
 
 @Component({
   selector: 'app-bill-approval',
@@ -76,8 +77,8 @@ export class BillApprovalComponent implements OnInit {
         bILLNO: data?.data?.bILLNO
       }
       const status = {
-        bSTS: 2,
-        bSTSNM: "Bill Approved",
+        bSTS: CustomerBillStatus.Approved,
+        bSTSNM: CustomerBillStatus[CustomerBillStatus.Approved],
         aPR: {
           loc: this.storage.branch,
           aDT: new Date(),

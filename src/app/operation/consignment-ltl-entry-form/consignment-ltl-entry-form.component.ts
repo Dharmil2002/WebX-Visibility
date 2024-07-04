@@ -1962,8 +1962,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
   // Updated function to handle `isOrigin` condition correctly
   getTermValue(term, isOrigin) {
-    const typeMapping = { "Area": "AR", "Pincode": "PIN", "City": "CT", "State": "ST" };
-    const fieldKey = isOrigin ? "fromCity" : "toCity";
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
+    let fieldKey = isOrigin ? "fromCity" : "toCity";
+    if(term == "Location") {
+      fieldKey = isOrigin ? "origin" : "destination";
+    }
     const type = typeMapping[term];
     let valueKey;
 
@@ -1974,7 +1977,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;
+        break;  
+      case "Location":
+          valueKey = "value";
+          break;   
       case "City":
         valueKey = "ct";
         break;
@@ -1984,8 +1990,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       default:
         return [];
     }
-    const controls = this.consignmentForm;
-    const value = this.consignmentForm.controls[fieldKey].value[valueKey];
+    const controls = this.consignmentForm.controls;
+    let value;
+    if(fieldKey == "origin") {
+      value = controls[fieldKey].value;
+    } else { 
+      value = controls[fieldKey].value[valueKey];
+    }
     if (value) {
       return [
         { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
@@ -2070,9 +2081,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const contractId = this.consignmentForm.value.contract;
     const opsMode = this.LoadType.find((x) => x.name == this.storage.mode)?.value || "LTL";
 
-    const terms = ["Area", "Pincode", "City", "State"];
+    const terms = ["Area", "Pincode", "Location", "City", "State"];
 
     const allCombinations = generateCombinations(terms);
+
+    console.log(allCombinations);
 
     let matches = allCombinations.map(([fromTerm, toTerm]) => {
       let match = { "D$and": [] };
@@ -2089,12 +2102,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     matches.push({
       D$and: [
         { "D$in": ['$fTYPE', [null, ""]] },
-        { "D$in": ['$ffROM', [null, ""]] }]
+        { "D$in": ['$fROM', [null, ""]] }]
     });
     matches.push({
       D$and: [
         { "D$in": ['$tTYPE', [null, ""]] },
-        { "D$in": ['$tfROM', [null, ""]] }]
+        { "D$in": ['$tO', [null, ""]] }]
     });
 
     let reqBody =
@@ -2574,7 +2587,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                             };
                             const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
                             window.open(url, '', 'width=1000,height=800');
-                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                            this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                              window.location.reload();
+                            });
                           } else if (result.isDismissed) {
                             // Handle the action for the cancel button here.
                             this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
@@ -2667,7 +2682,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
     const chgs = this.otherCharges.map(x => ({
       aCCD: x.aCCD,
-      aMT: x.aMT,
+      aMT: Number(x.aMT),
       oPS: x.oPS
     }));
 
@@ -2975,14 +2990,32 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                     Swal.fire({
                       icon: "success",
                       title: "Booked Successfully",
-                      text: "DocketNo : " + DocketNo,
+                      text: "GCN No: " + DocketNo,
+                      confirmButtonText: 'OK',
                       showConfirmButton: true,
+                      denyButtonText: 'Print',
+                      showDenyButton: true,
+                      showCancelButton: true,
+                      cancelButtonText: 'Close'
                     }).then((result) => {
                       if (result.isConfirmed) {
-                        Swal.hideLoading();
-                        setTimeout(() => {
-                          Swal.close();
-                        }, 2000);
+                        // Redirect after the alert is closed with OK button.
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                      } else if (result.isDenied) {
+                        // Handle the action for the deny button here.
+                        const templateBody = {
+                          templateName: "DKT",
+                          PartyField: "",
+                          DocNo: this.consignmentForm.controls["docketNumber"].value,
+                        }
+                        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                        window.open(url, '', 'width=1000,height=800');
+                        this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                          window.location.reload();
+                        });
+                      } else if (result.isDismissed) {
+                        // Handle the action for the cancel button here.
+                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
                       }
                     });
                   },

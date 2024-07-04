@@ -156,7 +156,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
   async GeneralFieldChangedForTableData(event) {
     const customerId = this.ContractForm.value?.Customer?.value;
     const productId = this.ContractForm.value?.Product?.value;
-    const payBasis = ""//this.ContractForm.value?.PayBasis?.name
+    const payBasis = this.ContractForm.value?.PayBasis?.name
 
     if (customerId) {
       this.tableData = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId, payBasis);
@@ -403,7 +403,8 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
   async CheckItsvalidContract() {
     const customerId = this.ContractForm.value?.Customer?.value;
     const productId = this.ContractForm.value?.Product?.value;
-    const ExistingContracts = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId);
+    const payBasis = this.ContractForm.value?.PayBasis?.name;
+    const ExistingContracts = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId, payBasis);
 
     const startDate = stripTimeFromDate(new Date(this.ContractForm.value?.ContractStartDate));
     const endDate = stripTimeFromDate(new Date(this.ContractForm.value?.Expirydate));

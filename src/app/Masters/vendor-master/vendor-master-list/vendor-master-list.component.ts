@@ -3,7 +3,6 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
-import { GetGeneralMasterData } from "../../Customer Contract/CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
 import { MatDialog } from "@angular/material/dialog";
 import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-master-upload.component";
@@ -14,7 +13,6 @@ import { VendorMasterUploadComponent } from "../vendor-master-upload/vendor-mast
 export class VendorMasterListComponent implements OnInit {
   data: [] | any;
   csv: any[];
-  companyCode: any = 0;
   csvFileName: string;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   // Define column headers for the table
@@ -23,7 +21,7 @@ export class VendorMasterListComponent implements OnInit {
       Title: "Created Date",
       class: "matcolumncenter",
       Style: "min-width:15%",
-      datatype: "datetime"
+      // datatype: "date"
     },
     vendorCode: {
       Title: "Vendor Code",
@@ -63,36 +61,50 @@ export class VendorMasterListComponent implements OnInit {
   headerForCsv = {
     "vendorCode": "Vendor Code",
     "vendorName": "Vendor Name",
-    "vendorType": "Vendor Type",
+    "vendorManager": "Vendor Manager",
+    "vendorTypeName": "Vendor Type Name",
     "vendorAddress": "Vendor Address",
     "vendorLocation": "Vendor Location",
-    "vendorCity": "Vendor City",
     "vendorPinCode": "Vendor Pin Code",
+    "vendorCity": "Vendor City",
+    "vendorState": "Vendor State",
+    "vendorCountry": "Vendor Country",
     "vendorPhoneNo": "Vendor Phone No",
-    "emailId": "Email ID",
-    "isActive": "Active Flag",
-    "blackListed": "Black Listed",
-    "panNo": "PAN NO",
-    "serviceTaxNo": "Service Tax No",
-    "remarks": "Remarks",
-    "paymentEmail": "Payment Email",
-    "tdsApplicable": "TDS Applicable",
-    "tdsType": "TDS Type",
-    "tdsRate": "TDS Rate",
+    "emailId": "Vendor Email ID",
+    "panNo": "PAN No",
+    "cinNumber": "Cin Number",
+    "itrnumber": "ITR Number",
+    "dateofFilling": "Date of Filling",
+    "financialYear": "financialYear",
+    "vendorAdvance": "Vendor Advance",
+    "msmeRegistered": "MSME Registered",
+    "isBlackListed": "Black Listed",
+    "isLowRateApplicable": "Low TDS Rate Applicable",
+    "hTDSRA": "High TDS Rate Applicable",
+    "isGSTregistered": "GST Registered",
+    "isBankregistered": "Bank Registered",
+    "msmeNumber": "MSME Number",
+    "msmeTypeName": "MSME Type Name",
+    "effectiveFrom": "Effective From",
+    "validUpto": "Valid Upto",
+    "lowTDSLimit": "Low TDS Limit",
+    "tdsSectionName": "TDS Section Name",
+    "isTDSDeclaration": "TDS Declaration",
+    "bankACNumber": "Bank Account No",
+    "ifscCode": "IFSC Code",
     "bankName": "Bank Name",
-    "accountNumber": "Account Number",
-    "ifscNumber": "IFSC Number",
-    "panDocument": "Pan Document",
-    "audited": "Audited",
-    "auditedBy": "Audited By",
-    "auditedDate": "Audited Date",
-    "tdsDocument": "TDS Document",
-    "cancelCheque": "Cancel Cheque",
-    "msme": "MSME",
-    "isMsmeApplicable": "IsMSMEApplicable",
-    "isGstCharged": "IsGSTCharged",
-    "franchise": "Franchise",
-    "integrateWithFinSystem": "Integrate With Fin System"
+    "bankBrachName": "Bank Branch Name",
+    "city": "City",
+    "upiId": "UPI Id",
+    "contactPerson": "Contact Person",
+    "mobileNumber": "Mobile Number",
+    "emails": "E-mail id",
+    "gstNumber0": "GST Number",
+    "gstState0": "GST State",
+    "gstPincode0": "GST Pincode",
+    "gstCity0": "GST City",
+    "gstAddress0": "GST Address",
+    "isActive": "Active Flag"
   }
   //#endregion 
   breadScrums = [
@@ -112,12 +124,12 @@ export class VendorMasterListComponent implements OnInit {
   addAndEditPath: string;
   viewComponent: any;
   uploadComponent = VendorMasterUploadComponent
+  csvFileData: any;
   constructor(
     private masterService: MasterService,
     private storage: StorageService,
     private dialog: MatDialog
   ) {
-    this.companyCode = this.storage.companyCode;
     this.addAndEditPath = "/Masters/VendorMaster/AddVendorMaster";//setting Path to add data
   }
   ngOnInit(): void {
@@ -127,31 +139,144 @@ export class VendorMasterListComponent implements OnInit {
   }
   //#region to get Vendor details
   async getVendorDetails() {
-    let req = {
-      "companyCode": this.companyCode,
-      "collectionName": "vendor_detail",
-      "filter": { companyCode: this.storage.companyCode }
-    }
-    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-    if (res) {
-      // Generate srno for each object in the array
-      const dataWithSrno = res.data
-        .map((obj) => {
-          return {
-            ...obj,
-            // srNo: index + 1,
-            vendorName: obj.vendorName.toUpperCase(),
-            vendorType: obj.vendorTypeName ? obj.vendorTypeName.toUpperCase() : '',
-            eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
-          };
-        })
-        .sort((a, b) => b.vendorCode.localeCompare(a.vendorCode));
+    try {
+      // Prepare the request object
+      const req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "vendor_detail",
+        filter: { companyCode: this.storage.companyCode }
+      };
 
-      this.csv = dataWithSrno;
+      // Make the API call using firstValueFrom for the first emitted value
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+      if (res && res.data) {
+        // Map, transform, and sort data
+        const dataWithSrno = res.data.map(item => {
+          const transformedItem = {
+            ...item,
+            vendorName: item.vendorName.toUpperCase(),
+            vendorType: item.vendorTypeName ? item.vendorTypeName.toUpperCase() : '',
+            eNTDT: item.eNTDT ? formatDocketDate(item.eNTDT) : ''
+          };
+
+          // Extract details from otherdetails if available
+          if (item.otherdetails && item.otherdetails.length > 0) {
+            const detail = item.otherdetails[0]; // Take the first element
+            transformedItem.gstNumber0 = detail.gstNumber || '';
+            transformedItem.gstState0 = detail.gstState || '';
+            transformedItem.gstAddress0 = detail.gstAddress || '';
+            transformedItem.gstPincode0 = detail.gstPincode || '';
+            transformedItem.gstCity0 = detail.gstCity || '';
+          }
+
+          return transformedItem;
+        }).sort((a, b) => b.vendorCode.localeCompare(a.vendorCode));
+
+        // Assign transformed data to this.csv excluding gst details
+        this.csv = dataWithSrno.map(item => ({
+          ...item,
+          // Exclude gst details from csv
+          gstNumber0: undefined,
+          gstState0: undefined,
+          gstAddress0: undefined,
+          gstPincode0: undefined,
+          gstCity0: undefined
+        }));
+
+        // Assign transformed data to this.modifiedData including gst details
+        this.csvFileData = dataWithSrno;
+        console.log(this.csv, this.csvFileData);
+
+      } else {
+        console.error('Response or data is empty.');
+        // If response or data is empty, you might handle this case accordingly.
+        this.csv = []; // Set this.csv to an empty array or handle as per your application's logic
+        this.csvFileData = []; // Set this.modifiedData to an empty array or handle as per your application's logic
+      }
+    } catch (error) {
+      console.error('Error fetching vendor details:', error);
+      throw error; // Propagate the error for higher-level handling
+    } finally {
+      // Perform any final actions here, such as updating flags or variables
       this.tableLoad = false;
     }
-
   }
+
+  // async getVendorDetails() {
+  //   let req = {
+  //     "companyCode": this.storage.companyCode,
+  //     "collectionName": "vendor_detail",
+  //     "filter": { companyCode: this.storage.companyCode }
+  //   }
+  //   const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+  //   if (res) {
+  //     // Generate srno for each object in the array
+  //     const dataWithSrno = res.data
+  //       .map((obj) => {
+  //         return {
+  //           ...obj,
+  //           // srNo: index + 1,
+  //           vendorName: obj.vendorName.toUpperCase(),
+  //           vendorType: obj.vendorTypeName ? obj.vendorTypeName.toUpperCase() : '',
+  //           eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
+  //         };
+  //       })
+  //       .sort((a, b) => b.vendorCode.localeCompare(a.vendorCode));
+
+  //     this.csv = dataWithSrno;
+  //     this.tableLoad = false;
+  //   }
+
+  // }
+  // async getVendorDetails() {
+  //   try {
+  //     // Prepare the request object
+  //     const req = {
+  //       companyCode: this.storage.companyCode,
+  //       collectionName: "vendor_detail",
+  //       filter: { companyCode: this.storage.companyCode }
+  //     };
+
+  //     // Make the API call using firstValueFrom for the first emitted value
+  //     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+
+  //     if (res && res.data) {
+  //       // Map and transform data
+  //       const dataWithSrno = res.data.map(item => {
+  //         const transformedItem = {
+  //           ...item,
+
+  //         };
+
+  //         // Extract details from otherdetails if available
+  //         if (item.otherdetails && item.otherdetails.length > 0) {
+  //           const detail = item.otherdetails[0]; // Take the first element
+  //           transformedItem.gstNumber0 = detail.gstNumber || '';
+  //           transformedItem.gstState0 = detail.gstState || '';
+  //           transformedItem.gstAddress0 = detail.gstAddress || '';
+  //           transformedItem.gstPincode0 = detail.gstPincode || '';
+  //           transformedItem.gstCity0 = detail.gstCity || '';
+  //         }
+
+  //         // Remove otherdetails array from transformedItem
+  //         delete transformedItem.otherdetails;
+
+  //         return transformedItem;
+  //       });
+  //       this.modifiedData = dataWithSrno;
+  //     } else {
+  //       console.error('Response or data is empty.');
+  //       return []; // Return an empty array or handle as per your application's logic
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching vendor details:', error);
+  //     throw error; // Propagate the error for higher-level handling
+  //   }
+  // }
+
+
+
   //#endregion
 
   async isActiveFuntion(det) {

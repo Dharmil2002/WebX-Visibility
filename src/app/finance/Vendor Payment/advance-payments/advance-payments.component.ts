@@ -1113,7 +1113,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
   GetDebitVoucherLedgers(thc, AdvancePaymentAmount) {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
-    const createVoucher = (accCode, debit, credit, THCNo, accName = null, accCategory = null) => ({
+    const createVoucher = (accCode, TDSApplicable, debit, credit, THCNo, accName = null, accCategory = null) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.AdvancePayment,
@@ -1133,7 +1133,7 @@ export class AdvancePaymentsComponent implements OnInit {
       GSTRate: 0,
       GSTAmount: 0,
       Total: debit + credit,
-      TDSApplicable: false,
+      TDSApplicable: TDSApplicable,
       narration: `When Advance Paid against THC NO : ${THCNo}`,
     });
 
@@ -1155,21 +1155,21 @@ export class AdvancePaymentsComponent implements OnInit {
     //   Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
     // }
     // else {
-    Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
+    Result.push(createVoucher('LIA001002', false, parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
     // }
 
     const PaymentAmountWithoutTDS = parseFloat((AdvancePaymentAmount).toString());
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;
-      Result.push(createVoucher(CashAccount.aCCD, 0, PaymentAmountWithoutTDS, thc.THC, CashAccount.aCNM, "ASSET"));
+      Result.push(createVoucher(CashAccount.aCCD, false, 0, PaymentAmountWithoutTDS, thc.THC, CashAccount.aCNM, "ASSET"));
     }
     else if (PaymentMode == "Journal") {
       const JournalAccount = this.PaymentSummaryFilterForm.get("JournalAccount").value;
-      Result.push(createVoucher(JournalAccount.value, 0, PaymentAmountWithoutTDS, thc.THC, JournalAccount.name, "ASSET"));
+      Result.push(createVoucher(JournalAccount.value, false, 0, PaymentAmountWithoutTDS, thc.THC, JournalAccount.name, "ASSET"));
     }
     else if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      Result.push(createVoucher(BankDetails.value, 0, PaymentAmountWithoutTDS, thc.THC, BankDetails.name, "ASSET"));
+      Result.push(createVoucher(BankDetails.value, false, 0, PaymentAmountWithoutTDS, thc.THC, BankDetails.name, "ASSET"));
     }
 
     // Push TDS Sectiond Data
@@ -1177,6 +1177,7 @@ export class AdvancePaymentsComponent implements OnInit {
       if (+this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount != 0) {
         Result.push(createVoucher(
           this.VendorAdvanceTaxationTDSFilterForm.value.TDSSection.value,
+          true,
           0,
           +this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount,
           thc.THC,

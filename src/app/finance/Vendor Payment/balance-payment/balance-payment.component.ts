@@ -1366,7 +1366,7 @@ export class BalancePaymentComponent implements OnInit {
 
   GetJournalVoucherLedgers(SelectedData, BillNo, PaymentAmount, NetPayable, RoundOffAmount) {
 
-    const createVoucher = (accCode, accName, accCategory, debit, credit, THC, BillNo, sacCode = "", sacName = "") => ({
+    const createVoucher = (accCode, accName, TDSApplicable, accCategory, debit, credit, THC, BillNo, sacCode = "", sacName = "") => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.BalancePayment,
@@ -1386,7 +1386,7 @@ export class BalancePaymentComponent implements OnInit {
       GSTRate: 0,
       GSTAmount: 0,
       Total: debit + credit,
-      TDSApplicable: false,
+      TDSApplicable: TDSApplicable,
       narration: `When Vendor Bill Generated For : ${THC}  Against Bill No : ${BillNo}`
     });
 
@@ -1404,7 +1404,7 @@ export class BalancePaymentComponent implements OnInit {
             const GetLeadgerInfo = ledgerInfo[item.cHGNM];
             if (item.aMT.oldValue < item.aMT.newValue) {
               if (GetLeadgerInfo) {
-                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, +(Math.abs(item.aMT.difference)), 0, DataItem.THC, BillNo));
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, false, GetLeadgerInfo.LeadgerCategory, +(Math.abs(item.aMT.difference)), 0, DataItem.THC, BillNo));
               }
               else {
                 OtherChargePositiveAmt += +(Math.abs(item.aMT.difference));
@@ -1412,7 +1412,7 @@ export class BalancePaymentComponent implements OnInit {
             }
             if (item.aMT.oldValue > item.aMT.newValue) {
               if (GetLeadgerInfo) {
-                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, 0, +(Math.abs(item.aMT.difference)), DataItem.THC, BillNo));
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, false, GetLeadgerInfo.LeadgerCategory, 0, +(Math.abs(item.aMT.difference)), DataItem.THC, BillNo));
               }
               else {
                 OtherChargeNegativeAmt += +(Math.abs(item.aMT.difference));
@@ -1422,7 +1422,7 @@ export class BalancePaymentComponent implements OnInit {
             const GetLeadgerInfo = ledgerInfo[item.cHGNM];
             if (item.aMT.oldValue < item.aMT.newValue) {
               if (GetLeadgerInfo) {
-                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, 0, +(Math.abs(item.aMT.difference)), DataItem.THC, BillNo));
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, false, GetLeadgerInfo.LeadgerCategory, 0, +(Math.abs(item.aMT.difference)), DataItem.THC, BillNo));
               }
               else {
                 OtherChargeNegativeAmt += +(Math.abs(item.aMT.difference));
@@ -1430,7 +1430,7 @@ export class BalancePaymentComponent implements OnInit {
             }
             if (item.aMT.oldValue > item.aMT.newValue) {
               if (GetLeadgerInfo) {
-                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, GetLeadgerInfo.LeadgerCategory, +(Math.abs(item.aMT.difference)), 0, DataItem.THC, BillNo));
+                Result.push(createVoucher(GetLeadgerInfo.LeadgerCode, GetLeadgerInfo.LeadgerName, false, GetLeadgerInfo.LeadgerCategory, +(Math.abs(item.aMT.difference)), 0, DataItem.THC, BillNo));
               }
               else {
                 OtherChargePositiveAmt += +(Math.abs(item.aMT.difference));
@@ -1441,10 +1441,10 @@ export class BalancePaymentComponent implements OnInit {
       }
 
       if (OtherChargePositiveAmt != 0) {
-        Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, OtherChargePositiveAmt, 0, DataItem.THC, BillNo));
+        Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, false, ledgerInfo['EXP001009'].LeadgerCategory, OtherChargePositiveAmt, 0, DataItem.THC, BillNo));
       }
       if (OtherChargeNegativeAmt != 0) {
-        Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, ledgerInfo['EXP001009'].LeadgerCategory, 0, OtherChargeNegativeAmt, DataItem.THC, BillNo));
+        Result.push(createVoucher(ledgerInfo['EXP001009'].LeadgerCode, ledgerInfo['EXP001009'].LeadgerName, false, ledgerInfo['EXP001009'].LeadgerCategory, 0, OtherChargeNegativeAmt, DataItem.THC, BillNo));
       }
 
       // Push TDS Sectiond Data
@@ -1453,6 +1453,7 @@ export class BalancePaymentComponent implements OnInit {
           Result.push(createVoucher(
             this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value,
             this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name,
+            true,
             "LIABILITY",
             0,
             +this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount,
@@ -1462,17 +1463,17 @@ export class BalancePaymentComponent implements OnInit {
         }
       }
       if (RoundOffAmount != 0) {
-        Result.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName, ledgerInfo['EXP001042'].LeadgerCategory, RoundOffAmount > 0 ? RoundOffAmount : 0, RoundOffAmount < 0 ? RoundOffAmount : 0, DataItem.THC, BillNo));
+        Result.push(createVoucher(ledgerInfo['EXP001042'].LeadgerCode, ledgerInfo['EXP001042'].LeadgerName, false, ledgerInfo['EXP001042'].LeadgerCategory, RoundOffAmount > 0 ? RoundOffAmount : 0, RoundOffAmount < 0 ? RoundOffAmount : 0, DataItem.THC, BillNo));
       }
       // Push GST Data
       if (this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount != 0) {
         if (this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount != 0) {
-          Result.push(createVoucher(ledgerInfo['LIA002004'].LeadgerCode, ledgerInfo['LIA002004'].LeadgerName, ledgerInfo['LIA002004'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002004'].LeadgerCode, ledgerInfo['LIA002004'].LeadgerName, false, ledgerInfo['LIA002004'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
         } else if (this.VendorBalancePaymentFilterForm.value.CGSTAmount != 0 && this.VendorBalancePaymentFilterForm.value.SGSTAmount != 0) {
-          Result.push(createVoucher(ledgerInfo['LIA002003'].LeadgerCode, ledgerInfo['LIA002003'].LeadgerName, ledgerInfo['LIA002003'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
-          Result.push(createVoucher(ledgerInfo['LIA002001'].LeadgerCode, ledgerInfo['LIA002001'].LeadgerName, ledgerInfo['LIA002001'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002003'].LeadgerCode, ledgerInfo['LIA002003'].LeadgerName, false, ledgerInfo['LIA002003'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002001'].LeadgerCode, ledgerInfo['LIA002001'].LeadgerName, false, ledgerInfo['LIA002001'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
         } else if (this.VendorBalancePaymentFilterForm.value.UGSTAmount != 0) {
-          Result.push(createVoucher(ledgerInfo['LIA002002'].LeadgerCode, ledgerInfo['LIA002002'].LeadgerName, ledgerInfo['LIA002002'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
+          Result.push(createVoucher(ledgerInfo['LIA002002'].LeadgerCode, ledgerInfo['LIA002002'].LeadgerName, false, ledgerInfo['LIA002002'].LeadgerCategory, +this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount, 0, DataItem.THC, BillNo, this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.value.toString(), this.VendorBalanceTaxationGSTFilterForm.value?.GSTSACcode?.name.toString()));
         }
       }
     });
@@ -1484,6 +1485,7 @@ export class BalancePaymentComponent implements OnInit {
     Result.push(createVoucher(
       ledgerInfo['LIA001002'].LeadgerCode,
       ledgerInfo['LIA001002'].LeadgerName,
+      false,
       ledgerInfo['LIA001002'].LeadgerCategory,
       difference > 0 ? 0 : Math.abs(difference),
       difference < 0 ? 0 : Math.abs(difference),

@@ -455,7 +455,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
 
     this.invoiceForm.controls['materialDensity'].setValue("");
-
     this.consignmentForm.controls['risk'].setValue(rskType);
     this.consignmentForm.controls['pkgsType'].setValue(pkgType);
     this.freightForm.controls['freightRatetype'].setValue("");

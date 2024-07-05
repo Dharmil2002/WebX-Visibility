@@ -472,7 +472,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
                 tPSDATE: new Date(),
                 docNo: "",
                 bILLNO: tdsData.docNo,
-                bGNDT: tdsData.bGNDT,
+                bGNDT: tdsData.bDT,
                 bDOCTYP: tdsData.dOCTYP,
                 vND: {
                   cD: tdsData.vND.cD,

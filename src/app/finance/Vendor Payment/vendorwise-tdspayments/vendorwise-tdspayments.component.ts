@@ -218,11 +218,11 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
     }
 
     const totalTAmount = selectedData.reduce(
-      (total, item) => total + parseInt(item.bALAMT),
+      (total, item) => total + parseFloat(item.bALAMT),
       0
     );
     const totalTds = selectedData.reduce(
-      (total, item) => total + parseInt(item.tdsaMT),
+      (total, item) => total + parseFloat(item.tdsaMT),
       0
     );
 
@@ -706,7 +706,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
 
 
   GetVouchersLedgers(data) {
-    const TotalAmount = this.totalamount;
+    const TotalAmount = this.totalTdsamount;
     const createVoucher = (accCode, accName, accCategory, debit, credit) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",

@@ -231,7 +231,7 @@ export class DepartVehicleComponent implements OnInit {
         firstValueFrom(this._operationService.operationMongoPost("generic/getOne", reqVeh)),
         this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
       ]);
-       const data=thcDetails;
+       const thcData=thcDetails?.data||"";
       if (Object.keys(res.data).length > 0) {
         const { data } = res;
         this.departvehicleTableForm.controls["VendorType"].setValue(data?.vendorType || "");
@@ -239,23 +239,23 @@ export class DepartVehicleComponent implements OnInit {
         this.departvehicleTableForm.controls["Driver"].setValue(data?.driver || "");
         this.departvehicleTableForm.controls["DriverMob"].setValue(data?.dMobNo || "");
         this.departvehicleTableForm.controls["License"].setValue(data?.lcNo || "");
-        this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehType || "");
-        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehTypeCode || "");
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(thcData?.vTYPNM ||data?.vehType || "");
+        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(thcData?.vTYP||data?.vTYP || "");
         this.departvehicleTableForm.controls["Expiry"].setValue(data?.lcExpireDate);
-        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(data?.capacityVolCFT || 0);
-        this.loadingSheetTableForm.controls['Capacity'].setValue(data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED.wT || 0);
-        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED.vOL || 0);
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(thcData?.cAP?.vOL||data?.capacityVolCFT || 0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(thcData?.cAP?.wT ||  data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED?.wT || 0);
+        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED?.vOL || 0);
 
       }
       if (Object.keys(resVeh.data).length > 0) {
         const { data } = resVeh;
         this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehicleType || "");
         this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehicleTypeCode || "");
-        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(data?.cft || 0);
-        this.loadingSheetTableForm.controls['Capacity'].setValue(data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedKg'].setValue(data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(data?.cft || 0); // Assuming you meant cft here for consistency
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(thcData?.cAP?.vOL||data?.cft || 0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(thcData?.cAP?.wT||data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED?.wT||data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED?.vOL||data?.cft || 0); // Assuming you meant cft here for consistency
         // THC Details handling
       
       }

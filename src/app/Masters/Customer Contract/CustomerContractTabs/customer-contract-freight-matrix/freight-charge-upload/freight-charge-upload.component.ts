@@ -494,7 +494,7 @@ export class FreightChargeUploadComponent implements OnInit {
       processedData.tMODID = updatetransportMode.value;
     }
     processedData.tRDYS = element.TransitDays
-    processedData.rT = parseFloat(element.Rate);
+    processedData.rT = parseFloat(element.Rate).toFixed(2);
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
 
     // SET Start Date And End Date

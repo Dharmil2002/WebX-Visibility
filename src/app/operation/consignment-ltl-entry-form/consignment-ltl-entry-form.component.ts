@@ -492,11 +492,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     // console.log("fn handler called" , $event);
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
-
-    // we can add more arguments here, if needed. like as shown
-    // $event['fieldName'] = field.name;
-
-    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {

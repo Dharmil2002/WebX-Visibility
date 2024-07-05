@@ -215,7 +215,6 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   async vehicleDetails() {
-    debugger
     try {
       const reqbody = {
         companyCode: this.companyCode,

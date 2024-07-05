@@ -703,6 +703,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
     const createVoucher = (
       accCode,
       accName,
+      TDSApplicable,
       accCategory,
       debit,
       credit,
@@ -730,7 +731,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
       GSTRate: 0,
       GSTAmount: 0,
       Total: debit + credit,
-      TDSApplicable: false,
+      TDSApplicable: TDSApplicable,
       narration: `When Vendor Bill Generated For : ${RefNo}  Against Bill No : ${BillNo}`,
     });
 
@@ -739,7 +740,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
 
     // Push Debit Account Data
     const AccountData = this.AccountList.find((x) => x.aCCD == data.DebitAccount);
-    Result.push(createVoucher(AccountData.aCCD, AccountData.aCNM, AccountData.mRPNM, parseFloat(data.Amount), 0, data.ManualBillNo, BillNo));
+    Result.push(createVoucher(AccountData.aCCD, AccountData.aCNM, false, AccountData.mRPNM, parseFloat(data.Amount), 0, data.ManualBillNo, BillNo));
 
     //#region Push TDS Sectiond Data
     if (+data.TDSRate != 0) {
@@ -749,7 +750,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         // Get TDS Section Code and Name
         const TDSLedger = this.TDSAccountList.find((x) => x.aCCD == data.TDSLedger);
         if (TDSLedger) {
-          Result.push(createVoucher(TDSLedger.aCCD, TDSLedger.aCNM, "LIABILITY", 0, TDSAmount, data.ManualBillNo, BillNo));
+          Result.push(createVoucher(TDSLedger.aCCD, TDSLedger.aCNM, true, "LIABILITY", 0, TDSAmount, data.ManualBillNo, BillNo));
         }
       }
     }
@@ -765,14 +766,14 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         if (GSTLedger) {
           const isSameState = data.StateofSupply.replace(/\s+/g, '').toUpperCase() === data.StateOfBilling.replace(/\s+/g, '').toUpperCase();
           if (isSameState) {
-            Result.push(createVoucher(ledgerInfo["CGST"].LeadgerCode, ledgerInfo["CGST"].LeadgerName, ledgerInfo["CGST"].LeadgerCategory,
+            Result.push(createVoucher(ledgerInfo["CGST"].LeadgerCode, ledgerInfo["CGST"].LeadgerName, false, ledgerInfo["CGST"].LeadgerCategory,
               GSTAmount / 2, 0, data.ManualBillNo, BillNo, GSTLedger.aCCD, GSTLedger.aCNM));
             Result.push(createVoucher(
-              ledgerInfo["SGST"].LeadgerCode, ledgerInfo["SGST"].LeadgerName, ledgerInfo["SGST"].LeadgerCategory,
+              ledgerInfo["SGST"].LeadgerCode, ledgerInfo["SGST"].LeadgerName, false, ledgerInfo["SGST"].LeadgerCategory,
               GSTAmount / 2, 0, data.ManualBillNo, BillNo, GSTLedger.aCCD, GSTLedger.aCNM
             ));
           } else {
-            Result.push(createVoucher(ledgerInfo["IGST"].LeadgerCode, ledgerInfo["IGST"].LeadgerName,
+            Result.push(createVoucher(ledgerInfo["IGST"].LeadgerCode, ledgerInfo["IGST"].LeadgerName, false,
               ledgerInfo["IGST"].LeadgerCategory,
               GSTAmount, 0, data.ManualBillNo, BillNo, GSTLedger.aCCD, GSTLedger.aCNM));
           }
@@ -789,6 +790,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
       createVoucher(
         ledgerInfo["LIA001001"].LeadgerCode,
         ledgerInfo["LIA001001"].LeadgerName,
+        false,
         ledgerInfo["LIA001001"].LeadgerCategory,
         difference > 0 ? 0 : Math.abs(difference),
         difference < 0 ? 0 : Math.abs(difference),

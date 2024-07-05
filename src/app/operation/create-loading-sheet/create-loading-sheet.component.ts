@@ -26,6 +26,7 @@ import { AddMarketVehicleComponent } from "../add-market-vehicle/add-market-vehi
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -220,6 +221,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     private generalService: GeneralService,
     private loadingSheetService: LoadingSheetService,
     private vehicleTypeService: VehicleTypeService,
+    private thcService:ThcService,
     private vehicleService: VehicleService,
     public snackBarUtilityService: SnackBarUtilityService
   ) {
@@ -315,6 +317,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     );
 
     if (this.tripData.Action.replace(" ", "") === 'UpdateTrip') {
+
       //this.loadingSheetTableForm.controls['VehicleNo'].setValue(this.tripData.VehicleNo);
       this.loadVehicleDetails();
       this.getshipmentData();
@@ -327,6 +330,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         );
       this.lsDetails = lsDetail[lsDetail.length - 1];
       this.departFlag = true;
+      this.getThcDetails();
       this.getCapacity();
       if (!this.tripData.VehicleNo) {
         this.GetVehicleDropDown();
@@ -336,6 +340,28 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.GetVehicleDropDown();
       this.getshipmentData();
     }
+  }
+  async getThcDetails() {
+    if(this.isUpdate){
+    const res = await this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
+    if (Object.keys(res.data).length > 0) {
+      this.loadingSheetTableForm.controls['vehicleType'].setValue(res.data?.vTYP||"");
+     // this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(res.data?.vTYP);
+      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(res.data?.cAP?.vOL||0);
+      this.loadingSheetTableForm.controls['Capacity'].setValue(res.data?.cAP?.wT||"");
+      const fieldName=['vehicle','Capacity','CapacityVolumeCFT','vehicleType'];
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
+        if (fieldName.includes(x.name)) {
+          x.disable = true
+        }
+        return x;
+      });
+     // this.loadingSheetTableForm.controls['vehicle'].disable();
+      //this.loadingSheetTableForm.controls['Capacity'].disable();
+      //this.loadingSheetTableForm.controls['CapacityVolumeCFT'].disable();
+      //this.loadingSheetTableForm.controls['vehicleType'].disable();
+    }
+  }
   }
   /*below function is for the inatalize a forGroup*/
   IntializeFormControl() {
@@ -524,7 +550,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.isDisbled = true;
     try {
       this.snackBarUtilityService.commonToast(async () => {
-        const lsForm = this.loadingSheetTableForm.value;
+        const lsForm = this.loadingSheetTableForm.getRawValue();
         if (lsForm.vendorType == "Market" || !this.isUpdate) {
           try {
             if (this.isMarket && this.MarketData) {
@@ -897,8 +923,8 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
         this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
         this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData?.vendorType || "Market");
-        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
-        this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData?.cft||0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData?.capacity||0);
       }
       else {
         this.checkIsMarketVehicle(vehicleData);

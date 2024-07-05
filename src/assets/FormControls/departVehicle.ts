@@ -203,7 +203,7 @@ export class BalanceControl {
                 type: 'dropdown',
                 value: '',
                 additionalData: {
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                     metaData: "vehLoad"
                 },
                 Validations: [{
@@ -241,7 +241,7 @@ export class BalanceControl {
                 type: 'dropdown',
                 value: '',
                 additionalData: {
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                     metaData: "vehLoad"
                 },
                 Validations: [{

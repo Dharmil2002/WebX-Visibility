@@ -140,7 +140,7 @@ export class AdvancePaymentsComponent implements OnInit {
   TDSdata: any;
   VoucherRequestModel = new VoucherRequestModel();
   VoucherDataRequestModel = new VoucherDataRequestModel();
-  isInterBranchControl = false;
+  //isInterBranchControl = false;
   ModifdTHCDataList = [];
   constructor(
     private filter: FilterUtils,
@@ -196,7 +196,7 @@ export class AdvancePaymentsComponent implements OnInit {
     }
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
-      this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false;
+      // this.isInterBranchControl = res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false;
       this.accountingOnThc = res.find(x => x.rULEID === "THCACONGEN")?.vAL === true ? true : false;
     }
   }
@@ -782,45 +782,25 @@ export class AdvancePaymentsComponent implements OnInit {
         const Response = [];
 
         // Process Journal Requests
-        if (this.isInterBranchControl) {
-          // Process Debit Requests
-          for (let i = 0; i < selectedData.length; i++) {
-            const data = selectedData[i];
-            const result = await firstValueFrom(this.createDebitRequest(data, true));
-            const { docNo: THCNo, vNO: VoucherNo } = result.data.ops[0];
-            const AdvancePendingAmount = (parseFloat(data.AdvancePending) - parseFloat(data.AdvancePaymentAmount)).toFixed(2);
+        // if (this.isInterBranchControl) {
+        //   // Process Debit Requests
+        //   for (let i = 0; i < selectedData.length; i++) {
+        //     const data = selectedData[i];
+        //     const result = await firstValueFrom(this.createDebitRequest(data, true));
+        //     const { docNo: THCNo, vNO: VoucherNo } = result.data.ops[0];
+        //     const AdvancePendingAmount = (parseFloat(data.AdvancePending) - parseFloat(data.AdvancePaymentAmount)).toFixed(2);
 
-            const ResultObject = {
-              THCNo,
-              VoucherNo,
-              AdvancePendingAmount,
-              data
-            };
+        //     const ResultObject = {
+        //       THCNo,
+        //       VoucherNo,
+        //       AdvancePendingAmount,
+        //       data
+        //     };
+        //     Response.push(ResultObject);
+        //   }
+        // } else 
 
-
-            Response.push(ResultObject);
-          }
-        } else {
-          if (!this.accountingOnThc) {
-            for (let i = 0; i < selectedData.length; i++) {
-              const data = selectedData[i];
-              const result = await firstValueFrom(this.createJournalRequest(data));
-
-              const { docNo: THCNo, vNO: VoucherNo } = result.data.ops[0];
-              const AdvancePendingAmount = (parseFloat(data.AdvancePending) - parseFloat(data.AdvancePaymentAmount)).toFixed(2);
-
-              const ResultObject = {
-                THCNo,
-                VoucherNo,
-                AdvancePendingAmount,
-                data
-              };
-
-
-              Response.push(ResultObject);
-            }
-          }
-          // Process Debit Requests
+        if (this.accountingOnThc) {
           for (let i = 0; i < selectedData.length; i++) {
             const data = selectedData[i];
             const result = await firstValueFrom(this.createDebitRequest(data, false));
@@ -838,7 +818,24 @@ export class AdvancePaymentsComponent implements OnInit {
             Response.push(ResultObject);
           }
         }
+        else {
+          for (let i = 0; i < selectedData.length; i++) {
+            const data = selectedData[i];
+            const result = await firstValueFrom(this.createJournalRequest(data));
 
+            const { docNo: THCNo, vNO: VoucherNo } = result.data.ops[0];
+            const AdvancePendingAmount = (parseFloat(data.AdvancePending) - parseFloat(data.AdvancePaymentAmount)).toFixed(2);
+
+            const ResultObject = {
+              THCNo,
+              VoucherNo,
+              AdvancePendingAmount,
+              data
+            };
+            Response.push(ResultObject);
+          }
+
+        }
         this.UpdateTHCAmount(Response, this.PaymentData?.Mode);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error);
@@ -1116,7 +1113,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
   GetDebitVoucherLedgers(thc, AdvancePaymentAmount) {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
-    const createVoucher = (accCode, debit, credit, THCNo, accName = null, accCategory = null) => ({
+    const createVoucher = (accCode, TDSApplicable, debit, credit, THCNo, accName = null, accCategory = null) => ({
       companyCode: this.storage.companyCode,
       voucherNo: "",
       transCode: VoucherInstanceType.AdvancePayment,
@@ -1136,7 +1133,7 @@ export class AdvancePaymentsComponent implements OnInit {
       GSTRate: 0,
       GSTAmount: 0,
       Total: debit + credit,
-      TDSApplicable: false,
+      TDSApplicable: TDSApplicable,
       narration: `When Advance Paid against THC NO : ${THCNo}`,
     });
 
@@ -1149,28 +1146,30 @@ export class AdvancePaymentsComponent implements OnInit {
      Credit thc.Advance to AST003001
      Credit balAMT to LIA001002, if balAMT > 0
     */
-    if (this.isInterBranchControl) {
-      Result.push(createVoucher('LIA003004', THCAmount, 0, thc.THC));
-      if (balAMT > 0) {
-        Result.push(createVoucher('LIA001002', 0, balAMT, thc.THC));
-      }
-    }
-    else {
-      Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
-    }
+    // if (this.isInterBranchControl) {
+    //   // Result.push(createVoucher('LIA003004', THCAmount, 0, thc.THC));
+    //   // if (balAMT > 0) {
+    //   //   Result.push(createVoucher('LIA001002', 0, balAMT, thc.THC));
+    //   // }
+    //   // Made Changes For WT-928 Given by Upen Sir
+    //   Result.push(createVoucher('LIA001002', parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
+    // }
+    // else {
+    Result.push(createVoucher('LIA001002', false, parseFloat(AdvancePaymentAmount + TDSAmount), 0, thc.THC));
+    // }
 
     const PaymentAmountWithoutTDS = parseFloat((AdvancePaymentAmount).toString());
     if (PaymentMode == "Cash") {
       const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount").value;
-      Result.push(createVoucher(CashAccount.aCCD, 0, PaymentAmountWithoutTDS, thc.THC, CashAccount.aCNM, "ASSET"));
+      Result.push(createVoucher(CashAccount.aCCD, false, 0, PaymentAmountWithoutTDS, thc.THC, CashAccount.aCNM, "ASSET"));
     }
     else if (PaymentMode == "Journal") {
       const JournalAccount = this.PaymentSummaryFilterForm.get("JournalAccount").value;
-      Result.push(createVoucher(JournalAccount.value, 0, PaymentAmountWithoutTDS, thc.THC, JournalAccount.name, "ASSET"));
+      Result.push(createVoucher(JournalAccount.value, false, 0, PaymentAmountWithoutTDS, thc.THC, JournalAccount.name, "ASSET"));
     }
     else if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      Result.push(createVoucher(BankDetails.value, 0, PaymentAmountWithoutTDS, thc.THC, BankDetails.name, "ASSET"));
+      Result.push(createVoucher(BankDetails.value, false, 0, PaymentAmountWithoutTDS, thc.THC, BankDetails.name, "ASSET"));
     }
 
     // Push TDS Sectiond Data
@@ -1178,6 +1177,7 @@ export class AdvancePaymentsComponent implements OnInit {
       if (+this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount != 0) {
         Result.push(createVoucher(
           this.VendorAdvanceTaxationTDSFilterForm.value.TDSSection.value,
+          true,
           0,
           +this.VendorAdvanceTaxationTDSFilterForm.value.TDSAmount,
           thc.THC,

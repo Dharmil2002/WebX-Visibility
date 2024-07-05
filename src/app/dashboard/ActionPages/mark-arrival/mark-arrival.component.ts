@@ -122,7 +122,6 @@ export class MarkArrivalComponent implements OnInit {
     })
   }
   async getManifestDetail() {
-
     const shipment = await this.arrivalService.getThcWiseMeniFest({ tHC: this.MarkArrivalTable.TripID, "D$or": [{ iSDEL: false }, { iSDEL: { D$exists: false } }] });
     this.mfList = shipment
   }
@@ -177,7 +176,8 @@ export class MarkArrivalComponent implements OnInit {
       };
     }
     //#endregion
-    const dktStatus = (this.mfList ?? []).length > 0 ? "dktAvail" : "noDkt";
+  
+    const dktStatus = (this.mfList.filter(f => f.lDEST == this.storage.branch) ?? []).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
     let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
@@ -245,7 +245,7 @@ export class MarkArrivalComponent implements OnInit {
       const reqBody = {
         "companyCode": this.companyCode,
         "collectionName": "trip_Route_Schedule",
-        "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
+        "filter": { tHC:this.MarkArrivalTableForm.value?.TripID},
         "update": {
           ...tripDetails
         }

@@ -305,6 +305,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
 
   }
 
+  // Get Vendor Information
   async GetVendorInformation() {
     this.VendorDetails = await GetSingleVendorDetailsFromApi(
       this.masterService,

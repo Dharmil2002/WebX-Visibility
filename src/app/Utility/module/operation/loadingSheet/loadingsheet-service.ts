@@ -7,6 +7,7 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { VehicleService } from "../../masters/vehicle-master/vehicle-master-service";
+import { debug } from "console";
 
 @Injectable({
   providedIn: "root",
@@ -279,11 +280,11 @@ export class LoadingSheetService {
     if (tabledata.length > 0) {
       tabledata.forEach((element, index) => {
         let tripMovementJson = {
-          "_id": `${this.storage.companyCode}-${index}-${data?.TripID}`,
-          "tHC": data?.TripID || "",
+          "_id": `${this.storage.companyCode}-${index}-${data?.tripID}`,
+          "tHC": data?.tripID || "",
           "cID": this.storage.companyCode,
-          "fLOC": element?.orgLoc || "",
-          "tLOC": element?.destLoc || "",
+          "fLOC": element?.leg.split("-")[0] || "",
+          "tLOC": element?.leg.split("-")[1] || "",
           "lOAD": {
             "dKTS": element?.count || 0,
             "pKGS": element?.packages || 0,
@@ -357,8 +358,8 @@ export class LoadingSheetService {
           "mFNO": "",
           "vEHNO": data?.vehicle.value || "",
           "tOTDKT": element?.count || "",
-          "fLOC": element?.orgLoc || "",
-          "tLOC": element?.destLoc || "",
+          "fLOC": element?.leg.split("-")[0] || "",
+          "tLOC": element?.leg.split("-")[1] || "",
           "nXTLOC": "",
           "pKGS": parseInt(element?.packages) || 0,
           "wT": ConvertToNumber(element?.weightKg || 0, 2),

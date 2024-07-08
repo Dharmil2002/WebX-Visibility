@@ -161,12 +161,16 @@ export class DepartureService {
         "bALAMT": data?.BalanceAmt || 0,
         "aDPAYAT": data?.advPdAt?.value || "",
         "bLPAYAT": data?.balAmtAt?.value || "",
+        "fCT":data?.fromCity||"",
+        "tCT":data?.toCity||"",
         "iSBILLED": false,
         "bILLNO": "",
         "eNGNO":data?.engineNo||"",
         "cHASNO":data?.chasisNo||"",
         "iNSEXDT":data?.inExdt||null,
         "fITDT":data?.fitdt||null,
+        "tRNTIME":null    ,
+        "vEHREGDT":data?.vehRegDate||null,
         "dRV": {
           "nM": data?.Driver || "",
           "mNO": data?.DriverMob || "",
@@ -177,9 +181,9 @@ export class DepartureService {
         "oTHAMT":data?.otherAmount||0,
         "tLOC": next,
         "dPT": {
-          "sCHDT": ConvertToDate(data?.DeptartureTime || new Date()),
-          "eXPDT": ConvertToDate(data?.DeptartureTime || new Date()),
-          "aCTDT": ConvertToDate(data?.DeptartureTime || new Date()),
+          "sCHDT": ConvertToDate(data?.DeptartureTime),
+          "eXPDT": ConvertToDate(data?.DeptartureTime),
+          "aCTDT": ConvertToDate(data?.DeptartureTime),
           "oDOMT": 0,
           "cEWB": data?.Cewb || ""
         },
@@ -201,8 +205,8 @@ export class DepartureService {
     }
     else {
       thcSummary = {
-        "oPSST": 1,
-        "oPSSTNM": "In Transit",
+        "oPSST": ThcStatus.In_Transit,
+        "oPSSTNM": ThcStatus[ThcStatus.In_Transit].split("_").join(" "),
         "cAP": {
           "wT": data?.Capacity || 0,
           "vOL": data?.VolumeaddedCFT || 0,

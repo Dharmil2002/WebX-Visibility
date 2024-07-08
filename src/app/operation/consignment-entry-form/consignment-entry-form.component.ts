@@ -991,7 +991,7 @@ export class ConsignmentEntryFormComponent
           this.model.consignmentTableForm.controls["cnbp"].disable();
           break;
         default:
-         
+
         // Handle other cases or throw an error
       }
     } else {
@@ -1271,7 +1271,7 @@ export class ConsignmentEntryFormComponent
       const json = {
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
-        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment( this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
+        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment(this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1478,12 +1478,12 @@ export class ConsignmentEntryFormComponent
     this.isManual = this.checkboxChecked == true ? false : true;
     this.isUpdate = this.checkboxChecked == true ? false : true;
     this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
-    if(this.isManual){
+    if (this.isManual) {
       this.model.consignmentTableForm.controls['docketNumber'].enable();
     }
-    else{
+    else {
       this.model.consignmentTableForm.controls['docketNumber'].disable();
-    
+
     }
   }
   checkDocketRules() {
@@ -2297,8 +2297,7 @@ export class ConsignmentEntryFormComponent
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT:
           this.model.FreightTableForm.controls["gstChargedAmount"].value,
-        cHG: "",
-        nFCHG: this.model.NonFreightTableForm?.value
+        cHG: this.model.NonFreightTableForm?.value
           ? Object.entries(this.model.NonFreightTableForm.value)
             .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
             .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
@@ -2500,7 +2499,7 @@ export class ConsignmentEntryFormComponent
       Swal.fire({
         icon: "success",
         title: "Docket Update Successfully",
-        text:"GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
+        text: "GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
         confirmButtonText: 'OK',
         showConfirmButton: true,
         denyButtonText: 'Print',
@@ -2510,7 +2509,7 @@ export class ConsignmentEntryFormComponent
       }).then((result) => {
         if (result.isConfirmed) {
           this.navService.navigateTotab("docket", "dashboard/Index");
-        }else if (result.isDenied) {
+        } else if (result.isDenied) {
           // Handle the action for the deny button here.
           const templateBody = {
             templateName: "DKT",
@@ -3049,7 +3048,7 @@ export class ConsignmentEntryFormComponent
   getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
     let fieldKey = isOrigin ? "fromCity" : "toCity";
-    if(term == "Location") {
+    if (term == "Location") {
       fieldKey = isOrigin ? "origin" : "destination";
     }
     const type = typeMapping[term];
@@ -3062,10 +3061,10 @@ export class ConsignmentEntryFormComponent
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;  
+        break;
       case "Location":
-          valueKey = "value";
-          break;   
+        valueKey = "value";
+        break;
       case "City":
         valueKey = "ct";
         break;
@@ -3077,9 +3076,9 @@ export class ConsignmentEntryFormComponent
     }
     const controls = this.model.consignmentTableForm.controls;
     let value;
-    if(fieldKey == "origin") {
+    if (fieldKey == "origin") {
       value = controls[fieldKey].value;
-    } else { 
+    } else {
       value = controls[fieldKey].value[valueKey];
     }
     if (value) {
@@ -3119,7 +3118,7 @@ export class ConsignmentEntryFormComponent
         0
       );
     }
-    const terms = ["Area", "Pincode","Location", "City", "State"];
+    const terms = ["Area", "Pincode", "Location", "City", "State"];
     const allCombinations = generateCombinations(terms);
     let matches = allCombinations
       .map(([fromTerm, toTerm]) => {
@@ -3134,16 +3133,16 @@ export class ConsignmentEntryFormComponent
         return null;
       })
       .filter((x) => x != null);
-      matches.push({
-        D$and: [
-          { "D$in": ['$fTYPE', [null, ""]] },
-          { "D$in": ['$fROM', [null, ""]] }]
-      });
-      matches.push({
-        D$and: [
-          { "D$in": ['$tTYPE', [null, ""]] },
-          { "D$in": ['$tO', [null, ""]] }]
-      });
+    matches.push({
+      D$and: [
+        { "D$in": ['$fTYPE', [null, ""]] },
+        { "D$in": ['$fROM', [null, ""]] }]
+    });
+    matches.push({
+      D$and: [
+        { "D$in": ['$tTYPE', [null, ""]] },
+        { "D$in": ['$tO', [null, ""]] }]
+    });
     let reqBody = {
       companyCode: this.storage.companyCode,
       customerCode: this.model.consignmentTableForm.value.billingParty.value,
@@ -3913,9 +3912,9 @@ export class ConsignmentEntryFormComponent
                       showCancelButton: true
                     }).then((result) => {
                       if (result.isConfirmed) {
-                       // Redirect after the alert is closed with OK button.
-                      this.navService.navigateTotab('docket', "dashboard/Index");
-                      }else if (result.isDenied) {
+                        // Redirect after the alert is closed with OK button.
+                        this.navService.navigateTotab('docket', "dashboard/Index");
+                      } else if (result.isDenied) {
                         // Handle the action for the deny button here.
                         const templateBody = {
                           templateName: "DKT",

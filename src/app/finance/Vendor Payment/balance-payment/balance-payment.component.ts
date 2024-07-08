@@ -1042,8 +1042,10 @@ export class BalancePaymentComponent implements OnInit {
         this.VoucherDataRequestModel.scanSupportingDocument = "";
         this.VoucherDataRequestModel.transactionNumber = BillNo;
         const SelectedData = this.tableData.filter((x) => x.isSelected == true);
-        const voucherlineItems = this.GetJournalVoucherLedgers(SelectedData, BillNo, PaymentAmount, NetPayable, RoundOffAmount);
+        let voucherlineItems = this.GetJournalVoucherLedgers(SelectedData, BillNo, PaymentAmount, NetPayable, RoundOffAmount);
 
+        // Remove Debit and credit both 0 amount
+        voucherlineItems = voucherlineItems.filter(item => !(item.debit === 0 && item.credit === 0));
         // get sum of debit and credit
         const debitTotal = voucherlineItems.reduce((acc, curr) => acc + curr.debit, 0);
         const creditTotal = voucherlineItems.reduce((acc, curr) => acc + curr.credit, 0);

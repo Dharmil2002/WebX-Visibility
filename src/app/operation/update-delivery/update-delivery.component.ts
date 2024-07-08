@@ -201,7 +201,7 @@ export class UpdateDeliveryComponent implements OnInit {
                 x.pod = result.upload || "",
                 x.ltReason = result.ltReason || "",
                 x.reason = result?.deliveryPartial || result?.ltReason || "",
-                x.startKm = result?.startKm || 0,
+                x.endKm = result?.endKm || 0,
                 x.person = result?.person || this.storage.branch
             }
             return x;

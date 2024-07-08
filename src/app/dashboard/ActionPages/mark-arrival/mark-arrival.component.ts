@@ -139,6 +139,10 @@ export class MarkArrivalComponent implements OnInit {
       if (res) {
         this.updateTripData()
       }
+      Swal.hideLoading();
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
     }, " Vehicle Arrival");
   }
 

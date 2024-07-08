@@ -236,7 +236,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     });
   }
   getValidate(event) {
-
+if(!this.shipmentDetails.hasOwnProperty('Type')){
     const fm = {
       pkgs: {
         name: 'noofPkts',
@@ -335,6 +335,7 @@ export class EditShipmentDetailsComponent implements OnInit {
       Swal.fire('Warning', result.message, 'warning');
     }
     this.getCheckDeps();
+  }
   }
   getPkgsCheck() {
     const arrivalPkgs = this.EditShipmentForm.get('noofPkts')?.value || 0;

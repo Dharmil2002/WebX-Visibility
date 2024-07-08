@@ -41,6 +41,7 @@ export class thcreportService {
                 THCDT: item.THCDT ? moment(item.THCDT).format("DD MMM YY HH:MM") : "",
                 THCUpdateDate: item.THCUpdateDate ? moment(item.THCUpdateDate).format("DD MMM YY HH:MM") : "",
                 Dateandtime: item.Dateandtime ? moment(item.Dateandtime).format("DD MMM YY HH:MM") : "",
+                Unloadingdate: item.Unloadingdate ? moment(item.Unloadingdate).format("DD MMM YY HH:MM") : "",
                 UnloadedPkg : !isLTL && item.THCStatus === (1) ? 0: item.UnloadedPkg,
                 UnloadedWeight : !isLTL && item.THCStatus === (1) ? 0: item.UnloadedWeight,
                 TotalGCNUnloded : !isLTL && item.THCStatus === (1) ? 0: item.TotalGCNUnloded,

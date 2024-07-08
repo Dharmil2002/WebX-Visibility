@@ -483,8 +483,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       }));
       this.DeliveryTimeChargesArray = enable.sort((a, b) => a.name.localeCompare(b.name));
       this.DeliveryTimeChargesForm = formGroupBuilder(this.fb, [this.DeliveryTimeChargesArray]);
-      this.OnChangeBookingTimeCharges(null);
     }
+    this.OnChangeBookingTimeCharges(null);
   }
   //#endregion
 
@@ -499,8 +499,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         this.BookingTimechargesForm.get(event.field.ChargeId + "3").setValue(DiffAmount);
       }
     }
-
-    const NewFreight = this.BookingTimechargesForm.get('NewFreight').value;
+    const NewFreight = Number(this.BookingTimechargesForm.get('NewFreight').value || 0);
     // Calculate the Booking time charges
 
     this.TotalBookingTimeCharges = 0;
@@ -526,11 +525,13 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     // Calculate Delivery Time Charges
     this.TotalDeliveryTimeCharges = 0;
-    this.DeliveryTimeChargesArray.forEach((element) => {
-      const value = parseFloat(this.DeliveryTimeChargesForm.get(element.name).value);
-      const amountToAdd = isNaN(value) ? 0 : (element.additionalData.metaData.aDD_DEDU === "-" ? -value : value);
-      this.TotalDeliveryTimeCharges += amountToAdd;
-    });
+    if (this.DeliveryTimeChargesArray != undefined) {
+      this.DeliveryTimeChargesArray.forEach((element) => {
+        const value = parseFloat(this.DeliveryTimeChargesForm.get(element.name).value);
+        const amountToAdd = isNaN(value) ? 0 : (element.additionalData.metaData.aDD_DEDU === "-" ? -value : value);
+        this.TotalDeliveryTimeCharges += amountToAdd;
+      });
+    }
     const taxableAmount = this.TotalEditedAmount + NewFreight + this.TotalDeliveryTimeCharges;
     this.SummaryForm.get('DocketNewTotal').setValue(taxableAmount.toFixed(2));
 
@@ -841,19 +842,22 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
             });
           }
 
-          const dtChgs = this.DeliveryTimeChargesArray.map((d) => {
+          let dtChgs = [];
+          if (this.DeliveryTimeChargesArray != undefined) {
+            dtChgs = this.DeliveryTimeChargesArray.map((d) => {
 
-            var nd = {
-              "cHGID": d.additionalData.metaData.cHACD,
-              "cHGNM": d.additionalData.metaData.cAPTION || d.additionalData.metaData.sELCHA,
-              "aMT": 0,
-              "oPS": d.additionalData.metaData.aDD_DEDU,
-              "cHACAT": d.additionalData.metaData.cHACAT,
-            }
-            const value = parseFloat(this.DeliveryTimeChargesForm.get(d.name).value);
-            nd.aMT = isNaN(value) ? 0 : (d.additionalData.metaData.aDD_DEDU === "-" ? -value : value);
-            return nd;
-          });
+              var nd = {
+                "cHGID": d.additionalData.metaData.cHACD,
+                "cHGNM": d.additionalData.metaData.cAPTION || d.additionalData.metaData.sELCHA,
+                "aMT": 0,
+                "oPS": d.additionalData.metaData.aDD_DEDU,
+                "cHACAT": d.additionalData.metaData.cHACAT,
+              }
+              const value = parseFloat(this.DeliveryTimeChargesForm.get(d.name).value);
+              nd.aMT = isNaN(value) ? 0 : (d.additionalData.metaData.aDD_DEDU === "-" ? -value : value);
+              return nd;
+            });
+          }
 
           let PaymentMode = this.PaymentSummaryFilterForm.value.PaymentMode
           const headerRequest = {
@@ -1289,14 +1293,6 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
 
     if (type == "collection") {
       const PaymentMode = VoucherDataRequestModel.paymentMode;
-      if (PaymentMode == "Cash") {
-        Result.push(createVoucher(VoucherDataRequestModel.accountCode, VoucherDataRequestModel.accountName, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
-      }
-      if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
-        const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == VoucherDataRequestModel.accountCode && item.bANM == VoucherDataRequestModel.accountName)
-        Result.push(createVoucher(AccountDetails.aCCD, AccountDetails.aCNM, "ASSET", VoucherDataRequestModel.netPayable, 0, VoucherDataRequestModel.transactionNumber));
-      }
-
       if (this.isInterBranchControl) {
         Result.push(createVoucher(ledgerInfo["AST006002"].LeadgerCode, ledgerInfo["AST006002"].LeadgerName, ledgerInfo["AST006002"].LeadgerCategory,
           0, VoucherDataRequestModel.netPayable, VoucherDataRequestModel.transactionNumber));
@@ -1310,6 +1306,15 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
           Result.push(createVoucher(ledgerInfo[item].LeadgerCode, ledgerInfo[item].LeadgerName, ledgerInfo[item].LeadgerCategory,
             0, gst[item], VoucherDataRequestModel.transactionNumber));
         });
+      }
+      // Calculate Total Credit and Debit Amount If Any Difrrence Add to Gross Amount
+      const TotalCredit = Result.reduce((a, b) => a + parseFloat(b.credit), 0);
+      if (PaymentMode == "Cash") {
+        Result.push(createVoucher(VoucherDataRequestModel.accountCode, VoucherDataRequestModel.accountName, "ASSET", TotalCredit, 0, VoucherDataRequestModel.transactionNumber));
+      }
+      if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
+        const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == VoucherDataRequestModel.accountCode && item.bANM == VoucherDataRequestModel.accountName)
+        Result.push(createVoucher(AccountDetails.aCCD, AccountDetails.aCNM, "ASSET", TotalCredit, 0, VoucherDataRequestModel.transactionNumber));
       }
     }
     else if (type == "transfer") {

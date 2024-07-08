@@ -128,10 +128,10 @@ export class DepartVehicleComponent implements OnInit {
   vehicleDetail: any;
   listDocket = [];
   next: string;
-  products:AutoComplete[];
+  products: AutoComplete[];
   isSysCEVB: boolean = true;
   rules: any;
-  isDisble:boolean=false;
+  isDisble: boolean = false;
   thcDetails: any;
 
   // DepartVehicleControls: DepartVehicleControl;
@@ -145,16 +145,16 @@ export class DepartVehicleComponent implements OnInit {
     private generalService: GeneralService,
     private departureService: DepartureService,
     private hawkeyeUtilityService: HawkeyeUtilityService,
-    private storage:StorageService,
-    private locationService:LocationService,
+    private storage: StorageService,
+    private locationService: LocationService,
     private filter: FilterUtils,
     private controlPanel: ControlPanelService,
-    private snackBarUtilityService:SnackBarUtilityService
+    private snackBarUtilityService: SnackBarUtilityService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-    
+
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
     this.getRules().finally(() => {
@@ -179,9 +179,9 @@ export class DepartVehicleComponent implements OnInit {
   }
   async generalMaster() {
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
-    const product=["Road","Express"];
-    this.products = this.products.filter((x) => product.includes(x.name));  
-    setGeneralMasterData(this.jsonControlArray,this.products, "transMode");
+    const product = ["Road", "Express"];
+    this.products = this.products.filter((x) => product.includes(x.name));
+    setGeneralMasterData(this.jsonControlArray, this.products, "transMode");
     this.vehicleDetails();
   }
   async autoBindData() {
@@ -206,11 +206,22 @@ export class DepartVehicleComponent implements OnInit {
     const loadingLocationFormControl = this.loadingSheetTableForm.controls["LoadingLocation"];
     const loadingLocationValue = this.storage.branch || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
-    const route=this.tripData.RouteandSchedule.split(":")[1].split("-");
+    const route = this.tripData.RouteandSchedule.split(":")[1].split("-");
     const first = route[0];  // Accessing the first element
-    const last = route[route.length - 1]; 
-    this.balanceTableForm.controls['balAmtAt'].setValue({name:last,value:last});
-    this.balanceTableForm.controls['advPdAt'].setValue({name:first,value:first});
+    const last = route[route.length - 1];
+    try {
+      const locData = await this.locationService.getLocations({
+        locCode: { D$in: [last, first] },
+      });
+      const balAmtLoc = locData.find((x) => x.locCode == last)
+      const adAmt = locData.find((x) => x.locCode == first)
+      this.balanceTableForm.controls['balAmtAt'].setValue({ name: balAmtLoc?.locCode || "", value: balAmtLoc?.locName || "" });
+      this.balanceTableForm.controls['advPdAt'].setValue({ name: adAmt?.locCode, value: balAmtLoc?.locName || "" });
+    }
+    catch (err) {
+      this.balanceTableForm.controls['balAmtAt'].setValue({ name: first, value: first });
+      this.balanceTableForm.controls['advPdAt'].setValue({ name: last, value: last });
+    }
 
   }
 
@@ -232,8 +243,8 @@ export class DepartVehicleComponent implements OnInit {
         firstValueFrom(this._operationService.operationMongoPost("generic/getOne", reqVeh)),
         this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
       ]);
-       const thcData=thcDetails?.data||"";
-       this.thcDetails=thcDetails?.data||"";
+      const thcData = thcDetails?.data || "";
+      this.thcDetails = thcDetails?.data || "";
       if (Object.keys(res.data).length > 0) {
         const { data } = res;
         this.departvehicleTableForm.controls["VendorType"].setValue(data?.vendorType || "");
@@ -241,11 +252,11 @@ export class DepartVehicleComponent implements OnInit {
         this.departvehicleTableForm.controls["Driver"].setValue(data?.driver || "");
         this.departvehicleTableForm.controls["DriverMob"].setValue(data?.dMobNo || "");
         this.departvehicleTableForm.controls["License"].setValue(data?.lcNo || "");
-        this.loadingSheetTableForm.controls['vehicleType'].setValue(thcData?.vTYPNM ||data?.vehType || "");
-        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(thcData?.vTYP||data?.vTYP || "");
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(thcData?.vTYPNM || data?.vehType || "");
+        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(thcData?.vTYP || data?.vTYP || "");
         this.departvehicleTableForm.controls["Expiry"].setValue(data?.lcExpireDate);
-        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(thcData?.cAP?.vOL||data?.capacityVolCFT || 0);
-        this.loadingSheetTableForm.controls['Capacity'].setValue(thcData?.cAP?.wT ||  data?.capacity || 0);
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(thcData?.cAP?.vOL || data?.capacityVolCFT || 0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(thcData?.cAP?.wT || data?.capacity || 0);
         this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED?.wT || 0);
         this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED?.vOL || 0);
 
@@ -254,20 +265,20 @@ export class DepartVehicleComponent implements OnInit {
         const { data } = resVeh;
         this.loadingSheetTableForm.controls['vehicleType'].setValue(data?.vehicleType || "");
         this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(data?.vehicleTypeCode || "");
-        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(thcData?.cAP?.vOL||data?.cft || 0);
-        this.loadingSheetTableForm.controls['Capacity'].setValue(thcData?.cAP?.wT||data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED?.wT||data?.capacity || 0);
-        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED?.vOL||data?.cft || 0); // Assuming you meant cft here for consistency
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(thcData?.cAP?.vOL || data?.cft || 0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(thcData?.cAP?.wT || data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedKg'].setValue(thcDetails?.data?.lOADED?.wT || data?.capacity || 0);
+        this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(thcDetails?.data?.lOADED?.vOL || data?.cft || 0); // Assuming you meant cft here for consistency
         // THC Details handling
-      
+
       }
       if (Object.keys(thcDetails.data).length > 0) {
         const { data: thcData } = thcDetails;
-        if(thcData?.tMODE){
-        this.loadingSheetTableForm.controls['transMode'].setValue(`${thcData?.tMODE}`);
+        if (thcData?.tMODE) {
+          this.loadingSheetTableForm.controls['transMode'].setValue(`${thcData?.tMODE}`);
         }
-        else{
-          const products=this.products.find((x)=>x.name=="Road");
+        else {
+          const products = this.products.find((x) => x.name == "Road");
           this.loadingSheetTableForm.controls['transMode'].setValue(products.value);
         }
         this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(thcData?.lOADED.wT || 0);
@@ -279,25 +290,37 @@ export class DepartVehicleComponent implements OnInit {
         // this.advanceTableForm.controls['Unloading'].setValue(thcData?.cHG.uNLOADING || 0);
         // this.advanceTableForm.controls['Enroute'].setValue(thcData?.cHG.eNROUTE || 0);
         // this.advanceTableForm.controls['Misc'].setValue(thcData?.cHG.mISC || 0);
-       // this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
+        // this.balanceTableForm.controls['PaidByCash'].setValue(thcData?.aDV.pCASH || 0);
         //this.balanceTableForm.controls['PaidbyBank'].setValue(thcData?.aDV.pBANK || 0);
         ///this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
         this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
-        this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0); 
-       // this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
+        this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
+        // this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
         //this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
-       // this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
-        this.balanceTableForm.controls['balAmtAt'].setValue({name:thcData?.bLPAYAT||"",value:thcData?.bLPAYAT ||""});
-        this.balanceTableForm.controls['advPdAt'].setValue({name:thcData?.aDPAYAT||"",value:thcData?.aDPAYAT ||""});
+        // this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
+        try {
+          const locData = await this.locationService.getLocations({
+            locCode: { D$in: [ thcData?.bLPAYAT, thcData?.aDPAYAT] },
+          });
+          const balAmtLoc = locData.find((x) => x.locCode == thcData?.bLPAYAT)
+          const adAmt = locData.find((x) => x.locCode == thcData?.aDPAYAT)
+          this.balanceTableForm.controls['balAmtAt'].setValue({ name: balAmtLoc?.locCode || "", value: balAmtLoc?.locName || "" });
+          this.balanceTableForm.controls['advPdAt'].setValue({ name: adAmt?.locCode||"", value: balAmtLoc?.locName || "" });
+        }
+        catch (err) {
+          this.balanceTableForm.controls['balAmtAt'].setValue({ name: thcData?.bLPAYAT || "", value: thcData?.bLPAYAT || "" });
+          this.balanceTableForm.controls['advPdAt'].setValue({ name: thcData?.aDPAYAT || "", value: thcData?.aDPAYAT || "" });
+        }
+       
         const Expected = moment(this.tripData.ExpectedDate).format("DD MMM YY HH:MM");
         this.loadingSheetTableForm.controls['Expected'].setValue(Expected);
-        if(thcData.cHG && thcData.cHG.length>0){
-          this.getAutoFillCharges(thcData.cHG,thcData);
+        if (thcData.cHG && thcData.cHG.length > 0) {
+          this.getAutoFillCharges(thcData.cHG, thcData);
         }
-        else{
-          this.getCharges(thcData?.tMODENM||"Road");
+        else {
+          this.getCharges(thcData?.tMODENM || "Road");
         }
-        
+
       }
     } catch (error) {
       console.error("Error fetching vehicle details:", error);
@@ -352,6 +375,7 @@ export class DepartVehicleComponent implements OnInit {
       console.log("failed");
     }
   }
+
   IsActiveFuntion($event) {
     this.loadingData = $event;
   }
@@ -361,19 +385,20 @@ export class DepartVehicleComponent implements OnInit {
       const locData = await this.locationService.getLocations({
         locCode: { 'D$regex': `^${this.balanceTableForm.controls[event.field.name].value}`, 'D$options': 'i' },
       });
-      const locationMapping=locData.map((x)=>
-      {return {
-        name:x.locCode,
-        value:x.locCode,
-        locData:x
-      }})
+      const locationMapping = locData.map((x) => {
+        return {
+          name: x.locName,
+          value: x.locCode,
+          locData: x
+        }
+      })
       this.filter.Filter(
         this.balanceControlArray,
         this.balanceTableForm,
         locationMapping,
         event.field.name,
         false
-        );
+      );
     }
   }
   /*End*/
@@ -467,31 +492,33 @@ export class DepartVehicleComponent implements OnInit {
 
   Close() {
     this.snackBarUtilityService.commonToast(async () => {
-    this.isDisble=true;
-    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
-    const loadingArray = [this.loadingSheetTableForm.value];
-    const departArray = [this.departvehicleTableForm.value];
-    const advancearray = [this.advanceTableForm.value];
-    const balanceArray = [this.balanceTableForm.value];
-    const departureArray = [this.departureTableForm.value];
+      this.isDisble = true;
+      this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
+      this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
+      const loadingArray = [this.loadingSheetTableForm.getRawValue()];
+      const departArray = [this.departvehicleTableForm.getRawValue()];
+      const advancearray = [this.advanceTableForm.getRawValue()];
+      const balanceArray = [this.balanceTableForm.getRawValue()];
+      const departureArray = [this.departureTableForm.getRawValue()];
 
-    const mergedArray = [
-      ...loadingArray,
-      ...departArray,
-      ...advancearray,
-      ...balanceArray,
-      ...departureArray,
-    ];
-    const mergedData = this.mergeArrays(mergedArray);
-    delete mergedData.vehicleTypecontrolHandler;
-    mergedData['lsno'] = this.lsDetails?.lsno || '';
-    mergedData['mfNo'] = this.lsDetails?.mfNo || '';
-    this.addDepartData(mergedData);
-  },"Depart Vehicle");
+      const mergedArray = [
+        ...loadingArray,
+        ...departArray,
+        ...advancearray,
+        ...balanceArray,
+        ...departureArray,
+      ];
+      const mergedData = this.mergeArrays(mergedArray);
+      delete mergedData.vehicleTypecontrolHandler;
+      mergedData['lsno'] = this.lsDetails?.lsno || '';
+      mergedData['mfNo'] = this.lsDetails?.mfNo || '';
+      this.addDepartData(mergedData);
+      Swal.hideLoading();
+      setTimeout(() => {
+        Swal.close();
+      }, 7000);
+    }, "Depart Vehicle");
   }
-
-
   async addDepartData(departData) {
     let charges = []
     this.advanceControlArray.filter((x) => x.hasOwnProperty("id")).forEach(element => {
@@ -510,7 +537,6 @@ export class DepartVehicleComponent implements OnInit {
     this.askTracking(departData);
     //this.goBack('Departures');
   }
-
   async askTracking(departData) {
     //get trip details
     let filter = {
@@ -526,28 +552,28 @@ export class DepartVehicleComponent implements OnInit {
       this.goBack('Departures');
     }
   }
-  
-  async pushDeptCT(tripDet){
-    let filter= {
-      vehicleNo:tripDet.vEHNO 
+
+  async pushDeptCT(tripDet) {
+    let filter = {
+      vehicleNo: tripDet.vEHNO
     }
-    let vehicleDet=await this.departureService.fetchData('vehicle_detail',filter);
-    if(vehicleDet?.length>0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId!="" ){
-      const reqArrivalDeparture={
-        action:"TripArrivalDepartureUpdate",
-        reqBody:{
-          cid:this.companyCode,
-          EventType:'D',
+    let vehicleDet = await this.departureService.fetchData('vehicle_detail', filter);
+    if (vehicleDet?.length > 0 && vehicleDet[0]?.isActive && vehicleDet[0]?.gpsDeviceEnabled && vehicleDet[0]?.gpsDeviceId != "") {
+      const reqArrivalDeparture = {
+        action: "TripArrivalDepartureUpdate",
+        reqBody: {
+          cid: this.companyCode,
+          EventType: 'D',
           loc: this.storage.branch || "",
-          tripId:tripDet.tHC
+          tripId: tripDet.tHC
         }
       }
       this.hawkeyeUtilityService.pushToCTCommon(reqArrivalDeparture);
     }
 
   }
-  async openVehicleTracking(tripDet){
-    let filter= {
+  async openVehicleTracking(tripDet) {
+    let filter = {
       vehicleNo: tripDet[0].vEHNO
     }
     let vehicleDet = await this.departureService.fetchData('vehicle_detail', filter);
@@ -609,11 +635,11 @@ export class DepartVehicleComponent implements OnInit {
   }
   async getCharges(prod) {
     this.advanceControlArray = this.advanceControlArray.filter((x) => !x.hasOwnProperty('id'));
-    const filter = { "pRNm": prod, aCTV: true, cHBTY: {D$in:["Booking","Both"]}}
-    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod,cHATY:"Charges","cHAPP":{D$in:["THC"] },isActive:true }
+    const filter = { "pRNm": prod, aCTV: true, cHBTY: { D$in: ["Booking", "Both"] } }
+    const productFilter = { "cHACAT": { "D$in": ['V', 'B'] }, "pRNM": prod, cHATY: "Charges", "cHAPP": { D$in: ["THC"] }, isActive: true }
     const result = await this.thcService.getChargesV2(filter, productFilter);
     if (result && result.length > 0) {
-      
+
       const invoiceList = [];
       result.forEach((element, index) => {
         if (element) {
@@ -650,17 +676,17 @@ export class DepartVehicleComponent implements OnInit {
         // First, ensure "contAmt" always comes first
         if (a.name === "ContractAmt") return -1;
         if (b.name === "ContractAmt") return 1;
-        if (a.additionalData  && a.additionalData.metaData === '+') return -1;
+        if (a.additionalData && a.additionalData.metaData === '+') return -1;
         if (a.additionalData && a.additionalData.metaData === '-') return 1;
-      
+
         return 0;
       });
       this.advanceTableForm = formGroupBuilder(this.fb, [chargeControl]);
     }
   }
   /*below code is for getting a Chages from Charge Master*/
-  async getAutoFillCharges(charges,thcData) {
-    
+  async getAutoFillCharges(charges, thcData) {
+
     if (charges && charges.length > 0) {
       const invoiceList = [];
 
@@ -698,21 +724,20 @@ export class DepartVehicleComponent implements OnInit {
         // First, ensure "contAmt" always comes first
         if (a.name === "ContractAmt") return -1;
         if (b.name === "ContractAmt") return 1;
-        if (a.oPS  && a.additionalData.oPS === '+') return -1;
+        if (a.oPS && a.additionalData.oPS === '+') return -1;
         if (a.oPS && a.additionalData.oPS === '-') return 1;
-      
+
         return 0;
       });
-     // this.advanceControlArray = chargeControl;
-      this.advanceTableForm= formGroupBuilder(this.fb, [chargeControl]);
-   
+      // this.advanceControlArray = chargeControl;
+      this.advanceTableForm = formGroupBuilder(this.fb, [chargeControl]);
+
       this.advanceTableForm.controls['ContractAmt'].setValue(thcData?.cONTAMT || 0);
       this.advanceTableForm.controls['TotalTripAmt'].setValue(thcData?.tOTAMT || 0);
     }
   }
   /*End*/
   calucatedCharges() {
-
     let total = 0;
     const dyanmicCal = this.advanceControlArray.filter((x) => x.hasOwnProperty("id"));
     const chargeMapping = dyanmicCal.map((x) => { return { name: x.name, operation: x.additionalData.metaData } });
@@ -726,6 +751,7 @@ export class DepartVehicleComponent implements OnInit {
         return acc; // In case of an unknown operation
       }
     }, 0);
+    this.advanceTableForm.controls['otherAmount'].setValue(ConvertToNumber(total, 2));
     const totalAmt = ConvertToNumber(total, 2) + ConvertToNumber(this.advanceTableForm.controls["ContractAmt"].value, 2);
     this.advanceTableForm.controls['TotalTripAmt'].setValue(totalAmt);
     this.onCalculateTotal();
@@ -791,7 +817,7 @@ export class DepartVehicleComponent implements OnInit {
    * Fetches loading sheet details from the API and updates the form fields.
    */
   async fetchLoadingSheetDetailFromApi() {
-    
+
     // Fetch loading sheet details
     const loadingSheetDetail = await getLoadingSheetDetail(
       this.companyCode,
@@ -850,14 +876,46 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   onCalculateTotal(): void {
-    if(this.thcDetails.oPSST==1){
-    // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm
-    // Step 2: Calculate the total advances and set TotalAdv in the balanceTableForm
-    calculateTotalAdvances(this.balanceTableForm);
-    // Step 3: Calculate the balance amount as the difference between TotalAdv and TotalTripAmt,
-    // and set it in the BalanceAmount control of the balanceTableForm
-    const totalTripAmt = parseFloat(this.advanceTableForm.controls['TotalTripAmt'].value) || 0;
-    calculateBalanceAmount(this.balanceTableForm, totalTripAmt);
+    if (this.thcDetails.oPSST == 1) {
+      // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm
+      // Step 2: Calculate the total advances and set TotalAdv in the balanceTableForm
+      calculateTotalAdvances(this.balanceTableForm);
+      // Step 3: Calculate the balance amount as the difference between TotalAdv and TotalTripAmt,
+      // and set it in the BalanceAmount control of the balanceTableForm
+      const totalTripAmt = parseFloat(this.advanceTableForm.controls['TotalTripAmt'].value) || 0;
+      calculateBalanceAmount(this.balanceTableForm, totalTripAmt);
+    }
+    else {
+      const formControls = [
+        'ContractAmt',
+        'Advance',
+        'advPdAt',
+        'balAmtAt',
+        'BalanceAmt',
+        'VendorType',
+        'Vendor',
+        'Driver',
+        'DriverMob',
+        'License',
+        'vehicleType',
+        'Expiry',
+        'CapacityVolumeCFT',
+        'Capacity',
+        'LoadedKg',
+        'LoadedvolumeCFT',
+        'chasisNo',
+        'engineNo',
+        'inExdt',
+        'fitdt',
+        'otherAmount'
+      ];
+
+      formControls.forEach(control => {
+        this.advanceTableForm.controls[control]?.disable();
+        this.balanceTableForm.controls[control]?.disable();
+        this.departvehicleTableForm.controls[control]?.disable();
+        this.loadingSheetTableForm.controls[control]?.disable();
+      });
     }
   }
   async docketStatus() {
@@ -894,7 +952,7 @@ export class DepartVehicleComponent implements OnInit {
     const req = {
       DocNo: event.data?.manifest,
       templateName: "MF",
-      PartyField:""
+      PartyField: ""
     };
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, '', 'width=1000,height=800');

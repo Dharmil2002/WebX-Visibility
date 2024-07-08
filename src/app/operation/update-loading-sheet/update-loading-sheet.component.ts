@@ -375,6 +375,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
           const requestBody=await this.depsService.fieldArrivalDeps(selectedData); 
           const res = await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData, selectedData, notSelectedData, this.packageData, this.isScan);
           if(requestBody){
+            Swal.hideLoading();
+            setTimeout(() => {
+              Swal.close();
+            }, 3000);
             const res = await this.depsService.createDeps(requestBody);
             try {
               // Check if depsHeader exists and is an array

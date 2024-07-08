@@ -490,6 +490,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     if (resMf) {
       if (this.shipmentStatus == 'Loaded') {
+         Swal.hideLoading();
+         setTimeout(() => {
+           Swal.close();
+         }, 1000);
+         this.snackBarUtilityService.ShowCommonSwalSuccess('Manifest Generated Successfully');
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
           width: '100%', // Set the desired width
           data: { arrivalData: this.arrivalData, loadingSheetData: menifest ? menifest : this.shipingDataTable, mfNo: resMf } // Pass the data object
@@ -518,7 +523,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         this.dialogRef.close("");
       }
     }
-  },"Manifest");
+  },"Manifest")
   }
   Close(): void {
     this.dialogRef.close()

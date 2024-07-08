@@ -64,6 +64,62 @@ export class DepartVehicleControl {
                 generatecontrol: true,
                 disable: false
             },
+           
+            /*new field addedd by dhaval patel*/
+            {
+                name: "chasisNo",
+                label: "Chasis Number",
+                placeholder: "Chasis Number",
+                type: "text",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable:false,
+                Validations: [
+                ],
+                functions: {},
+                additionalData: { metaData: "Basic" }
+            },
+            {
+                name: "engineNo",
+                label: "Engine Number",
+                placeholder: "Engine Number",
+                type: "text",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable:false,
+                Validations: [
+                ],
+                functions: {},
+                additionalData: { }
+            },
+            {
+                name: 'inExdt', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
+                type: 'date', value: "", generatecontrol: true, disable: false,
+                Validations: [
+                ],
+                additionalData: {
+                    minDate: new Date(), // Set the minimum date to the current date
+                    maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+                }
+            },
+
+            {
+                name: 'fitdt', label: "Fitness Validity Date", placeholder: "", type: 'date',
+                value: "", generatecontrol: true, disable: false,
+                Validations: [
+                  
+                ],
+                additionalData: {
+                    minDate: new Date(), // Set the minimum date to the current date
+                    maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+                }
+            },
             {
                 name: 'vendorTypeCode',
                 label: 'Vendor Type',
@@ -74,6 +130,7 @@ export class DepartVehicleControl {
                 generatecontrol: false,
                 disable: false
             },
+            /*End*/
         ];
     }
     getDepartVehicleFormControls() {
@@ -98,6 +155,16 @@ export class AdvanceControl {
                 functions:{
                     onModel:'calucatedCharges'
                 }
+            },
+            {
+                name: 'otherAmount',
+                label: 'Other Amount(₹)',
+                placeholder: '',
+                type: 'number',
+                value: 0,
+                Validations: [],
+                generatecontrol: true,
+                disable: true
             },
          {
                 name: 'TotalTripAmt',

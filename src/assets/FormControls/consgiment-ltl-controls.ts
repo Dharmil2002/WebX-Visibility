@@ -1131,7 +1131,7 @@ export class ConsignmentLtl extends BaseControl {
       },
       {
         name: "freight_amount",
-        label: "Frieght Amount (₹)",
+        label: "Freight Amount (₹)",
         placeholder: "Freight Amount",
         type: "number",
         value: "",

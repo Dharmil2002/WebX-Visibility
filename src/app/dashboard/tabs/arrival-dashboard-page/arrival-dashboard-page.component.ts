@@ -352,7 +352,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
               cNRES: result.value//required cancel reason in popup
             }
             const res = await this.departureService.updateTHCLTL(filter, status);
-            //await this.departureService.deleteTrip({ cID: this.storage.companyCode, tHC: Data.label.data.TripID });
+            await this.departureService.deleteTrip({ cID: this.storage.companyCode, tHC: Data.label.data.TripID });
             Data.label.data.reason= result.value;
           this.departureService.updateDocket(Data.label.data);
             if (res) {

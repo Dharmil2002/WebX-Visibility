@@ -215,8 +215,10 @@ export class DepartVehicleComponent implements OnInit {
       });
       const balAmtLoc = locData.find((x) => x.locCode == last)
       const adAmt = locData.find((x) => x.locCode == first)
-      this.balanceTableForm.controls['balAmtAt'].setValue({ name: balAmtLoc?.locCode || "", value: balAmtLoc?.locName || "" });
-      this.balanceTableForm.controls['advPdAt'].setValue({ name: adAmt?.locCode, value: balAmtLoc?.locName || "" });
+      this.balanceTableForm.controls['balAmtAt'].setValue({ name: balAmtLoc?.locName || "", value: balAmtLoc?.locCode || "" });
+      this.balanceTableForm.controls['advPdAt'].setValue({ name: adAmt?.locName, value: balAmtLoc?.locCode || "" });
+      this.balanceTableForm.controls['fromCity'].setValue(balAmtLoc?.locCity||"");
+      this.balanceTableForm.controls['toCity'].setValue(adAmt?.locCity||"");
     }
     catch (err) {
       this.balanceTableForm.controls['balAmtAt'].setValue({ name: first, value: first });
@@ -224,7 +226,7 @@ export class DepartVehicleComponent implements OnInit {
     }
 
   }
-
+  
   async vehicleDetails() {
     try {
       const reqbody = {
@@ -295,6 +297,11 @@ export class DepartVehicleComponent implements OnInit {
         ///this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
         this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
         this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
+        this.departvehicleTableForm.controls['engineNo'].setValue(thcData?.eNGNO || 0);
+        this.departvehicleTableForm.controls['chasisNo'].setValue(thcData?.cHASNO || 0);
+        this.departvehicleTableForm.controls['inExdt'].setValue(thcData?.iNSEXDT || 0);
+        this.departvehicleTableForm.controls['fitdt'].setValue(thcData?.fITDT || 0);
+        this.departvehicleTableForm.controls['vehRegDate'].setValue(thcData?.vEHREGDT || 0);
         // this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
         //this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
         // this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
@@ -304,8 +311,8 @@ export class DepartVehicleComponent implements OnInit {
           });
           const balAmtLoc = locData.find((x) => x.locCode == thcData?.bLPAYAT)
           const adAmt = locData.find((x) => x.locCode == thcData?.aDPAYAT)
-          this.balanceTableForm.controls['balAmtAt'].setValue({ name: balAmtLoc?.locCode || "", value: balAmtLoc?.locName || "" });
-          this.balanceTableForm.controls['advPdAt'].setValue({ name: adAmt?.locCode||"", value: balAmtLoc?.locName || "" });
+          this.balanceTableForm.controls['balAmtAt'].setValue({ name: balAmtLoc?.locName || "", value: balAmtLoc?.locCode || "" });
+          this.balanceTableForm.controls['advPdAt'].setValue({ name: adAmt?.locName||"", value: balAmtLoc?.locCode || "" });
         }
         catch (err) {
           this.balanceTableForm.controls['balAmtAt'].setValue({ name: thcData?.bLPAYAT || "", value: thcData?.bLPAYAT || "" });
@@ -782,7 +789,6 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-
           this.docketStatus();
         }
       }
@@ -874,8 +880,9 @@ export class DepartVehicleComponent implements OnInit {
     }
     // Rest of your code that depends on loadingSheetDetail
   }
-
   onCalculateTotal(): void {
+    
+    const thc=this.thcDetails
     if (this.thcDetails.oPSST == 1) {
       // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm
       // Step 2: Calculate the total advances and set TotalAdv in the balanceTableForm
@@ -907,7 +914,8 @@ export class DepartVehicleComponent implements OnInit {
         'engineNo',
         'inExdt',
         'fitdt',
-        'otherAmount'
+        'otherAmount',
+        'vehRegDate'
       ];
 
       formControls.forEach(control => {

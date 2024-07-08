@@ -108,7 +108,6 @@ export class DepartVehicleControl {
                     maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
                 }
             },
-
             {
                 name: 'fitdt', label: "Fitness Validity Date", placeholder: "", type: 'date',
                 value: "", generatecontrol: true, disable: false,
@@ -118,6 +117,15 @@ export class DepartVehicleControl {
                 additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
                     maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+                }
+            },
+            {
+                name: 'vehRegDate', label: "Vehicle Register Date", placeholder: "", type: 'date',
+                value: "", generatecontrol: true, disable: false,
+                Validations: [
+                  
+                ],
+                additionalData: {
                 }
             },
             {
@@ -325,6 +333,32 @@ export class BalanceControl {
             ],
                 functions:{
                     onModel:"getLocation"
+                },
+                generatecontrol: true,
+                disable:false
+            },
+            {
+                name: 'fromCity',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '',
+                additionalData: {},
+                Validations: [],
+                functions:{
+                },
+                generatecontrol: true,
+                disable:false
+            },
+            {
+                name: 'toCity',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '',
+                additionalData:{},
+                Validations: [],
+                functions:{
                 },
                 generatecontrol: true,
                 disable:false

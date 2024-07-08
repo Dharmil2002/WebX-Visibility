@@ -206,7 +206,7 @@ export class VolumetricShipmentRegisterComponent implements OnInit {
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
 
-      this.source = result.data.data.data;
+      this.source = result.data;
       this.LoadTable = true;
       if (this.source.length === 0) {
         if (this.source) {

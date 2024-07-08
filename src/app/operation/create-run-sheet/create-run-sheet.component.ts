@@ -641,7 +641,6 @@ export class CreateRunSheetComponent implements OnInit {
   AccountPostingForAutoBilling(billData, BillNo): Observable<any> {
     const TotalAmount = billData?.aMT || 0;
     const GstAmount = billData?.gST?.aMT || 0;
-    debugger
 
     this.VoucherRequestModel.companyCode = this.storage.companyCode;
     this.VoucherRequestModel.docType = "VR";

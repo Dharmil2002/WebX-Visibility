@@ -84,6 +84,7 @@ import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-b
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
  
 @NgModule({
   imports: [
@@ -174,7 +175,8 @@ import { OpeningClosingStockReportComponent } from './opening-closing-stock-repo
     ToPayPaidButNotCollectedRegisterReportComponent,
     GcnFlowReportComponent,
     DriverStatusRegisterComponent,
-    OpeningClosingStockReportComponent
+    OpeningClosingStockReportComponent,
+    VendorWiseOutstandingRegisterReportComponent
   ],
   exports: [],
 

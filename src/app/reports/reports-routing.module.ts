@@ -46,6 +46,7 @@ import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-b
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
 
 
 const routes: Routes = [
@@ -93,8 +94,7 @@ const routes: Routes = [
   { path: "gcn-flow-report", component: GcnFlowReportComponent },
   { path: "driver-status-register-report", component: DriverStatusRegisterComponent },
   { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
- 
-
+  { path: "VendorWiseOutstandingRegister", component: VendorWiseOutstandingRegisterReportComponent },
 ];
 
 @NgModule({

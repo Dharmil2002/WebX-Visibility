@@ -1,3 +1,4 @@
+import { firstValueFrom } from "rxjs";
 import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
 
@@ -183,8 +184,11 @@ export async function getVehicleDetailFromApi(companyCode: number, operationServ
   }
   };
   try {
-    const res = await operationService.operationMongoPost("generic/get", reqBody).toPromise();
-    return res.data[0]
+    const res:any = await firstValueFrom(operationService.operationMongoPost("generic/get", reqBody));
+    if(res?.data && res.data.length > 0)
+      return res.data[0];
+    else 
+      return null;
   } catch (error) {
     console.error('Error occurred during the API call:', error);
   }

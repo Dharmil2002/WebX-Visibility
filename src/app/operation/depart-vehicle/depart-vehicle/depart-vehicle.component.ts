@@ -297,11 +297,12 @@ export class DepartVehicleComponent implements OnInit {
         ///this.balanceTableForm.controls['PaidbyFuel'].setValue(thcData?.aDV.pFUEL || 0);
         this.balanceTableForm.controls['Advance'].setValue(thcData?.aDV.tOTAMT || 0);
         this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);
-        this.departvehicleTableForm.controls['engineNo'].setValue(thcData?.eNGNO || 0);
-        this.departvehicleTableForm.controls['chasisNo'].setValue(thcData?.cHASNO || 0);
-        this.departvehicleTableForm.controls['inExdt'].setValue(thcData?.iNSEXDT || 0);
-        this.departvehicleTableForm.controls['fitdt'].setValue(thcData?.fITDT || 0);
-        this.departvehicleTableForm.controls['vehRegDate'].setValue(thcData?.vEHREGDT || 0);
+        this.departvehicleTableForm.controls['engineNo'].setValue(thcData?.eNGNO ||"");
+        this.departvehicleTableForm.controls['chasisNo'].setValue(thcData?.cHASNO ||"");
+        this.departvehicleTableForm.controls['inExdt'].setValue(thcData?.iNSEXDT ||"");
+        this.departvehicleTableForm.controls['fitdt'].setValue(thcData?.fITDT || "");
+        this.departvehicleTableForm.controls['vehRegDate'].setValue(thcData?.vEHREGDT ||"");
+        this.advanceTableForm.controls['otherAmount'].setValue(ConvertToNumber(thcData?.oTHAMT, 2));
         // this.balanceTableForm.controls['PaidbyCard'].setValue(thcData?.aDV.pCARD || 0);
         //this.balanceTableForm.controls['TotalAdv'].setValue(thcData?.aDV.tOTAMT || 0);
         // this.balanceTableForm.controls['BalanceAmt'].setValue(thcData?.bALAMT || 0);

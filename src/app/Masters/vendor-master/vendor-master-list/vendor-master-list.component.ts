@@ -59,6 +59,7 @@ export class VendorMasterListComponent implements OnInit {
 
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
+    "eNTDT": "Created Date",
     "vendorCode": "Vendor Code",
     "vendorName": "Vendor Name",
     "vendorManager": "Vendor Manager",
@@ -186,7 +187,6 @@ export class VendorMasterListComponent implements OnInit {
 
         // Assign transformed data to this.modifiedData including gst details
         this.csvFileData = dataWithSrno;
-        console.log(this.csv, this.csvFileData);
 
       } else {
         console.error('Response or data is empty.');
@@ -202,81 +202,6 @@ export class VendorMasterListComponent implements OnInit {
       this.tableLoad = false;
     }
   }
-
-  // async getVendorDetails() {
-  //   let req = {
-  //     "companyCode": this.storage.companyCode,
-  //     "collectionName": "vendor_detail",
-  //     "filter": { companyCode: this.storage.companyCode }
-  //   }
-  //   const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-  //   if (res) {
-  //     // Generate srno for each object in the array
-  //     const dataWithSrno = res.data
-  //       .map((obj) => {
-  //         return {
-  //           ...obj,
-  //           // srNo: index + 1,
-  //           vendorName: obj.vendorName.toUpperCase(),
-  //           vendorType: obj.vendorTypeName ? obj.vendorTypeName.toUpperCase() : '',
-  //           eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
-  //         };
-  //       })
-  //       .sort((a, b) => b.vendorCode.localeCompare(a.vendorCode));
-
-  //     this.csv = dataWithSrno;
-  //     this.tableLoad = false;
-  //   }
-
-  // }
-  // async getVendorDetails() {
-  //   try {
-  //     // Prepare the request object
-  //     const req = {
-  //       companyCode: this.storage.companyCode,
-  //       collectionName: "vendor_detail",
-  //       filter: { companyCode: this.storage.companyCode }
-  //     };
-
-  //     // Make the API call using firstValueFrom for the first emitted value
-  //     const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-
-  //     if (res && res.data) {
-  //       // Map and transform data
-  //       const dataWithSrno = res.data.map(item => {
-  //         const transformedItem = {
-  //           ...item,
-
-  //         };
-
-  //         // Extract details from otherdetails if available
-  //         if (item.otherdetails && item.otherdetails.length > 0) {
-  //           const detail = item.otherdetails[0]; // Take the first element
-  //           transformedItem.gstNumber0 = detail.gstNumber || '';
-  //           transformedItem.gstState0 = detail.gstState || '';
-  //           transformedItem.gstAddress0 = detail.gstAddress || '';
-  //           transformedItem.gstPincode0 = detail.gstPincode || '';
-  //           transformedItem.gstCity0 = detail.gstCity || '';
-  //         }
-
-  //         // Remove otherdetails array from transformedItem
-  //         delete transformedItem.otherdetails;
-
-  //         return transformedItem;
-  //       });
-  //       this.modifiedData = dataWithSrno;
-  //     } else {
-  //       console.error('Response or data is empty.');
-  //       return []; // Return an empty array or handle as per your application's logic
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching vendor details:', error);
-  //     throw error; // Propagate the error for higher-level handling
-  //   }
-  // }
-
-
-
   //#endregion
 
   async isActiveFuntion(det) {

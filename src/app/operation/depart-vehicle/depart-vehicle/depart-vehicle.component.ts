@@ -228,7 +228,6 @@ export class DepartVehicleComponent implements OnInit {
   }
   
   async vehicleDetails() {
-    debugger
     try {
       const reqbody = {
         companyCode: this.companyCode,
@@ -882,7 +881,7 @@ export class DepartVehicleComponent implements OnInit {
     // Rest of your code that depends on loadingSheetDetail
   }
   onCalculateTotal(): void {
-    debugger
+    
     const thc=this.thcDetails
     if (this.thcDetails.oPSST == 1) {
       // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm

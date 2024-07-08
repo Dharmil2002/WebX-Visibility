@@ -85,6 +85,7 @@ import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.compon
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
 import { VendorTdsPaymentReportComponent } from './vendor-tds-payment-report/vendor-tds-payment-report.component';
+import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
  
 @NgModule({
   imports: [
@@ -176,7 +177,8 @@ import { VendorTdsPaymentReportComponent } from './vendor-tds-payment-report/ven
     GcnFlowReportComponent,
     DriverStatusRegisterComponent,
     OpeningClosingStockReportComponent,
-    VendorTdsPaymentReportComponent
+    VendorTdsPaymentReportComponent,
+    VendorWiseOutstandingRegisterReportComponent
   ],
   exports: [],
 

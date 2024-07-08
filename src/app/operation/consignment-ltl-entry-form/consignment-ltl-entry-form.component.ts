@@ -1629,6 +1629,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.isManual = this.checkboxChecked == true ? false : true;
     this.isUpdate = this.checkboxChecked == true ? false : true;
     this.consignmentForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
+    if(this.isManual){
+      this.consignmentForm.controls['docketNumber'].enable();
+    }
+    else{
+      this.consignmentForm.controls['docketNumber'].disable();
+    
+    }
   }
   checkDocketRules() {
     const STYP = this.rules.find(x => x.rULEID == "STYP" && x.aCTIVE)
@@ -1639,12 +1646,14 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.consignmentForm.controls['docketNumber'].setValue(isManual ? "" : "Computerized");
         this.isManual = isManual;
         this.isUpdate = isManual;
+        this.consignmentForm.controls['docketNumber'].enable();
       }
       else {
         this.isBoth = STYP.vAL == "B"
         this.checkboxChecked = true
         this.isManual = false;
         this.consignmentForm.controls['docketNumber'].setValue("Computerized");
+        this.consignmentForm.controls['docketNumber'].disable();
       }
 
     }

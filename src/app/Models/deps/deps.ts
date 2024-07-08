@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { IFieldDefinition } from "../../Interface/IFieldDefinition.interface";
 import * as StorageService from 'src/app/core/service/storage.service';
 import { StoreKeys } from "src/app/config/myconstants";
+import { DataType } from "@generic-ui/ngx-grid/core/structure/field/domain/field/data/data-type";
 
 @Injectable({
   providedIn: "root",
@@ -15,6 +16,7 @@ export class DepsModel implements IFieldDefinition {
       Style: "min-width:18%",
       functionName: "OpenPrq",
       sticky: true,
+      datatype:"string"
     },
     dEPSDT: {
       Title: "DEPS Date",
@@ -26,6 +28,7 @@ export class DepsModel implements IFieldDefinition {
       Title: "GCN No:",
       class: "matcolumnleft",
       Style: "min-width:8%",
+       datatype:"string"
     },
     pKGS: {
       Title: "No of Pks",
@@ -44,6 +47,7 @@ export class DepsModel implements IFieldDefinition {
       Title: "Reason",
       class: "matcolumnleft",
       Style: "min-width:10%",
+       datatype:"string"
     },
     actionsItems: {
       Title: "Action",

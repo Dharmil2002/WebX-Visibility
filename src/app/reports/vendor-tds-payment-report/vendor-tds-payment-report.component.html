@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="tdspaymentregisterTableForm">
+        <app-form-webxpress [form]="tdspaymentregisterTableForm" [FormTitle]="'Vendor Tds Payment Register Report'"
+            [formData]="jsontdspayregisterFormArray" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveButton]="true" [submit]="'View'">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

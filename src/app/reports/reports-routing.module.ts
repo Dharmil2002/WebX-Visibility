@@ -46,6 +46,7 @@ import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-b
 import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
 import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+import { VendorTdsPaymentReportComponent } from './vendor-tds-payment-report/vendor-tds-payment-report.component';
 import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
 
 
@@ -94,6 +95,7 @@ const routes: Routes = [
   { path: "gcn-flow-report", component: GcnFlowReportComponent },
   { path: "driver-status-register-report", component: DriverStatusRegisterComponent },
   { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
+  { path: "vendor-tds-payment-report", component: VendorTdsPaymentReportComponent  },
   { path: "VendorWiseOutstandingRegister", component: VendorWiseOutstandingRegisterReportComponent },
 ];
 

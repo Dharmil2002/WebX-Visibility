@@ -116,6 +116,8 @@ export class DepsService {
                     },
                     "sTS": depsStatus.Generated,
                     "sTSNM": depsStatus[depsStatus.Generated],
+                    "dEPTYP": otherDetails?.depsType || "",
+                    "dEPTYPNM": otherDetails?.depsTypeName || "",
                     "dOC": "",
                     "eNTBY": this.storage.userName,
                     "eNTDT": new Date(),
@@ -334,7 +336,7 @@ export class DepsService {
                         "eNTLOC": this.storage.branch
                     });
 
-                    const createDepsDetailsJson = (remarks) => ({
+                    const createDepsDetailsJson = (remarks,depsType,depsTypeNM) => ({
                         "cID": this.storage.companyCode,
                         "dEPSNO": "",
                         "dKTNO": dk.extraDetails.dKTNO,
@@ -351,6 +353,8 @@ export class DepsService {
                         "sTS": depsStatus.Generated,
                         "sTSNM": depsStatus[depsStatus.Generated],
                         "dOC": "",
+                        "dEPTYP":depsType,
+                        "dEPTYPNM":depsTypeNM,
                         "eNTBY": this.storage.userName,
                         "eNTDT": new Date(),
                         "eNTLOC": this.storage.branch
@@ -387,7 +391,7 @@ export class DepsService {
                                     }
                                 };
                                 depsdMG.push(createDepsHeaderJson(typeSpecificData));
-                                depsdMGDet.push(createDepsDetailsJson(dk?.extra?.demageRemarks));
+                                depsdMGDet.push(createDepsDetailsJson(dk?.extra?.demageRemarks,"D","Damage"));
                                 break;
                             case "S":
                                 const remaininSgpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.shortPkgs);
@@ -418,7 +422,7 @@ export class DepsService {
                                     }
                                 };
                                 depsShort.push(createDepsHeaderJson(typeSpecificData));
-                                depsShortDetails.push(createDepsDetailsJson(dk?.extra?.shortRemarks));
+                                depsShortDetails.push(createDepsDetailsJson(dk?.extra?.shortRemarks, "S","Shortage"));
                                 break;
                             case "P":
                                 const remaininPgpkgs = parseInt(dk.extra.noofPkts) - parseInt(dk.extra.pilferagePkgs);
@@ -449,7 +453,7 @@ export class DepsService {
                                     }
                                 };
                                 depspF.push(createDepsHeaderJson(typeSpecificData));
-                                depspFDet.push(createDepsDetailsJson(dk?.extra?.pilferageRemarks || ""));
+                                depspFDet.push(createDepsDetailsJson(dk?.extra?.pilferageRemarks || "","P", "Pilferage"));
                                 break;
                         }
                     });

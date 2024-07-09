@@ -236,7 +236,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     });
   }
   getValidate(event) {
-if(!this.shipmentDetails.hasOwnProperty('Type')){
+
     const fm = {
       pkgs: {
         name: 'noofPkts',

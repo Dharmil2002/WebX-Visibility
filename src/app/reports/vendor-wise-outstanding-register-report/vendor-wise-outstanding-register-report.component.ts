@@ -183,8 +183,18 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
        ],
     };
     const res = await this.reportService.fetchReportData("VendorWiseOutstandingReport", matchQuery);
+    const mapResponseValues = (item) => {
+    if (item.dOCTYP === "Upload") {
+      item.dOCTYP = "General";
+    }
+    if (["Awaiting Approval", "Approved"].includes(item.bSTATNM)) {
+      item.bSTATNM = "Pending";
+    }
+    return item;
+  };
+    const mappedData = res.data.data.map(mapResponseValues);
     return {
-      data: res.data.data,
+      data: mappedData,
       grid: res.data.grid
     };
   }

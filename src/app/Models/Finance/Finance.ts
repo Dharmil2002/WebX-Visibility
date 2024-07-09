@@ -11,6 +11,7 @@ export class VoucherRequestModel {
   data: VoucherDataRequestModel
   details: DebitVoucherdetailsRequestModel[]
   debitAgainstDocumentList: DebitAgainstDocumentList[]
+  accountPosting: boolean = false;
 }
 
 export class VoucherDataRequestModel {

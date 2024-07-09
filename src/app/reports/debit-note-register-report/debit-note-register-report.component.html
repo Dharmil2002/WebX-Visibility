@@ -1,0 +1,11 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="DebitNoteForm">
+      <app-form-webxpress [form]="DebitNoteForm"
+        [FormTitle]="'Debit Note Register Report'"
+        [formData]="jsonControlArray"
+        (functionCallEmitter)="functionCallHandler($event)" 
+        (callFunction)="functionCallHandler($event)"
+        [showSaveButton]="true" [submit]="'View'">
+      </app-form-webxpress>
+    </form>
+  </app-common-wrapper-webxpress>

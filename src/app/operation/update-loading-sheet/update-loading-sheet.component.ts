@@ -19,6 +19,7 @@ import { ControlPanelService } from 'src/app/core/service/control-panel/control-
 import { StockUpdate } from 'src/app/Models/stock-update/stock-update';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -38,6 +39,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   jsonControlArray: any;
   jsonscanControlArray: any;
   scanPackage: string;
+  width: "20%"
+  height: "90%"
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -126,7 +129,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private storage: StorageService,
     private arrivalService: ArrivalVehicleService,
-    private snackBarUtilityService: SnackBarUtilityService
+    private snackBarUtilityService: SnackBarUtilityService,
+    private depsService:DepsService
   ) {
     this.metaData = {
       checkBoxRequired: true,
@@ -134,16 +138,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this.currentBranch = this.storage.branch;
     this.companyCode = this.storage.companyCode;
-
-    // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
-
-    // Assign the item to the arrivalData property
     this.arrivalData = item;
-
-    // Call the getShippningData() function to fetch shipping data
     this.getLoadingSheetDetail();
-    // Initialize form controls for the loading sheet table
     this.IntializeFormControl();
   }
 
@@ -170,6 +167,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       KgWt: shipment?.wT || "",
       mfNo: shipment?.docNo || "",
       CftVolume: shipment?.vOL || "",
+      extraDetails:shipment,
       actions: ["Edit"]
     }));
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
@@ -188,16 +186,19 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   shipmentsEdit(event) {
-    const { shipment, suffix, noofPkts, actualWeight, ctWeight } = event;
-    const data = this.csv.find(x => x.Shipment === shipment && x.Suffix === suffix);
+
+    const data = this.csv.find(x => x.Shipment === event.shipment && x.Suffix === event.suffix);
     if (data) {
-      const unloadedPkg = parseInt(noofPkts, 10);
-      const unloadedWT = parseFloat(actualWeight).toFixed(2);
-      const unloadctWeight = parseFloat(ctWeight).toFixed(2);
+      const unloadedPkg = parseInt(event.noofPkts, 10);
+      const unloadedWT = parseFloat(event.actualWeight).toFixed(2);
+      const unloadctWeight = parseFloat(event.ctWeight).toFixed(2);
       const pendPkg = data.Packages - unloadedPkg;
-      const pendWt = data.weight - parseFloat(actualWeight);
-      const pendCwt = data.cWeight - parseFloat(ctWeight);
-      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt });
+      const pendWt = data.weight - parseFloat(event.actualWeight);
+      const pendCwt = data.cWeight - parseFloat(event.ctWeight);
+      const depsType = event.depsOptions||'';
+      const isDeps = event.isDeps||'';
+      const extra=event;
+      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,extra,isDeps});
       this.cdr.detectChanges();
     }
   }
@@ -296,11 +297,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const scan = this.rules.find(x => x.rULEID == "SCAN" && x.aCTIVE);
     this.isScan = scan.vAL == "Y" ? true : false;
   }
-
   /**
    * Function to initialize form controls for the loading sheet table
    */
-
   IntializeFormControl() {
     // Create an instance of UpdateloadingControl
     const ManifestGeneratedFormControl = new UpdateloadingControl();
@@ -323,11 +322,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     // Set the arrival data binding
     this.setArrivalDataBindData();
   }
-
   IsActiveFuntion($event) {
     this.loadingData = $event
   }
-
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
@@ -345,7 +342,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   onSelectAllClicked(event) {
 
   }
-
   async CompleteScan() {
     this.snackBarUtilityService.commonToast(
       async () => {
@@ -376,7 +372,43 @@ export class UpdateLoadingSheetComponent implements OnInit {
           }
           this.isDisbled=true
           let notSelectedData = this.csv.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
+          const requestBody=await this.depsService.fieldArrivalDeps(selectedData); 
           const res = await this.arrivalService.fieldMappingWithoutScanArrival(this.arrivalData, selectedData, notSelectedData, this.packageData, this.isScan);
+          if(requestBody){
+            Swal.hideLoading();
+            setTimeout(() => {
+              Swal.close();
+            }, 3000);
+            const res = await this.depsService.createDeps(requestBody);
+            try {
+              // Check if depsHeader exists and is an array
+              if (res.data.data.depsHeader && Array.isArray(res.data.data.depsHeader)) {
+                // Extracting dEPSNO values into an array
+                const depNos = res.data.data.depsHeader.map(header => header.dEPSNO);
+                // Joining array elements into a comma-separated string
+                const commaSeparatedDepNos = depNos.join(', ');
+                if (res) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "DEPS Generated Successfully",
+                    text: `DEPS Number is ${commaSeparatedDepNos}`,
+                    showConfirmButton: true,
+                  })
+                }
+              } else {
+                throw new Error('depsHeader is not an array or does not exist.');
+              }
+            } catch (error) {
+              Swal.fire({
+                icon: "error",
+                title: "DEPS Generation Failed",
+                text: "There was an issue with DEPS generation. Please try again later.",
+                showConfirmButton: true,
+              });
+              
+            }
+          
+          }
           if (res) {
             this.dialogRef.close(this.loadingSheetTableForm.value)
             this.goBack('Departures')
@@ -393,7 +425,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
         }
       }, "Scanning");
   }
-
   async UpdateDocketDetail(dkt) {
     if (dkt) {
       await updateTracking(this.companyCode, this._operation, dkt, this.arrivalData?.TripID);
@@ -420,14 +451,14 @@ export class UpdateLoadingSheetComponent implements OnInit {
       });
     });
   }
-
   Close(): void {
     this.dialogRef.close()
     this.goBack('Departures')
   }
   goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
-  }
+  } 
+  
   async updateTripStatus() {
     const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);
     let tripDetails
@@ -486,7 +517,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
     })
   }
-
+  
   tripHistoryUpdate() {
 
     let tripDetails = {

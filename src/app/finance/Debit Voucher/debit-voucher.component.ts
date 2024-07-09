@@ -332,33 +332,37 @@ export class DebitVoucherComponent implements OnInit {
     let responseFromAPI: any;
     switch (Preparedfor) {
       case 'Vendor':
-        responseFromAPI = await GetSingleVendorDetailsFromApi(this.masterService, PartyName.value)
-        this.filter.Filter(
-          this.jsonControlDebitVoucherSummaryArray,
-          this.DebitVoucherSummaryForm,
-          responseFromAPI,
-          "Partystate",
-          false
-        );
-        if (responseFromAPI[0]?.othersdetails?.PANnumber) {
-          this.DebitVoucherSummaryForm.get("PANnumber").setValue(responseFromAPI[0]?.othersdetails?.PANnumber);
-          this.DebitVoucherSummaryForm.get("PANnumber").disable();
+        if (typeof PartyName == 'object') {
+          responseFromAPI = await GetSingleVendorDetailsFromApi(this.masterService, PartyName.value)
+          this.filter.Filter(
+            this.jsonControlDebitVoucherSummaryArray,
+            this.DebitVoucherSummaryForm,
+            responseFromAPI,
+            "Partystate",
+            false
+          );
+          if (responseFromAPI[0]?.othersdetails?.PANnumber) {
+            this.DebitVoucherSummaryForm.get("PANnumber").setValue(responseFromAPI[0]?.othersdetails?.PANnumber);
+            this.DebitVoucherSummaryForm.get("PANnumber").disable();
+          }
         }
         break;
       case 'Customer':
-        responseFromAPI = await GetSingleCustomerDetailsFromApi(this.masterService, PartyName.value)
-        this.filter.Filter(
-          this.jsonControlDebitVoucherSummaryArray,
-          this.DebitVoucherSummaryForm,
-          responseFromAPI,
-          "Partystate",
-          false
-        );
-        if (responseFromAPI[0]?.othersdetails?.PANnumber) {
-          this.DebitVoucherSummaryForm.get("PANnumber").setValue(responseFromAPI[0]?.othersdetails?.PANnumber);
-          this.DebitVoucherSummaryForm.get("PANnumber").disable();
+        if (typeof PartyName == 'object') {
+          responseFromAPI = await GetSingleCustomerDetailsFromApi(this.masterService, PartyName.value)
+          this.filter.Filter(
+            this.jsonControlDebitVoucherSummaryArray,
+            this.DebitVoucherSummaryForm,
+            responseFromAPI,
+            "Partystate",
+            false
+          );
+          if (responseFromAPI[0]?.othersdetails?.PANnumber) {
+            this.DebitVoucherSummaryForm.get("PANnumber").setValue(responseFromAPI[0]?.othersdetails?.PANnumber);
+            this.DebitVoucherSummaryForm.get("PANnumber").disable();
+          }
+          break;
         }
-        break;
       default:
         this.filter.Filter(
           this.jsonControlDebitVoucherSummaryArray,
@@ -367,8 +371,6 @@ export class DebitVoucherComponent implements OnInit {
           "Partystate",
           false
         );
-
-
     }
   }
   TDSSectionFieldChanged(event) {
@@ -822,7 +824,7 @@ export class DebitVoucherComponent implements OnInit {
 
         this.VoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
         this.VoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
-        this.VoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
+        this.VoucherDataRequestModel.partyCode = "" + this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888";
         this.VoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName;
         this.VoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
         this.VoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
@@ -875,7 +877,7 @@ export class DebitVoucherComponent implements OnInit {
             "branch": Branch,
             "accCode": item.LedgerHdn,
             "accName": item.Ledger,
-            "accCategory": item.SubLedger,
+            "accCategory": item.SubCategoryName,
             "sacCode": item.SACCodeHdn.toString(),
             "sacName": item.SACCode,
             "debit": parseFloat(item.DebitAmount).toFixed(2),
@@ -977,7 +979,7 @@ export class DebitVoucherComponent implements OnInit {
                 docType: "Voucher",
                 partyType: this.DebitVoucherSummaryForm.value.Preparedfor,
                 docNo: "",
-                partyCode: this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
+                partyCode: "" + this.DebitVoucherSummaryForm.value.PartyName?.value ?? "8888",
                 partyName: this.DebitVoucherSummaryForm.value.PartyName?.name ?? this.DebitVoucherSummaryForm.value.PartyName,
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),

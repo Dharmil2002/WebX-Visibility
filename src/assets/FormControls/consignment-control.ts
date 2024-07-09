@@ -1258,7 +1258,7 @@ export class FreightControl extends BaseControl {
         generatecontrol: true, disable: false
       },
       {
-        name: 'freight_amount', label: 'Frieght Amount (₹)', placeholder: 'Freight Amount', type: 'mobile-number',
+        name: 'freight_amount', label: 'Freight Amount (₹)', placeholder: 'Freight Amount', type: 'mobile-number',
         value: docketDetail.freight_amount, Validations: [{
           name: "required",
           message: " Freight Amount is required",

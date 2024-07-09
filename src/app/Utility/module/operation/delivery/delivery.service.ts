@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
+import { debug } from "console";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
-import { DocketStatus,DocketEvents } from "src/app/Models/docStatus";
+import { DocketStatus,DocketEvents, getEnumName } from "src/app/Models/docStatus";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { StorageService } from "src/app/core/service/storage.service";
 
@@ -72,7 +73,6 @@ export class DeliveryService {
     return res.data;
   }
   async deliveryUpdate(data, shipment) {
-    
     const evnData = shipment.map((item) => {
       const evnData = {
         "_id": `${this.storage.companyCode}${item.dKTNO}-${item.sFX}-${DocketEvents.Delivery_Update}-${moment().format("YYYYMMDDHHmmss")}`,
@@ -82,16 +82,17 @@ export class DeliveryService {
         "cNO": null,
         "lOC": this.storage.branch,
         "eVNID":DocketEvents.Delivery_Update,
-        "eVNDES":DocketEvents.Delivery_Update.split("_").join(" "),
+        "eVNDES": getEnumName(DocketEvents, DocketEvents.Delivery_Update).replace(/_/g, " "),
         "eVNDT": new Date(),
         "eVNSRC": "Delivery Update",
         "dOCTY": "DRS",
-        "dOCNO":data.tripId,
-        "sTS":data.statusCd,
-        "sTSNM": DocketStatus[data.statusCd],
+        "dOCNO": data.tripId,
+        "sTS": item.statusCd,
+        "sTSNM": DocketStatus[item.statusCd],
         "oPSSTS":`Delivered to ${item.person} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}${item.reason ? `, reason: ${item.reason}` : ''}`,
         "eNTLOC": this.storage.branch,
-        "eNTBY": this.storage.userName
+        "eNTBY": this.storage.userName,
+        "eNTDT": new Date()
       }
       return evnData
     })

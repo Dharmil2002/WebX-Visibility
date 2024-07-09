@@ -16,14 +16,38 @@ export class VehicletypeMasterListComponent implements OnInit {
     companyCode: any = 0;
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
-    columnHeader =
-        {
-            "eNTDT": "Created Date",
-            "vehicleTypeCode": "Vehicle Type Code",
-            "vehicleTypeName": "Vehicle Type Name",
-            "isActive": "Active",
-            "actions": "Actions"
+    columnHeader = {
+        eNTDT: {
+            Title: "Created Date",
+            class: "matcolumncenter",
+            Style: "min-width:15%",
+            datatype: "datetime"
+        },
+        vehicleTypeCode: {
+            Title: "Vehicle Type Code",
+            class: "matcolumncenter",
+            Style: "min-width:15%",
+        },
+        vehicleTypeName: {
+            Title: "Vehicle Type Name",
+            class: "matcolumnleft",
+            Style: "min-width:15%",
+            datatype: "string"
+        },
+        isActive: {
+            type: "Activetoggle",
+            Title: "Active",
+            class: "matcolumncenter",
+            Style: "min-width:15%",
+            functionName: "isActiveFuntion"
+        },
+        actions: {
+            Title: "Actions",
+            class: "matcolumncenter",
+            Style: "min-width:15%",
         }
+    }
+    staticField = ["eNTDT", "vehicleTypeCode", "vehicleTypeName"]
     headerForCsv = {
         "vehicleTypeCode": "Vehicle Type Code",
         "vehicleTypeName": "Vehicle Type Name",
@@ -49,7 +73,7 @@ export class VehicletypeMasterListComponent implements OnInit {
     linkArray = []
     tableData: any;
     constructor(private masterService: MasterService, private storage: StorageService) {
-        this.companyCode = this.storage.companyCode;    
+        this.companyCode = this.storage.companyCode;
         this.addAndEditPath = "/Masters/VehicleTypeMaster/AddVehicleTypeMaster";
     }
     ngOnInit(): void {
@@ -62,7 +86,7 @@ export class VehicletypeMasterListComponent implements OnInit {
         try {
             const req = {
                 companyCode: this.companyCode,
-                filter: {},
+                filter: { companyCode:this.companyCode },
                 collectionName: "vehicleType_detail"
             };
 
@@ -89,19 +113,18 @@ export class VehicletypeMasterListComponent implements OnInit {
     }
     //#endregion
     async isActiveFuntion(det) {
-        let id = det._id;
+        let id = det.data._id;
         // Remove the "id" field from the form controls
-        delete det._id;
-        delete det.activeflag;
-        delete det.eNTDT
-        det['mODDT'] = new Date()
-        det['mODBY'] = this.storage.userName
-        det['mODLOC'] = this.storage.branch
+        delete det.data._id;
+        delete det.data.eNTDT
+        det.data['mODDT'] = new Date()
+        det.data['mODBY'] = this.storage.userName
+        det.data['mODLOC'] = this.storage.branch
         let req = {
             companyCode: this.companyCode,
             collectionName: "vehicleType_detail",
             filter: { _id: id },
-            update: det
+            update: det.data
         };
         const res = await firstValueFrom(this.masterService.masterPut('generic/update', req));
         if (res) {
@@ -113,6 +136,15 @@ export class VehicletypeMasterListComponent implements OnInit {
                 showConfirmButton: true,
             });
             this.getVehicleTypeDetails();
+        }
+    }
+
+    functionCallHandler($event) {
+        let functionName = $event.functionName;
+        try {
+            this[functionName]($event);
+        } catch (error) {
+            console.log("failed");
         }
     }
 }

@@ -44,6 +44,7 @@ import { CustomerService } from "src/app/Utility/module/masters/customer/custome
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import {
+  SACInfo,
   VoucherDataRequestModel,
   VoucherInstanceType,
   VoucherRequestModel,
@@ -63,6 +64,11 @@ import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
 import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/cluster.master.service";
+import { InvoiceServiceService } from "src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service";
+import { CustomerBillStatus } from "src/app/Models/docStatus";
+import { StateService } from "src/app/Utility/module/masters/state/state.service";
+import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -130,10 +136,12 @@ export class ConsignmentEntryFormComponent
   mseq: boolean;
   lastDoc: string;
   isManual: boolean;
+  checkboxChecked: boolean; // Checkbox is checked by default
   dcrDetail = {};
   conLoc: boolean;
   pageLoad: boolean;
   LoadType: any;
+  isBoth: boolean = false;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -159,8 +167,10 @@ export class ConsignmentEntryFormComponent
     private voucherServicesService: VoucherServicesService,
     private controlPanel: ControlPanelService,
     private dcrService: DCRService,
-    private _NavigationService: NavigationService,
-    private clusterService: ClusterMasterService
+    private clusterService: ClusterMasterService,
+    private invoiceServiceService: InvoiceServiceService,
+    private stateService: StateService,
+    private thcService: ThcService,
   ) {
     super();
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -407,7 +417,9 @@ export class ConsignmentEntryFormComponent
     ]);
     this.commonDropDownMapping();
     this.model.consignmentTableForm.controls["payType"].setValue("P02");
-    //this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    this.model.consignmentTableForm.controls["transMode"].setValue("P1");
+    this.model.consignmentTableForm.controls["risk"].setValue("O");
+    this.model.consignmentTableForm.controls["delivery_type"].setValue("DD");
 
     const filteredMode = this.model.movementType.find(
       (item) => item.name == this.storage.mode
@@ -427,6 +439,7 @@ export class ConsignmentEntryFormComponent
       this.getRules();
     }
     this.onRcmChange();
+    this.model.FreightTableForm.controls["rcm"].setValue('Y');
     this.model.FreightTableForm.controls["gstAmount"].disable();
     this.model.FreightTableForm.controls["gstChargedAmount"].disable();
   }
@@ -953,6 +966,7 @@ export class ConsignmentEntryFormComponent
     if (checked) {
       switch (fieldName) {
         case "cnbp":
+          this.model.consignmentTableForm.controls["cnbp"].enable();
           updateForm(
             fieldConsignorName,
             fieldContactNumber,
@@ -963,8 +977,10 @@ export class ConsignmentEntryFormComponent
             gstvalue
           );
           this.expanded = true;
+          this.model.consignmentTableForm.controls["cnebp"].disable();
           break;
         case "cnebp":
+          this.model.consignmentTableForm.controls["cnebp"].enable();
           updateForm(
             fieldConsigneeName,
             fieldConsigneeContactNumber,
@@ -974,11 +990,15 @@ export class ConsignmentEntryFormComponent
             fieldConsigneegst,
             gstvalue
           );
+          this.model.consignmentTableForm.controls["cnbp"].disable();
           break;
         default:
+
         // Handle other cases or throw an error
       }
     } else {
+      this.model.consignmentTableForm.controls["cnebp"].enable();
+      this.model.consignmentTableForm.controls["cnbp"].enable();
       // done by harikesh
       switch (fieldName) {
         case "cnbp":
@@ -1253,9 +1273,7 @@ export class ConsignmentEntryFormComponent
       const json = {
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
-        expiryDate: this.model.invoiceTableForm.value.expiryDate
-          ? this.model.invoiceTableForm.value.expiryDate
-          : new Date(),
+        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment(this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1457,16 +1475,39 @@ export class ConsignmentEntryFormComponent
     }
   }
   /*End*/
+  OnChangeCheckBox(event) {
+    this.checkboxChecked = event.event.checked;
+    this.isManual = this.checkboxChecked == true ? false : true;
+    this.isUpdate = this.checkboxChecked == true ? false : true;
+    this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
+    if (this.isManual) {
+      this.model.consignmentTableForm.controls['docketNumber'].enable();
+    }
+    else {
+      this.model.consignmentTableForm.controls['docketNumber'].disable();
+
+    }
+  }
   checkDocketRules() {
     const STYP = this.rules.find((x) => x.rULEID == "STYP" && x.aCTIVE);
     if (STYP) {
       const isManual = STYP.vAL === "M";
-      this.model.allformControl.find((x) => x.name == "docketNumber").disable =
-        !isManual;
-      this.model.consignmentTableForm.controls["docketNumber"].setValue(
-        isManual ? "" : "Computerized"
-      );
-      this.isManual = isManual;
+      if (STYP.vAL != "B") {
+        this.model.allformControl.find((x) => x.name == "docketNumber").disable =
+          !isManual;
+        this.model.consignmentTableForm.controls["docketNumber"].setValue(
+          isManual ? "" : "Computerized"
+        );
+        this.isManual = isManual;
+        this.model.consignmentTableForm.controls['docketNumber'].enable();
+      }
+      else {
+        this.isBoth = STYP.vAL == "B"
+        this.checkboxChecked = true
+        this.isManual = false;
+        this.model.consignmentTableForm.controls['docketNumber'].setValue("Computerized");
+        this.model.consignmentTableForm.controls['docketNumber'].disable();
+      }
     }
     const ELOC = this.rules.find((x) => x.rULEID == "ELOC" && x.aCTIVE);
     if (ELOC) {
@@ -1886,6 +1927,25 @@ export class ConsignmentEntryFormComponent
   }
 
   async save() {
+
+    // get Charges Details Based on ChargesArrayList
+    const ChargesArrayList = Object.keys(this.model.NonFreightTableForm?.value || {});
+    let ChargesArray = [];
+    if (ChargesArrayList.length > 0) {
+      const filter = { cHACD: { D$in: ChargesArrayList } };
+      const Result = await this.thcService.getCharges(filter);
+      ChargesArray = Result.map(x => {
+        return {
+          cHGID: x.cHACD,
+          cHGNM: x.sELCHA,
+          aMT: this.model.NonFreightTableForm.controls[x.cHACD]?.value || 0,
+          oPS: x.oPS || "+",
+          tY: x.tY || "nFC",
+          aCCD: x.aCCD || "",
+          aCNM: x.aCNM || ""
+        };
+      });
+    }
     this.isSubmit = true;
     const tabcontrols = this.model.consignmentTableForm;
     tabcontrols.removeControl["test"];
@@ -2026,8 +2086,8 @@ export class ConsignmentEntryFormComponent
       };
 
       let docketDetails = {
-        ...this.model.consignmentTableForm.value,
-        ...this.model.FreightTableForm.value,
+        ...this.model.consignmentTableForm.getRawValue(),
+        ...this.model.FreightTableForm.getRawValue(),
         ...invoiceDetails,
         ...containerDetail,
         ...id,
@@ -2054,8 +2114,7 @@ export class ConsignmentEntryFormComponent
       docketDetails["cnogst"] =
         this.model.consignmentTableForm.controls["cnogst"]?.value;
       docketDetails["cneAddress"] =
-        this.model.consignmentTableForm.controls["cneAddress"].value?.name ||
-        "";
+        this.model.consignmentTableForm.controls["cneAddress"].value?.name || "";
       docketDetails["cnegst"] =
         this.model.consignmentTableForm.controls["cnegst"]?.value;
       docketDetails["billingParty"] = bParty?.value;
@@ -2259,13 +2318,7 @@ export class ConsignmentEntryFormComponent
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT:
           this.model.FreightTableForm.controls["gstChargedAmount"].value,
-        cHG: "",
-        nFCHG: this.model.NonFreightTableForm?.value
-          ? Object.entries(this.model.NonFreightTableForm.value)
-            .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
-            .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
-          : [],
-
+        cHG: ChargesArray,
         tOTAMT: this.model.FreightTableForm.controls["totalAmount"].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -2321,20 +2374,35 @@ export class ConsignmentEntryFormComponent
               : res.data;
             const PayTypeCode = this.model.consignmentTableForm.value.payType;
             if (PayTypeCode === "P01") {
-              this.AccountPosting(dockNo);
+              this.AccountPosting(reqBody, dockNo);
             } else {
               Swal.fire({
                 icon: "success",
                 title: "Booked Successfully",
-                text: "DocketNo: " + dockNo,
+                text: "GCN No: " + dockNo,
                 showConfirmButton: true,
+                denyButtonText: 'Print',
+                showDenyButton: true,
+                showCancelButton: true,
+                cancelButtonText: 'Close'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                  }, 2000);
                   this.navService.navigateTotab("docket", "dashboard/Index");
+                } else if (result.isDenied) {
+                  // Handle the action for the deny button here.
+                  const templateBody = {
+                    templateName: "DKT",
+                    PartyField: "",
+                    DocNo: dockNo,
+                  };
+                  const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                  window.open(url, '', 'width=1000,height=800');
+                  this.route.navigateByUrl('Operation/ConsignmentEntry').then(() => {
+                    window.location.reload();
+                  });
+                } else if (result.isDismissed) {
+                  // Handle the action for the cancel button here.
+                  this.navService.navigateTotab('docket', "dashboard/Index");
                 }
               });
             }
@@ -2447,12 +2515,28 @@ export class ConsignmentEntryFormComponent
       Swal.fire({
         icon: "success",
         title: "Docket Update Successfully",
-        text:
-          "DocketNo: " +
-          this.model.consignmentTableForm.controls["docketNumber"].value,
+        text: "GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
+        confirmButtonText: 'OK',
         showConfirmButton: true,
+        denyButtonText: 'Print',
+        showDenyButton: true,
+        cancelButtonText: 'Close',
+        showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
+          this.navService.navigateTotab("docket", "dashboard/Index");
+        } else if (result.isDenied) {
+          // Handle the action for the deny button here.
+          const templateBody = {
+            templateName: "DKT",
+            PartyField: "",
+            DocNo: this.model.consignmentTableForm.controls["docketNumber"].value,
+          }
+          const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+          window.open(url, '', 'width=1000,height=800');
+          this.navService.navigateTotab("docket", "dashboard/Index");
+        } else if (result.isDismissed) {
+          // Handle the action for the cancel button here.
           this.navService.navigateTotab("docket", "dashboard/Index");
         }
       });
@@ -2509,12 +2593,32 @@ export class ConsignmentEntryFormComponent
     Swal.fire({
       icon: "success",
       title: "Booked Successfully",
-      text: "DocketNo: " + dkt,
+      text: "GCN No: " + dkt,
+      confirmButtonText: 'OK',
       showConfirmButton: true,
+      denyButtonText: 'Print',
+      showDenyButton: true,
+      showCancelButton: true,
+      cancelButtonText: 'Close'
     }).then((result) => {
       if (result.isConfirmed) {
         // Redirect to the desired page after the success message is confirmed.
         this.navService.navigateTotab("docket", "dashboard/Index");
+      } else if (result.isDenied) {
+        // Handle the action for the deny button here.
+        const templateBody = {
+          templateName: "DKT",
+          PartyField: "",
+          DocNo: dkt,
+        };
+        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+        window.open(url, '', 'width=1000,height=800');
+        this.route.navigateByUrl('Operation/ConsignmentEntry').then(() => {
+          window.location.reload();
+        });
+      } else if (result.isDismissed) {
+        // Handle the action for the cancel button here.
+        this.navService.navigateTotab('docket', "dashboard/Index");
       }
     });
   }
@@ -2958,8 +3062,11 @@ export class ConsignmentEntryFormComponent
 
   // Updated function to handle `isOrigin` condition correctly
   getTermValue(term, isOrigin) {
-    const typeMapping = { Area: "AR", Pincode: "PIN", City: "CT", State: "ST" };
-    const fieldKey = isOrigin ? "fromCity" : "toCity";
+    const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
+    let fieldKey = isOrigin ? "fromCity" : "toCity";
+    if (term == "Location") {
+      fieldKey = isOrigin ? "origin" : "destination";
+    }
     const type = typeMapping[term];
     let valueKey;
 
@@ -2971,6 +3078,9 @@ export class ConsignmentEntryFormComponent
       case "Pincode":
         valueKey = "pincode";
         break;
+      case "Location":
+        valueKey = "value";
+        break;
       case "City":
         valueKey = "ct";
         break;
@@ -2980,14 +3090,18 @@ export class ConsignmentEntryFormComponent
       default:
         return [];
     }
-    const controls = this.model.consignmentTableForm;
-    const value =
-      this.model.consignmentTableForm.controls[fieldKey].value[valueKey];
+    const controls = this.model.consignmentTableForm.controls;
+    let value;
+    if (fieldKey == "origin") {
+      value = controls[fieldKey].value;
+    } else {
+      value = controls[fieldKey].value[valueKey];
+    }
     if (value) {
       return [
-        { D$eq: [`$${isOrigin ? "f" : "t"}TYPE`, type] },
-        { D$eq: [`$${isOrigin ? "fROM" : "tO"}`, value] },
-      ];
+        { "D$eq": [`$${isOrigin ? 'f' : 't'}TYPE`, type] },
+        { "D$eq": [`$${isOrigin ? 'fROM' : 'tO'}`, value] }];
+
     }
     return [];
   }
@@ -3020,7 +3134,7 @@ export class ConsignmentEntryFormComponent
         0
       );
     }
-    const terms = ["Area", "Pincode", "City", "State"];
+    const terms = ["Area", "Pincode", "Location", "City", "State"];
     const allCombinations = generateCombinations(terms);
     let matches = allCombinations
       .map(([fromTerm, toTerm]) => {
@@ -3035,6 +3149,16 @@ export class ConsignmentEntryFormComponent
         return null;
       })
       .filter((x) => x != null);
+    matches.push({
+      D$and: [
+        { "D$in": ['$fTYPE', [null, ""]] },
+        { "D$in": ['$fROM', [null, ""]] }]
+    });
+    matches.push({
+      D$and: [
+        { "D$in": ['$tTYPE', [null, ""]] },
+        { "D$in": ['$tO', [null, ""]] }]
+    });
     let reqBody = {
       companyCode: this.storage.companyCode,
       customerCode: this.model.consignmentTableForm.value.billingParty.value,
@@ -3249,7 +3373,7 @@ export class ConsignmentEntryFormComponent
     return data
       .filter((x) => x.cBT === "Fixed")
       .map((x) => ({
-        name: x.sCT.replaceAll(/\s/g, ""),
+        name: x.sCTCD.replaceAll(/\s/g, ""),
         label: x.sCT,
         placeholder: x.sCT,
         type: "number",
@@ -3292,7 +3416,7 @@ export class ConsignmentEntryFormComponent
     };
   }
   // Account Posting When  C Note Booked
-  async AccountPosting(DocketNo) {
+  async AccountPosting(DocketRequestBody, DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         let GSTAmount = 0;
@@ -3412,27 +3536,31 @@ export class ConsignmentEntryFormComponent
                 .FinancePost("fin/account/posting", reqBody)
                 .subscribe({
                   next: (res: any) => {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Booked Successfully And Voucher Created",
-                      text:
-                        "DocketNo: " +
-                        DocketNo +
-                        "  Voucher No: " +
-                        reqBody.voucherNo,
-                      showConfirmButton: true,
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        Swal.hideLoading();
-                        setTimeout(() => {
-                          Swal.close();
-                        }, 2000);
-                        this.navService.navigateTotab(
-                          "docket",
-                          "dashboard/Index"
-                        );
-                      }
-                    });
+                    if (res.success) {
+                      // Call Bill Generation
+                      this.AutoCustomerInvoicing(DocketRequestBody, DocketNo);
+                    }
+                    // Swal.fire({
+                    //   icon: "success",
+                    //   title: "Booked Successfully And Voucher Created",
+                    //   text:
+                    //     "DocketNo: " +
+                    //     DocketNo +
+                    //     "  Voucher No: " +
+                    //     reqBody.voucherNo,
+                    //   showConfirmButton: true,
+                    // }).then((result) => {
+                    //   if (result.isConfirmed) {
+                    //     Swal.hideLoading();
+                    //     setTimeout(() => {
+                    //       Swal.close();
+                    //     }, 2000);
+                    //     this.navService.navigateTotab(
+                    //       "docket",
+                    //       "dashboard/Index"
+                    //     );
+                    //   }
+                    // });
                   },
                   error: (err: any) => {
                     if (err.status === 400) {
@@ -3528,7 +3656,399 @@ export class ConsignmentEntryFormComponent
     }
     return response;
   }
+  //#region Auto Customer Invoicing for Paid  GCN WT-930
+
+  async AutoCustomerInvoicing(RequestData, docketNo) {
+    // STEP 1: Get the required data from the form
+    const DocketNo = docketNo;
+    const customerCode = RequestData?.data?.billingParty;
+    const customerName = RequestData?.data?.billingPartyName;
+    // STEP 2: Prepare the request body For For Approve GCN And Call the API
+    const DocketStatusResult = this.invoiceServiceService.updateShipmentStatus(DocketNo, "FTL");
+    if (DocketStatusResult) {
+      // STEP 3: Prepare the request body For Customer Bill Generation And Call the API
+      const custList = await this.customerService.customerFromFilter({ customerCode: customerCode }, false);
+      const CustomerDetails = custList[0];
+      const custGroup = await this.customerService.customerGroupFilter(CustomerDetails?.customerGroup);
+      const tranDetail = await getApiCompanyDetail(this.masterService);
+      const data = RequestData?.data;
+      const gstAppliedList = await this.stateService.checkGst(tranDetail?.data[0].gstNo, data?.cnogst);
+      const gstTypes = Object.fromEntries(
+        Object.entries(gstAppliedList).filter(([key, value]) => value === true)
+      )
+      let jsonBillingList = [
+        {
+          _id: "",
+          bILLNO: "",
+          dKTNO: DocketNo,
+          cID: this.storage.companyCode,
+          oRGN: data?.origin || "",
+          dEST: data?.destination || "",
+          dKTDT: data?.docketDate || new Date(),
+          cHRGWT: data?.cHRWT || 0.00,
+          dKTAMT: data?.freight_amount || 0.00,
+          dKTTOT: data?.totalAmount || 0.00,
+          sUBTOT: data?.grossAmount || 0.00,
+          gSTTOT: data?.gstChargedAmount || 0.00,
+          gSTRT: data?.gstAmount || 0.00,
+          tOTAMT: data?.totalAmount || 0.00,
+          fCHRG: data?.freight_rate || 0.00,
+          sGST: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          sGSTRT: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) / 2 : 0,
+          cGST: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          cGSTRT: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) / 2 : 0,
+          uTGST: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
+          uTGSTRT: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) : 0,
+          iGST: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
+          iGSTRT: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) : 0,
+          eNTDT: new Date(),
+          eNTLOC: this.storage.branch || "",
+          eNTBY: this.storage?.userName || "",
+        }];
+      const billData = {
+        "_id": `${this.storage.companyCode}` || "",
+        "cID": this.storage.companyCode,
+        "companyCode": this.storage.companyCode,
+        "dOCTYP": "Transaction",
+        "dOCCD": "T",
+        "bUSVRT": "FTL",
+        "bILLNO": "",
+        "bGNDT": new Date(),
+        "bDUEDT": new Date(),
+        "bLOC": this.storage.branch,
+        "pAYBAS": data?.payType,
+        "tRNMODE": data?.transMode,
+        "bSTS": CustomerBillStatus.Submitted,
+        "bSTSNM": CustomerBillStatus[CustomerBillStatus.Submitted],
+        "bSTSDT": new Date(),
+        "eXMT": data?.rcm == "Y" ? true : false,
+        "eXMTRES": "",
+        "gEN": {
+          "lOC": data?.origin || "",
+          "cT": data?.fromCity || "",
+          "sT": "",
+          "gSTIN": "",
+        },
+        "sUB": {
+          "lOC": this.storage.branch,
+          "tO": customerName,
+          "tOMOB": CustomerDetails?.customer_mobile || "",
+          "dTM": data?.docketDate || new Date(),
+          "dOC": ""
+        },
+        "cOL": {
+          "lOC": "",
+          "aMT": 0.00,
+          "bALAMT": data?.totalAmount || 0.00,
+        },
+        "cUST": {
+          "cD": customerCode,
+          "nM": customerName,
+          "tEL": CustomerDetails?.customer_mobile || "",
+          "aDD": CustomerDetails?.RegisteredAddress || "",
+          "eML": CustomerDetails?.Customer_Emails || "",
+          "cT": CustomerDetails?.city || "",
+          "sT": CustomerDetails?.state || "",
+          "gSTIN": CustomerDetails?.GSTdetails ? CustomerDetails?.GSTdetails?.[0]?.gstNo : "",
+          "cGCD": custGroup?.groupCode || "",
+          "cGNM": custGroup?.groupName || "",
+        },
+        "gST": {
+          "tYP": Object.keys(gstTypes).join() || "",
+          "rATE": data?.gstAmount || 0.00,
+          "iGST": 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
+          "uTGST": 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
+          "cGST": 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          "sGST": 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          "aMT": data?.gstChargedAmount || 0.00,
+        },
+        "aPR": {
+          "loc": this.storage.branch,
+          "aDT": new Date(),
+          "aBY": this.storage.userName,
+        },
+        "sUPDOC": "",
+        "pRODID": data?.transMode || "",
+        "dKTCNT": 1,
+        "CURR": "INR",
+        "dKTTOT": data?.totalAmount || 0.00,
+        "gROSSAMT": data?.totalAmount || 0.00,
+        "rOUNOFFAMT": 0.00,
+        "aMT": data?.totalAmount || 0.00,
+        "custDetails": jsonBillingList,
+        "eNTDT": new Date(),
+        "eNTLOC": this.storage.branch,
+        "eNTBY": this.storage.userName,
+      }
+      const req = {
+        companyCode: this.storage.companyCode,
+        docType: "BILL",
+        branch: this.storage.branch,
+        finYear: financialYear,
+        party: customerName.toUpperCase(),
+        collectionName: "cust_bill_headers",
+        data: billData
+      };
+      const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/create", req));
+      if (res) {
+        if (res.success) {
+          const BillNo = res.data.ops[0].docNo;
+          this.AccountPostingForAutoBilling(billData, BillNo, DocketNo);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: res.message,
+            showConfirmButton: false,
+          });
+        }
+      }
+
+    }
+  }
+  // Account Posting When  When Bill Has been Generated/ Finalized	
+  async AccountPostingForAutoBilling(billData, BillNo, DocketNo) {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        const TotalAmount = billData?.aMT || 0;
+        const GstAmount = billData?.gST?.aMT || 0;
+
+        this.VoucherRequestModel.companyCode = this.storage.companyCode;
+        this.VoucherRequestModel.docType = "VR";
+        this.VoucherRequestModel.branch = this.storage.branch;
+        this.VoucherRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.voucherNo = "";
+        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval;
+        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval];
+        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
+        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+        this.VoucherDataRequestModel.transDate = new Date();
+        this.VoucherDataRequestModel.docType = "VR";
+        this.VoucherDataRequestModel.branch = this.storage.branch;
+        this.VoucherDataRequestModel.finYear = financialYear
+
+        this.VoucherDataRequestModel.accLocation = this.storage.branch;
+        this.VoucherDataRequestModel.preperedFor = "Customer";
+        this.VoucherDataRequestModel.partyCode = billData?.cUST?.cD || "";
+        this.VoucherDataRequestModel.partyName = billData?.cUST?.nM || "";
+        this.VoucherDataRequestModel.partyState = billData?.cUST?.sT || "";
+        this.VoucherDataRequestModel.entryBy = this.storage.userName;
+        this.VoucherDataRequestModel.entryDate = new Date();
+        this.VoucherDataRequestModel.panNo = ""
+
+        this.VoucherDataRequestModel.tdsSectionCode = "";
+        this.VoucherDataRequestModel.tdsSectionName = "";
+        this.VoucherDataRequestModel.tdsRate = 0;
+        this.VoucherDataRequestModel.tdsAmount = 0;
+        this.VoucherDataRequestModel.tdsAtlineitem = false;
+        this.VoucherDataRequestModel.tcsSectionCode = "";
+        this.VoucherDataRequestModel.tcsSectionName = "";
+        this.VoucherDataRequestModel.tcsRate = 0;
+        this.VoucherDataRequestModel.tcsAmount = 0;
+
+        this.VoucherDataRequestModel.IGST = billData?.gST?.iGST || 0;
+        this.VoucherDataRequestModel.SGST = billData?.gST?.sGST || 0;
+        this.VoucherDataRequestModel.CGST = billData?.gST?.cGST || 0;
+        this.VoucherDataRequestModel.UGST = billData?.gST?.uTGST || 0;
+        this.VoucherDataRequestModel.GSTTotal = GstAmount;
+
+        this.VoucherDataRequestModel.GrossAmount = TotalAmount || 0;
+        this.VoucherDataRequestModel.netPayable = TotalAmount;
+        this.VoucherDataRequestModel.roundOff = 0;
+        this.VoucherDataRequestModel.voucherCanceled = false
+        this.VoucherDataRequestModel.transactionNumber = BillNo;
+        this.VoucherDataRequestModel.paymentMode = "";
+        this.VoucherDataRequestModel.refNo = "";
+        this.VoucherDataRequestModel.accountName = "";
+        this.VoucherDataRequestModel.accountCode = "";
+        this.VoucherDataRequestModel.date = "";
+        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        var VoucherlineitemList = this.GetVouchersLedgersForAutoBilling(billData, BillNo);
+
+        this.VoucherRequestModel.details = VoucherlineitemList
+        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
+        this.VoucherRequestModel.debitAgainstDocumentList = [];
+
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+
+              let reqBody = {
+                companyCode: this.storage.companyCode,
+                voucherNo: res?.data?.mainData?.ops[0].vNO,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: this.storage.branch,
+                transCode: VoucherInstanceType.BillApproval,
+                transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+                voucherCode: VoucherType.JournalVoucher,
+                voucherType: VoucherType[VoucherType.JournalVoucher],
+                docType: "Voucher",
+                partyType: "Customer",
+                docNo: BillNo,
+                partyCode: billData?.cUST?.cD || "",
+                partyName: billData?.cUST?.nM || "",
+                entryBy: this.storage.userName,
+                entryDate: Date(),
+                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.debit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+                  return {
+                    "accCode": item.accCode,
+                    "accName": item.accName,
+                    "accCategory": item.accCategory,
+                    "amount": item.credit,
+                    "narration": item.narration ?? ""
+                  };
+                }),
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Booked Successfully",
+                      text: "DocketNo : " + DocketNo,
+                      confirmButtonText: 'OK',
+                      showConfirmButton: true,
+                      denyButtonText: 'Print',
+                      showDenyButton: true,
+                      cancelButtonText: 'Close',
+                      showCancelButton: true
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        // Redirect after the alert is closed with OK button.
+                        this.navService.navigateTotab('docket', "dashboard/Index");
+                      } else if (result.isDenied) {
+                        // Handle the action for the deny button here.
+                        const templateBody = {
+                          templateName: "DKT",
+                          PartyField: "",
+                          DocNo: DocketNo,
+                        }
+                        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                        window.open(url, '', 'width=1000,height=800');
+                        this.route.navigateByUrl('Operation/ConsignmentEntry').then(() => {
+                          window.location.reload();
+                        });
+                      } else if (result.isDismissed) {
+                        // Handle the action for the cancel button here.
+                        this.navService.navigateTotab('docket', "dashboard/Index");
+                      }
+                    });
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+
+    }, "C-Note Booking Voucher Generating..!");
+
+  }
+  GetVouchersLedgersForAutoBilling(billData, BillNo) {
+    const TotalAmount = billData?.aMT;
+    const GstAmount = billData?.gST?.aMT;
+    const GstRate = billData?.gST?.rATE;
+    const DocketAmount = parseFloat(billData?.dKTTOT) - parseFloat(billData?.gST?.aMT);
+
+    const createVoucher = (accCode, accName, accCategory, debit, credit, sacInfo = "",) => ({
+      companyCode: this.storage.companyCode,
+      voucherNo: "",
+      transCode: VoucherInstanceType.BillApproval,
+      transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+      voucherCode: VoucherType.JournalVoucher,
+      voucherType: VoucherType[VoucherType.JournalVoucher],
+      transDate: new Date(),
+      finYear: financialYear,
+      branch: this.storage.branch,
+      accCode,
+      accName,
+      accCategory,
+      sacCode: sacInfo ? SACInfo['996511'].sacCode : "",
+      sacName: sacInfo ? SACInfo['996511'].sacName : "",
+      debit,
+      credit,
+      GSTRate: sacInfo ? GstRate : 0,
+      GSTAmount: sacInfo ? GstAmount : 0,
+      Total: debit + credit,
+      TDSApplicable: false,
+      narration: `When Customer Bill freight is Generated :${BillNo}`,
+    });
+
+    const response = [
+      createVoucher(ledgerInfo['AST001002'].LeadgerCode, ledgerInfo['AST001002'].LeadgerName, ledgerInfo['AST001002'].LeadgerCategory, TotalAmount, 0),
+    ];
+    let LeadgerDetails;
+    switch (billData?.pRODID) {
+      case "P1":
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+      case "P2":
+        LeadgerDetails = ledgerInfo['INC001004'];
+        break;
+      case "P3":
+        LeadgerDetails = ledgerInfo['INC001002'];
+        break;
+      case "P4":
+        LeadgerDetails = ledgerInfo['INC001001'];
+        break;
+      default:
+        LeadgerDetails = ledgerInfo['INC001003'];
+        break;
+    }
+    // Income Ledger
+    if (LeadgerDetails) {
+      response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, DocketAmount));
+    }
+
+    const gstTypeMapping = {
+      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
+      cGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
+      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
+      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
+    };
+
+    const gstType = billData?.gST?.tYP;
+    const GSTTypeList = [gstType]
+    GSTTypeList.forEach(element => {
+      if (gstType && gstTypeMapping[element]) {
+        const { accCode, accName, accCategory, prop } = gstTypeMapping[element];
+        if (billData?.gST?.[prop] > 0) {
+          response.push(createVoucher(accCode, accName, accCategory, 0, billData?.gST?.[prop], '996511'));
+        }
+      }
+    });
+    return response;
+  }
+  //#endregion
 }
+
 
 const RateTypeCalculation = [
   {

@@ -22,7 +22,8 @@ export class GeneralLedgerReportService {
             vDT: { 'D$gte': data.startValue }
           }, // Convert start date to ISO format
           { vDT: { 'D$lte': data.endValue } }, // Bill date less than or equal to end date       
-          ...(data.partyName.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pCODE', data.partyName] } }] : []), // State names condition
+          ...(data.partyName.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pNAME', data.partyName] } }] : []), // State names condition
+          ...(data.partyCode.length > 0 ? [{ 'D$expr': { 'D$in': ['$details.pCODE', data.partyCode] } }] : []), // State names condition
           ...(data?.category ? [{ aCCAT: { 'D$in': [data.category] } }] : []), // account code condition
           ...([{ lOC: { 'D$in': data.branch } }]), //branch condition
           ...(data.fnYear ? [{ 'fY': data.fnYear }] : []), // financial year condition
@@ -70,7 +71,7 @@ export class GeneralLedgerReportService {
       };
 
       const res = await firstValueFrom(this.masterService.masterMongoPost("generic/query", reqBody));
-      console.log(res.data);
+      // console.log(res.data);
       const reportFile: any = await firstValueFrom(this.masterService.getJsonFileDetails('generalLedgerReport'));
 
       if (res.data && res.data.length > 0) {
@@ -248,13 +249,16 @@ export class GeneralLedgerReportService {
     // Process the response if it exists
     if (res) {
       // Map the data to a simplified structure and filter out any null values
-      const data = res?.data
+      let data = res?.data
         .map(x => ({ value: x.vendorCode, name: x.vendorName }))
         .filter(x => x != null)
         .sort((a, b) => a.value.localeCompare(b.value)); // Sort vendors by vendorCode
-
+      const marketVn = await this.getMarketVendorList();
+      // console.log(marketVn);
+      data = [...data, ...marketVn]
       return data;
     }
+
   }
 
   async usersData() {
@@ -338,6 +342,49 @@ export class GeneralLedgerReportService {
     } catch (error) {
       console.error("An error occurred:", error);
       return null;
+    }
+  }
+  async getMarketVendorList() {
+    const companyCode = this.storage.companyCode;
+    const collections = ['thc_summary', 'thc_summary_ltl'];
+    const filters = [
+      { 'D$match': { 'D$expr': { 'D$eq': ["$vND.tYNM", "Market"] } } },
+      {
+        D$group: {
+          _id: {
+            vendorcode: "$vND.cD",
+            vendorname: "$vND.nM"
+          }
+        }
+      },
+      {
+        D$project: {
+          _id: 0,
+          vendorcode: "$_id.vendorcode",
+          vendorname: "$_id.vendorname"
+        }
+      }
+    ];
+
+    try {
+      const requests = collections.map(collection => {
+        const reqBody = {
+          companyCode,
+          collectionName: collection,
+          filters
+        };
+
+        return firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+      });
+
+      const results = await Promise.all(requests);
+      // console.log(results);
+
+      const vendorList = results.flatMap(res => res.data).map(x => ({ value: x.vendorcode, name: x.vendorname }));
+      return vendorList;
+    } catch (error) {
+      console.error('Error fetching market vendor list:', error);
+      throw error; // Re-throw the error for further handling if necessary
     }
   }
   //#endregion

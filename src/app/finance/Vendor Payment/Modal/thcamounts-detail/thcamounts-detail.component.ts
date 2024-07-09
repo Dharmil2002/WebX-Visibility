@@ -219,7 +219,19 @@ export class THCAmountsDetailComponent implements OnInit {
     // Return an empty array if no charges are found
     return [];
   }
+  OnChangeAdvancePaymentAmt(event) {
+    const advancePaymentAmt = parseFloat(this.THCAmountsForm.get("AdvancePaymentAmt").value);
+    const advancePendingAmt = parseFloat(this.THCData?.AdvancePending);
 
+    if (advancePaymentAmt > advancePendingAmt) {
+      this.THCAmountsForm.get("AdvancePaymentAmt").setValue(advancePendingAmt);
+      this.snackBarUtilityService.ShowCommonSwal(
+        "error",
+        "Advance Payment Amount cannot be more than Advance Pending Amount...!"
+      );
+    }
+
+  }
   OnChangePlusAmounts(event) {
     this.THCAmountsADDForm.get("ContractAmount").setValue(
       this.THCData?.THCContraAmount
@@ -246,6 +258,9 @@ export class THCAmountsDetailComponent implements OnInit {
     );
     this.THCAmountsForm.get("Balance").setValue(
       (THCTotal - +this.THCData?.Advance).toFixed(2)
+    );
+    this.THCAmountsForm.get("AdvancePaymentAmt").setValue(
+      (+this.THCData?.AdvancePaymentAmount).toFixed(2)
     );
   }
   OnChangeAdvanceAmount(event) {
@@ -292,7 +307,7 @@ export class THCAmountsDetailComponent implements OnInit {
     });
     const commonBody = {
       cHG: Charges,
-      aDVPENAMT: this.THCAmountsForm.value.Advance,
+      // aDVPENAMT: this.THCAmountsForm.value.Advance,
       bALAMT: this.THCAmountsForm.value.Balance,
       bLPAYAT: this.THCAmountsForm.value.BalanceLocation.name,
       aDPAYAT: this.THCAmountsForm.value.AdvanceLocation.name,
@@ -308,9 +323,12 @@ export class THCAmountsDetailComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPut("generic/update", req)
     );
-    console.log("res", res);
     if (res.success) {
-      this.dialogRef.close({ success: res.success });
+      const Result = {
+        THCNo: this.THCData.THC,
+        AdvancePaymentAmount: this.THCAmountsForm.value.AdvancePaymentAmt,
+      }
+      this.dialogRef.close({ success: res.success, data: Result });
     }
   }
 

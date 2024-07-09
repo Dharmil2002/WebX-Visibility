@@ -1,0 +1,52 @@
+<section class="content">
+    <div class="container-fluid">
+      <div class="block-header" *ngFor="let breadscrum of breadscrums">
+        <app-breadcrumb
+          [title]="breadscrum.title"
+          [items]="breadscrum.items"
+          [active_item]="breadscrum.active"
+        >
+        </app-breadcrumb>
+      </div>
+      <div class="card" *ngIf="menuDetail">
+        <mat-tab-group
+          (selectedTabChange)="onTabChange($event)"
+          (selectedIndexChange)="GetSelectedIndex($event)"
+          #myTabGroup
+        >
+          <mat-tab label="JobOrders">
+            <ng-template mat-tab-label>Job Orders</ng-template>
+            <app-job-orders
+              (CurrentIndex)="GetSelectedIndex($event)"
+              [selectedIndex]="1"
+            ></app-job-orders>
+          </mat-tab>
+          <mat-tab label="WorkOrders">
+            <ng-template mat-tab-label>Work orders</ng-template>
+            <app-work-orders
+              (CurrentIndex)="GetSelectedIndex($event)"
+              [selectedIndex]="2"
+              *ngIf="tabName === 'WorkOrders'"
+            ></app-work-orders>
+          </mat-tab>
+          <mat-tab label="VendorBills">
+            <ng-template mat-tab-label>Vendor Bills</ng-template>
+            <app-vendor-bills
+              (CurrentIndex)="GetSelectedIndex($event)"
+              [selectedIndex]="3"
+              *ngIf="tabName === 'VendorBills'"
+            ></app-vendor-bills>
+          </mat-tab>
+          <mat-tab label="JobTracker">
+            <ng-template mat-tab-label>Job Tracker</ng-template>
+            <app-job-tracker
+              (CurrentIndex)="GetSelectedIndex($event)"
+              [selectedIndex]="3"
+              *ngIf="tabName === 'JobTracker'"
+            ></app-job-tracker>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </section>
+  

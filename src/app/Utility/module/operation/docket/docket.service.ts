@@ -28,7 +28,7 @@ export class DocketService {
     }
     vehicleDetail: any;
     docCalledAs: DocCalledAsModel;
-    
+
     // Define a mapping object
     statusMapping = {
         default: {
@@ -125,7 +125,6 @@ export class DocketService {
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
         return result;
     }
-
     async updateDocketSuffix(filter, data) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
@@ -138,7 +137,6 @@ export class DocketService {
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
         return result;
     }
-
     bindData(dataArray, targetArray) {
         if (dataArray.length > 0) {
             const modifiedData = dataArray.map((x, index) => {
@@ -151,7 +149,6 @@ export class DocketService {
             targetArray = modifiedData;
         }
     }
-
     /* below the function  was generated for the mapping of data */
     // Define a common service function
     async processShipmentList(shipmentList) {
@@ -340,7 +337,7 @@ export class DocketService {
             "inboundNumber": data.iNBNUM,
             "shipment": data.sHIP,
             "rfqNo": data.rFQNO,
-            "spIns": data?.rMK||"",
+            "spIns": data?.rMK || "",
             "podDoNumber": data.pODONUM,
             "vehicleDetail": null,
             "invoiceDetails": [],
@@ -807,7 +804,7 @@ export class DocketService {
             },
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": ConvertToNumber(data?.cft_tot || 0),
-            "cSGE": {
+            "cSGN": {
                 "cD": data?.consignorName?.value || "",
                 "nM": data?.consignorName?.name || "",
                 "cT": data?.consignorCity?.value || "",
@@ -818,7 +815,7 @@ export class DocketService {
                 "mOB": data?.consignorMobileNo || "",
                 "tEL": data?.consignorTelephoneNo || "",
             },
-            "cSGN": {
+            "cSGE": {
                 "cD": data?.consigneeName?.value || "",
                 "nM": data?.consigneeName?.name || "",
                 "cT": data?.consigneeCity?.value || "",
@@ -890,7 +887,7 @@ export class DocketService {
                 "mTNM": element?.Invoice_Product || "",
                 "hSN": element?.HSN_CODE || "",
                 "hSNNM": element?.HSN_CODE || "",
-                "pKGTYP":element?.pkgsTypeInv || "",
+                "pKGTYP": element?.pkgsTypeInv || "",
                 "eWBNO": data?.ewbNo || "",
                 "eWBDT": ConvertToDate(element?.ewbDate),
                 "eXPDT": ConvertToDate(data?.ewbExprired),
@@ -1055,7 +1052,7 @@ export class DocketService {
     }
     /*End*/
     /*below function is use in many places so Please change in wisely beacause it affect would be in many module*/
-    async getDocketList(filter,iSMR=false) {
+    async getDocketList(filter, iSMR = false) {
         let matchQuery = filter
         const reqBody = {
             companyCode: this.storage.companyCode,
@@ -1156,16 +1153,16 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', req));
         return res.data.length > 0 ? true : false;
     }
-    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData,nonfreight="") {
-   
-        let nonfreightAmt={};
+    async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData, nonfreight = "") {
+
+        let nonfreightAmt = {};
         if (nonfreight) {
-          Object.keys(nonfreight).forEach((key) => {
-            let modifiedKey = key.replace(/./g, (match, index) => {
-              return index >0 ? match.toUpperCase() : match.toLowerCase();
+            Object.keys(nonfreight).forEach((key) => {
+                let modifiedKey = key.replace(/./g, (match, index) => {
+                    return index > 0 ? match.toUpperCase() : match.toLowerCase();
+                });
+                nonfreightAmt[modifiedKey] = nonfreight[key];
             });
-            nonfreightAmt[modifiedKey] = nonfreight[key];
-          });
         }
         let docketField = {
             "_id": data?.id || "",
@@ -1198,7 +1195,7 @@ export class DocketService {
             "iSCOM": true,
             "cFTRATO": parseFloat(data?.cft_ratio || 0),
             "cFTTOT": invoiceData.length > 0 ? ConvertToNumber(invoiceData.reduce((c, a) => c + a.cft, 0)) : 0,
-            "cSGE": {
+            "cSGN": {
                 "cD": data?.consignorName?.value || "C8888",
                 "nM": data?.consignorName?.name || data?.consignorName,
                 "cT": data?.fromCity?.value || "",
@@ -1209,7 +1206,7 @@ export class DocketService {
                 "mOB": data?.ccontactNumber || "",
                 "aLMOB": data?.calternateContactNo || "",
             },
-            "cSGN": {
+            "cSGE": {
                 "cD": data?.consigneeName?.value || "C8888",
                 "nM": data?.consigneeName?.name || data?.consigneeName,
                 "cT": data?.toCity?.value || "",
@@ -1230,7 +1227,7 @@ export class DocketService {
             "oTHAMT": ConvertToNumber(data?.otherAmount || 0, 2),
             "gROAMT": ConvertToNumber(data?.grossAmount || 0, 2),
             "rCM": data?.rcm || "N",
-            "gSTAMT": ConvertToNumber(data?.gstAmount || 0, 2),
+            "gSTRT": ConvertToNumber(data?.gstRate || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
             "gST": {
                 "tY": "SGST",
@@ -1249,13 +1246,13 @@ export class DocketService {
             "pKGTY": data?.pkgsType || "",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
-            "pVTMARK" : data?.pvtMark || "",
+            "pVTMARK": data?.pvtMark || "",
             "wLCN": data?.cnWinCsgn || false,
             "wLCNE": data?.cnWinCsgne || false,
             "iSCEBP": data?.cnebp || false,
             "iSCNBP": data?.cnbp || false,
-            "dELTYPE": data?.delivery_type || "",
-            "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
+            "dELTYPE": data?.delivery_typeNm || "",
+            "dELTYPECD": data?.delivery_type || "",//here the name wolud be come from the master
             "iNVTOT": ConvertToNumber(chargeBase?.InvoiceAmount || 0, 2),
             "pARTQTY": parseInt(data?.totalPartQuantity || 0),
             "tRNMOD": data?.transMode || "",//check value transMode
@@ -1270,9 +1267,9 @@ export class DocketService {
             "oTHINF": otherData ? otherData.otherInfo : '',
             "fSTSN": DocketFinStatus[DocketFinStatus.Pending],
             "cONTRACT": data?.contract || "",
-            "iSSCAN":data?.iSSCAN,
+            "iSSCAN": data?.iSSCAN,
             "nFCHG": nonfreightAmt,
-            "rMK":data?.spIns||"",
+            "rMK": data?.spIns || "",
             "yIELD": ConvertToNumber(data?.yIELD || 0, 2)
         };
 
@@ -1286,7 +1283,7 @@ export class DocketService {
                 "cID": this.storage.companyCode,
                 "dKTNO": isUpdate ? data?.docketNumber : "",
                 "iNVNO": element?.invoiceNumber || "",
-                "iNVDT": ConvertToDate(element?.invDt),
+                "iNVDT": moment(element?.invDt),
                 "vOL": {
                     "uNIT": "FT",
                     "l": roundToNumber(l, 3),
@@ -1298,16 +1295,16 @@ export class DocketService {
                 "cURR": "INR",
                 "cUBWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "mATDN": element?.materialDensity || "",
-                "pKGTY":element?.pkgsTypeInv || "",
-                "pKGTYN":element?.pkgsTypeInvNM || "",
+                "pKGTY": element?.pkgsTypeInv || "",
+                "pKGTYN": element?.pkgsTypeInvNM || "",
                 "pKGS": parseInt(element?.noOfPackage || 0),
                 "cFTWT": ConvertToNumber(element?.cubWT || 0, 2),
                 "aCTWT": ConvertToNumber(element?.actualWeight || 0, 2),
                 "cHRWT": ConvertToNumber(element?.chargedWeight || 0, 2),
                 "mTNM": element?.materialName || "",
                 "eWBNO": element?.ewayBillNo || "",
-                "eWBDT": ConvertToDate(element?.ewayBillDate),
-                "eXPDT": ConvertToDate(data?.expiryDate),
+                "eWBDT": moment(element?.ewayBillDate),
+                "eXPDT": moment(data?.expiryDate),
                 "eNTBY": this.storage.userName,
                 "eNTDT": new Date(),
                 "eNTLOC": this.storage.branch,
@@ -1329,13 +1326,13 @@ export class DocketService {
             rCM: data.rcm,
             gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
             gSTCHAMT: ConvertToNumber(data?.gstChargedAmount || 0, 2),
-            cHG: otherData ? otherData.otherCharges : '',            
+            cHG: otherData ? otherData.otherCharges : '',
             tOTAMT: ConvertToNumber(data?.totAmt || 0, 2),
             sTS: DocketFinStatus.Pending,
             sTSNM: DocketFinStatus[DocketFinStatus.Pending],
             sTSTM: new Date(),
             isBILLED: false,
-            bILLNO: "",            
+            bILLNO: "",
             pBILLAMT: ConvertToNumber(data?.totAmt || 0, 2),
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
@@ -1490,8 +1487,16 @@ export class DocketService {
         const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
         return res.data
     }
+    async getdocketFromOpsOne(filter) {
+        const req = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filter: filter
+        }
+        const res = await firstValueFrom(this.operation.operationMongoPost('generic/getOne', req));
+        return Object.keys(res.data).length>0?res.data:null
+    }
     async getDocketsDetails(city) {
-
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: "dockets",
@@ -1530,11 +1535,6 @@ export class DocketService {
                                         D$and: [
                                             {
                                                 D$expr: { D$eq: ["$docketsOPs.sTS", 2], },
-                                            },
-                                            {
-                                                D$expr: {
-                                                    D$gte: ["$docketsOPs.sTSTM", moment().tz(this.storage.timeZone).startOf('day').toDate()],
-                                                }
                                             }
                                         ],
                                     },
@@ -1660,4 +1660,98 @@ export class DocketService {
     }
 
     /*end*/
+    async getOneDocketLtl(filter) {
+
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "docket_ops_det_ltl",
+            filters: [
+                {
+                    D$match: filter,
+                },
+                {
+                    D$lookup: {
+                        from: "dockets_ltl",
+                        localField: "dKTNO",
+                        foreignField: "dKTNO",
+                        as: "dockets_details"
+                    }
+                },
+                {
+                    D$unwind: {
+                        path: "$dockets_details",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    D$project: {
+                        dKTNO: 1,
+                        dKTDT: "$dockets_details.dKTDT",
+                        pAYTYP: "$dockets_details.pAYTYP",
+                        pAYTYPNM: "$dockets_details.pAYTYPNM",
+                        bPARTY: "$dockets_details.bPARTY",
+                        bPARTYNM: "$dockets_details.bPARTYNM",
+                        cLOC: "$cLOC",
+                        oRGN: "$oRGN",
+                        dEST: "$dEST",
+                        pKGS: "$pKGS",
+                        aCTWT: "$aCTWT",
+                        cHRWT: "$cHRWT",
+                        sFX: 1
+                    }
+                }
+            ]
+        }
+        const res = await firstValueFrom(this.operation.operationPost("generic/query",reqBody));
+        return res.data.length > 0 ? res.data : null;
+    }
+    async getDocketListForBilling(filter) {
+        let matchQuery = filter
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: "dockets_ltl",
+            filters: [
+                {
+                    D$match: matchQuery,
+                },
+                {
+                    "D$lookup": {
+                        "from": "docket_fin_det_ltl",
+                        "let": { "dKTNO": "$dKTNO" },
+                        "pipeline": [
+                            {
+                                "D$match": {
+                                    'D$expr': {
+                                        'D$and': [
+                                            {
+                                                'D$eq': [
+                                                    '$dKTNO', '$$dKTNO'
+                                                ]
+                                            },
+                                            {
+                                                'D$eq': [
+                                                    '$isBILLED', false
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "as": "financialDetails"
+                    },
+                },
+                {
+                    'D$unwind': {
+                        path: "$financialDetails",
+                        preserveNullAndEmptyArrays: false,
+                    }
+                },
+            ]
+
+        }
+        // Send request and handle response
+        const res = await firstValueFrom(this.operation.operationMongoPost("generic/query", reqBody));
+        return res.data;
+    }
 }

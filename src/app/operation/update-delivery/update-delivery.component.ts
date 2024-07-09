@@ -1,4 +1,4 @@
-import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -28,7 +28,7 @@ export class UpdateDeliveryComponent implements OnInit {
     edit: false,
     //csv: true
   }
-  menuItems = [{ label: "Edit"}];
+  menuItems = [{ label: "Edit" }];
   menuItemflag: boolean = true;
   jsonControlupdatedeliveryArray: any;
   updatedeliveryControls: UpdateDeliveryControl;
@@ -78,15 +78,15 @@ export class UpdateDeliveryComponent implements OnInit {
 
   constructor(
     private fb: UntypedFormBuilder,
-    private route:Router,
+    private route: Router,
     public dialog: MatDialog,
-    private storage:StorageService,
-    private changeDetectorRef:ChangeDetectorRef,
-    private deliveryService:DeliveryService,
+    private storage: StorageService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private deliveryService: DeliveryService,
     public snackBarUtilityService: SnackBarUtilityService,
     private navService: NavigationService
-    ) {
-     this.deliveryData = this.route.getCurrentNavigation()?.extras?.state?.data;
+  ) {
+    this.deliveryData = this.route.getCurrentNavigation()?.extras?.state?.data;
     this.initializeFormControl();
   }
 
@@ -102,30 +102,30 @@ export class UpdateDeliveryComponent implements OnInit {
     this.updatedeliveryTableForm = formGroupBuilder(this.fb, [this.jsonControlupdatedeliveryArray]);
     this.autoFillDelivery();
   }
-  
-  autoFillDelivery(){
-    this.updatedeliveryTableForm.controls['Vehicle'].setValue(this.deliveryData?.columnData.vehicleNo||"");
-    this.updatedeliveryTableForm.controls['route'].setValue(this.deliveryData?.columnData.Cluster||"");
-    this.updatedeliveryTableForm.controls['tripId'].setValue(this.deliveryData?.columnData.RunSheet||"");
+
+  autoFillDelivery() {
+    this.updatedeliveryTableForm.controls['Vehicle'].setValue(this.deliveryData?.columnData.vehicleNo || "");
+    this.updatedeliveryTableForm.controls['route'].setValue(this.deliveryData?.columnData.Cluster || "");
+    this.updatedeliveryTableForm.controls['tripId'].setValue(this.deliveryData?.columnData.RunSheet || "");
     this.getShipments();
   }
   async getShipments() {
-    if(this.deliveryData?.columnData.RunSheet){
-     const res= await this.deliveryService.getDeliveryDetail(this.deliveryData?.columnData.RunSheet);
+    if (this.deliveryData?.columnData.RunSheet) {
+      const res = await this.deliveryService.getDeliveryDetail(this.deliveryData?.columnData.RunSheet);
       this.tableData = res.map((x) => {
         return {
           shipment: x.dKTNO,
-          packages: x.dockets?.pEND?.pKGS !== undefined ? x.dockets?.pEND?.pKGS : x?.pKGS,   
-          sFX: x?.sFX||0,
-          delivered:"",
-          person:"",
-          reason:"",
-          ltReason:"",
-          deliveryPartial:"",
+          packages: x.dockets?.pEND?.pKGS !== undefined ? x.dockets?.pEND?.pKGS : x?.pKGS,
+          sFX: x?.sFX || 0,
+          delivered: "",
+          person: "",
+          reason: "",
+          ltReason: "",
+          deliveryPartial: "",
           pod: "",
-          statusCd:DeliveryStatus.Yet_to_deliver,
-          status:DeliveryStatus[DeliveryStatus.Yet_to_deliver].replace(/_/g, " "),
-          actions:["Edit"],
+          statusCd: DeliveryStatus.Yet_to_deliver,
+          status: DeliveryStatus[DeliveryStatus.Yet_to_deliver].replace(/_/g, " "),
+          actions: ["Edit"],
           ...x
         }
       });
@@ -134,14 +134,14 @@ export class UpdateDeliveryComponent implements OnInit {
 
   }
   kpiData() {
-    const totalDkt=this.tableData;
-   const totalPendPkgs = this.tableData && this.tableData.length>0?this.tableData.reduce((total, shipment) => total + shipment.dockets.pEND.pKGS, 0):0;
-   const totalDel = this.tableData && this.tableData.length>0?this.tableData.filter((x)=>x.hasOwnProperty('statusCd') && x.statusCd === 10).length:0;
-   const totalValue = this.tableData && this.tableData.length > 0 
-    ? this.tableData
+    const totalDkt = this.tableData;
+    const totalPendPkgs = this.tableData && this.tableData.length > 0 ? this.tableData.reduce((total, shipment) => total + shipment.dockets.pEND.pKGS, 0) : 0;
+    const totalDel = this.tableData && this.tableData.length > 0 ? this.tableData.filter((x) => x.hasOwnProperty('statusCd') && x.statusCd === 10).length : 0;
+    const totalValue = this.tableData && this.tableData.length > 0
+      ? this.tableData
         .filter(x => x.hasOwnProperty('deliveryPkgs'))
         .reduce((acc, curr) => acc + curr.deliveryPkgs, 0)
-    : 0;
+      : 0;
 
     const createShipDataObject = (count, title, className) => ({
       count,
@@ -175,58 +175,58 @@ export class UpdateDeliveryComponent implements OnInit {
     if (data.label.label === "Edit") {
       const dialogref = this.dialog.open(UpdateDeliveryModalComponent, {
         data: data.data,
-        height:"100vw",
-        width:"100vw",
-        maxWidth:"232vw"
+        height: "100vw",
+        width: "100vw",
+        maxWidth: "232vw"
       });
       dialogref.afterClosed().subscribe((result) => {
         if (result) {
-          this.tableload=true;
-           this.tableData.map((x)=>{
-            if(x.shipment==result.dKTNO){
+          this.tableload = true;
+          this.tableData.map((x) => {
+            if (x.shipment == result.dKTNO) {
               const { status, statusCd } = this.getStatusAndCode(result.arrivedPkgs, result.deliveryPkgs);
-              x.status=status;
-              x.statusCd=statusCd;
-              x.dateTime=result.DTTM;
-              x.remarks=result.remarks;
-              x.bookedPkgs=parseInt(result.bookedPkgs);
-              x.arrivedPkgs=parseInt(result.arrivedPkgs);
-              x.deliveryPkgs=parseInt(result.deliveryPkgs);
-              x.pendingPkgs=parseInt(result?.arrivedPkgs||0)-parseInt(result?.deliveryPkgs||0);
-              x.pendingWt=parseInt(result?.arrivedWeight||0)-parseInt(result?.deliveryWeight||0);
-              x.cODDODCharges=result?.cODDODCharges||"0.00",
-              x.codDodPaid=result?.codDodPaid||"0.00",
-              x.dDateTime=moment.utc(result.DTTM).format("DD MMM YY HH:MM:SS");
-              x.deliveryPartial=result.deliveryPartial||"",
-              x.pod= result.upload||"",
-              x.ltReason=result.ltReason||"",
-              x.reason=result?.deliveryPartial||result?.ltReason||"",
-              x.startKm=result?.startKm||0,
-              x.person=result?.person||this.storage.branch
+              x.status = status;
+              x.statusCd = statusCd;
+              x.dateTime = result.DTTM;
+              x.remarks = result.remarks;
+              x.bookedPkgs = parseInt(result.bookedPkgs);
+              x.arrivedPkgs = parseInt(result.arrivedPkgs);
+              x.deliveryPkgs = parseInt(result.deliveryPkgs);
+              x.pendingPkgs = parseInt(result?.arrivedPkgs || 0) - parseInt(result?.deliveryPkgs || 0);
+              x.pendingWt = parseInt(result?.arrivedWeight || 0) - parseInt(result?.deliveryWeight || 0);
+              x.cODDODCharges = result?.cODDODCharges || "0.00",
+                x.codDodPaid = result?.codDodPaid || "0.00",
+                x.dDateTime = moment.utc(result.DTTM).format("DD MMM YY HH:MM:SS");
+              x.deliveryPartial = result.deliveryPartial || "",
+                x.pod = result.upload || "",
+                x.ltReason = result.ltReason || "",
+                x.reason = result?.deliveryPartial || result?.ltReason || "",
+                x.endKm = result?.endKm || 0,
+                x.person = result?.person || this.storage.branch
             }
             return x;
-           })
-           this.tableload=false;
-           this.changeDetectorRef?.detectChanges();
-           this.kpiData();
+          })
+          this.tableload = false;
+          this.changeDetectorRef?.detectChanges();
+          this.kpiData();
         }
       });
     }
-    }
-    getStatusAndCode(arrivedPkgs, deliveryPkgs) {
-      arrivedPkgs = parseInt(arrivedPkgs, 10);
-      deliveryPkgs = parseInt(deliveryPkgs, 10);
-      if (arrivedPkgs === deliveryPkgs) {
-        return { status: DeliveryStatus[DeliveryStatus.Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Delivered}; // Adjust based on actual logic
-      } else if (deliveryPkgs == 0) {
-        return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Un_Delivered };
-      } else if (arrivedPkgs > deliveryPkgs) {
-        return { status: DeliveryStatus[DeliveryStatus.Part_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Part_Delivered };
-      } else {
-        return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd:DeliveryStatus.Un_Delivered}; // Adjust as needed
-      }
   }
-  async CompleteScan(){
+  getStatusAndCode(arrivedPkgs, deliveryPkgs) {
+    arrivedPkgs = parseInt(arrivedPkgs, 10);
+    deliveryPkgs = parseInt(deliveryPkgs, 10);
+    if (arrivedPkgs === deliveryPkgs) {
+      return { status: DeliveryStatus[DeliveryStatus.Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Delivered }; // Adjust based on actual logic
+    } else if (deliveryPkgs == 0) {
+      return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Un_Delivered };
+    } else if (arrivedPkgs > deliveryPkgs) {
+      return { status: DeliveryStatus[DeliveryStatus.Part_Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Part_Delivered };
+    } else {
+      return { status: DeliveryStatus[DeliveryStatus.Un_Delivered].replace(/_/g, " "), statusCd: DeliveryStatus.Un_Delivered }; // Adjust as needed
+    }
+  }
+  async CompleteScan() {
     const status = this.tableData.every(x => x.dateTime);
     if (!status) { // If not every item has a non-empty dateTime, show the error
       Swal.fire({
@@ -236,24 +236,25 @@ export class UpdateDeliveryComponent implements OnInit {
       });
       return false;
     }
-    else{
-      this.snackBarUtilityService.commonToast(async () => {  
-        const res = await this.deliveryService.deliveryUpdate(this.updatedeliveryTableForm.value,this.tableData);
-        if(res){
+    else {
+      this.snackBarUtilityService.commonToast(async () => {
+        const res = await this.deliveryService.deliveryUpdate(this.updatedeliveryTableForm.value, this.tableData);
+        if (res) {
           Swal.fire({
             icon: "success",
             title: "Delivery Update Successfully",
             text: "DRS NO: " + this.updatedeliveryTableForm.controls['tripId'].value,
             showConfirmButton: true,
           }).then((result) => {
-              // Redirect to the desired page after the success message is confirmed.
-              this.navService.navigateTotab(
-                "docket",
-                "dashboard/Index"
-              );
-        })
-      }
-      },"Delivery Update Successfull");
+            // Redirect to the desired page after the success message is confirmed.
+            this.navService.navigateTotab(
+              "docket",
+              "dashboard/Index"
+            );
+          })
+        }
+      }, "Delivery Update Successful");
     }
   }
+
 }

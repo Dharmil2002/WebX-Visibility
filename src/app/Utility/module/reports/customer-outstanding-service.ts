@@ -129,6 +129,33 @@ export class CustOutstandingService {
                               },
                          },
                          {
+                              D$lookup: {
+                                   from: "cd_note_header",
+                                   let: {
+                                        bILLNO: "$bILLNO"
+                                   },
+                                   pipeline: [
+                                        {
+                                             D$match: {
+                                                  D$and: [
+                                                       {
+                                                            D$expr: {
+                                                                 D$eq: ["$bILLNO", "$$bILLNO"],
+                                                            },
+                                                       },
+                                                       {
+                                                            cNL: {
+                                                                 D$in: [false, null],
+                                                            },
+                                                       },
+                                                  ],
+                                             },
+                                        },
+                                   ],
+                                   as: "creditnote",
+                              },
+                         },
+                         {
                               D$project:
                               {
                                    customer: 1,
@@ -159,7 +186,10 @@ export class CustOutstandingService {
                                    //      D$sum: "$cOL.aMT",
                                    // },
                                    collectedAmt: {
-                                        D$sum: "$coll.aMT",
+                                        D$sum: "$cOL.aMT",
+                                   },
+                                   creditNoteAmt: {
+                                        D$sum: "$creditnote.aMT",
                                    },
                               },
                          },
@@ -169,7 +199,13 @@ export class CustOutstandingService {
                                         D$max: [
                                              0,
                                              {
-                                                  D$subtract: ["$aMT", "$collectedAmt"],
+                                                  // D$subtract: ["$aMT", "$collectedAmt"],
+                                                  D$subtract: [
+                                                       {
+                                                            D$subtract: ["$aMT", "$collectedAmt"]
+                                                       },
+                                                       "$creditNoteAmt"
+                                                  ]
                                              },
                                         ],
                                    },
@@ -201,6 +237,9 @@ export class CustOutstandingService {
                                    },
                                    collectedAmt: {
                                         D$sum: "$collectedAmt",
+                                   },
+                                   creditNoteAmt: {
+                                        D$sum: "$creditNoteAmt",
                                    },
                                    "0-15": {
                                         D$sum: {

@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { VehicleService } from 'src/app/Utility/module/masters/vehicle-master/vehicle-master-service';
+import { LoadingSheetService } from 'src/app/Utility/module/operation/loadingSheet/loadingsheet-service';
 @Component({
   selector: 'app-add-market-vehicle',
   templateUrl: './add-market-vehicle.component.html'
@@ -42,6 +43,9 @@ export class AddMarketVehicleComponent implements OnInit {
       private storage: StorageService,
       private vehicleTypeService: VehicleTypeService,
       private markerVehicleService: MarkerVehicleService,
+      private vehicleService:VehicleService,
+      private loadingSheetService:LoadingSheetService,
+
       private vehicleStatus: VehicleService,
       private objImageHandling: ImageHandling) {
 
@@ -134,6 +138,8 @@ export class AddMarketVehicleComponent implements OnInit {
 
     };
     const res = await this.markerVehicleService.SaveVehicleData(data);
+    const reqBody = await this.loadingSheetService.requestVehicle(this.marketVehicleTableForm.getRawValue())
+    await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
     if (res) {
       this.dialogRef.close(this.marketVehicleTableForm.value);
     }

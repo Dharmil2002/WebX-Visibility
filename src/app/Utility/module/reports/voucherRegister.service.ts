@@ -52,90 +52,6 @@ export class voucherRegService {
                };
           }
 
-          // const reqBody = {
-          //      companyCode: this.storage.companyCode,
-          //      collectionName: "acc_trans_2425",
-          //      filters:
-          //           [
-          //                {
-          //                     D$match: matchQuery,
-          //                },
-          //                {
-          //                     D$addFields: {
-          //                          account: {
-          //                               D$concat: [
-          //                                    {
-          //                                         D$toString: "$aCCCD",
-          //                                    },
-          //                                    " : ",
-          //                                    "$aCCNM",
-          //                               ],
-          //                          },
-          //                          party: {
-          //                               D$concat: [
-          //                                    {
-          //                                         D$toString: "$pARTYCD",
-          //                                    },
-          //                                    " : ",
-          //                                    "$pARTYNM",
-          //                               ],
-          //                          }
-          //                     }
-          //                },
-          //                {
-          //                     D$group: {
-          //                          _id: "$vNO",
-          //                          vNO: {
-          //                               D$first: "$vNO",
-          //                          },
-          //                          vDt: {
-          //                               D$first: "$vDT",
-          //                          },
-          //                          vTp: {
-          //                               D$first: "$vTYPNM",
-          //                          },
-          //                          accLoc: {
-          //                               D$first: "$lOC",
-          //                          },
-          //                          accCdDes: {
-          //                               D$first: "$account",
-          //                          },
-          //                          DA: {
-          //                               D$first: "$dR",
-          //                          },
-          //                          CA: {
-          //                               D$first: "$cR",
-          //                          },
-          //                          Narr: {
-          //                               D$first: "$nRT",
-          //                          },
-          //                          PT: {
-          //                               D$first: "$pARTYTY",
-          //                          },
-          //                          PCN: {
-          //                               D$first: "$party",
-          //                          },
-          //                          TT: {
-          //                               D$first: "$tTYPNM",
-          //                          },
-          //                          // DocNo: {},
-          //                          // CUNo: {},
-          //                          // CUDate: {},
-          //                          EB: {
-          //                               D$first: "$eNTBY",
-          //                          },
-          //                          EDT: {
-          //                               D$first: "$eNTDT",
-          //                          },
-          //                          EL: {
-          //                               D$first: "$eNTLOC",
-          //                          },
-          //                     },
-          //                },
-
-          //           ]
-          // };
-
           const reqBody = {
                companyCode: this.storage.companyCode,
                collectionName: "voucher_trans",
@@ -143,28 +59,6 @@ export class voucherRegService {
                     [
                          {
                               D$match: matchQuery,
-                         },
-                         {
-                              D$addFields: {
-                                   pCdNM: {
-                                        D$concat: [
-                                             {
-                                                  D$toString: "$pCODE",
-                                             },
-                                             " : ",
-                                             "$pNAME",
-                                        ],
-                                   },
-                                   accCdNM: {
-                                        D$concat: [
-                                             {
-                                                  D$toString: "$vTranDet.aCOD",
-                                             },
-                                             " : ",
-                                             "$vTranDet.aNM",
-                                        ],
-                                   }
-                              },
                          },
                          {
                               "D$lookup": {
@@ -187,13 +81,30 @@ export class voucherRegService {
                               "D$unwind": { "path": "$vTranDet", "preserveNullAndEmptyArrays": true }
                          },
                          {
+                              "D$addFields": {
+                                   "pCdNM": {
+                                        "D$cond": {
+                                             "if": { "D$ne": ["$pCODE", ""] },
+                                             "then": { "D$concat": [{ "D$toString": "$pCODE" }, " : ", "$pNAME"] },
+                                             "else": ""
+                                        }
+                                   },
+                                   "accCdNM": {
+                                        "D$cond": {
+                                             "if": { "D$ne": ["$vTranDet.aCOD", ""] },
+                                             "then": { "D$concat": [{ "D$toString": "$vTranDet.aCOD" }, " : ", { "D$toString": "$vTranDet.aNM" }] },
+                                             "else": ""
+                                        }
+                                   }
+                              }
+                         },
+                         {
                               "D$project": {
                                    "vNO": { "D$ifNull": ["$vNO", ""] },
                                    "vDt": { "D$ifNull": ["$tTDT", ""] },
                                    "vTp": { "D$ifNull": ["$vTYPNM", ""] },
                                    "accLoc": { "D$ifNull": ["$lOC", ""] },
-                                   "accCdDes": { "D$concat": [{ "D$ifNull": ["$vTranDet.aCOD", ""] }, " - ", { "D$ifNull": ["$vTranDet.aNM", ""] }] },
-                                   // "accCdDes":{ "D$ifNull": ["$accCdNM", ""] },
+                                   "accCdDes": { "D$ifNull": ["$accCdNM", ""] },
                                    "DA": { "D$ifNull": ["$vTranDet.dBTAMT", ""] },
                                    "CA": { "D$ifNull": ["$vTranDet.cDAMT", ""] },
                                    "Narr": { "D$ifNull": ["$vTranDet.nAR", ""] },

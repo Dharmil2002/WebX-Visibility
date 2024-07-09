@@ -1,9 +1,9 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
-    <form [formGroup]="vehicleTypeTableForm" >
-        <app-form-webxpress [form]="vehicleTypeTableForm"
-        [formData]="jsonControlVehicleTypeArray" [FormTitle]="'Vehicle Type Details'"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-        (callFunction)="functionCallHandler($event)" [submit]="submit">
-      </app-form-webxpress>
-    </form>
+  <form [formGroup]="vehicleTypeTableForm">
+    <app-form-webxpress [form]="vehicleTypeTableForm" [formData]="jsonControlVehicleTypeArray"
+      [FormTitle]="'Vehicle Type Details'" (functionCallEmitter)="functionCallHandler($event)"
+      [modifyAndSaveButton]="true" (callFunction)="functionCallHandler($event)" [submit]="submit" 
+      [Disabled]="isSubmit">
+    </app-form-webxpress>
+  </form>
 </app-common-wrapper-webxpress>

@@ -27,7 +27,10 @@ export class FreightChargeUploadComponent implements OnInit {
   rateTypedata: any;
   arealist: any[];
   transportMode: any;
-
+  Processing: boolean = false
+  RateData;
+  containerData;
+  vehicleData;
   constructor(
     private fb: UntypedFormBuilder,
     private dialog: MatDialog,
@@ -64,6 +67,13 @@ export class FreightChargeUploadComponent implements OnInit {
       loadType: res.data[0].lTYP,
       rateTypecontrolHandler: res.data[0].rTYP,
     };
+    this.existingData = await this.fetchExistingData();
+    this.RateData = await GetGeneralMasterData(this.masterService, "RTTYP");
+    this.containerData = await this.objContainerService.getContainerList();
+    this.vehicleData = await GetGeneralMasterData(
+      this.masterService,
+      "VEHSIZE"
+    );
   }
 
   //#region to select file
@@ -75,25 +85,20 @@ export class FreightChargeUploadComponent implements OnInit {
     const file = fileList[0];
 
     if (file) {
+      this.Processing = true
       this.xlsxUtils.readFile(file).then(async (jsonData) => {
         // Fetch data from various services
-        this.existingData = await this.fetchExistingData();
-        const RateData = await GetGeneralMasterData(this.masterService, "RTTYP");
         this.rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
           (x, index) => {
-            return RateData.find((t) => t.value == x);
+            return this.RateData.find((t) => t.value == x);
           }
         );
-        const containerData = await this.objContainerService.getContainerList();
-        const vehicleData = await GetGeneralMasterData(
-          this.masterService,
-          "VEHSIZE"
-        );
-        const containerDataWithPrefix = vehicleData.map((item) => ({
+
+        const containerDataWithPrefix = this.vehicleData.map((item) => ({
           name: `Veh- ${item.name}`,
           value: item.value,
         }));
-        this.capacityList = [...containerDataWithPrefix, ...containerData];
+        this.capacityList = [...containerDataWithPrefix, ...this.containerData];
         const stateReqBody = {
           companyCode: this.storage.companyCode,
           filter: {},
@@ -246,7 +251,7 @@ export class FreightChargeUploadComponent implements OnInit {
             this.ReValidateData(data, this.existingData);
           }
         });
-
+        this.Processing = false
       });
     }
   }
@@ -397,7 +402,6 @@ export class FreightChargeUploadComponent implements OnInit {
 
       // Format the final data with additional information
       const formattedData = this.formatFreightData(freightChargeData, newId);
-
       if (formattedData.length === 0) {
         // Display success message
         Swal.fire({
@@ -494,12 +498,12 @@ export class FreightChargeUploadComponent implements OnInit {
       processedData.tMODID = updatetransportMode.value;
     }
     processedData.tRDYS = element.TransitDays
-    processedData.rT = parseFloat(element.Rate);
+    processedData.rT = parseFloat(element.Rate).toFixed(2);
     processedData.lTYPE = this.ServiceSelectiondata.loadType;
 
     // SET Start Date And End Date
-    processedData.vFDT = moment(element.ValidFromDate, 'DD MMM YY').toDate();
-    processedData.vEDT = moment(element.ValidToDate, 'DD MMM YY').toDate();
+    processedData.vFDT = moment(element.ValidFromDate, 'D/M/YYYY').toDate();
+    processedData.vEDT = moment(element.ValidToDate, 'D/M/YYYY').toDate();
 
     // Set timestamp and user information
     processedData.eNTDT = new Date();

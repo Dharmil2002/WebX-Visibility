@@ -53,11 +53,14 @@ export class DashboardComponent implements OnInit {
     if (event.data.id == 9) {
       this.router.navigate(['/Finance/VendorBillGeneration/Criteria'])
     }
-    if (event.data.id == 10) {
+    if (event.data.id == 10) {  
       this.router.navigate(['/Finance/DebitNote/GenerateDebitNote']);
     }
     if (event.data.id == 11) {
       this.router.navigate(['/Finance/DebitNote/ApproveDebitNote']);
+    }
+    if (event.data.id == 12) {
+      this.router.navigate(['/Finance/VendorPayment/TDS-Payment']);
     }
   }
 
@@ -82,7 +85,11 @@ const TransactionsFirst = {
       title: "Pick up and Delivery Payments",
       class: "info-box7 bg-c-Daisy-light order-info-box7",
     },
-
+    {
+      id: 12,
+      title: "TDS payment Vendor",
+      class: "info-box7  bg-c-Bottle-light order-info-box7",
+    },
   ],
 };
 const TransactionsSecond = {

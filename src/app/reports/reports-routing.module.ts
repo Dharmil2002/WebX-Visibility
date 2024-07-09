@@ -31,13 +31,24 @@ import { BalanceSheetViewComponent } from './Account Report/Components/BalanceSh
 import { MRRegisterReportComponent } from './mr-register-report/mrregister-report.component';
 import { CustomerInvoiceRegisterComponent } from './customer-invoice-register/customer-invoice-register.component';
 import { VolumetricShipmentRegisterComponent } from './volumetric-shipment-register/volumetric-shipment-register.component';
-
 import { ThcRegisterReportComponent } from './thc-register-report/thc-register-report.component';
 import { DrsRegisterComponent } from './drs-register/drs-register.component';
 import { ManifestRegisterReportComponent } from './manifest-register-report/manifest-register-report.component'
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
+import { CreditNoteRegisterReportComponent } from './credit-note-register-report/credit-note-register-report.component';
+import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
+import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
+import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
+import { AdviceRegisterComponent } from './advice-register/advice-register.component';
+import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-but-not-collected-register-report/to-pay-paid-but-not-collected-register-report.component';
+import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
+import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
+import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+import { VendorTdsPaymentReportComponent } from './vendor-tds-payment-report/vendor-tds-payment-report.component';
+import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
+
 
 const routes: Routes = [
   { path: "Cash-Bank-Book-Report", component: CashBankBookReportComponent },
@@ -57,6 +68,7 @@ const routes: Routes = [
   { path: "AccountReport/ProfitAndLoss", component: ProfitAndLossCriteriaComponent },
   { path: "AccountReport/ProfitAndLossview", component: ProfitAndLossViewComponent },
   { path: "AccountReport/ProfitAndLossviewdetails", component: ProfitAndLossViewDetailsComponent },
+  { path: "AccountReport/ProfitAndLossviewdetailsvouchersList", component: ProfitAndLossViewDetailsVouchersListComponent },
   { path: "Dashboard", component: DashboardComponent },
   { path: "ControlTower", component: ControlTowerDashboardComponent },
   { path: "AccountReport/TrialBalance", component: TrialBalanceCriteriaComponent },
@@ -66,6 +78,7 @@ const routes: Routes = [
   { path: "DCRRegister", component: DcrRegisterComponent },
   { path: "AccountReport/BalanceSheet", component: BalanceSheetCriteriaComponent },
   { path: "AccountReport/BalanceSheetview", component: BalanceSheetViewComponent },
+  { path: "AccountReport/BalanceSheetviewdetails", component: BalanceSheetViewDetailsComponent },
   { path: "MR-Register-Report", component: MRRegisterReportComponent },
   { path: "CustomerInvoiceRegister", component: CustomerInvoiceRegisterComponent },
   { path: "Volumetric-Shipment-Register-Report", component: VolumetricShipmentRegisterComponent },
@@ -75,6 +88,15 @@ const routes: Routes = [
   { path: "LoadingsheetRegister", component: LoadingsheetRegisterComponent },
   { path: "TDSRegister", component: GenerateTdsRegisterReportComponent },
   { path: "generic-report-view", component: GenericReportViewComponent },
+  { path: "credit-note-register-report", component: CreditNoteRegisterReportComponent },
+  { path: "debit-note-register-report", component: DebitNoteRegisterReportComponent },
+  { path: "advice-register-report", component: AdviceRegisterComponent },
+  { path: "to-pay-paid-but-not-collected-register-report", component: ToPayPaidButNotCollectedRegisterReportComponent },
+  { path: "gcn-flow-report", component: GcnFlowReportComponent },
+  { path: "driver-status-register-report", component: DriverStatusRegisterComponent },
+  { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
+  { path: "vendor-tds-payment-report", component: VendorTdsPaymentReportComponent  },
+  { path: "VendorWiseOutstandingRegister", component: VendorWiseOutstandingRegisterReportComponent },
 ];
 
 @NgModule({

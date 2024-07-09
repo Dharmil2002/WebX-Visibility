@@ -112,7 +112,8 @@ export const OperationActions = {
     CreateThc: "operation/thc/create",
     getThc: "operation/thc/get",
     createCha: "operation/cha/create",
-    createRake: "operation/rake/create"
+    createRake: "operation/rake/create",
+    createDeps:"operation/deps/create"
 }
 
 export const UploadFieldType = {

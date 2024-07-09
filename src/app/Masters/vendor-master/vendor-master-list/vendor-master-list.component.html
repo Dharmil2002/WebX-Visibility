@@ -1,9 +1,8 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
-    <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
-        [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" (onFlagChange)="isActiveFuntion($event)"
-        [metaData]="METADATA" [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"
-        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
-        [dynamicControls]="dynamicControls" [addAndEditPath]="addAndEditPath" [uploadComponent]=true
-        (uploadEvent)="upload()">
-    </generic-table-webxpress>
+    <app-generic-table-v2 *ngIf="!tableLoad" [columnHeader]="columnHeader" [dynamicControls]="dynamicControls"
+        [tableData]="csv" [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [EventButton]="EventButton"
+        (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'Vendor Master'" [staticField]="staticField"
+        [refreshbtn]="true" [uploadComponent]=true (uploadEvent)="upload()" [csvData]="csvFileData"
+        [csvHeaders]="headerForCsv">
+    </app-generic-table-v2>
 </app-common-wrapper-webxpress>

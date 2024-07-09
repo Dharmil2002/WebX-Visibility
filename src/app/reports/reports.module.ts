@@ -75,6 +75,18 @@ import { ManifestRegisterReportComponent } from './manifest-register-report/mani
 import { LoadingsheetRegisterComponent } from './loadingsheet-register/loadingsheet-register.component';
 import { GenerateTdsRegisterReportComponent } from './generate-tds-register-report/generate-tds-register-report.component';
 import { GenericReportViewComponent } from './generic-report-view/generic-report-view.component';
+import { CreditNoteRegisterReportComponent } from './credit-note-register-report/credit-note-register-report.component';
+import { DebitNoteRegisterReportComponent } from './debit-note-register-report/debit-note-register-report.component';
+import { BalanceSheetViewDetailsComponent } from './Account Report/Components/BalanceSheet/balance-sheet-view-details/balance-sheet-view-details.component';
+import { ProfitAndLossViewDetailsVouchersListComponent } from './Account Report/Components/ProfitAndLoss/profit-and-loss-view-details-vouchers-list/profit-and-loss-view-details-vouchers-list.component';
+import { AdviceRegisterComponent } from './advice-register/advice-register.component';
+import { ToPayPaidButNotCollectedRegisterReportComponent } from './to-pay-paid-but-not-collected-register-report/to-pay-paid-but-not-collected-register-report.component';
+import { GcnFlowReportComponent } from './gcn-flow-report/gcn-flow-report.component';
+import { DriverStatusRegisterComponent } from './driver-status-register/driver-status-register.component';
+import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
+import { VendorTdsPaymentReportComponent } from './vendor-tds-payment-report/vendor-tds-payment-report.component';
+import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
+ 
 @NgModule({
   imports: [
     CommonModule,
@@ -155,7 +167,18 @@ import { GenericReportViewComponent } from './generic-report-view/generic-report
     ManifestRegisterReportComponent,
     LoadingsheetRegisterComponent,
     GenerateTdsRegisterReportComponent,
-    GenericReportViewComponent
+    GenericReportViewComponent,
+    CreditNoteRegisterReportComponent,
+    DebitNoteRegisterReportComponent,
+    BalanceSheetViewDetailsComponent,
+    ProfitAndLossViewDetailsVouchersListComponent,
+    AdviceRegisterComponent,
+    ToPayPaidButNotCollectedRegisterReportComponent,
+    GcnFlowReportComponent,
+    DriverStatusRegisterComponent,
+    OpeningClosingStockReportComponent,
+    VendorTdsPaymentReportComponent,
+    VendorWiseOutstandingRegisterReportComponent
   ],
   exports: [],
 

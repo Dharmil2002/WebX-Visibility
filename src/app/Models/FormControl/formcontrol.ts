@@ -13,6 +13,7 @@ export class FormControls {
     suffix?: string;
     maxlength?: number;
     Validations: any[];
+    readonly?: boolean;
 
     additionalData?: any;
     functions?: any;

@@ -153,8 +153,8 @@ export class UpdateShipmentDeliveryControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: "startKm",
-                label: "Start Km",
+                name: "endKm",
+                label: "End Km",
                 placeholder: '',
                 type: "text",
                 value: '',

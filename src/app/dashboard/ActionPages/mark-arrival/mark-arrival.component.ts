@@ -122,25 +122,28 @@ export class MarkArrivalComponent implements OnInit {
     })
   }
   async getManifestDetail() {
-
     const shipment = await this.arrivalService.getThcWiseMeniFest({ tHC: this.MarkArrivalTable.TripID, "D$or": [{ iSDEL: false }, { iSDEL: { D$exists: false } }] });
     this.mfList = shipment
   }
   async save() {
     this.ObjSnackBarUtility.commonToast(async () => {
-    this.MarkArrivalTableForm.controls['LateReason']
-      .setValue(
-        this.MarkArrivalTableForm.controls['LateReason']?.
-          value.name || ""
-      )
-    const pod = this.imageData?.Upload || ""
-    this.MarkArrivalTableForm.controls['pod'].setValue(pod);
-    let tripDetailForm = this.MarkArrivalTableForm.value
-    const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
-    if (res) {
-      this.updateTripData()
-    }
-  }," Vehicle Arrival");
+      this.MarkArrivalTableForm.controls['LateReason']
+        .setValue(
+          this.MarkArrivalTableForm.controls['LateReason']?.
+            value.name || ""
+        )
+      const pod = this.imageData?.Upload || ""
+      this.MarkArrivalTableForm.controls['pod'].setValue(pod);
+      let tripDetailForm = this.MarkArrivalTableForm.value
+      const res = await this.arrivalService.fieldMappingMarkArrival(this.MarkArrivalTable, tripDetailForm, this.mfList);
+      if (res) {
+        this.updateTripData()
+      }
+      Swal.hideLoading();
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+    }, " Vehicle Arrival");
   }
 
   async updateTripData() {
@@ -154,7 +157,7 @@ export class MarkArrivalComponent implements OnInit {
     const res: any = await this.controlPanel.getModuleRules(filter);
     if (res.length > 0) {
       this.Request = {
-        isInterBranchControl: res.find(x => x.rULEID === "THCIBC").vAL,
+        isInterBranchControl: res.find(x => x.rULEID === "THCIBC")?.vAL === true ? true : false,
         thcNo: this.MarkArrivalTableForm.value?.TripID,
         thc: {
           collation: "thc_summary_ltl",
@@ -177,7 +180,8 @@ export class MarkArrivalComponent implements OnInit {
       };
     }
     //#endregion
-    const dktStatus = (this.mfList ?? []).length > 0 ? "dktAvail" : "noDkt";
+  
+    const dktStatus = (this.mfList.filter(f => f.lDEST == this.storage.branch) ?? []).length > 0 ? "dktAvail" : "noDkt";
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
     let tripStatus, tripDetails, stCode, stName;
     if (dktStatus === "dktAvail") {
@@ -245,7 +249,7 @@ export class MarkArrivalComponent implements OnInit {
       const reqBody = {
         "companyCode": this.companyCode,
         "collectionName": "trip_Route_Schedule",
-        "filter": { tHC: this.MarkArrivalTableForm.value?.TripID },
+        "filter": { tHC:this.MarkArrivalTableForm.value?.TripID},
         "update": {
           ...tripDetails
         }

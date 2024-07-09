@@ -2,6 +2,7 @@
     <div *ngIf="basicFormControls">
         <form [formGroup]="consignmentForm">
             <app-form-webxpress [form]="consignmentForm" [FormTitle]="'Basic Detail'" [formData]="basicFormControls"
+                [DisplayCheckbox]="isBoth"[CheckBoxMessage]="'Computerized'"[checkboxValue]="checkboxChecked"
                 (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
                 (callFunction)="functionCallHandler($event)" [MatButton]="(this.consignmentForm.value?.docketDate &&
                 this.consignmentForm.value?.toCity &&
@@ -90,7 +91,6 @@
                 <!-- [disabled]="!model.consignmentTableForm.valid || !model.FreightTableForm.valid || isSubmit" -->
                 <button class="msr-3" mat-raised-button color="primary" (click)="save()" [disabled]="isSubmit">Generate
                     Docket</button>
-                <button class="msr-3" mat-raised-button color="primary">Back</button>
                 <!-- <button class="msr-3" [disabled]="
                     !this.consignmentForm.value?.docketDate ||
                     !this.consignmentForm.value?.toCity ||

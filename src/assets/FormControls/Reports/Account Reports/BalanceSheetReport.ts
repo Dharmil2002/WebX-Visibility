@@ -30,7 +30,7 @@ export class BalanceSheetReport {
                     },
                     functions: {
                          onOptionSelect: "resetDateRange"
-                     },
+                    },
                     generatecontrol: true, disable: false
                },
                {
@@ -116,6 +116,7 @@ export class BalanceSheetReport {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
+                    functions: { onDate: "validateDateRange" }
                }
           ]
      }

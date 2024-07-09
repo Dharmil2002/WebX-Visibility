@@ -56,7 +56,7 @@ export class GenericTableV2Component
   @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
-  @Input() tableWidth ;
+  @Input() tableWidth;
   @Input() containerWidth;
   @Input() width;
   @Input() maxWidth;
@@ -148,7 +148,7 @@ export class GenericTableV2Component
     this.loadData();
     this.dataSource = new MatTableDataSource<any>(this.tableData);
 
-    if(this.showPaginator){
+    if (this.showPaginator) {
       this.dataSource.paginator = this.paginator;
     }
     this.dataSource.sort = this.sort;
@@ -176,9 +176,16 @@ export class GenericTableV2Component
 
   //#region function to reload data, in case of any change.
   loadData() {
+    if (this.tableData != undefined && this.tableData.length == 0) {
+      Object.keys(this.columnHeader).forEach(key => {
+        if (this.columnHeader[key].hasOwnProperty('sticky')) {
+          this.columnHeader[key].sticky = false;
+        }
+      });
+    }
     this.dataSource = new MatTableDataSource(this.tableData);
     this.dataSource.sort = this.sort;
-   if(this.showPaginator){
+    if (this.showPaginator) {
       this.dataSource.paginator = this.paginator;
     }
     if (this.filter) {
@@ -206,15 +213,15 @@ export class GenericTableV2Component
   }
   //#region this function is called when rendering data in table and returns formatted data if required.
   formatData(val: any, key: string) {
-   const field=[
-    "dKTNO",
-    "dOCNO",
-    "docNo",
-    "bOOK",
-    "oBOOK",
-    "fROM",
-    "tO"
-  ]
+    const field = [
+      "dKTNO",
+      "dOCNO",
+      "docNo",
+      "bOOK",
+      "oBOOK",
+      "fROM",
+      "tO"
+    ]
     const colDef = this.columnHeader[key];
     if (field.includes(key)) {
       return val;
@@ -236,7 +243,7 @@ export class GenericTableV2Component
       }
     }
     else {
-      if(val) {      
+      if (val) {
         if (typeof val !== 'boolean' && isValidNumber(val)) {
           return Number(val);
         } else if (typeof val === 'string' && isValidDate(val)) {
@@ -316,7 +323,7 @@ export class GenericTableV2Component
         },
       });
     }
-    else if (this.menuItems && this.menuItems.length>0) {
+    else if (this.menuItems && this.menuItems.length > 0) {
       let navigateToComponent;
       if (tableData === "Action") {
         let action = item.Action;
@@ -461,7 +468,7 @@ export class GenericTableV2Component
     this.DeleteFunction.emit({ element })
   }
   functionHandle(name, element, columnData = null, value = null) {
-    this.functionCallEmitter.emit({ functionName: name, data: element, columnData: columnData, value: value})
+    this.functionCallEmitter.emit({ functionName: name, data: element, columnData: columnData, value: value })
   }
   OnChangeToggle(event) {
     let context = { event };

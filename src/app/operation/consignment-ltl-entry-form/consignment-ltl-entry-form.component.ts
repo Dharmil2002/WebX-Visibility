@@ -436,13 +436,13 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const rskType = this.riskType.find((x) => x.value == (this.fieldRules.find(f => f.Field == "risk")?.Default) || "")?.value || "";
     const delvryType = this.deliveryType.find((x) => x.value == (this.fieldRules.find(f => f.Field == "delivery_type")?.Default) || "")?.value || "";
     const material = this.matrials.find((x) => x.value == (this.fieldRules.find(f => f.Field == "materialName")?.Default) || "");
-     if(payType == "P01" || payType == "P03"||payType == "P04"){
+    if (payType == "P01" || payType == "P03" || payType == "P04") {
       this.consignmentForm.controls['billingParty'].disable();
-     }
-     else{
+    }
+    else {
       this.consignmentForm.controls['billingParty'].enable();
-     }
-  
+    }
+
     setGeneralMasterData(this.allFormControls, this.paymentType, "payType");
     setGeneralMasterData(this.allFormControls, this.riskType, "risk");
     setGeneralMasterData(this.allFormControls, this.pkgsType, "pkgsType");
@@ -689,10 +689,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
     switch (name) {
       case "cnebp":
-        if(value){
+        if (value) {
           this.consignmentForm.controls["cnbp"].disable();
         }
-        else{
+        else {
           this.consignmentForm.controls["cnbp"].enable();
         }
         this.consignmentForm.controls["consigneeName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
@@ -703,10 +703,10 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
 
         break;
       case "cnbp":
-        if(value){
+        if (value) {
           this.consignmentForm.controls["cnebp"].disable();
         }
-        else{
+        else {
           this.consignmentForm.controls["cnebp"].enable();
         }
         this.consignmentForm.controls["consignorName"].setValue(value ? { name: customer?.customerName || "", value: customer?.customerCode || "" } : "");
@@ -717,7 +717,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.consignmentForm.controls["cnbp"].enable();
         break;
     }
-  
+
   }
   /*End*/
   /*below function is volumetric function*/
@@ -942,12 +942,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const payType = this.consignmentForm.get('payType').value;
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name;
     if (payTypeNm == "PAID") {
-      this.consignmentForm.controls['billingParty'].setValue( this.consignmentForm.controls['consignorName'].value)
+      this.consignmentForm.controls['billingParty'].setValue(this.consignmentForm.controls['consignorName'].value)
     }
     if (payTypeNm == "TO PAY") {
       this.consignmentForm.controls['billingParty'].setValue(this.consignmentForm.controls['consigneeName'].value)
     }
-}
+  }
 
   async findWalkinGST(gstno) {
     const request = {
@@ -1478,7 +1478,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     const payTypeNm = this.paymentType.find(x => x.value === payType)?.name;
     switch (payTypeNm) {
       case "TBB":
-        this.consignmentForm.get('billingParty').setValidators([Validators.required,autocompleteValidator()]);
+        this.consignmentForm.get('billingParty').setValidators([Validators.required, autocompleteValidator()]);
         this.consignmentForm.get('billingParty').enable();
         break;
       case "PAID":
@@ -1629,12 +1629,12 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.isManual = this.checkboxChecked == true ? false : true;
     this.isUpdate = this.checkboxChecked == true ? false : true;
     this.consignmentForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
-    if(this.isManual){
+    if (this.isManual) {
       this.consignmentForm.controls['docketNumber'].enable();
     }
-    else{
+    else {
       this.consignmentForm.controls['docketNumber'].disable();
-    
+
     }
   }
   checkDocketRules() {
@@ -1836,7 +1836,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   async toPayAccouting(DocketBookingRequestBody) {
     const payType = this.consignmentForm.get('payType').value;
-    if (payType === "P01" || payType === "P02" || payType === "P03" || payType === "P04") {
+    if (payType === "P01" || payType === "P02" || payType === "P03") {
       this.AccountPosting(DocketBookingRequestBody, this.consignmentForm.controls["docketNumber"].value)
     }
     else {
@@ -2473,7 +2473,9 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherRequestModel.companyCode = this.storage.companyCode;
         this.VoucherRequestModel.docType = "VR";
         this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear
+        this.VoucherRequestModel.finYear = financialYear;
+        this.VoucherRequestModel.accountPosting = true;
+
 
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.CNoteBooking;
@@ -2543,99 +2545,45 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
           .subscribe({
             next: (res: any) => {
-
-              let reqBody = {
-                companyCode: this.storage.companyCode,
-                voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transCode: VoucherInstanceType.CNoteBooking,
-                transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
-                transDate: Date(),
-                finYear: financialYear,
-                branch: this.storage.branch,
-                docType: "Voucher",
-                partyType: "Customer",
-                docNo: DocketNo,
-                partyCode: this.consignmentForm.value?.billingParty?.value,
-                partyName: this.consignmentForm.value?.billingParty?.name,
-                entryBy: this.storage.getItem(StoreKeys.UserId),
-                entryDate: Date(),
-                debit: filteredVoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.debit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
-                credit: filteredVoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.credit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
-              };
-
-              this.voucherServicesService
-                .FinancePost("fin/account/posting", reqBody)
-                .subscribe({
-                  next: (res: any) => {
-                    if (res.success) {
-                      // If Payment Mode is Paid then Generate Bill
-                      if (this.consignmentForm.value.payType == "P01") {
-                        this.AutoCustomerInvoicing(DocketBookingRequestBody, DocketNo);
-                      } else {
-                        Swal.fire({
-                          icon: "success",
-                          title: "Booked Successfully And Voucher Created",
-                          text: "GCN No: " + DocketNo + "  Voucher No: " + reqBody.voucherNo,
-                          showConfirmButton: true,
-                          denyButtonText: 'Print',
-                          showDenyButton: true,
-                          showCancelButton: true,
-                          cancelButtonText: 'Close'
-                        }).then((result) => {
-                          if (result.isConfirmed) {
-                            // Redirect after the alert is closed with OK button.
-                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                          } else if (result.isDenied) {
-                            // Handle the action for the deny button here.
-                            const templateBody = {
-                              templateName: "DKT",
-                              PartyField: "",
-                              DocNo: this.consignmentForm.controls["docketNumber"].value,
-                            };
-                            const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-                            window.open(url, '', 'width=1000,height=800');
-                            this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
-                              window.location.reload();
-                            });
-                          } else if (result.isDismissed) {
-                            // Handle the action for the cancel button here.
-                            this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                          }
-                        });
-                      }
-
+              if (res.success) {
+                // If Payment Mode is Paid then Generate Bill
+                if (this.consignmentForm.value.payType == "P01") {
+                  this.AutoCustomerInvoicing(DocketBookingRequestBody, DocketNo);
+                } else {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Booked Successfully And Voucher Created",
+                    text: "GCN No: " + DocketNo + "  Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+                    showConfirmButton: true,
+                    denyButtonText: 'Print',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    cancelButtonText: 'Close'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      // Redirect after the alert is closed with OK button.
+                      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+                    } else if (result.isDenied) {
+                      // Handle the action for the deny button here.
+                      const templateBody = {
+                        templateName: "DKT",
+                        PartyField: "",
+                        DocNo: this.consignmentForm.controls["docketNumber"].value,
+                      };
+                      const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                      window.open(url, '', 'width=1000,height=800');
+                      this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                        window.location.reload();
+                      });
+                    } else if (result.isDismissed) {
+                      // Handle the action for the cancel button here.
+                      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
                     }
-                  },
-                  error: (err: any) => {
-                    if (err.status === 400) {
-                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
-                    } else {
-                      this.snackBarUtilityService.ShowCommonSwal("error", err);
-                    }
-                  },
-                });
-              try {
-                // Additional logic here
-              } catch (error) {
-                this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+                  });
+                }
+
+              } else {
+                this.snackBarUtilityService.ShowCommonSwal("error", res.message);
               }
             },
             error: (err: any) => {
@@ -2693,9 +2641,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         break;
       case "P03": //To Pay
         LeadgerDetails = GetLeadgerInfoFromLocalStorage("INC001009")
-        break;
-      case "P04": //FOC
-        LeadgerDetails = GetLeadgerInfoFromLocalStorage("INC001008")
         break;
     }
     // Income Ledger
@@ -3014,8 +2959,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
                   next: (res: any) => {
                     Swal.fire({
                       icon: "success",
-                      title: "Booked Successfully",
-                      text: "GCN No: " + DocketNo,
+                      title: "Booked Successfully And Bill Created",
+                      text: "GCN No: " + DocketNo + "  Voucher No: " + BillNo,
                       confirmButtonText: 'OK',
                       showConfirmButton: true,
                       denyButtonText: 'Print',

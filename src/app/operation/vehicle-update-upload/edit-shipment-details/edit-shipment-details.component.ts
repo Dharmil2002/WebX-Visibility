@@ -95,7 +95,6 @@ export class EditShipmentDetailsComponent implements OnInit {
   }
 
   IntializeFormControl() {
-    debugger
     const shipmentControls = new ShipmentEditControls();
     this.allJsonControlArray = shipmentControls.getShipmentFormControls();
     this.jsonControlArray = this.allJsonControlArray.filter((x) => x.additionalData?.require)
@@ -177,7 +176,6 @@ export class EditShipmentDetailsComponent implements OnInit {
   }
 
   toggleChanges(event) {
-    debugger
     const updateJsonData = (fieldNames, requireValue, event) => {
       return this.allJsonControlArray.map((x) => {
         if (fieldNames.includes(x.name)) {

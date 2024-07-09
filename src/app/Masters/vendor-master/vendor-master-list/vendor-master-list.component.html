@@ -2,6 +2,7 @@
     <app-generic-table-v2 *ngIf="!tableLoad" [columnHeader]="columnHeader" [dynamicControls]="dynamicControls"
         [tableData]="csv" [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [EventButton]="EventButton"
         (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'Vendor Master'" [staticField]="staticField"
-        [refreshbtn]="true" [uploadComponent]=true (uploadEvent)="upload()">
+        [refreshbtn]="true" [uploadComponent]=true (uploadEvent)="upload()" [csvData]="csvFileData"
+        [csvHeaders]="headerForCsv">
     </app-generic-table-v2>
 </app-common-wrapper-webxpress>

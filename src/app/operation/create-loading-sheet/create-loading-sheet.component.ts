@@ -944,10 +944,12 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
   goBack(tabIndex: string): void {
-    this.navigationService.navigateTotab(
-      tabIndex,
-      "/dashboard/Index"
-    );
+    setTimeout(()=>{
+      this.navigationService.navigateTotab(
+        tabIndex,
+        "/dashboard/Index"
+      );
+    },2000)
   }
 
   getCapacity() {

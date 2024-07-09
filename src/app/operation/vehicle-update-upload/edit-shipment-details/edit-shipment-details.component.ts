@@ -95,6 +95,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   }
 
   IntializeFormControl() {
+    debugger
     const shipmentControls = new ShipmentEditControls();
     this.allJsonControlArray = shipmentControls.getShipmentFormControls();
     this.jsonControlArray = this.allJsonControlArray.filter((x) => x.additionalData?.require)
@@ -176,6 +177,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   }
 
   toggleChanges(event) {
+    debugger
     const updateJsonData = (fieldNames, requireValue, event) => {
       return this.allJsonControlArray.map((x) => {
         if (fieldNames.includes(x.name)) {
@@ -236,7 +238,7 @@ export class EditShipmentDetailsComponent implements OnInit {
     });
   }
   getValidate(event) {
-if(!this.shipmentDetails.hasOwnProperty('Type')){
+
     const fm = {
       pkgs: {
         name: 'noofPkts',
@@ -284,10 +286,12 @@ if(!this.shipmentDetails.hasOwnProperty('Type')){
           const aWT = proportionalWeightCalculation(pkg, totPkg, totActWT);
           const cWT = proportionalWeightCalculation(pkg, totPkg, totChgWT);
           setFieldValues({ pkgs: pkg, actWeight: aWT, chgWeight: cWT });
+          if(!this.shipmentDetails.hasOwnProperty('Type')){
           this.EditShipmentForm.controls['shortPkts'].setValue(true);
           this.toggleChanges(this.requestdata);
           const shortPkgs = parseInt(totPkg) - pkg;
           this.EditShipmentForm.controls['shortPkgs'].setValue(shortPkgs);
+          }
         }
         else if (pkg == 0) {
           setFieldValues({ pkgs: 0, actWeight: 0, chgWeight: 0 });
@@ -334,11 +338,12 @@ if(!this.shipmentDetails.hasOwnProperty('Type')){
     if (!result.isValid) {
       Swal.fire('Warning', result.message, 'warning');
     }
+    if(!this.shipmentDetails.hasOwnProperty('Type')){
     this.getCheckDeps();
   }
   }
   getPkgsCheck() {
-    const arrivalPkgs = this.EditShipmentForm.get('noofPkts')?.value || 0;
+    const arrivalPkgs =this.shipmentDetails?.Packages || 0;
     const shortPkgs = this.EditShipmentForm.get('shortPkgs')?.value || 0;
     const philoPkgs = this.EditShipmentForm.get('pilferagePkgs')?.value || 0;
     const demangePkgs = this.EditShipmentForm.get('demagePkgs')?.value || 0;

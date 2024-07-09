@@ -68,6 +68,7 @@ import { InvoiceServiceService } from "src/app/Utility/module/billing/InvoiceSum
 import { CustomerBillStatus } from "src/app/Models/docStatus";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -169,6 +170,7 @@ export class ConsignmentEntryFormComponent
     private clusterService: ClusterMasterService,
     private invoiceServiceService: InvoiceServiceService,
     private stateService: StateService,
+    private thcService: ThcService,
   ) {
     super();
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -1925,6 +1927,25 @@ export class ConsignmentEntryFormComponent
   }
 
   async save() {
+
+    // get Charges Details Based on ChargesArrayList
+    const ChargesArrayList = Object.keys(this.model.NonFreightTableForm?.value || {});
+    let ChargesArray = [];
+    if (ChargesArrayList.length > 0) {
+      const filter = { cHACD: { D$in: ChargesArrayList } };
+      const Result = await this.thcService.getCharges(filter);
+      ChargesArray = Result.map(x => {
+        return {
+          cHGID: x.cHACD,
+          cHGNM: x.sELCHA,
+          aMT: this.model.NonFreightTableForm.controls[x.cHACD]?.value || 0,
+          oPS: x.oPS || "+",
+          tY: x.tY || "nFC",
+          aCCD: x.aCCD || "",
+          aCNM: x.aCNM || ""
+        };
+      });
+    }
     this.isSubmit = true;
     const tabcontrols = this.model.consignmentTableForm;
     tabcontrols.removeControl["test"];
@@ -2297,12 +2318,7 @@ export class ConsignmentEntryFormComponent
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT:
           this.model.FreightTableForm.controls["gstChargedAmount"].value,
-        cHG: this.model.NonFreightTableForm?.value
-          ? Object.entries(this.model.NonFreightTableForm.value)
-            .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
-            .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
-          : [],
-
+        cHG: ChargesArray,
         tOTAMT: this.model.FreightTableForm.controls["totalAmount"].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -3357,7 +3373,7 @@ export class ConsignmentEntryFormComponent
     return data
       .filter((x) => x.cBT === "Fixed")
       .map((x) => ({
-        name: x.sCT.replaceAll(/\s/g, ""),
+        name: x.sCTCD.replaceAll(/\s/g, ""),
         label: x.sCT,
         placeholder: x.sCT,
         type: "number",

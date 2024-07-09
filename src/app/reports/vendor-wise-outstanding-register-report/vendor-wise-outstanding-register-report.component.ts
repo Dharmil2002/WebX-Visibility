@@ -100,7 +100,10 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
       false
     );
     const loginBranch = branchList.find(branch => branch.value === this.storage.branch);
-    this.VendorOutstandingRegisterForm.controls["branch"].setValue([loginBranch.name]);
+    const selectedStatusData = branchList.filter((x) =>
+      loginBranch.name.includes(x.name)
+    );
+    this.VendorOutstandingRegisterForm.controls['locHandler'].setValue(selectedStatusData);
     const statusList = [
       { name: "All", value: "All" },
       { name: "Pending", value: "2"},
@@ -176,12 +179,22 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
           : []),
         ...(loc.length > 0 ? [{ eNTLOC: { 'D$in': loc } }] : []),
         ...(data.DocStatus !== 'All' ? [{ bSTAT: { 'D$eq': data.DocStatus } }] : []),
-        { bSTAT: { 'D$ne': [3,7] } }
+        { bSTAT: { 'D$nin': [3,7] } }
        ],
     };
     const res = await this.reportService.fetchReportData("VendorWiseOutstandingReport", matchQuery);
+    const mapResponseValues = (item) => {
+    if (item.dOCTYP === "Upload") {
+      item.dOCTYP = "General";
+    }
+    if (["Awaiting Approval", "Approved"].includes(item.bSTATNM)) {
+      item.bSTATNM = "Pending";
+    }
+    return item;
+  };
+    const mappedData = res.data.data.map(mapResponseValues);
     return {
-      data: res.data.data,
+      data: mappedData,
       grid: res.data.grid
     };
   }

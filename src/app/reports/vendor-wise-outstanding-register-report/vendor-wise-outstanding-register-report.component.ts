@@ -100,7 +100,10 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
       false
     );
     const loginBranch = branchList.find(branch => branch.value === this.storage.branch);
-    this.VendorOutstandingRegisterForm.controls["branch"].setValue([loginBranch.name]);
+    const selectedStatusData = branchList.filter((x) =>
+      loginBranch.name.includes(x.name)
+    );
+    this.VendorOutstandingRegisterForm.controls['locHandler'].setValue(selectedStatusData);
     const statusList = [
       { name: "All", value: "All" },
       { name: "Pending", value: "2"},

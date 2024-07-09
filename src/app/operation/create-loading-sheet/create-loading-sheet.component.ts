@@ -406,7 +406,6 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   /*when we check on checkbox that time that function would be called*/
   IsActiveFuntion($event) {
-
     // Assign the value of $event to the loadingData property
     this.loadingData = $event;
     if (!this.loadingSheetTableForm.value.vehicle) {
@@ -544,10 +543,15 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['vendorType'].setValue("Market");
   }
   async loadingSheetGenerate() {
+    const formData=this.loadingSheetTableForm;
     const shipment = this.tableData.filter((x) => x.isSelected);
     if (shipment.length == 0) {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
       return false;
+    }
+    if (shipment.filter((x) => x.count > 0).length < 1) {
+      SwalerrorMessage("error", "There are no shipments in your leg", "", true);
+      return;
     }
     this.isDisbled = true;
     try {
@@ -949,7 +953,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         tabIndex,
         "/dashboard/Index"
       );
-    },2000)
+    },500)
   }
 
   getCapacity() {
@@ -1096,7 +1100,6 @@ export class CreateLoadingSheetComponent implements OnInit {
       data: "ltl",
     });
     dialogref.afterClosed().subscribe((result) => {
-      console.log(result)
       if (result) {
         this.isMarket = true;
         this.MarketData = result;

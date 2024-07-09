@@ -86,12 +86,13 @@ export class DeliveryService {
         "eVNDT": new Date(),
         "eVNSRC": "Delivery Update",
         "dOCTY": "DRS",
-        "dOCNO":data.tripId,
-        "sTS":data.statusCd,
-        "sTSNM": DocketStatus[data.statusCd],
+        "dOCNO": data.tripId,
+        "sTS": item.statusCd,
+        "sTSNM": DocketStatus[item.statusCd],
         "oPSSTS":`Delivered to ${item.person} on ${moment(new Date()).tz(this.storage.timeZone).format("DD MMM YYYY @ hh:mm A")}${item.reason ? `, reason: ${item.reason}` : ''}`,
         "eNTLOC": this.storage.branch,
-        "eNTBY": this.storage.userName
+        "eNTBY": this.storage.userName,
+        "eNTDT": new Date()
       }
       return evnData
     })

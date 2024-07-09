@@ -176,7 +176,7 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
           : []),
         ...(loc.length > 0 ? [{ eNTLOC: { 'D$in': loc } }] : []),
         ...(data.DocStatus !== 'All' ? [{ bSTAT: { 'D$eq': data.DocStatus } }] : []),
-        { bSTAT: { 'D$ne': [3,7] } }
+        { bSTAT: { 'D$nin': [3,7] } }
        ],
     };
     const res = await this.reportService.fetchReportData("VendorWiseOutstandingReport", matchQuery);

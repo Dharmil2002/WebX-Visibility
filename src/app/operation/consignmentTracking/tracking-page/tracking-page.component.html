@@ -72,11 +72,13 @@
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>EDD:</p>
-                            <p class="font-width-600"></p>
+                            <p *ngIf="item.eDDDT" class="font-width-600">
+                                {{item.eDDDT | date: "dd/MM/YY"}}
+                            </p>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
                             <p>ATD:</p>
-                            <p class="font-width-600" style="color: #4caf50">
+                            <p *ngIf="item.ATD" class="font-width-600" style="color: #4caf50">
                                 {{item.ATD | date: "dd/MM/YY"}}
                             </p>
                         </div>
@@ -98,10 +100,10 @@
                             Booking Date:
                         </p>
                         <p class="font-width-600" style="display: flex; align-items: center; color: #ff8e11">
-                            <mat-icon *ngIf="item.docketData.dKTDT"
+                            <mat-icon *ngIf="item.dKTDT"
                                 style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color:#ff8e11;"
                                 fontIcon="verified"></mat-icon>
-                            {{item.docketData.dKTDT | date: "dd/MM/YY"}}
+                            {{item.dKTDT | date: "dd/MM/YY"}}
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 15%; text-align: center; ">

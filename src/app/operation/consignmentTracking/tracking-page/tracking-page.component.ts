@@ -205,16 +205,23 @@ export class TrackingPageComponent implements OnInit {
       this.masterService.masterMongoPost("generic/query", req)
     );
     if (res.success) {
+      let userIds = [];
       if (res.data && res.data.length) {
-        const getUser = await this.userMasterService.getUserName({ companyCode: this.storage.companyCode, userId: { "D$in": res.data.map(x => x.eNTBY) } })
         this.trackingData = res.data;
-        if (getUser && getUser.data && getUser.data.length > 0) {
-          this.trackingData.forEach(x => {
-            x.DocketTrackingData.forEach(element => {
-              element.eNTBY = `${element.eNTBY}:${getUser.data.find(z => z.userId == element.eNTBY)?.name}`;
-            });
-          })
-        }
+        
+        // userIds = [ ...userIds,  ...res.data.map(m => m.eNTBY), ...res.data.map(m => m.mODBY) ];
+        // userIds = [...new Set(userIds)];
+
+        // const getUser = await this.userMasterService.getUserName({ companyCode: this.storage.companyCode, userId: { "D$in": userIds } })
+        // this.trackingData = res.data;
+        // if (getUser && getUser.data && getUser.data.length > 0) {
+        //   this.trackingData.forEach(x => {
+        //     x.DocketTrackingData.forEach(element => {
+        //       element.eNTBY = `${element.eNTBY}:${getUser.data.find(z => z.userId == element.eNTBY)?.name || ""}`;
+        //     });
+        //   })
+        // }
+
         this.trackingData.forEach((x) => {
           x["GroupColor"] = this.CountCard.find((t) => t.groupId == x.GroupId)?.Color;
         });

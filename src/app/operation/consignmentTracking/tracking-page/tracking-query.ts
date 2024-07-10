@@ -92,15 +92,7 @@ export const GetTrakingDataPipeLine = () => {
             },
           }
         },
-      },
-      {
-        D$lookup: {
-          from: "docket_events",
-          localField: "dKTNO",
-          foreignField: "dKTNO",
-          as: "DocketTrackingData",
-        },
-      },
+      },      
       {
         D$addFields: {
           MoveFrom: "$docketData.fCT",
@@ -138,7 +130,28 @@ export const GetTrakingDataPipeLine = () => {
           },
         },
       },
-      
+      {
+        D$project: {
+          dKTNO: 1,
+          dKTDT: "$docketData.dKTDT",
+          eDDDT: "$docketData.eDDDT",
+          TransitMode: 1,          
+          ATD: 1,
+          sTSNM: 1,
+          sTSTM: 1,
+          oPSSTS: 1,              
+          eWBNO: 1,
+          eXPDT: 1,
+          MoveFrom: 1,
+          MoveTo: 1,
+          Consignor: 1,
+          Consignee: 1,
+          GroupId: 1,
+          eNTDT:1,
+          eNTLOC:1,
+          eNTBY:1,
+        }
+      }
     ];
   } else {
     return [
@@ -225,7 +238,12 @@ export const GetTrakingDataPipeLine = () => {
           },
           ATD: {
             D$cond: {
-              if: { D$eq: ["$iSDEL", true] },
+              if: { 
+                $or: [ 
+                  { D$eq: ["$iSDEL", true] },
+                  { D$eq: ["$sTS", 10]}
+                ]
+              },
               then: {
                 D$ifNull: ["$dELDT", "$sTSTM"],
               },
@@ -233,15 +251,7 @@ export const GetTrakingDataPipeLine = () => {
             },
           }
         },
-      },
-      {
-        D$lookup: {
-          from: "docket_events_ltl",
-          localField: "dKTNO",
-          foreignField: "dKTNO",
-          as: "DocketTrackingData",
-        },
-      },
+      },      
       {
         D$addFields: {
           MoveFrom: "$docketData.oRGN",
@@ -346,9 +356,32 @@ export const GetTrakingDataPipeLine = () => {
           },
         },
       },
+      {
+        D$project: {
+          dKTNO: 1,
+          dKTDT: "$docketData.dKTDT",
+          eDDDT: "$docketData.eDDDT",
+          TransitMode: 1,
+          ATD: 1,
+          sTSNM: 1,
+          sTSTM: 1,
+          oPSSTS: 1,              
+          eWBNO: 1,
+          eXPDT: 1,
+          MoveFrom: 1,
+          MoveTo: 1,
+          Consignor: 1,
+          Consignee: 1,
+          GroupId: 1,
+          eNTDT:1,
+          eNTLOC:1,
+          eNTBY:1,
+        }
+      }
     ];
   }
 };
+
 
 export const formArray = [
   {

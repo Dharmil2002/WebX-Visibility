@@ -1709,7 +1709,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     let yieldOn = this.contract?.cYIELDON || "CYO-0002";
     let yieldValue = ConvertToNumber(((yieldOn == "CYO-0001" ? data?.freight_amount : data?.grossAmount) || 0) / this.chargeBase.ChargedWeight, 2);
 
-    if (this.contract?.sERVSELEC.includes("YieldProtection") && yieldValue < this.contract?.mYIELD) {
+    if (this.contract?.sERVSELEC?.includes("YieldProtection") && yieldValue < this.contract?.mYIELD) {
       Swal.fire({
         icon: "error",
         title: "Oops...",

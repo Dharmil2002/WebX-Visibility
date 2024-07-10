@@ -68,7 +68,6 @@ import { InvoiceServiceService } from "src/app/Utility/module/billing/InvoiceSum
 import { CustomerBillStatus } from "src/app/Models/docStatus";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
-import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -170,7 +169,6 @@ export class ConsignmentEntryFormComponent
     private clusterService: ClusterMasterService,
     private invoiceServiceService: InvoiceServiceService,
     private stateService: StateService,
-    private thcService: ThcService,
   ) {
     super();
     this.DocCalledAs = controlPanel.DocCalledAs;
@@ -993,7 +991,7 @@ export class ConsignmentEntryFormComponent
           this.model.consignmentTableForm.controls["cnbp"].disable();
           break;
         default:
-
+         
         // Handle other cases or throw an error
       }
     } else {
@@ -1273,7 +1271,9 @@ export class ConsignmentEntryFormComponent
       const json = {
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
-        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment(this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
+        billDate: this.model.invoiceTableForm.value.billDate ? moment( this.model.invoiceTableForm.value.billDate).format("DD MMM YY HH:MM") : "",
+        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment( this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
+        invoiceDate: this.model.invoiceTableForm.value.invoiceDate?moment( this.model.invoiceTableForm.value.invoiceDate).format("DD MMM YY HH:MM") : "",
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1282,6 +1282,8 @@ export class ConsignmentEntryFormComponent
         actualWeight: this.model.invoiceTableForm.value.actualWeight,
         chargedWeight: this.model.invoiceTableForm.value.chargedWeight,
         invoice: true,
+        billDateO: this.model.invoiceTableForm.value.billDate,
+        invoiceDateO: this.model.invoiceTableForm.value.invoiceDate,
         expiryDateO: this.model.invoiceTableForm.value.expiryDate,
         actions: ["Edit", "Remove"],
       };
@@ -1480,12 +1482,12 @@ export class ConsignmentEntryFormComponent
     this.isManual = this.checkboxChecked == true ? false : true;
     this.isUpdate = this.checkboxChecked == true ? false : true;
     this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
-    if (this.isManual) {
+    if(this.isManual){
       this.model.consignmentTableForm.controls['docketNumber'].enable();
     }
-    else {
+    else{
       this.model.consignmentTableForm.controls['docketNumber'].disable();
-
+    
     }
   }
   checkDocketRules() {
@@ -1820,6 +1822,8 @@ export class ConsignmentEntryFormComponent
           x.expiryDate = x.eXPDT ? x.eXPDT : new Date();
           x.invoiceNo = x.iNVNO;
           x.invoiceAmount = x.iNVAMT;
+          x.billDate = x?.eWBDT;
+          x.invoiceDate = x?.iNVDT;
           x.noofPkts = x.pKGS;
           x.materialName = x.mTNM;
           x.actualWeight = (parseFloat(x.aCTWT) / 1000).toString();
@@ -1927,25 +1931,6 @@ export class ConsignmentEntryFormComponent
   }
 
   async save() {
-
-    // get Charges Details Based on ChargesArrayList
-    const ChargesArrayList = Object.keys(this.model.NonFreightTableForm?.value || {});
-    let ChargesArray = [];
-    if (ChargesArrayList.length > 0) {
-      const filter = { cHACD: { D$in: ChargesArrayList } };
-      const Result = await this.thcService.getCharges(filter);
-      ChargesArray = Result.map(x => {
-        return {
-          cHGID: x.cHACD,
-          cHGNM: x.sELCHA,
-          aMT: this.model.NonFreightTableForm.controls[x.cHACD]?.value || 0,
-          oPS: x.oPS || "+",
-          tY: x.tY || "nFC",
-          aCCD: x.aCCD || "",
-          aCNM: x.aCNM || ""
-        };
-      });
-    }
     this.isSubmit = true;
     const tabcontrols = this.model.consignmentTableForm;
     tabcontrols.removeControl["test"];
@@ -2265,6 +2250,8 @@ export class ConsignmentEntryFormComponent
           cURR: "INR",
           eWBNO: i.ewayBillNo,
           eXPDT: i.expiryDateO,
+          eWBDT: i.billDateO,
+          iNVDT: i.invoiceDateO,
           pKGS: parseInt(i.noofPkts) || 0,
           mTNM: i.materialName,
           aCTWT: ConvertToNumber(actualWeight || 0, 2),
@@ -2318,7 +2305,13 @@ export class ConsignmentEntryFormComponent
         gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
         gSTCHAMT:
           this.model.FreightTableForm.controls["gstChargedAmount"].value,
-        cHG: ChargesArray,
+        cHG: "",
+        nFCHG: this.model.NonFreightTableForm?.value
+          ? Object.entries(this.model.NonFreightTableForm.value)
+            .filter(([cHGNM, cHGVL]) => cHGVL !== null && cHGVL !== undefined)
+            .map(([cHGNM, cHGVL]) => ({ cHGNM, cHGVL }))
+          : [],
+
         tOTAMT: this.model.FreightTableForm.controls["totalAmount"].value,
         sTS: 0,
         sTSNM: "Booked",
@@ -2515,7 +2508,7 @@ export class ConsignmentEntryFormComponent
       Swal.fire({
         icon: "success",
         title: "Docket Update Successfully",
-        text: "GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
+        text:"GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
         confirmButtonText: 'OK',
         showConfirmButton: true,
         denyButtonText: 'Print',
@@ -2525,7 +2518,7 @@ export class ConsignmentEntryFormComponent
       }).then((result) => {
         if (result.isConfirmed) {
           this.navService.navigateTotab("docket", "dashboard/Index");
-        } else if (result.isDenied) {
+        }else if (result.isDenied) {
           // Handle the action for the deny button here.
           const templateBody = {
             templateName: "DKT",
@@ -2959,6 +2952,8 @@ export class ConsignmentEntryFormComponent
     const formFields = {
       ewayBillNo: "ewayBillNo",
       expiryDate: "expiryDateO",
+      billDate: "billDateO",
+      invoiceDate: "invoiceDateO",
       invoiceNo: "invoiceNo",
       invoiceAmount: "invoiceAmount",
       noofPkts: "noofPkts",
@@ -3064,7 +3059,7 @@ export class ConsignmentEntryFormComponent
   getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
     let fieldKey = isOrigin ? "fromCity" : "toCity";
-    if (term == "Location") {
+    if(term == "Location") {
       fieldKey = isOrigin ? "origin" : "destination";
     }
     const type = typeMapping[term];
@@ -3077,10 +3072,10 @@ export class ConsignmentEntryFormComponent
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;
+        break;  
       case "Location":
-        valueKey = "value";
-        break;
+          valueKey = "value";
+          break;   
       case "City":
         valueKey = "ct";
         break;
@@ -3092,9 +3087,9 @@ export class ConsignmentEntryFormComponent
     }
     const controls = this.model.consignmentTableForm.controls;
     let value;
-    if (fieldKey == "origin") {
+    if(fieldKey == "origin") {
       value = controls[fieldKey].value;
-    } else {
+    } else { 
       value = controls[fieldKey].value[valueKey];
     }
     if (value) {
@@ -3134,7 +3129,7 @@ export class ConsignmentEntryFormComponent
         0
       );
     }
-    const terms = ["Area", "Pincode", "Location", "City", "State"];
+    const terms = ["Area", "Pincode","Location", "City", "State"];
     const allCombinations = generateCombinations(terms);
     let matches = allCombinations
       .map(([fromTerm, toTerm]) => {
@@ -3149,16 +3144,16 @@ export class ConsignmentEntryFormComponent
         return null;
       })
       .filter((x) => x != null);
-    matches.push({
-      D$and: [
-        { "D$in": ['$fTYPE', [null, ""]] },
-        { "D$in": ['$fROM', [null, ""]] }]
-    });
-    matches.push({
-      D$and: [
-        { "D$in": ['$tTYPE', [null, ""]] },
-        { "D$in": ['$tO', [null, ""]] }]
-    });
+      matches.push({
+        D$and: [
+          { "D$in": ['$fTYPE', [null, ""]] },
+          { "D$in": ['$fROM', [null, ""]] }]
+      });
+      matches.push({
+        D$and: [
+          { "D$in": ['$tTYPE', [null, ""]] },
+          { "D$in": ['$tO', [null, ""]] }]
+      });
     let reqBody = {
       companyCode: this.storage.companyCode,
       customerCode: this.model.consignmentTableForm.value.billingParty.value,
@@ -3373,7 +3368,7 @@ export class ConsignmentEntryFormComponent
     return data
       .filter((x) => x.cBT === "Fixed")
       .map((x) => ({
-        name: x.sCTCD.replaceAll(/\s/g, ""),
+        name: x.sCT.replaceAll(/\s/g, ""),
         label: x.sCT,
         placeholder: x.sCT,
         type: "number",
@@ -3928,9 +3923,9 @@ export class ConsignmentEntryFormComponent
                       showCancelButton: true
                     }).then((result) => {
                       if (result.isConfirmed) {
-                        // Redirect after the alert is closed with OK button.
-                        this.navService.navigateTotab('docket', "dashboard/Index");
-                      } else if (result.isDenied) {
+                       // Redirect after the alert is closed with OK button.
+                      this.navService.navigateTotab('docket', "dashboard/Index");
+                      }else if (result.isDenied) {
                         // Handle the action for the deny button here.
                         const templateBody = {
                           templateName: "DKT",

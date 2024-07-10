@@ -126,6 +126,8 @@ export class InvoiceDetail {
     id:number
     ewayBillNo: string
     expiryDate: string
+    billDate: Date
+    invoiceDate: Date
     invoiceNo: string
     invoiceAmount: string
     noofPkts: string
@@ -138,6 +140,8 @@ export class InvoiceDetail {
     iNVNO: string
     eWBNO: string
     eXPDT: any
+    eWBDT: Date
+    iNVDT: Date
     iNVAMT: string
     pKGS: string
     mTNM: string

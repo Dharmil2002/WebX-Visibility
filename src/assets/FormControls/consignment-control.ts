@@ -205,7 +205,7 @@ export class ConsignmentControl extends BaseControl {
           }
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },
@@ -857,6 +857,23 @@ export class ConsignmentControl extends BaseControl {
         disable: false,
       },
       {
+        name: "billDate",
+        label: "Eway Bill Date",
+        placeholder: "Eway Bill Date",
+        type: "date",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [],
+        additionalData: {
+          minDate: new Date(),
+          metaData: "invoiceDetail",
+        },
+        generatecontrol: true,
+        disable: false,
+      },
+      {
         name: "expiryDate",
         label: "Expiry Date",
         placeholder: "Expiry Date",
@@ -890,6 +907,28 @@ export class ConsignmentControl extends BaseControl {
         }],
         additionalData: {
           showNameAndValue: false,
+        },
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "invoiceDate",
+        label: "Invoice Date",
+        placeholder: "Invoice Date",
+        type: "date",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [
+          {
+            name: "required",
+            message: "Eway Bill Date is required",
+          },
+        ],
+        additionalData: {
+          maxDate: new Date(),
+          metaData: "invoiceDetail",
         },
         generatecontrol: true,
         disable: false,

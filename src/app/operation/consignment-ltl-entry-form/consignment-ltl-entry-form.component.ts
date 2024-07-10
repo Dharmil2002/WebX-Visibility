@@ -293,24 +293,24 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
       this.updateInvoiceValidators(value);
     });
-  }  
+  }
   /*end*/
-   //*getindividualControls */
-   getindividualControls(){
-    const value= this.consignmentForm.controls['indvl']?.value||false;
-    this.consignorControlArray.find((x)=>x.name=="cnGovno").generatecontrol=value;
-    this.consigneeControlArray.find((x)=>x.name=="cneGovno").generatecontrol=value;
-    if(this.consignmentForm.controls['indvl']?.value){
+  //*getindividualControls */
+  getindividualControls() {
+    const value = this.consignmentForm.controls['indvl']?.value || false;
+    this.consignorControlArray.find((x) => x.name == "cnGovno").generatecontrol = value;
+    this.consigneeControlArray.find((x) => x.name == "cneGovno").generatecontrol = value;
+    if (this.consignmentForm.controls['indvl']?.value) {
       this.consignmentForm.controls['cnogst'].clearValidators();
       this.consignmentForm.controls['cnegst'].clearValidators();
     }
-    else{
+    else {
       this.consignmentForm.get('cnogst')?.setValidators([Validators.required]);
       this.consignmentForm.get('cnegst')?.setValidators([Validators.required]);
     }
     this.consignmentForm.controls['cnegst'].updateValueAndValidity();
     this.consignmentForm.controls['cnogst'].updateValueAndValidity();
-   }
+  }
   //#region Function to get rules for the form  controls  from the control panel  
   updateInvoiceValidators(invoiceAmount: number): void {
     if (invoiceAmount > 49999) {
@@ -2873,6 +2873,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.VoucherRequestModel.docType = "VR";
         this.VoucherRequestModel.branch = this.storage.branch;
         this.VoucherRequestModel.finYear = financialYear
+        this.VoucherRequestModel.accountPosting = false;
 
         this.VoucherDataRequestModel.voucherNo = "";
         this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval;

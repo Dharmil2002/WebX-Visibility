@@ -21,6 +21,8 @@ export class HomePageComponent implements OnInit {
   searchData: any;
   isNavbarCollapsed = true;
   punchLine: string = "";
+  token: string = "";
+
   cardList = [
     {
       title:"Full Truck Operations",
@@ -89,7 +91,8 @@ export class HomePageComponent implements OnInit {
       title:"Purchase",
       iconName:"shop_two",
       mode: "",
-      route: "https://webx-tms-po.azurewebsites.net/#/dashboard/Index",
+     // route: "https://webx-tms-po.azurewebsites.net/#/dashboard/Index",
+      route: "",
       class: "fa fa-shipping-fast card-icon",
       bgColor: "#fd7e14",
       color: "#ffffff"
@@ -114,11 +117,14 @@ export class HomePageComponent implements OnInit {
     },
     
   ];
+
   constructor(private router: Router, private masterService: MasterService, private menuService: MenuService, private storage: StorageService
-    , private controlPanel: ControlPanelService, private thcCostUpdateService: ThcCostUpdateService
+    , private controlPanel: ControlPanelService, private thcCostUpdateService: ThcCostUpdateService,
   ) {       
     this.punchLine = this.storage.getItem(StoreKeys.PunchLine) || "";
     this.bindMenu();
+    this.token = this.storage.getItem('token') || '';
+    this.setCardRoutes();
   }
 
   ngOnInit(): void {}
@@ -127,7 +133,15 @@ export class HomePageComponent implements OnInit {
     this.searchData = JSON.parse(this.storage.getItem(StoreKeys.SearchData) || "[]");   
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
     this.allOptions = searchDetail;
+  }
 
+
+  setCardRoutes() {
+    this.cardList.forEach(card => {
+      if (card.title === "Purchase") {
+        card.route = `https://webx-tms-po.azurewebsites.net/#/authentication/signin?token=${this.token}`;
+      }
+    });
   }
 
   // async onAddAppClick() {

@@ -27,7 +27,7 @@ export class GenericViewPrintComponent implements OnInit {
     },
   ];
   @Input() HtmlTemplate: any;
-  @Input() isLandscape: any = true;
+  @Input() isLandscape: any = false;
   @Input() JsonData: any;
   @Input() FieldMapping: any[];
   @Input() EventButton;

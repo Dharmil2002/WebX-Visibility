@@ -1242,8 +1242,8 @@ export class DocketService {
                 "aMT": ConvertToNumber(data?.gstChargedAmount || 0, 2)
             },
             "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
-            "pKGTYN": data?.pkgsTypeName || "",
-            "pKGTY": data?.pkgsType || "",
+            "pKGTYN": data?.pkgsTypeName|| invoiceData[0]?.pkgsTypeInvNM||"",
+            "pKGTY": data?.pkgsType|| invoiceData[0]?.pkgsTypeInv||"",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
             "pVTMARK": data?.pvtMark || "",
@@ -1251,8 +1251,8 @@ export class DocketService {
             "wLCNE": data?.cnWinCsgne || false,
             "iSCEBP": data?.cnebp || false,
             "iSCNBP": data?.cnbp || false,
-            "dELTYPE": data?.delivery_type || "",
-            "dELTYPECD": data?.delivery_typeNm || "",//here the name wolud be come from the master
+            "dELTYPE": data?.delivery_typeNm || "",
+            "dELTYPECD": data?.delivery_type || "",//here the name wolud be come from the master
             "iNVTOT": ConvertToNumber(chargeBase?.InvoiceAmount || 0, 2),
             "pARTQTY": parseInt(data?.totalPartQuantity || 0),
             "tRNMOD": data?.transMode || "",//check value transMode

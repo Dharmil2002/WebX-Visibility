@@ -389,7 +389,9 @@ export class CreateLoadingSheetComponent implements OnInit {
     ]);
   }
   /*End*/
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+    this.checkIsMarketVehicle(false);
+  }
 
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -404,7 +406,6 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   /*when we check on checkbox that time that function would be called*/
   IsActiveFuntion($event) {
-
     // Assign the value of $event to the loadingData property
     this.loadingData = $event;
     if (!this.loadingSheetTableForm.value.vehicle) {
@@ -542,10 +543,15 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['vendorType'].setValue("Market");
   }
   async loadingSheetGenerate() {
+    const formData=this.loadingSheetTableForm;
     const shipment = this.tableData.filter((x) => x.isSelected);
     if (shipment.length == 0) {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
       return false;
+    }
+    if (shipment.filter((x) => x.count > 0).length < 1) {
+      SwalerrorMessage("error", "There are no shipments in your leg", "", true);
+      return;
     }
     this.isDisbled = true;
     try {
@@ -554,8 +560,8 @@ export class CreateLoadingSheetComponent implements OnInit {
         if (lsForm.vendorType == "Market" || !this.isUpdate) {
           try {
             if (this.isMarket && this.MarketData) {
-              const reqBody = await this.loadingSheetService.requestVehicle(this.MarketData)
-              await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
+          //    const reqBody = await this.loadingSheetService.requestVehicle(this.MarketData)
+            //  await this.vehicleService.updateOrCreateVehicleStatus(reqBody);
             }
             else {
               await this.vehicleService.updateVehicleCap(this.loadingSheetTableForm.value);
@@ -581,8 +587,9 @@ export class CreateLoadingSheetComponent implements OnInit {
           lsData['transMode'] = this.products.find((x) => x.value == lsForm.transMode)?.value ?? '';
           lsData['transModeName'] = this.products.find((x) => x.name == "Road")?.name ?? '';
           if (lsData.vendorType == 'Market') {
+            const vehicleTypeList=this.vehicleTypeList
             const vehicleData = this.vehicleTypeList?.find(x => 
-              x.value === lsData['vehicleType'] || x.name === lsData['vehicleType']
+              x.value == lsData['vehicleType'] || x.name == lsData['vehicleType'] || x.value==lsData['vehicleTypeCode']
             ) ?? { name: "", value: "" };
             lsData['vehicleType'] = vehicleData?.name ||""
             lsData['vehicleTypeCode'] =  vehicleData.value || "";
@@ -601,6 +608,10 @@ export class CreateLoadingSheetComponent implements OnInit {
 
         }
         const data = this.tableData.filter((x) => x.LoadingSheet != "")
+          Swal.hideLoading();
+          setTimeout(() => {
+            Swal.close();
+          }, 1000);
         const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
           this.dialog.open(LodingSheetGenerateSuccessComponent, {
             width: "100%", // Set the desired width
@@ -661,8 +672,8 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   async checkIsMarketVehicle(vehicleData) {
     const fieldName = ["vehicleType", "Capacity", "CapacityVolumeCFT"];
+    const res = await this.vehicleTypeService.getVehicleTypeList();
     if (typeof (this.loadingSheetTableForm.controls['vehicle'].value) == "string" || vehicleData == undefined) {
-      const res = await this.vehicleTypeService.getVehicleTypeList();
       const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
       this.jsonControlArray = this.jsonControlArray.map((x) => {
         if (fieldName.includes(x.name)) {
@@ -676,6 +687,10 @@ export class CreateLoadingSheetComponent implements OnInit {
         }
         return x;
       });
+      this.vehicleTypeList=vehicleType;
+    }
+    else{
+      const vehicleType = res.map(x => ({ value: x.vehicleTypeCode, name: x.vehicleTypeName }));
       this.vehicleTypeList=vehicleType;
     }
 
@@ -933,10 +948,12 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
   goBack(tabIndex: string): void {
-    this.navigationService.navigateTotab(
-      tabIndex,
-      "/dashboard/Index"
-    );
+    setTimeout(()=>{
+      this.navigationService.navigateTotab(
+        tabIndex,
+        "/dashboard/Index"
+      );
+    },500)
   }
 
   getCapacity() {
@@ -1083,7 +1100,6 @@ export class CreateLoadingSheetComponent implements OnInit {
       data: "ltl",
     });
     dialogref.afterClosed().subscribe((result) => {
-      console.log(result)
       if (result) {
         this.isMarket = true;
         this.MarketData = result;

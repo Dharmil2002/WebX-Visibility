@@ -27,6 +27,7 @@ import { GenerateDebitNoteComponent } from './Debit-Note/generate-debit-note/gen
 import { ApproveDebitNoteComponent } from './Debit-Note/approve-debit-note/approve-debit-note/approve-debit-note.component';
 import { DebitNoteDetailsComponent } from './Debit-Note/debit-note-details/debit-note-details/debit-note-details.component';
 import { SetOpeningBalanceVendorWiseComponent } from './FA Masters/Components/set-opening-balance-vendor-wise/set-opening-balance-vendor-wise.component';
+import { POServiceComponent } from './po-service/po-service.component';
 import { TdsPaymentsComponent } from './Vendor Payment/tds-payments/tds-payments.component';
 import { VendorwiseTdspaymentsComponent } from './Vendor Payment/vendorwise-tdspayments/vendorwise-tdspayments.component';
 
@@ -58,6 +59,7 @@ const routes: Routes = [
   { path: 'DebitNote/ApproveDebitNote', component: ApproveDebitNoteComponent },
   { path: 'DebitNote/DebitNoteDetails', component: DebitNoteDetailsComponent },
   { path: 'FAMasters/SetOpeningBalanceVendorWise', component: SetOpeningBalanceVendorWiseComponent },
+  { path: 'POService', component: POServiceComponent },
   { path: 'VendorPayment/TDS-Payment', component: TdsPaymentsComponent },
   { path: 'VendorPayment/Vendor-TdsPayment', component: VendorwiseTdspaymentsComponent },
 ];

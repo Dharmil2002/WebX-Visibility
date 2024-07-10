@@ -161,8 +161,16 @@ export class DepartureService {
         "bALAMT": data?.BalanceAmt || 0,
         "aDPAYAT": data?.advPdAt?.value || "",
         "bLPAYAT": data?.balAmtAt?.value || "",
+        "fCT":data?.fromCity||"",
+        "tCT":data?.toCity||"",
         "iSBILLED": false,
         "bILLNO": "",
+        "eNGNO":data?.engineNo||"",
+        "cHASNO":data?.chasisNo||"",
+        "iNSEXDT":data?.inExdt||null,
+        "fITDT":data?.fitdt||null,
+        "tRNTIME":null    ,
+        "vEHREGDT":data?.vehRegDate||null,
         "dRV": {
           "nM": data?.Driver || "",
           "mNO": data?.DriverMob || "",
@@ -170,6 +178,7 @@ export class DepartureService {
           "lEDT": ConvertToDate(data?.Expiry)
         },
         "fLOC": this.storage.branch,
+        "oTHAMT":data?.otherAmount||0,
         "tLOC": next,
         "dPT": {
           "sCHDT": ConvertToDate(data?.DeptartureTime),
@@ -196,8 +205,8 @@ export class DepartureService {
     }
     else {
       thcSummary = {
-        "oPSST": 1,
-        "oPSSTNM": "In Transit",
+        "oPSST": ThcStatus.In_Transit,
+        "oPSSTNM": ThcStatus[ThcStatus.In_Transit].split("_").join(" "),
         "cAP": {
           "wT": data?.Capacity || 0,
           "vOL": data?.VolumeaddedCFT || 0,
@@ -254,9 +263,9 @@ export class DepartureService {
           "vWT": 0
         },
         "dPT": {
-          "sCHDT": ConvertToDate(data?.DeptartureTime),
-          "eXPDT": ConvertToDate(data?.DeptartureTime),
-          "aCTDT": ConvertToDate(data?.DeptartureTime),
+          "sCHDT": ConvertToDate(data?.DeptartureTime||null),
+          "eXPDT": ConvertToDate(data?.DeptartureTime||null),
+          "aCTDT": ConvertToDate(data?.DeptartureTime||null),
           "gPSDT": null,
           "oDOMT": 0
         },
@@ -307,9 +316,9 @@ export class DepartureService {
           "vWT": 0
         },
         "dPT": {
-          "sCHDT": ConvertToDate(data?.DeptartureTime),
-          "eXPDT": ConvertToDate(data?.DeptartureTime),
-          "aCTDT": ConvertToDate(data?.DeptartureTime),
+          "sCHDT": ConvertToDate(data?.DeptartureTime||null),
+          "eXPDT": ConvertToDate(data?.DeptartureTime||null),
+          "aCTDT": ConvertToDate(data?.DeptartureTime||null),
           "gPSDT": null,
           "oDOMT": 0
         },
@@ -490,7 +499,7 @@ export class DepartureService {
           update: {
             tHC: "",
             mFNO: "",
-            lSNO:"",
+            lSNO: "",
             sTS: DocketStatus.Booked,
             sTSNM: DocketStatus[DocketStatus.Booked],
             mODDT: new Date(),
@@ -520,7 +529,7 @@ export class DepartureService {
       companyCode: this.storage.companyCode,
       collectionName: "vehicle_status",
       filter: filter,
-      update:{status:"Available"}
+      update: { status: "Available" }
     }
     const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
     return res
@@ -617,9 +626,9 @@ export class DepartureService {
           voucherCode: VoucherType.JournalVoucher,
           voucherType: VoucherType[VoucherType.JournalVoucher],
           docType: "Voucher",
-          partyType: "Vendor" ,
+          partyType: "Vendor",
           docNo: data.tripID,
-          partyCode:this.vendCode || "V8888",
+          partyCode: this.vendCode || "V8888",
           partyName: data?.Vendor || "",
           entryBy: this.storage.userName,
           entryDate: Date(),

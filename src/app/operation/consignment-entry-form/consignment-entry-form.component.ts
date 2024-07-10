@@ -1271,7 +1271,9 @@ export class ConsignmentEntryFormComponent
       const json = {
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
+        billDate: this.model.invoiceTableForm.value.billDate ? moment( this.model.invoiceTableForm.value.billDate).format("DD MMM YY HH:MM") : "",
         expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment( this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
+        invoiceDate: this.model.invoiceTableForm.value.invoiceDate?moment( this.model.invoiceTableForm.value.invoiceDate).format("DD MMM YY HH:MM") : "",
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1280,6 +1282,8 @@ export class ConsignmentEntryFormComponent
         actualWeight: this.model.invoiceTableForm.value.actualWeight,
         chargedWeight: this.model.invoiceTableForm.value.chargedWeight,
         invoice: true,
+        billDateO: this.model.invoiceTableForm.value.billDate,
+        invoiceDateO: this.model.invoiceTableForm.value.invoiceDate,
         expiryDateO: this.model.invoiceTableForm.value.expiryDate,
         actions: ["Edit", "Remove"],
       };
@@ -1818,6 +1822,8 @@ export class ConsignmentEntryFormComponent
           x.expiryDate = x.eXPDT ? x.eXPDT : new Date();
           x.invoiceNo = x.iNVNO;
           x.invoiceAmount = x.iNVAMT;
+          x.billDate = x?.eWBDT;
+          x.invoiceDate = x?.iNVDT;
           x.noofPkts = x.pKGS;
           x.materialName = x.mTNM;
           x.actualWeight = (parseFloat(x.aCTWT) / 1000).toString();
@@ -2244,6 +2250,8 @@ export class ConsignmentEntryFormComponent
           cURR: "INR",
           eWBNO: i.ewayBillNo,
           eXPDT: i.expiryDateO,
+          eWBDT: i.billDateO,
+          iNVDT: i.invoiceDateO,
           pKGS: parseInt(i.noofPkts) || 0,
           mTNM: i.materialName,
           aCTWT: ConvertToNumber(actualWeight || 0, 2),
@@ -2944,6 +2952,8 @@ export class ConsignmentEntryFormComponent
     const formFields = {
       ewayBillNo: "ewayBillNo",
       expiryDate: "expiryDateO",
+      billDate: "billDateO",
+      invoiceDate: "invoiceDateO",
       invoiceNo: "invoiceNo",
       invoiceAmount: "invoiceAmount",
       noofPkts: "noofPkts",

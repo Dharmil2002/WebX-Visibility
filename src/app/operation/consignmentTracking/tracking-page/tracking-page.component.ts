@@ -62,7 +62,7 @@ export class TrackingPageComponent implements OnInit {
     {
       title: "Booked",
       count: 0,
-      Color: "#ff8e11",  
+      Color: "#ff8e11",
       groupId: 1
     },
     {
@@ -102,7 +102,7 @@ export class TrackingPageComponent implements OnInit {
     private Route: Router,
     private masterService: MasterService,
     public dialog: MatDialog,
-    private userMasterService:UserMasterService,
+    private userMasterService: UserMasterService,
     private changeDetectorRef: ChangeDetectorRef,
     private fb: UntypedFormBuilder,
     private controlPanel: ControlPanelService,
@@ -126,7 +126,7 @@ export class TrackingPageComponent implements OnInit {
             dKTNO: { D$in: this.QueryData.Docket },
           },
         };
-        this.getTrackingDocket(Query).then(() => { 
+        this.getTrackingDocket(Query).then(() => {
           this.GetCardData();
         });
       } else if (this.QueryData.start && this.QueryData.end) {
@@ -146,7 +146,7 @@ export class TrackingPageComponent implements OnInit {
             ],
           },
         };
-        this.getTrackingDocket(Query).then(() => { 
+        this.getTrackingDocket(Query).then(() => {
           this.GetCardData();
         });
       } else {
@@ -184,7 +184,7 @@ export class TrackingPageComponent implements OnInit {
 
   async GetCardData() {
     this.CountCard.forEach((t) => {
-      if(t.groupId == 0) {
+      if (t.groupId == 0) {
         t.count = this.trackingData?.length || 0;
       } else {
         t.count = this.trackingData?.filter((x) => x.GroupId == t.groupId)?.length || 0;
@@ -200,24 +200,24 @@ export class TrackingPageComponent implements OnInit {
         this.Mode == "FTL" ? "dockets" : "dockets_ltl",
       filters: [{ ...QueryFilter }, ...PipeLine],
     };
-    
+
     const res = await firstValueFrom(
       this.masterService.masterMongoPost("generic/query", req)
     );
     if (res.success) {
       if (res.data && res.data.length) {
-         const getUser= await this.userMasterService.getUserName({companyCode:this.storage.companyCode,userId:{"D$in":res.data.map(x=>x.eNTBY)}})
+        const getUser = await this.userMasterService.getUserName({ companyCode: this.storage.companyCode, userId: { "D$in": res.data.map(x => x.eNTBY) } })
         this.trackingData = res.data;
-        if( getUser && getUser.data && getUser.data.length>0){
-          this.trackingData.forEach(x=>{
+        if (getUser && getUser.data && getUser.data.length > 0) {
+          this.trackingData.forEach(x => {
             x.DocketTrackingData.forEach(element => {
-              element.eNTBY = `${element.eNTBY}:${getUser.data.find(z=>z.userId == element.eNTBY)?.name}`;
+              element.eNTBY = `${element.eNTBY}:${getUser.data.find(z => z.userId == element.eNTBY)?.name}`;
             });
           })
         }
         this.trackingData.forEach((x) => {
           x["GroupColor"] = this.CountCard.find((t) => t.groupId == x.GroupId)?.Color;
-        }); 
+        });
 
         this.trackingData = this.trackingData.sort(
           (a, b) => new Date(b.sTSTM).getTime() - new Date(a.sTSTM).getTime()
@@ -247,13 +247,13 @@ export class TrackingPageComponent implements OnInit {
   }
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
-      data: { TrackingList: eventData?.DocketTrackingData , DokNo: eventData.dKTNO},
-      width: "95%",
-      //height: "90%",
+      data: { TrackingList: eventData?.DocketTrackingData, DokNo: eventData.dKTNO },
+      minWidth: "90%",
+      height: "95%",
       disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {});
+    dialogRef.afterClosed().subscribe((result) => { });
   }
   SearchData(searchText) {
     const filterPipe = new CustomFilterPipe();
@@ -279,11 +279,10 @@ export class TrackingPageComponent implements OnInit {
     const req = {
       DocNo: DockNo,
       templateName: "DKT",
-      PartyField:"",
+      PartyField: "",
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(req)}`;
     window.open(url, "", "width=1000,height=800");
   }
 
@@ -310,16 +309,16 @@ export class TrackingPageComponent implements OnInit {
     this.csvFileName = this.QueryData.Docket
       ? `DocTracking ${this.QueryData.Docket}`
       : `DocTracking ${moment(new Date(this.QueryData.start)).format(
-          "DD_MM_YYYY"
-        )} To ${moment(new Date(this.QueryData.end)).format("DD_MM_YYYY")}`;
+        "DD_MM_YYYY"
+      )} To ${moment(new Date(this.QueryData.end)).format("DD_MM_YYYY")}`;
     const formattedData = [
       Object.values(this.headerForCsv),
       ...jsonCsv.map((row) => {
         return Object.keys(this.headerForCsv).map((col) => {
           let value =
             col.toLowerCase().includes("date") ||
-            col.toLowerCase().includes("dob") ||
-            col.toLowerCase().includes("dt")
+              col.toLowerCase().includes("dob") ||
+              col.toLowerCase().includes("dt")
               ? moment(new Date(row[col])).format("DD MMM YY") ===
                 "Invalid date"
                 ? row[col]

@@ -116,13 +116,24 @@ export class DocketEntryModel implements IFieldDefinition {
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
+    billDate: {
+      Title: "Eway Bill Date",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
     expiryDate: {
       Title: "Expiry Date",
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
+    
     invoiceNo: {
       Title: "Invoice No",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    invoiceDate: {
+      Title: "Invoice Date",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -168,6 +179,8 @@ export class DocketEntryModel implements IFieldDefinition {
     "noofPkts",
     "materialName",
     "actualWeight",
+    "billDate",
+    "invoiceDate",
     "chargedWeight",
   ];
 

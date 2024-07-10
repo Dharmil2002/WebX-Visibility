@@ -206,6 +206,9 @@ export class ViewTrackingPopupComponent implements OnInit {
       case "DE":
         templateName = "DE";
         break;
+      case "DMR":
+          templateName = "DMR";
+          break;
       case "DRS":
         templateName = "drs";
         break;

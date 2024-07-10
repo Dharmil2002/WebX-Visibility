@@ -1242,8 +1242,8 @@ export class DocketService {
                 "aMT": ConvertToNumber(data?.gstChargedAmount || 0, 2)
             },
             "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
-            "pKGTYN": data?.pkgsTypeName || "",
-            "pKGTY": data?.pkgsType || "",
+            "pKGTYN": data?.pkgsTypeName|| invoiceData[0]?.pkgsTypeInvNM||"",
+            "pKGTY": data?.pkgsType|| invoiceData[0]?.pkgsTypeInv||"",
             "rSKTY": data?.risk || "",//need to verfied field name risk
             "rSKTYN": data?.rsktyName || "",
             "pVTMARK": data?.pvtMark || "",

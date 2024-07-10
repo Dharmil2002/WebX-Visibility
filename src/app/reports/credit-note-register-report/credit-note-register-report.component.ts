@@ -104,6 +104,7 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       this.branchStatus
     );
     const loginBranch = branchList.find(x => x.value === this.storage.branch);
+    this.CreditNoteReportRegisterForm.controls["DocStatus"].setValue("All");
     this.CreditNoteReportRegisterForm.controls["Branch"].setValue(loginBranch);
     this.CreditNoteReportRegisterForm.get('Individual').setValue("Y");
     const custNameReq = {

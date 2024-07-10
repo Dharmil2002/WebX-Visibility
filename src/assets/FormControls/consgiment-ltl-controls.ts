@@ -420,6 +420,21 @@ export class ConsignmentLtl extends BaseControl {
         },
       },
       {
+        name: "indvl",
+        label: "Individual",
+        placeholder: "",
+        type: "toggle",
+        value: false,
+        generatecontrol: true,
+        disable: false,
+        functions: {onChange: "getindividualControls"},
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "custom",
+        },
+      },
+      {
         name: "cnWinCsgn",
         label: "walk in",
         placeholder: "",
@@ -567,6 +582,22 @@ export class ConsignmentLtl extends BaseControl {
         },
       },
       {
+        name: "cnGovno",
+        label: "Government No",
+        placeholder: "Government No",
+        displayIndex: 6,
+        type: "text",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+        functions: {
+        },
+        additionalData: {
+          metaData: "consignor",
+        },
+      },
+      {
         name: "consigneeName",
         label: "Consignee Name",
         placeholder: "Consignee Name",
@@ -677,6 +708,22 @@ export class ConsignmentLtl extends BaseControl {
         functions: {
           onChange: "GetWalkingAutofill",
           onModel: "validatetogst",
+        },
+        additionalData: {
+          metaData: "consignee",
+        },
+      },
+      {
+        name: "cneGovno",
+        label: "Government No",
+        placeholder: "Government No",
+        displayIndex: 6,
+        type: "text",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+        functions: {
         },
         additionalData: {
           metaData: "consignee",

@@ -1201,6 +1201,7 @@ export class DocketService {
                 "cT": data?.fromCity?.value || "",
                 "pIN": data?.fromCity?.pincode || "",
                 "aDD": data.cnoAddress?.name || data.cnoAddress,
+                "gOVID": data?.cnGovno || "",
                 "aDDCD": data.cnoAddress?.value || "A8888",
                 "gST": data?.cnogst || "",
                 "mOB": data?.ccontactNumber || "",
@@ -1212,6 +1213,7 @@ export class DocketService {
                 "cT": data?.toCity?.value || "",
                 "pIN": data?.toCity?.pincode || "",
                 "aDD": data?.cneAddress?.name || data.cneAddress,
+                "gOVID": data?.cneGovno || "",
                 "aDDCD": data.cneAddress?.value || "A8888",
                 "gST": data?.cnegst || "",
                 "mOB": data?.cncontactNumber || "",
@@ -1250,6 +1252,7 @@ export class DocketService {
             "wLCN": data?.cnWinCsgn || false,
             "wLCNE": data?.cnWinCsgne || false,
             "iSCEBP": data?.cnebp || false,
+            "iSINDV": data?.indvl || false,
             "iSCNBP": data?.cnbp || false,
             "dELTYPE": data?.delivery_typeNm || "",
             "dELTYPECD": data?.delivery_type || "",//here the name wolud be come from the master

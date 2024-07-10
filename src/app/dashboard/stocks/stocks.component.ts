@@ -64,6 +64,7 @@ export class StocksComponent
 
   boxData: { count: any; title: any; class: string }[];
   branch = "";
+  rules: any;
   // declararing properties
   constructor(
   private docketService:DocketService,
@@ -114,9 +115,29 @@ export class StocksComponent
       this.tableData =[];
       this.tableload = false;
     }
+    this.getRules();
   }
 
 
+  async getRules() {
+      const filter = {
+        cID: this.storage.companyCode,
+        mODULE: { "D$in": ["CNOTE"] },
+        aCTIVE: true
+      }
+      const res = await this.controlPanel.getModuleRules(filter);
+      if (res.length > 0) {
+        this.rules = res;
+        const isNavToQuick=res?.find((x)=>x.rULEID=="NAV")?.vAL=="Y"
+        if(isNavToQuick){
+          this.addAndEditPath = "Operation/QuickCreateDocket";
+        }
+        else{
+          this.addAndEditPath = "Operation/consignment-entry-ltl";
+        }
+
+    }
+  }
 
   getControlConfig() {
     return {

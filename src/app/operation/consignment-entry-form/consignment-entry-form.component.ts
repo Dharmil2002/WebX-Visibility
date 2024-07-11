@@ -2095,11 +2095,11 @@ export class ConsignmentEntryFormComponent
         "A8888";
       docketDetails["cnoAddress"] =
         this.model.consignmentTableForm.controls["cnoAddress"].value?.name ||
-        "";
+        this.model.consignmentTableForm.controls["cnoAddress"]?.value||"";
       docketDetails["cnogst"] =
         this.model.consignmentTableForm.controls["cnogst"]?.value;
       docketDetails["cneAddress"] =
-        this.model.consignmentTableForm.controls["cneAddress"].value?.name || "";
+        this.model.consignmentTableForm.controls["cneAddress"].value?.name ||   this.model.consignmentTableForm.controls["cneAddress"]?.value||"";
       docketDetails["cnegst"] =
         this.model.consignmentTableForm.controls["cnegst"]?.value;
       docketDetails["billingParty"] = bParty?.value;

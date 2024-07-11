@@ -48,6 +48,7 @@ import { DriverStatusRegisterComponent } from './driver-status-register/driver-s
 import { OpeningClosingStockReportComponent } from './opening-closing-stock-report/opening-closing-stock-report.component';
 import { VendorTdsPaymentReportComponent } from './vendor-tds-payment-report/vendor-tds-payment-report.component';
 import { VendorWiseOutstandingRegisterReportComponent } from './vendor-wise-outstanding-register-report/vendor-wise-outstanding-register-report.component';
+import { GCNSummaryComponent } from './gcn-summary/gcn-summary.component';
 
 
 const routes: Routes = [
@@ -97,6 +98,7 @@ const routes: Routes = [
   { path: "OpeningClosingStockReport", component: OpeningClosingStockReportComponent },
   { path: "vendor-tds-payment-report", component: VendorTdsPaymentReportComponent  },
   { path: "VendorWiseOutstandingRegister", component: VendorWiseOutstandingRegisterReportComponent },
+  { path: "gcn-summary", component: GCNSummaryComponent },
 ];
 
 @NgModule({

@@ -1135,7 +1135,55 @@ export class ConsignmentLtl extends BaseControl {
         },
         generatecontrol: true,
         disable: false,
-    }
+      },
+      {
+        name: "cvunit",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [],
+        additionalData: {},
+        functions: {},
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "clength",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [],
+        additionalData: {},
+        functions: {},
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "cbreadth",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [],
+        additionalData: {},
+        functions: {},
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "cheight",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [],
+        additionalData: {},
+        functions: {},
+        generatecontrol: false,
+        disable: false,
+      }
     ];
     this.freightDetails = [
       {
@@ -1452,7 +1500,7 @@ export class ConsignmentLtl extends BaseControl {
         functions: {},
         generatecontrol: true,
         disable: false,
-      },
+      }
     ];
   }
   getInvoiceDetail() {

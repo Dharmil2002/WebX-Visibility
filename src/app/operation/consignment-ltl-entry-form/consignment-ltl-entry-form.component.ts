@@ -1127,7 +1127,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       }
       this.loadIn = true;
       this.tableLoadIn = true;
-      const delayDuration = 1000;
+      const delayDuration = 500;
       // Create a promise that resolves after the specified delay
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       // Use async/await to introduce the delay
@@ -1156,6 +1156,11 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         'pkgsTypeInvNM': this.pkgsType.find(f => f.value == invoice.pkgsTypeInv)?.name || "",
         'pkgsTypeInv': invoice.pkgsTypeInv,
         'cft': invoice.cft,
+        'bvunit': this.unitsName,
+        'cvunit': invoice.cvunit,
+        'clength': invoice.clength,
+        'cbreadth': invoice.cbreadth,
+        'cheight': invoice.cheight,
         'actions': ["Edit", "Remove"]
       }
       this.tableData.push(req);
@@ -1438,54 +1443,50 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const pkg = parseInt(this.invoiceForm.controls['noOfPackage']?.value || 0.00);
       const cftRatio = parseFloat(this.invoiceForm.controls['cftRatio']?.value || 0.00);
       const pkGcft = convert(length).from('cm').to('ft') *
-        convert(breadth).from('cm').to('ft') *
-        convert(height).from('cm').to('ft');
+                     convert(breadth).from('cm').to('ft') *
+                     convert(height).from('cm').to('ft');
 
       let volWt = 0;
       let cft = 0;
       let chargeWeight = 0;
+      let bUnit = "ft";
+      let cUnit = "ft";
+
       switch (this.unitsName.toUpperCase()) {
         case "CM":
-          //cft = length * breadth * height * pkg / 27000
-          cft = convert(length).from('cm').to('ft') *
-            convert(breadth).from('cm').to('ft') *
-            convert(height).from('cm').to('ft') * pkg;
-          volWt = cft * cftRatio;
-          this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
-          break
+            bUnit = "cm";
+            break
         case "INCHES":
         case "INCH":
-          //cft = length * breadth * height * pkg / 1728
-          cft = convert(length).from('in').to('ft') *
-            convert(breadth).from('in').to('ft') *
-            convert(height).from('in').to('ft') * pkg;
-          volWt = cft * cftRatio;
-          this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
-          break
+            bUnit = "in";
+            break
         case "MM":
-          //cft = length * breadth * height * pkg / 27000
-          cft = convert(length).from('mm').to('ft') *
-            convert(breadth).from('mm').to('ft') *
-            convert(height).from('mm').to('ft') * pkg;
-          volWt = cft * cftRatio;
-          this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
-          break
+            bUnit = "mm";
+            break
         case "MT":
         case "METER":
-          //cft = length * breadth * height * pkg / 27000
-          cft = convert(length).from('mt').to('ft') *
-            convert(breadth).from('mt').to('ft') *
-            convert(height).from('mt').to('ft') * pkg;
-          volWt = cft * cftRatio;
-          this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
+          bUnit = "mt";          
           break
         default:
-          cft = length * breadth * height * pkg
-          volWt = cftRatio * cft
-          this.invoiceForm.controls['cft'].setValue(cft.toFixed(2))
+          bUnit = "ft";
           break;
       }
+
+      let clength = convert(length).from(bUnit).to(cUnit);
+      let cbreadth = convert(breadth).from(bUnit).to(cUnit);
+      let cheight = convert(height).from(bUnit).to(cUnit);
+
+      cft = clength * cbreadth * cheight * pkg;  
+      volWt = cft * cftRatio;
+
+      this.invoiceForm.controls['cvunit']?.setValue( cUnit );
+      this.invoiceForm.controls['clength']?.setValue( clength.toFixed(3) || 0.00);
+      this.invoiceForm.controls['cbreadth']?.setValue( cbreadth.toFixed(3) || 0.00);
+      this.invoiceForm.controls['cheight']?.setValue( cheight.toFixed(3) || 0.00);
+
+      this.invoiceForm.controls['cft'].setValue(cft.toFixed(2));
       this.invoiceForm.controls['cubWT']?.setValue(volWt.toFixed(2));
+      
       const actualWeight = parseFloat(this.invoiceForm.controls['actualWeight'].value);
       if (volWt > actualWeight) {
         this.invoiceForm.controls['chargeWeight'].setValue(volWt.toFixed(2))
@@ -1493,7 +1494,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       else {
         this.invoiceForm.controls['chargeWeight'].setValue(actualWeight.toFixed(2))
       }
-
     }
   }
   /*below function would be change when the Payment time field as select any value*/

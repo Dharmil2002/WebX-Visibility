@@ -1277,10 +1277,16 @@ export class DocketService {
         };
 
         let invoiceDetails = invoiceData.map((element) => {
-            let l = convertCmToFeet(ConvertToNumber(element?.length || 0, 3));
-            let b = convertCmToFeet(ConvertToNumber(element?.breadth || 0, 3));
-            let h = convertCmToFeet(ConvertToNumber(element?.height || 0, 3));
-            let cubwt = ConvertToNumber(element?.cubWT || 0)
+            let pkgs = parseInt(element?.noOfPackage || 0);
+
+            let l = ConvertToNumber(element?.length || 0, 3);
+            let b = ConvertToNumber(element?.breadth || 0, 3);
+            let h = ConvertToNumber(element?.height || 0, 3);
+
+            let cl = ConvertToNumber(element?.clength || 0, 3);
+            let cb = ConvertToNumber(element?.cbreadth || 0, 3);
+            let ch = ConvertToNumber(element?.cheight || 0, 3);
+
             const invoiceJson = {
                 "_id": isUpdate ? `${this.storage.companyCode}-${data?.docketNumber}-${element?.invoiceNumber}` : "",
                 "cID": this.storage.companyCode,
@@ -1288,15 +1294,24 @@ export class DocketService {
                 "iNVNO": element?.invoiceNumber || "",
                 "iNVDT": moment(element?.invDt),
                 "vOL": {
-                    "uNIT": "FT",
+                    "uNIT":  (element?.cvunit || "FT").toUpperCase(),
+                    "l": roundToNumber(cl, 3),
+                    "b": roundToNumber(cb, 3),
+                    "h": roundToNumber(ch, 3),
+                    "cU": roundToNumber(cl * cb * ch, 3),
+                    "tVol": ConvertToNumber( (cl * cb * ch *  pkgs )  || 0, 3),
+                },
+                "dVOL": {
+                    "uNIT": (element?.bvunit || "FT").toUpperCase(),
                     "l": roundToNumber(l, 3),
                     "b": roundToNumber(b, 3),
                     "h": roundToNumber(h, 3),
-                    "cU": roundToNumber(cubwt, 3),
+                    "cU": roundToNumber(l * b * h, 3),
+                    "tVol": ConvertToNumber((l * b * h *  pkgs ) || 0, 3),
                 },
                 "iNVAMT": ConvertToNumber(element?.invoiceAmount || 0, 2),
                 "cURR": "INR",
-                "cUBWT": ConvertToNumber(element?.cubWT || 0, 2),
+                "cFT": ConvertToNumber(element?.cft || 0, 3),
                 "mATDN": element?.materialDensity || "",
                 "pKGTY": element?.pkgsTypeInv || "",
                 "pKGTYN": element?.pkgsTypeInvNM || "",

@@ -354,7 +354,7 @@ export class ConsignmentEntryFormComponent
     data: AutoComplete[],
     controlName: string
   ) {
-    const control = controls.find((x) => x.name === controlName);
+    const control = controls?.find((x) => x.name === controlName);
     if (control) {
       control.value = data;
     }
@@ -2735,6 +2735,16 @@ export class ConsignmentEntryFormComponent
     this.calculateRate();
   }
   calculateRate() {
+    if (parseInt(this.model.FreightTableForm.controls['gstAmount'].value) > 100) {
+      Swal.fire({
+          icon: 'warning',
+          title: 'Warning',
+          text: 'GST rate should not be greater than 100 %'
+      });
+      this.model.FreightTableForm.controls['gstAmount'].setValue(0);
+      return 
+  }
+
     if (this.model.FreightTableForm.controls['rcm'].value == "N") {
       const gstRate = parseFloat(this.model.FreightTableForm.controls['gstAmount'].value);
       const grossAmt = parseFloat(this.model.FreightTableForm.controls['grossAmount'].value);

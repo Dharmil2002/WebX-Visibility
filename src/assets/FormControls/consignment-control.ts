@@ -1340,7 +1340,7 @@ export class FreightControl extends BaseControl {
          Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
+        name: 'gstAmount', label: 'GST Rate (%)', placeholder: 'GST Rate (%)', type: 'mobile-number',//please consider GstAmount as Gst Rate
         value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false,
         functions: {
           onChange: "calculateRate"

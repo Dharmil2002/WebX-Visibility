@@ -1324,6 +1324,15 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.calculateRate();
   }
   calculateRate() {
+    if (parseInt(this.freightForm.controls['gstRate'].value) > 100) {
+      Swal.fire({
+          icon: 'warning',
+          title: 'Warning',
+          text: 'GST rate should not be greater than 100 %'
+      });
+      this.freightForm.controls['gstRate'].setValue(0);
+      return 
+  }
     if (this.freightForm.controls['rcm'].value == "N") {
       const gstRate = parseFloat(this.freightForm.controls['gstRate'].value);
       const grossAmt = parseFloat(this.freightForm.controls['grossAmount'].value);
